@@ -72,6 +72,9 @@ public class XFormsModelSchemaValidator {
     private String schemaURIs;
     private Grammar schemaGrammar;
 
+    // REDocumentDeclaration is not reentrant, but the validator is used by a single thread
+    private REDocumentDeclaration documentDeclaration;
+
     public XFormsModelSchemaValidator(Element modelElement) {
         this.modelElement = modelElement;
         this.schemaURIs = modelElement.attributeValue("schema");
@@ -120,14 +123,13 @@ public class XFormsModelSchemaValidator {
             final String surl = u.toString();
             return XMLUtils.ENTITY_RESOLVER.resolveEntity("", surl);
         }
-
     }
 
     private static class SchemaKey extends CacheKey {
         final int hash;
-        final java.net.URL url;
+        final URL url;
 
-        SchemaKey(final java.net.URL u) {
+        SchemaKey(final URL u) {
             setClazz(SchemaKey.class);
             url = u;
             hash = url.hashCode();
@@ -155,7 +157,7 @@ public class XFormsModelSchemaValidator {
         private final ArrayList modTimes = new ArrayList(0);
         private Grammar grammar;
 
-        void addInclude(final java.net.URL u) throws java.io.IOException {
+        void addInclude(final URL u) throws java.io.IOException {
             // Get the time first.  This way if there's a problem the array lengths will remain
             // the same.
             final Long modTim = NetUtils.getLastModified(u, (Long) null);
@@ -167,7 +169,7 @@ public class XFormsModelSchemaValidator {
             boolean ret = true;
             final int size = includes.size();
             for (int i = 0; ret && i < size; i++) {
-                final java.net.URL u = (java.net.URL) includes.get(i);
+                final URL u = (URL) includes.get(i);
                 try {
                     final Long crntTim = NetUtils.getLastModified(u, (Long) null);
                     final Long lstTim = (Long) modTimes.get(i);
@@ -218,128 +220,245 @@ public class XFormsModelSchemaValidator {
 
     private void addSchemaError(final Element element, final String errMsg) {
         final InstanceData instanceData = XFormsUtils.getLocalInstanceData(element);
-        final String em;
+        final String newErrorMessage;
         if (errMsg == null) {
             // Looks like if n is an element and errMsg == null then the problem is missing
             // character data.  No idea why MSV doesn't just give us the error msg itself.
-            em = "Missing character data.";
+            newErrorMessage = "Missing character data.";
         } else {
-            em = errMsg;
+            newErrorMessage = errMsg;
         }
-        instanceData.addSchemaError(em, element.getStringValue(), null);
+        instanceData.addSchemaError(newErrorMessage, element.getStringValue(), null);
     }
 
     private void addSchemaError(final Attribute attribute, final String errMsg) {
-        // Looks like if n is an element and errMsg == null then the problem is missing character
-        // data.
         final InstanceData instanceData = XFormsUtils.getLocalInstanceData(attribute);
         instanceData.addSchemaError(errMsg, attribute.getStringValue(), null);
     }
 
-    private Acceptor getChildAcceptor
-            (final Element elt, final StartTagInfo si, final Acceptor acc, final StringRef sr) {
-        Acceptor ret = acc.createChildAcceptor(si, null);
-        if (ret == null) {
-            ret = acc.createChildAcceptor(si, sr);
-            addSchemaError(elt, sr.str);
-        }
-        return ret;
-    }
-
     private void handleIDErrors(final IDConstraintChecker icc) {
-        for (ErrorInfo errInf = icc.clearErrorInfo(); errInf != null; errInf = icc.clearErrorInfo()) {
-            addSchemaError(errInf.element, errInf.message);
+        for (ErrorInfo errorInfo = icc.clearErrorInfo(); errorInfo != null; errorInfo = icc.clearErrorInfo()) {
+            addSchemaError(errorInfo.element, errorInfo.message);
         }
     }
 
-    private void validateElement(final Element element, final Acceptor acceptor, final IDConstraintChecker icc) {
+    private boolean validateElement(final Element element, final Acceptor acceptor, final IDConstraintChecker icc, final boolean isReportErrors) {
+
+        // Create StartTagInfo
         final StartTagInfo startTagInfo;
         {
-            final String nsURI = element.getNamespaceURI();
-            final String nam = element.getName();
-            final String qnam = element.getQualifiedName();
-            final List attLst = element.attributes();
-            final AttributesImpl atts = new AttributesImpl();
+            final String uri = element.getNamespaceURI();
+            final String name = element.getName();
+            final String qName = element.getQualifiedName();
+            final List attributesList = element.attributes();
+            final AttributesImpl attributes = new AttributesImpl();
 
-            for (final Iterator itr = attLst.iterator(); itr.hasNext();) {
-                final Attribute att = (Attribute) itr.next();
-                final String auri = att.getNamespaceURI();
-                final String anam = att.getName();
-                final String aQNam = att.getQualifiedName();
-                final String val = att.getValue();
-                atts.addAttribute(auri, anam, aQNam, null, val);
+            for (final Iterator iterator = attributesList.iterator(); iterator.hasNext();) {
+                final Attribute attribute = (Attribute) iterator.next();
+                final String attributeURI = attribute.getNamespaceURI();
+                final String attributeName = attribute.getName();
+                final String attributeQName = attribute.getQualifiedName();
+                final String attributeValue = attribute.getValue();
+                attributes.addAttribute(attributeURI, attributeName, attributeQName, null, attributeValue);
             }
-            startTagInfo = new StartTagInfo(nsURI, nam, qnam, atts, validationContext);
+            startTagInfo = new StartTagInfo(uri, name, qName, attributes, validationContext);
         }
 
         final StringRef stringRef = new StringRef();
-        final Acceptor childAcceptor = getChildAcceptor(element, startTagInfo, acceptor, stringRef);
-        if (icc != null) {
+
+        // Get child acceptor
+        final Acceptor childAcceptor;
+        {
+            Acceptor tempChildAcceptor = acceptor.createChildAcceptor(startTagInfo, null);
+            if (tempChildAcceptor == null) {
+                if (isReportErrors) {
+                    tempChildAcceptor = acceptor.createChildAcceptor(startTagInfo, stringRef);
+                    addSchemaError(element, stringRef.str);
+                } else {
+                    return false;
+                }
+            }
+            childAcceptor = tempChildAcceptor;
+        }
+
+        // Handle id errors
+        if (icc != null && isReportErrors) {
             icc.onNextAcceptorReady(startTagInfo, childAcceptor, element);
             handleIDErrors(icc);
         }
 
+        // Validate children
         final int stringCareLevel = childAcceptor.getStringCareLevel();
         final DatatypeRef datatypeRef = new DatatypeRef();
-        validateChildren(element, childAcceptor, startTagInfo, stringCareLevel, icc, datatypeRef);
+        final boolean childrenValid = validateChildren(element, childAcceptor, startTagInfo, stringCareLevel, icc, datatypeRef, isReportErrors);
+        if (!childrenValid && !isReportErrors)
+            return false;
+
         if (!childAcceptor.isAcceptState(null)) {
-            childAcceptor.isAcceptState(stringRef);
-            addSchemaError(element, stringRef.str);
+            if (isReportErrors) {
+                childAcceptor.isAcceptState(stringRef);
+                addSchemaError(element, stringRef.str);
+            } else {
+                return false;
+            }
         }
-        if (icc != null) {
+
+        // Handle id errors
+        if (icc != null && isReportErrors) {
             icc.endElement(element, datatypeRef.types);
             handleIDErrors(icc);
         }
+
+        // Get back to parent acceptor
         if (!acceptor.stepForward(childAcceptor, null)) {
-            acceptor.stepForward(childAcceptor, stringRef);
-            addSchemaError(element, stringRef.str);
+            if (isReportErrors) {
+                acceptor.stepForward(childAcceptor, stringRef);
+                addSchemaError(element, stringRef.str);
+            } else {
+                return false;
+            }
+        }
+
+        // This element is valid
+        return true;
+    }
+
+    /**
+     * Validate an element following the XML Schema "lax" mode.
+     *
+     * @param element   element to validate
+     */
+    private void validateElementLax(final Element element) {
+
+        final String elementURI = element.getNamespaceURI();
+        final String elementName = element.getName();
+//        final String elementQName = element.getQualifiedName();
+        {
+            // Find expression for element type
+            final Expression expression;
+            {
+                // Find schema for type namespace
+                final XMLSchemaSchema schema = ((XMLSchemaGrammar) schemaGrammar).getByNamespace(elementURI);
+                if (schema != null) {
+                    // Try to find the expression in the schema
+                    expression = schema.elementDecls.get(elementName);
+                } else {
+                    // No schema so no expression
+                    expression = null;
+                }
+            }
+
+            if (expression != null) {
+                // Found type for element, so validate element
+                final Acceptor acceptor = documentDeclaration.createAcceptor();
+                validateElement(element, acceptor, null, true);
+            } else {
+                // Element does not have type, so try to validate attributes and children elements
+
+                // Attributes
+                {
+                    final List attributesList = element.attributes();
+                    for (final Iterator iterator = attributesList.iterator(); iterator.hasNext();) {
+                        final Attribute attribute = (Attribute) iterator.next();
+                        final String attributeURI = attribute.getNamespaceURI();
+                        final String attributeName = attribute.getName();
+//                        final String attributeQName = attribute.getQualifiedName();
+                        final String attributeValue = attribute.getValue();
+
+                        // Find expression for element type
+                        final Expression attributeExpression;
+                        {
+                            // Find schema for type namespace
+                            final XMLSchemaSchema schema = ((XMLSchemaGrammar) schemaGrammar).getByNamespace(attributeURI);
+                            if (schema != null) {
+                                attributeExpression = schema.attributeDecls.get(attributeName);
+                            } else {
+                                attributeExpression = null;
+                            }
+                        }
+                        if (attributeExpression != null) {
+                            // TODO: find out way of validating an attribute only
+                        }
+                    }
+                }
+
+                // Validate children elements
+                for (final Iterator iterator = element.elementIterator(); iterator.hasNext();) {
+                    final Element childElement = (Element) iterator.next();
+                    validateElementLax(childElement);
+                }
+            }
         }
     }
 
     /**
-     * Note that all of the attribs of elt should be in si.attributes.  If they are out of synch
-     * it break the ability to access the attribs by index.
+     * Note that all of the attribs of element should be in startTagInfo.attributes. If they are out of synch it break
+     * the ability to access the attribs by index.
      */
-    private void validateChildren(final Element element, final Acceptor acceptor, final StartTagInfo startTagInfo, final int stringCareLevel,
-                                  final IDConstraintChecker icc, final DatatypeRef datatypeRef) {
+    private boolean validateChildren(final Element element, final Acceptor acceptor, final StartTagInfo startTagInfo, final int stringCareLevel,
+                                     final IDConstraintChecker icc, final DatatypeRef datatypeRef, final boolean isReportErrors) {
 
-        final int end = startTagInfo.attributes.getLength();
-        final StringRef sr = new StringRef();
-        final DatatypeRef attDRef = new DatatypeRef();
-        for (int i = 0; i < end; i++) {
-            final String uri = startTagInfo.attributes.getURI(i);
-            if (XFormsConstants.XXFORMS_NAMESPACE_URI.equals(uri)) continue;
-            final String nam = startTagInfo.attributes.getLocalName(i);
-            final String qNam = startTagInfo.attributes.getQName(i);
-            final String val = startTagInfo.attributes.getValue(i);
 
-            if (!acceptor.onAttribute2(uri, nam, qNam, val, startTagInfo.context, null, attDRef)) {
-                final Attribute att = element.attribute(i);
-                acceptor.onAttribute2(uri, nam, qNam, val, startTagInfo.context, sr, (DatatypeRef) null);
-                addSchemaError(att, sr.str);
+        // Validate attributes
+        final StringRef stringRef = new StringRef();
+        {
+            final DatatypeRef attributeDatatypeRef = new DatatypeRef();
+            final int end = startTagInfo.attributes.getLength();
+            for (int i = 0; i < end; i++) {
+                final String uri = startTagInfo.attributes.getURI(i);
+
+                // TODO: Is this legacy check still useful?
+                if (XFormsConstants.XXFORMS_NAMESPACE_URI.equals(uri))
+                    continue;
+
+                final String name = startTagInfo.attributes.getLocalName(i);
+                final String qName = startTagInfo.attributes.getQName(i);
+                final String value = startTagInfo.attributes.getValue(i);
+
+                if (!acceptor.onAttribute2(uri, name, qName, value, startTagInfo.context, null, attributeDatatypeRef)) {
+                    if (isReportErrors) {
+                        final Attribute attribute = element.attribute(i);
+                        acceptor.onAttribute2(uri, name, qName, value, startTagInfo.context, stringRef, (DatatypeRef) null);
+                        addSchemaError(attribute, stringRef.str);
+                    } else {
+                        return false;
+                    }
+                }
+                final Attribute attribute = element.attribute(i);
+                if (icc != null && isReportErrors) {
+                    icc.feedAttribute(acceptor, attribute, attributeDatatypeRef.types);
+                    handleIDErrors(icc);
+                }
             }
-            final Attribute att = element.attribute(i);
-            if (icc != null) {
-                icc.feedAttribute(acceptor, att, attDRef.types);
-                handleIDErrors(icc);
+
+            if (!acceptor.onEndAttributes(startTagInfo, null)) {
+                if (isReportErrors) {
+                    acceptor.onEndAttributes(startTagInfo, stringRef);
+                    addSchemaError(element, stringRef.str);
+                } else {
+                    return false;
+                }
             }
         }
-        if (!acceptor.onEndAttributes(startTagInfo, null)) {
-            acceptor.onEndAttributes(startTagInfo, sr);
-            addSchemaError(element, sr.str);
+
+        // Validate children elements
+        for (final Iterator iterator = element.elementIterator(); iterator.hasNext();) {
+            final Element childElement = (Element) iterator.next();
+            final boolean isChildElementValid = validateElement((Element) childElement, acceptor, icc, isReportErrors);
+            if (!isReportErrors && !isChildElementValid)
+                return false;
         }
-        for (final Iterator itr = element.elementIterator(); itr.hasNext();) {
-            final Element chld = (Element) itr.next();
-            validateElement((Element) chld, acceptor, icc);
-        }
-        // If we just iterate over nodes, i.e. use nodeIterator() ) then validation of char data
-        // ends up being incorrect.  Specifically elements of type xs:string end up being invalid
-        // when they are empty. ( Which is wrong. )
-        final String txt = element.getText();
+
+        // If we just iterate over nodes, i.e. use nodeIterator() ) then validation of char data ends up being
+        // incorrect. Specifically elements of type xs:string end up being invalid when they are empty. (Which is
+        // wrong.)
+
+        // TODO: this is very likely wrong as we get the whole text value of the element!!!
+        final String text = element.getText();
         switch (stringCareLevel) {
             case Acceptor.STRING_IGNORE:
                 {
-                    if (txt.length() > 0) {
+                    if (text.length() > 0) {
 //                        addSchemaError(elt, sr.str);
                         // TODO: Check this! It is not clear whether this should actually be tested
                         // as above. I have noticed that some documents that should pass validation
@@ -352,28 +471,41 @@ public class XFormsModelSchemaValidator {
                 }
             case Acceptor.STRING_PROHIBITED:
                 {
-                    final String trmd = txt.trim();
-                    if (trmd.length() > 0) {
-                        addSchemaError(element, sr.str);
+                    final String trimmed = text.trim();
+                    if (trimmed.length() > 0) {
+                        if (isReportErrors) {
+                            addSchemaError(element, stringRef.str);
+                        } else {
+                            return false;
+                        }
                     }
                     datatypeRef.types = null;
                     break;
                 }
             case Acceptor.STRING_STRICT:
                 {
-                    if (!acceptor.onText2(txt, startTagInfo.context, null, datatypeRef)) {
-                        acceptor.onText2(txt, startTagInfo.context, sr, null);
-                        addSchemaError(element, sr.str);
+                    if (!acceptor.onText2(text, startTagInfo.context, null, datatypeRef)) {
+                        if (isReportErrors) {
+                            acceptor.onText2(text, startTagInfo.context, stringRef, null);
+                            addSchemaError(element, stringRef.str);
+                        } else {
+                            return false;
+                        }
                     }
                     break;
                 }
         }
+
+        // The element children are valid
+        return true;
     }
 
     /**
      * Load XForms model schemas.
+     *
+     * @param pipelineContext       current PipelineContext
      */
-    public void loadSchemas(final PipelineContext pipelineContext, XFormsContainingDocument containingDocument) {
+    public void loadSchemas(final PipelineContext pipelineContext) {
         if (!isSkipInstanceSchemaValidation()) {
             final String schemaURI = schemaURIs;// TODO: check for multiple schemas
 
@@ -430,20 +562,34 @@ public class XFormsModelSchemaValidator {
     }
 
     /**
-     * Apply schema validation.
+     * Apply schema validation to an instance.
      *
-     * @param instance      instance to validate
+     * @param instance          instance to validate
+     * @param processContents   validation mode, either "strict" or "lax"
      */
-    public void applySchema(XFormsInstance instance) {
+    public void validateInstance(XFormsInstance instance, String processContents) {
         if (!isSkipInstanceSchemaValidation() && schemaGrammar != null) {
-            final REDocumentDeclaration documentDeclaration = new REDocumentDeclaration(schemaGrammar);
-            final Acceptor acceptor = documentDeclaration.createAcceptor();
-            final Element instanceRootElement = instance.getDocument().getRootElement();
-            final IDConstraintChecker idConstraintChecker = new IDConstraintChecker();
 
-            validateElement(instanceRootElement, acceptor, idConstraintChecker);
-            idConstraintChecker.endDocument();
-            handleIDErrors(idConstraintChecker);
+            // Create REDocumentDeclaration if needed
+            if (documentDeclaration == null) {
+                documentDeclaration = new REDocumentDeclaration(schemaGrammar);
+            }
+
+            final boolean isLax = "lax".equals(processContents);
+            if (isLax) {
+                // Lax validation
+                final Element instanceRootElement = instance.getDocument().getRootElement();
+                validateElementLax(instanceRootElement);
+            } else {
+                // Strict validation
+                final Acceptor acceptor = documentDeclaration.createAcceptor();
+                final Element instanceRootElement = instance.getDocument().getRootElement();
+                final IDConstraintChecker idConstraintChecker = new IDConstraintChecker();
+
+                validateElement(instanceRootElement, acceptor, idConstraintChecker, true);
+                idConstraintChecker.endDocument();
+                handleIDErrors(idConstraintChecker);
+            }
         }
     }
 
@@ -455,6 +601,8 @@ public class XFormsModelSchemaValidator {
      * @param typeNamespaceURI      namespace URI of the type ("" if no namespace)
      * @param typeLocalname         local name of the type
      * @param typeQName             QName of type type (for error handling)
+     * @param locationData          LocationData to use in case of error
+     * @param modelBindId           id of model bind to use in case of error
      * @return                      validation error message, null if no error
      */
     public String validateDatatype(NodeInfo containingNodeInfo, String value, String typeNamespaceURI, String typeLocalname, String typeQName, LocationData locationData, String modelBindId) {
@@ -462,13 +610,15 @@ public class XFormsModelSchemaValidator {
         if (typeNamespaceURI == null)
             typeNamespaceURI = "";
 
-        // REDocumentDeclaration is not reentrant
-        final REDocumentDeclaration documentDeclaration = new REDocumentDeclaration(schemaGrammar);
+        // Create REDocumentDeclaration if needed
+        if (documentDeclaration == null) {
+            documentDeclaration = new REDocumentDeclaration(schemaGrammar);
+        }
 
         // Find expression to use to validate
         final Expression contentModelExpression;
         {
-            if( typeNamespaceURI.equals(XSAcceptor.XMLSchemaNamespace) ) {
+            if (typeNamespaceURI.equals(XSAcceptor.XMLSchemaNamespace) ) {
                 // Handle built-in schema type
                 try {
                     contentModelExpression = schemaGrammar.getPool().createData(DatatypeFactory.getTypeByName(typeLocalname) );
@@ -484,6 +634,7 @@ public class XFormsModelSchemaValidator {
                 final ComplexTypeExp complexTypeExpression = schema.complexTypes.get(typeLocalname);
                 if (complexTypeExpression != null) {
                     // XForms mandates simple types
+                    // TODO: Actually complex type with simple content is also allowed
                     throw new ValidationException("Simple type required for type: " + typeQName, locationData);
                 } else {
                     // Find simple type in schema
@@ -502,24 +653,41 @@ public class XFormsModelSchemaValidator {
         // Send text to acceptor
         final StringRef errorStringRef = new StringRef();
         final DatatypeRef datatypeRef = new DatatypeRef();
-        expressionAcceptor.onText2(value, validationContext, errorStringRef, datatypeRef);
 
-        // Return validation error if any
-        return errorStringRef.str;
+        // Validate text
+        if (!expressionAcceptor.onText2(value, validationContext, errorStringRef, datatypeRef)) {
+            if (errorStringRef.str == null) // not sure if this can happen
+                errorStringRef.str = "Error validating simple type";
+            return errorStringRef.str;
+        }
+
+        // Check final acceptor state
+        if (!expressionAcceptor.isAcceptState(errorStringRef)) {
+            if (errorStringRef.str == null) // not sure if this can happen
+                errorStringRef.str = "Error validating simple type";
+            return errorStringRef.str;
+        }
+
+        // Value is valid
+        return null;
     }
 
     /**
      * Return whether XForms instance validation should be skipped based on configuration
      * properties.
+     *
+     * @return  whether validation should be skipped
      */
     private boolean isSkipInstanceSchemaValidation() {
-        OXFProperties.PropertySet propertySet = OXFProperties.instance().getPropertySet();
-        Boolean schmVldatdObj =  propertySet.getBoolean(XFormsConstants.XFORMS_VALIDATION_PROPERTY, true);
+        final OXFProperties.PropertySet propertySet = OXFProperties.instance().getPropertySet();
+        final Boolean schmVldatdObj =  propertySet.getBoolean(XFormsConstants.XFORMS_VALIDATION_PROPERTY, true);
         return !schmVldatdObj.booleanValue();
     }
 
     /**
      * Return the value of the @schema attribute on the model.
+     *
+     * @return  value of the @schema attribute on the model
      */
     public String getSchemaURIs() {
         return schemaURIs;

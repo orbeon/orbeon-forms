@@ -713,7 +713,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         // Create Schema validator only if we have schemas specified
         if (modelElement.attributeValue("schema") != null && schemaValidator == null) {
             schemaValidator = new XFormsModelSchemaValidator(modelElement);
-            schemaValidator.loadSchemas(pipelineContext, containingDocument);
+            schemaValidator.loadSchemas(pipelineContext);
         }
     }
 
@@ -725,7 +725,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                 final XFormsInstance currentInstance = (XFormsInstance) i.next();
                 // Currently we don't support validating read-only instances
                 if (!currentInstance.isReadOnly())
-                    schemaValidator.applySchema(currentInstance);
+                    schemaValidator.validateInstance(currentInstance, "lax");
             }
         }
     }

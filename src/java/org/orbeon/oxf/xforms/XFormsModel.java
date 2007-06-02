@@ -253,7 +253,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
      * Set an instance document for this model. There may be multiple instance documents. Each instance document may
      * have an associated id that identifies it.
      */
-    public XFormsInstance setInstanceDocument(Object instanceDocument, String modelId, String instanceId, String instanceSourceURI, String username, String password, boolean shared) {
+    public XFormsInstance setInstanceDocument(Object instanceDocument, String modelId, String instanceId, String instanceSourceURI, String username, String password, boolean shared, String validation) {
         // Initialize containers if needed
         if (instances == null) {
             instances = Arrays.asList(new XFormsInstance[instanceIds.size()]);
@@ -264,9 +264,9 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         final XFormsInstance newInstance;
         {
             if (instanceDocument instanceof Document)
-                newInstance = new XFormsInstance(modelId, instanceId, (Document) instanceDocument, instanceSourceURI, username, password, shared);
+                newInstance = new XFormsInstance(modelId, instanceId, (Document) instanceDocument, instanceSourceURI, username, password, shared, validation);
             else if (instanceDocument instanceof DocumentInfo)
-                newInstance = new SharedXFormsInstance(modelId, instanceId, (DocumentInfo) instanceDocument, instanceSourceURI, username, password, shared);
+                newInstance = new SharedXFormsInstance(modelId, instanceId, (DocumentInfo) instanceDocument, instanceSourceURI, username, password, shared, validation);
             else
                 throw new OXFException("Invalid type for instance document: " + instanceDocument.getClass().getName());
         }
@@ -725,7 +725,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                 final XFormsInstance currentInstance = (XFormsInstance) i.next();
                 // Currently we don't support validating read-only instances
                 if (!currentInstance.isReadOnly())
-                    schemaValidator.validateInstance(currentInstance, "lax");
+                    schemaValidator.validateInstance(currentInstance);
             }
         }
     }
@@ -811,7 +811,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                                         XFormsServer.logger.debug("XForms - using instance from application shared instance cache (instance from static state was not initialized): " + staticStateInstance.getEffectiveId());
 
                                     final SharedXFormsInstance sharedInstance
-                                            = XFormsServerSharedInstancesCache.instance().find(pipelineContext, staticStateInstance.getEffectiveId(), staticStateInstance.getModelId(), staticStateInstance.getSourceURI());
+                                            = XFormsServerSharedInstancesCache.instance().find(pipelineContext, staticStateInstance.getEffectiveId(), staticStateInstance.getModelId(), staticStateInstance.getSourceURI(), staticStateInstance.getValidation());
                                     setInstance(sharedInstance, false);
 
                                 } else {
@@ -832,6 +832,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                         final String instanceSourceURI;
                         final String xxformsUsername;
                         final String xxformsPassword;
+                        final String xxformsValidation = instanceContainerElement.attributeValue(XFormsConstants.XXFORMS_VALIDATION_QNAME);
 
                         final long startTime = XFormsServer.logger.isDebugEnabled() ? System.currentTimeMillis() : 0;
                         final String srcAttribute = instanceContainerElement.attributeValue("src");
@@ -934,7 +935,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
                                 // Get instance from shared cache if possible
                                 if (isApplicationSharedHint) {
-                                    final SharedXFormsInstance sharedXFormsInstance = XFormsServerSharedInstancesCache.instance().find(pipelineContext, instanceId, modelId, absoluteResolvedURLString);
+                                    final SharedXFormsInstance sharedXFormsInstance = XFormsServerSharedInstancesCache.instance().find(pipelineContext, instanceId, modelId, absoluteResolvedURLString, xxformsValidation);
                                     setInstance(sharedXFormsInstance, false);
                                     continue;
                                 }
@@ -1006,7 +1007,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                         }
 
                         // Set instance and associated information if everything went well
-                        setInstanceDocument(instanceDocument, modelId, instanceId, instanceSourceURI, xxformsUsername, xxformsPassword, isApplicationSharedHint);
+                        setInstanceDocument(instanceDocument, modelId, instanceId, instanceSourceURI, xxformsUsername, xxformsPassword, isApplicationSharedHint, xxformsValidation);
                     }
                 }
             }

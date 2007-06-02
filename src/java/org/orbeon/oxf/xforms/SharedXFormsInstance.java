@@ -28,8 +28,8 @@ public class SharedXFormsInstance extends XFormsInstance {
         super(containerElement);
     }
 
-    public SharedXFormsInstance(String modelId, String instanceId, DocumentInfo instanceDocumentInfo, String instanceSourceURI, String username, String password, boolean applicationShared) {
-        super(modelId, instanceId, instanceDocumentInfo, instanceSourceURI, username, password, applicationShared);
+    public SharedXFormsInstance(String modelId, String instanceId, DocumentInfo instanceDocumentInfo, String instanceSourceURI, String username, String password, boolean applicationShared, String validation) {
+        super(modelId, instanceId, instanceDocumentInfo, instanceSourceURI, username, password, applicationShared, validation);
     }
 
     public void setInstanceDocument(Object instanceDocument, boolean initialize) {

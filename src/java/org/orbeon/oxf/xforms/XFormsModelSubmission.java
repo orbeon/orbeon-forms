@@ -308,7 +308,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         modelForInstance.setInstanceDocument(initialDocumentToSubmit,
                                 currentInstance.getModelId(), currentInstance.getEffectiveId(), currentInstance.getSourceURI(),
                                 currentInstance.getUsername(), currentInstance.getPassword(),
-                                currentInstance.isApplicationShared());
+                                currentInstance.isApplicationShared(),
+                                currentInstance.getValidation());
 
                         // Revalidate instance
                         modelForInstance.doRevalidate(pipelineContext);
@@ -428,7 +429,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         modelForInstance.setInstanceDocument(documentToSubmit,
                                 currentInstance.getModelId(), currentInstance.getEffectiveId(), currentInstance.getSourceURI(),
                                 currentInstance.getUsername(), currentInstance.getPassword(),
-                                currentInstance.isApplicationShared());
+                                currentInstance.isApplicationShared(),
+                                currentInstance.getValidation());
 
                         // Revalidate instance
                         modelForInstance.doRevalidate(pipelineContext);
@@ -631,7 +633,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                             final String absoluteResolvedURLString = absoluteResolvedURL.toExternalForm();
 
                             final SharedXFormsInstance sharedInstance
-                                    = XFormsServerSharedInstancesCache.instance().find(pipelineContext, replaceInstance.getEffectiveId(), replaceInstance.getModelId(), absoluteResolvedURLString);
+                                    = XFormsServerSharedInstancesCache.instance().find(pipelineContext, replaceInstance.getEffectiveId(), replaceInstance.getModelId(), absoluteResolvedURLString, replaceInstance.getValidation());
 
                             // Handle new instance and associated events
                             final XFormsModel replaceModel = sharedInstance.getModel(containingDocument);
@@ -730,7 +732,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                                                     final Document resultingInstanceDocument = Dom4jUtils.readDom4j(connectionResult.getResultInputStream(), connectionResult.resourceURI);
                                                     newInstance = new XFormsInstance(replaceInstance.getModelId(), replaceInstance.getEffectiveId(), resultingInstanceDocument,
-                                                            connectionResult.resourceURI, resolvedXXFormsUsername, resolvedXXFormsPassword, false);
+                                                            connectionResult.resourceURI, resolvedXXFormsUsername, resolvedXXFormsPassword, false, replaceInstance.getValidation());
                                                 } else {
                                                     // Resulting instance is read-only
 
@@ -739,7 +741,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                                                     final DocumentInfo resultingInstanceDocument = TransformerUtils.readTinyTree(connectionResult.getResultInputStream(), connectionResult.resourceURI);
                                                     newInstance = new SharedXFormsInstance(replaceInstance.getModelId(), replaceInstance.getEffectiveId(), resultingInstanceDocument,
-                                                            connectionResult.resourceURI, resolvedXXFormsUsername, resolvedXXFormsPassword, false);
+                                                            connectionResult.resourceURI, resolvedXXFormsUsername, resolvedXXFormsPassword, false, replaceInstance.getValidation());
                                                 }
 
                                                 // Set new instance

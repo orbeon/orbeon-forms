@@ -166,6 +166,7 @@ public class XFormsConstants {
     public static final QName XXFORMS_USERNAME_QNAME = new QName("username", XFormsConstants.XXFORMS_NAMESPACE);
     public static final QName XXFORMS_PASSWORD_QNAME = new QName("password", XFormsConstants.XXFORMS_NAMESPACE);
     public static final QName XXFORMS_SHARED_QNAME = new QName("shared", XFormsConstants.XXFORMS_NAMESPACE);
+    public static final QName XXFORMS_VALIDATION_QNAME = new QName("validation", XFormsConstants.XXFORMS_NAMESPACE);
 
     public static final QName XXFORMS_INSTANCE_QNAME = new QName("instance", XFormsConstants.XXFORMS_NAMESPACE);
     public static final QName XXFORMS_SHOW_PROGRESS_QNAME = new QName("show-progress", XFormsConstants.XXFORMS_NAMESPACE);

@@ -62,7 +62,7 @@ public class XFormsServerSharedInstancesCache {
         cache.add(pipelineContext, cacheKey, CONSTANT_VALIDITY, sharedXFormsInstance);
     }
 
-    public synchronized SharedXFormsInstance find(PipelineContext pipelineContext, String instanceId, String modelId, String sourceURI) {
+    public synchronized SharedXFormsInstance find(PipelineContext pipelineContext, String instanceId, String modelId, String sourceURI, String validation) {
         final Cache cache = ObjectCache.instance(XFORMS_SHARED_INSTANCES_CACHE_NAME, XFORMS_SHARED_INSTANCES_CACHE_DEFAULT_SIZE);
         final InternalCacheKey cacheKey = new InternalCacheKey(SHARED_INSTANCE_KEY_TYPE, sourceURI);
         final SharedXFormsInstance sharedInstance = (SharedXFormsInstance) cache.findValid(pipelineContext, cacheKey, CONSTANT_VALIDITY);
@@ -74,7 +74,7 @@ public class XFormsServerSharedInstancesCache {
 
             // Return a copy because id, etc. can be different
             return new SharedXFormsInstance(modelId, instanceId, sharedInstance.getDocumentInfo(),
-                        sourceURI, null, null, sharedInstance.isApplicationShared());
+                        sourceURI, null, null, sharedInstance.isApplicationShared(), sharedInstance.getValidation());
         } else {
             // Instance was not found, load from URI and add to cache
 
@@ -101,7 +101,7 @@ public class XFormsServerSharedInstancesCache {
             try {
                 // Read result as XML and create new shared instance
                 final DocumentInfo documentInfo = TransformerUtils.readTinyTree(connectionResult.getResultInputStream(), connectionResult.resourceURI);
-                final SharedXFormsInstance newInstance = new SharedXFormsInstance(modelId, instanceId, documentInfo, sourceURI, null, null, true);
+                final SharedXFormsInstance newInstance = new SharedXFormsInstance(modelId, instanceId, documentInfo, sourceURI, null, null, true, validation);
 
                 // Add result to cache
                 add(pipelineContext, sourceURI, newInstance);

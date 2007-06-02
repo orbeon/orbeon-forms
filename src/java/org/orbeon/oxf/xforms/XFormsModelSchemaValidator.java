@@ -363,7 +363,7 @@ public class XFormsModelSchemaValidator {
                         final String attributeURI = attribute.getNamespaceURI();
                         final String attributeName = attribute.getName();
 //                        final String attributeQName = attribute.getQualifiedName();
-                        final String attributeValue = attribute.getValue();
+//                        final String attributeValue = attribute.getValue();
 
                         // Find expression for element type
                         final Expression attributeExpression;
@@ -378,6 +378,30 @@ public class XFormsModelSchemaValidator {
                         }
                         if (attributeExpression != null) {
                             // TODO: find out way of validating an attribute only
+
+//                            final ExpressionAcceptor expressionAcceptor = new SimpleAcceptor(documentDeclaration, attributeExpression, null, null);
+//                            // Validate attribute value
+//                            final StringRef errorStringRef = new StringRef();
+//                            final DatatypeRef datatypeRef = new DatatypeRef();
+//
+//                            if (!expressionAcceptor.onAttribute2(attributeURI, attributeName, attributeQName, attributeValue, validationContext, errorStringRef, datatypeRef)) {
+//                                if (errorStringRef.str == null) // not sure if this can happen
+//                                    errorStringRef.str = "Error validating attribute";
+//                                addSchemaError(attribute, errorStringRef.str);
+//                            }
+
+//                            if (!expressionAcceptor.onText2(attributeValue, validationContext, errorStringRef, datatypeRef)) {
+//                                if (errorStringRef.str == null) // not sure if this can happen
+//                                    errorStringRef.str = "Error validating attribute";
+//                                addSchemaError(attribute, errorStringRef.str);
+//                            }
+//
+//                            // Check final acceptor state
+//                            if (!expressionAcceptor.isAcceptState(errorStringRef)) {
+//                                if (errorStringRef.str == null) // not sure if this can happen
+//                                    errorStringRef.str = "Error validating attribute";
+//                                addSchemaError(attribute, errorStringRef.str);
+//                            }
                         }
                     }
                 }
@@ -565,9 +589,8 @@ public class XFormsModelSchemaValidator {
      * Apply schema validation to an instance.
      *
      * @param instance          instance to validate
-     * @param processContents   validation mode, either "strict" or "lax"
      */
-    public void validateInstance(XFormsInstance instance, String processContents) {
+    public void validateInstance(XFormsInstance instance) {
         if (!isSkipInstanceSchemaValidation() && schemaGrammar != null) {
 
             // Create REDocumentDeclaration if needed
@@ -575,12 +598,13 @@ public class XFormsModelSchemaValidator {
                 documentDeclaration = new REDocumentDeclaration(schemaGrammar);
             }
 
-            final boolean isLax = "lax".equals(processContents);
-            if (isLax) {
+            // Get validation mode ("lax" is the default)
+            final String validation = (instance.getValidation() == null) ? "lax" : instance.getValidation();
+            if ("lax".equals(validation)) {
                 // Lax validation
                 final Element instanceRootElement = instance.getDocument().getRootElement();
                 validateElementLax(instanceRootElement);
-            } else {
+            } else if ("strict".equals(instance.getValidation())) {
                 // Strict validation
                 final Acceptor acceptor = documentDeclaration.createAcceptor();
                 final Element instanceRootElement = instance.getDocument().getRootElement();
@@ -589,6 +613,8 @@ public class XFormsModelSchemaValidator {
                 validateElement(instanceRootElement, acceptor, idConstraintChecker, true);
                 idConstraintChecker.endDocument();
                 handleIDErrors(idConstraintChecker);
+            } else {
+                // Skip validation
             }
         }
     }
@@ -650,11 +676,9 @@ public class XFormsModelSchemaValidator {
         // Create a simple acceptor
         final ExpressionAcceptor expressionAcceptor = new SimpleAcceptor(documentDeclaration, contentModelExpression, null, null);
 
-        // Send text to acceptor
+        // Validate text
         final StringRef errorStringRef = new StringRef();
         final DatatypeRef datatypeRef = new DatatypeRef();
-
-        // Validate text
         if (!expressionAcceptor.onText2(value, validationContext, errorStringRef, datatypeRef)) {
             if (errorStringRef.str == null) // not sure if this can happen
                 errorStringRef.str = "Error validating simple type";

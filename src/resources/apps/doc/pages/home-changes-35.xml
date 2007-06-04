@@ -44,7 +44,7 @@
         <section>
             <title>Changes in Version 3.5.2 [UNDER DEVELOPMENT]</title>
             <p>
-                Orbeon Forms 3.5.2 [UNDER DEVELOPMENT] is an update to Orbeon Forms 3.5.1.
+                Orbeon Forms 3.5.2 <b style="color: red">[UNDER DEVELOPMENT]</b> is an update to Orbeon Forms 3.5.1.
             </p>
             <section>
                 <title>Noteworthy Changes</title>
@@ -104,6 +104,65 @@
                             Applications</a> for more information.
                         </p>
                     </li>
+                    <li>
+                        <p>
+                            <b>Bindings support types imported from XML Schemas.</b> In previous versions, only built-in
+                            types such as <code>xs:integer</code>, <code>xs:date</code>, etc. were supported on the
+                            <code>type</code> attribute of <code>&lt;xforms:bind></code> element. In this version,
+                            simple types declared in an imported XML Schema can be used. For example, assume the
+                            following schema declaring a type called <code>my:state</code>:
+                        </p>
+                        <xml-source>
+                            <xs:schema targetNamespace="http://orbeon.org/oxf/examples/my"
+                                       xmlns:my="http://orbeon.org/oxf/examples/my"
+                                       xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                                       elementFormDefault="qualified"
+                                       attributeFormDefault="unqualified">
+                                <xs:simpleType name="state">
+                                    <xs:restriction base="xs:string">
+                                        <xs:enumeration value="AL"/>
+                                        <xs:enumeration value="AK"/>
+                                        <xs:enumeration value="AZ"/>
+                                        ...
+                                        <xs:enumeration value="GU"/>
+                                        <xs:enumeration value="MP"/>
+                                        <xs:enumeration value="PR"/>
+                                    </xs:restriction>
+                                </xs:simpleType>
+                            </xs:schema>
+                        </xml-source>
+                        <p>
+                            You use <code>&lt;xforms:bind></code> to assign this type as follows:
+                        </p>
+                        <xml-source>
+                            <xforms:bind nodeset="address/state" type="my:state"/>
+                        </xml-source>
+                        <p>
+                            Note that with XForms 1.1, the <code>type</code> attribute only supports simple types, or
+                            complex types with simple content. Orbeon Forms only support simple types at the moment.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Improved XML Schema validation.</b> In previous versions, XML Schema validation always
+                            followed a strict mode where all instances had to be strictly valid as per imported schema
+                            definitions. In particular, this meant that if you imported a schema, the top-level element
+                            of an instance had to have a valid schema definition or the instance would be entirely
+                            invalid.
+                        </p>
+                        <p>
+                            In this version, Orbeon Forms implements a "lax" validation mode by default, where only
+                            elements that have definitions in the imported schemas are validated. Other elements are not
+                            considered for validation. This is in line with XML Schema and XSLT 2.0 lax validation
+                            modes.
+                        </p>
+                        <p>
+                            In addition, the author can specify the validation mode directly on each instance with the
+                            extension <code>xxforms:validation</code> attribute, which takes values <code>lax</code>
+                            (the default), <code>strict</code> (the root element has to have a definition in the schema
+                            and must be valid), or <code>skip</code> (no validation at all for that instance).
+                        </p>
+                    </li>
                 </ul>
             </section>
             <section>
@@ -131,6 +190,132 @@ http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=2
 
                 -->
                 <ul>
+
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307140&amp;group_id=168&amp;atid=350207">#307140:
+                            Implement lax XML Schema validation
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307141&amp;group_id=168&amp;atid=350207">#307141:
+                            RFE: Support user-controlled "lax", "strict" and "skip" validation
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306628&amp;group_id=168&amp;atid=350207">#306628:
+                            RFE: Support xforms:input bound to xs:boolean value
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307108&amp;group_id=168&amp;atid=350207">#307108:
+                            Migrate to recent MSV library
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306753&amp;group_id=168&amp;atid=350207">#306753:
+                            type MIP must support types defined in imported XML schemas
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307089&amp;group_id=168&amp;atid=350207">#307089:
+                            PDF Template processor must not require config input
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307093&amp;group_id=168&amp;atid=350207">#307093:
+                            p:choose should use TinyTree, not dom4j, in order to consume less memory and run faster
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307087&amp;group_id=168&amp;atid=350207">#307087:
+                            Handle case where the initial value for the select1 tree is empty
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307073&amp;group_id=168&amp;atid=350207">#307073:
+                            Group around tr: classes are not correct upon page load
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307083&amp;group_id=168&amp;atid=350207">#307083:
+                            Read-only triggers in Government Forms summary don't work anymore
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307082&amp;group_id=168&amp;atid=350207">#307082:
+                            JavaScript error in some cases when using the upload control with replace="instance"
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307064&amp;group_id=168&amp;atid=350207">#307064:
+                            Instance replacement no longer causes xforms-value-changed to be fired
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307059&amp;group_id=168&amp;atid=350207">#307059:
+                            Read-only instance cannot be submitted
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307051&amp;group_id=168&amp;atid=350207">#307051:
+                            RFE: Select tree: make the currently selected value visible
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307046&amp;group_id=168&amp;atid=350207">#307046:
+                            NPE in XInclude processor
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306991&amp;group_id=168&amp;atid=350207">#306991:
+                            xforms:select1[@appearance="xxforms:tree"] should support updating its structure
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306979&amp;group_id=168&amp;atid=350207">#306979:
+                            Tree does not appear hierarchical when itemset comes from readonly shared instance
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306259&amp;group_id=168&amp;atid=350207">#306259:
+                            RFE: Make xforms:group around xhtml:tr work
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307031&amp;group_id=168&amp;atid=350207">#307031:
+                            Select tree: parent value is considered selected even if not all the children are selected
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307030&amp;group_id=168&amp;atid=350207">#307030:
+                            Items in select tree incorrectly selected
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306974&amp;group_id=168&amp;atid=350207">#306974:
+                            Submission replace="all" is opening a new window in IE
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306983&amp;group_id=168&amp;atid=350207">#306983:
+                            Itemsets are re-evaluated everytime the controls are rebuilt
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306982&amp;group_id=168&amp;atid=350207">#306982:
+                            Orbeon Forms uses Saxon linked tree instead of TinyTree for read-only instances
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306971&amp;group_id=168&amp;atid=350207">#306971:
+                            Delegation processor: Incorrect use of XSLT in example
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306969&amp;group_id=168&amp;atid=350207">#306969:
+                            Calling ORBEON.xforms.Document.setValue with non-existent id causes unexpected JS error
+                        </a>
+                    </li>
                     <li>
                         <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306960&amp;group_id=168&amp;atid=350207">#306960:
                             RFE: XSLT transformer should leverage Saxon input document location information
@@ -142,7 +327,6 @@ http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=2
                         </a>
                     </li>
                     <li>
-
                         <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306958&amp;group_id=168&amp;atid=350207">#306958:
                             XInclude processor does not adjust system ID in output locator
                         </a>
@@ -156,7 +340,6 @@ http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=2
                         <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306728&amp;group_id=168&amp;atid=350207">#306728:
                             Tree shouldn't send Ajax requests as you click on it, unless incremental mode is set
                         </a>
-
                     </li>
                     <li>
                         <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306950&amp;group_id=168&amp;atid=350207">#306950:
@@ -169,7 +352,6 @@ http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=2
                         </a>
                     </li>
                     <li>
-
                         <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306919&amp;group_id=168&amp;atid=350207">#306919:
                             Submission: can't use serialize="false" with method="post"
                         </a>

@@ -38,12 +38,12 @@ public class XFormsSelect1Control extends XFormsValueControl {
     public static final String MENU_APPEARANCE = Dom4jUtils.qNameToexplodedQName(XFormsConstants.XXFORMS_MENU_APPEARANCE_QNAME);
     public static final String AUTOCOMPLETE_APPEARANCE = Dom4jUtils.qNameToexplodedQName(XFormsConstants.XXFORMS_AUTOCOMPLETE_APPEARANCE_QNAME);
 
-    private boolean hasItemset;
-    private boolean itemsetsEvaluated;
-    private List itemsetInfos;
+    private String xxformsRefresh;
+    private List items;
 
     public XFormsSelect1Control(XFormsContainingDocument containingDocument, XFormsControl parent, Element element, String name, String id) {
         super(containingDocument, parent, element, name, id);
+        this.xxformsRefresh = element.attributeValue(XFormsConstants.XXFORMS_REFRESH_ITEMS_QNAME);
     }
 
     public boolean hasJavaScriptInitialization() {
@@ -53,13 +53,12 @@ public class XFormsSelect1Control extends XFormsValueControl {
     }
 
     public void markItemsetDirty() {
-        itemsetsEvaluated = false;
+        items = null;
     }
 
-    private void evaluateItemsets(final PipelineContext pipelineContext) {
+    private List evaluateItemsets(final PipelineContext pipelineContext) {
 
-        hasItemset = false;
-        itemsetInfos = new ArrayList();
+        final List newItems = new ArrayList();
 
         // Set binding on this control
         final XFormsControls xformsControls = containingDocument.getXFormsControls();
@@ -77,12 +76,11 @@ public class XFormsSelect1Control extends XFormsValueControl {
                     final String label = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, element.element(XFormsConstants.XFORMS_LABEL_QNAME), false);
                     final String value = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, element.element(XFormsConstants.XFORMS_VALUE_QNAME), false);
 
-                    itemsetInfos.add(new Item(false, element.attributes(), label, value, hierarchyLevel + 1));// TODO: must filter attributes on element.attributes()
+                    newItems.add(new Item(false, element.attributes(), label, value, hierarchyLevel + 1));// TODO: must filter attributes on element.attributes()
 
                 } else if ("itemset".equals(localname)) {
                     // xforms:itemset
 
-                    hasItemset = true;
                     final int itemsetLevel = hierarchyLevel;
                     xformsControls.pushBinding(pipelineContext, element);
                     {
@@ -129,7 +127,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
                                     if (valueCopyElement.getName().equals("value")) {
                                         // Handle xforms:value
                                         final String value = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, element.element(XFormsConstants.XFORMS_VALUE_QNAME), false);
-                                        itemsetInfos.add(new Item(true, element.attributes(), label != null ? label : "", value, newLevel));// TODO: must filter attributes on element.attributes()
+                                        newItems.add(new Item(true, element.attributes(), label != null ? label : "", value, newLevel));// TODO: must filter attributes on element.attributes()
                                     } else {
                                         // TODO: handle xforms:copy
                                     }
@@ -150,7 +148,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
                     if (labelElement != null) {
                         final String label = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, element.element(XFormsConstants.XFORMS_LABEL_QNAME), false);
                         hierarchyLevel++;
-                        itemsetInfos.add(new Item(false, element.attributes(), label, null, hierarchyLevel));// TODO: must filter attributes on element.attributes()
+                        newItems.add(new Item(false, element.attributes(), label, null, hierarchyLevel));// TODO: must filter attributes on element.attributes()
                     }
                 }
             }
@@ -161,18 +159,25 @@ public class XFormsSelect1Control extends XFormsValueControl {
             public void text(Text text) {
             }
         });
-        itemsetsEvaluated = true;
+        return newItems;
     }
 
     public List getItemset(PipelineContext pipelineContext) {
-        if (!itemsetsEvaluated) {
-            evaluateItemsets(pipelineContext);
+        if ("false".equals(xxformsRefresh)) {
+            // Items are not automatically refreshed and stored globally
+            List items =  containingDocument.getXFormsControls().getConstantItems(getOriginalId());
+            if (items == null) {
+                items = evaluateItemsets(pipelineContext);
+                containingDocument.getXFormsControls().setConstantItems(getOriginalId(), items);
+            }
+            return items;
+        } else {
+            // Items are stored in the control
+            if (items == null) {
+                items = evaluateItemsets(pipelineContext);
+            }
+            return items;
         }
-        return itemsetInfos;
-    }
-
-    public boolean hasItemset() {
-        return hasItemset;
     }
 
     public void performDefaultAction(PipelineContext pipelineContext, XFormsEvent event) {

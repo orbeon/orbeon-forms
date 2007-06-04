@@ -28,7 +28,6 @@ import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.oxf.xml.dom4j.NonLazyUserDataElement;
 import org.orbeon.saxon.functions.FunctionLibrary;
 import org.orbeon.saxon.om.NodeInfo;
 import org.xml.sax.Locator;
@@ -58,6 +57,8 @@ public class XFormsControls {
 
     private XFormsContainingDocument containingDocument;
     private Document controlsDocument;
+    
+    private Map constantItems;
 
     protected Stack contextStack = new Stack();
 
@@ -1949,6 +1950,31 @@ public class XFormsControls {
                 }
             }
         }
+    }
+
+    /**
+     * Get the items for a given control id. This is not an effective id, but an original control id.
+     *
+     * @param controlId     original control id
+     * @return              List of Item
+     */
+    public List getConstantItems(String controlId) {
+        if (constantItems == null)
+            return null;
+        else
+            return (List) constantItems.get(controlId);
+    }
+
+    /**
+     * Set the items for a given control id. This is not an effective id, but an original control id.
+     *
+     * @param controlId     original control id
+     * @param items         List of Item
+     */
+    public void setConstantItems(String controlId, List items) {
+        if (constantItems == null)
+            constantItems = new HashMap();
+        constantItems.put(controlId, items);
     }
 
     public void destroy() {

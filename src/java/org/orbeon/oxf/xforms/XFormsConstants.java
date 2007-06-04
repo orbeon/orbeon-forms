@@ -171,6 +171,8 @@ public class XFormsConstants {
     public static final QName XXFORMS_INSTANCE_QNAME = new QName("instance", XFormsConstants.XXFORMS_NAMESPACE);
     public static final QName XXFORMS_SHOW_PROGRESS_QNAME = new QName("show-progress", XFormsConstants.XXFORMS_NAMESPACE);
 
+    public static final QName XXFORMS_REFRESH_ITEMS_QNAME = new QName("refresh-items", XFormsConstants.XXFORMS_NAMESPACE);
+
     public static final char REPEAT_HIERARCHY_SEPARATOR_1 = 0xB7;
     public static final char REPEAT_HIERARCHY_SEPARATOR_2 = '-';
     public static final String DEFAULT_UPLOAD_TYPE_EXPLODED_QNAME = ProcessorUtils.XS_ANYURI_EXPLODED_QNAME;

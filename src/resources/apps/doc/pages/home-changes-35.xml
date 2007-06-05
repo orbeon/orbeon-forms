@@ -178,7 +178,7 @@ http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=2
 <ul>
     {
         for $table in //table[tr/td/span/strong[. = 'ID']]
-            let $latest-id := '306805'
+            let $latest-id := '307140'
             let $latest-position := count(($table//tr)[td[normalize-space(.) = $latest-id]]/preceding-sibling::tr) + 1
             return
                 for $row in ($table//tr)[position() ge 2 and position() lt $latest-position and normalize-space(td[7]) = 'Fixed'] return
@@ -190,7 +190,77 @@ http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=2
 
                 -->
                 <ul>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307161&amp;group_id=168&amp;atid=350207">#307161:
+                            Disable verbose logging of eXist storage access
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307160&amp;group_id=168&amp;atid=350207">#307160:
+                            Rename theme-portal.xsl to theme-examples.xsl
+                        </a>
+                    </li>
+                    <li>
 
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307159&amp;group_id=168&amp;atid=350207">#307159:
+                            Schemas for XPL must support foreign attributes
+                        </a>
+                    </li>
+                    <!-- Closed recently, but fixed before 3.5.2 -->
+                    <!--<li>-->
+                        <!--<a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=305211&amp;group_id=168&amp;atid=350207">#305211:-->
+                            <!--Fix build error related to building static HTML doc-->
+                        <!--</a>-->
+                    <!--</li>-->
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306570&amp;group_id=168&amp;atid=350207">#306570:
+                            Evaluation of XPath expressions in repeat returns incorrect result
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306421&amp;group_id=168&amp;atid=350207">#306421:
+                            Non-required blank date does not appear invalid
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=304934&amp;group_id=168&amp;atid=350207">#304934:
+                            Incorrect validation when using xsi:type on root element
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=305063&amp;group_id=168&amp;atid=350207">#305063:
+                            xs:date bound through schema doesn't cause date picker to display
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=304152&amp;group_id=168&amp;atid=350207">#304152:
+                            Schema validation should be checked against spec
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306010&amp;group_id=168&amp;atid=350207">#306010:
+                            Schema validation doesn't check if a schema definition is "applicable"
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307153&amp;group_id=168&amp;atid=350207">#307153:
+                            XML Schema validation must support complex types with simple content
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307152&amp;group_id=168&amp;atid=350207">#307152:
+                            RFE: Support constant itemsets for xforms:select1 and xforms:select
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307151&amp;group_id=168&amp;atid=350207">#307151:
+                            Split XForms reference documentation into two pages
+                        </a>
+                    </li>
                     <li>
                         <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307140&amp;group_id=168&amp;atid=350207">#307140:
                             Implement lax XML Schema validation

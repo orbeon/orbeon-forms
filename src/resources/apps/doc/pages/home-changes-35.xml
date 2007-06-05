@@ -141,6 +141,10 @@
                             Note that with XForms 1.1, the <code>type</code> attribute only supports simple types, or
                             complex types with simple content. Orbeon Forms only support simple types at the moment.
                         </p>
+                        <p>
+                            See issue <a
+                            href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=306753&amp;group_id=168&amp;atid=350207">#306753</a>.
+                        </p>
                     </li>
                     <li>
                         <p>
@@ -161,6 +165,67 @@
                             extension <code>xxforms:validation</code> attribute, which takes values <code>lax</code>
                             (the default), <code>strict</code> (the root element has to have a definition in the schema
                             and must be valid), or <code>skip</code> (no validation at all for that instance).
+                        </p>
+                        <p>
+                            Nodes validated through a schema now receive datatype annotations, which means that if an
+                            element or attribute is validated against <code>xs:date</code> in a schema, an XForms
+                            control bound to that node will display a date picker. Previously, you had to bind the type
+                            with a binding even if you used a schema:
+                        </p>
+                        <xml-source>
+                            <xforms:bind nodeset="..." type="xs:date"/>
+                        </xml-source>
+                        <p>
+                            This is now no longer necessary if you use a schema. Of course if you don't use a schema, or
+                            if you want to perform validation in addition to what is picked-up by a schema, then using
+                            <code>&lt;xforms:bind></code> is still the correct way of binding types.
+                        </p>
+                        <p>
+                            See issues <a
+                            href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=307140&amp;group_id=168&amp;atid=350207">#307140</a>,
+                            <a
+                            href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=307141&amp;group_id=168&amp;atid=350207">#307141</a>
+                            and <a
+                            href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=305063&amp;group_id=168&amp;atid=350207">#305063</a>.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Support for <code>&lt;xforms:group></code> around <code>&lt;xhtml:tr></code>.</b> This didn't
+                            work reliably in previous versions. This in particular allows controlling the visibility of
+                            table rows using <code>&lt;xforms:group></code>, for example:
+                        </p>
+                        <xml-source>
+                            <xhtml:table>
+                                <xhtml:tr>
+                                    <xhtml:th>Name</xhtml:th>
+                                </xhtml:tr>
+                                <xforms:group ref="person[address/state = 'CA']">
+                                    <xhtml:tr>
+                                        <xhtml:td>
+                                            <xforms:output ref="name"/>
+                                        </xhtml:td>
+                                    </xhtml:tr>
+                                </xforms:group>
+                            </xhtml:table>
+                        </xml-source>
+                        <p>
+                            Note that whether XForms implementations should support XForms elements around table rows and
+                            cells is a matter of debate, but Orbeon Forms already supports <code>&lt;xforms:repeat></code>
+                            around table rows for the convenience of form authors, and supporting groups is a matter of
+                            consistency.
+                        </p>
+                        <p>
+                            See issue <a
+                            href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=306259&amp;group_id=168&amp;atid=350207">#306259</a>.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Support for boolean type in input fields.</b> Previously, <code>&lt;xforms:input></code>
+                            controls bound to nodes of type <code>xs:boolean</code> would display a regular input field.
+                            The control now shows a checkbox allowing to better select a boolean value. See issue <a
+                            href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=306628&amp;group_id=168&amp;atid=350207">#306628</a>.
                         </p>
                     </li>
                 </ul>
@@ -191,314 +256,314 @@ http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=2
                 -->
                 <ul>
                     <li>
-                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307161&amp;group_id=168&amp;atid=350207">#307161:
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=307161&amp;group_id=168&amp;atid=350207">#307161:
                             Disable verbose logging of eXist storage access
                         </a>
                     </li>
                     <li>
-                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307160&amp;group_id=168&amp;atid=350207">#307160:
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=307160&amp;group_id=168&amp;atid=350207">#307160:
                             Rename theme-portal.xsl to theme-examples.xsl
                         </a>
                     </li>
                     <li>
 
-                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307159&amp;group_id=168&amp;atid=350207">#307159:
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=307159&amp;group_id=168&amp;atid=350207">#307159:
                             Schemas for XPL must support foreign attributes
                         </a>
                     </li>
                     <!-- Closed recently, but fixed before 3.5.2 -->
                     <!--<li>-->
-                        <!--<a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=305211&amp;group_id=168&amp;atid=350207">#305211:-->
+                        <!--<a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=305211&amp;group_id=168&amp;atid=350207">#305211:-->
                             <!--Fix build error related to building static HTML doc-->
                         <!--</a>-->
                     <!--</li>-->
                     <li>
-                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306570&amp;group_id=168&amp;atid=350207">#306570:
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=306570&amp;group_id=168&amp;atid=350207">#306570:
                             Evaluation of XPath expressions in repeat returns incorrect result
                         </a>
 
                     </li>
                     <li>
-                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306421&amp;group_id=168&amp;atid=350207">#306421:
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=306421&amp;group_id=168&amp;atid=350207">#306421:
                             Non-required blank date does not appear invalid
                         </a>
                     </li>
                     <li>
-                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=304934&amp;group_id=168&amp;atid=350207">#304934:
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=304934&amp;group_id=168&amp;atid=350207">#304934:
                             Incorrect validation when using xsi:type on root element
                         </a>
                     </li>
                     <li>
 
-                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=305063&amp;group_id=168&amp;atid=350207">#305063:
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=305063&amp;group_id=168&amp;atid=350207">#305063:
                             xs:date bound through schema doesn't cause date picker to display
                         </a>
                     </li>
                     <li>
-                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=304152&amp;group_id=168&amp;atid=350207">#304152:
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=304152&amp;group_id=168&amp;atid=350207">#304152:
                             Schema validation should be checked against spec
                         </a>
                     </li>
                     <li>
-                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306010&amp;group_id=168&amp;atid=350207">#306010:
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=306010&amp;group_id=168&amp;atid=350207">#306010:
                             Schema validation doesn't check if a schema definition is "applicable"
                         </a>
 
                     </li>
                     <li>
-                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307153&amp;group_id=168&amp;atid=350207">#307153:
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=307153&amp;group_id=168&amp;atid=350207">#307153:
                             XML Schema validation must support complex types with simple content
                         </a>
                     </li>
                     <li>
-                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307152&amp;group_id=168&amp;atid=350207">#307152:
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=307152&amp;group_id=168&amp;atid=350207">#307152:
                             RFE: Support constant itemsets for xforms:select1 and xforms:select
                         </a>
                     </li>
                     <li>
 
-                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307151&amp;group_id=168&amp;atid=350207">#307151:
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=307151&amp;group_id=168&amp;atid=350207">#307151:
                             Split XForms reference documentation into two pages
                         </a>
                     </li>
                     <li>
-                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307140&amp;group_id=168&amp;atid=350207">#307140:
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=307140&amp;group_id=168&amp;atid=350207">#307140:
                             Implement lax XML Schema validation
                         </a>
                     </li>
                     <li>
-                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307141&amp;group_id=168&amp;atid=350207">#307141:
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=307141&amp;group_id=168&amp;atid=350207">#307141:
                             RFE: Support user-controlled "lax", "strict" and "skip" validation
                         </a>
                     </li>
                     <li>
-                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306628&amp;group_id=168&amp;atid=350207">#306628:
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=306628&amp;group_id=168&amp;atid=350207">#306628:
                             RFE: Support xforms:input bound to xs:boolean value
                         </a>
                     </li>
                     <li>
-                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307108&amp;group_id=168&amp;atid=350207">#307108:
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=307108&amp;group_id=168&amp;atid=350207">#307108:
                             Migrate to recent MSV library
                         </a>
                     </li>
                     <li>
-                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306753&amp;group_id=168&amp;atid=350207">#306753:
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=306753&amp;group_id=168&amp;atid=350207">#306753:
                             type MIP must support types defined in imported XML schemas
                         </a>
                     </li>
                     <li>
-                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307089&amp;group_id=168&amp;atid=350207">#307089:
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=307089&amp;group_id=168&amp;atid=350207">#307089:
                             PDF Template processor must not require config input
                         </a>
                     </li>
                     <li>
-                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307093&amp;group_id=168&amp;atid=350207">#307093:
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=307093&amp;group_id=168&amp;atid=350207">#307093:
                             p:choose should use TinyTree, not dom4j, in order to consume less memory and run faster
                         </a>
                     </li>
                     <li>
-                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307087&amp;group_id=168&amp;atid=350207">#307087:
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=307087&amp;group_id=168&amp;atid=350207">#307087:
                             Handle case where the initial value for the select1 tree is empty
                         </a>
                     </li>
                     <li>
-                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307073&amp;group_id=168&amp;atid=350207">#307073:
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=307073&amp;group_id=168&amp;atid=350207">#307073:
                             Group around tr: classes are not correct upon page load
                         </a>
                     </li>
                     <li>
-                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307083&amp;group_id=168&amp;atid=350207">#307083:
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=307083&amp;group_id=168&amp;atid=350207">#307083:
                             Read-only triggers in Government Forms summary don't work anymore
                         </a>
                     </li>
                     <li>
-                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307082&amp;group_id=168&amp;atid=350207">#307082:
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=307082&amp;group_id=168&amp;atid=350207">#307082:
                             JavaScript error in some cases when using the upload control with replace="instance"
                         </a>
                     </li>
                     <li>
-                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307064&amp;group_id=168&amp;atid=350207">#307064:
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=307064&amp;group_id=168&amp;atid=350207">#307064:
                             Instance replacement no longer causes xforms-value-changed to be fired
                         </a>
                     </li>
                     <li>
-                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307059&amp;group_id=168&amp;atid=350207">#307059:
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=307059&amp;group_id=168&amp;atid=350207">#307059:
                             Read-only instance cannot be submitted
                         </a>
                     </li>
                     <li>
-                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307051&amp;group_id=168&amp;atid=350207">#307051:
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=307051&amp;group_id=168&amp;atid=350207">#307051:
                             RFE: Select tree: make the currently selected value visible
                         </a>
                     </li>
                     <li>
-                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307046&amp;group_id=168&amp;atid=350207">#307046:
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=307046&amp;group_id=168&amp;atid=350207">#307046:
                             NPE in XInclude processor
                         </a>
                     </li>
                     <li>
-                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306991&amp;group_id=168&amp;atid=350207">#306991:
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=306991&amp;group_id=168&amp;atid=350207">#306991:
                             xforms:select1[@appearance="xxforms:tree"] should support updating its structure
                         </a>
                     </li>
                     <li>
-                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306979&amp;group_id=168&amp;atid=350207">#306979:
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=306979&amp;group_id=168&amp;atid=350207">#306979:
                             Tree does not appear hierarchical when itemset comes from readonly shared instance
                         </a>
                     </li>
                     <li>
-                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306259&amp;group_id=168&amp;atid=350207">#306259:
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=306259&amp;group_id=168&amp;atid=350207">#306259:
                             RFE: Make xforms:group around xhtml:tr work
                         </a>
                     </li>
                     <li>
-                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307031&amp;group_id=168&amp;atid=350207">#307031:
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=307031&amp;group_id=168&amp;atid=350207">#307031:
                             Select tree: parent value is considered selected even if not all the children are selected
                         </a>
                     </li>
                     <li>
-                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307030&amp;group_id=168&amp;atid=350207">#307030:
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=307030&amp;group_id=168&amp;atid=350207">#307030:
                             Items in select tree incorrectly selected
                         </a>
                     </li>
                     <li>
-                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306974&amp;group_id=168&amp;atid=350207">#306974:
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=306974&amp;group_id=168&amp;atid=350207">#306974:
                             Submission replace="all" is opening a new window in IE
                         </a>
                     </li>
                     <li>
-                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306983&amp;group_id=168&amp;atid=350207">#306983:
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=306983&amp;group_id=168&amp;atid=350207">#306983:
                             Itemsets are re-evaluated everytime the controls are rebuilt
                         </a>
                     </li>
                     <li>
-                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306982&amp;group_id=168&amp;atid=350207">#306982:
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=306982&amp;group_id=168&amp;atid=350207">#306982:
                             Orbeon Forms uses Saxon linked tree instead of TinyTree for read-only instances
                         </a>
                     </li>
                     <li>
-                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306971&amp;group_id=168&amp;atid=350207">#306971:
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=306971&amp;group_id=168&amp;atid=350207">#306971:
                             Delegation processor: Incorrect use of XSLT in example
                         </a>
                     </li>
                     <li>
-                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306969&amp;group_id=168&amp;atid=350207">#306969:
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=306969&amp;group_id=168&amp;atid=350207">#306969:
                             Calling ORBEON.xforms.Document.setValue with non-existent id causes unexpected JS error
                         </a>
                     </li>
                     <li>
-                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306960&amp;group_id=168&amp;atid=350207">#306960:
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=306960&amp;group_id=168&amp;atid=350207">#306960:
                             RFE: XSLT transformer should leverage Saxon input document location information
                         </a>
                     </li>
                     <li>
-                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306959&amp;group_id=168&amp;atid=350207">#306959:
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=306959&amp;group_id=168&amp;atid=350207">#306959:
                             SAXStore only keeps track of a single system ID per document
                         </a>
                     </li>
                     <li>
-                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306958&amp;group_id=168&amp;atid=350207">#306958:
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=306958&amp;group_id=168&amp;atid=350207">#306958:
                             XInclude processor does not adjust system ID in output locator
                         </a>
                     </li>
                     <li>
-                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306957&amp;group_id=168&amp;atid=350207">#306957:
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=306957&amp;group_id=168&amp;atid=350207">#306957:
                             Dialog: cursor now showing in text fields on Firefox when multiple dialog in the same page
                         </a>
                     </li>
                     <li>
-                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306728&amp;group_id=168&amp;atid=350207">#306728:
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=306728&amp;group_id=168&amp;atid=350207">#306728:
                             Tree shouldn't send Ajax requests as you click on it, unless incremental mode is set
                         </a>
                     </li>
                     <li>
-                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306950&amp;group_id=168&amp;atid=350207">#306950:
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=306950&amp;group_id=168&amp;atid=350207">#306950:
                             XForms: document xxforms:target
                         </a>
                     </li>
                     <li>
-                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306942&amp;group_id=168&amp;atid=350207">#306942:
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=306942&amp;group_id=168&amp;atid=350207">#306942:
                             XSLT Templates object still indirectly refers to some PipelineContext objects
                         </a>
                     </li>
                     <li>
-                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306919&amp;group_id=168&amp;atid=350207">#306919:
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=306919&amp;group_id=168&amp;atid=350207">#306919:
                             Submission: can't use serialize="false" with method="post"
                         </a>
                     </li>
                     <li>
-                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306937&amp;group_id=168&amp;atid=350207">#306937:
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=306937&amp;group_id=168&amp;atid=350207">#306937:
                             theme-plain.xsl must not refer to orbeon.css
                         </a>
                     </li>
                     <li>
-                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306931&amp;group_id=168&amp;atid=350207">#306931:
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=306931&amp;group_id=168&amp;atid=350207">#306931:
                             Schemas and instance URIs don't resolve against URI of JSP page
                         </a>
                     </li>
                     <li>
 
-                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306927&amp;group_id=168&amp;atid=350207">#306927:
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=306927&amp;group_id=168&amp;atid=350207">#306927:
                             Exception with trigger appearance="minimal" and empty label
                         </a>
                     </li>
                     <li>
-                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306911&amp;group_id=168&amp;atid=350207">#306911:
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=306911&amp;group_id=168&amp;atid=350207">#306911:
                             Group with appearance="xxforms:fieldset" generates xhtml:legend outside xhtml:fieldset
                         </a>
                     </li>
                     <li>
-                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306641&amp;group_id=168&amp;atid=350207">#306641:
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=306641&amp;group_id=168&amp;atid=350207">#306641:
                             RFE: Integrate "Deploying Orbeon Forms as a separate WebApp" changes
                         </a>
 
                     </li>
                     <li>
-                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306703&amp;group_id=168&amp;atid=350207">#306703:
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=306703&amp;group_id=168&amp;atid=350207">#306703:
                             Orbeon 3.5 doesn't compile with Java 6
                         </a>
                     </li>
                     <!-- Closed recently, but fixed before 3.5.2 -->
                     <!--<li>-->
-                        <!--<a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=305208&amp;group_id=168&amp;atid=350207">#305208:-->
+                        <!--<a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=305208&amp;group_id=168&amp;atid=350207">#305208:-->
                             <!--Upgrade to Saxon 8.7.3-->
                         <!--</a>-->
                     <!--</li>-->
                     <li>
 
-                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306897&amp;group_id=168&amp;atid=350207">#306897:
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=306897&amp;group_id=168&amp;atid=350207">#306897:
                             XPath cache mixes up XPath expressions with AVT expressions
                         </a>
                     </li>
                     <li>
-                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306896&amp;group_id=168&amp;atid=350207">#306896:
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=306896&amp;group_id=168&amp;atid=350207">#306896:
                             Submission with replace="all" is broken after background upload
                         </a>
                     </li>
                     <li>
-                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306869&amp;group_id=168&amp;atid=350207">#306869:
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=306869&amp;group_id=168&amp;atid=350207">#306869:
                             Remove handling of xforms-help from themes
                         </a>
 
                     </li>
                     <li>
-                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306894&amp;group_id=168&amp;atid=350207">#306894:
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=306894&amp;group_id=168&amp;atid=350207">#306894:
                             Should rename cli-ops.jar to ops-cli.jar for consistency
                         </a>
                     </li>
                     <!-- Closed recently, but fixed before 3.5.2 -->
                     <!--<li>-->
-                        <!--<a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306862&amp;group_id=168&amp;atid=350207">#306862:-->
+                        <!--<a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=306862&amp;group_id=168&amp;atid=350207">#306862:-->
                             <!--Resource Server processor locks the files it serves-->
                         <!--</a>-->
                     <!--</li>-->
                     <li>
-                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306859&amp;group_id=168&amp;atid=350207">#306859:
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=306859&amp;group_id=168&amp;atid=350207">#306859:
                             XForms schema: xsd:any conflicts with xsd:element ref="xsd:schema"
                         </a>
                     </li>
                     <li>
-                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306858&amp;group_id=168&amp;atid=350207">#306858:
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=306858&amp;group_id=168&amp;atid=350207">#306858:
                             XPL schema is invalid
                         </a>
                     </li>

@@ -628,9 +628,9 @@
                 produce HTML documents and use a theme stylesheet, since the epilogue is able to convert XHTML to HTML.
             </p>
             <p>
-                Orbeon Forms comes with two stylesheets: <code>theme-plain.xsl</code> and <code>theme-portal.xsl</code>.
+                Orbeon Forms comes with two stylesheets: <code>theme-plain.xsl</code> and <code>theme-examples.xsl</code>.
                 <code>theme-plain.xsl</code> only makes minor adjustments to your page view. You can simplify it
-                further, or expand it. <code>theme-portal.xsl</code> is the theme for the built-in Orbeon Forms example
+                further, or expand it. <code>theme-examples.xsl</code> is the theme for the built-in Orbeon Forms example
                 applications. It decorates pages views with a list of available example applications, and provides a
                 mechanism for viewing application source code.
             </p>

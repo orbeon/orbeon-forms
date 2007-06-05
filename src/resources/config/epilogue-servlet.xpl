@@ -57,7 +57,7 @@
                     <p:processor name="oxf:unsafe-xslt">
                         <p:input name="data" href="#xformed-data"/>
                         <p:input name="request" href="#request"/>
-                        <p:input name="config" href="theme-plain.xsl"/>
+                        <p:input name="config" href="theme-doc.xsl"/>
                         <p:output name="data" id="themed-data"/>
                     </p:processor>
                     <!-- Rewrite all URLs in HTML and XHTML documents -->
@@ -80,7 +80,7 @@
                     <p:processor name="oxf:unsafe-xslt">
                         <p:input name="data" href="#xformed-data"/>
                         <p:input name="request" href="#request"/>
-                        <p:input name="config" href="theme-portal.xsl"/>
+                        <p:input name="config" href="theme-examples.xsl"/>
                         <p:output name="data" id="themed-data"/>
                     </p:processor>
                     <!-- Rewrite all URLs in HTML and XHTML documents -->
@@ -197,7 +197,7 @@
                             <name>Cache-Control</name>
                             <value>post-check=0, pre-check=0</value>
                         </header>
-                        <!-- NOTE: HTML converter specifies text/html content-type -->
+                        <!-- NOTE: converter specifies text/html content-type -->
                     </config>
                 </p:input>
                 <p:input name="data" href="#converted"/>

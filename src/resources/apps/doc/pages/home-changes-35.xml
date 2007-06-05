@@ -449,7 +449,7 @@ http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=2
                             <b>Support for combined XForms resources.</b> The XForms engine now supports an option to
                             automatically combine CSS and JavaScript resources used by XForms pages. This can lead to page
                             loading time improvements. See the <a
-                            href="reference-xforms-ng#xforms-combined-resources">XForms Reference</a> for details.
+                            href="reference-xforms-2#xforms-combined-resources">XForms Reference</a> for details.
                         </p>
                         <p>
                             <i>This feature was kindly sponsored by Teleflex.</i>
@@ -505,14 +505,14 @@ http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=2
                             behaves like the standard XForms <code>index()</code> function, except that its argument is
                             optional. When the argument is omitted, the function returns the index of the closest enclosing
                             <code>&lt;xforms:repeat></code> element. See the <a
-                            href="reference-xforms-ng#xxforms-index">XForms Reference</a> for details.
+                            href="reference-xforms-2#xxforms-index">XForms Reference</a> for details.
 
                         </p>
                     </li>
                     <li>
                         <p>
                             <b>Attribute Value Templates (AVTs).</b> Support for AVTs is now <a
-                            href="reference-xforms-ng#avts">documented</a>. Support for escaping brackets has been added.
+                            href="reference-xforms-2#avts">documented</a>. Support for escaping brackets has been added.
                             See issue <a
                             href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306835">#306835</a>.
                         </p>
@@ -528,7 +528,7 @@ http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=2
                     <li>
                         <p>
                             <b>Documentation of submission attribute.</b> The extension attribute <a
-                            href="reference-xforms-ng#submission-show-progress"><code>xxforms:show-progress="false"</code></a>
+                            href="reference-xforms-2#submission-show-progress"><code>xxforms:show-progress="false"</code></a>
                             of <code>&lt;xforms:submission></code> is now documented.
                         </p>
                     </li>
@@ -667,14 +667,14 @@ http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=2
                             controls are loaded only when necessary. In addition, the property
                             <code>oxf.xforms.minimal-resources</code> allows specifying whether "minimal" versions of
                             those resources should be used when possible. See the <a
-                            href="reference-xforms-ng#xforms-minimal-resources">XForms Reference</a> for details.
+                            href="reference-xforms-2#xforms-minimal-resources">XForms Reference</a> for details.
                         </p>
                     </li>
                     <li>
                         <p>
                             <b>Read-only and shared instances.</b> XForms instances can be marked as read-only and can
-                            be globally shared. See <a href="reference-xforms-ng#xxforms-readonly">Read-Only XForms
-                            Instances</a> and <a href="reference-xforms-ng#xxforms-shared">Sharing of Read-Only XForms
+                            be globally shared. See <a href="reference-xforms-2#xxforms-readonly">Read-Only XForms
+                            Instances</a> and <a href="reference-xforms-2#xxforms-shared">Sharing of Read-Only XForms
                             Instances</a> for details.
                         </p>
                     </li>
@@ -719,7 +719,7 @@ http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=2
                             <code>xxforms:readonly-appearance="static"</code>, read-only controls take a static
                             appearance appropriate for read-only rendition of forms in HTML. See <a
                             href="/forms/">Government Forms</a> sample application's <i>View Read-Only</i> option for
-                            an example, as well as the <a href="reference-xforms-ng#readonly-mode">Read-Only Mode</a>
+                            an example, as well as the <a href="reference-xforms-2#readonly-mode">Read-Only Mode</a>
                             documentation.
                         </p>
                         <p>
@@ -916,7 +916,7 @@ http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=2
                     <li>
                         <p>
                             <b><code>xxforms:instance()</code> extension function.</b> The <a
-                            href="reference-xforms-ng#xxforms-instance"><code>xxforms:instance()</code></a>
+                            href="reference-xforms-2#xxforms-instance"><code>xxforms:instance()</code></a>
                             function works like the standard <code>instance()</code> function except that it
                             searches for instances in all the models of the XForms document.
                         </p>
@@ -924,7 +924,7 @@ http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=2
                     <li>
                         <p>
                             <b><code>exforms:sort()</code> extension function.</b> The <a
-                            href="reference-xforms-ng#exforms-sort"><code>exforms:sort()</code></a> function
+                            href="reference-xforms-2#exforms-sort"><code>exforms:sort()</code></a> function
                             implements the <a href="http://exforms.org/sorting.html">eXforms proposal's</a> sorting
                             function.
                         </p>
@@ -932,7 +932,7 @@ http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=2
                     <li>
                         <p>
                             <b><code>xxforms:context()</code> extension function.</b> The <a
-                            href="reference-xforms-ng#xxforms-context"><code>xxforms:context()</code></a> XPath
+                            href="reference-xforms-2#xxforms-context"><code>xxforms:context()</code></a> XPath
                             function allows you to obtain the evaluation context for an enclosing
                             <code>xforms:group</code>, <code>xforms:repeat</code>, or <code>xforms:switch</code>.
                         </p>
@@ -940,7 +940,7 @@ http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=2
                     <li>
                         <p>
                             <b><code>xxforms:evaluate()</code> extension function.</b> The <a
-                            href="reference-xforms-ng#xxforms-serialize"><code>xxforms:serialize()</code></a> XPath
+                            href="reference-xforms-2#xxforms-serialize"><code>xxforms:serialize()</code></a> XPath
                             functions allow you to respectively evaluate dynamic XPath expressions and serialize XML
                             documents.
                         </p>
@@ -948,7 +948,7 @@ http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=2
                     <li>
                         <p>
                             <b><code>xxforms:repeat-current()</code> extension function.</b> The <a
-                            href="reference-xforms-ng#xxforms-repeat-current"><code>xxforms:repeat-current()</code></a>
+                            href="reference-xforms-2#xxforms-repeat-current"><code>xxforms:repeat-current()</code></a>
                             XPath function allws you to find the current item of an enclosing
                             <code>xforms:repeat</code>.
                         </p>
@@ -956,7 +956,7 @@ http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=2
                     <li>
                         <p>
                             <b><code>xxforms:script</code> extension action.</b> A new extension action <a
-                            href="reference-xforms-ng#xxforms-script-extension"><code>xxforms:script</code></a>
+                            href="reference-xforms-2#xxforms-script-extension"><code>xxforms:script</code></a>
                             allows you to call client-side JavaScript code as a result of XForms events.
                         </p>
                     </li>
@@ -976,7 +976,7 @@ http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=2
             <section>
                 <title>XForms Instance Inspector</title>
                 <p>
-                    The new <a href="reference-xforms-ng#xforms-instance-inspector">Instance Inspector</a> allows you
+                    The new <a href="reference-xforms-2#xforms-instance-inspector">Instance Inspector</a> allows you
                     to visualize all the instances of your XForms page.
                 </p>
                 <img src="../apps/doc/images/instance-inspector.png"/>

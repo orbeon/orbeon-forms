@@ -1,0 +1,122 @@
+<!--
+    Copyright (C) 2007 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:f="http://orbeon.org/oxf/xml/formatting"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:widget="http://orbeon.org/oxf/xml/widget"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xhtml:head>
+        <xhtml:title>Rows of Radio Buttons and Checkboxes</xhtml:title>
+        <xforms:model>
+            <xforms:instance id="form-instance">
+                <form>
+                    <select/>
+                    <select1/>
+                </form>
+            </xforms:instance>
+            <xforms:instance id="items-instance">
+                <items>
+                    <item label="One" value="1"/>
+                    <item label="Two" value="2"/>
+                    <item label="Three" value="3"/>
+                    <item label="Four" value="4"/>
+                    <item label="Five" value="5"/>
+                    <item label="Six" value="6"/>
+                    <item label="Seven" value="7"/>
+                    <item label="Eight" value="8"/>
+                </items>
+            </xforms:instance>
+        </xforms:model>
+        <xhtml:style type="text/css">
+            .controls .xforms-select span { width: 5em; display: -moz-inline-box; diplay: inline-block }
+            .controls .xforms-select1 span { width: 5em; display: -moz-inline-box; diplay: inline-block }
+        </xhtml:style>
+    </xhtml:head>
+    <xhtml:body>
+
+        <xhtml:div class="controls">
+            <xhtml:h2>Single Selection</xhtml:h2>
+
+            <xhtml:p>
+                NOTE: This works just fine but in theory controls should show out-of-range conditions.
+            </xhtml:p>
+
+            <xforms:group ref="select1">
+                <xforms:select1 ref="." appearance="full">
+                    <xforms:label/>
+                    <xforms:itemset nodeset="instance('items-instance')/item[position() ge 1 and position() le 3]">
+                        <xforms:label ref="@label"/>
+                        <xforms:value ref="@value"/>
+                    </xforms:itemset>
+                </xforms:select1>
+                <xhtml:br/>
+                <xforms:select1 ref="." appearance="full">
+                    <xforms:label/>
+                    <xforms:itemset nodeset="instance('items-instance')/item[position() ge 4 and position() le 6]">
+                        <xforms:label ref="@label"/>
+                        <xforms:value ref="@value"/>
+                    </xforms:itemset>
+                </xforms:select1>
+                <xhtml:br/>
+                <xforms:select1 ref="." appearance="full">
+                    <xforms:label/>
+                    <xforms:itemset nodeset="instance('items-instance')/item[position() ge 7 and position() le 9]">
+                        <xforms:label ref="@label"/>
+                        <xforms:value ref="@value"/>
+                    </xforms:itemset>
+                </xforms:select1>
+            </xforms:group>
+
+            <xhtml:h2>Multiple Selection</xhtml:h2>
+
+            <xhtml:p>
+                NOTE: This doesn't work as selecting a value in a row clears values selected with other rows. Not sure
+                what's the correct behavior as per the spec, so we sent emails to the public-forms mailing-list W3C to
+                get some clarifications. The controls may also have to show out-of-range conditions.
+            </xhtml:p>
+
+            <xforms:group ref="select">
+                <xforms:select ref="." appearance="full">
+                    <xforms:label/>
+                    <xforms:itemset nodeset="instance('items-instance')/item[position() ge 1 and position() le 3]">
+                        <xforms:label ref="@label"/>
+                        <xforms:value ref="@value"/>
+                    </xforms:itemset>
+                </xforms:select>
+                <xhtml:br/>
+                <xforms:select ref="." appearance="full">
+                    <xforms:label/>
+                    <xforms:itemset nodeset="instance('items-instance')/item[position() ge 4 and position() le 6]">
+                        <xforms:label ref="@label"/>
+                        <xforms:value ref="@value"/>
+                    </xforms:itemset>
+                </xforms:select>
+                <xhtml:br/>
+                <xforms:select ref="." appearance="full">
+                    <xforms:label/>
+                    <xforms:itemset nodeset="instance('items-instance')/item[position() ge 7 and position() le 9]">
+                        <xforms:label ref="@label"/>
+                        <xforms:value ref="@value"/>
+                    </xforms:itemset>
+                </xforms:select>
+            </xforms:group>
+        </xhtml:div>
+
+        <widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>
+
+    </xhtml:body>
+</xhtml:html>

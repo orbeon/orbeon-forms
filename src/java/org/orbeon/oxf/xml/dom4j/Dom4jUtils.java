@@ -428,8 +428,8 @@ public class Dom4jUtils {
         qNameString = qNameString.trim();
         if (qNameString.length() == 0)
             return null;
-        Map namespaces = getNamespaceContext(element);
-        int colonIndex = qNameString.indexOf(':');
+        final Map namespaces = getNamespaceContext(element);
+        final int colonIndex = qNameString.indexOf(':');
         final String prefix;
         final String localName;
         final String namespaceURI;
@@ -526,12 +526,16 @@ public class Dom4jUtils {
 
         final Element parentElement = newRoot.getParent();
         final Map parentNamespaceContext = Dom4jUtils.getNamespaceContext(parentElement);
+        final Map rootElementNamespaceContext = Dom4jUtils.getNamespaceContext(rootElement);
 
         for (Iterator k = parentNamespaceContext.keySet().iterator(); k.hasNext();) {
             final String prefix = (String) k.next();
-            final String uri = (String) parentNamespaceContext.get(prefix);
-            if (rootElement.getNamespaceForPrefix(prefix) == null)
+            // NOTE: Don't use rootElement.getNamespaceForPrefix() because that will return the element prefix's
+            // namespace even if there are no namespace nodes
+            if (rootElementNamespaceContext.get(prefix) == null) {
+                final String uri = (String) parentNamespaceContext.get(prefix);
                 rootElement.addNamespace(prefix, uri);
+            }
         }
 
         return document;

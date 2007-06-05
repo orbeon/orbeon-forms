@@ -29,11 +29,13 @@ import com.sun.msv.verifier.regexp.StringToken;
 import com.sun.msv.verifier.regexp.ExpressionAcceptor;
 import com.sun.msv.verifier.regexp.SimpleAcceptor;
 import com.sun.msv.verifier.regexp.xmlschema.XSAcceptor;
+import com.sun.msv.verifier.regexp.xmlschema.XSREDocDecl;
 import com.sun.msv.datatype.xsd.DatatypeFactory;
 import com.sun.msv.datatype.xsd.XSDatatype;
 import org.apache.log4j.Logger;
 import org.dom4j.Attribute;
 import org.dom4j.Element;
+import org.dom4j.QName;
 import org.orbeon.oxf.cache.Cache;
 import org.orbeon.oxf.cache.CacheKey;
 import org.orbeon.oxf.cache.ObjectCache;
@@ -48,7 +50,9 @@ import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.msv.IDConstraintChecker;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.TransformerUtils;
+import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.om.NodeInfo;
 import org.relaxng.datatype.Datatype;
 import org.relaxng.datatype.DatatypeException;
@@ -198,11 +202,18 @@ public class XFormsModelSchemaValidator {
     }
 
     private static class ValidationContext implements IDContextProvider2 {
+
+        private Element currentElement;
+
+        public void setCurrentElement(Element currentElement) {
+            this.currentElement = currentElement;
+        }
+
         public void onID(final Datatype dt, final String s) {
         }
 
-        public String resolveNamespacePrefix(final String s) {
-            return null;
+        public String resolveNamespacePrefix(final String prefix) {
+            return (String) Dom4jUtils.getNamespaceContext(currentElement).get(prefix);
         }
 
         public String getBaseUri() {
@@ -264,6 +275,7 @@ public class XFormsModelSchemaValidator {
                 final String attributeValue = attribute.getValue();
                 attributes.addAttribute(attributeURI, attributeName, attributeQName, null, attributeValue);
             }
+            validationContext.setCurrentElement(element);
             startTagInfo = new StartTagInfo(uri, name, qName, attributes, validationContext);
         }
 
@@ -347,9 +359,23 @@ public class XFormsModelSchemaValidator {
      */
     private void validateElementLax(final Element element) {
 
-        final String elementURI = element.getNamespaceURI();
-        final String elementName = element.getName();
-//        final String elementQName = element.getQualifiedName();
+        final String elementURI;
+        final String elementName;
+
+        // NOTE: We do some special processing for xsi:type to find if there is a type declared for it. If not, we do
+        // lax processing. However, it is not clear whether we should apply lax processing in this case or not. Maybe if
+        // an xsi:type is specified and not found, the element should just be invalid.
+        final QName xsiType = Dom4jUtils.extractAttributeValueQName(element, XMLConstants.XSI_TYPE_QNAME);
+        if (xsiType != null) {
+            // Honor xsi:type
+            elementURI = xsiType.getNamespaceURI();
+            elementName = xsiType.getName();
+        } else {
+            // Use element name
+            elementURI = element.getNamespaceURI();
+            elementName = element.getName();
+        }
+
         {
             // Find expression for element type
             final Expression expression;
@@ -358,7 +384,17 @@ public class XFormsModelSchemaValidator {
                 final XMLSchemaSchema schema = ((XMLSchemaGrammar) schemaGrammar).getByNamespace(elementURI);
                 if (schema != null) {
                     // Try to find the expression in the schema
-                    expression = schema.elementDecls.get(elementName);
+                    final ElementDeclExp elementDeclExp = schema.elementDecls.get(elementName);
+                    if (elementDeclExp != null) {
+                        // Found element type
+                        expression = elementDeclExp;
+                    } else if (xsiType != null) {
+                        // Try also complex type
+                        expression = schema.complexTypes.get(elementName);
+                    } else {
+                        // No type found
+                        expression = null;
+                    }
                 } else {
                     // No schema so no expression
                     expression = null;
@@ -625,7 +661,7 @@ public class XFormsModelSchemaValidator {
 
             // Create REDocumentDeclaration if needed
             if (documentDeclaration == null) {
-                documentDeclaration = new REDocumentDeclaration(schemaGrammar);
+                documentDeclaration = createDocumentDeclaration(schemaGrammar);
             }
 
             // Get validation mode ("lax" is the default)
@@ -668,7 +704,7 @@ public class XFormsModelSchemaValidator {
 
         // Create REDocumentDeclaration if needed
         if (documentDeclaration == null) {
-            documentDeclaration = new REDocumentDeclaration(schemaGrammar);
+            documentDeclaration = createDocumentDeclaration(schemaGrammar);
         }
 
         // Find expression to use to validate
@@ -752,6 +788,19 @@ public class XFormsModelSchemaValidator {
 
         // Value is valid
         return null;
+    }
+
+    /**
+     * Create an REDocumentDeclaration.
+     *
+     * @param grammar   Grammar to use
+     * @return          REDocumentDeclaration for that Grammar
+     */
+    private REDocumentDeclaration createDocumentDeclaration(Grammar grammar) {
+        if (grammar instanceof XMLSchemaGrammar)
+            return new XSREDocDecl((XMLSchemaGrammar) grammar);
+        else
+            return new REDocumentDeclaration(grammar);
     }
 
     /**

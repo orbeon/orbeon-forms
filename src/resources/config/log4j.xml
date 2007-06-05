@@ -1,5 +1,5 @@
 <!--
-    Copyright (C) 2006 Orbeon, Inc.
+    Copyright (C) 2006-2007 Orbeon, Inc.
   
     This program is free software; you can redistribute it and/or modify it under the terms of the
     GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -31,7 +31,7 @@
         <param name="LocationInfo" value="true"/>
     </appender>
     
-    <!-- This is the OPS Studio monitor -->
+    <!-- This is the Orbeon Forms Studio monitor -->
     <appender name="OPSMonitor" class="org.apache.log4j.net.SocketHubAppender">
         <param name="Port" value="4446"/>
         <param name="LocationInfo" value="true"/>
@@ -82,10 +82,6 @@
         <priority value="debug"/>
     </category>
 
-    <category name="org.orbeon.oxf.xforms.processor.XFormsServer">
-        <priority value="debug"/>
-    </category>
-
     <category name="org.orbeon.oxf.processor.PageFlowControllerProcessor">
         <priority value="debug"/>
     </category>
@@ -102,6 +98,19 @@
         <priority value="info"/>
     </category>
     -->
+
+    <!-- Prevent extra display of eXist paging activity -->
+    <category name="org.exist.storage.btree.Paged">
+        <priority value="warn"/>
+    </category>
+
+    <category name="org.exist.storage.DBBroker">
+        <priority value="warn"/>
+    </category>
+
+    <category name="org.exist.storage.BrokerPool">
+        <priority value="warn"/>
+    </category>
 
     <!-- You decide here which one of the loggers listed above you want to use. -->
     <root>

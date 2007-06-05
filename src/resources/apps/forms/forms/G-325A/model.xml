@@ -25,7 +25,6 @@
 
     <xforms:bind nodeset="instance('document-instance')">
         <xforms:bind nodeset="." readonly="xxforms:instance('parameters-instance')/readonly = 'true'"/>
-        <xforms:bind nodeset=".//date" type="xs:date"/>
     </xforms:bind>
 
     <!-- XForms instance for widget control information -->

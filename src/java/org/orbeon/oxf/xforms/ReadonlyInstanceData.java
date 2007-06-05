@@ -49,7 +49,7 @@ public class ReadonlyInstanceData extends InstanceData {
     };
 
     private static final TypeModelItemProperty CONSTANT_TYPE_MIP = new TypeModelItemProperty() {
-        public void set(int value) {
+        public void set(String valueAsString) {
             throwException();
         }
     };

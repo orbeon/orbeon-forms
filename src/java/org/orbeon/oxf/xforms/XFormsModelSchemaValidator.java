@@ -30,6 +30,7 @@ import com.sun.msv.verifier.regexp.ExpressionAcceptor;
 import com.sun.msv.verifier.regexp.SimpleAcceptor;
 import com.sun.msv.verifier.regexp.xmlschema.XSAcceptor;
 import com.sun.msv.datatype.xsd.DatatypeFactory;
+import com.sun.msv.datatype.xsd.XSDatatype;
 import org.apache.log4j.Logger;
 import org.dom4j.Attribute;
 import org.dom4j.Element;
@@ -302,6 +303,20 @@ public class XFormsModelSchemaValidator {
                 addSchemaError(element, stringRef.str);
             } else {
                 return false;
+            }
+        } else if (datatypeRef.types != null && datatypeRef.types.length > 0) {
+            // This element is valid and has at least one assigned datatype
+
+            // Attempt to set datatype name
+            final InstanceData instanceData = XFormsUtils.getLocalInstanceData(element);
+            final Datatype datatype = datatypeRef.types[0];
+            if (datatype instanceof XSDatatype) {
+                final XSDatatype xsDatatype = (XSDatatype) datatype;
+                final String datatTypeURI = xsDatatype.getNamespaceUri();
+                final String datatTypeName = xsDatatype.getName();
+
+                if (datatTypeName != null && !datatTypeName.equals(""))
+                    instanceData.getType().set(XMLUtils.buildExplodedQName(datatTypeURI, datatTypeName));
             }
         }
 

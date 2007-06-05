@@ -138,7 +138,7 @@
                                 </xforms:input>
                             </td>
                             <td>
-                                <xforms:select1 ref="dmv:state">
+                                <xforms:select1 ref="dmv:state" xxforms:refresh-items="false">
                                     <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/state" class="dmv-address-col2-label"/>
                                     <xforms:alert model="resources-model" ref="instance('resources-instance')/detail/alerts/state"/>
                                     <xforms:item>
@@ -245,7 +245,7 @@
                                     <xforms:alert model="resources-model" ref="instance('resources-instance')/detail/alerts/city"/>
                                     <!--<xforms:hint>Do Not Abbreviate - Use First 22 Characters in City Name</xforms:hint>-->
                                 </xforms:input>
-                                <xforms:select1 ref="dmv:state">
+                                <xforms:select1 ref="dmv:state" xxforms:refresh-items="false">
                                     <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/state"/>
                                     <xforms:alert model="resources-model" ref="instance('resources-instance')/detail/alerts/state"/>
                                     <xforms:item>
@@ -509,7 +509,7 @@
                                 <xforms:alert model="resources-model" ref="instance('resources-instance')/detail/alerts/city"/>
                                 <!--<xforms:hint>Do Not Abbreviate - Use First 22 Characters in City Name</xforms:hint>-->
                             </xforms:input>
-                            <xforms:select1 ref="dmv:state">
+                            <xforms:select1 ref="dmv:state" xxforms:refresh-items="false">
                                 <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/state"/>
                                 <xforms:alert model="resources-model" ref="instance('resources-instance')/detail/alerts/state"/>
                                 <xforms:item>

@@ -123,5 +123,15 @@
         </xs:complexType>
     </xs:element>
 
+    <xs:element name="nillable-state-element" nillable="true">
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="test:state-type">
+                   <xs:attribute name="code" type="xs:integer"/>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+
 </xs:schema>
 

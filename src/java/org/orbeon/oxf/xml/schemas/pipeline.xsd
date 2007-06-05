@@ -1,5 +1,5 @@
 <!--
-    Copyright (C) 2004 Orbeon, Inc.
+    Copyright (C) 2004-2007 Orbeon, Inc.
   
     This program is free software; you can redistribute it and/or modify it under the terms of the
     GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -17,48 +17,72 @@
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
            elementFormDefault="qualified" 
            attributeFormDefault="unqualified" 
-           xsi:schemaLocation="http://www.w3.org/2001/XMLSchema http://www.w3.org/2001/XMLSchema.xsd"> 
-    <xs:element name="config">
+           xsi:schemaLocation="http://www.w3.org/2001/XMLSchema http://www.w3.org/2001/XMLSchema.xsd">
+
+    <xs:element name="config" type="p:pipeline-content">
         <xs:annotation>
             <xs:documentation>XPL root element</xs:documentation>
         </xs:annotation>
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element name="param" minOccurs="0" maxOccurs="unbounded">
-                    <xs:complexType>
-                        <xs:attribute name="name" type="xs:string" use="required"/>
-                        <xs:attribute name="type" use="required">
-                            <xs:simpleType>
-                                <xs:restriction base="xs:token">
-                                    <xs:enumeration value="input"/>
-                                    <xs:enumeration value="output"/>
-                                </xs:restriction>
-                            </xs:simpleType>
-                        </xs:attribute>
-                        <xs:attributeGroup ref="p:debug-schema-attributes"/>
-                    </xs:complexType>
-                </xs:element>
-                <xs:group ref="p:statements"/>
-            </xs:sequence>
-            <xs:anyAttribute namespace="##other" processContents="lax"/>
-        </xs:complexType>
-        <xs:key name="params-unique" >
+        <xs:key name="params-unique-1">
           <xs:annotation>
             <xs:documentation>For params the pair ( name, type ) must be unique</xs:documentation>
           </xs:annotation>
-          <xs:selector xpath="p:param" />
-          <xs:field xpath="@name" />
-          <xs:field xpath="@type" />
+          <xs:selector xpath="p:param"/>
+          <xs:field xpath="@name"/>
+          <xs:field xpath="@type"/>
         </xs:key>
-        <xs:unique name="output-ids-unique">
+        <xs:unique name="output-ids-unique-1">
           <xs:selector xpath="p:processor/p:output|p:for-each"/>
           <xs:field xpath="@id"/>
         </xs:unique>
-        <xs:unique name="output-refs-unique">
+        <xs:unique name="output-refs-unique-1">
           <xs:selector xpath="p:processor/p:output|p:for-each"/>
           <xs:field xpath="@ref"/>
         </xs:unique>
     </xs:element>
+    <xs:element name="pipeline" type="p:pipeline-content">
+        <xs:annotation>
+            <xs:documentation>XPL root element</xs:documentation>
+        </xs:annotation>
+        <xs:key name="params-unique-2" >
+          <xs:annotation>
+            <xs:documentation>For params the pair ( name, type ) must be unique</xs:documentation>
+          </xs:annotation>
+          <xs:selector xpath="p:param"/>
+          <xs:field xpath="@name"/>
+          <xs:field xpath="@type"/>
+        </xs:key>
+        <xs:unique name="output-ids-unique-2">
+          <xs:selector xpath="p:processor/p:output|p:for-each"/>
+          <xs:field xpath="@id"/>
+        </xs:unique>
+        <xs:unique name="output-refs-unique-2">
+          <xs:selector xpath="p:processor/p:output|p:for-each"/>
+          <xs:field xpath="@ref"/>
+        </xs:unique>
+    </xs:element>
+    <xs:complexType name="pipeline-content">
+        <xs:sequence>
+            <xs:element name="param" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                    <xs:attribute name="name" type="xs:string" use="required"/>
+                    <xs:attribute name="type" use="required">
+                        <xs:simpleType>
+                            <xs:restriction base="xs:token">
+                                <xs:enumeration value="input"/>
+                                <xs:enumeration value="output"/>
+                            </xs:restriction>
+                        </xs:simpleType>
+                    </xs:attribute>
+                    <xs:attributeGroup ref="p:debug-schema-attributes"/>
+                    <xs:anyAttribute namespace="##other" processContents="lax"/>
+                </xs:complexType>
+            </xs:element>
+            <xs:group ref="p:statements"/>
+        </xs:sequence>
+        <xs:anyAttribute namespace="##other" processContents="lax"/>
+    </xs:complexType>
+
     <xs:group name="statement">
         <xs:sequence>
             <xs:choice>
@@ -73,6 +97,7 @@
                                     <xs:attribute name="name" type="xs:NCName" use="required"/>
                                     <xs:attribute name="href" type="xs:string" use="optional"/>
                                     <xs:attributeGroup ref="p:debug-schema-attributes"/>
+                                    <xs:anyAttribute namespace="##other" processContents="lax"/>
                                 </xs:complexType>
                             </xs:element>
                             <xs:element name="output" minOccurs="0" maxOccurs="unbounded">
@@ -84,12 +109,14 @@
                                     <xs:attribute name="id" type="xs:NCName" use="optional"/>
                                     <xs:attribute name="ref" type="xs:NCName" use="optional"/>
                                     <xs:attributeGroup ref="p:debug-schema-attributes"/>
+                                    <xs:anyAttribute namespace="##other" processContents="lax"/>
                                 </xs:complexType>
                             </xs:element>
                         </xs:sequence>
                         <xs:attribute name="uri" type="xs:anyURI" use="optional"/>
                         <xs:attribute name="name" type="xs:anyURI" use="optional"/>
                         <xs:attribute name="encapsulation" type="xs:string" use="optional"/>
+                        <xs:anyAttribute namespace="##other" processContents="lax"/>
                     </xs:complexType>
                     <xs:key name="input-name-unique">
                         <xs:selector xpath="p:input"/>
@@ -104,56 +131,60 @@
                     <xs:complexType>
                         <xs:sequence>
                             <xs:element name="when" maxOccurs="unbounded">
-                              <xs:complexType>
-                                <xs:group ref="p:statements"/>
-                                <xs:attribute name="test" type="xs:string" use="required"/>
-                              </xs:complexType>
-                              <xs:unique name="output-ids-in-when-unique">
-                                <xs:selector xpath="p:processor/p:output|p:for-each"/>
-                                <xs:field xpath="@id"/>
-                              </xs:unique>
-                              <xs:unique name="output-refs-in-when-unique">
-                                <xs:selector xpath="p:processor/p:output|p:for-each"/>
-                                <xs:field xpath="@ref"/>
-                              </xs:unique>
+                                <xs:complexType>
+                                    <xs:group ref="p:statements"/>
+                                    <xs:attribute name="test" type="xs:string" use="required"/>
+                                    <xs:anyAttribute namespace="##other" processContents="lax"/>
+                                </xs:complexType>
+                                <xs:unique name="output-ids-in-when-unique">
+                                    <xs:selector xpath="p:processor/p:output|p:for-each"/>
+                                    <xs:field xpath="@id"/>
+                                </xs:unique>
+                                <xs:unique name="output-refs-in-when-unique">
+                                    <xs:selector xpath="p:processor/p:output|p:for-each"/>
+                                    <xs:field xpath="@ref"/>
+                                </xs:unique>
                             </xs:element>
                             <xs:element name="otherwise" minOccurs="0">
-                              <xs:complexType>
-                                <xs:group ref="p:statements"/>
-                              </xs:complexType>
-                              <xs:unique name="output-ids-in-otherwise-unique">
-                                <xs:selector xpath="p:processor/p:output|p:for-each"/>
-                                <xs:field xpath="@id"/>
-                              </xs:unique>
-                              <xs:unique name="output-refs-in-otherwise-unique">
-                                <xs:selector xpath="p:processor/p:output|p:for-each"/>
-                                <xs:field xpath="@ref"/>
-                              </xs:unique>
+                                <xs:complexType>
+                                    <xs:group ref="p:statements"/>
+                                    <xs:anyAttribute namespace="##other" processContents="lax"/>
+                                </xs:complexType>
+                                <xs:unique name="output-ids-in-otherwise-unique">
+                                    <xs:selector xpath="p:processor/p:output|p:for-each"/>
+                                    <xs:field xpath="@id"/>
+                                </xs:unique>
+                                <xs:unique name="output-refs-in-otherwise-unique">
+                                    <xs:selector xpath="p:processor/p:output|p:for-each"/>
+                                    <xs:field xpath="@ref"/>
+                                </xs:unique>
                             </xs:element>
                         </xs:sequence>
                         <xs:attribute name="href" type="xs:string" use="required"/>
                         <xs:attributeGroup ref="p:debug-schema-attributes"/>
+                        <xs:anyAttribute namespace="##other" processContents="lax"/>
                     </xs:complexType>
                 </xs:element>
                 <xs:element name="for-each">
-                  <xs:complexType>
-                    <xs:group ref="p:statements"/>
-                    <xs:attribute name="href" type="xs:string" use="required"/>
-                    <xs:attribute name="select" type="xs:string" use="required"/>
-                    <xs:attribute name="id" type="xs:NCName" use="optional"/>
-                    <xs:attribute name="ref" type="xs:NCName" use="optional"/>
-                    <xs:attribute name="root" type="xs:QName" use="optional"/>
-                    <xs:attribute name="input-debug" type="xs:string" use="optional"/>
-                    <xs:attribute name="output-debug" type="xs:string" use="optional"/>
-                  </xs:complexType>
-                  <xs:unique name="output-ids-in-for-unique">
-                    <xs:selector xpath="p:processor/p:output|p:for-each"/>
-                    <xs:field xpath="@id"/>
-                  </xs:unique>
-                  <xs:unique name="output-refs-in-for-unique">
-                    <xs:selector xpath="p:processor/p:output|p:for-each"/>
-                    <xs:field xpath="@ref"/>
-                  </xs:unique>
+                    <xs:complexType>
+                        <xs:group ref="p:statements"/>
+                        <xs:attribute name="href" type="xs:string" use="required"/>
+                        <xs:attribute name="select" type="xs:string" use="required"/>
+                        <xs:attribute name="id" type="xs:NCName" use="optional"/>
+                        <xs:attribute name="ref" type="xs:NCName" use="optional"/>
+                        <xs:attribute name="root" type="xs:QName" use="optional"/>
+                        <xs:attribute name="input-debug" type="xs:string" use="optional"/>
+                        <xs:attribute name="output-debug" type="xs:string" use="optional"/>
+                        <xs:anyAttribute namespace="##other" processContents="lax"/>
+                    </xs:complexType>
+                    <xs:unique name="output-ids-in-for-unique">
+                        <xs:selector xpath="p:processor/p:output|p:for-each"/>
+                        <xs:field xpath="@id"/>
+                    </xs:unique>
+                    <xs:unique name="output-refs-in-for-unique">
+                        <xs:selector xpath="p:processor/p:output|p:for-each"/>
+                        <xs:field xpath="@ref"/>
+                    </xs:unique>
                 </xs:element>
             </xs:choice>
         </xs:sequence>

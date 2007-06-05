@@ -78,7 +78,7 @@ public class PipelineReader extends ProcessorImpl {
 
         Document pipelineDocument = readInputAsDOM4J(context, "pipeline");
 
-        Element configElement = (Element) XPathUtils.selectSingleNode(pipelineDocument, "p:config", PREFIXES);
+        Element configElement = (Element) XPathUtils.selectSingleNode(pipelineDocument, "p:config | p:pipeline", PREFIXES);
         List params = new ArrayList();
 
         // Read params

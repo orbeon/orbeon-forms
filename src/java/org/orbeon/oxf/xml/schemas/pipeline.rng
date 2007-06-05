@@ -1,5 +1,5 @@
 <!--
-    Copyright (C) 2004 Orbeon, Inc.
+    Copyright (C) 2004-2007 Orbeon, Inc.
   
     This program is free software; you can redistribute it and/or modify it under the terms of the
     GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -20,18 +20,24 @@
     </start>
 
     <define name="config">
-        <element name="p:config">
+        <element>
+            <choice>
+                <name>p:config</name>
+                <name>p:pipeline</name>
+            </choice>
+            <ref name="anyAttributeOtherNS"/>
             <optional>
                 <attribute name="id"/>
             </optional>
             <ref name="param"/>
-            <ref name="statement"/>
+            <ref name="statements"/>
         </element>
     </define>
 
     <define name="param">
         <zeroOrMore>
             <element name="p:param">
+                <ref name="anyAttributeOtherNS"/>
                 <attribute name="name"/>
                 <attribute name="type">
                     <choice>
@@ -45,7 +51,7 @@
         </zeroOrMore>
     </define>
 
-    <define name="statement">
+    <define name="statements">
         <interleave>
             <zeroOrMore>
                 <ref name="processor"/>
@@ -61,6 +67,7 @@
 
     <define name="processor">
         <element name="p:processor">
+            <ref name="anyAttributeOtherNS"/>
             <choice>
                 <attribute name="uri"/>
                 <attribute name="name"/>
@@ -81,6 +88,7 @@
             <interleave>
                 <zeroOrMore>
                     <element name="p:input">
+                        <ref name="anyAttributeOtherNS"/>
                         <attribute name="name"/>
                         <ref name="debug"/>
                         <ref name="schemas"/>
@@ -93,6 +101,7 @@
 
                 <zeroOrMore>
                     <element name="p:output">
+                        <ref name="anyAttributeOtherNS"/>
                         <attribute name="name"/>
                         <ref name="schemas"/>
                         <ref name="debug"/>
@@ -113,19 +122,22 @@
 
     <define name="choose">
         <element name="p:choose">
+            <ref name="anyAttributeOtherNS"/>
             <attribute name="href"/>
             <optional>
                 <attribute name="debug"/>
             </optional>
             <oneOrMore>
                 <element name="p:when">
+                    <ref name="anyAttributeOtherNS"/>
                     <attribute name="test"/>
-                    <ref name="statement"/>
+                    <ref name="statements"/>
                 </element>
             </oneOrMore>
             <optional>
                 <element name="p:otherwise">
-                    <ref name="statement"/>
+                    <ref name="anyAttributeOtherNS"/>
+                    <ref name="statements"/>
                 </element>
             </optional>
         </element>
@@ -133,6 +145,7 @@
 
     <define name="for-each">
         <element name="p:for-each">
+            <ref name="anyAttributeOtherNS"/>
             <attribute name="href"/>
             <attribute name="select"/>
             <optional>
@@ -164,7 +177,7 @@
                     <attribute name="output-schema-uri"/>
                 </choice>
             </optional>
-            <ref name="statement"/>
+            <ref name="statements"/>
         </element>
     </define>
 
@@ -196,6 +209,20 @@
                 </choice>
             </zeroOrMore>
         </element>
+    </define>
+
+    <define name="anyAttributeOtherNS">
+        <!-- Can contain any number of extra attributes in any non-null namespace which is not the p: namespace -->
+        <zeroOrMore>
+            <attribute>
+                <anyName>
+                    <except>
+                        <nsName ns=""/>
+                        <nsName ns="http://www.orbeon.com/oxf/pipeline"/>
+                    </except>
+                </anyName>
+            </attribute>
+        </zeroOrMore>
     </define>
 
 </grammar>

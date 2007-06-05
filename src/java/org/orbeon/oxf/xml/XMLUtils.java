@@ -123,29 +123,47 @@ public class XMLUtils {
         return newSAXParser(false, true);
     }
 
+    /**
+     * Get a SAXParserFactory to build combinations of validating and XInclude-aware SAXParser.
+     *
+     * @param validating        whether the factory creates validating parsers
+     * @param handleXInclude    whether the factory creates XInclude-aware parsers
+     * @return                  the SAXParserFactory
+     */
+    public static synchronized SAXParserFactory getSAXParserFactory(boolean validating, boolean handleXInclude) {
+        if (validating) {
+            if (handleXInclude) {
+                if (validatingXIncludeSAXParserFactory == null)
+                    validatingXIncludeSAXParserFactory = createSAXParserFactory(validating, handleXInclude);
+                return validatingXIncludeSAXParserFactory;
+            } else {
+                if (validatingSAXParserFactory == null)
+                    validatingSAXParserFactory = createSAXParserFactory(validating, handleXInclude);
+                return validatingSAXParserFactory;
+            }
+        } else {
+            if (handleXInclude) {
+                if (nonValidatingXIncludeSAXParserFactory == null)
+                    nonValidatingXIncludeSAXParserFactory = createSAXParserFactory(validating, handleXInclude);
+                return nonValidatingXIncludeSAXParserFactory;
+            } else {
+                if (nonValidatingSAXParserFactory == null)
+                    nonValidatingSAXParserFactory = createSAXParserFactory(validating, handleXInclude);
+                return nonValidatingSAXParserFactory;
+            }
+        }
+    }
+
+    /**
+     * Create a new SAXParser, which can be a combination of validating and/or XInclude-aware.
+     *
+     * @param validating        whether the parser is validating
+     * @param handleXInclude    whether the parser is XInclude-aware
+     * @return                  the SAXParser
+     */
     public static synchronized SAXParser newSAXParser(boolean validating, boolean handleXInclude) {
         try {
-            if (validating) {
-                if (handleXInclude) {
-                    if (validatingXIncludeSAXParserFactory == null)
-                        validatingXIncludeSAXParserFactory = createSAXParserFactory(validating, handleXInclude);
-                    return validatingXIncludeSAXParserFactory.newSAXParser();
-                } else {
-                    if (validatingSAXParserFactory == null)
-                        validatingSAXParserFactory = createSAXParserFactory(validating, handleXInclude);
-                    return validatingSAXParserFactory.newSAXParser();
-                }
-            } else {
-                if (handleXInclude) {
-                    if (nonValidatingXIncludeSAXParserFactory == null)
-                        nonValidatingXIncludeSAXParserFactory = createSAXParserFactory(validating, handleXInclude);
-                    return nonValidatingXIncludeSAXParserFactory.newSAXParser();
-                } else {
-                    if (nonValidatingSAXParserFactory == null)
-                        nonValidatingSAXParserFactory = createSAXParserFactory(validating, handleXInclude);
-                    return nonValidatingSAXParserFactory.newSAXParser();
-                }
-            }
+            return getSAXParserFactory(validating, handleXInclude).newSAXParser();
         } catch (Exception e) {
             throw new OXFException(e);
         }

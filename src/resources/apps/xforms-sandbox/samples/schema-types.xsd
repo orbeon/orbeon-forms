@@ -25,8 +25,8 @@
                         <!--<xs:attribute name="state" type="test:state"/>-->
                     <!--</xs:complexType>-->
                 <!--</xs:element>-->
-                <!--<xs:element name="state1" type="test:state"/>-->
-                <!--<xs:element name="state2" type="test:state"/>-->
+                <!--<xs:element name="state1" type="test:state-type"/>-->
+                <!--<xs:element name="state2" type="test:state-type"/>-->
             <!--</xs:sequence>-->
         <!--</xs:complexType>-->
     <!--</xs:element>-->
@@ -46,7 +46,7 @@
         </xs:restriction>
     </xs:simpleType>
 
-    <xs:simpleType name="state">
+    <xs:simpleType name="state-type">
         <xs:restriction base="xs:string">
             <xs:enumeration value="AL"/>
             <xs:enumeration value="AK"/>
@@ -104,6 +104,24 @@
             <xs:enumeration value="PR"/>
         </xs:restriction>
     </xs:simpleType>
+
+    <xs:complexType name="state-with-attribute">
+        <xs:simpleContent>
+            <xs:extension base="test:state-type">
+               <xs:attribute name="code" type="xs:integer"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+    <xs:element name="state-element">
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="test:state-type">
+                   <xs:attribute name="code" type="xs:integer"/>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
 
 </xs:schema>
 

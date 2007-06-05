@@ -18,6 +18,7 @@ import com.sun.msv.grammar.IDContextProvider2;
 import com.sun.msv.grammar.Expression;
 import com.sun.msv.grammar.xmlschema.*;
 import com.sun.msv.reader.GrammarReaderController;
+import com.sun.msv.reader.xmlschema.XMLSchemaReader;
 import com.sun.msv.reader.util.GrammarLoader;
 import com.sun.msv.util.DatatypeRef;
 import com.sun.msv.util.StartTagInfo;
@@ -45,6 +46,7 @@ import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.msv.IDConstraintChecker;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.NodeInfo;
 import org.relaxng.datatype.Datatype;
@@ -84,12 +86,12 @@ public class XFormsModelSchemaValidator {
 
         static private Logger logger = LoggerFactory.createLogger(MSVGrammarReaderController.class);
 
-        private final String base;
+        private final String baseURI;
         private final SchemaInfo schemaInfo;
 
-        MSVGrammarReaderController(final String bs, final SchemaInfo schmInf) {
-            base = bs;
-            schemaInfo = schmInf;
+        MSVGrammarReaderController(final String baseURI, final SchemaInfo schemaInfo) {
+            this.baseURI = baseURI;
+            this.schemaInfo = schemaInfo;
         }
 
         public void warning(final Locator[] locs, final String msg) {
@@ -117,7 +119,7 @@ public class XFormsModelSchemaValidator {
 
         public InputSource resolveEntity(final String pid, final String sid)
                 throws SAXException, IOException {
-            final java.net.URL u = URLFactory.createURL(base, sid);
+            final java.net.URL u = URLFactory.createURL(baseURI, sid);
             schemaInfo.addInclude(u);
 
             final String surl = u.toString();
@@ -358,7 +360,7 @@ public class XFormsModelSchemaValidator {
                 // Attributes
                 {
                     final List attributesList = element.attributes();
-                    for (final Iterator iterator = attributesList.iterator(); iterator.hasNext();) {
+                    for (final Iterator iterator = attributesList.iterator(); iterator.hasNext();)   {
                         final Attribute attribute = (Attribute) iterator.next();
                         final String attributeURI = attribute.getNamespaceURI();
                         final String attributeName = attribute.getName();
@@ -571,7 +573,7 @@ public class XFormsModelSchemaValidator {
 
                 final InputSource is = XMLUtils.ENTITY_RESOLVER.resolveEntity("", schemaURI);
                 final MSVGrammarReaderController controller = new MSVGrammarReaderController(schemaURI, newSchemaInfo);
-                final SAXParserFactory factory = XMLUtils.createSAXParserFactory(false, true);
+                final SAXParserFactory factory = XMLUtils.createSAXParserFactory(false, true);// could we use getSAXParserFactory() instead?
 
                 grammar = GrammarLoader.loadSchema(is, controller, factory);
                 newSchemaInfo.setGrammar(grammar);
@@ -585,8 +587,21 @@ public class XFormsModelSchemaValidator {
         }
     }
 
+    private Grammar loadGrammar(final String baseURI, final NodeInfo schemaElementInfo) {
+
+        final SchemaInfo newSchemaInfo = new SchemaInfo();
+        final MSVGrammarReaderController controller = new MSVGrammarReaderController(baseURI, newSchemaInfo);
+        final SAXParserFactory saxParserFactory = XMLUtils.getSAXParserFactory(false, false);
+        final XMLSchemaReader reader = new XMLSchemaReader(controller, saxParserFactory);
+
+        TransformerUtils.writeTinyTree(schemaElementInfo, reader);
+
+        return reader.getResult();
+    }
+
     /**
-     * Apply schema validation to an instance.
+     * Apply schema validation to an instance. The instance may content a hint specifying whether to perform "lax",
+     * "strict", or "skip" validation.
      *
      * @param instance          instance to validate
      */
@@ -657,18 +672,46 @@ public class XFormsModelSchemaValidator {
                 if (schema == null)
                     throw new ValidationException("No schema found for namespace: " + typeNamespaceURI, locationData);
 
-                final ComplexTypeExp complexTypeExpression = schema.complexTypes.get(typeLocalname);
-                if (complexTypeExpression != null) {
-                    // XForms mandates simple types
-                    // TODO: Actually complex type with simple content is also allowed
-                    throw new ValidationException("Simple type required for type: " + typeQName, locationData);
-                } else {
-                    // Find simple type in schema
-                    final SimpleTypeExp simpleTypeExpression = schema.simpleTypes.get(typeLocalname);
-                    if (simpleTypeExpression == null)
-                        throw new ValidationException("Simple type not found: " + typeQName, locationData);
-
+                // Find simple type in schema
+                final SimpleTypeExp simpleTypeExpression = schema.simpleTypes.get(typeLocalname);
+                if (simpleTypeExpression != null) {
+                    // There is a simple type definition
                     contentModelExpression = simpleTypeExpression;
+                } else {
+                    // Find complex type in schema
+                    final ComplexTypeExp complexTypeExpression = schema.complexTypes.get(typeLocalname);
+                    if (complexTypeExpression != null) {
+                        // There is a complex type definition
+                        if (complexTypeExpression != null && complexTypeExpression.simpleBaseType != null) {
+                            // Complex type with simple content
+                            // Here, we only validate the datatype part
+                            // NOTE: Here we are guessing a little bit from MSV by looking at simpleBaseType. Is this 100% correct?
+                            contentModelExpression = complexTypeExpression;
+                        } else {
+                            // XForms mandates simple types or complex types with simple content
+                            throw new ValidationException("Simple type or complex type with simple content required for type: " + typeQName, locationData);
+                        }
+                    } else {
+                        // Find element declaration in schema
+                        final ElementDeclExp elementDeclExp = schema.elementDecls.get(typeLocalname);
+                        if (elementDeclExp != null) {
+                            // There is an element type definition
+                            final ElementDeclExp.XSElementExp xsElementExp = elementDeclExp.getElementExp();
+                            final Expression contentModel = xsElementExp.contentModel;
+                            if (contentModel instanceof ComplexTypeExp && ((ComplexTypeExp) contentModel).simpleBaseType != null) {
+                                // Element complex type with simple content
+                                // Here, we only validate the datatype part
+                                // NOTE: Here again, we do some guesswork from MSV. Is this 100% correct?
+                                contentModelExpression = contentModel;
+                            } else {
+                                throw new ValidationException("Simple type or complex type with simple content required for type: " + typeQName, locationData);
+                            }
+                        } else {
+                            // XForms mandates simple types or complex types with simple content
+                            throw new ValidationException("Simple type or complex type with simple content required for type: " + typeQName, locationData);
+                        }
+                    }
+                    // TODO: Must also look at schema.attributeDecls?
                 }
             }
         }

@@ -545,7 +545,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
 
                         // Get value to validate
-                        final String nodeStringValue = XFormsInstance.getValueForNodeInfo(nodeInfo).trim();// TODO: should we really trim?
+                        final String nodeStringValue = XFormsInstance.getValueForNodeInfo(nodeInfo);
 
                         // TODO: XForms 1.1: "The type model item property is not applied to instance nodes that contain child elements"
 

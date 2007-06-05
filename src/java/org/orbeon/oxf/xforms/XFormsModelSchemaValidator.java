@@ -431,6 +431,7 @@ public class XFormsModelSchemaValidator {
                         }
                         if (attributeExpression != null) {
                             // TODO: find out way of validating an attribute only
+                            // TODO: should we also look at schema.attributeGroups?
 
 //                            final ExpressionAcceptor expressionAcceptor = new SimpleAcceptor(documentDeclaration, attributeExpression, null, null);
 //                            // Validate attribute value

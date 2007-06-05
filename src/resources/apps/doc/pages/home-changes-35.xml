@@ -228,6 +228,19 @@
                             href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=306628&amp;group_id=168&amp;atid=350207">#306628</a>.
                         </p>
                     </li>
+                    <li>
+                        <p>
+                            <b>Support for optimization hint on selection controls.</b> The new
+                            <code>xxforms:refresh-items</code> attribute on selection controls allows for performance
+                            improvements in certain cases. See <a
+                            href="reference-xforms-2#xxforms-refresh-items">Controlling Item Sets Refreshes with
+                            xxforms:refresh-items</a>.
+                        </p>
+                        <p>
+                            See issue <a
+                            href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=307152&amp;group_id=168&amp;atid=350207">#307152</a>.
+                        </p>
+                    </li>
                 </ul>
             </section>
             <section>

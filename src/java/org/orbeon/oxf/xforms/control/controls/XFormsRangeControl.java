@@ -16,10 +16,10 @@ package org.orbeon.oxf.xforms.control.controls;
 import org.dom4j.Element;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.xml.XMLUtils;
 
 /**
  * Represents an xforms:range control.
@@ -60,7 +60,7 @@ public class XFormsRangeControl extends XFormsValueControl {
     private String convertFromExternalValue(String externalValue) {
 
         if (getStart() != null && getEnd() != null
-                && XMLConstants.XS_INTEGER_EXPLODED_QNAME.equals(getType())) {
+                && (XMLConstants.XS_INTEGER_EXPLODED_QNAME.equals(getType()) || XFormsConstants.XFORMS_INTEGER_EXPLODED_QNAME.equals(getType()))) {
 
             final int start = Integer.parseInt(getStart());
             final int end = Integer.parseInt(getEnd());
@@ -75,7 +75,7 @@ public class XFormsRangeControl extends XFormsValueControl {
     public String convertToExternalValue(String internalValue) {
 
         if (getStart() != null && getEnd() != null
-                && XMLConstants.XS_INTEGER_EXPLODED_QNAME.equals(getType())) {
+                && (XMLConstants.XS_INTEGER_EXPLODED_QNAME.equals(getType()) || XFormsConstants.XFORMS_INTEGER_EXPLODED_QNAME.equals(getType()))) {
 
             final int start = Integer.parseInt(getStart());
             final int end = Integer.parseInt(getEnd());

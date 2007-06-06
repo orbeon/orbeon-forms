@@ -49,8 +49,6 @@ public abstract class HandlerBase extends ElementHandlerNew {
     // cannot be used; those should probably be in the XHTML namespace
     private static final String[] XHTML_ATTRIBUTES_TO_COPY = {"style", "onchange"};
 
-    private static final String XSD_PREFIX = "{" + XMLConstants.XSD_URI + "}";
-
     private boolean repeating;
     private boolean forwarding;
 
@@ -152,12 +150,12 @@ public abstract class HandlerBase extends ElementHandlerNew {
                 }
             }
             final String type = xformsControl.getType();
-            if (type != null && type.startsWith(XSD_PREFIX)) {
+            if (type != null && (type.startsWith(XFormsConstants.XSD_EXPLODED_TYPE_PREFIX) || type.startsWith(XFormsConstants.XFORMS_EXPLODED_TYPE_PREFIX))) {
                 // Control is bound to built-in schema type
                 if (sb.length() > 0)
                     sb.append(' ');
 
-                final String typeLocalname = type.substring(XSD_PREFIX.length());
+                final String typeLocalname = type.substring(type.indexOf('}') + 1);
                 sb.append("xforms-type-");
                 sb.append(typeLocalname);
             }
@@ -170,9 +168,20 @@ public abstract class HandlerBase extends ElementHandlerNew {
     }
 
     public static boolean isDateOrTime(String type) {
-        return XMLConstants.XS_DATE_EXPLODED_QNAME.equals(type)
-                || XMLConstants.XS_DATETIME_EXPLODED_QNAME.equals(type)
-                || XMLConstants.XS_TIME_EXPLODED_QNAME.equals(type);
+        if (type != null){
+            // Support both xs:* and xforms:*
+            final boolean isBuiltInSchemaType = type.startsWith(XFormsConstants.XSD_EXPLODED_TYPE_PREFIX);
+            final boolean isBuiltInXFormsType = type.startsWith(XFormsConstants.XFORMS_EXPLODED_TYPE_PREFIX);
+
+            if (isBuiltInSchemaType || isBuiltInXFormsType) {
+                final String typeName = type.substring(type.indexOf('}') + 1);
+                return "date".equals(typeName) || "dateTime".equals(typeName) || "time".equals(typeName);
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
     }
 
     protected void handleAccessibilityAttributes(Attributes srcAttributes, AttributesImpl destAttributes) {

@@ -95,35 +95,46 @@ public abstract class XFormsValueControl extends XFormsControl {
 
             final OXFProperties.PropertySet propertySet = OXFProperties.instance().getPropertySet();
 
+            // Format according to type
             final String type = getType();
-            if ("{http://www.w3.org/2001/XMLSchema}date".equals(type)) {
-                // Format a date
-                final String DEFAULT_FORMAT = "if (. castable as xs:date) then format-date(xs:date(.), '[MNn] [D], [Y]', 'en', (), ()) else .";
-                format = propertySet.getString(XFormsConstants.XFORMS_DEFAULT_DATE_FORMAT_PROPERTY, DEFAULT_FORMAT);
-            } else if ("{http://www.w3.org/2001/XMLSchema}dateTime".equals(type)) {
-                // Format a dateTime
-                final String DEFAULT_FORMAT = "if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), '[MNn] [D], [Y] [H01]:[m01]:[s01] UTC', 'en', (), ()) else .";
-                format = propertySet.getString(XFormsConstants.XFORMS_DEFAULT_DATETIME_FORMAT_PROPERTY, DEFAULT_FORMAT);
-            } else if ("{http://www.w3.org/2001/XMLSchema}time".equals(type)) {
-                // Format a time
-                final String DEFAULT_FORMAT = "if (. castable as xs:time) then format-time(xs:time(.), '[H01]:[m01]:[s01] UTC', 'en', (), ()) else .";
-                format = propertySet.getString(XFormsConstants.XFORMS_DEFAULT_TIME_FORMAT_PROPERTY, DEFAULT_FORMAT);
-            } else if ("{http://www.w3.org/2001/XMLSchema}decimal".equals(type)) {
-                // Format a decimal
-                final String DEFAULT_FORMAT = "if (. castable as xs:decimal) then format-number(xs:decimal(.),'#,##0.00') else .";
-                format = propertySet.getString(XFormsConstants.XFORMS_DEFAULT_DECIMAL_FORMAT_PROPERTY, DEFAULT_FORMAT);
-            } else if ("{http://www.w3.org/2001/XMLSchema}integer".equals(type)) {
-                // Format an integer
-                final String DEFAULT_FORMAT = "if (. castable as xs:integer) then format-number(xs:integer(.),'#,##0') else .";
-                format = propertySet.getString(XFormsConstants.XFORMS_DEFAULT_INTEGER_FORMAT_PROPERTY, DEFAULT_FORMAT);
-            } else if ("{http://www.w3.org/2001/XMLSchema}float".equals(type)) {
-                // Format a float
-                final String DEFAULT_FORMAT = "if (. castable as xs:float) then format-number(xs:float(.),'#,##0.000') else .";
-                format = propertySet.getString(XFormsConstants.XFORMS_DEFAULT_FLOAT_FORMAT_PROPERTY, DEFAULT_FORMAT);
-            } else if ("{http://www.w3.org/2001/XMLSchema}double".equals(type)) {
-                // Format a double
-                final String DEFAULT_FORMAT = "if (. castable as xs:double) then format-number(xs:double(.),'#,##0.000') else .";
-                format = propertySet.getString(XFormsConstants.XFORMS_DEFAULT_DOUBLE_FORMAT_PROPERTY, DEFAULT_FORMAT);
+            if (type != null){
+                // Support both xs:* and xforms:*
+                final boolean isBuiltInSchemaType = type.startsWith(XFormsConstants.XSD_EXPLODED_TYPE_PREFIX);
+                final boolean isBuiltInXFormsType = type.startsWith(XFormsConstants.XFORMS_EXPLODED_TYPE_PREFIX);
+
+                if (isBuiltInSchemaType || isBuiltInXFormsType) {
+                    final String typeName = type.substring(type.indexOf('}') + 1);
+
+                    if ("date".equals(typeName)) {
+                        // Format a date
+                        final String DEFAULT_FORMAT = "if (. castable as xs:date) then format-date(xs:date(.), '[MNn] [D], [Y]', 'en', (), ()) else .";
+                        format = propertySet.getString(XFormsConstants.XFORMS_DEFAULT_DATE_FORMAT_PROPERTY, DEFAULT_FORMAT);
+                    } else if ("dateTime".equals(typeName)) {
+                        // Format a dateTime
+                        final String DEFAULT_FORMAT = "if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), '[MNn] [D], [Y] [H01]:[m01]:[s01] UTC', 'en', (), ()) else .";
+                        format = propertySet.getString(XFormsConstants.XFORMS_DEFAULT_DATETIME_FORMAT_PROPERTY, DEFAULT_FORMAT);
+                    } else if ("time".equals(typeName)) {
+                        // Format a time
+                        final String DEFAULT_FORMAT = "if (. castable as xs:time) then format-time(xs:time(.), '[H01]:[m01]:[s01] UTC', 'en', (), ()) else .";
+                        format = propertySet.getString(XFormsConstants.XFORMS_DEFAULT_TIME_FORMAT_PROPERTY, DEFAULT_FORMAT);
+                    } else if ("decimal".equals(typeName)) {
+                        // Format a decimal
+                        final String DEFAULT_FORMAT = "if (. castable as xs:decimal) then format-number(xs:decimal(.),'#,##0.00') else .";
+                        format = propertySet.getString(XFormsConstants.XFORMS_DEFAULT_DECIMAL_FORMAT_PROPERTY, DEFAULT_FORMAT);
+                    } else if ("integer".equals(typeName)) {
+                        // Format an integer
+                        final String DEFAULT_FORMAT = "if (. castable as xs:integer) then format-number(xs:integer(.),'#,##0') else .";
+                        format = propertySet.getString(XFormsConstants.XFORMS_DEFAULT_INTEGER_FORMAT_PROPERTY, DEFAULT_FORMAT);
+                    } else if ("float".equals(typeName)) {
+                        // Format a float
+                        final String DEFAULT_FORMAT = "if (. castable as xs:float) then format-number(xs:float(.),'#,##0.000') else .";
+                        format = propertySet.getString(XFormsConstants.XFORMS_DEFAULT_FLOAT_FORMAT_PROPERTY, DEFAULT_FORMAT);
+                    } else if ("double".equals(typeName)) {
+                        // Format a double
+                        final String DEFAULT_FORMAT = "if (. castable as xs:double) then format-number(xs:double(.),'#,##0.000') else .";
+                        format = propertySet.getString(XFormsConstants.XFORMS_DEFAULT_DOUBLE_FORMAT_PROPERTY, DEFAULT_FORMAT);
+                    }
+                }
             }
 
             if (format != null) {

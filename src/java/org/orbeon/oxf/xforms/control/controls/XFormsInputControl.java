@@ -50,7 +50,7 @@ public class XFormsInputControl extends XFormsValueControl {
     private String convertFromExternalValue(String externalValue) {
         final String type = getType();
         // Store "false" when we get a blank value from the client when type is xs:boolean (case of single checkbox)
-        if (type != null && XMLConstants.XS_BOOLEAN_EXPLODED_QNAME.equals(type) && externalValue.trim().equals("")) {
+        if (type != null && (XMLConstants.XS_BOOLEAN_EXPLODED_QNAME.equals(type) || XFormsConstants.XFORMS_BOOLEAN_EXPLODED_QNAME.equals(type)) && externalValue.trim().equals("")) {
             return "false";
         } else {
             return externalValue;

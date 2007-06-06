@@ -66,8 +66,8 @@ public class XFormsInputHandler extends XFormsValueControlHandler {
             if (!handlerContext.isGenerateTemplate()) {
                 if (isConcreteControl) {
                     final String controlType = xformsControl.getType();
-                    isDate = XMLConstants.XS_DATE_EXPLODED_QNAME.equals(controlType);
-                    isBoolean = XMLConstants.XS_BOOLEAN_EXPLODED_QNAME.equals(controlType);
+                    isDate = XMLConstants.XS_DATE_EXPLODED_QNAME.equals(controlType) || XFormsConstants.XFORMS_DATE_EXPLODED_QNAME.equals(controlType);
+                    isBoolean = XMLConstants.XS_BOOLEAN_EXPLODED_QNAME.equals(controlType) || XFormsConstants.XFORMS_BOOLEAN_EXPLODED_QNAME.equals(controlType);
                 } else {
                     isDate = false;
                     isBoolean = false;

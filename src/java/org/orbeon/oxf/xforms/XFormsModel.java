@@ -545,37 +545,35 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
 
                         // Get value to validate
-                        final String nodeStringValue = XFormsInstance.getValueForNodeInfo(nodeInfo);
+                        final String nodeValue = XFormsInstance.getValueForNodeInfo(nodeInfo);
 
                         // TODO: XForms 1.1: "The type model item property is not applied to instance nodes that contain child elements"
 
+                        // TODO: "[...] these datatypes can be used in the type model item property without the
+                        // addition of the XForms namespace qualifier if the namespace context has the XForms namespace
+                        // as the default namespace."
+
+                        final boolean isBuiltInSchemaType = XMLConstants.XSD_URI.equals(typeNamespaceURI);
+                        final boolean isBuiltInXFormsType = XFormsConstants.XFORMS_NAMESPACE_URI.equals(typeNamespaceURI);
+
                         final InstanceData instanceData = XFormsUtils.getLocalInstanceData(nodeInfo);
-                        if (schemaValidator != null) {
-                            // There are possibly types defined in the schema
-                            final String validationError
-                                    = schemaValidator.validateDatatype(nodeInfo, nodeStringValue, typeNamespaceURI, typeLocalname, typeQName, modelBind.getLocationData(), modelBind.getId());
+                        if (isBuiltInXFormsType && nodeValue.length() == 0) {
+                            // Don't consider the node invalid if the string is empty
+                        } else if (isBuiltInSchemaType || isBuiltInXFormsType) {
+                            // Built-in schema or XForms type
 
-                            // Set error on node if necessary
-                            if (validationError != null) {
-                                instanceData.addSchemaError(validationError, nodeStringValue, modelBind.getId());
-                            }
-
-                        } else {
-                            // There is no schema, use Saxon to validate simple types
+                            // Use XML Schema namespace URI as Saxon doesn't know anytyhing about XForms types
+                            final String newTypeNamespaceURI = XMLConstants.XSD_URI;
 
                             // Get type information
-                            int requiredTypeFingerprint = -1;
-                            if (typeNamespaceURI != null) {
-                                // Built-in type must be in a namespace
-                                requiredTypeFingerprint = StandardNames.getFingerprint(typeNamespaceURI, typeLocalname);
-                            }
-
+                            final int requiredTypeFingerprint = StandardNames.getFingerprint(newTypeNamespaceURI, typeLocalname);
                             if (requiredTypeFingerprint == -1) {
                                 throw new ValidationException("Invalid type '" + modelBind.getType() + "'", modelBind.getLocationData());
                             }
 
                             // Try to perform casting
-                            final StringValue stringValue = new StringValue(nodeStringValue);
+                            // TODO: Should we actually perform casting? This for example removes leading and trailing space around tokens. Is that expected?
+                            final StringValue stringValue = new StringValue(nodeValue);
                             final XPathContext xpContext = new XPathContextMajor(stringValue, xpathEvaluator.getStaticContext().getConfiguration());
                             final AtomicValue result = stringValue.convertPrimitive((BuiltInAtomicType) BuiltInSchemaFactory.getSchemaType(requiredTypeFingerprint), true, xpContext);
 
@@ -583,6 +581,20 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                             if (result instanceof ValidationErrorValue) {
                                 instanceData.updateValueValid(false, nodeInfo, modelBind.getId());
                             }
+
+                        } else if (schemaValidator != null) {
+                            // Other type and there is a schema
+
+                            // There are possibly types defined in the schema
+                            final String validationError
+                                    = schemaValidator.validateDatatype(nodeInfo, nodeValue, typeNamespaceURI, typeLocalname, typeQName, modelBind.getLocationData(), modelBind.getId());
+
+                            // Set error on node if necessary
+                            if (validationError != null) {
+                                instanceData.addSchemaError(validationError, nodeValue, modelBind.getId());
+                            }
+                        } else {
+                            throw new ValidationException("Invalid type '" + modelBind.getType() + "'", modelBind.getLocationData());
                         }
 
                         // Set type on node

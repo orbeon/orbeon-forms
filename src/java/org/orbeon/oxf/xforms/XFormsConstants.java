@@ -17,8 +17,9 @@ import org.dom4j.Namespace;
 import org.dom4j.QName;
 import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.XMLUtils;
 
-/**
+    /**
  * Constants useful for the XForms engine. 
  */
 public class XFormsConstants {
@@ -173,6 +174,13 @@ public class XFormsConstants {
 
     public static final QName XXFORMS_REFRESH_ITEMS_QNAME = new QName("refresh-items", XFormsConstants.XXFORMS_NAMESPACE);
 
+    public static final String XFORMS_BOOLEAN_EXPLODED_QNAME = XMLUtils.buildExplodedQName(XFORMS_NAMESPACE_URI, "boolean");
+    public static final String XFORMS_INTEGER_EXPLODED_QNAME = XMLUtils.buildExplodedQName(XFORMS_NAMESPACE_URI, "integer");
+    public static final String XFORMS_DATE_EXPLODED_QNAME = XMLUtils.buildExplodedQName(XFORMS_NAMESPACE_URI, "date");
+    public static final String XFORMS_DATETIME_EXPLODED_QNAME = XMLUtils.buildExplodedQName(XFORMS_NAMESPACE_URI, "dateTime");
+    public static final String XFORMS_TIME_EXPLODED_QNAME = XMLUtils.buildExplodedQName(XFORMS_NAMESPACE_URI, "time");
+    public static final String XFORMS_ANYURI_EXPLODED_QNAME = XMLUtils.buildExplodedQName(XFORMS_NAMESPACE_URI, "anyURI");
+
     public static final char REPEAT_HIERARCHY_SEPARATOR_1 = 0xB7;
     public static final char REPEAT_HIERARCHY_SEPARATOR_2 = '-';
     public static final String DEFAULT_UPLOAD_TYPE_EXPLODED_QNAME = ProcessorUtils.XS_ANYURI_EXPLODED_QNAME;
@@ -188,6 +196,9 @@ public class XFormsConstants {
 
     public static final String DUMMY_IMAGE_URI = "/ops/images/xforms/spacer.gif";
     public static final String HELP_IMAGE_URI = "/ops/images/xforms/help.gif";
+
+    public static final String XSD_EXPLODED_TYPE_PREFIX = "{" + XMLConstants.XSD_URI + "}";
+    public static final String XFORMS_EXPLODED_TYPE_PREFIX = "{" + XFORMS_NAMESPACE_URI + "}";
 
     private XFormsConstants() {
         // Disallow contruction

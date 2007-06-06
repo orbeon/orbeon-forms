@@ -1395,7 +1395,6 @@ ORBEON.xforms.Init = {
                 if (startPathToJavaScript != -1) {
                     BASE_URL = scriptSrc.substr(0, startPathToJavaScript);
                     XFORMS_SERVER_URL = BASE_URL + "/xforms-server";
-                    alert("xxx" + scriptSrc + " - " + startPathToJavaScript + " - " + BASE_URL + " - " + XFORMS_SERVER_URL);
                     break;
                 }
             }

@@ -262,6 +262,9 @@
             </section>
             <section>
                 <title>Complete List of Issues Addressed in this Release</title>
+                <p>
+                    Orbeon Forms 3.5.2 addresses over 60 bugs and features:
+                </p>
                 <ul>
                     [TODO: complete]
                 </ul>

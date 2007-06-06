@@ -858,22 +858,25 @@
                     As you can see, the idea is to store the information about all the books in a single XML document.
                     So under a top-level <code>&lt;books></code> element, we put as many <code>&lt;book></code> children
                     elements as needed. You will see later how it is possible with XForms to add and remove children
-                    elements. For now, your initial instance declaration is empty and contains a single book:
+                    elements. For now, your initial instance declaration is empty and contains a single book, and you
+                    place it as usual within an <code>&lt;xforms:model></code> element:
                 </p>
                 <xml-source show-namespaces="true" ignore-root-element="true">
                     <html xmlns="http://www.w3.org/1999/xhtml" xmlns:xforms="http://www.w3.org/2002/xforms">
-                        <xforms:instance id="books-instance">
-                            <books xmlns="">
-                                <book>
-                                    <title/>
-                                    <author/>
-                                    <language/>
-                                    <link/>
-                                    <rating/>
-                                    <notes/>
-                                </book>
-                            </books>
-                        </xforms:instance>
+                        <xforms:model>
+                            <xforms:instance id="books-instance">
+                                <books xmlns="">
+                                    <book>
+                                        <title/>
+                                        <author/>
+                                        <language/>
+                                        <link/>
+                                        <rating/>
+                                        <notes/>
+                                    </book>
+                                </books>
+                            </xforms:instance>
+                        </xforms:model>
                     </html>
                 </xml-source>
                 <p>

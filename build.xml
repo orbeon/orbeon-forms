@@ -53,11 +53,10 @@
         <include name="axis_1_2_1-saaj.jar"/>
         <include name="axis_1_2_1-wsdl4j-1.5.1.jar"/>
         <include name="jakarta-oro-2_0_8_orbeon.jar"/>
-        <!--<include name="msv-20070407.jar"/>-->
         <include name="msv-20070407_orbeon.jar"/>
-        <include name="isorelax-20070407.jar"/>
-        <include name="xsdlib-20070407.jar"/>
-        <include name="relaxngDatatype-20070407.jar"/>
+        <include name="msv-isorelax-20070407.jar"/>
+        <include name="msv-xsdlib-20070407.jar"/>
+        <include name="msv-relaxngDatatype-20070407.jar"/>
         <include name="hsqldb-1_7_2_8_orbeon.jar"/>
         <include name="jfreechart*"/>
         <include name="jcommon*"/>

@@ -1183,13 +1183,29 @@ public class XFormsUtils {
 
         // Note that the XML Schema spec says "Spaces are, in principle, allowed in the álexical spaceá of anyURI,
         // however, their use is highly discouraged (unless they are encoded by %20).".
-
         uriString = uriString.trim();
+
+        // We try below to follow the "Human Readable Resource Identifiers" RFC, in draft as of 2007-06-06. This
+        // recommends to encode:
+
+        // * the control characters #x0 to #x1F and #x7F to #x9F
+        // TODO: do this, and do better algorithm than below!
+
+        // * space #x20
         uriString = StringUtils.replace(uriString , " ", "%20");
-        uriString = StringUtils.replace(uriString , "{", "%7B");
-        uriString = StringUtils.replace(uriString , "}", "%7D");
+
+        // * the delimiters "<" #x3C, ">" #x3E, and """ #x22
         uriString = StringUtils.replace(uriString , "<", "%3C");
         uriString = StringUtils.replace(uriString , ">", "%3E");
+        uriString = StringUtils.replace(uriString , "\"", "%22");
+
+        // * the unwise characters "{" #x7B, "}" #x7D, "|" #x7C, "\" #x5C, "^" #x5E, and "`" #x60
+        uriString = StringUtils.replace(uriString , "{", "%7B");
+        uriString = StringUtils.replace(uriString , "}", "%7D");
+        uriString = StringUtils.replace(uriString , "|", "%7C");
+        uriString = StringUtils.replace(uriString , "\\", "%5C");
+        uriString = StringUtils.replace(uriString , "^", "%5E");
+        uriString = StringUtils.replace(uriString , "`", "%60");
 
         return uriString;
     }

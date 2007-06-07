@@ -126,6 +126,29 @@
                     href="http://cvs.forge.objectweb.org/cgi-bin/viewcvs.cgi/ops/">browse the repository</a> with your
                     web browser.
                 </p>
+                <p>
+                    Use the <code>orbeon</code> CVS module for Orbeon Forms proper, and the <code>saxon</code> CVS
+                    module for the Saxon source code (which sometimes contains fixes against the latest released
+                    Saxon).
+                </p>
+            </section>
+            <a name="issue-tracker"/>
+            <section added="2007-06-06">
+                <title>Is there a list of known issues?</title>
+                <p>
+                    Yes. You find it on the ObjectWeb site as well, <a
+                    href="http://forge.objectweb.org/tracker/index.php?set=custom&amp;_assigned_to=0&amp;_status=1&amp;_category=100&amp;_group=100&amp;_sort_col=priority&amp;_sort_ord=DESC&amp;submit=Browse&amp;atid=350207&amp;group_id=168&amp;func=browse">here
+                    ordered by descending priority</a>.
+                </p>
+                <p>
+                    Note that we put bugs and requests for enhancement (RFEs) in the same tracker category, and just
+                    prefix RFE descriptions with the string "RFE:".
+                </p>
+                <p>
+                    In general, we recommend you do not add bugs or RFEs in the tracker yourself, as we may miss them,
+                    and you may introduce duplicates. Please discuss bugs or issues on the Orbeon Forms <a
+                    href="http://www.orbeon.com/forms/mailing-list">mailing-list</a> first.
+                </p>
             </section>
             <a name="oxf"/>
             <section added="2007-01-15">

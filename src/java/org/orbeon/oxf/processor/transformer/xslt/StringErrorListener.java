@@ -186,7 +186,6 @@ public class StringErrorListener implements ErrorListener {
             } else if (e instanceof SAXException) {
                 e = ((SAXException) e).getException();
             } else {
-                // e.printStackTrace();
                 break;
             }
         }

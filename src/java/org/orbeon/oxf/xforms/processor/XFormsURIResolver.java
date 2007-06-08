@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.processor;
 
 import org.dom4j.Document;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.URIProcessorOutputImpl;
@@ -22,6 +23,7 @@ import org.orbeon.oxf.processor.transformer.TransformerURIResolver;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
+import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.tinytree.TinyBuilder;
 import org.xml.sax.ContentHandler;
@@ -125,7 +127,7 @@ public class XFormsURIResolver extends TransformerURIResolver {
             return documentResult.getDocument();
 
         } catch (Exception e) {
-            throw new OXFException(e);
+            throw ValidationException.wrapException(e, new LocationData(urlString, -1, -1));
         }
     }
 
@@ -144,7 +146,7 @@ public class XFormsURIResolver extends TransformerURIResolver {
             return (DocumentInfo) treeBuilder.getCurrentRoot();
 
         } catch (Exception e) {
-            throw new OXFException(e);
+            throw ValidationException.wrapException(e, new LocationData(urlString, -1, -1));
         }
     }
 
@@ -161,7 +163,7 @@ public class XFormsURIResolver extends TransformerURIResolver {
             xmlReader.parse(urlString);
 
         } catch (Exception e) {
-            throw new OXFException(e);
+            throw ValidationException.wrapException(e, new LocationData(urlString, -1, -1));
         }
     }
 }

@@ -19,6 +19,7 @@ import org.dom4j.Document;
 import org.orbeon.oxf.cache.InternalCacheKey;
 import org.orbeon.oxf.cache.OutputCacheKey;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
@@ -30,9 +31,11 @@ import org.orbeon.oxf.xforms.processor.handlers.XHTMLBodyHandler;
 import org.orbeon.oxf.xforms.processor.handlers.XHTMLHeadHandler;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
+import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
+import org.xml.sax.Locator;
 
 import javax.xml.transform.sax.TransformerHandler;
 import java.util.HashMap;
@@ -373,6 +376,105 @@ public class XFormsToXHTML extends ProcessorImpl {
                 return (XFormsConstants.XXFORMS_NAMESPACE_URI.equals(uri) && !(localname.equals("img") || localname.equals("dialog")))
                         || (XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri)
                             && !(XFormsControls.isActualControl(localname) || exceptionXFormsElements.get(localname) != null));
+            }
+
+            // Below we wrap all the exceptions to try to add location information
+            private Locator locator;
+
+            public void setDocumentLocator(Locator locator) {
+                super.setDocumentLocator(locator);
+                this.locator = locator;
+            }
+
+            public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
+                try {
+                    super.startElement(uri, localname, qName, attributes);
+                } catch (RuntimeException e) {
+                    wrapException(e);
+                }
+            }
+
+            public void endElement(String uri, String localname, String qName) throws SAXException {
+                try {
+                    super.endElement(uri, localname, qName);
+                } catch (RuntimeException e) {
+                    wrapException(e);
+                }
+            }
+
+            public void characters(char[] chars, int start, int length) throws SAXException {
+                try {
+                    super.characters(chars, start, length);
+                } catch (RuntimeException e) {
+                    wrapException(e);
+                }
+            }
+
+            public void startPrefixMapping(String s, String s1) throws SAXException {
+                try {
+                    super.startPrefixMapping(s, s1);
+                } catch (RuntimeException e) {
+                    wrapException(e);
+                }
+            }
+
+            public void endPrefixMapping(String s) throws SAXException {
+                try {
+                    super.endPrefixMapping(s);
+                } catch (RuntimeException e) {
+                    wrapException(e);
+                }
+            }
+
+            public void ignorableWhitespace(char[] chars, int start, int length) throws SAXException {
+                try {
+                    super.ignorableWhitespace(chars, start, length);
+                } catch (RuntimeException e) {
+                    wrapException(e);
+                }
+            }
+
+            public void skippedEntity(String s) throws SAXException {
+                try {
+                    super.skippedEntity(s);
+                } catch (RuntimeException e) {
+                    wrapException(e);
+                }
+            }
+
+            public void processingInstruction(String s, String s1) throws SAXException {
+                try {
+                    super.processingInstruction(s, s1);
+                } catch (RuntimeException e) {
+                    wrapException(e);
+                }
+            }
+
+            public void endDocument() throws SAXException {
+                try {
+                    super.endDocument();
+                } catch (RuntimeException e) {
+                    wrapException(e);
+                }
+            }
+
+            public void startDocument() throws SAXException {
+                try {
+                    super.startDocument();
+                } catch (RuntimeException e) {
+                    wrapException(e);
+                }
+            }
+
+            private void wrapException(Exception e) throws SAXException {
+                if (locator != null)
+                    throw ValidationException.wrapException(e, new ExtendedLocationData(locator, "converting XHTML+XForms document to XHTML"));
+                else if (e instanceof SAXException)
+                    throw (SAXException) e;
+                else if (e instanceof RuntimeException)
+                    throw (RuntimeException) e;
+                else
+                    throw new OXFException(e);// this should not happen
             }
         });
     }

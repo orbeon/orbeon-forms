@@ -19,10 +19,7 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.transformer.TransformerURIResolver;
-import org.orbeon.oxf.xml.ForwardingContentHandler;
-import org.orbeon.oxf.xml.NamespaceSupport3;
-import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.*;
 
@@ -53,24 +50,33 @@ public class XIncludeProcessor extends ProcessorImpl {
     public ProcessorOutput createOutput(final String name) {
         final ProcessorOutput output = new URIProcessorOutputImpl(XIncludeProcessor.this, name, INPUT_CONFIG) {
             public void readImpl(final PipelineContext pipelineContext, final ContentHandler contentHandler) {
-//                final ContentHandler debugContentHandler = new SAXLoggerProcessor.DebugContentHandler(contentHandler);
-                final TransformerURIResolver uriResolver = new TransformerURIResolver(XIncludeProcessor.this, pipelineContext, INPUT_CONFIG, false);
-
-                // Try to cache URI references
-                // NOTE: Always be careful not to cache refs to TransformerURIResolver. We seem to be fine here.
-                final boolean[] wasRead = { false };
-                readCacheInputAsObject(pipelineContext, getInputByName(INPUT_CONFIG), new CacheableInputReader() {
-                    public Object read(PipelineContext context, ProcessorInput input) {
-                        final URIReferences uriReferences = new URIReferences();
-                        readInputAsSAX(pipelineContext, INPUT_CONFIG, new XIncludeContentHandler(pipelineContext, contentHandler, uriReferences, uriResolver));
-                        wasRead[0] = true;
-                        return uriReferences;
-                    }
-                });
-
-                // Read if not already read
-                if (!wasRead[0]) {
-                    readInputAsSAX(pipelineContext, INPUT_CONFIG, new XIncludeContentHandler(pipelineContext, contentHandler, null, uriResolver));
+                try {
+                    /**
+                     * This code reads the input in a SAX store, before replaying the SAX store to the
+                     * XIncludeContentHandler.
+                     *
+                     * This may seem inefficient, but it is necessary (unfortunately) so the URI resolver which will
+                     * called by the XInclude content handler has the right parents in the stack. When we do
+                     * readInputAsSAX() here, this might run a processor PR which might be outside of the current
+                     * pipeline PI that executed the XInclude processor. When PR run, PI might not be in the processor
+                     * stack anymore, because it is possible for PR to be outside of PI. When PR calls a SAX method of
+                     * the XInclude handler, there is no executeChildren() that runs, so when the XInclude handler
+                     * method is called the parent stack might not include PI, and so reading an input of PI will fail.
+                     *
+                     * The general rule is that when you receive SAX events, you might not be in the right context.
+                     * While the readInput...() method is running you can't rely on having the right context, so you
+                     * shouldn't call other readInput...() methods or do anything that relies on the context.
+                     *
+                     * We don't have this problem with Saxon, because Saxon will first read the input stylesheet and
+                     * then processes it. So when the processing happens, the readInput...() methods that reads the
+                     * stylesheet has returned.
+                     */
+                    final SAXStore saxStore = new SAXStore();
+                    readInputAsSAX(pipelineContext, INPUT_CONFIG, saxStore);
+                    final TransformerURIResolver uriResolver = new TransformerURIResolver(XIncludeProcessor.this, pipelineContext, INPUT_CONFIG, false);
+                    saxStore.replay(new XIncludeContentHandler(pipelineContext, contentHandler, new URIReferences(), uriResolver));
+                } catch (SAXException e) {
+                    throw new OXFException(e);
                 }
             }
         };

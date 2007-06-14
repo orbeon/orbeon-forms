@@ -163,6 +163,7 @@ ORBEON.util.IEDom = {
                     newClassName += classes[i];
                 }
             }
+            // Setting the class with setAttribute("class", newClassName) doesn't work on IE6 and IE7
             element.className = newClassName;
         }
     }
@@ -2798,7 +2799,7 @@ ORBEON.xforms.Server = {
 
                                             var yuiDialog = ORBEON.xforms.Globals.dialogs[controlId];
                                             if (yuiDialog == null) {
-                                                // This is a case, not a dialog
+                                                // This is a case
                                                 var caseBeginId = "xforms-case-begin-" + controlId;
                                                 var caseBegin = ORBEON.util.Dom.getElementById(caseBeginId);
                                                 var caseBeginParent = caseBegin.parentNode;

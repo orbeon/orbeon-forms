@@ -1,5 +1,5 @@
 <!--
-    Copyright (C) 2006 Orbeon, Inc.
+    Copyright (C) 2006-2007 Orbeon, Inc.
 
     This program is free software; you can redistribute it and/or modify it under the terms of the
     GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -22,14 +22,14 @@
     <xhtml:head>
         <xhtml:title>Tree Widget</xhtml:title>
         <xforms:model>
-            <xforms:instance id="instance">
+            <xforms:instance id="main-instance">
                 <instance>
+                    <data-set>encyclopedia-instance</data-set>
                     <select1>ar1</select1>
                     <select>en1 cu1 cr1 sc2</select>
-                    <input/>
                 </instance>
             </xforms:instance>
-            <xforms:instance id="items">
+            <xforms:instance id="encyclopedia-instance">
                 <items>
                     <item label="Encyclopedia" value="en1">
                         <item label="Science" value="sc1"/>
@@ -47,16 +47,54 @@
                     </item>
                 </items>
             </xforms:instance>
+            <xforms:instance id="books-instance">
+                <items>
+                    <item label="Lois McMaster Bujold" value="bujold">
+                        <item label="Cordelia's Honor" value="bujold-1"/>
+                        <item label="The Warrior's Apprentice" value="bujold-2"/>
+                        <item label="The Vor Game" value="bujold-3"/>
+                        <item label="Young Miles" value="bujold-4"/>
+                        <item label="Cetaganda" value="bujold-5"/>
+                        <item label="Borders of Infinity" value="bujold-6"/>
+                        <item label="Brothers in Arms" value="bujold-7"/>
+                        <item label="Mirror Dance" value="bujold-8"/>
+                        <item label="Memory" value="bujold-9"/>
+                        <item label="Komarr" value="bujold-10"/>
+                        <item label="A Civil Campaign" value="bujold-11"/>
+                        <item label="Falling Free" value="bujold-12"/>
+                        <item label="Ethan of Athos" value="bujold-13"/>
+                        <item label="The Spirit Ring" value="bujold-14"/>
+                    </item>
+                    <item label="Carl Sagan" value="sagan">
+                        <item label="Broca's Brain" value="sagan-1"/>
+                        <item label="Cosmos" value="sagan-2"/>
+                        <item label="The Dragons of Eden" value="sagan-3"/>
+                        <item label="Murmurs of Earth" value="sagan-4"/>
+                        <item label="Shadows of Forgotten Ancestors" value="sagan-5"/>
+                    </item>
+                </items>
+            </xforms:instance>
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
+        <xforms:select1 ref="data-set">
+            <xforms:label>Data Set:</xforms:label>
+            <xforms:item>
+                <xforms:label>Encyclopedia</xforms:label>
+                <xforms:value>encyclopedia-instance</xforms:value>
+            </xforms:item>
+            <xforms:item>
+                <xforms:label>Books</xforms:label>
+                <xforms:value>books-instance</xforms:value>
+            </xforms:item>
+        </xforms:select1>
         <xhtml:h2>select1 tree (incremental)</xhtml:h2>
         <xhtml:p>
             Selected values:
             <xforms:output ref="select1" id="tree1-output"/>
         </xhtml:p>
         <xforms:select1 ref="select1" appearance="xxforms:tree" id="tree1" incremental="true">
-            <xforms:itemset nodeset="instance('items')//item">
+            <xforms:itemset nodeset="instance(instance('main-instance')/data-set)//item">
                 <xforms:label ref="@label"/>
                 <xforms:value ref="@value"/>
             </xforms:itemset>
@@ -67,7 +105,7 @@
             <xforms:output ref="select1" id="tree2-output"/>
         </xhtml:p>
         <xforms:select1 ref="select1" appearance="xxforms:tree" id="tree2" incremental="false">
-            <xforms:itemset nodeset="instance('items')//item">
+            <xforms:itemset nodeset="instance(instance('main-instance')/data-set)//item">
                 <xforms:label ref="@label"/>
                 <xforms:value ref="@value"/>
             </xforms:itemset>
@@ -78,7 +116,7 @@
             <xforms:output ref="select" id="tree3-output"/>
         </xhtml:p>
         <xforms:select ref="select" appearance="xxforms:tree" id="tree3" incremental="true">
-            <xforms:itemset nodeset="instance('items')//item">
+            <xforms:itemset nodeset="instance(instance('main-instance')/data-set)//item">
                 <xforms:label ref="@label"/>
                 <xforms:value ref="@value"/>
             </xforms:itemset>

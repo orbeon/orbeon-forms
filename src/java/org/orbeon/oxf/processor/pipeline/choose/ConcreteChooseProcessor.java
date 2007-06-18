@@ -185,7 +185,7 @@ public class ConcreteChooseProcessor extends ProcessorImpl {
             PooledXPathExpression expr = null;
             final Map namespaces = (Map) branchNamespaces.get(branchIndex);
             try {
-                expr = XPathCache.getXPathExpression(context, hrefDocumentInfo, "boolean(" + condition + ")", namespaces);
+                expr = XPathCache.getXPathExpression(context, hrefDocumentInfo, "boolean(" + condition + ")", namespaces, getLocationData());
                 if( ((Boolean)expr.evaluateSingle()).booleanValue()) {
                     selectedBranch = branchIndex;
                     break;

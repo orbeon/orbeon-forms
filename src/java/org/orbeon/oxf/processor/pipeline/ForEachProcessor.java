@@ -223,7 +223,7 @@ public class ForEachProcessor extends ProcessorImpl implements AbstractProcessor
                     state.domGenerators = new ArrayList();
                     PooledXPathExpression expr = XPathCache.getXPathExpression(context,
                             new DocumentWrapper(dataInput, null, new Configuration()),
-                            select, namespaceContext);
+                            select, namespaceContext, getLocationData());
                     try {
                         for (Iterator i = expr.evaluate().iterator(); i.hasNext();) {
                             Node node = (Node) i.next();

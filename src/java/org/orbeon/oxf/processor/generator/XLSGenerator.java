@@ -69,7 +69,7 @@ public class XLSGenerator extends ProcessorImpl {
                         final Document requestDocument  = readInputAsDOM4J(context, INPUT_REQUEST);
                         final PooledXPathExpression expr = XPathCache.getXPathExpression(context,
                                 new DocumentWrapper(requestDocument, null, new Configuration()),
-                                "/request/parameters/parameter[1]/value");
+                                "/request/parameters/parameter[1]/value", getLocationData());
 
                         final Element valueElement;
                         try {

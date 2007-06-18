@@ -86,8 +86,7 @@ public class XLSSerializer extends HttpBinarySerializer {
             PooledXPathExpression expr = null;
             List nodes = null;
             try {
-                expr = XPathCache.getXPathExpression(pipelineContext,
-                        wrapper, "/workbook/sheet");
+                expr = XPathCache.getXPathExpression(pipelineContext, wrapper, "/workbook/sheet", getLocationData());
                 nodes = expr.evaluate();
             } catch (XPathException e) {
                 throw new OXFException(e);
@@ -150,7 +149,7 @@ public class XLSSerializer extends HttpBinarySerializer {
 
                         // Set cell value
                         PooledXPathExpression expr = XPathCache.getXPathExpression(pipelineContext,
-                                wrapper.wrap(sheetElement), "string(" + sourceXPath + ")");
+                                wrapper.wrap(sheetElement), "string(" + sourceXPath + ")", getLocationData());
                         String newValue;
                         try {
                             newValue = (String) expr.evaluateSingle();

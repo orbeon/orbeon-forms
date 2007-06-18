@@ -79,7 +79,7 @@ public class XPathProcessor extends ProcessorImpl {
                 PooledXPathExpression xpath = null;
                 try {
                     final String baseURI = (locationData == null) ? null : locationData.getSystemID();
-                    xpath = XPathCache.getXPathExpression(context, wrapper, config.getExpression(), config.getNamespaces(), null, null, baseURI);
+                    xpath = XPathCache.getXPathExpression(context, wrapper, config.getExpression(), config.getNamespaces(), null, null, baseURI, locationData);
                     List results = xpath.evaluate();
                     contentHandler.startDocument();
                     // WARNING: Here we break the rule that processors must output valid XML documents, because

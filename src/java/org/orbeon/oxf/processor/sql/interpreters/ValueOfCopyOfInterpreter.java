@@ -92,7 +92,7 @@ public class ValueOfCopyOfInterpreter extends SQLProcessor.InterpreterContentHan
 //                            String stringValue = interpreterContext.getInput().createXPath(".").valueOf(result);
 //                            String stringValue = XPathCache.createCacheXPath(null, ".").valueOf(result);
                         PooledXPathExpression expr = XPathCache.getXPathExpression(interpreterContext.getPipelineContext(),
-                                wrapper.wrap(result), "string(.)");
+                                wrapper.wrap(result), "string(.)", null);
                         String stringValue;
                         try {
                             stringValue = (String) expr.evaluateSingle();
@@ -117,7 +117,7 @@ public class ValueOfCopyOfInterpreter extends SQLProcessor.InterpreterContentHan
 //                            String stringValue = interpreterContext.getInput().createXPath(".").valueOf(result);
 //                            String stringValue = XPathCache.createCacheXPath(null, ".").valueOf(result);
                         PooledXPathExpression expr = XPathCache.getXPathExpression(interpreterContext.getPipelineContext(),
-                                wrapper.wrap(result), "string(.)");
+                                wrapper.wrap(result), "string(.)", null);
                         String stringValue;
                         try {
                             stringValue = (String) expr.evaluateSingle();

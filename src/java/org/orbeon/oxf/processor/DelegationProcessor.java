@@ -289,7 +289,7 @@ public class DelegationProcessor extends ProcessorImpl {
                                                     new DocumentWrapper(resultEnvelopeDOM4j, null, new Configuration()),
                                                     xpath,
                                                     operation != null && operation.select != null
-                                                            ? operation.selectNamespaceContext : null);
+                                                            ? operation.selectNamespaceContext : null, getLocationData());
                                             for (java.util.Iterator i = expr.evaluate().iterator(); i.hasNext();) {
 
                                                 // Create document with node from SOAP envelope

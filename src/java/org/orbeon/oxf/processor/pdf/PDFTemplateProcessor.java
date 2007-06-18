@@ -26,6 +26,7 @@ import org.orbeon.oxf.processor.serializer.HttpBinarySerializer;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
@@ -65,8 +66,7 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {
 
         try {
             // Get reader
-
-            final String templateHref = XPathCache.evaluateAsString(pipelineContext, configDocumentInfo, "/*/template/@href", null, null, null, null);
+            final String templateHref = XPathCache.evaluateAsString(pipelineContext, configDocumentInfo, "/*/template/@href", null, null, null, null, null);//TODO: LocationData
             final PdfReader reader = new PdfReader(URLFactory.createURL(templateHref));
             // Get total number of pages
             final int pageCount = reader.getNumberOfPages();
@@ -75,7 +75,7 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {
             final float width = psize.width();
             final float height = psize.height();
 
-            final String showGrid = XPathCache.evaluateAsString(pipelineContext, configDocumentInfo, "/*/template/@show-grid", null, null, null, null);
+            final String showGrid = XPathCache.evaluateAsString(pipelineContext, configDocumentInfo, "/*/template/@show-grid", null, null, null, null, null);//TODO: LocationData
 
             // Create result document and writer
             final Document document = new Document(psize, 50, 50, 50, 50);
@@ -217,7 +217,7 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {
 
                 final String ref = currentElement.attributeValue("ref");
                 if (ref != null) {
-                    final NodeInfo newContextNode = (NodeInfo) XPathCache.evaluateSingle(pipelineContext, groupContext.contextNodeSet, groupContext.contextPosition, ref, namespaceMap, variableToValueMap, null, null);
+                    final NodeInfo newContextNode = (NodeInfo) XPathCache.evaluateSingle(pipelineContext, groupContext.contextNodeSet, groupContext.contextPosition, ref, namespaceMap, variableToValueMap, null, null, (LocationData) currentElement.getData());
 
                     if (newContextNode == null)
                         continue;
@@ -254,7 +254,8 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {
                 // Handle repeat
 
                 final String nodeset = currentElement.attributeValue("nodeset");
-                final List iterations = XPathCache.evaluate(pipelineContext, groupContext.contextNodeSet, groupContext.contextPosition, nodeset, namespaceMap, variableToValueMap, null, null);
+                final List iterations = XPathCache.evaluate(pipelineContext, groupContext.contextNodeSet, groupContext.contextPosition, nodeset, namespaceMap,
+                        variableToValueMap, null, null, (LocationData) currentElement.getData());
 
                 final String offsetXString = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, contextNode, variableToValueMap, null, currentElement, currentElement.attributeValue("offset-x"));
                 final String offsetYString = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, contextNode, variableToValueMap, null, currentElement, currentElement.attributeValue("offset-y"));
@@ -323,7 +324,7 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {
                     final float yPosition = groupContext.pageHeight - (Float.parseFloat(topPosition) + groupContext.offsetY);
 
                     // Get value from instance
-                    final String text = XPathCache.evaluateAsString(pipelineContext, groupContext.contextNodeSet, groupContext.contextPosition, value, namespaceMap, variableToValueMap, null, null);
+                    final String text = XPathCache.evaluateAsString(pipelineContext, groupContext.contextNodeSet, groupContext.contextPosition, value, namespaceMap, variableToValueMap, null, null, (LocationData) currentElement.getData());
 
                     // Iterate over characters and print them
                     if (text != null) {

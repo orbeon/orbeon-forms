@@ -22,6 +22,8 @@
 
     <!-- Get generic templates from plain theme -->
     <xsl:import href="theme-plain.xsl"/>
+    <!-- XML formatting -->
+    <xsl:import href="oxf:/ops/utils/formatting/formatting.xsl"/>
 
     <!-- This contains some useful request information -->
     <xsl:variable name="request" select="doc('input:request')" as="document-node()"/>

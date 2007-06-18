@@ -1,5 +1,5 @@
 <!--
-    Copyright (C) 2004 Orbeon, Inc.
+    Copyright (C) 2004-2007 Orbeon, Inc.
   
     This program is free software; you can redistribute it and/or modify it under the terms of the
     GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -13,8 +13,8 @@
 -->
 <!--
 
-  This pipeline is called by Orbeon Forms when an exception occurs, as configured in web.xml. Developers can customize
-  this at will.
+  This pipeline is called by Orbeon Forms when an exception occurs, as configured in web.xml. You can customize this at
+  will.
 
 -->
 <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
@@ -49,7 +49,13 @@
     <p:processor name="oxf:unsafe-xslt">
         <p:input name="data" href="#document"/>
         <p:input name="request" href="#request"/>
-        <p:input name="config" href="oxf:/config/theme-plain.xsl"/>
+        <p:input name="config">
+            <xsl:stylesheet version="2.0">
+                <xsl:import href="oxf:/config/theme-plain.xsl"/>
+                <xsl:import href="oxf:/ops/utils/formatting/formatting.xsl"/>
+            </xsl:stylesheet>
+        </p:input>
+        <!--<p:input name="config" href=""/>-->
         <p:output name="data" id="themed"/>
     </p:processor>
 

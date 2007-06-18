@@ -27,12 +27,10 @@
                 xmlns:version="java:org.orbeon.oxf.common.Version"
                 xmlns="http://www.w3.org/1999/xhtml">
 
-    <!--<xsl:import href="oxf:/oxf/xslt/utils/utils.xsl"/>-->
-
     <xsl:variable name="servlet-classes" as="xs:string+" select="('org.orbeon.oxf.servlet.OPSServlet', 'org.orbeon.oxf.servlet.OXFServlet')"/>
     <xsl:variable name="portlet-classes" as="xs:string+" select="('org.orbeon.oxf.portlet.OPSPortlet', 'org.orbeon.oxf.portlet.OPSPortlet')"/>
     <xsl:variable name="orbeon-forms-version" as="xs:string" select="version:getVersion()"/>
-    <xsl:variable name="title" as="xs:string" select="'Orbeon Forms - Error Page'"/>
+    <xsl:variable name="title" as="xs:string" select="'Orbeon Forms - An Error has Occurred'"/>
 
     <xsl:template match="/">
         <html>
@@ -53,7 +51,7 @@
             <body>
                 <div class="maincontent">
                     <h1><xsl:value-of select="$title"/></h1>
-                    <h2>Error Message</h2>
+                    <!--<h2>Error Message</h2>-->
                     <p>
                         The following error has occurred:
                     </p>
@@ -111,35 +109,30 @@
                                         group-by="concat(system-id, '-', line, '-', column)">
                                     <tr>
                                         <td><xsl:value-of select="system-id"/></td>
-                                        <td><xsl:value-of select="if (line castable as xs:positiveInteger) then line else 'N/A'"/></td>
-                                        <td><xsl:value-of select="if (column castable as xs:positiveInteger) then column else 'N/A'"/></td>
+                                        <td style="text-align: right"><xsl:value-of select="if (line castable as xs:positiveInteger) then line else 'N/A'"/></td>
+                                        <td style="text-align: right"><xsl:value-of select="if (column castable as xs:positiveInteger) then column else 'N/A'"/></td>
                                         <td>
                                             <xsl:for-each select="current-group()[description != '']">
-                                                <xsl:if test="position() > 1">
-                                                    <br/>
-                                                </xsl:if>
-                                                <xsl:value-of select="description"/>
-                                            </xsl:for-each>
-                                            <xsl:if test="current-group()[parameters/parameter]">
-                                                <span style="font-size: smaller">
-                                                    <xsl:text> (</xsl:text>
-                                                        <xsl:for-each select="current-group()/parameters/parameter[value != '']">
+                                                <div>
+                                                    <xsl:value-of select="description"/>
+                                                    <xsl:if test="parameters/parameter[value != '']">
+                                                        <div style="font-size: smaller; margin-left: 1em; white-space: nowrap; padding: 0px">
+                                                            <xsl:for-each select="parameters/parameter[value != '']">
                                                             <xsl:if test="position() > 1">
-                                                                <xsl:text>, </xsl:text>
+                                                                <br/>
                                                             </xsl:if>
-                                                            <xsl:value-of select="concat(name, '=''', value, '''')"/>
+                                                            <xsl:value-of select="concat(name, ': ', value, '')"/>
                                                         </xsl:for-each>
-                                                    <xsl:text>)</xsl:text>
-                                                </span>
-                                            </xsl:if>
+                                                        </div>
+                                                    </xsl:if>
+                                                </div>
+                                            </xsl:for-each>
                                         </td>
                                         <td>
-                                            <xsl:for-each select="current-group()[element != '']">
-                                                <xsl:if test="position() > 1">
-                                                    <br/>
-                                                </xsl:if>
+                                            <!-- Display unique XML element -->
+                                            <xsl:for-each-group select="current-group()[element != '']" group-by="string(element)">
                                                 <xsl:variable name="element" as="element()">
-                                                    <xsl:copy-of select="saxon:parse(element)/*"/>
+                                                    <xsl:copy-of select="saxon:parse(current-group()[1]/element)/*"/>
                                                 </xsl:variable>
                                                 <xsl:variable name="just-element" as="element()">
                                                     <xsl:for-each select="$element">
@@ -155,7 +148,7 @@
                                                 <f:xml-source show-namespaces="false">
                                                     <xsl:copy-of select="$just-element"/>
                                                 </f:xml-source>
-                                            </xsl:for-each>
+                                            </xsl:for-each-group>
                                         </td>
                                     </tr>
                                 </xsl:for-each-group>

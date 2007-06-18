@@ -44,7 +44,7 @@ public class XFormsRequestEncoder extends ProcessorImpl {
                 // Encode static state here
                 contentHandlerHelper.startElement("xxforms", XFormsConstants.XXFORMS_NAMESPACE_URI, "static-state");
                 final Document document = readCacheInputAsDOM4J(pipelineContext, INPUT_DATA);
-                final String encoded = XFormsUtils.encodeXML(pipelineContext, document, XFormsUtils.getEncryptionKey());
+                final String encoded = XFormsUtils.encodeXML(pipelineContext, document, XFormsUtils.getEncryptionKey(), false);
                 contentHandlerHelper.text(encoded);
                 contentHandlerHelper.endElement();
 

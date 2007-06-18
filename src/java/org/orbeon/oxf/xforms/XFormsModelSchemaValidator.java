@@ -84,7 +84,7 @@ public class XFormsModelSchemaValidator {
 
     public XFormsModelSchemaValidator(Element modelElement) {
         this.modelElement = modelElement;
-        this.schemaURIs = modelElement.attributeValue("schema");
+        this.schemaURIs = XFormsUtils.encodeHRRI(modelElement.attributeValue("schema"), false);
     }
 
     private static class MSVGrammarReaderController implements GrammarReaderController {

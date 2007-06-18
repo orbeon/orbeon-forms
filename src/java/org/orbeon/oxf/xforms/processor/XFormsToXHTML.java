@@ -151,6 +151,7 @@ public class XFormsToXHTML extends ProcessorImpl {
                     annotatedSAXStore = new SAXStore(new TeeContentHandler(new ContentHandler[] {
                             new XFormsExtractorContentHandler(pipelineContext, identity),
                             digestContentHandler
+//                            ,new SAXLoggerProcessor.DebugContentHandler()
                     }));
 
                     // Read the input

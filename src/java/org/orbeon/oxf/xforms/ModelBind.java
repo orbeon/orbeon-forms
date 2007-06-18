@@ -29,6 +29,8 @@ import java.util.Map;
  */
 public class ModelBind {
 
+    private Element bindElement;
+
     private String id;
     private String nodeset;
     private String relevant;
@@ -40,26 +42,26 @@ public class ModelBind {
     private String xxformsExternalize;
 
     private Map namespaceMap;
-    private LocationData locationData;
     private ModelBind parent;
     private List children = new ArrayList();
     private NodeInfo currentNodeInfo;
 
     public ModelBind(Element bindElement, ModelBind parent) {
-        this(bindElement.attributeValue("id"), bindElement.attributeValue("nodeset"),
+        this(bindElement, bindElement.attributeValue("id"), bindElement.attributeValue("nodeset"),
                     bindElement.attributeValue("relevant"), bindElement.attributeValue("calculate"), bindElement.attributeValue("type"),
                     bindElement.attributeValue("constraint"), bindElement.attributeValue("required"), bindElement.attributeValue("readonly"),
                     bindElement.attributeValue(XFormsConstants.XXFORMS_EXTERNALIZE_QNAME),
-                    Dom4jUtils.getNamespaceContextNoDefault(bindElement),
-                    new ExtendedLocationData((LocationData) bindElement.getData(), "xforms:bind element", bindElement), parent);
+                    Dom4jUtils.getNamespaceContextNoDefault(bindElement), parent);
     }
 
-    private ModelBind(String id, String nodeset, String relevant, String calculate, String type, String constraint,
+    private ModelBind(Element bindElement, String id, String nodeset, String relevant, String calculate, String type, String constraint,
                      String required, String readonly, String xxformsExternalize,
-                     Map namespaceMap, LocationData locationData, ModelBind parent) {
+                     Map namespaceMap, ModelBind parent) {
+
+        this.bindElement = bindElement;
 
         if (nodeset == null)
-            throw new ValidationException("Bind element is missing nodeset attribute", locationData);
+            throw new ValidationException("Bind element is missing nodeset attribute", getLocationData());
 
         this.id = id;
         this.nodeset = nodeset;
@@ -73,9 +75,13 @@ public class ModelBind {
         this.xxformsExternalize = xxformsExternalize;
 
         this.namespaceMap = namespaceMap;
-        this.locationData = locationData;
 
         this.parent = parent;
+    }
+
+
+    public Element getBindElement() {
+        return bindElement;
     }
 
     public String getId() {
@@ -119,7 +125,7 @@ public class ModelBind {
     }
 
     public LocationData getLocationData() {
-        return locationData;
+        return new ExtendedLocationData((LocationData) bindElement.getData(), "xforms:bind element", bindElement);
     }
 
     public void addChild(ModelBind bind) {

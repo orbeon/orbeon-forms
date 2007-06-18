@@ -28,6 +28,7 @@ import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.saxon.functions.FunctionLibrary;
 import org.orbeon.saxon.om.NodeInfo;
 import org.xml.sax.Locator;
@@ -363,10 +364,10 @@ public class XFormsControls {
         contextStack.addAll(ancestorsOrSelf);
     }
 
-    private void pushBinding(PipelineContext pipelineContext, XFormsControl XFormsControl) {
+    private void pushBinding(PipelineContext pipelineContext, XFormsControl xformsControl) {
 
-        final Element bindingElement = XFormsControl.getControlElement();
-        if (!(XFormsControl instanceof RepeatIterationControl)) {
+        final Element bindingElement = xformsControl.getControlElement();
+        if (!(xformsControl instanceof RepeatIterationControl)) {
             // Regular XFormsControl backed by an element
 
             final String ref = bindingElement.attributeValue("ref");
@@ -382,7 +383,7 @@ public class XFormsControls {
         } else {
             // RepeatIterationInfo
 
-            final XFormsControl repeatXFormsControl = XFormsControl.getParent();
+            final XFormsControl repeatXFormsControl = xformsControl.getParent();
             final List repeatChildren = repeatXFormsControl.getChildren();
             final BindingContext currentBindingContext = getCurrentBindingContext();
             final List currentNodeset = currentBindingContext.getNodeset();
@@ -391,12 +392,12 @@ public class XFormsControls {
             final int currentNodesetSize = (currentNodeset == null) ? 0 : currentNodeset.size();
 
             if (repeatChildrenSize != currentNodesetSize)
-                throw new IllegalStateException("repeatChildren and newNodeset have different sizes.");
+                throw new ValidationException("repeatChildren and newNodeset have different sizes.", xformsControl.getLocationData());
 
             // Push "artificial" binding with just current node in nodeset
             final XFormsModel newModel = currentBindingContext.getModel();
-            final int position = ((RepeatIterationControl) XFormsControl).getIteration();
-            contextStack.push(new BindingContext(currentBindingContext, newModel, currentNodeset, position, XFormsControl.getParent().getOriginalId(), true, null));
+            final int position = ((RepeatIterationControl) xformsControl).getIteration();
+            contextStack.push(new BindingContext(currentBindingContext, newModel, currentNodeset, position, xformsControl.getParent().getOriginalId(), true, null));
         }
     }
 
@@ -455,24 +456,29 @@ public class XFormsControls {
     public void pushBinding(PipelineContext pipelineContext, String ref, String context, String nodeset, String modelId, String bindId,
                             Element bindingElement, Map bindingElementNamespaceContext) {
 
+        // Get location data for error reporting
+        final LocationData locationData = (bindingElement == null)
+                ? containingDocument.getLocationData()
+                : new ExtendedLocationData((LocationData) bindingElement.getData(), "pushing XForms control binding", bindingElement);
+
         // Check for mandatory and optional bindings
         if (bindingElement != null && XFormsConstants.XFORMS_NAMESPACE_URI.equals(bindingElement.getNamespaceURI())) {
             final String controlName = bindingElement.getName();
             if (mandatorySingleNodeControls.get(controlName) != null
                     && !(bindingElement.attribute("ref") != null || bindingElement.attribute("bind") != null)) {
-                throw new OXFException("Missing mandatory single node binding for element: " + bindingElement.getQualifiedName());
+                throw new ValidationException("Missing mandatory single node binding for element: " + bindingElement.getQualifiedName(), locationData);
             }
             if (noSingleNodeControls.get(controlName) != null
                     && (bindingElement.attribute("ref") != null || bindingElement.attribute("bind") != null)) {
-                throw new OXFException("Single node binding is prohibited for element: " + bindingElement.getQualifiedName());
+                throw new ValidationException("Single node binding is prohibited for element: " + bindingElement.getQualifiedName(), locationData);
             }
             if (mandatoryNodesetControls.get(controlName) != null
                     && !(bindingElement.attribute("nodeset") != null || bindingElement.attribute("bind") != null)) {
-                throw new OXFException("Missing mandatory nodeset binding for element: " + bindingElement.getQualifiedName());
+                throw new ValidationException("Missing mandatory nodeset binding for element: " + bindingElement.getQualifiedName(), locationData);
             }
             if (noNodesetControls.get(controlName) != null
                     && bindingElement.attribute("nodeset") != null) {
-                throw new OXFException("Node-set binding is prohibited for element: " + bindingElement.getQualifiedName());
+                throw new ValidationException("Node-set binding is prohibited for element: " + bindingElement.getQualifiedName(), locationData);
             }
         }
 
@@ -485,7 +491,7 @@ public class XFormsControls {
         if (modelId != null) {
             newModel = containingDocument.getModel(modelId);
             if (newModel == null)
-                throw new ValidationException("Invalid model id: " + modelId, (bindingElement == null) ? null : (LocationData) bindingElement.getData());
+                throw new ValidationException("Invalid model id: " + modelId, locationData);
             isNewModel = newModel != currentBindingContext.getModel();// don't say it's a new model unless it has really changed
         } else {
             newModel = currentBindingContext.getModel();
@@ -501,7 +507,7 @@ public class XFormsControls {
                 // Resolve the bind id to a nodeset
                 final ModelBind modelBind = newModel.getModelBindById(bindId);
                 if (modelBind == null)
-                    throw new OXFException("Cannot find bind for id: " + bindId);
+                    throw new ValidationException("Cannot find bind for id: " + bindId, locationData);
                 newNodeset = newModel.getBindNodeset(pipelineContext, modelBind);
                 isNewBind = true;
                 newPosition = 1;
@@ -527,8 +533,8 @@ public class XFormsControls {
                             contextStack.push(new BindingContext(currentBindingContext, newModel, getCurrentNodeset(newModel.getEffectiveId()), 1, null, false, null));
 
                         // Evaluate new node-set
-                        newNodeset = containingDocument.getEvaluator().evaluate(pipelineContext, currentSingleNodeForModel,
-                                ref != null ? ref : nodeset, bindingElementNamespaceContext, null, functionLibrary, null);
+                        newNodeset = XPathCache.evaluate(pipelineContext, currentSingleNodeForModel,
+                                ref != null ? ref : nodeset, bindingElementNamespaceContext, null, functionLibrary, null, locationData);
 
                         // Restore context
                         contextStack.pop();
@@ -540,8 +546,8 @@ public class XFormsControls {
                     // Simply evaluate new node-set
                     final NodeInfo currentSingleNode = getCurrentSingleNode();
                     if (currentSingleNode != null) {
-                        newNodeset = containingDocument.getEvaluator().evaluate(pipelineContext, currentSingleNode,
-                                ref != null ? ref : nodeset, bindingElementNamespaceContext, null, functionLibrary, null);
+                        newNodeset = XPathCache.evaluate(pipelineContext, currentSingleNode,
+                                ref != null ? ref : nodeset, bindingElementNamespaceContext, null, functionLibrary, null, locationData);
                     } else {
                         newNodeset = Collections.EMPTY_LIST;
                     }
@@ -627,7 +633,7 @@ public class XFormsControls {
         // If not found, return the document element of the model's default instance
         final XFormsInstance defaultInstance = containingDocument.getModel(modelId).getDefaultInstance();
         if (defaultInstance == null)
-            throw new OXFException("Cannot find default instance in model: " + modelId);
+            throw new ValidationException("Cannot find default instance in model: " + modelId, bindingContext.getLocationData());
         return Collections.singletonList(defaultInstance.getInstanceRootElementInfo());
     }
 
@@ -691,9 +697,9 @@ public class XFormsControls {
         }
         // It is required that there is a relevant enclosing xforms:repeat
         if (repeatId == null)
-            throw new OXFException("Enclosing xforms:repeat not found.");
+            throw new ValidationException("No enclosing xforms:repeat found.", getCurrentBindingContext().getLocationData());
         else
-            throw new OXFException("Enclosing xforms:repeat not found for id: " + repeatId);
+            throw new ValidationException("No enclosing xforms:repeat found for repeat id: " + repeatId, getCurrentBindingContext().getLocationData());
     }
 
     /**
@@ -713,7 +719,7 @@ public class XFormsControls {
             }
         }
         // It is required that there is a relevant enclosing xforms:repeat
-        throw new OXFException("Enclosing xforms:repeat not found.");
+        throw new ValidationException("Enclosing xforms:repeat not found.", getCurrentBindingContext().getLocationData());
     }
 
     /**
@@ -752,9 +758,9 @@ public class XFormsControls {
         }
         // It is required that there is a relevant enclosing xforms:repeat
         if (contextId == null)
-            throw new OXFException("Enclosing XForms element not found.");
+            throw new ValidationException("Enclosing XForms element not found.", getCurrentBindingContext().getLocationData());
         else
-            throw new OXFException("Enclosing XForms element not found for id: " + contextId);
+            throw new ValidationException("Enclosing XForms element not found for id: " + contextId, getCurrentBindingContext().getLocationData());
     }
 
     /**
@@ -809,7 +815,8 @@ public class XFormsControls {
             public boolean startVisitControl(Element controlElement, String effectiveControlId) {
 
                 if (effectiveControlId == null)
-                    throw new OXFException("Control element doesn't have an id: " + controlElement.getQualifiedName());
+                    throw new ValidationException("Control element doesn't have an id", new ExtendedLocationData((LocationData) controlElement.getData(),
+                            "analyzing control element", controlElement));
 
                 final String controlName = controlElement.getName();
 
@@ -830,7 +837,7 @@ public class XFormsControls {
                 // Handle xforms:case
                 if (controlName.equals("case")) {
                     if (!(currentControlsContainer.getName().equals("switch")))
-                        throw new OXFException("xforms:case with id '" + effectiveControlId + "' is not directly within an xforms:switch container.");
+                        throw new ValidationException("xforms:case with id '" + effectiveControlId + "' is not directly within an xforms:switch container.", xformsControl.getLocationData());
                     final String switchId = currentControlsContainer.getEffectiveId();
 
                     if (switchIdToSelectedCaseIdMap.get(switchId) == null) {
@@ -1376,7 +1383,8 @@ public class XFormsControls {
                 for (Iterator i = nodeset.iterator(); i.hasNext();) {
                     final Object currentItem = i.next();
                     if (!(currentItem instanceof NodeInfo))
-                        throw new OXFException("A reference to a node (such as text, element, or attribute) is required in a binding. Attempted to bind to the invalid item type: " + currentItem.getClass());
+                        throw new ValidationException("A reference to a node (such as text, element, or attribute) is required in a binding. Attempted to bind to the invalid item type: " + currentItem.getClass(),
+                                (LocationData) controlElement.getData());
                 }
             }
         }
@@ -1407,6 +1415,21 @@ public class XFormsControls {
 
         public Element getControlElement() {
             return controlElement;
+        }
+
+        /**
+         * Convenience method returning the location data associated with the XForms element (typically, a control)
+         * associated with the binding.
+         *
+         * @return  LocationData object, or null if not found
+         */
+        public LocationData getLocationData() {
+            if (controlElement == null)
+                return null;
+            final Object data = controlElement.getData();
+            if (!(data instanceof LocationData))
+                return null;
+            return (LocationData) data;
         }
 
         /**
@@ -1490,15 +1513,6 @@ public class XFormsControls {
          * Update switch info state for the given case id.
          */
         public void initializeState(String switchId, String caseId, ControlsState controlsState, boolean visible) {
-
-            // Find SwitchXFormsControl
-//            final XFormsControl caseControl = (XFormsControl) controlsState.getIdToControl().get(caseId);
-//            if (caseControl == null)
-//                throw new OXFException("No XFormsControl found for case id '" + caseId + "'.");
-//            final XFormsControl switchControl = (XFormsControl) caseControl.getParent();
-//            if (switchControl == null)
-//                throw new OXFException("No XFormsSwitchControl found for case id '" + caseId + "'.");
-
             // Update currently selected case id
             if (visible) {
                 getSwitchIdToSelectedCaseIdMap().put(switchId, caseId);

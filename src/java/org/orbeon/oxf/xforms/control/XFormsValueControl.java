@@ -24,6 +24,7 @@ import org.orbeon.oxf.xforms.XFormsInstance;
 import org.orbeon.oxf.xforms.action.actions.XFormsSetvalueAction;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.saxon.om.NodeInfo;
 
 import java.util.HashMap;
@@ -142,8 +143,8 @@ public abstract class XFormsValueControl extends XFormsControl {
                 if (boundNode == null) {
                     result = null;
                 } else {
-                    result = containingDocument.getEvaluator().evaluateAsString(pipelineContext, boundNode,
-                            format, prefixToURIMap, null, containingDocument.getXFormsControls().getFunctionLibrary(), null);
+                    result = XPathCache.evaluateAsString(pipelineContext, boundNode,
+                            format, prefixToURIMap, null, containingDocument.getXFormsControls().getFunctionLibrary(), null, getLocationData());
                 }
             } else {
                 result = null;
@@ -157,8 +158,8 @@ public abstract class XFormsValueControl extends XFormsControl {
             if (boundNode == null) {
                 result = null;
             } else {
-                result = containingDocument.getEvaluator().evaluateAsString(pipelineContext, boundNode,
-                        format, prefixToURIMap, null, containingDocument.getXFormsControls().getFunctionLibrary(), null);
+                result = XPathCache.evaluateAsString(pipelineContext, boundNode,
+                        format, prefixToURIMap, null, containingDocument.getXFormsControls().getFunctionLibrary(), null, getLocationData());
             }
         }
         setDisplayValue(result);

@@ -23,6 +23,7 @@ import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.xforms.input.action.Action;
 import org.orbeon.oxf.processor.xforms.input.action.ActionFunctionContext;
 import org.orbeon.oxf.util.LoggerFactory;
+import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.om.NodeInfo;
@@ -122,7 +123,6 @@ public class XFormsInput extends ProcessorImpl {
 
                                 if (groupElements.size() != setValueElements.size())
                                     throw new OXFException("Number of <setvalue> or <param> elements does not match number of groups in path regular expression");
-                                final DocumentXPathEvaluator evaluator = new DocumentXPathEvaluator();
                                 for (Iterator setValueIterator = setValueElements.iterator(),
                                         groupIterator = groupElements.iterator(); setValueIterator.hasNext();) {
                                     final Element paramElement = (Element) setValueIterator.next();
@@ -131,8 +131,8 @@ public class XFormsInput extends ProcessorImpl {
                                     if (!"".equals(value)) {
 
                                         final String refXPath = paramElement.attributeValue("ref");
-                                        final Object o = evaluator.evaluateSingle(pipelineContext, localInstance.getDocumentInfo(),
-                                                refXPath, Dom4jUtils.getNamespaceContextNoDefault(paramElement), null, null, null);
+                                        final Object o = XPathCache.evaluateSingle(pipelineContext, localInstance.getDocumentInfo(),
+                                                refXPath, Dom4jUtils.getNamespaceContextNoDefault(paramElement), null, null, null, null);// TODO: LocationData
                                         if (o == null || !(o instanceof NodeInfo))
                                             throw new OXFException("Cannot find node instance for param '" + refXPath + "'");
 

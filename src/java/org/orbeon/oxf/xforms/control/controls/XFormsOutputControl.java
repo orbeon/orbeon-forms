@@ -26,6 +26,7 @@ import org.orbeon.oxf.xml.ForwardingContentHandler;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.saxon.om.NodeInfo;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -76,9 +77,10 @@ public class XFormsOutputControl extends XFormsValueControl {
 //                    System.out.print("xxx evaluating preceding::..." + valueAttribute + ", nodeset size " + currentNodeset.size());
 //                }
                 
-                rawValue = containingDocument.getEvaluator().evaluateAsString(pipelineContext,
+                rawValue = XPathCache.evaluateAsString(pipelineContext,
                         currentNodeset, bindingContext.getPosition(),
-                        valueAttribute, Dom4jUtils.getNamespaceContextNoDefault(getControlElement()), null, containingDocument.getXFormsControls().getFunctionLibrary(), null);
+                        valueAttribute, Dom4jUtils.getNamespaceContextNoDefault(getControlElement()), null,
+                        containingDocument.getXFormsControls().getFunctionLibrary(), null, getLocationData());
 
 //                if (isTest) {
 //                    System.out.print("  " + rawValue);

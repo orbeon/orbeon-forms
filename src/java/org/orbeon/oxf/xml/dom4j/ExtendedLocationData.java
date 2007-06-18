@@ -108,7 +108,14 @@ public class ExtendedLocationData extends LocationData {
             this.elementString = Dom4jUtils.domToString(element);
     }
 
-    private ExtendedLocationData(LocationData locationData, String description, String[] parameters) {
+    /**
+     * Create extended location data with a description and parameters.
+     *
+     * @param locationData
+     * @param description
+     * @param parameters
+     */
+    public ExtendedLocationData(LocationData locationData, String description, String[] parameters) {
         super((locationData == null) ? null : locationData.getSystemID(), (locationData == null) ? -1 : locationData.getLine(), (locationData == null) ? -1 : locationData.getCol());
         this.description = description;
         if (parameters != null) {

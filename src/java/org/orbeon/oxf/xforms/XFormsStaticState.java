@@ -19,6 +19,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.UUIDUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.dom4j.LocationData;
 
 import java.util.*;
 
@@ -60,6 +61,7 @@ public class XFormsStaticState {
     private Map externalEventsMap;
     private String containerType;
     private String containerNamespace;
+    private LocationData locationData;
 
     /**
      * Create static state object from an encoded version.
@@ -85,14 +87,16 @@ public class XFormsStaticState {
 
     private XFormsStaticState(Document staticStateDocument, String encodedStaticState) {
 
+        final Element rootElement = staticStateDocument.getRootElement();
+
         // Remember UUID
         this.uuid = UUIDUtils.createPseudoUUID();
 
         // Get controls document
-        controlsDocument = Dom4jUtils.createDocumentCopyParentNamespaces(staticStateDocument.getRootElement().element("controls"));
+        controlsDocument = Dom4jUtils.createDocumentCopyParentNamespaces(rootElement.element("controls"));
 
         // Get models from static state
-        final Element modelsElement = staticStateDocument.getRootElement().element("models");
+        final Element modelsElement = rootElement.element("models");
 
         // Get all models
         // FIXME: we don't get a System ID here. Is there a simple solution?
@@ -104,7 +108,7 @@ public class XFormsStaticState {
         }
 
         // Scripts
-        final Element scriptsElement = staticStateDocument.getRootElement().element("scripts");
+        final Element scriptsElement = rootElement.element("scripts");
         if (scriptsElement != null) {
             xxformsScripts = new HashMap();
             for (Iterator i = scriptsElement.elements("script").iterator(); i.hasNext();) {
@@ -114,20 +118,20 @@ public class XFormsStaticState {
         }
 
         // Attributes
-        final String stateHandlingAttribute = staticStateDocument.getRootElement().attributeValue(XFormsConstants.XXFORMS_STATE_HANDLING_ATTRIBUTE_NAME);
+        final String stateHandlingAttribute = rootElement.attributeValue(XFormsConstants.XXFORMS_STATE_HANDLING_ATTRIBUTE_NAME);
         stateHandling = (stateHandlingAttribute != null)
                 ? stateHandlingAttribute
                 : XFormsUtils.isCacheSession() ? XFormsConstants.XXFORMS_STATE_HANDLING_SESSION_VALUE : XFormsConstants.XXFORMS_STATE_HANDLING_CLIENT_VALUE;
 
-        final String readonlyAttribute = staticStateDocument.getRootElement().attributeValue(XFormsConstants.XXFORMS_READONLY_ATTRIBUTE_NAME);
+        final String readonlyAttribute = rootElement.attributeValue(XFormsConstants.XXFORMS_READONLY_ATTRIBUTE_NAME);
         readonly = (readonlyAttribute != null) && new Boolean(readonlyAttribute).booleanValue() ;
 
-        final String readonlyAppearanceAttribute = staticStateDocument.getRootElement().attributeValue(XFormsConstants.XXFORMS_READONLY_APPEARANCE_ATTRIBUTE_NAME);
+        final String readonlyAppearanceAttribute = rootElement.attributeValue(XFormsConstants.XXFORMS_READONLY_APPEARANCE_ATTRIBUTE_NAME);
         readonlyAppearance = (readonlyAppearanceAttribute != null)
                 ? readonlyAppearanceAttribute
                 : XFormsConstants.XXFORMS_READONLY_APPEARANCE_DYNAMIC_VALUE;
 
-        final String externalEventsAttribute = staticStateDocument.getRootElement().attributeValue(XFormsConstants.XXFORMS_EXTERNAL_EVENTS_ATTRIBUTE_NAME);
+        final String externalEventsAttribute = rootElement.attributeValue(XFormsConstants.XXFORMS_EXTERNAL_EVENTS_ATTRIBUTE_NAME);
         if (externalEventsAttribute != null) {
             final StringTokenizer st = new StringTokenizer(externalEventsAttribute);
             while (st.hasMoreTokens()) {
@@ -137,14 +141,21 @@ public class XFormsStaticState {
             }
         }
 
-        baseURI = staticStateDocument.getRootElement().attributeValue(XMLConstants.XML_BASE_QNAME);
-        containerType = staticStateDocument.getRootElement().attributeValue("container-type");
-        containerNamespace = staticStateDocument.getRootElement().attributeValue("container-namespace");
+        baseURI = rootElement.attributeValue(XMLConstants.XML_BASE_QNAME);
+        containerType = rootElement.attributeValue("container-type");
+        containerNamespace = rootElement.attributeValue("container-namespace");
         if (containerNamespace == null)
             containerNamespace = "";
 
+        {
+            final String systemId = rootElement.attributeValue("system-id");
+            if (systemId != null) {
+                locationData = new LocationData(systemId, Integer.parseInt(rootElement.attributeValue("line")), Integer.parseInt(rootElement.attributeValue("column")));
+            }
+        }
+
         // Extract instances if present
-        final Element instancesElement = staticStateDocument.getRootElement().element("instances");
+        final Element instancesElement = rootElement.element("instances");
         if (instancesElement != null) {
             instancesMap = new HashMap();
 
@@ -208,7 +219,7 @@ public class XFormsStaticState {
             final boolean isStateHandlingSession = stateHandling.equals(XFormsConstants.XXFORMS_STATE_HANDLING_SESSION_VALUE);
 
             // Remember encoded state an discard Document
-            encodedStaticState = XFormsUtils.encodeXML(pipelineContext, staticStateDocument, isStateHandlingSession ? null : XFormsUtils.getEncryptionKey());
+            encodedStaticState = XFormsUtils.encodeXML(pipelineContext, staticStateDocument, isStateHandlingSession ? null : XFormsUtils.getEncryptionKey(), true);
             staticStateDocument = null;
             initialized = true;
         }
@@ -261,5 +272,9 @@ public class XFormsStaticState {
 
     public String getContainerNamespace() {
         return containerNamespace;
+    }
+
+    public LocationData getLocationData() {
+        return locationData;
     }
 }

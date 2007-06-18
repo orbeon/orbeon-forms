@@ -33,13 +33,8 @@ import org.orbeon.oxf.xforms.mip.RelevantModelItemProperty;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.event.events.XFormsLinkErrorEvent;
 import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl;
-import org.orbeon.oxf.xml.ForwardingContentHandler;
-import org.orbeon.oxf.xml.TransformerUtils;
-import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
+import org.orbeon.oxf.xml.*;
+import org.orbeon.oxf.xml.dom4j.*;
 import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.om.*;
 import org.orbeon.saxon.functions.FunctionLibrary;
@@ -51,7 +46,9 @@ import org.xml.sax.SAXException;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
+import javax.xml.transform.Source;
 import javax.xml.transform.sax.SAXResult;
+import javax.xml.transform.sax.TransformerHandler;
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -376,50 +373,29 @@ public class XFormsUtils {
     }
 
     public static String encodeXMLAsDOM(PipelineContext pipelineContext, org.w3c.dom.Node node) {
-
         try {
-            return encodeXML(pipelineContext, TransformerUtils.domToDom4jDocument(node), getEncryptionKey());
+            return encodeXML(pipelineContext, TransformerUtils.domToDom4jDocument(node), getEncryptionKey(), false);
         } catch (TransformerException e) {
             throw new OXFException(e);
         }
     }
 
-    public static String encodeXML(PipelineContext pipelineContext, Document documentToEncode) {
-        return encodeXML(pipelineContext, documentToEncode, getEncryptionKey());
+    public static String encodeXML(PipelineContext pipelineContext, Document documentToEncode, boolean encodeLocationData) {
+        return encodeXML(pipelineContext, documentToEncode, getEncryptionKey(), encodeLocationData);
     }
-
-//    public static String encodeXML(PipelineContext pipelineContext, SAXStore saxStore, String encryptionPassword) {
-//        try {
-//            final ByteArrayOutputStream gzipByteArray = new ByteArrayOutputStream();
-//            final GZIPOutputStream gzipOutputStream = new GZIPOutputStream(gzipByteArray);
-//
-//            final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
-//            identity.setResult(new StreamResult(gzipOutputStream));
-//            saxStore.replay(identity);
-//
-//            gzipOutputStream.close();
-//            String result = Base64.encode(gzipByteArray.toByteArray());
-//            if (encryptionPassword != null)
-//                result = SecureUtils.encrypt(pipelineContext, encryptionPassword, result);
-//            return result;
-//        } catch (Exception e) {
-//            throw new OXFException(e);
-//        }
-//    }
 
     // Use a Deflater pool as creating Deflaters is expensive
     final static SoftReferenceObjectPool deflaterPool = new SoftReferenceObjectPool(new DeflaterPoolableObjetFactory());
 
-
-    public static String encodeXML(PipelineContext pipelineContext, Document documentToEncode, String encryptionPassword) {
+    public static String encodeXMLOld(PipelineContext pipelineContext, Document documentToEncode, String encryptionPassword) {
         //        XFormsServer.logger.debug("XForms - encoding XML.");
 
         // The XML document as a string
         final String xmlString = Dom4jUtils.domToString(documentToEncode, false, false);
-        return encodeString(pipelineContext, xmlString, encryptionPassword);
+        return encodeStringOld(pipelineContext, xmlString, encryptionPassword);
     }
 
-    public static String encodeString(PipelineContext pipelineContext, String stringToEncode, String encryptionPassword) {
+    private static String encodeStringOld(PipelineContext pipelineContext, String stringToEncode, String encryptionPassword) {
         Deflater deflater = null;
         try {
             // Compress if needed
@@ -454,6 +430,95 @@ public class XFormsUtils {
                     // NOTE: In this scenario, we take a shortcut and assume we don't even need to base64 the string
                     // as it is going to stay in memory
                     return "X3" + stringToEncode;
+                } else {
+                    // The data was compressed
+                    return "X4" + Base64.encode(gzipByteArray);
+                }
+            }
+        } catch (Throwable e) {
+            try {
+                if (deflater != null)
+                    deflaterPool.invalidateObject(deflater);
+            } catch (Exception e1) {
+                throw new OXFException(e1);
+            }
+            throw new OXFException(e);
+        } finally {
+            try {
+                if (deflater != null) {
+                    deflater.reset();
+                    deflaterPool.returnObject(deflater);
+                }
+            } catch (Exception e) {
+                throw new OXFException(e);
+            }
+        }
+    }
+
+    public static String encodeXML(PipelineContext pipelineContext, Document documentToEncode, String encryptionPassword, boolean encodeLocationData) {
+        //        XFormsServer.logger.debug("XForms - encoding XML.");
+
+        // Get SAXStore
+        // TODO: This is not optimal since we create a second in-memory representation. Should stream instead.
+        final SAXStore saxStore;
+        try {
+            saxStore = new SAXStore();
+            final SAXResult saxResult = new SAXResult(saxStore);
+            final Transformer identity = TransformerUtils.getIdentityTransformer();
+            final Source source = encodeLocationData ? new LocationDocumentSource(documentToEncode) : new DocumentSource(documentToEncode);
+            identity.transform(source, saxResult);
+        } catch (TransformerException e) {
+            throw new OXFException(e);
+        }
+
+        // Serialize SAXStore to bytes
+        // TODO: This is not optimal since we create a third in-memory representation. Should stream instead.
+        final byte[] bytes;
+        try {
+            final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            saxStore.writeExternal(new ObjectOutputStream(byteArrayOutputStream));
+            bytes = byteArrayOutputStream.toByteArray();
+        } catch (IOException e) {
+            throw new OXFException(e);
+        }
+
+        // Encode bytes
+        return encodeBytes(pipelineContext, bytes, encryptionPassword);
+    }
+
+    public static String encodeBytes(PipelineContext pipelineContext, byte[] bytesToEncode, String encryptionPassword) {
+        Deflater deflater = null;
+        try {
+            // Compress if needed
+            final byte[] gzipByteArray;
+            if (isGZIPState()) {
+                deflater = (Deflater) deflaterPool.borrowObject();
+                final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                final DeflaterGZIPOutputStream gzipOutputStream = new DeflaterGZIPOutputStream(deflater, byteArrayOutputStream, 1024);
+                gzipOutputStream.write(bytesToEncode);
+                gzipOutputStream.close();
+                gzipByteArray = byteArrayOutputStream.toByteArray();
+            } else {
+                gzipByteArray = null;
+            }
+
+            // Encrypt if needed
+            if (encryptionPassword != null) {
+                // Perform encryption
+                final String encryptedString;
+                if (gzipByteArray == null) {
+                    // The data was not compressed
+                    encryptedString = "X1" + SecureUtils.encrypt(pipelineContext, encryptionPassword, bytesToEncode);
+                } else {
+                    // The data was compressed
+                    encryptedString = "X2" + SecureUtils.encrypt(pipelineContext, encryptionPassword, gzipByteArray);
+                }
+                return encryptedString;
+            } else {
+                // No encryption
+                if (gzipByteArray == null) {
+                    // The data was not compressed
+                    return "X3" + Base64.encode(bytesToEncode);
                 } else {
                     // The data was compressed
                     return "X4" + Base64.encode(gzipByteArray);
@@ -635,9 +700,11 @@ public class XFormsUtils {
             if (hasValueAttribute) {
                 final List currentNodeset = currentBindingContext.getNodeset();
                 if (currentNodeset != null && currentNodeset.size() > 0) {
-                    final String tempResult = containingDocument.getEvaluator().evaluateAsString(pipelineContext,
+                    final String tempResult = XPathCache.evaluateAsString(pipelineContext,
                             currentNodeset, currentBindingContext.getPosition(),
-                            valueAttribute, Dom4jUtils.getNamespaceContextNoDefault(childElement), null, containingDocument.getXFormsControls().getFunctionLibrary(), null);
+                            valueAttribute, Dom4jUtils.getNamespaceContextNoDefault(childElement),
+                            null, containingDocument.getXFormsControls().getFunctionLibrary(), null,
+                            (LocationData) childElement.getData());
 
                     return (acceptHTML) ? XMLUtils.escapeXMLMinimal(tempResult) : tempResult;
                 } else {
@@ -846,36 +913,6 @@ public class XFormsUtils {
         }
     }
 
-//    public static String encodeXML2(PipelineContext pipelineContext, Document instance) {
-//        return encodeXML2(pipelineContext, instance, getEncryptionKey());
-//    }
-//
-//    public static String encodeXML2(PipelineContext pipelineContext, Document instance, String encryptionPassword) {
-//        // NOTE: This is an attempt to implement an alternative way of encoding. It appears to be
-//        // slower. Possibly manually serializing the SAXStore could yield better performance.
-//        try {
-//            final SAXStore saxStore = new SAXStore();
-//            final SAXResult saxResult = new SAXResult(saxStore);
-//            final Transformer identity = TransformerUtils.getIdentityTransformer();
-//            identity.transform(new DocumentSource(instance), saxResult);
-//
-//            final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-//            final GZIPOutputStream gzipOutputStream = new GZIPOutputStream(byteArrayOutputStream);
-//            final ObjectOutputStream objectOutputStream = new ObjectOutputStream(gzipOutputStream);
-//            objectOutputStream.writeObject(saxStore);
-//            objectOutputStream.close();
-//
-//            String result = Base64.encode(byteArrayOutputStream.toByteArray());
-//            if (encryptionPassword != null)
-//                result = SecureUtils.encrypt(pipelineContext, encryptionPassword, result);
-//            return result;
-//        } catch (IOException e) {
-//            throw new OXFException(e);
-//        } catch (TransformerException e) {
-//            throw new OXFException(e);
-//        }
-//    }
-
     public static org.w3c.dom.Document decodeXMLAsDOM(PipelineContext pipelineContext, String encodedXML) {
         try {
             return TransformerUtils.dom4jToDomDocument(XFormsUtils.decodeXML(pipelineContext, encodedXML));
@@ -888,11 +925,45 @@ public class XFormsUtils {
         return decodeXML(pipelineContext, encodedXML, getEncryptionKey());
     }
 
-
     public static Document decodeXML(PipelineContext pipelineContext, String encodedXML, String encryptionPassword) {
 
+        final byte[] bytes = decodeBytes(pipelineContext, encodedXML, encryptionPassword);
+
+        // Deserialize bytes to SAXStore
+        // TODO: This is not optimal
+        final ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
+        final SAXStore saxStore;
+        try {
+            saxStore = new SAXStore(new ObjectInputStream(byteArrayInputStream));
+//            saxStore = (SAXStore) new ObjectInputStream(byteArrayInputStream).readObject();
+        } catch (IOException e) {
+            throw new OXFException(e);
+//        } catch (ClassNotFoundException e) {
+//            throw new OXFException(e);
+        }
+
+        // Deserialize SAXStore to dom4j document
+        // TODO: This is not optimal
+        final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
+        final LocationDocumentResult result = new LocationDocumentResult();
+        identity.setResult(result);
+        try {
+            saxStore.replay(identity);
+        } catch (SAXException e) {
+            throw new OXFException(e);
+        }
+        return result.getDocument();
+    }
+
+    public static Document decodeXMLOld(PipelineContext pipelineContext, String encodedXML, String encryptionPassword) {
+
         // Decoded string
-        final String xmlString = decodeString(pipelineContext, encodedXML, encryptionPassword);
+        final String xmlString;
+        try {
+            xmlString = new String(decodeBytes(pipelineContext, encodedXML, encryptionPassword), "utf-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new OXFException(e);// won't happen
+        }
 
         // Parse XML and return document
         final LocationSAXContentHandler saxContentHandler = new LocationSAXContentHandler();
@@ -901,34 +972,38 @@ public class XFormsUtils {
     }
 
     public static String decodeString(PipelineContext pipelineContext, String encoded) {
-        return decodeString(pipelineContext, encoded,  getEncryptionKey());
+        try {
+            return new String(decodeBytes(pipelineContext, encoded,  getEncryptionKey()), "utf-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new OXFException(e);// won't happen
+        }
     }
 
-    public static String decodeString(PipelineContext pipelineContext, String encoded, String encryptionPassword) {
+    public static byte[] decodeBytes(PipelineContext pipelineContext, String encoded, String encryptionPassword) {
         try {
             // Get raw text
-            String resultString;
+            byte[] resultBytes;
             {
                 final String prefix = encoded.substring(0, 2);
                 final String encodedString = encoded.substring(2);
 
-                final String resultString1;
+                final byte[] resultBytes1;
                 final byte[] gzipByteArray;
                 if (prefix.equals("X1")) {
                     // Encryption + uncompressed
-                    resultString1 = SecureUtils.decryptAsString(pipelineContext, encryptionPassword, encodedString);
+                    resultBytes1 = SecureUtils.decrypt(pipelineContext, encryptionPassword, encodedString);
                     gzipByteArray = null;
                 } else if (prefix.equals("X2")) {
                     // Encryption + compressed
-                    resultString1 = null;
+                    resultBytes1 = null;
                     gzipByteArray = SecureUtils.decrypt(pipelineContext, encryptionPassword, encodedString);
                 } else if (prefix.equals("X3")) {
                     // No encryption + uncompressed
-                    resultString1 = encodedString;
+                    resultBytes1 = Base64.decode(encodedString);
                     gzipByteArray = null;
                 } else if (prefix.equals("X4")) {
                     // No encryption + compressed
-                    resultString1 = null;
+                    resultBytes1 = null;
                     gzipByteArray = Base64.decode(encodedString);
                 } else {
                     throw new OXFException("Invalid prefix for encoded string: " + prefix);
@@ -940,49 +1015,17 @@ public class XFormsUtils {
                     final GZIPInputStream gzipInputStream = new GZIPInputStream(compressedData);
                     final ByteArrayOutputStream binaryData = new ByteArrayOutputStream(1024);
                     NetUtils.copyStream(gzipInputStream, binaryData);
-                    resultString = new String(binaryData.toByteArray(), "utf-8");
+                    resultBytes = binaryData.toByteArray();
                 } else {
-                    resultString = resultString1;
+                    resultBytes = resultBytes1;
                 }
             }
-            return resultString;
+            return resultBytes;
 
         } catch (IOException e) {
             throw new OXFException(e);
         }
     }
-
-//    public static Document decodeXML2(PipelineContext pipelineContext, String encodedXML) {
-//        return decodeXML2(pipelineContext, encodedXML, getEncryptionKey());
-//    }
-//
-//    public static Document decodeXML2(PipelineContext pipelineContext, String encodedXML, String encryptionPassword) {
-//        // NOTE: This is an attempt to implement an alternative way of decoding. It appears to be
-//        // slower. Possibly manually serializing the SAXStore could yield better performance.
-//        try {
-//            if (encryptionPassword != null)
-//                encodedXML = SecureUtils.decrypt(pipelineContext, encryptionPassword, encodedXML);
-//            final ByteArrayInputStream compressedData = new ByteArrayInputStream(Base64.decode(encodedXML));
-//            final GZIPInputStream gzipInputStream = new GZIPInputStream(compressedData);
-//
-//            final ObjectInputStream objectInputStream = new ObjectInputStream(gzipInputStream);
-//            final SAXStore saxStore = (SAXStore) objectInputStream.readObject();
-//
-//            final LocationDocumentResult documentResult = new LocationDocumentResult();
-//            final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
-//            identity.setResult(documentResult);
-//            saxStore.replay(identity);
-//
-//            return documentResult.getDocument();
-//
-//        } catch (IOException e) {
-//            throw new OXFException(e);
-//        } catch (ClassNotFoundException e) {
-//            throw new OXFException(e);
-//        } catch (SAXException e) {
-//            throw new OXFException(e);
-//        }
-//    }
 
     public static String getEncryptionKey() {
         if (XFormsUtils.isHiddenEncryptionEnabled())
@@ -1168,46 +1211,47 @@ public class XFormsUtils {
         if (attributeValue == null)
             return null;
 
-        return XPathCache.evaluateAsAvt(pipelineContext, contextNode, attributeValue, Dom4jUtils.getNamespaceContextNoDefault(element), variableToValueMap, functionLibrary, null);
+        return XPathCache.evaluateAsAvt(pipelineContext, contextNode, attributeValue, Dom4jUtils.getNamespaceContextNoDefault(element), variableToValueMap, functionLibrary, null, (LocationData) element.getData());
     }
 
     /**
-     * Encode certain special URI characters for convenience. This includes spaces and brackets.
+     * Encode a Human Readable Resource Identifier to a URI. Leading and trailing spaces are removed first.
      *
      * @param uriString    URI to encode
+     * @param processSpace whether to process the space character or leave it unchanged
      * @return             encoded URI
      */
-    public static String encodeConvenienceCharactersForURI(String uriString) {
-
-        // For user convenience, allow spaces and brackets
+    public static String encodeHRRI(String uriString, boolean processSpace) {
 
         // Note that the XML Schema spec says "Spaces are, in principle, allowed in the álexical spaceá of anyURI,
         // however, their use is highly discouraged (unless they are encoded by %20).".
+
+        // We assume that we never want leading or trailing spaces. You can use %20 if you realy want this.
         uriString = uriString.trim();
 
-        // We try below to follow the "Human Readable Resource Identifiers" RFC, in draft as of 2007-06-06. This
-        // recommends to encode:
-
+        // We try below to follow the "Human Readable Resource Identifiers" RFC, in draft as of 2007-06-06.
         // * the control characters #x0 to #x1F and #x7F to #x9F
-        // TODO: do this, and do better algorithm than below!
-
         // * space #x20
-        uriString = StringUtils.replace(uriString , " ", "%20");
-
         // * the delimiters "<" #x3C, ">" #x3E, and """ #x22
-        uriString = StringUtils.replace(uriString , "<", "%3C");
-        uriString = StringUtils.replace(uriString , ">", "%3E");
-        uriString = StringUtils.replace(uriString , "\"", "%22");
-
         // * the unwise characters "{" #x7B, "}" #x7D, "|" #x7C, "\" #x5C, "^" #x5E, and "`" #x60
-        uriString = StringUtils.replace(uriString , "{", "%7B");
-        uriString = StringUtils.replace(uriString , "}", "%7D");
-        uriString = StringUtils.replace(uriString , "|", "%7C");
-        uriString = StringUtils.replace(uriString , "\\", "%5C");
-        uriString = StringUtils.replace(uriString , "^", "%5E");
-        uriString = StringUtils.replace(uriString , "`", "%60");
+        final FastStringBuffer sb = new FastStringBuffer(uriString.length() * 2);
+        for (int i = 0; i < uriString.length(); i++) {
+            final char currentChar = uriString.charAt(i);
 
-        return uriString;
+            if (currentChar >= 0
+                    && (currentChar <= 0x1f || (processSpace && currentChar == 0x20) || currentChar == 0x22
+                     || currentChar == 0x3c || currentChar == 0x3e
+                     || currentChar == 0x5c || currentChar == 0x5e || currentChar == 0x60
+                     || (currentChar >= 0x7b && currentChar <= 0x7d)
+                     || (currentChar >= 0x7f && currentChar <= 0x9f))) {
+                sb.append('%');
+                sb.append(NumberUtils.toHexString((byte) currentChar).toUpperCase());
+            } else {
+                sb.append(currentChar);
+            }
+        };
+
+        return sb.toString();
     }
 
     public static interface InstanceWalker {

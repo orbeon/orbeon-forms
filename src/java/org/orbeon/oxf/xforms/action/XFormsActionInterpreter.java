@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.action;
 
 import org.dom4j.Element;
-import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.control.XFormsControl;
@@ -22,6 +22,9 @@ import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
+import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.saxon.om.NodeInfo;
 
 import java.util.List;
@@ -61,65 +64,72 @@ public class XFormsActionInterpreter {
         final String actionNamespaceURI = actionElement.getNamespaceURI();
         final String actionName = actionElement.getName();
         if (!XFormsActions.isActionName(actionNamespaceURI, actionName)) {
-            throw new OXFException("Invalid action name: " + XMLUtils.buildExplodedQName(actionNamespaceURI, actionName));
+            throw new ValidationException("Invalid action: " + XMLUtils.buildExplodedQName(actionNamespaceURI, actionName),
+                    new ExtendedLocationData((LocationData) actionElement.getData(), "running XForms action", actionElement,
+                            new String[] { "action name", XMLUtils.buildExplodedQName(actionNamespaceURI, actionName) }));
         }
 
-        // Handle conditional action (@if / @exf:if)
-        final String conditionAttribute;
-        {
-            final String ifAttribute = actionElement.attributeValue("if");
-            if (ifAttribute != null)
-                conditionAttribute = ifAttribute;
-            else
-                conditionAttribute = actionElement.attributeValue(XFormsConstants.EXFORMS_IF_ATTRIBUTE_QNAME);
-        }
-
-        // Handle iterated action (@while / @exf:while)
-        final String iterationAttribute;
-        {
-            final String whileAttribute = actionElement.attributeValue("while");
-            if (whileAttribute != null)
-                iterationAttribute = whileAttribute;
-            else
-                iterationAttribute = actionElement.attributeValue(XFormsConstants.EXFORMS_WHILE_ATTRIBUTE_QNAME);
-        }
-
-        final String eventHandlerContainerId = eventHandlerContainer.getEffectiveId();
-        int iteration = 1;
-        while (true) {
-            // Check if the conditionAttribute attribute exists and stop if false
-            if (conditionAttribute != null) {
-                boolean result = evaluateCondition(pipelineContext, eventHandlerContainerId, actionElement, actionName, conditionAttribute, "if");
-                if (!result)
-                    break;
-            }
-            // Check if the iterationAttribute attribute exists and stop if false
-            if (iterationAttribute != null) {
-                boolean result = evaluateCondition(pipelineContext, eventHandlerContainerId, actionElement, actionName, iterationAttribute, "while");
-                if (!result)
-                    break;
-            }
-
-            // Set binding context to action element
-            setActionBindingContext(pipelineContext, containingDocument, eventHandlerContainerId, actionElement);
-
-            // We are executing the action
-            if (XFormsServer.logger.isDebugEnabled()) {
-                if (iterationAttribute == null)
-                    XFormsServer.logger.debug("XForms - executing action: " + actionName);
+        try {
+            // Handle conditional action (@if / @exf:if)
+            final String conditionAttribute;
+            {
+                final String ifAttribute = actionElement.attributeValue("if");
+                if (ifAttribute != null)
+                    conditionAttribute = ifAttribute;
                 else
-                    XFormsServer.logger.debug("XForms - executing action (iteration " + iteration  +"): " + actionName);
+                    conditionAttribute = actionElement.attributeValue(XFormsConstants.EXFORMS_IF_ATTRIBUTE_QNAME);
             }
 
-            // Get action and execute it
-            final XFormsAction xformsAction = XFormsActions.getAction(actionNamespaceURI, actionName);
-            xformsAction.execute(this, pipelineContext, targetId, eventHandlerContainer, actionElement);
+            // Handle iterated action (@while / @exf:while)
+            final String iterationAttribute;
+            {
+                final String whileAttribute = actionElement.attributeValue("while");
+                if (whileAttribute != null)
+                    iterationAttribute = whileAttribute;
+                else
+                    iterationAttribute = actionElement.attributeValue(XFormsConstants.EXFORMS_WHILE_ATTRIBUTE_QNAME);
+            }
 
-            // Stop if there is no iteration
-            if (iterationAttribute == null)
-                break;
+            final String eventHandlerContainerId = eventHandlerContainer.getEffectiveId();
+            int iteration = 1;
+            while (true) {
+                // Check if the conditionAttribute attribute exists and stop if false
+                if (conditionAttribute != null) {
+                    boolean result = evaluateCondition(pipelineContext, eventHandlerContainerId, actionElement, actionName, conditionAttribute, "if");
+                    if (!result)
+                        break;
+                }
+                // Check if the iterationAttribute attribute exists and stop if false
+                if (iterationAttribute != null) {
+                    boolean result = evaluateCondition(pipelineContext, eventHandlerContainerId, actionElement, actionName, iterationAttribute, "while");
+                    if (!result)
+                        break;
+                }
 
-            iteration++;
+                // Set binding context to action element
+                setActionBindingContext(pipelineContext, containingDocument, eventHandlerContainerId, actionElement);
+
+                // We are executing the action
+                if (XFormsServer.logger.isDebugEnabled()) {
+                    if (iterationAttribute == null)
+                        XFormsServer.logger.debug("XForms - executing action: " + actionName);
+                    else
+                        XFormsServer.logger.debug("XForms - executing action (iteration " + iteration  +"): " + actionName);
+                }
+
+                // Get action and execute it
+                final XFormsAction xformsAction = XFormsActions.getAction(actionNamespaceURI, actionName);
+                xformsAction.execute(this, pipelineContext, targetId, eventHandlerContainer, actionElement);
+
+                // Stop if there is no iteration
+                if (iterationAttribute == null)
+                    break;
+
+                iteration++;
+            }
+        } catch (Exception e) {
+            throw ValidationException.wrapException(e, new ExtendedLocationData((LocationData) actionElement.getData(), "running XForms action", actionElement,
+                    new String[] { "action name", XMLUtils.buildExplodedQName(actionNamespaceURI, actionName) }));
         }
     }
 
@@ -181,9 +191,9 @@ public class XFormsActionInterpreter {
             return false;
         }
 
-        final List conditionResult = containingDocument.getEvaluator().evaluate(pipelineContext,
+        final List conditionResult = XPathCache.evaluate(pipelineContext,
             currentSingleNode, "boolean(" + conditionAttribute + ")",
-            Dom4jUtils.getNamespaceContextNoDefault(actionElement), null, xformsControls.getFunctionLibrary(), null);
+            Dom4jUtils.getNamespaceContextNoDefault(actionElement), null, xformsControls.getFunctionLibrary(), null, (LocationData) actionElement.getData());
 
         if (!((Boolean) conditionResult.get(0)).booleanValue()) {
             // Don't execute action

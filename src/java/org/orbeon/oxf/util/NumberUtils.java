@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ *  Copyright (C) 2004-2007 Orbeon, Inc.
  *
  *  This program is free software; you can redistribute it and/or modify it under the terms of the
  *  GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -13,6 +13,8 @@
  */
 package org.orbeon.oxf.util;
 
+import org.orbeon.saxon.om.FastStringBuffer;
+
 public class NumberUtils {
 
     private static final char digits[] = {
@@ -24,13 +26,29 @@ public class NumberUtils {
 
     /**
      * Convert a byte array into a hexadecimal String representation.
+     *
+     * @param bytes  array of bytes to convert
+     * @return       hexadecimal representation
      */
     public static String toHexString(byte[] bytes) {
-        StringBuffer sb = new StringBuffer();
+        final FastStringBuffer sb = new FastStringBuffer(bytes.length * 2);
         for (int i = 0; i < bytes.length; i++) {
             sb.append(digits[(bytes[i] >> 4) & 0x0f]);
             sb.append(digits[bytes[i] & 0x0f]);
         }
+        return sb.toString();
+    }
+
+    /**
+     * Convert a byte into a hexadecimal String representation.
+     *
+     * @param b      byte to convert
+     * @return       hexadecimal representation
+     */
+    public static String toHexString(byte b) {
+        final FastStringBuffer sb = new FastStringBuffer(2);
+        sb.append(digits[(b >> 4) & 0x0f]);
+        sb.append(digits[b & 0x0f]);
         return sb.toString();
     }
 
@@ -42,7 +60,6 @@ public class NumberUtils {
                 (newValue.doubleValue() - oldValue.doubleValue())/oldValue.doubleValue();
         }
     }
-
 
     public static int readIntBigEndian(byte[] bytes, int first) {
         return ((((int) bytes[first + 0]) & 0xff) << 24)

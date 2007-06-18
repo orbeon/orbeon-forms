@@ -57,7 +57,7 @@ public class XFormsLoadAction extends XFormsAction {
             final NodeInfo currentNode = bindingContext.getSingleNode();
             if (currentNode != null) {
                 final String value = XFormsInstance.getValueForNodeInfo(currentNode);
-                final String encodedValue = XFormsUtils.encodeConvenienceCharactersForURI(value);
+                final String encodedValue = XFormsUtils.encodeHRRI(value, true);
                 resolveLoadValue(containingDocument, pipelineContext, actionElement, doReplace, encodedValue, target, urlType, urlNorewrite, isShowProgress);
             } else {
                 // The action is a NOP if it's not bound to a node
@@ -74,7 +74,7 @@ public class XFormsLoadAction extends XFormsAction {
             // Resolve AVT
             final String resolvedResource = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, bindingContext.getSingleNode(),
                     null, xformsControls.getFunctionLibrary(), actionElement, resourceAttributeValue);
-            final String encodedResource = XFormsUtils.encodeConvenienceCharactersForURI(resolvedResource);
+            final String encodedResource = XFormsUtils.encodeHRRI(resolvedResource, true);
             resolveLoadValue(containingDocument, pipelineContext, actionElement, doReplace, encodedResource, target, urlType, urlNorewrite, isShowProgress);
             // NOTE: We are supposed to throw an xforms-link-error in case of failure. Can we do it?
         } else {

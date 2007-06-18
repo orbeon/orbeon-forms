@@ -24,6 +24,8 @@ import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
 import org.orbeon.oxf.xforms.event.events.XFormsScrollFirstEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsScrollLastEvent;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.saxon.om.NodeInfo;
 
 import java.util.HashMap;
@@ -47,9 +49,10 @@ public class XFormsSetindexAction extends XFormsAction {
         if (currentSingleNode == null)
             return;
 
-        final String indexString = containingDocument.getEvaluator().evaluateAsString(pipelineContext,
+        final String indexString = XPathCache.evaluateAsString(pipelineContext,
                 xformsControls.getCurrentNodeset(), xformsControls.getCurrentPosition(),
-                "number(" + indexXPath + ")", Dom4jUtils.getNamespaceContextNoDefault(actionElement), null, xformsControls.getFunctionLibrary(), null);
+                "number(" + indexXPath + ")", Dom4jUtils.getNamespaceContextNoDefault(actionElement), null, xformsControls.getFunctionLibrary(), null,
+                (LocationData) actionElement.getData());
 
         executeSetindexAction(pipelineContext, containingDocument, repeatId, indexString);
     }

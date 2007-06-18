@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ *  Copyright (C) 2004-2007 Orbeon, Inc.
  *
  *  This program is free software; you can redistribute it and/or modify it under the terms of the
  *  GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -24,7 +24,7 @@ import org.xml.sax.helpers.AttributesImpl;
 
 import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
-import java.io.Serializable;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,7 +34,7 @@ import java.util.List;
  * TODO: Handling of system IDs is not optimal in memory as system IDs are unlikely to change much within a document.
  * TODO: For "large" documents, growing by doubling the capacity is not optimal.
  */
-public class SAXStore extends ForwardingContentHandler implements Serializable {
+public class SAXStore extends ForwardingContentHandler implements Serializable, Externalizable {
 
     public static final byte START_DOCUMENT = 0x00;
     public static final byte END_DOCUMENT = 0x01;
@@ -70,12 +70,22 @@ public class SAXStore extends ForwardingContentHandler implements Serializable {
     private List stringBuffer = new ArrayList();
 
     private boolean hasDocumentLocator;
-    private transient Locator locator; // used only for recording events
     private String publicId;
+
+    private transient Locator locator; // used only for recording events
 
     public SAXStore() {
         super.setForward(false);
         init();
+    }
+
+    public SAXStore(ObjectInput input) {
+        super.setForward(false);
+        try {
+            readExternal(input);
+        } catch (Exception e) {
+            throw new OXFException(e);
+        }
     }
 
     public SAXStore(ContentHandler contentHandler) {
@@ -487,4 +497,85 @@ public class SAXStore extends ForwardingContentHandler implements Serializable {
 //    private int getNewCapacity(int oldCapacity) {
 //
 //    }
+
+
+    public void writeExternal(ObjectOutput out) throws IOException {
+
+        out.writeInt(eventBufferPosition);
+        out.write(eventBuffer, 0, eventBufferPosition);
+
+        out.writeInt(charBufferPosition);
+        for (int i = 0; i < charBufferPosition; i++)
+            out.writeChar(charBuffer[i]);
+
+        out.writeInt(intBufferPosition);
+        for (int i = 0; i < intBufferPosition; i++)
+            out.writeInt(intBuffer[i]);
+
+        out.writeInt(lineBufferPosition);
+        for (int i = 0; i < lineBufferPosition; i++)
+            out.writeInt(lineBuffer[i]);
+
+        out.writeInt(systemIdBufferPosition);
+        for (int i = 0; i < systemIdBufferPosition; i++) {
+            final String systemId = systemIdBuffer[i];
+            out.writeUTF(systemId == null ? "" : systemId);
+        }
+
+        out.writeInt(attributeCountBufferPosition);
+        for (int i = 0; i < attributeCountBufferPosition; i++)
+            out.writeInt(attributeCountBuffer[i]);
+
+        out.writeInt(stringBuffer.size());
+        for (int i = 0; i < stringBuffer.size(); i++)
+            out.writeUTF((String) stringBuffer.get(i));
+
+        out.writeBoolean(hasDocumentLocator);
+        out.writeUTF(publicId == null ? "" : publicId);
+
+        out.flush();
+    }
+
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        eventBufferPosition = in.readInt();
+        eventBuffer = new byte[eventBufferPosition];
+        in.read(eventBuffer);
+
+        charBufferPosition = in.readInt();
+        charBuffer = new char[charBufferPosition];
+        for (int i = 0; i < charBufferPosition; i++)
+            charBuffer[i] = in.readChar();
+
+        intBufferPosition = in.readInt();
+        intBuffer = new int[intBufferPosition];
+        for (int i = 0; i < intBufferPosition; i++)
+            intBuffer[i] = in.readInt();
+
+        lineBufferPosition = in.readInt();
+        lineBuffer = new int[lineBufferPosition];
+        for (int i = 0; i < lineBufferPosition; i++)
+            lineBuffer[i] = in.readInt();
+
+        systemIdBufferPosition = in.readInt();
+        systemIdBuffer = new String[systemIdBufferPosition];
+        for (int i = 0; i < systemIdBufferPosition; i++) {
+            systemIdBuffer[i] = in.readUTF();
+            if ("".equals(systemIdBuffer[i]))
+                systemIdBuffer[i] = null;
+        }
+
+        attributeCountBufferPosition = in.readInt();
+        attributeCountBuffer = new int[attributeCountBufferPosition];
+        for (int i = 0; i < attributeCountBufferPosition; i++)
+            attributeCountBuffer[i] = in.readInt();
+
+        final int stringBufferSize = in.readInt();
+        for (int i = 0; i < stringBufferSize; i++)
+            stringBuffer.add(in.readUTF());
+
+        hasDocumentLocator = in.readBoolean();
+        publicId = in.readUTF();
+        if ("".equals(publicId))
+            publicId = null;
+    }
 }

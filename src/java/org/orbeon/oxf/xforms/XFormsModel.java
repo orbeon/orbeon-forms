@@ -22,6 +22,7 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.*;
@@ -353,7 +354,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                     modelBind.setCurrentNodeInfo(defaultInstance.getInstanceRootElementInfo());
                     bindRunner.applyBind(modelBind);
                 } catch (final Exception e) {
-                    throw new ValidationException(e, modelBind.getLocationData());
+                    throw ValidationException.wrapException(e, new ExtendedLocationData(modelBind.getLocationData(), "evaluating XForms binds", modelBind.getBindElement()));
                 }
             }
         }
@@ -366,14 +367,15 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                 public void handleNode(NodeInfo nodeInfo) {
                     // Compute calculated value
                     try {
-                        final String stringResult = containingDocument.getEvaluator().evaluateAsString(pipelineContext, nodeInfo, modelBind.getCalculate(), modelBind.getNamespaceMap(), null,
-                            xformsFunctionLibrary, modelBind.getLocationData().getSystemID());
+                        final String stringResult = XPathCache.evaluateAsString(pipelineContext, nodeInfo, modelBind.getCalculate(), modelBind.getNamespaceMap(), null,
+                            xformsFunctionLibrary, modelBind.getLocationData().getSystemID(), modelBind.getLocationData());
 
                         // TODO: Detect if we have already handled this node and dispatch xforms-binding-exception
                         XFormsInstance.setValueForNodeInfo(pipelineContext, nodeInfo, stringResult, null);
 
                     } catch (Exception e) {
-                        throw new ValidationException("Error when evaluating string expression '" + modelBind.getCalculate() + "'", e, modelBind.getLocationData());
+                        throw ValidationException.wrapException(e, new ExtendedLocationData(modelBind.getLocationData(), "evaluating XForms calculate bind",
+                                modelBind.getBindElement(), new String[] { "expression", modelBind.getCalculate() }));
                     }
                 }
             });
@@ -392,14 +394,15 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                     try {
                         // Mark node
                         final String xpath = "boolean(" + modelBind.getRequired() + ")";
-                        final boolean required = ((Boolean) containingDocument.getEvaluator().evaluateSingle(pipelineContext,
+                        final boolean required = ((Boolean) XPathCache.evaluateSingle(pipelineContext,
                             nodeInfo, xpath, modelBind.getNamespaceMap(), null,
-                            xformsFunctionLibrary, modelBind.getLocationData().getSystemID())).booleanValue();
+                            xformsFunctionLibrary, modelBind.getLocationData().getSystemID(), modelBind.getLocationData())).booleanValue();
 
                         final InstanceData instanceData = XFormsUtils.getLocalInstanceData(nodeInfo);
                         instanceData.updateRequired(required, nodeInfo, modelBind.getId());
                     } catch (Exception e) {
-                        throw new ValidationException("Error when evaluating boolean expression '" + modelBind.getRequired() + "'", e, modelBind.getLocationData());
+                        throw ValidationException.wrapException(e, new ExtendedLocationData(modelBind.getLocationData(), "evaluating XForms required bind",
+                                modelBind.getBindElement(), new String[] { "expression", modelBind.getRequired() }));
                     }
                 }
             });
@@ -412,14 +415,15 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                     // Evaluate "relevant" XPath expression on this node
                     try {
                         final String xpath = "boolean(" + modelBind.getRelevant() + ")";
-                        boolean relevant = ((Boolean) containingDocument.getEvaluator().evaluateSingle(pipelineContext,
+                        boolean relevant = ((Boolean) XPathCache.evaluateSingle(pipelineContext,
                             nodeInfo, xpath, modelBind.getNamespaceMap(), null,
-                            xformsFunctionLibrary, modelBind.getLocationData().getSystemID())).booleanValue();
+                            xformsFunctionLibrary, modelBind.getLocationData().getSystemID(), modelBind.getLocationData())).booleanValue();
                         // Mark node
                         InstanceData instanceData = XFormsUtils.getLocalInstanceData(nodeInfo);
                         instanceData.getRelevant().set(relevant);
                     } catch (Exception e) {
-                        throw new ValidationException("Error when evaluating boolean expression '" + modelBind.getRelevant() + "'", e, modelBind.getLocationData());
+                        throw ValidationException.wrapException(e, new ExtendedLocationData(modelBind.getLocationData(), "evaluating XForms relevant bind",
+                                modelBind.getBindElement(), new String[] { "expression", modelBind.getRelevant() }));
                     }
                 }
             });
@@ -433,15 +437,16 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                     // Evaluate "readonly" XPath expression on this node
                     try {
                         final String xpath = "boolean(" + modelBind.getReadonly() + ")";
-                        boolean readonly = ((Boolean) containingDocument.getEvaluator().evaluateSingle(pipelineContext,
+                        boolean readonly = ((Boolean) XPathCache.evaluateSingle(pipelineContext,
                             nodeInfo, xpath, modelBind.getNamespaceMap(), null,
-                            xformsFunctionLibrary, modelBind.getLocationData().getSystemID())).booleanValue();
+                            xformsFunctionLibrary, modelBind.getLocationData().getSystemID(), modelBind.getLocationData())).booleanValue();
 
                         // Mark node
                         InstanceData instanceData = XFormsUtils.getLocalInstanceData(nodeInfo);
                         instanceData.getReadonly().set(readonly);
                     } catch (Exception e) {
-                        throw new ValidationException("Error when evaluating boolean expression '" + modelBind.getReadonly() + "'", e, modelBind.getLocationData());
+                        throw ValidationException.wrapException(e, new ExtendedLocationData(modelBind.getLocationData(), "evaluating XForms readonly bind",
+                                modelBind.getBindElement(), new String[] { "expression", modelBind.getReadonly() }));
                     }
                 }
             });
@@ -464,15 +469,16 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                     // Evaluate "externalize" XPath expression on this node
                     try {
                         final String xpath = "boolean(" + modelBind.getXXFormsExternalize() + ")";
-                        boolean xxformsExternalize = ((Boolean) containingDocument.getEvaluator().evaluateSingle(pipelineContext,
+                        boolean xxformsExternalize = ((Boolean) XPathCache.evaluateSingle(pipelineContext,
                             nodeInfo, xpath, modelBind.getNamespaceMap(), null,
-                            xformsFunctionLibrary, modelBind.getLocationData().getSystemID())).booleanValue();
+                            xformsFunctionLibrary, modelBind.getLocationData().getSystemID(), modelBind.getLocationData())).booleanValue();
 
                         // Mark node
                         final InstanceData instanceData = XFormsUtils.getLocalInstanceData(nodeInfo);
                         instanceData.getXXFormsExternalize().set(xxformsExternalize);
                     } catch (Exception e) {
-                        throw new ValidationException("Error when evaluating boolean expression '" + modelBind.getXXFormsExternalize() + "'", e, modelBind.getLocationData());
+                        throw ValidationException.wrapException(e, new ExtendedLocationData(modelBind.getLocationData(), "evaluating XForms xxforms:externalize bind",
+                                modelBind.getBindElement(), new String[] { "expression", modelBind.getXXFormsExternalize() }));
                     }
                 }
             });
@@ -490,13 +496,14 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                     // Evaluate constraint
                     try {
                         final String xpath = "boolean(" + modelBind.getConstraint() + ")";
-                        final Boolean valid = (Boolean) containingDocument.getEvaluator().evaluateSingle(pipelineContext,
+                        final Boolean valid = (Boolean) XPathCache.evaluateSingle(pipelineContext,
                             nodeInfo, xpath, modelBind.getNamespaceMap(), null,
-                            xformsFunctionLibrary, modelBind.getLocationData().getSystemID());
+                            xformsFunctionLibrary, modelBind.getLocationData().getSystemID(), modelBind.getLocationData());
                         final InstanceData instanceData = XFormsUtils.getLocalInstanceData(nodeInfo);
                         instanceData.updateConstraint(valid.booleanValue(), nodeInfo, modelBind.getId());
                     } catch (Exception e) {
-                        throw new ValidationException("Error when evaluating boolean expression '" + modelBind.getConstraint() + "'", e, modelBind.getLocationData());
+                        throw ValidationException.wrapException(e, new ExtendedLocationData(modelBind.getLocationData(), "evaluating XForms constraint bind",
+                                modelBind.getBindElement(), new String[] { "expression", modelBind.getConstraint() }));
                     }
                 }
             });
@@ -508,15 +515,15 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
             // Need an evaluator to check and convert type below
             final XPathEvaluator xpathEvaluator;
             try {
-                xpathEvaluator= new XPathEvaluator();
+                xpathEvaluator = new XPathEvaluator();
                 // NOTE: Not sure declaring namespaces here is necessary just to perform the cast
-                IndependentContext context = xpathEvaluator.getStaticContext();
+                final IndependentContext context = xpathEvaluator.getStaticContext();
                 for (Iterator j = modelBind.getNamespaceMap().keySet().iterator(); j.hasNext();) {
-                    String prefix = (String) j.next();
+                    final String prefix = (String) j.next();
                     context.declareNamespace(prefix, (String) modelBind.getNamespaceMap().get(prefix));
                 }
             } catch (Exception e) {
-                throw new OXFException(e);
+                throw ValidationException.wrapException(e, modelBind.getLocationData());
             }
 
             iterateNodeSet(pipelineContext, modelBind, new NodeHandler() {
@@ -568,7 +575,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                             // Get type information
                             final int requiredTypeFingerprint = StandardNames.getFingerprint(newTypeNamespaceURI, typeLocalname);
                             if (requiredTypeFingerprint == -1) {
-                                throw new ValidationException("Invalid type '" + modelBind.getType() + "'", modelBind.getLocationData());
+                                throw new ValidationException("Invalid schema type '" + modelBind.getType() + "'", modelBind.getLocationData());
                             }
 
                             // Try to perform casting
@@ -594,7 +601,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                                 instanceData.addSchemaError(validationError, nodeValue, modelBind.getId());
                             }
                         } else {
-                            throw new ValidationException("Invalid type '" + modelBind.getType() + "'", modelBind.getLocationData());
+                            throw new ValidationException("Invalid schema type '" + modelBind.getType() + "'", modelBind.getLocationData());
                         }
 
                         // Set type on node
@@ -609,12 +616,12 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
     private void handleChildrenBinds(final PipelineContext pipelineContext, final ModelBind modelBind, BindRunner bindRunner) {
         // Handle children binds
-        try {
-            final List nodeset = containingDocument.getEvaluator().evaluate(pipelineContext,
+        final List nodeset = XPathCache.evaluate(pipelineContext,
                 modelBind.getCurrentNodeInfo(),
                 modelBind.getNodeset(),
                 modelBind.getNamespaceMap(),
-                null, xformsFunctionLibrary, modelBind.getLocationData().getSystemID());
+                null, xformsFunctionLibrary, modelBind.getLocationData().getSystemID(), modelBind.getLocationData());
+        try {
             for (Iterator j = nodeset.iterator(); j.hasNext();) {
                 final NodeInfo nodeInfo = (NodeInfo) j.next();
                 for (Iterator childIterator = modelBind.getChildren().iterator(); childIterator.hasNext();) {
@@ -624,23 +631,25 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                 }
             }
         } catch (Exception e) {
-            throw new ValidationException("Error when evaluating bind node-set '" + modelBind.getNodeset() + "'", e, modelBind.getLocationData());
+            throw ValidationException.wrapException(e, new ExtendedLocationData(modelBind.getLocationData(), "evaluating XForms children binds",
+                    modelBind.getBindElement(), new String[] { "node-set", modelBind.getNodeset() }));
         }
     }
 
     private void iterateNodeSet(PipelineContext pipelineContext, ModelBind modelBind, NodeHandler nodeHandler) {
         try {
-            final List nodeset = containingDocument.getEvaluator().evaluate(pipelineContext,
+            final List nodeset = XPathCache.evaluate(pipelineContext,
                 modelBind.getCurrentNodeInfo(),
                 modelBind.getNodeset(),
                 modelBind.getNamespaceMap(),
-                null, xformsFunctionLibrary, null);
+                null, xformsFunctionLibrary, modelBind.getLocationData().getSystemID(), modelBind.getLocationData());
             for (Iterator j = nodeset.iterator(); j.hasNext();) {
                 final NodeInfo nodeInfo = (NodeInfo) j.next();
                 nodeHandler.handleNode(nodeInfo);
             }
         } catch (Exception e) {
-            throw new ValidationException("Error when evaluating bind node-set '" + modelBind.getNodeset() + "'", e, modelBind.getLocationData());
+            throw ValidationException.wrapException(e, new ExtendedLocationData(modelBind.getLocationData(), "iterating XForms bind",
+                    modelBind.getBindElement(), new String[] { "node-set", modelBind.getNodeset() }));
         }
     }
 
@@ -656,12 +665,12 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         return (LocationData) modelDocument.getRootElement().getData();
     }
 
-    public List getBindNodeset(PipelineContext pipelineContext, ModelBind bind) {
+    public List getBindNodeset(PipelineContext pipelineContext, ModelBind modelBind) {
         // Get a list of parents, ordered by grandfather first
         final List parents = new ArrayList();
         {
-            parents.add(bind);
-            ModelBind parent = bind;
+            parents.add(modelBind);
+            ModelBind parent = modelBind;
             while ((parent = parent.getParent()) != null) {
                 parents.add(parent);
             }
@@ -673,7 +682,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         // Find the root node
         final XFormsInstance defaultInstance = getDefaultInstance();
         if (defaultInstance == null)
-            throw new ValidationException("No default instance found for xforms:bind element with id: " + bind.getId(), bind.getLocationData());
+            throw new ValidationException("No default instance found for xforms:bind element with id: " + modelBind.getId(), modelBind.getLocationData());
         nodeset.add(defaultInstance.getInstanceRootElementInfo());
 
         for (Iterator i = parents.iterator(); i.hasNext();) {
@@ -682,8 +691,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
             for (Iterator j = nodeset.iterator(); j.hasNext();) {
                 final NodeInfo node = (NodeInfo) j.next();
                 // Execute XPath expresssion
-                currentModelBindResults.addAll(containingDocument.getEvaluator().evaluate(pipelineContext, node, current.getNodeset(),
-                        current.getNamespaceMap(), null, xformsFunctionLibrary, current.getLocationData().getSystemID()));
+                currentModelBindResults.addAll(XPathCache.evaluate(pipelineContext, node, current.getNodeset(),
+                        current.getNamespaceMap(), null, xformsFunctionLibrary, current.getLocationData().getSystemID(), current.getLocationData()));
             }
             nodeset.addAll(currentModelBindResults);
             // Last iteration of i: remove all except last
@@ -817,7 +826,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
                                     // This means that the instance was application shared
                                     if (!staticStateInstance.isApplicationShared())
-                                        throw new OXFException("Non-initialized instance has to be application shared for id: " + staticStateInstance.getEffectiveId());
+                                        throw new ValidationException("Non-initialized instance has to be application shared for id: " + staticStateInstance.getEffectiveId(),
+                                                (LocationData) instanceContainerElement.getData());
 
                                     if (XFormsServer.logger.isDebugEnabled())
                                         XFormsServer.logger.debug("XForms - using instance from application shared instance cache (instance from static state was not initialized): " + staticStateInstance.getEffectiveId());
@@ -847,12 +857,23 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                         final String xxformsValidation = instanceContainerElement.attributeValue(XFormsConstants.XXFORMS_VALIDATION_QNAME);
 
                         final long startTime = XFormsServer.logger.isDebugEnabled() ? System.currentTimeMillis() : 0;
-                        final String srcAttribute = instanceContainerElement.attributeValue("src");
-                        if (srcAttribute == null) {
+                        final String instanceResource;
+                        {
+                            final String srcAttribute = instanceContainerElement.attributeValue("src");
+                            final String resourceAttribute = instanceContainerElement.attributeValue("resource");
+                            if (srcAttribute != null)
+                                instanceResource = XFormsUtils.encodeHRRI(srcAttribute, true);
+                            else if (resourceAttribute != null)
+                                instanceResource = XFormsUtils.encodeHRRI(resourceAttribute, true);
+                            else
+                                instanceResource = null;
+                        }
+                        if (instanceResource == null) {
                             // Inline instance
                             final List children = instanceContainerElement.elements();
                             if (children == null || children.size() != 1) {
-                                final Throwable throwable = new ValidationException("xforms:instance element must contain exactly one child element", locationData);
+                                final Throwable throwable = new ValidationException("xforms:instance element must contain exactly one child element",
+                                        new ExtendedLocationData(locationData, "processing inline XForms instance", instanceContainerElement));
                                 containingDocument.dispatchEvent(pipelineContext, new XFormsLinkExceptionEvent(XFormsModel.this, null, instanceContainerElement, throwable));
                                 break;
                             }
@@ -864,7 +885,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                             instanceSourceURI = null;
                             xxformsUsername = null;
                             xxformsPassword = null;
-                        } else if (!srcAttribute.trim().equals("")) {
+                        } else if (!instanceResource.trim().equals("")) {
 
                             // External instance
                             final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
@@ -878,14 +899,14 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 //                                    || (externalContext.getRequest().getContainerType().equals("servlet")
 //                                        && XFormsUtils.isOptimizeLocalInstanceLoads()));
 
-                            final boolean optimizeForPortlets = !NetUtils.urlHasProtocol(srcAttribute)
+                            final boolean optimizeForPortlets = !NetUtils.urlHasProtocol(instanceResource)
                                                         && externalContext.getRequest().getContainerType().equals("portlet");
 
                             final XFormsModelSubmission.ConnectionResult connectionResult;
                             if (optimizeForPortlets) {
                                 // Use optimized local mode
 
-                                final URI resolvedURI = XFormsUtils.resolveXMLBase(instanceContainerElement, srcAttribute);
+                                final URI resolvedURI = XFormsUtils.resolveXMLBase(instanceContainerElement, instanceResource);
 
                                 if (XFormsServer.logger.isDebugEnabled())
                                     XFormsServer.logger.debug("XForms - getting document from optimized URI for: " + resolvedURI.toString());
@@ -897,23 +918,23 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                                 xxformsPassword = null;
 
                                 try {
-                                    // Handle connection errors
-                                    if (connectionResult.resultCode != 200) {
-                                        final ValidationException validationException = new ValidationException("Got invalid return code while loading instance: " + srcAttribute + ", " + connectionResult.resultCode, locationData);
-                                        dispatchXFormsLinkExceptionEvent(pipelineContext, connectionResult, srcAttribute, validationException, instanceContainerElement, locationData);
+                                    try {
+                                        // Handle connection errors
+                                        if (connectionResult.resultCode != 200) {
+                                            throw new OXFException("Got invalid return code while loading instance: " + instanceResource + ", " + connectionResult.resultCode);
+                                        }
+
+                                        // Read result as XML
+                                        if (!isReadonlyHint) {
+                                            instanceDocument = TransformerUtils.readDom4j(connectionResult.getResultInputStream(), connectionResult.resourceURI);
+                                        } else {
+                                            instanceDocument = TransformerUtils.readTinyTree(connectionResult.getResultInputStream(), connectionResult.resourceURI);
+                                        }
+                                    } catch (Exception e) {
+                                        final LocationData extendedLocationData = new ExtendedLocationData(locationData, "reading external XForms instance (optimized)", instanceContainerElement);
+                                        dispatchXFormsLinkExceptionEvent(pipelineContext, connectionResult, instanceResource, e, instanceContainerElement, extendedLocationData);
                                         break;
                                     }
-
-                                    // Read result as XML
-                                    if (!isReadonlyHint) {
-                                        instanceDocument = TransformerUtils.readDom4j(connectionResult.getResultInputStream(), connectionResult.resourceURI);
-                                    } else {
-                                        instanceDocument = TransformerUtils.readTinyTree(connectionResult.getResultInputStream(), connectionResult.resourceURI);
-                                    }
-                                } catch (Exception e) {
-                                    final ValidationException validationException = new ValidationException(e, locationData);
-                                    dispatchXFormsLinkExceptionEvent(pipelineContext, connectionResult, srcAttribute, validationException, instanceContainerElement, locationData);
-                                    break;
                                 } finally {
                                     // Clean-up
                                     if (connectionResult != null)
@@ -932,7 +953,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                                 final URL absoluteResolvedURL;
                                 final String absoluteResolvedURLString;
                                 {
-                                    final String resolvedURL = XFormsUtils.resolveResourceURL(pipelineContext, instanceContainerElement, srcAttribute);
+                                    final String resolvedURL = XFormsUtils.resolveResourceURL(pipelineContext, instanceContainerElement, instanceResource);
                                     final String inputName = ProcessorImpl.getProcessorInputSchemeInputName(resolvedURL);
                                     if (inputName != null) {
                                         // URL is input:*, keep it as is
@@ -962,22 +983,23 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                                             "get", absoluteResolvedURL, xxformsUsername, xxformsPassword, null, null);
 
                                     try {
-                                        // Handle connection errors
-                                        if (connectionResult.resultCode != 200) {
-                                            final ValidationException validationException = new ValidationException("Got invalid return code while loading instance: " + srcAttribute + ", " + connectionResult.resultCode, locationData);
-                                            dispatchXFormsLinkExceptionEvent(pipelineContext, connectionResult, srcAttribute, validationException, instanceContainerElement, locationData);
+                                        try {
+                                            // Handle connection errors
+                                            if (connectionResult.resultCode != 200) {
+                                                throw new OXFException("Got invalid return code while loading instance: " + instanceResource + ", " + connectionResult.resultCode);
+                                            }
+
+                                            // Read result as XML
+                                            if (!isReadonlyHint) {
+                                                instanceDocument = TransformerUtils.readDom4j(connectionResult.getResultInputStream(), connectionResult.resourceURI);
+                                            } else {
+                                                instanceDocument = TransformerUtils.readTinyTree(connectionResult.getResultInputStream(), connectionResult.resourceURI);
+                                            }
+                                        } catch (Exception e) {
+                                            final LocationData extendedLocationData = new ExtendedLocationData(locationData, "reading external instance (no resolver)", instanceContainerElement);
+                                            dispatchXFormsLinkExceptionEvent(pipelineContext, connectionResult, instanceResource, e, instanceContainerElement, extendedLocationData);
                                             break;
                                         }
-
-                                        // Read result as XML
-                                        if (!isReadonlyHint) {
-                                            instanceDocument = TransformerUtils.readDom4j(connectionResult.getResultInputStream(), connectionResult.resourceURI);
-                                        } else {
-                                            instanceDocument = TransformerUtils.readTinyTree(connectionResult.getResultInputStream(), connectionResult.resourceURI);
-                                        }
-                                    } catch (Exception e) {
-                                        dispatchXFormsLinkExceptionEvent(pipelineContext, connectionResult, srcAttribute, e, instanceContainerElement, locationData);
-                                        break;
                                     } finally {
                                         // Clean-up
                                         if (connectionResult != null)
@@ -986,7 +1008,6 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
                                 } else {
                                     // Optimized case that uses the provided resolver
-
                                     if (XFormsServer.logger.isDebugEnabled())
                                         XFormsServer.logger.debug("XForms - getting document from resolver for: " + absoluteResolvedURLString);
 
@@ -997,9 +1018,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                                             instanceDocument = containingDocument.getURIResolver().readURLAsDocumentInfo(absoluteResolvedURLString, xxformsUsername, xxformsPassword);
                                         }
                                     } catch (Exception e) {
-                                        final ValidationException validationException = new ValidationException(e, new ExtendedLocationData(new LocationData(absoluteResolvedURLString, -1, -1),
-                                                "reading external instance", instanceContainerElement));
-                                        dispatchXFormsLinkExceptionEvent(pipelineContext, new XFormsModelSubmission.ConnectionResult(absoluteResolvedURLString), srcAttribute, validationException, instanceContainerElement, locationData);
+                                        final LocationData extendedLocationData = new ExtendedLocationData(locationData, "reading external instance (resolver)", instanceContainerElement);
+                                        dispatchXFormsLinkExceptionEvent(pipelineContext, new XFormsModelSubmission.ConnectionResult(absoluteResolvedURLString), instanceResource, e, instanceContainerElement, extendedLocationData);
                                         break;
                                     }
                                 }
@@ -1008,8 +1028,9 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                             }
                         } else {
                             // Got a blank src attribute, just dispatch xforms-link-exception
-                            final Throwable throwable = new ValidationException("Invalid blank URL specified for instance: " + instanceId, locationData);
-                            containingDocument.dispatchEvent(pipelineContext, new XFormsLinkExceptionEvent(XFormsModel.this, srcAttribute, instanceContainerElement, throwable));
+                            final LocationData extendedLocationData = new ExtendedLocationData(locationData, "processing XForms instance", instanceContainerElement);
+                            final Throwable throwable = new ValidationException("Invalid blank URL specified for instance: " + instanceId, extendedLocationData);
+                            containingDocument.dispatchEvent(pipelineContext, new XFormsLinkExceptionEvent(XFormsModel.this, instanceResource, instanceContainerElement, throwable));
                             break;
                         }
 
@@ -1143,12 +1164,12 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         final Throwable throwable;
         if (connectionResult != null && connectionResult.resourceURI != null) {
             final ValidationException validationException
-                = new ValidationException(e, new ExtendedLocationData(new LocationData(connectionResult.resourceURI, -1, -1),
+                = ValidationException.wrapException(e, new ExtendedLocationData(new LocationData(connectionResult.resourceURI, -1, -1),
                     "reading external instance", instanceContainerElement));
             validationException.addLocationData(locationData);
             throwable = validationException;
         } else {
-            throwable = new ValidationException(e, locationData);
+            throwable = ValidationException.wrapException(e, locationData);
         }
         containingDocument.dispatchEvent(pipelineContext, new XFormsLinkExceptionEvent(XFormsModel.this, srcAttribute, instanceContainerElement, throwable));
     }

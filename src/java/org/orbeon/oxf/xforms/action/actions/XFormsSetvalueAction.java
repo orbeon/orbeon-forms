@@ -23,6 +23,8 @@ import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.saxon.om.NodeInfo;
 
 import java.util.Collections;
@@ -64,9 +66,10 @@ public class XFormsSetvalueAction extends XFormsAction {
                 // This would require an update to the way we impelement the processing model.
             }
 
-            valueToSet = containingDocument.getEvaluator().evaluateAsString(pipelineContext,
+            valueToSet = XPathCache.evaluateAsString(pipelineContext,
                     currentNodeset, xformsControls.getCurrentPosition(),
-                    value, namespaceContext, null, xformsControls.getFunctionLibrary(), null);
+                    value, namespaceContext, null, xformsControls.getFunctionLibrary(), null,
+                    (LocationData) actionElement.getData());
         } else {
             // Value to set is static content
             valueToSet = content;

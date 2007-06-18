@@ -17,6 +17,7 @@ import org.apache.log4j.Logger;
 import org.dom4j.*;
 import org.dom4j.io.DocumentSource;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorUtils;
@@ -35,6 +36,7 @@ import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
+import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.functions.FunctionLibrary;
 import org.orbeon.saxon.om.DocumentInfo;
@@ -143,7 +145,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 avtActionOrResource = submissionElement.attributeValue("action");
             if (avtActionOrResource == null) {
                 // TODO: For XForms 1.1, support @resource and nested xforms:resource
-                throw new OXFException("xforms:submission: action attribute or resource attribute is missing.");
+                throw new XFormsSubmissionException("xforms:submission: action attribute or resource attribute is missing.",
+                        "processing xforms:submission attributes");
             }
 
             method = submissionElement.attributeValue("method");
@@ -262,10 +265,10 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                     // Check that we have a current node and that it is pointing to a document or an element
                     if (currentNodeInfo == null)
-                        throw new OXFException("Empty single-node binding on xforms:submission for submission id: " + id);
+                        throw new XFormsSubmissionException("Empty single-node binding on xforms:submission for submission id: " + id, "getting submission single-node binding");
 
                     if (!(currentNodeInfo instanceof DocumentInfo || currentNodeInfo.getNodeKind() == org.w3c.dom.Document.ELEMENT_NODE)) {
-                        throw new OXFException("xforms:submission: single-node binding must refer to a document node or an element.");
+                        throw new XFormsSubmissionException("xforms:submission: single-node binding must refer to a document node or an element.", "getting submission single-node binding");
                     }
                 }
 
@@ -328,7 +331,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                                 logger.debug("XForms - submission - instance document or subset thereof cannot be submitted:\n" + documentString);
                             }
-                            throw new OXFException("xforms:submission: instance to submit does not satisfy valid and/or required model item properties.");
+                            throw new XFormsSubmissionException("xforms:submission: instance to submit does not satisfy valid and/or required model item properties.",
+                                    "checking instance validity");
                         }
                     } finally {
                         // Restore instance document
@@ -351,7 +355,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                     final FunctionLibrary functionLibrary = xformsControls.getFunctionLibrary();
 
                     final String tempActionOrResource = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, currentNodeInfo, null, functionLibrary, submissionElement, avtActionOrResource);
-                    resolvedActionOrResource = XFormsUtils.encodeConvenienceCharactersForURI(tempActionOrResource);
+                    resolvedActionOrResource = XFormsUtils.encodeHRRI(tempActionOrResource, true);
 
                     resolvedXXFormsUsername = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, currentNodeInfo, null, functionLibrary, submissionElement, avtXXFormsUsername);
                     resolvedXXFormsPassword = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, currentNodeInfo, null, functionLibrary, submissionElement, avtXXFormsPassword);
@@ -365,12 +369,15 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 final boolean isApplicationSharedHint = "application".equals(resolvedXXFormsShared);
                 if (isApplicationSharedHint) {
                     if (!XFormsSubmissionUtils.isGet(method))
-                        throw new OXFException("xforms:submission: xxforms:shared=\"application\" can be set only with method=\"get\".");
+                        throw new XFormsSubmissionException("xforms:submission: xxforms:shared=\"application\" can be set only with method=\"get\".",
+                                "checking read-only and shared hints");
                     if (!isReplaceInstance)
-                        throw new OXFException("xforms:submission: xxforms:shared=\"application\" can be set only with replace=\"instance\".");
+                        throw new XFormsSubmissionException("xforms:submission: xxforms:shared=\"application\" can be set only with replace=\"instance\".",
+                                "checking read-only and shared hints");
                 } else if (isReadonlyHint) {
                     if (!isReplaceInstance)
-                        throw new OXFException("xforms:submission: xxforms:readonly=\"true\" can be \"true\" only with replace=\"instance\".");
+                        throw new XFormsSubmissionException("xforms:submission: xxforms:readonly=\"true\" can be \"true\" only with replace=\"instance\".",
+                                "checking read-only and shared hints");
                 }
 
                 final Document documentToSubmit;
@@ -450,7 +457,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                                 logger.debug("XForms - submission - instance document or subset thereof cannot be submitted:\n" + documentString);
                             }
-                            throw new OXFException("xforms:submission: instance to submit does not satisfy valid and/or required model item properties.");
+                            throw new XFormsSubmissionException("xforms:submission: instance to submit does not satisfy valid and/or required model item properties.",
+                                    "checking instance validity");
                         }
                     } finally {
                         // Restore instance document
@@ -483,13 +491,13 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 {
                     if (method.equals("multipart-post")) {
                         // TODO
-                        throw new OXFException("xforms:submission: submission method not yet implemented: " + method);
+                        throw new XFormsSubmissionException("xforms:submission: submission method not yet implemented: " + method, "serializing instance");
                     } else if (method.equals("form-data-post")) {
                         // TODO
 
 //                        final MultipartFormDataBuilder builder = new MultipartFormDataBuilder(, , null);
 
-                        throw new OXFException("xforms:submission: submission method not yet implemented: " + method);
+                        throw new XFormsSubmissionException("xforms:submission: submission method not yet implemented: " + method, "serializing instance");
                     } else if (method.equals("urlencoded-post")) {
 
                         // Perform "application/x-www-form-urlencoded" serialization
@@ -512,7 +520,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                 identity.transform(new DocumentSource(documentToSubmit), new StreamResult(os));
                                 messageBody = os.toByteArray();
                             } catch (Exception e) {
-                                throw new OXFException("xforms:submission: exception while serializing instance to XML.", e);
+                                throw new XFormsSubmissionException(e, "xforms:submission: exception while serializing instance to XML.", "serializing instance");
                             }
                         } else {
                             messageBody = null;
@@ -528,7 +536,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         defaultMediatype = null;
 
                     } else {
-                        throw new OXFException("xforms:submission: invalid submission method requested: " + method);
+                        throw new XFormsSubmissionException("xforms:submission: invalid submission method requested: " + method, "serializing instance");
                     }
                 }
 
@@ -559,7 +567,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         // Test action
 
                         if (messageBody == null)
-                            throw new OXFException("Action 'test:': no message body.");
+                            throw new XFormsSubmissionException("Action 'test:': no message body.", "processing submission response");
 
                         connectionResult = new ConnectionResult(null);
                         connectionResult.resultCode = 200;
@@ -761,19 +769,19 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                             }
                                         } catch (Exception e) {
                                             submitErrorEvent = createErrorEvent(connectionResult);
-                                            throw new OXFException("xforms:submission: exception while serializing XML to instance.", e);
+                                            throw new XFormsSubmissionException(e, "xforms:submission: exception while serializing XML to instance.", "processing instance replacement");
                                         }
                                     } else {
                                         // Other media type
                                         submitErrorEvent = createErrorEvent(connectionResult);
-                                        throw new OXFException("Body received with non-XML media type for replace=\"instance\": " + connectionResult.resultMediaType);
+                                        throw new XFormsSubmissionException("Body received with non-XML media type for replace=\"instance\": " + connectionResult.resultMediaType, "processing instance replacement");
                                     }
                                 } else if (replace.equals(XFormsConstants.XFORMS_SUBMIT_REPLACE_NONE)) {
                                     // Just notify that processing is terminated
                                     submitDone = true;
                                 } else {
                                     submitErrorEvent = createErrorEvent(connectionResult);
-                                    throw new OXFException("xforms:submission: invalid replace attribute: " + replace);
+                                    throw new XFormsSubmissionException("xforms:submission: invalid replace attribute: " + replace, "processing instance replacement");
                                 }
 
                             } else {
@@ -808,7 +816,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         } else {
                             // Error code received
                             submitErrorEvent = createErrorEvent(connectionResult);
-                            throw new OXFException("xforms:submission for submission id: " + id + ", error code received when submitting instance: " + connectionResult.resultCode);
+                            throw new XFormsSubmissionException("xforms:submission for submission id: " + id + ", error code received when submitting instance: " + connectionResult.resultCode, "processing submission response");
                         }
                     }
                 } finally {
@@ -825,7 +833,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
             } catch (Throwable e) {
                 if (isDeferredSubmissionSecondPass && XFormsUtils.isOptimizePostAllSubmission()) {
                     // It doesn't serve any purpose here to dispatch an event, so we just propagate the exception
-                    throw new OXFException(e);
+                    throw new XFormsSubmissionException(e, "Error while processing xforms:submission", "processing submission");
                 } else {
                     // Any exception will cause an error event to be dispatched
                     if (submitErrorEvent == null)
@@ -848,7 +856,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
         } else if (XFormsEvents.XFORMS_BINDING_EXCEPTION.equals(eventName)) {
             // The default action for this event results in the following: Fatal error.
-            throw new OXFException("Binding exception.");
+            throw new OXFException("Binding exception.");// TODO: what location information should we provide here?
         }
     }
 
@@ -1137,6 +1145,18 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
         }
 
         public void close() {}
+    }
+
+    private class XFormsSubmissionException extends ValidationException {
+        public XFormsSubmissionException(String message, String description) {
+            super(message, new ExtendedLocationData(XFormsModelSubmission.this.getLocationData(), description,
+                    XFormsModelSubmission.this.getSubmissionElement()));
+        }
+
+        public XFormsSubmissionException(Throwable e, String message, String description) {
+            super(message, e, new ExtendedLocationData(XFormsModelSubmission.this.getLocationData(), description,
+                    XFormsModelSubmission.this.getSubmissionElement()));
+        }
     }
 }
 

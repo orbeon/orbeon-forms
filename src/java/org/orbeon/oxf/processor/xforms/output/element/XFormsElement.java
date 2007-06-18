@@ -18,6 +18,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.util.SecureUtils;
 import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.InstanceData;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsElementContext;
@@ -90,8 +91,8 @@ public class XFormsElement {
             final NodeInfo contextNode = context.getCurrentSingleNode();
             if (contextNode == null)
                 throw new ValidationException("null context node for boolean 'test' expression: " + test, new LocationData(context.getLocator())); 
-            final Boolean value = (Boolean) context.getContainingDocument().getEvaluator().evaluateSingle(context.getPipelineContext(), contextNode,
-                    "boolean(" + test + ")", prefixToURI, context.getRepeatIdToIndex(), fncLib, null);
+            final Boolean value = (Boolean) XPathCache.evaluateSingle(context.getPipelineContext(), contextNode,
+                    "boolean(" + test + ")", prefixToURI, context.getRepeatIdToIndex(), fncLib, null, null);
 
             addExtensionAttribute(newAttributes, "value", Boolean.toString(value.booleanValue()));
         } else if (context.getParentElement(0) instanceof Itemset
@@ -212,8 +213,8 @@ public class XFormsElement {
                 if (contextNode == null)
                     throw new ValidationException("null context node for number 'at' expression: " + atExpression, new LocationData(context.getLocator()));
 
-                final Object at = context.getContainingDocument().getEvaluator().evaluateSingle(context.getPipelineContext(), context.getCurrentSingleNode(),
-                        "round(" + atExpression + ")", context.getCurrentPrefixToURIMap(), null, context.getFunctionLibrary(), null);
+                final Object at = XPathCache.evaluateSingle(context.getPipelineContext(), context.getCurrentSingleNode(),
+                        "round(" + atExpression + ")", context.getCurrentPrefixToURIMap(), null, context.getFunctionLibrary(), null, null);
 
                 if (!(at instanceof Number))
                     throw new ValidationException("'at' expression must return a number",
@@ -232,8 +233,8 @@ public class XFormsElement {
                 if (contextNode == null)
                     throw new ValidationException("null context node for string 'value' expression: " + valueExpression, new LocationData(context.getLocator()));
 
-                Object value = context.getContainingDocument().getEvaluator().evaluateSingle(context.getPipelineContext(), context.getCurrentSingleNode(),
-                        "string(" + valueExpression + ")", context.getCurrentPrefixToURIMap(), null, context.getFunctionLibrary(), null);
+                Object value = XPathCache.evaluateSingle(context.getPipelineContext(), context.getCurrentSingleNode(),
+                        "string(" + valueExpression + ")", context.getCurrentPrefixToURIMap(), null, context.getFunctionLibrary(), null, null);
 
                 if (!(value instanceof String))
                     throw new ValidationException("'value' expression must return a string",

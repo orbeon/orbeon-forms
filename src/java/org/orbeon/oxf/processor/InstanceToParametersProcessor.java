@@ -120,7 +120,7 @@ public class InstanceToParametersProcessor extends ProcessorImpl {
                         // If all the nodes of the instance map to parameters, we don't output the instance parameter
                         if (removeXXFormsAttributes)
                             XFormsUtils.removeInstanceAttributes(instanceWrapper);
-                        outputParameter("$instance", XFormsUtils.encodeXML(pipelineContext, instance), contentHandler);
+                        outputParameter("$instance", XFormsUtils.encodeXML(pipelineContext, instance, false), contentHandler);
                     }
                     contentHandler.endElement("", PARAMETERS_ELEMENT, PARAMETERS_ELEMENT);
                     contentHandler.endDocument();

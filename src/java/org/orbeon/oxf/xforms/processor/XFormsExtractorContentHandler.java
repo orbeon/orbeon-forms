@@ -28,6 +28,7 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
     private final String BODY_QNAME = XMLUtils.buildExplodedQName(XMLConstants.XHTML_NAMESPACE_URI, "body");
 
     private Locator locator;
+    private LocationData locationData;
 
     private String stateHandling;
     private String readonly;
@@ -107,6 +108,12 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
             // Add external-events configuration
             if (externalEvents != null)
                 attributesImpl.addAttribute("", "external-events", "external-events", ContentHandlerHelper.CDATA, externalEvents);
+            // Add location information
+            if (locationData != null) {
+                attributesImpl.addAttribute("", "system-id", "system-id", ContentHandlerHelper.CDATA, locationData.getSystemID());
+                attributesImpl.addAttribute("", "line", "line", ContentHandlerHelper.CDATA, Integer.toString(locationData.getLine()));
+                attributesImpl.addAttribute("", "column", "column", ContentHandlerHelper.CDATA, Integer.toString(locationData.getCol()));
+            }
 
             super.startElement("", "static-state", "static-state", attributesImpl);
             mustOutputFirstElement = false;
@@ -159,9 +166,18 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
 
     public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
 
+        // Handle location data
+        if (locationData == null && locator != null && mustOutputFirstElement) {
+            final String systemId = locator.getSystemId();
+            if (systemId != null) {
+                locationData = new LocationData(systemId, locator.getLineNumber(), locator.getColumnNumber());
+            }
+        }
+
         namespaceSupport.startElement();
 
         if (!inModel && !inControl) {
+
             // Handle xml:base
             {
                 final String xmlBaseAttribute = attributes.getValue(XMLConstants.XML_URI, "base");

@@ -25,8 +25,9 @@ import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
 import org.orbeon.oxf.xforms.event.events.XFormsDeleteEvent;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.saxon.om.NodeInfo;
-import org.orbeon.saxon.dom4j.DocumentWrapper;
 
 import java.util.*;
 
@@ -93,9 +94,9 @@ public class XFormsDeleteAction extends XFormsAction {
                         // position is 1."
 
                         // "2. The return value is processed according to the rules of the XPath function round()"
-                        final String insertionIndexString = containingDocument.getEvaluator().evaluateAsString(pipelineContext,
+                        final String insertionIndexString = XPathCache.evaluateAsString(pipelineContext,
                             collectionToUpdate, 1,
-                            "round(" + atAttribute + ")", Dom4jUtils.getNamespaceContextNoDefault(actionElement), null, xformsControls.getFunctionLibrary(), null);
+                            "round(" + atAttribute + ")", Dom4jUtils.getNamespaceContextNoDefault(actionElement), null, xformsControls.getFunctionLibrary(), null, (LocationData) actionElement.getData());
 
                         // "3. If the result is in the range 1 to the Node Set Binding node-set size, then the insert
                         // location is equal to the result. If the result is non-positive, then the insert location is

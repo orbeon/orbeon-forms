@@ -11,6 +11,7 @@ package org.orbeon.oxf.processor.xforms.output.element;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsElementContext;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.saxon.om.NodeInfo;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -52,8 +53,8 @@ public class Itemset extends XFormsElement {
     private void sendElement(XFormsElementContext context, NodeInfo node, String localname,
                              String ref, Map prefixToURI) throws SAXException {
 
-        final String value =  context.getContainingDocument().getEvaluator().evaluateAsString(context.getPipelineContext(), node,
-                ref, prefixToURI, context.getRepeatIdToIndex(), null, null);
+        final String value =  XPathCache.evaluateAsString(context.getPipelineContext(), node,
+                ref, prefixToURI, context.getRepeatIdToIndex(), null, null, null);
 
         context.getContentHandler().startElement(XFormsConstants.XFORMS_NAMESPACE_URI, localname,
                 XFormsConstants.XFORMS_PREFIX + ":" + localname, XMLUtils.EMPTY_ATTRIBUTES);

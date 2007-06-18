@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms;
 import org.apache.commons.pool.ObjectPool;
 import org.dom4j.Document;
 import org.dom4j.Element;
-import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -35,6 +34,7 @@ import org.orbeon.oxf.xforms.processor.XFormsURIResolver;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.saxon.om.NodeInfo;
 
 import java.io.IOException;
@@ -62,9 +62,6 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
 
     // URI resolver
     private XFormsURIResolver uriResolver;
-
-    // XPath evaluator
-    private DocumentXPathEvaluator documentXPathEvaluator = new DocumentXPathEvaluator();
 
     // A document contains models and controls
     private XFormsStaticState xformsStaticState;
@@ -138,7 +135,11 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         this.uriResolver = uriResolver;
 
         // Initialize the containing document
-        initialize(pipelineContext);
+        try {
+            initialize(pipelineContext);
+        } catch (Exception e) {
+            throw ValidationException.wrapException(e, new ExtendedLocationData(getLocationData(), "initializing XForms containing document"));
+        }
 
         // Clear URI resolver, since it is of no use after initialization
         this.uriResolver = null;
@@ -161,12 +162,16 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         // Restore the containing document's dynamic state
         final String encodedDynamicState = xformsState.getDynamicState();
 
-        if (encodedDynamicState == null || encodedDynamicState.equals("")) {
-            // Just for tests, we allow the dynamic state to be empty
-            initialize(pipelineContext);
-        } else {
-            // Regular case
-            restoreDynamicState(pipelineContext, encodedDynamicState);
+        try {
+            if (encodedDynamicState == null || encodedDynamicState.equals("")) {
+                // Just for tests, we allow the dynamic state to be empty
+                initialize(pipelineContext);
+            } else {
+                // Regular case
+                restoreDynamicState(pipelineContext, encodedDynamicState);
+            }
+        } catch (Exception e) {
+            throw ValidationException.wrapException(e, new ExtendedLocationData(getLocationData(), "re-initializing XForms containing document"));
         }
     }
 
@@ -194,10 +199,6 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
 
     public ObjectPool getSourceObjectPool() {
         return sourceObjectPool;
-    }
-
-    public DocumentXPathEvaluator getEvaluator() {
-        return documentXPathEvaluator;
     }
 
     public XFormsURIResolver getURIResolver() {
@@ -393,7 +394,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
      */
     public void setClientActiveSubmission(XFormsModelSubmission activeSubmission) {
         if (this.activeSubmission != null)
-            throw new OXFException("There is already an active submission.");
+            throw new ValidationException("There is already an active submission.", activeSubmission.getLocationData());
         this.activeSubmission = activeSubmission;
     }
 
@@ -569,7 +570,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
             final Object eventTargetObject = getObjectById(pipelineContext, controlId);
             if (!(eventTargetObject instanceof XFormsEventTarget)) {
                 if (XFormsUtils.isExceptionOnInvalidClientControlId()) {
-                    throw new OXFException("Event target id '" + controlId + "' is not an XFormsEventTarget.");
+                    throw new ValidationException("Event target id '" + controlId + "' is not an XFormsEventTarget.", getLocationData());
                 } else {
                     if (XFormsServer.logger.isDebugEnabled()) {
                         XFormsServer.logger.debug("XForms - ignoring client event with invalid control id: " + controlId);
@@ -649,7 +650,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                 otherEventTarget = null;
             } else if (!(otherEventTargetObject instanceof XFormsEventTarget)) {
                 if (XFormsUtils.isExceptionOnInvalidClientControlId()) {
-                    throw new OXFException("Other event target id '" + otherControlId + "' is not an XFormsEventTarget.");
+                    throw new ValidationException("Other event target id '" + otherControlId + "' is not an XFormsEventTarget.", getLocationData());
                 } else {
                     if (XFormsServer.logger.isDebugEnabled()) {
                         XFormsServer.logger.debug("XForms - ignoring client event with invalid second control id: " + otherControlId);
@@ -805,7 +806,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     }
 
     public LocationData getLocationData() {
-        return null;
+        return xformsStaticState.getLocationData(); 
     }
 
     public void performDefaultAction(PipelineContext pipelineContext, XFormsEvent event) {
@@ -831,7 +832,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                 }
                 externalContext.getResponse().sendRedirect(pathInfo, parameters, false, false);
             } catch (IOException e) {
-                throw new OXFException(e);
+                throw new ValidationException(e, getLocationData());
             }
         }
     }
@@ -845,10 +846,10 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
             XFormsServer.logger.debug("XForms - dispatching event: " + getEventLogSpaces() + event.getEventName() + " - " + event.getTargetObject().getEffectiveId() + " - at " + event.getLocationData());
         }
 
-        final XFormsEventTarget targetObject = (XFormsEventTarget) event.getTargetObject();
+        final XFormsEventTarget targetObject = event.getTargetObject();
         try {
             if (targetObject == null)
-                throw new OXFException("Target object null for event: " + event.getEventName());
+                throw new ValidationException("Target object null for event: " + event.getEventName(), getLocationData());
 
             // Find all event handler containers
             final List containers = new ArrayList();
@@ -940,14 +941,15 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                 }
             }
         } catch (Exception e) {
-            // Add OPS trace information if possible
-            final LocationData locationData = (targetObject != null) ? targetObject.getLocationData() : null;
-            if (locationData != null)
-                throw ValidationException.wrapException(e, locationData);
-            else if (e instanceof OXFException)
-                throw (OXFException) e;
-            else
-                throw new OXFException(e);
+            // Add location information if possible
+            final LocationData locationData = (targetObject != null)
+                    ? ((targetObject.getLocationData() != null)
+                        ? targetObject.getLocationData()
+                        : getLocationData())
+                    : null;
+
+            throw ValidationException.wrapException(e, new ExtendedLocationData(locationData, "dispatching XForms event",
+                    new String[] { "event", event.getEventName(), "target id", targetObject.getEffectiveId() }));
         }
     }
 
@@ -997,7 +999,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
      */
     public String createEncodedDynamicState(PipelineContext pipelineContext) {
         return XFormsUtils.encodeXML(pipelineContext, createDynamicStateDocument(),
-            isSessionStateHandling() ? null : XFormsUtils.getEncryptionKey());
+            isSessionStateHandling() ? null : XFormsUtils.getEncryptionKey(), false);
     }
 
     private Document createDynamicStateDocument() {
@@ -1139,7 +1141,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
 
                         // This means that the instance was application shared
                         if (!newInstance.isApplicationShared())
-                            throw new OXFException("Non-initialized instance has to be application shared for id: " + newInstance.getEffectiveId());
+                            throw new ValidationException("Non-initialized instance has to be application shared for id: " + newInstance.getEffectiveId(), getLocationData());
 
                         final SharedXFormsInstance sharedInstance
                                 = XFormsServerSharedInstancesCache.instance().find(pipelineContext, newInstance.getEffectiveId(), newInstance.getModelId(), newInstance.getSourceURI(), newInstance.getValidation());
@@ -1166,7 +1168,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
 
                             // This means that the instance was application shared
                             if (!currentInstance.isApplicationShared())
-                                throw new OXFException("Non-initialized instance has to be application shared for id: " + currentInstance.getEffectiveId());
+                                throw new ValidationException("Non-initialized instance has to be application shared for id: " + currentInstance.getEffectiveId(), getLocationData());
 
                             final SharedXFormsInstance sharedInstance
                                     = XFormsServerSharedInstancesCache.instance().find(pipelineContext, currentInstance.getEffectiveId(), currentInstance.getModelId(), currentInstance.getSourceURI(), currentInstance.getValidation());
@@ -1179,11 +1181,6 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                     }
                 }
             }
-
-            // Number of instances must be zero or match number of models
-//            if (expectedInstancesCount != foundInstancesCount)
-//                throw new OXFException("Number of instances (" + foundInstancesCount
-//                        + ") doesn't match number of instances in models (" + expectedInstancesCount + ").");
         }
 
         // Restore models state

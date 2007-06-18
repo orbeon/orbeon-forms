@@ -454,7 +454,7 @@ public class XFormsServer extends ProcessorImpl {
                         }
                         // Encode events so that the client cannot send back arbitrary events
                         ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "server-events");
-                        ch.text(XFormsUtils.encodeXML(pipelineContext, eventsDocument));
+                        ch.text(XFormsUtils.encodeXML(pipelineContext, eventsDocument, false));
                         ch.endElement();
 
                     }

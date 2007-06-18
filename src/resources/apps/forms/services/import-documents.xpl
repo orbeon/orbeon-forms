@@ -11,7 +11,7 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
+<p:pipeline xmlns:p="http://www.orbeon.com/oxf/pipeline"
           xmlns:oxf="http://www.orbeon.com/oxf/processors"
           xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
@@ -63,4 +63,4 @@
 
     </p:for-each>
 
-</p:config>
+</p:pipeline>

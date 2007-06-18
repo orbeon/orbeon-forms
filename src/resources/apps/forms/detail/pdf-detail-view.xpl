@@ -11,27 +11,20 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
-    xmlns:oxf="http://www.orbeon.com/oxf/processors">
+<p:pipeline xmlns:p="http://www.orbeon.com/oxf/pipeline"
+    xmlns:oxf="http://www.orbeon.com/oxf/processors"
+    xmlns:xforms="http://www.w3.org/2002/xforms">
 
     <p:param name="instance" type="input"/>
     <p:param name="data" type="output"/>
 
-    <!-- Create REST submission -->
-    <p:processor name="oxf:xslt">
-        <p:input name="config">
-            <xforms:submission xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                               xsl:version="2.0" serialize="false"
-                               method="get" action="/exist/rest/db/orbeon/forms/{/*/form-id}/{/*/document-id}"/>
-        </p:input>
-        <p:input name="data" href="#instance"/>
-        <p:output name="data" id="submission"/>
-    </p:processor>
-
     <!-- Execute REST submission -->
     <p:processor name="oxf:xforms-submission">
-        <p:input name="submission" href="#submission"/>
-        <p:input name="request"><dummy/></p:input>
+        <p:input name="submission">
+            <xforms:submission serialize="false" method="get"
+                               action="/exist/rest/db/orbeon/forms/{/*/form-id}/{/*/document-id}"/>
+        </p:input>
+        <p:input name="request" href="#instance"/>
         <p:output name="response" id="document"/>
     </p:processor>
     
@@ -42,4 +35,4 @@
         <p:output name="data" ref="data"/>
     </p:processor>
 
-</p:config>
+</p:pipeline>

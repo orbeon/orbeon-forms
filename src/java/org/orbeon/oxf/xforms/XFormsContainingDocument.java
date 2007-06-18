@@ -806,7 +806,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     }
 
     public LocationData getLocationData() {
-        return xformsStaticState.getLocationData(); 
+        return (xformsStaticState != null) ? xformsStaticState.getLocationData() : null;
     }
 
     public void performDefaultAction(PipelineContext pipelineContext, XFormsEvent event) {

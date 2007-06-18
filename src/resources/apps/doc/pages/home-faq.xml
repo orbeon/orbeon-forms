@@ -690,6 +690,34 @@
                     cross-domain access.
                 </p>
             </section>
+            <a name="xforms-webforms-20"/>
+            <section added="2007-06-18">
+                <title>How does Web Forms 2.0 compare with XForms? Does Orbeon plan to implement it?</title>
+                <p>
+                    Web Forms 2.0 is a specification of <a href="http://www.whatwg.org/">WHATWG</a> which describes a
+                    series of improvements over HTML forms. Since some key WHATWG members have joined the recently
+                    revamped <a href="http://www.w3.org/html/wg/">HTML Working Group at W3C</a>, there is a strong
+                    possibility that Web Forms 2.0 will be integrated (as is or with modifications) into the W3C's
+                    upcoming HTML 5 specification.
+                </p>
+                <p>
+                    One of the main goals of Web Forms 2.0 is to be backward compatible with HTML forms. XForms on the
+                    other hand is a more radical departure from HTML forms due to its use of XML to store form data, a
+                    model-view architecture, and XML events and actions. Web Forms 2.0 does not support an XML data
+                    model, XPath, or XML schema validation. The closest Web Forms 2.0 comes to supporting XML is that it
+                    allows serializing form data into XML in a submission.
+                </p>
+                <p>
+                    At Orbeon, we do not think that Web Forms 2.0 directly competes with XForms because it does not
+                    cover as much ground. We believe that for relatively large forms, an XML data model is absolutely
+                    necessary. We also believe that the declarative event and action model used by XForms is a huge
+                    benefit to form authors.
+                </p>
+                <p>
+                    But Web Forms 2.0, or an evolution of it as part of HTML 5, could be leveraged by Orbeon Forms as
+                    it become supported by browsers.
+                </p>
+            </section>
         </section>
         <a name="xpl"/>
         <section>

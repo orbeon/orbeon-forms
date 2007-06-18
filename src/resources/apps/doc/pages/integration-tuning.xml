@@ -346,7 +346,7 @@
         </section>
         <a name="xforms"/>
         <section>
-            <title>XForms Tuning</title>
+            <title>Tuning XForms</title>
             <a name="xforms-minimal-resources"/>
             <section>
                 <title>Enable minimal resources</title>
@@ -377,6 +377,15 @@
                     href="reference-xforms-2#xxforms-readonly">XForms reference</a> for details.
                 </p>
             </section>
+            <a name="xforms-selection-controls"/>
+            <section>
+                <title>Consider not refreshing sets of items on selection controls</title>
+                <p>
+                    The <code>xxforms:refresh-items</code> attribute on selection controls allows for performance
+                    improvements in certain cases. See <a href="reference-xforms-2#xxforms-refresh-items">Controlling
+                    Item Sets Refreshes with xxforms:refresh-items</a>.
+                </p>
+            </section>
             <a name="xforms-state"/>
             <section>
                 <title>Consider server-side XForms state handling</title>
@@ -388,6 +397,13 @@
                     have low bandwidth connection to the server. See the <a
                     href="reference-xforms-2#xforms-state-handling">XForms reference</a> for the benefits and drawbacks
                     of each option and for details on how to configure state handling.
+                </p>
+            </section>
+            <a name="xforms-cache"/>
+            <section>
+                <title>Tune XForms caches</title>
+                <p>
+                    [TODO]
                 </p>
             </section>
         </section>

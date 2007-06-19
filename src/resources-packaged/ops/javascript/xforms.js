@@ -3037,7 +3037,7 @@ ORBEON.xforms.Server = {
 //                sourceResize();
 
             } else if (responseXML && responseXML.documentElement
-                    && responseXML.documentElement.tagName.indexOf("exceptions") != -1) {
+                    && responseXML.documentElement.tagName.indexOf("error") != -1) {
                 // We received an error from the server
                 ORBEON.xforms.Globals.lastRequestIsError = true;
 

@@ -150,6 +150,7 @@
                     <auth-type>FORM</auth-type>
                     <secure>true</secure>
                     <remote-user>scott</remote-user>
+                    <user-principal>scott</user-principal>
                     <role>user</role>
                 </request-security>
             </xml-source>

@@ -364,19 +364,25 @@
                 </init-param>
             </servlet>
 
-            <servlet>
-                <servlet-name>struts-servlet</servlet-name>
-                <servlet-class>org.apache.struts.action.ActionServlet</servlet-class>
-                <init-param>
-                    <param-name>config</param-name>
-                    <param-value>/WEB-INF/struts-config.xml</param-value>
-                </init-param>
-                <init-param>
-                    <param-name>config/examples/struts/module</param-name>
-                    <param-value>/WEB-INF/struts-module.xml</param-value>
-                </init-param>
-                <load-on-startup>3</load-on-startup>
-            </servlet>
+            <xsl:call-template name="comment">
+                <xsl:with-param name="caption" select="'Struts examples'"/>
+                <xsl:with-param name="commented" select="$target = 'war'"/>
+                <xsl:with-param name="content">
+                    <servlet>
+                        <servlet-name>struts-servlet</servlet-name>
+                        <servlet-class>org.apache.struts.action.ActionServlet</servlet-class>
+                        <init-param>
+                            <param-name>config</param-name>
+                            <param-value>/WEB-INF/struts-config.xml</param-value>
+                        </init-param>
+                        <init-param>
+                            <param-name>config/examples/struts/module</param-name>
+                            <param-value>/WEB-INF/struts-module.xml</param-value>
+                        </init-param>
+                        <load-on-startup>3</load-on-startup>
+                    </servlet>
+                </xsl:with-param>
+            </xsl:call-template>
 
             <xsl:call-template name="comment">
                 <xsl:with-param name="caption" select="'SQL examples'"/>
@@ -429,10 +435,16 @@
                 <url-pattern>/exist/atom/*</url-pattern>
             </servlet-mapping>
 
-            <servlet-mapping>
-                <servlet-name>struts-servlet</servlet-name>
-                <url-pattern>/struts/*</url-pattern>
-            </servlet-mapping>
+            <xsl:call-template name="comment">
+                <xsl:with-param name="caption" select="'Struts examples'"/>
+                <xsl:with-param name="commented" select="$target = 'war'"/>
+                <xsl:with-param name="content">
+                    <servlet-mapping>
+                        <servlet-name>struts-servlet</servlet-name>
+                        <url-pattern>/struts/*</url-pattern>
+                    </servlet-mapping>
+                </xsl:with-param>
+            </xsl:call-template>
 
             <xsl:call-template name="comment">
                 <xsl:with-param name="caption" select="'SQL examples'"/>
@@ -469,22 +481,22 @@
                 <xsl:with-param name="content">
                     <security-constraint>
                         <web-resource-collection>
-                            <web-resource-name>Administration</web-resource-name>
-                            <url-pattern>/examples-standalone/authentication</url-pattern>
+                            <web-resource-name>Authentication example</web-resource-name>
+                            <url-pattern>/java-authentication/</url-pattern>
                         </web-resource-collection>
                         <auth-constraint>
-                            <role-name>administrator</role-name>
+                            <role-name>orbeon-admin</role-name>
                         </auth-constraint>
                     </security-constraint>
                     <login-config>
                         <auth-method>FORM</auth-method>
                         <form-login-config>
-                            <form-login-page>/examples-standalone/authentication/login</form-login-page>
-                            <form-error-page>/examples-standalone/authentication/login-error</form-error-page>
+                            <form-login-page>/java-authentication/login</form-login-page>
+                            <form-error-page>/java-authentication/login-error</form-error-page>
                         </form-login-config>
                     </login-config>
                     <security-role>
-                        <role-name>administrator</role-name>
+                        <role-name>orbeon-admin</role-name>
                     </security-role>
                 </xsl:with-param>
             </xsl:call-template>

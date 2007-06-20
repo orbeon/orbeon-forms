@@ -24,6 +24,7 @@ import org.orbeon.oxf.xml.XPathUtils;
 import org.xml.sax.ContentHandler;
 
 import java.util.Iterator;
+import java.security.Principal;
 
 public class RequestSecurityGenerator extends ProcessorImpl {
 
@@ -54,6 +55,12 @@ public class RequestSecurityGenerator extends ProcessorImpl {
                         addElement(contentHandler, "secure", "false");
                     }
                     addElement(contentHandler, "remote-user", request.getRemoteUser());
+                    {
+                        final Principal principal = request.getUserPrincipal();
+                        if (principal != null) {
+                            addElement(contentHandler, "user-principal", principal.getName());
+                        }
+                    }
 
                     for (Iterator i = XPathUtils.selectIterator(config, "/config/role"); i.hasNext();) {
                         Node node = (Node) i.next();

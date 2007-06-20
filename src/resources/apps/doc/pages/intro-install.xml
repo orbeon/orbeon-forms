@@ -173,8 +173,9 @@
                             content of this by with:
                             <xml-source>
                                 <tomcat-users>
-                                  <role rolename="administrator"/>
-                                  <user username="admin" password="password" roles="administrator"/>
+                                    <role rolename="orbeon-user"/>
+                                    <role rolename="orbeon-admin"/>
+                                    <user username="orbeonadmin" password="xforms" roles="orbeon-user,orbeon-admin"/>
                                 </tomcat-users>
                             </xml-source>
                         </li>
@@ -901,9 +902,9 @@
                                     <application-policy name = "orbeon-demo">
                                        <authentication>
                                           <login-module code="org.jboss.security.auth.spi.UsersRolesLoginModule"
-                                             flag = "required">
-                                             <module-option name="usersProperties">orbeon-demo-users.properties</module-option>
-                                             <module-option name="rolesProperties">orbeon-demo-roles.properties</module-option>
+                                                        flag="required">
+                                             <module-option name="usersProperties">jboss-orbeon-example-users.properties</module-option>
+                                             <module-option name="rolesProperties">jboss-orbeon-example-roles.properties</module-option>
                                           </login-module>
                                        </authentication>
                                     </application-policy>

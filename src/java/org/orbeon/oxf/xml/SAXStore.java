@@ -539,7 +539,8 @@ public class SAXStore extends ForwardingContentHandler implements Serializable, 
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         eventBufferPosition = in.readInt();
         eventBuffer = new byte[eventBufferPosition];
-        in.read(eventBuffer);
+        for (int i = 0; i < eventBufferPosition; i++)
+            eventBuffer[i] = in.readByte();
 
         charBufferPosition = in.readInt();
         charBuffer = new char[charBufferPosition];

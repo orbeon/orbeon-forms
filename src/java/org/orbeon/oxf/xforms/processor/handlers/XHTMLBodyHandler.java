@@ -132,14 +132,14 @@ public class XHTMLBodyHandler extends HandlerBase {
                         // Produce dynamic state key
                         final String newRequestId = UUIDUtils.createPseudoUUID();
                         final XFormsServerSessionStateCache sessionCache = XFormsServerSessionStateCache.instance(externalContext.getSession(true), true);
-                        sessionCache.add(currentPageGenerationId, newRequestId, xformsState);
+                        sessionCache.add(currentPageGenerationId, null, newRequestId, xformsState);
                         dynamicStateString = XFormsServer.SESSION_STATE_PREFIX + newRequestId;
                     } else {
                         // In this case, we first store in the application scope, so that multiple requests can use the
                         // same cached state.
                         dynamicStateString = XFormsServer.APPLICATION_STATE_PREFIX + handlerContext.getDynamicStateUUID();
                         final XFormsServerApplicationStateCache applicationStateCache = XFormsServerApplicationStateCache.instance(externalContext, true);
-                        applicationStateCache.add(currentPageGenerationId, handlerContext.getDynamicStateUUID(), xformsState);
+                        applicationStateCache.add(currentPageGenerationId, null, handlerContext.getDynamicStateUUID(), xformsState);
                     }
                 } else {
                     // Send state to the client

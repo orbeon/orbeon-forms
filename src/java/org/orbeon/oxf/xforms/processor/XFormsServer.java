@@ -99,6 +99,7 @@ public class XFormsServer extends ProcessorImpl {
         final XFormsContainingDocument containingDocument;
         final XFormsState xformsState;
         final String staticStateUUID;
+        final String dynamicStateUUID;
 
         // Use request input provided by client
         final Document requestDocument = readInputAsDOM4J(pipelineContext, INPUT_REQUEST);
@@ -130,7 +131,7 @@ public class XFormsServer extends ProcessorImpl {
             
             if (dynamicStateString.startsWith(APPLICATION_STATE_PREFIX)) {
                 //  State is currently stored in the application scope
-                final String dynamicStateUUID = dynamicStateString.substring(APPLICATION_STATE_PREFIX.length());
+                dynamicStateUUID = dynamicStateString.substring(APPLICATION_STATE_PREFIX.length());
 
                 // Extract page generation id
                 staticStateUUID = staticStateString.substring(APPLICATION_STATE_PREFIX.length());
@@ -147,7 +148,7 @@ public class XFormsServer extends ProcessorImpl {
 
             } else if (dynamicStateString.startsWith(SESSION_STATE_PREFIX)) {
                 // State doesn't come with the request, we should look it up in the repository
-                final String dynamicStateUUID = dynamicStateString.substring(SESSION_STATE_PREFIX.length());
+                dynamicStateUUID = dynamicStateString.substring(SESSION_STATE_PREFIX.length());
 
                 // Extract page generation id
                 staticStateUUID = staticStateString.startsWith(SESSION_STATE_PREFIX)
@@ -166,6 +167,7 @@ public class XFormsServer extends ProcessorImpl {
             } else {
                 // State comes with request
                 staticStateUUID = null;
+                dynamicStateUUID = null;
                 xformsState = new XFormsState(staticStateString, dynamicStateString);
             }
         }
@@ -262,7 +264,7 @@ public class XFormsServer extends ProcessorImpl {
             // Create resulting document if there is a ContentHandler
             if (contentHandler != null) {
                 outputResponse(containingDocument, allEvents, valueChangeControlIds, pipelineContext, contentHandler,
-                        staticStateUUID, externalContext, xformsState, false, false);
+                        staticStateUUID, dynamicStateUUID, externalContext, xformsState, false, false);
             }
         } catch (Throwable e) {
             // If an exception is caught, we need to discard the object as its state may be inconsistent
@@ -292,6 +294,7 @@ public class XFormsServer extends ProcessorImpl {
 
     public static void outputResponse(XFormsContainingDocument containingDocument, boolean allEvents, Map valueChangeControlIds,
                                 PipelineContext pipelineContext, ContentHandler contentHandler, String requestPageGenerationId,
+                                String requestId,
                                 ExternalContext externalContext, XFormsState xformsState, boolean testOutputStaticState, boolean testOutputAllActions) {
 
         final XFormsControls xformsControls = containingDocument.getXFormsControls();
@@ -321,10 +324,10 @@ public class XFormsServer extends ProcessorImpl {
 
                 ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "dynamic-state");
                 if (containingDocument.isSessionStateHandling()) {
-                    // Produce dynamic state key
-                    final String newRequestId = UUIDUtils.createPseudoUUID();
+                    // Produce dynamic state key (keep the same when allEvents!)
+                    final String newRequestId = allEvents ? requestId : UUIDUtils.createPseudoUUID();
                     final XFormsServerSessionStateCache sessionStateCache = XFormsServerSessionStateCache.instance(externalContext.getSession(true), true);
-                    sessionStateCache.add(currentPageGenerationId, newRequestId, newXFormsState);
+                    sessionStateCache.add(currentPageGenerationId, requestId, newRequestId, newXFormsState);
                     ch.text(SESSION_STATE_PREFIX + newRequestId);
                 } else {
                     // Send state to the client
@@ -840,13 +843,13 @@ public class XFormsServer extends ProcessorImpl {
                             final XFormsSelect1Control xformsSelect1Control2 = (XFormsSelect1Control) xformsControl2;
 
                             if (itemsetsFull1 != null && xformsSelect1Control1 != null) {
-                                final Object items = xformsSelect1Control1.getItemset(pipelineContext);
+                                final Object items = xformsSelect1Control1.getItemset(pipelineContext, true);
                                 if (items != null)
                                     itemsetsFull1.put(xformsSelect1Control1.getEffectiveId(), items);
                             }
 
                             if (itemsetsFull2 != null && xformsSelect1Control2 != null) {
-                                final Object items = xformsSelect1Control2.getItemset(pipelineContext);
+                                final Object items = xformsSelect1Control2.getItemset(pipelineContext, true);
                                 if (items != null)
                                     itemsetsFull2.put(xformsSelect1Control2.getEffectiveId(), items);
                             }
@@ -1160,14 +1163,14 @@ public class XFormsServer extends ProcessorImpl {
                     final XFormsSelect1Control xformsSelect1Control1 = (XFormsSelect1Control) xformsControl1;
                     final XFormsSelect1Control xformsSelect1Control2 = (XFormsSelect1Control) xformsControl2;
 
-                    if (itemsetsFull1 != null && xformsSelect1Control1 != null) {
-                        final Object items = xformsSelect1Control1.getItemset(pipelineContext);
+                    if (itemsetsFull1 != null && xformsSelect1Control1 != null && xformsSelect1Control1.isRelevant()) {
+                        final Object items = xformsSelect1Control1.getItemset(pipelineContext, true);
                         if (items != null)
                             itemsetsFull1.put(xformsSelect1Control1.getEffectiveId(), items);
                     }
 
-                    if (itemsetsFull2 != null && xformsSelect1Control2 != null) {
-                        final Object items = xformsSelect1Control2.getItemset(pipelineContext);
+                    if (itemsetsFull2 != null && xformsSelect1Control2 != null && xformsSelect1Control2.isRelevant()) {
+                        final Object items = xformsSelect1Control2.getItemset(pipelineContext, true);
                         if (items != null)
                             itemsetsFull2.put(xformsSelect1Control2.getEffectiveId(), items);
                     }

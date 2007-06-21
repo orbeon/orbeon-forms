@@ -62,10 +62,10 @@ public class XFormsServerDocumentCache {
             // The pool is not in cache
             destinationPool = createXFormsContainingDocumentPool(xformsState);
             cache.add(pipelineContext, cacheKey, CONSTANT_VALIDITY, destinationPool);
-            XFormsServer.logger.debug("XForms - containing document cache (cacheContainingDocument): did not find document pool in cache; creating new pool and returning document to it.");
+            XFormsServer.logger.debug("XForms - containing document cache (add): did not find document pool in cache; creating new pool and returning document to it.");
         } else {
             // Pool is already in cache
-            XFormsServer.logger.debug("XForms - containing document cache (cacheContainingDocument): found containing document pool in cache. Returning document to it.");
+            XFormsServer.logger.debug("XForms - containing document cache (add): found containing document pool in cache. Returning document to it.");
         }
 
         // Return object to destination pool

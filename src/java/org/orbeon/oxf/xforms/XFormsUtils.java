@@ -505,23 +505,21 @@ public class XFormsUtils {
             // Encrypt if needed
             if (encryptionPassword != null) {
                 // Perform encryption
-                final String encryptedString;
                 if (gzipByteArray == null) {
                     // The data was not compressed
-                    encryptedString = "X1" + SecureUtils.encrypt(pipelineContext, encryptionPassword, bytesToEncode);
+                    return "X1" + SecureUtils.encrypt(pipelineContext, encryptionPassword, bytesToEncode).replace((char) 0xa, ' ');
                 } else {
                     // The data was compressed
-                    encryptedString = "X2" + SecureUtils.encrypt(pipelineContext, encryptionPassword, gzipByteArray);
+                    return "X2" + SecureUtils.encrypt(pipelineContext, encryptionPassword, gzipByteArray).replace((char) 0xa, ' ');
                 }
-                return encryptedString;
             } else {
                 // No encryption
                 if (gzipByteArray == null) {
                     // The data was not compressed
-                    return "X3" + Base64.encode(bytesToEncode);
+                    return "X3" + Base64.encode(bytesToEncode).replace((char) 0xa, ' ');
                 } else {
                     // The data was compressed
-                    return "X4" + Base64.encode(gzipByteArray);
+                    return "X4" + Base64.encode(gzipByteArray).replace((char) 0xa, ' ');
                 }
             }
         } catch (Throwable e) {

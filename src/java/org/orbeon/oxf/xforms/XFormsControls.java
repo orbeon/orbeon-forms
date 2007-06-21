@@ -211,7 +211,7 @@ public class XFormsControls {
      * @param pipelineContext   current PipelineContext
      */
     public void initialize(PipelineContext pipelineContext) {
-        initializeState(pipelineContext, null, null);
+        initializeState(pipelineContext, null, null, false);
     }
 
     /**
@@ -222,7 +222,7 @@ public class XFormsControls {
      * @param divsElement           current div elements, or null
      * @param repeatIndexesElement  current repeat indexes, or null
      */
-    public void initializeState(PipelineContext pipelineContext, Element divsElement, Element repeatIndexesElement) {
+    public void initializeState(PipelineContext pipelineContext, Element divsElement, Element repeatIndexesElement, boolean evaluateItemsets) {
 
         if (controlsDocument != null) {
 
@@ -235,7 +235,7 @@ public class XFormsControls {
                 // Build controls state
 
                 // Get initial controls state information
-                initialControlsState = buildControlsState(pipelineContext);
+                initialControlsState = buildControlsState(pipelineContext, evaluateItemsets);
                 currentControlsState = initialControlsState;
 
                 initialSwitchState = new SwitchState(initialControlsState.getSwitchIdToSelectedCaseIdMap());
@@ -790,7 +790,7 @@ public class XFormsControls {
         return functionLibrary;
     }
 
-    private ControlsState buildControlsState(final PipelineContext pipelineContext) {
+    private ControlsState buildControlsState(final PipelineContext pipelineContext, final boolean evaluateItemsets) {
 
         final long startTime;
         if (XFormsServer.logger.isDebugEnabled()) {
@@ -855,8 +855,12 @@ public class XFormsControls {
 
                 // Handle xforms:itemset
                 if (xformsControl instanceof XFormsSelectControl || xformsControl instanceof XFormsSelect1Control) {
-                    // NOTE: This is dirty anyway because 
-                    ((XFormsSelect1Control) xformsControl).markItemsetDirty();
+                    final XFormsSelect1Control select1Control = ((XFormsSelect1Control) xformsControl);
+                    // NOTE: This is dirty anyway because we just created the control
+                    select1Control.markItemsetDirty();
+                    // Evaluate itemsets only if specified (case of restoring dynamic state)
+                    if (evaluateItemsets)
+                        select1Control.getItemset(pipelineContext, false);
                 }
 
                 // Set current binding for control element
@@ -889,6 +893,7 @@ public class XFormsControls {
                                 xformsControl.setReadonly(true);
                         } else {
                             // Control is not bound to a node - it becomes non-relevant
+                            // TODO: We could probably optimize and not even *create* the control object and its descendants
                             xformsControl.setReadonly(false);
                             xformsControl.setRequired(false);
                             xformsControl.setRelevant(false);
@@ -1109,7 +1114,7 @@ public class XFormsControls {
         final ControlsState currentControlsState = this.currentControlsState;
 
         // Create new controls state
-        final ControlsState result = buildControlsState(pipelineContext);
+        final ControlsState result = buildControlsState(pipelineContext, false);
 
         // Transfer some of the previous information
         final Map currentRepeatIdToIndex = currentControlsState.getRepeatIdToIndex();

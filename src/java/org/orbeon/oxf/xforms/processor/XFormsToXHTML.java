@@ -201,23 +201,25 @@ public class XFormsToXHTML extends ProcessorImpl {
             // Get static state UUID
             if (cachedInput[0]) {
                 staticStateUUID = inputDependencies.getXFormsEngineStaticState().getUUID();
+                logger.debug("XForms - found cached static state UUID.");
             } else {
                 staticStateUUID = null;
+                logger.debug("XForms - did not find cached static state UUID.");
             }
 
             // Try to cache dynamic state UUID associated with the output
             final String dynamicStateUUID = (String) getCacheOutputObject(pipelineContext, processorOutput, OUTPUT_CACHE_KEY, new OutputObjectCreator() {
                 public Object create(PipelineContext pipelineContext, ProcessorOutput processorOutput) {
-                    logger.debug("XForms - caching UUID for resulting document.");
+                    logger.debug("XForms - caching dynamic state UUID for resulting document.");
                     return UUIDUtils.createPseudoUUID();
                 }
 
                 public void foundInCache() {
-                    logger.debug("XForms - found cached UUID for resulting document.");
+                    logger.debug("XForms - found cached dynamic state UUID for resulting document.");
                 }
 
                 public void unableToCache() {
-                    logger.debug("XForms - cannot cache UUID for resulting document.");
+                    logger.debug("XForms - cannot cache dynamic state UUID for resulting document.");
                 }
             });
 
@@ -503,6 +505,6 @@ public class XFormsToXHTML extends ProcessorImpl {
         xformsControls.rebuildCurrentControlsStateIfNeeded(pipelineContext);
 
         // Output XML response
-        XFormsServer.outputResponse(containingDocument, false, null, pipelineContext, contentHandler, staticStateUUID, externalContext, xformsState, false, true);
+        XFormsServer.outputResponse(containingDocument, false, null, pipelineContext, contentHandler, staticStateUUID, dynamicStateUUID, externalContext, xformsState, false, true);
     }
 }

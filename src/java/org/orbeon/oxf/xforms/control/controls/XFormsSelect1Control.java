@@ -54,15 +54,19 @@ public class XFormsSelect1Control extends XFormsValueControl {
 
     public void markItemsetDirty() {
         items = null;
+        if ("false".equals(xxformsRefresh))
+            containingDocument.getXFormsControls().setConstantItems(getOriginalId(), null);
     }
 
-    private List evaluateItemsets(final PipelineContext pipelineContext) {
+    private List evaluateItemsets(final PipelineContext pipelineContext, boolean setBinding) {
 
         final List newItems = new ArrayList();
 
-        // Set binding on this control
         final XFormsControls xformsControls = containingDocument.getXFormsControls();
-        xformsControls.setBinding(pipelineContext, this);
+
+        // Set binding on this control if required
+        if (setBinding)
+            xformsControls.setBinding(pipelineContext, this);
 
         Dom4jUtils.visitSubtree(getControlElement(), new Dom4jUtils.VisitorListener() {
 
@@ -162,19 +166,19 @@ public class XFormsSelect1Control extends XFormsValueControl {
         return newItems;
     }
 
-    public List getItemset(PipelineContext pipelineContext) {
+    public List getItemset(PipelineContext pipelineContext, boolean setBinding) {
         if ("false".equals(xxformsRefresh)) {
             // Items are not automatically refreshed and stored globally
             List items =  containingDocument.getXFormsControls().getConstantItems(getOriginalId());
             if (items == null) {
-                items = evaluateItemsets(pipelineContext);
+                items = evaluateItemsets(pipelineContext, setBinding);
                 containingDocument.getXFormsControls().setConstantItems(getOriginalId(), items);
             }
             return items;
         } else {
             // Items are stored in the control
             if (items == null) {
-                items = evaluateItemsets(pipelineContext);
+                items = evaluateItemsets(pipelineContext, setBinding);
             }
             return items;
         }

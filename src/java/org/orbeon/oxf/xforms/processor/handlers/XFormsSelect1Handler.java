@@ -88,7 +88,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                 appearance = XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME;// default for xforms:select1
         }
 
-        final List items = (xformsSelect1Control != null) ? xformsSelect1Control.getItemset(pipelineContext) : null;
+        final List items = (xformsSelect1Control != null) ? xformsSelect1Control.getItemset(pipelineContext, true) : null;
         outputContent(localname, xformsSelect1Control, items, isMany, appearance);
     }
 

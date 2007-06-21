@@ -57,5 +57,6 @@
     <section label="Integrating with Java">
         <application id="java-properties" label="Java Properties"/>
         <application id="java-api" label="Java API"/>
+        <application id="java-authentication" label="Java Authentication"/>
     </section>
 </applications>

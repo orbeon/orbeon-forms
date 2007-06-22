@@ -289,12 +289,72 @@ http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=2
                 -->
                 <ul>
                     <li>
-                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307007&amp;group_id=168&amp;atid=350207">#307007:
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=307210&amp;group_id=168&amp;atid=350207">#307210:
+                            Move current error.xpl to private resources
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=307056&amp;group_id=168&amp;atid=350207">#307056:
+                            Session cache stores too much information and causes early expiration of entries
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=307209&amp;group_id=168&amp;atid=350207">#307209:
+                            Incorrect request id returned to client upon back/reload
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=307208&amp;group_id=168&amp;atid=350207">#307208:
+                            Document cache not used in client state mode
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=307207&amp;group_id=168&amp;atid=350207">#307207:
+                            Control with xxforms:refresh-items="false" doesn't show correct items when becoming relevant
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=307025&amp;group_id=168&amp;atid=350207">#307025:
+                            XForms controls: "add carrier" has no effect with client-side event handling
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=307202&amp;group_id=168&amp;atid=350207">#307202:
+                            Should restore authentication example
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=307201&amp;group_id=168&amp;atid=350207">#307201:
+                            RFE: oxf:request-security should provide access to the user principal when available
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=307191&amp;group_id=168&amp;atid=350207">#307191:
+                            Error page no longer shows XML elements
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=307165&amp;group_id=168&amp;atid=350207">#307165:
+                            RFE: Implement "Human Readable Resource Identifiers"
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=307176&amp;group_id=168&amp;atid=350207">#307176:
+                            Upgrade to FOP 0.93
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=307174&amp;group_id=168&amp;atid=350207">#307174:
+                            Error: Pipeline input "forms" is not connected, while the input is indeed connected
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=307007&amp;group_id=168&amp;atid=350207">#307007:
                             Fix back how client obtains server name
                         </a>
                     </li>
                     <li>
-                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307162&amp;group_id=168&amp;atid=350207">#307162:
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=307162&amp;group_id=168&amp;atid=350207">#307162:
                             RFE: Support XForms 1.1 datypes to allow empty content
                         </a>
                     </li>

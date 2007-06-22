@@ -194,6 +194,9 @@
                 }
             }
         </xhtml:script>
+        <xhtml:style type="text/css">
+            #xforms-error-panel .bd { overflow: auto; } 
+        </xhtml:style>
     </xhtml:head>
     <xhtml:body>
 
@@ -249,7 +252,7 @@
                     var errorPanelDiv = ORBEON.util.Dom.getElementById("xforms-error-panel");
                     ORBEON.util.Dom.removeClass(errorPanelDiv, "xforms-initially-hidden");
                     var errorPanel = new YAHOO.widget.Panel("xforms-error-panel", {
-                        width: "700px",
+                        width: "500px",
                         modal: true,
                         fixedcenter: true,
                         underlay: "shadow",

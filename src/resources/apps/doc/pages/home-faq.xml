@@ -150,6 +150,35 @@
                     href="http://www.orbeon.com/forms/mailing-list">mailing-list</a> first.
                 </p>
             </section>
+            <a name="issue-fixing"/>
+            <section added="2007-06-22">
+                <title>When are you going to fix/implement feature foobar?</title>
+                <p>
+                    Usually a feature gets implemented in Orbeon Forms when:
+                </p>
+                <ul>
+                    <li>
+                        <p>It is very easy to implement, so we just implement it along the way to make everybody happy.</p>
+                    </li>
+                    <li>
+                        <p>We need it for a project we are currently working on.</p>
+                    </li>
+                    <li>
+                        <p>We have put it on our roadmap and scheduled it because we think it is a crucial feature for Orbeon Forms.</p>
+                    </li>
+                    <li>
+                        <p>Somebody sponsors it.</p>
+                    </li>
+                    <li>
+                        <p>Somebody sends a patch for it.</p>
+                    </li>
+                </ul>
+                <p>
+                    We need help on Orbeon Forms by the way, and we definitely appreciate outside contributions. So
+                    check out the <a href="#source-code">source code</a> and start hacking away. You can ask your
+                    questions on the <a href="http://www.orbeon.com/forms/mailing-list">mailing-list</a>.
+                </p>
+            </section>
             <a name="oxf"/>
             <section added="2007-01-15">
                 <title>What is OXF?</title>
@@ -382,7 +411,7 @@
             </section>
             <a name="xforms-html"/>
             <section>
-                <title>Do I need to use XForms to create my HTML forms?</title>
+                <title>Do I need to use XForms to build forms?</title>
                 <p>
                     It is not a requirement to use XForms. It is possible to generate HTML form elements and to examine
                     request parameters manually. We recommend however using XForms whenever possible, because it
@@ -430,11 +459,18 @@
             <section added="2006-01-11">
                 <title>Can I mix and match XForms and JSP?</title>
                 <p>
-                    Yes, you can use JSP alongside XForms, even within the same web app. You can "call" JSP by
-                    redirecting or forwarding using the <a href="processors-other#redirect-processor">Redirect
-                    processor</a>. You can also use the Servlet Include generator to include the content produced by a
-                    JSP. Finally, you can use the Servlet Filter generator and implement JSP post-processing with Orbeon
-                    Forms.
+                    Yes, you can use JSP alongside XForms, in the same web application or in a separate web
+                    application.
+                </p>
+                <p>
+                    You can use JSP to produce pages containing XForms or other content to be processed by Orbeon
+                    Forms. See <a href="reference-xforms-java">Using the Orbeon Forms XForms Engine with Java
+                    Applications</a>.
+                </p>
+                <p>
+                    If you feel more advanced, you can also "call" JSP pages with HTML links, or by redirecting or
+                    forwarding using the <a href="processors-other#redirect-processor">Redirect processor</a>. You can
+                    also use the Servlet Include generator to include the content produced by a JSP.
                 </p>
             </section>
             <a name="xforms-jsf-mix"/>
@@ -518,26 +554,50 @@
                     In the future we hope to also add support in XForms NG for non-JavaScript (and non-Ajax) browsers.
                 </p>
             </section>
+            <section added="2006-12-06">
+                <title>How do I design forms in Orbeon Forms?</title>
+                <p>
+                    Orbeon Forms does not come with a visual forms designer. You create forms by writing XHTML pages
+                    that contain embedded XForms markup.
+                </p>
+                <p>
+                    Orbeon Forms 3.5 comes with a <a href="intro-tutorial">new tutorial</a> that explains step by step
+                    how to create your first forms. We recommend you also look at the other sample Orbeon Forms
+                    applications that you find under your WAR file's <code>WEB-INF/resources/apps</code> directory.
+                </p>
+                <p>
+                    Also note that Orbeon provides services around Orbeon Forms, including training. Please visit our
+                    <a href="http://www.orbeon.com/support">support page</a> for more information.
+                </p>
+                <p>
+                    In the future, we hope to be able to provide a web-based tool to help build forms.
+                </p>
+            </section>
             <a name="graphical-designer"/>
             <section>
                 <title>What visual tool / graphical designer do you recommend for XForms?</title>
                 <p>
-                    We develop all our applications and forms using an XML editor. This is the only way you can leverage
-                    all the features of XForms today, especially the more complex ones like events and actions. This
-                    means that we do not have a visual tool to recommend officially. You may however try the Intalio
-                    designer. Trial versions are available <a href="http://www.intalio.com/">from their web site</a>
-                    once you register.
+                    At Orbeon we develop all our applications and forms using an XML editor. This is the only way you
+                    can leverage all the features of XForms today, especially the more complex ones like events and
+                    actions. This means that we do not have a visual tool to recommend officially. You may however try
+                    the Intalio designer. Trial versions are available <a href="http://www.intalio.com/">from their web
+                    site</a> once you register.
                 </p>
                 <p>
                     Our perception is that visual tools tend to be of little use for actual developers except for the
                     first few steps of development (and this is not only true for XForms but also for other frameworks
                     like JavaServer Faces), so we advise not to have too high expectations when it comes to visual
-                    tools. However, we reckon that helping developers during the first stages of application development
-                    is valuable and we would like in the future to offer such a tool, most likely web-based (and itself
-                    implemented with XForms!).
+                    tools.
                 </p>
                 <p>
-                    If you have good experience with a visual tool, please be sure to let us know.
+                    However, we reckon that helping developers during the first stages of application development is
+                    very valuable and we would like in the future to offer such a tool, which most likely will be a
+                    web-based tool (and itself implemented with XForms!). In fact, we already have a prototype, so stay
+                    tuned!
+                </p>
+                <p>
+                    If you have good experience with an existing visual tool, whether for XForms or not, please be sure
+                    to let us know.
                 </p>
             </section>
             <a name="javascript-dom"/>
@@ -577,25 +637,6 @@
                     PHP. Please visit <a href="reference-xforms-java">Using the Orbeon Forms XForms Engine with Java
                     Applications for more details</a>. Post additional questions to the <a
                     href="http://www.orbeon.com/forms/mailing-list">ops-users</a> mailing-list.
-                </p>
-            </section>
-            <section added="2006-12-06">
-                <title>How do I design forms in Orbeon Forms?</title>
-                <p>
-                    Orbeon Forms does not come with a visual forms designer. You create forms by writing XHTML pages
-                    that contain embedded XForms markup.
-                </p>
-                <p>
-                    Orbeon Forms 3.5 comes with a <a href="intro-tutorial">new tutorial</a> that explains step by step
-                    how to create your first forms. In the meanwhile, we recommend you look at the sample Orbeon Forms
-                    applications that you find under your WAR file's <code>WEB-INF/resources/apps</code> directory.
-                </p>
-                <p>
-                    Also note that Orbeon provides services around Orbeon Forms, including training. Please visit our
-                    <a href="http://www.orbeon.com/support">support page</a> for more information.
-                </p>
-                <p>
-                    In the future, we hope to be able to provide a web-based tool to help build forms.
                 </p>
             </section>
             <a name="xforms-server-submit"/>
@@ -1183,6 +1224,7 @@
                     Orbeon Forms also ships with Saxon 6, Xalan 2.5 and XSLTC 2.5.
                 </p>
             </section>
+            <!--
             <a name="xslt-perf"/>
             <section>
                 <title>Isn't XSLT processing slow?</title>
@@ -1212,6 +1254,7 @@
                     project if necessary.
                 </p>
             </section>
+            -->
             <a name="dom4j-illegal-add"/>
             <section>
                 <title>

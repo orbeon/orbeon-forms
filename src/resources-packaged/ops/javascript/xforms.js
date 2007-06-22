@@ -3043,7 +3043,7 @@ ORBEON.xforms.Server = {
 
                 // Find an error message starting from the inner-most exception
                 errorMessage = "XForms error";
-                var messageElements = responseXML.getElementsByTagName("message");
+                var messageElements = responseXML.getElementsByTagName("title");
                 for (var messageIndex = messageElements.length - 1; messageIndex >= 0; messageIndex--) {
                     if (messageElements[messageIndex].firstChild != null) {
                         errorMessage += ": " + ORBEON.util.Dom.getStringValue(messageElements[messageIndex]);

@@ -22,7 +22,7 @@
     <page id="apps" path-info="/([^/]+)/.*" matcher="oxf:perl5-matcher" model="apps/${1}/page-flow-edit.xml"/>
 
     <!-- "Not Found" page displayed when no page matches the request path -->
-    <page id="not-found" path-info="/not-found" view="/config/not-found.xml"/>
+    <page id="not-found" path-info="/not-found" view="/config/not-found.xhtml"/>
 
     <epilogue url="/config/epilogue.xpl"/>
     <not-found-handler page="not-found"/>

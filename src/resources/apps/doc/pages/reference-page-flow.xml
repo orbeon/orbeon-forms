@@ -1383,11 +1383,11 @@
                 </p>
                 <xml-source>
                     <comment> "Not Found" page displayed when no page matches the request path </comment>
-                    <page id="not-found" path-info="/not-found" view="/config/not-found.xml"/>
+                    <page id="not-found" path-info="/not-found" view="/config/not-found.xhtml"/>
                     <not-found-handler page="not-found"/>
                 </xml-source>
                 <p>
-                    By default, <code>oxf:/config/not-found.xml</code> displays a simple XHTML page
+                    By default, <code>oxf:/config/not-found.xhtml</code> displays a simple XHTML page
                     telling the user that the page requested cannot be found.
                 </p>
                 <note>

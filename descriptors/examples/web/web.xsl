@@ -240,7 +240,7 @@
                 </init-param>
                 <init-param>
                     <param-name>oxf.error-processor.input.config</param-name>
-                    <param-value>oxf:/config/error.xpl</param-value>
+                    <param-value>oxf:/ops/pfc/error.xpl</param-value>
                 </init-param>
                 <xsl:comment> Set supported methods </xsl:comment>
                 <init-param>
@@ -313,7 +313,7 @@
                 </init-param>
                 <init-param>
                     <param-name>oxf.error-processor.input.config</param-name>
-                    <param-value>oxf:/config/error.xpl</param-value>
+                    <param-value>oxf:/ops/pfc/error.xpl</param-value>
                 </init-param>
             </servlet>
 

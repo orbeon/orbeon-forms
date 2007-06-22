@@ -49,7 +49,7 @@
                 <title>Setup</title>
                 <p>
                     The following code in <code>web.xml</code> specifies that upon error, the
-                    Pipeline processor must run using the <code>oxf:/config/error.xpl</code>
+                    Pipeline processor must run using the <code>oxf:/ops/pfc/error.xpl</code>
                     pipeline:
                 </p>
                 <xml-source>
@@ -64,7 +64,7 @@
                         <comment>The pipeline to execute</comment>
                         <init-param>
                             <param-name>oxf.error-processor.input.config</param-name>
-                            <param-value>oxf:/config/error.xpl</param-value>
+                            <param-value>oxf:/ops/pfc/error.xpl</param-value>
                         </init-param>
                     </servlet>
                 </xml-source>

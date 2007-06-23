@@ -62,6 +62,16 @@ public class ExceptionGenerator extends ProcessorImpl {
                         throwable = OXFException.getNestedException(throwable);
                     }
 
+                    // The code below outputs the first exception only, but not all the OPS stack trace info
+//                    while (true) {
+//                        final Throwable nestedThrowable = OXFException.getNestedException(throwable);
+//                        if (nestedThrowable == null) {
+//                            addThrowable(helper, throwable);
+//                            break;
+//                        }
+//                        throwable = nestedThrowable;
+//                    }
+
                     helper.endElement();
                     helper.endDocument();
                 } catch (Exception e) {
@@ -130,10 +140,12 @@ public class ExceptionGenerator extends ProcessorImpl {
                             final String paramName = parameters[j];
                             final String paramValue = parameters[j + 1];
 
-                            helper.startElement("parameter");
-                            helper.element("name", paramName);
-                            helper.element("value", paramValue);
-                            helper.endElement();
+                            if (paramValue != null) {
+                                helper.startElement("parameter");
+                                helper.element("name", paramName);
+                                helper.element("value", paramValue);
+                                helper.endElement();
+                            }
                         }
                         helper.endElement();
                     }

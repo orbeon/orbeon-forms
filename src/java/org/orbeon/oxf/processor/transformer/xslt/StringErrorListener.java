@@ -45,37 +45,38 @@ public class StringErrorListener implements ErrorListener {
         if (exception.getLocator() != null)
             message += getLocationMessage(exception) + "\n  ";
         message += getExpandedMessage(exception);
+
         logger.warn(message);
+
+        if (messages.length() > 0)
+            messages.append("\n");
         messages.append(message);
-        messages.append("\n");
     }
 
     public void error(TransformerException exception) throws TransformerException {
         addError(exception);
 
-        String locationMessage = getLocationMessage(exception);
-        String message = "Error"
+        final String locationMessage = getLocationMessage(exception);
+        final String message = "Error"
                 + (locationMessage.length() > 0 ? " " + locationMessage + ":\n" : ": ")
                 + getExpandedMessage(exception);
+
         logger.error(message);
+
+        if (messages.length() > 0)
+            messages.append("\n");
         messages.append(message);
-        messages.append("\n");
     }
 
     /**
      * Receive notification of a non-recoverable error.
-     * <p/>
-     * <p>The application must assume that the transformation cannot
-     * continue after the Transformer has invoked this method,
-     * and should continue (if at all) only to collect
-     * addition error messages. In fact, Transformers are free
-     * to stop reporting events once this method has been invoked.</p>
      *
-     * @param exception The error information encapsulated in a
-     *                  transformer exception.
-     * @throws javax.xml.transform.TransformerException
-     *          if the application
-     *          chooses to discontinue the transformation.
+     * The application must assume that the transformation cannot continue after the Transformer has invoked this
+     * method, and should continue (if at all) only to collect addition error messages. In fact, Transformers are free
+     * to stop reporting events once this method has been invoked.
+     *
+     * @param exception The error information encapsulated in a transformer exception.
+     * @throws javax.xml.transform.TransformerException if the application chooses to discontinue the transformation.
      * @see javax.xml.transform.TransformerException
      */
 
@@ -110,24 +111,24 @@ public class StringErrorListener implements ErrorListener {
     /**
      * Try to get the best possible location data for a TransformerException.
      *
-     * @param te               TransformerException to process
-     * @param defaultSystemId  System Id to use if none is found in the TransformerException.
+     * @param transformerException  TransformerException to process
+     * @param defaultSystemId       System Id to use if none is found in the TransformerException.
      * @return ExtendedLocationData
      */
-    public static ExtendedLocationData getTransformerExceptionLocationData(TransformerException te, String defaultSystemId) {
-        final SourceLocator loc = te.getLocator();
-        if (loc == null && defaultSystemId == null) {
+    public static ExtendedLocationData getTransformerExceptionLocationData(TransformerException transformerException, String defaultSystemId) {
+        final SourceLocator locator = transformerException.getLocator();
+        if (locator == null && defaultSystemId == null) {
             return null;
-        } else if (loc == null) {
+        } else if (locator == null) {
             return new ExtendedLocationData(defaultSystemId, -1, -1, null);
         } else {
             String description;
-            if (loc instanceof DOMLocator) {
-                description = ((DOMLocator) loc).getOriginatingNode().getNodeName();
-            } else if (loc.getClass().getName().equals("net.sf.saxon.instruct.InstructionDetails")
-                    || loc.getClass().getName().equals("org.orbeon.saxon.instruct.InstructionDetails")) {
+            if (locator instanceof DOMLocator) {
+                description = ((DOMLocator) locator).getOriginatingNode().getNodeName();
+            } else if (locator.getClass().getName().equals("net.sf.saxon.instruct.InstructionDetails")
+                    || locator.getClass().getName().equals("org.orbeon.saxon.instruct.InstructionDetails")) {
                 try {
-                    description = loc.getClass().getMethod("getInstructionName", new Class[]{}).invoke(loc, new Object[]{}).toString();
+                    description = locator.getClass().getMethod("getInstructionName", new Class[]{}).invoke(locator, new Object[]{}).toString();
                 } catch (Exception e) {
                     // Let's not consider this a real issue, just clear the description
                     description = null;
@@ -135,7 +136,7 @@ public class StringErrorListener implements ErrorListener {
             } else {
                 description = null;
             }
-            return new ExtendedLocationData((loc.getSystemId() != null) ? loc.getSystemId() : defaultSystemId, loc.getLineNumber(), loc.getColumnNumber(), description);
+            return new ExtendedLocationData((locator.getSystemId() != null) ? locator.getSystemId() : defaultSystemId, locator.getLineNumber(), locator.getColumnNumber(), description);
         }
     }
 
@@ -145,11 +146,7 @@ public class StringErrorListener implements ErrorListener {
     private static String getLocationMessage(TransformerException te) {
         final ExtendedLocationData extendedLocationData = getTransformerExceptionLocationData(te, null);
         if (extendedLocationData != null) {
-            return "at "
-                    + ((extendedLocationData.getDescription() != null) ? extendedLocationData.getDescription() : "")
-                    + ((extendedLocationData.getLine() != -1) ? ", line " + extendedLocationData.getLine() : "")
-                    + ((extendedLocationData.getCol() != -1) ? ", column " + extendedLocationData.getCol() : "")
-                    + ((extendedLocationData.getSystemID() != null) ? " of  " + extendedLocationData.getSystemID() : "");
+            return "at " + extendedLocationData.toString();
         } else  if (te.getException() instanceof OXFException) {
             final Throwable t = OXFException.getRootThrowable(te.getException());
             // TODO: check this, should maybe look for root validation data?
@@ -165,7 +162,6 @@ public class StringErrorListener implements ErrorListener {
     /**
      * Get a string containing the message for this exception and all contained exceptions
      */
-
     private static String getExpandedMessage(TransformerException err) {
         String message = "";
         Throwable e = err;

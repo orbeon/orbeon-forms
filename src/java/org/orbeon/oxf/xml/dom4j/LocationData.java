@@ -15,6 +15,7 @@ package org.orbeon.oxf.xml.dom4j;
 
 import org.xml.sax.Locator;
 import org.xml.sax.SAXParseException;
+import org.orbeon.saxon.om.FastStringBuffer;
 
 import javax.xml.transform.SourceLocator;
 
@@ -62,6 +63,30 @@ public class LocationData {
     public int getCol() { return col; }
 
     public String toString() {
-        return systemID + ", line " + line + ", column " + col;
+        final FastStringBuffer sb = new FastStringBuffer("");
+        final boolean hasLine;
+        if (getLine() > 0) {
+            sb.append("line ");
+            sb.append(Integer.toString(getLine()));
+            hasLine = true;
+        } else {
+            hasLine = false;
+        }
+        final boolean hasColumn;
+        if (getCol() > 0) {
+            if (hasLine)
+                sb.append(", ");
+            sb.append("column ");
+            sb.append(Integer.toString(getCol()));
+            hasColumn = true;
+        } else {
+            hasColumn = false;
+        }
+        if (getSystemID() != null) {
+            if (hasLine || hasColumn)
+                sb.append(" of ");
+            sb.append(getSystemID());
+        }
+        return sb.toString();
     }
 }

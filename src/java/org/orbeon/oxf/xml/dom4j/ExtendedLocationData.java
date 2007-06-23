@@ -15,6 +15,7 @@ package org.orbeon.oxf.xml.dom4j;
 
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.saxon.om.FastStringBuffer;
 import org.xml.sax.Locator;
 
 /**
@@ -139,34 +140,50 @@ public class ExtendedLocationData extends LocationData {
         return elementString;
     }
 
-
-    public String getParametersString() {
-        final StringBuffer sb = new StringBuffer(description);
-        boolean first = true;
-        for (int i = 0; i < parameters.length; i += 2) {
-            final String paramName = parameters[i];
-            final String paramValue = parameters[i + 1];
-
-            if (paramValue != null) {
-
-                sb.append((first) ? ": " : ", ");
-
-                sb.append(paramName);
-                sb.append("='");
-                sb.append(paramValue);
-                sb.append("'");
-
-                first = false;
-            }
-        }
-        return sb.toString();
-    }
-
     public String[] getParameters() {
         return parameters;
     }
 
     public String toString() {
-        return super.toString() + ", description " + description;
+        final FastStringBuffer sb = new FastStringBuffer(super.toString());
+        final String parametersString = getParametersString();
+        final boolean hasDescription = getDescription() != null;
+        final boolean hasParameters = parametersString.length() > 0;
+        if (hasDescription|| hasParameters) {
+            sb.append(" (");
+            if (hasDescription)
+                sb.append(getDescription());
+            if (hasParameters) {
+                if (hasDescription)
+                    sb.append(": ");
+                sb.append(parametersString);
+            }
+            sb.append(")");
+        }
+        return sb.toString();
+    }
+
+    private String getParametersString() {
+        final FastStringBuffer sb = new FastStringBuffer("");
+        if (parameters != null) {
+            boolean first = true;
+            for (int i = 0; i < parameters.length; i += 2) {
+                final String paramName = parameters[i];
+                final String paramValue = parameters[i + 1];
+
+                if (paramValue != null) {
+                    if (!first)
+                        sb.append(", ");
+
+                    sb.append(paramName);
+                    sb.append("='");
+                    sb.append(paramValue);
+                    sb.append("'");
+
+                    first = false;
+                }
+            }
+        }
+        return sb.toString();
     }
 }

@@ -368,17 +368,29 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                             }
                         }
                     }
-                } catch (ValidationException e) {
-                    throw e;
                 } catch (TransformerException e) {
-                    final ExtendedLocationData extendedLocationData
-                            = StringErrorListener.getTransformerExceptionLocationData(e, templatesInfo.systemId);
-                    throw new ValidationException(e, extendedLocationData);
+                    // This exception occurred during transformation (we make sure creating the transformer wraps into ValidationException or OXFException)
+
+                    // Add location data of TransformerException if possible
+                    final LocationData transformerLocationData =
+                            (e.getLocator() != null && e.getLocator().getSystemId() != null)
+                                ? new LocationData(e.getLocator())
+                                : (templatesInfo.systemId != null)
+                                    ? new LocationData(templatesInfo.systemId, -1, -1)
+                                    : null;
+
+                    throw new ValidationException(e, new ExtendedLocationData(transformerLocationData, "executing XSLT transformation"));
                 } catch (Exception e) {
-                    if (templatesInfo != null && templatesInfo.systemId != null) {
-                        throw new ValidationException(e, new LocationData(templatesInfo.systemId, -1, -1));
+
+                    if (templatesInfo != null) {
+                        // Transformer was created, this exception occurred during transformation
+
+                        // Add template location data if possible
+                        final LocationData templatesLocationData = (templatesInfo.systemId != null) ? new LocationData(templatesInfo.systemId, -1, -1) : null;
+                        throw ValidationException.wrapException(e, new ExtendedLocationData(templatesLocationData, "executing XSLT transformation"));
                     } else {
-                        throw new OXFException(e);
+                        // No transformer was created, this exception occurred while creating the transformer
+                        throw ValidationException.wrapException(e, new ExtendedLocationData((LocationData) null, "creating XSLT transformer"));
                     }
                 }
             }
@@ -532,40 +544,44 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                     return templatesInfo;
 
                 } catch (TransformerException e) {
-                    final ExtendedLocationData extendedLocationData
-                            = StringErrorListener.getTransformerExceptionLocationData(e, topStylesheetContentHandler.getSystemId());
-
-                    final ValidationException ve = new ValidationException(e.getMessage() + " " + errorListener.getMessages(), e, extendedLocationData);
-
-                    // Append location data gathered from error listener
                     if (errorListener.hasErrors()) {
-                        final List errors = errorListener.getErrors();
-                        if (errors != null) {
-                            for (Iterator i = errors.iterator(); i.hasNext();) {
-                                final LocationData currentLocationData = (LocationData) i.next();
-                                ve.addLocationData(currentLocationData);
-                            }
-                        }
+                        // Use error messages information and provide location data of first errror
+                        final ValidationException validationException = new ValidationException(errorListener.getMessages(), (LocationData) errorListener.getErrors().get(0));
+                        // If possible add location of top-level stylesheet
+                        if (topStylesheetContentHandler.getSystemId() != null)
+                            validationException.addLocationData(new ExtendedLocationData(new LocationData(topStylesheetContentHandler.getSystemId(), -1, -1), "creating XSLT transformer"));
+                        throw validationException;
+                    } else {
+                        // No XSLT errors are available
+                        final LocationData transformerExceptionLocationData
+                            = StringErrorListener.getTransformerExceptionLocationData(e, topStylesheetContentHandler.getSystemId());
+                        if (transformerExceptionLocationData.getSystemID() != null)
+                            throw ValidationException.wrapException(e, new ExtendedLocationData(transformerExceptionLocationData, "creating XSLT transformer"));
+                        else
+                            throw new OXFException(e);
                     }
 
-                    throw ve;
+//                    final ExtendedLocationData extendedLocationData
+//                            = StringErrorListener.getTransformerExceptionLocationData(e, topStylesheetContentHandler.getSystemId());
+//
+//                    final ValidationException ve = new ValidationException(e.getMessage() + " " + errorListener.getMessages(), e, extendedLocationData);
+//
+//                    // Append location data gathered from error listener
+//                    if (errorListener.hasErrors()) {
+//                        final List errors = errorListener.getErrors();
+//                        if (errors != null) {
+//                            for (Iterator i = errors.iterator(); i.hasNext();) {
+//                                final LocationData currentLocationData = (LocationData) i.next();
+//                                ve.addLocationData(currentLocationData);
+//                            }
+//                        }
+//                    }
+//                    throw ve;
                 } catch (Exception e) {
                     if (topStylesheetContentHandler.getSystemId() != null) {
-                        if (errorListener.hasErrors()) {
-                            // TODO: Check this: will this ever be called?
-                            throw new ValidationException(errorListener.getMessages(),
-                                    new LocationData(topStylesheetContentHandler.getSystemId(), 0, 0));
-                        } else {
-                            throw new ValidationException(e,
-                                    new LocationData(topStylesheetContentHandler.getSystemId(), 0, 0));
-                        }
+                        throw ValidationException.wrapException(e, new ExtendedLocationData(topStylesheetContentHandler.getSystemId(), -1, -1, "creating XSLT transformer"));
                     } else {
-                        if (errorListener.hasErrors()) {
-                            // TODO: Check this: will this ever be called?
-                            throw new OXFException(errorListener.getMessages());
-                        } else {
-                            throw new OXFException(e);
-                        }
+                        throw new OXFException(e);
                     }
                 }
             }

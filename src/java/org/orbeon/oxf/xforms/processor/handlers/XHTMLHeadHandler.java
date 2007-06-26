@@ -225,11 +225,6 @@ public class XHTMLHeadHandler extends HandlerBase {
         {
             helper.startElement(prefix, XMLConstants.XHTML_NAMESPACE_URI, "script", new String[] {
                     "type", "text/javascript"});
-            {
-                // TODO: Use absolute path only?
-                final String applicationBase = response.rewriteResourceURL("/", true);
-                helper.text("var opsXFormsServerBase = \"" + applicationBase + "\";");
-            }
 
             // Produce JSON output
             if (appearancesMap.size() > 0) {

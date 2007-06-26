@@ -77,7 +77,7 @@ public class XHTMLBodyHandler extends HandlerBase {
 
         final XFormsControls xformsControls = containingDocument.getXFormsControls();
 
-        final String prefix = XMLUtils.prefixFromQName(qName);
+        final String htmlPrefix = XMLUtils.prefixFromQName(qName);
 
         final boolean hasUpload = xformsControls.getCurrentControlsState().isHasUpload();
 
@@ -91,7 +91,7 @@ public class XHTMLBodyHandler extends HandlerBase {
                 PageFlowControllerProcessor.XFORMS_SUBMISSION_PATH_PROPERTY_NAME,
                 PageFlowControllerProcessor.XFORMS_SUBMISSION_PATH_DEFAULT_VALUE);
 
-        helper.startElement(prefix, XMLConstants.XHTML_NAMESPACE_URI, "form", new String[] {
+        helper.startElement(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "form", new String[] {
                 "class", "xforms-form", "action", xformsSubmissionPath, "method", "POST", "onsubmit", "return false",
                 hasUpload ? "enctype" : null, hasUpload ? "multipart/form-data" : null});
 
@@ -116,7 +116,7 @@ public class XHTMLBodyHandler extends HandlerBase {
                 currentPageGenerationId = null;
             }
 
-            helper.element(prefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[] {
+            helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[] {
                     "type", "hidden", "name", "$static-state", "value", staticStateString
             });
         }
@@ -146,13 +146,13 @@ public class XHTMLBodyHandler extends HandlerBase {
                     dynamicStateString = xformsState.getDynamicState();
                 }
             }
-            helper.element(prefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[]{
+            helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[]{
                     "type", "hidden", "name", "$dynamic-state", "value", dynamicStateString
             });
-            helper.element(prefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[]{
+            helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[]{
                     "type", "hidden", "name", "$server-events", "value", ""
             });
-            helper.element(prefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[]{
+            helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[]{
                     "type", "hidden", "name", "$client-state", "value", ""
             });
         }
@@ -200,7 +200,7 @@ public class XHTMLBodyHandler extends HandlerBase {
                 }
             });
 
-            helper.element(prefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[]{
+            helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[]{
                     "type", "hidden", "name", "$repeat-tree", "value", repeatHierarchyStringBuffer.toString()
             });
         }
@@ -224,7 +224,7 @@ public class XHTMLBodyHandler extends HandlerBase {
                 }
             }
 
-            helper.element(prefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[]{
+            helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[]{
                     "type", "hidden", "name", "$repeat-indexes", "value", repeatIndexesStringBuffer.toString()
             });
         }
@@ -232,16 +232,18 @@ public class XHTMLBodyHandler extends HandlerBase {
         // Ajax loading indicator
         if (XFormsUtils.isAjaxShowLoadingIcon()) {
 
-            helper.startElement(prefix, XMLConstants.XHTML_NAMESPACE_URI, "span", new String[]{"class", "xforms-loading-loading"});
+            helper.startElement(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "span", new String[]{ "class", "xforms-loading-loading" });
             helper.text("Loading..."); // text is hardcoded, but you can rewrite it in the theme if needed 
             helper.endElement();
 
-            helper.element(prefix, XMLConstants.XHTML_NAMESPACE_URI, "span", new String[]{"class", "xforms-loading-none"});
+            helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "span", new String[]{ "class", "xforms-loading-none" });
         }
 
         // Ajax errors
         if (XFormsUtils.isAjaxShowErrors()) {
-            helper.element(prefix, XMLConstants.XHTML_NAMESPACE_URI, "span", new String[]{"class", "xforms-loading-error"});
+            // XInclude dialog so users can configure it
+            // TODO: must send startPrefixMapping()/endPrefixMapping()?
+            helper.element("", XMLConstants.XINCLUDE_URI, "include", new String[] { "href", "oxf:/config/error-dialog.xml" });
         }
     }
 

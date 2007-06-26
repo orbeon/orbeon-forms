@@ -353,7 +353,7 @@
                                 <comment>The pipeline to execute</comment>
                                 <init-param>
                                     <param-name>oxf.error-processor.input.config</param-name>
-                                    <param-value>oxf:/ops/pfc/error.xpl</param-value>
+                                    <param-value>oxf:/config/error.xpl</param-value>
                                 </init-param>
                             </servlet>
                         </xml-source>
@@ -365,7 +365,7 @@
                                 <comment>The error processor that OPSServlet must execute</comment>
                                 <property as="xs:QName" name="oxf.error-processor.name" value="oxf:pipeline"/>
                                 <comment>The Page Flow Controller configuration file</comment>
-                                <property as="xs:anyURI" name="oxf.error-processor.input.config" value="oxf:/ops/pfc/error.xpl"/>
+                                <property as="xs:anyURI" name="oxf.error-processor.input.config" value="oxf:/config/error.xpl"/>
                             </properties>
                         </xml-source>
                     </li>
@@ -380,7 +380,7 @@
                             <comment>The pipeline to execute</comment>
                             <context-param>
                                 <param-name>oxf.error-processor.input.config</param-name>
-                                <param-value>oxf:/ops/pfc/error.xpl</param-value>
+                                <param-value>oxf:/config/error.xpl</param-value>
                             </context-param>
                         </xml-source>
                     </li>

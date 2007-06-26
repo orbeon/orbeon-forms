@@ -217,7 +217,7 @@
                         </init-param>
                         <init-param>
                             <name>oxf.error-processor.input.config</name>
-                            <value>oxf:/ops/pfc/error.xpl</value>
+                            <value>oxf:/config/error.xpl</value>
                         </init-param>
                         <supports>
                             <mime-type>text/html</mime-type>

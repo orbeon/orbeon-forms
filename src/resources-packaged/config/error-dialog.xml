@@ -1,0 +1,38 @@
+<!--
+    Copyright (C) 2007 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:div xmlns:xhtml="http://www.w3.org/1999/xhtml"
+           class="xforms-error-panel xforms-initially-hidden">
+    <xhtml:div class="hd">An error has occurred</xhtml:div>
+    <xhtml:div class="bd">
+        <xhtml:p>
+            An error has occurred in Orbeon Forms. You may want to try the following:
+        </xhtml:p>
+        <xhtml:ul>
+            <xhtml:li>Close this dialog and continue to use this page.</xhtml:li>
+            <xhtml:li>If this does not work, press ctrl key (or command key on Mac) and click on the Reload button in the toolbar.</xhtml:li>
+            <xhtml:li>Return <xhtml:a href="/">home</xhtml:a></xhtml:li>
+        </xhtml:ul>
+        <xhtml:div class="xforms-error-panel-details-hidden">
+            <xhtml:p>
+                <xhtml:a class="xforms-error-panel-show-details" href="#">Show details</xhtml:a>
+            </xhtml:p>
+        </xhtml:div>
+        <xhtml:div class="xforms-error-panel-details-shown xforms-disabled">
+            <xhtml:p>
+                <xhtml:a class="xforms-error-panel-hide-details" href="#">Hide details</xhtml:a>
+            </xhtml:p>
+            <xhtml:div class="xforms-error-details"/>
+        </xhtml:div>
+    </xhtml:div>
+</xhtml:div>

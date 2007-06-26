@@ -1,4 +1,4 @@
-<!--Copyright (C) 2005 Orbeon, Inc.
+<!-- Copyright (C) 2005-2007 Orbeon, Inc.
 
     This program is free software; you can redistribute it and/or modify it under the terms of the
     GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -117,7 +117,13 @@
                     <p:processor name="oxf:xforms-to-xhtml">
                         <p:input name="annotated-document" href="#annotated-view"/>
                         <p:input name="instance" href="#instance"/>
-                        <p:output name="document" ref="xformed-data"/>
+                        <p:output name="document" id="xhtml-data"/>
+                    </p:processor>
+
+                    <!-- XInclude processing to add error dialog configuration and more -->
+                    <p:processor name="oxf:xinclude">
+                        <p:input name="config" href="#xhtml-data"/>
+                        <p:output name="data" ref="xformed-data"/>
                     </p:processor>
                 </p:when>
                 <p:otherwise>

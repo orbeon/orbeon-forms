@@ -69,7 +69,6 @@ ORBEON.xforms.Globals = ORBEON.xforms.Globals || {
     eventsFirstEventTime: 0,             // Time when the first event in the queue was added
     requestForm: null,                   // HTML for the request currently in progress
     requestInProgress: false,            // Indicates wether an Ajax request is currently in process
-    lastRequestIsError: false,           // Whether the last XHR request returned an error
     executeEventFunctionQueued: 0,       // Number of ORBEON.xforms.Server.executeNextRequest waiting to be executed
     maskFocusEvents: false,              // Avoid catching focus event when we do it because the server told us to
     previousDOMFocusOut: null,           // We only send a focus out when we receive a focus in, or another focus out
@@ -102,7 +101,7 @@ ORBEON.xforms.Globals = ORBEON.xforms.Globals || {
     // Use ORBEON.util.Dom.getFormIndex(form) to get the index of a given form on the page
     formLoadingLoadingOverlay: [],       // Overlay for the loading indicator
     formLoadingLoadingInitialRightTop:[],// Initial number of pixel between the loading indicator and the top of the page
-    formLoadingError: [],                // HTML element with the markup displayed when there is an error
+    formErrorPanel: [],                  // YUI panel used to report errors
     formLoadingNone: [],                 // HTML element with the markup displayed when nothing is displayed
     formStaticState: [],                 // State that does not change for the life of the page
     formDynamicState: [],                // State that changes at every request
@@ -1314,6 +1313,19 @@ ORBEON.xforms.Events = {
             // Send new value to server
             ORBEON.xforms.Events.treeClickValueUpdated(control);
         }
+    },
+
+    errorShowHideDetails: function() {
+        var errorBodyDiv = this.parentNode.parentNode.parentNode;
+        var detailsHidden = ORBEON.util.Dom.getChildElementByClass(errorBodyDiv, "xforms-error-panel-details-hidden");
+        var detailsShown = ORBEON.util.Dom.getChildElementByClass(errorBodyDiv, "xforms-error-panel-details-shown");
+        if (this.className == "xforms-error-panel-show-details") {
+            ORBEON.util.Dom.addClass(detailsHidden, "xforms-disabled");
+            ORBEON.util.Dom.removeClass(detailsShown, "xforms-disabled");
+        } else {
+            ORBEON.util.Dom.removeClass(detailsHidden, "xforms-disabled");
+            ORBEON.util.Dom.addClass(detailsShown, "xforms-disabled");
+        }
     }
 };
 
@@ -1448,7 +1460,7 @@ ORBEON.xforms.Init = {
             if (ORBEON.util.Dom.hasClass(form, "xforms-form")) {
 
                 // Initialize loading and error indicator
-                ORBEON.xforms.Globals.formLoadingError[formIndex] = null;
+                ORBEON.xforms.Globals.formErrorPanel[formIndex] = null;
                 ORBEON.xforms.Globals.formLoadingNone[formIndex] = null;
 
                 var xformsLoadingCount = 0;
@@ -1467,8 +1479,38 @@ ORBEON.xforms.Init = {
                         xformsLoadingCount++;
                         continue;
                     }
-                    if (formChild.className == "xforms-loading-error") {
-                        ORBEON.xforms.Globals.formLoadingError[formIndex] = formChild;
+                    if (ORBEON.util.Dom.hasClass(formChild, "xforms-error-panel")) {
+
+                        // Create and store error panel
+                        YAHOO.util.Dom.generateId(formChild);
+                        ORBEON.util.Dom.removeClass(formChild, "xforms-initially-hidden");
+                        var errorPanel = new YAHOO.widget.Panel(formChild.id, {
+                            width: "500px",
+                            modal: true,
+                            fixedcenter: true,
+                            underlay: "shadow",
+                            visible: false,
+                            constraintoviewport: true
+                        });
+                        errorPanel.render();
+                        ORBEON.xforms.Globals.formErrorPanel[formIndex] = errorPanel;
+
+                        // Find reference to elements in the deails hidden section
+                        var bodyDiv = ORBEON.util.Dom.getChildElementByClass(formChild, "bd");
+                        var detailsHiddenDiv = ORBEON.util.Dom.getChildElementByClass(bodyDiv, "xforms-error-panel-details-hidden");
+                        var showDetailsA = ORBEON.util.Dom.getChildElementByIndex(ORBEON.util.Dom.getChildElementByIndex(detailsHiddenDiv, 0), 0);
+                        YAHOO.util.Dom.generateId(showDetailsA);
+
+                        // Find reference to elements in the deails shown section
+                        var detailsShownDiv = ORBEON.util.Dom.getChildElementByClass(bodyDiv, "xforms-error-panel-details-shown");
+                        var hideDetailsA = ORBEON.util.Dom.getChildElementByIndex(ORBEON.util.Dom.getChildElementByIndex(detailsShownDiv, 0), 0);
+                        YAHOO.util.Dom.generateId(hideDetailsA);
+                        errorPanel.errorDetailsDiv = ORBEON.util.Dom.getChildElementByClass(detailsShownDiv, "xforms-error-details");
+
+                        // Register listener that will show/hide the detail section
+                        YAHOO.util.Event.addListener(showDetailsA.id, "click", ORBEON.xforms.Events.errorShowHideDetails);
+                        YAHOO.util.Event.addListener(hideDetailsA.id, "click", ORBEON.xforms.Events.errorShowHideDetails);
+
                         xformsLoadingCount++;
                         continue;
                     }
@@ -1833,13 +1875,21 @@ ORBEON.xforms.Server = {
      */
     exceptionWhenTalkingToServer: function(e, formIndex) {
         ORBEON.util.Utils.logException("JavaScript error", e);
-        if (e.message != "") {
-            ORBEON.xforms.Globals.lastRequestIsError = true;
-            var errorContainer = ORBEON.xforms.Globals.formLoadingError[formIndex];
-            var errorMessage = "Error while processing response: " + e.message;
-            ORBEON.util.Dom.setStringValue(errorContainer, errorMessage);
-            xformsDisplayIndicator("error");
-        }
+        var details = "Exception in client-side code.";
+        details += "<ul>";
+        if (e.message != null) details += "<li>Message: " + e.message + "</li>";
+        if (e.fileName != null) details += "<li>File: " + e.fileName + "</li>";
+        if (e.lineNumber != null) details += "<li>Line number: " + e.lineNumber + "</li>";
+        details += "</ul>";
+        ORBEON.xforms.Server.showError(details, formIndex);
+    },
+
+    /**
+     * Display the error panel and shows the specified detailed message in the detail section of the panel.
+     */
+    showError: function(details, formIndex) {
+        ORBEON.xforms.Globals.formErrorPanel[formIndex].errorDetailsDiv.innerHTML = details;
+        ORBEON.xforms.Globals.formErrorPanel[formIndex].show();
     },
 
     fireEvents: function(events, incremental) {
@@ -2015,22 +2065,15 @@ ORBEON.xforms.Server = {
         // Hide loading indicator if we have not started a new request (nothing more to run)
         // and there are not events in the queue. However make sure not to hide the error message
         // if the last XHR query returned an error.
-        if (!executedRequest && ORBEON.xforms.Globals.eventQueue.length == 0
-                && !ORBEON.xforms.Globals.lastRequestIsError)
+        if (!executedRequest && ORBEON.xforms.Globals.eventQueue.length == 0)
             xformsDisplayIndicator("none");
     },
 
     handleFailure: function(o) {
         ORBEON.xforms.Globals.requestInProgress = false;
         var formIndex = ORBEON.util.Dom.getFormIndex(ORBEON.xforms.Globals.requestForm);
-        ORBEON.xforms.Globals.lastRequestIsError = true;
-        if (typeof console != "undefined") {
-            ORBEON.util.Utils.logException("Communication failure", o);
-        }
-        var errorContainer = ORBEON.xforms.Globals.formLoadingError[formIndex];
-        var errorMessage = "Error while processing response: " + (o.responseText !== undefined ? o.responseText : "");
-        ORBEON.util.Dom.setStringValue(errorContainer, errorMessage);
-        xformsDisplayIndicator("error");
+        var details = "Error while processing response: " + (o.responseText !== undefined ? o.responseText : "");
+        ORBEON.xforms.Server.showError(details, formIndex);
     },
 
     handleUploadResponse: function(o) {
@@ -2056,7 +2099,6 @@ ORBEON.xforms.Server = {
             responseXML = ORBEON.util.Dom.stringToDom(xmlString);
         }
 
-        var errorMessage = null;
         try {
             if (responseXML && responseXML.documentElement
                     && responseXML.documentElement.tagName.indexOf("event-response") != -1) {
@@ -3031,41 +3073,22 @@ ORBEON.xforms.Server = {
                     xformsDisplayIndicator("loading");
                     ORBEON.xforms.Globals.loadingOtherPage = true;
                 }
-                ORBEON.xforms.Globals.lastRequestIsError = false;
 
                 // Hack for instance inspector - need to see how to do this better
 //                sourceResize();
 
             } else if (responseXML && responseXML.documentElement
                     && responseXML.documentElement.tagName.indexOf("error") != -1) {
-                // We received an error from the server
-                ORBEON.xforms.Globals.lastRequestIsError = true;
-
                 // Find an error message starting from the inner-most exception
-                errorMessage = "XForms error";
-                var messageElements = responseXML.getElementsByTagName("title");
-                for (var messageIndex = messageElements.length - 1; messageIndex >= 0; messageIndex--) {
-                    if (messageElements[messageIndex].firstChild != null) {
-                        errorMessage += ": " + ORBEON.util.Dom.getStringValue(messageElements[messageIndex]);
-                        break;
-                    }
-                }
-
+                var details = ORBEON.util.Dom.getStringValue(responseXML.getElementsByTagName("body")[0]);
+                ORBEON.xforms.Server.showError(details, formIndex);
             } else {
                 // The server didn't send valid XML
                 ORBEON.xforms.Globals.lastRequestIsError = true;
-                errorMessage = "Unexpected response received from server";
+                ORBEON.xforms.Server.showError("Server didn't respond with valid XML", formIndex);
             }
         } catch (e) {
-            // Do nothing when there is an exception.
             ORBEON.xforms.Server.exceptionWhenTalkingToServer(e, formIndex);
-        }
-
-        // Display error if there is one
-        if (errorMessage != null) {
-            var errorContainer = ORBEON.xforms.Globals.formLoadingError[formIndex];
-            ORBEON.util.Dom.setStringValue(errorContainer, errorMessage);
-            xformsDisplayIndicator("error");
         }
 
         // Reset changes, as changes are included in this bach of events
@@ -3287,25 +3310,13 @@ function xformsDisplayIndicator(state) {
                 ORBEON.xforms.Globals.formLoadingLoadingOverlay[formIndex].cfg.setProperty("visible", true);
                 ORBEON.xforms.Controls.updateLoadingPosition(formIndex);
             }
-            if (ORBEON.xforms.Globals.formLoadingError[formIndex] != null)
-                ORBEON.xforms.Globals.formLoadingError[formIndex].style.display = "none";
             if (ORBEON.xforms.Globals.formLoadingNone[formIndex] != null)
                 ORBEON.xforms.Globals.formLoadingNone[formIndex].style.display = "block";
-            break;
-        case "error":
-            if (ORBEON.xforms.Globals.formLoadingLoadingOverlay[formIndex] != null)
-                ORBEON.xforms.Globals.formLoadingLoadingOverlay[formIndex].cfg.setProperty("visible", false);
-            if (ORBEON.xforms.Globals.formLoadingError[formIndex] != null)
-                ORBEON.xforms.Globals.formLoadingError[formIndex].style.display = "block";
-            if (ORBEON.xforms.Globals.formLoadingNone[formIndex] != null)
-                ORBEON.xforms.Globals.formLoadingNone[formIndex].style.display = "none";
             break;
         case "none":
             if (!ORBEON.xforms.Globals.loadingOtherPage) {
                 if (ORBEON.xforms.Globals.formLoadingLoadingOverlay[formIndex] != null)
                     ORBEON.xforms.Globals.formLoadingLoadingOverlay[formIndex].cfg.setProperty("visible", false);
-                if (ORBEON.xforms.Globals.formLoadingError[formIndex] != null)
-                    ORBEON.xforms.Globals.formLoadingError[formIndex].style.display = "none";
                 if (ORBEON.xforms.Globals.formLoadingNone[formIndex] != null)
                     ORBEON.xforms.Globals.formLoadingNone[formIndex].style.display = "block";
             }

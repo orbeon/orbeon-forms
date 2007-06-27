@@ -29,245 +29,24 @@
                 </root>
             </xforms:instance>
         </xforms:model>
-        <xhtml:script>
-            var serverMessage = "&lt;table class=\"gridtable\"&gt;\n" +
-                "\n" +
-                "   &lt;tr&gt;\n" +
-                "\n" +
-                "      &lt;th&gt;Resource URL&lt;/th&gt;\n" +
-                "\n" +
-                "      &lt;th&gt;Line&lt;/th&gt;\n" +
-                "\n" +
-                "      &lt;th&gt;Column&lt;/th&gt;\n" +
-                "\n" +
-                "      &lt;th&gt;Description&lt;/th&gt;\n" +
-                "\n" +
-                "      &lt;th&gt;XML Element&lt;/th&gt;\n" +
-                "\n" +
-                "   &lt;/tr&gt;\n" +
-                "\n" +
-                "   &lt;tr&gt;\n" +
-                "\n" +
-                "      &lt;td&gt;oxf:/config/xforms-widgets.xsl&lt;/td&gt;\n" +
-                "\n" +
-                "      &lt;td class=\"ops-number-cell\"&gt;27&lt;/td&gt;\n" +
-                "\n" +
-                "      &lt;td class=\"ops-number-cell\"&gt;N/A&lt;/td&gt;\n" +
-                "\n" +
-                "      &lt;td&gt;\n" +
-                "\n" +
-                "         &lt;div&gt;evaluating XPath expression\n" +
-                "\n" +
-                "            &lt;div class=\"ops-param-block\"&gt;xpath: /root/*[number(/root/@position)] treat as element\n" +
-                "\n" +
-                "(a)&lt;/div&gt;\n" +
-                "\n" +
-                "         &lt;/div&gt;\n" +
-                "\n" +
-                "         &lt;div&gt;pushing XForms control binding&lt;/div&gt;\n" +
-                "\n" +
-                "         &lt;div&gt;dispatching XForms event\n" +
-                "\n" +
-                "            &lt;div class=\"ops-param-block\"&gt;event: xforms-refresh&lt;br&gt;target id: xforms-elem\n" +
-                "\n" +
-                "ent-1\n" +
-                "\n" +
-                "            &lt;/div&gt;\n" +
-                "\n" +
-                "         &lt;/div&gt;\n" +
-                "\n" +
-                "      &lt;/td&gt;\n" +
-                "\n" +
-                "      &lt;td&gt;\n" +
-                "\n" +
-                "         &lt;f:xml-source xmlns:xs=\"http://www.w3.org/2001/XMLSchema\" xmlns:version=\"java:org.orbeon\n" +
-                "\n" +
-                ".oxf.common.Version\" xmlns:f=\"http://orbeon.org/oxf/xml/formatting\" xmlns=\"http://www.w3.org/1999/xhtml\"\n" +
-                "\n" +
-                " xmlns:saxon=\"http://saxon.sf.net/\" xmlns:xhtml=\"http://www.w3.org/1999/xhtml\" xmlns:oxf=\"http://www\n" +
-                "\n" +
-                ".orbeon.com/oxf/processors\" xmlns:p=\"http://www.orbeon.com/oxf/pipeline\" show-namespaces=\"false\"&gt;\n" +
-                "\n" +
-                "            &lt;xforms:input xmlns:xforms=\"http://www.w3.org/2002/xforms\" xmlns:xxforms=\"http://orbeon\n" +
-                "\n" +
-                ".org/oxf/xml/xforms\" xmlns:ev=\"http://www.w3.org/2001/xml-events\" xmlns:widget=\"http://orbeon.org/oxf\n" +
-                "\n" +
-                "/xml/widget\" ref=\"/root/*[number(/root/@position)] treat as element(a)\" id=\"xforms-element-4\" xml:base\n" +
-                "\n" +
-                "=\"/xforms-sandbox/sample/error-ajax\"&gt;&lt;/xforms:input&gt;\n" +
-                "\n" +
-                "         &lt;/f:xml-source&gt;\n" +
-                "\n" +
-                "      &lt;/td&gt;\n" +
-                "\n" +
-                "   &lt;/tr&gt;\n" +
-                "\n" +
-                "   &lt;tr&gt;\n" +
-                "\n" +
-                "      &lt;td&gt;oxf:/ops/xforms/xforms-server.xpl&lt;/td&gt;\n" +
-                "\n" +
-                "      &lt;td class=\"ops-number-cell\"&gt;57&lt;/td&gt;\n" +
-                "\n" +
-                "      &lt;td class=\"ops-number-cell\"&gt;123&lt;/td&gt;\n" +
-                "\n" +
-                "      &lt;td&gt;\n" +
-                "\n" +
-                "         &lt;div&gt;reading processor output\n" +
-                "\n" +
-                "            &lt;div class=\"ops-param-block\"&gt;name: response&lt;br&gt;id: xml-response\n" +
-                "\n" +
-                "            &lt;/div&gt;\n" +
-                "\n" +
-                "         &lt;/div&gt;\n" +
-                "\n" +
-                "      &lt;/td&gt;\n" +
-                "\n" +
-                "      &lt;td&gt;\n" +
-                "\n" +
-                "         &lt;f:xml-source xmlns:xs=\"http://www.w3.org/2001/XMLSchema\" xmlns:version=\"java:org.orbeon\n" +
-                "\n" +
-                ".oxf.common.Version\" xmlns:f=\"http://orbeon.org/oxf/xml/formatting\" xmlns=\"http://www.w3.org/1999/xhtml\"\n" +
-                "\n" +
-                " xmlns:saxon=\"http://saxon.sf.net/\" xmlns:xhtml=\"http://www.w3.org/1999/xhtml\" xmlns:oxf=\"http://www\n" +
-                "\n" +
-                ".orbeon.com/oxf/processors\" xmlns:p=\"http://www.orbeon.com/oxf/pipeline\" show-namespaces=\"false\"&gt;\n" +
-                "\n" +
-                "            &lt;p:output name=\"response\" id=\"xml-response\" schema-href=\"xforms-server-response.rng\" debug\n" +
-                "\n" +
-                "=\"xxxresponse\"&gt;&lt;/p:output&gt;\n" +
-                "\n" +
-                "         &lt;/f:xml-source&gt;\n" +
-                "\n" +
-                "      &lt;/td&gt;\n" +
-                "\n" +
-                "   &lt;/tr&gt;\n" +
-                "\n" +
-                "   &lt;tr&gt;\n" +
-                "\n" +
-                "      &lt;td&gt;oxf:/ops/xforms/xforms-server.xpl&lt;/td&gt;\n" +
-                "\n" +
-                "      &lt;td class=\"ops-number-cell\"&gt;61&lt;/td&gt;\n" +
-                "\n" +
-                "      &lt;td class=\"ops-number-cell\"&gt;52&lt;/td&gt;\n" +
-                "\n" +
-                "      &lt;td&gt;\n" +
-                "\n" +
-                "         &lt;div&gt;executing processor\n" +
-                "\n" +
-                "            &lt;div class=\"ops-param-block\"&gt;name: {http://www.orbeon.com/oxf/processors}xml-serializer\n" +
-                "\n" +
-                "&lt;/div&gt;\n" +
-                "\n" +
-                "         &lt;/div&gt;\n" +
-                "\n" +
-                "      &lt;/td&gt;\n" +
-                "\n" +
-                "      &lt;td&gt;\n" +
-                "\n" +
-                "         &lt;f:xml-source xmlns:xs=\"http://www.w3.org/2001/XMLSchema\" xmlns:version=\"java:org.orbeon\n" +
-                "\n" +
-                ".oxf.common.Version\" xmlns:f=\"http://orbeon.org/oxf/xml/formatting\" xmlns=\"http://www.w3.org/1999/xhtml\"\n" +
-                "\n" +
-                " xmlns:saxon=\"http://saxon.sf.net/\" xmlns:xhtml=\"http://www.w3.org/1999/xhtml\" xmlns:oxf=\"http://www\n" +
-                "\n" +
-                ".orbeon.com/oxf/processors\" xmlns:p=\"http://www.orbeon.com/oxf/pipeline\" show-namespaces=\"false\"&gt;\n" +
-                "\n" +
-                "            &lt;p:processor name=\"oxf:xml-serializer\"&gt;...&lt;/p:processor&gt;\n" +
-                "\n" +
-                "         &lt;/f:xml-source&gt;\n" +
-                "\n" +
-                "      &lt;/td&gt;\n" +
-                "\n" +
-                "   &lt;/tr&gt;\n" +
-                "\n" +
-                "&lt;/table&gt;";
-
-            function errorDetails() {
-                var detailsHidden = ORBEON.util.Dom.getElementById("xforms-error-panel-details-hidden");
-                var detailsShown = ORBEON.util.Dom.getElementById("xforms-error-panel-details-shown");
-                if (this.id == "xforms-error-panel-show-details") {
-                    ORBEON.util.Dom.addClass(detailsHidden, "xforms-disabled");
-                    ORBEON.util.Dom.removeClass(detailsShown, "xforms-disabled");
-                } else {
-                    ORBEON.util.Dom.removeClass(detailsHidden, "xforms-disabled");
-                    ORBEON.util.Dom.addClass(detailsShown, "xforms-disabled");
-                }
-            }
-        </xhtml:script>
         <xhtml:style type="text/css">
-            #xforms-error-panel .bd { overflow: auto; } 
         </xhtml:style>
     </xhtml:head>
     <xhtml:body>
 
-        <!-- Dummy dialog, so the appropriate JS is included -->
-        <xxforms:dialog id="myDialog" level="modeless" close="true" draggable="true">
-            Hey there
-        </xxforms:dialog>
-
-        <!-- Test case for error on Ajax request -->
         <xforms:input ref="/root/*[number(/root/@position)] treat as element(a)"/>
+
         <xforms:trigger>
-            <xforms:label>Change binding</xforms:label>
+            <xforms:label>Server-side XPath error</xforms:label>
             <xforms:action ev:event="DOMActivate">
-                <!--<xxforms:show dialog="myDialog"/>-->
-                <!--<xxforms:script>-->
-                    <!--ORBEON.xforms.Server.showError("gaga");-->
-                <!--</xxforms:script>-->
                 <xforms:setvalue ref="/root/@position" value="'2'"/>
             </xforms:action>
         </xforms:trigger>
 
-        <!-- Markup generated by the server on every page -->
-        <xhtml:div id="xforms-error-panel" class="xforms-initially-hidden">
-            <xhtml:div class="hd">Unexpected condition</xhtml:div>
-            <xhtml:div class="bd">
-                <xhtml:p>
-                    Something has gone awry. Don't worry, it's not your fault. You can try to:
-                </xhtml:p>
-                <xhtml:ul>
-                    <xhtml:li>Close this dialog and continue to use this page.</xhtml:li>
-                    <xhtml:li>If this does not work, press ctrl key (or command key on Mac) and click on the Reload button in the toolbar.</xhtml:li>
-                    <xhtml:li>Return to <xhtml:a href="/">home</xhtml:a></xhtml:li>
-                </xhtml:ul>
-                <xhtml:div id="xforms-error-panel-details-hidden">
-                    <xhtml:p>
-                        <xhtml:a id="xforms-error-panel-show-details" href="#">Show details</xhtml:a>
-                    </xhtml:p>
-                </xhtml:div>
-                <xhtml:div id="xforms-error-panel-details-shown" class="xforms-disabled">
-                    <xhtml:p>
-                        <xhtml:a id="xforms-error-panel-hide-details" href="#">Hide details</xhtml:a>
-                    </xhtml:p>
-                    <xhtml:div id="xforms-error-details"/>
-                </xhtml:div>
-            </xhtml:div>
-        </xhtml:div>
-
-        <!-- Button showing the error panel -->
         <xforms:trigger>
-            <xforms:label>Show error panel</xforms:label>
+            <xforms:label>Client-side JS error</xforms:label>
             <xforms:action ev:event="DOMActivate">
-                <xxforms:script>
-                    var errorPanelDiv = ORBEON.util.Dom.getElementById("xforms-error-panel");
-                    ORBEON.util.Dom.removeClass(errorPanelDiv, "xforms-initially-hidden");
-                    var errorPanel = new YAHOO.widget.Panel("xforms-error-panel", {
-                        width: "500px",
-                        modal: true,
-                        fixedcenter: true,
-                        underlay: "shadow",
-                        visible: false,
-                        constraintoviewport: true
-                    });
-
-                    var detailsDiv = ORBEON.util.Dom.getElementById("xforms-error-details");
-                    detailsDiv.innerHTML = serverMessage;
-
-                    YAHOO.util.Event.addListener("xforms-error-panel-show-details", "click", errorDetails);
-                    YAHOO.util.Event.addListener("xforms-error-panel-hide-details", "click", errorDetails);
-                    errorPanel.render();
-                    errorPanel.show();
-                </xxforms:script>
+                <xxforms:script>invalidFunctionCall();</xxforms:script>
             </xforms:action>
         </xforms:trigger>
 

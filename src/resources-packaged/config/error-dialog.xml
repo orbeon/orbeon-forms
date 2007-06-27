@@ -20,7 +20,7 @@
         </xhtml:p>
         <xhtml:ul>
             <xhtml:li>Close this dialog and continue to use this page.</xhtml:li>
-            <xhtml:li>If this does not work, press ctrl key (or command key on Mac) and click on the Reload button in the toolbar.</xhtml:li>
+            <xhtml:li>If this does not work, press the <code>ctrl</code> key (or <code>command</code> key on a Mac) and click on the Reload button in the toolbar.</xhtml:li>
             <xhtml:li>Return <xhtml:a href="/">home</xhtml:a>.</xhtml:li>
         </xhtml:ul>
         <xhtml:div class="xforms-error-panel-details-hidden">

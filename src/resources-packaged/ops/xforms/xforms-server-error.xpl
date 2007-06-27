@@ -53,6 +53,7 @@
         <p:input name="config">
             <xsl:stylesheet version="2.0" saxon:allow-all-built-in-types="yes">
                 <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
+                <xsl:import href="oxf:/ops/utils/formatting/formatting.xsl"/>
                 <xsl:output method="html" name="html"/>
                 <xsl:template match="/error/body">
                     <xsl:copy>

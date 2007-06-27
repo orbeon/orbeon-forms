@@ -125,7 +125,8 @@ public class XFormsFeatures {
 //                public String getFeatureName() { return "htmlarea"; }
 //            },
             // Other standard stylesheets
-            new ResourceConfig("/config/theme/xforms.css", null)
+            new ResourceConfig("/config/theme/xforms.css", null),
+            new ResourceConfig("/config/theme/error.css", null)
     };
 
     private static final ResourceConfig[] scripts = {

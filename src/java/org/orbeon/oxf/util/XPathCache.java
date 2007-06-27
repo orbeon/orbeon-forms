@@ -263,7 +263,7 @@ public class XPathCache {
 
     private static ValidationException handleXPathException(Exception e, String xpathString, String description, LocationData locationData) {
         final ValidationException validationException = ValidationException.wrapException(e, new ExtendedLocationData(locationData, description,
-                    new String[] { "xpath", xpathString } ));
+                    new String[] { "expression", xpathString } ));
 
         // Details of ExtendedLocationData passed are discarded by the constructor for ExtendedLocationData above,
         // so we need to explicitly add them.

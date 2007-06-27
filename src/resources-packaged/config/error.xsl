@@ -37,6 +37,7 @@
             <head>
                 <title><xsl:value-of select="$title"/></title>
                 <link rel="stylesheet" href="/config/theme/orbeon.css" type="text/css"/>
+                <link rel="stylesheet" href="/config/theme/error.css" type="text/css"/>
                 <script type="text/javascript">
                     function hideShowTBody(id) {
                         var tbody = document.getElementById(id);
@@ -47,10 +48,6 @@
                         }
                     }
                 </script>
-                <style type="text/css">
-                    .ops-number-cell { text-align: right }
-                    .ops-param-block { font-size: smaller; margin-left: 1em; white-space: nowrap; padding: 0px}
-                </style>
             </head>
             <body>
                 <div class="maincontent">
@@ -84,7 +81,7 @@
                         the first exception along with the Orbeon Forms Stack Trace above provide
                         enough information to track down an issue.
                     </p>
-                    <table class="gridtable" width="100%">
+                    <table class="orbeon-error-table orbeon-error-java-table">
                         <xsl:for-each select="/exceptions/exception">
                             <xsl:sort select="position()" order="descending"/>
                             <xsl:variable name="exception-position" select="position()"/>
@@ -197,7 +194,7 @@
     <xsl:template name="format-java-stack-trace">
         <xsl:param name="elements" as="element()*"/>
         <xsl:param name="trace-id" as="xs:string"/>
-        <table class="gridtable" width="100%">
+        <table class="orbeon-error-table orbeon-error-java-table">
             <thead>
                 <tr>
                     <th>Class Name</th>
@@ -270,8 +267,7 @@
 
     <xsl:template name="format-orbeon-call-stack">
         <xsl:param name="exceptions" as="element(exception)*"/>
-
-        <table class="gridtable">
+        <table class="orbeon-error-table">
             <tr>
                 <th>Resource URL</th>
                 <th>Line</th>
@@ -285,27 +281,27 @@
                     <xsl:for-each-group select="/exceptions/exception[location][1]/location[normalize-space(system-id) != '' and line castable as xs:integer and not(ends-with(system-id, '.java'))]"
                             group-by="concat(system-id, '-', line, '-', column)">
                         <tr>
-                            <td><xsl:value-of select="system-id"/></td>
-                            <td class="ops-number-cell"><xsl:value-of select="if (line castable as xs:positiveInteger) then line else 'N/A'"/></td>
-                            <td class="ops-number-cell"><xsl:value-of select="if (column castable as xs:positiveInteger) then column else 'N/A'"/></td>
-                            <td>
+                            <td class="orbeon-error-panel-url-cell"><xsl:value-of select="system-id"/></td>
+                            <td class="orbeon-error-panel-line-cell"><xsl:value-of select="if (line castable as xs:positiveInteger) then line else 'N/A'"/></td>
+                            <td class="orbeon-error-panel-column-cell"><xsl:value-of select="if (column castable as xs:positiveInteger) then column else 'N/A'"/></td>
+                            <td class="orbeon-error-panel-description-cell">
                                 <xsl:for-each select="current-group()[description != '']">
                                     <div>
                                         <xsl:value-of select="description"/>
                                         <xsl:if test="parameters/parameter[value != '']">
-                                            <div class="ops-param-block">
+                                            <div class="orbeon-error-panel-param-block">
                                                 <xsl:for-each select="parameters/parameter[value != '']">
                                                 <xsl:if test="position() > 1">
                                                     <br/>
                                                 </xsl:if>
-                                                <xsl:value-of select="concat(name, ': ', value, '')"/>
+                                                <xsl:value-of select="concat(name, ' &#8594; ', value, '')"/>
                                             </xsl:for-each>
                                             </div>
                                         </xsl:if>
                                     </div>
                                 </xsl:for-each>
                             </td>
-                            <td>
+                            <td class="orbeon-error-panel-xml-cell">
                                 <!-- Display unique XML element -->
                                 <xsl:for-each-group select="current-group()[element != '']" group-by="string(element)">
                                     <xsl:variable name="element" as="element()">

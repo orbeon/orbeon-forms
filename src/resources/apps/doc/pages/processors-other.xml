@@ -23,7 +23,7 @@
         <section>
             <title>File Processor</title>
             <p>
-                The File Processor allows you to delete files on disk. In the future, it may be
+                The File processor allows you to delete files on disk. In the future, it may be
                 enhanced to provide more actions such as renaming files, moving files, etc.
             </p>
             <section>
@@ -66,7 +66,7 @@
                 <xml-source>
                     <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
                         xmlns:oxf="http://www.orbeon.com/oxf/processors">
-                        <p:processor name="oxf:file-processor">
+                        <p:processor name="oxf:file">
                             <p:input name="config">
                                 <config>
                                     <delete>

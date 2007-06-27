@@ -92,16 +92,11 @@
     right: 2em;
 }
 
-.xforms-loading-error {
-    background-image: url(../../ops/images/xforms/error.gif);
-    background-repeat: no-repeat;
-    background-position: top left;
-    padding-left: 20px;
-    margin-left: 0;
-    color: #c00;
-    display: none;
-    height: 18px;
-}
+.xforms-error-panel .bd { overflow: auto; }
+.xforms-error-panel .hd {background-color: #FF6600; }
+.xforms-error-details { padding-left: 1em; }
+.xforms-error-panel-details-hidden, .xforms-error-panel-details-shown { vertical-align: middle; }
+.xforms-error-panel-show-details, .xforms-error-panel-hide-details { cursor: pointer; }
 
 .xforms-loading-none {
     display: block;

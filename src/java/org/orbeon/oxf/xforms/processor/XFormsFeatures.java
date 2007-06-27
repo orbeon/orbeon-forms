@@ -97,6 +97,7 @@ public class XFormsFeatures {
             // Calendar stylesheets
             // TODO: move to YUI if possible
             new ResourceConfig("/ops/javascript/jscalendar/calendar-blue.css", null),
+            new ResourceConfig("/ops/css/yui/container.css", null),
             // Yahoo! UI Library
             new ResourceConfig("/ops/css/yui/tree.css", null) {
                 public boolean isInUse(Map appearancesMap) {
@@ -115,12 +116,6 @@ public class XFormsFeatures {
                     return isMenuInUse(appearancesMap);
                 }
                 public String getFeatureName() { return "menu"; }
-            },
-            new ResourceConfig("/ops/css/yui/container.css", null) {
-                public boolean isInUse(Map appearancesMap) {
-                    return isDialogInUse(appearancesMap);
-                }
-                public String getFeatureName() { return "dialog"; }
             },
             // NOTE: This doesn't work, probably because FCK editor files must be loaded in an iframe
 //            new ResourceConfig("/ops/fckeditor/editor/skins/default/fck_editor.css", null) {
@@ -144,15 +139,8 @@ public class XFormsFeatures {
             new ResourceConfig("/ops/javascript/yui/event.js", "/ops/javascript/yui/event-min.js"),
             new ResourceConfig("/ops/javascript/yui/dom.js", "/ops/javascript/yui/dom-min.js"),
             new ResourceConfig("/ops/javascript/yui/connection.js", "/ops/javascript/yui/connection-min.js"),
-            new ResourceConfig("/ops/javascript/yui/container_core.js", "/ops/javascript/yui/container_core-min.js") {
-                public boolean isInUse(Map appearancesMap) {
-                    return !isDialogInUse(appearancesMap);
-                }
-                public boolean isInUseByFeatureMap(Map featureMap) {
-                    final FeatureConfig featureConfig = (FeatureConfig) featureMap.get("dialog");
-                    return featureConfig == null;
-                }
-            },
+            new ResourceConfig("/ops/javascript/yui/container.js", "/ops/javascript/yui/container-min.js"),
+            new ResourceConfig("/ops/javascript/yui/dragdrop.js", "/ops/javascript/yui/dragdrop-min.js"),
             new ResourceConfig("/ops/javascript/yui/animation.js", "/ops/javascript/yui/animation-min.js") {
                 public boolean isInUse(Map appearancesMap) {
                     return isRangeInUse(appearancesMap);
@@ -189,30 +177,11 @@ public class XFormsFeatures {
                 }
                 public String getFeatureName() { return "tree"; }
             },
-            new ResourceConfig("/ops/javascript/yui/container.js", "/ops/javascript/yui/container-min.js") {
-                public boolean isInUse(Map appearancesMap) {
-                    return isDialogInUse(appearancesMap);
-                }
-                public String getFeatureName() { return "dialog"; }
-            },
-
-//            new ResourceConfig("/ops/javascript/yui/mem_leak_patch.js", null) {
-//                public boolean isInUse(Map appearancesMap) {
-//                    return isDialogInUse(appearancesMap);
-//                }
-//                public String getFeatureName() { return "dialog"; }
-//            },
             new ResourceConfig("/ops/javascript/yui/menu.js", "/ops/javascript/yui/menu-min.js") {
                 public boolean isInUse(Map appearancesMap) {
                     return isMenuInUse(appearancesMap);
                 }
                 public String getFeatureName() { return "menu"; }
-            },
-            new ResourceConfig("/ops/javascript/yui/dragdrop.js", "/ops/javascript/yui/dragdrop-min.js") {
-                public boolean isInUse(Map appearancesMap) {
-                    return isDialogInUse(appearancesMap);
-                }
-                public String getFeatureName() { return "dialog"; }
             },
             // HTML area
             new ResourceConfig("/ops/fckeditor/fckeditor.js", null) {

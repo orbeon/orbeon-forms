@@ -1315,6 +1315,9 @@ ORBEON.xforms.Events = {
         }
     },
 
+    /**
+     * Called when end-users click on the show/hide details link in the error panel.
+     */
     errorShowHideDetails: function() {
         var errorBodyDiv = this.parentNode.parentNode.parentNode;
         var detailsHidden = ORBEON.util.Dom.getChildElementByClass(errorBodyDiv, "xforms-error-panel-details-hidden");
@@ -1326,6 +1329,23 @@ ORBEON.xforms.Events = {
             ORBEON.util.Dom.removeClass(detailsHidden, "xforms-disabled");
             ORBEON.util.Dom.addClass(detailsShown, "xforms-disabled");
         }
+    },
+
+    /**
+     * When the error dialog is closed, we make sure that the "details" section is closed,
+     * so it will be closed the next time the dialog is opened.
+     */
+    errorPanelClosed: function(type, args, me) {
+        var errorPanel = ORBEON.xforms.Globals.formErrorPanel[me];
+        var errorBodyDiv = errorPanel.errorDetailsDiv.parentNode.parentNode;
+        var detailsHidden = ORBEON.util.Dom.getChildElementByClass(errorBodyDiv, "xforms-error-panel-details-hidden");
+        var detailsShown = ORBEON.util.Dom.getChildElementByClass(errorBodyDiv, "xforms-error-panel-details-shown");
+        ORBEON.util.Dom.removeClass(detailsHidden, "xforms-disabled");
+        ORBEON.util.Dom.addClass(detailsShown, "xforms-disabled");
+    },
+
+    errorCloseClicked: function(event, errorPanel) {
+        errorPanel.hide();
     }
 };
 
@@ -1493,6 +1513,7 @@ ORBEON.xforms.Init = {
                             constraintoviewport: true
                         });
                         errorPanel.render();
+                        errorPanel.beforeHideEvent.subscribe(ORBEON.xforms.Events.errorPanelClosed, formIndex);
                         ORBEON.xforms.Globals.formErrorPanel[formIndex] = errorPanel;
 
                         // Find reference to elements in the deails hidden section
@@ -1510,6 +1531,13 @@ ORBEON.xforms.Init = {
                         // Register listener that will show/hide the detail section
                         YAHOO.util.Event.addListener(showDetailsA.id, "click", ORBEON.xforms.Events.errorShowHideDetails);
                         YAHOO.util.Event.addListener(hideDetailsA.id, "click", ORBEON.xforms.Events.errorShowHideDetails);
+
+                        //
+                        var closeA = YAHOO.util.Dom.getElementsByClassName("xforms-error-panel-close", null, formChild);
+                        if (closeA.length != 0) {
+                            YAHOO.util.Dom.generateId(closeA[0]);
+                            YAHOO.util.Event.addListener(closeA[0].id, "click", ORBEON.xforms.Events.errorCloseClicked, errorPanel);
+                        }
 
                         xformsLoadingCount++;
                         continue;

@@ -237,8 +237,7 @@
               <exclude name="org/orbeon/oxf/servlet/OPSXFormsFilter*.class"/>
           </fileset>
           <fileset dir="${resources-packaged.dir}">
-              <include name="oxf/**/*.*"/>
-              <include name="config/*.xml"/>
+              <include name="config/*-processors.xml"/>
               <include name="*.xml"/>
           </fileset>
           <zipfileset dir="descriptors/jar" prefix="META-INF" >
@@ -292,6 +291,10 @@
                 <exclude name="ops/fckeditor/**/*.php"/>
                 <exclude name="ops/fckeditor/**/*.pl"/>
                 <exclude name="ops/fckeditor/**/*.lasso"/>
+                <include name="oxf/**/*.*"/>
+                <include name="config/**/*.*"/>
+                <!-- We keep these in ops.jar -->
+                <exclude name="config/*-processors.xml"/>
             </fileset>
         </jar>
 
@@ -311,7 +314,6 @@
             </fileset>
             <zipfileset dir="${build.temp.dir}/theme" prefix="config/theme">
                 <include name="*.css"/>
-                <!--<exclude name="orbeon.css"/>-->
             </zipfileset>
         </jar>
 

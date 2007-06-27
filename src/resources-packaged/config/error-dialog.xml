@@ -11,34 +11,34 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:div xmlns:xhtml="http://www.w3.org/1999/xhtml"
-           class="xforms-error-panel xforms-initially-hidden">
-    <xhtml:div class="hd">An error has occurred</xhtml:div>
-    <xhtml:div class="bd">
-        <xhtml:p>
+<div xmlns="http://www.w3.org/1999/xhtml"
+     class="xforms-error-panel xforms-initially-hidden">
+    <div class="hd">An error has occurred</div>
+    <div class="bd">
+        <p>
             An error has occurred in Orbeon Forms. You may want to try the following:
-        </xhtml:p>
-        <xhtml:ul>
-            <xhtml:li>Close this dialog and continue to use this page.</xhtml:li>
-            <xhtml:li>If this does not work, press the <code>ctrl</code> key (or <code>command</code> key on a Mac) and click on the Reload button in the toolbar.</xhtml:li>
-            <xhtml:li>Return <xhtml:a href="/">home</xhtml:a>.</xhtml:li>
-        </xhtml:ul>
-        <xhtml:div class="xforms-error-panel-details-hidden">
-            <xhtml:p>
-                <xhtml:a class="xforms-error-panel-show-details">
-                    <xhtml:img src="/ops/images/xforms/section-closed.png"/>
-                    <xhtml:span>Show details</xhtml:span>
-                </xhtml:a>
-            </xhtml:p>
-        </xhtml:div>
-        <xhtml:div class="xforms-error-panel-details-shown xforms-disabled">
-            <xhtml:p>
-                <xhtml:a class="xforms-error-panel-hide-details">
-                    <xhtml:img src="/ops/images/xforms/section-opened.png"/>
-                    <xhtml:span>Hide details</xhtml:span>
-                </xhtml:a>
-            </xhtml:p>
-            <xhtml:div class="xforms-error-details"/>
-        </xhtml:div>
-    </xhtml:div>
-</xhtml:div>
+        </p>
+        <ul>
+            <li>Close this dialog and continue to use this page.</li>
+            <li>If this does not work, press the <code>ctrl</code> key (or <code>command</code> key on a Mac) and click on the Reload button in the toolbar.</li>
+            <li>Return <a href="/">home</a>.</li>
+        </ul>
+        <div class="xforms-error-panel-details-hidden">
+            <p>
+                <a class="xforms-error-panel-show-details">
+                    <img src="/ops/images/xforms/section-closed.png" alt="Show Details"/>
+                    <span>Show details</span>
+                </a>
+            </p>
+        </div>
+        <div class="xforms-error-panel-details-shown xforms-disabled">
+            <p>
+                <a class="xforms-error-panel-hide-details">
+                    <img src="/ops/images/xforms/section-opened.png" alt="Hide Details"/>
+                    <span>Hide details</span>
+                </a>
+            </p>
+            <div class="xforms-error-details"/>
+        </div>
+    </div>
+</div>

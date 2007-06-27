@@ -59,24 +59,37 @@ public class XFormsServerSharedInstancesCache {
         final Cache cache = ObjectCache.instance(XFORMS_SHARED_INSTANCES_CACHE_NAME, XFORMS_SHARED_INSTANCES_CACHE_DEFAULT_SIZE);
         final InternalCacheKey cacheKey = new InternalCacheKey(SHARED_INSTANCE_KEY_TYPE, instanceSourceURI);
 
-        cache.add(pipelineContext, cacheKey, CONSTANT_VALIDITY, sharedXFormsInstance);
+        cache.add(pipelineContext, cacheKey, CONSTANT_VALIDITY, new CacheEntry(sharedXFormsInstance, System.currentTimeMillis()));
     }
 
-    public synchronized SharedXFormsInstance find(PipelineContext pipelineContext, String instanceId, String modelId, String sourceURI, String validation) {
+    public synchronized SharedXFormsInstance find(PipelineContext pipelineContext, String instanceId, String modelId, String sourceURI, long timeToLive, String validation) {
         final Cache cache = ObjectCache.instance(XFORMS_SHARED_INSTANCES_CACHE_NAME, XFORMS_SHARED_INSTANCES_CACHE_DEFAULT_SIZE);
         final InternalCacheKey cacheKey = new InternalCacheKey(SHARED_INSTANCE_KEY_TYPE, sourceURI);
-        final SharedXFormsInstance sharedInstance = (SharedXFormsInstance) cache.findValid(pipelineContext, cacheKey, CONSTANT_VALIDITY);
+        final CacheEntry cacheEntry = (CacheEntry) cache.findValid(pipelineContext, cacheKey, CONSTANT_VALIDITY);
 
-        if (sharedInstance != null) {
+        // Whether there is an entry but it has expired
+        boolean isExpired = cacheEntry != null && cacheEntry.sharedInstance.getTimeToLive() >= 0
+                && ((cacheEntry.timestamp + cacheEntry.sharedInstance.getTimeToLive()) < System.currentTimeMillis());
+
+        // Remove expired entry if any
+        if (isExpired) {
+            if (XFormsServer.logger.isDebugEnabled())
+                XFormsServer.logger.debug("XForms - expiring application shared instance: " + sourceURI);
+            cache.remove(pipelineContext, cacheKey);
+        }
+
+        if (cacheEntry != null && !isExpired) {
             // Instance was found
             if (XFormsServer.logger.isDebugEnabled())
                 XFormsServer.logger.debug("XForms - application shared instance with id '" + instanceId + "' found in cache for URI: " + sourceURI);
 
+            final SharedXFormsInstance sharedInstance = cacheEntry.sharedInstance;
+
             // Return a copy because id, etc. can be different
             return new SharedXFormsInstance(modelId, instanceId, sharedInstance.getDocumentInfo(),
-                        sourceURI, null, null, sharedInstance.isApplicationShared(), sharedInstance.getValidation());
+                        sourceURI, null, null, sharedInstance.isApplicationShared(), sharedInstance.getTimeToLive(), sharedInstance.getValidation());
         } else {
-            // Instance was not found, load from URI and add to cache
+            // Instance was not found or has expired, load from URI and add to cache
 
             final URL sourceURL;
             try {
@@ -101,7 +114,7 @@ public class XFormsServerSharedInstancesCache {
             try {
                 // Read result as XML and create new shared instance
                 final DocumentInfo documentInfo = TransformerUtils.readTinyTree(connectionResult.getResultInputStream(), connectionResult.resourceURI);
-                final SharedXFormsInstance newInstance = new SharedXFormsInstance(modelId, instanceId, documentInfo, sourceURI, null, null, true, validation);
+                final SharedXFormsInstance newInstance = new SharedXFormsInstance(modelId, instanceId, documentInfo, sourceURI, null, null, true, timeToLive, validation);
 
                 // Add result to cache
                 add(pipelineContext, sourceURI, newInstance);
@@ -125,5 +138,15 @@ public class XFormsServerSharedInstancesCache {
         final InternalCacheKey cacheKey = new InternalCacheKey(SHARED_INSTANCE_KEY_TYPE, instanceSourceURI);
 
         cache.remove(pipelineContext, cacheKey);
+    }
+
+    private static class CacheEntry {
+        public SharedXFormsInstance sharedInstance;
+        public long timestamp;
+
+        public CacheEntry(SharedXFormsInstance sharedInstance, long timestamp) {
+            this.sharedInstance = sharedInstance;
+            this.timestamp = timestamp;
+        }
     }
 }

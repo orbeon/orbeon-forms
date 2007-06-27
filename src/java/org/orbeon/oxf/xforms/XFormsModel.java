@@ -254,7 +254,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
      * Set an instance document for this model. There may be multiple instance documents. Each instance document may
      * have an associated id that identifies it.
      */
-    public XFormsInstance setInstanceDocument(Object instanceDocument, String modelId, String instanceId, String instanceSourceURI, String username, String password, boolean shared, String validation) {
+    public XFormsInstance setInstanceDocument(Object instanceDocument, String modelId, String instanceId, String instanceSourceURI, String username, String password, boolean shared, long timeToLive, String validation) {
         // Initialize containers if needed
         if (instances == null) {
             instances = Arrays.asList(new XFormsInstance[instanceIds.size()]);
@@ -265,9 +265,9 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         final XFormsInstance newInstance;
         {
             if (instanceDocument instanceof Document)
-                newInstance = new XFormsInstance(modelId, instanceId, (Document) instanceDocument, instanceSourceURI, username, password, shared, validation);
+                newInstance = new XFormsInstance(modelId, instanceId, (Document) instanceDocument, instanceSourceURI, username, password, shared, timeToLive, validation);
             else if (instanceDocument instanceof DocumentInfo)
-                newInstance = new SharedXFormsInstance(modelId, instanceId, (DocumentInfo) instanceDocument, instanceSourceURI, username, password, shared, validation);
+                newInstance = new SharedXFormsInstance(modelId, instanceId, (DocumentInfo) instanceDocument, instanceSourceURI, username, password, shared, timeToLive, validation);
             else
                 throw new OXFException("Invalid type for instance document: " + instanceDocument.getClass().getName());
         }
@@ -810,6 +810,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                         // Handle read-only hints
                         final boolean isReadonlyHint = XFormsInstance.isReadonlyHint(instanceContainerElement);
                         final boolean isApplicationSharedHint = XFormsInstance.isApplicationSharedHint(instanceContainerElement);
+                        final long xxformsTimeToLive = XFormsInstance.getTimeToLive(instanceContainerElement);
 
                         // Skip processing in case somebody has already set this particular instance
                         if (instances.get(instancePosition) != null)
@@ -833,7 +834,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                                         XFormsServer.logger.debug("XForms - using instance from application shared instance cache (instance from static state was not initialized): " + staticStateInstance.getEffectiveId());
 
                                     final SharedXFormsInstance sharedInstance
-                                            = XFormsServerSharedInstancesCache.instance().find(pipelineContext, staticStateInstance.getEffectiveId(), staticStateInstance.getModelId(), staticStateInstance.getSourceURI(), staticStateInstance.getValidation());
+                                            = XFormsServerSharedInstancesCache.instance().find(pipelineContext, staticStateInstance.getEffectiveId(), staticStateInstance.getModelId(), staticStateInstance.getSourceURI(), staticStateInstance.getTimeToLive(), staticStateInstance.getValidation());
                                     setInstance(sharedInstance, false);
 
                                 } else {
@@ -968,7 +969,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
                                 // Get instance from shared cache if possible
                                 if (isApplicationSharedHint) {
-                                    final SharedXFormsInstance sharedXFormsInstance = XFormsServerSharedInstancesCache.instance().find(pipelineContext, instanceId, modelId, absoluteResolvedURLString, xxformsValidation);
+                                    final SharedXFormsInstance sharedXFormsInstance = XFormsServerSharedInstancesCache.instance().find(pipelineContext, instanceId, modelId, absoluteResolvedURLString, xxformsTimeToLive, xxformsValidation);
                                     setInstance(sharedXFormsInstance, false);
                                     continue;
                                 }
@@ -1040,7 +1041,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                         }
 
                         // Set instance and associated information if everything went well
-                        setInstanceDocument(instanceDocument, modelId, instanceId, instanceSourceURI, xxformsUsername, xxformsPassword, isApplicationSharedHint, xxformsValidation);
+                        setInstanceDocument(instanceDocument, modelId, instanceId, instanceSourceURI, xxformsUsername, xxformsPassword, isApplicationSharedHint, xxformsTimeToLive, xxformsValidation);
                     }
                 }
             }

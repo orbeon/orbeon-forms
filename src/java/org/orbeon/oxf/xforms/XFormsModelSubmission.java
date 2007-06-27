@@ -312,6 +312,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                 currentInstance.getModelId(), currentInstance.getEffectiveId(), currentInstance.getSourceURI(),
                                 currentInstance.getUsername(), currentInstance.getPassword(),
                                 currentInstance.isApplicationShared(),
+                                currentInstance.getTimeToLive(),
                                 currentInstance.getValidation());
 
                         // Revalidate instance
@@ -367,6 +368,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 XFormsInstance.checkSharedHints(submissionElement, resolvedXXFormsReadonly, resolvedXXFormsShared);
                 final boolean isReadonlyHint = "true".equals(resolvedXXFormsReadonly);
                 final boolean isApplicationSharedHint = "application".equals(resolvedXXFormsShared);
+                final long timeToLive = XFormsInstance.getTimeToLive(submissionElement);
                 if (isApplicationSharedHint) {
                     if (!XFormsSubmissionUtils.isGet(method))
                         throw new XFormsSubmissionException("xforms:submission: xxforms:shared=\"application\" can be set only with method=\"get\".",
@@ -437,6 +439,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                 currentInstance.getModelId(), currentInstance.getEffectiveId(), currentInstance.getSourceURI(),
                                 currentInstance.getUsername(), currentInstance.getPassword(),
                                 currentInstance.isApplicationShared(),
+                                currentInstance.getTimeToLive(),
                                 currentInstance.getValidation());
 
                         // Revalidate instance
@@ -641,7 +644,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                             final String absoluteResolvedURLString = absoluteResolvedURL.toExternalForm();
 
                             final SharedXFormsInstance sharedInstance
-                                    = XFormsServerSharedInstancesCache.instance().find(pipelineContext, replaceInstance.getEffectiveId(), replaceInstance.getModelId(), absoluteResolvedURLString, replaceInstance.getValidation());
+                                    = XFormsServerSharedInstancesCache.instance().find(pipelineContext, replaceInstance.getEffectiveId(), replaceInstance.getModelId(), absoluteResolvedURLString, timeToLive, replaceInstance.getValidation());
 
                             // Handle new instance and associated events
                             final XFormsModel replaceModel = sharedInstance.getModel(containingDocument);
@@ -740,16 +743,17 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                                                     final Document resultingInstanceDocument = Dom4jUtils.readDom4j(connectionResult.getResultInputStream(), connectionResult.resourceURI);
                                                     newInstance = new XFormsInstance(replaceInstance.getModelId(), replaceInstance.getEffectiveId(), resultingInstanceDocument,
-                                                            connectionResult.resourceURI, resolvedXXFormsUsername, resolvedXXFormsPassword, false, replaceInstance.getValidation());
+                                                            connectionResult.resourceURI, resolvedXXFormsUsername, resolvedXXFormsPassword, false, -1, replaceInstance.getValidation());
                                                 } else {
                                                     // Resulting instance is read-only
 
                                                     if (XFormsServer.logger.isDebugEnabled())
                                                         XFormsServer.logger.debug("XForms - submission - replacing instance with read-only instance: " + replaceInstance.getEffectiveId());
 
+                                                    // NOTE: isApplicationSharedHint is always false when get get here. isApplicationSharedHint="true" is handled above.
                                                     final DocumentInfo resultingInstanceDocument = TransformerUtils.readTinyTree(connectionResult.getResultInputStream(), connectionResult.resourceURI);
                                                     newInstance = new SharedXFormsInstance(replaceInstance.getModelId(), replaceInstance.getEffectiveId(), resultingInstanceDocument,
-                                                            connectionResult.resourceURI, resolvedXXFormsUsername, resolvedXXFormsPassword, false, replaceInstance.getValidation());
+                                                            connectionResult.resourceURI, resolvedXXFormsUsername, resolvedXXFormsPassword, false, -1, replaceInstance.getValidation());
                                                 }
 
                                                 // Set new instance

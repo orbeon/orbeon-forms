@@ -1102,6 +1102,18 @@
                             <xforms:dispatch name="xxforms-instance-invalidate" target="data-to-save-instance"/>
                         </xforms:action>
                     </xml-source>
+                    <p>
+                        When using <code>xxforms:readonly="true"</code>, another attribute, <code>xxforms:ttl</code>,
+                        can be used to set a <i>time to live</i> for the instance in cache. This duration is expressed
+                        in milliseconds and has to be greater than zero. When a shared instance if found in cache but
+                        has an associated time to live, if it was put in the cache more than time to live milliseconds
+                        in the past, then the instance is discarded from the cache and retrieved again by URI as if it
+                        had not been found in cache at all. The following example expires the shared instance after one
+                        hour:
+                    </p>
+                    <xml-source>
+                        <xforms:instance id="resources-instance" src="/forms/resources/en" xxforms:readonly="true" xxforms:shared="application" xxforms:ttl="3600000"/>
+                    </xml-source>
                     <warning>
                         When using <code>xxforms:shared="application"</code>, be sure that the data contained in the
                         instance does not contain information that could be inadvertently shared with other XForms

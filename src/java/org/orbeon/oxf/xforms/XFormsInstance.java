@@ -54,6 +54,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventHandlerCont
 
     private boolean readonly;
     private boolean applicationShared;
+    private long timeToLive;
     private String username;
     private String password;
     private String validation;
@@ -82,6 +83,9 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventHandlerCont
 
         this.readonly = "true".equals(containerElement.attributeValue("readonly"));
         this.applicationShared = "application".equals(containerElement.attributeValue("shared"));
+        final String timeToLiveAttribute = containerElement.attributeValue("ttl");
+        this.timeToLive = (timeToLiveAttribute != null) ? Long.parseLong(timeToLiveAttribute) : -1;
+
         this.username = containerElement.attributeValue("username");
         this.password = containerElement.attributeValue("password");
         this.validation = containerElement.attributeValue("validation");
@@ -118,17 +122,18 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventHandlerCont
         setInstanceDocumentInfo(documentInfo, true);
     }
 
-    public XFormsInstance(String modelId, String instanceId, Document instanceDocument, String instanceSourceURI, String username, String password, boolean applicationShared, String validation) {
+    public XFormsInstance(String modelId, String instanceId, Document instanceDocument, String instanceSourceURI, String username, String password, boolean applicationShared, long timeToLive, String validation) {
         // We normalize the Document before setting it, so that text nodes follow the XPath constraints
-        this(modelId, instanceId, new DocumentWrapper((Document) Dom4jUtils.normalizeTextNodes(instanceDocument), null, new Configuration()), instanceSourceURI, username, password, applicationShared, validation);
+        this(modelId, instanceId, new DocumentWrapper((Document) Dom4jUtils.normalizeTextNodes(instanceDocument), null, new Configuration()), instanceSourceURI, username, password, applicationShared, timeToLive, validation);
     }
 
-    protected XFormsInstance(String modelId, String instanceId, DocumentInfo instanceDocumentInfo, String instanceSourceURI, String username, String password, boolean applicationShared, String validation) {
+    protected XFormsInstance(String modelId, String instanceId, DocumentInfo instanceDocumentInfo, String instanceSourceURI, String username, String password, boolean applicationShared, long timeToLive, String validation) {
         this.instanceId = instanceId;
         this.modelId = modelId;
 
         this.readonly = !(instanceDocumentInfo instanceof DocumentWrapper);
         this.applicationShared = applicationShared;
+        this.timeToLive = timeToLive;
 
         this.sourceURI = instanceSourceURI;
 
@@ -154,6 +159,8 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventHandlerCont
             instanceElement.addAttribute("readonly", "true");
         if (applicationShared)
             instanceElement.addAttribute("shared", "application");
+        if (timeToLive >= 0)
+            instanceElement.addAttribute("ttl", Long.toString(timeToLive));
 
         instanceElement.addAttribute("id", instanceId);
         instanceElement.addAttribute("model-id", modelId);
@@ -214,6 +221,11 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventHandlerCont
 
     public boolean isApplicationShared() {
         return applicationShared;
+    }
+
+
+    public long getTimeToLive() {
+        return timeToLive;
     }
 
     public NodeInfo getInstanceRootElementInfo() {
@@ -511,7 +523,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventHandlerCont
      * @return  mutable XFormsInstance
      */
     public SharedXFormsInstance createSharedInstance() {
-        return new SharedXFormsInstance(modelId, instanceId, documentInfo, sourceURI, username, password, false, validation);
+        return new SharedXFormsInstance(modelId, instanceId, documentInfo, sourceURI, username, password, false, timeToLive, validation);
     }
 
     public static String getInstanceId(Element xformsInstanceElement) {
@@ -552,6 +564,10 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventHandlerCont
         }
     }
 
+    public static long getTimeToLive(Element element) {
+        final String timeToLiveValue = element.attributeValue(XFormsConstants.XXFORMS_TIME_TO_LIVE_QNAME);
+        return (timeToLiveValue != null) ? Long.parseLong(timeToLiveValue) : -1;
+    }
 
     public List getEventHandlers(XFormsContainingDocument containingDocument) {
         return getModel(containingDocument).getEventHandlersForInstance(instanceId);

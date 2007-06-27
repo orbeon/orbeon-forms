@@ -1144,7 +1144,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                             throw new ValidationException("Non-initialized instance has to be application shared for id: " + newInstance.getEffectiveId(), getLocationData());
 
                         final SharedXFormsInstance sharedInstance
-                                = XFormsServerSharedInstancesCache.instance().find(pipelineContext, newInstance.getEffectiveId(), newInstance.getModelId(), newInstance.getSourceURI(), newInstance.getValidation());
+                                = XFormsServerSharedInstancesCache.instance().find(pipelineContext, newInstance.getEffectiveId(), newInstance.getModelId(), newInstance.getSourceURI(), newInstance.getTimeToLive(), newInstance.getValidation());
                         getModel(sharedInstance.getModelId()).setInstance(sharedInstance, false);
 
                     } else {
@@ -1171,7 +1171,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                                 throw new ValidationException("Non-initialized instance has to be application shared for id: " + currentInstance.getEffectiveId(), getLocationData());
 
                             final SharedXFormsInstance sharedInstance
-                                    = XFormsServerSharedInstancesCache.instance().find(pipelineContext, currentInstance.getEffectiveId(), currentInstance.getModelId(), currentInstance.getSourceURI(), currentInstance.getValidation());
+                                    = XFormsServerSharedInstancesCache.instance().find(pipelineContext, currentInstance.getEffectiveId(), currentInstance.getModelId(), currentInstance.getSourceURI(), currentInstance.getTimeToLive(), currentInstance.getValidation());
                             getModel(sharedInstance.getModelId()).setInstance(sharedInstance, false);
 
                         } else {

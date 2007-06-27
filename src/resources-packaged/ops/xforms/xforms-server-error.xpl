@@ -30,16 +30,18 @@
                 <xsl:import href="oxf:/config/error.xsl"/>
                 <xsl:template match="/">
                     <error>
-                        <title>
-                            <xsl:call-template name="format-message">
-                                <xsl:with-param name="exceptions" select="/exceptions/exception"/>
-                            </xsl:call-template>
-                        </title>
-                        <body>
-                            <xsl:call-template name="format-orbeon-call-stack">
-                                <xsl:with-param name="exceptions" select="/exceptions/exception"/>
-                            </xsl:call-template>
-                        </body>
+                        <div class="orbeon-error-panel-body">
+                            <p class="orbeon-error-panel-message">
+                                <xsl:call-template name="format-message">
+                                    <xsl:with-param name="exceptions" select="/exceptions/exception"/>
+                                </xsl:call-template>
+                            </p>
+                            <div class="orbeon-error-panel-call-stack">
+                                <xsl:call-template name="format-orbeon-call-stack">
+                                    <xsl:with-param name="exceptions" select="/exceptions/exception"/>
+                                </xsl:call-template>
+                            </div>
+                        </div>
                     </error>
                 </xsl:template>
             </xsl:stylesheet>
@@ -55,7 +57,7 @@
                 <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
                 <xsl:import href="oxf:/ops/utils/formatting/formatting.xsl"/>
                 <xsl:output method="html" name="html"/>
-                <xsl:template match="/error/body">
+                <xsl:template match="/error">
                     <xsl:copy>
                         <xsl:variable name="xhtml-body" as="element()" select="*[1]"/>
                         <xsl:variable name="html-body" as="element()">

@@ -38,7 +38,7 @@
                     <span>Hide details</span>
                 </a>
             </p>
-            <div class="xforms-error-details"/>
+            <div class="xforms-error-panel-details"/>
         </div>
     </div>
 </div>

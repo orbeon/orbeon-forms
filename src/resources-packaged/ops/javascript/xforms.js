@@ -1505,7 +1505,7 @@ ORBEON.xforms.Init = {
                         var detailsShownDiv = ORBEON.util.Dom.getChildElementByClass(bodyDiv, "xforms-error-panel-details-shown");
                         var hideDetailsA = ORBEON.util.Dom.getChildElementByIndex(ORBEON.util.Dom.getChildElementByIndex(detailsShownDiv, 0), 0);
                         YAHOO.util.Dom.generateId(hideDetailsA);
-                        errorPanel.errorDetailsDiv = ORBEON.util.Dom.getChildElementByClass(detailsShownDiv, "xforms-error-details");
+                        errorPanel.errorDetailsDiv = ORBEON.util.Dom.getChildElementByClass(detailsShownDiv, "xforms-error-panel-details");
 
                         // Register listener that will show/hide the detail section
                         YAHOO.util.Event.addListener(showDetailsA.id, "click", ORBEON.xforms.Events.errorShowHideDetails);
@@ -3082,7 +3082,7 @@ ORBEON.xforms.Server = {
             } else if (responseXML && responseXML.documentElement
                     && responseXML.documentElement.tagName.indexOf("error") != -1) {
                 // Find an error message starting from the inner-most exception
-                var details = ORBEON.util.Dom.getStringValue(responseXML.getElementsByTagName("body")[0]);
+                var details = ORBEON.util.Dom.getStringValue(responseXML.documentElement);
                 ORBEON.xforms.Server.showError(details, formIndex);
             } else {
                 // The server didn't send valid XML

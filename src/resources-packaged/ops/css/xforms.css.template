@@ -94,7 +94,6 @@
 
 .xforms-error-panel .bd { overflow: auto; }
 .xforms-error-panel .hd { background-color: #FF6600; }
-.xforms-error-details table { margin-left: 1em; margin-right: 1em; margin-bottom: .5em; font-size: 90% }
 .xforms-error-panel-details-hidden, .xforms-error-panel-details-shown { vertical-align: middle; }
 .xforms-error-panel-show-details, .xforms-error-panel-hide-details { cursor: pointer; }
 

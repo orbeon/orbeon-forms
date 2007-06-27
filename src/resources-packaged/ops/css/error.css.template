@@ -11,6 +11,9 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 */
+.orbeon-error-panel-body { margin-left: 1em; margin-right: 1em; margin-bottom: .5em }
+.orbeon-error-panel-message { color: #FF6600; border: solid 2px #FF6600; padding: .5em }
+.orbeon-error-panel-call-stack { font-size: 90% }
 .orbeon-error-panel-url-cell { }
 .orbeon-error-panel-line-cell { text-align: right }
 .orbeon-error-panel-column-cell { text-align: right }

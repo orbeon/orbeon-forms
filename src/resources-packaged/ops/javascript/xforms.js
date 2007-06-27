@@ -1479,7 +1479,7 @@ ORBEON.xforms.Init = {
                         xformsLoadingCount++;
                         continue;
                     }
-                    if (ORBEON.util.Dom.hasClass(formChild, "xforms-error-panel")) {
+                    if (ORBEON.util.Dom.isElement(formChild) && ORBEON.util.Dom.hasClass(formChild, "xforms-error-panel")) {
 
                         // Create and store error panel
                         YAHOO.util.Dom.generateId(formChild);
@@ -1888,8 +1888,10 @@ ORBEON.xforms.Server = {
      * Display the error panel and shows the specified detailed message in the detail section of the panel.
      */
     showError: function(details, formIndex) {
-        ORBEON.xforms.Globals.formErrorPanel[formIndex].errorDetailsDiv.innerHTML = details;
-        ORBEON.xforms.Globals.formErrorPanel[formIndex].show();
+        if (ORBEON.xforms.Globals.formErrorPanel[formIndex]) {
+            ORBEON.xforms.Globals.formErrorPanel[formIndex].errorDetailsDiv.innerHTML = details;
+            ORBEON.xforms.Globals.formErrorPanel[formIndex].show();
+        }
     },
 
     fireEvents: function(events, incremental) {

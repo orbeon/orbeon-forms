@@ -21,16 +21,22 @@
         <xhtml:ul>
             <xhtml:li>Close this dialog and continue to use this page.</xhtml:li>
             <xhtml:li>If this does not work, press ctrl key (or command key on Mac) and click on the Reload button in the toolbar.</xhtml:li>
-            <xhtml:li>Return <xhtml:a href="/">home</xhtml:a></xhtml:li>
+            <xhtml:li>Return <xhtml:a href="/">home</xhtml:a>.</xhtml:li>
         </xhtml:ul>
         <xhtml:div class="xforms-error-panel-details-hidden">
             <xhtml:p>
-                <xhtml:a class="xforms-error-panel-show-details" href="#">Show details</xhtml:a>
+                <xhtml:a class="xforms-error-panel-show-details">
+                    <xhtml:img src="/ops/images/xforms/section-closed.png"/>
+                    <xhtml:span>Show details</xhtml:span>
+                </xhtml:a>
             </xhtml:p>
         </xhtml:div>
         <xhtml:div class="xforms-error-panel-details-shown xforms-disabled">
             <xhtml:p>
-                <xhtml:a class="xforms-error-panel-hide-details" href="#">Hide details</xhtml:a>
+                <xhtml:a class="xforms-error-panel-hide-details">
+                    <xhtml:img src="/ops/images/xforms/section-opened.png"/>
+                    <xhtml:span>Hide details</xhtml:span>
+                </xhtml:a>
             </xhtml:p>
             <xhtml:div class="xforms-error-details"/>
         </xhtml:div>

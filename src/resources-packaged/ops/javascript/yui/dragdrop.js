@@ -43,7 +43,7 @@ var Dom=YAHOO.util.Dom;
  * also override the methods you want on an instance of the class...
  * <pre>
  *  dd.onDragDrop = function(e, id) {
- *  &nbsp;&nbsp;alert("dd was dropped on " + id);
+ *  &#160;&#160;alert("dd was dropped on " + id);
  *  }
  * </pre>
  * @namespace YAHOO.util

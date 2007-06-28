@@ -1346,11 +1346,11 @@ if (!YAHOO.util.Event) {
              * @param sType {string} optional type of listener to return. If
              * left out, all listeners will be returned
              * @return {Object} the listener. Contains the following fields:
-             * &nbsp;&nbsp;type:   (string)   the type of event
-             * &nbsp;&nbsp;fn:     (function) the callback supplied to addListener
-             * &nbsp;&nbsp;obj:    (object)   the custom object supplied to addListener
-             * &nbsp;&nbsp;adjust: (boolean)  whether or not to adjust the default scope
-             * &nbsp;&nbsp;index:  (int)      its position in the Event util listener cache
+             * &#160;&#160;type:   (string)   the type of event
+             * &#160;&#160;fn:     (function) the callback supplied to addListener
+             * &#160;&#160;obj:    (object)   the custom object supplied to addListener
+             * &#160;&#160;adjust: (boolean)  whether or not to adjust the default scope
+             * &#160;&#160;index:  (int)      its position in the Event util listener cache
              * @static
              */           
             getListeners: function(el, sType) {

@@ -2985,7 +2985,7 @@ YAHOO.widget.Panel.prototype.init = function(el, userConfig) {
 		var draggable = this.cfg.getProperty("draggable");
 		if (draggable) {
 			if (! this.header) {
-				this.setHeader("&nbsp;");
+				this.setHeader("&#160;");
 			}
 		}
 	}, this, true);
@@ -3132,7 +3132,7 @@ YAHOO.widget.Panel.prototype.configClose = function(type, args, obj) {
 				YAHOO.util.Dom.addClass(this.close, "nonsecure");
 			}
 
-			this.close.innerHTML = "&nbsp;";
+			this.close.innerHTML = "&#160;";
 			this.innerElement.appendChild(this.close);
 			YAHOO.util.Event.addListener(this.close, "click", doHide, this);
 		} else {
@@ -3187,7 +3187,7 @@ YAHOO.widget.Panel.prototype.configUnderlay = function(type, args, obj) {
 			if (! this.underlay) { // create if not already in DOM
 				this.underlay = document.createElement("DIV");
 				this.underlay.className = "underlay";
-				this.underlay.innerHTML = "&nbsp;";
+				this.underlay.innerHTML = "&#160;";
 				this.element.appendChild(this.underlay);
 			}
 
@@ -3480,7 +3480,7 @@ YAHOO.widget.Panel.prototype.buildMask = function() {
 		this.mask = document.createElement("DIV");
 		this.mask.id = this.id + "_mask";
 		this.mask.className = "mask";
-		this.mask.innerHTML = "&nbsp;";
+		this.mask.innerHTML = "&#160;";
 
 		var maskClick = function(e, obj) {
 			YAHOO.util.Event.stopEvent(e);

@@ -159,6 +159,14 @@
     padding-right: 1px;
 }
 
+span.xforms-select-appearance-full.xforms-required-empty, span.xforms-select1-appearance-full.xforms-required-empty {
+    background-color: #fcc
+}
+
+span.xforms-select-appearance-full.xforms-required-empty input, span.xforms-select1-appearance-full.xforms-required-empty input {
+    border: none
+}
+
 .xforms-select1-appearance-full input { vertical-align: middle }
 .xforms-select1-appearance-full label { vertical-align: middle; margin-right: .5em }
 

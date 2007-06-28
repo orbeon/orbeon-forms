@@ -330,6 +330,11 @@ http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=2
                 -->
                 <ul>
                     <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=304746&amp;group_id=168&amp;atid=350207">#304746:
+                            Default date formatting improvements
+                        </a>
+                    </li>
+                    <li>
                         <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306558&amp;group_id=168&amp;atid=350207">#306558:
                             RFE: Improve error location information
                         </a>

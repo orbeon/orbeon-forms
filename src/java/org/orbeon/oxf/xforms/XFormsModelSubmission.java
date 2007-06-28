@@ -321,7 +321,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         // "no notification events are marked for dispatching due to this operation"
 
                         // Check that there are no validation errors
-                        final boolean instanceSatisfiesValidRequired = isDocumentSatisfiesValidRequired(initialDocumentToSubmit);
+                        // NOTE: If the instance is read-only, it can't have MIPs, and can't fail validation/requiredness, so we don't go through the process at all.
+                        final boolean instanceSatisfiesValidRequired = currentInstance.isReadOnly() || isDocumentSatisfiesValidRequired(initialDocumentToSubmit);
                         if (!instanceSatisfiesValidRequired) {
                             if (logger.isDebugEnabled()) {
                                 final LocationDocumentResult documentResult = new LocationDocumentResult();
@@ -449,7 +450,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         // "no notification events are marked for dispatching due to this operation"
 
                         // Check that there are no validation errors
-                        final boolean instanceSatisfiesValidRequired = isDocumentSatisfiesValidRequired(documentToSubmit);
+                        // NOTE: If the instance is read-only, it can't have MIPs, and can't fail validation/requiredness, so we don't go through the process at all.
+                        final boolean instanceSatisfiesValidRequired = currentInstance.isReadOnly() || isDocumentSatisfiesValidRequired(documentToSubmit);
                         if (!instanceSatisfiesValidRequired) {
                             if (logger.isDebugEnabled()) {
                                 final LocationDocumentResult documentResult = new LocationDocumentResult();

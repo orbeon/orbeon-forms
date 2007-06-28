@@ -32,7 +32,8 @@
             </p>
             <p>
                 Orbeon Forms 3.6 features around <a href="#changes-36-full">80 improvements</a> over <a
-                href="home-changes-35">Orbeon Forms 3.5.1</a>.
+                href="home-changes-35">Orbeon Forms 3.5.1</a>, including major improvements in the areas of error
+                handling, XML Schema validation, and deployment within Java applications.
             </p>
             <p>
                 This document describes changes made between Orbeon PresentationServer 3.5.1 and Orbeon Forms 3.6.

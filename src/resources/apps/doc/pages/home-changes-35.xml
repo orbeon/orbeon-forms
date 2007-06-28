@@ -37,18 +37,61 @@
                 own Orbeon Forms applications.
             </p>
             <p>
-                This document describes changes made between Orbeon PresentationServer 3.0.1 and Orbeon Forms 3.5.1.
+                This document describes changes made between Orbeon PresentationServer 3.0.1 and Orbeon Forms 3.5.2.
             </p>
         </section>
+        <!--<a name="changes-353"/>-->
+        <!--<section>-->
+            <!--<title>Changes in Version 3.5.3</title>-->
+            <!--<p>-->
+                <!--Orbeon Forms 3.5.3 <b style="color: red">[UNDER DEVELOPMENT]</b> is an update to Orbeon Forms 3.5.2.-->
+            <!--</p>-->
+        <!--</section>-->
         <a name="changes-352"/>
         <section>
-            <title>Changes in Version 3.5.2 [UNDER DEVELOPMENT]</title>
+            <title>Changes in Version 3.5.2</title>
             <p>
-                Orbeon Forms 3.5.2 <b style="color: red">[UNDER DEVELOPMENT]</b> is an update to Orbeon Forms 3.5.1.
+                Orbeon Forms 3.5.2 is an update to Orbeon Forms 3.5.1.
             </p>
             <section>
                 <title>Noteworthy Changes</title>
                 <ul>
+                    <li>
+                        <p>
+                            <b>Better display of JavaScript and Ajax errors.</b> Orbeon Forms now displays JavaScript
+                            and Ajax errors in a user-friendly error dialog, with an initially collapsed section
+                            containing details of the error useful to the developer.
+                        </p>
+                        <p>
+                            [TODO: SCREENSHOT]
+                        </p>
+                        <p>
+                            See issue <a
+                            href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307198&amp;group_id=168&amp;atid=350207">#307198</a>.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Improved XForms error location information.</b> What's more frustrating during form
+                            development than seeing cryptic errors and not being able to find out what exact line of
+                            code caused the problem? Orbeon Forms now supports much enhanced file name and line number
+                            reporting in XForms. In many cases, error messages now indicate an exact file name and line
+                            number, along with a better call stack.
+                        </p>
+                        <p>
+                            [TODO: SCREENSHOT]
+                        </p>
+                        <p>
+                            Note that this currently requires setting the following property in <code>properties.xml</code>:
+                        </p>
+                        <xml-source>
+                            <property as="xs:boolean" processor-name="oxf:saxon8" name="generate-source-location" value="true"/>
+                        </xml-source>
+                        <p>
+                            See issue <a
+                            href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306558&amp;group_id=168&amp;atid=350207">#306558</a>.
+                        </p>
+                    </li>
                     <li>
                         <p>
                             <b>Support for deployment as separate WAR.</b> Orbeon Forms can now be deployed as a Java
@@ -260,14 +303,12 @@
                     </li>
                 </ul>
             </section>
+            <a name="changes-352-full"/>
             <section>
                 <title>Complete List of Issues Addressed in this Release</title>
                 <p>
                     Orbeon Forms 3.5.2 addresses over 70 bugs and features:
                 </p>
-                <ul>
-                    [TODO: complete]
-                </ul>
                 <!--
 Request to extract bugs from SourceForge with http://www.orbeon.com/ops/xquery-the-web/ :
 
@@ -288,6 +329,26 @@ http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=2
 
                 -->
                 <ul>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306558&amp;group_id=168&amp;atid=350207">#306558:
+                            RFE: Improve error location information
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307224&amp;group_id=168&amp;atid=350207">#307224:
+                            RFE: Application shared instances should have expiration option
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307198&amp;group_id=168&amp;atid=350207">#307198:
+                            Errors occurring during Ajax requests must also indicate location data and stack trace
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306408&amp;group_id=168&amp;atid=350207">#306408:
+                            XSLT errors no longer show in stack traces
+                        </a>
+                    </li>
                     <li>
                         <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=307210&amp;group_id=168&amp;atid=350207">#307210:
                             Move current error.xpl to private resources
@@ -772,6 +833,7 @@ http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=2
                     </li>
                 </ul>
             </section>
+            <a name="changes-351-full"/>
             <section>
                 <title>Complete List of Issues Addressed in this Release</title>
                 <ul>

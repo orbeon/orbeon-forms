@@ -30,18 +30,9 @@
                 <xsl:import href="oxf:/config/error.xsl"/>
                 <xsl:template match="/">
                     <error>
-                        <div class="orbeon-error-panel-body">
-                            <p class="orbeon-error-panel-message">
-                                <xsl:call-template name="format-message">
-                                    <xsl:with-param name="exceptions" select="/exceptions/exception"/>
-                                </xsl:call-template>
-                            </p>
-                            <div class="orbeon-error-panel-call-stack">
-                                <xsl:call-template name="format-orbeon-call-stack">
-                                    <xsl:with-param name="exceptions" select="/exceptions/exception"/>
-                                </xsl:call-template>
-                            </div>
-                        </div>
+                        <xsl:call-template name="format-xforms-error-panel-body">
+                            <xsl:with-param name="exceptions" select="/exceptions/exception"/>
+                        </xsl:call-template>
                     </error>
                 </xsl:template>
             </xsl:stylesheet>

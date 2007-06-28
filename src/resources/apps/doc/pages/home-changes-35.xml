@@ -59,12 +59,13 @@
                     <li>
                         <p>
                             <b>Better display of JavaScript and Ajax errors.</b> Orbeon Forms now displays JavaScript
-                            and Ajax errors in a user-friendly error dialog, with an initially collapsed section
-                            containing details of the error useful to the developer.
+                            and Ajax errors in a user-friendly error dialog:
                         </p>
+                        <img src="../apps/doc/images/home-changes-35-ajax-error-1.png" alt="Ajax error dialog"/>
                         <p>
-                            [TODO: SCREENSHOT]
+                            An initially collapsed section containing details of the error useful to the developer:
                         </p>
+                        <img src="../apps/doc/images/home-changes-35-ajax-error-2.png" alt="Ajax error dialog"/>
                         <p>
                             See issue <a
                             href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307198&amp;group_id=168&amp;atid=350207">#307198</a>.
@@ -76,11 +77,9 @@
                             development than seeing cryptic errors and not being able to find out what exact line of
                             code caused the problem? Orbeon Forms now supports much enhanced file name and line number
                             reporting in XForms. In many cases, error messages now indicate an exact file name and line
-                            number, along with a better call stack.
+                            number, along with a better call stack:
                         </p>
-                        <p>
-                            [TODO: SCREENSHOT]
-                        </p>
+                        <img src="../apps/doc/images/home-changes-35-error-location.png" alt="Error with location information"/>
                         <p>
                             Note that this currently requires setting the following property in <code>properties.xml</code>:
                         </p>

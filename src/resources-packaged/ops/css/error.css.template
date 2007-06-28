@@ -21,7 +21,7 @@
 .orbeon-error-panel-xml-cell { }
 .orbeon-error-panel-param-block { font-size: smaller; margin-left: 1em; white-space: nowrap; padding: 0}
 
-.orbeon-error-table { border-collapse: collapse }
+.orbeon-error-table { border-collapse: collapse; width: 100% }
 
 .orbeon-error-table th {
     background-color: &xlight-color;;
@@ -39,6 +39,18 @@
 }
 
 .orbeon-error-java-table { width: 100% }
+
+/* Classes for standalone error page */
+.orbeon-error-panel { margin: .71em; padding: 0 }
+.orbeon-error-panel { font-family: Arial, Helvetica, Geneva, sans-serif; font-size: 9pt; }
+.orbeon-error-panel table { font-family: Arial, Helvetica, Geneva, sans-serif; font-size: 9pt; }
+.orbeon-error-panel h1 { background-color: #FF6600; color: white; font-size:14pt; padding: 2px }
+.orbeon-error-panel h2 { background-color: #FF6600; color: white; font-size:9pt; padding: 2px }
+.orbeon-error-panel a { color: &medium-color;; text-decoration: none }
+.orbeon-error-panel a:hover { text-decoration: underline }
+.orbeon-error-panel img { border: 0 }
+.orbeon-error-disabled { display: none }
+.orbeon-error-panel .ops-version { text-align: center; font-size: smaller }
 
 /* XML formatter definitions */
 .xml-cd { margin-left: 0; margin-top: 0; margin-bottom: 0; display: block; }

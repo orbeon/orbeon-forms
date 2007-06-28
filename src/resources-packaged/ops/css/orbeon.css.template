@@ -11,10 +11,7 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 */
-body {
-    margin: .71em .71em .71em .71em;
-    padding: 0;
-}
+body { margin: .71em; padding: 0 }
 
 body, input, button, table {
     font-family: Arial, Helvetica, Geneva, sans-serif;

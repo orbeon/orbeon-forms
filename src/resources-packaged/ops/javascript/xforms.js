@@ -1505,12 +1505,13 @@ ORBEON.xforms.Init = {
                         YAHOO.util.Dom.generateId(formChild);
                         ORBEON.util.Dom.removeClass(formChild, "xforms-initially-hidden");
                         var errorPanel = new YAHOO.widget.Panel(formChild.id, {
-                            width: "500px",
+                            width: "700px",
                             modal: true,
                             fixedcenter: true,
                             underlay: "shadow",
                             visible: false,
-                            constraintoviewport: true
+                            constraintoviewport: true,
+                            draggable: true
                         });
                         errorPanel.render();
                         errorPanel.beforeHideEvent.subscribe(ORBEON.xforms.Events.errorPanelClosed, formIndex);

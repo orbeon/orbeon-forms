@@ -1556,6 +1556,135 @@
                 </p>
             </section>
         </section>
+        <a name="support"/>
+        <section>
+            <title>Support FAQ</title>
+            <a name="getting-support"/>
+            <section>
+                <title>How can I get support for Orbeon Forms?</title>
+                <ul>
+                    <li>
+                        You can get support from the Orbeon Forms community on the ops-users mailing list. The
+                        ops-users mailing list is the hub of the Orbeon Forms community, and this is the best place to
+                        ask questions, share you experience, or post issues and requests for enhancements. Also see:
+
+                        <ul>
+                            <li><a href="#mailing-list">How can I subscribe to the Orbeon Forms mailing list?</a></li>
+                            <li><a href="#reporting-issues">How to report issue in the Orbeon Forms mailing list?</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        Orbeon can provide professional support for your company. Orbeon has two types of plans: <a
+                        href="http://www.orbeon.com/support-services/product">Product Support plans</a> are the most
+                        appropriate when your application is in production, while <a
+                        href="http://www.orbeon.com/support-services/proactive">Proactive Support plans</a> also covers
+                        issues during development, feature enhancements, and training. For more information contact
+                        Orbeon at <a href="mailto:info@orbeon.com">info@orbeon.com</a>.
+                    </li>
+                </ul>
+            </section>
+            <a name="mailing-list"/>
+            <section>
+                <title>How can I subscribe to the Orbeon Forms mailing list?</title>
+                <ol>
+                    <li>
+                        To subscribe, send an email to: <a
+                        href="mailto:ops-users-subscribe@objectweb.org">ops-users-subscribe@objectweb.org</a>. You can
+                        leave the subject and body of your email empty.
+                    </li>
+                    <li>
+                        You will receive a message from sympa@objectweb.org, asking you to confirm that you want to
+                        subscribe to the list. Confirm by following the instructions in that message. If you don't
+                        receive this message in an hour or so, you might want to check if it went to your spam folder.
+                    </li>
+                    <li>
+                        You should then start receiving messages from the list in the next few hours. You might receive 10
+                        to 30 messages a day, so you might want to setup your mail client to automatically move those
+                        messages in a particular folder, so they don't all show up in your inbox.
+                    </li>
+                </ol>
+                <p>
+                    If you are having any problem subscribing to the list, please contact at <a
+                    href="mailto:info@orbeon.com">info@orbeon.com</a>.
+                </p>
+            </section>
+            <a name="reporting-issues"/>
+            <section>
+                <title>How to report an issue in the Orbeon Forms mailing list?</title>
+                <p>
+                    The key to effectively reporting an issue is to post in the ops-users mailing list a message with:
+                </p>
+                <ul>
+                    <li>A reproducible test case, attached to your message</li>
+                    <li>How to run this test case</li>
+                    <li>What is the behavior you observe when you run the test case</li>
+                    <li>What is the behavior you expect</li>
+                </ul>
+                <p>
+                    But why a reproducible test case? The alternative is to describe the issue in plain English with
+                    maybe the help of code snippets. The problem with this approach is that it requires of people who
+                    will be helping you on the mailing list to understand the context of your problem, which might be
+                    trivial to you, but can be hard to grasp quickly for someone else.
+                </p>
+                <p>You can provide two types of test cases:</p>
+                <ul>
+                    <li>
+                        <b>An XHTML+XForms file</b> that runs in the <a href="http://www.orbeon.com/ops/xforms-sandbox/">XForms
+                        sandbox</a> - This is by far the preferred way of submitting a test case. Most problems with
+                        XForms can be shown in one single XHTML+XForms file. If you need the XForms to call a service
+                        with an <code>&lt;xforms:submission></code>, you can simulate this by placing an XML file that
+                        contains the response from that service on a public web site, and changing the
+                        <code>&lt;xforms:submission></code> to point to that file. If you don't have a server of your
+                        own that you can use for this, a free hosting service like <a
+                        href="http://geocities.yahoo.com/">GeoCities</a> will work.
+                    </li>
+                    <li>
+                        <b>An application</b> - An Orbeon Forms application is stored under <code>resources/apps</code>.
+                        Assuming you have your application under <code>resources/apps/foo</code>, it can be accessed by
+                        going to <code>http://localhost:8080/ops/foo/</code>. If you can't create a test case that runs
+                        in the XForms sandbox, create a simple standalone application under directory foo, zip the
+                        content of that directory, and attach it to your email in the mailing list as
+                        <code>foo.zip</code>.
+                    </li>
+                </ul>
+                <p>In both cases:</p>
+                <ul>
+                    <li>
+                        Make your test case as simple as possible. Remember that people who will be helping you on the list
+                        often don't have much time, and you are more likely to receive feedback that is useful if your
+                        test case only contains the minimum amount of code required to reproduce the issue.
+                    </li>
+                    <li>
+                        Keep your post focused on a single issue. If there are more issues you would like to report,
+                        post them in separate threads, or post the first one and wait to get that one resolved before
+                        you post the next one in another thread.
+                    </li>
+                </ul>
+            </section>
+            <a name="support-orbeon-forms"/>
+            <section>
+                <title>How can I support Orbeon Forms?</title>
+                <p>You can help by:</p>
+                <ul>
+                    <li>
+                        Subscribing to the <a href="#mailing-list">ops-users mailing list</a>, and helping other people in community.
+                    </li>
+                    <li>
+                        Contributing to the open source effort. If you have a feature in mind and think it would
+                        benefit Orbeon Forms, you can implement it and contribute it. The best place to get started is
+                        to discuss your idea on the ops-users mailing list.
+                    </li>
+                    <li>
+                        Get a Support Plan with Orbeon. If Orbeon Forms is what it is today, it is in great part thanks
+                        to companies who have financially supported Orbeon, allowing Orbeon developers to be paid to
+                        work on Orbeon Forms and make it a better product. For more information, see <a
+                        href="http://www.orbeon.com/support-services/overview">Support and Service</a> or contact
+                        Orbeon at <a href="mailto:info@orbeon.com">info@orbeon.com</a>.
+                    </li>
+                </ul>
+                <p>Your support is greatly appreciated!</p>
+            </section>
+        </section>
         <section>
             <title>Studio FAQ</title>
             <a name="studio-xpl-trace"/>

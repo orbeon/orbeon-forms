@@ -254,7 +254,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
      * Set an instance document for this model. There may be multiple instance documents. Each instance document may
      * have an associated id that identifies it.
      */
-    public XFormsInstance setInstanceDocument(Object instanceDocument, String modelId, String instanceId, String instanceSourceURI, String username, String password, boolean shared, long timeToLive, String validation) {
+    public XFormsInstance setInstanceDocument(Object instanceDocument, boolean initialize, String modelId, String instanceId, String instanceSourceURI, String username, String password, boolean shared, long timeToLive, String validation) {
         // Initialize containers if needed
         if (instances == null) {
             instances = Arrays.asList(new XFormsInstance[instanceIds.size()]);
@@ -265,9 +265,9 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         final XFormsInstance newInstance;
         {
             if (instanceDocument instanceof Document)
-                newInstance = new XFormsInstance(modelId, instanceId, (Document) instanceDocument, instanceSourceURI, username, password, shared, timeToLive, validation);
+                newInstance = new XFormsInstance(modelId, instanceId, (Document) instanceDocument, initialize, instanceSourceURI, username, password, shared, timeToLive, validation);
             else if (instanceDocument instanceof DocumentInfo)
-                newInstance = new SharedXFormsInstance(modelId, instanceId, (DocumentInfo) instanceDocument, instanceSourceURI, username, password, shared, timeToLive, validation);
+                newInstance = new SharedXFormsInstance(modelId, instanceId, (DocumentInfo) instanceDocument, initialize, instanceSourceURI, username, password, shared, timeToLive, validation);
             else
                 throw new OXFException("Invalid type for instance document: " + instanceDocument.getClass().getName());
         }
@@ -1041,7 +1041,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                         }
 
                         // Set instance and associated information if everything went well
-                        setInstanceDocument(instanceDocument, modelId, instanceId, instanceSourceURI, xxformsUsername, xxformsPassword, isApplicationSharedHint, xxformsTimeToLive, xxformsValidation);
+                        setInstanceDocument(instanceDocument, true, modelId, instanceId, instanceSourceURI, xxformsUsername, xxformsPassword, isApplicationSharedHint, xxformsTimeToLive, xxformsValidation);
                     }
                 }
             }

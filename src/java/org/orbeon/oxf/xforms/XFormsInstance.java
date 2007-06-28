@@ -122,12 +122,12 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventHandlerCont
         setInstanceDocumentInfo(documentInfo, true);
     }
 
-    public XFormsInstance(String modelId, String instanceId, Document instanceDocument, String instanceSourceURI, String username, String password, boolean applicationShared, long timeToLive, String validation) {
+    public XFormsInstance(String modelId, String instanceId, Document instanceDocument, boolean initialize, String instanceSourceURI, String username, String password, boolean applicationShared, long timeToLive, String validation) {
         // We normalize the Document before setting it, so that text nodes follow the XPath constraints
-        this(modelId, instanceId, new DocumentWrapper((Document) Dom4jUtils.normalizeTextNodes(instanceDocument), null, new Configuration()), instanceSourceURI, username, password, applicationShared, timeToLive, validation);
+        this(modelId, instanceId, new DocumentWrapper((Document) Dom4jUtils.normalizeTextNodes(instanceDocument), null, new Configuration()), initialize, instanceSourceURI, username, password, applicationShared, timeToLive, validation);
     }
 
-    protected XFormsInstance(String modelId, String instanceId, DocumentInfo instanceDocumentInfo, String instanceSourceURI, String username, String password, boolean applicationShared, long timeToLive, String validation) {
+    protected XFormsInstance(String modelId, String instanceId, DocumentInfo instanceDocumentInfo, boolean initialize, String instanceSourceURI, String username, String password, boolean applicationShared, long timeToLive, String validation) {
         this.instanceId = instanceId;
         this.modelId = modelId;
 
@@ -141,7 +141,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventHandlerCont
         this.password = password;
         this.validation = validation;
 
-        setInstanceDocumentInfo(instanceDocumentInfo, true);
+        setInstanceDocumentInfo(instanceDocumentInfo, initialize);
     }
 
     /**
@@ -523,7 +523,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventHandlerCont
      * @return  mutable XFormsInstance
      */
     public SharedXFormsInstance createSharedInstance() {
-        return new SharedXFormsInstance(modelId, instanceId, documentInfo, sourceURI, username, password, false, timeToLive, validation);
+        return new SharedXFormsInstance(modelId, instanceId, documentInfo, false, sourceURI, username, password, false, timeToLive, validation);
     }
 
     public static String getInstanceId(Element xformsInstanceElement) {

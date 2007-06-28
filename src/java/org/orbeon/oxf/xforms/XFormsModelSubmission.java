@@ -308,7 +308,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         initialDocumentToSubmit = createDocumentToSubmit(currentNodeInfo, currentInstance);
 
                         // Temporarily change instance document so that we can run validation again
-                        modelForInstance.setInstanceDocument(initialDocumentToSubmit,
+                        modelForInstance.setInstanceDocument(initialDocumentToSubmit, false,
                                 currentInstance.getModelId(), currentInstance.getEffectiveId(), currentInstance.getSourceURI(),
                                 currentInstance.getUsername(), currentInstance.getPassword(),
                                 currentInstance.isApplicationShared(),
@@ -435,7 +435,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         documentToSubmit = createDocumentToSubmit(currentNodeInfo, currentInstance);
 
                         // Temporarily change instance document so that we can run validation again
-                        modelForInstance.setInstanceDocument(documentToSubmit,
+                        modelForInstance.setInstanceDocument(documentToSubmit, false,
                                 currentInstance.getModelId(), currentInstance.getEffectiveId(), currentInstance.getSourceURI(),
                                 currentInstance.getUsername(), currentInstance.getPassword(),
                                 currentInstance.isApplicationShared(),
@@ -742,7 +742,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                                         XFormsServer.logger.debug("XForms - submission - replacing instance with mutable instance: " + replaceInstance.getEffectiveId());
 
                                                     final Document resultingInstanceDocument = Dom4jUtils.readDom4j(connectionResult.getResultInputStream(), connectionResult.resourceURI);
-                                                    newInstance = new XFormsInstance(replaceInstance.getModelId(), replaceInstance.getEffectiveId(), resultingInstanceDocument,
+                                                    newInstance = new XFormsInstance(replaceInstance.getModelId(), replaceInstance.getEffectiveId(), resultingInstanceDocument, true,
                                                             connectionResult.resourceURI, resolvedXXFormsUsername, resolvedXXFormsPassword, false, -1, replaceInstance.getValidation());
                                                 } else {
                                                     // Resulting instance is read-only
@@ -752,7 +752,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                                                     // NOTE: isApplicationSharedHint is always false when get get here. isApplicationSharedHint="true" is handled above.
                                                     final DocumentInfo resultingInstanceDocument = TransformerUtils.readTinyTree(connectionResult.getResultInputStream(), connectionResult.resourceURI);
-                                                    newInstance = new SharedXFormsInstance(replaceInstance.getModelId(), replaceInstance.getEffectiveId(), resultingInstanceDocument,
+                                                    newInstance = new SharedXFormsInstance(replaceInstance.getModelId(), replaceInstance.getEffectiveId(), resultingInstanceDocument, true,
                                                             connectionResult.resourceURI, resolvedXXFormsUsername, resolvedXXFormsPassword, false, -1, replaceInstance.getValidation());
                                                 }
 

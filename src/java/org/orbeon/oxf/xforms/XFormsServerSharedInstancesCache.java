@@ -86,7 +86,7 @@ public class XFormsServerSharedInstancesCache {
             final SharedXFormsInstance sharedInstance = cacheEntry.sharedInstance;
 
             // Return a copy because id, etc. can be different
-            return new SharedXFormsInstance(modelId, instanceId, sharedInstance.getDocumentInfo(),
+            return new SharedXFormsInstance(modelId, instanceId, sharedInstance.getDocumentInfo(), true,
                         sourceURI, null, null, sharedInstance.isApplicationShared(), sharedInstance.getTimeToLive(), sharedInstance.getValidation());
         } else {
             // Instance was not found or has expired, load from URI and add to cache
@@ -114,7 +114,7 @@ public class XFormsServerSharedInstancesCache {
             try {
                 // Read result as XML and create new shared instance
                 final DocumentInfo documentInfo = TransformerUtils.readTinyTree(connectionResult.getResultInputStream(), connectionResult.resourceURI);
-                final SharedXFormsInstance newInstance = new SharedXFormsInstance(modelId, instanceId, documentInfo, sourceURI, null, null, true, timeToLive, validation);
+                final SharedXFormsInstance newInstance = new SharedXFormsInstance(modelId, instanceId, documentInfo, true, sourceURI, null, null, true, timeToLive, validation);
 
                 // Add result to cache
                 add(pipelineContext, sourceURI, newInstance);

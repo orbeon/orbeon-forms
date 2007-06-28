@@ -1739,4 +1739,68 @@
         </output>
     </test>
 
+    <test description="Test that submitting required but empty values fails submission" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-server-init.xpl"/>
+                    <p:input name="document">
+                        <xhtml:html>
+                            <xhtml:head>
+                                <xforms:model id="main-model" xxforms:state-handling="client">
+                                    <xforms:instance id="main-instance">
+                                        <instance xmlns="">
+                                            <required-but-emtpy-element/>
+                                            <other-element required-but-emtpy-attribute=""/>
+                                            <submission-serialized>false</submission-serialized>
+                                            <submission-result/>
+                                        </instance>
+                                    </xforms:instance>
+                                    
+                                    <xforms:bind nodeset="required-but-emtpy-element" required="true()"/>
+                                    <xforms:bind nodeset="other-element/@required-but-emtpy-attribute" required="true()"/>
+
+                                    <xforms:submission id="test-submission" method="post" action="test:" replace="instance">
+                                        <xforms:setvalue ev:event="xforms-submit-error" ref="submission-result">error</xforms:setvalue>
+                                        <xforms:setvalue ev:event="xforms-submit-done" ref="submission-result">done</xforms:setvalue>
+                                        <xforms:setvalue ev:event="xforms-submit-serialize" ref="submission-serialized">true</xforms:setvalue>
+                                    </xforms:submission>
+                                    <xforms:send ev:event="xforms-ready" submission="test-submission"/>
+                                </xforms:model>
+                            </xhtml:head>
+                            <xhtml:body>
+                            </xhtml:body>
+                        </xhtml:html>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+
+            </p:config>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="main-instance" model-id="main-model">
+                                <instance>
+                                    <required-but-emtpy-element/>
+                                    <other-element required-but-emtpy-attribute=""/>
+                                    <submission-serialized>false</submission-serialized>
+                                    <submission-result>error</submission-result>
+                                </instance>
+                            </instance>
+                        </instances>
+                        <divs/>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>

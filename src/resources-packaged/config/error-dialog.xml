@@ -19,7 +19,7 @@
             An error has occurred in Orbeon Forms. You may want to try one of the following:
         </p>
         <ul>
-            <li><a class="xforms-error-panel-close" href="#">Close this dialog</a> and continue to use this page.</li>
+            <li><a class="xforms-error-panel-close">Close this dialog</a> and continue to use this page.</li>
             <li>If this does not work, press the <code>ctrl</code> key (or <code>command</code> key on a Mac) and click on the Reload button in the toolbar.</li>
             <li>Return <a href="/">home</a>.</li>
         </ul>

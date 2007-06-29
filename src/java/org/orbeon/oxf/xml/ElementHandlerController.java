@@ -128,7 +128,7 @@ public class ElementHandlerController extends ForwardingContentHandler implement
                 final String explodedQName = XMLUtils.buildExplodedQName(uri, localname);
                 final String handlerClassName = (String) handlerKeysToNames.get(explodedQName);
 
-                final ElementHandlerNew elementHandler;
+                final ElementHandler elementHandler;
                 if (handlerClassName != null) {
                     // Found handler
                     elementHandler = getHandlerByClassName(handlerClassName);
@@ -265,7 +265,7 @@ public class ElementHandlerController extends ForwardingContentHandler implement
         return locator;
     }
 
-    private ElementHandlerNew getHandlerByClassName(String handlerClassName) {
+    private ElementHandler getHandlerByClassName(String handlerClassName) {
 
         Class handlerClass = (Class) classNameToHandlerClass.get(handlerClassName);
         if (handlerClass == null) {
@@ -277,7 +277,7 @@ public class ElementHandlerController extends ForwardingContentHandler implement
             }
         }
         try {
-            return (ElementHandlerNew) handlerClass.newInstance();
+            return (ElementHandler) handlerClass.newInstance();
         } catch (Exception e) {
             throw ValidationException.wrapException(e, new LocationData(locator));
         }
@@ -286,18 +286,18 @@ public class ElementHandlerController extends ForwardingContentHandler implement
     private static class HandlerInfo {
         public int level;
         public String explodedQName;
-        public ElementHandlerNew elementHandler;
+        public ElementHandler elementHandler;
         public Attributes attributes;
 
         public SAXStore saxStore;
 
-        public HandlerInfo(int level, String explodedQName, ElementHandlerNew elementHandler) {
+        public HandlerInfo(int level, String explodedQName, ElementHandler elementHandler) {
             this.level = level;
             this.explodedQName = explodedQName;
             this.elementHandler = elementHandler;
         }
 
-        public HandlerInfo(int level, String explodedQName, ElementHandlerNew elementHandler, Attributes attributes, Locator locator) {
+        public HandlerInfo(int level, String explodedQName, ElementHandler elementHandler, Attributes attributes, Locator locator) {
             this.level = level;
             this.explodedQName = explodedQName;
             this.elementHandler = elementHandler;

@@ -21,7 +21,7 @@ import org.orbeon.oxf.xforms.XFormsControls;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
-import org.orbeon.oxf.xml.ElementHandlerNew;
+import org.orbeon.oxf.xml.ElementHandler;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.common.ValidationException;
@@ -36,7 +36,7 @@ import org.dom4j.Namespace;
 /**
  *
  */
-public abstract class HandlerBase extends ElementHandlerNew {
+public abstract class HandlerBase extends ElementHandler {
 
     private int level = 0;
 

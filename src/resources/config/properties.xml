@@ -37,7 +37,7 @@
     <property as="xs:boolean" name="oxf.xforms.encrypt-names"                        value="true"/>
 
     <!-- Default formatting of XForms types -->
-    <property as="xs:string"  name="oxf.xforms.format.date"                          value="if (. castable as xs:date) then format-date(xs:date(.), '[FNn] [MNn] [D], [Y]', 'en', (), ()) else ."/>
+    <property as="xs:string"  name="oxf.xforms.format.date"                          value="if (. castable as xs:date) then format-date(xs:date(.), '[FNn] [MNn] [D], [Y] [ZN]', 'en', (), ()) else ."/>
     <property as="xs:string"  name="oxf.xforms.format.dateTime"                      value="if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), '[FNn] [MNn] [D], [Y] [H01]:[m01]:[s01] [ZN]', 'en', (), ()) else ."/>
     <property as="xs:string"  name="oxf.xforms.format.time"                          value="if (. castable as xs:time) then format-time(xs:time(.), '[H01]:[m01]:[s01] [ZN]', 'en', (), ()) else ."/>
     <property as="xs:string"  name="oxf.xforms.format.decimal"                       value="if (. castable as xs:decimal) then format-number(xs:decimal(.),'###,###,###,##0.00') else ."/>
@@ -66,7 +66,7 @@
     <property as="xs:boolean" name="oxf.xforms.optimize-relevance"                   value="false"/>
 
     <!-- Rarely used global properties -->
-    <property as="xs:string" name="oxf.servlet.externalize-form-values-prefix"      value="$extnode^"/>
+    <property as="xs:string" name="oxf.servlet.externalize-form-values-prefix"       value="$extnode^"/>
 
     <!-- XPL profiling support -->
     <!-- Currently one of org.orbeon.oxf.processor.NetworkTrace,

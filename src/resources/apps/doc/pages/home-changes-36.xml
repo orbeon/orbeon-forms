@@ -32,8 +32,8 @@
             </p>
             <p>
                 Orbeon Forms 3.6 features around <a href="#changes-36-full">80 improvements</a> over <a
-                href="home-changes-35">Orbeon Forms 3.5.1</a>, including major improvements in the areas of error
-                handling, XML Schema validation, and deployment within Java applications.
+                href="home-changes-35">Orbeon Forms 3.5.1</a>, including major improvements in the areas of XML Schema
+                validation, error handling, and deployment within Java applications.
             </p>
             <p>
                 This document describes changes made between Orbeon PresentationServer 3.5.1 and Orbeon Forms 3.6.
@@ -55,6 +55,108 @@
             <section>
                 <title>Noteworthy Changes</title>
                 <ul>
+                    <li>
+                        <p>
+                            <b>Bindings support types imported from XML Schemas.</b> In previous versions, only built-in
+                            types such as <code>xs:integer</code>, <code>xs:date</code>, etc. were supported on the
+                            <code>type</code> attribute of <code>&lt;xforms:bind></code> element. In this version,
+                            simple types declared in an imported XML Schema can be used. For example, assume the
+                            following schema declaring a type called <code>my:state</code>:
+                        </p>
+                        <xml-source>
+                            <xs:schema targetNamespace="http://orbeon.org/oxf/examples/my"
+                                       xmlns:my="http://orbeon.org/oxf/examples/my"
+                                       xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                                       elementFormDefault="qualified"
+                                       attributeFormDefault="unqualified">
+                                <xs:simpleType name="state">
+                                    <xs:restriction base="xs:string">
+                                        <xs:enumeration value="AL"/>
+                                        <xs:enumeration value="AK"/>
+                                        <xs:enumeration value="AZ"/>
+                                        ...
+                                        <xs:enumeration value="GU"/>
+                                        <xs:enumeration value="MP"/>
+                                        <xs:enumeration value="PR"/>
+                                    </xs:restriction>
+                                </xs:simpleType>
+                            </xs:schema>
+                        </xml-source>
+                        <p>
+                            You use <code>&lt;xforms:bind></code> to assign this type as follows:
+                        </p>
+                        <xml-source>
+                            <xforms:bind nodeset="address/state" type="my:state"/>
+                        </xml-source>
+                        <p>
+                            Note that with XForms 1.1, the <code>type</code> attribute only supports simple types, or
+                            complex types with simple content. Orbeon Forms only support simple types at the moment.
+                        </p>
+                        <p>
+                            See issue <a
+                            href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=306753&amp;group_id=168&amp;atid=350207">#306753</a>.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Improved XML Schema validation.</b> In previous versions, XML Schema validation always
+                            followed a strict mode where all instances had to be strictly valid as per imported schema
+                            definitions. In particular, this meant that if you imported a schema, the top-level element
+                            of an instance had to have a valid schema definition or the instance would be entirely
+                            invalid.
+                        </p>
+                        <p>
+                            In this version, Orbeon Forms implements a "lax" validation mode by default, where only
+                            elements that have definitions in the imported schemas are validated. Other elements are not
+                            considered for validation. This is in line with XML Schema and XSLT 2.0 lax validation
+                            modes.
+                        </p>
+                        <p>
+                            In addition, the author can specify the validation mode directly on each instance with the
+                            extension <code>xxforms:validation</code> attribute, which takes values <code>lax</code>
+                            (the default), <code>strict</code> (the root element has to have a definition in the schema
+                            and must be valid), or <code>skip</code> (no validation at all for that instance).
+                        </p>
+                        <p>
+                            Nodes validated through a schema now receive datatype annotations, which means that if an
+                            element or attribute is validated against <code>xs:date</code> in a schema, an XForms
+                            control bound to that node will display a date picker. Previously, you had to bind the type
+                            with a binding even if you used a schema:
+                        </p>
+                        <xml-source>
+                            <xforms:bind nodeset="..." type="xs:date"/>
+                        </xml-source>
+                        <p>
+                            This is now no longer necessary if you use a schema. Of course if you don't use a schema, or
+                            if you want to perform validation in addition to what is picked-up by a schema, then using
+                            <code>&lt;xforms:bind></code> is still the correct way of binding types.
+                        </p>
+                        <p>
+                            See issues <a
+                            href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=307140&amp;group_id=168&amp;atid=350207">#307140</a>,
+                            <a
+                            href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=307141&amp;group_id=168&amp;atid=350207">#307141</a>
+                            and <a
+                            href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=305063&amp;group_id=168&amp;atid=350207">#305063</a>.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Support for XForms 1.1 types allowing empty content.</b> Several built-in XML Schema data
+                            types, such as <code>xs:date</code>, do not consider an empty string as a valid value. This
+                            makes it difficult, for example, to specify the type "optional date" in XForms. With XForms
+                            1.1, every built-in data type has a counterpart in the <code>xforms</code> namespace, which
+                            adds the empty string as a valid value. These types are now supported in Orbeon Forms. For
+                            example, you denote an optional date in an instance with:
+                        </p>
+                        <xml-source>
+                            <xforms:bind nodeset="..." type="xforms:date"/>
+                        </xml-source>
+                        <p>
+                            See issue <a
+                            href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307162&amp;group_id=168&amp;atid=350207">#307162</a>.
+                        </p>
+                    </li>
                     <li>
                         <p>
                             <b>Better display of JavaScript and Ajax errors.</b> Orbeon Forms now displays JavaScript
@@ -147,87 +249,10 @@
                     </li>
                     <li>
                         <p>
-                            <b>Bindings support types imported from XML Schemas.</b> In previous versions, only built-in
-                            types such as <code>xs:integer</code>, <code>xs:date</code>, etc. were supported on the
-                            <code>type</code> attribute of <code>&lt;xforms:bind></code> element. In this version,
-                            simple types declared in an imported XML Schema can be used. For example, assume the
-                            following schema declaring a type called <code>my:state</code>:
-                        </p>
-                        <xml-source>
-                            <xs:schema targetNamespace="http://orbeon.org/oxf/examples/my"
-                                       xmlns:my="http://orbeon.org/oxf/examples/my"
-                                       xmlns:xs="http://www.w3.org/2001/XMLSchema"
-                                       elementFormDefault="qualified"
-                                       attributeFormDefault="unqualified">
-                                <xs:simpleType name="state">
-                                    <xs:restriction base="xs:string">
-                                        <xs:enumeration value="AL"/>
-                                        <xs:enumeration value="AK"/>
-                                        <xs:enumeration value="AZ"/>
-                                        ...
-                                        <xs:enumeration value="GU"/>
-                                        <xs:enumeration value="MP"/>
-                                        <xs:enumeration value="PR"/>
-                                    </xs:restriction>
-                                </xs:simpleType>
-                            </xs:schema>
-                        </xml-source>
-                        <p>
-                            You use <code>&lt;xforms:bind></code> to assign this type as follows:
-                        </p>
-                        <xml-source>
-                            <xforms:bind nodeset="address/state" type="my:state"/>
-                        </xml-source>
-                        <p>
-                            Note that with XForms 1.1, the <code>type</code> attribute only supports simple types, or
-                            complex types with simple content. Orbeon Forms only support simple types at the moment.
-                        </p>
-                        <p>
-                            See issue <a
-                            href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=306753&amp;group_id=168&amp;atid=350207">#306753</a>.
-                        </p>
-                    </li>
-                    <li>
-                        <p>
-                            <b>Improved XML Schema validation.</b> In previous versions, XML Schema validation always
-                            followed a strict mode where all instances had to be strictly valid as per imported schema
-                            definitions. In particular, this meant that if you imported a schema, the top-level element
-                            of an instance had to have a valid schema definition or the instance would be entirely
-                            invalid.
-                        </p>
-                        <p>
-                            In this version, Orbeon Forms implements a "lax" validation mode by default, where only
-                            elements that have definitions in the imported schemas are validated. Other elements are not
-                            considered for validation. This is in line with XML Schema and XSLT 2.0 lax validation
-                            modes.
-                        </p>
-                        <p>
-                            In addition, the author can specify the validation mode directly on each instance with the
-                            extension <code>xxforms:validation</code> attribute, which takes values <code>lax</code>
-                            (the default), <code>strict</code> (the root element has to have a definition in the schema
-                            and must be valid), or <code>skip</code> (no validation at all for that instance).
-                        </p>
-                        <p>
-                            Nodes validated through a schema now receive datatype annotations, which means that if an
-                            element or attribute is validated against <code>xs:date</code> in a schema, an XForms
-                            control bound to that node will display a date picker. Previously, you had to bind the type
-                            with a binding even if you used a schema:
-                        </p>
-                        <xml-source>
-                            <xforms:bind nodeset="..." type="xs:date"/>
-                        </xml-source>
-                        <p>
-                            This is now no longer necessary if you use a schema. Of course if you don't use a schema, or
-                            if you want to perform validation in addition to what is picked-up by a schema, then using
-                            <code>&lt;xforms:bind></code> is still the correct way of binding types.
-                        </p>
-                        <p>
-                            See issues <a
-                            href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=307140&amp;group_id=168&amp;atid=350207">#307140</a>,
-                            <a
-                            href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=307141&amp;group_id=168&amp;atid=350207">#307141</a>
-                            and <a
-                            href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=305063&amp;group_id=168&amp;atid=350207">#305063</a>.
+                            <b>Support for boolean type in input fields.</b> Previously, <code>&lt;xforms:input></code>
+                            controls bound to nodes of type <code>xs:boolean</code> would display a regular input field.
+                            The control now shows a checkbox allowing to better select a boolean value. See issue <a
+                            href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=306628&amp;group_id=168&amp;atid=350207">#306628</a>.
                         </p>
                     </li>
                     <li>
@@ -259,31 +284,6 @@
                         <p>
                             See issue <a
                             href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=306259&amp;group_id=168&amp;atid=350207">#306259</a>.
-                        </p>
-                    </li>
-                    <li>
-                        <p>
-                            <b>Support for XForms 1.1 types allowing empty content.</b> Several built-in XML Schema data
-                            types, such as <code>xs:date</code>, do not consider an empty string as a valid value. This
-                            makes it difficult, for example, to specify the type "optional date" in XForms. With XForms
-                            1.1, every built-in data type has a counterpart in the <code>xforms</code> namespace, which
-                            adds the empty string as a valid value. These types are now supported in Orbeon Forms. For
-                            example, you denote an optional date in an instance with:
-                        </p>
-                        <xml-source>
-                            <xforms:bind nodeset="..." type="xforms:date"/>
-                        </xml-source>
-                        <p>
-                            See issue <a
-                            href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307162&amp;group_id=168&amp;atid=350207">#307162</a>.
-                        </p>
-                    </li>
-                    <li>
-                        <p>
-                            <b>Support for boolean type in input fields.</b> Previously, <code>&lt;xforms:input></code>
-                            controls bound to nodes of type <code>xs:boolean</code> would display a regular input field.
-                            The control now shows a checkbox allowing to better select a boolean value. See issue <a
-                            href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=306628&amp;group_id=168&amp;atid=350207">#306628</a>.
                         </p>
                     </li>
                     <li>

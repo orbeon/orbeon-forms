@@ -83,7 +83,7 @@ public class XFormsElementContext extends XFormsControls {
         final List newNodeset = new ArrayList();
         newNodeset.add(getCurrentNodeset().get(index - 1));
         final BindingContext currentBindingContext = getCurrentBindingContext();
-        contextStack.push(new BindingContext(currentBindingContext, currentBindingContext.getModel(), newNodeset, 1, repeatId, true, null));//TODO: check this
+        contextStack.push(new BindingContext(currentBindingContext, currentBindingContext.getModel(), newNodeset, 1, repeatId, true, null, null));//TODO: check this
 
         if (repeatId != null)
             repeatIdToIndex.put(repeatId, new Integer(index));

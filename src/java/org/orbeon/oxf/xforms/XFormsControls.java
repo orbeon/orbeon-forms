@@ -316,9 +316,9 @@ public class XFormsControls {
         // Push the default context
         if (xformsModel.getInstanceCount() > 0) {
             final List defaultNodeset = Arrays.asList(new Object[]{xformsModel.getDefaultInstance().getInstanceRootElementInfo()});
-            contextStack.push(new BindingContext(null, xformsModel, defaultNodeset, 1, null, true, null));
+            contextStack.push(new BindingContext(null, xformsModel, defaultNodeset, 1, null, true, null, xformsModel.getDefaultInstance().getLocationData()));
         } else {
-            contextStack.push(new BindingContext(null, xformsModel, Collections.EMPTY_LIST, 0, null, true, null));
+            contextStack.push(new BindingContext(null, xformsModel, Collections.EMPTY_LIST, 0, null, true, null, xformsModel.getLocationData()));
         }
     }
 
@@ -397,7 +397,7 @@ public class XFormsControls {
             // Push "artificial" binding with just current node in nodeset
             final XFormsModel newModel = currentBindingContext.getModel();
             final int position = ((RepeatIterationControl) xformsControl).getIteration();
-            contextStack.push(new BindingContext(currentBindingContext, newModel, currentNodeset, position, xformsControl.getParent().getOriginalId(), true, null));
+            contextStack.push(new BindingContext(currentBindingContext, newModel, currentNodeset, position, xformsControl.getParent().getOriginalId(), true, null, repeatXFormsControl.getLocationData()));
         }
     }
 
@@ -528,9 +528,9 @@ public class XFormsControls {
                         // Temporarily update the context so that the function library's instance() function works
                         final BindingContext modelBindingContext = getCurrentBindingContextForModel(newModel.getEffectiveId());
                         if (modelBindingContext != null)
-                            contextStack.push(new BindingContext(currentBindingContext, newModel, modelBindingContext.getNodeset(), modelBindingContext.getPosition(), null, false, null));
+                            contextStack.push(new BindingContext(currentBindingContext, newModel, modelBindingContext.getNodeset(), modelBindingContext.getPosition(), null, false, null, locationData));
                         else
-                            contextStack.push(new BindingContext(currentBindingContext, newModel, getCurrentNodeset(newModel.getEffectiveId()), 1, null, false, null));
+                            contextStack.push(new BindingContext(currentBindingContext, newModel, getCurrentNodeset(newModel.getEffectiveId()), 1, null, false, null, locationData));
 
                         // Evaluate new node-set
                         newNodeset = XPathCache.evaluate(pipelineContext, currentSingleNodeForModel,
@@ -580,7 +580,7 @@ public class XFormsControls {
 
         // Push new context
         final String id = (bindingElement == null) ? null : bindingElement.attributeValue("id");
-        contextStack.push(new BindingContext(currentBindingContext, newModel, newNodeset, newPosition, id, isNewBind, bindingElement));
+        contextStack.push(new BindingContext(currentBindingContext, newModel, newNodeset, newPosition, id, isNewBind, bindingElement, locationData));
     }
 
     /**
@@ -1230,7 +1230,7 @@ public class XFormsControls {
                     if (currentNodeSet != null) {
                         for (int currentPosition = 1; currentPosition <= currentNodeSet.size(); currentPosition++) {
                             // Push "artificial" binding with just current node in nodeset
-                            contextStack.push(new BindingContext(currentBindingContext, currentBindingContext.getModel(), currentNodeSet, currentPosition, controlId, true, null));
+                            contextStack.push(new BindingContext(currentBindingContext, currentBindingContext.getModel(), currentNodeSet, currentPosition, controlId, true, null, (LocationData) controlElement.getData()));
                             try {
                                 // Handle children of xforms:repeat
                                 if (doContinue) {
@@ -1373,8 +1373,9 @@ public class XFormsControls {
         private String idForContext;
         private boolean newBind;
         private Element controlElement;
+        private LocationData locationData;
 
-        public BindingContext(BindingContext parent, XFormsModel model, List nodeSet, int position, String idForContext, boolean newBind, Element controlElement) {
+        public BindingContext(BindingContext parent, XFormsModel model, List nodeSet, int position, String idForContext, boolean newBind, Element controlElement, LocationData locationData) {
             this.parent = parent;
             this.model = model;
             this.nodeset = nodeSet;
@@ -1382,14 +1383,14 @@ public class XFormsControls {
             this.idForContext = idForContext;
             this.newBind = newBind;
             this.controlElement = controlElement;
+            this.locationData = (locationData != null) ? locationData : (controlElement != null) ? (LocationData) controlElement.getData() : null;
 
             if (nodeset != null && nodeset.size() > 0) {
                 // TODO: PERF: This seems to take some significant time
                 for (Iterator i = nodeset.iterator(); i.hasNext();) {
                     final Object currentItem = i.next();
                     if (!(currentItem instanceof NodeInfo))
-                        throw new ValidationException("A reference to a node (such as text, element, or attribute) is required in a binding. Attempted to bind to the invalid item type: " + currentItem.getClass(),
-                                (LocationData) controlElement.getData());
+                        throw new ValidationException("A reference to a node (such as text, element, or attribute) is required in a binding. Attempted to bind to the invalid item type: " + currentItem.getClass(), this.locationData);
                 }
             }
         }
@@ -1424,17 +1425,13 @@ public class XFormsControls {
 
         /**
          * Convenience method returning the location data associated with the XForms element (typically, a control)
-         * associated with the binding.
+         * associated with the binding. If location data was passed during construction, pass that, otherwise try to get
+         * location data from passed element.
          *
          * @return  LocationData object, or null if not found
          */
         public LocationData getLocationData() {
-            if (controlElement == null)
-                return null;
-            final Object data = controlElement.getData();
-            if (!(data instanceof LocationData))
-                return null;
-            return (LocationData) data;
+            return locationData;
         }
 
         /**

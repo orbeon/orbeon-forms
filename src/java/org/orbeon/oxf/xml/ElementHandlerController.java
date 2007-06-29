@@ -15,6 +15,7 @@ package org.orbeon.oxf.xml;
 
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.processor.xinclude.XIncludeProcessor;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
@@ -43,7 +44,7 @@ public class ElementHandlerController extends ForwardingContentHandler implement
 
     private NamespaceSupport3 namespaceSupport = new NamespaceSupport3();
 
-    private Locator locator;
+    private XIncludeProcessor.OutputLocator locator;
 
     private int level;
 
@@ -105,7 +106,7 @@ public class ElementHandlerController extends ForwardingContentHandler implement
             setForward(true);
             super.startDocument();
         } catch (Exception e) {
-            throw new ValidationException(e, new LocationData(locator));
+            throw ValidationException.wrapException(e, new LocationData(locator));
         }
     }
 
@@ -113,7 +114,7 @@ public class ElementHandlerController extends ForwardingContentHandler implement
         try {
             super.endDocument();
         } catch (Exception e) {
-            throw new ValidationException(e, new LocationData(locator));
+            throw ValidationException.wrapException(e, new LocationData(locator));
         }
     }
 
@@ -151,7 +152,7 @@ public class ElementHandlerController extends ForwardingContentHandler implement
                         handlerInfos.push(currentHandlerInfo);
 
                     if (elementHandler.isRepeating()) {
-                        currentHandlerInfo = new HandlerInfo(level, explodedQName, elementHandler, attributes);
+                        currentHandlerInfo = new HandlerInfo(level, explodedQName, elementHandler, attributes, this.locator);
                         super.setContentHandler(currentHandlerInfo.saxStore);
                         isFillingUpSAXStore = true;
                     } else {
@@ -168,7 +169,7 @@ public class ElementHandlerController extends ForwardingContentHandler implement
 
             level++;
         } catch (Exception e) {
-            throw new ValidationException(e, new LocationData(locator));
+            throw ValidationException.wrapException(e, new LocationData(locator));
         }
     }
 
@@ -201,19 +202,24 @@ public class ElementHandlerController extends ForwardingContentHandler implement
             namespaceSupport.endElement();
 
         } catch (Exception e) {
-            throw new ValidationException(e, new LocationData(locator));
+            throw ValidationException.wrapException(e, new LocationData(locator));
         }
     }
 
     public void repeatBody() throws SAXException {
+        // Replay content of current SAXStore
         currentHandlerInfo.saxStore.replay(this);
+        if (this.locator != null) {
+            // This means that the SAXStore sent out setDocumentLocator() as well
+            this.locator.popLocator();
+        }
     }
 
     public void characters(char[] chars, int start, int length) throws SAXException {
         try {
             super.characters(chars, start, length);
         } catch (Exception e) {
-            throw new ValidationException(e, new LocationData(locator));
+            throw ValidationException.wrapException(e, new LocationData(locator));
         }
     }
 
@@ -223,7 +229,7 @@ public class ElementHandlerController extends ForwardingContentHandler implement
             namespaceSupport.startPrefixMapping(prefix, uri);
             super.startPrefixMapping(prefix, uri);
         } catch (Exception e) {
-            throw new ValidationException(e, new LocationData(locator));
+            throw ValidationException.wrapException(e, new LocationData(locator));
         }
     }
 
@@ -231,12 +237,32 @@ public class ElementHandlerController extends ForwardingContentHandler implement
         try {
             super.endPrefixMapping(s);
         } catch (Exception e) {
-            throw new ValidationException(e, new LocationData(locator));
+            throw ValidationException.wrapException(e, new LocationData(locator));
         }
     }
 
     public void setDocumentLocator(Locator locator) {
-        this.locator = locator;
+        if (locator != null) {
+            if (this.locator == null) {
+                // This is likely the source's initial setDocumentLocator() call
+
+                // Use our own locator
+                this.locator = new XIncludeProcessor.OutputLocator();
+                if (locator != null)
+                    this.locator.pushLocator(locator);
+                // We don't forward this (anyway nobody is listening initially)
+            } else {
+                // This is likely during a SAXStore replay
+
+                // Push the SAXStore's locator
+                this.locator.pushLocator(locator);
+                // But don't forward this! SAX prevents calls to setDocumentLocator() mid-course. Our own locator will do the job.
+            }
+        }
+    }
+
+    public Locator getLocator() {
+        return locator;
     }
 
     private ElementHandlerNew getHandlerByClassName(String handlerClassName) {
@@ -247,13 +273,13 @@ public class ElementHandlerController extends ForwardingContentHandler implement
                 handlerClass = Class.forName(handlerClassName);
                 classNameToHandlerClass.put(handlerClassName, handlerClass);
             } catch (ClassNotFoundException e) {
-                throw new ValidationException(e, new LocationData(locator));
+                throw ValidationException.wrapException(e, new LocationData(locator));
             }
         }
         try {
             return (ElementHandlerNew) handlerClass.newInstance();
         } catch (Exception e) {
-            throw new ValidationException(e, new LocationData(locator));
+            throw ValidationException.wrapException(e, new LocationData(locator));
         }
     }
 
@@ -271,13 +297,16 @@ public class ElementHandlerController extends ForwardingContentHandler implement
             this.elementHandler = elementHandler;
         }
 
-        public HandlerInfo(int level, String explodedQName, ElementHandlerNew elementHandler, Attributes attributes) {
+        public HandlerInfo(int level, String explodedQName, ElementHandlerNew elementHandler, Attributes attributes, Locator locator) {
             this.level = level;
             this.explodedQName = explodedQName;
             this.elementHandler = elementHandler;
             this.attributes = new AttributesImpl(attributes);
 
             this.saxStore = new SAXStore();
+            // Set initial locator so that SAXStore can obtain location data if any
+            if (locator != null)
+                this.saxStore.setDocumentLocator(locator);
         }
     }
 }

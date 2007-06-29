@@ -326,7 +326,7 @@ public class XIncludeProcessor extends ProcessorImpl {
      * This is the Locator object passed to the output. It supports a stack of input Locator objects in order to
      * correctly report location information of the included documents.
      */
-    private static class OutputLocator implements Locator {
+    public static class OutputLocator implements Locator {
 
         private Stack locators = new Stack();
 

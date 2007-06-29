@@ -24,7 +24,7 @@ import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.ElementHandlerNew;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.saxon.om.FastStringBuffer;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -302,7 +302,7 @@ public abstract class HandlerBase extends ElementHandlerNew {
                 if (XFormsConstants.XXFORMS_NAMESPACE_URI.equals(appearance.getNamespace().getURI()))
                     sb.append("xxforms-");
                 else if (!"".equals(appearance.getNamespace().getURI()))
-                    throw new OXFException("Invalid appearance namespace URI: " + appearance.getNamespace().getURI());
+                    throw new ValidationException("Invalid appearance namespace URI: " + appearance.getNamespace().getURI(), handlerContext.getLocationData());
                 sb.append(appearance.getName());
             }
         }
@@ -314,7 +314,7 @@ public abstract class HandlerBase extends ElementHandlerNew {
                 // NOTE: We could certainly do a better check than this to make sure we have a valid mediatype
                 final int slashIndex = mediatypeValue.indexOf('/');
                 if (slashIndex == -1)
-                    throw new OXFException("Invalid mediatype attribute value: " + mediatypeValue);
+                    throw new ValidationException("Invalid mediatype attribute value: " + mediatypeValue, handlerContext.getLocationData());
 
                 if (sb.length() > 0)
                     sb.append(' ');

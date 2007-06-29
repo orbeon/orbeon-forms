@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
-import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
@@ -21,8 +21,10 @@ import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.processor.XFormsState;
 import org.orbeon.oxf.xml.ElementHandlerController;
 import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
+import org.xml.sax.Locator;
 
 import java.util.Stack;
 
@@ -89,7 +91,7 @@ public class HandlerContext {
 
         // TEMP: in this case, we should probably map our own prefix, or set
         // the default namespace and restore it on children elements
-        throw new OXFException("No prefix found for HTML namespace");
+        throw new ValidationException("No prefix found for HTML namespace", new LocationData(controller.getLocator()));
 //                return null;
     }
 
@@ -156,6 +158,16 @@ public class HandlerContext {
 
     public String getEffectiveId(Attributes controlElementAttributes) {
         return controlElementAttributes.getValue("id") + getIdPostfix();
+    }
+
+    /**
+     * Return location data associated with the current SAX event.
+     *
+     * @return  LocationData, null if no Locator was found
+     */
+    public LocationData getLocationData() {
+        final Locator locator = getController().getLocator();
+        return (locator == null) ? null : new LocationData(locator);
     }
 
     private Stack repeatContextStack;

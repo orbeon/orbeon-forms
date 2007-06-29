@@ -20,6 +20,8 @@ import org.orbeon.oxf.xforms.processor.XFormsElementFilterContentHandler;
 import org.orbeon.oxf.xml.DeferredContentHandler;
 import org.orbeon.oxf.xml.DeferredContentHandlerImpl;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
+import org.orbeon.oxf.common.ValidationException;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -49,8 +51,8 @@ public class XFormsRepeatHandler extends HandlerBase {
         final Map effectiveRepeatIdToIterations = currentControlState.getEffectiveRepeatIdToIterations();
         final Map repeatIdToIndex = currentControlState.getRepeatIdToIndex();
 
-        final XFormsRepeatControl repeatControlInfo = handlerContext.isGenerateTemplate() ? null : (XFormsRepeatControl) containingDocument.getObjectById(pipelineContext, effectiveId);
-        final boolean isConcreteControl = repeatControlInfo != null;
+        final XFormsRepeatControl repeatControl = handlerContext.isGenerateTemplate() ? null : (XFormsRepeatControl) containingDocument.getObjectById(pipelineContext, effectiveId);
+        final boolean isConcreteControl = repeatControl != null;
 
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
         final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
@@ -84,14 +86,14 @@ public class XFormsRepeatHandler extends HandlerBase {
 
                 // Is the current iteration selected?
                 final boolean isCurrentRepeatSelected = isRepeatSelected && i == currentRepeatIndex;
-                final boolean isCurrentRepeatRelevant = ((RepeatIterationControl) repeatControlInfo.getChildren().get(i - 1)).isRelevant();
+                final boolean isCurrentRepeatRelevant = ((RepeatIterationControl) repeatControl.getChildren().get(i - 1)).isRelevant();
                 final int numberParentRepeat = handlerContext.countParentRepeats();
 
                 // Determine classes to add on root elements and around root characters
                 final StringBuffer addedClasses;
                 {
                     addedClasses = new StringBuffer();
-                    if (isCurrentRepeatSelected && !isStaticReadonly(repeatControlInfo)) {
+                    if (isCurrentRepeatSelected && !isStaticReadonly(repeatControl)) {
                         addedClasses.append("xforms-repeat-selected-item-");
                         addedClasses.append(Integer.toString((numberParentRepeat % 4) + 1));
                     }
@@ -102,7 +104,11 @@ public class XFormsRepeatHandler extends HandlerBase {
 
                 // Apply the content of the body for this iteration
                 handlerContext.pushRepeatContext(false, i, false, isCurrentRepeatSelected);
-                handlerContext.getController().repeatBody();
+                try {
+                    handlerContext.getController().repeatBody();
+                } catch (Exception e) {
+                    throw ValidationException.wrapException(e, new ExtendedLocationData(repeatControl.getLocationData(), "unrolling xforms:repeat control", repeatControl.getControlElement()));
+                }
                 outputInterceptor.flushCharacters(true, true);
                 handlerContext.popRepeatContext();
             }

@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.dom4j.QName;
-import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
@@ -22,6 +22,7 @@ import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -229,8 +230,9 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                         contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
                     } else {
                         // We do not support other appearances or regular open selection for now
-                        throw new OXFException("Open selection currently only supports the xxforms:autocomplete appearance.");
-                        // TODO: Use ValidationException.
+                        throw new ValidationException("Open selection currently only supports the xxforms:autocomplete appearance.",
+                                new ExtendedLocationData(handlerContext.getLocationData(), "producing markup for xforms:" + localname + " control",
+                                        (xformsValueControl != null) ? xformsValueControl.getControlElement() : null));
                     }
 
                 } else if (isTree) {
@@ -451,12 +453,12 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                     for (int i = currentLevel; i > newLevel; i--) {
                         listener.endItem(contentHandler);
                         startItemCount--;
-                        if (startItemCount < 0) throw new OXFException("Too many endItem() generated.");
+                        if (startItemCount < 0) throw new ValidationException("Too many endItem() generated.", handlerContext.getLocationData());
                         listener.endLevel(contentHandler, i);
                     }
                     listener.endItem(contentHandler);
                     startItemCount--;
-                    if (startItemCount < 0) throw new OXFException("Too many endItem() generated.");
+                    if (startItemCount < 0) throw new ValidationException("Too many endItem() generated.", handlerContext.getLocationData());
                 } else if (newLevel > currentLevel) {
                     // We are going up one or more levels
                     for (int i = currentLevel + 1; i <= newLevel; i++) {
@@ -466,7 +468,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                     // Same level as previous item
                     listener.endItem(contentHandler);
                     startItemCount--;
-                    if (startItemCount < 0) throw new OXFException("Too many endItem() generated.");
+                    if (startItemCount < 0) throw new ValidationException("Too many endItem() generated.", handlerContext.getLocationData());
                 }
 
                 startItemCount++;
@@ -478,7 +480,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
             for (int i = currentLevel; i > 0; i--) {
                 listener.endItem(contentHandler);
                 startItemCount--;
-                if (startItemCount < 0) throw new OXFException("Too many endItem() generated.");
+                if (startItemCount < 0) throw new ValidationException("Too many endItem() generated.", handlerContext.getLocationData());
                 listener.endLevel(contentHandler, i);
             }
         }

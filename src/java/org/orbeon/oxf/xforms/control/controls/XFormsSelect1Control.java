@@ -25,6 +25,7 @@ import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.saxon.om.NodeInfo;
 
 import java.util.*;
@@ -97,7 +98,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
                             for (int currentPosition = 1; currentPosition <= currentNodeSet.size(); currentPosition++) {
 
                                 // Push "artificial" binding with just current node in nodeset
-                                xformsControls.getContextStack().push(new XFormsControls.BindingContext(currentBindingContext, currentBindingContext.getModel(), xformsControls.getCurrentNodeset(), currentPosition, null, true, null));
+                                xformsControls.getContextStack().push(new XFormsControls.BindingContext(currentBindingContext, currentBindingContext.getModel(), xformsControls.getCurrentNodeset(), currentPosition, null, true, null, currentBindingContext.getLocationData()));
                                 {
                                     // Handle children of xforms:itemset
                                     final String label;
@@ -167,20 +168,24 @@ public class XFormsSelect1Control extends XFormsValueControl {
     }
 
     public List getItemset(PipelineContext pipelineContext, boolean setBinding) {
-        if ("false".equals(xxformsRefresh)) {
-            // Items are not automatically refreshed and stored globally
-            List items =  containingDocument.getXFormsControls().getConstantItems(getOriginalId());
-            if (items == null) {
-                items = evaluateItemsets(pipelineContext, setBinding);
-                containingDocument.getXFormsControls().setConstantItems(getOriginalId(), items);
+        try {
+            if ("false".equals(xxformsRefresh)) {
+                // Items are not automatically refreshed and stored globally
+                List items =  containingDocument.getXFormsControls().getConstantItems(getOriginalId());
+                if (items == null) {
+                    items = evaluateItemsets(pipelineContext, setBinding);
+                    containingDocument.getXFormsControls().setConstantItems(getOriginalId(), items);
+                }
+                return items;
+            } else {
+                // Items are stored in the control
+                if (items == null) {
+                    items = evaluateItemsets(pipelineContext, setBinding);
+                }
+                return items;
             }
-            return items;
-        } else {
-            // Items are stored in the control
-            if (items == null) {
-                items = evaluateItemsets(pipelineContext, setBinding);
-            }
-            return items;
+        } catch (Exception e) {
+            throw ValidationException.wrapException(e, new ExtendedLocationData(getLocationData(), "evaluating itemset", getControlElement()));
         }
     }
 

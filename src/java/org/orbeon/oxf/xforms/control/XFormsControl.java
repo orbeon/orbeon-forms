@@ -108,7 +108,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
     }
 
     public LocationData getLocationData() {
-        return (LocationData) controlElement.getData();
+        return (controlElement != null) ? (LocationData) controlElement.getData() : null;
     }
 
     public List getChildren() {

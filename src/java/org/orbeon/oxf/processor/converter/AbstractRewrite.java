@@ -282,7 +282,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
          *     <xsl:copy>
          *       <xsl:copy-of select="@*[namespace-uri() = '']"/>
          *         <xsl:attribute name="{res attrib name}">
-         *           <xsl:value-of select="context:rewriteActionURL(@{res attrib name})"/>
+         *           <xsl:value-of select="context:rewriteResourceURL(@{res attrib name})"/>
          *         </xsl:attribute>
          *         <xsl:apply-templates/>
          *       </xsl:copy>
@@ -311,6 +311,53 @@ abstract class AbstractRewrite extends ProcessorImpl {
                 final String newRes = response.rewriteResourceURL(res, false);
                 final int idx = newAtts.getIndex("", resAtt);
                 newAtts.setValue(idx, newRes);
+                contentHandler.startElement(ns, lnam, qnam, newAtts);
+            }
+            return ret;
+        }
+
+        /**
+         * Handle xhtml:object
+         */
+        private State2 handleObject
+                (final String ns, final String lnam
+                        , final String qnam, final Attributes atts)
+                throws SAXException {
+            State2 ret = null;
+            done :
+            if ("object".equals(lnam)) {
+
+                final String classidAttribute = atts.getValue("", "classid");
+                final String codebaseAttribute = atts.getValue("", "codebase");
+                final String dataAttribute = atts.getValue("", "data");
+                final String usemapAttribute = atts.getValue("", "usemap");
+                // NOTE: the @archive attribute is a space-separated list of URIs. We don't handle it here yet.
+
+                if (classidAttribute == null && codebaseAttribute == null && dataAttribute == null && usemapAttribute == null) break done;
+
+                ret = this;
+                final AttributesImpl newAtts = XMLUtils.getAttribsFromDefaultNamespace(atts);
+                if (classidAttribute != null) {
+                    final String newAttribute = response.rewriteResourceURL(classidAttribute, false);
+                    final int idx = newAtts.getIndex("", "classid");
+                    newAtts.setValue(idx, newAttribute);
+                }
+                if (codebaseAttribute != null) {
+                    final String newAttribute = response.rewriteResourceURL(codebaseAttribute, false);
+                    final int idx = newAtts.getIndex("", "codebase");
+                    newAtts.setValue(idx, newAttribute);
+                }
+                if (dataAttribute != null) {
+                    final String newAttribute = response.rewriteResourceURL(dataAttribute, false);
+                    final int idx = newAtts.getIndex("", "data");
+                    newAtts.setValue(idx, newAttribute);
+                }
+                if (usemapAttribute != null) {
+                    final String newAttribute = response.rewriteResourceURL(usemapAttribute, false);
+                    final int idx = newAtts.getIndex("", "usemap");
+                    newAtts.setValue(idx, newAttribute);
+                }
+
                 contentHandler.startElement(ns, lnam, qnam, newAtts);
             }
             return ret;
@@ -706,6 +753,9 @@ abstract class AbstractRewrite extends ProcessorImpl {
                     if (ret != null) break done;
 
                     ret = handleEltWithResource("body", BACKGROUND_ATT, ns, lnam, qnam, atts);
+                    if (ret != null) break done;
+
+                    ret = handleObject(ns, lnam, qnam, atts);
                     if (ret != null) break done;
                 }
                 ret = this;

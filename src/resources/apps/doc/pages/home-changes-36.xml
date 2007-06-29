@@ -31,7 +31,7 @@
                 Welcome to Orbeon Forms 3.6!
             </p>
             <p>
-                Orbeon Forms 3.6 features around <a href="#changes-36-full">80 improvements</a> over <a
+                Orbeon Forms 3.6 features over <a href="#changes-36-full">80 improvements</a> over <a
                 href="home-changes-35">Orbeon Forms 3.5.1</a>, including major improvements in the areas of XML Schema
                 validation, error handling, and deployment within Java applications.
             </p>
@@ -305,7 +305,7 @@
             <section>
                 <title>Complete List of Issues Addressed in this Release</title>
                 <p>
-                    Orbeon Forms 3.6 addresses around 80 bugs and features:
+                    Orbeon Forms 3.6 addresses over 80 bugs and features:
                 </p>
                 <!--
 Request to extract bugs from SourceForge with http://www.orbeon.com/ops/xquery-the-web/ :
@@ -327,6 +327,21 @@ http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=2
 
                 -->
                 <ul>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307237&amp;group_id=168&amp;atid=350207">#307237: URL
+                            rewriting does not rewrite attributes of xhtml:object
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307236&amp;group_id=168&amp;atid=350207">#307236:
+                            Missing or incorrect location data when certain errors occur within xforms:repeat
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307232&amp;group_id=168&amp;atid=350207">#307232:
+                            Inaccurate description of how to customize the jscalendar
+                        </a>
+                    </li>
                     <li>
                         <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307229&amp;group_id=168&amp;atid=350207">#307229:
                             Required but empty selection controls are not properly styled

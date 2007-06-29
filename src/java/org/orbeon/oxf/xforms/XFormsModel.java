@@ -157,9 +157,11 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
             return this;
 
         // Search instances
-        final XFormsInstance instance = (XFormsInstance) instancesMap.get(id);
-        if (instance != null)
-            return instance;
+        if (instancesMap != null) {
+            final XFormsInstance instance = (XFormsInstance) instancesMap.get(id);
+            if (instance != null)
+                return instance;
+        }
 
         // Search submissions
         if (submissions != null) {

@@ -1014,20 +1014,22 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
             for (Iterator i = getModels().iterator(); i.hasNext();) {
                 final XFormsModel currentModel = (XFormsModel) i.next();
 
-                for (Iterator j = currentModel.getInstances().iterator(); j.hasNext();) {
-                    final XFormsInstance currentInstance = (XFormsInstance) j.next();
+                if (currentModel.getInstances() != null) {
+                    for (Iterator j = currentModel.getInstances().iterator(); j.hasNext();) {
+                        final XFormsInstance currentInstance = (XFormsInstance) j.next();
 
-                    // TODO: can we avoid storing the instance in the dynamic state if it has not changed from static state?
+                        // TODO: can we avoid storing the instance in the dynamic state if it has not changed from static state?
 
-                    if (currentInstance.isReplaced() || !(currentInstance instanceof SharedXFormsInstance)) {
-                        // Instance has been replaced, or it is not shared, so it has to go in the dynamic state
-                        instancesElement.add(currentInstance.createContainerElement(!currentInstance.isApplicationShared()));
-                    }
+                        if (currentInstance.isReplaced() || !(currentInstance instanceof SharedXFormsInstance)) {
+                            // Instance has been replaced, or it is not shared, so it has to go in the dynamic state
+                            instancesElement.add(currentInstance.createContainerElement(!currentInstance.isApplicationShared()));
+                        }
 
-                    // Log instance if needed
-                    if (XFormsServer.logger.isDebugEnabled()) {
-                        XFormsServer.logger.debug("XForms - resulting instance: model id='" + currentModel.getEffectiveId() +  "', instance id= '" + currentInstance.getEffectiveId() + "'\n"
-                                + TransformerUtils.tinyTreeToString(currentInstance.getInstanceRootElementInfo()));
+                        // Log instance if needed
+                        if (XFormsServer.logger.isDebugEnabled()) {
+                            XFormsServer.logger.debug("XForms - resulting instance: model id='" + currentModel.getEffectiveId() +  "', instance id= '" + currentInstance.getEffectiveId() + "'\n"
+                                    + TransformerUtils.tinyTreeToString(currentInstance.getInstanceRootElementInfo()));
+                        }
                     }
                 }
             }

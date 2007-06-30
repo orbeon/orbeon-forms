@@ -744,11 +744,13 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         // Don't do anything if there is no schema
         if (schemaValidator != null) {
             // Apply schemas to all instances
-            for (Iterator i = getInstances().iterator(); i.hasNext();) {
-                final XFormsInstance currentInstance = (XFormsInstance) i.next();
-                // Currently we don't support validating read-only instances
-                if (!currentInstance.isReadOnly())
-                    schemaValidator.validateInstance(currentInstance);
+            if (getInstances() != null) {
+                for (Iterator i = getInstances().iterator(); i.hasNext();) {
+                    final XFormsInstance currentInstance = (XFormsInstance) i.next();
+                    // Currently we don't support validating read-only instances
+                    if (!currentInstance.isReadOnly())
+                        schemaValidator.validateInstance(currentInstance);
+                }
             }
         }
     }
@@ -1049,7 +1051,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
             }
 
             // Call special listener to update instance
-            if (instanceConstructListener != null) {
+            if (instanceConstructListener != null && getInstances() != null) {
                 int position = 0;
                 for (Iterator i = getInstances().iterator(); i.hasNext(); position++) {
                     instanceConstructListener.updateInstance(position, (XFormsInstance) i.next());
@@ -1082,20 +1084,22 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
                 final boolean modelHasReset = false;// TODO: containingDocument[0].hasReset(modelId) or xformsEngineStaticState.hasReset(modelId);
 
-                for (Iterator instanceIterator = getInstances().iterator(); instanceIterator.hasNext();) {
-                    final XFormsInstance currentInstance = (XFormsInstance) instanceIterator.next();
+                if (getInstances() != null) {
+                    for (Iterator instanceIterator = getInstances().iterator(); instanceIterator.hasNext();) {
+                        final XFormsInstance currentInstance = (XFormsInstance) instanceIterator.next();
 
-                    if (currentInstance instanceof SharedXFormsInstance) {
+                        if (currentInstance instanceof SharedXFormsInstance) {
 
-                        // NOTE: We add all shared instances, even the globally shared ones, and the static state
-                        // decides of the amount of information to actually store
-                        if (XFormsServer.logger.isDebugEnabled())
-                            XFormsServer.logger.debug("XForms - adding read-only instance to static state: " + currentInstance);
-                        staticState.addInstance((SharedXFormsInstance) currentInstance);
-                    } else if (modelHasReset) {
-                        if (XFormsServer.logger.isDebugEnabled())
-                            XFormsServer.logger.debug("XForms - adding reset instance to static state: " + currentInstance.getEffectiveId());
-                        staticState.addInstance(currentInstance.createSharedInstance());
+                            // NOTE: We add all shared instances, even the globally shared ones, and the static state
+                            // decides of the amount of information to actually store
+                            if (XFormsServer.logger.isDebugEnabled())
+                                XFormsServer.logger.debug("XForms - adding read-only instance to static state: " + currentInstance);
+                            staticState.addInstance((SharedXFormsInstance) currentInstance);
+                        } else if (modelHasReset) {
+                            if (XFormsServer.logger.isDebugEnabled())
+                                XFormsServer.logger.debug("XForms - adding reset instance to static state: " + currentInstance.getEffectiveId());
+                            staticState.addInstance(currentInstance.createSharedInstance());
+                        }
                     }
                 }
             }

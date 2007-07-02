@@ -118,7 +118,7 @@
                     <!-- Details -->
                     <div id="orbeon-error-panel-details-hidden">
                         <p>
-                            <a class="orbeon-error-panel-show-details" href="#" onclick="hideShowSection(this)">
+                            <a class="orbeon-error-panel-show-details" onclick="hideShowSection(this)">
                                 <img src="/ops/images/xforms/section-closed.png" alt="Show Details"/>
                                 <span>Show details</span>
                             </a>
@@ -126,7 +126,7 @@
                     </div>
                     <div id="orbeon-error-panel-details-shown" class="orbeon-error-disabled">
                         <p>
-                            <a class="orbeon-error-panel-hide-details" href="#" onclick="hideShowSection(this)">
+                            <a class="orbeon-error-panel-hide-details" onclick="hideShowSection(this)">
                                 <img src="/ops/images/xforms/section-opened.png" alt="Hide Details"/>
                                 <span>Hide details</span>
                             </a>

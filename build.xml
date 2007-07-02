@@ -293,6 +293,7 @@
                 <exclude name="ops/fckeditor/**/*.lasso"/>
                 <include name="oxf/**/*.*"/>
                 <include name="config/**/*.*"/>
+                <exclude name="config/theme/**/*.*"/>
                 <!-- We keep these in ops.jar -->
                 <exclude name="config/*-processors.xml"/>
             </fileset>
@@ -311,6 +312,7 @@
                 <exclude name="ops/fckeditor/_samples/**/*.*"/>
                 <exclude name="ops/fckeditor/editor/_source/**/*.*"/>
                 <exclude name="ops/fckeditor/_testcases/**/*.*"/>
+                <include name="config/theme/**/*.*"/>
             </fileset>
             <zipfileset dir="${build.temp.dir}/theme" prefix="config/theme">
                 <include name="*.css"/>
@@ -354,6 +356,7 @@
     </target>
 
     <target name="dev-css-templates" depends="init">
+        <mkdir dir="${war.dir}/WEB-INF/resources/config/theme"/>
         <copy file="${resources-packaged.dir}/ops/css/orbeon.css.template" toFile="${war.dir}/WEB-INF/resources/config/theme/orbeon.css">
             <filterset refid="css-filter-set"/>
         </copy>
@@ -674,9 +677,9 @@
                 <exclude name="apps/doc/**/*.cdr"/>
                 <exclude name="apps/doc/**/*.cpl"/>
             </zipfileset>
-            <zipfileset dir="${build.temp.dir}/theme" prefix="WEB-INF/resources/config/theme">
-                <include name="*.css"/>
-            </zipfileset>
+            <!--<zipfileset dir="${build.temp.dir}/theme" prefix="WEB-INF/resources/config/theme">-->
+                <!--<include name="*.css"/>-->
+            <!--</zipfileset>-->
         </zip>
     </target>
 

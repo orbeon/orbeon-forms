@@ -783,9 +783,6 @@ http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=2
                         will have to merge the changes introduced in <code>ops-resources-public.jar</code>, or better,
                         don't modify these CSS files but override CSS definitions in your own CSS files instead.</p>
                     </li>
-                    <li>
-                        <p></p>
-                    </li>
                 </ul>
             </section>
         </section>

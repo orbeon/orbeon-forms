@@ -1,5 +1,5 @@
 <!--
-    Copyright (C) 2006 Orbeon, Inc.
+    Copyright (C) 2006-2007 Orbeon, Inc.
 
     This program is free software; you can redistribute it and/or modify it under the terms of the
     GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -18,18 +18,16 @@
 <xsl:stylesheet version="2.0"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    xmlns:f="http://orbeon.org/oxf/xml/formatting"
     xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xforms="http://www.w3.org/2002/xforms"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
     xmlns:version="java:org.orbeon.oxf.common.Version">
 
     <!-- Orbeon Forms version -->
     <xsl:variable name="orbeon-forms-version" select="version:getVersion()" as="xs:string"/>
 
     <!-- - - - - - - Themed page template - - - - - - -->
-    <xsl:template match="/">
-        <xhtml:html>
+    <xsl:template match="/*">
+        <xsl:copy>
+            <xsl:copy-of select="@*"/>
             <xhtml:head>
                 <!-- Standard scripts/styles -->
                 <!-- NOTE: The XForms engine may place additional scripts and stylesheets here as needed -->
@@ -60,7 +58,7 @@
                 <!-- Copy body -->
                 <xsl:apply-templates select="/xhtml:html/xhtml:body/node()"/>
             </xhtml:body>
-        </xhtml:html>
+        </xsl:copy>
     </xsl:template>
 
     <!-- Simply copy everything that's not matched -->

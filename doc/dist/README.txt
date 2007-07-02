@@ -4,7 +4,7 @@
 
 =====================================================
 
-Last updated for Orbeon Forms 3.6, June 2007
+Last updated for Orbeon Forms 3.6, July 2007
 
 This README.TXT file covers the following topics:
 
@@ -80,11 +80,11 @@ third-party software.
 
 A complete list of changes can be found online at:
 
-  http://www.orbeon.com/ops/doc/home-changes-35
+  http://www.orbeon.com/ops/doc/home-changes-36
 
 or in this distribution under:
 
-  doc/home-changes-35.html
+  doc/home-changes-36.html
 
 
 ****************************************

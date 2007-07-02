@@ -131,7 +131,7 @@ public class StreamInterceptor {
                         // are left to using a default or hope that the source
                         // set a known encoding.
                         inputStream = inputSource.getByteStream();
-                        tidy.setCharEncoding(TidyConfig.getTidyEncoding(encoding));
+                        tidy.setInputEncoding(TidyConfig.getTidyEncoding(encoding));
                     } else {
                         // Here we go from characters to bytes to characters
                         // again, which is very suboptimal, but the version of
@@ -139,7 +139,7 @@ public class StreamInterceptor {
 
                         // Use utf-8 both ways and hope for the best
                         inputStream = new ByteArrayInputStream(stringContent.getBytes("utf-8"));
-                        tidy.setCharEncoding(Configuration.UTF8);
+                        tidy.setInputEncoding("utf-8");
                     }
 
                     Document document = tidy.parseDOM(inputStream, null);

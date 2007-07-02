@@ -802,7 +802,7 @@ public class URLGenerator extends ProcessorImpl {
 
             // Set encoding
             // If the encoding is null, we get a default
-            tidy.setCharEncoding(TidyConfig.getTidyEncoding(encoding));
+            tidy.setInputEncoding(TidyConfig.getTidyEncoding(encoding));
 
             // Parse and output to SAXResult
             Document document = tidy.parseDOM(is, null);

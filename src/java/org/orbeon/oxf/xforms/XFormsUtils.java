@@ -547,7 +547,7 @@ public class XFormsUtils {
         final Tidy tidy = new Tidy();
         tidy.setShowWarnings(false);
         tidy.setQuiet(true);
-        tidy.setCharEncoding(TidyConfig.getTidyEncoding("utf-8"));
+        tidy.setInputEncoding("utf-8");
 
         // Parse and output to SAXResult
         final byte[] valueBytes;

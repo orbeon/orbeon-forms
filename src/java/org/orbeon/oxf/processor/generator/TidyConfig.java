@@ -75,17 +75,7 @@ public class TidyConfig {
                 + "|" + isUppercaseAttrs() + "|" + isUppercaseTags() + "|" + isWord2000() + "]";
     }
 
-    public static int getTidyEncoding(String encoding) {
-        // Set default encoding
-        if (encoding == null)
-            encoding = DEFAULT_HTML_ENCODING;
-
-        // See if we got a known encoding
-        if (encoding.equalsIgnoreCase("iso-8859-1"))
-            return Configuration.LATIN1;
-        else if (encoding.equalsIgnoreCase("utf-8"))
-            return Configuration.UTF8;
-        else
-            return getTidyEncoding(DEFAULT_HTML_ENCODING);
+    public static String getTidyEncoding(String encoding) {
+        return (encoding == null) ? encoding = DEFAULT_HTML_ENCODING : encoding;
     }
 }

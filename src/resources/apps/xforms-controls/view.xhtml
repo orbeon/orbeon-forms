@@ -81,7 +81,7 @@
                                       then current-date() + xdt:dayTimeDuration('P1D') >= xs:date(.)
                                       else false()"
                                       readonly="false()"
-                                      calculate="if (. = '') then current-date() else ."/>
+                                      calculate="if (. = '') then adjust-date-to-timezone(current-date(), ()) else ."/>
                 <!--<xforms:bind nodeset="time" type="xs:time"/>-->
                 <xforms:bind nodeset="range/value" type="xs:integer"/>
                 <xforms:bind nodeset="range/letter" calculate="

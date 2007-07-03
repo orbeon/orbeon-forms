@@ -213,9 +213,8 @@
     </xs:simpleType>
 
     <xs:simpleType name="zip">
-        <xs:restriction base="xs:positiveInteger">
-            <xs:minInclusive value="10000"/>
-            <xs:maxInclusive value="99999"/>
+        <xs:restriction base="xs:string">
+            <xs:pattern value="\d{5}"/>
         </xs:restriction>
     </xs:simpleType>
 

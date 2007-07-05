@@ -63,6 +63,11 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
 
+/**
+ * NOTE: This class requires a re-rooted Saxon to be present. Saxon is used to detect stylesheet dependencies, and the
+ * processor also has support for outputting Saxon line numbers. But the processor must remain able to run other
+ * transformers like Xalan.
+ */
 public abstract class XSLTTransformer extends ProcessorImpl {
 
     private static Logger logger = Logger.getLogger(XSLTTransformer.class);
@@ -154,6 +159,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                         transformer.setOutputProperty(SaxonOutputKeys.SUPPLY_SOURCE_LOCATOR, "yes");
 
                     final String transformerClassName = transformerHandler.getTransformer().getClass().getName();
+                    // TODO: 2007-07-05 MK suggests that since we depend on Saxon anyway, we shouldn't use reflection here but directly the Saxon classes to avoid the cost of reflection.
                     if (transformerClassName.equals("net.sf.saxon.Controller") || transformerClassName.equals("org.orbeon.saxon.Controller")) {
                         saxonStringWriter = new StringWriter();
                         Object saxonTransformer = transformerHandler.getTransformer();
@@ -210,7 +216,9 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                         // bug in Saxon.
                         public void startPrefixMapping(String s, String s1) throws SAXException {
                             if ("xmlns".equals(s)) {
-                                return;
+                                // TODO: This may be an old Saxon bug which doesn't occur anymore. Try to see if it occurs again.
+                                throw new IllegalArgumentException("xmlns");
+//                                return;
                             }
                             super.startPrefixMapping(s, s1);
                         }
@@ -720,10 +728,16 @@ public abstract class XSLTTransformer extends ProcessorImpl {
 
                 // <xsl:include> or <xsl:import>
                 if ("include".equals(localname) || "import".equals(localname)) {
-                    String href = attributes.getValue("href");
-                    URIReference uriReference = new URIReference();
+                    final String href = attributes.getValue("href");
+                    final URIReference uriReference = new URIReference();
                     uriReference.context = systemId;
                     uriReference.spec = href;
+                    uriReferences.stylesheetReferences.add(uriReference);
+                } else if ("import-schema".equals(localname)) {
+                    final String schemaLocation = attributes.getValue("schema-location");// NOTE: We ignore the @namespace attribute for now
+                    final URIReference uriReference = new URIReference();
+                    uriReference.context = systemId;
+                    uriReference.spec = schemaLocation;
                     uriReferences.stylesheetReferences.add(uriReference);
                 }
 
@@ -740,9 +754,11 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                     try {
                         // First, test that one of the strings is present so we don't have to parse unnecessarily
 
-                        // NOTE: We assume that function calls don't allow spaces between the function name and the
-                        // opening bracket. This seems to be what XPath 2.0 specifies, but it looke like XPath engines
-                        // seem to allow spaces.
+                        // TODO: 2007-07-05 MK says that there can be spaces and comments between the "doc" and the "(". Suggestion:
+                        // "One possibility here if you want to avoid parsing the expression unnecessarily is to run it
+                        // through the lexer (net.sf.saxon.expr.Tokenizer). You can just look at the stream of tokens
+                        // and look for doc (or a lexical QName whose local part is doc) followed by "("."
+
                         final boolean containsDocString = xpathString.indexOf("doc(") != -1 || xpathString.indexOf("document(") != -1;
                         if (containsDocString) {
                             final Expression expression = ExpressionTool.make(xpathString, dummySaxonXPathContext, 0, -1, 0);
@@ -773,21 +789,24 @@ public abstract class XSLTTransformer extends ProcessorImpl {
         }
 
         private void visitExpression(Expression expression) {
-            Iterator subExpressionsIterator = expression.iterateSubExpressions();
+
+            // TODO: 2007-07-05 MK "is potentially expensive and should be moved into the "if". Or reused [where expression.iterateSubExpressions() appears below]"
+            final Iterator subExpressionsIterator = expression.iterateSubExpressions();
             boolean foundDocFunction = false;
             if (expression instanceof FunctionCall) {
-                String functionName = ((FunctionCall) expression).getDisplayName(namePool);
+                final String functionName = ((FunctionCall) expression).getDisplayName(namePool);
                 if ("doc".equals(functionName) || "document".equals(functionName)) {
+                    // TODO: 2007-07-05 MK says "functionName is the name as written by the user: it could be "fn:doc"."
                     foundDocFunction = true;
                     // Call to doc(...)
                     if (subExpressionsIterator.hasNext()) {
-                        Object value = subExpressionsIterator.next();
+                        final Object value = subExpressionsIterator.next();
                         if (value instanceof StringValue) {
                             // doc(...) call just contains a string, record the URI
-                            String uri = ((StringValue) value).getStringValue();
+                            final String uri = ((StringValue) value).getStringValue();
                             // We don't need to worry here about reference to the processor inputs
                             if (!isProcessorInputScheme(uri)) {
-                                URIReference uriReference = new URIReference();
+                                final URIReference uriReference = new URIReference();
                                 uriReference.context = systemId;
                                 uriReference.spec = uri;
                                 uriReferences.documentReferences.add(uriReference);

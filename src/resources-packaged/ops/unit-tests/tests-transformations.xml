@@ -231,38 +231,38 @@
             </company>
         </input>
         <input name="config">
-            <xquery>
-                xquery version "1.0";
-                declare namespace xs = "http://www.w3.org/2001/XMLSchema";
-                declare namespace local = "http://orbeon.org/oxf/xml/local";
+    <xquery>
+        xquery version "1.0";
+        declare namespace xs = "http://www.w3.org/2001/XMLSchema";
+        declare namespace local = "http://orbeon.org/oxf/xml/local";
 
-                (: Find employees of a certain department :)
-                declare function local:employees($company as element(), $name as xs:string) as element()* {
-                     $company/department[@name = $name]/employee
-                };
+        (: Find employees of a certain department :)
+        declare function local:employees($company as element(), $name as xs:string) as element()* {
+             $company/department[@name = $name]/employee
+        };
 
-                (: Compute longest last name :)
-                declare function local:maxLastnameLength($employees as element()*) as xs:integer {
-                    let $lengths :=
-                        for $e in $employees
-                        return string-length($e/@lastname)
-                    return max($lengths)
-                };
+        (: Compute longest last name :)
+        declare function local:maxLastnameLength($employees as element()*) as xs:integer {
+            let $lengths :=
+                for $e in $employees
+                return string-length($e/@lastname)
+            return max($lengths)
+        };
 
-                let $company := /*
-                let $hrEmployees := local:employees($company, "HR")
-                let $engineeringEmployees := local:employees($company, "Engineering")
+        let $company := /*
+        let $hrEmployees := local:employees($company, "HR")
+        let $engineeringEmployees := local:employees($company, "Engineering")
 
-                return
-                    <mixed-up-company employee-count="{count($company/department/employee)}"
-                            max-lastname-length="{local:maxLastnameLength($company/department/employee)}">
-                        {
-                            for $first in $hrEmployees
-                            for $second in $engineeringEmployees
-                            return <employee firstname="{$first/@firstname}" lastname="{$second/@lastname}"/>
-                        }
-                    </mixed-up-company>
-            </xquery>
+        return
+            <mixed-up-company employee-count="{count($company/department/employee)}"
+                    max-lastname-length="{local:maxLastnameLength($company/department/employee)}">
+                {
+                    for $first in $hrEmployees
+                    for $second in $engineeringEmployees
+                    return <employee firstname="{$first/@firstname}" lastname="{$second/@lastname}"/>
+                }
+            </mixed-up-company>
+    </xquery>
         </input>
         <output name="data">
             <mixed-up-company max-lastname-length="8" employee-count="6">

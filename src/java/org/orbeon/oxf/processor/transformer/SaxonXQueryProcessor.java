@@ -15,8 +15,6 @@ package org.orbeon.oxf.processor.transformer;
 
 import org.apache.log4j.Logger;
 import org.dom4j.Document;
-import org.dom4j.Element;
-import org.dom4j.Namespace;
 import org.dom4j.io.DocumentSource;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -28,7 +26,6 @@ import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.Configuration;
-import org.orbeon.saxon.TransformerFactoryImpl;
 import org.orbeon.saxon.query.DynamicQueryContext;
 import org.orbeon.saxon.query.StaticQueryContext;
 import org.orbeon.saxon.query.XQueryExpression;
@@ -36,7 +33,6 @@ import org.xml.sax.ContentHandler;
 
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.URIResolver;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
@@ -66,19 +62,6 @@ public class SaxonXQueryProcessor extends ProcessorImpl {
         addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
     }
 
-    // This class just to make a method public. I believe it is already public in the newer version
-    // of Saxon. When that is integrated, we can remove the class below.
-    class LocalStaticQueryContext extends StaticQueryContext {
-
-        public LocalStaticQueryContext(Configuration config) {
-            super(config);
-        }
-
-        public void declareActiveNamespace(String prefix, String uri) {
-            super.declareActiveNamespace(prefix, uri);
-        }
-    };
-
     public ProcessorOutput createOutput(String name) {
         ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
             public void readImpl(final PipelineContext pipelineContext, ContentHandler contentHandler) {
@@ -91,7 +74,11 @@ public class SaxonXQueryProcessor extends ProcessorImpl {
                     final Configuration config = new Configuration();
                     {
                         config.setErrorListener(new StringErrorListener(logger));
-                        config.setURIResolver(uriResolver);
+
+                        // 2007-07-05 MK says: "fetching of query modules is done by the ModuleURIResolver in the
+                        // static context, fetching of doc() is done by the URIResolver in the dynamic context; the
+                        // URIResolver in the Configuration is just a fallback."
+//                        config.setURIResolver(uriResolver);
 
                         // Read attributes
                         Map attributes = null;
@@ -109,45 +96,55 @@ public class SaxonXQueryProcessor extends ProcessorImpl {
                                 });
                             }
                         }
-                        if (attributes != null)
-                            setConfigurationAttributes(config, attributes);
+                        // Set configuration attributes if any
+                        if (attributes != null) {
+                            for (Iterator i = attributes.keySet().iterator(); i.hasNext();) {
+                                String key = (String) i.next();
+                                Object value = attributes.get(key);
+
+                                config.setConfigurationProperty(key, value);
+                            }
+                        }
                     }
 
                     // Create static context
-                    final LocalStaticQueryContext staticContext = new LocalStaticQueryContext(config);
+                    final StaticQueryContext staticContext = new StaticQueryContext(config);
 
                     // Create XQuery expression (depends on config input and static context)
                     // TODO: caching of query must also depend on attributes input
                     XQueryExpression xqueryExpression = (XQueryExpression) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_CONFIG), new CacheableInputReader() {
                         public Object read(PipelineContext context, ProcessorInput input) {
 
-                            // Read XQuery into String
-                            final Document xqueryDocument = readCacheInputAsDOM4J(pipelineContext, INPUT_CONFIG);
-                            String xqueryBody;
-                            if (XMLConstants.XS_STRING_QNAME.equals(Dom4jUtils.extractAttributeValueQName(xqueryDocument.getRootElement(), XMLConstants.XSI_TYPE_QNAME))) {
-                                // Content is text under an XML root element
-                                xqueryBody = xqueryDocument.getRootElement().getStringValue();
-                            } else {
-                                // Content is XQuery embedded into XML
-                                xqueryBody = Dom4jUtils.domToString(xqueryDocument);
-                                xqueryBody = xqueryBody.substring(xqueryBody.indexOf(">") + 1);
-                                xqueryBody = xqueryBody.substring(0, xqueryBody.lastIndexOf("<"));
-                            }
-
-                            // Add namespaces declarations
-                            final Map namespaces = new HashMap();
-                            getDeclaredNamespaces(namespaces, xqueryDocument.getRootElement());
-                            for (Iterator i = namespaces.keySet().iterator(); i.hasNext();) {
-                                String prefix = (String) i.next();
-                                String uri = (String) namespaces.get(prefix);
-                                staticContext.declareActiveNamespace(prefix, uri);
-                            }
-
                             try {
-                                final XQueryExpression result = staticContext.compileQuery(xqueryBody);
+
+                                // Read XQuery into String
+                                final Document xqueryDocument = readCacheInputAsDOM4J(pipelineContext, INPUT_CONFIG);
+                                String xqueryBody;
+                                if (XMLConstants.XS_STRING_QNAME.equals(Dom4jUtils.extractAttributeValueQName(xqueryDocument.getRootElement(), XMLConstants.XSI_TYPE_QNAME))) {
+                                    // Content is text under an XML root element
+                                    xqueryBody = xqueryDocument.getRootElement().getStringValue();
+                                } else {
+                                    // Content is XQuery embedded into XML
+                                    xqueryBody = Dom4jUtils.domToString(xqueryDocument);
+                                    xqueryBody = xqueryBody.substring(xqueryBody.indexOf(">") + 1);
+                                    xqueryBody = xqueryBody.substring(0, xqueryBody.lastIndexOf("<"));
+
+                                    // Add namespaces declarations
+                                    // TODO: 2007-7-05 MK says that this shouldn't be necessary. In fact, I don't know why we do this.
+                                    final Map namespaces = Dom4jUtils.getNamespaceContext(xqueryDocument.getRootElement());
+                                    for (Iterator i = namespaces.keySet().iterator(); i.hasNext();) {
+                                        String prefix = (String) i.next();
+                                        String uri = (String) namespaces.get(prefix);
+                                        staticContext.declarePassiveNamespace(prefix, uri, false);
+                                    }
+                                }
+
+                                // 2007-07-05 MK says: "fetching of query modules is done by the ModuleURIResolver in the
+                                // static context, fetching of doc() is done by the URIResolver in the dynamic context; the
+                                // URIResolver in the Configuration is just a fallback."
                                 // Clear URI resolver from static context as this must not end up in the cache
-                                staticContext.getConfiguration().setURIResolver(null);
-                                return result;
+//                                staticContext.getConfiguration().setURIResolver(null);
+                                return staticContext.compileQuery(xqueryBody);
                             } catch (Exception e) {
                                 throw new OXFException(e);
                             }
@@ -156,7 +153,7 @@ public class SaxonXQueryProcessor extends ProcessorImpl {
 
                     // Create dynamic context and run query
                     DynamicQueryContext dynamicContext =  new DynamicQueryContext(config);
-                    dynamicContext.setContextNode(staticContext.buildDocument(new DocumentSource(dataDocument)));
+                    dynamicContext.setContextItem(staticContext.buildDocument(new DocumentSource(dataDocument)));
                     dynamicContext.setURIResolver(uriResolver);
                     // TODO: use xqueryExpression.getStaticContext() when Saxon is upgraded
                     xqueryExpression.run(dynamicContext, new SAXResult(contentHandler), new Properties());
@@ -168,49 +165,5 @@ public class SaxonXQueryProcessor extends ProcessorImpl {
         };
         addOutput(name, output);
         return output;
-    }
-
-    private void setConfigurationAttributes(Configuration config, Map attributes) {
-
-        // NOTE: The code below directly uses the Saxon TransformerFactoryImpl, which may change
-        // when we upgrade Saxon, but it's the easiest way to set attributes on a Configuration
-        // object from name / value pairs.
-        TransformerFactoryImpl transformerFactory = new TransformerFactoryImpl();
-        transformerFactory.setConfiguration(config);
-
-        for (Iterator i = attributes.keySet().iterator(); i.hasNext();) {
-            String key = (String) i.next();
-            Object value = attributes.get(key);
-
-            transformerFactory.setAttribute(key, value);
-        }
-    }
-
-    /**
-     * Returns all the namespaces declared in the given document. Throws an exception if a prefix
-     * is mapped to two different URI in the document (we might want to support this in the future).
-     */
-    private void getDeclaredNamespaces(Map namespaces, Element element) {
-
-        // Handle namespace in this element
-        for (Iterator i = element.declaredNamespaces().iterator(); i.hasNext();) {
-            Namespace namespace = (Namespace) i.next();
-            String prefix = namespace.getPrefix();
-            String uri = namespace.getURI();
-            String existingMapping = (String) namespaces.get(prefix);
-            if (existingMapping != null) {
-                if (!uri.equals(existingMapping))
-                    throw new OXFException("Namespace prefix '" + prefix + "' is mapped to more than one URI: '"
-                            + existingMapping + "' and '" + uri + "'");
-            } else {
-                namespaces.put(prefix, uri);
-            }
-        }
-
-        // Go through children elements
-        for (Iterator i = element.elements().iterator(); i.hasNext();) {
-            Element child = (Element) i.next();
-            getDeclaredNamespaces(namespaces, child);
-        }
     }
 }

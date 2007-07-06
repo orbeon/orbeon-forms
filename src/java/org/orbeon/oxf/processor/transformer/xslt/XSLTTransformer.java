@@ -159,17 +159,22 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                         transformer.setOutputProperty(SaxonOutputKeys.SUPPLY_SOURCE_LOCATOR, "yes");
 
                     final String transformerClassName = transformerHandler.getTransformer().getClass().getName();
-                    // TODO: 2007-07-05 MK suggests that since we depend on Saxon anyway, we shouldn't use reflection here but directly the Saxon classes to avoid the cost of reflection.
+
+                    // NOTE: 2007-07-05 MK suggests that since we depend on Saxon anyway, we shouldn't use reflection
+                    // here but directly the Saxon classes to avoid the cost of reflection.
+
+                    // Well, in fact if we really want to test on the two classes, we probably need to use reflection.
+                    // org.orbeon.saxon.Controller will be there for sure, but not net.sf.saxon.Controller.
                     if (transformerClassName.equals("net.sf.saxon.Controller") || transformerClassName.equals("org.orbeon.saxon.Controller")) {
                         saxonStringWriter = new StringWriter();
-                        Object saxonTransformer = transformerHandler.getTransformer();
-                        Method getMessageEmitter = saxonTransformer.getClass().getMethod("getMessageEmitter", new Class[]{});
+                        final Object saxonTransformer = transformerHandler.getTransformer();
+                        final Method getMessageEmitter = saxonTransformer.getClass().getMethod("getMessageEmitter", new Class[]{});
                         Object messageEmitter = getMessageEmitter.invoke(saxonTransformer, new Object[]{});
                         if (messageEmitter == null) {
                             Method makeMessageEmitter = saxonTransformer.getClass().getMethod("makeMessageEmitter", new Class[]{});
                             messageEmitter = makeMessageEmitter.invoke(saxonTransformer, new Object[]{});
                         }
-                        Method setWriter = messageEmitter.getClass().getMethod("setWriter", new Class[]{Writer.class});
+                        final Method setWriter = messageEmitter.getClass().getMethod("setWriter", new Class[]{Writer.class});
                         setWriter.invoke(messageEmitter, new Object[]{saxonStringWriter});
                     }
 
@@ -618,7 +623,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
         private final NamePool namePool = new NamePool();
 
         private void initDummySaxonXPathContext() {
-            Configuration config = new Configuration();
+            final Configuration config = new Configuration();
             config.setHostLanguage(Configuration.XSLT);
             config.setNamePool(namePool);
             dummySaxonXPathContext = new IndependentContext(config) {
@@ -626,6 +631,34 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                     // Dummy Function lib that accepts any name
                     setFunctionLibrary(new FunctionLibrary() {
                         public Expression bind(final int nameCode, String uri, String local, final Expression[] staticArgs)  {
+
+                            // TODO: Saxon 9.0 expressions should test "instanceof StringValue" to "instanceof StringLiteral"
+                            if ((XMLConstants.XPATH_FUNCTIONS_NAMESPACE_URI.equals(uri) || "".equals(uri))
+                                    && ("doc".equals(local) || "document".equals(local))
+                                    && (staticArgs != null && staticArgs.length > 0)) {
+
+                                if (staticArgs[0] instanceof StringValue) {
+                                    // Found doc() or document() function which contains a static string
+                                    final String literalURI = ((StringValue) staticArgs[0]).toString();
+
+                                    // We don't need to worry here about reference to the processor inputs
+                                    if (!isProcessorInputScheme(literalURI)) {
+                                        final URIReference uriReference = new URIReference();
+                                        uriReference.context = systemId;
+                                        uriReference.spec = literalURI;
+                                        uriReferences.documentReferences.add(uriReference);
+                                    }
+
+                                } else {
+                                    // Found doc() or document() function which contains something more complex
+                                    uriReferences.hasDynamicDocumentReferences = true;
+                                }
+                            }
+
+                            // NOTE: We used to return new FunctionCall() here, but MK says EmptySequence.getInstance() will work.
+                            // TODO: Check if this works in Saxon 9.0. It doesn't work in 8.8, so for now we keep return new FunctionCall().
+//                            return EmptySequence.getInstance();
+
                             return new FunctionCall() {
                                 {
                                     this.argument = staticArgs;
@@ -754,15 +787,28 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                     try {
                         // First, test that one of the strings is present so we don't have to parse unnecessarily
 
-                        // TODO: 2007-07-05 MK says that there can be spaces and comments between the "doc" and the "(". Suggestion:
-                        // "One possibility here if you want to avoid parsing the expression unnecessarily is to run it
-                        // through the lexer (net.sf.saxon.expr.Tokenizer). You can just look at the stream of tokens
-                        // and look for doc (or a lexical QName whose local part is doc) followed by "("."
+                        // NOTE: 2007-07-05 MK says that there can be spaces and comments between the "doc" and the
+                        // "(". Suggestion: "One possibility here if you want to avoid parsing the expression
+                        // unnecessarily is to run it through the lexer (net.sf.saxon.expr.Tokenizer). You can just look
+                        // at the stream of tokens and look for doc (or a lexical QName whose local part is doc)
+                        // followed by "("."
 
-                        final boolean containsDocString = xpathString.indexOf("doc(") != -1 || xpathString.indexOf("document(") != -1;
+                        // For now, we will probably have many false positive but we just est on "doc". The exact match
+                        // is done by parsing the expression below anyway.
+                        final boolean containsDocString = xpathString.indexOf("doc") != -1;
                         if (containsDocString) {
-                            final Expression expression = ExpressionTool.make(xpathString, dummySaxonXPathContext, 0, -1, 0);
-                            visitExpression(expression);
+                            // The following will call our FunctionLibrary.bind() method, which we use to test for the
+                            // presence of the functions.
+                            ExpressionTool.make(xpathString, dummySaxonXPathContext, 0, -1, 0);
+
+                            // NOTE: *If* we wanted to use Saxon to parse the whole Stylesheet:
+                            
+                            // MK: "In Saxon 9.0 there's a method explain() on PreparedStylesheet that writes an XML
+                            // representation of the compiled stylesheet to a user-supplied Receiver as a sequence of
+                            // events. You could call this with your own Receiver and just watch for the events
+                            // representing <functionCall name="doc"><literal>...</literal></functionCall>. But this
+                            // depends on compiling the stylesheet first.
+
                         }
                     } catch (XPathException e) {
                         logger.error("Original exception", e);
@@ -786,45 +832,6 @@ public abstract class XSLTTransformer extends ProcessorImpl {
 
         public void startDocument() throws SAXException {
             super.startDocument();
-        }
-
-        private void visitExpression(Expression expression) {
-
-            // TODO: 2007-07-05 MK "is potentially expensive and should be moved into the "if". Or reused [where expression.iterateSubExpressions() appears below]"
-            final Iterator subExpressionsIterator = expression.iterateSubExpressions();
-            boolean foundDocFunction = false;
-            if (expression instanceof FunctionCall) {
-                final String functionName = ((FunctionCall) expression).getDisplayName(namePool);
-                if ("doc".equals(functionName) || "document".equals(functionName)) {
-                    // TODO: 2007-07-05 MK says "functionName is the name as written by the user: it could be "fn:doc"."
-                    foundDocFunction = true;
-                    // Call to doc(...)
-                    if (subExpressionsIterator.hasNext()) {
-                        final Object value = subExpressionsIterator.next();
-                        if (value instanceof StringValue) {
-                            // doc(...) call just contains a string, record the URI
-                            final String uri = ((StringValue) value).getStringValue();
-                            // We don't need to worry here about reference to the processor inputs
-                            if (!isProcessorInputScheme(uri)) {
-                                final URIReference uriReference = new URIReference();
-                                uriReference.context = systemId;
-                                uriReference.spec = uri;
-                                uriReferences.documentReferences.add(uriReference);
-                            }
-                        }
-                    } else {
-                        // doc(...) call contains something more complex
-                        uriReferences.hasDynamicDocumentReferences = true;
-                    }
-                }
-            }
-
-            if (!foundDocFunction) {
-                // Recurse in subexpressions
-                for (Iterator i = expression.iterateSubExpressions(); i.hasNext();) {
-                    visitExpression((Expression) i.next());
-                }
-            }
         }
     }
 

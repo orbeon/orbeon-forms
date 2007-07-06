@@ -639,7 +639,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
 
                                 if (staticArgs[0] instanceof StringValue) {
                                     // Found doc() or document() function which contains a static string
-                                    final String literalURI = ((StringValue) staticArgs[0]).toString();
+                                    final String literalURI = ((StringValue) staticArgs[0]).getStringValue();
 
                                     // We don't need to worry here about reference to the processor inputs
                                     if (!isProcessorInputScheme(literalURI)) {
@@ -658,22 +658,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                             // NOTE: We used to return new FunctionCall() here, but MK says EmptySequence.getInstance() will work.
                             // TODO: Check if this works in Saxon 9.0. It doesn't work in 8.8, so for now we keep return new FunctionCall().
 //                            return EmptySequence.getInstance();
-
-                            return new FunctionCall() {
-                                {
-                                    this.argument = staticArgs;
-                                    this.setFunctionNameCode(nameCode);
-                                }
-                                protected void checkArguments(StaticContext env) {};
-
-                                protected int computeCardinality() {
-                                    return this.argument.length;
-                                }
-
-                                public ItemType getItemType(TypeHierarchy typeHierarchy) {
-                                    return Type.BOOLEAN_TYPE;
-                                }
-                            };
+                            return new ContextItemExpression();
                         }
 
                         public boolean isAvailable(int fingerprint, String uri, String local, int arity) {

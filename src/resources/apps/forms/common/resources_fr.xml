@@ -39,7 +39,7 @@
         </labels>
         <formats>
             <date>Le [D] [Mn] [Y]</date>
-            <save-datetime>[Fn], le [D] [Mn] [Y] à [H01]:[m01]:[s01] UTC</save-datetime>
+            <save-datetime>[FNn], le [D] [Mn] [Y] à [H01]:[m01]:[s01]</save-datetime>
         </formats>
     </summary>
     <detail>

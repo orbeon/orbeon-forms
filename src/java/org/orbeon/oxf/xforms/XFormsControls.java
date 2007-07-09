@@ -905,7 +905,7 @@ public class XFormsControls {
                         final InstanceData instanceData = XFormsUtils.getInstanceDataUpdateInherited(currentNode);
                         xformsControl.setReadonly(false);
                         xformsControl.setRequired(false);
-                        xformsControl.setRelevant(instanceData.getInheritedRelevant().get()); // inherit relevance anyway
+                        xformsControl.setRelevant(instanceData != null && instanceData.getInheritedRelevant().get()); // inherit relevance anyway
                         xformsControl.setValid(true);// by default, a control is not invalid
                         xformsControl.setType(null);
                     }

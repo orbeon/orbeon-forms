@@ -132,6 +132,7 @@ public class XFormsConstants {
     public static final String XFORMS_COMBINE_RESOURCES_PROPERTY = "oxf.xforms.combine-resources";
     public static final String XFORMS_CACHE_COMBINED_RESOURCES_PROPERTY = "oxf.xforms.cache-combined-resources";
     public static final String XFORMS_OPTIMIZE_RELEVANCE_PROPERTY = "oxf.xforms.optimize-relevance";
+    public static final String XFORMS_TEST_AJAX_PROPERTY = "oxf.xforms.test.ajax";
 
     public static final String XXFORMS_STATE_HANDLING_ATTRIBUTE_NAME = "state-handling";
     public static final String XXFORMS_STATE_HANDLING_CLIENT_VALUE = "client";
@@ -194,6 +195,7 @@ public class XFormsConstants {
     public static final boolean DEFAULT_COMBINE_RESOURCES = false;
     public static final boolean DEFAULT_CACHE_COMBINED_RESOURCES = false;
     public static final boolean DEFAULT_OPTIMIZE_RELEVANCE = false;
+    public static final boolean DEFAULT_TEST_AJAX = false;
 
     public static final String DUMMY_IMAGE_URI = "/ops/images/xforms/spacer.gif";
     public static final String HELP_IMAGE_URI = "/ops/images/xforms/help.gif";

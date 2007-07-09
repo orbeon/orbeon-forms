@@ -71,8 +71,10 @@ public class XFormsUtils {
     public static InstanceData getLocalInstanceData(NodeInfo nodeInfo) {
         if (nodeInfo instanceof NodeWrapper) {
             return getLocalInstanceData(getNodeFromNodeInfo(nodeInfo, ""));
-        } else {
+        } else if (nodeInfo != null) {
             return READONLY_LOCAL_INSTANCE_DATA;
+        } else {
+            return null;
         }
     }
 
@@ -109,10 +111,13 @@ public class XFormsUtils {
      * Return the XForms instance data for the given node with updated inherited MIPs, null if not available.
      */
     public static InstanceData getInstanceDataUpdateInherited(NodeInfo nodeInfo) {
+
         if (nodeInfo instanceof NodeWrapper) {
             return getInstanceDataUpdateInherited(getNodeFromNodeInfo(nodeInfo, ""));
-        } else {
+        } else if (nodeInfo != null) {
             return READONLY_LOCAL_INSTANCE_DATA;
+        } else {
+            return null;
         }
     }
 
@@ -1154,6 +1159,11 @@ public class XFormsUtils {
                 (XFormsConstants.XFORMS_OPTIMIZE_RELEVANCE_PROPERTY, XFormsConstants.DEFAULT_OPTIMIZE_RELEVANCE).booleanValue();
     }
 
+    public static boolean isAjaxTest() {
+        return OXFProperties.instance().getPropertySet().getBoolean
+                (XFormsConstants.XFORMS_TEST_AJAX_PROPERTY, XFormsConstants.DEFAULT_TEST_AJAX).booleanValue();
+    }
+
     public static String resolveURLDoReplace(XFormsContainingDocument containingDocument, PipelineContext pipelineContext, Element currentElement, String url) {
         final boolean isPortletLoad = "portlet".equals(containingDocument.getContainerType());
 
@@ -1221,7 +1231,7 @@ public class XFormsUtils {
      */
     public static String encodeHRRI(String uriString, boolean processSpace) {
 
-        // Note that the XML Schema spec says "Spaces are, in principle, allowed in the álexical spaceá of anyURI,
+        // Note that the XML Schema spec says "Spaces are, in principle, allowed in the ï¿½lexical spaceï¿½ of anyURI,
         // however, their use is highly discouraged (unless they are encoded by %20).".
 
         // We assume that we never want leading or trailing spaces. You can use %20 if you realy want this.

@@ -28,12 +28,19 @@
             <xforms:submission method="get" action="http://www.google.com/gaga" id="doomed-submission" replace="instance">
                 <xforms:setvalue ref="/error" ev:event="xforms-submit-error">Submission failed.</xforms:setvalue>
             </xforms:submission>
+            <xforms:submission method="get" action="{f()}" id="invalid-submission" replace="instance">
+                <xforms:setvalue ref="/error" ev:event="xforms-submit-error">Submission failed.</xforms:setvalue>
+            </xforms:submission>
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
         <xforms:trigger>
             <xforms:label>Run doomed submission</xforms:label>
             <xforms:send submission="doomed-submission" ev:event="DOMActivate"/>
+        </xforms:trigger>
+        <xforms:trigger>
+            <xforms:label>Run invalid submission</xforms:label>
+            <xforms:send submission="invalid-submission" ev:event="DOMActivate"/>
         </xforms:trigger>
         <xhtml:p>
             <xforms:output ref="/error"/>

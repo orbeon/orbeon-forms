@@ -83,7 +83,7 @@
             <!--<occupation>Occupation</occupation>-->
         </alerts>
         <formats>
-            <birth-date>Le [D] [MNn] [Y]</birth-date>
+            <birth-date>Le [D] [Mn] [Y]</birth-date>
         </formats>
     </detail>
 </resources>

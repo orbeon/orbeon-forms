@@ -87,7 +87,7 @@
             <county>Doit contenir seulement des lettres, '-' ou espaces, commencer avec une lettre, et avoir 14 caractères au plus.</county>
         </alerts>
         <formats>
-            <birth-date>Le [D] [MNn] [Y]</birth-date>
+            <birth-date>Le [D] [Mn] [Y]</birth-date>
         </formats>
     </detail>
 </resources>

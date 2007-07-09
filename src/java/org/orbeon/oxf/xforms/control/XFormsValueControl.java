@@ -201,7 +201,11 @@ public abstract class XFormsValueControl extends XFormsControl {
 
         final XFormsValueControl other = (XFormsValueControl) obj;
 
-        if (!((value == null && other.value == null) || (value != null && other.value != null && value.equals(other.value))))
+        final String displayValueOrValue = getDisplayValueOrValue();
+        final String otherDisplayValueOrValue = other.getDisplayValueOrValue();
+
+        if (!((displayValueOrValue == null && otherDisplayValueOrValue == null)
+                || (displayValueOrValue != null && otherDisplayValueOrValue != null && displayValueOrValue.equals(otherDisplayValueOrValue))))
             return false;
 
         return super.equals(obj);

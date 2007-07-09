@@ -38,8 +38,8 @@
             <form-choice>Choisisez un formulaire</form-choice>
         </labels>
         <formats>
-            <date>Le [D] [MNn] [Y]</date>
-            <save-datetime>[FNn], le [D] [MNn] [Y] à [H01]:[m01]:[s01] UTC</save-datetime>
+            <date>Le [D] [Mn] [Y]</date>
+            <save-datetime>[Fn], le [D] [Mn] [Y] à [H01]:[m01]:[s01] UTC</save-datetime>
         </formats>
     </summary>
     <detail>

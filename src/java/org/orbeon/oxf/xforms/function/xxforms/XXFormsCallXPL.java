@@ -163,8 +163,10 @@ public class XXFormsCallXPL extends XFormsFunction {
             final StaticExternalContext.StaticContext staticContext = StaticExternalContext.getStaticContext();
             PipelineContext pipelineContext = (staticContext != null) ? staticContext.getPipelineContext() : null;
             final boolean newPipelineContext = pipelineContext == null;
-            if (newPipelineContext)
+            if (newPipelineContext) {
+                logger.warn("Cannot find pipeline context from static context. Creating new pipeline context.");
                 pipelineContext = new PipelineContext();
+            }
 
             processor.reset(pipelineContext);
 

@@ -142,7 +142,29 @@ public class XFormsActionInterpreter {
 
         if (eventHandlerContainer instanceof XFormsControl) {
             // The event handler is contained within a control. Bindings are relative to that control
-            xformsControls.setBinding(pipelineContext, (XFormsControl) eventHandlerContainer);
+
+            // TODO: Not sure whether an event handler within a repeat must be in the context of the iteratino or not.
+            // If in the iteration, then it may be in no context if there is no iteration.
+//            if (eventHandlerContainer instanceof XFormsRepeatControl) {
+//                final XFormsRepeatControl repeatControl = (XFormsRepeatControl) eventHandlerContainer;
+//                final List children = repeatControl.getChildren();
+//
+//                final Integer repeatIndexInteger = (Integer) xformsControls.getCurrentControlsState().getRepeatIdToIndex().get(eventHandlerContainerId);
+//                if (repeatIndexInteger != null && children != null && children.size() > 0) {
+//                    final int index = repeatIndexInteger.intValue();
+//                    final int childrenSize = children.size();
+//                    if (index > 0 && index < childrenSize) {
+//                        final RepeatIterationControl repeatIteration = (RepeatIterationControl) children.get(index);
+//                        xformsControls.setBinding(pipelineContext, repeatIteration);
+//                    } else {
+//                        xformsControls.setBinding(pipelineContext, (XFormsControl) eventHandlerContainer);
+//                    }
+//                } else {
+//                    xformsControls.setBinding(pipelineContext, (XFormsControl) eventHandlerContainer);
+//                }
+//            } else {
+                xformsControls.setBinding(pipelineContext, (XFormsControl) eventHandlerContainer);
+//            }
         } else {
             // The event handler is not contained within a control (e.g. model or submission)
             // TODO: Separate context handling from XFormsControls
@@ -184,15 +206,18 @@ public class XFormsActionInterpreter {
         // We are now in the right context to evaluate the condition
 
         // Don't evaluate the condition if the context has gone missing
-        final NodeInfo currentSingleNode = xformsControls.getCurrentSingleNode();
-        if (currentSingleNode == null || containingDocument.getInstanceForNode(currentSingleNode) == null) {
-            if (XFormsServer.logger.isDebugEnabled())
-                XFormsServer.logger.debug("XForms - not executing \"" + conditionType + "\" conditional action (missing context): " + actionName);
-            return false;
+        {
+            final NodeInfo currentSingleNode = xformsControls.getCurrentSingleNode();
+            if (currentSingleNode == null || containingDocument.getInstanceForNode(currentSingleNode) == null) {
+                if (XFormsServer.logger.isDebugEnabled())
+                    XFormsServer.logger.debug("XForms - not executing \"" + conditionType + "\" conditional action (missing context): " + actionName);
+                return false;
+            }
         }
 
+        final XFormsControls.BindingContext currentBindingContext = xformsControls.getCurrentBindingContext();
         final List conditionResult = XPathCache.evaluate(pipelineContext,
-            currentSingleNode, "boolean(" + conditionAttribute + ")",
+            currentBindingContext.getNodeset(), currentBindingContext.getPosition(), "boolean(" + conditionAttribute + ")",
             Dom4jUtils.getNamespaceContextNoDefault(actionElement), null, xformsControls.getFunctionLibrary(), null, (LocationData) actionElement.getData());
 
         if (!((Boolean) conditionResult.get(0)).booleanValue()) {

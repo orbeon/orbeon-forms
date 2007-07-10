@@ -533,7 +533,7 @@ public class XFormsControls {
                             contextStack.push(new BindingContext(currentBindingContext, newModel, getCurrentNodeset(newModel.getEffectiveId()), 1, null, false, null, locationData));
 
                         // Evaluate new node-set
-                        newNodeset = XPathCache.evaluate(pipelineContext, currentSingleNodeForModel,
+                        newNodeset = XPathCache.evaluate(pipelineContext, Collections.singletonList(currentSingleNodeForModel), 1,
                                 ref != null ? ref : nodeset, bindingElementNamespaceContext, null, functionLibrary, null, locationData);
 
                         // Restore context
@@ -544,9 +544,9 @@ public class XFormsControls {
 
                 } else {
                     // Simply evaluate new node-set
-                    final NodeInfo currentSingleNode = getCurrentSingleNode();
-                    if (currentSingleNode != null) {
-                        newNodeset = XPathCache.evaluate(pipelineContext, currentSingleNode,
+                    final BindingContext contextBindingContext = getCurrentBindingContext();
+                    if (contextBindingContext != null && contextBindingContext.getNodeset().size() > 0) {
+                        newNodeset = XPathCache.evaluate(pipelineContext, contextBindingContext.getNodeset(), contextBindingContext.getPosition(),
                                 ref != null ? ref : nodeset, bindingElementNamespaceContext, null, functionLibrary, null, locationData);
                     } else {
                         newNodeset = Collections.EMPTY_LIST;

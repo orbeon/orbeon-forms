@@ -914,6 +914,9 @@ public class XMLUtils {
         // Make sure the file is deleted when the context is destroyed
         pipelineContext.addContextListener(new PipelineContext.ContextListenerAdapter() {
             public void contextDestroyed(boolean success) {
+                // Log when we delete files, as there is a transient issue with temporary files
+                // that seem to be deleted too early.
+                logger.info("Deleting temporary file: " + fileItem.getName());
                 fileItem.delete();
             }
         });

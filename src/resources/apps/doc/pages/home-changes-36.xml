@@ -810,16 +810,18 @@ http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=2
                 <ul>
                     <li>
                         <p>
-                            The files <code>error.xpl</code> and <code>error.xsl</code> under
-                            <code>RESOURCES/config</code> have been moved to <code>ops-resources-private.jar</code>.
-                            If you haven't modified these files, make sure that you remove the old files from
-                            <code>RESOURCES/config</code>. If you have made modification, you will have to merge the
-                            changes introduced in <code>ops-resources-private.jar</code>.
+                            <b>Error resources moved to private location.</b> The files <code>error.xpl</code> and
+                            <code>error.xsl</code> under <code>RESOURCES/config</code> have been moved to
+                            <code>ops-resources-private.jar</code>. If you haven't modified these files, make sure that
+                            you remove the old files from <code>RESOURCES/config</code>. If you have made
+                            modification, you will have to merge the changes introduced in
+                            <code>ops-resources-private.jar</code>.
                         </p>
                     </li>
                     <li>
                         <p>
-                            The files under <code>RESOURCES/config/theme</code> have been moved to
+                            <b>Theme CSS stylesheets moved to private location.</b> The files under
+                            <code>RESOURCES/config/theme</code> have been moved to
                             <code>ops-resources-public.jar</code>. This includes <code>xforms.css</code> and
                             <code>xforms-widgets.css</code>. If you haven't modified these files, make sure that you
                             remove the old files from <code>RESOURCES/config/theme</code>. If you have made
@@ -830,11 +832,11 @@ http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=2
                     </li>
                     <li>
                         <p>
-                            The Xerces XML parser has been upgraded to version 2.9. The previous version supported an
-                            obsolete version of the XInclude namespace: <code>http://www.w3.org/2003/XInclude</code>.
-                            The new version supports the correct namespace as specified by <a
-                            href="http://www.w3.org/TR/xinclude/">XInclude 1.0</a>:
-                            <code>http://www.w3.org/2001/XInclude</code>.
+                            <b>XML parser upgrade requires XInclude namespace change.</b> The Xerces XML parser has
+                            been upgraded to version 2.9. The previous version supported an obsolete version of the
+                            XInclude namespace: <code>http://www.w3.org/2003/XInclude</code>. The new version supports
+                            the correct namespace as specified by <a href="http://www.w3.org/TR/xinclude/">XInclude
+                            1.0</a>: <code>http://www.w3.org/2001/XInclude</code>.
                         </p>
                         <p>
                             Note that the correct version has the older year, <code>2001</code>, instead of the newer
@@ -842,6 +844,34 @@ http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=2
                             your namespace declarations for XInclude, you will need to change these declarations to
                             <code>http://www.w3.org/2001/XInclude</code>.
                         </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Plain theme no longer copies attributes in XHTML namespace.</b> The plain theme, under
+                            <code>RESOURCES/config/theme-plain.xsl</code>, used to convert attributes in the XHTML
+                            namespace to attributes in no namespace. If you wrote:
+                        </p>
+                        <xml-source>
+                            <div xhtml:style="background-color: red"/>
+                        </xml-source>
+                        <p>
+                            then the plain theme would convert this to:
+                        </p>
+                        <xml-source>
+                            <div style="background-color: red"/>
+                        </xml-source>
+                        <p>
+                            There does not seem to be much use for this feature, so for reasons of simplification it
+                            was removed. If you do need it then you can add again the following XSLT template:
+                        </p>
+                        <xml-source>
+                             <comment> Copy attributes in XHTML namespace to no namespace </comment>
+                             <xsl:template match="@xhtml:*">
+                                 <xsl:attribute name="{local-name()}">
+                                     <xsl:value-of select="."/>
+                                 </xsl:attribute>
+                             </xsl:template>
+                        </xml-source>
                     </li>
                 </ul>
             </section>

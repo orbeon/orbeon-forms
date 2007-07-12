@@ -12,7 +12,7 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <processors xmlns:oxf="http://www.orbeon.com/oxf/processors"
-            xmlns:xi="http://www.w3.org/2003/XInclude">
+            xmlns:xi="http://www.w3.org/2001/XInclude">
 
     <!-- Include user definitions. The file must be present, even if almost empty -->
     <xi:include href="oxf:/config/custom-processors.xml"/>

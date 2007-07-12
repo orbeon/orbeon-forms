@@ -17,7 +17,7 @@
       xmlns:xforms="http://www.w3.org/2002/xforms"
       xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
       xmlns:f="http://orbeon.org/oxf/xml/formatting"
-      xmlns:xi="http://www.w3.org/2003/XInclude"
+      xmlns:xi="http://www.w3.org/2001/XInclude"
       xmlns="http://www.w3.org/1999/xhtml">
 
     <head>

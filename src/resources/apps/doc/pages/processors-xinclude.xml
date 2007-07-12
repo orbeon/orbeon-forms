@@ -81,15 +81,12 @@
                 </ul>
                 <note>
                     <p>
-                        The correct namespace to use for XInclude 1.0 is <code>http://www.w3.org/2001/XInclude</code>
-                        (that is, with a <code>2001</code> in
-                        it). However, when including at parsing time, the version of the Xerces XML
-                        parser included with Orbeon Forms incorrectly requires a URI with <code>2003</code>. This only occurs
-                        when XInclude is explicitly processed at parsing time but not when the XInclude processor is
-                        used explicitly or implicitly (by the PFC). With the current version of Orbeon Forms, you must use
-                        <code>http://www.w3.org/2003/XInclude</code> when including at parsing time, but
-                        <code>http://www.w3.org/2001/XInclude</code> when including with the XInclude processor. This
-                        will be fixed in a future version of Orbeon Forms.
+                        The correct namespace to use for XInclude 1.0 is <code>http://www.w3.org/2001/XInclude</code>.
+                        When using XInclude to perform inclusions, with the XInclude processor or during parsing, be
+                        sure to use this correct namespace instead of the older
+                        <code>http://www.w3.org/2003/XInclude</code>, which is used by some XML parsers (see next
+                        entry). Note that the correct version has the older year, <code>2001</code>, instead of the
+                        newer year, <code>2003</code>.
                     </p>
                 </note>
             </section>

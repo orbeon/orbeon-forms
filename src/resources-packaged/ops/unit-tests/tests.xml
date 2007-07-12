@@ -23,7 +23,7 @@
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:xu="http://www.xmldb.org/xupdate"
     xmlns:oxf="http://www.orbeon.com/oxf/processors"
-    xmlns:xi="http://www.w3.org/2003/XInclude">
+    xmlns:xi="http://www.w3.org/2001/XInclude">
 
     <xi:include href="tests-xpl.xml"/>
     <xi:include href="tests-xforms.xml"/>
@@ -292,16 +292,6 @@
             <data/>
         </output>
     </test>
-
-<!--    <test description="XInclude with 2001 namespace (recommended one)" name="oxf:identity" only="true"-->
-<!--            xmlns:xi2001="http://www.w3.org/2001/XInclude">-->
-<!--        <input name="data">-->
-<!--            <xi2001:include href="note.xml"/>-->
-<!--        </input>-->
-<!--        <output name="data">-->
-<!--            <xi2001:include href="note.xml"/>-->
-<!--        </output>-->
-<!--    </test>-->
 
     <!-- TODO: -->
 <!--    <test description="Page Flow Controller: 'when' on 'result' with no action" name="oxf:page-flow" only="true">-->

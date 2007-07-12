@@ -1,4 +1,4 @@
-<form xmlns:xi="http://www.w3.org/2003/XInclude">
+<form xmlns:xi="http://www.w3.org/2001/XInclude">
     <document-id>123456789</document-id>
     <include2>
         <xi:include href="included-2.xml"/>

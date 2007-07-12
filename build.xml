@@ -36,7 +36,11 @@
         <include name="log4j-1.3alpha0.jar"/>
         <include name="jaxen-1_1_beta_9.jar"/>
         <include name="saxpath-dev_orbeon.jar"/>
-        <include name="resolver-xerces_2_6_2_orbeon.jar"/>
+
+        <include name="xerces-resolver-2_9_orbeon_20070711.jar"/>
+        <include name="xerces-serializer-2_9_orbeon_20070711.jar"/>
+        <include name="xerces-xml-apis-2_9_orbeon_20070711.jar"/>
+
         <include name="xalan-2_5_1_orbeon.jar"/>
         <include name="xsltc-2_5_1_orbeon.jar"/>
         <include name="commons-collections-2_0.jar"/>
@@ -101,14 +105,12 @@
         <include name="mail-1_3_2.jar"/>
         <include name="itext-1_02b.jar"/>
         <include name="itext-xml-1_02.jar"/>
-        <include name="xml-apis-xerces_2_6_2_orbeon.jar"/>
-        <!--<include name="xml-apis-xerces_2_7_1_orbeon.jar"/>-->
+
         <include name="pdfbox-0_7_1.jar"/>
         <include name="ant-1_6_5.jar"/>
     </fileset>
     <fileset id='war.libs.private' dir="${lib.dir}">
-        <include name="xercesImpl_2_6_2_orbeon.jar"/>
-        <!--<include name="xercesImpl_2_7_1_orbeon.jar"/>-->
+        <include name="xerces-xercesImpl-2_9_orbeon_20070711.jar"/>
         <include name='commons-logging-1_0_4.jar' />
     </fileset>
 
@@ -484,14 +486,15 @@
             <formatter type="plain" usefile="false"/>
             <sysproperty key="oxf.resources.factory"
                          value="org.orbeon.oxf.resources.PriorityResourceManagerFactory"/>
+            <!-- Put resources-packaged first, as we need to touch files and compile Java files there -->
             <sysproperty key="oxf.resources.priority.1"
                          value="org.orbeon.oxf.resources.FilesystemResourceManagerFactory"/>
             <sysproperty key="oxf.resources.priority.1.oxf.resources.filesystem.sandbox-directory"
-                         value="${resources.dir}"/>
+                         value="${resources-packaged.dir}"/>
             <sysproperty key="oxf.resources.priority.2"
                          value="org.orbeon.oxf.resources.FilesystemResourceManagerFactory"/>
             <sysproperty key="oxf.resources.priority.2.oxf.resources.filesystem.sandbox-directory"
-                         value="${resources-packaged.dir}"/>
+                         value="${resources.dir}"/>
             <sysproperty key="oxf.resources.priority.3"
                          value="org.orbeon.oxf.resources.ClassLoaderResourceManagerFactory"/>
             <sysproperty key="oxf.resources.common.min-reload-interval" value="50"/>

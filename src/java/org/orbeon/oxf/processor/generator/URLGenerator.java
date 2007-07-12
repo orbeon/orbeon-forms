@@ -25,6 +25,7 @@ import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.resources.handler.OXFHandler;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xml.*;
+import org.orbeon.oxf.xml.xerces.XIncludeHandler;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.w3c.dom.Document;
 import org.w3c.tidy.Tidy;
@@ -396,7 +397,7 @@ public class URLGenerator extends ProcessorImpl {
                                 handler.readHTML(output);
                                 configURIReferences.uriReferences = null;
                             } else if (ProcessorUtils.isXMLContentType(contentType)) {
-                                LocalXIncludeListener localXIncludeListener = new LocalXIncludeListener();
+                                final LocalXIncludeListener localXIncludeListener = new LocalXIncludeListener();
                                 XIncludeHandler.setXIncludeListener(localXIncludeListener);
                                 try {
                                     handler.readXML(pipelineContext, output);

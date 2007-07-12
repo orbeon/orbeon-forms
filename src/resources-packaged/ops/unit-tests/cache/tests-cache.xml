@@ -244,7 +244,7 @@
 <!--                <assert output-name="data" condition="cached-value-equal" value="v13"/>-->
                 <!-- Test resulting output document -->
                 <assert output-name="data" condition="output-equals">
-                    <result xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xi="http://www.w3.org/2003/XInclude">Some text
+                    <result xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xi="http://www.w3.org/2001/XInclude">Some text
                         <test-document>
                             <e1/>
                             <e2 a1="v1" a2="v2"/>

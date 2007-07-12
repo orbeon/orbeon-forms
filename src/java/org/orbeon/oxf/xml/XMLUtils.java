@@ -25,6 +25,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.xerces.XercesSAXParserFactoryImpl;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -39,7 +40,6 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.stream.StreamResult;
 import java.io.*;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
@@ -111,7 +111,7 @@ public class XMLUtils {
      */
     public static SAXParserFactory createSAXParserFactory(boolean validating, boolean handleXInclude) {
         try {
-            SAXParserFactory factory = new XercesSAXParserFactoryImpl(handleXInclude);
+            SAXParserFactory factory = new XercesSAXParserFactoryImpl(validating, handleXInclude);
             factory.setValidating(validating);
             return factory;
         } catch (Exception e) {

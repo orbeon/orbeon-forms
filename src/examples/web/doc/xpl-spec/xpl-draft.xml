@@ -13,7 +13,7 @@
 <!--<!ENTITY draft-name "NOTE-xpl">-->
 <!--<!ENTITY namespaceName "http://www.orbeon.com/oxf/xpl">-->
 <!--]>-->
-<spec w3c-doctype="note" xmlns:xi="http://www.w3.org/2003/XInclude">
+<spec w3c-doctype="note" xmlns:xi="http://www.w3.org/2001/XInclude">
     <header>
         <title>XML Pipeline Language (XPL)</title>
         <version>Version 1.0 (Draft)</version>

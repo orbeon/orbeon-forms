@@ -1,1 +1,1 @@
-org.orbeon.oxf.xml.XercesSAXParser
+org.orbeon.oxf.xml.xerces.XercesSAXParser

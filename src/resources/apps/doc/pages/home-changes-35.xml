@@ -19,7 +19,7 @@
         xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
         xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:xs="http://www.w3.org/2001/XMLSchema"
-        xmlns:xi="http://www.w3.org/2003/XInclude" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+        xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
     <header>
         <title>Changes in Version 3.5</title>
     </header>

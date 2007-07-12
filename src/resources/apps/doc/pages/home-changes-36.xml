@@ -31,7 +31,7 @@
                 Welcome to Orbeon Forms 3.6!
             </p>
             <p>
-                Orbeon Forms 3.6 features over <a href="#changes-36-full">80 improvements</a> over <a
+                Orbeon Forms 3.6 features over <a href="#changes-36-full">90 improvements</a> over <a
                 href="home-changes-35">Orbeon Forms 3.5.1</a>, including major improvements in the areas of XML Schema
                 validation, error handling, and deployment within Java applications.
             </p>
@@ -305,7 +305,7 @@
             <section>
                 <title>Complete List of Issues Addressed in this Release</title>
                 <p>
-                    Orbeon Forms 3.6 addresses over 80 bugs and features:
+                    Orbeon Forms 3.6 addresses over 90 bugs and features:
                 </p>
                 <!--
 Request to extract bugs from SourceForge with http://www.orbeon.com/ops/xquery-the-web/ :
@@ -327,6 +327,46 @@ http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=2
 
                 -->
                 <ul>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307283&amp;group_id=168&amp;atid=350207">#307283:
+                            RFE: Upgrade to Xerces 2.9
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307268&amp;group_id=168&amp;atid=350207">#307268:
+                            position() within repeat: works with output value="..., but not in ref="..."
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307261&amp;group_id=168&amp;atid=350207">#307261:
+                            XPath expression not evaluated in the correct context?
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307267&amp;group_id=168&amp;atid=350207">#307267:
+                            Government Forms detail: switching language no longer switches birth date format
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307252&amp;group_id=168&amp;atid=350207">#307252:
+                            Add section about support (mailing-list, commercial) in FAQ
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307240&amp;group_id=168&amp;atid=350207">#307240:
+                            DMV form's zip code definition is incorrect
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307238&amp;group_id=168&amp;atid=350207">#307238:
+                            Mediatype text/html does not process HTML iframe element
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306498&amp;group_id=168&amp;atid=350207">#306498:
+                            Some CSS files are duplicated between resources and ops-resources-public.jar
+                        </a>
+                    </li>
                     <li>
                         <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307237&amp;group_id=168&amp;atid=350207">#307237: URL
                             rewriting does not rewrite attributes of xhtml:object

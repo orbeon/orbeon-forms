@@ -136,6 +136,10 @@
                                         <value>visible</value>
                                     </choice>
                                 </attribute>
+                                <!-- For dialog positioning -->
+                                <optional>
+                                    <attribute name="neighbor"/>
+                                </optional>
                             </element>
                         </zeroOrMore>
                     </element>

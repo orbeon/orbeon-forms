@@ -711,8 +711,8 @@ public class XFormsServer extends ProcessorImpl {
                                     }
                                 }
 
-                                // Output xforms:output-specific information
                                 if (xformsControl2 instanceof XFormsOutputControl) {
+                                    // Output xforms:output-specific information
                                     final XFormsOutputControl outputControlInfo1 = (XFormsOutputControl) xformsControl1;
                                     final XFormsOutputControl outputControlInfo2 = (XFormsOutputControl) xformsControl2;
 
@@ -722,10 +722,8 @@ public class XFormsServer extends ProcessorImpl {
                                     if (!((mediaTypeValue1 == null && mediaTypeValue2 == null) || (mediaTypeValue1 != null && mediaTypeValue2 != null && mediaTypeValue1.equals(mediaTypeValue2)))) {
                                         attributesImpl.addAttribute("", "mediatype", "mediatype", ContentHandlerHelper.CDATA, mediaTypeValue2 != null ? mediaTypeValue2 : "");
                                     }
-                                }
-                                
-                                // Output xforms:upload-specific information
-                                if (xformsControl2 instanceof XFormsUploadControl) {
+                                } else if (xformsControl2 instanceof XFormsUploadControl) {
+                                    // Output xforms:upload-specific information
                                     final XFormsUploadControl uploadControlInfo1 = (XFormsUploadControl) xformsControl1;
                                     final XFormsUploadControl uploadControlInfo2 = (XFormsUploadControl) xformsControl2;
 
@@ -765,7 +763,6 @@ public class XFormsServer extends ProcessorImpl {
                                             attributesImpl.addAttribute("", "size", "size", ContentHandlerHelper.CDATA, sizeValue2 != null ? sizeValue2 : "");
                                         }
                                     }
-
                                 }
                             }
 
@@ -1029,8 +1026,8 @@ public class XFormsServer extends ProcessorImpl {
                             }
                         }
 
-                        // Output xforms:output-specific information
                         if (xformsControl2 instanceof XFormsOutputControl) {
+                            // Output xforms:output-specific information
                             final XFormsOutputControl outputControlInfo1 = (XFormsOutputControl) xformsControl1;
                             final XFormsOutputControl outputControlInfo2 = (XFormsOutputControl) xformsControl2;
 
@@ -1043,10 +1040,8 @@ public class XFormsServer extends ProcessorImpl {
                                     attributesImpl.addAttribute("", "mediatype", "mediatype", ContentHandlerHelper.CDATA, mediatypeValue2 != null ? mediatypeValue2 : "");
                                 }
                             }
-                        }
-
-                        // Output xforms:upload-specific information
-                        if (xformsControl2 instanceof XFormsUploadControl) {
+                        } else if (xformsControl2 instanceof XFormsUploadControl) {
+                            // Output xforms:upload-specific information
                             final XFormsUploadControl uploadControlInfo1 = (XFormsUploadControl) xformsControl1;
                             final XFormsUploadControl uploadControlInfo2 = (XFormsUploadControl) xformsControl2;
 
@@ -1086,7 +1081,6 @@ public class XFormsServer extends ProcessorImpl {
                                     attributesImpl.addAttribute("", "size", "size", ContentHandlerHelper.CDATA, sizeValue2 != null ? sizeValue2 : "");
                                 }
                             }
-
                         }
                     }
 
@@ -1387,11 +1381,17 @@ public class XFormsServer extends ProcessorImpl {
                         }
 
                         // Output selected case id
-                        ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[]{"id", selectedCaseId, "visibility", "visible"});
+                        ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[]{
+                                "id", selectedCaseId,
+                                "visibility", "visible"
+                        });
 
                         if (previousSelectedCaseId != null) {
                             // Output deselected case ids
-                            ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[]{"id", previousSelectedCaseId, "visibility", "hidden"});
+                            ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[]{
+                                    "id", previousSelectedCaseId,
+                                    "visibility", "hidden"}
+                            );
                         } else {
                             // This is a new switch (can happen with repeat), send all deselected to be sure
                             final XFormsControl switchXFormsControl = (XFormsControl) xformsControls.getObjectById(switchId);
@@ -1401,7 +1401,10 @@ public class XFormsServer extends ProcessorImpl {
                                     final XFormsControl caseXFormsControl = (XFormsControl) j.next();
 
                                     if (!caseXFormsControl.getEffectiveId().equals(selectedCaseId)) {
-                                        ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[]{"id", caseXFormsControl.getEffectiveId(), "visibility", "hidden"});
+                                        ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[]{
+                                                "id", caseXFormsControl.getEffectiveId(),
+                                                "visibility", "hidden"
+                                        });
                                     }
                                 }
                             }
@@ -1434,7 +1437,15 @@ public class XFormsServer extends ProcessorImpl {
                             found = true;
                         }
 
-                        ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[]{"id", dialogId, "visibility", visible.booleanValue() ? "visible" : "hidden"});
+                        final boolean visibleBoolean = visible.booleanValue();
+                        final XXFormsDialogControl dialogControl = visibleBoolean ? (XXFormsDialogControl) xformsControls.getObjectById(dialogId) : null;
+                        final String relativeControlId = (dialogControl != null) ? dialogControl.getNeighborControlId() : null;
+
+                        ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[] {
+                                "id", dialogId,
+                                "visibility", visibleBoolean ? "visible" : "hidden",
+                                (relativeControlId != null) ? "neighbor" : null, relativeControlId
+                        });
                     }
                 }
             }

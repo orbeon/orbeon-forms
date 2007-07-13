@@ -31,6 +31,7 @@ public class XXFormsDialogControl extends XFormsControl {
     private String level;
     private boolean close;
     private boolean draggable;
+    private String neighborControlId;
 
     public XXFormsDialogControl(XFormsContainingDocument containingDocument, XFormsControl parent, Element element, String name, String effectiveId) {
         super(containingDocument, parent, element, name, effectiveId);
@@ -39,6 +40,7 @@ public class XXFormsDialogControl extends XFormsControl {
             this.level = "modal";
         this.close = !"false".equals(element.attributeValue("close"));
         this.draggable = !"false".equals(element.attributeValue("draggable"));
+        this.neighborControlId = element.attributeValue("neighbor");
     }
 
     public boolean hasJavaScriptInitialization() {
@@ -56,6 +58,11 @@ public class XXFormsDialogControl extends XFormsControl {
 
     public boolean isDraggable() {
         return draggable;
+    }
+
+
+    public String getNeighborControlId() {
+        return neighborControlId;
     }
 
     public void performDefaultAction(PipelineContext pipelineContext, XFormsEvent event) {

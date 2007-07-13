@@ -1372,7 +1372,7 @@ ORBEON.xforms.Init = {
                 "{http://orbeon.org/oxf/xml/xforms}autosize": ORBEON.xforms.Init._widetextArea,
                 "text/html": ORBEON.xforms.Init._htmlArea
             },
-            "dialog": { "": ORBEON.xforms.Init._dialog}
+            "dialog": { "": ORBEON.xforms.Init._dialog,  "full": ORBEON.xforms.Init._dialog }
         };
         return ORBEON.xforms.Init._specialControlsInitFunctions;
     },

@@ -627,11 +627,8 @@
             <arg value="oxf:/apps/doc/generate-static-html.xpl"/>
         </java>
         <copy todir="${build.doc.dir}/reference">
-            <fileset dir="${resources.dir}/config">
+            <fileset dir="${resources-packaged.dir}/config">
                 <include name="theme/images/**"/>
-                <include name="theme/javascript/**"/>
-                <include name="theme/jscalendar/**"/>
-                <include name="theme/style/**"/>
             </fileset>
         </copy>
         <copy todir="${build.doc.dir}/reference">

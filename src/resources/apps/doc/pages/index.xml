@@ -66,18 +66,18 @@
                 </li>
                 <li>
                     <p>
-                        The <a href="/doc/reference-xforms-ng">XForms Reference</a>.
+                        The <a href="reference-xforms-ng">XForms Reference</a>.
                     </p>
                 </li>
                 <li>
                     <p>
-                        The <a href="/doc/home-changes-36">list of changes since the previous version</a>.
+                        The <a href="home-changes-36">list of changes since the previous version</a>.
                     </p>
                 </li>
             </ul>
             <p>
                 For any further questions, you are invited to join the Orbeon Forms community <a
-                href="http://www.orbeon.com/forms/mailing-list">mailing-list</a>.
+                href="home-faq#mailing-list">mailing-list</a>.
             </p>
         </section>
         <!--<section>-->

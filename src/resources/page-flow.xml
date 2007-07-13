@@ -24,6 +24,7 @@
     <files path-info="*.jpg"/>
     <files path-info="*.xsd"/>
     <files path-info="*.xml" mime-type="application/xml"/>
+    <files path-info="*.svg" mime-type="image/svg+xml"/>
     <files path-info="*.html" mime-type="text/html"/>
     <files path-info="*.htm" mime-type="text/html"/>
     <files path-info="*.java" mime-type="text/plain"/>

@@ -13,8 +13,8 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
-import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XXFormsDialogControl;
+import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -27,8 +27,7 @@ import org.xml.sax.SAXException;
  */
 public class XXFormsDialogHandler extends HandlerBase {
 
-    protected String effectiveDialogId;
-    private XXFormsDialogControl dialogXFormsControl;
+    private boolean isMinimalAppearance;
 
     public XXFormsDialogHandler() {
         super(false, true);
@@ -36,19 +35,19 @@ public class XXFormsDialogHandler extends HandlerBase {
 
     public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
 
-        effectiveDialogId = handlerContext.getEffectiveId(attributes);
+        final String effectiveDialogId = handlerContext.getEffectiveId(attributes);
+        final XXFormsDialogControl dialogXFormsControl = ((XXFormsDialogControl) containingDocument.getObjectById(handlerContext.getPipelineContext(), effectiveDialogId));
+        isMinimalAppearance = XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME.equals(getAppearance(attributes));
 
         // Find classes to add
-        final StringBuffer classes = new StringBuffer("xforms-dialog xforms-initially-hidden");
-        if (!handlerContext.isGenerateTemplate()) {// NOTE: xxforms:dialog cannot be in a template
-            dialogXFormsControl = ((XXFormsDialogControl) containingDocument.getObjectById(handlerContext.getPipelineContext(), effectiveDialogId));
-            classes.append(" xforms-dialog-");
-            classes.append(dialogXFormsControl.getLevel());
-            classes.append(" xforms-dialog-close-");
-            classes.append(Boolean.toString(dialogXFormsControl.isClose()));
-            classes.append(" xforms-dialog-draggable-");
-            classes.append(Boolean.toString(dialogXFormsControl.isDraggable()));
-        }
+        final StringBuffer classes = getInitialClasses(localname, attributes, null);
+        classes.append(" xforms-initially-hidden");
+        classes.append(" xforms-dialog-");
+        classes.append(dialogXFormsControl.getLevel());
+        classes.append(" xforms-dialog-close-");
+        classes.append(Boolean.toString(dialogXFormsControl.isClose()));
+        classes.append(" xforms-dialog-draggable-");
+        classes.append(Boolean.toString(dialogXFormsControl.isDraggable()));
 
         // Start main xhtml:div
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
@@ -56,20 +55,27 @@ public class XXFormsDialogHandler extends HandlerBase {
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
         contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, getAttributes(attributes, classes.toString(), effectiveDialogId));
 
-        // Child xhtml:div for label
-        final String labelValue = handlerContext.isGenerateTemplate() ? null : dialogXFormsControl.getLabel();
-        if (labelValue != null) {
-            reusableAttributes.clear();
-            reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "hd");
-            contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, reusableAttributes);
-            contentHandler.characters(labelValue.toCharArray(), 0, labelValue.length());
-            contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName);
-        }
+        if (!isMinimalAppearance) {
+            // Child xhtml:div for label
+            final String labelValue = dialogXFormsControl.getLabel();
+            if (labelValue != null) {
+                reusableAttributes.clear();
+                reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "hd");
+                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, reusableAttributes);
+                contentHandler.characters(labelValue.toCharArray(), 0, labelValue.length());
+                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName);
+            }
 
-        // Child xhtml:div for body
-        reusableAttributes.clear();
-        reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "bd");
-        contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, reusableAttributes);
+            // Child xhtml:div for body
+            reusableAttributes.clear();
+            reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "bd");
+            contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, reusableAttributes);
+        } else {
+            // Two nested xhtml:div
+            reusableAttributes.clear();
+            contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, reusableAttributes);
+            contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, reusableAttributes);
+        }
     }
 
     public void end(String uri, String localname, String qName) throws SAXException {
@@ -80,5 +86,9 @@ public class XXFormsDialogHandler extends HandlerBase {
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
         contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName);
         contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName);
+
+        // One more to close with minimal appearance
+        if (isMinimalAppearance)
+            contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName);
     }
 }

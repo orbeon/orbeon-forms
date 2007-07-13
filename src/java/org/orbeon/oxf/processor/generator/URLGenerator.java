@@ -669,7 +669,7 @@ public class URLGenerator extends ProcessorImpl {
         }
     }
 
-    private static class LocalXIncludeListener implements orbeon.apache.xerces.xinclude.XIncludeHandler.XIncludeListener {
+    private static class LocalXIncludeListener implements XIncludeHandler.XIncludeListener {
 
         private URIReferences uriReferences;
 

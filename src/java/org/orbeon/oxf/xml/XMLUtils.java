@@ -13,10 +13,7 @@
  */
 package org.orbeon.oxf.xml;
 
-import org.apache.commons.fileupload.DefaultFileItem;
-import org.apache.commons.fileupload.DefaultFileItemFactory;
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileItemFactory;
+import org.apache.commons.fileupload.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
@@ -914,10 +911,17 @@ public class XMLUtils {
         // Make sure the file is deleted when the context is destroyed
         pipelineContext.addContextListener(new PipelineContext.ContextListenerAdapter() {
             public void contextDestroyed(boolean success) {
-                // Log when we delete files, as there is a transient issue with temporary files
-                // that seem to be deleted too early.
-                logger.info("Deleting temporary file: " + fileItem.getName());
-                fileItem.delete();
+                try {
+                    // Log when we delete files, as there is a transient issue with temporary files
+                    // that seem to be deleted too early.
+                    if (logger.isInfoEnabled()) {
+                        String temporaryFileName = ((DeferredFileOutputStream) fileItem.getOutputStream()).getFile().getAbsolutePath();
+                        logger.info("Deleting temporary file: " + temporaryFileName);
+                    }
+                    fileItem.delete();
+                } catch (IOException e) {
+                    throw new OXFException(e);
+                }
             }
         });
         // Return FileItem object

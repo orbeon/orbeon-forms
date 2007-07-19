@@ -265,18 +265,18 @@
                         example, in the case of a Servlet:
                         <xml-source>
                             <servlet>
-                                <servlet-name>oxf</servlet-name>
+                                <servlet-name>ops-main-servlet</servlet-name>
                                 <servlet-class>org.orbeon.oxf.servlet.OPSServlet</servlet-class>
-                                <comment>The main processor that OPSServlet must execute</comment>
+                                <comment> Set main processor </comment>
                                 <init-param>
                                     <param-name>oxf.main-processor.name</param-name>
                                     <param-value>{http://www.orbeon.com/oxf/processors}page-flow</param-value>
                                 </init-param>
-                                <comment>The Page Flow Controller configuration file</comment>
                                 <init-param>
                                     <param-name>oxf.main-processor.input.controller</param-name>
                                     <param-value>oxf:/page-flow.xml</param-value>
                                 </init-param>
+                                <comment> ... </comment>
                             </servlet>
 					    </xml-source>
                     </li>
@@ -322,76 +322,38 @@
             <section>
                 <title>Definition</title>
                 <p>
-                    In case an error is encoutered during the execution or the main processor,
-                    Orbeon Forms tries to execute an error processor. The error processor is
-                    typically a pipeline that produces a page showing the exception that was
-                    encountered. For more information, please refer to the <a
-                    href="reference-error-pipeline">Error Pipeline</a> documentation.
+                    In case an error is encountered during the execution or the main processor associated with a
+                    servlet, Orbeon Forms tries to execute an error processor. The error processor is typically a
+                    pipeline that produces a page showing the exception that was encountered. For more information,
+                    please refer to the <a href="reference-error-pipeline">Error Page</a> documentation.
                 </p>
             </section>
             <a name="error-configuration"/>
             <section>
                 <title>Configuring the Error Processor</title>
                 <p>
-                    You can configure an error processor in the same way the main processor is
-                    configured. The error processor is looked up in the following locations, in
-                    this order:
+                    You can configure an error processor in the same way the main processor is configured. The preferred
+                    way of configuring the error processor is using the component's initialization parameters in <code>web.xml</code>. For example, in the case
+                    of a Servlet:
                 </p>
-                <ol>
-                    <li>
-                        The component's initialization parameters in <code>web.xml</code>. For
-                        example, in the case of a Servlet:
-                        <xml-source>
-                            <servlet>
-                                <servlet-name>oxf</servlet-name>
-                                <servlet-class>org.orbeon.oxf.servlet.OPSServlet</servlet-class>
-                                <comment>The error processor that OPSServlet must execute</comment>
-                                <init-param>
-                                    <param-name>oxf.error-processor.name</param-name>
-                                    <param-value>{http://www.orbeon.com/oxf/processors}pipeline</param-value>
-                                </init-param>
-                                <comment>The pipeline to execute</comment>
-                                <init-param>
-                                    <param-name>oxf.error-processor.input.config</param-name>
-                                    <param-value>oxf:/config/error.xpl</param-value>
-                                </init-param>
-                            </servlet>
-                        </xml-source>
-                    </li>
-                    <li>
-                        <code>properties.xml</code>, for example:
-                        <xml-source>
-                            <properties>
-                                <comment>The error processor that OPSServlet must execute</comment>
-                                <property as="xs:QName" name="oxf.error-processor.name" value="oxf:pipeline"/>
-                                <comment>The Page Flow Controller configuration file</comment>
-                                <property as="xs:anyURI" name="oxf.error-processor.input.config" value="oxf:/config/error.xpl"/>
-                            </properties>
-                        </xml-source>
-                    </li>
-                    <li>
-                        The context parameters in <code>web.xml</code>
-                        <xml-source>
-                            <comment>The error processor that OPSServlet must execute</comment>
-                            <context-param>
-                                <param-name>oxf.error-processor.name</param-name>
-                                <param-value>{http://www.orbeon.com/oxf/processors}pipeline</param-value>
-                            </context-param>
-                            <comment>The pipeline to execute</comment>
-                            <context-param>
-                                <param-name>oxf.error-processor.input.config</param-name>
-                                <param-value>oxf:/config/error.xpl</param-value>
-                            </context-param>
-                        </xml-source>
-                    </li>
-                </ol>
-                <p>
-                    It is recommended to configure each Web or Portlet Application component
-                    individually in the component's initialization properties in <code>web.xml</code>,
-                    so that adding components with different configurations is facilitated. There are
-                    situations where several components need to share a configuration, but it is
-                    expected that such situations will be rare.
-                </p>
+                <xml-source>
+                    <servlet>
+                        <servlet-name>ops-main-servlet</servlet-name>
+                        <servlet-class>org.orbeon.oxf.servlet.OPSServlet</servlet-class>
+                        <comment> ... </comment>
+                        <comment> Set error processor </comment>
+                        <init-param>
+                            <param-name>oxf.error-processor.name</param-name>
+                            <param-value>{http://www.orbeon.com/oxf/processors}pipeline</param-value>
+                        </init-param>
+                        <init-param>
+                            <param-name>oxf.error-processor.input.config</param-name>
+                            <param-value>oxf:/config/error.xpl</param-value>
+                        </init-param>
+                        <comment> Set supported methods </comment>
+                        <comment> ... </comment>
+                    </servlet>
+                </xml-source>
             </section>
         </section>
 	</body>

@@ -31,7 +31,10 @@
 		</section>
 		<section>
 			<title>WAR Structure</title>
-			<table ca="|l|p{0.5\textwidth}|">
+            <p>
+                The following table lists the most important files contained in <code>ops.war</code>: 
+            </p>
+            <table>
 				<tr>
 					<th>Files</th>
 					<th>Description</th>
@@ -59,9 +62,8 @@
 						<code>WEB-INF/lib/*.jar</code>
 					</td>
 					<td>
-                        All the other JAR files in the <code>WEB-INF/lib</code> directory are used
-                        either by the Orbeon Forms core engine, or one of the Presentation
-                        Server processors.
+                        All the other JAR files in the <code>WEB-INF/lib</code> directory are used either by the Orbeon
+                        Forms core engine, or one of the Presentation Server processors.
                     </td>
 				</tr>
 				<tr>
@@ -69,9 +71,9 @@
 						<code>WEB-INF/web.xml</code>
 					</td>
 					<td>
-                        The standard descriptor for this WAR file. It declares
-                        <code>OPSServlet</code> as the default Servlet and passes some basic
-                        configuration parameters to this Servlet.
+                        The standard descriptor for this WAR file. It configures the Orbeon Forms properties and
+                        resource manager, the Orbeon Forms main servlet and Ajax servlet, as well as other resources
+                        such as the embedded eXist XML database.
                     </td>
 				</tr>
                 <tr>
@@ -81,10 +83,11 @@
 					<td>
                         The standard portlet descriptor for this WAR file is required if you use portlets. It typically
                         declares instances of <code>OPSPortlet</code>. For more information, see <a
-                        href="integration-portlets">Writing Portlets With Orbeon Forms</a>.
+                        href="integration-portlets">JSR-168 Portlets</a>.
                     </td>
 				</tr>
-				<tr>
+                <!--
+                <tr>
 					<td>
 						<code>WEB-INF/weblogic.xml</code>
 					</td>
@@ -104,19 +107,43 @@
                         (e.g. for EJBs, users, JDBC data sources, etc).
                     </td>
 				</tr>
+				-->
 				<tr>
 					<td>
 						<code>WEB-INF/resources/*</code>
 					</td>
 					<td>
-                        Contains the resources for the Orbeon Forms example application.
-                        Most of the files in this directory will be replaced when you build your own
-                        Orbeon Forms web applications. In particular, this directory
-                        contains <code>properties.xml</code>, the main Orbeon Forms
-                        configuration file.
+                        Contains Orbeon Forms resources.
                     </td>
 				</tr>
-			</table>
+                <tr>
+					<td>
+						<code>WEB-INF/resources/config/*</code>
+					</td>
+					<td>
+                        Contains Orbeon Forms resources which you can configure. In particular, this directory
+                        contains <code>properties.xml</code>, the main Orbeon Forms configuration file.
+                    </td>
+				</tr>
+                <tr>
+					<td>
+						<code>WEB-INF/resources/apps/*</code>
+					</td>
+					<td>
+                        Contains Orbeon Forms example applications resources. Each sub-directory contains a separate
+                        Orbeon Forms example application. When building your own application xxx
+                    </td>
+				</tr>
+                <tr>
+					<td>
+						<code>xforms-jsp/*</code>
+					</td>
+					<td>
+                        Contains examples using JavaServer Pages (JSP) to produce XForms. This directory can be removed
+                        if you do not want to run these examples.
+                    </td>
+				</tr>
+            </table>
 		</section>
 		<section>
 			<title>Orbeon Forms Initialization</title>

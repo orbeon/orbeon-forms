@@ -16,7 +16,7 @@
 -->
 <document xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xforms="http://www.w3.org/2002/xforms">
     <header>
-        <title>Error Page</title>
+        <title>Error Page and Error Dialog</title>
     </header>
     <body>
         <section>
@@ -40,8 +40,12 @@
                 </li>
             </ul>
             <p>
-                Orbeon Forms provides defaults for the error page and error dialog. The dialog looks as follows with
-                Orbeon Forms 3.6:
+                Orbeon Forms provides defaults for the error page and error dialog. The default error dialog looks as
+                follows with Orbeon Forms 3.6:
+            </p>
+            <img src="../apps/doc/images/home-changes-35-ajax-error-1.png" alt="Ajax error dialog"/>
+            <p>
+                An initially collapsed section containing details of the error useful to the developer:
             </p>
             <img src="../apps/doc/images/home-changes-35-ajax-error-2.png" alt="Ajax error dialog"/>
             <p>

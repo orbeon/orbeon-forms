@@ -52,7 +52,7 @@
 					<td>
 						<code>WEB-INF/lib/ops-resources-private.jar</code>
 					</td>
-					<td>JAR file with all the Orbeon Forms files that can not be served to a web client..</td>
+					<td>JAR file with all the Orbeon Forms files that can not be served to a web client.</td>
 				</tr>
                 <tr>
 					<td>

@@ -22,12 +22,11 @@
 		<section>
 			<title>Scope</title>
 			<p>
-                This section explains the structure of the standard WAR distributed with
-                Orbeon Forms and how this WAR integrates with the application server (or
-                Servlet container). This information is useful if you need to repackage Presentation
-                Server. For instance, if you want to build an EAR file, or if you need to deploy
-                more complex Orbeon Forms applications containing Servlets, Servlet Filters,
-                Portlets, and Servlet context listeners.
+                This section explains the structure of the standard WAR distributed with Orbeon Forms and how this WAR
+                integrates with the application server (or Servlet container). This information is useful if you need to
+                repackage Orbeon Forms. For instance, if you want to build an EAR file, or if you need to deploy more
+                complex Orbeon Forms applications containing Servlets, Servlet Filters, Portlets, and Servlet context
+                listeners.
             </p>
 		</section>
 		<section>
@@ -43,7 +42,19 @@
 					</td>
 					<td>JAR file with all the Orbeon Forms classes.</td>
 				</tr>
-				<tr>
+                <tr>
+					<td>
+						<code>WEB-INF/lib/ops-resources-public.jar</code>
+					</td>
+					<td>JAR file with all the Orbeon Forms files that can be served to a web client, such as CSS and JavaScript files.</td>
+				</tr>
+                <tr>
+					<td>
+						<code>WEB-INF/lib/ops-resources-private.jar</code>
+					</td>
+					<td>JAR file with all the Orbeon Forms files that can not be served to a web client..</td>
+				</tr>
+                <tr>
 					<td>
 						<code>WEB-INF/lib/*.jar</code>
 					</td>
@@ -122,23 +133,22 @@
 					<p>The application server reads the
                     <code>WEB-INF/web.xml</code> file, which:</p>
 					<ul>
-						<li>Declares a Servlet named <code>oxf</code>
-                        implemented by the class
-                        <code>org.orbeon.oxf.servlet.OPSServlet</code>
-                        (loaded from <code>lib/ops.jar</code>)</li>
-						<li>Defines <code>oxf</code> as the default Servlet
+						<li>Declares a Servlet named <code>ops-main-servlet</code>
+                        implemented by the class <code>org.orbeon.oxf.servlet.OPSServlet</code> (loaded from
+                        <code>lib/ops.jar</code>)</li>
+						<li>Defines <code>ops-main-servlet</code> as the default Servlet
                         (i.e. the Servlet handling all the requests).</li>
 					</ul>
 					<xml-source>
 <web-app>
     <servlet>
-        <servlet-name>oxf</servlet-name>
+        <servlet-name>ops-main-servlet</servlet-name>
         <servlet-class>org.orbeon.oxf.servlet.OPSServlet</servlet-class>
         <comment>Initialization parameters here (see below)</comment>
     </servlet>
     <servlet-mapping>
-        <servlet-name>oxf</servlet-name>
-        <url-pattern>/*</url-pattern>
+        <servlet-name>ops-main-servlet</servlet-name>
+        <url-pattern>/</url-pattern>
     </servlet-mapping>
 </web-app>
 					</xml-source>
@@ -150,65 +160,49 @@
                     </p>
 					<ul>
 						<li>
-                            What resource manager has to be used, and how this resource manager is
-                            configured. In the default WAR bundled in the Orbeon Forms
-                            distribution, Orbeon Forms loads resources from the
-                            <code>WEB-INF/resources</code> directory inside the WAR. If it can't
-                            find a resource in this directory, it will try to look for it inside
-                            <code>ops.jar</code>. Only static resources that are part of
-                            Orbeon Forms are stored in <code>ops.jar</code> (as opposed to
-                            Orbeon Forms applications). The <link
-                            href="reference-resource-managers">Resource Managers</link> section
-                            explains in detail how resource managers work.
+                            <p>
+                                What resource manager has to be used, and how this resource manager is configured. In
+                                the default WAR bundled in the Orbeon Forms distribution, Orbeon Forms loads resources
+                                from the <code>WEB-INF/resources</code> directory inside the WAR. If it can't find a
+                                resource in this directory, it will try to look for it inside <code>ops.jar</code> or
+                                <code>ops-resources-private.jar</code>. Only static resources that are part of Orbeon
+                                Forms are stored in <code>ops.jar</code> and <code>ops-resources-private.jar</code> (as
+                                opposed to Orbeon Forms applications). The <link
+                                href="reference-resource-managers">Resource Managers</link> section explains in detail
+                                how resource managers work.
+                            </p>
                         </li>
 						<li>
-                            The location of <code>properties.xml</code>.
+                            <p>
+                                The location of <code>properties.xml</code>, by default <code>oxf:/config/properties.xml</code>.
+                            </p>
                         </li>
                         <li>
-                            Optionally, what main processor or context listener
-                            processors must be used.
+                            <p>
+                                What main processor or context listener processors must be used. By default, the Page
+                                Flow Controller is used as the main processor.:
+                            </p>
+                            <xml-source>
+                                <comment>The main processor that OPSServlet must execute</comment>
+                                <init-param>
+                                    <param-name>oxf.main-processor.name</param-name>
+                                    <param-value>{http://www.orbeon.com/oxf/processors}page-flow</param-value>
+                                </init-param>
+                                <comment>The Page Flow Controller configuration file</comment>
+                                <init-param>
+                                    <param-name>oxf.main-processor.input.controller</param-name>
+                                    <param-value>oxf:/page-flow.xml</param-value>
+                                </init-param>
+                            </xml-source>
                         </li>
 					</ul>
 				</li>
 				<li>
 					<p>
-                        Orbeon Forms is configured through an XML file,
-                        <code>properties.xml</code>, stored with the resources. The exact name and
-                        path of this file is specified within <code>web.xml</code>.
-                        <code>properties.xml</code> may declare the main processor to be executed by
-                        <code>OPSServlet</code>, as well as optional inputs of this processor.
-                        Alternatively, the main processor can be declared directly within
-                        <code>web.xml</code>, which is the recommended approach. By default, the
-                        Page Flow Controller is used as the main processor. If the configuration is
-                        done in <code>web.xml</code>:
-                    </p>
-					<xml-source>
-<comment>The main processor that OPSServlet must execute</comment>
-<context-param>
-    <param-name>oxf.main-processor.name</param-name>
-    <param-value>{http://www.orbeon.com/oxf/processors}page-flow</param-value>
-</context-param>
-<comment>The Page Flow Controller configuration file</comment>
-<context-param>
-    <param-name>oxf.main-processor.input.controller</param-name>
-    <param-value>oxf:/page-flow.xml</param-value>
-</context-param>
-					</xml-source>
-                    <p>
-                        If the configuration is done in <code>properties.xml</code>:
-                    </p>
-					<xml-source>
-<properties>
-    <comment>The main processor that OPSServlet must execute</comment>
-    <property as="xs:QName" name="oxf.main-processor.main" value="oxf:page-flow"/>
-    <comment>The Page Flow Controller configuration file</comment>
-    <property as="xs:anyURI" name="oxf.main-processor.input.controller" value="oxf:/page-flow.xml"/>
-</properties>
-					</xml-source>
-                    <p>
-                        For more information about the properties file, see
-                        <link href="reference-properties">Orbeon Forms
-                        Properties</link>.
+                        More Orbeon Forms configuration is available in an XML file, <code>properties.xml</code>, stored
+                        with the resources. The exact name and path of this file is specified within
+                        <code>web.xml</code>. For more information about the properties file, see <link
+                        href="reference-properties">Orbeon Forms Properties</link>.
                     </p>
 				</li>
 				<li>
@@ -257,63 +251,25 @@
                 <title>Orbeon Forms Servlet, Orbeon Forms Servlet Filter, and Orbeon Forms Portlet</title>
                 <p>
                     These components can each have their own main processor. The main processor for
-                    such components is looked up in the following locations, in this order:
+                    such components is looked up in in the initialization parameters of the component. For
+                    example, in the case of a Servlet:
                 </p>
-                <ol>
-                    <li>
-                        The component's initialization parameters in <code>web.xml</code>. For
-                        example, in the case of a Servlet:
-                        <xml-source>
-                            <servlet>
-                                <servlet-name>ops-main-servlet</servlet-name>
-                                <servlet-class>org.orbeon.oxf.servlet.OPSServlet</servlet-class>
-                                <comment> Set main processor </comment>
-                                <init-param>
-                                    <param-name>oxf.main-processor.name</param-name>
-                                    <param-value>{http://www.orbeon.com/oxf/processors}page-flow</param-value>
-                                </init-param>
-                                <init-param>
-                                    <param-name>oxf.main-processor.input.controller</param-name>
-                                    <param-value>oxf:/page-flow.xml</param-value>
-                                </init-param>
-                                <comment> ... </comment>
-                            </servlet>
-					    </xml-source>
-                    </li>
-                    <li>
-                        <code>properties.xml</code>, for example:
-					    <xml-source>
-                            <properties>
-                                <comment>The main processor that OPSServlet must execute</comment>
-                                <property as="xs:QName" name="oxf.main-processor.name" value="oxf:page-flow"/>
-                                <comment>The Page Flow Controller configuration file</comment>
-                                <property as="xs:anyURI" name="oxf.main-processor.input.controller" value="oxf:/page-flow.xml"/>
-                            </properties>
-					    </xml-source>
-                    </li>
-                    <li>
-                        The context parameters in <code>web.xml</code>
-					    <xml-source>
-                            <comment>The main processor that OPSServlet must execute</comment>
-                            <context-param>
-                                <param-name>oxf.main-processor.name</param-name>
-                                <param-value>{http://www.orbeon.com/oxf/processors}page-flow</param-value>
-                            </context-param>
-                            <comment>The Page Flow Controller configuration file</comment>
-                            <context-param>
-                                <param-name>oxf.main-processor.input.controller</param-name>
-                                <param-value>oxf:/page-flow.xml</param-value>
-                            </context-param>
-					    </xml-source>
-                    </li>
-                </ol>
-                <p>
-                    It is recommended to configure each Web component individually in the
-                    component's initialization properties in <code>web.xml</code>, so that adding
-                    components with different configurations is facilitated. There are situations
-                    where several components need to share a configuration, but it is expected that
-                    such situations will be rare.
-                </p>
+                <xml-source>
+                    <servlet>
+                        <servlet-name>ops-main-servlet</servlet-name>
+                        <servlet-class>org.orbeon.oxf.servlet.OPSServlet</servlet-class>
+                        <comment> Set main processor </comment>
+                        <init-param>
+                            <param-name>oxf.main-processor.name</param-name>
+                            <param-value>{http://www.orbeon.com/oxf/processors}page-flow</param-value>
+                        </init-param>
+                        <init-param>
+                            <param-name>oxf.main-processor.input.controller</param-name>
+                            <param-value>oxf:/page-flow.xml</param-value>
+                        </init-param>
+                        <comment> ... </comment>
+                    </servlet>
+                </xml-source>
             </section>
         </section>
         <a name="error-processor"/>

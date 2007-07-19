@@ -261,25 +261,26 @@
             </p:processor>
         </p:when>
         <!-- SVG detection -->
-        <p:when test="/svg:svg">
-            <p:processor name="oxf:svg-converter">
-                <p:input name="config"><config/></p:input>
-                <p:input name="data" href="#xformed-data"/>
-                <p:output name="data" id="converted"/>
-            </p:processor>
-            <p:processor name="oxf:http-serializer">
-                <p:input name="config">
-                    <config>
-                        <header>
-                            <name>Cache-Control</name>
-                            <value>post-check=0, pre-check=0</value>
-                        </header>
+        <!-- TODO: Make this configurable with properties -->
+        <!--<p:when test="/svg:svg">-->
+            <!--<p:processor name="oxf:svg-converter">-->
+                <!--<p:input name="config"><config/></p:input>-->
+                <!--<p:input name="data" href="#xformed-data"/>-->
+                <!--<p:output name="data" id="converted"/>-->
+            <!--</p:processor>-->
+            <!--<p:processor name="oxf:http-serializer">-->
+                <!--<p:input name="config">-->
+                    <!--<config>-->
+                        <!--<header>-->
+                            <!--<name>Cache-Control</name>-->
+                            <!--<value>post-check=0, pre-check=0</value>-->
+                        <!--</header>-->
                         <!-- NOTE: SVG converter specifies content-type, usually image/png -->
-                    </config>
-                </p:input>
-                <p:input name="data" href="#converted"/>
-            </p:processor>
-        </p:when>
+                    <!--</config>-->
+                <!--</p:input>-->
+                <!--<p:input name="data" href="#converted"/>-->
+            <!--</p:processor>-->
+        <!--</p:when>-->
         <!-- Atom detection -->
         <p:when test="/atom:feed">
             <p:processor name="oxf:xml-converter">

@@ -1335,8 +1335,9 @@ ORBEON.xforms.Events = {
      * When the error dialog is closed, we make sure that the "details" section is closed,
      * so it will be closed the next time the dialog is opened.
      */
-    errorPanelClosed: function(type, args, me) {
-        var errorPanel = ORBEON.xforms.Globals.formErrorPanel[me];
+    errorPanelClosed: function(type, args, obj) {
+        var formIndex = obj[0];
+        var errorPanel = ORBEON.xforms.Globals.formErrorPanel[formIndex];
         var errorBodyDiv = errorPanel.errorDetailsDiv.parentNode.parentNode;
         var detailsHidden = ORBEON.util.Dom.getChildElementByClass(errorBodyDiv, "xforms-error-panel-details-hidden");
         var detailsShown = ORBEON.util.Dom.getChildElementByClass(errorBodyDiv, "xforms-error-panel-details-shown");
@@ -1514,7 +1515,7 @@ ORBEON.xforms.Init = {
                             draggable: true
                         });
                         errorPanel.render();
-                        errorPanel.beforeHideEvent.subscribe(ORBEON.xforms.Events.errorPanelClosed, formIndex);
+                        errorPanel.beforeHideEvent.subscribe(ORBEON.xforms.Events.errorPanelClosed, [formIndex]);
                         ORBEON.xforms.Globals.formErrorPanel[formIndex] = errorPanel;
 
                         // Find reference to elements in the deails hidden section
@@ -2144,8 +2145,13 @@ ORBEON.xforms.Server = {
                 for (var i = 0; i < responseRoot.childNodes.length; i++) {
 
                     // Update instances
-                    if (xformsGetLocalName(responseRoot.childNodes[i]) == "dynamic-state")
+                    if (xformsGetLocalName(responseRoot.childNodes[i]) == "dynamic-state") {
                         newDynamicState = ORBEON.util.Dom.getStringValue(responseRoot.childNodes[i]);
+                        // Store new dynamic state as soon as we find it. This is because the server only keeps the last
+                        // dynamic state. So if a JavaScript error happens later on while processing the response,
+                        // the next request we do we still want to send the latest dynamic state known to the server.
+                        xformsStoreInClientState(formIndex, "ajax-dynamic-state", newDynamicState);
+                    }
 
                     if (xformsGetLocalName(responseRoot.childNodes[i]) == "action") {
                         var actionElement = responseRoot.childNodes[i];
@@ -3094,9 +3100,6 @@ ORBEON.xforms.Server = {
                         }
                     }
                 }
-
-                // Store new dynamic state if that state did not trigger a post
-                xformsStoreInClientState(formIndex, "ajax-dynamic-state", newDynamicState);
 
                 if (newDynamicStateTriggersReplace) {
                     // Display loading indicator when we go to another page.

@@ -364,6 +364,7 @@
                 </init-param>
             </servlet>
 
+            <!--
             <xsl:call-template name="comment">
                 <xsl:with-param name="caption" select="'Struts examples'"/>
                 <xsl:with-param name="commented" select="$target = 'war'"/>
@@ -383,6 +384,7 @@
                     </servlet>
                 </xsl:with-param>
             </xsl:call-template>
+            -->
 
             <xsl:call-template name="comment">
                 <xsl:with-param name="caption" select="'SQL examples'"/>
@@ -435,6 +437,7 @@
                 <url-pattern>/exist/atom/*</url-pattern>
             </servlet-mapping>
 
+            <!--
             <xsl:call-template name="comment">
                 <xsl:with-param name="caption" select="'Struts examples'"/>
                 <xsl:with-param name="commented" select="$target = 'war'"/>
@@ -445,6 +448,7 @@
                     </servlet-mapping>
                 </xsl:with-param>
             </xsl:call-template>
+            -->
 
             <xsl:call-template name="comment">
                 <xsl:with-param name="caption" select="'SQL examples'"/>

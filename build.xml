@@ -375,7 +375,9 @@
 
     <target name="war-copy-descriptors" depends="prepare">
         <copy todir="${war.inf}">
-            <fileset dir="${descriptors.dir}" includes="*.xml"/>
+            <fileset dir="${descriptors.dir}">
+                <include name="*.xml"/>
+            </fileset>
         </copy>
         <!-- eXist database -->
         <mkdir dir="${war.inf}/exist-data"/>

@@ -1120,7 +1120,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         if (currentEntry.getValue() instanceof String) {
                             // Case of String
                             final String headerValue = (String) currentEntry.getValue();
-                            forwardHeader(response, headerName, headerValue);
+                            forwardHeaderFilter(response, headerName, headerValue);
                         } else {
                             // Case of List
                             final List headerValues = (List) currentEntry.getValue();
@@ -1128,7 +1128,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                 for (Iterator j = headerValues.iterator(); j.hasNext();) {
                                     final String headerValue = (String) j.next();
                                     if (headerValue != null) {
-                                        forwardHeader(response, headerName, headerValue);
+                                        forwardHeaderFilter(response, headerName, headerValue);
                                     }
                                 }
                             }
@@ -1138,7 +1138,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
             }
         }
 
-        private void forwardHeader(ExternalContext.Response response, String headerName, String headerValue) {
+        private void forwardHeaderFilter(ExternalContext.Response response, String headerName, String headerValue) {
             /**
              * Filtering the Transfer-Encoding header
              *

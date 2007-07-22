@@ -684,35 +684,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                     final ExternalContext.Response response = externalContext.getResponse();
 
                                     // Forward headers to response
-                                    if (connectionResult.resultHeaders != null) {
-                                        for (Iterator i = connectionResult.resultHeaders.entrySet().iterator(); i.hasNext();) {
-                                            final Map.Entry currentEntry = (Map.Entry) i.next();
-                                            final String headerName = (String) currentEntry.getKey();
-                                            // We only get one header value per name
-                                            final String headerValue = (String) currentEntry.getValue();
-
-                                            /**
-                                             * Filtering the Transfer-Encoding header
-                                             *
-                                             * We don't pass the Transfer-Encoding header, as the request body is
-                                             * already decoded for us. Passing along the Transfer-Encoding causes a
-                                             * problem if the server sends us chunked data and we send it in the
-                                             * response not chunked but saying in the header that it is chunked.
-                                             *
-                                             * Non-filtering of Content-Encoding header
-                                             *
-                                             * The Content-Encoding has the potential of causing the same problem as
-                                             * the Transfer-Encoding header. It could be an issue if we get data with
-                                             * Content-Encoding: gzip, but pass it along uncompressed but still
-                                             * include the Content-Encoding: gzip. However this does not happen, as
-                                             * the request we send does not contain a Accept-Encoding: gzip,deflate. So
-                                             * filtering the Content-Encoding header is safe here.
-                                             */
-                                            if (headerName != null && headerValue != null && !"transfer-encoding".equals(headerName.toLowerCase())) {
-                                                response.addHeader(headerName, headerValue);
-                                            }
-                                        }
-                                    }
+                                    connectionResult.forwardHeaders(response);
 
                                     // Forward content to response
                                     NetUtils.copyStream(connectionResult.getResultInputStream(), response.getOutputStream());
@@ -800,21 +772,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                             final ExternalContext.Response response = externalContext.getResponse();
 
                             // Forward headers to response
-                            // TODO: this is duplicated from above
-                            if (connectionResult.resultHeaders != null) {
-                                for (Iterator i = connectionResult.resultHeaders.entrySet().iterator(); i.hasNext();) {
-                                    final Map.Entry currentEntry = (Map.Entry) i.next();
-                                    final String headerName = (String) currentEntry.getKey();
-                                    // TODO: In some cases it seems this returns a String, not a List
-                                    final List headerValues = (List) currentEntry.getValue();
-
-                                    if (headerName != null && headerValues != null) {
-                                        for (Iterator j = headerValues.iterator(); j.hasNext();) {
-                                            response.addHeader(headerName, (String) j.next());
-                                        }
-                                    }
-                                }
-                            }
+                            connectionResult.forwardHeaders(response);
 
                             // Forward redirect
                             response.setStatus(connectionResult.resultCode);
@@ -1147,6 +1105,59 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 resultInputStream.mark(1);
                 hasContent = resultInputStream.read() != -1;
                 resultInputStream.reset();
+            }
+        }
+
+        public void forwardHeaders(ExternalContext.Response response) {
+            if (resultHeaders != null) {
+                for (Iterator i = resultHeaders.entrySet().iterator(); i.hasNext();) {
+                    final Map.Entry currentEntry = (Map.Entry) i.next();
+                    final String headerName = (String) currentEntry.getKey();
+
+                    if (headerName != null) {
+                        // NOTE: As per the doc, this should always be a List, but for some unknown reason
+                        // it appears to be a String sometimes
+                        if (currentEntry.getValue() instanceof String) {
+                            // Case of String
+                            final String headerValue = (String) currentEntry.getValue();
+                            forwardHeader(response, headerName, headerValue);
+                        } else {
+                            // Case of List
+                            final List headerValues = (List) currentEntry.getValue();
+                            if (headerValues != null) {
+                                for (Iterator j = headerValues.iterator(); j.hasNext();) {
+                                    final String headerValue = (String) j.next();
+                                    if (headerValue != null) {
+                                        forwardHeader(response, headerName, headerValue);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private void forwardHeader(ExternalContext.Response response, String headerName, String headerValue) {
+            /**
+             * Filtering the Transfer-Encoding header
+             *
+             * We don't pass the Transfer-Encoding header, as the request body is
+             * already decoded for us. Passing along the Transfer-Encoding causes a
+             * problem if the server sends us chunked data and we send it in the
+             * response not chunked but saying in the header that it is chunked.
+             *
+             * Non-filtering of Content-Encoding header
+             *
+             * The Content-Encoding has the potential of causing the same problem as
+             * the Transfer-Encoding header. It could be an issue if we get data with
+             * Content-Encoding: gzip, but pass it along uncompressed but still
+             * include the Content-Encoding: gzip. However this does not happen, as
+             * the request we send does not contain a Accept-Encoding: gzip,deflate. So
+             * filtering the Content-Encoding header is safe here.
+             */
+            if (!"transfer-encoding".equals(headerName.toLowerCase())) {
+                response.addHeader(headerName, headerValue);
             }
         }
 

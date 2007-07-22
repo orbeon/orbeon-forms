@@ -553,6 +553,7 @@ public class XFormsUtils {
         tidy.setShowWarnings(false);
         tidy.setQuiet(true);
         tidy.setInputEncoding("utf-8");
+        //tidy.setNumEntities(true); // CHECK: what does this do exactly?
 
         // Parse and output to SAXResult
         final byte[] valueBytes;

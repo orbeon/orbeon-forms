@@ -375,7 +375,9 @@ ORBEON.util.Dom = {
  */
 ORBEON.util.String = {
     replace: function(text, placeholder, replacement) {
-        return text.replace(new RegExp(placeholder, "g"), replacement);
+        // Don't try to do the replacement if the string does not contain the placeholder
+        return text.indexOf(placeholder) == -1 ? text :
+               text.replace(new RegExp(placeholder, "g"), replacement);
     },
 
     /**
@@ -385,6 +387,13 @@ ORBEON.util.String = {
         javascriptString = ORBEON.util.String.replace(javascriptString, "\n", " ");
         javascriptString = ORBEON.util.String.replace(javascriptString, "\r", " ");
         return eval(javascriptString);
+    },
+
+    /**
+     * Escape text that apears in an HTML attribute which we use in an innerHTML.
+     */
+    escapeAttribute: function(text) {
+        return ORBEON.util.String.replace(text, '"', '&quot;');
     }
 }
 
@@ -2367,42 +2376,47 @@ ORBEON.xforms.Server = {
                                                 }
                                             }
 
-                                            // Update select per content of itemset
-                                            var itemCount = 0;
-                                            for (var k = 0; k < itemsetTree.length; k++) {
-                                                var itemElement = itemsetTree[k];
-                                                if (itemCount >= options.length) {
-                                                    // Add a new option
-                                                    var newOption = document.createElement("OPTION");
-                                                    documentElement.appendChild(newOption);
-                                                    newOption.text = itemElement[0];
-                                                    newOption.value = itemElement[1];
-                                                    newOption.selected = xformsArrayContains(selectedValues, newOption.value);
-                                                } else {
-                                                    // Replace current label/value if necessary
-                                                    var option = options[itemCount];
-                                                    if (option.text != itemElement[0]) {
-                                                        option.text = itemElement[0];
-                                                    }
-                                                    if (option.value != itemElement[1]) {
-                                                        option.value = itemElement[1];
-                                                    }
-                                                    option.selected = xformsArrayContains(selectedValues, option.value);
-                                                }
-                                                itemCount++;
+                                            // Utility function to generate an option
+                                            function generateOption(label, value, selectedValues) {
+                                                var selected = xformsArrayContains(selectedValues, value);
+                                                return '<option value="' + ORBEON.util.String.escapeAttribute(value) + '"'
+                                                        + (selected ? ' selected="selected"' : '') + '>' + label + '</option>';
                                             }
 
-                                            // Remove options in select if necessary
-                                            while (options.length > itemCount) {
-                                                if (options.remove) {
-                                                    // For IE
-                                                    options.remove(options.length - 1);
+                                            // Build new content for the select element
+                                            var sb = new Array();
+                                            for (var topIndex = 0; topIndex < itemsetTree.length; topIndex++) {
+                                                var itemElement = itemsetTree[topIndex];
+                                                var label = itemElement[0];
+                                                var value = itemElement[1];
+                                                if (itemElement.length > 2) {
+                                                    // This is item that contains other elements
+                                                    sb[sb.length] = '<optgroup label="' + ORBEON.util.String.escapeAttribute(label) + '">';
+                                                    // Go through options in this optgroup
+                                                    for (var innerIndex = 2; innerIndex < itemElement.length; innerIndex++) {
+                                                        var itemElementOption = itemElement[innerIndex];
+                                                        sb[sb.length] = generateOption(itemElementOption[0], itemElementOption[1], selectedValues);
+                                                    }
+                                                    sb[sb.length] = '</optgroup>';
                                                 } else {
-                                                    // For Firefox
-                                                    var toRemove = options.item(options.length - 1);
-                                                    toRemove.parentNode.removeChild(toRemove);
+                                                    // This item is directly an option
+                                                    sb[sb.length] = generateOption(label, value, selectedValues);
                                                 }
                                             }
+
+                                            // Set content of select element
+                                            if (ORBEON.xforms.Globals.isRenderingEngineTridend) {
+                                                // IE does not support setting the content of a select with innerHTML
+                                                // So we have to generate the whole select, and use outerHTML
+                                                documentElement.innerHTML = "";
+                                                documentElement.outerHTML =
+                                                    documentElement.outerHTML.substring(0, documentElement.outerHTML.indexOf("</SELECT>"))
+                                                    + sb.join("") + "</select>";
+                                            } else {
+                                                // Version for compliant browsers
+                                                documentElement.innerHTML = sb.join("");
+                                            }
+
                                         } else {
 
                                             // Case of checkboxes / radio buttons

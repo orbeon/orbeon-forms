@@ -19,7 +19,7 @@
 
     <p:param type="input" name="instance"/>
 
-    <!-- If necssary, create tables in database -->
+    <!-- If necessary, create tables in database -->
     <p:processor name="oxf:pipeline">
         <p:input name="config" href="init-database/init-database.xpl"/>
     </p:processor>

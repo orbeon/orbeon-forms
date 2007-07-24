@@ -1335,7 +1335,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
         // This just handles the legacy XForms engine which doesn't use the controls
         final XFormsControls xformsControls = containingDocument.getXFormsControls();
-        if (xformsControls == null)
+        if (xformsControls == null || xformsControls.getCurrentControlsState() == null)
             return;
 
         if (XFormsServer.logger.isDebugEnabled())

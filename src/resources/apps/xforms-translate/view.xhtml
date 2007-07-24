@@ -21,6 +21,7 @@
     <xhtml:head>
         <xhtml:title>Instant Translation</xhtml:title>
         <xforms:model>
+            <xforms:setfocus ev:event="xforms-ready" control="input-area"/>
             <xforms:instance id="request-instance">
                 <translation>
                     <language-pair>en|fr</language-pair>
@@ -127,7 +128,7 @@
             </xforms:select1>
         </xhtml:p>
         <xhtml:p>
-            <xforms:textarea ref="instance('request-instance')/source" appearance="xxforms:autosize" incremental="true">
+            <xforms:textarea id="input-area" ref="instance('request-instance')/source" appearance="xxforms:autosize" incremental="true">
                 <xforms:label class="bold">Translate text:</xforms:label>
                 <xforms:send submission="default-submission" ev:event="xforms-value-changed"/>
             </xforms:textarea>

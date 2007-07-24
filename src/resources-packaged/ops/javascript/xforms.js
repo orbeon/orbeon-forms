@@ -849,8 +849,10 @@ ORBEON.xforms.Events = {
                 ORBEON.xforms.Globals.lastFocusControlId = target.id;
                 // Activate hint if we found one
                 ORBEON.xforms.Controls.hintActive(target, true);
-                // Store initial value of control
-                if (typeof ORBEON.xforms.Globals.serverValue[target.id] == "undefined")
+                // Store initial value of control if we don't have a server value already, and if this is is not a list
+                // Initial value for lists is set up initialization, as when we receive the focus event the new value is already set.
+                if (typeof ORBEON.xforms.Globals.serverValue[target.id] == "undefined"
+                        && ! ORBEON.util.Dom.hasClass(target, "xforms-select-appearance-compact"))
                     ORBEON.xforms.Globals.serverValue[target.id] = target.value;
                 // Send focus events
                 var previousDOMFocusOut = ORBEON.xforms.Globals.previousDOMFocusOut;

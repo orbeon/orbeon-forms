@@ -676,6 +676,7 @@ ORBEON.xforms.Controls = {
     setFocus: function(controlId) {
         var control = ORBEON.util.Dom.getElementById(controlId);
         // To-do: getting elements by position is not very robust
+        ORBEON.xforms.Globals.maskFocusEvents = true;
         if (ORBEON.util.Dom.hasClass(control, "xforms-input") && !ORBEON.util.Dom.hasClass(control, "xforms-type-boolean")) {
             ORBEON.util.Dom.getChildElementByIndex(control, 1).focus();
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-select-appearance-full")) {
@@ -3092,14 +3093,7 @@ ORBEON.xforms.Server = {
                                 case "setfocus": {
                                     var setfocusElement = actionElement.childNodes[actionIndex];
                                     var controlId = ORBEON.util.Dom.getAttribute(setfocusElement, "control-id");
-                                    var control = ORBEON.util.Dom.getElementById(controlId);
-                                    if (ORBEON.util.Dom.hasClass(control, "xforms-input") && !ORBEON.util.Dom.hasClass(control, "xforms-type-boolean")) {
-                                        control = ORBEON.util.Dom.getChildElementByIndex(control, 1);
-                                    } else if (ORBEON.util.Dom.hasClass(control, "xforms-select1-appearance-xxforms-autocomplete")) {
-                                        control = ORBEON.util.Dom.getChildElementByIndex(control, 0);
-                                    }
-                                    ORBEON.xforms.Globals.maskFocusEvents = true;
-                                    control.focus();
+                                    ORBEON.xforms.Controls.setFocus(controlId);
                                     break;
                                 }
 

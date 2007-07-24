@@ -164,14 +164,13 @@ public class XHTMLBodyHandler extends HandlerBase {
 
                 private Stack ancestorRepeatIds;
 
-                public boolean startVisitControl(Element controlElement, String effectiveControlId) {
+                public boolean startVisitControl(Element controlElement, String controlId) {
                     if (controlElement.getName().equals("repeat")) {
-                        final String repeatId = controlElement.attributeValue("id");
 
                         if (repeatHierarchyStringBuffer.length() > 0)
                             repeatHierarchyStringBuffer.append(',');
 
-                        repeatHierarchyStringBuffer.append(repeatId);
+                        repeatHierarchyStringBuffer.append(controlId);
 
                         if (ancestorRepeatIds != null && ancestorRepeatIds.size() > 0) {
                             repeatHierarchyStringBuffer.append(' ');
@@ -181,12 +180,12 @@ public class XHTMLBodyHandler extends HandlerBase {
                         if (ancestorRepeatIds == null)
                             ancestorRepeatIds = new Stack();
 
-                        ancestorRepeatIds.push(repeatId);
+                        ancestorRepeatIds.push(controlId);
                     }
                     return true;
                 }
 
-                public boolean endVisitControl(Element controlElement, String effectiveControlId) {
+                public boolean endVisitControl(Element controlElement, String controlId) {
                     if (controlElement.getName().equals("repeat")) {
                         ancestorRepeatIds.pop();
                     }

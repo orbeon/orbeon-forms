@@ -24,7 +24,7 @@ import java.util.*;
 /**
  * Represents an XForms (or just plain XML Events) event handler implementation.
  */
-public class XFormsEventHandlerImpl implements org.orbeon.oxf.xforms.event.XFormsEventHandler {
+public class XFormsEventHandlerImpl implements XFormsEventHandler {
 
     private XFormsContainingDocument containingDocument;
     private Element eventHandlerElement;
@@ -34,9 +34,9 @@ public class XFormsEventHandlerImpl implements org.orbeon.oxf.xforms.event.XForm
 //    private String observer;
 //    private String target;
     //private String handler;
-    private boolean phase; // "true" means "default" (bubbling), "false" means "capture"
-    private boolean propagate; // "true" means "continue", "false" means "stop"
-    private boolean defaultAction; // "true" means "perform", "false" means "cancel"
+    private boolean phase;          // "true" means "default" (bubbling), "false" means "capture"
+    private boolean propagate;      // "true" means "continue", "false" means "stop"
+    private boolean defaultAction;  // "true" means "perform", "false" means "cancel"
 
     public XFormsEventHandlerImpl(XFormsContainingDocument containingDocument, XFormsEventHandlerContainer eventHandlerContainer, Element eventHandlerElement) {
         this.containingDocument = containingDocument;
@@ -60,6 +60,14 @@ public class XFormsEventHandlerImpl implements org.orbeon.oxf.xforms.event.XForm
         }
     }
 
+    /**
+     * Utility method to extract event handlers.
+     *
+     * @param containingDocument        current XFormsContainingDocument
+     * @param eventHandlerContainer     control, submission, etc. containing the event handlers
+     * @param containingElement         element possibly containing event handlers
+     * @return                          List of XFormsEventHandler
+     */
     public static List extractEventHandlers(XFormsContainingDocument containingDocument, XFormsEventHandlerContainer eventHandlerContainer, Element containingElement) {
         final List children = containingElement.elements();
         if (children == null)
@@ -77,6 +85,29 @@ public class XFormsEventHandlerImpl implements org.orbeon.oxf.xforms.event.XForm
             }
         }
         return eventHandlers;
+    }
+
+    /**
+     * Utility method to statically gather a event handlers' event names.
+     *
+     * @param eventNames            Map into which event names are stored
+     * @param containingElement     element possibly containing event handlers
+     */
+    public static void gatherEventHandlerNames(Map eventNames, Element containingElement) {
+        final List children = containingElement.elements();
+        if (children == null)
+            return;
+
+        for (Iterator i = children.iterator(); i.hasNext();) {
+            final Element currentElement = (Element) i.next();
+            if (XFormsActions.isActionName(currentElement.getNamespaceURI(), currentElement.getName())) {
+                final String eventName = currentElement.attributeValue(XFormsConstants.XML_EVENTS_EVENT_ATTRIBUTE_QNAME);
+                if (eventName != null) {
+                    // Found an action
+                    eventNames.put(eventName, "");
+                }
+            }
+        }
     }
 
     public static Map extractEventHandlersObserver(XFormsContainingDocument containingDocument, XFormsEventHandlerContainer eventHandlerContainer, Element containingElement) {

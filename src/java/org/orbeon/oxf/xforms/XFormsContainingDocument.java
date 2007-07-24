@@ -53,10 +53,6 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
 
     public static final String CONTAINING_DOCUMENT_PSEUDO_ID = "$containing-document$";
 
-//    private static int xxxToggleValue = 0;
-
-//    private LocationData locationData; // At some point we need to be able to store this
-
     // Object pool this object must be returned to, if any
     private ObjectPool sourceObjectPool;
 
@@ -78,6 +74,9 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     private String focusEffectiveControlId;
 
     private XFormsActionInterpreter actionInterpreter;
+
+    // Global flag used during initialization only
+    private boolean mustPerformInitializationFirstRefresh;
 
     // Legacy information
     private String legacyContainerType;
@@ -115,6 +114,9 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         // External events allowed on xxforms:dialog
         allowedXXFormsDialogExternalEvents.put(XFormsEvents.XXFORMS_DIALOG_CLOSE, "");
     }
+
+    // For testing only
+    private static int testAjaxToggleValue = 0;
 
     /**
      * Create an XFormsContainingDocument from an XFormsEngineStaticState object.
@@ -680,20 +682,21 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         }
 
         // Create event
-
-//        if (eventName.equals(XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE)) {// XXX HACK FOR PERF TEST
-//            if ("category-select1".equals(controlId)) {
-//                if (xxxToggleValue == 0) {
-//                    xxxToggleValue = 1;
-//                    contextString = "supplier";
-//                } else {
-//                    xxxToggleValue = 0;
-//                    contextString = "customer";
-//                }
-//            } else if ("name".equals(controlId)) {
-//                contextString = "value" + System.currentTimeMillis();
-//            }
-//        }
+        if (XFormsUtils.isAjaxTest()) {
+            if (eventName.equals(XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE)) {
+                if ("category-select1".equals(controlId)) {
+                    if (testAjaxToggleValue == 0) {
+                        testAjaxToggleValue = 1;
+                        contextString = "supplier";
+                    } else {
+                        testAjaxToggleValue = 0;
+                        contextString = "customer";
+                    }
+                } else if ("name".equals(controlId)) {
+                    contextString = "value" + System.currentTimeMillis();
+                }
+            }
+        }
         
         final XFormsEvent xformsEvent = XFormsEventFactory.createEvent(eventName, eventTarget, otherEventTarget, true, true, true, contextString, null, null, filesElement);
 
@@ -1196,6 +1199,18 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         xformsControls.initializeState(pipelineContext, divsElement, repeatIndexesElement, true);
     }
 
+    /**
+     * Whether, during initialization, this is the first refresh. The flag is automatically cleared during this call so
+     * that only the first call returns true.
+     *
+     * @return  true if this is the first refresh, false otherwise
+     */
+    public boolean isInitializationFirstRefreshClear() {
+        boolean result = mustPerformInitializationFirstRefresh;
+        mustPerformInitializationFirstRefresh = false;
+        return result;
+    }
+
     private void initialize(PipelineContext pipelineContext) {
         // This is called upon the first creation of the XForms engine only
 
@@ -1208,31 +1223,47 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         // 2. Dispatch xforms-model-construct-done to all models
         // 3. Dispatch xforms-ready to all models
 
+        // Before dispaching initialization events, remember that first refresh must be performed
+        this.mustPerformInitializationFirstRefresh = true;
+
         final String[] eventsToDispatch = { XFormsEvents.XFORMS_MODEL_CONSTRUCT, XFormsEvents.XFORMS_MODEL_CONSTRUCT_DONE, XFormsEvents.XFORMS_READY, XFormsEvents.XXFORMS_READY };
         for (int i = 0; i < eventsToDispatch.length; i++) {
+            // Initialize controls right at the beginning
             final boolean isXFormsModelConstructDone = i == 1;
-            final boolean isXFormsReady = i == 2;
-
             if (isXFormsModelConstructDone) {
                 // Initialize controls after all the xforms-model-construct events have been sent
                 xformsControls.initialize(pipelineContext);
+            }
+
+            // Group all xforms-ready events within a single outermost action handler in order to optimize events
+            final boolean isXFormsReady = i == 2;
+            if (isXFormsReady) {
+                // Performed deferred updates only for xforms-ready
+                startOutermostActionHandler();
             }
 
             // Iterate over all the models
             for (Iterator j = getModels().iterator(); j.hasNext();) {
                 final XFormsModel currentModel = (XFormsModel) j.next();
 
-                if (isXFormsReady) {
-                    // Performed deferred updates only for xforms-ready
-                    startOutermostActionHandler();
+                // Make sure there is at least one refresh
+                final XFormsModel.DeferredActionContext deferredActionContext = currentModel.getDeferredActionContext();
+                if (deferredActionContext != null) {
+                    deferredActionContext.refresh = true;
                 }
+
                 dispatchEvent(pipelineContext, XFormsEventFactory.createEvent(eventsToDispatch[i], currentModel));
-                if (isXFormsReady) {
-                    // Performed deferred updates only for xforms-ready
-                    endOutermostActionHandler(pipelineContext);
-                }
+            }
+
+            if (isXFormsReady) {
+                // Performed deferred updates only for xforms-ready
+                endOutermostActionHandler(pipelineContext);
             }
         }
+
+        // In case there is no model or no controls, make sure the flag is cleared as it is only relevant during
+        // initialization
+        this.mustPerformInitializationFirstRefresh = false;
     }
 
     private void createControlAndModel(Element repeatIndexesElement) {

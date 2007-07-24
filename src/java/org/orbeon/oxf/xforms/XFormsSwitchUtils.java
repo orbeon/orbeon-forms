@@ -36,40 +36,43 @@ public class XFormsSwitchUtils {
     public static boolean prepareSwitches(XFormsControls xformsControls) {
         // Store temporary switch information into appropriate nodes
         boolean found = false;
-        for (Iterator i = xformsControls.getCurrentSwitchState().getSwitchIdToSelectedCaseIdMap().entrySet().iterator(); i.hasNext();) {
-            final Map.Entry entry = (Map.Entry) i.next();
-            final String switchId = (String) entry.getKey();
+        final XFormsControls.SwitchState currentSwitchState = xformsControls.getCurrentSwitchState();
+        if (currentSwitchState != null) {
+            for (Iterator i = currentSwitchState.getSwitchIdToSelectedCaseIdMap().entrySet().iterator(); i.hasNext();) {
+                final Map.Entry entry = (Map.Entry) i.next();
+                final String switchId = (String) entry.getKey();
 
-//            System.out.println("xxx 1: switch id: " + switchId);
+    //            System.out.println("xxx 1: switch id: " + switchId);
 
-            if (switchId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1) != -1) {
-                // This switch id may be affected by this insertion
+                if (switchId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1) != -1) {
+                    // This switch id may be affected by this insertion
 
-//                System.out.println("xxx 1: has separator");
+    //                System.out.println("xxx 1: has separator");
 
-                final XFormsControl switchXFormsControl = (XFormsControl) xformsControls.getObjectById(switchId);
-                XFormsControl parent = switchXFormsControl;
-                while ((parent = parent.getParent()) != null) {
-                    if (parent instanceof RepeatIterationControl) {
-                        // Found closest enclosing repeat iteration
+                    final XFormsControl switchXFormsControl = (XFormsControl) xformsControls.getObjectById(switchId);
+                    XFormsControl parent = switchXFormsControl;
+                    while ((parent = parent.getParent()) != null) {
+                        if (parent instanceof RepeatIterationControl) {
+                            // Found closest enclosing repeat iteration
 
-                        final RepeatIterationControl repeatIterationInfo = (RepeatIterationControl) parent;
-                        final XFormsRepeatControl repeatControlInfo = (XFormsRepeatControl) repeatIterationInfo.getParent();
+                            final RepeatIterationControl repeatIterationInfo = (RepeatIterationControl) parent;
+                            final XFormsRepeatControl repeatControlInfo = (XFormsRepeatControl) repeatIterationInfo.getParent();
 
-                        final List currentNodeset = repeatControlInfo.getBindingContext().getNodeset();
+                            final List currentNodeset = repeatControlInfo.getBindingContext().getNodeset();
 
-                        final NodeInfo node = (NodeInfo) currentNodeset.get(repeatIterationInfo.getIteration() - 1);
-                        final InstanceData instanceData = XFormsUtils.getLocalInstanceData(node);
+                            final NodeInfo node = (NodeInfo) currentNodeset.get(repeatIterationInfo.getIteration() - 1);
+                            final InstanceData instanceData = XFormsUtils.getLocalInstanceData(node);
 
-                        // Store an original case id instead of an effective case id
-                        final String caseId = (String) entry.getValue();
-                        instanceData.addSwitchIdToCaseId(switchXFormsControl.getOriginalId(), caseId.substring(0, caseId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1)));
+                            // Store an original case id instead of an effective case id
+                            final String caseId = (String) entry.getValue();
+                            instanceData.addSwitchIdToCaseId(switchXFormsControl.getOriginalId(), caseId.substring(0, caseId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1)));
 
-//                        System.out.println("xxx 1: adding case id " + switchControlInfo.getOriginalId() + " " + entry.getValue());
+    //                        System.out.println("xxx 1: adding case id " + switchControlInfo.getOriginalId() + " " + entry.getValue());
 
-                        found = true;
+                            found = true;
 
-                        break;
+                            break;
+                        }
                     }
                 }
             }
@@ -126,43 +129,46 @@ public class XFormsSwitchUtils {
      * Update switch information after a modification to the DOM.
      */
     public static void updateSwitches(XFormsControls xformsControls) {
-        for (Iterator i = xformsControls.getCurrentSwitchState().getSwitchIdToSelectedCaseIdMap().entrySet().iterator(); i.hasNext();) {
-            final Map.Entry entry = (Map.Entry) i.next();
-            final String switchId = (String) entry.getKey();
+        final XFormsControls.SwitchState currentSwitchState = xformsControls.getCurrentSwitchState();
+        if (currentSwitchState != null) {
+            for (Iterator i = currentSwitchState.getSwitchIdToSelectedCaseIdMap().entrySet().iterator(); i.hasNext();) {
+                final Map.Entry entry = (Map.Entry) i.next();
+                final String switchId = (String) entry.getKey();
 
-//            System.out.println("xxx 2: switch id: " + switchId);
+    //            System.out.println("xxx 2: switch id: " + switchId);
 
-            if (switchId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1) != -1) {
-                // This switch id may be affected by this insertion
+                if (switchId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1) != -1) {
+                    // This switch id may be affected by this insertion
 
-//                System.out.println("xxx 2: has separator");
+    //                System.out.println("xxx 2: has separator");
 
-                final XFormsControl switchXFormsControl = (XFormsControl) xformsControls.getObjectById(switchId);
-                XFormsControl parent = switchXFormsControl;
-                while ((parent = parent.getParent()) != null) {
-                    if (parent instanceof RepeatIterationControl) {
-                        // Found closest enclosing repeat iteration
+                    final XFormsControl switchXFormsControl = (XFormsControl) xformsControls.getObjectById(switchId);
+                    XFormsControl parent = switchXFormsControl;
+                    while ((parent = parent.getParent()) != null) {
+                        if (parent instanceof RepeatIterationControl) {
+                            // Found closest enclosing repeat iteration
 
-                        final RepeatIterationControl repeatIterationInfo = (RepeatIterationControl) parent;
-                        final XFormsRepeatControl repeatControlInfo = (XFormsRepeatControl) repeatIterationInfo.getParent();
+                            final RepeatIterationControl repeatIterationInfo = (RepeatIterationControl) parent;
+                            final XFormsRepeatControl repeatControlInfo = (XFormsRepeatControl) repeatIterationInfo.getParent();
 
-                        final List currentNodeset = repeatControlInfo.getBindingContext().getNodeset();
+                            final List currentNodeset = repeatControlInfo.getBindingContext().getNodeset();
 
-                        final NodeInfo node = (NodeInfo) currentNodeset.get(repeatIterationInfo.getIteration() - 1);
-                        final InstanceData instanceData = XFormsUtils.getLocalInstanceData(node);
+                            final NodeInfo node = (NodeInfo) currentNodeset.get(repeatIterationInfo.getIteration() - 1);
+                            final InstanceData instanceData = XFormsUtils.getLocalInstanceData(node);
 
-                        final String caseId = instanceData.getCasedIdForSwitchId(switchXFormsControl.getOriginalId());
+                            final String caseId = instanceData.getCasedIdForSwitchId(switchXFormsControl.getOriginalId());
 
-//                        System.out.println("xxx 2: found case id " + caseId);
+    //                        System.out.println("xxx 2: found case id " + caseId);
 
-                        if (caseId != null) {
-                            // Set effective case id
-                            final String effectiveCaseId = caseId + switchId.substring(switchId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1));
-//                            System.out.println("xxx 2: setting case id " + effectiveCaseId);
-                            entry.setValue(effectiveCaseId);
+                            if (caseId != null) {
+                                // Set effective case id
+                                final String effectiveCaseId = caseId + switchId.substring(switchId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1));
+    //                            System.out.println("xxx 2: setting case id " + effectiveCaseId);
+                                entry.setValue(effectiveCaseId);
+                            }
+
+                            break;
                         }
-
-                        break;
                     }
                 }
             }

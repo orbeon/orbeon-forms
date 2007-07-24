@@ -126,7 +126,9 @@ public class XFormsInsertAction extends XFormsAction {
                     // origin attribute in the insert context."
 
                     originObjects = XPathCache.evaluate(pipelineContext, insertContextNodeInfo,
-                        originAttribute, Dom4jUtils.getNamespaceContextNoDefault(actionElement), null, xformsControls.getFunctionLibrary(), null, (LocationData) actionElement.getData());
+                        originAttribute, Dom4jUtils.getNamespaceContextNoDefault(actionElement), null, xformsControls.getFunctionLibrary(),
+                        null, (LocationData) actionElement.getData());
+                    //XFormsUtils.resolveXMLBase(actionElement, ".").toString()
 
                     // "The insert action is terminated with no effect if the origin node-set is the empty node-set."
                     if (originObjects.size() == 0)
@@ -336,7 +338,7 @@ public class XFormsInsertAction extends XFormsAction {
             final XFormsControls.ControlsState currentControlsState = xformsControls.getCurrentControlsState();
 
             // Update repeat indexes
-            XFormsIndexUtils.ajustIndexesAfterInsert(pipelineContext, xformsControls, currentControlsState, clonedNodes);
+            XFormsIndexUtils.adjustIndexesAfterInsert(pipelineContext, xformsControls, currentControlsState, clonedNodes);
 
             // Update switches
             XFormsSwitchUtils.updateSwitches(xformsControls);

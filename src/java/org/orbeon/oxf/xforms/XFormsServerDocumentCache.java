@@ -52,9 +52,8 @@ public class XFormsServerDocumentCache {
     public synchronized void add(PipelineContext pipelineContext, XFormsState xformsState, XFormsContainingDocument containingDocument) {
 
         final Cache cache = ObjectCache.instance(XFORMS_DOCUMENT_CACHE_NAME, XFORMS_DOCUMENT_CACHE_DEFAULT_SIZE);
-        final String cacheKeyString = xformsState.toString();
-//        final String cacheKeyString = xformsState.getStaticState();//XXX TEMP HACK FOR PERF TEST
-        //logger.info("xxx KEY used when returning: " + cacheKeyString);
+        // NOTE: For special Ajax test, key by static state only.
+        final String cacheKeyString = XFormsUtils.isAjaxTest() ? xformsState.getStaticState() : xformsState.toString();
 
         final InternalCacheKey cacheKey = new InternalCacheKey(CONTAINING_DOCUMENT_KEY_TYPE, cacheKeyString);
         ObjectPool destinationPool = (ObjectPool) cache.findValid(pipelineContext, cacheKey, CONSTANT_VALIDITY);
@@ -101,8 +100,8 @@ public class XFormsServerDocumentCache {
         // when a submission occurs during createXFormsContainingDocument() and submits to the same document.
 
         final Cache cache = ObjectCache.instance(XFORMS_DOCUMENT_CACHE_NAME, XFORMS_DOCUMENT_CACHE_DEFAULT_SIZE);
-        final String cacheKeyString = xformsState.toString();
-//        final String cacheKeyString = xformsState.getStaticState();//XXX TEMP HACK FOR PERF TEST
+        // NOTE: For special Ajax test, key by static state only.
+        final String cacheKeyString = XFormsUtils.isAjaxTest() ? xformsState.getStaticState() : xformsState.toString();
 
         // Try to find pool in cache, create it if not found
         final InternalCacheKey cacheKey = new InternalCacheKey(CONTAINING_DOCUMENT_KEY_TYPE, cacheKeyString);

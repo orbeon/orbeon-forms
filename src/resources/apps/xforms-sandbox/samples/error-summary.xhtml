@@ -1,0 +1,176 @@
+<!--
+    Copyright (C) 2007 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<html xmlns:xs="http://www.w3.org/2001/XMLSchema"
+      xmlns:xforms="http://www.w3.org/2002/xforms"
+      xmlns:ev="http://www.w3.org/2001/xml-events"
+      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+      xmlns:exforms="http://www.exforms.org/exf/1-0"
+      xmlns:xi="http://www.w3.org/2001/XInclude"
+      xmlns:f="http://orbeon.org/oxf/xml/formatting"
+      xmlns:xhtml="http://www.w3.org/1999/xhtml"
+      xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+      xmlns="http://www.w3.org/1999/xhtml">
+
+    <head>
+        <title>Error Summary</title>
+        <xforms:model>
+
+            <!-- Main instance containing form data -->
+            <xforms:instance id="form-instance">
+                <instance xmlns="">
+                    <age>354</age>
+                    <secret>42</secret>
+                    <textarea>The world is but a canvas for the imagination.</textarea>
+                    <label>Hello, World!</label>
+                    <date>incorrect</date>
+                </instance>
+
+            </xforms:instance>
+
+            <xforms:bind nodeset="instance('form-instance')">
+                <xforms:bind nodeset="age" type="xs:positiveInteger" constraint="number(.) >= 0 and number(.) &lt;= 150"/>
+                <xforms:bind nodeset="secret" constraint="string(.) = '42'"/>
+                <xforms:bind nodeset="textarea" constraint="string-length(.) > 10"/>
+                <xforms:bind nodeset="date" type="xs:date"/>
+            </xforms:bind>
+
+            <!-- XForms instance for error information -->
+            <xforms:instance id="errors-instance">
+                <errors xmlns=""/>
+            </xforms:instance>
+
+            <!-- Template for error information -->
+            <xforms:instance id="error-template">
+                <error xmlns="" id="" indexes="" label="" alert=""/>
+            </xforms:instance>
+
+        </xforms:model>
+        <style type="text/css">
+            .errors-table { border: 2px solid red; margin: 1em }
+            .errors-table .xforms-repeat-selected-item-1 { background: transparent }
+            .errors-table th { text-align: right }
+            th.error-title { background: red; color: white; text-align: left }
+            .no-errors-table { border: 2px solid green; margin: 1em }
+            th.no-error-title { background: green; color: white; text-align: left }
+
+            .controls-table { border: 2px solid black; margin: 1em }
+
+            .xforms-input input { width: 20em; }
+            .xforms-secret { width: 20em; }
+            .xforms-textarea { height: 6em; width: 20em; }
+        </style>
+    </head>
+    <body>
+
+        <!-- Error summary -->
+        <xforms:group ref="instance('errors-instance')">
+            <xforms:group ref=".[error]">
+                <table class="errors-table">
+                    <tr>
+                        <th colspan="3" class="error-title">
+                            Your form has
+                            <xforms:output value="concat(count(error), ' ', if (count(error) gt 1) then 'errors' else 'error')"/>
+                        </th>
+                    </tr>
+                    <xforms:repeat nodeset="error" id="errors-repeat">
+                        <tr>
+                            <th>
+                                <xforms:output value="@label"/>
+                            </th>
+                            <td>
+                                <i>
+                                    <xforms:output value="if (string-length(@indexes) > 0) then concat('(Row ', @indexes, ')') else ''"/>
+                                </i>
+                            </td>
+                            <td>
+                                <xforms:output value="@alert"/>
+                            </td>
+                        </tr>
+                    </xforms:repeat>
+                </table>
+            </xforms:group>
+            <xforms:group ref=".[not(error)]">
+                <table class="no-errors-table">
+                    <tr>
+                        <th colspan="3" class="no-error-title">
+                            Your form doesn't have any errors
+                        </th>
+                    </tr>
+                </table>
+            </xforms:group>
+        </xforms:group>
+
+        <!-- Controls -->
+        <xforms:group>
+            <!-- Handle invalid and valid events in order to update error summary -->
+            <xforms:action ev:event="xforms-invalid" if="normalize-space(event('alert')) != ''">
+                <xforms:action if="not(instance('errors-instance')/error[@id = event('target') and @indexes = string-join(event('repeat-indexes'), '-')])">
+                    <xforms:insert context="instance('errors-instance')" nodeset="error" origin="instance('error-template')"/>
+                    <xforms:setvalue ref="instance('errors-instance')/error[index('errors-repeat')]/@id" value="event('target')"/>
+                    <xforms:setvalue ref="instance('errors-instance')/error[index('errors-repeat')]/@indexes" value="string-join(event('repeat-indexes'), '-')"/>
+                </xforms:action>
+                <xforms:setvalue ref="instance('errors-instance')/error[@id = event('target') and @indexes = string-join(event('repeat-indexes'), '-')]/@alert" value="event('alert')"/>
+                <xforms:setvalue ref="instance('errors-instance')/error[@id = event('target') and @indexes = string-join(event('repeat-indexes'), '-')]/@label" value="event('label')"/>
+            </xforms:action>
+            <xforms:action ev:event="xforms-valid" if="instance('errors-instance')/error[@id = event('target') and @indexes = string-join(event('repeat-indexes'), '-')]">
+                <xforms:delete nodeset="instance('errors-instance')/error[@id = event('target') and @indexes = string-join(event('repeat-indexes'), '-')]"/>
+            </xforms:action>
+
+            <!-- Form-specific controls -->
+            <xforms:group ref="instance('form-instance')">
+                <table class="controls-table">
+                    <tr>
+                        <td>
+                            <xforms:input ref="age" incremental="true" xxforms:maxlength="3" navindex="1">
+                                <xforms:label class="fixed-width">Age:</xforms:label>
+                                <xforms:hint>Positive number</xforms:hint>
+                                <xforms:alert>Invalid age</xforms:alert>
+                            </xforms:input>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <xforms:secret ref="secret" incremental="true" navindex="2">
+                                <xforms:label class="fixed-width">Password:</xforms:label>
+                                <xforms:hint>The password is 42 ;)</xforms:hint>
+                                <xforms:alert>Invalid password</xforms:alert>
+                            </xforms:secret>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <xforms:textarea ref="textarea" incremental="true" navindex="3">
+                                <xforms:label class="fixed-width">Text area:</xforms:label>
+                                <xforms:hint>Enter at least 11 characters</xforms:hint>
+                                <xforms:alert>Content of text area has less than 10 characters</xforms:alert>
+                            </xforms:textarea>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <xforms:input ref="date" navindex="4">
+                                <xforms:label class="fixed-width">Date:</xforms:label>
+                                <xforms:alert>Invalid date</xforms:alert>
+                            </xforms:input>
+                        </td>
+                    </tr>
+                </table>
+            </xforms:group>
+
+        </xforms:group>
+
+        <!--<widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>-->
+
+    </body>
+</html>

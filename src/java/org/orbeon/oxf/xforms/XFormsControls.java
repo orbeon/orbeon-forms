@@ -22,6 +22,7 @@ import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsControlFactory;
 import org.orbeon.oxf.xforms.control.controls.*;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
+import org.orbeon.oxf.xforms.event.XFormsEventHandlerImpl;
 import org.orbeon.oxf.xforms.event.events.XFormsDeselectEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsSelectEvent;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
@@ -58,6 +59,7 @@ public class XFormsControls {
 
     private XFormsContainingDocument containingDocument;
     private Document controlsDocument;
+    private Map eventsMap;
     
     private Map constantItems;
 
@@ -144,10 +146,11 @@ public class XFormsControls {
     }
 
     private void initializeMinimal(Element repeatIndexesElement) {
-        // Set initial repeat index
+        // Set initial repeat indexes
         if (controlsDocument != null) {
             final ControlsState result = new ControlsState();
-            getDefaultRepeatIndexes(result);
+            eventsMap = new HashMap();
+            getDefaultRepeatIndexesEventNames(result, eventsMap);
             initialControlsState = result;
             currentControlsState = initialControlsState;
         }
@@ -169,17 +172,18 @@ public class XFormsControls {
      * Iterate statically through controls and set the default repeat index for xforms:repeat.
      *
      * @param controlsState    ControlsState to update with setDefaultRepeatIndex()
+     * @param eventNames       Map to gather event names, null if not necessary
      */
-    private void getDefaultRepeatIndexes(final ControlsState controlsState) {
+    private void getDefaultRepeatIndexesEventNames(final ControlsState controlsState, final Map eventNames) {
         visitAllControlStatic(new ControlElementVisitorListener() {
 
             private Stack repeatStack = new Stack();
 
-            public boolean startVisitControl(Element controlElement, String effectiveControlId) {
+            public boolean startVisitControl(Element controlElement, String controlId) {
                 if (controlElement.getName().equals("repeat")) {
                     // Create control without parent, just to hold iterations
                     final XFormsRepeatControl repeatControl
-                            = new XFormsRepeatControl(containingDocument, null, controlElement, controlElement.getName(), effectiveControlId);
+                            = new XFormsRepeatControl(containingDocument, null, controlElement, controlElement.getName(), controlId);
 
                     // Set initial index
                     controlsState.setDefaultRepeatIndex(repeatControl.getRepeatId(), repeatControl.getStartIndex());
@@ -187,10 +191,16 @@ public class XFormsControls {
                     // Keep control on stack
                     repeatStack.push(repeatControl);
                 }
+
+                // Gather event names if required
+                if (eventNames != null) {
+                    XFormsEventHandlerImpl.gatherEventHandlerNames(eventNames, controlElement);
+                }
+
                 return true;
             }
 
-            public boolean endVisitControl(Element controlElement, String effectiveControlId) {
+            public boolean endVisitControl(Element controlElement, String controlId) {
                 return true;
             }
 
@@ -205,8 +215,23 @@ public class XFormsControls {
         });
     }
 
+
     /**
-     * Initialize the controls if needed. This is usually called upon initial creation of the engine.
+     * Returns whether there is any event handler registered anywhere in the controls for the given event name.
+     *
+     * @param eventName event name, like xforms-value-changed
+     * @return          true if there is a handler, false otherwise
+     */
+    public boolean hasHandlerForEvent(String eventName) {
+        return eventsMap.get(eventName) != null;
+    }
+
+    /**
+     * Initialize the controls if needed. This is called upon initial creation of the engine OR when new exernal events
+     * arrive.
+     *
+     * TODO: this is called in XFormsContainingDocument.prepareForExternalEventsSequence() but it is not really an
+     * initialization in that case.
      *
      * @param pipelineContext   current PipelineContext
      */
@@ -268,7 +293,7 @@ public class XFormsControls {
                 // Handle repeat indexes if needed
                 if (initialControlsState.isHasRepeat()) {
                     // Get default xforms:repeat indexes beforehand
-                    getDefaultRepeatIndexes(initialControlsState);
+                    getDefaultRepeatIndexesEventNames(initialControlsState, null);// TODO: redundant since we called this in initializeMinimal()? If so, migrate initial indexes?
 
                     // Set external updates
                     setRepeatIndexState(repeatIndexesElement);
@@ -1091,24 +1116,36 @@ public class XFormsControls {
      */
     public boolean rebuildCurrentControlsStateIfNeeded(PipelineContext pipelineContext) {
 
-        // Don't do anything if we are clean
-        if (!currentControlsState.isDirty())
-            return false;
+        if (!initialized) {
+            // This can occur because we lazily initialize controls during initialization
+            initialize(pipelineContext);
+            return true;
+        } else {
+            // This is the regular case
 
-        // Rebuild
-        rebuildCurrentControlsState(pipelineContext);
+            // Don't do anything if we are clean
+            if (!currentControlsState.isDirty())
+                return false;
 
-        // Everything is clean
-        initialControlsState.dirty = false;
-        currentControlsState.dirty = false;
+            // Rebuild
+            rebuildCurrentControlsState(pipelineContext);
 
-        return true;
+            // Everything is clean
+            initialControlsState.dirty = false;
+            currentControlsState.dirty = false;
+
+            return true;
+        }
     }
 
     /**
      * Rebuild the current controls state information.
      */
     public void rebuildCurrentControlsState(PipelineContext pipelineContext) {
+
+        // If we haven't been initialized yet, don't do anything
+        if (!initialized)
+            return;
 
         // Remember current state
         final ControlsState currentControlsState = this.currentControlsState;
@@ -1688,24 +1725,24 @@ public class XFormsControls {
 
                 private boolean found;
 
-                public boolean startVisitControl(Element controlElement, String effectiveControlId) {
+                public boolean startVisitControl(Element controlElement, String controlId) {
                     if (controlElement.getName().equals("repeat")) {
 
                         if (!found) {
                             // Not found yet
-                            if (repeatId.equals(controlElement.attributeValue("id")))
+                            if (repeatId.equals(controlId))
                                 found = true;
                         } else {
                             // We are within the searched repeat id
-                            result.add(controlElement.attributeValue("id"));
+                            result.add(controlId);
                         }
                     }
                     return true;
                 }
 
-                public boolean endVisitControl(Element controlElement, String effectiveControlId) {
+                public boolean endVisitControl(Element controlElement, String controlId) {
                     if (found) {
-                        if (repeatId.equals(controlElement.attributeValue("id")))
+                        if (repeatId.equals(controlId))
                             found = false;
                     }
                     return true;

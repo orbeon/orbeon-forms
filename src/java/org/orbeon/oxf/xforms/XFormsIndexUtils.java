@@ -112,7 +112,7 @@ public class XFormsIndexUtils {
      * @param currentControlsState
      * @param clonedNodes
      */
-    public static void ajustIndexesAfterInsert(PipelineContext pipelineContext, final XFormsControls xformsControls,
+    public static void adjustIndexesAfterInsert(PipelineContext pipelineContext, final XFormsControls xformsControls,
                                                final XFormsControls.ControlsState currentControlsState, final List clonedNodes) {
 
         // NOTE: The code below assumes that there are no nested repeats bound to node-sets that intersect

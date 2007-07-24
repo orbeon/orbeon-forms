@@ -339,6 +339,10 @@ public class XFormsToXHTML extends ProcessorImpl {
             // Create containing document and initialize XForms engine
             containingDocument[0] = new XFormsContainingDocument(pipelineContext, xformsStaticState, uriResolver);
 
+            // Make sure we have up to date controls before creating state below
+            final XFormsControls xformsControls = containingDocument[0].getXFormsControls();
+            xformsControls.rebuildCurrentControlsStateIfNeeded(pipelineContext);
+
             // This is the state after XForms initialization
             xformsState[0] = new XFormsState(xformsStaticState.getEncodedStaticState(pipelineContext),
                     containingDocument[0].createEncodedDynamicState(pipelineContext));
@@ -359,7 +363,7 @@ public class XFormsToXHTML extends ProcessorImpl {
 
         final ElementHandlerController controller = new ElementHandlerController();
 
-        // Make sure we have up to date controls
+        // Make sure we have up to date controls (should already be the case)
         final XFormsControls xformsControls = containingDocument.getXFormsControls();
         xformsControls.rebuildCurrentControlsStateIfNeeded(pipelineContext);
 

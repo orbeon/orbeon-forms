@@ -2120,7 +2120,11 @@ ORBEON.xforms.Server = {
         var formIndex = ORBEON.util.Dom.getFormIndex(ORBEON.xforms.Globals.requestForm);
         var details = "Error while processing response: " + (o.responseText !== undefined ? o.responseText : o.statusText);
         if (ORBEON.xforms.Globals.isRenderingEngineGecko && o.statusText == "communication failure") {
-            // On Firefox, when  
+            // On Firefox, when the user navigates to another page while an Ajax request is in progress,
+            // we receive an error here, which we don't want to display. We don't have a good way of knowning if we get
+            // this error because there was really a communication failure or if this is because the user is
+            // going to another page. So we wait some time before showing the error, hoping that if another page is
+            // loading, that other page will be loaded by the time our timeout expires.
             window.setTimeout(function() { ORBEON.xforms.Server.showError(details, formIndex); },
                 XFORMS_DELAY_BEFORE_GECKO_COMMUNICATION_ERROR_IN_MS);
         } else {

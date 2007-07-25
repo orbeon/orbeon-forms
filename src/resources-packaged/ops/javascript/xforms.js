@@ -17,6 +17,7 @@
  */
 var XFORMS_DELAY_BEFORE_INCREMENTAL_REQUEST_IN_MS = 500;
 var XFORMS_DELAY_BEFORE_FORCE_INCREMENTAL_REQUEST_IN_MS = 2000;
+var XFORMS_DELAY_BEFORE_GECKO_COMMUNICATION_ERROR_IN_MS = 5000;
 var XFORMS_INTERNAL_SHORT_DELAY_IN_MS = 10;
 var XFORMS_DELAY_BEFORE_DISPLAY_LOADING_IN_MS = 500;
 var XFORMS_DEBUG_WINDOW_HEIGHT = 600;
@@ -59,6 +60,7 @@ ORBEON.xforms = ORBEON.xforms || {};
  */
 ORBEON.xforms.Globals = ORBEON.xforms.Globals || {
     // Booleans used for browser detection
+    isRenderingEngineGecko : navigator.userAgent.toLowerCase().indexOf("gecko") != -1,    // Firefox
     isRenderingEnginePresto: navigator.userAgent.toLowerCase().indexOf("opera") != -1,    // Opera
     isRenderingEngineWebCore: navigator.userAgent.toLowerCase().indexOf("safari") != -1,  // Safari
     isRenderingEngineWebCore13: navigator.userAgent.indexOf("AppleWebKit/312") != -1,     // Safari 1.3
@@ -2116,8 +2118,15 @@ ORBEON.xforms.Server = {
     handleFailure: function(o) {
         ORBEON.xforms.Globals.requestInProgress = false;
         var formIndex = ORBEON.util.Dom.getFormIndex(ORBEON.xforms.Globals.requestForm);
-        var details = "Error while processing response: " + (o.responseText !== undefined ? o.responseText : "");
-        ORBEON.xforms.Server.showError(details, formIndex);
+        var details = "Error while processing response: " + (o.responseText !== undefined ? o.responseText : o.statusText);
+        if (ORBEON.xforms.Globals.isRenderingEngineGecko && o.statusText == "communication failure") {
+            // On Firefox, when  
+            window.setTimeout(function() { ORBEON.xforms.Server.showError(details, formIndex); },
+                XFORMS_DELAY_BEFORE_GECKO_COMMUNICATION_ERROR_IN_MS);
+        } else {
+            // Display alert right away
+            ORBEON.xforms.Server.showError(details, formIndex);
+        }
     },
 
     handleUploadResponse: function(o) {

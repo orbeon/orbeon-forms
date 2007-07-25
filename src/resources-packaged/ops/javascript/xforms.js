@@ -1522,7 +1522,7 @@ ORBEON.xforms.Init = {
                         var errorPanel = new YAHOO.widget.Panel(formChild.id, {
                             width: "700px",
                             modal: true,
-                            fixedcenter: true,
+                            fixedcenter: false,
                             underlay: "shadow",
                             visible: false,
                             constraintoviewport: true,
@@ -1888,7 +1888,7 @@ ORBEON.xforms.Init = {
             close: hasClose,
             visible: false,
             draggable: draggable,
-            fixedcenter: true,
+            fixedcenter: false,
             constraintoviewport: true,
             underlay: "shadow"
         });
@@ -1935,6 +1935,7 @@ ORBEON.xforms.Server = {
         if (ORBEON.xforms.Globals.formErrorPanel[formIndex]) {
             ORBEON.xforms.Globals.formErrorPanel[formIndex].errorDetailsDiv.innerHTML = details;
             ORBEON.xforms.Globals.formErrorPanel[formIndex].show();
+            ORBEON.xforms.Globals.formErrorPanel[formIndex].center();
         }
     },
 
@@ -2931,6 +2932,7 @@ ORBEON.xforms.Server = {
                                                     // Fixes cursor Firefox issue; more on this in dialog init code
                                                     yuiDialog.element.style.display = "block";
                                                     yuiDialog.show();
+                                                    yuiDialog.center();
                                                 } else {
                                                     yuiDialog.hide();
                                                     // Fixes cursor Firefox issue; more on this in dialog init code

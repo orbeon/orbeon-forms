@@ -190,7 +190,9 @@ public class FileSerializer extends ProcessorImpl {
             // Delete file if it exists, unless we append
             if (!config.isAppend() && file.exists()) {
                 final boolean deleted = file.delete();
-                if (!deleted)
+                // We test on file.exists() here again so we don't complain that the file can't be deleted if it got
+                // deleted just between our last test and the delete operation.  
+                if (!deleted && file.exists())
                     throw new OXFException("Can't delete file: " + file);
             }
 

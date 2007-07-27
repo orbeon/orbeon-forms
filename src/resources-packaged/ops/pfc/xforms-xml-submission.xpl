@@ -37,7 +37,7 @@
 
     <p:choose href="#request-info">
         <!-- Check for XML post -->
-        <p:when test="lower-case(/*/method) = 'post' and (/*/content-type = ('application/xml', 'text/xml') or ends-with(/*/content-type, '+xml'))">
+        <p:when test="lower-case(/*/method) = ('post', 'put') and (/*/content-type = ('application/xml', 'text/xml') or ends-with(/*/content-type, '+xml'))">
 
             <!-- Extract request body -->
             <p:processor name="oxf:request">

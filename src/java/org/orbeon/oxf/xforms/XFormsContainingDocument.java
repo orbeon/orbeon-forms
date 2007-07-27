@@ -664,8 +664,8 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
             }
         }
 
-        // Handle repeat focus
-        if (controlId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1) != -1) {
+        // Handle repeat focus. Don't dispatch event on DOMFocusOut however.
+        if (controlId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1) != -1 && !XFormsEvents.XFORMS_DOM_FOCUS_OUT.equals(eventName)) {
             // The event target is in a repeated structure, so make sure it gets repeat focus
             dispatchEvent(pipelineContext, new XXFormsRepeatFocusEvent(eventTarget));
         }

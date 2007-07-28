@@ -67,6 +67,13 @@ ORBEON.xforms.Globals = ORBEON.xforms.Globals || {
     isRenderingEngineTridend: navigator.userAgent.toLowerCase().indexOf("msie") != -1     // Internet Explorer
         && navigator.userAgent.toLowerCase().indexOf("opera") == -1,
 
+    /**
+     * All the browsers support events in the capture phase, except IE and Safari 1.3. When browser don't support events
+     * in the capture phase, we need to register a listener for certain events on the elements itself, instead of
+     * just registering the event handler on the window object.
+     */
+    supportsCaptureEvents: window.addEventListener && !ORBEON.xforms.Globals.isRenderingEngineWebCore13,
+
     eventQueue: [],                      // Events to be sent to the server
     eventsFirstEventTime: 0,             // Time when the first event in the queue was added
     requestForm: null,                   // HTML for the request currently in progress
@@ -688,6 +695,14 @@ ORBEON.xforms.Controls = {
         } else if (typeof control.focus != "undefined") {
             control.focus();
         }
+
+        // Save current value as server value. We usually do this on focus, but for control where we set the focus
+        // with xforms:setfocus, we still receive the focus event when the value changes, but after the change event
+        // (which means we then don't send the new value to the server).
+        if (typeof ORBEON.xforms.Globals.serverValue[controlId] == "undefined") {
+            var currentValue = ORBEON.xforms.Controls.getCurrentValue(control);
+            ORBEON.xforms.Globals.serverValue[controlId] = currentValue;
+        }
     },
 
     /**
@@ -855,8 +870,9 @@ ORBEON.xforms.Events = {
                 // Store initial value of control if we don't have a server value already, and if this is is not a list
                 // Initial value for lists is set up initialization, as when we receive the focus event the new value is already set.
                 if (typeof ORBEON.xforms.Globals.serverValue[target.id] == "undefined"
-                        && ! ORBEON.util.Dom.hasClass(target, "xforms-select-appearance-compact"))
+                        && ! ORBEON.util.Dom.hasClass(target, "xforms-select-appearance-compact")) {
                     ORBEON.xforms.Globals.serverValue[target.id] = target.value;
+                }
                 // Send focus events
                 var previousDOMFocusOut = ORBEON.xforms.Globals.previousDOMFocusOut;
                 if (previousDOMFocusOut) {
@@ -1392,32 +1408,34 @@ ORBEON.xforms.Init = {
         return ORBEON.xforms.Init._specialControlsInitFunctions;
     },
 
-    _registerListerersOnFormElements: function() {
+    registerListenersOnFormElements: function() {
         for (var i = 0; i < document.forms.length; i++) {
             var form = document.forms[i];
             if (ORBEON.util.Dom.hasClass(form, "xforms-form")) {
                 for (var j = 0; j < form.elements.length; j++) {
                     var element = form.elements[j];
-                    YAHOO.util.Event.addListener(element, "focus", ORBEON.xforms.Events.focus);
-                    YAHOO.util.Event.addListener(element, "blur", ORBEON.xforms.Events.blur);
-                    YAHOO.util.Event.addListener(element, "change", ORBEON.xforms.Events.change);
+                    ORBEON.xforms.Init.registerListenersOnFormElement((element));
                 }
             }
         }
     },
 
+    registerListenersOnFormElement: function(element) {
+        YAHOO.util.Event.addListener(element, "focus", ORBEON.xforms.Events.focus);
+        YAHOO.util.Event.addListener(element, "blur", ORBEON.xforms.Events.blur);
+        YAHOO.util.Event.addListener(element, "change", ORBEON.xforms.Events.change);
+    },
+
     document: function() {
 
         // Register events in the capture phase for W3C-compliant browsers.
-        // Avoid Safari 1.3 which is buggy.
-        if (window.addEventListener && !ORBEON.xforms.Globals.isRenderingEngineWebCore13) {
+        if (ORBEON.xforms.Globals.supportsCaptureEvents) {
             window.addEventListener("focus", ORBEON.xforms.Events.focus, true);
             window.addEventListener("blur", ORBEON.xforms.Events.blur, true);
             window.addEventListener("change", ORBEON.xforms.Events.change, true);
         } else {
-            ORBEON.xforms.Init._registerListerersOnFormElements();
+            ORBEON.xforms.Init.registerListenersOnFormElements();
         }
-
 
         // Register events that bubble on document for all browsers
         YAHOO.util.Event.addListener(document, "keypress", ORBEON.xforms.Events.keypress);
@@ -2269,8 +2287,8 @@ ORBEON.xforms.Server = {
                                                     ORBEON.xforms.Init.insertedElement(templateNode);
                                                 }
                                                 // Initialize newly added form elements
-                                                if (ORBEON.xforms.Globals.isRenderingEngineWebCore13)
-                                                    ORBEON.xforms.Init._registerListerersOnFormElements();
+                                                if (! ORBEON.xforms.Globals.supportsCaptureEvents)
+                                                    ORBEON.xforms.Init.registerListenersOnFormElements();
                                                 break;
                                             }
 
@@ -2429,6 +2447,10 @@ ORBEON.xforms.Server = {
                                                 documentElement.outerHTML =
                                                     documentElement.outerHTML.substring(0, documentElement.outerHTML.indexOf("</SELECT>"))
                                                     + sb.join("") + "</select>";
+                                                // Get again control, as it has been re-created
+                                                documentElement = ORBEON.util.Dom.getElementById(controlId);
+                                                // Re-register handlers on the newly created control
+                                                ORBEON.xforms.Init.registerListenersOnFormElement(documentElement);
                                             } else {
                                                 // Version for compliant browsers
                                                 documentElement.innerHTML = sb.join("");
@@ -3308,7 +3330,6 @@ function xformsLog(object) {
         // Handle click on clear button
         YAHOO.util.Event.addListener(clear, "click", function (event) {
             var target = getEventTarget(event);
-            alert("click");
             while (target.nextSibling)
                 target.parentNode.removeChild(target.nextSibling);
             return false;

@@ -72,11 +72,12 @@ ORBEON.xforms.Globals = ORBEON.xforms.Globals || {
      * in the capture phase, we need to register a listener for certain events on the elements itself, instead of
      * just registering the event handler on the window object.
      */
-    supportsCaptureEvents: window.addEventListener && !ORBEON.xforms.Globals.isRenderingEngineWebCore13,
+    supportsCaptureEvents: window.addEventListener && navigator.userAgent.indexOf("AppleWebKit/312") == -1,
 
     eventQueue: [],                      // Events to be sent to the server
     eventsFirstEventTime: 0,             // Time when the first event in the queue was added
     requestForm: null,                   // HTML for the request currently in progress
+    requestIgnoreErrors: false,          // Should we ignore errors that result from running this request
     requestInProgress: false,            // Indicates wether an Ajax request is currently in process
     executeEventFunctionQueued: 0,       // Number of ORBEON.xforms.Server.executeNextRequest waiting to be executed
     maskFocusEvents: false,              // Avoid catching focus event when we do it because the server told us to
@@ -427,10 +428,10 @@ ORBEON.xforms.Document = {
     /**
      * Reference: http://www.w3.org/TR/xforms/slice10.html#action-dispatch
      */
-    dispatchEvent: function(targetId, eventName, form, bubbles, cancelable, incremental) {
+    dispatchEvent: function(targetId, eventName, form, bubbles, cancelable, incremental, ignoreErrors) {
 
         // Use the first XForms form on the page when no form is provided
-        if (form == undefined) {
+        if (form == null) {
             for (var formIndex = 0; formIndex < document.forms.length; formIndex++) {
                 var candidateForm = document.forms[formIndex];
                 if (ORBEON.util.Dom.hasClass(candidateForm, "xforms-form")) {
@@ -441,7 +442,7 @@ ORBEON.xforms.Document = {
         }
 
         // Create event and fire
-        var event = new ORBEON.xforms.Server.Event(form, targetId, null, null, eventName, bubbles, cancelable);
+        var event = new ORBEON.xforms.Server.Event(form, targetId, null, null, eventName, bubbles, cancelable, ignoreErrors);
         ORBEON.xforms.Server.fireEvents([event], incremental == undefined ? false : incremental);
     },
 
@@ -1921,7 +1922,7 @@ ORBEON.xforms.Init = {
 
 ORBEON.xforms.Server = {
 
-    Event: function(form, targetId, otherId, value, eventName, bubbles, cancelable) {
+    Event: function(form, targetId, otherId, value, eventName, bubbles, cancelable, ignoreErrors) {
         this.form = form;
         this.targetId = targetId;
         this.otherId = otherId;
@@ -1929,6 +1930,7 @@ ORBEON.xforms.Server = {
         this.eventName = eventName;
         this.bubbles = bubbles;
         this.cancelable = cancelable;
+        this.ignoreErrors = ignoreErrors;
     },
 
     /**
@@ -1950,10 +1952,12 @@ ORBEON.xforms.Server = {
      * Display the error panel and shows the specified detailed message in the detail section of the panel.
      */
     showError: function(details, formIndex) {
-        if (ORBEON.xforms.Globals.formErrorPanel[formIndex]) {
-            ORBEON.xforms.Globals.formErrorPanel[formIndex].errorDetailsDiv.innerHTML = details;
-            ORBEON.xforms.Globals.formErrorPanel[formIndex].show();
-            ORBEON.xforms.Globals.formErrorPanel[formIndex].center();
+        if (!ORBEON.xforms.Globals.requestIgnoreErrors) {
+            if (ORBEON.xforms.Globals.formErrorPanel[formIndex]) {
+                ORBEON.xforms.Globals.formErrorPanel[formIndex].errorDetailsDiv.innerHTML = details;
+                ORBEON.xforms.Globals.formErrorPanel[formIndex].show();
+                ORBEON.xforms.Globals.formErrorPanel[formIndex].center();
+            }
         }
     },
 
@@ -2042,6 +2046,16 @@ ORBEON.xforms.Server = {
                         ORBEON.xforms.Globals.changedIdsRequest[id] = null;
                 }
 
+                // Figure out if we will be ignoring error during this request or not
+                ORBEON.xforms.Globals.requestIgnoreErrors = true;
+                for (var eventIndex = 0; eventIndex < ORBEON.xforms.Globals.eventQueue.length; eventIndex++) {
+                    var event = ORBEON.xforms.Globals.eventQueue[eventIndex];
+                    if (!event.ignoreErrors) {
+                        ORBEON.xforms.Globals.requestIgnoreErrors = false;
+                        break;
+                    }
+                }
+                
                 // Build request
                 var requestDocumentString = "";
 

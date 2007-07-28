@@ -840,6 +840,19 @@
                                 events that would occur during that timespan to be aggregated with the current event.
                             </td>
                         </tr>
+                        <tr>
+                            <th>ignoreErrors</th>
+                            <td>Optional</td>
+                            <td>
+                                When set to <code>true</code>, errors happening while the event is dispatched to the
+                                server are ignored. This is in particular useful when you are using a JavaScript timer
+                                (e.g. <code>window.setInterval()</code>) that runs a JavaScript function on a regular
+                                interval to dispatch an event to the server, maybe to have part of the UI updated. In
+                                some cases, you might not want to alert the user when a there is a maybe temporary
+                                communication error while the event is being dispatched to the server. In those cases,
+                                you call call <code>dispatchEvent</code> with <code>ignoreErrors</code> set to true.
+                            </td>
+                        </tr>
                     </table>
                     <p>
                         In most cases, you only need to call <code>dispatchEvent()</code> with a target id and event name,

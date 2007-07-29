@@ -62,7 +62,7 @@
         <include name="msv-isorelax-20070407.jar"/>
         <include name="msv-xsdlib-20070407.jar"/>
         <include name="msv-relaxngDatatype-20070407.jar"/>
-        <include name="hsqldb-1_7_2_8_orbeon.jar"/>
+        <include name="hsqldb-1_8_0_7.jar"/>
         <include name="jfreechart*"/>
         <include name="jcommon*"/>
         <include name="activation-1_0_2.jar"/>
@@ -782,7 +782,7 @@
         <copy file="descriptors/install/tomcat-users.xml" todir="${build.dir}/install/${install.tomcat}/conf"/>
         <copy file="descriptors/install/oxf.ico" todir="${build.dir}/install"/>
         <copy file="descriptors/install/startOXF.bat" todir="${build.dir}/install"/>
-        <copy file="lib/hsqldb-1_7_1.jar" todir="${build.dir}/install/${install.tomcat}/common/lib"/>
+        <copy file="lib/hsqldb-1_8_0_7.jar" todir="${build.dir}/install/${install.tomcat}/common/lib"/>
 
         <!-- Prepare Orbeon -->
         <unzip src="build/distrib/${project.name}.war" dest="${build.dir}/install/ops-${release.number}"/>

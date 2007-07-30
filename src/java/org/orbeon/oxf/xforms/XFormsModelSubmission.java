@@ -298,9 +298,21 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 final boolean isDeferredSubmissionFirstPass = isDeferredSubmission && XFormsEvents.XFORMS_SUBMIT.equals(eventName);
                 isDeferredSubmissionSecondPass = isDeferredSubmission && !isDeferredSubmissionFirstPass; // here we get XXFORMS_SUBMIT
 
-                // TODO: Somewhere around here, check flags and doRecalculate() if needed
-
+                // "The data model is updated"
                 final XFormsModel modelForInstance = currentInstance.getModel(containingDocument);
+                {
+                    // NOTE: As of 2007-07-30, the spec says this should happen regardless of whether we serialize or not.
+                    final XFormsModel.DeferredActionContext deferredActionContext = modelForInstance.getDeferredActionContext();
+                    if (deferredActionContext != null) {
+                        if (deferredActionContext.rebuild) {
+                            modelForInstance.doRebuild(pipelineContext);
+                        }
+                        if (deferredActionContext.recalculate) {
+                            modelForInstance.doRecalculate(pipelineContext);
+                        }
+                    }
+                }
+
                 final Document initialDocumentToSubmit;
                 if (serialize && !isDeferredSubmissionSecondPass) {
                     // Create document to submit

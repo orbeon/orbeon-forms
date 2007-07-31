@@ -1,0 +1,25 @@
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:f="http://orbeon.org/oxf/xml/formatting"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:widget="http://orbeon.org/oxf/xml/widget"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xhtml:head>
+        <xforms:model>
+            <xforms:instance id="instance">
+                <dummy/>
+            </xforms:instance>
+            <xforms:submission id="long-submission" ref="instance('instance')" action="http://www.scdi.org/~avernet/try/long.php" method="post" replace="instance"/>
+        </xforms:model>
+    </xhtml:head>
+    <xhtml:body>
+        <xforms:trigger>
+            <xforms:label>Run long submission</xforms:label>
+            <xforms:action ev:event="DOMActivate">
+                <xforms:send submission="long-submission"/>
+            </xforms:action>
+        </xforms:trigger>
+    </xhtml:body>
+</xhtml:html>

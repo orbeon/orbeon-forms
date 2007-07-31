@@ -18,6 +18,7 @@
 var XFORMS_DELAY_BEFORE_INCREMENTAL_REQUEST_IN_MS = 500;
 var XFORMS_DELAY_BEFORE_FORCE_INCREMENTAL_REQUEST_IN_MS = 2000;
 var XFORMS_DELAY_BEFORE_GECKO_COMMUNICATION_ERROR_IN_MS = 5000;
+var XFORMS_DELAY_BEFORE_CLOSE_MINIMAL_DIALOG_IN_MS = 1000;
 var XFORMS_INTERNAL_SHORT_DELAY_IN_MS = 10;
 var XFORMS_DELAY_BEFORE_DISPLAY_LOADING_IN_MS = 500;
 var XFORMS_DEBUG_WINDOW_HEIGHT = 600;
@@ -100,6 +101,8 @@ ORBEON.xforms.Globals = ORBEON.xforms.Globals || {
     fckEditorLoading: false,             // True if  a FCK editor is currently loading
     fckEditorsToLoad: [],                // Queue of FCK editor to load
     dialogs: {},                         // Map for dialogs: id -> YUI dialog object
+    dialogMinimalVisible: {},            // Map for minimal dialog id -> boolean isVisible
+    dialogMinimalLastMouseOut: {},       // Map for minimal dialog id -> -1 or timestamp of last time the mouse got out of the dialog
     debugDiv: null,                      // Points to the div when debug messages are displayed
     debugLastTime: new Date().getTime(), // Timestamp when the last debug message was printed
     pageLoadedRegistered: false,         // If the page loaded listener has been registered already, to avoid running it more than once
@@ -808,6 +811,19 @@ ORBEON.xforms.Controls = {
             }
         }
 
+    },
+
+    /**
+     * Hides a minimal dialog and notified the server.
+     */
+    dialogMinimalHide: function(yuiDialog) {
+        // Mark this dialog as closed, so we don't try to close it over and over again
+        ORBEON.xforms.Globals.dialogMinimalVisible[yuiDialog.element.id] = false;
+        // Hide the dialog in the UI
+        yuiDialog.hide();
+        // Notify the server that this dialog is closed, otherwise server won't tell us to open it when necessary
+        xformsFireEvents([xformsCreateEventArray(yuiDialog.element, "xxforms-dialog-close")], false);
+
     }
 };
 
@@ -838,13 +854,22 @@ ORBEON.xforms.Events = {
         while (true) {
             if (!element) return null; // No more parent, stop search
             if (element.xformsElement) {
-                // HTML area on Gecko: event target is the document, return the textarea
+                // HTML area on Firefox: event target is the document, return the textarea
                 return element.xformsElement;
             } else if (element.ownerDocument && element.ownerDocument.xformsElement) {
-                // HTML area on IS: event target is the body of the document, return the textarea
+                // HTML area on IE: event target is the body of the document, return the textarea
                 return element.ownerDocument.xformsElement;
+            } else if (element.tagName != null
+                    && element.tagName.toLowerCase() == "iframe") {
+                // This might be the iframe that corresponds to a dialog on IE6
+                for (var dialogId in ORBEON.xforms.Globals.dialogs) {
+                    var dialog = ORBEON.xforms.Globals.dialogs[dialogId];
+                    if (dialog.iframe == element)
+                        return dialog.element;
+                }
             } else if (element.className != null) {
                 if (ORBEON.util.Dom.hasClass(element, "xforms-control")
+                        || ORBEON.util.Dom.hasClass(element, "xforms-dialog")
                         || ORBEON.util.Dom.hasClass(element, "xforms-help-image")
                         || ORBEON.util.Dom.hasClass(element, "xforms-alert")) {
                     // We found our XForms element
@@ -1067,20 +1092,32 @@ ORBEON.xforms.Events = {
     mouseover: function(event) {
         var target = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
         if (target != null) {
-
             if (ORBEON.util.Dom.hasClass(target, "xforms-help-image")) {
-                // Show help tool-tip
+                // Help image: show help tool-tip
                 var label = target.nextSibling;
                 while (!ORBEON.util.Dom.isElement(label)) label = target.nextSibling;
                 var control = ORBEON.util.Dom.getElementById(label.htmlFor);
                 ORBEON.xforms.Events._showToolTip(event, label, "xforms-help", ORBEON.xforms.Controls.getHelpMessage(control));
             } else if (ORBEON.util.Dom.hasClass(target, "xforms-alert-active")) {
+                // Alert image: show alert tool-tip
                 var control = ORBEON.util.Dom.getElementById(target.htmlFor);
                 var message = ORBEON.xforms.Controls.getAlertMessage(control);
                 if (message != "") {
-                    // Show alert tool-tip
                     ORBEON.xforms.Events._showToolTip(event, target, "xforms-alert", ORBEON.xforms.Controls.getAlertMessage(control));
                 }
+            } else if (ORBEON.util.Dom.hasClass(target, "xforms-dialog-appearance-minimal")) {
+                // Minimal dialog: record more is back inside the dialog
+                ORBEON.xforms.Globals.dialogMinimalLastMouseOut[target.id] = -1;
+            }
+
+            // Check if this control is inside a minimal dialog, in which case we are also inside that dialog
+            var current = target;
+            while (current != null && current != document) {
+                if (ORBEON.util.Dom.hasClass(current, "xforms-dialog-appearance-minimal")) {
+                    ORBEON.xforms.Globals.dialogMinimalLastMouseOut[current.id] = -1;
+                    break;
+                }
+                current = current.parentNode;
             }
         }
     },
@@ -1089,16 +1126,23 @@ ORBEON.xforms.Events = {
         var target = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
         if (target != null) {
 
-            // Hide help
             if (ORBEON.util.Dom.hasClass(target, "xforms-help-image")
-                    || ORBEON.util.Dom.hasClass(target, "xforms-alert-active"))
+                    || ORBEON.util.Dom.hasClass(target, "xforms-alert-active")) {
+                // Help and alert image: hide tool-tip
                 tt_Hide();
+            } else if (ORBEON.util.Dom.hasClass(target, "xforms-dialog-appearance-minimal")) {
+                // Minimal dialog: register listener to maybe close the dialog
+                ORBEON.xforms.Globals.dialogMinimalLastMouseOut[yuiDialog.element.id] = new Date().getTime();
+                window.setTimeout(function() { ORBEON.xforms.Events.dialogMinimalCheckMouseIn(yuiDialog); },
+                        XFORMS_DELAY_BEFORE_CLOSE_MINIMAL_DIALOG_IN_MS);
+            }
         }
     },
 
     click: function(event) {
         var originalTarget = YAHOO.util.Event.getTarget(event);
         var target = ORBEON.xforms.Events._findParentXFormsControl(originalTarget);
+
         if (target != null) {
             // Activate hint
             ORBEON.xforms.Controls.hintActive(target, true);
@@ -1378,6 +1422,37 @@ ORBEON.xforms.Events = {
 
     errorCloseClicked: function(event, errorPanel) {
         errorPanel.hide();
+    },
+
+    /**
+     * Called for each minimal dialog when there is a click on the document.
+     */
+    dialogMinimalBodyClick: function(event, yuiDialog) {
+        // Abord if one of the parents is drop-down dialog
+        var current = event.target;
+        var foundDropDownParent = false;
+        while (current != null && current != document) {
+            if (ORBEON.util.Dom.hasClass(current, "xforms-dialog-drop-down")) {
+                foundDropDownParent = true;
+                break;
+            }
+            current = current.parentNode;
+        }
+        if (!foundDropDownParent)
+            ORBEON.xforms.Controls.dialogMinimalHide(yuiDialog);
+    },
+
+    /**
+     * Called when the mouse is outside of a minimal dialog for more than a certain amount of time.
+     * Here we close the dialog if appropriate.
+     */
+    dialogMinimalCheckMouseIn: function(yuiDialog) {
+        var current = new Date().getTime();
+        if (ORBEON.xforms.Globals.dialogMinimalVisible[yuiDialog.element.id]
+                && ORBEON.xforms.Globals.dialogMinimalLastMouseOut[yuiDialog.element.id] != -1
+                && current - ORBEON.xforms.Globals.dialogMinimalLastMouseOut[yuiDialog.element.id] >= XFORMS_DELAY_BEFORE_CLOSE_MINIMAL_DIALOG_IN_MS) {
+            ORBEON.xforms.Controls.dialogMinimalHide(yuiDialog);
+        }
     }
 };
 
@@ -1404,7 +1479,11 @@ ORBEON.xforms.Init = {
                 "{http://orbeon.org/oxf/xml/xforms}autosize": ORBEON.xforms.Init._widetextArea,
                 "text/html": ORBEON.xforms.Init._htmlArea
             },
-            "dialog": { "": ORBEON.xforms.Init._dialog,  "full": ORBEON.xforms.Init._dialog }
+            "dialog": {
+                "": ORBEON.xforms.Init._dialog,
+                "full": ORBEON.xforms.Init._dialog,
+                "minimal": ORBEON.xforms.Init._dialog 
+            }
         };
         return ORBEON.xforms.Init._specialControlsInitFunctions;
     },
@@ -1901,18 +1980,35 @@ ORBEON.xforms.Init = {
         var isModal = ORBEON.util.Dom.hasClass(dialog, "xforms-dialog-modal");
         var hasClose = ORBEON.util.Dom.hasClass(dialog, "xforms-dialog-close-true");
         var draggable = ORBEON.util.Dom.hasClass(dialog, "xforms-dialog-draggable-true");
+        var isMinimal = ORBEON.util.Dom.hasClass(dialog, "xforms-dialog-appearance-minimal");
         ORBEON.util.Dom.removeClass(dialog, "xforms-initially-hidden");
-        yuiDialog = new YAHOO.widget.Dialog(dialog.id, {
-            modal: isModal,
-            close: hasClose,
-            visible: false,
-            draggable: draggable,
-            fixedcenter: false,
-            constraintoviewport: true,
-            underlay: "shadow"
-        });
-        yuiDialog.beforeHideEvent.subscribe(ORBEON.xforms.Events.dialogClose, dialog.id);
+
+        // Create dialog object
+        if (isMinimal) {
+            // Create minimal dialog
+            yuiDialog = new YAHOO.widget.Overlay(dialog.id, {
+                visible:false,
+                constraintoviewport: true,
+                iframe: true
+            });
+            // Close the dialog when users click on document
+            YAHOO.util.Event.addListener(document.body, "click", ORBEON.xforms.Events.dialogMinimalBodyClick, yuiDialog);
+        } else {
+            // Create full dialog
+            yuiDialog = new YAHOO.widget.Dialog(dialog.id, {
+                modal: isModal,
+                close: hasClose,
+                visible: false,
+                draggable: draggable,
+                fixedcenter: false,
+                constraintoviewport: true,
+                underlay: "shadow"
+            });
+            // Register listener for when the dialog is closed by a click on the "x"
+            yuiDialog.beforeHideEvent.subscribe(ORBEON.xforms.Events.dialogClose, dialog.id);
+        }
         yuiDialog.render();
+
         // We hide the dialog as it otherwise interfers with other dialogs, preventing
         // the cursor from showing in input fields of other dialogs
         yuiDialog.element.style.display = "none";
@@ -2174,7 +2270,6 @@ ORBEON.xforms.Server = {
             if (ORBEON.util.Dom.hasClass(uploadElement, "xforms-upload-state-empty"))// this also excludes templates
                 ORBEON.util.Dom.clearUploadControl(uploadElement);
         }
-
         ORBEON.xforms.Server.handleResponse(o);
     },
 
@@ -2185,7 +2280,7 @@ ORBEON.xforms.Server = {
         if (!responseXML || (responseXML && responseXML.documentElement && responseXML.documentElement.tagName.toLowerCase() == "html")) {
             // The XML docucment does not come in o.responseXML: parse o.responseText.
             // This happens in particular when we get a response after a background upload.
-            var xmlString = o.responseText.replace(/&lt;/g, "<").replace(/&gt;/g, ">");
+            var xmlString = o.responseText.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
             responseXML = ORBEON.util.Dom.stringToDom(xmlString);
         }
 
@@ -2965,10 +3060,19 @@ ORBEON.xforms.Server = {
                                             } else {
                                                 // This is a dialog
                                                 if (visibile)  {
+                                                    var neighbor = ORBEON.util.Dom.getAttribute(divElement, "neighbor");
                                                     // Fixes cursor Firefox issue; more on this in dialog init code
                                                     yuiDialog.element.style.display = "block";
                                                     yuiDialog.show();
-                                                    yuiDialog.center();
+                                                    if (neighbor == null) {
+                                                        // Center dialog in page, if not positined relative to other element
+                                                        yuiDialog.center();
+                                                    } else {
+                                                        // Align dialog relative to neighbor
+                                                        yuiDialog.cfg.setProperty("context", [neighbor, "tl", "bl"]);
+                                                        yuiDialog.align();
+                                                        ORBEON.xforms.Globals.dialogMinimalVisible[controlId] = true;
+                                                    }
                                                 } else {
                                                     yuiDialog.hide();
                                                     // Fixes cursor Firefox issue; more on this in dialog init code

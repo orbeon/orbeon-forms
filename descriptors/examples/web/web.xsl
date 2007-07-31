@@ -245,7 +245,7 @@
                 <xsl:comment> Set supported methods </xsl:comment>
                 <init-param>
                     <param-name>oxf.http.accept-methods</param-name>
-                    <param-value>get,post,head</param-value>
+                    <param-value>get,post,head,put,delete</param-value>
                 </init-param>
                 <xsl:comment> Set initialization listener </xsl:comment>
                 <init-param>

@@ -21,17 +21,25 @@
 
     <xhtml:head>
         <xhtml:title>Error Dialog</xhtml:title>
-        <xforms:model>
+        <xforms:model id="xforms-model" xxforms:external-events="provoke-error">
             <xforms:instance id="instance">
                 <root position="1">
                     <a>1</a>
                     <b>2</b>
                 </root>
             </xforms:instance>
+            <xforms:action ev:event="xforms-ready">
+                <xxforms:script>window.setInterval(refresh, 5000);</xxforms:script>
+            </xforms:action>
         </xforms:model>
-        <xhtml:style type="text/css">
-        </xhtml:style>
+        <xhtml:script type="text/javascript">
+            function refresh() {
+                //ORBEON.xforms.Document.dispatchEvent("main-model", "dummy");
+                ORBEON.xforms.Document.dispatchEvent("main-model", "dummy", null, null, null, null, true);
+            }
+        </xhtml:script>
     </xhtml:head>
+
     <xhtml:body>
 
         <xforms:input ref="/root/*[number(/root/@position)] treat as element(a)"/>

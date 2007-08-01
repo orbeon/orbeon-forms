@@ -128,6 +128,10 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventHandlerCont
     }
 
     protected XFormsInstance(String modelId, String instanceId, DocumentInfo instanceDocumentInfo, boolean initialize, String instanceSourceURI, String username, String password, boolean applicationShared, long timeToLive, String validation) {
+
+        if (applicationShared && instanceSourceURI == null)
+            throw new OXFException("Only XForms instances externally loaded through the src attribute may have xxforms:shared=\"application\".");
+
         this.instanceId = instanceId;
         this.modelId = modelId;
 

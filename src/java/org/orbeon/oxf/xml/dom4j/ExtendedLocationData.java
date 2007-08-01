@@ -25,7 +25,7 @@ public class ExtendedLocationData extends LocationData {
 
     private String description;
     private String[] parameters;
-    private String elementString;
+    private Element element;
 
     public ExtendedLocationData(String systemID, int line, int col, String description) {
         super(systemID, line, col);
@@ -58,8 +58,7 @@ public class ExtendedLocationData extends LocationData {
      */
     public ExtendedLocationData(LocationData locationData, String description, Element element) {
         this(locationData, description);
-        if (element != null)
-            this.elementString = Dom4jUtils.domToString(element);
+        this.element = element;
     }
 
     /**
@@ -105,8 +104,7 @@ public class ExtendedLocationData extends LocationData {
     public ExtendedLocationData(LocationData locationData, String description, Element element, String[] parameters, boolean defaultIfNecessary) {
         this(((locationData == null || locationData.getSystemID() == null) && defaultIfNecessary) ? Dom4jUtils.getLocationData(1, false) : locationData,
                 description, parameters);
-        if (element != null)
-            this.elementString = Dom4jUtils.domToString(element);
+        this.element = element;
     }
 
     /**
@@ -137,7 +135,7 @@ public class ExtendedLocationData extends LocationData {
     }
 
     public String getElementString() {
-        return elementString;
+        return (element != null) ? Dom4jUtils.domToString(element) : null;
     }
 
     public String[] getParameters() {

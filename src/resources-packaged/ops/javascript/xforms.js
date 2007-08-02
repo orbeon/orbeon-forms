@@ -1627,6 +1627,7 @@ ORBEON.xforms.Init = {
                             draggable: true
                         });
                         errorPanel.render();
+                        errorPanel.element.style.display = "none";
                         errorPanel.beforeHideEvent.subscribe(ORBEON.xforms.Events.errorPanelClosed, [formIndex]);
                         ORBEON.xforms.Globals.formErrorPanel[formIndex] = errorPanel;
 
@@ -2050,6 +2051,7 @@ ORBEON.xforms.Server = {
     showError: function(details, formIndex) {
         if (!ORBEON.xforms.Globals.requestIgnoreErrors) {
             if (ORBEON.xforms.Globals.formErrorPanel[formIndex]) {
+                ORBEON.xforms.Globals.formErrorPanel[formIndex].element.style.display = "block";
                 ORBEON.xforms.Globals.formErrorPanel[formIndex].errorDetailsDiv.innerHTML = details;
                 ORBEON.xforms.Globals.formErrorPanel[formIndex].show();
                 ORBEON.xforms.Globals.formErrorPanel[formIndex].center();

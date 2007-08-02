@@ -18,7 +18,7 @@
 var XFORMS_DELAY_BEFORE_INCREMENTAL_REQUEST_IN_MS = 500;
 var XFORMS_DELAY_BEFORE_FORCE_INCREMENTAL_REQUEST_IN_MS = 2000;
 var XFORMS_DELAY_BEFORE_GECKO_COMMUNICATION_ERROR_IN_MS = 5000;
-var XFORMS_DELAY_BEFORE_CLOSE_MINIMAL_DIALOG_IN_MS = 1000;
+var XFORMS_DELAY_BEFORE_CLOSE_MINIMAL_DIALOG_IN_MS = 5000;
 var XFORMS_INTERNAL_SHORT_DELAY_IN_MS = 10;
 var XFORMS_DELAY_BEFORE_DISPLAY_LOADING_IN_MS = 500;
 var XFORMS_DEBUG_WINDOW_HEIGHT = 600;
@@ -811,19 +811,6 @@ ORBEON.xforms.Controls = {
             }
         }
 
-    },
-
-    /**
-     * Hides a minimal dialog and notified the server.
-     */
-    dialogMinimalHide: function(yuiDialog) {
-        // Mark this dialog as closed, so we don't try to close it over and over again
-        ORBEON.xforms.Globals.dialogMinimalVisible[yuiDialog.element.id] = false;
-        // Hide the dialog in the UI
-        yuiDialog.hide();
-        // Notify the server that this dialog is closed, otherwise server won't tell us to open it when necessary
-        xformsFireEvents([xformsCreateEventArray(yuiDialog.element, "xxforms-dialog-close")], false);
-
     }
 };
 
@@ -1426,20 +1413,25 @@ ORBEON.xforms.Events = {
 
     /**
      * Called for each minimal dialog when there is a click on the document.
+     * We have one listener per dialog, which listens to those events all the time,
+     * not just when the dialog is open.
      */
     dialogMinimalBodyClick: function(event, yuiDialog) {
-        // Abord if one of the parents is drop-down dialog
-        var current = event.target;
-        var foundDropDownParent = false;
-        while (current != null && current != document) {
-            if (ORBEON.util.Dom.hasClass(current, "xforms-dialog-drop-down")) {
-                foundDropDownParent = true;
-                break;
+        // If this dialog is visible
+        if (ORBEON.xforms.Globals.dialogMinimalVisible[yuiDialog.element.id]) {
+            // Abord if one of the parents is drop-down dialog
+            var current = YAHOO.util.Event.getTarget(event);
+            var foundDropDownParent = false;
+            while (current != null && current != document) {
+                if (ORBEON.util.Dom.hasClass(current, "xforms-dialog-appearance-minimal")) {
+                    foundDropDownParent = true;
+                    break;
+                }
+                current = current.parentNode;
             }
-            current = current.parentNode;
+            if (!foundDropDownParent)
+                xformsFireEvents([xformsCreateEventArray(yuiDialog.element, "xxforms-dialog-close")], false);
         }
-        if (!foundDropDownParent)
-            ORBEON.xforms.Controls.dialogMinimalHide(yuiDialog);
     },
 
     /**
@@ -1451,7 +1443,7 @@ ORBEON.xforms.Events = {
         if (ORBEON.xforms.Globals.dialogMinimalVisible[yuiDialog.element.id]
                 && ORBEON.xforms.Globals.dialogMinimalLastMouseOut[yuiDialog.element.id] != -1
                 && current - ORBEON.xforms.Globals.dialogMinimalLastMouseOut[yuiDialog.element.id] >= XFORMS_DELAY_BEFORE_CLOSE_MINIMAL_DIALOG_IN_MS) {
-            ORBEON.xforms.Controls.dialogMinimalHide(yuiDialog);
+            xformsFireEvents([xformsCreateEventArray(yuiDialog.element, "xxforms-dialog-close")], false);
         }
     }
 };
@@ -3075,10 +3067,19 @@ ORBEON.xforms.Server = {
                                                         yuiDialog.align();
                                                         ORBEON.xforms.Globals.dialogMinimalVisible[controlId] = true;
                                                     }
+                                                    // Take out the focus from the current control. This is particulary important with non-modal dialogs
+                                                    // opened with a minimal trigger, otherwise we have a dotted line around the link after it opens.
+                                                    if (ORBEON.xforms.Globals.lastFocusControlId) {
+                                                        var focusedElement = ORBEON.util.Dom.getElementById(ORBEON.xforms.Globals.lastFocusControlId);
+                                                        if (focusedElement) focusedElement.blur();
+                                                    }
                                                 } else {
                                                     yuiDialog.hide();
                                                     // Fixes cursor Firefox issue; more on this in dialog init code
                                                     yuiDialog.element.style.display = "none";
+                                                    // Remember the server knows that this dialog is closed so we don't close it again later
+                                                    if (ORBEON.xforms.Globals.dialogMinimalVisible[yuiDialog.element.id])
+                                                        ORBEON.xforms.Globals.dialogMinimalVisible[yuiDialog.element.id] = false;
                                                 }
                                             }
                                         }

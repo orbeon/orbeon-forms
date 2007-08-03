@@ -111,11 +111,16 @@ public class XFormsGroupHandler extends HandlerBase {
                     contentHandler.characters(labelValue.toCharArray(), 0, labelValue.length());
                 contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "legend", legendQName);
             } else {
-                // Output an xhtml:label element
+
                 // TODO: Should find a way to find xforms:alert/@class
-                reusableAttributes.clear();
-                reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-label");
-                outputLabelFor(handlerContext, reusableAttributes, effectiveGroupId, labelValue);
+
+                // Output an xhtml:label element if and only if there is an xforms:label element
+                // TODO: Label element detection should be based on static control info so we don't needlessly generate a label in the template
+                if (handlerContext.isGenerateTemplate() || groupXFormsControl.hasLabel()) {
+                    reusableAttributes.clear();
+                    reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-label");
+                    outputLabelFor(handlerContext, reusableAttributes, effectiveGroupId, labelValue);
+                }
 
                 // Start xhtml:span element
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, groupElementName, groupElementQName, getAttributes(attributes, classes.toString(), effectiveGroupId));

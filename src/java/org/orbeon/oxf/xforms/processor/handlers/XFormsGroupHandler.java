@@ -115,7 +115,10 @@ public class XFormsGroupHandler extends HandlerBase {
                 // TODO: Should find a way to find xforms:alert/@class
 
                 // Output an xhtml:label element if and only if there is an xforms:label element
-                // TODO: Label element detection should be based on static control info so we don't needlessly generate a label in the template
+
+                // TODO: Label element detection should be based on static control info so we don't needlessly generate
+                // a label in the template. Maybe XFormsControls should just support a method to obtain a control
+                // element by id.
                 if (handlerContext.isGenerateTemplate() || groupXFormsControl.hasLabel()) {
                     reusableAttributes.clear();
                     reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-label");

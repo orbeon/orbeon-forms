@@ -26,6 +26,7 @@ import java.io.InputStream;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -72,6 +73,10 @@ public class HTTPURLConnection extends URLConnection {
                 int separatorPosition = userinfo.indexOf(":");
                 String username = separatorPosition == -1 ? userinfo : userinfo.substring(0, separatorPosition);
                 String password = separatorPosition == -1 ? "" : userinfo.substring(separatorPosition + 1);
+                // If the username/password contain special character, those character will be encoded, since we
+                // are getting this from a URL. Now do the decoding.
+                username = URLDecoder.decode(username, "utf-8");
+                password = URLDecoder.decode(password, "utf-8");
                 client.getState().setCredentials(
                     new AuthScope(url.getHost(), url.getPort()),
                     new UsernamePasswordCredentials(username, password)

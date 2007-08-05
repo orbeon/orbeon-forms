@@ -119,15 +119,15 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventHandlerCont
             documentInfo = new DocumentWrapper((Document) Dom4jUtils.normalizeTextNodes(instanceDocument), null, new Configuration());
         }
 
-        setInstanceDocumentInfo(documentInfo, true);
+        this.documentInfo = documentInfo;
     }
 
-    public XFormsInstance(String modelId, String instanceId, Document instanceDocument, boolean initialize, String instanceSourceURI, String username, String password, boolean applicationShared, long timeToLive, String validation) {
+    public XFormsInstance(String modelId, String instanceId, Document instanceDocument, String instanceSourceURI, String username, String password, boolean applicationShared, long timeToLive, String validation) {
         // We normalize the Document before setting it, so that text nodes follow the XPath constraints
-        this(modelId, instanceId, new DocumentWrapper((Document) Dom4jUtils.normalizeTextNodes(instanceDocument), null, new Configuration()), initialize, instanceSourceURI, username, password, applicationShared, timeToLive, validation);
+        this(modelId, instanceId, new DocumentWrapper((Document) Dom4jUtils.normalizeTextNodes(instanceDocument), null, new Configuration()), instanceSourceURI, username, password, applicationShared, timeToLive, validation);
     }
 
-    protected XFormsInstance(String modelId, String instanceId, DocumentInfo instanceDocumentInfo, boolean initialize, String instanceSourceURI, String username, String password, boolean applicationShared, long timeToLive, String validation) {
+    protected XFormsInstance(String modelId, String instanceId, DocumentInfo instanceDocumentInfo, String instanceSourceURI, String username, String password, boolean applicationShared, long timeToLive, String validation) {
 
         if (applicationShared && instanceSourceURI == null)
             throw new OXFException("Only XForms instances externally loaded through the src attribute may have xxforms:shared=\"application\".");
@@ -145,7 +145,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventHandlerCont
         this.password = password;
         this.validation = validation;
 
-        setInstanceDocumentInfo(instanceDocumentInfo, initialize);
+        this.documentInfo = instanceDocumentInfo;
     }
 
     /**
@@ -265,50 +265,10 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventHandlerCont
         this.replaced = replaced;
     }
 
-    /**
-     * Set the instance document.
-     *
-     * @param instanceDocument  the Document or DocumentInfo to use
-     * @param initialize        true if initial decoration (MIPs) has to be reset
-     */
-    public void setInstanceDocument(Object instanceDocument, boolean initialize) {
-        if (instanceDocument instanceof Document)
-            setInstanceDocument((Document) instanceDocument, initialize);
-        else
-            setInstanceDocumentInfo((DocumentInfo) instanceDocument, initialize);
-    }
-
-    /**
-     * Set the instance document.
-     *
-     * @param instanceDocument  the Document to use
-     * @param initialize        true if initial decoration (MIPs) has to be reset
-     */
-    public void setInstanceDocument(Document instanceDocument, boolean initialize) {
-        setInstanceDocumentInfo(new DocumentWrapper((Document) Dom4jUtils.normalizeTextNodes(instanceDocument), null, new Configuration()), initialize);
-    }
-
-    /**
-     * Set the instance document.
-     *
-     * @param instanceDocumentInfo  the DocumentInfo to use
-     * @param initialize            true if initial decoration (MIPs) has to be reset
-     */
-    private void setInstanceDocumentInfo(DocumentInfo instanceDocumentInfo, boolean initialize) {
-        if (initialize && instanceDocumentInfo instanceof DocumentWrapper) {
-            // Only set annotations on Document
-            final DocumentWrapper documentWrapper = (DocumentWrapper) instanceDocumentInfo;
-            XFormsUtils.setInitialDecoration((Document) documentWrapper.getUnderlyingNode());
-        }
-        this.documentInfo = instanceDocumentInfo;
-    }
-
     public void synchronizeInstanceDataEventState() {
         XFormsUtils.iterateInstanceData(this, new XFormsUtils.InstanceWalker() {
-            public void walk(NodeInfo nodeInfo, InstanceData updatedInstanceData) {
-                if (updatedInstanceData != null) {
-                    updatedInstanceData.clearInstanceDataEventState();
-                }
+            public void walk(NodeInfo nodeInfo) {
+                InstanceData.clearInstanceDataEventState(nodeInfo);
             }
         }, true);
     }
@@ -339,12 +299,9 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventHandlerCont
      */
     public static void setValueForNode(PipelineContext pipelineContext, Node node, String newValue, String type) {
 
-        // Get local instance data as we are not using any inheritance here AND we are doing an update
-        final InstanceData instanceData = XFormsUtils.getLocalInstanceData(node);
-
         // Convert value based on types if possible
         if (type != null) {
-            final String nodeType = instanceData.getType().getAsString();
+            final String nodeType = InstanceData.getType(node);
 
             if (nodeType != null && !nodeType.equals(type)) {
                 // There is a different type already, do a conversion
@@ -357,50 +314,60 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventHandlerCont
         }
 
         // Set value
-        final String currentValue;
+        final String previousValue;
         if (node instanceof Element) {
-            // "10.1.9 The setvalue Element: Element nodes: If the element has any child text nodes, the first text
-            // node is replaced with one corresponding to the new value. If no child text nodes are present, a text
-            // node is created, corresponding to the new value, and appended as the first child node."
+            // NOTE: Previously, there was a "first text node rule" which ended up causing problems and was removed.
             final Element elementnode = (Element) node;
-            currentValue = XFormsUtils.setFirstTextNodeValue(elementnode, newValue);
+            previousValue = elementnode.getStringValue();
+            elementnode.setText(newValue);
         } else if (node instanceof Attribute) {
             // "Attribute nodes: The string-value of the attribute is replaced with a string corresponding to the new
             // value."
             final Attribute attributenode = (Attribute) node;
-            currentValue = attributenode.getValue();
+            previousValue = attributenode.getStringValue();
             attributenode.setValue(newValue);
         } else if (node instanceof Text) {
             // "Text nodes: The text node is replaced with a new one corresponding to the new value."
             final Text textNode = (Text) node;
-            currentValue = textNode.getText();
+            previousValue = textNode.getStringValue();
             textNode.setText(newValue);
         } else {
-
             // "Namespace, processing instruction, comment, and the XPath root node: behavior is undefined."
-            throw new OXFException("Node is not an element or attribute.");
+            throw new OXFException("Setting value on node other than element, attribute or text is not supported for node type: " + node.getNodeTypeName());
         }
 
         // Remember that the value has changed for this node if it has actually changed
-        if (!newValue.equals(currentValue))
-            instanceData.markValueChanged();
+        if (!newValue.equals(previousValue))
+            InstanceData.markValueChanged(node);
     }
 
-    public static String getValueForNodeInfo(NodeInfo currentNode) {
+    public static String getValueForNodeInfo(NodeInfo nodeInfo) {
 
-        if (currentNode.getNodeKind() == org.w3c.dom.Document.ELEMENT_NODE) {
-            // "Element nodes: if text child nodes are present, returns the string-value of the first text child node.
-            // Otherwise, returns "" (the empty string)"
-            return XFormsUtils.getFirstTextNodeValue(currentNode);
-        } else if (currentNode.getNodeKind() == org.w3c.dom.Document.ATTRIBUTE_NODE) {
-            // "Attribute nodes: returns the string-value of the node."
-            return currentNode.getStringValue();
-        } else if (currentNode.getNodeKind() == org.w3c.dom.Document.TEXT_NODE) {
-            // "Text nodes: returns the string-value of the node."
-            return currentNode.getStringValue();
+        if (nodeInfo.getNodeKind() == org.w3c.dom.Document.ELEMENT_NODE
+                || nodeInfo.getNodeKind() == org.w3c.dom.Document.ATTRIBUTE_NODE
+                || nodeInfo.getNodeKind() == org.w3c.dom.Document.TEXT_NODE) {
+
+            // NOTE: In XForms 1.1, all these node types return the string value. Note that previously, there was a
+            // "first text node rule" which ended up causing problems and was removed.
+            return nodeInfo.getStringValue();
         } else {
             // "Namespace, processing instruction, comment, and the XPath root node: behavior is undefined."
-            throw new OXFException("Invalid node type: " + currentNode.getNodeKind());
+            throw new OXFException("Setting value on node other than element, attribute or text is not supported for node type: " + nodeInfo.getNodeKind());
+        }
+    }
+
+    public static String getValueForNode(Node node) {
+
+        if (node.getNodeType() == org.w3c.dom.Document.ELEMENT_NODE
+                || node.getNodeType() == org.w3c.dom.Document.ATTRIBUTE_NODE
+                || node.getNodeType() == org.w3c.dom.Document.TEXT_NODE) {
+
+            // NOTE: In XForms 1.1, all these node types return the string value. Note that previously, there was a
+            // "first text node rule" which ended up causing problems and was removed.
+            return node.getStringValue();
+        } else {
+            // "Namespace, processing instruction, comment, and the XPath root node: behavior is undefined."
+            throw new OXFException("Setting value on node other than element, attribute or text is not supported for node type: " + node.getNodeTypeName());
         }
     }
 
@@ -412,7 +379,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventHandlerCont
     public void read(ContentHandler contentHandler) {
         try {
             if (documentInfo instanceof DocumentWrapper) {
-                XFormsUtils.addInstanceAttributes(getInstanceRootElementInfo());
+                InstanceData.addInstanceAttributes(getInstanceRootElementInfo());
             }
 
             final Transformer identity = TransformerUtils.getIdentityTransformer();
@@ -468,13 +435,12 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventHandlerCont
             }
 
             private final void addMIPInfo(Element parentInfoElement, Node node) {
-                final InstanceData instanceData = XFormsUtils.getInstanceDataUpdateInherited(node);
-                parentInfoElement.addAttribute("readonly", Boolean.toString(instanceData.getInheritedReadonly().get()));
-                parentInfoElement.addAttribute("relevant", Boolean.toString(instanceData.getInheritedRelevant().get()));
-                parentInfoElement.addAttribute("required", Boolean.toString(instanceData.getRequired().get()));
-                parentInfoElement.addAttribute("valid", Boolean.toString(instanceData.getValid().get()));
-                final String typeAsString = instanceData.getType().getAsString();
-                parentInfoElement.addAttribute("type", (typeAsString == null) ? "" : typeAsString);
+                parentInfoElement.addAttribute("readonly", Boolean.toString(InstanceData.getInheritedReadonly(node)));
+                parentInfoElement.addAttribute("relevant", Boolean.toString(InstanceData.getInheritedRelevant(node)));
+                parentInfoElement.addAttribute("required", Boolean.toString(InstanceData.getRequired(node)));
+                parentInfoElement.addAttribute("valid", Boolean.toString(InstanceData.getValid(node)));
+                final String type = InstanceData.getType(node);
+                parentInfoElement.addAttribute("type", (type == null) ? "" : type);
 //                parentInfoElement.addAttribute("schema-error-messages", instanceData.getSchemaErrorsMsgs());
             }
         });
@@ -527,7 +493,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventHandlerCont
      * @return  mutable XFormsInstance
      */
     public SharedXFormsInstance createSharedInstance() {
-        return new SharedXFormsInstance(modelId, instanceId, documentInfo, false, sourceURI, username, password, false, timeToLive, validation);
+        return new SharedXFormsInstance(modelId, instanceId, documentInfo, sourceURI, username, password, false, timeToLive, validation);
     }
 
     public static String getInstanceId(Element xformsInstanceElement) {

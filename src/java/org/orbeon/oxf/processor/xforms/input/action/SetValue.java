@@ -47,7 +47,7 @@ public class SetValue implements Action {
                 id = SecureUtils.decryptAsString(pipelineContext, encryptionPassword, id);
             final Integer idInteger = new Integer(Integer.parseInt(id));
 
-            final Node node = (Node) XFormsUtils.getIdToNodeMap(instanceDocumentInfo).get(idInteger);
+            final Node node = (Node) InstanceData.getIdToNodeMap(instanceDocumentInfo).get(idInteger);
             final String newValue = value != null ? value : content == null ? "" : content;
 
             XFormsInstance.setValueForNode(pipelineContext, node, newValue, null);

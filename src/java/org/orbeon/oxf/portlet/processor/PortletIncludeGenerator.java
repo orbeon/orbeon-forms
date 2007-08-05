@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.portlet.processor;
 
-import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.Node;
 import org.orbeon.oxf.common.OXFException;
@@ -23,11 +22,10 @@ import org.orbeon.oxf.portlet.PortletConfigImpl;
 import org.orbeon.oxf.portlet.PortletContainer;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.TidyConfig;
-import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.XPathUtils;
-import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.InstanceData;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
@@ -39,8 +37,6 @@ import java.util.Iterator;
 import java.util.Map;
 
 public class PortletIncludeGenerator extends ProcessorImpl {
-
-    private static Logger logger = LoggerFactory.createLogger(PortletIncludeGenerator.class);
 
     private static final String INPUT_INSTANCE = "instance";
 
@@ -103,7 +99,7 @@ public class PortletIncludeGenerator extends ProcessorImpl {
                 {
                     // This is the XForms instance document of the portal. It is used later on to rewrite portlet URLs.
                     Document instanceDocument = (Document) readCacheInputAsDOM4J(pipelineContext, INPUT_INSTANCE).clone();
-                    XFormsUtils.setInitialDecoration(instanceDocument);
+                    InstanceData.setInitialDecoration(instanceDocument);
                     externalContext.getRequest().getAttributesMap().put(REQUEST_PORTAL_INSTANCE_DOCUMENT, instanceDocument);
                 }
 

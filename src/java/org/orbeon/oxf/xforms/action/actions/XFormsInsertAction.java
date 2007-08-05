@@ -165,19 +165,19 @@ public class XFormsInsertAction extends XFormsAction {
                     }
                 }
 
-                // We can never really insert a document into anything, but we assume that this means the root element
                 for (int i = 0; i < clonedNodesTemp.size(); i++) {
                     final Node clonedNodeTemp = (Node) clonedNodesTemp.get(i);
 
                     if (clonedNodeTemp instanceof Element)
-                        XFormsUtils.setInitialDecoration((Element) clonedNodeTemp);
+                        InstanceData.remove(clonedNodeTemp);
                     else if (clonedNodeTemp instanceof Attribute)
-                        XFormsUtils.setInitialDecoration((Attribute) clonedNodeTemp);
+                        InstanceData.remove(clonedNodeTemp);
                     else if (clonedNodeTemp instanceof Document) {
-                        XFormsUtils.setInitialDecoration(clonedNodeTemp.getDocument().getRootElement());
-                        clonedNodesTemp.set(i, clonedNodeTemp.getDocument().getRootElement().detach());
+                        final Element clonedNodeTempRootElement = clonedNodeTemp.getDocument().getRootElement();
+                        InstanceData.remove(clonedNodeTempRootElement);
+                        // We can never really insert a document into anything, but we assume that this means the root element
+                        clonedNodesTemp.set(i, clonedNodeTempRootElement.detach());
                     }
-                    // TODO: we don't handle instance data on text nodes and other nodes
                 }
                 clonedNodes = clonedNodesTemp;
             }
@@ -222,7 +222,10 @@ public class XFormsInsertAction extends XFormsAction {
             // Prepare switches
             for (int i = 0; i < sourceNodes.size(); i++) {
                 final Node sourceNode = (Node) sourceNodes.get(i);
-                if (sourceNode != null && XFormsUtils.getLocalInstanceData(sourceNode) != null) { // 1) may be null when source is an item 2) may be null when source is from a read-only instance
+                // 1) may be null when source is an item 2) may be null when source is from a read-only instance
+                //  && InstanceData.getLocalInstanceData(sourceNode) != null
+                // TODO: How could this come from a read-only instance since we have a Node? Remove this and the above comment when we have made sure this is fine.
+                if (sourceNode != null) {
                     final Node clonedNode = (Node) clonedNodes.get(i);
                     XFormsSwitchUtils.prepareSwitches(xformsControls, sourceNode, clonedNode);
                 }

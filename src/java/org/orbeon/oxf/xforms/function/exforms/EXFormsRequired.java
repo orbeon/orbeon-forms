@@ -14,9 +14,10 @@
 package org.orbeon.oxf.xforms.function.exforms;
 
 import org.orbeon.oxf.xforms.InstanceData;
+import org.orbeon.saxon.om.NodeInfo;
 
 public class EXFormsRequired  extends EXFormsMIP {
-    protected boolean getResult(InstanceData instanceData) {
-        return instanceData.getRequired().get();
+    protected boolean getResult(NodeInfo nodeInfo) {
+        return InstanceData.getRequired(nodeInfo);
     }
 }

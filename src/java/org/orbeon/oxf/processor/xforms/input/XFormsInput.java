@@ -87,8 +87,11 @@ public class XFormsInput extends ProcessorImpl {
                     = new RequestParameters(pipelineContext, readInputAsDOM4J(pipelineContext, INPUT_REQUEST));
 
                 // Set instance on model if provided
-                if (requestParameters.getInstance() != null)
-                    model.setInstanceDocument((Document) requestParameters.getInstance().clone(), true, model.getEffectiveId(), model.getDefaultInstanceId(), null, null, null, false, -1, null);
+                if (requestParameters.getInstance() != null) {
+                    final Document instanceDocument = (Document) requestParameters.getInstance().clone();
+                    InstanceData.setInitialDecoration(instanceDocument);
+                    model.setInstanceDocument(instanceDocument, model.getEffectiveId(), model.getDefaultInstanceId(), null, null, null, false, -1, null);
+                }
                 // Set initialization listener
                 model.setInstanceConstructListener(new XFormsModel.InstanceConstructListener() {
                     public void updateInstance(int position, XFormsInstance localInstance) {
@@ -99,7 +102,7 @@ public class XFormsInput extends ProcessorImpl {
                             for (int i = 0; i < ids.length; i++) {
                                 final int id = ids[i];
 
-                                final Node node = (Node) XFormsUtils.getIdToNodeMap(localInstance.getDocumentInfo()).get(new Integer(id));
+                                final Node node = (Node) InstanceData.getIdToNodeMap(localInstance.getDocumentInfo()).get(new Integer(id));
                                 XFormsInstance.setValueForNode(pipelineContext, node, requestParameters.getValue(id), requestParameters.getType(id));
                             }
 

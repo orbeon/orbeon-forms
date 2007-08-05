@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms;
 
 import org.apache.commons.pool.PoolableObjectFactory;
-import org.apache.commons.lang.StringUtils;
 import org.dom4j.*;
 import org.dom4j.io.DocumentSource;
 import org.orbeon.oxf.common.OXFException;
@@ -23,13 +22,9 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.DebugProcessor;
 import org.orbeon.oxf.processor.ProcessorUtils;
-import org.orbeon.oxf.processor.generator.TidyConfig;
 import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.*;
-import org.orbeon.oxf.xforms.mip.BooleanModelItemProperty;
-import org.orbeon.oxf.xforms.mip.ReadonlyModelItemProperty;
-import org.orbeon.oxf.xforms.mip.RelevantModelItemProperty;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.event.events.XFormsLinkErrorEvent;
 import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl;
@@ -61,181 +56,7 @@ import java.util.zip.GZIPInputStream;
 
 public class XFormsUtils {
 
-    private static final int BUFFER_SIZE = 1024;
-
-    private static final InstanceData READONLY_LOCAL_INSTANCE_DATA = new ReadonlyInstanceData(null, -1);
-
-    /**
-     * Return the local XForms instance data for the given node, null if not available.
-     */
-    public static InstanceData getLocalInstanceData(NodeInfo nodeInfo) {
-        if (nodeInfo instanceof NodeWrapper) {
-            return getLocalInstanceData(getNodeFromNodeInfo(nodeInfo, ""));
-        } else if (nodeInfo != null) {
-            return READONLY_LOCAL_INSTANCE_DATA;
-        } else {
-            return null;
-        }
-    }
-
-    public static InstanceData getLocalInstanceData(Node node) {
-        final Object instanceData;
-        if (node instanceof Element) {
-             instanceData = ((Element) node).getData();
-        } else if (node instanceof Attribute) {
-            instanceData = ((Attribute) node).getData();
-        } else if (node instanceof Document) {
-            // We can't store data on the Document object. Use root element instead.
-            instanceData = ((Document) node).getRootElement().getData();
-        } else {
-            return null;
-        }
-        // TODO: other node types once we update to handling text nodes correctly
-        if (instanceData instanceof InstanceData)
-            return (InstanceData) instanceData;
-        else
-            return null;
-    }
-
-    public static Map getIdToNodeMap(NodeInfo nodeInfo) {
-        if (nodeInfo instanceof NodeWrapper) {
-            final Node node = getNodeFromNodeInfo(nodeInfo, "");
-            return ((InstanceData) ((Document) node.getDocument()).getRootElement().getData()).getIdToNodeMap();
-        } else {
-            // TODO: check how we proceed for TinyTree: should we return something anyway?
-            return null;
-        }
-    }
-
-    /**
-     * Return the XForms instance data for the given node with updated inherited MIPs, null if not available.
-     */
-    public static InstanceData getInstanceDataUpdateInherited(NodeInfo nodeInfo) {
-
-        if (nodeInfo instanceof NodeWrapper) {
-            return getInstanceDataUpdateInherited(getNodeFromNodeInfo(nodeInfo, ""));
-        } else if (nodeInfo != null) {
-            return READONLY_LOCAL_INSTANCE_DATA;
-        } else {
-            return null;
-        }
-    }
-
-    public static InstanceData getInstanceDataUpdateInherited(Node node) {
-        final InstanceData localInstanceData = getLocalInstanceData(node);
-        if (localInstanceData == null)
-            return null;
-
-        // Clear current inherited state
-        localInstanceData.setInheritedReadonly(null);
-        localInstanceData.setInheritedRelevant(null);
-
-        boolean handleReadonly = !localInstanceData.getReadonly().get();
-        boolean handleRelevant = localInstanceData.getRelevant().get();
-
-        if (handleReadonly || handleRelevant) {
-            // There may be something to do
-
-            for (Element currentElement = node.getParent(); currentElement != null && (handleReadonly || handleRelevant);
-                 currentElement = currentElement.getParent()) {
-
-                final InstanceData currentInstanceData = getLocalInstanceData(currentElement);
-
-                // Handle readonly inheritance
-                if (handleReadonly && currentInstanceData.getReadonly().get()) {
-                    if (localInstanceData.getInheritedReadonly() == null)
-                        localInstanceData.setInheritedReadonly(new ReadonlyModelItemProperty());
-                    localInstanceData.getInheritedReadonly().set(true);
-                    handleReadonly = false;
-                }
-                // Handle relevant inheritance
-                if (handleRelevant && !currentInstanceData.getRelevant().get()) {
-                    if (localInstanceData.getInheritedRelevant() == null)
-                        localInstanceData.setInheritedRelevant(new RelevantModelItemProperty());
-                    localInstanceData.getInheritedRelevant().set(false);
-                    handleRelevant = false;
-                }
-            }
-        }
-
-        // Make sure there is a reference to a MIP
-        if (localInstanceData.getInheritedReadonly() == null)
-            localInstanceData.setInheritedReadonly(localInstanceData.getReadonly());
-        if (localInstanceData.getInheritedRelevant() == null)
-            localInstanceData.setInheritedRelevant(localInstanceData.getRelevant());
-
-        return localInstanceData;
-    }
-
-    /**
-     * Recursively decorate all the elements and attributes with default <code>InstanceData</code>.
-     */
-    public static void setInitialDecoration(Document document) {
-        final Element rootElement = document.getRootElement();
-        final Map idToNodeMap = new HashMap();
-        setInitialDecorationWorker(rootElement, new int[]{-1}, idToNodeMap);
-        ((InstanceData) rootElement.getData()).setIdToNodeMap(idToNodeMap);
-    }
-
-    /**
-     * Recursively decorate the element and its attributes with default <code>InstanceData</code>.
-     */
-    public static void setInitialDecoration(Element element) {
-        setInitialDecorationWorker(element, null, null);
-    }
-
-    public static void setInitialDecoration(Attribute attribute) {
-        attribute.setData(newInstanceData(attribute.getData(), -1));
-    }
-
-    private static void setInitialDecorationWorker(Element element, int[] currentId, Map idToNodeMap) {
-        // NOTE: ids are only used by the legacy XForms engine
-        int elementId = (currentId != null) ? ++currentId[0] : -1;
-        if (idToNodeMap != null) {
-            idToNodeMap.put(new Integer(elementId), element);
-        }
-
-        element.setData(newInstanceData(element.getData(), elementId));
-
-        for (Iterator i = element.attributes().iterator(); i.hasNext();) {
-            Attribute attribute = (Attribute) i.next();
-            if (!XFormsConstants.XXFORMS_NAMESPACE_URI.equals(attribute.getNamespaceURI())) {
-                // NOTE: ids are only used by the legacy XForms engine
-                int attributeId = (currentId != null) ? ++currentId[0] : -1;
-                if (idToNodeMap != null) {
-                    idToNodeMap.put(new Integer(attributeId), attribute);
-                }
-                attribute.setData(newInstanceData(attribute.getData(), attributeId));
-            }
-        }
-        for (Iterator i = element.elements().iterator(); i.hasNext();) {
-            Element child = (Element) i.next();
-            setInitialDecorationWorker(child, currentId, idToNodeMap);
-        }
-    }
-
-    private static InstanceData newInstanceData(Object existingData, int id) {
-        if (existingData instanceof LocationData) {
-            return new InstanceData((LocationData) existingData, id);
-        } else if (existingData instanceof InstanceData) {
-            return new InstanceData(((InstanceData) existingData).getLocationData(), id);
-        } else {
-            return new InstanceData(null, id);
-        }
-    }
-
-    /**
-     * Mark all value nodes of an instance document as having changed.
-     */
-    public static void markAllValuesChanged(XFormsInstance instance) {
-        XFormsUtils.iterateInstanceData(instance, new XFormsUtils.InstanceWalker() {
-            public void walk(NodeInfo nodeInfo, InstanceData updatedInstanceData) {
-                if (updatedInstanceData != null) {
-                    updatedInstanceData.markValueChanged();
-                }
-            }
-        }, false);
-    }
+    private static final int SRC_CONTENT_BUFFER_SIZE = 1024;
 
     /**
      * Return whether name encryption is enabled (legacy XForms engine only).
@@ -253,75 +74,7 @@ public class XFormsUtils {
                 (XFormsConstants.XFORMS_ENCRYPT_HIDDEN_PROPERTY, false).booleanValue();
     }
 
-    /**
-     * Reconcile "DOM InstanceData annotations" with "attribute annotations"
-     */
-    public static void addInstanceAttributes(final NodeInfo elementNodeInfo) {
-
-        // Don't do anything if we have a read-only document
-        if (!(elementNodeInfo instanceof NodeWrapper))
-            return;
-
-        final InstanceData instanceData = getInstanceDataUpdateInherited(elementNodeInfo);
-
-        if (instanceData != null) {
-            final Element element = (Element) getNodeFromNodeInfo(elementNodeInfo, "");
-            final String invalidBindIds = instanceData.getInvalidBindIds();
-            updateAttribute(element, XFormsConstants.XXFORMS_INVALID_BIND_IDS_ATTRIBUTE_QNAME, invalidBindIds, null);
-
-            // Reconcile boolean model item properties
-            reconcileBoolean(instanceData.getInheritedReadonly(), element, XFormsConstants.XXFORMS_READONLY_ATTRIBUTE_QNAME, false);
-            reconcileBoolean(instanceData.getInheritedRelevant(), element, XFormsConstants.XXFORMS_RELEVANT_ATTRIBUTE_QNAME, true);
-            reconcileBoolean(instanceData.getRequired(), element, XFormsConstants.XXFORMS_REQUIRED_ATTRIBUTE_QNAME, false);
-            reconcileBoolean(instanceData.getValid(), element, XFormsConstants.XXFORMS_VALID_ATTRIBUTE_QNAME, true);
-        }
-
-        final List elements = getChildrenElements(elementNodeInfo);
-        for (Iterator i = elements.iterator(); i.hasNext();) {
-            final NodeInfo currentElementNodeInfo = (NodeInfo) i.next();
-            addInstanceAttributes(currentElementNodeInfo);
-        }
-    }
-
-    private static void reconcileBoolean(final BooleanModelItemProperty prp, final Element elt, final QName qnm, final boolean defaultValue) {
-        final String currentBooleanValue;
-        if (prp.hasChangedFromDefault()) {
-            final boolean b = prp.get();
-            currentBooleanValue = Boolean.toString(b);
-        } else {
-            currentBooleanValue = null;
-        }
-        updateAttribute(elt, qnm, currentBooleanValue, Boolean.toString(defaultValue));
-    }
-
-    private static void updateAttribute(final Element element, final QName qnam, final String currentValue, final String defaultValue) {
-        Attribute attribute = element.attribute(qnam);
-        if (((currentValue == null) || (currentValue != null && currentValue.equals(defaultValue))) && attribute != null) {
-            element.remove(attribute);
-        } else if (currentValue != null && !currentValue.equals(defaultValue)) {
-            // Add a namespace declaration if necessary
-            final String prefix = qnam.getNamespacePrefix();
-            final String uri = qnam.getNamespaceURI();
-            final Namespace namespace = element.getNamespaceForPrefix(prefix);
-            final String nsURI = namespace == null ? null : namespace.getURI();
-            if (namespace == null) {
-                element.addNamespace(prefix, uri);
-            } else if (!nsURI.equals(uri)) {
-                final LocationData locationData = getNodeLocationData(element);
-                throw new ValidationException("Cannot add attribute to node with 'xxforms' prefix"
-                        + " as the prefix is already mapped to another URI", locationData);
-            }
-            // Add attribute
-            if (attribute == null) {
-                attribute = Dom4jUtils.createAttribute(element, qnam, currentValue);
-                setInitialDecoration(attribute);
-                element.add(attribute);
-            } else {
-                attribute.setValue(currentValue);
-            }
-        }
-    }
-
+    // For XForms Classic only.
     public static void removeInstanceAttributes(final NodeInfo elementNodeInfo) {
         // Don't do anything if we have a read-only document
         if (!(elementNodeInfo instanceof NodeWrapper))
@@ -343,12 +96,11 @@ public class XFormsUtils {
         };
         instanceNode.accept(visitor);
     }
-
     /**
      * Iterate through nodes of the instance document and call the walker on each of them.
      *
-     * @param instance
-     * @param instanceWalker
+     * @param instance          instance to iterate
+     * @param instanceWalker    walker to call back
      * @param allNodes          all the nodes, otherwise only leaf data nodes
      */
     public static void iterateInstanceData(XFormsInstance instance, InstanceWalker instanceWalker, boolean allNodes) {
@@ -361,12 +113,12 @@ public class XFormsUtils {
 
         // We "walk" an element which contains elements only if allNodes == true
         if (allNodes || childrenElements.size() == 0)
-            instanceWalker.walk(elementNodeInfo, getInstanceDataUpdateInherited(elementNodeInfo));
+            instanceWalker.walk(elementNodeInfo);
 
         // "walk" current element's attributes
         for (Iterator i = getAttributes(elementNodeInfo).iterator(); i.hasNext();) {
             final NodeInfo attributeNodeInfo = (NodeInfo) i.next();
-            instanceWalker.walk(attributeNodeInfo, getInstanceDataUpdateInherited(attributeNodeInfo));
+            instanceWalker.walk(attributeNodeInfo);
         }
         // "walk" current element's children elements
         if (childrenElements.size() != 0) {
@@ -391,74 +143,6 @@ public class XFormsUtils {
 
     // Use a Deflater pool as creating Deflaters is expensive
     final static SoftReferenceObjectPool deflaterPool = new SoftReferenceObjectPool(new DeflaterPoolableObjetFactory());
-
-    public static String encodeXMLOld(PipelineContext pipelineContext, Document documentToEncode, String encryptionPassword) {
-        //        XFormsServer.logger.debug("XForms - encoding XML.");
-
-        // The XML document as a string
-        final String xmlString = Dom4jUtils.domToString(documentToEncode, false, false);
-        return encodeStringOld(pipelineContext, xmlString, encryptionPassword);
-    }
-
-    private static String encodeStringOld(PipelineContext pipelineContext, String stringToEncode, String encryptionPassword) {
-        Deflater deflater = null;
-        try {
-            // Compress if needed
-            final byte[] gzipByteArray;
-            if (isGZIPState()) {
-                deflater = (Deflater) deflaterPool.borrowObject();
-                final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                final DeflaterGZIPOutputStream gzipOutputStream = new DeflaterGZIPOutputStream(deflater, byteArrayOutputStream, 1024);
-                gzipOutputStream.write(stringToEncode.getBytes("utf-8"));
-                gzipOutputStream.close();
-                gzipByteArray = byteArrayOutputStream.toByteArray();
-            } else {
-                gzipByteArray = null;
-            }
-
-            // Encrypt if needed
-            if (encryptionPassword != null) {
-                // Perform encryption
-                final String encryptedString;
-                if (gzipByteArray == null) {
-                    // The data was not compressed
-                    encryptedString = "X1" + SecureUtils.encrypt(pipelineContext, encryptionPassword, stringToEncode);
-                } else {
-                    // The data was compressed
-                    encryptedString = "X2" + SecureUtils.encrypt(pipelineContext, encryptionPassword, gzipByteArray);
-                }
-                return encryptedString;
-            } else {
-                // No encryption
-                if (gzipByteArray == null) {
-                    // The data was not compressed
-                    // NOTE: In this scenario, we take a shortcut and assume we don't even need to base64 the string
-                    // as it is going to stay in memory
-                    return "X3" + stringToEncode;
-                } else {
-                    // The data was compressed
-                    return "X4" + Base64.encode(gzipByteArray);
-                }
-            }
-        } catch (Throwable e) {
-            try {
-                if (deflater != null)
-                    deflaterPool.invalidateObject(deflater);
-            } catch (Exception e1) {
-                throw new OXFException(e1);
-            }
-            throw new OXFException(e);
-        } finally {
-            try {
-                if (deflater != null) {
-                    deflater.reset();
-                    deflaterPool.returnObject(deflater);
-                }
-            } catch (Exception e) {
-                throw new OXFException(e);
-            }
-        }
-    }
 
     public static String encodeXML(PipelineContext pipelineContext, Document documentToEncode, String encryptionPassword, boolean encodeLocationData) {
         //        XFormsServer.logger.debug("XForms - encoding XML.");
@@ -959,22 +643,6 @@ public class XFormsUtils {
         return result.getDocument();
     }
 
-    public static Document decodeXMLOld(PipelineContext pipelineContext, String encodedXML, String encryptionPassword) {
-
-        // Decoded string
-        final String xmlString;
-        try {
-            xmlString = new String(decodeBytes(pipelineContext, encodedXML, encryptionPassword), "utf-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new OXFException(e);// won't happen
-        }
-
-        // Parse XML and return document
-        final LocationSAXContentHandler saxContentHandler = new LocationSAXContentHandler();
-        XMLUtils.stringToSAX(xmlString, null, saxContentHandler, false, false);
-        return saxContentHandler.getDocument();
-    }
-
     public static String decodeString(PipelineContext pipelineContext, String encoded) {
         try {
             return new String(decodeBytes(pipelineContext, encoded,  getEncryptionKey()), "utf-8");
@@ -1045,9 +713,9 @@ public class XFormsUtils {
         InputStreamReader reader = new InputStreamReader(url.openStream());
         try {
             StringBuffer value = new StringBuffer();
-            char[] buff = new char[BUFFER_SIZE];
+            char[] buff = new char[SRC_CONTENT_BUFFER_SIZE];
             int c = 0;
-            while ((c = reader.read(buff, 0, BUFFER_SIZE - 1)) != -1) value.append(buff, 0, c);
+            while ((c = reader.read(buff, 0, SRC_CONTENT_BUFFER_SIZE - 1)) != -1) value.append(buff, 0, c);
             return value.toString();
         } finally {
             if (reader != null)
@@ -1264,7 +932,7 @@ public class XFormsUtils {
     }
 
     public static interface InstanceWalker {
-        public void walk(NodeInfo nodeInfo, InstanceData updatedInstanceData);
+        public void walk(NodeInfo nodeInfo);
     }
 
     /**
@@ -1388,9 +1056,9 @@ public class XFormsUtils {
         }
         if (data == null)
             return null;
-        if (data instanceof LocationData)
-            return (LocationData) node;
-        if (data instanceof InstanceData)
+        else if (data instanceof LocationData)
+            return (LocationData) data;
+        else if (data instanceof InstanceData)
             return ((InstanceData) data).getLocationData();
 
         return null;
@@ -1452,51 +1120,51 @@ public class XFormsUtils {
         return result;
     }
 
-    public static String getFirstTextNodeValue(NodeInfo nodeInfo) {
-        // NOTE: We could probably optimize this for dom4j
-        if (nodeInfo.hasChildNodes()) {
-            final AxisIterator i = nodeInfo.iterateAxis(Axis.CHILD);
-            i.next();
-            while (i.current() != null) {
-                final Item current = i.current();
-                if (current instanceof NodeInfo) {
-                    final NodeInfo currentNodeInfo = (NodeInfo) current;
-                    if (currentNodeInfo.getNodeKind() == org.w3c.dom.Document.TEXT_NODE) {
-                        return currentNodeInfo.getStringValue();
-                    }
-                }
-                i.next();
-            }
-        }
+//    public static String getFirstTextNodeValue(NodeInfo nodeInfo) {
+//        // NOTE: We could probably optimize this for dom4j
+//        if (nodeInfo.hasChildNodes()) {
+//            final AxisIterator i = nodeInfo.iterateAxis(Axis.CHILD);
+//            i.next();
+//            while (i.current() != null) {
+//                final Item current = i.current();
+//                if (current instanceof NodeInfo) {
+//                    final NodeInfo currentNodeInfo = (NodeInfo) current;
+//                    if (currentNodeInfo.getNodeKind() == org.w3c.dom.Document.TEXT_NODE) {
+//                        return currentNodeInfo.getStringValue();
+//                    }
+//                }
+//                i.next();
+//            }
+//        }
+//
+//        // "Element nodes: if text child nodes are present, returns the string-value of the first text child node.
+//        // Otherwise, returns "" (the empty string)"
+//
+//        return "";
+//    }
 
-        // "Element nodes: if text child nodes are present, returns the string-value of the first text child node.
-        // Otherwise, returns "" (the empty string)"
-        
-        return "";
-    }
-
-    public static String setFirstTextNodeValue(Element element, String newValue) {
-
-        // "10.1.9 The setvalue Element: Element nodes: If the element has any child text nodes, the first text node
-        // is replaced with one corresponding to the new value. If no child text nodes are present, a text node is
-        // created, corresponding to the new value, and appended as the first child node."
-
-        for (Iterator contentIterator = element.content().iterator(); contentIterator. hasNext();) {
-            final Node currentNode = (Node) contentIterator.next();
-            if (currentNode instanceof Text) {
-                // This is the first text node, replace its value
-                final Text textNode = (Text) currentNode;
-                final String currentValue = textNode.getText();
-                textNode.setText(newValue);
-                return currentValue;
-            }
-        }
-
-        // No text node was found, create one a first child
-        if (!"".equals(newValue)) // don't create empty text nodes
-            element.content().add(0, Dom4jUtils.createText(newValue));
-        return "";
-    }
+//    public static String setFirstTextNodeValue(Element element, String newValue) {
+//
+//        // "10.1.9 The setvalue Element: Element nodes: If the element has any child text nodes, the first text node
+//        // is replaced with one corresponding to the new value. If no child text nodes are present, a text node is
+//        // created, corresponding to the new value, and appended as the first child node."
+//
+//        for (Iterator contentIterator = element.content().iterator(); contentIterator. hasNext();) {
+//            final Node currentNode = (Node) contentIterator.next();
+//            if (currentNode instanceof Text) {
+//                // This is the first text node, replace its value
+//                final Text textNode = (Text) currentNode;
+//                final String currentValue = textNode.getText();
+//                textNode.setText(newValue);
+//                return currentValue;
+//            }
+//        }
+//
+//        // No text node was found, create one a first child
+//        if (!"".equals(newValue)) // don't create empty text nodes
+//            element.content().add(0, Dom4jUtils.createText(newValue));
+//        return "";
+//    }
 
     /**
      * Create a JavaScript function name based on a script id.

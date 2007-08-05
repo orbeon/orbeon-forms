@@ -898,20 +898,17 @@ public class XFormsControls {
                 // Update MIPs on control
                 // TODO: we don't need to set these values until we produce output, right?
                 if (!(xformsControl instanceof XFormsRepeatControl && currentNodeSet != null && currentNodeSet.size() == 0)) {
-                    final NodeInfo currentNode = currentBindingContext.getSingleNode();
+                    final NodeInfo currentNodeInfo = currentBindingContext.getSingleNode();
                     if (currentBindingContext.isNewBind()) {
-                        if (currentNode != null) {
+                        if (currentNodeInfo != null) {
                             // Control is bound to a node - get model item properties
-                            final InstanceData instanceData = XFormsUtils.getInstanceDataUpdateInherited(currentNode);
-                            if (instanceData != null) {
-                                xformsControl.setReadonly(instanceData.getInheritedReadonly().get());
-                                xformsControl.setRequired(instanceData.getRequired().get());
-                                xformsControl.setRelevant(instanceData.getInheritedRelevant().get());
-                                xformsControl.setValid(instanceData.getValid().get());
-                                final String typeAsString = instanceData.getType().getAsString();
-                                if (typeAsString != null) {
-                                    xformsControl.setType(typeAsString);
-                                }
+                            xformsControl.setReadonly(InstanceData.getInheritedReadonly(currentNodeInfo));
+                            xformsControl.setRequired(InstanceData.getRequired(currentNodeInfo));
+                            xformsControl.setRelevant(InstanceData.getInheritedRelevant(currentNodeInfo));
+                            xformsControl.setValid(InstanceData.getValid(currentNodeInfo));
+                            final String type = InstanceData.getType(currentNodeInfo);
+                            if (type != null) {
+                                xformsControl.setType(type);
                             }
                             // Handle global read-only setting
                             if (containingDocument.isReadonly())
@@ -927,10 +924,9 @@ public class XFormsControls {
                         }
                     } else {
                         // Control is not bound to a node because it doesn't have a binding (group, trigger, etc. without @ref)
-                        final InstanceData instanceData = XFormsUtils.getInstanceDataUpdateInherited(currentNode);
                         xformsControl.setReadonly(false);
                         xformsControl.setRequired(false);
-                        xformsControl.setRelevant(instanceData != null && instanceData.getInheritedRelevant().get()); // inherit relevance anyway
+                        xformsControl.setRelevant((currentNodeInfo != null) ? InstanceData.getInheritedRelevant(currentNodeInfo) : false); // inherit relevance anyway
                         xformsControl.setValid(true);// by default, a control is not invalid
                         xformsControl.setType(null);
                     }
@@ -995,16 +991,14 @@ public class XFormsControls {
                 repeatIterationXForms.setBindingContext(currentBindingContext);
 
                 // Set current binding for control element
-                final NodeInfo currentNode = currentBindingContext.getSingleNode();
+                final NodeInfo currentNodeInfo = currentBindingContext.getSingleNode();
 
                 // Get model item properties
-                final InstanceData instanceData = XFormsUtils.getInstanceDataUpdateInherited(currentNode);
-                if (instanceData != null) {
-                    repeatIterationXForms.setReadonly(instanceData.getInheritedReadonly().get());
-                    repeatIterationXForms.setRequired(instanceData.getRequired().get());
-                    repeatIterationXForms.setRelevant(instanceData.getInheritedRelevant().get());
-                    repeatIterationXForms.setValid(instanceData.getValid().get());
-                }
+                repeatIterationXForms.setReadonly(InstanceData.getInheritedReadonly(currentNodeInfo));
+                repeatIterationXForms.setRequired(InstanceData.getRequired(currentNodeInfo));
+                repeatIterationXForms.setRelevant(InstanceData.getInheritedRelevant(currentNodeInfo));
+                repeatIterationXForms.setValid(InstanceData.getValid(currentNodeInfo));
+
                 // Handle global read-only setting
                 if (containingDocument.isReadonly())
                     repeatIterationXForms.setReadonly(true);
@@ -1097,7 +1091,9 @@ public class XFormsControls {
     }
 
 
-    public void showHideDialog(String dialogId, boolean show) {
+    public void showHideDialog(String dialogId, boolean show, String neighbor) {
+
+        // TODO XXX : handle @neighbor
 
         // Make sure the id refers to an existing xxforms:dialog
         final Object object = getObjectById(dialogId);
@@ -1302,7 +1298,7 @@ public class XFormsControls {
                         // are not bound to a node OR we are bound to a relevant node OR we are in a selected case
                         if (!isOptimizeRelevance
                                 || (!currentBindingContext.isNewBind()
-                                    || (currentBindingContext.getSingleNode() != null && XFormsUtils.getInstanceDataUpdateInherited(currentBindingContext.getSingleNode()).getRelevant().get()))
+                                    || (currentBindingContext.getSingleNode() != null && InstanceData.getInheritedRelevant(currentBindingContext.getSingleNode())))
                                     && (!controlName.equals("case") || isCaseSelectedByControlElement(controlElement, effectiveControlId, idPostfix))) {
 
                             doContinue = handleControls(pipelineContext, controlElementVisitorListener, isOptimizeRelevance, controlElement, idPostfix);

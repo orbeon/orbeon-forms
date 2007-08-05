@@ -21,6 +21,7 @@ import org.orbeon.oxf.processor.xforms.output.element.ViewContentHandler;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsElementContext;
 import org.orbeon.oxf.xforms.XFormsModel;
+import org.orbeon.oxf.xforms.InstanceData;
 import org.xml.sax.ContentHandler;
 
 /**
@@ -58,7 +59,8 @@ public class XFormsOutput extends ProcessorImpl {
 
                 // Set annotated instance on model
                 final Document instanceDocument = (Document) readInputAsDOM4J(pipelineContext, INPUT_INSTANCE);
-                model.setInstanceDocument(instanceDocument, true, model.getEffectiveId(), model.getDefaultInstanceId(), null, null, null, false, -1, null);
+                InstanceData.setInitialDecoration(instanceDocument);
+                model.setInstanceDocument(instanceDocument,  model.getEffectiveId(), model.getDefaultInstanceId(), null, null, null, false, -1, null);
 
                 // Create and initialize XForms Engine
                 final XFormsContainingDocument containingDocument = new XFormsContainingDocument(pipelineContext, model);

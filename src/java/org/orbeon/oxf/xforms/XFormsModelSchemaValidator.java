@@ -233,7 +233,6 @@ public class XFormsModelSchemaValidator {
     }
 
     private void addSchemaError(final Element element, final String errMsg) {
-        final InstanceData instanceData = XFormsUtils.getLocalInstanceData(element);
         final String newErrorMessage;
         if (errMsg == null) {
             // Looks like if n is an element and errMsg == null then the problem is missing
@@ -242,12 +241,11 @@ public class XFormsModelSchemaValidator {
         } else {
             newErrorMessage = errMsg;
         }
-        instanceData.addSchemaError(newErrorMessage, element.getStringValue(), null);
+        InstanceData.addSchemaError(element, newErrorMessage, element.getStringValue(), null);
     }
 
-    private void addSchemaError(final Attribute attribute, final String errMsg) {
-        final InstanceData instanceData = XFormsUtils.getLocalInstanceData(attribute);
-        instanceData.addSchemaError(errMsg, attribute.getStringValue(), null);
+    private void addSchemaError(final Attribute attribute, final String schemaError) {
+        InstanceData.addSchemaError(attribute, schemaError, attribute.getStringValue(), null);
     }
 
     private void handleIDErrors(final IDConstraintChecker icc) {
@@ -320,7 +318,6 @@ public class XFormsModelSchemaValidator {
             // This element is valid and has at least one assigned datatype
 
             // Attempt to set datatype name
-            final InstanceData instanceData = XFormsUtils.getLocalInstanceData(element);
             final Datatype datatype = datatypeRef.types[0];
             if (datatype instanceof XSDatatype) {
                 final XSDatatype xsDatatype = (XSDatatype) datatype;
@@ -328,7 +325,7 @@ public class XFormsModelSchemaValidator {
                 final String datatTypeName = xsDatatype.getName();
 
                 if (datatTypeName != null && !datatTypeName.equals(""))
-                    instanceData.getType().set(XMLUtils.buildExplodedQName(datatTypeURI, datatTypeName));
+                    InstanceData.setType(element, XMLUtils.buildExplodedQName(datatTypeURI, datatTypeName));
             }
         }
 
@@ -485,7 +482,7 @@ public class XFormsModelSchemaValidator {
             for (int i = 0; i < end; i++) {
                 final String uri = startTagInfo.attributes.getURI(i);
 
-                // TODO: Is this legacy check still useful?
+                // TODO: Is this legacy XForms Classic check still useful?
                 if (XFormsConstants.XXFORMS_NAMESPACE_URI.equals(uri))
                     continue;
 
@@ -641,6 +638,7 @@ public class XFormsModelSchemaValidator {
 
     private Grammar loadGrammar(final String baseURI, final NodeInfo schemaElementInfo) {
 
+        // TODO: Work in progress for loading inline schemas (?)
         final SchemaInfo newSchemaInfo = new SchemaInfo();
         final MSVGrammarReaderController controller = new MSVGrammarReaderController(baseURI, newSchemaInfo);
         final SAXParserFactory saxParserFactory = XMLUtils.getSAXParserFactory(false, false);

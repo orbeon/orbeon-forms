@@ -15,9 +15,10 @@ package org.orbeon.oxf.xforms.function.xxforms;
 
 import org.orbeon.oxf.xforms.InstanceData;
 import org.orbeon.oxf.xforms.function.exforms.EXFormsMIP;
+import org.orbeon.saxon.om.NodeInfo;
 
 public class XXFormsValid  extends EXFormsMIP {
-    protected boolean getResult(InstanceData instanceData) {
-        return instanceData.getValid().get();
+    protected boolean getResult(NodeInfo nodeInfo) {
+        return InstanceData.getValid(nodeInfo);
     }
 }

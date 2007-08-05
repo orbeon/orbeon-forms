@@ -434,7 +434,8 @@ public abstract class HandlerBase extends ElementHandler {
 
                 final AttributesImpl imgAttributes = new AttributesImpl();
                 imgAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, helpImageClasses);
-                imgAttributes.addAttribute("", "src", "src", ContentHandlerHelper.CDATA, externalContext.getResponse().rewriteResourceURL(XFormsConstants.HELP_IMAGE_URI, false));
+                imgAttributes.addAttribute("", "src", "src", ContentHandlerHelper.CDATA,
+                        externalContext.getResponse().rewriteResourceURL(XFormsConstants.HELP_IMAGE_URI, false));
                 imgAttributes.addAttribute("", "title", "title", ContentHandlerHelper.CDATA, "");
                 imgAttributes.addAttribute("", "alt", "alt", ContentHandlerHelper.CDATA, "Help");
 

@@ -22,7 +22,18 @@ import org.orbeon.oxf.xforms.event.XFormsEvents;
  */
 public class XXFormsDialogOpenEvent extends XFormsEvent {
 
+    private String neighbor;
+
     public XXFormsDialogOpenEvent(XFormsEventTarget targetObject) {
         super(XFormsEvents.XXFORMS_DIALOG_OPEN, targetObject, true, false);
+    }
+
+    public XXFormsDialogOpenEvent(XFormsEventTarget targetObject, String neighbor) {
+        super(XFormsEvents.XXFORMS_DIALOG_OPEN, targetObject, true, false);
+        this.neighbor = neighbor;
+    }
+
+    public String getNeighbor() {
+        return neighbor;
     }
 }

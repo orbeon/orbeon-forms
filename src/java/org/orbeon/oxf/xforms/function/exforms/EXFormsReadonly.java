@@ -13,10 +13,11 @@
  */
 package org.orbeon.oxf.xforms.function.exforms;
 
+import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.oxf.xforms.InstanceData;
 
 public class EXFormsReadonly  extends EXFormsMIP {
-    protected boolean getResult(InstanceData instanceData) {
-        return instanceData.getInheritedReadonly().get();
+    protected boolean getResult(NodeInfo nodeInfo) {
+        return InstanceData.getInheritedReadonly(nodeInfo);
     }
 }

@@ -20,6 +20,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.SecureUtils;
 import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.InstanceData;
 import org.orbeon.saxon.om.DocumentInfo;
 
 import java.util.Iterator;
@@ -57,7 +58,7 @@ public class Insert implements Action {
             else
                 lastIndexInteger = new Integer(lastIndex);
 
-            final Node lastNode = (Node) XFormsUtils.getIdToNodeMap(instanceDocumentInfo).get(lastIndexInteger);
+            final Node lastNode = (Node) InstanceData.getIdToNodeMap(instanceDocumentInfo).get(lastIndexInteger);
             if (!(lastNode instanceof Element))
                 throw new OXFException("last node in nodeset attribute from insert action must must be an element");
             elementToDuplicate = (Element) lastNode;
@@ -77,7 +78,7 @@ public class Insert implements Action {
             if (XFormsUtils.isNameEncryptionEnabled())
                 id = SecureUtils.decryptAsString(context, encryptionPassword, id);
 
-            final Node atNode = (Node) XFormsUtils.getIdToNodeMap(instanceDocumentInfo).get(new Integer(id));
+            final Node atNode = (Node) InstanceData.getIdToNodeMap(instanceDocumentInfo).get(new Integer(id));
             if (!(atNode instanceof Element))
                 throw new OXFException("node pointed by 'at' position in nodeset attribute from"
                         + " insert action must must be an element");

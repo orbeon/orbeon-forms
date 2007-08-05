@@ -47,13 +47,7 @@ public class Group extends XFormsElement {
                 }
 
                 private void wipeValue(Node node) {
-                    InstanceData data;
-                    if(node instanceof Element)
-                        data = (InstanceData)((Element)node).getData();
-                    else
-                        data = (InstanceData)((Attribute)node).getData();
-
-                    if(data != null && data.isGenerated())
+                    if (InstanceData.getXXFormsGenerated(node))
                         node.setText("");
                 }
             });

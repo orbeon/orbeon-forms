@@ -14,9 +14,7 @@
 package org.orbeon.oxf.xforms;
 
 import org.dom4j.Element;
-import org.dom4j.Document;
 import org.orbeon.saxon.om.DocumentInfo;
-import org.orbeon.oxf.common.OXFException;
 
 /**
  * XFormsInstance that can be shared among multiple users. It must be passed a DocumentInfo and it is not possible to
@@ -28,20 +26,8 @@ public class SharedXFormsInstance extends XFormsInstance {
         super(containerElement);
     }
 
-    public SharedXFormsInstance(String modelId, String instanceId, DocumentInfo instanceDocumentInfo, boolean initialize, String instanceSourceURI, String username, String password, boolean applicationShared, long timeToLive, String validation) {
-        super(modelId, instanceId, instanceDocumentInfo, initialize, instanceSourceURI, username, password, applicationShared, timeToLive, validation);
-    }
-
-    public void setInstanceDocument(Object instanceDocument, boolean initialize) {
-        if (getDocumentInfo() == null) {
-            super.setInstanceDocument(instanceDocument, initialize);
-        } else {
-            throw new OXFException("Cannot set instance document on shared instance.");
-        }
-    }
-
-    public void setInstanceDocument(Document instanceDocument, boolean initialize) {
-        throw new OXFException("Cannot set instance document on shared instance.");
+    public SharedXFormsInstance(String modelId, String instanceId, DocumentInfo instanceDocumentInfo, String instanceSourceURI, String username, String password, boolean applicationShared, long timeToLive, String validation) {
+        super(modelId, instanceId, instanceDocumentInfo, instanceSourceURI, username, password, applicationShared, timeToLive, validation);
     }
 
     public void synchronizeInstanceDataEventState() {

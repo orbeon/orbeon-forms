@@ -27,8 +27,6 @@ import org.orbeon.oxf.xforms.action.actions.XFormsLoadAction;
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
 import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.*;
-import org.orbeon.oxf.xforms.mip.BooleanModelItemProperty;
-import org.orbeon.oxf.xforms.mip.ValidModelItemProperty;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -320,7 +318,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         initialDocumentToSubmit = createDocumentToSubmit(currentNodeInfo, currentInstance);
 
                         // Temporarily change instance document so that we can run validation again
-                        modelForInstance.setInstanceDocument(initialDocumentToSubmit, false,
+                        modelForInstance.setInstanceDocument(initialDocumentToSubmit,
                                 currentInstance.getModelId(), currentInstance.getEffectiveId(), currentInstance.getSourceURI(),
                                 currentInstance.getUsername(), currentInstance.getPassword(),
                                 currentInstance.isApplicationShared(),
@@ -448,7 +446,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         documentToSubmit = createDocumentToSubmit(currentNodeInfo, currentInstance);
 
                         // Temporarily change instance document so that we can run validation again
-                        modelForInstance.setInstanceDocument(documentToSubmit, false,
+                        modelForInstance.setInstanceDocument(documentToSubmit,
                                 currentInstance.getModelId(), currentInstance.getEffectiveId(), currentInstance.getSourceURI(),
                                 currentInstance.getUsername(), currentInstance.getPassword(),
                                 currentInstance.isApplicationShared(),
@@ -660,14 +658,12 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                             final SharedXFormsInstance sharedInstance
                                     = XFormsServerSharedInstancesCache.instance().find(pipelineContext, replaceInstance.getEffectiveId(), replaceInstance.getModelId(), absoluteResolvedURLString, timeToLive, replaceInstance.getValidation());
 
-                            // Handle new instance and associated events
-                            final XFormsModel replaceModel = sharedInstance.getModel(containingDocument);
-
                             if (XFormsServer.logger.isDebugEnabled())
                                 XFormsServer.logger.debug("XForms - submission - replacing instance with read-only instance: " + sharedInstance.getEffectiveId());
 
-                            replaceModel.setInstance(sharedInstance, true);
-                            replaceModel.handleNewInstanceDocuments(pipelineContext);
+                            // Handle new instance and associated events
+                            final XFormsModel replaceModel = sharedInstance.getModel(containingDocument);
+                            replaceModel.handleNewInstanceDocuments(pipelineContext, sharedInstance);
 
                             connectionResult = null;
                             submitDone = true;
@@ -728,7 +724,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                                         XFormsServer.logger.debug("XForms - submission - replacing instance with mutable instance: " + replaceInstance.getEffectiveId());
 
                                                     final Document resultingInstanceDocument = Dom4jUtils.readDom4j(connectionResult.getResultInputStream(), connectionResult.resourceURI);
-                                                    newInstance = new XFormsInstance(replaceInstance.getModelId(), replaceInstance.getEffectiveId(), resultingInstanceDocument, true,
+                                                    newInstance = new XFormsInstance(replaceInstance.getModelId(), replaceInstance.getEffectiveId(), resultingInstanceDocument,
                                                             connectionResult.resourceURI, resolvedXXFormsUsername, resolvedXXFormsPassword, false, -1, replaceInstance.getValidation());
                                                 } else {
                                                     // Resulting instance is read-only
@@ -738,21 +734,13 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                                                     // NOTE: isApplicationSharedHint is always false when get get here. isApplicationSharedHint="true" is handled above.
                                                     final DocumentInfo resultingInstanceDocument = TransformerUtils.readTinyTree(connectionResult.getResultInputStream(), connectionResult.resourceURI);
-                                                    newInstance = new SharedXFormsInstance(replaceInstance.getModelId(), replaceInstance.getEffectiveId(), resultingInstanceDocument, true,
+                                                    newInstance = new SharedXFormsInstance(replaceInstance.getModelId(), replaceInstance.getEffectiveId(), resultingInstanceDocument,
                                                             connectionResult.resourceURI, resolvedXXFormsUsername, resolvedXXFormsPassword, false, -1, replaceInstance.getValidation());
                                                 }
 
-                                                // Set new instance
-                                                final XFormsModel replaceModel = newInstance.getModel(containingDocument);
-                                                replaceModel.setInstance(newInstance, true);
-
-                                                if (!newInstance.isReadOnly()) {
-                                                    // Mark all values as changed so that refresh sends appropriate events
-                                                    XFormsUtils.markAllValuesChanged(newInstance);
-                                                }
-
                                                 // Handle new instance and associated events
-                                                replaceModel.handleNewInstanceDocuments(pipelineContext);
+                                                final XFormsModel replaceModel = newInstance.getModel(containingDocument);
+                                                replaceModel.handleNewInstanceDocuments(pipelineContext, newInstance);
 
                                                 // Notify that submission is done
                                                 submitDone = true;
@@ -912,19 +900,9 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                         private final void checkInstanceData(Node node) {
                             if (nodeToDetach[0] == null) {
-                                final InstanceData instanceData = XFormsUtils.getInstanceDataUpdateInherited(node);
-
-
-                                if (instanceData == null) {
-                                    System.out.println();
-                                }
-
                                 // Check "relevant" MIP and remove non-relevant nodes
-                                {
-                                    final BooleanModelItemProperty relevantMIP = instanceData.getInheritedRelevant();
-                                    if (relevantMIP != null && !relevantMIP.get())
+                                    if (!InstanceData.getInheritedRelevant(node))
                                         nodeToDetach[0] = node;
-                                }
                             }
                         }
                     });
@@ -987,8 +965,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
             documentToSubmit.accept(new VisitorSupport() {
 
                 public final void visit(Element element) {
-                    final InstanceData instanceData = XFormsUtils.getLocalInstanceData(element);
-                    final boolean valid = checkInstanceData(instanceData);
+                    final boolean valid = checkInstanceData(element);
 
                     instanceSatisfiesValidRequired[0] &= valid;
 
@@ -998,8 +975,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 }
 
                 public final void visit(Attribute attribute) {
-                    final InstanceData instanceData = XFormsUtils.getLocalInstanceData(attribute);
-                    final boolean valid = checkInstanceData(instanceData);
+                    final boolean valid = checkInstanceData(attribute);
 
                     instanceSatisfiesValidRequired[0] &= valid;
 
@@ -1009,19 +985,18 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                     }
                 }
 
-                private final boolean checkInstanceData(InstanceData instanceData) {
+                private final boolean checkInstanceData(Node node) {
                     // Check "valid" MIP
-                    {
-                        final BooleanModelItemProperty validMIP = instanceData.getValid();
-                        if (validMIP != null && !validMIP.get())
-                            return false;
-                    }
+                    if (!InstanceData.getValid(node)) return false;
                     // Check "required" MIP
                     {
-                        final ValidModelItemProperty requiredMIP = instanceData.getRequired();
-                        if (requiredMIP != null && requiredMIP.get() && requiredMIP.getStringValue().length() == 0) {
-                            // Required and empty
-                            return false;
+                        final boolean isRequired = InstanceData.getRequired(node);
+                        if (isRequired) {
+                            final String value = XFormsInstance.getValueForNode(node);
+                            if (value.length() == 0) {
+                                // Required and empty
+                                return false;
+                            }
                         }
                     }
                     return true;

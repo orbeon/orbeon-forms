@@ -13,15 +13,13 @@
  */
 package org.orbeon.oxf.xforms.function.exforms;
 
-import org.dom4j.Node;
-import org.orbeon.oxf.xforms.InstanceData;
-import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.StaticContext;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.Item;
+import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.value.BooleanValue;
 
@@ -53,10 +51,8 @@ public abstract class EXFormsMIP extends XFormsFunction {
         if (item == null)
             return BooleanValue.get(false);
 
-        final Node node = (Node) ((NodeWrapper) item).getUnderlyingNode();
-        final InstanceData instanceData = XFormsUtils.getInstanceDataUpdateInherited(node);
-        return BooleanValue.get(getResult(instanceData));
+        return BooleanValue.get(getResult((NodeWrapper) item));
     }
 
-    protected abstract boolean getResult(InstanceData instanceData);
+    protected abstract boolean getResult(NodeInfo nodeInfo);
 }

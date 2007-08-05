@@ -21,9 +21,7 @@ import org.orbeon.oxf.xforms.control.controls.RepeatIterationControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.saxon.om.NodeInfo;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Utilities related to xforms:switch.
@@ -60,12 +58,11 @@ public class XFormsSwitchUtils {
 
                             final List currentNodeset = repeatControlInfo.getBindingContext().getNodeset();
 
-                            final NodeInfo node = (NodeInfo) currentNodeset.get(repeatIterationInfo.getIteration() - 1);
-                            final InstanceData instanceData = XFormsUtils.getLocalInstanceData(node);
+                            final NodeInfo nodeInfo = (NodeInfo) currentNodeset.get(repeatIterationInfo.getIteration() - 1);
 
                             // Store an original case id instead of an effective case id
                             final String caseId = (String) entry.getValue();
-                            instanceData.addSwitchIdToCaseId(switchXFormsControl.getOriginalId(), caseId.substring(0, caseId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1)));
+                            InstanceData.addSwitchIdToCaseId(nodeInfo, switchXFormsControl.getOriginalId(), caseId.substring(0, caseId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1)));
 
     //                        System.out.println("xxx 1: adding case id " + switchControlInfo.getOriginalId() + " " + entry.getValue());
 
@@ -93,9 +90,11 @@ public class XFormsSwitchUtils {
 
     private static void copySwitchInfo(Node sourceNode, Node destNode) {
 
-        final InstanceData sourceInstanceData = XFormsUtils.getLocalInstanceData(sourceNode);
-        final InstanceData destInstanceData = XFormsUtils.getLocalInstanceData(destNode);
-        destInstanceData.setSwitchIdsToCaseIds(sourceInstanceData.getSwitchIdsToCaseIds());
+        {
+            // NOTE: We create a new HashMap because each node must keep separate switch information
+            final Map existingSwitchIdsToCaseIds = InstanceData.getSwitchIdsToCaseIds(sourceNode);
+            InstanceData.setSwitchIdsToCaseIds(destNode, (existingSwitchIdsToCaseIds != null) ? new HashMap(existingSwitchIdsToCaseIds) : null);
+        }
 
         if (sourceNode instanceof Element) {
             final Element sourceElement = (Element) sourceNode;
@@ -107,10 +106,11 @@ public class XFormsSwitchUtils {
                     final Attribute sourceAttribute = (Attribute) i.next();
                     final Attribute destAttribute = (Attribute) j.next();
 
-                    final InstanceData sourceAttributeInstanceData = XFormsUtils.getLocalInstanceData(sourceAttribute);
-                    final InstanceData destAttributeInstanceData = XFormsUtils.getLocalInstanceData(destAttribute);
-
-                    destAttributeInstanceData.setSwitchIdsToCaseIds(sourceAttributeInstanceData.getSwitchIdsToCaseIds());
+                    {
+                        // NOTE: We create a new HashMap because each node must keep separate switch information
+                        final Map existingSwitchIdsToCaseIds = InstanceData.getSwitchIdsToCaseIds(sourceAttribute);
+                        InstanceData.setSwitchIdsToCaseIds(destAttribute, (existingSwitchIdsToCaseIds != null) ? new HashMap(existingSwitchIdsToCaseIds) : null);
+                    }
                 }
             }
             // Recurse over children elements
@@ -153,10 +153,9 @@ public class XFormsSwitchUtils {
 
                             final List currentNodeset = repeatControlInfo.getBindingContext().getNodeset();
 
-                            final NodeInfo node = (NodeInfo) currentNodeset.get(repeatIterationInfo.getIteration() - 1);
-                            final InstanceData instanceData = XFormsUtils.getLocalInstanceData(node);
+                            final NodeInfo nodeInfo = (NodeInfo) currentNodeset.get(repeatIterationInfo.getIteration() - 1);
 
-                            final String caseId = instanceData.getCasedIdForSwitchId(switchXFormsControl.getOriginalId());
+                            final String caseId = InstanceData.getCaseIdForSwitchId(nodeInfo, switchXFormsControl.getOriginalId());
 
     //                        System.out.println("xxx 2: found case id " + caseId);
 

@@ -199,6 +199,7 @@ public class XFormsConstants {
 
     public static final String DUMMY_IMAGE_URI = "/ops/images/xforms/spacer.gif";
     public static final String HELP_IMAGE_URI = "/ops/images/xforms/help.gif";
+    public static final String CALENDAR_IMAGE_URI = "/ops/images/xforms/calendar.gif";
 
     public static final String XSD_EXPLODED_TYPE_PREFIX = "{" + XMLConstants.XSD_URI + "}";
     public static final String XFORMS_EXPLODED_TYPE_PREFIX = "{" + XFORMS_NAMESPACE_URI + "}";

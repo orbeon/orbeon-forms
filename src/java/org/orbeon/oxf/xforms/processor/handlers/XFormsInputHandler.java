@@ -185,8 +185,20 @@ public class XFormsInputHandler extends XFormsValueControlHandler {
                     reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, spanClasses.toString());
                     reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, "showcalendar-" + effectiveId);
 
-                    contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, reusableAttributes);
-                    contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
+                    // HACK: Output XHTML image natively in order to help with the IE bug whereby IE reloads
+                    // background images way too often.
+                    reusableAttributes.addAttribute("", "src", "src", ContentHandlerHelper.CDATA,
+                            externalContext.getResponse().rewriteResourceURL(XFormsConstants.CALENDAR_IMAGE_URI, false));
+
+                    // TODO: xmlns:f declaration should be placed on xhtml:body
+                    final String formattingPrefix = handlerContext.findFormattingPrefixDeclare();
+                    reusableAttributes.addAttribute(XMLConstants.OPS_FORMATTING_URI, "url-norewrite", XMLUtils.buildQName(formattingPrefix, "url-norewrite"), ContentHandlerHelper.CDATA, "true");
+
+                    final String imgQName = XMLUtils.buildQName(xhtmlPrefix, "img");
+                    contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "img", imgQName, reusableAttributes);
+                    contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "img", imgQName);
+
+                    handlerContext.findFormattingPrefixUndeclare(formattingPrefix);
                 }
             }
             contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);

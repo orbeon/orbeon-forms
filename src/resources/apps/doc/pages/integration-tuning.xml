@@ -217,6 +217,21 @@
                     see how they impact performance.
                 </p>
             </section>
+            <a name="ops-xslt-source-location"/>
+            <section>
+                <title>Disable Saxon Source Location</title>
+                <p>
+                    Make sure the following property is set to <code>false</code> in <code>properties.xml</code>:
+                </p>
+                <xml-source>
+                    <property as="xs:boolean" processor-name="oxf:saxon8" name="generate-source-location" value="false"/>
+                </xml-source>
+                <p>
+                    While this property should be set to <code>true</code> during development in order to obtain better
+                    line number information, it has a performance impact. To optimize for speed, it should be set to
+                    <code>false</code>.
+                </p>
+            </section>
         </section>
         <a name="your-app"/>
         <section>

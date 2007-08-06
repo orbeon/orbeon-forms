@@ -159,6 +159,22 @@
                     </li>
                     <li>
                         <p>
+                            <b>Memory usage improvements.</b> The way XForms Model Item Properties (MIPs) are
+                            implemented has changed since Orbeon Forms 3.5.1. A memory profiler has revealed that a very
+                            large number of objects related to MIPs were created. The implementation has been modified
+                            to drastically reduce the number of such objects, with an expected benefit of reduced memory
+                            usage and less garbage collection time.
+                        </p>
+                        <p>
+                            Thanks to Adrian Baker and to CSC for their work and support regarding this issue.
+                        </p>
+                        <p>
+                            See issue <a
+                            href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307388&amp;group_id=168&amp;atid=350207">#307388</a>.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
                             <b>Better display of JavaScript and Ajax errors.</b> Orbeon Forms now displays JavaScript
                             and Ajax errors in a user-friendly error dialog:
                         </p>
@@ -189,6 +205,12 @@
                         <xml-source>
                             <property as="xs:boolean" processor-name="oxf:saxon8" name="generate-source-location" value="true"/>
                         </xml-source>
+                        <note>
+                            <p>
+                                This property should usually be turned off in deployment, as line number handling with
+                                XSLT currently has a noticeable impact on performance.
+                            </p>
+                        </note>
                         <p>
                             See issue <a
                             href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306558&amp;group_id=168&amp;atid=350207">#306558</a>.

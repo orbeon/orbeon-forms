@@ -187,8 +187,9 @@ public class XFormsSubmissionUtils {
                                httpURLConnection.setPassword(password);
                         }
                     }
+                    final String contentTypeMediaType = NetUtils.getContentTypeMediaType(mediatype);
                     if (hasRequestBody) {
-                        if (isPost(method) && "application/soap+xml".equals(NetUtils.getContentTypeMediaType(mediatype))) {
+                        if (isPost(method) && "application/soap+xml".equals(contentTypeMediaType)) {
                             // SOAP POST
                             XFormsServer.logger.debug("XForms - found SOAP POST.");
 
@@ -220,6 +221,27 @@ public class XFormsSubmissionUtils {
                             }
                         } else {
                             urlConnection.setRequestProperty("Content-Type", (mediatype != null) ? mediatype : "application/xml");
+                        }
+                    } else {
+                        if (isGet(method) && "application/soap+xml".equals(contentTypeMediaType)) {
+                            // SOAP GET
+                            XFormsServer.logger.debug("XForms - found SOAP GET.");
+
+                            final Map parameters = NetUtils.getContentTypeParameters(mediatype);
+                            final FastStringBuffer sb = new FastStringBuffer("application/soap+xml");
+
+                            // Extract charset parameter if present
+                            if (parameters != null) {
+                                final String charsetParameter = (String) parameters.get("charset");
+                                if (charsetParameter != null) {
+                                    // Append charset parameter
+                                    sb.append("; ");
+                                    sb.append(charsetParameter);
+                                }
+                            }
+
+                            // Set Accept header with optional charset
+                            urlConnection.setRequestProperty("Accept", sb.toString());
                         }
                     }
 

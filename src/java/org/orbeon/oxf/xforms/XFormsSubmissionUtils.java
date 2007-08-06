@@ -26,6 +26,7 @@ import org.orbeon.oxf.xforms.event.events.XFormsSubmitDoneEvent;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.saxon.om.FastStringBuffer;
 
 import java.io.*;
 import java.net.MalformedURLException;
@@ -187,7 +188,39 @@ public class XFormsSubmissionUtils {
                         }
                     }
                     if (hasRequestBody) {
-                        urlConnection.setRequestProperty("Content-type", (mediatype != null) ? mediatype : "application/xml");
+                        if (isPost(method) && "application/soap+xml".equals(NetUtils.getContentTypeMediaType(mediatype))) {
+                            // SOAP POST
+                            XFormsServer.logger.debug("XForms - found SOAP POST.");
+
+                            final Map parameters = NetUtils.getContentTypeParameters(mediatype);
+                            final FastStringBuffer sb = new FastStringBuffer("text/xml");
+
+                            // Extract charset parameter if present
+                            // TODO: We have the body as bytes already, using the xforms:submission/@encoding attribute, so this is not right.
+                            if (parameters != null) {
+                                final String charsetParameter = (String) parameters.get("charset");
+                                if (charsetParameter != null) {
+                                    // Append charset parameter
+                                    sb.append("; ");
+                                    sb.append(charsetParameter);
+                                }
+                            }
+
+                            // Set new content type
+                            urlConnection.setRequestProperty("Content-Type", sb.toString());
+
+                            // Extract action parameter if present
+                            if (parameters != null) {
+                                final String actionParameter = (String) parameters.get("action");
+                                if (actionParameter != null) {
+                                    // Set SOAPAction header
+                                    urlConnection.setRequestProperty("SOAPAction", actionParameter);
+                                    XFormsServer.logger.debug("XForms - setting SOAPAction header: " + actionParameter);
+                                }
+                            }
+                        } else {
+                            urlConnection.setRequestProperty("Content-Type", (mediatype != null) ? mediatype : "application/xml");
+                        }
                     }
 
                     // Forward cookies for session handling

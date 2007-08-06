@@ -193,18 +193,43 @@ public class NetUtils {
     }
 
     public static String getContentTypeCharset(String contentType) {
+        final Map parameters = getContentTypeParameters(contentType);
+        return (String) ((parameters == null) ? null : parameters.get("charset"));
+    }
+
+    public static Map getContentTypeParameters(String contentType) {
         if (contentType == null)
             return null;
-        int semicolumnIndex = contentType.indexOf(";");
+
+        // Check whether there may be parameters
+        final int semicolumnIndex = contentType.indexOf(";");
         if (semicolumnIndex == -1)
             return null;
-        int charsetIndex = contentType.indexOf("charset=", semicolumnIndex);
-        if (charsetIndex == -1)
+
+        // Tokenize
+        final StringTokenizer st = new StringTokenizer(contentType, ";");
+
+        if (!st.hasMoreTokens())
+            return null; // should not happen as there should be at least the content type    
+
+        st.nextToken();
+
+        // No parameters
+        if (!st.hasMoreTokens())
             return null;
-        // FIXME: There may be other attributes after charset, right?
-        String afterCharset = contentType.substring(charsetIndex + 8);
-        afterCharset = afterCharset.replace('"', ' ');
-        return afterCharset.trim();
+
+        // Parse parameters
+        final Map parameters = new HashMap();
+        while (st.hasMoreTokens()) {
+            final String parameter = st.nextToken().trim();
+            final int equalIndex = parameter.indexOf('=');
+            if (equalIndex == -1)
+                continue;
+            final String name = parameter.substring(0, equalIndex).trim();
+            final String value = parameter.substring(equalIndex + 1).trim();
+            parameters.put(name, value);
+        }
+        return parameters;
     }
 
     public static Map getCharsetHeaderCharsets(String header) {

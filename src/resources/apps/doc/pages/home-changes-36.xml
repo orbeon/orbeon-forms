@@ -31,7 +31,7 @@
                 Welcome to Orbeon Forms 3.6!
             </p>
             <p>
-                Orbeon Forms 3.6 features over <a href="#changes-36-full">90 improvements</a> over <a
+                Orbeon Forms 3.6 features well over <a href="#changes-36-full">100 improvements</a> since <a
                 href="home-changes-35">Orbeon Forms 3.5.1</a>, including major improvements in the areas of XML Schema
                 validation, error handling, and deployment within Java applications.
             </p>
@@ -307,7 +307,7 @@
             <section>
                 <title>Complete List of Issues Addressed in this Release</title>
                 <p>
-                    Orbeon Forms 3.6 addresses over 90 bugs and features:
+                    Orbeon Forms 3.6 addresses well over 100 bugs and features:
                 </p>
                 <!--
 Request to extract bugs from SourceForge with http://www.orbeon.com/ops/xquery-the-web/ :
@@ -329,6 +329,96 @@ http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=2
 
                 -->
                 <ul>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307390&amp;group_id=168&amp;atid=350207">#307390:
+                            RFE: Government Forms example needs button to discard changes and go back to summary
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307389&amp;group_id=168&amp;atid=350207">#307389:
+                            Date input should use img instead of label to work around background image IE bug
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307388&amp;group_id=168&amp;atid=350207">#307388:
+                            Lazily create MIP information
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307386&amp;group_id=168&amp;atid=350207">#307386:
+                            Special characters are not supported in submission authentication
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307380&amp;group_id=168&amp;atid=350207">#307380:
+                            xforms:group generates HTML markup for a label even if no child xforms:label is present
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307377&amp;group_id=168&amp;atid=350207">#307377:
+                            Cusor not visible in input fields
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307356&amp;group_id=168&amp;atid=350207">#307356:
+                            Image in label set on file upload shown as escaped text
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307361&amp;group_id=168&amp;atid=350207">#307361:
+                            Submission must perform rebuild/recalculate before submitting if needed
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307358&amp;group_id=168&amp;atid=350207">#307358:
+                            Update to HSQLDB version 1.8.0.7
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307354&amp;group_id=168&amp;atid=350207">#307354:
+                            Incorrect current value of repeat index when clicking on external trigger
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307255&amp;group_id=168&amp;atid=350207">#307255:
+                            "Error while processing response" appears when you follow a link and Ajax requests are being processed
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307281&amp;group_id=168&amp;atid=350207">#307281:
+                            RFE: Solution to fire MIP events upon initialization
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307336&amp;group_id=168&amp;atid=350207">#307336:
+                            The first click on an item in a list does not send an xforms-value-changed to the server
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306597&amp;group_id=168&amp;atid=350207">#306597:
+                            Client doesn't support updates to hierarchical itemsets
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307327&amp;group_id=168&amp;atid=350207">#307327:
+                            Remove obsolete Struts configuration files from WEB-INF
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307331&amp;group_id=168&amp;atid=350207">#307331:
+                            ClassCastException in submission with redirection
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307330&amp;group_id=168&amp;atid=350207">#307330:
+                            Error when closing orange error dialog when there is only one form on the page
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307231&amp;group_id=168&amp;atid=350207">#307231:
+                            Document error.xsl configuration
+                        </a>
+                    </li>
                     <li>
                         <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307283&amp;group_id=168&amp;atid=350207">#307283:
                             RFE: Upgrade to Xerces 2.9

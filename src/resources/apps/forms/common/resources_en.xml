@@ -50,6 +50,8 @@
         <labels>
             <save-document>Save Document</save-document>
             <return>Return to Forms</return>
+            <discard>Forget Changes</discard>
+            <language-choice>Language</language-choice>
             <check-errors-in-form>Please check errors in form</check-errors-in-form>
             <error-details>View error details</error-details>
             <language-choice>Language</language-choice>

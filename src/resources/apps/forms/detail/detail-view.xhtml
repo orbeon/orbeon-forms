@@ -52,13 +52,15 @@
                 <control xmlns="">
                     <data-status/>
                     <back-trigger/>
+                    <discard-trigger/>
                     <save-trigger/>
                     <errors-on-page/>
                 </control>
             </xforms:instance>
 
             <xforms:bind nodeset="instance('control-instance')">
-                <xforms:bind nodeset="back-trigger" readonly="../data-status = 'dirty' and not(instance('parameters-instance')/readonly = 'true')"/>
+                <xforms:bind nodeset="back-trigger" relevant="../data-status != 'dirty' or instance('parameters-instance')/readonly = 'true'"/>
+                <xforms:bind nodeset="discard-trigger" relevant="../data-status = 'dirty'"/>
                 <xforms:bind nodeset="save-trigger" readonly="not(../data-status = 'dirty' and count(instance('errors-instance')/error) = 0) or instance('parameters-instance')/readonly = 'true'"/>
                 <xforms:bind nodeset="errors-on-page" relevant="count(instance('errors-instance')/error) != 0"/>
             </xforms:bind>
@@ -130,14 +132,24 @@
             <table class="forms-action-table" id="main-action-table">
                 <tr>
                     <td>
-                        <xforms:group ref="instance('control-instance')/back-trigger">
-                            <xforms:trigger ref=".">
-                                <xforms:label>
-                                    <img src="../../../apps/forms/images/back.gif" alt="Back"/>
-                                    <span><xforms:output model="resources-model" ref="instance('resources-instance')/detail/labels/return"/></span>
-                                </xforms:label>
-                                <xforms:load ev:event="DOMActivate" resource="/forms/{{xxforms:instance('parameters-instance')/form-id}}"/>
-                            </xforms:trigger>
+                        <xforms:group>
+                            <xforms:group ref="instance('control-instance')/back-trigger">
+                                <xforms:trigger ref=".">
+                                    <xforms:label>
+                                        <img src="../../../apps/forms/images/back.gif" alt="Back"/>
+                                        <span><xforms:output model="resources-model" ref="instance('resources-instance')/detail/labels/return"/></span>
+                                    </xforms:label>
+                                </xforms:trigger>
+                            </xforms:group>
+                            <xforms:group ref="instance('control-instance')/discard-trigger">
+                                <xforms:trigger ref=".">
+                                    <xforms:label>
+                                        <img src="../../../apps/forms/images/back.gif" alt="Back"/>
+                                        <span><xforms:output model="resources-model" ref="instance('resources-instance')/detail/labels/discard"/></span>
+                                    </xforms:label>
+                                </xforms:trigger>
+                            </xforms:group>
+                            <xforms:load ev:event="DOMActivate" resource="/forms/{{xxforms:instance('parameters-instance')/form-id}}"/>
                         </xforms:group>
                     </td>
                     <td>

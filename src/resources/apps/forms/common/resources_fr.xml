@@ -33,7 +33,6 @@
             <view-readonly>Vue Lecture Seule</view-readonly>
             <view-xml>Vue XML</view-xml>
             <view-pdf>Vue PDF</view-pdf>
-
             <language-choice>Langue</language-choice>
             <form-choice>Choisisez un formulaire</form-choice>
         </labels>
@@ -51,6 +50,7 @@
         <labels>
             <save-document>Sauvegarder</save-document>
             <return>Retour aux Formulaires</return>
+            <discard>Ignore les Changements</discard>
             <language-choice>Langue</language-choice>
             <check-errors-in-form>Vérifiez les erreurs dans le formulaire</check-errors-in-form>
             <error-details>Détail des erreurs</error-details>

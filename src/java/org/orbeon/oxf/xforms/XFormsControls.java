@@ -275,17 +275,21 @@ public class XFormsControls {
                         final Element divElement = (Element) i.next();
 
                         final String dialogId = divElement.attributeValue("dialog-id");
-                        final String visibilityString = divElement.attributeValue("visibility");
-                        final boolean visibility = "visible".equals(visibilityString);
+                        final boolean isShow;
+                        {
+                            final String visibilityString = divElement.attributeValue("visibility");
+                            isShow = "visible".equals(visibilityString);
+                        }
 
                         if (dialogId != null) {
                             // xxforms:dialog
-                            currentDialogState.showHide(dialogId, visibility);
+                            final String neighbor = divElement.attributeValue("neighbor");
+                            currentDialogState.showHide(dialogId, isShow, isShow ? neighbor : null);
                         } else {
                             // xforms:switch/xforms:case
                             final String switchId = divElement.attributeValue("switch-id");
                             final String caseId = divElement.attributeValue("case-id");
-                            currentSwitchState.initializeState(switchId, caseId, initialControlsState, visibility);
+                            currentSwitchState.initializeState(switchId, caseId, initialControlsState, isShow);
                         }
                     }
                 }
@@ -875,7 +879,7 @@ public class XFormsControls {
 
                 // Handle xxforms:dialog
                 if (controlName.equals("dialog")) {
-                    dialogIdToVisibleMap.put(effectiveControlId, Boolean.valueOf(false));
+                    dialogIdToVisibleMap.put(effectiveControlId, new DialogState.DialogInfo(false, null));
                 }
 
                 // Handle xforms:itemset
@@ -1093,8 +1097,6 @@ public class XFormsControls {
 
     public void showHideDialog(String dialogId, boolean show, String neighbor) {
 
-        // TODO XXX : handle @neighbor
-
         // Make sure the id refers to an existing xxforms:dialog
         final Object object = getObjectById(dialogId);
         if (object == null || !(object instanceof XXFormsDialogControl))
@@ -1104,7 +1106,7 @@ public class XFormsControls {
         if (initialDialogState == currentDialogState)
             currentDialogState = new DialogState(new HashMap(initialDialogState.getDialogIdToVisibleMap()));
 
-        currentDialogState.showHide(dialogId, show);
+        currentDialogState.showHide(dialogId, show, neighbor);
     }
 
     /**
@@ -1569,8 +1571,40 @@ public class XFormsControls {
             return dialogIdToVisibleMap;
         }
 
-        public void showHide(String dialogId, boolean show) {
-            dialogIdToVisibleMap.put(dialogId, Boolean.valueOf(show));
+        public void showHide(String dialogId, boolean show, String neighbor) {
+            dialogIdToVisibleMap.put(dialogId, new DialogInfo(show, neighbor));
+        }
+
+        public static class DialogInfo {
+            public boolean show;
+            public String neighbor;
+
+            public DialogInfo(boolean show, String neighbor) {
+                this.show = show;
+                this.neighbor = neighbor;
+            }
+
+            public boolean isShow() {
+                return show;
+            }
+
+            public String getNeighbor() {
+                return neighbor;
+            }
+
+//            public boolean equals(Object obj) {
+//                final DialogInfo other = (DialogState.DialogInfo) obj;
+//                if (!(other instanceof DialogInfo))
+//                    return false;
+//
+//                if (show != other.show)
+//                    return false;
+//
+//                if (!((neighbor == null && other.neighbor == null) || (neighbor != null && other.neighbor != null && neighbor.equals(other.neighbor))))
+//                    return false;
+//
+//                return true;
+//            }
         }
     }
 

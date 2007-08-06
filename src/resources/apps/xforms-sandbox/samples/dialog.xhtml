@@ -34,7 +34,7 @@
     <xhtml:body>
 
         <!-- The dialog -->
-        <xxforms:dialog id="myDialog" level="modeless" close="true" draggable="true" appearance="full">
+        <xxforms:dialog id="myDialog" level="modeless" close="true" draggable="true" appearance="full" neighbor="message-output">
 
             <xforms:setvalue ev:event="xxforms-dialog-open" ref="message">Dialog open</xforms:setvalue>
             <xforms:setvalue ev:event="xxforms-dialog-close" ref="message">Dialog closed</xforms:setvalue>
@@ -58,9 +58,13 @@
         </xxforms:dialog>
 
         <!-- Button to show the dialog -->
-        <xforms:trigger>
-            <xforms:label>Show dialog</xforms:label>
-            <xxforms:show dialog="myDialog" ev:event="DOMActivate"/>
+        <xforms:trigger id="show-dialog-below-output-trigger">
+            <xforms:label>Show dialog below output</xforms:label>
+            <xxforms:show ev:event="DOMActivate" dialog="myDialog" />
+        </xforms:trigger>
+        <xforms:trigger id="show-dialog-below-trigger-trigger">
+            <xforms:label>Show dialog below trigger</xforms:label>
+            <xxforms:show ev:event="DOMActivate" dialog="myDialog" neighbor="show-dialog-below-trigger-trigger"/>
         </xforms:trigger>
         <!-- Displays value entered in the dialog -->
         <xhtml:p>
@@ -69,7 +73,7 @@
             </xforms:output>
         </xhtml:p>
         <xhtml:p>
-            <xforms:output ref="message">
+            <xforms:output ref="message" id="message-output">
                 <xforms:label>Message:</xforms:label>
             </xforms:output>
         </xhtml:p>

@@ -1425,11 +1425,16 @@ public class XFormsServer extends ProcessorImpl {
                 for (Iterator i = dialogIdToVisibleMap2.entrySet().iterator(); i.hasNext();) {
                     final Map.Entry currentEntry = (Map.Entry) i.next();
                     final String dialogId = (String) currentEntry.getKey();
-                    final Boolean visible = (Boolean) currentEntry.getValue();
+
+                    final XFormsControls.DialogState.DialogInfo newDialogInfo
+                            = (XFormsControls.DialogState.DialogInfo) currentEntry.getValue();
 
                     // Only output the information if it has changed
-                    final Boolean previousVisible = (Boolean) dialogIdToVisibleMap1.get(dialogId);
-                    if (!visible.equals(previousVisible)) {
+                    final XFormsControls.DialogState.DialogInfo previousDialogInfo
+                            = (XFormsControls.DialogState.DialogInfo) dialogIdToVisibleMap1.get(dialogId);
+
+                    if (newDialogInfo.isShow() != previousDialogInfo.isShow()) {// NOTE: We only compare on show as we con't support just changing the neighbor
+                        // There is a difference
 
                         if (!found) {
                             // Open xxf:divs element
@@ -1437,14 +1442,17 @@ public class XFormsServer extends ProcessorImpl {
                             found = true;
                         }
 
-                        final boolean visibleBoolean = visible.booleanValue();
-                        final XXFormsDialogControl dialogControl = visibleBoolean ? (XXFormsDialogControl) xformsControls.getObjectById(dialogId) : null;
-                        final String relativeControlId = (dialogControl != null) ? dialogControl.getNeighborControlId() : null;
+                        // Find neighbor if any, first on xxforms:show, then on xxforms:dialog
+                        final XXFormsDialogControl dialogControl = newDialogInfo.isShow() ? (XXFormsDialogControl) xformsControls.getObjectById(dialogId) : null;
+                        final String neighbor = !newDialogInfo.isShow()
+                                ? null : (newDialogInfo.getNeighbor() != null)
+                                ? newDialogInfo.getNeighbor() : (dialogControl != null) ? dialogControl.getNeighborControlId() : null;
 
+                        // Output element
                         ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[] {
                                 "id", dialogId,
-                                "visibility", visibleBoolean ? "visible" : "hidden",
-                                (relativeControlId != null) ? "neighbor" : null, relativeControlId
+                                "visibility", newDialogInfo.isShow() ? "visible" : "hidden",
+                                (neighbor != null) ? "neighbor" : null, neighbor
                         });
                     }
                 }

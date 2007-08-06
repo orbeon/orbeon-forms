@@ -1106,12 +1106,17 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                 for (Iterator i = dialogIdToVisibleMap.entrySet().iterator(); i.hasNext();) {
                     final Map.Entry currentEntry = (Map.Entry) i.next();
                     final String dialogId = (String) currentEntry.getKey();
-                    final Boolean visible = (Boolean) currentEntry.getValue();
 
+                    final XFormsControls.DialogState.DialogInfo dialogInfo
+                            = (XFormsControls.DialogState.DialogInfo) currentEntry.getValue();
+
+                    // Output element and attributes
                     {
                         final Element divElement = divsElement.addElement("xxf:div", XFormsConstants.XXFORMS_NAMESPACE_URI);
                         divElement.addAttribute("dialog-id", dialogId);
-                        divElement.addAttribute("visibility", visible.booleanValue() ? "visible" : "hidden");
+                        divElement.addAttribute("visibility", dialogInfo.isShow() ? "visible" : "hidden");
+                        if (dialogInfo.isShow() && dialogInfo.getNeighbor() != null)
+                            divElement.addAttribute("neighbor", dialogInfo.getNeighbor());
                     }
                 }
             }

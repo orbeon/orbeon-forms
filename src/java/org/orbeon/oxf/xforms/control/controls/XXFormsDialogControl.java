@@ -60,7 +60,6 @@ public class XXFormsDialogControl extends XFormsControl {
         return draggable;
     }
 
-
     public String getNeighborControlId() {
         return neighborControlId;
     }

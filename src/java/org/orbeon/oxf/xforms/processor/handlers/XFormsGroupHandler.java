@@ -17,6 +17,7 @@ import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.processor.XFormsElementFilterContentHandler;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xml.*;
+import org.orbeon.saxon.om.FastStringBuffer;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -121,7 +122,13 @@ public class XFormsGroupHandler extends HandlerBase {
                 // element by id.
                 if (handlerContext.isGenerateTemplate() || groupXFormsControl.hasLabel()) {
                     reusableAttributes.clear();
-                    reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-label");
+
+                    // Handle relevance
+                    final FastStringBuffer labelClasses = new FastStringBuffer("xforms-label");
+                    if (groupXFormsControl != null && !groupXFormsControl.isRelevant())
+                        labelClasses.append(" xforms-disabled");
+
+                    reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, labelClasses.toString());
                     outputLabelFor(handlerContext, reusableAttributes, effectiveGroupId, labelValue);
                 }
 
@@ -130,7 +137,7 @@ public class XFormsGroupHandler extends HandlerBase {
             }
 
             // NOTE: This doesn't work because attributes for the label are only gathered after start()
-    //        handleLabelHintHelpAlert(effectiveGroupId, "label", groupXFormsControl);
+//            handleLabelHintHelpAlert(effectiveGroupId, "label", groupXFormsControl);
         } else {
 
             // Place interceptor on output

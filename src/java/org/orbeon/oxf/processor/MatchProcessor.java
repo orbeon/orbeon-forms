@@ -17,6 +17,7 @@ import org.dom4j.Document;
 import org.orbeon.oro.text.regex.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
@@ -34,7 +35,7 @@ public abstract class MatchProcessor extends ProcessorImpl {
 
     public ProcessorOutput createOutput(String name) {
         ProcessorOutput output = new ProcessorImpl.CacheableTransformerOutputImpl(getClass(), name) {
-            public void readImpl(org.orbeon.oxf.pipeline.api.PipelineContext context, ContentHandler contentHandler) {
+            public void readImpl(PipelineContext context, ContentHandler contentHandler) {
 
                 try {
                     Document data = readInputAsDOM4J(context, INPUT_DATA);

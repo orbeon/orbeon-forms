@@ -39,6 +39,7 @@ import java.util.Map;
 public class PageFlowControllerProcessor extends ProcessorImpl {
 
     static private Logger logger = LoggerFactory.createLogger(PageFlowControllerProcessor.class);
+
     public final static String INPUT_CONTROLER = "controller";
     public final static String CONTROLLER_NAMESPACE_URI = "http://www.orbeon.com/oxf/controller";
     private final static Document TRUE_DOCUMENT = new NonLazyUserDataDocument();

@@ -62,14 +62,8 @@
             <section>
                 <title>Chart Input</title>
                 <p>
-                    The
-                    <code>chart</code> input contains the configuration
-                    information for the processor. The following table shows
-                    elements that are available inside the
-                    <code>chart</code>
-                    root element. The
-                    <link href="../examples/chart">Chart
-                        Example</link> shows most of these options.
+                    The <code>chart</code> input contains the configuration information for the processor. The following
+                    table shows elements that are available inside the <code>chart</code> root element.
                 </p>
                 <note>
                     The colors are always specified in RGB format, prefixed by a

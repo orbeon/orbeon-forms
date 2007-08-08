@@ -55,11 +55,8 @@
                 <tr>
                     <xforms:repeat nodeset="td" id="cell-repeat">
                         <td>
-                            (
-                            <xforms:output value="count(xxforms:repeat-current('row-repeat')/preceding-sibling::*) + 1"/>
-                            ,
-                            <xforms:output value="position()"/>
-                            }
+                            (<xforms:output value="count(xxforms:repeat-current('row-repeat')/preceding-sibling::*) + 1"/>,
+                            <xforms:output value="position()"/>)
                         </td>
                     </xforms:repeat>
                 </tr>

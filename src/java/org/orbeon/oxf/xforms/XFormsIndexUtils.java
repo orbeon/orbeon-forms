@@ -139,20 +139,22 @@ public class XFormsIndexUtils {
                                 int currentRepeatIndex = 1;
                                 for (Iterator i = repeatNodeSet.iterator(); i.hasNext(); currentRepeatIndex++) {
                                     final NodeInfo currentNodeInfo = (NodeInfo) i.next();
-                                    final Node currentNode = (Node) ((NodeWrapper) currentNodeInfo).getUnderlyingNode();
+                                    if (currentNodeInfo instanceof NodeWrapper) { // underlying node can't match if it's not a NodeWrapper
+                                        final Node currentNode = (Node) ((NodeWrapper) currentNodeInfo).getUnderlyingNode();
 
-                                    final int currentNodeIndex = clonedNodes.indexOf(currentNode);
+                                        final int currentNodeIndex = clonedNodes.indexOf(currentNode);
 
-                                    if (currentNodeIndex != -1) {
-                                        // This node of the repeat node-set points to an inserted node
-                                        if (currentNodeIndex > clonedNodesIndex) {
-                                            clonedNodesIndex = currentNodeIndex; // prefer nodes inserted last
-                                            newRepeatIndex = currentRepeatIndex;
+                                        if (currentNodeIndex != -1) {
+                                            // This node of the repeat node-set points to an inserted node
+                                            if (currentNodeIndex > clonedNodesIndex) {
+                                                clonedNodesIndex = currentNodeIndex; // prefer nodes inserted last
+                                                newRepeatIndex = currentRepeatIndex;
+                                            }
+
+                                            // Stop if this node of the repeat node-set points to the last inserted node
+                                            if (clonedNodesIndex == clonedNodes.size() - 1)
+                                                break;
                                         }
-
-                                        // Stop if this node of the repeat node-set points to the last inserted node
-                                        if (clonedNodesIndex == clonedNodes.size() - 1)
-                                            break;
                                     }
                                 }
                             }
@@ -277,7 +279,8 @@ public class XFormsIndexUtils {
                             // Find whether one node of the repeat node-set contains the inserted node
                             for (Iterator i = repeatNodeSet.iterator(); i.hasNext();) {
                                 final NodeInfo currentNode = (NodeInfo) i.next();
-                                if (((NodeWrapper) currentNode).getUnderlyingNode() == nodeToRemove) {
+                                if ((currentNode instanceof NodeWrapper) // underlying node can't match if it's not a NodeWrapper
+                                        && ((NodeWrapper) currentNode).getUnderlyingNode() == nodeToRemove) {
                                     // Found xforms:repeat affected by the change
 
                                     final int newIndex;

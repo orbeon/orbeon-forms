@@ -92,6 +92,7 @@ public class XHTMLBodyHandler extends HandlerBase {
                 PageFlowControllerProcessor.XFORMS_SUBMISSION_PATH_DEFAULT_VALUE);
 
         helper.startElement(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "form", new String[] {
+                "id", XFormsUtils.namespaceId(containingDocument, "xforms-form"), // add id so that things work in portals
                 "class", "xforms-form", "action", xformsSubmissionPath, "method", "POST", "onsubmit", "return false",
                 hasUpload ? "enctype" : null, hasUpload ? "multipart/form-data" : null});
 

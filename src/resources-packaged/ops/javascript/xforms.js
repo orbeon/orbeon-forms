@@ -110,16 +110,15 @@ ORBEON.xforms.Globals = ORBEON.xforms.Globals || {
     menuYui: {},                         // Maps menu id to the YUI object for that menu
     treeYui: {},                         // Maps tree id to the YUI object for that tree
 
-    // Data relative to a form is stored in an array indexed by the position of the form on the page.
-    // Use ORBEON.util.Dom.getFormIndex(form) to get the index of a given form on the page
-    formLoadingLoadingOverlay: [],       // Overlay for the loading indicator
-    formLoadingLoadingInitialRightTop:[],// Initial number of pixel between the loading indicator and the top of the page
-    formErrorPanel: [],                  // YUI panel used to report errors
-    formLoadingNone: [],                 // HTML element with the markup displayed when nothing is displayed
-    formStaticState: [],                 // State that does not change for the life of the page
-    formDynamicState: [],                // State that changes at every request
-    formServerEvents: [],                // Server events information
-    formClientState: []                  // Store for information we want to keep when the page reloaded
+    // Data relative to a form is stored in an array indexed by form id.
+    formLoadingLoadingOverlay: {},       // Overlay for the loading indicator
+    formLoadingLoadingInitialRightTop:{},// Initial number of pixel between the loading indicator and the top of the page
+    formErrorPanel: {},                  // YUI panel used to report errors
+    formLoadingNone: {},                 // HTML element with the markup displayed when nothing is displayed
+    formStaticState: {},                 // State that does not change for the life of the page
+    formDynamicState: {},                // State that changes at every request
+    formServerEvents: {},                // Server events information
+    formClientState: {}                  // Store for information we want to keep when the page reloaded
 };
 
 /**
@@ -337,15 +336,6 @@ ORBEON.util.Dom = {
             if (ORBEON.util.Dom.isElement(child) && ORBEON.util.Dom.hasClass(child, clazz)) {
                 return child;
             }
-        }
-        return null;
-    },
-
-    getFormIndex: function(form) {
-        for (var formIndex = 0; formIndex < document.forms.length; formIndex++) {
-            var candidateForm = document.forms[formIndex];
-            if (form == candidateForm)
-                return formIndex;
         }
         return null;
     },
@@ -775,10 +765,10 @@ ORBEON.xforms.Controls = {
         iframe.className = textarea.className;
     },
 
-    updateLoadingPosition: function(formIndex) {
+    updateLoadingPosition: function(formID) {
         // Compute new X
         var x; {
-            var initialRight = ORBEON.xforms.Globals.formLoadingLoadingInitialRightTop[formIndex][0];
+            var initialRight = ORBEON.xforms.Globals.formLoadingLoadingInitialRightTop[formID][0];
             var scrollX = document.documentElement.scrollLeft || document.body.scrollLeft;
             x = scrollX + YAHOO.util.Dom.getViewportWidth() - initialRight;
         }
@@ -786,7 +776,7 @@ ORBEON.xforms.Controls = {
         var y; {
             // Distance between top of viewport and top of the page. Initially 0 when we are at the top of the page.
             var scrollY = document.documentElement.scrollTop || document.body.scrollTop;
-            var initialTop = ORBEON.xforms.Globals.formLoadingLoadingInitialRightTop[formIndex][1];
+            var initialTop = ORBEON.xforms.Globals.formLoadingLoadingInitialRightTop[formID][1];
             y = scrollY + XFORMS_LOADING_MIN_TOP_PADDING > initialTop
                     // Place indicator at a few pixels from the top of the viewport
                     ? scrollY + XFORMS_LOADING_MIN_TOP_PADDING
@@ -794,7 +784,7 @@ ORBEON.xforms.Controls = {
                     : initialTop;
         }
         // Position overlay
-        var overlay = ORBEON.xforms.Globals.formLoadingLoadingOverlay[formIndex];
+        var overlay = ORBEON.xforms.Globals.formLoadingLoadingOverlay[formID];
         overlay.cfg.setProperty("x", x);
         overlay.cfg.setProperty("y", y);
     },
@@ -1249,10 +1239,10 @@ ORBEON.xforms.Events = {
      * Upon scrolling or resizing, adjust position of loading indicators
      */
     scrollOrResize: function() {
-        for (var formIndex = 0; formIndex < ORBEON.xforms.Globals.formLoadingLoadingOverlay.length; formIndex++) {
-            var overlay = ORBEON.xforms.Globals.formLoadingLoadingOverlay[formIndex];
+        for (var formID in ORBEON.xforms.Globals.formLoadingLoadingOverlay) {
+            var overlay = ORBEON.xforms.Globals.formLoadingLoadingOverlay[formID];
             if (overlay && overlay.cfg.getProperty("visible"))
-                ORBEON.xforms.Controls.updateLoadingPosition(formIndex);
+                ORBEON.xforms.Controls.updateLoadingPosition(formID);
         }
     },
 
@@ -1397,9 +1387,8 @@ ORBEON.xforms.Events = {
      * When the error dialog is closed, we make sure that the "details" section is closed,
      * so it will be closed the next time the dialog is opened.
      */
-    errorPanelClosed: function(type, args, obj) {
-        var formIndex = obj[0];
-        var errorPanel = ORBEON.xforms.Globals.formErrorPanel[formIndex];
+    errorPanelClosed: function(type, args, formID) {
+        var errorPanel = ORBEON.xforms.Globals.formErrorPanel[formID];
         var errorBodyDiv = errorPanel.errorDetailsDiv.parentNode.parentNode;
         var detailsHidden = ORBEON.util.Dom.getChildElementByClass(errorBodyDiv, "xforms-error-panel-details-hidden");
         var detailsShown = ORBEON.util.Dom.getChildElementByClass(errorBodyDiv, "xforms-error-panel-details-shown");
@@ -1583,10 +1572,11 @@ ORBEON.xforms.Init = {
             var form = document.forms[formIndex];
             // If this is an XForms form, procede with initialization
             if (ORBEON.util.Dom.hasClass(form, "xforms-form")) {
+                var formID = document.forms[formIndex].id;
 
                 // Initialize loading and error indicator
-                ORBEON.xforms.Globals.formErrorPanel[formIndex] = null;
-                ORBEON.xforms.Globals.formLoadingNone[formIndex] = null;
+                ORBEON.xforms.Globals.formErrorPanel[formID] = null;
+                ORBEON.xforms.Globals.formLoadingNone[formID] = null;
 
                 var xformsLoadingCount = 0;
                 for (var formChildIndex = 0; formChildIndex < form.childNodes.length; formChildIndex++) {
@@ -1594,13 +1584,13 @@ ORBEON.xforms.Init = {
                     var formChild = form.childNodes[formChildIndex];
                     if (formChild.className == "xforms-loading-loading") {
                         formChild.style.display = "block";
-                        ORBEON.xforms.Globals.formLoadingLoadingOverlay[formIndex] = new YAHOO.widget.Overlay(formChild);
-                        ORBEON.xforms.Globals.formLoadingLoadingInitialRightTop[formIndex] = [
+                        ORBEON.xforms.Globals.formLoadingLoadingOverlay[formID] = new YAHOO.widget.Overlay(formChild);
+                        ORBEON.xforms.Globals.formLoadingLoadingInitialRightTop[formID] = [
                             YAHOO.util.Dom.getViewportWidth() - YAHOO.util.Dom.getX(formChild),
                             YAHOO.util.Dom.getY(formChild)
                         ];
                         formChild.style.right = "auto";
-                        ORBEON.xforms.Globals.formLoadingLoadingOverlay[formIndex].cfg.setProperty("visible", false);
+                        ORBEON.xforms.Globals.formLoadingLoadingOverlay[formID].cfg.setProperty("visible", false);
                         xformsLoadingCount++;
                         continue;
                     }
@@ -1620,8 +1610,8 @@ ORBEON.xforms.Init = {
                         });
                         errorPanel.render();
                         errorPanel.element.style.display = "none";
-                        errorPanel.beforeHideEvent.subscribe(ORBEON.xforms.Events.errorPanelClosed, [formIndex]);
-                        ORBEON.xforms.Globals.formErrorPanel[formIndex] = errorPanel;
+                        errorPanel.beforeHideEvent.subscribe(ORBEON.xforms.Events.errorPanelClosed, formID);
+                        ORBEON.xforms.Globals.formErrorPanel[formID] = errorPanel;
 
                         // Find reference to elements in the deails hidden section
                         var bodyDiv = ORBEON.util.Dom.getChildElementByClass(formChild, "bd");
@@ -1650,7 +1640,7 @@ ORBEON.xforms.Init = {
                         continue;
                     }
                     if (formChild.className == "xforms-loading-none") {
-                        ORBEON.xforms.Globals.formLoadingNone[formIndex] = formChild;
+                        ORBEON.xforms.Globals.formLoadingNone[formID] = formChild;
                         xformsLoadingCount++;
                         continue;
                     }
@@ -1662,16 +1652,16 @@ ORBEON.xforms.Init = {
                 for (var elementIndex = 0; elementIndex < elements.length; elementIndex++) {
                     var element = elements[elementIndex];
                     if (element.name.indexOf("$static-state") != -1) {
-                        ORBEON.xforms.Globals.formStaticState[formIndex] = element;
+                        ORBEON.xforms.Globals.formStaticState[formID] = element;
                     } else if (element.name.indexOf("$dynamic-state") != -1) {
-                        ORBEON.xforms.Globals.formDynamicState[formIndex] = element;
+                        ORBEON.xforms.Globals.formDynamicState[formID] = element;
                     } else if (element.name.indexOf("$server-events") != -1) {
-                        ORBEON.xforms.Globals.formServerEvents[formIndex] = element;
+                        ORBEON.xforms.Globals.formServerEvents[formID] = element;
                     } else if (element.name.indexOf("$client-state") != -1) {
-                        ORBEON.xforms.Globals.formClientState[formIndex] = element;
+                        ORBEON.xforms.Globals.formClientState[formID] = element;
                         if (element.value == "")
-                            xformsStoreInClientState(formIndex, "ajax-dynamic-state",
-                                    ORBEON.xforms.Globals.formDynamicState[formIndex].value);
+                            xformsStoreInClientState(formID, "ajax-dynamic-state",
+                                    ORBEON.xforms.Globals.formDynamicState[formID].value);
                     } else if (element.name.indexOf("$repeat-tree") != -1) {
                         xformsRepeatTree = element;
                     } else if (element.name.indexOf("$repeat-indexes") != -1) {
@@ -1711,8 +1701,8 @@ ORBEON.xforms.Init = {
                 }
 
                 // Ask server to resend events if this is not the first time load is called
-                if (xformsGetFromClientState(formIndex, "load-did-run") == null) {
-                    xformsStoreInClientState(formIndex, "load-did-run", "true");
+                if (xformsGetFromClientState(formID, "load-did-run") == null) {
+                    xformsStoreInClientState(formID, "load-did-run", "true");
                 } else {
                     xformsFireEvents(new Array(xformsCreateEventArray(form, "xxforms-all-events-required", null, null)), false);
                 }
@@ -1980,7 +1970,7 @@ ORBEON.xforms.Init = {
         if (isMinimal) {
             // Create minimal dialog
             yuiDialog = new YAHOO.widget.Overlay(dialog.id, {
-                visible:false,
+                visible: false,
                 constraintoviewport: true,
                 iframe: true
             });
@@ -2026,7 +2016,7 @@ ORBEON.xforms.Server = {
      * When an exception happens while we communicate with the server, we catch it and show an error in the UI.
      * This is to prevent the UI from becoming totally unusable after an error.
      */
-    exceptionWhenTalkingToServer: function(e, formIndex) {
+    exceptionWhenTalkingToServer: function(e, formID) {
         ORBEON.util.Utils.logException("JavaScript error", e);
         var details = "Exception in client-side code.";
         details += "<ul>";
@@ -2034,19 +2024,19 @@ ORBEON.xforms.Server = {
         if (e.fileName != null) details += "<li>File: " + e.fileName + "</li>";
         if (e.lineNumber != null) details += "<li>Line number: " + e.lineNumber + "</li>";
         details += "</ul>";
-        ORBEON.xforms.Server.showError(details, formIndex);
+        ORBEON.xforms.Server.showError(details, formID);
     },
 
     /**
      * Display the error panel and shows the specified detailed message in the detail section of the panel.
      */
-    showError: function(details, formIndex) {
+    showError: function(details, formID) {
         if (!ORBEON.xforms.Globals.requestIgnoreErrors) {
-            if (ORBEON.xforms.Globals.formErrorPanel[formIndex]) {
-                ORBEON.xforms.Globals.formErrorPanel[formIndex].element.style.display = "block";
-                ORBEON.xforms.Globals.formErrorPanel[formIndex].errorDetailsDiv.innerHTML = details;
-                ORBEON.xforms.Globals.formErrorPanel[formIndex].show();
-                ORBEON.xforms.Globals.formErrorPanel[formIndex].center();
+            if (ORBEON.xforms.Globals.formErrorPanel[formID]) {
+                ORBEON.xforms.Globals.formErrorPanel[formID].element.style.display = "block";
+                ORBEON.xforms.Globals.formErrorPanel[formID].errorDetailsDiv.innerHTML = details;
+                ORBEON.xforms.Globals.formErrorPanel[formID].show();
+                ORBEON.xforms.Globals.formErrorPanel[formID].center();
             }
         }
     },
@@ -2122,7 +2112,7 @@ ORBEON.xforms.Server = {
 
                 // Save the form for this request
                 ORBEON.xforms.Globals.requestForm = ORBEON.xforms.Globals.eventQueue[0].form;
-                var formIndex = ORBEON.util.Dom.getFormIndex(ORBEON.xforms.Globals.requestForm);
+                var formID = ORBEON.xforms.Globals.requestForm.id;
 
                 // Mark this as loading
                 ORBEON.xforms.Globals.requestInProgress = true;
@@ -2160,13 +2150,13 @@ ORBEON.xforms.Server = {
                     // Add static state
                     requestDocumentString += indent;
                     requestDocumentString += '<xxforms:static-state>';
-                    requestDocumentString += ORBEON.xforms.Globals.formStaticState[formIndex].value;
+                    requestDocumentString += ORBEON.xforms.Globals.formStaticState[formID].value;
                     requestDocumentString += '</xxforms:static-state>\n';
 
                     // Add dynamic state (element is just created and will be filled just before we send the request)
                     requestDocumentString += indent;
                     requestDocumentString += '<xxforms:dynamic-state>';
-                    requestDocumentString += xformsGetFromClientState(formIndex, "ajax-dynamic-state");
+                    requestDocumentString += xformsGetFromClientState(formID, "ajax-dynamic-state");
                     requestDocumentString += '</xxforms:dynamic-state>\n';
 
                     // Start action
@@ -2226,7 +2216,7 @@ ORBEON.xforms.Server = {
                     YAHOO.util.Connect.asyncRequest("POST", XFORMS_SERVER_URL, callback, requestDocumentString);
                 } catch (e) {
                     ORBEON.xforms.Globals.requestInProgress = false;
-                    ORBEON.xforms.Server.exceptionWhenTalkingToServer(e, formIndex);
+                    ORBEON.xforms.Server.exceptionWhenTalkingToServer(e, formID);
                 }
             }
         }
@@ -2240,7 +2230,7 @@ ORBEON.xforms.Server = {
 
     handleFailure: function(o) {
         ORBEON.xforms.Globals.requestInProgress = false;
-        var formIndex = ORBEON.util.Dom.getFormIndex(ORBEON.xforms.Globals.requestForm);
+        var formID = ORBEON.xforms.Globals.requestForm.id;
         var details = "Error while processing response: " + (o.responseText !== undefined ? o.responseText : o.statusText);
         if (ORBEON.xforms.Globals.isRenderingEngineGecko && o.statusText == "communication failure") {
             // On Firefox, when the user navigates to another page while an Ajax request is in progress,
@@ -2248,11 +2238,11 @@ ORBEON.xforms.Server = {
             // this error because there was really a communication failure or if this is because the user is
             // going to another page. So we wait some time before showing the error, hoping that if another page is
             // loading, that other page will be loaded by the time our timeout expires.
-            window.setTimeout(function() { ORBEON.xforms.Server.showError(details, formIndex); },
+            window.setTimeout(function() { ORBEON.xforms.Server.showError(details, formID); },
                 XFORMS_DELAY_BEFORE_GECKO_COMMUNICATION_ERROR_IN_MS);
         } else {
             // Display alert right away
-            ORBEON.xforms.Server.showError(details, formIndex);
+            ORBEON.xforms.Server.showError(details, formID);
         }
     },
 
@@ -2269,7 +2259,7 @@ ORBEON.xforms.Server = {
 
     handleResponse: function(o) {
 
-        var formIndex = ORBEON.util.Dom.getFormIndex(ORBEON.xforms.Globals.requestForm);
+        var formID = ORBEON.xforms.Globals.requestForm.id;
         var responseXML = o.responseXML;
         if (!responseXML || (responseXML && responseXML.documentElement && responseXML.documentElement.tagName.toLowerCase() == "html")) {
             // The XML docucment does not come in o.responseXML: parse o.responseText.
@@ -2297,7 +2287,7 @@ ORBEON.xforms.Server = {
                         // Store new dynamic state as soon as we find it. This is because the server only keeps the last
                         // dynamic state. So if a JavaScript error happens later on while processing the response,
                         // the next request we do we still want to send the latest dynamic state known to the server.
-                        xformsStoreInClientState(formIndex, "ajax-dynamic-state", newDynamicState);
+                        xformsStoreInClientState(formID, "ajax-dynamic-state", newDynamicState);
                     }
 
                     if (xformsGetLocalName(responseRoot.childNodes[i]) == "action") {
@@ -3188,11 +3178,11 @@ ORBEON.xforms.Server = {
                                     var action = ORBEON.util.Dom.getAttribute(submissionElement, "action");
                                     var replace = ORBEON.util.Dom.getAttribute(submissionElement, "replace");
                                     if (replace == null) replace = "all";
-                                    ORBEON.xforms.Globals.formDynamicState[formIndex].value = newDynamicState;
+                                    ORBEON.xforms.Globals.formDynamicState[formID].value = newDynamicState;
                                     if (serverEventsIndex != -1) {
-                                        ORBEON.xforms.Globals.formServerEvents[formIndex].value = ORBEON.util.Dom.getStringValue(actionElement.childNodes[serverEventsIndex]);
+                                        ORBEON.xforms.Globals.formServerEvents[formID].value = ORBEON.util.Dom.getStringValue(actionElement.childNodes[serverEventsIndex]);
                                     } else {
-                                        ORBEON.xforms.Globals.formServerEvents[formIndex].value = "";
+                                        ORBEON.xforms.Globals.formServerEvents[formID].value = "";
                                     }
                                     if (replace == "all") {
                                         // Go to another page
@@ -3212,7 +3202,7 @@ ORBEON.xforms.Server = {
                                         }
                                         YAHOO.util.Connect.asyncRequest("POST", action, callback);
                                     }
-                                    ORBEON.xforms.Globals.formServerEvents[formIndex].value = "";
+                                    ORBEON.xforms.Globals.formServerEvents[formID].value = "";
                                     break;
                                 }
 
@@ -3283,14 +3273,14 @@ ORBEON.xforms.Server = {
                     && responseXML.documentElement.tagName.indexOf("error") != -1) {
                 // Find an error message starting from the inner-most exception
                 var details = ORBEON.util.Dom.getStringValue(responseXML.documentElement);
-                ORBEON.xforms.Server.showError(details, formIndex);
+                ORBEON.xforms.Server.showError(details, formID);
             } else {
                 // The server didn't send valid XML
                 ORBEON.xforms.Globals.lastRequestIsError = true;
-                ORBEON.xforms.Server.showError("Server didn't respond with valid XML", formIndex);
+                ORBEON.xforms.Server.showError("Server didn't respond with valid XML", formID);
             }
         } catch (e) {
-            ORBEON.xforms.Server.exceptionWhenTalkingToServer(e, formIndex);
+            ORBEON.xforms.Server.exceptionWhenTalkingToServer(e, formID);
         }
 
         // Reset changes, as changes are included in this bach of events
@@ -3504,30 +3494,30 @@ function xformsLogProperties(object) {
 
 function xformsDisplayIndicator(state) {
     var form = ORBEON.xforms.Globals.requestForm;
-    var formIndex = ORBEON.util.Dom.getFormIndex(form);
+    var formID = form.id;
     switch (state) {
         case "loading":
-            if (ORBEON.xforms.Globals.formLoadingLoadingOverlay[formIndex] != null) {
-                ORBEON.xforms.Globals.formLoadingLoadingOverlay[formIndex].cfg.setProperty("visible", true);
-                ORBEON.xforms.Controls.updateLoadingPosition(formIndex);
+            if (ORBEON.xforms.Globals.formLoadingLoadingOverlay[formID] != null) {
+                ORBEON.xforms.Globals.formLoadingLoadingOverlay[formID].cfg.setProperty("visible", true);
+                ORBEON.xforms.Controls.updateLoadingPosition(formID);
             }
-            if (ORBEON.xforms.Globals.formLoadingNone[formIndex] != null)
-                ORBEON.xforms.Globals.formLoadingNone[formIndex].style.display = "block";
+            if (ORBEON.xforms.Globals.formLoadingNone[formID] != null)
+                ORBEON.xforms.Globals.formLoadingNone[formID].style.display = "block";
             break;
         case "none":
             if (!ORBEON.xforms.Globals.loadingOtherPage) {
-                if (ORBEON.xforms.Globals.formLoadingLoadingOverlay[formIndex] != null)
-                    ORBEON.xforms.Globals.formLoadingLoadingOverlay[formIndex].cfg.setProperty("visible", false);
-                if (ORBEON.xforms.Globals.formLoadingNone[formIndex] != null)
-                    ORBEON.xforms.Globals.formLoadingNone[formIndex].style.display = "block";
+                if (ORBEON.xforms.Globals.formLoadingLoadingOverlay[formID] != null)
+                    ORBEON.xforms.Globals.formLoadingLoadingOverlay[formID].cfg.setProperty("visible", false);
+                if (ORBEON.xforms.Globals.formLoadingNone[formID] != null)
+                    ORBEON.xforms.Globals.formLoadingNone[formID].style.display = "block";
             }
             break;
     }
 }
 
 // Gets a value stored in the hidden client-state input field
-function xformsGetFromClientState(formIndex, key) {
-    var clientState = ORBEON.xforms.Globals.formClientState[formIndex];
+function xformsGetFromClientState(formID, key) {
+    var clientState = ORBEON.xforms.Globals.formClientState[formID];
     var keyValues = clientState.value.split("&");
     for (var i = 0; i < keyValues.length; i = i + 2)
         if (keyValues[i] == key)
@@ -3536,8 +3526,8 @@ function xformsGetFromClientState(formIndex, key) {
 }
 
 // Returns a value stored in the hidden client-state input field
-function xformsStoreInClientState(formIndex, key, value) {
-    var clientState = ORBEON.xforms.Globals.formClientState[formIndex];
+function xformsStoreInClientState(formID, key, value) {
+    var clientState = ORBEON.xforms.Globals.formClientState[formID];
     var keyValues = clientState.value == ""? new Array() : clientState.value.split("&");
     var found = false;
     // If we found the key, replace the value

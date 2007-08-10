@@ -71,14 +71,14 @@ public class XXFormsDialogControl extends XFormsControl {
             final XXFormsDialogControl dialogControl = (XXFormsDialogControl) dialogCloseEvent.getTargetObject();
 
             final XFormsControls xformsControls = containingDocument.getXFormsControls();
-            xformsControls.showHideDialog(dialogControl.getEffectiveId(), false, null);
+            xformsControls.showHideDialog(dialogControl.getEffectiveId(), false, null, false);
         } else if (XFormsEvents.XXFORMS_DIALOG_OPEN.equals(event.getEventName())) {
             // Open the dialog
             final XXFormsDialogOpenEvent dialogOpenEvent = (XXFormsDialogOpenEvent) event;
             final XXFormsDialogControl dialogControl = (XXFormsDialogControl) dialogOpenEvent.getTargetObject();
 
             final XFormsControls xformsControls = containingDocument.getXFormsControls();
-            xformsControls.showHideDialog(dialogControl.getEffectiveId(), true, dialogOpenEvent.getNeighbor());
+            xformsControls.showHideDialog(dialogControl.getEffectiveId(), true, dialogOpenEvent.getNeighbor(), dialogOpenEvent.isConstrainToViewport());
         }
         super.performDefaultAction(pipelineContext, event);
     }

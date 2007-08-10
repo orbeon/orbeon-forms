@@ -140,6 +140,12 @@
                                 <optional>
                                     <attribute name="neighbor"/>
                                 </optional>
+                                <!-- For constraining to viewport -->
+                                <optional>
+                                    <attribute name="constrain">
+                                        <data type="boolean"/>
+                                    </attribute>
+                                </optional>
                             </element>
                         </zeroOrMore>
                     </element>

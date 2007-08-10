@@ -1115,8 +1115,12 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                         final Element divElement = divsElement.addElement("xxf:div", XFormsConstants.XXFORMS_NAMESPACE_URI);
                         divElement.addAttribute("dialog-id", dialogId);
                         divElement.addAttribute("visibility", dialogInfo.isShow() ? "visible" : "hidden");
-                        if (dialogInfo.isShow() && dialogInfo.getNeighbor() != null)
-                            divElement.addAttribute("neighbor", dialogInfo.getNeighbor());
+                        if (dialogInfo.isShow()) {
+                            if (dialogInfo.getNeighbor() != null)
+                                divElement.addAttribute("neighbor", dialogInfo.getNeighbor());
+                            if (dialogInfo.isConstrainToViewport())
+                                divElement.addAttribute("constrain", Boolean.toString(dialogInfo.isConstrainToViewport()));
+                        }
                     }
                 }
             }

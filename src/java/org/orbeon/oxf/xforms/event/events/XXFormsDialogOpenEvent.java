@@ -23,17 +23,23 @@ import org.orbeon.oxf.xforms.event.XFormsEvents;
 public class XXFormsDialogOpenEvent extends XFormsEvent {
 
     private String neighbor;
+    private boolean constrainToViewport;
 
     public XXFormsDialogOpenEvent(XFormsEventTarget targetObject) {
         super(XFormsEvents.XXFORMS_DIALOG_OPEN, targetObject, true, false);
     }
 
-    public XXFormsDialogOpenEvent(XFormsEventTarget targetObject, String neighbor) {
+    public XXFormsDialogOpenEvent(XFormsEventTarget targetObject, String neighbor, boolean constrainToViewport) {
         super(XFormsEvents.XXFORMS_DIALOG_OPEN, targetObject, true, false);
         this.neighbor = neighbor;
+        this.constrainToViewport = constrainToViewport;
     }
 
     public String getNeighbor() {
         return neighbor;
+    }
+
+    public boolean isConstrainToViewport() {
+        return constrainToViewport;
     }
 }

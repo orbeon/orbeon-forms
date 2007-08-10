@@ -284,7 +284,8 @@ public class XFormsControls {
                         if (dialogId != null) {
                             // xxforms:dialog
                             final String neighbor = divElement.attributeValue("neighbor");
-                            currentDialogState.showHide(dialogId, isShow, isShow ? neighbor : null);
+                            final boolean constrainToViewport = "true".equals(divElement.attributeValue("constrain"));
+                            currentDialogState.showHide(dialogId, isShow, isShow ? neighbor : null, constrainToViewport);
                         } else {
                             // xforms:switch/xforms:case
                             final String switchId = divElement.attributeValue("switch-id");
@@ -879,7 +880,7 @@ public class XFormsControls {
 
                 // Handle xxforms:dialog
                 if (controlName.equals("dialog")) {
-                    dialogIdToVisibleMap.put(effectiveControlId, new DialogState.DialogInfo(false, null));
+                    dialogIdToVisibleMap.put(effectiveControlId, new DialogState.DialogInfo(false, null, false));
                 }
 
                 // Handle xforms:itemset
@@ -1095,7 +1096,7 @@ public class XFormsControls {
     }
 
 
-    public void showHideDialog(String dialogId, boolean show, String neighbor) {
+    public void showHideDialog(String dialogId, boolean show, String neighbor, boolean constrainToViewport) {
 
         // Make sure the id refers to an existing xxforms:dialog
         final Object object = getObjectById(dialogId);
@@ -1106,7 +1107,7 @@ public class XFormsControls {
         if (initialDialogState == currentDialogState)
             currentDialogState = new DialogState(new HashMap(initialDialogState.getDialogIdToVisibleMap()));
 
-        currentDialogState.showHide(dialogId, show, neighbor);
+        currentDialogState.showHide(dialogId, show, neighbor, constrainToViewport);
     }
 
     /**
@@ -1571,17 +1572,19 @@ public class XFormsControls {
             return dialogIdToVisibleMap;
         }
 
-        public void showHide(String dialogId, boolean show, String neighbor) {
-            dialogIdToVisibleMap.put(dialogId, new DialogInfo(show, neighbor));
+        public void showHide(String dialogId, boolean show, String neighbor, boolean constrainToViewport) {
+            dialogIdToVisibleMap.put(dialogId, new DialogInfo(show, neighbor, constrainToViewport));
         }
 
         public static class DialogInfo {
             public boolean show;
             public String neighbor;
+            public boolean constrainToViewport;
 
-            public DialogInfo(boolean show, String neighbor) {
+            public DialogInfo(boolean show, String neighbor, boolean constrainToViewport) {
                 this.show = show;
                 this.neighbor = neighbor;
+                this.constrainToViewport = constrainToViewport;
             }
 
             public boolean isShow() {
@@ -1592,19 +1595,9 @@ public class XFormsControls {
                 return neighbor;
             }
 
-//            public boolean equals(Object obj) {
-//                final DialogInfo other = (DialogState.DialogInfo) obj;
-//                if (!(other instanceof DialogInfo))
-//                    return false;
-//
-//                if (show != other.show)
-//                    return false;
-//
-//                if (!((neighbor == null && other.neighbor == null) || (neighbor != null && other.neighbor != null && neighbor.equals(other.neighbor))))
-//                    return false;
-//
-//                return true;
-//            }
+            public boolean isConstrainToViewport() {
+                return constrainToViewport;
+            }
         }
     }
 

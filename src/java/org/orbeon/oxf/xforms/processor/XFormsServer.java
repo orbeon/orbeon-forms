@@ -1447,12 +1447,14 @@ public class XFormsServer extends ProcessorImpl {
                         final String neighbor = !newDialogInfo.isShow()
                                 ? null : (newDialogInfo.getNeighbor() != null)
                                 ? newDialogInfo.getNeighbor() : (dialogControl != null) ? dialogControl.getNeighborControlId() : null;
+                        final boolean constrainToViewport = newDialogInfo.isConstrainToViewport();
 
                         // Output element
                         ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[] {
                                 "id", dialogId,
                                 "visibility", newDialogInfo.isShow() ? "visible" : "hidden",
-                                (neighbor != null) ? "neighbor" : null, neighbor
+                                (neighbor != null) ? "neighbor" : null, neighbor,
+                                "constrain", Boolean.toString(constrainToViewport)
                         });
                     }
                 }

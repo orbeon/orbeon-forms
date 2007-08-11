@@ -29,110 +29,33 @@
         </xforms:model>
         <xhtml:style type="text/css">
             .show-drop-down img { border: 0; }
-            .xforms-dialog-drop-down { visibility:hidden; border: 1px outset #eef; }
-            .xforms-dialog-drop-down div { border: 0; padding: 5px; background-color: #dde; margin: 0; }
-            .xforms-dialog-drop-down div div { padding: 3px; background-color: #fff }
         </xhtml:style>
-        <xhtml:script type="text/javascript">
-
-            var dropDownOverlays = {};
-            var dropDownLastMouseOut = {};
-            var dropDownVisible = {}
-
-            function init() {
-                var dropDownID = "overlay";
-                var contextID = "show-trigger";
-                dropDownOverlays[dropDownID] = new YAHOO.widget.Overlay(dropDownID, {
-                    context:[contextID,"tl","bl"],
-                    visible:false, 
-                    constraintoviewport: true,
-                    width:"200px"
-                });
-                dropDownOverlays[dropDownID].render(document.body);
-                dropDownVisible[dropDownID] = false;
-                dropDownLastMouseOut[dropDownID] = -1;
-            }
-
-            function showDropDown(dropDownID) {
-                document.getElementsByTagName("form")[0].blur();
-                dropDownOverlays[dropDownID].show();
-                ORBEON.util.Dom.getElementById(dropDownID).focus();
-                dropDownVisible[dropDownID] = true;
-                YAHOO.util.Event.addListener(dropDownID, "mouseout", dropDownOut);
-                YAHOO.util.Event.addListener(dropDownID, "mouseover", dropDownOver);
-                YAHOO.util.Event.addListener(document.body, "click", function(event) {
-                    // Abord if one of the parents is drop-down dialog
-                    var current = event.target;
-                    var foundDropDownParent = false;
-                    while (current != null &amp;&amp; current != document) {
-                        if (ORBEON.util.Dom.hasClass(current, "xforms-dialog-drop-down")) {
-                            foundDropDownParent = true;
-                            break;
-                        }
-                        current = current.parentNode;
-                    }
-                    if (!foundDropDownParent)
-                        hideDropDown(dropDownID);
-                });
-            }
-
-            function hideDropDown(dropDownID) {
-                dropDownVisible[dropDownID] = false;
-                YAHOO.util.Event.removeListener(dropDownID, "mouseout", dropDownOut);
-                YAHOO.util.Event.removeListener(dropDownID, "mouseover", dropDownOver);
-                dropDownOverlays[dropDownID].hide();
-            }
-
-            function dropDownOut() {
-                var dropDownID = this.id;
-                dropDownLastMouseOut[this.id] = new Date().getTime();
-                window.setTimeout(function() { checkDropDownMouseIn(dropDownID); }, 1000);
-            }
-
-            function dropDownOver() {
-                dropDownLastMouseOut[this.id] = -1;
-            }
-
-            function checkDropDownMouseIn(dropDownID) {
-                var current = new Date().getTime();
-                if (dropDownVisible[dropDownID]
-                        &amp;&amp; dropDownLastMouseOut[dropDownID] != -1
-                        &amp;&amp; current - dropDownLastMouseOut[dropDownID] >= 1000) {
-                    hideDropDown(dropDownID);
-                }
-            }
-
-            YAHOO.util.Event.addListener(window, "load", init);
-        </xhtml:script>
+        <xhtml:script language="javascript" type="text/javascript" src="/apps/firebug/firebug.js"/>
     </xhtml:head>
     <xhtml:body>
 
-        <xforms:group>
-            <!-- This is the markup we need for the dialog with appearance="minimal"
-                 Change the class as appropriate to be consistent with other classes we set. -->
-            <xhtml:div id="overlay" class="xforms-dialog-drop-down">
-                <!-- We need all those divs to style the dialog. I haven't found a way to do this without
-                     those nested divs. (And apparently Amazon hasn't found a way either, as this is
-                     inspired from what Amazon did.) -->
-                <xhtml:div>
-                    <xhtml:div>
-                        Some text here.
-                        <xforms:trigger appearance="minimal">
-                            <xforms:label>Does nothing</xforms:label>
-                        </xforms:trigger>
-                    </xhtml:div>
-                </xhtml:div>
-            </xhtml:div>
+        <xforms:group id="my-group">
 
-            <xforms:trigger appearance="minimal" class="show-drop-down" id="show-trigger">
-                <xforms:label>
-                    <xhtml:span>Show drop-down dialog</xhtml:span>
-                    <xhtml:img src="/apps/xforms-sandbox/samples/images/dialog-down.png"/>
-                </xforms:label>
-                <xxforms:script ev:event="DOMActivate">
-                    showDropDown("overlay");
-                </xxforms:script>
-            </xforms:trigger>
+            <xxforms:dialog id="dialog" neighbor="show-trigger" appearance="minimal" constrain="true">
+                Some text here.
+                <xhtml:a href="#">HTML link.</xhtml:a>
+                <xforms:trigger appearance="minimal">
+                    <xforms:label>XForms link.</xforms:label>
+                </xforms:trigger>
+            </xxforms:dialog>
+
+            <xhtml:div>
+                Let's start with this.
+            </xhtml:div>
+            <xhtml:div>
+                <xforms:trigger appearance="minimal" class="show-drop-down" id="show-trigger">
+                    <xforms:label>
+                        <xhtml:span>Show drop-down dialog</xhtml:span>
+                        <xhtml:img src="/apps/xforms-sandbox/samples/images/dialog-down.png"/>
+                    </xforms:label>
+                    <xxforms:show ev:event="DOMActivate" dialog="dialog"/>
+                </xforms:trigger>
+            </xhtml:div>
 
         </xforms:group>
 

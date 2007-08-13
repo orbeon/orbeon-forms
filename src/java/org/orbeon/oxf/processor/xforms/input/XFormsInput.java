@@ -135,7 +135,7 @@ public class XFormsInput extends ProcessorImpl {
 
                                         final String refXPath = paramElement.attributeValue("ref");
                                         final Object o = XPathCache.evaluateSingle(pipelineContext, localInstance.getDocumentInfo(),
-                                                refXPath, Dom4jUtils.getNamespaceContextNoDefault(paramElement), null, null, null, null);// TODO: LocationData
+                                                refXPath, Dom4jUtils.getNamespaceContextNoDefault(paramElement), null, null, null, null, null);// TODO: LocationData
                                         if (o == null || !(o instanceof NodeInfo))
                                             throw new OXFException("Cannot find node instance for param '" + refXPath + "'");
 

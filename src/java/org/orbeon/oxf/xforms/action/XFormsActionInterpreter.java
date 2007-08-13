@@ -218,7 +218,7 @@ public class XFormsActionInterpreter {
         final XFormsControls.BindingContext currentBindingContext = xformsControls.getCurrentBindingContext();
         final List conditionResult = XPathCache.evaluate(pipelineContext,
             currentBindingContext.getNodeset(), currentBindingContext.getPosition(), "boolean(" + conditionAttribute + ")",
-            Dom4jUtils.getNamespaceContextNoDefault(actionElement), null, xformsControls.getFunctionLibrary(), null, (LocationData) actionElement.getData());
+            Dom4jUtils.getNamespaceContextNoDefault(actionElement), null, XFormsContainingDocument.getFunctionLibrary(), xformsControls, null, (LocationData) actionElement.getData());
 
         if (!((Boolean) conditionResult.get(0)).booleanValue()) {
             // Don't execute action

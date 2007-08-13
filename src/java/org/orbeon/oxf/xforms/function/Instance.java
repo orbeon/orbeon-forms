@@ -43,7 +43,7 @@ public class Instance extends XFormsFunction {
     public SequenceIterator iterate(XPathContext xpathContext) throws XPathException {
         // Get instance id
         final Expression instanceIdExpression = argument[0];
-        final String instanceId = XFormsUtils.namespaceId(getXFormsContainingDocument(), instanceIdExpression.evaluateAsString(xpathContext));
+        final String instanceId = XFormsUtils.namespaceId(getXFormsContainingDocument(xpathContext), instanceIdExpression.evaluateAsString(xpathContext));
 
         // Get model and instance with given id for that model only
         
@@ -51,7 +51,7 @@ public class Instance extends XFormsFunction {
         // current context node, this function returns a node-set containing just the root element node (also called the
         // document element node) of the referenced instance data. In all other cases, an empty node-set is returned."
 
-        final XFormsModel model = (getXFormsModel() != null) ? getXFormsModel() : getXFormsControls().getCurrentModel();
+        final XFormsModel model = (getXFormsModel(xpathContext) != null) ? getXFormsModel(xpathContext) : getXFormsControls(xpathContext).getCurrentModel();
         final XFormsInstance instance = model.getInstance(instanceId);
 
 

@@ -43,11 +43,11 @@ public class XXFormsListInstances extends XFormsFunction {
 
     public SequenceIterator iterate(XPathContext xpathContext) throws XPathException {
 
-        final XFormsContainingDocument containingDocument = getXFormsContainingDocument();
+        final XFormsContainingDocument containingDocument = getXFormsContainingDocument(xpathContext);
 
         // Get model id
         final Expression modelIdExpression = argument[0];
-        final String modelId = XFormsUtils.namespaceId(getXFormsContainingDocument(), modelIdExpression.evaluateAsString(xpathContext));
+        final String modelId = XFormsUtils.namespaceId(containingDocument, modelIdExpression.evaluateAsString(xpathContext));
 
         final XFormsModel model = containingDocument.getModel(modelId);
 

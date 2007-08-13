@@ -66,7 +66,7 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {
 
         try {
             // Get reader
-            final String templateHref = XPathCache.evaluateAsString(pipelineContext, configDocumentInfo, "/*/template/@href", null, null, null, null, null);//TODO: LocationData
+            final String templateHref = XPathCache.evaluateAsString(pipelineContext, configDocumentInfo, "/*/template/@href", null, null, null, null, null, null);//TODO: LocationData
             final PdfReader reader = new PdfReader(URLFactory.createURL(templateHref));
             // Get total number of pages
             final int pageCount = reader.getNumberOfPages();
@@ -75,7 +75,7 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {
             final float width = psize.width();
             final float height = psize.height();
 
-            final String showGrid = XPathCache.evaluateAsString(pipelineContext, configDocumentInfo, "/*/template/@show-grid", null, null, null, null, null);//TODO: LocationData
+            final String showGrid = XPathCache.evaluateAsString(pipelineContext, configDocumentInfo, "/*/template/@show-grid", null, null, null, null, null, null);//TODO: LocationData
 
             // Create result document and writer
             final Document document = new Document(psize, 50, 50, 50, 50);
@@ -217,7 +217,7 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {
 
                 final String ref = currentElement.attributeValue("ref");
                 if (ref != null) {
-                    final NodeInfo newContextNode = (NodeInfo) XPathCache.evaluateSingle(pipelineContext, groupContext.contextNodeSet, groupContext.contextPosition, ref, namespaceMap, variableToValueMap, null, null, (LocationData) currentElement.getData());
+                    final NodeInfo newContextNode = (NodeInfo) XPathCache.evaluateSingle(pipelineContext, groupContext.contextNodeSet, groupContext.contextPosition, ref, namespaceMap, variableToValueMap, null, null, null, (LocationData) currentElement.getData());
 
                     if (newContextNode == null)
                         continue;
@@ -226,25 +226,25 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {
                     newGroupContext.contextPosition = 1;
                 }
 
-                final String offsetXString = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, contextNode, variableToValueMap, null, currentElement, currentElement.attributeValue("offset-x"));
+                final String offsetXString = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, contextNode, variableToValueMap, null, null, currentElement, currentElement.attributeValue("offset-x"));
                 if (offsetXString != null) {
                     newGroupContext.offsetX = groupContext.offsetX + Float.parseFloat(offsetXString);
                 }
 
-                final String offsetYString = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, contextNode, variableToValueMap, null, currentElement, currentElement.attributeValue("offset-y"));
+                final String offsetYString = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, contextNode, variableToValueMap, null, null, currentElement, currentElement.attributeValue("offset-y"));
                 if (offsetYString != null) {
                     newGroupContext.offsetY = groupContext.offsetY + Float.parseFloat(offsetYString);
                 }
 
-                final String fontPitch = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, contextNode, variableToValueMap, null, currentElement, currentElement.attributeValue("font-pitch"));
+                final String fontPitch = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, contextNode, variableToValueMap, null, null, currentElement, currentElement.attributeValue("font-pitch"));
                 if (fontPitch != null)
                     newGroupContext.fontPitch = Float.parseFloat(fontPitch);
 
-                final String fontFamily = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, contextNode, variableToValueMap, null, currentElement, currentElement.attributeValue("font-family"));
+                final String fontFamily = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, contextNode, variableToValueMap, null, null, currentElement, currentElement.attributeValue("font-family"));
                 if (fontFamily != null)
                     newGroupContext.fontFamily = fontFamily;
 
-                final String fontSize = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, contextNode, variableToValueMap, null, currentElement, currentElement.attributeValue("font-size"));
+                final String fontSize = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, contextNode, variableToValueMap, null, null, currentElement, currentElement.attributeValue("font-size"));
                 if (fontSize != null)
                     newGroupContext.fontSize = Float.parseFloat(fontSize);
 
@@ -255,10 +255,10 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {
 
                 final String nodeset = currentElement.attributeValue("nodeset");
                 final List iterations = XPathCache.evaluate(pipelineContext, groupContext.contextNodeSet, groupContext.contextPosition, nodeset, namespaceMap,
-                        variableToValueMap, null, null, (LocationData) currentElement.getData());
+                        variableToValueMap, null, null, null, (LocationData) currentElement.getData());
 
-                final String offsetXString = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, contextNode, variableToValueMap, null, currentElement, currentElement.attributeValue("offset-x"));
-                final String offsetYString = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, contextNode, variableToValueMap, null, currentElement, currentElement.attributeValue("offset-y"));
+                final String offsetXString = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, contextNode, variableToValueMap, null, null, currentElement, currentElement.attributeValue("offset-x"));
+                final String offsetYString = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, contextNode, variableToValueMap, null, null, currentElement, currentElement.attributeValue("offset-y"));
                 final float offsetIncrementX = (offsetXString == null) ? 0 : Float.parseFloat(offsetXString);
                 final float offsetIncrementY = (offsetYString == null) ? 0 : Float.parseFloat(offsetYString);
 
@@ -281,17 +281,17 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {
                 final String leftAttribute = currentElement.attributeValue("left") == null ? currentElement.attributeValue("left-position") : currentElement.attributeValue("left");
                 final String topAttribute = currentElement.attributeValue("top") == null ? currentElement.attributeValue("top-position") : currentElement.attributeValue("top");
 
-                final String leftPosition = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, contextNode, variableToValueMap, null, currentElement, leftAttribute);
-                final String topPosition = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, contextNode, variableToValueMap, null, currentElement, topAttribute);
+                final String leftPosition = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, contextNode, variableToValueMap, null, null, currentElement, leftAttribute);
+                final String topPosition = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, contextNode, variableToValueMap, null, null, currentElement, topAttribute);
 
-                final String size = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, contextNode, variableToValueMap, null, currentElement, currentElement.attributeValue("size"));
+                final String size = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, contextNode, variableToValueMap, null, null, currentElement, currentElement.attributeValue("size"));
                 final String value = currentElement.attributeValue("value") == null ? currentElement.attributeValue("ref") : currentElement.attributeValue("value");
 
                 final float fontPitch;
                 {
                     final String fontPitchAttribute = currentElement.attributeValue("font-pitch") == null ? currentElement.attributeValue("spacing") : currentElement.attributeValue("font-pitch");
                     if (fontPitchAttribute != null)
-                        fontPitch = Float.parseFloat(XFormsUtils.resolveAttributeValueTemplates(pipelineContext, contextNode, variableToValueMap, null, currentElement, fontPitchAttribute));
+                        fontPitch = Float.parseFloat(XFormsUtils.resolveAttributeValueTemplates(pipelineContext, contextNode, variableToValueMap, null, null, currentElement, fontPitchAttribute));
                     else
                         fontPitch = groupContext.fontPitch;
                 }
@@ -300,7 +300,7 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {
                 {
                     final String fontFamilyAttribute = currentElement.attributeValue("font-family");
                     if (fontFamilyAttribute != null)
-                        fontFamily = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, contextNode, variableToValueMap, null, currentElement, fontFamilyAttribute);
+                        fontFamily = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, contextNode, variableToValueMap, null, null, currentElement, fontFamilyAttribute);
                     else
                         fontFamily = groupContext.fontFamily;
                 }
@@ -309,7 +309,7 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {
                 {
                     final String fontSizeAttribute = currentElement.attributeValue("font-size");
                     if (fontSizeAttribute != null)
-                        fontSize = Float.parseFloat(XFormsUtils.resolveAttributeValueTemplates(pipelineContext, contextNode, variableToValueMap, null, currentElement, fontSizeAttribute));
+                        fontSize = Float.parseFloat(XFormsUtils.resolveAttributeValueTemplates(pipelineContext, contextNode, variableToValueMap, null, null, currentElement, fontSizeAttribute));
                     else
                         fontSize = groupContext.fontSize;
                 }
@@ -324,7 +324,7 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {
                     final float yPosition = groupContext.pageHeight - (Float.parseFloat(topPosition) + groupContext.offsetY);
 
                     // Get value from instance
-                    final String text = XPathCache.evaluateAsString(pipelineContext, groupContext.contextNodeSet, groupContext.contextPosition, value, namespaceMap, variableToValueMap, null, null, (LocationData) currentElement.getData());
+                    final String text = XPathCache.evaluateAsString(pipelineContext, groupContext.contextNodeSet, groupContext.contextPosition, value, namespaceMap, variableToValueMap, null, null, null, (LocationData) currentElement.getData());
 
                     // Iterate over characters and print them
                     if (text != null) {

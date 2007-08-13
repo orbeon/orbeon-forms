@@ -68,7 +68,7 @@ public class XFormsSetvalueAction extends XFormsAction {
 
             valueToSet = XPathCache.evaluateAsString(pipelineContext,
                     currentNodeset, xformsControls.getCurrentPosition(),
-                    value, namespaceContext, null, xformsControls.getFunctionLibrary(), null,
+                    value, namespaceContext, null, XFormsContainingDocument.getFunctionLibrary(), xformsControls, null,
                     (LocationData) actionElement.getData());
         } else {
             // Value to set is static content

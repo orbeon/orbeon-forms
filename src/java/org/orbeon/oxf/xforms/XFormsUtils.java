@@ -391,7 +391,7 @@ public class XFormsUtils {
                     final String tempResult = XPathCache.evaluateAsString(pipelineContext,
                             currentNodeset, currentBindingContext.getPosition(),
                             valueAttribute, Dom4jUtils.getNamespaceContextNoDefault(childElement),
-                            null, containingDocument.getXFormsControls().getFunctionLibrary(), null,
+                            null, XFormsContainingDocument.getFunctionLibrary(), containingDocument.getXFormsControls(), null,
                             (LocationData) childElement.getData());
 
                     return (acceptHTML) ? XMLUtils.escapeXMLMinimal(tempResult) : tempResult;
@@ -883,12 +883,12 @@ public class XFormsUtils {
      * @param attributeValue     attribute value
      * @return                   resolved attribute value
      */
-    public static String resolveAttributeValueTemplates(PipelineContext pipelineContext, NodeInfo contextNode, Map variableToValueMap, FunctionLibrary functionLibrary, Element element, String attributeValue) {
+    public static String resolveAttributeValueTemplates(PipelineContext pipelineContext, NodeInfo contextNode, Map variableToValueMap, FunctionLibrary functionLibrary, Object functionContext, Element element, String attributeValue) {
 
         if (attributeValue == null)
             return null;
 
-        return XPathCache.evaluateAsAvt(pipelineContext, contextNode, attributeValue, Dom4jUtils.getNamespaceContextNoDefault(element), variableToValueMap, functionLibrary, null, (LocationData) element.getData());
+        return XPathCache.evaluateAsAvt(pipelineContext, contextNode, attributeValue, Dom4jUtils.getNamespaceContextNoDefault(element), variableToValueMap, functionLibrary, functionContext, null, (LocationData) element.getData());
     }
 
     /**

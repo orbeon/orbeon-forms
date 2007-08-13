@@ -43,21 +43,21 @@ public class Index extends XFormsFunction {
 
     public Item evaluateItem(XPathContext xpathContext) throws XPathException {
 
-        final String repeatId = XFormsUtils.namespaceId(getXFormsContainingDocument(), argument[0].evaluateAsString(xpathContext));
+        final String repeatId = XFormsUtils.namespaceId(getXFormsContainingDocument(xpathContext), argument[0].evaluateAsString(xpathContext));
 
-        if (getXFormsControls() instanceof XFormsElementContext) {
+        if (getXFormsControls(xpathContext) instanceof XFormsElementContext) {
             // Legacy implementation
-            XFormsElementContext xFormsElementContext = (XFormsElementContext) getXFormsControls();
+            XFormsElementContext xFormsElementContext = (XFormsElementContext) getXFormsControls(xpathContext);
 
             return new IntegerValue(((Integer) xFormsElementContext.getRepeatIdToIndex().get(repeatId)).intValue());
         } else {
             // New implementation
-            return findIndexForRepeatId(repeatId);
+            return findIndexForRepeatId(xpathContext, repeatId);
         }
     }
 
-    protected Item findIndexForRepeatId(String repeatId) {
-        final int index = getXFormsControls().getRepeatIdIndex(repeatId);
+    protected Item findIndexForRepeatId(XPathContext xpathContext, String repeatId) {
+        final int index = getXFormsControls(xpathContext).getRepeatIdIndex(repeatId);
 
         if (index == -1) {
             // Dispatch exception event
@@ -69,7 +69,7 @@ public class Index extends XFormsFunction {
             final StaticExternalContext.StaticContext staticContext = StaticExternalContext.getStaticContext();
             PipelineContext pipelineContext = (staticContext != null) ? staticContext.getPipelineContext() : null;
 
-            final XFormsModel currentModel = getXFormsControls().getCurrentModel();
+            final XFormsModel currentModel = getXFormsControls(xpathContext).getCurrentModel();
             currentModel.getContainingDocument().dispatchEvent(pipelineContext,
                     new org.orbeon.oxf.xforms.event.events.XFormsComputeExceptionEvent(currentModel, message, exception));
 

@@ -364,15 +364,15 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 // Evaluate AVTs
                 // TODO FIXME: the submission element is not a control, so we shouldn't use XFormsControls.
                 {
-                    final FunctionLibrary functionLibrary = xformsControls.getFunctionLibrary();
+                    final FunctionLibrary functionLibrary = XFormsContainingDocument.getFunctionLibrary();
 
-                    final String tempActionOrResource = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, currentNodeInfo, null, functionLibrary, submissionElement, avtActionOrResource);
+                    final String tempActionOrResource = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, currentNodeInfo, null, functionLibrary, xformsControls, submissionElement, avtActionOrResource);
                     resolvedActionOrResource = XFormsUtils.encodeHRRI(tempActionOrResource, true);
 
-                    resolvedXXFormsUsername = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, currentNodeInfo, null, functionLibrary, submissionElement, avtXXFormsUsername);
-                    resolvedXXFormsPassword = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, currentNodeInfo, null, functionLibrary, submissionElement, avtXXFormsPassword);
-                    resolvedXXFormsReadonly = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, currentNodeInfo, null, functionLibrary, submissionElement, avtXXFormsReadonly);
-                    resolvedXXFormsShared = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, currentNodeInfo, null, functionLibrary, submissionElement, avtXXFormsShared);
+                    resolvedXXFormsUsername = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, currentNodeInfo, null, functionLibrary, xformsControls, submissionElement, avtXXFormsUsername);
+                    resolvedXXFormsPassword = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, currentNodeInfo, null, functionLibrary, xformsControls, submissionElement, avtXXFormsPassword);
+                    resolvedXXFormsReadonly = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, currentNodeInfo, null, functionLibrary, xformsControls, submissionElement, avtXXFormsReadonly);
+                    resolvedXXFormsShared = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, currentNodeInfo, null, functionLibrary, xformsControls, submissionElement, avtXXFormsShared);
                 }
 
                 // Check read-only and shared hints

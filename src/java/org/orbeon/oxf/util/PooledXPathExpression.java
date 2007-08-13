@@ -78,7 +78,7 @@ public class PooledXPathExpression {
 
         final NodeInfo contextNode = (NodeInfo) contextNodeSet.get(contextPosition - 1);
         final XPathContextMajor xpathContext = new XPathContextMajor(contextNode, this.configuration);
-        final SequenceIterator iter = evaluate(xpathContext);
+        final SequenceIterator iter = evaluate(xpathContext, null);
 
         final SequenceExtent extent = new SequenceExtent(iter);
         return (List) extent.convertToJava(Object.class, xpathContext);
@@ -87,10 +87,10 @@ public class PooledXPathExpression {
     /**
      * Evaluate and return a List of native Java objects, but keep NodeInfo objects.
      */
-    public List evaluateKeepNodeInfo() throws XPathException {
+    public List evaluateKeepNodeInfo(Object functionContext) throws XPathException {
         final NodeInfo contextNode = (NodeInfo) contextNodeSet.get(contextPosition - 1);
         final XPathContextMajor xpathContext = new XPathContextMajor(contextNode, this.configuration);
-        final SequenceIterator iter = evaluate(xpathContext);
+        final SequenceIterator iter = evaluate(xpathContext, functionContext);
 
         final SequenceExtent extent = new SequenceExtent(iter);
         return convertToJavaKeepNodeInfo(extent, xpathContext);
@@ -120,7 +120,7 @@ public class PooledXPathExpression {
 
         final NodeInfo contextNode = (NodeInfo) contextNodeSet.get(contextPosition - 1);
         final XPathContextMajor xpathContext = new XPathContextMajor(contextNode, this.configuration);
-        final SequenceIterator iter = evaluate(xpathContext);
+        final SequenceIterator iter = evaluate(xpathContext, null);
 
         final Item firstItem = iter.next();
         if (firstItem == null) {
@@ -134,17 +134,16 @@ public class PooledXPathExpression {
      * Evaluate and return a single native Java object, but keep NodeInfo objects. Return null if the evaluation
      * doesn't return any item.
      */
-    public Object evaluateSingleKeepNodeInfo() throws XPathException {
+    public Object evaluateSingleKeepNodeInfo(Object functionContext) throws XPathException {
 
         final NodeInfo contextNode = (NodeInfo) contextNodeSet.get(contextPosition - 1);
         final XPathContextMajor xpathContext = new XPathContextMajor(contextNode, this.configuration);
-        final SequenceIterator iter = evaluate(xpathContext);
+        final SequenceIterator iter = evaluate(xpathContext, functionContext);
 
         final Item firstItem = iter.next();
         if (firstItem == null) {
             return null;
         } else {
-
             if (firstItem instanceof AtomicValue) {
                 return Value.convert(firstItem);
             } else {
@@ -153,7 +152,17 @@ public class PooledXPathExpression {
         }
     }
 
-    private SequenceIterator evaluate(XPathContextMajor xpathContext) throws XPathException {
+    /**
+     * Return the function context passed to the expression if any.
+     */
+    public static Object getFunctionContext(XPathContext xpathContext) {
+        return xpathContext.getController().getUserData("", PooledXPathExpression.class.getName());
+    }
+
+    private SequenceIterator evaluate(XPathContextMajor xpathContext, Object functionContext) throws XPathException {
+
+        // Pass function context to controller
+        xpathContext.getController().setUserData("", this.getClass().getName(), functionContext);
 
         // Use low-level Expression object and implement context node-set and context position
         final SlotManager slotManager = this.stackFrameMap; // this is already set on XPathExpressionImpl but we can't get to it

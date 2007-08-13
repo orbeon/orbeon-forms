@@ -16,39 +16,41 @@ package org.orbeon.oxf.xforms.function;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsControls;
 import org.orbeon.oxf.xforms.XFormsModel;
+import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.saxon.functions.SystemFunction;
+import org.orbeon.saxon.expr.XPathContext;
 
 /**
  * Base class for all XForms functions.
  */
 abstract public class XFormsFunction extends SystemFunction {
 
-    private XFormsContainingDocument xformsContainingDocument;
-    private XFormsModel xformsModel;
-    private XFormsControls xformsControls;
-
     protected XFormsFunction() {
     }
 
-    public XFormsModel getXFormsModel() {
-        return xformsModel;
+    public XFormsModel getXFormsModel(XPathContext xpathContext) {
+        final Object functionContext = PooledXPathExpression.getFunctionContext(xpathContext);
+        return (XFormsModel) ((functionContext instanceof XFormsModel) ? functionContext : null);
     }
 
-    public void setXFormsModel(XFormsModel xFormsModel) {
-        this.xformsModel = xFormsModel;
-        this.xformsContainingDocument = xFormsModel.getContainingDocument();
+    public XFormsControls getXFormsControls(XPathContext xpathContext) {
+        final Object functionContext = PooledXPathExpression.getFunctionContext(xpathContext);
+        if (functionContext instanceof XFormsControls)
+            return (XFormsControls) functionContext;
+        if (functionContext instanceof XFormsModel) {
+            final XFormsModel xformsModel = (XFormsModel) functionContext;
+            return xformsModel.getContainingDocument().getXFormsControls();
+        }
+        return null;
     }
 
-    public XFormsControls getXFormsControls() {
-        return xformsControls;
-    }
-
-    public void setXFormsControls(XFormsControls xFormsControls) {
-        this.xformsControls = xFormsControls;
-        this.xformsContainingDocument = xFormsControls.getContainingDocument();
-    }
-
-    public XFormsContainingDocument getXFormsContainingDocument() {
-        return xformsContainingDocument;
+    public XFormsContainingDocument getXFormsContainingDocument(XPathContext xpathContext) {
+        final XFormsModel xformsModel = getXFormsModel(xpathContext);
+        if (xformsModel != null && xformsModel.getContainingDocument() != null)
+            return xformsModel.getContainingDocument();
+        final XFormsControls xformsControls = getXFormsControls(xpathContext);
+        if (xformsControls != null)
+            return xformsControls.getContainingDocument();
+        return null;
     }
 }

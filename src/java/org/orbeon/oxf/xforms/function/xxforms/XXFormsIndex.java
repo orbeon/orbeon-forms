@@ -13,20 +13,13 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms;
 
-import org.orbeon.oxf.xforms.function.XFormsFunction;
-import org.orbeon.oxf.xforms.function.Index;
 import org.orbeon.oxf.xforms.XFormsUtils;
-import org.orbeon.oxf.xforms.XFormsElementContext;
-import org.orbeon.oxf.xforms.XFormsModel;
-import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.pipeline.StaticExternalContext;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.xforms.function.Index;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.StaticContext;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.trans.XPathException;
-import org.orbeon.saxon.value.IntegerValue;
 
 /**
  * xxforms:index() function. Behaves like the standard XForms index() function, except the repeat id is optional. When
@@ -45,11 +38,11 @@ public class XXFormsIndex extends Index {
     public Item evaluateItem(XPathContext xpathContext) throws XPathException {
 
         final Expression repeatIdExpression = (argument == null || argument.length == 0) ? null : argument[0];
-        final String repeatId = (repeatIdExpression == null) ? null : XFormsUtils.namespaceId(getXFormsContainingDocument(), repeatIdExpression.evaluateAsString(xpathContext));
+        final String repeatId = (repeatIdExpression == null) ? null : XFormsUtils.namespaceId(getXFormsContainingDocument(xpathContext), repeatIdExpression.evaluateAsString(xpathContext));
 
         if (repeatId == null) {
             // Find closest enclosing id
-            return findIndexForRepeatId(getXFormsControls().getEnclosingRepeatId());
+            return findIndexForRepeatId(xpathContext, getXFormsControls(xpathContext).getEnclosingRepeatId());
         } else {
             return super.evaluateItem(xpathContext);
         }

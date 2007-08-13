@@ -49,7 +49,7 @@ public class XFormsSetfocusAction extends XFormsAction {
 
             // Resolve AVT
             resolvedControlId = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, bindingContext.getSingleNode(),
-                    null, xformsControls.getFunctionLibrary(), actionElement, controlIdAttributeValue);
+                    null, XFormsContainingDocument.getFunctionLibrary(), xformsControls, actionElement, controlIdAttributeValue);
         }
 
         final String effectiveControlId = xformsControls.getCurrentControlsState().findEffectiveControlId(resolvedControlId);

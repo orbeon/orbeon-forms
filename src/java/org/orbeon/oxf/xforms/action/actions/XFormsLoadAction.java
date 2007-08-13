@@ -73,7 +73,7 @@ public class XFormsLoadAction extends XFormsAction {
 
             // Resolve AVT
             final String resolvedResource = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, bindingContext.getSingleNode(),
-                    null, xformsControls.getFunctionLibrary(), actionElement, resourceAttributeValue);
+                    null, XFormsContainingDocument.getFunctionLibrary(), xformsControls, actionElement, resourceAttributeValue);
             final String encodedResource = XFormsUtils.encodeHRRI(resolvedResource, true);
             resolveLoadValue(containingDocument, pipelineContext, actionElement, doReplace, encodedResource, target, urlType, urlNorewrite, isShowProgress);
             // NOTE: We are supposed to throw an xforms-link-error in case of failure. Can we do it?

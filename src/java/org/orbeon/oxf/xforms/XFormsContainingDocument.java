@@ -53,6 +53,9 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
 
     public static final String CONTAINING_DOCUMENT_PSEUDO_ID = "$containing-document$";
 
+    // Global XForms function library
+    private static XFormsFunctionLibrary functionLibrary = new XFormsFunctionLibrary();
+
     // Object pool this object must be returned to, if any
     private ObjectPool sourceObjectPool;
 
@@ -117,6 +120,13 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
 
     // For testing only
     private static int testAjaxToggleValue = 0;
+
+    /**
+     * Return the global function library.
+     */
+    public static XFormsFunctionLibrary getFunctionLibrary() {
+        return functionLibrary;
+    }
 
     /**
      * Create an XFormsContainingDocument from an XFormsEngineStaticState object.

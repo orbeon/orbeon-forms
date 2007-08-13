@@ -36,11 +36,7 @@ import java.util.Map;
 
 public class XFormsFunctionLibrary implements FunctionLibrary {
 
-
     private static Map functionTable = new HashMap();
-
-    private XFormsModel xFormsModel;
-    private XFormsControls xFormsControls;
 
     private static StandardFunction.Entry register(String name,
                                                    Class implementationClass,
@@ -235,25 +231,6 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
         StandardFunction.arg(e, 4, Type.STRING_TYPE, StaticProperty.ALLOWS_ZERO_OR_ONE);
     }
 
-    /**
-     * This constructor is used when the function context includes an XForms model.
-     *
-     * @param xFormsModel
-     */
-    public XFormsFunctionLibrary(XFormsModel xFormsModel, XFormsControls xFormsControls) {
-        this.xFormsModel = xFormsModel;
-        this.xFormsControls = xFormsControls;
-    }
-
-    /**
-     * This constructor is used when the function context includes XForms controls only.
-     *
-     * @param xFormsControls
-     */
-    public XFormsFunctionLibrary(XFormsControls xFormsControls) {
-        this.xFormsControls = xFormsControls;
-    }
-
     private StandardFunction.Entry getEntry(String uri, String local, int arity) {
         StandardFunction.Entry entry;
         if (uri.equals(NamespaceConstant.FN)) {
@@ -289,13 +266,6 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
         } catch (Exception err) {
             throw new OXFException("Failed to load XForms function: " + err.getMessage(), err);
         }
-        // Set function context if it's one of ours
-        if (f instanceof XFormsFunction) {
-            if (xFormsControls != null)
-                ((XFormsFunction) f).setXFormsControls(xFormsControls);
-            if (xFormsModel != null)
-                ((XFormsFunction) f).setXFormsModel(xFormsModel);
-        }
         f.setDetails(entry);
         f.setFunctionNameCode(nameCode);
         f.setArguments(staticArgs);
@@ -307,9 +277,7 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
     }
 
     public int hashCode() {
-        // This should be better than super.hashCode()!
-        // TODO: Fix this once FunctionLibrary no longer refers to controls and models
-//        return functionTable.hashCode();
+        // There is only one global XForms function library, so we don't need a special hashCode() implementation
         return super.hashCode();
     }
 }

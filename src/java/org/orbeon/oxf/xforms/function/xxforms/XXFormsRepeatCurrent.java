@@ -42,9 +42,9 @@ public class XXFormsRepeatCurrent extends XFormsFunction {
 
         // Get instance id
         final Expression repeatIdExpression = (argument == null || argument.length == 0) ? null : argument[0];
-        final String repeatId = (repeatIdExpression == null) ? null : XFormsUtils.namespaceId(getXFormsContainingDocument(), repeatIdExpression.evaluateAsString(xpathContext));
+        final String repeatId = (repeatIdExpression == null) ? null : XFormsUtils.namespaceId(getXFormsContainingDocument(xpathContext), repeatIdExpression.evaluateAsString(xpathContext));
 
-        final XFormsControls xformsControls = getXFormsControls();
+        final XFormsControls xformsControls = getXFormsControls(xpathContext);
 
         // Get current single node
         return xformsControls.getRepeatCurrentSingleNode(repeatId);

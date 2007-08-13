@@ -46,10 +46,10 @@ public class XXFormsContext extends XFormsFunction {
 
         // Get instance id
         final Expression contextIdExpression = (argument == null || argument.length == 0) ? null : argument[0];
-        final String contextId = (contextIdExpression == null) ? null : XFormsUtils.namespaceId(getXFormsContainingDocument(), contextIdExpression.evaluateAsString(xpathContext));
+        final String contextId = (contextIdExpression == null) ? null : XFormsUtils.namespaceId(getXFormsContainingDocument(xpathContext), contextIdExpression.evaluateAsString(xpathContext));
 
         // Get context for id
-        final XFormsControls xformsControls = getXFormsControls();
+        final XFormsControls xformsControls = getXFormsControls(xpathContext);
         final List currentNodeset = xformsControls.getContextForId(contextId);
 
         return new ListIterator(currentNodeset);

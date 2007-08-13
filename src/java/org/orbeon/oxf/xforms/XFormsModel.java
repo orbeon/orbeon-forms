@@ -32,7 +32,6 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.dom4j.NodeWrapper;
-import org.orbeon.saxon.functions.FunctionLibrary;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.sxpath.XPathEvaluator;
@@ -75,7 +74,6 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
     // Binds
     private List binds;
-    private FunctionLibrary xformsFunctionLibrary;
 
     // Schema validation
     private XFormsModelSchemaValidator schemaValidator;
@@ -134,9 +132,6 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
         // Extract event handlers
         eventHandlers = XFormsEventHandlerImpl.extractEventHandlersObserver(containingDocument, this, modelElement);
-
-        // Create XForms function library
-        xformsFunctionLibrary = new XFormsFunctionLibrary(this, getContainingDocument().getXFormsControls());
     }
 
     public XFormsContainingDocument getContainingDocument() {
@@ -370,7 +365,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                     // Compute calculated value
                     try {
                         final String stringResult = XPathCache.evaluateAsString(pipelineContext, nodeInfo, modelBind.getCalculate(), modelBind.getNamespaceMap(), null,
-                            xformsFunctionLibrary, modelBind.getLocationData().getSystemID(), modelBind.getLocationData());
+                            XFormsContainingDocument.getFunctionLibrary(), XFormsModel.this, modelBind.getLocationData().getSystemID(), modelBind.getLocationData());
 
                         // TODO: Detect if we have already handled this node and dispatch xforms-binding-exception
                         XFormsInstance.setValueForNodeInfo(pipelineContext, nodeInfo, stringResult, null);
@@ -398,7 +393,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                         final String xpath = "boolean(" + modelBind.getRequired() + ")";
                         final boolean required = ((Boolean) XPathCache.evaluateSingle(pipelineContext,
                             nodeInfo, xpath, modelBind.getNamespaceMap(), null,
-                            xformsFunctionLibrary, modelBind.getLocationData().getSystemID(), modelBind.getLocationData())).booleanValue();
+                            XFormsContainingDocument.getFunctionLibrary(), XFormsModel.this, modelBind.getLocationData().getSystemID(), modelBind.getLocationData())).booleanValue();
 
                         // Update node with MIP value
                         InstanceData.setRequired(nodeInfo, required);
@@ -419,7 +414,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                         final String xpath = "boolean(" + modelBind.getRelevant() + ")";
                         boolean relevant = ((Boolean) XPathCache.evaluateSingle(pipelineContext,
                             nodeInfo, xpath, modelBind.getNamespaceMap(), null,
-                            xformsFunctionLibrary, modelBind.getLocationData().getSystemID(), modelBind.getLocationData())).booleanValue();
+                            XFormsContainingDocument.getFunctionLibrary(), XFormsModel.this, modelBind.getLocationData().getSystemID(), modelBind.getLocationData())).booleanValue();
                         // Mark node
                         InstanceData.setRelevant(nodeInfo, relevant);
                     } catch (Exception e) {
@@ -440,7 +435,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                         final String xpath = "boolean(" + modelBind.getReadonly() + ")";
                         boolean readonly = ((Boolean) XPathCache.evaluateSingle(pipelineContext,
                             nodeInfo, xpath, modelBind.getNamespaceMap(), null,
-                            xformsFunctionLibrary, modelBind.getLocationData().getSystemID(), modelBind.getLocationData())).booleanValue();
+                            XFormsContainingDocument.getFunctionLibrary(), XFormsModel.this, modelBind.getLocationData().getSystemID(), modelBind.getLocationData())).booleanValue();
 
                         // Mark node
                         InstanceData.setReadonly(nodeInfo, readonly);
@@ -470,7 +465,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                         final String xpath = "boolean(" + modelBind.getXXFormsExternalize() + ")";
                         boolean xxformsExternalize = ((Boolean) XPathCache.evaluateSingle(pipelineContext,
                             nodeInfo, xpath, modelBind.getNamespaceMap(), null,
-                            xformsFunctionLibrary, modelBind.getLocationData().getSystemID(), modelBind.getLocationData())).booleanValue();
+                            XFormsContainingDocument.getFunctionLibrary(), XFormsModel.this, modelBind.getLocationData().getSystemID(), modelBind.getLocationData())).booleanValue();
 
                         // Mark node
                         InstanceData.setXXFormsExternalize(nodeInfo, xxformsExternalize);
@@ -497,7 +492,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                         final String xpath = "boolean(" + modelBind.getConstraint() + ")";
                         final Boolean valid = (Boolean) XPathCache.evaluateSingle(pipelineContext,
                             nodeInfo, xpath, modelBind.getNamespaceMap(), null,
-                            xformsFunctionLibrary, modelBind.getLocationData().getSystemID(), modelBind.getLocationData());
+                            XFormsContainingDocument.getFunctionLibrary(), XFormsModel.this, modelBind.getLocationData().getSystemID(), modelBind.getLocationData());
 
                         // Update node with MIP value
                         InstanceData.updateConstraint(nodeInfo, valid.booleanValue());
@@ -619,7 +614,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                 modelBind.getCurrentNodeInfo(),
                 modelBind.getNodeset(),
                 modelBind.getNamespaceMap(),
-                null, xformsFunctionLibrary, modelBind.getLocationData().getSystemID(), modelBind.getLocationData());
+                null, XFormsContainingDocument.getFunctionLibrary(), XFormsModel.this, modelBind.getLocationData().getSystemID(), modelBind.getLocationData());
         try {
             for (Iterator j = nodeset.iterator(); j.hasNext();) {
                 final NodeInfo nodeInfo = (NodeInfo) j.next();
@@ -641,7 +636,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                 modelBind.getCurrentNodeInfo(),
                 modelBind.getNodeset(),
                 modelBind.getNamespaceMap(),
-                null, xformsFunctionLibrary, modelBind.getLocationData().getSystemID(), modelBind.getLocationData());
+                null, XFormsContainingDocument.getFunctionLibrary(), XFormsModel.this, modelBind.getLocationData().getSystemID(), modelBind.getLocationData());
             for (Iterator j = nodeset.iterator(); j.hasNext();) {
                 final NodeInfo nodeInfo = (NodeInfo) j.next();
                 nodeHandler.handleNode(nodeInfo);
@@ -691,7 +686,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                 final NodeInfo node = (NodeInfo) j.next();
                 // Execute XPath expresssion
                 currentModelBindResults.addAll(XPathCache.evaluate(pipelineContext, node, current.getNodeset(),
-                        current.getNamespaceMap(), null, xformsFunctionLibrary, current.getLocationData().getSystemID(), current.getLocationData()));
+                        current.getNamespaceMap(), null, XFormsContainingDocument.getFunctionLibrary(), XFormsModel.this, current.getLocationData().getSystemID(), current.getLocationData()));
             }
             nodeset.addAll(currentModelBindResults);
             // Last iteration of i: remove all except last

@@ -52,7 +52,7 @@ public class XFormsDispatchAction extends XFormsAction {
 
             // Resolve AVT
             resolvedNewEventName = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, bindingContext.getSingleNode(),
-                    null, xformsControls.getFunctionLibrary(), actionElement, newEventNameAttributeValue);
+                    null, XFormsContainingDocument.getFunctionLibrary(), xformsControls, actionElement, newEventNameAttributeValue);
         }
 
         final String resolvedNewEventTargetId;
@@ -64,7 +64,7 @@ public class XFormsDispatchAction extends XFormsAction {
             // Resolve AVT
             resolvedNewEventTargetId = XFormsUtils.namespaceId(containingDocument,
                     XFormsUtils.resolveAttributeValueTemplates(pipelineContext, bindingContext.getSingleNode(),
-                    null, xformsControls.getFunctionLibrary(), actionElement, newEventTargetIdValue));
+                    null, XFormsContainingDocument.getFunctionLibrary(), xformsControls, actionElement, newEventTargetIdValue));
         }
 
         // Optional attributes

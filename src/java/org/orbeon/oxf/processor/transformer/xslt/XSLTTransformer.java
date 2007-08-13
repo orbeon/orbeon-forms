@@ -43,9 +43,6 @@ import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.trans.IndependentContext;
 import org.orbeon.saxon.trans.XPathException;
-import org.orbeon.saxon.type.ItemType;
-import org.orbeon.saxon.type.Type;
-import org.orbeon.saxon.type.TypeHierarchy;
 import org.orbeon.saxon.value.StringValue;
 import org.xml.sax.*;
 
@@ -153,7 +150,8 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                     transformerHandler = TransformerUtils.getTransformerHandler(templatesInfo.templates, templatesInfo.transformerClass, attributes);
 
                     final Transformer transformer = transformerHandler.getTransformer();
-                    transformer.setURIResolver(new TransformerURIResolver(XSLTTransformer.this, pipelineContext, INPUT_DATA, URLGenerator.DEFAULT_HANDLE_XINCLUDE));
+                    final TransformerURIResolver transformerURIResolver = new TransformerURIResolver(XSLTTransformer.this, pipelineContext, INPUT_DATA, URLGenerator.DEFAULT_HANDLE_XINCLUDE);
+                    transformer.setURIResolver(transformerURIResolver);
                     transformer.setErrorListener(errorListener);
                     if (isGenerateSourceLocation)
                         transformer.setOutputProperty(SaxonOutputKeys.SUPPLY_SOURCE_LOCATOR, "yes");
@@ -351,19 +349,24 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                             // document is read, which is not compatible with
                             // our processing model. So in this case, we first
                             // read the data in a SAX store.
-                            SAXStore dataSaxStore = new SAXStore();
+                            final SAXStore dataSaxStore = new SAXStore();
                             readInputAsSAX(pipelineContext, INPUT_DATA, dataSaxStore);
                             dataSaxStore.replay(transformerHandler);
                         } else {
                             readInputAsSAX(pipelineContext, INPUT_DATA, transformerHandler);
                         }
                     } finally {
+
                         // Log message from Saxon
                         if (saxonStringWriter != null) {
                             String message = saxonStringWriter.toString();
                             if (message.length() > 0)
                                 logger.info(message);
                         }
+
+                        // Make sure we don't keep stale references to URI resolver objects
+                        transformer.setURIResolver(null);
+                        transformerURIResolver.destroy();
                     }
 
                     // Check whether some errors were added

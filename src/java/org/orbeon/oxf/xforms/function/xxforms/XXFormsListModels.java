@@ -42,7 +42,7 @@ public class XXFormsListModels extends XFormsFunction {
 
     public SequenceIterator iterate(XPathContext xpathContext) throws XPathException {
 
-        final XFormsContainingDocument containingDocument = getXFormsContainingDocument();
+        final XFormsContainingDocument containingDocument = getXFormsContainingDocument(xpathContext);
         final List models = containingDocument.getModels();
 
         if (models != null && models.size() > 0) {

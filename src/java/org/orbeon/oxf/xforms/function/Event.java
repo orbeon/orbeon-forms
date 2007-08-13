@@ -43,7 +43,7 @@ public class Event extends XFormsFunction {
         final String attributeName = instanceIdExpression.evaluateAsString(xpathContext);
 
         // Get the current event
-        final XFormsEvent event = getXFormsContainingDocument().getCurrentEvent();
+        final XFormsEvent event = getXFormsContainingDocument(xpathContext).getCurrentEvent();
 
         // TODO: Currently the spec doesn't specify what happens when we call event() outside of an event handler
         if (event == null)

@@ -30,7 +30,6 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.util.XPathCache;
-import org.orbeon.saxon.functions.FunctionLibrary;
 import org.orbeon.saxon.om.NodeInfo;
 import org.xml.sax.Locator;
 
@@ -64,8 +63,6 @@ public class XFormsControls {
     private Map constantItems;
 
     protected Stack contextStack = new Stack();
-
-    private FunctionLibrary functionLibrary = new XFormsFunctionLibrary(this);
 
     private static final Map groupingControls = new HashMap();
     private static final Map valueControls = new HashMap();
@@ -564,7 +561,7 @@ public class XFormsControls {
 
                         // Evaluate new node-set
                         newNodeset = XPathCache.evaluate(pipelineContext, Collections.singletonList(currentSingleNodeForModel), 1,
-                                ref != null ? ref : nodeset, bindingElementNamespaceContext, null, functionLibrary, null, locationData);
+                                ref != null ? ref : nodeset, bindingElementNamespaceContext, null, XFormsContainingDocument.getFunctionLibrary(), XFormsControls.this, null, locationData);
 
                         // Restore context
                         contextStack.pop();
@@ -577,7 +574,7 @@ public class XFormsControls {
                     final BindingContext contextBindingContext = getCurrentBindingContext();
                     if (contextBindingContext != null && contextBindingContext.getNodeset().size() > 0) {
                         newNodeset = XPathCache.evaluate(pipelineContext, contextBindingContext.getNodeset(), contextBindingContext.getPosition(),
-                                ref != null ? ref : nodeset, bindingElementNamespaceContext, null, functionLibrary, null, locationData);
+                                ref != null ? ref : nodeset, bindingElementNamespaceContext, null, XFormsContainingDocument.getFunctionLibrary(), XFormsControls.this, null, locationData);
                     } else {
                         newNodeset = Collections.EMPTY_LIST;
                     }
@@ -814,10 +811,6 @@ public class XFormsControls {
                 return getContainingDocument().getInstanceForNode(currentSingleNode);
         }
         return null;
-    }
-
-    public FunctionLibrary getFunctionLibrary() {
-        return functionLibrary;
     }
 
     private ControlsState buildControlsState(final PipelineContext pipelineContext, final boolean evaluateItemsets) {
@@ -2065,6 +2058,5 @@ public class XFormsControls {
         containingDocument = null;
         controlsDocument = null;
         contextStack = null;
-        functionLibrary = null;
     }
 }

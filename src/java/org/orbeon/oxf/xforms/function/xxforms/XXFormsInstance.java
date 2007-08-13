@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.function.xxforms;
 import org.orbeon.oxf.xforms.XFormsInstance;
 import org.orbeon.oxf.xforms.XFormsModel;
 import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.StaticContext;
@@ -41,11 +42,14 @@ public class XXFormsInstance extends XFormsFunction {
     }
 
     public SequenceIterator iterate(XPathContext xpathContext) throws XPathException {
+
+        final XFormsContainingDocument containingDocument = getXFormsContainingDocument(xpathContext);
+
         // Get instance id
         final Expression instanceIdExpression = argument[0];
-        final String instanceId = XFormsUtils.namespaceId(getXFormsContainingDocument(), instanceIdExpression.evaluateAsString(xpathContext));
+        final String instanceId = XFormsUtils.namespaceId(containingDocument, instanceIdExpression.evaluateAsString(xpathContext));
 
-        final XFormsInstance instance = getXFormsContainingDocument().findInstance(instanceId);
+        final XFormsInstance instance = containingDocument.findInstance(instanceId);
 
         // Return instance document if found
         if (instance != null) {

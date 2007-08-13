@@ -126,7 +126,7 @@ public class XFormsInsertAction extends XFormsAction {
                     // origin attribute in the insert context."
 
                     originObjects = XPathCache.evaluate(pipelineContext, insertContextNodeInfo,
-                        originAttribute, Dom4jUtils.getNamespaceContextNoDefault(actionElement), null, xformsControls.getFunctionLibrary(),
+                        originAttribute, Dom4jUtils.getNamespaceContextNoDefault(actionElement), null, XFormsContainingDocument.getFunctionLibrary(), xformsControls,
                         null, (LocationData) actionElement.getData());
                     //XFormsUtils.resolveXMLBase(actionElement, ".").toString()
 
@@ -199,7 +199,7 @@ public class XFormsInsertAction extends XFormsAction {
                     // "b. The return value is processed according to the rules of the XPath function round()"
                     final String insertionIndexString = XPathCache.evaluateAsString(pipelineContext,
                         collectionToBeUpdated, 1,
-                        "round(" + atAttribute + ")", Dom4jUtils.getNamespaceContextNoDefault(actionElement), null, xformsControls.getFunctionLibrary(), null,
+                        "round(" + atAttribute + ")", Dom4jUtils.getNamespaceContextNoDefault(actionElement), null, XFormsContainingDocument.getFunctionLibrary(), xformsControls, null,
                             (LocationData) actionElement.getData());
 
                     // "c. If the result is in the range 1 to the Node Set Binding node-set size, then the insert

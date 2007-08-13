@@ -51,7 +51,7 @@ public class XFormsSetindexAction extends XFormsAction {
 
         final String indexString = XPathCache.evaluateAsString(pipelineContext,
                 xformsControls.getCurrentNodeset(), xformsControls.getCurrentPosition(),
-                "number(" + indexXPath + ")", Dom4jUtils.getNamespaceContextNoDefault(actionElement), null, xformsControls.getFunctionLibrary(), null,
+                "number(" + indexXPath + ")", Dom4jUtils.getNamespaceContextNoDefault(actionElement), null, XFormsContainingDocument.getFunctionLibrary(), xformsControls, null,
                 (LocationData) actionElement.getData());
 
         executeSetindexAction(pipelineContext, containingDocument, repeatId, indexString);

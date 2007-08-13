@@ -120,7 +120,7 @@ public class XFormsGroupHandler extends HandlerBase {
                 // TODO: Label element detection should be based on static control info so we don't needlessly generate
                 // a label in the template. Maybe XFormsControls should just support a method to obtain a control
                 // element by id.
-                if (handlerContext.isGenerateTemplate() || groupXFormsControl.hasLabel()) {
+                if (handlerContext.isGenerateTemplate() || groupXFormsControl == null || groupXFormsControl.hasLabel()) {
                     reusableAttributes.clear();
 
                     // Handle relevance

@@ -446,6 +446,11 @@ public class InstanceData {
         return (existingInstanceData == null) ? false : existingInstanceData.valueChanged;
     }
 
+    public static boolean isValueChanged(Node node) {
+        final InstanceData existingInstanceData = getLocalInstanceData(node, false);
+        return (existingInstanceData == null) ? false : existingInstanceData.valueChanged;
+    }
+
     public static void markValueChanged(NodeInfo nodeInfo) {
         getOrCreateInstanceData(nodeInfo).valueChanged = true;
     }
@@ -506,6 +511,10 @@ public class InstanceData {
     private static InstanceData getOrCreateInstanceData(Node node) {
         final InstanceData existingInstanceData = getLocalInstanceData(node);
         return (existingInstanceData != null) ? existingInstanceData : createNewInstanceData(node);
+    }
+
+    private static InstanceData getLocalInstanceData(Node node, boolean forUpdate) {
+        return getLocalInstanceData(node);
     }
 
     private static InstanceData getLocalInstanceData(NodeInfo nodeInfo, boolean forUpdate) {

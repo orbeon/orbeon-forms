@@ -442,6 +442,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventHandlerCont
                 final String type = InstanceData.getType(node);
                 parentInfoElement.addAttribute("type", (type == null) ? "" : type);
 //                parentInfoElement.addAttribute("schema-error-messages", instanceData.getSchemaErrorsMsgs());
+                parentInfoElement.addAttribute("value-changed", Boolean.toString(InstanceData.isValueChanged(node)));
             }
         });
 

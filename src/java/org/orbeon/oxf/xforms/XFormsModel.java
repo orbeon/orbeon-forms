@@ -1478,6 +1478,11 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
             synchronizeInstanceDataEventState();
             xformsControls.getCurrentControlsState().setEventsToDispatch(null);
 
+            // "Actions that directly invoke rebuild, recalculate, revalidate, or refresh always
+            // have an immediate effect, and clear the corresponding flag."
+            if (deferredActionContext != null)
+                deferredActionContext.refresh = false;
+
             // Add "relevant binding" events
             if (relevantBindingEvents != null)
                 eventsToDispatch.addAll(relevantBindingEvents.values());
@@ -1644,6 +1649,11 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
             synchronizeInstanceDataEventState();
             xformsControls.getCurrentControlsState().setEventsToDispatch(null);
+
+            // "Actions that directly invoke rebuild, recalculate, revalidate, or refresh always
+            // have an immediate effect, and clear the corresponding flag."
+            if (deferredActionContext != null)
+                deferredActionContext.refresh = false;
         }
 
         // "5. The user interface reflects the state of the model, which means that all forms
@@ -1651,11 +1661,6 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         if (xformsControls != null) {
             xformsControls.refreshForModel(pipelineContext, this);
         }
-
-        // "Actions that directly invoke rebuild, recalculate, revalidate, or refresh always
-        // have an immediate effect, and clear the corresponding flag."
-        if (deferredActionContext != null)
-            deferredActionContext.refresh = false;
     }
 
     private void sendDefaultEventsForDisabledControl(PipelineContext pipelineContext, XFormsControl xformsControl, boolean isValueControl,

@@ -72,7 +72,7 @@ public class SAXStore extends ForwardingContentHandler implements Serializable, 
     private boolean hasDocumentLocator;
     private String publicId;
 
-    private transient Locator locator; // used only for recording events
+    private transient Locator locator; // used only for recording events, MUST be cleared afterwards
 
     public SAXStore() {
         super.setForward(false);
@@ -287,6 +287,9 @@ public class SAXStore extends ForwardingContentHandler implements Serializable, 
             addToSystemIdBuffer(locator.getSystemId());
         }
         super.endDocument();
+
+        // The resulting SAXStore should never keep references to whoever filled it
+        locator = null;
     }
 
     public void endElement(String uri, String localname, String qName) throws SAXException {

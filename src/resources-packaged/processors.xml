@@ -286,7 +286,7 @@
     </processor>
 
     <!-- Page Flow processors -->
-    <processor name="oxf:page-flow" uri="oxf/processor/page-flow">
+    <processor name="oxf:page-flow">
         <class name="org.orbeon.oxf.processor.PageFlowControllerProcessor"/>
     </processor>
 

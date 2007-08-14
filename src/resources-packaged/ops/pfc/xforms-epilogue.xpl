@@ -18,6 +18,7 @@
     xmlns:xhtml="http://www.w3.org/1999/xhtml">
 
     <p:param type="input" name="data"/>
+    <p:param type="input" name="model-data"/>
     <p:param type="input" name="instance"/>
     <p:param type="input" name="xforms-model"/>
     <p:param type="output" name="xformed-data"/>
@@ -116,6 +117,7 @@
                     <!-- Native XForms Initialization -->
                     <p:processor name="oxf:xforms-to-xhtml">
                         <p:input name="annotated-document" href="#annotated-view"/>
+                        <p:input name="data" href="#model-data"/>
                         <p:input name="instance" href="#instance"/>
                         <p:output name="document" id="xhtml-data"/>
                     </p:processor>

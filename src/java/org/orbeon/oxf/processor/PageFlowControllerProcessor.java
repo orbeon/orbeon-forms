@@ -217,7 +217,8 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                     ASTChoose currentChoose = null;
                     int matcherCount = 0;
 
-                    final ASTOutput html = new ASTOutput(null, "html");
+                    final ASTOutput epilogueData = new ASTOutput(null, "html");
+                    final ASTOutput epilogueModelData = new ASTOutput(null, "epilogue-model-data");
                     final ASTOutput epilogueInstance = new ASTOutput(null, "epilogue-instance");
                     final ASTOutput epilogueXFormsModel = new ASTOutput(null, "epilogue-xforms-model");
                     for (Iterator i = controllerDocument.getRootElement().elements().iterator(); i.hasNext();) {
@@ -321,13 +322,13 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                                 currentChoose.getWhen().add(when);
                                 if ("files".equals(element.getName())) {
                                     previousIsFile = true;
-                                    handleFile(when, request, mimeType, html, epilogueInstance, epilogueXFormsModel);
+                                    handleFile(when, request, mimeType, epilogueData, epilogueModelData, epilogueInstance, epilogueXFormsModel);
                                 } else if ("page".equals(element.getName())) {
                                     previousIsFile = false;
                                     // Get unique page number
                                     int pageNumber = element.getParent().elements().indexOf(element);
                                     handlePage(stepProcessorContext, controllerContext, when.getStatements(), element,
-                                            pageNumber, requestWithParameters, matcherOutput, html,
+                                            pageNumber, requestWithParameters, matcherOutput, epilogueData, epilogueModelData,
                                             epilogueInstance, epilogueXFormsModel, pageIdToPathInfo, pageIdToXFormsModel, pageIdToSetvaluesDocument,
                                             instancePassing);
                                 }
@@ -356,7 +357,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                                 throw new OXFException("Cannot find \"not found\" page with id '" + notFoundPageId + "' in page flow");
                             // Create an artificial page number (must be different from the other page numbers)
                             handlePage(stepProcessorContext, controllerContext, statementsList, notFoundPageElement,
-                                    pageCount, requestWithParameters, dummyMatcherOutput, html,
+                                    pageCount, requestWithParameters, dummyMatcherOutput, epilogueData, epilogueModelData,
                                     epilogueInstance, epilogueXFormsModel, pageIdToPathInfo, pageIdToXFormsModel, pageIdToSetvaluesDocument,
                                     instancePassing);
                         } else {
@@ -373,13 +374,19 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                                 addOutput(dataOutput);
                             }});
 
+                            // There is no model data to send to the epilogue
+                            statementsList.add(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
+                                addInput(new ASTInput("data", Dom4jUtils.NULL_DOCUMENT));
+                                addOutput(new ASTOutput("data", epilogueModelData));
+                            }});
+
                             // Send not-found through epilogue
-                            handleEpilogue(controllerContext, statementsList, epilogueURL, epilogueElement, notFoundHTML, epilogueInstance, epilogueXFormsModel, 404);
+                            handleEpilogue(controllerContext, statementsList, epilogueURL, epilogueElement, notFoundHTML, epilogueModelData, epilogueInstance, epilogueXFormsModel, 404);
 
                             // Notify final epilogue that there is nothing to send
                             statementsList.add(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
                                 addInput(new ASTInput("data", Dom4jUtils.NULL_DOCUMENT));
-                                addOutput(new ASTOutput("data", html));
+                                addOutput(new ASTOutput("data", epilogueData));
                             }});
                             statementsList.add(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
                                 addInput(new ASTInput("data", Dom4jUtils.NULL_DOCUMENT));
@@ -393,13 +400,18 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                     }
 
                     // Handle view, if there was one
-                    addStatement(new ASTChoose(new ASTHrefId(html)) {{
+                    addStatement(new ASTChoose(new ASTHrefId(epilogueData)) {{
                         addWhen(new ASTWhen("not(/*/@xsi:nil = 'true')") {{
                             setNamespaces(NAMESPACES_WITH_XSI_AND_XSLT);
                             handleEpilogue(controllerContext, getStatements(), epilogueURL, epilogueElement,
-                                    html, epilogueInstance, epilogueXFormsModel, 200);
+                                    epilogueData, epilogueModelData, epilogueInstance, epilogueXFormsModel, 200);
                         }});
-                        addWhen(new ASTWhen());
+                        addWhen(new ASTWhen() {{
+                            // Make sure we execute the model if there is a model but no view
+                            addStatement(new ASTProcessorCall(XMLConstants.NULL_SERIALIZER_PROCESSOR_QNAME) {{
+                                addInput(new ASTInput("data", new ASTHrefId(epilogueModelData)));
+                            }});
+                        }});
                     }});
                 }};
 
@@ -419,12 +431,12 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
     }
 
     private static void handleEpilogue(final String controllerContext, List statements, final String epilogueURL, final Element epilogueElement,
-                                       final ASTOutput html, final ASTOutput epilogueInstance, final ASTOutput epilogueXFormsModel,
+                                       final ASTOutput epilogueData, final ASTOutput epilogueModelData, final ASTOutput epilogueInstance, final ASTOutput epilogueXFormsModel,
                                        final int defaultStatusCode) {
         // Send result through epilogue
         if (epilogueURL == null) {
             // Run HTML serializer
-            statements.add(new ASTChoose(new ASTHrefId(html)) {{
+            statements.add(new ASTChoose(new ASTHrefId(epilogueData)) {{
                 addWhen(new ASTWhen("not(/*/@xsi:nil = 'true')") {{
                     setNamespaces(NAMESPACES_WITH_XSI_AND_XSLT);
                     // The epilogue did not do the serialization
@@ -439,7 +451,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                         if (HTMLSerializer.DEFAULT_VERSION != null)
                             rootElement.addElement("version").addText(HTMLSerializer.DEFAULT_VERSION);
                         addInput(new ASTInput("config", config));
-                        addInput(new ASTInput("data", new ASTHrefId(html)));
+                        addInput(new ASTInput("data", new ASTHrefId(epilogueData)));
                         //setLocationData(xxx);
                     }});
                 }});
@@ -454,7 +466,8 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                     throw new OXFException(e);
                 };
                 addInput(new ASTInput("config", new ASTHrefURL(url)));
-                addInput(new ASTInput("data", new ASTHrefId(html)));
+                addInput(new ASTInput("data", new ASTHrefId(epilogueData)));
+                addInput(new ASTInput("model-data", new ASTHrefId(epilogueModelData)));
                 addInput(new ASTInput("instance", new ASTHrefId(epilogueInstance)));
                 addInput(new ASTInput("xforms-model", new ASTHrefId(epilogueXFormsModel)));
                 final String[] locationParams = new String[] { "pipeline",  epilogueURL };
@@ -497,7 +510,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
     private void handlePage(final StepProcessorContext stepProcessorContext, final String controllerContext,
                             List statementsList, final Element pageElement, final int pageNumber,
                             final ASTOutput requestWithParameters, final ASTOutput matcherOutput,
-                            final ASTOutput viewData, final ASTOutput viewInstance, final ASTOutput epilogueXFormsModel,
+                            final ASTOutput viewData, final ASTOutput epilogueModelData, final ASTOutput viewInstance, final ASTOutput epilogueXFormsModel,
                             final Map pageIdToPathInfo,
                             final Map pageIdToXFormsModel,
                             final Map pageIdToSetvaluesDocument,
@@ -777,10 +790,11 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
         statementsList.add(new ASTChoose(new ASTHrefId(isRedirect)) {{
             addWhen(new ASTWhen("/is-redirect = 'false'") {{
 
-                // Model
+                // Handle page model
                 final ASTOutput modelData = new ASTOutput(null, "model-data");
                 final ASTOutput modelInstance = new ASTOutput(null, "model-instance");
                 if (modelAttribute != null) {
+                    // There is a model
                     addStatement(new StepProcessorCall(stepProcessorContext, controllerContext, modelAttribute, "model") {{
                         addInput(new ASTInput("data", new ASTHrefId(actionData)));
                         addInput(new ASTInput("instance", new ASTHrefId(xupdatedInstance)));
@@ -801,6 +815,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                         setLocationData(new ExtendedLocationData((LocationData) pageElement.getData(), "executing page model", pageElement, locationParams, true));
                     }});
                 } else if (viewAttribute != null) {
+                    // There is no model but there is a view
                     addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
                         addInput(new ASTInput("data", new ASTHrefId(actionData)));
                         addOutput(new ASTOutput("data", modelData));
@@ -811,8 +826,9 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                     }});
                 }
 
+                // Handle page view
                 if (viewAttribute != null) {
-                    // View
+                    // There is a view
                     addStatement(new StepProcessorCall(stepProcessorContext, controllerContext, viewAttribute, "view") {{
                         addInput(new ASTInput("data", new ASTHrefId(modelData)));
                         addInput(new ASTInput("instance", new ASTHrefId(modelInstance)));
@@ -844,7 +860,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                         }});
                     }
                 } else {
-                    // Send nothing to epilogue
+                    // There is no view, send nothing to epilogue
                     addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
                         addInput(new ASTInput("data", Dom4jUtils.NULL_DOCUMENT));
                         addOutput(new ASTOutput("data", viewData));
@@ -860,18 +876,31 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                 }
 
                 if (modelAttribute != null && viewAttribute == null) {
-                    // Make sure we execute the model
-                    addStatement(new ASTProcessorCall(XMLConstants.NULL_SERIALIZER_PROCESSOR_QNAME) {{
-                        addInput(new ASTInput("data", new ASTHrefId(modelData)));
-                    }});
                     // With XForms NG we want lazy evaluation of the instance, so we should not force a
                     // read on the instance. We just connect the output.
                     addStatement(new ASTProcessorCall(XMLConstants.NULL_PROCESSOR_QNAME) {{
                         addInput(new ASTInput("data", new ASTHrefId(modelInstance)));
                     }});
                 }
+
+                if (modelAttribute == null && viewAttribute == null) {
+                    // Send out epilogue model data as a null document
+                    addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
+                        addInput(new ASTInput("data", Dom4jUtils.NULL_DOCUMENT));
+                        addOutput(new ASTOutput("data", epilogueModelData));
+                    }});
+                } else {
+                    // Send out epilogue model data as produced by the model or used by the view
+                    addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
+                        addInput(new ASTInput("data", new ASTHrefId(modelData)));
+                        addOutput(new ASTOutput("data", epilogueModelData));
+                    }});
+                }
+
             }});
             addWhen(new ASTWhen() {{
+                // There is a redirection due to the action
+
                 // With XForms NG we want lazy evaluation of the instance, so we should not force a
                 // read on the instance. We just connect the output.
                 addStatement(new ASTProcessorCall(XMLConstants.NULL_PROCESSOR_QNAME) {{
@@ -884,6 +913,10 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                 addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
                     addInput(new ASTInput("data", Dom4jUtils.NULL_DOCUMENT));
                     addOutput(new ASTOutput("data", viewData));
+                }});
+                addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
+                    addInput(new ASTInput("data", Dom4jUtils.NULL_DOCUMENT));
+                    addOutput(new ASTOutput("data", epilogueModelData));
                 }});
                 addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
                     addInput(new ASTInput("data", Dom4jUtils.NULL_DOCUMENT));
@@ -1121,7 +1154,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
      * Handle &lt;files>
      */
     private void handleFile(ASTWhen when, final ASTOutput request, final String mimeType,
-                            final ASTOutput html,
+                            final ASTOutput epilogueData, final ASTOutput epilogueModelData,
                             final ASTOutput epilogueInstance, final ASTOutput epilogueXFormsModel) {
         when.addStatement(new ASTProcessorCall(XMLConstants.RESOURCE_SERVER_PROCESSOR_QNAME) {{
             addInput(new ASTInput("config", new ASTHrefAggregate("path", new ASTHrefXPointer
@@ -1144,7 +1177,11 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
         }});
         when.addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
             addInput(new ASTInput("data", Dom4jUtils.NULL_DOCUMENT));
-            addOutput(new ASTOutput("data", html));
+            addOutput(new ASTOutput("data", epilogueData));
+        }});
+        when.addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
+            addInput(new ASTInput("data", Dom4jUtils.NULL_DOCUMENT));
+            addOutput(new ASTOutput("data", epilogueModelData));
         }});
         when.addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
             addInput(new ASTInput("data", Dom4jUtils.NULL_DOCUMENT));

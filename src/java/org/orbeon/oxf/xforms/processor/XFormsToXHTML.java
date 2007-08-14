@@ -137,6 +137,9 @@ public class XFormsToXHTML extends ProcessorImpl {
         final InputDependencies inputDependencies = (InputDependencies) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_ANNOTATED_DOCUMENT), new CacheableInputReader() {
             public Object read(PipelineContext pipelineContext, ProcessorInput processorInput) {
 
+                // Create URIResolver
+                final XFormsURIResolver uriResolver = new XFormsURIResolver(XFormsToXHTML.this, processorOutput, pipelineContext, INPUT_ANNOTATED_DOCUMENT, URLGenerator.DEFAULT_HANDLE_XINCLUDE);
+
                 // Compute annotated XForms document + static state document
                 final SAXStore annotatedSAXStore;
                 final XFormsStaticState xformsStaticState;
@@ -149,7 +152,7 @@ public class XFormsToXHTML extends ProcessorImpl {
                     final XMLUtils.DigestContentHandler digestContentHandler = new XMLUtils.DigestContentHandler("MD5");
 
                     annotatedSAXStore = new SAXStore(new TeeContentHandler(new ContentHandler[] {
-                            new XFormsExtractorContentHandler(pipelineContext, identity),
+                            new XFormsExtractorContentHandler(pipelineContext, identity, uriResolver),
                             digestContentHandler
 //                            ,new SAXLoggerProcessor.DebugContentHandler()
                     }));
@@ -163,13 +166,13 @@ public class XFormsToXHTML extends ProcessorImpl {
 //                    final String digest = Base64.encode(digestContentHandler.getResult());
 //                    if (XFormsServer.logger.isDebugEnabled())
 //                        XFormsServer.logger.debug("XForms - created digest for static state: " + digest);
-//                    xformsEngineStaticState = new XFormsEngineStaticState(pipelineContext, staticStateDocument, digest);
+//                    xformsEngineStaticState = new XFormsStaticState(pipelineContext, staticStateDocument, digest);
 
                     xformsStaticState = new XFormsStaticState(staticStateDocument);
                 }
 
                 // Create document here so we can do appropriate analysis of caching dependencies
-                createCacheContainingDocument(pipelineContext, processorOutput, xformsStaticState, containingDocument, xformsState);
+                createCacheContainingDocument(pipelineContext, uriResolver, xformsStaticState, containingDocument, xformsState);
 
                 // Set caching dependencies
                 final InputDependencies inputDependencies = new InputDependencies(annotatedSAXStore, xformsStaticState);
@@ -193,7 +196,10 @@ public class XFormsToXHTML extends ProcessorImpl {
             if (containingDocument[0] == null) {
                 // In this case, we found the static state and more in the cache, but we must now create a new XFormsContainingDocument from this information
                 logger.debug("XForms - annotated document and static state obtained from cache; creating containing document.");
-                createCacheContainingDocument(pipelineContext, processorOutput, inputDependencies.getXFormsEngineStaticState(), containingDocument, xformsState);
+
+                // Create URIResolver and XFormsContainingDocument
+                final XFormsURIResolver uriResolver = new XFormsURIResolver(XFormsToXHTML.this, processorOutput, pipelineContext, INPUT_ANNOTATED_DOCUMENT, URLGenerator.DEFAULT_HANDLE_XINCLUDE);
+                createCacheContainingDocument(pipelineContext, uriResolver, inputDependencies.getXFormsEngineStaticState(), containingDocument, xformsState);
             } else {
                 logger.debug("XForms - annotated document and static state not obtained from cache.");
             }
@@ -330,12 +336,9 @@ public class XFormsToXHTML extends ProcessorImpl {
         }
     }
 
-    private void createCacheContainingDocument(final PipelineContext pipelineContext, URIProcessorOutputImpl processorOutput, XFormsStaticState xformsStaticState,
+    private void createCacheContainingDocument(final PipelineContext pipelineContext, XFormsURIResolver uriResolver, XFormsStaticState xformsStaticState,
                                                XFormsContainingDocument[] containingDocument, XFormsState[] xformsState) {
         {
-            // Create URIResolver
-            final XFormsURIResolver uriResolver = new XFormsURIResolver(XFormsToXHTML.this, processorOutput, pipelineContext, INPUT_ANNOTATED_DOCUMENT, URLGenerator.DEFAULT_HANDLE_XINCLUDE);
-
             // Create containing document and initialize XForms engine
             containingDocument[0] = new XFormsContainingDocument(pipelineContext, xformsStaticState, uriResolver);
 

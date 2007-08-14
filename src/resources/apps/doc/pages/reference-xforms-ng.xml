@@ -1990,6 +1990,31 @@
                         href="reference-page-flow#page-model-page-view">PFC documentation</a>.
                     </p>
                 </section>
+                <a name="xforms-instance-initialization-src"/>
+                <section>
+                    <title>Using the <code>src</code> Attribute</title>
+                    <p>
+                        The <code>&lt;xforms:instance></code> element supports an <code>src</code> attribute, able to
+                        access the current XML submission using the <code>input:instance</code> URI, as well as the page
+                        model data using the <code>input:data</code> URI.
+                    </p>
+                    <xml-source show-namespaces="false">
+                        <html xmlns:xforms="http://www.w3.org/2002/xforms"
+                              xmlns:xi="http://www.w3.org/2001/XInclude-doc"
+                              xmlns="http://www.w3.org/1999/xhtml">
+                            <head>
+                                <title>Summary</title>
+                                <xforms:model>
+                                    <xforms:instance id="document-infos-instance" src="input:instance"/>
+                                    ...
+                                </xforms:model>
+                            </head>
+                            <body>
+                                ...
+                            </body>
+                        </html>
+                    </xml-source>
+                </section>
                 <a name="xforms-instance-initialization-xinclude"/>
                 <section>
                     <title>Using XInclude</title>
@@ -2029,6 +2054,13 @@
                             <xi:include href="input:instance"/>
                         </xforms:instance>
                     </xml-source>
+                    <note>
+                        <p>
+                            Whenever possible, the use of the <code>&lt;xforms:instance></code>'s
+                            <code>src</code>attribute is preferable. Doing so may have a positive impact on performance
+                            as more caching can take place.
+                        </p>
+                    </note>
                 </section>
                 <a name="xforms-instance-initialization-xslt"/>
                 <section>
@@ -2084,37 +2116,11 @@
                         <!--[TODO: Figure showing XInclude -> XSLT processing.]-->
                     </note>
                     <note>
-                        Using XSLT for page views has an impact for debugging, as the output of XSLT transformations do not
-                        contain valuable location information. For performance and ease of debugging reasons, we recommend
-                        using static XHTML views with XInclude whenever possible.
-                    </note>
-                </section>
-                <a name="xforms-instance-initialization-src"/>
-                <section>
-                    <title>Using the <code>src</code> Attribute</title>
-                    <p>
-                        The <code>xforms:instance</code> element supports an <code>src</code> attribute, able to access the
-                        current XML submission using the <code>input:instance</code> URI.
-                    </p>
-                    <xml-source show-namespaces="false">
-                        <html xmlns:xforms="http://www.w3.org/2002/xforms"
-                              xmlns:xi="http://www.w3.org/2001/XInclude-doc"
-                              xmlns="http://www.w3.org/1999/xhtml">
-                            <head>
-                                <title>Summary</title>
-                                <xforms:model>
-                                    <xforms:instance id="document-infos-instance" src="input:instance"/>
-                                    ...
-                                </xforms:model>
-                            </head>
-                            <body>
-                                ...
-                            </body>
-                        </html>
-                    </xml-source>
-                    <note>
                         <p>
-                            Note that the URI <code>input:data</code> is not supported in the <code>src</code> attribute.
+                            Whenever possible, the use of the <code>&lt;xforms:instance></code>'s
+                            <code>src</code>attribute is preferable. Doing so may have a positive impact on performance
+                            as more caching can take place. For performance reasons, we also recommend using static
+                            XHTML views instead of XSLT whenever possible.
                         </p>
                     </note>
                 </section>

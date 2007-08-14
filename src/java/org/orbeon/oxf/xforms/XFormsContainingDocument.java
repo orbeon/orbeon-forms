@@ -153,7 +153,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
             throw ValidationException.wrapException(e, new ExtendedLocationData(getLocationData(), "initializing XForms containing document"));
         }
 
-        // Clear URI resolver, since it is of no use after initialization
+        // Clear URI resolver, since it is of no use after initialization, and it may keep dangerous references (PipelineContext)
         this.uriResolver = null;
     }
 

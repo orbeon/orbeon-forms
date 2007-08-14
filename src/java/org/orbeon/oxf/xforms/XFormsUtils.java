@@ -34,14 +34,13 @@ import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.om.*;
 import org.orbeon.saxon.functions.FunctionLibrary;
 import org.w3c.tidy.Tidy;
-import org.xml.sax.Attributes;
-import org.xml.sax.ContentHandler;
-import org.xml.sax.Locator;
-import org.xml.sax.SAXException;
+import org.xml.sax.*;
+//import org.ccil.cowan.tagsoup.HTMLSchema;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.Source;
+import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.sax.TransformerHandler;
 import java.io.*;
@@ -231,7 +230,7 @@ public class XFormsUtils {
         }
     }
 
-    private static Document htmlStringToDocument(String value, LocationData locationData) {
+    private static org.w3c.dom.Document htmlStringToDocument(String value, LocationData locationData) {
         // Create and configure Tidy instance
         final Tidy tidy = new Tidy();
         tidy.setShowWarnings(false);
@@ -246,79 +245,63 @@ public class XFormsUtils {
         } catch (UnsupportedEncodingException e) {
             throw new OXFException(e); // will not happen
         }
-        Document bodyDocument = null;
         try {
-            final Document dom4jResult;
             final InputStream is = new ByteArrayInputStream(valueBytes);
-            final org.w3c.dom.Document result = tidy.parseDOM(is, null);
-            dom4jResult = TransformerUtils.domToDom4jDocument(result);
-            // Create content document
-            final Element htmlElement = dom4jResult.getRootElement();
-            final Element bodyElement = htmlElement.element("body");
-            if (bodyElement != null) {
-                bodyDocument =  Dom4jUtils.createDocument();
-                bodyDocument.setRootElement((Element) bodyElement.detach());
-            }
+            return tidy.parseDOM(is, null);
         } catch (Exception e) {
             throw new ValidationException("Cannot parse value as text/html for value: '" + value + "'", locationData);
         }
-
-        return bodyDocument;
     }
 
     public static void streamHTMLFragment(final ContentHandler contentHandler, String value, LocationData locationData, final String xhtmlPrefix) {
         
         if (value != null && value.trim().length() > 0) { // don't parse blank values
 
-            // TODO: optimize and skip creation of Dom4j document - we should be able to just stream out the W3C DOM crated by Tidy
-            final Document bodyDocument = htmlStringToDocument(value, locationData);
+//            final boolean useTagSoup = false;
+//
+//            if (useTagSoup) {
+//                try {
+//                    final XMLReader xmlReader = new org.ccil.cowan.tagsoup.Parser();
+//		            final HTMLSchema theSchema = new HTMLSchema();
+//
+//                    xmlReader.setProperty(org.ccil.cowan.tagsoup.Parser.schemaProperty, theSchema);
+//                    xmlReader.setContentHandler(new HTMLBodyContentHandler(contentHandler, xhtmlPrefix));
+//
+//                    final InputSource inputSource = new InputSource();
+//                    inputSource.setCharacterStream(new StringReader(value));
+//
+//                    xmlReader.parse(inputSource);
+//                } catch (SAXException e) {
+//                    throw new OXFException(e);
+//                } catch (IOException e) {
+//                    throw new OXFException(e);
+//                }
+//
+////			r.setFeature(Parser.CDATAElementsFeature, false);
+////			r.setFeature(Parser.namespacesFeature, false);
+////			r.setFeature(Parser.ignoreBogonsFeature, true);
+////			r.setFeature(Parser.bogonsEmptyFeature, false);
+////			r.setFeature(Parser.defaultAttributesFeature, false);
+////			r.setFeature(Parser.translateColonsFeature, true);
+////			r.setFeature(Parser.restartElementsFeature, false);
+////			r.setFeature(Parser.ignorableWhitespaceFeature, true);
+////			r.setProperty(Parser.scannerProperty, new PYXScanner());
+////          r.setProperty(Parser.lexicalHandlerProperty, h);
+//
+//            } else {
 
-            // Stream fragment to the output
-            try {
-                if (bodyDocument != null) {
-                    final Transformer identity = TransformerUtils.getIdentityTransformer();
-                    identity.transform(new DocumentSource(bodyDocument), new SAXResult(new ForwardingContentHandler(contentHandler) {
+                final org.w3c.dom.Document htmlDocument = htmlStringToDocument(value, locationData);
 
-                        private int level = 0;
-
-                        public void startDocument() {
-                        }
-
-                        public void endDocument() {
-                        }
-
-                        public void startPrefixMapping(String s, String s1) {
-                        }
-
-                        public void endPrefixMapping(String s) {
-                        }
-
-                        public void setDocumentLocator(Locator locator) {
-                        }
-
-                        public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
-                            if (level > 0) {
-                                final String xhtmlQName = XMLUtils.buildQName(xhtmlPrefix, localname);
-                                super.startElement(XMLConstants.XHTML_NAMESPACE_URI, localname, xhtmlQName, attributes);
-                            }
-
-                            level++;
-                        }
-
-                        public void endElement(String uri, String localname, String qName) throws SAXException {
-                            level--;
-
-                            if (level > 0) {
-                                final String xhtmlQName = XMLUtils.buildQName(xhtmlPrefix, localname);
-                                super.endElement(XMLConstants.XHTML_NAMESPACE_URI, localname, xhtmlQName);
-                            }
-                        }
-
-                    }));
+                // Stream fragment to the output
+                try {
+                    if (htmlDocument != null) {
+                        final Transformer identity = TransformerUtils.getIdentityTransformer();
+                        identity.transform(new DOMSource(htmlDocument), new SAXResult(new HTMLBodyContentHandler(contentHandler, xhtmlPrefix)));
+                    }
+                } catch (TransformerException e) {
+                    throw new OXFException(e);
                 }
-            } catch (TransformerException e) {
-                throw new OXFException(e);
-            }
+//            }
         }
     }
 

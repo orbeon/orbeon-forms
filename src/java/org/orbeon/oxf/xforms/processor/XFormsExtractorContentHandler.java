@@ -7,6 +7,8 @@ import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.servlet.OPSXFormsFilter;
+import org.orbeon.oxf.processor.ProcessorImpl;
+import org.orbeon.oxf.processor.xinclude.XIncludeProcessor;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
@@ -53,6 +55,7 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
 
     private boolean mustOutputFirstElement = true;
 
+    private final XFormsURIResolver uriResolver;
     private final ExternalContext externalContext;
     private Stack xmlBaseStack = new Stack();
 
@@ -61,10 +64,11 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
     private Map xxformsScriptMap;
     private StringBuffer xxformsScriptStringBuffer;
 
-    public XFormsExtractorContentHandler(PipelineContext pipelineContext, ContentHandler contentHandler) {
+    public XFormsExtractorContentHandler(PipelineContext pipelineContext, ContentHandler contentHandler, XFormsURIResolver uriResolver) {
         super(contentHandler);
 
         this.externalContext = ((ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT));
+        this.uriResolver = uriResolver;
 
         // Create xml:base stack
         try {
@@ -307,20 +311,47 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
                 }
 
                 if (inControl) {
-
                     if (localname.equals("label") || localname.equals("alert") || localname.equals("hint") || localname.equals("help")) {
                         inLabelHintHelpAlert = true;
                     }
 
                     super.startElement(uri, localname, qName, attributes);
                 }
+
             } else if (inLabelHintHelpAlert && (XMLConstants.XHTML_NAMESPACE_URI.equals(uri) || "".equals(uri))) {
                 // Preserve content
                 super.startElement(uri, localname, qName, attributes);
             }
 
             if (inModel) {
-                super.startElement(uri, localname, qName, attributes);
+
+                boolean found = false;
+                if (isXForms && "instance".equals(localname)) {
+                    // Processing an xforms:instance element
+                    final String srcAttribute = attributes.getValue("src");
+                    if (srcAttribute != null) {
+                        final String inputName = ProcessorImpl.getProcessorInputSchemeInputName(srcAttribute);
+                        if (inputName != null) {
+                            // Found an input:* URI
+
+                            // Take care of namespaces and other fun stuff
+                            // TODO: Handle locator
+                            final ContentHandler includeContentHandler = new XIncludeProcessor.XIncludeContentHandler(null, super.getContentHandler(), null, null, null, namespaceSupport, false, new XIncludeProcessor.OutputLocator());
+
+                            // Output instance element without @src attribute
+                            final AttributesImpl newAttributes = new AttributesImpl(attributes);
+                            newAttributes.removeAttribute(newAttributes.getIndex("src"));
+                            super.startElement(uri, localname, qName, newAttributes);
+
+                            // Include document in the output stream
+                            uriResolver.readURLAsSAX(srcAttribute, null, null, includeContentHandler);
+
+                            found = true;
+                        }
+                    }
+                }
+                if (!found)
+                    super.startElement(uri, localname, qName, attributes);
             }
         }
 

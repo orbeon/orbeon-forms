@@ -109,8 +109,9 @@ public class XIncludeProcessor extends ProcessorImpl {
         return output;
     }
 
-    private class XIncludeContentHandler extends ForwardingContentHandler {
+    public static class XIncludeContentHandler extends ForwardingContentHandler {
 
+        private boolean processXInclude;
         private PipelineContext pipelineContext;
         private URIProcessorOutputImpl.URIReferences uriReferences;
         private boolean topLevelContentHandler;
@@ -123,21 +124,25 @@ public class XIncludeProcessor extends ProcessorImpl {
         private NamespaceSupport3 namespaceSupport = new NamespaceSupport3();
 
         private int level;
-//        private boolean inInclude;
         private int includeLevel = -1;
 
         private boolean generateXMLBase;
 
+        public XIncludeContentHandler(ContentHandler contentHandler, NamespaceSupport3 parentNamespaceSupport, OutputLocator outputLocator) {
+            this(false, null, contentHandler, null, null, false, null, parentNamespaceSupport, false, outputLocator);
+        }
+
         public XIncludeContentHandler(PipelineContext pipelineContext, ContentHandler contentHandler, URIProcessorOutputImpl.URIReferences uriReferences, TransformerURIResolver uriResolver) {
-            this(pipelineContext, contentHandler, uriReferences, uriResolver, true, null, null, true, new OutputLocator());
+            this(true, pipelineContext, contentHandler, uriReferences, uriResolver, true, null, null, true, new OutputLocator());
         }
 
         public XIncludeContentHandler(PipelineContext pipelineContext, ContentHandler contentHandler, URIProcessorOutputImpl.URIReferences uriReferences, TransformerURIResolver uriResolver, String xmlBase, NamespaceSupport3 parentNamespaceSupport, boolean generateXMLBase, OutputLocator outputLocator) {
-            this(pipelineContext, contentHandler, uriReferences, uriResolver, false, xmlBase, parentNamespaceSupport, generateXMLBase, outputLocator);
+            this(true, pipelineContext, contentHandler, uriReferences, uriResolver, false, xmlBase, parentNamespaceSupport, generateXMLBase, outputLocator);
         }
 
-        private XIncludeContentHandler(PipelineContext pipelineContext, ContentHandler contentHandler, URIProcessorOutputImpl.URIReferences uriReferences, TransformerURIResolver uriResolver, boolean topLevelContentHandler, String xmlBase, NamespaceSupport3 paremtNamespaceSupport, boolean generateXMLBase, OutputLocator outputLocator) {
+        private XIncludeContentHandler(boolean processXInclude, PipelineContext pipelineContext, ContentHandler contentHandler, URIProcessorOutputImpl.URIReferences uriReferences, TransformerURIResolver uriResolver, boolean topLevelContentHandler, String xmlBase, NamespaceSupport3 paremtNamespaceSupport, boolean generateXMLBase, OutputLocator outputLocator) {
             super(contentHandler);
+            this.processXInclude = processXInclude;
             this.pipelineContext = pipelineContext;
             this.uriReferences = uriReferences;
             this.uriResolver = uriResolver;
@@ -180,64 +185,69 @@ public class XIncludeProcessor extends ProcessorImpl {
                 attributes = XMLUtils.addOrReplaceAttribute(attributes, XMLConstants.XML_URI, "xml", "base", xmlBase);
             }
 
-            if (XMLConstants.XINCLUDE_URI.equals(uri) || XMLConstants.OLD_XINCLUDE_URI.equals(uri)) {
-                // Found XInclude namespace
+            if (processXInclude) {
+                if (XMLConstants.XINCLUDE_URI.equals(uri) || XMLConstants.OLD_XINCLUDE_URI.equals(uri)) {
+                    // Found XInclude namespace
 
-                // Warn upon obsolete namespace URI
-                if (XMLConstants.OLD_XINCLUDE_URI.equals(uri))
-                    logger.warn("Using incorrect XInclude namespace URI: '" + uri + "'; should use '" + XMLConstants.XINCLUDE_URI + "' at " + new LocationData(outputLocator).toString());
+                    // Warn upon obsolete namespace URI
+                    if (XMLConstants.OLD_XINCLUDE_URI.equals(uri))
+                        logger.warn("Using incorrect XInclude namespace URI: '" + uri + "'; should use '" + XMLConstants.XINCLUDE_URI + "' at " + new LocationData(outputLocator).toString());
 
-                if ("include".equals(localname)) {
-                    // Start inclusion
+                    if ("include".equals(localname)) {
+                        // Start inclusion
 
-//                    inInclude = true;
+    //                    inInclude = true;
 
-                    final String href = attributes.getValue("href");
-                    final String parse = attributes.getValue("parse");
+                        final String href = attributes.getValue("href");
+                        final String parse = attributes.getValue("parse");
 
-                    // Whether to create/update xml:base attribute or not
-                    final boolean generateXMLBase;
-                    {
-                        final String disableXMLBase = attributes.getValue(XMLConstants.XXINCLUDE_NAMESPACE_URI, "omit-xml-base");
-                        generateXMLBase = !"true".equals(disableXMLBase);
+                        // Whether to create/update xml:base attribute or not
+                        final boolean generateXMLBase;
+                        {
+                            final String disableXMLBase = attributes.getValue(XMLConstants.XXINCLUDE_NAMESPACE_URI, "omit-xml-base");
+                            generateXMLBase = !"true".equals(disableXMLBase);
+                        }
+
+                        if (parse != null && !parse.equals("xml"))
+                            throw new ValidationException("Invalid 'parse' attribute value: " + parse, new LocationData(outputLocator));
+
+                        try {
+                            // Get SAXSource
+                            final String base = outputLocator == null ? null : outputLocator.getSystemId();
+                            final SAXSource source = (SAXSource) uriResolver.resolve(href, base);
+                            final XMLReader xmlReader = source.getXMLReader();
+                            xmlReader.setContentHandler(new XIncludeContentHandler(pipelineContext, getContentHandler(), uriReferences, uriResolver, source.getSystemId(), namespaceSupport, generateXMLBase, outputLocator));
+
+                            // Keep URI reference
+                            if (uriReferences != null)
+                                uriReferences.addReference(base, href, null, null);
+
+                            // Read document
+                            xmlReader.parse(new InputSource(source.getSystemId())); // Yeah, the SAX API doesn't make much sense
+
+                        } catch (Exception e) {
+                            // Resource error, must go to fallback if possible
+                            throw new OXFException(e);
+                        }
+
+                    } else if ("fallback".equals(localname)) {
+                        // TODO
+                    } else {
+                        throw new ValidationException("Invalid XInclude element: " + localname, new LocationData(outputLocator));
                     }
 
-                    if (parse != null && !parse.equals("xml"))
-                        throw new ValidationException("Invalid 'parse' attribute value: " + parse, new LocationData(outputLocator));
+                } else if (includeLevel != -1 && level == includeLevel) {
+                    // We are starting a sibling of an included element
 
-                    try {
-                        // Get SAXSource
-                        final String base = outputLocator == null ? null : outputLocator.getSystemId();
-                        final SAXSource source = (SAXSource) uriResolver.resolve(href, base);
-                        final XMLReader xmlReader = source.getXMLReader();
-                        xmlReader.setContentHandler(new XIncludeContentHandler(pipelineContext, getContentHandler(), uriReferences, uriResolver, source.getSystemId(), namespaceSupport, generateXMLBase, outputLocator));
+                    // Send adjusted prefix mappings
+                    sendRestoreStartPrefixMappings();
 
-                        // Keep URI reference
-                        if (uriReferences != null)
-                            uriReferences.addReference(base, href, null, null);
-
-                        // Read document
-                        xmlReader.parse(new InputSource(source.getSystemId())); // Yeah, the SAX API doesn't make much sense
-
-                    } catch (Exception e) {
-                        // Resource error, must go to fallback if possible
-                        throw new OXFException(e);
-                    }
-
-                } else if ("fallback".equals(localname)) {
-                    // TODO
+                    super.startElement(uri, localname, qName, attributes);
                 } else {
-                    throw new ValidationException("Invalid XInclude element: " + localname, new LocationData(outputLocator));
+                    super.startElement(uri, localname, qName, attributes);
                 }
-
-            } else if (includeLevel != -1 && level == includeLevel) {
-                // We are starting a sibling of an included element
-
-                // Send adjusted prefix mappings
-                sendRestoreStartPrefixMappings();
-
-                super.startElement(uri, localname, qName, attributes);
             } else {
+                // No XInclude processing
                 super.startElement(uri, localname, qName, attributes);
             }
 
@@ -299,7 +309,7 @@ public class XIncludeProcessor extends ProcessorImpl {
             level--;
 
             final boolean isEndingInclude;
-            if (XMLConstants.XINCLUDE_URI.equals(uri) || XMLConstants.OLD_XINCLUDE_URI.equals(uri)) {
+            if (processXInclude && (XMLConstants.XINCLUDE_URI.equals(uri) || XMLConstants.OLD_XINCLUDE_URI.equals(uri))) {
                 if ("include".equals(localname)) {
                     isEndingInclude = true;
                 } else {

@@ -293,7 +293,8 @@ public class XPathCache {
         private final String xpathString;
         private final Map prefixToURIMap;
         private final Map variableToValueMap;// TODO: should not store values in cache
-        private final FunctionLibrary functionLibrary;// TODO: should not store in cache, at least not store function library with references to XForms data structures
+        // NOTE: storing the FunctionLibrary in cache is ok if it doesn't hold dynamic references (case of global XFormsFunctionLibrary)
+        private final FunctionLibrary functionLibrary;
         private final ObjectPool pool;
         private final String baseURI;
         private final boolean isAvt;

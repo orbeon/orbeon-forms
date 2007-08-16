@@ -932,6 +932,136 @@
                     There are plans to support AVTs in more places in the future.
                 </p>
             </section>
+            <a name="dialog"/>
+            <section>
+                <title>Dialogs</title>
+                <a name="dialog-dialog"/>
+                <section>
+                    <title>The <code>xxforms:dialog</code> Control</title>
+                    <p>
+                        You declare dialogs directly under the <code>&lt;xhtml:body></code> element with:
+                    </p>
+                    <xml-source>
+                        <xxforms:dialog id="my-dialog-id" appearance="full | minimal" level="modeless" close="true" draggable="true">
+                            <xforms:label>Dialog title</xforms:label>
+                            Content of the dialog (XHTML + XForms)
+                        </xxforms:dialog>
+                    </xml-source>
+                    <ul>
+                        <li>
+                            When you have <code>appearance="full"</code> on the dialog, you define the title of the
+                            dialog with the embedded <code>&lt;xforms:label></code> element.
+                        </li>
+                        <li>
+                            Inside an <code>&lt;xxforms:dialog></code> you can use all the XHTML and XForms elements you
+                            can normally use elsewhere on the page. You can have other XForms controls, or show anything
+                            you would like to with HTML.
+                        </li>
+                        <li>
+                            The attributes on the <code>&lt;xxforms:dialog></code> are as follows:
+                        </li>
+                    </ul>
+                    <table>
+                        <tr>
+                            <th>id</th>
+                            <td>Mandatory</td>
+                            <td>
+                                The ID of the dialog. You reference this ID when opening the dialog with
+                                <code>&lt;xxforms:show dialog="my-dialog-id"></code>.
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>appearance</th>
+                            <td>
+                                Optional. Possible values are:
+                                <ul>
+                                    <li><code>full</code> (default)</li>
+                                    <li><code>minimal</code></li>
+                                </ul>
+                            </td>
+                            <td>
+                                You can set the appearance to either <code>full</code> or <code>minimal</code>:
+                                <ul>
+                                    <li>
+                                        The first screenshot below shows a dialog with <code>appearance="full"</code>
+                                        while the second one shows a dialog with <code>appearance="minimal"</code>.
+                                    </li>
+                                    <li>
+                                        In general, you will use the minimal dialog when you want to show a limited set
+                                        of information which is related to a certain element in the page. The minimal
+                                        dialog is sometime also referred to as a "drop-down dialog".
+                                    </li>
+                                    <li>
+                                        Some of the other attributes on <code>&lt;xxforms:dialog></code> can only be
+                                        used for the full or the minimal dialog. You will find more details on this
+                                        below.
+                                    </li>
+                                </ul>
+
+                                <img src="../apps/doc/images/reference-xforms-dialog-full.png"/>
+                                <img src="../apps/doc/images/reference-xforms-dialog-minimal.png"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>level</th>
+                            <td>
+                                Optional. Can only be used appearance is set to <code>full</code>. Possible values are:
+                                <ul>
+                                    <li><code>modal</code> (default)</li>
+                                    <li><code>modeless</code></li>
+                                </ul>
+                            </td>
+                            <td>
+                                When set to <code>modal</code> the rest the page is grayed out and you can't interact
+                                with any ontrol on the page outside of the dialog. When set to <code>modeless</code> you
+                                can still use other controls on the page.
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>close</th>
+                            <td>
+                                Optional. Can only be used appearance is set to <code>full</code>. Possible values are:
+                                <ul>
+                                    <li><code>true</code> (default)</li>
+                                    <li><code>false</code></li>
+                                </ul>
+                            </td>
+                            <td>
+                                A "x" is shown in the dialog title bar when <code>close</code> is set to
+                                <code>true</code>. If you specify <code>close="false"</code>, then you should provide a
+                                way to close the dialog, for instance by having you own "Close" button inside the
+                                dialog. This is typically useful when you want to force users to enter some data before
+                                proceeding and you don't want them to cancel the current operation by closing the
+                                dialog.
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>draggable</th>
+                            <td>
+                                Optional. Can only be used appearance is set to <code>full</code>. Possible values are:
+                                <ul>
+                                    <li><code>true</code> (default)</li>
+                                    <li><code>false</code></li>
+                                </ul>
+                            </td>
+                            <td>
+                                When set to <code>false</code>, you won't be able to move dialog on the page by using
+                                drag and drop in the dialog title bar.
+                            </td>
+                        </tr>
+                    </table>
+                </section>
+                <a name="dialog-show-hide"/>
+                <section>
+                    <title>The <code>xxforms:show</code> and <code>xxforms:hide</code> Actions</title>
+                    <p>[To be completed]</p>
+                </section>
+                <a name="dialog-dialog-open-close"/>
+                <section>
+                    <title>The <code>xxforms-dialog-open</code> and <code>xxforms-dialog-close</code> Events</title>
+                    <p>[To be completed]</p>
+                </section>
+            </section>
             <a name="other-extensions"/>
             <section>
                 <title>Other Extensions</title>
@@ -1182,13 +1312,6 @@
                     <p>
                         [TODO: describe the Orbeon Forms <code>xxforms:tree</code> appearance on
                         <code>xforms:select1</code>]
-                    </p>
-                </section>
-                <a name="dialog"/>
-                <section>
-                    <title>Dialogs with <code>xxforms:dialog</code>, <code>xxforms:show</code> and <code>xxforms:hide</code></title>
-                    <p>
-                        [TODO: describe the Orbeon Forms <code>xxforms:dialog</code> extension]
                     </p>
                 </section>
             </section>

@@ -1689,11 +1689,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         containingDocument.getXFormsControls().markDirty();
 
         // NOTE: The current spec specifies direct calls, but it might be updated to require setting flags instead.
-//        setAllDeferredFlags(true);
-        // TODO: Setting the flags seems to cause problems, see Governent Forms summary for example!
-        doRebuild(pipelineContext);
-        doRecalculate(pipelineContext);
-        doRevalidate(pipelineContext);
+        setAllDeferredFlags(true);
 
         // Mark new instance nodes to which controls are bound for event dispatching
         if (!newInstance.isReadOnly()) {// replacing a read-only instance does not cause value change events at the moment
@@ -1744,10 +1740,6 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                 });
             }
         }
-
-        // Finally do refresh
-        // NOTE: The current spec specifies direct calls, but it might be updated to require setting flags instead.
-        doRefresh(pipelineContext);
     }
 
     private DeferredActionContext deferredActionContext;
@@ -1785,8 +1777,6 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         // TODO: This is not 100% in line with the "correct" interpretation of the deferred updates, as deferred
         // behavior is triggered at the level of outermost action handlers, not outermost event dispatches.
 
-        // TODO: upon recursion, it looks like currentDeferredActionContext can be null and it is not clear why
-
         // Process deferred behavior
         final DeferredActionContext currentDeferredActionContext = deferredActionContext;
         deferredActionContext = null;
@@ -1812,10 +1802,6 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                 containingDocument.endOutermostActionHandler(pipelineContext);
             }
         }
-    }
-
-    public void processDeferredUpdates(PipelineContext pipelineContext) {
-
     }
 
     /**

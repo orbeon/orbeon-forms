@@ -23,6 +23,7 @@ import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
+import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
 import org.orbeon.oxf.xforms.control.controls.XXFormsDialogControl;
@@ -564,11 +565,16 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
             return null;
 
         final XFormsControl xformsControl = (XFormsControl) getObjectById(pipelineContext, focusEffectiveControlId);
-        // It doesn't make sense to tell the client to set the focus to an element that is non-relevant or readonly  
-        if (xformsControl != null && xformsControl.isRelevant() && !xformsControl.isReadonly())
-            return focusEffectiveControlId;
-        else
+        // It doesn't make sense to tell the client to set the focus to an element that is non-relevant or readonly
+        if (xformsControl != null && xformsControl instanceof XFormsSingleNodeControl) {
+            final XFormsSingleNodeControl xformsSingleNodeControl = (XFormsSingleNodeControl) xformsControl;
+            if (xformsSingleNodeControl.isRelevant() && !xformsSingleNodeControl.isReadonly())
+                return focusEffectiveControlId;
+            else
+                return null;
+        } else {
             return null;
+        }
     }
 
     /**
@@ -593,6 +599,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
             eventTarget = (XFormsEventTarget) eventTargetObject;
         }
 
+
         // Don't allow for events on non-relevant, readonly or xforms:output controls (we accept focus events on
         // xforms:output though).
         // This is also a security measures that also ensures that somebody is not able to change values in an instance
@@ -608,7 +615,13 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                 }
             } else {
                 // Target is a regular control
-                final XFormsControl xformsControl = (XFormsControl) eventTarget;
+
+                // Only single-node controls accept events from the client
+                if (!(eventTarget instanceof XFormsSingleNodeControl)) {
+                    return;
+                }
+
+                final XFormsSingleNodeControl xformsControl = (XFormsSingleNodeControl) eventTarget;
 
                 if (!xformsControl.isRelevant() || (xformsControl.isReadonly() && !(xformsControl instanceof XFormsOutputControl))) {
                     // Controls accept event only if they are relevant and not readonly, except for xforms:output which may be readonly

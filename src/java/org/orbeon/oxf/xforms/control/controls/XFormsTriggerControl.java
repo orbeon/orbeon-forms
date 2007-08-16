@@ -14,13 +14,14 @@
 package org.orbeon.oxf.xforms.control.controls;
 
 import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.dom4j.Element;
 
 /**
  * Represents an xforms:trigger control.
  */
-public class XFormsTriggerControl extends XFormsControl {
+public class XFormsTriggerControl extends XFormsSingleNodeControl {
     public XFormsTriggerControl(XFormsContainingDocument containingDocument, XFormsControl parent, Element element, String name, String id) {
         super(containingDocument, parent, element, name, id);
     }

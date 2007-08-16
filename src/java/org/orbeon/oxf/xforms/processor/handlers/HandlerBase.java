@@ -20,6 +20,7 @@ import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsControls;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
+import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.ElementHandler;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -113,14 +114,14 @@ public abstract class HandlerBase extends ElementHandler {
         level--;
     }
 
-    public static void handleReadOnlyAttribute(AttributesImpl newAttributes, XFormsContainingDocument containingDocument, XFormsControl xformsControl) {
+    public static void handleReadOnlyAttribute(AttributesImpl newAttributes, XFormsContainingDocument containingDocument, XFormsSingleNodeControl xformsControl) {
         if (xformsControl != null && xformsControl.isReadonly() && !containingDocument.getReadonlyAppearance().equals(XFormsConstants.XXFORMS_READONLY_APPEARANCE_STATIC_VALUE)) {
             // @disabled="disabled"
             newAttributes.addAttribute("", "disabled", "disabled", ContentHandlerHelper.CDATA, "disabled");
         }
     }
 
-    public static void handleMIPClasses(StringBuffer sb, XFormsControl xformsControl) {
+    public static void handleMIPClasses(StringBuffer sb, XFormsSingleNodeControl xformsControl) {
         if (xformsControl != null) {
             // The case of a concrete control
             if (!xformsControl.isRelevant()) {
@@ -347,11 +348,11 @@ public abstract class HandlerBase extends ElementHandler {
         return xformsControl != null && xformsControl.isStaticReadonly();
     }
 
-    protected void handleLabelHintHelpAlert(String parentId, String type, XFormsControl xformsControl) throws SAXException {
+    protected void handleLabelHintHelpAlert(String parentId, String type, XFormsSingleNodeControl xformsControl) throws SAXException {
         handleLabelHintHelpAlert(parentId, type, xformsControl, true);
     }
 
-    protected void handleLabelHintHelpAlert(String parentId, String type, XFormsControl xformsControl, boolean placeholder) throws SAXException {
+    protected void handleLabelHintHelpAlert(String parentId, String type, XFormsSingleNodeControl xformsControl, boolean placeholder) throws SAXException {
 
         // Don't handle alerts and help in read-only mode
         // TODO: Removing hints and help could be optional depending on appearance

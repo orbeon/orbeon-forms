@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.processor.XFormsElementFilterContentHandler;
-import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.control.controls.XFormsGroupControl;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.saxon.om.FastStringBuffer;
 import org.xml.sax.Attributes;
@@ -33,7 +33,7 @@ import java.util.HashMap;
 public class XFormsGroupHandler extends HandlerBase {
 
     protected String effectiveGroupId;
-    private XFormsControl groupXFormsControl;
+    private XFormsGroupControl groupXFormsControl;
     private boolean isFieldsetAppearance;
     private boolean isInternalAppearance;
 
@@ -70,7 +70,7 @@ public class XFormsGroupHandler extends HandlerBase {
         // Find classes to add
         final StringBuffer classes = getInitialClasses(localname, attributes, null);
         if (!handlerContext.isGenerateTemplate()) {
-            groupXFormsControl = ((XFormsControl) containingDocument.getObjectById(handlerContext.getPipelineContext(), effectiveGroupId));
+            groupXFormsControl = ((XFormsGroupControl) containingDocument.getObjectById(handlerContext.getPipelineContext(), effectiveGroupId));
 
             HandlerBase.handleMIPClasses(classes, groupXFormsControl);
         }

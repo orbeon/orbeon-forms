@@ -33,7 +33,7 @@ import java.util.Map;
 /**
  * Base class for all controls that hold a value.
  */
-public abstract class XFormsValueControl extends XFormsControl {
+public abstract class XFormsValueControl extends XFormsSingleNodeControl {
 
     private String value;
     private String displayValue;

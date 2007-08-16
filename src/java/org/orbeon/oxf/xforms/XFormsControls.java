@@ -20,6 +20,7 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsControlFactory;
+import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.controls.*;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerImpl;
@@ -888,47 +889,7 @@ public class XFormsControls {
 
                 // Set current binding for control element
                 final BindingContext currentBindingContext = getCurrentBindingContext();
-                final List currentNodeSet = currentBindingContext.getNodeset();
-
-                // Bind the control to the binding context
                 xformsControl.setBindingContext(currentBindingContext);
-
-                // Update MIPs on control
-                // TODO: we don't need to set these values until we produce output, right?
-                if (!(xformsControl instanceof XFormsRepeatControl && currentNodeSet != null && currentNodeSet.size() == 0)) {
-                    final NodeInfo currentNodeInfo = currentBindingContext.getSingleNode();
-                    if (currentBindingContext.isNewBind()) {
-                        if (currentNodeInfo != null) {
-                            // Control is bound to a node - get model item properties
-                            xformsControl.setReadonly(InstanceData.getInheritedReadonly(currentNodeInfo));
-                            xformsControl.setRequired(InstanceData.getRequired(currentNodeInfo));
-                            xformsControl.setRelevant(InstanceData.getInheritedRelevant(currentNodeInfo));
-                            xformsControl.setValid(InstanceData.getValid(currentNodeInfo));
-                            final String type = InstanceData.getType(currentNodeInfo);
-                            if (type != null) {
-                                xformsControl.setType(type);
-                            }
-                            // Handle global read-only setting
-                            if (containingDocument.isReadonly())
-                                xformsControl.setReadonly(true);
-                        } else {
-                            // Control is not bound to a node - it becomes non-relevant
-                            // TODO: We could probably optimize and not even *create* the control object and its descendants
-                            xformsControl.setReadonly(false);
-                            xformsControl.setRequired(false);
-                            xformsControl.setRelevant(false);
-                            xformsControl.setValid(true);// by default, a control is not invalid
-                            xformsControl.setType(null);
-                        }
-                    } else {
-                        // Control is not bound to a node because it doesn't have a binding (group, trigger, etc. without @ref)
-                        xformsControl.setReadonly(false);
-                        xformsControl.setRequired(false);
-                        xformsControl.setRelevant((currentNodeInfo != null) ? InstanceData.getInheritedRelevant(currentNodeInfo) : false); // inherit relevance anyway
-                        xformsControl.setValid(true);// by default, a control is not invalid
-                        xformsControl.setType(null);
-                    }
-                }
 
                 // Add to current controls container
                 currentControlsContainer.addChild(xformsControl);
@@ -940,6 +901,7 @@ public class XFormsControls {
 
                 return true;
             }
+            
             public boolean endVisitControl(Element controlElement, String effectiveControlId) {
 
                 final String controlName = controlElement.getName();
@@ -984,22 +946,7 @@ public class XFormsControls {
 
                 // Set current binding for control element
                 final BindingContext currentBindingContext = getCurrentBindingContext();
-
-                // Bind the control to the binding context
                 repeatIterationXForms.setBindingContext(currentBindingContext);
-
-                // Set current binding for control element
-                final NodeInfo currentNodeInfo = currentBindingContext.getSingleNode();
-
-                // Get model item properties
-                repeatIterationXForms.setReadonly(InstanceData.getInheritedReadonly(currentNodeInfo));
-                repeatIterationXForms.setRequired(InstanceData.getRequired(currentNodeInfo));
-                repeatIterationXForms.setRelevant(InstanceData.getInheritedRelevant(currentNodeInfo));
-                repeatIterationXForms.setValid(InstanceData.getValid(currentNodeInfo));
-
-                // Handle global read-only setting
-                if (containingDocument.isReadonly())
-                    repeatIterationXForms.setReadonly(true);
             }
 
             public void endRepeatIteration(int iteration) {
@@ -1221,6 +1168,12 @@ public class XFormsControls {
      * Get the object with the id specified, null if not found.
      */
     public Object getObjectById(String controlId) {
+
+//        for (Iterator i = currentControlsState.getIdToControl().entrySet().iterator(); i.hasNext(); ) {
+//            final Map.Entry entry = (Map.Entry) i.next();
+//            System.out.println("XXX entry: " + entry.getKey() + " => " + entry.getValue());
+//        }
+
         return currentControlsState.getIdToControl().get(controlId);
     }
 
@@ -1926,8 +1879,11 @@ public class XFormsControls {
             final XFormsControl leadingControl = (xformsControl2 != null) ? xformsControl2 : xformsControl1; // never null
 
             // 1: Check current control
-            if (!(leadingControl instanceof XFormsRepeatControl)) {
+            if (leadingControl instanceof XFormsSingleNodeControl) {
                 // xforms:repeat doesn't need to be handled independently, iterations do it
+
+                final XFormsSingleNodeControl xformsSingleNodeControl1 = (XFormsSingleNodeControl) xformsControl1;
+                final XFormsSingleNodeControl xformsSingleNodeControl2 = (XFormsSingleNodeControl) xformsControl2;
 
                 String foundControlId = null;
                 XFormsControl targetControl = null;
@@ -1936,11 +1892,11 @@ public class XFormsControls {
                     final NodeInfo boundNode1 = xformsControl1.getBoundNode();
                     final NodeInfo boundNode2 = xformsControl2.getBoundNode();
 
-                    if (boundNode1 != null && xformsControl1.isRelevant() && boundNode2 == null) {
+                    if (boundNode1 != null && xformsSingleNodeControl1.isRelevant() && boundNode2 == null) {
                         // A control was bound to a node and relevant, but has become no longer bound to a node
                         foundControlId = xformsControl2.getEffectiveId();
                         eventType = XFormsModel.EventSchedule.RELEVANT_BINDING;
-                    } else if (boundNode1 == null && boundNode2 != null && xformsControl2.isRelevant()) {
+                    } else if (boundNode1 == null && boundNode2 != null && xformsSingleNodeControl2.isRelevant()) {
                         // A control was not bound to a node, but has now become bound and relevant
                         foundControlId = xformsControl2.getEffectiveId();
                         eventType = XFormsModel.EventSchedule.RELEVANT_BINDING;
@@ -1955,14 +1911,14 @@ public class XFormsControls {
                     }
                 } else if (xformsControl2 != null) {
                     final NodeInfo boundNode2 = xformsControl2.getBoundNode();
-                    if (boundNode2 != null && xformsControl2.isRelevant()) {
+                    if (boundNode2 != null && xformsSingleNodeControl2.isRelevant()) {
                         // A control was not bound to a node, but has now become bound and relevant
                         foundControlId = xformsControl2.getEffectiveId();
                         eventType = XFormsModel.EventSchedule.RELEVANT_BINDING;
                     }
                 } else if (xformsControl1 != null) {
                     final NodeInfo boundNode1 = xformsControl1.getBoundNode();
-                    if (boundNode1 != null && xformsControl1.isRelevant()) {
+                    if (boundNode1 != null && xformsSingleNodeControl1.isRelevant()) {
                         // A control was bound to a node and relevant, but has become no longer bound to a node
                         foundControlId = xformsControl1.getEffectiveId();
                         // NOTE: This is the only case where we must dispatch the event to an obsolete control

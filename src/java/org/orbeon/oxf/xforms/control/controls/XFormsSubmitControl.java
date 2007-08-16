@@ -27,7 +27,7 @@ import org.orbeon.oxf.xforms.event.events.XFormsSubmitEvent;
 /**
  * Represents an xforms:submit control.
  */
-public class XFormsSubmitControl extends XFormsControl {
+public class XFormsSubmitControl extends XFormsTriggerControl {
     public XFormsSubmitControl(XFormsContainingDocument containingDocument, XFormsControl parent, Element element, String name, String id) {
         super(containingDocument, parent, element, name, id);
     }

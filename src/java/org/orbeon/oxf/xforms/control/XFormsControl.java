@@ -52,12 +52,6 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
     private String hintId;
     private String alertId;
 
-    private boolean readonly;
-    private boolean required;
-    private boolean relevant;
-    private boolean valid;
-    private String type;
-
     private List children;
     private List eventHandlers;
 
@@ -155,46 +149,6 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
         this.name = name;
     }
 
-    public boolean isReadonly() {
-        return readonly;
-    }
-
-    public void setReadonly(boolean readonly) {
-        this.readonly = readonly;
-    }
-
-    public boolean isRelevant() {
-        return relevant;
-    }
-
-    public void setRelevant(boolean relevant) {
-        this.relevant = relevant;
-    }
-
-    public boolean isRequired() {
-        return required;
-    }
-
-    public void setRequired(boolean required) {
-        this.required = required;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public boolean isValid() {
-        return valid;
-    }
-
-    public void setValid(boolean valid) {
-        this.valid = valid;
-    }
-
     public XFormsControl getParent() {
         return parent;
     }
@@ -259,18 +213,6 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
         if (!((alert == null && other.alert == null) || (alert != null && other.alert != null && alert.equals(other.alert))))
             return false;
 
-        if (readonly != other.readonly)
-            return false;
-        if (required != other.required)
-            return false;
-        if (relevant != other.relevant)
-            return false;
-        if (valid != other.valid)
-            return false;
-
-        if (!((type == null && other.type == null) || (type != null && other.type != null && type.equals(other.type))))
-            return false;
-
         return true;
     }
 
@@ -320,22 +262,6 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
     public NodeInfo getBoundNode() {
         return boundNode;
     }
-
-    /**
-     * Return the node to which the control is bound, if any. If the control is not bound to any node, return null. If
-     * the node to which the control no longer exists, return null.
-     */
-//    public NodeInfo getBoundNodeOld() {
-//        final NodeInfo boundSingleNode = bindingContext.getSingleNode();
-//        if (boundSingleNode == null)
-//            return null;
-//
-//        final XFormsInstance boundInstance = containingDocument.getInstanceForNode(boundSingleNode);
-//        if (boundInstance == null)
-//            return null;
-//
-//        return boundSingleNode;
-//    }
 
     public void evaluate(PipelineContext pipelineContext) {
 
@@ -464,8 +390,6 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
     }
 
     public boolean isStaticReadonly() {
-        return isReadonly()
-                && (XFormsConstants.XXFORMS_READONLY_APPEARANCE_STATIC_VALUE.equals(containingDocument.getReadonlyAppearance())
-                    || XFormsConstants.XXFORMS_READONLY_APPEARANCE_STATIC_VALUE.equals(getControlElement().attributeValue(XFormsConstants.XXFORMS_READONLY_APPEARANCE_ATTRIBUTE_QNAME)));
+        return false;
     }
 }

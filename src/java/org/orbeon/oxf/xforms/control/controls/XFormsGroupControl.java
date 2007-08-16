@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.control.controls;
 
 import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -22,7 +23,7 @@ import org.dom4j.Element;
 /**
  * Represents an xforms:group pseudo-control.
  */
-public class XFormsGroupControl extends XFormsControl {
+public class XFormsGroupControl extends XFormsSingleNodeControl {
 
     public static final String INTERNAL_APPEARANCE = Dom4jUtils.qNameToexplodedQName(XFormsConstants.XXFORMS_INTERNAL_APPEARANCE_QNAME);
 

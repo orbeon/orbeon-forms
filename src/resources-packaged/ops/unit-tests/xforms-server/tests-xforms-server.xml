@@ -735,7 +735,7 @@
                     <p:input name="config" href="xforms-server/wrap-server.xpl"/>
                     <p:input name="action">
                         <xxforms:action>
-                            <xxforms:event name="DOMActivate" source-control-id="id124·1"/>
+                            <xxforms:event name="DOMActivate" source-control-id="id127·1-1"/>
                         </xxforms:action>
                     </p:input>
                     <p:input name="controls" href="xforms-server/repeat-controls.xml"/>
@@ -791,6 +791,7 @@
                         <xxf:copy-repeat-template id="id123" parent-indexes="" id-suffix="4"/>
                         <xxf:copy-repeat-template id="id124" parent-indexes="1" id-suffix="3"/>
                         <xxf:repeat-iteration id="id124·1" readonly="false" required="false" relevant="true" valid="true" iteration="3"/>
+                        <xxf:control id="id127·1-3" label="Insert" readonly="false" required="false" relevant="true" valid="true" type=""/>
                         <xxf:control id="id125·1-3" readonly="false" required="false" relevant="true" valid="true" type="">f12</xxf:control>
                         <xxf:control id="id126·1-3" readonly="false" required="false" relevant="true" valid="true" type="">l12</xxf:control>
                         <xxf:repeat-iteration id="id123" readonly="false" required="false" relevant="true" valid="true" iteration="4"/>
@@ -798,15 +799,19 @@
                         <xxf:copy-repeat-template id="id124" parent-indexes="4" id-suffix="3"/>
                         <xxf:copy-repeat-template id="id124" parent-indexes="4" id-suffix="4"/>
                         <xxf:repeat-iteration id="id124·4" readonly="false" required="false" relevant="true" valid="true" iteration="1"/>
+                        <xxf:control id="id127·4-1" label="Insert" readonly="false" required="false" relevant="true" valid="true" type=""/>
                         <xxf:control id="id125·4-1" readonly="false" required="false" relevant="true" valid="true" type="">f31</xxf:control>
                         <xxf:control id="id126·4-1" readonly="false" required="false" relevant="true" valid="true" type="">l31</xxf:control>
                         <xxf:repeat-iteration id="id124·4" readonly="false" required="false" relevant="true" valid="true" iteration="2"/>
+                        <xxf:control id="id127·4-2" label="Insert" readonly="false" required="false" relevant="true" valid="true" type=""/>
                         <xxf:control id="id125·4-2" readonly="false" required="false" relevant="true" valid="true" type="">f32</xxf:control>
                         <xxf:control id="id126·4-2" readonly="false" required="false" relevant="true" valid="true" type="">l32</xxf:control>
                         <xxf:repeat-iteration id="id124·4" readonly="false" required="false" relevant="true" valid="true" iteration="3"/>
+                        <xxf:control id="id127·4-3" label="Insert" readonly="false" required="false" relevant="true" valid="true" type=""/>
                         <xxf:control id="id125·4-3" readonly="false" required="false" relevant="true" valid="true" type="">f33</xxf:control>
                         <xxf:control id="id126·4-3" readonly="false" required="false" relevant="true" valid="true" type="">l33</xxf:control>
                         <xxf:repeat-iteration id="id124·4" readonly="false" required="false" relevant="true" valid="true" iteration="4"/>
+                        <xxf:control id="id127·4-4" label="Insert" readonly="false" required="false" relevant="true" valid="true" type=""/>
                         <xxf:control id="id125·4-4" readonly="false" required="false" relevant="true" valid="true" type="">f34</xxf:control>
                         <xxf:control id="id126·4-4" readonly="false" required="false" relevant="true" valid="true" type="">l34</xxf:control>
                     </xxf:control-values>
@@ -827,7 +832,7 @@
                     <p:input name="config" href="xforms-server/wrap-server.xpl"/>
                     <p:input name="action">
                         <xxforms:action>
-                            <xxforms:event name="DOMActivate" source-control-id="id124·1"/>
+                            <xxforms:event name="DOMActivate" source-control-id="id127·1-1"/>
                         </xxforms:action>
                     </p:input>
                     <p:input name="controls">
@@ -837,10 +842,13 @@
                             xmlns:ev="http://www.w3.org/2001/xml-events">
                             <xforms:repeat nodeset="/form/departments/department" id="id123">
                                 <xforms:repeat nodeset="employee" id="id124" startindex="2">
-                                    <xforms:action ev:event="DOMActivate">
-                                        <xforms:delete nodeset="../../department[index('id123')]/employee" at="2"/>
-<!--                                        <xforms:delete nodeset="../../department" at="2"/>-->
-                                    </xforms:action>
+                                    <xforms:trigger id="id127">
+                                        <xforms:label>Delete</xforms:label>
+                                        <xforms:action ev:event="DOMActivate">
+                                            <xforms:delete nodeset="../../department[index('id123')]/employee" at="2"/>
+    <!--                                        <xforms:delete nodeset="../../department" at="2"/>-->
+                                        </xforms:action>
+                                    </xforms:trigger>
                                     <xforms:output ref="@first" id="id125"/>
                                     <xforms:output ref="@last" id="id126"/>
                                 </xforms:repeat>
@@ -907,7 +915,7 @@
                     <p:input name="config" href="xforms-server/wrap-server.xpl"/>
                     <p:input name="action">
                         <xxforms:action>
-                            <xxforms:event name="DOMActivate" source-control-id="id124·1"/>
+                            <xxforms:event name="DOMActivate" source-control-id="id127·1-1"/>
                         </xxforms:action>
                     </p:input>
                     <p:input name="controls">
@@ -917,10 +925,13 @@
                             xmlns:ev="http://www.w3.org/2001/xml-events">
                             <xforms:repeat nodeset="/form/departments/department" id="id123">
                                 <xforms:repeat nodeset="employee" id="id124" startindex="2">
-                                    <xforms:action ev:event="DOMActivate">
-                                        <xforms:setindex repeat="id123" index="7 - 4"/>
-                                        <xforms:setindex repeat="id124" index="4"/>
-                                    </xforms:action>
+                                    <xforms:trigger id="id127">
+                                        <xforms:label>Delete</xforms:label>
+                                        <xforms:action ev:event="DOMActivate">
+                                            <xforms:setindex repeat="id123" index="7 - 4"/>
+                                            <xforms:setindex repeat="id124" index="4"/>
+                                        </xforms:action>
+                                    </xforms:trigger>
                                     <xforms:output ref="@first" id="id125"/>
                                     <xforms:output ref="@last" id="id126"/>
                                 </xforms:repeat>

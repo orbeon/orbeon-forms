@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.control.controls;
 
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 
 /**
@@ -22,7 +23,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
  *
  * This is not really a control, but an abstraction for xforms:repeat branches.
  */
-public class RepeatIterationControl extends XFormsControl {
+public class RepeatIterationControl extends XFormsSingleNodeControl {
     private int iteration;
     public RepeatIterationControl(XFormsContainingDocument containingDocument, XFormsControl parent, int iteration) {
         super(containingDocument, parent, null, "xxforms-repeat-iteration", parent.getEffectiveId());

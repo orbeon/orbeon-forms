@@ -35,7 +35,7 @@ public class XXFormsShowAction extends XFormsAction {
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
         final String dialogId = XFormsUtils.namespaceId(containingDocument, actionElement.attributeValue("dialog"));
         final String neighbor = XFormsUtils.namespaceId(containingDocument, actionElement.attributeValue("neighbor"));
-        final boolean constrainToViewport = "true".equals(actionElement.attributeValue("constrain"));
+        final boolean constrainToViewport = !"false".equals(actionElement.attributeValue("constrain"));
 
         if (dialogId != null) {
             // Dispatch xxforms-dialog-open event to dialog

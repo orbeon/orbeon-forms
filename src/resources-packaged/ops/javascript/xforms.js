@@ -3044,10 +3044,15 @@ ORBEON.xforms.Server = {
                                             } else {
                                                 // This is a dialog
                                                 if (visibile)  {
-                                                    var neighbor = ORBEON.util.Dom.getAttribute(divElement, "neighbor");
                                                     // Fixes cursor Firefox issue; more on this in dialog init code
                                                     yuiDialog.element.style.display = "block";
+                                                    // Show the dialog
                                                     yuiDialog.show();
+                                                    // By default try to display the dialog inside the viewport, but this can be overridden with consrain="false"
+                                                    var constrain = ORBEON.util.Dom.getAttribute(divElement, "constrain") == "false" ? false : true;
+                                                    yuiDialog.cfg.setProperty("constraintoviewport", constrain);
+                                                    // Position the dialog either at the center of the viewport or relative of a neighbor
+                                                    var neighbor = ORBEON.util.Dom.getAttribute(divElement, "neighbor");
                                                     if (neighbor == null) {
                                                         // Center dialog in page, if not positined relative to other element
                                                         yuiDialog.center();

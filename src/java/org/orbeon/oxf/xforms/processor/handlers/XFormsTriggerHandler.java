@@ -14,10 +14,11 @@
 package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.dom4j.QName;
+import org.dom4j.Element;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsUtils;
-import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.event.XFormsEvents;
+import org.orbeon.oxf.xforms.control.controls.XFormsTriggerControl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -63,7 +64,7 @@ public class XFormsTriggerHandler extends HandlerBase {
         // xforms:trigger and xforms:submit
 
         final String effectiveId = handlerContext.getEffectiveId(elementAttributes);
-        final XFormsControl xformsControl = handlerContext.isGenerateTemplate() ? null : ((XFormsControl) containingDocument.getObjectById(pipelineContext, effectiveId));
+        final XFormsTriggerControl xformsControl = handlerContext.isGenerateTemplate() ? null : ((XFormsTriggerControl) containingDocument.getObjectById(pipelineContext, effectiveId));
 
         if (isStaticReadonly(xformsControl))
             return;
@@ -96,7 +97,44 @@ public class XFormsTriggerHandler extends HandlerBase {
             // Minimal or link appearance (xxforms:link)
 
             // TODO: probably needs f:url-norewrite="true"
-            newAttributes.addAttribute("", "href", "href", ContentHandlerHelper.CDATA, "");
+            if (true) {
+                newAttributes.addAttribute("", "href", "href", ContentHandlerHelper.CDATA, "");
+            } else {
+                // TODO: Complete experimenting with outputting href value
+                String hrefValue = "";
+                {
+                    // Try to compute an href value right away if we detect just a nested xforms:load
+                    // TODO: Need to tell the client not to handle clicks on hyperlink
+                    // TODO: This should probably be done at the control level
+                    // TODO: This duplicates code in XFormsLoadAction
+                    if (xformsControl != null && xformsControl.getControlElement() != null) {
+                        final Element controlElement = xformsControl.getControlElement();
+                        final Element loadElement = controlElement.element(XFormsConstants.XFORMS_LOAD_QNAME);
+                        if (loadElement != null && XFormsEvents.XFORMS_DOM_ACTIVATE.equals(loadElement.attributeValue(XFormsConstants.XML_EVENTS_EVENT_ATTRIBUTE_QNAME))) {
+                            final String resource = loadElement.attributeValue("resource");
+                            if (resource != null && resource.indexOf('{') == -1) {
+                                // Static resource URL
+                                hrefValue = resource;
+                            } else if (resource != null) {
+                                // Computed resource URL
+                                final XFormsControls.BindingContext curBindingContext = xformsControl.getBindingContext();
+                                if (curBindingContext != null && curBindingContext.getSingleNode() != null) {
+                                    hrefValue = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, curBindingContext.getSingleNode(),
+                                            null, XFormsContainingDocument.getFunctionLibrary(), containingDocument.getXFormsControls(), loadElement, resource);
+                                }
+                            } else {
+                                // Assume single-node binding
+                                final XFormsControls.BindingContext curBindingContext = xformsControl.getBindingContext();
+                                if (curBindingContext != null && curBindingContext.getSingleNode() != null) {
+                                    hrefValue = XFormsInstance.getValueForNodeInfo(curBindingContext.getSingleNode());
+                                }
+                            }
+                        }
+                    }
+                }
+
+                newAttributes.addAttribute("", "href", "href", ContentHandlerHelper.CDATA, hrefValue);
+            }
 
             // xhtml:a
             final String xhtmlPrefix = handlerContext.findXHTMLPrefix();

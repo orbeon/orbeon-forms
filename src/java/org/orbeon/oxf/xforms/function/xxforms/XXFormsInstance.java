@@ -21,6 +21,7 @@ import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.StaticContext;
 import org.orbeon.saxon.expr.XPathContext;
+import org.orbeon.saxon.expr.PathMap;
 import org.orbeon.saxon.om.ListIterator;
 import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.trans.XPathException;
@@ -59,5 +60,9 @@ public class XXFormsInstance extends XFormsFunction {
             // "an empty node-set is returned"
             return new ListIterator(Collections.EMPTY_LIST);
         }
+    }
+
+    public PathMap.PathMapNode addToPathMap(PathMap pathMap, PathMap.PathMapNode pathMapNode) {
+        return addDocToPathMap(pathMap, pathMapNode);
     }
 }

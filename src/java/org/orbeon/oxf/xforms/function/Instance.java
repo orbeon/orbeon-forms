@@ -19,6 +19,7 @@ import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.StaticContext;
 import org.orbeon.saxon.expr.XPathContext;
+import org.orbeon.saxon.expr.PathMap;
 import org.orbeon.saxon.om.ListIterator;
 import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.trans.XPathException;
@@ -54,7 +55,6 @@ public class Instance extends XFormsFunction {
         final XFormsModel model = (getXFormsModel(xpathContext) != null) ? getXFormsModel(xpathContext) : getXFormsControls(xpathContext).getCurrentModel();
         final XFormsInstance instance = model.getInstance(instanceId);
 
-
         // Return instance document if found
         if (instance != null) {
             // "this function returns a node-set containing just the root element node"
@@ -63,5 +63,9 @@ public class Instance extends XFormsFunction {
             // "an empty node-set is returned"
             return new ListIterator(Collections.EMPTY_LIST);
         }
+    }
+
+    public PathMap.PathMapNode addToPathMap(PathMap pathMap, PathMap.PathMapNode pathMapNode) {
+        return addDocToPathMap(pathMap, pathMapNode);
     }
 }

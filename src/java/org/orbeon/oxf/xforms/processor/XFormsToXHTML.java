@@ -17,7 +17,6 @@ import org.apache.commons.pool.ObjectPool;
 import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.orbeon.oxf.cache.InternalCacheKey;
-import org.orbeon.oxf.cache.OutputCacheKey;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
@@ -48,7 +47,8 @@ import java.util.Map;
  */
 public class XFormsToXHTML extends ProcessorImpl {
 
-    private static final boolean IS_MIGRATE_TO_SESSION = false;// TODO: for tests
+    private static final boolean TEST_BYPASS_INPUT = false;// TODO: for testing only
+//    private static final boolean IS_MIGRATE_TO_SESSION = false;// TODO: for testing only
 
     public static Logger logger = XFormsServer.logger;
 
@@ -59,6 +59,8 @@ public class XFormsToXHTML extends ProcessorImpl {
 
     private static final String NAMESPACE_CACHE_KEY = "containerNamespace";
     private static final Long CONSTANT_VALIDITY = new Long(0);
+
+    private static InputDependencies testCachingStaticStateInputDependencies;
 
 //    private static final KeyValidity CONSTANT_KEY_VALIDITY
 //            = new KeyValidity(new InternalCacheKey("sessionId", "NO_SESSION_DEPENDENCY"), new Long(0));
@@ -77,10 +79,10 @@ public class XFormsToXHTML extends ProcessorImpl {
                 doIt(pipelineContext, contentHandler, this, outputName);
             }
 
-            protected OutputCacheKey getKeyImpl(PipelineContext pipelineContext) {
-                final OutputCacheKey outputCacheKey = super.getKeyImpl(pipelineContext);
-
-                if (IS_MIGRATE_TO_SESSION && outputCacheKey != null) {
+//            protected OutputCacheKey getKeyImpl(PipelineContext pipelineContext) {
+//                final OutputCacheKey outputCacheKey = super.getKeyImpl(pipelineContext);
+//
+//                if (IS_MIGRATE_TO_SESSION && outputCacheKey != null) {
 //                    final InputDependencies inputDependencies = (InputDependencies) getCachedInputAsObject(pipelineContext, getInputByName(INPUT_ANNOTATED_DOCUMENT));
 //                    if (inputDependencies != null && inputDependencies.isDependsOnSession()) {
 //                        final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
@@ -96,10 +98,10 @@ public class XFormsToXHTML extends ProcessorImpl {
 //
 //                        // Migrate data to current session
 //                    }
-                }
-
-                return outputCacheKey;
-            }
+//                }
+//
+//                return outputCacheKey;
+//            }
 
             protected boolean supportsLocalKeyValidity() {
                 return true;
@@ -110,8 +112,6 @@ public class XFormsToXHTML extends ProcessorImpl {
                 // Use the container namespace as a dependency
                 final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
                 final String containerNamespace = externalContext.getRequest().getContainerNamespace();
-
-//                System.out.println("  XFormsToXHTML namespace: " + containerNamespace);
 
                 return new KeyValidity(new InternalCacheKey(XFormsToXHTML.this, NAMESPACE_CACHE_KEY, containerNamespace), CONSTANT_VALIDITY);
             }
@@ -134,61 +134,72 @@ public class XFormsToXHTML extends ProcessorImpl {
         final boolean[] cachedInput = new boolean[1];
 
         // Read and try to cache the complete XForms+XHTML document with annotations
-        final InputDependencies inputDependencies = (InputDependencies) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_ANNOTATED_DOCUMENT), new CacheableInputReader() {
-            public Object read(PipelineContext pipelineContext, ProcessorInput processorInput) {
+        final InputDependencies inputDependencies;
+        if (testCachingStaticStateInputDependencies == null) {
 
-                // Create URIResolver
-                final XFormsURIResolver uriResolver = new XFormsURIResolver(XFormsToXHTML.this, processorOutput, pipelineContext, INPUT_ANNOTATED_DOCUMENT, URLGenerator.DEFAULT_HANDLE_XINCLUDE);
+            inputDependencies = (InputDependencies) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_ANNOTATED_DOCUMENT), new CacheableInputReader() {
+                public Object read(PipelineContext pipelineContext, ProcessorInput processorInput) {
 
-                // Compute annotated XForms document + static state document
-                final SAXStore annotatedSAXStore;
-                final XFormsStaticState xformsStaticState;
-                {
-                    final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
-                    // TODO: Use TinyTree instead of dom4j Document
-                    final LocationDocumentResult documentResult = new LocationDocumentResult();
-                    identity.setResult(documentResult);
+                    // Create URIResolver
+                    final XFormsURIResolver uriResolver = new XFormsURIResolver(XFormsToXHTML.this, processorOutput, pipelineContext, INPUT_ANNOTATED_DOCUMENT, URLGenerator.DEFAULT_HANDLE_XINCLUDE);
 
-                    final XMLUtils.DigestContentHandler digestContentHandler = new XMLUtils.DigestContentHandler("MD5");
+                    // Compute annotated XForms document + static state document
+                    final SAXStore annotatedSAXStore;
+                    final XFormsStaticState xformsStaticState;
+                    {
+                        final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
+                        // TODO: Use TinyTree instead of dom4j Document
+                        final LocationDocumentResult documentResult = new LocationDocumentResult();
+                        identity.setResult(documentResult);
 
-                    annotatedSAXStore = new SAXStore(new TeeContentHandler(new ContentHandler[] {
-                            new XFormsExtractorContentHandler(pipelineContext, identity, uriResolver),
-                            digestContentHandler
-//                            ,new SAXLoggerProcessor.DebugContentHandler()
-                    }));
+                        // TODO: Digest not used at this point
+    //                    final XMLUtils.DigestContentHandler digestContentHandler = new XMLUtils.DigestContentHandler("MD5");
 
-                    // Read the input
-                    readInputAsSAX(pipelineContext, processorInput, annotatedSAXStore);
+                        annotatedSAXStore = new SAXStore(new TeeContentHandler(new ContentHandler[] {
+                                new XFormsExtractorContentHandler(pipelineContext, identity, uriResolver)
+    //                            ,digestContentHandler
+    //                            ,new SAXLoggerProcessor.DebugContentHandler()
+                        }));
 
-                    // Get the results
-                    final Document staticStateDocument = documentResult.getDocument();
-                    // TODO: Digest not used at this point?
-//                    final String digest = Base64.encode(digestContentHandler.getResult());
-//                    if (XFormsServer.logger.isDebugEnabled())
-//                        XFormsServer.logger.debug("XForms - created digest for static state: " + digest);
-//                    xformsEngineStaticState = new XFormsStaticState(pipelineContext, staticStateDocument, digest);
+                        // Read the input
+                        readInputAsSAX(pipelineContext, processorInput, annotatedSAXStore);
 
-                    xformsStaticState = new XFormsStaticState(staticStateDocument);
+                        // Get the results
+                        final Document staticStateDocument = documentResult.getDocument();
+                        // TODO: Digest not used at this point
+    //                    final String digest = Base64.encode(digestContentHandler.getResult());
+    //                    if (XFormsServer.logger.isDebugEnabled())
+    //                        XFormsServer.logger.debug("XForms - created digest for static state: " + digest);
+    //                    xformsEngineStaticState = new XFormsStaticState(pipelineContext, staticStateDocument, digest);
+
+                        xformsStaticState = new XFormsStaticState(staticStateDocument);
+                    }
+
+                    // Create document here so we can do appropriate analysis of caching dependencies
+                    createCacheContainingDocument(pipelineContext, uriResolver, xformsStaticState, containingDocument, xformsState);
+
+                    // Set caching dependencies
+                    final InputDependencies inputDependencies = new InputDependencies(annotatedSAXStore, xformsStaticState);
+                    setCachingDependencies(containingDocument[0], inputDependencies);
+
+                    return inputDependencies;
                 }
 
-                // Create document here so we can do appropriate analysis of caching dependencies
-                createCacheContainingDocument(pipelineContext, uriResolver, xformsStaticState, containingDocument, xformsState);
+                public void foundInCache() {
+                    cachedInput[0] = true;
+                }
 
-                // Set caching dependencies
-                final InputDependencies inputDependencies = new InputDependencies(annotatedSAXStore, xformsStaticState);
-                setCachingDependencies(containingDocument[0], inputDependencies);
-
-                return inputDependencies;
-            }
-
-            public void foundInCache() {
-                cachedInput[0] = true;
-            }
-
-            public void storedInCache() {
-                cachedInput[0] = true;
-            }
-        });
+                public void storedInCache() {
+                    cachedInput[0] = true;
+                }
+            });
+            // For testing only
+            if (TEST_BYPASS_INPUT)
+                testCachingStaticStateInputDependencies = inputDependencies;
+        } else {
+            // For testing only
+            inputDependencies = testCachingStaticStateInputDependencies;
+        }
 
         try {
             // Create containing document if not done yet
@@ -369,6 +380,7 @@ public class XFormsToXHTML extends ProcessorImpl {
         // Make sure we have up to date controls (should already be the case)
         final XFormsControls xformsControls = containingDocument.getXFormsControls();
         xformsControls.rebuildCurrentControlsStateIfNeeded(pipelineContext);
+        xformsControls.evaluateAllControlsIfNeeded(pipelineContext);
 
         // Register handlers on controller (the other handlers are registered by the body handler)
         controller.registerHandler(XHTMLHeadHandler.class.getName(), XMLConstants.XHTML_NAMESPACE_URI, "head");

@@ -42,7 +42,7 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
         super(containingDocument, parent, element, name, effectiveId);
     }
 
-    public void evaluate(PipelineContext pipelineContext) {
+    protected void evaluate(PipelineContext pipelineContext) {
 
         // Set context and evaluate other aspects of the control if necessary
         super.evaluate(pipelineContext);
@@ -166,6 +166,7 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
     }
 
     public String getValue() {
+        evaluateIfNeeded(null);// TODO: Statistics won't be gathered. Any other consequence?
         return value;
     }
 
@@ -173,6 +174,7 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
      * Return a formatted display value of the control value, null if there is no such display value.
      */
     public String getDisplayValue() {
+        evaluateIfNeeded(null);// TODO: Statistics won't be gathered. Any other consequence?
         return displayValue;
     }
 

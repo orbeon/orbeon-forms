@@ -21,8 +21,6 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
-import java.util.Map;
-
 /**
  * Handle xforms:case.
  */
@@ -48,7 +46,7 @@ public class XFormsCaseHandler extends HandlerBase {
 
         final boolean isVisible;
         if (!handlerContext.isGenerateTemplate()) {
-            final XFormsCaseControl caseControl = (XFormsCaseControl) controlsState.getIdToControl().get(currentCaseEffectiveId);
+            final XFormsCaseControl caseControl = (XFormsCaseControl) controlsState.getIdsToXFormsControls().get(currentCaseEffectiveId);
 
             // This case is visible if it is selected or if the switch is read-only and we display read-only as static
             isVisible = caseControl.isVisible();

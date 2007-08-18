@@ -350,6 +350,7 @@ public class XFormsServer extends ProcessorImpl {
                 } else {
                     initialContainingDocument = new XFormsContainingDocument(pipelineContext, containingDocument.getStaticState(), null);// NOTE: URIResolver is not available. What are the consequences? 
                     initialContainingDocument.getXFormsControls().rebuildCurrentControlsStateIfNeeded(pipelineContext);
+                    initialContainingDocument.getXFormsControls().evaluateAllControlsIfNeeded(pipelineContext);
                 }
 
                 ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "action");
@@ -366,6 +367,7 @@ public class XFormsServer extends ProcessorImpl {
                         if (xformsControls.isDirty() || testOutputAllActions) {
                             // Only output changes if needed
                             xformsControls.rebuildCurrentControlsStateIfNeeded(pipelineContext);
+                            xformsControls.evaluateAllControlsIfNeeded(pipelineContext);
                             final XFormsControls.ControlsState currentControlsState = xformsControls.getCurrentControlsState();
 
                             diffControlsState(pipelineContext, ch, containingDocument, testOutputAllActions ? null : xformsControls.getInitialControlsState().getChildren(), currentControlsState.getChildren(), itemsetsFull1, itemsetsFull2, valueChangeControlIds);
@@ -373,6 +375,7 @@ public class XFormsServer extends ProcessorImpl {
                     } else {
                         // Reload / back case
                         xformsControls.rebuildCurrentControlsStateIfNeeded(pipelineContext);
+                        xformsControls.evaluateAllControlsIfNeeded(pipelineContext);
                         final XFormsControls.ControlsState currentControlsState = xformsControls.getCurrentControlsState();
                         final XFormsControls.ControlsState initialControlsState = initialContainingDocument.getXFormsControls().getCurrentControlsState();
 
@@ -941,7 +944,7 @@ public class XFormsServer extends ProcessorImpl {
                         } else if (size2 < size1) {
                             // Size has shrunk
 
-                            outputDeleteRepeatTemplate(ch, xformsControl2, size1 - size2);
+                            outputDeleteRepeatTemplate(ch, leadingControl, size1 - size2);
 
                             // Diff the remaining subset
                             newDiffControlsState(pipelineContext, ch, containingDocument, children1.subList(0, size2), children2, itemsetsFull1, itemsetsFull2, valueChangeControlIds);

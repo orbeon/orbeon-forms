@@ -968,18 +968,27 @@ public class XFormsControls {
         result.setSwitchIdToSelectedCaseIdMap(switchIdToSelectedCaseIdMap);
         result.setDialogIdToVisibleMap(dialogIdToVisibleMap);
 
-        // Evaluate all controls
-        for (Iterator i = idsToXFormsControls.entrySet().iterator(); i.hasNext();) {
-            final Map.Entry currentEntry = (Map.Entry) i.next();
-            final XFormsControl currentControl = (XFormsControl) currentEntry.getValue();
-            currentControl.evaluate(pipelineContext);
-        }
-
         if (XFormsServer.logger.isDebugEnabled()) {
             XFormsServer.logger.debug("XForms - building controls state end: " + (System.currentTimeMillis() - startTime) + " ms.");
         }
 
         return result;
+    }
+
+    /**
+     * Evaluate all the controls if needed. Should be used before output initial XHTML and before computing differences
+     * in XFormsServer.
+     *
+     * @param pipelineContext   current PipelineContext
+     */
+    public void evaluateAllControlsIfNeeded(PipelineContext pipelineContext) {
+        final Map idsToXFormsControls = getCurrentControlsState().getIdsToXFormsControls();
+        // Evaluate all controls
+        for (Iterator i = idsToXFormsControls.entrySet().iterator(); i.hasNext();) {
+            final Map.Entry currentEntry = (Map.Entry) i.next();
+            final XFormsControl currentControl = (XFormsControl) currentEntry.getValue();
+            currentControl.evaluateIfNeeded(pipelineContext);
+        }
     }
 
     /**
@@ -1174,7 +1183,7 @@ public class XFormsControls {
 //            System.out.println("XXX entry: " + entry.getKey() + " => " + entry.getValue());
 //        }
 
-        return currentControlsState.getIdToControl().get(controlId);
+        return currentControlsState.getIdsToXFormsControls().get(controlId);
     }
 
     /**
@@ -1243,12 +1252,17 @@ public class XFormsControls {
                     doContinue = controlElementVisitorListener.startVisitControl(controlElement, effectiveControlId);
                     final BindingContext currentBindingContext = getCurrentBindingContext();
                     if (doContinue) {
-                        // Recurse into grouping control if we don't optimize relevance, OR if we do optimize and we
-                        // are not bound to a node OR we are bound to a relevant node OR we are in a selected case
+                        // Recurse into grouping control if we don't optimize relevance, OR if we do optimize and we are
+                        // not bound to a node OR we are bound to a relevant node
+
+                        // NOTE: Simply excluding non-selected cases with the expression below doesn't work. So for
+                        // now, we don't consider hidden cases as non-relevant. In the future, we might want to improve
+                        // this.
+                        // && (!controlName.equals("case") || isCaseSelectedByControlElement(controlElement, effectiveControlId, idPostfix))
+
                         if (!isOptimizeRelevance
                                 || (!currentBindingContext.isNewBind()
-                                    || (currentBindingContext.getSingleNode() != null && InstanceData.getInheritedRelevant(currentBindingContext.getSingleNode())))
-                                    && (!controlName.equals("case") || isCaseSelectedByControlElement(controlElement, effectiveControlId, idPostfix))) {
+                                     || (currentBindingContext.getSingleNode() != null && InstanceData.getInheritedRelevant(currentBindingContext.getSingleNode())))) {
 
                             doContinue = handleControls(pipelineContext, controlElementVisitorListener, isOptimizeRelevance, controlElement, idPostfix);
                         }
@@ -1470,7 +1484,7 @@ public class XFormsControls {
         public void updateSwitchInfo(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, ControlsState controlsState, String selectedCaseId) {
 
             // Find SwitchXFormsControl
-            final XFormsControl caseXFormsControl = (XFormsControl) controlsState.getIdToControl().get(selectedCaseId);
+            final XFormsControl caseXFormsControl = (XFormsControl) controlsState.getIdsToXFormsControls().get(selectedCaseId);
             if (caseXFormsControl == null)
                 throw new OXFException("No XFormsControl found for case id '" + selectedCaseId + "'.");
             final XFormsControl switchXFormsControl = (XFormsControl) caseXFormsControl.getParent();
@@ -1486,10 +1500,10 @@ public class XFormsControls {
                 getSwitchIdToSelectedCaseIdMap().put(switchXFormsControl.getEffectiveId(), selectedCaseId);
 
                 // "1. Dispatching an xforms-deselect event to the currently selected case."
-                containingDocument.dispatchEvent(pipelineContext, new XFormsDeselectEvent((XFormsEventTarget) controlsState.getIdToControl().get(currentSelectedCaseId)));
+                containingDocument.dispatchEvent(pipelineContext, new XFormsDeselectEvent((XFormsEventTarget) controlsState.getIdsToXFormsControls().get(currentSelectedCaseId)));
 
                 // "2. Dispatching an xform-select event to the case to be selected."
-                containingDocument.dispatchEvent(pipelineContext, new XFormsSelectEvent((XFormsEventTarget) controlsState.getIdToControl().get(selectedCaseId)));
+                containingDocument.dispatchEvent(pipelineContext, new XFormsSelectEvent((XFormsEventTarget) controlsState.getIdsToXFormsControls().get(selectedCaseId)));
             }
         }
 
@@ -1626,7 +1640,7 @@ public class XFormsControls {
             return children;
         }
 
-        public Map getIdToControl() {
+        public Map getIdsToXFormsControls() {
             return idsToXFormsControls;
         }
 
@@ -2000,19 +2014,5 @@ public class XFormsControls {
         if (constantItems == null)
             constantItems = new HashMap();
         constantItems.put(controlId, items);
-    }
-
-    public void destroy() {
-        // HACK: this is a temp XForms Classic hack to help with a memory leak (XPath cache -> FunctionLibrary issue)
-        locator = null;
-        initialControlsState = null;
-        currentControlsState = null;
-        initialSwitchState = null;
-        currentSwitchState = null;
-        initialDialogState = null;
-        currentDialogState = null;
-        containingDocument = null;
-        controlsDocument = null;
-        contextStack = null;
     }
 }

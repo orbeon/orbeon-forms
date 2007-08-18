@@ -32,31 +32,30 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
 
     protected XFormsContainingDocument containingDocument;
 
-    private XFormsControl parent;
-    private String name;
-
+    // Static information (never changes for the lifetime of the containing document)
     private Element controlElement;
-
     private String originalId;
-    private String appearance;
-    private String mediatype;
+    private String name;
+    private String appearance;// could become more dynamic in the future
+    private String mediatype;// could become more dynamic in the future
 
+    // Semi-dynamic information (depends on the tree of controls, but does not change over time)
+    private XFormsControl parent;
+
+    // Dynamic information (changes depending on the content of XForms instances)
     private String effectiveId;
+    private List eventHandlers;// this needs to be split into static info and non-static
+    protected XFormsControls.BindingContext bindingContext;
+    private NodeInfo boundNode;
+
+    private boolean evaluated;
     private String label;
     private String help;
     private String hint;
     private String alert;
 
-    private String labelId;
-    private String helpId;
-    private String hintId;
-    private String alertId;
-
+    // TODO: this should be handled in a subclass (e.g. ContainingControl)
     private List children;
-    private List eventHandlers;
-
-    protected XFormsControls.BindingContext bindingContext;
-    private NodeInfo boundNode;
 
     public XFormsControl(XFormsContainingDocument containingDocument, XFormsControl parent, Element element, String name, String effectiveId) {
         this.containingDocument = containingDocument;
@@ -70,22 +69,27 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
 
             // Extract event handlers
             eventHandlers = XFormsEventHandlerImpl.extractEventHandlers(containingDocument, this, element);
-
-            labelId = getChildElementId(element, XFormsConstants.XFORMS_LABEL_QNAME);
-            helpId = getChildElementId(element, XFormsConstants.XFORMS_HELP_QNAME);
-            hintId = getChildElementId(element, XFormsConstants.XFORMS_HINT_QNAME);
-            alertId = getChildElementId(element, XFormsConstants.XFORMS_ALERT_QNAME);
         }
     }
 
-    private String getChildElementId(Element element, QName qName) {
-        // Check that there is a current child element
-        Element childElement = element.element(qName);
-        if (childElement == null)
-            return null;
+//    protected XFormsControl(XFormsControl xformsControl) {
+//        this.controlElement = xformsControl.controlElement;
+//        this.originalId = xformsControl.originalId;
+//        this.name = xformsControl.name;
+//        this.appearance = xformsControl.appearance;
+//        this.mediatype = xformsControl.mediatype;
+//    }
+//
+//    public abstract XFormsControl getStaticControl();
 
-        return childElement.attributeValue("id");
-    }
+//    private String getChildElementId(Element element, QName qName) {
+//        // Check that there is a current child element
+//        Element childElement = element.element(qName);
+//        if (childElement == null)
+//            return null;
+//
+//        return childElement.attributeValue("id");
+//    }
 
     public void addChild(XFormsControl XFormsControl) {
         if (children == null)
@@ -110,35 +114,23 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
     }
 
     public String getAlert() {
+        evaluateIfNeeded(null);// TODO: Statistics won't be gathered. Any other consequence/
         return alert;
     }
 
     public String getHelp() {
+        evaluateIfNeeded(null);// TODO: Statistics won't be gathered. Any other consequence/
         return help;
     }
 
     public String getHint() {
+        evaluateIfNeeded(null);// TODO: Statistics won't be gathered. Any other consequence/
         return hint;
     }
 
     public String getLabel() {
+        evaluateIfNeeded(null);// TODO: Statistics won't be gathered. Any other consequence/
         return label;
-    }
-
-    public String getLabelId() {
-        return labelId;
-    }
-
-    public String getHintId() {
-        return hintId;
-    }
-
-    public String getHelpId() {
-        return helpId;
-    }
-
-    public String getAlertId() {
-        return alertId;
     }
 
     public String getName() {
@@ -263,7 +255,14 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
         return boundNode;
     }
 
-    public void evaluate(PipelineContext pipelineContext) {
+    public void evaluateIfNeeded(PipelineContext pipelineContext) {
+        if (!evaluated) {
+            evaluated = true;// be careful with this flag, you can get into a recursion if you don't set it before calling evaluate()
+            evaluate(pipelineContext);
+        }
+    }
+
+    protected void evaluate(PipelineContext pipelineContext) {
 
         // Set context to this control
         final XFormsControls xformsControls = containingDocument.getXFormsControls();

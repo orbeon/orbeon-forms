@@ -34,7 +34,7 @@ public class RepeatIterationControl extends XFormsSingleNodeControl {
         return iteration;
     }
 
-    public void evaluate(PipelineContext pipelineContext) {
+    protected void evaluate(PipelineContext pipelineContext) {
         // NOP
     }
 

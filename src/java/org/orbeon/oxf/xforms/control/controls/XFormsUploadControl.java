@@ -56,7 +56,7 @@ public class XFormsUploadControl extends XFormsValueControl {
     }
 
 
-    public void evaluate(PipelineContext pipelineContext) {
+    protected void evaluate(PipelineContext pipelineContext) {
         super.evaluate(pipelineContext);
 
         this.state = getState(pipelineContext);
@@ -137,18 +137,22 @@ public class XFormsUploadControl extends XFormsValueControl {
     }
 
     public String getState() {
+        evaluateIfNeeded(null);// TODO: Statistics won't be gathered. Any other consequence?
         return state;
     }
 
     public String getMediatype() {
+        evaluateIfNeeded(null);// TODO: Statistics won't be gathered. Any other consequence?
         return mediatype;
     }
 
     public String getSize() {
+        evaluateIfNeeded(null);// TODO: Statistics won't be gathered. Any other consequence?
         return size;
     }
 
     public String getFilename() {
+        evaluateIfNeeded(null);// TODO: Statistics won't be gathered. Any other consequence?
         return filename;
     }
 

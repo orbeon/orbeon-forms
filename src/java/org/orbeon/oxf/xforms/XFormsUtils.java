@@ -405,7 +405,7 @@ public class XFormsUtils {
 
         // Try to get inline value
         {
-            final StringBuffer sb = new StringBuffer();
+            final FastStringBuffer sb = new FastStringBuffer(20);
 
             // Visit the subtree and serialize
 
@@ -417,13 +417,13 @@ public class XFormsUtils {
 
                 public void startElement(Element element) {
                     if (element.getQName().equals(XFormsConstants.XFORMS_OUTPUT_QNAME)) {
-                        // This is an xforms:output
+                        // This is an xforms:output nested among other markup
 
                         final XFormsOutputControl outputControl = new XFormsOutputControl(containingDocument, null, element, element.getName(), null);
                         xformsControls.pushBinding(pipelineContext, element);
                         {
                             outputControl.setBindingContext(xformsControls.getCurrentBindingContext());
-                            outputControl.evaluate(pipelineContext);
+                            outputControl.evaluateIfNeeded(pipelineContext);
                         }
                         xformsControls.popBinding();
 

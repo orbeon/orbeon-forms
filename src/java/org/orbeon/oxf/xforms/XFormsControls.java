@@ -982,12 +982,25 @@ public class XFormsControls {
      * @param pipelineContext   current PipelineContext
      */
     public void evaluateAllControlsIfNeeded(PipelineContext pipelineContext) {
+
+        final long startTime;
+        if (XFormsServer.logger.isDebugEnabled()) {
+            XFormsServer.logger.debug("XForms - evaluating controls start.");
+            startTime = System.currentTimeMillis();
+        } else {
+            startTime = 0;
+        }
+
         final Map idsToXFormsControls = getCurrentControlsState().getIdsToXFormsControls();
         // Evaluate all controls
         for (Iterator i = idsToXFormsControls.entrySet().iterator(); i.hasNext();) {
             final Map.Entry currentEntry = (Map.Entry) i.next();
             final XFormsControl currentControl = (XFormsControl) currentEntry.getValue();
             currentControl.evaluateIfNeeded(pipelineContext);
+        }
+
+        if (XFormsServer.logger.isDebugEnabled()) {
+            XFormsServer.logger.debug("XForms - evaluating controls end: " + (System.currentTimeMillis() - startTime) + " ms.");
         }
     }
 

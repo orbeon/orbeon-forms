@@ -15,6 +15,7 @@ package org.orbeon.oxf.processor.converter;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.StringTokenizer;
 
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -28,6 +29,7 @@ import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.saxrewrite.RootFilter;
 import org.orbeon.oxf.xml.saxrewrite.State;
 import org.orbeon.oxf.xml.saxrewrite.StatefullHandler;
+import org.orbeon.saxon.om.FastStringBuffer;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -327,35 +329,101 @@ abstract class AbstractRewrite extends ProcessorImpl {
             done :
             if ("object".equals(lnam)) {
 
-                final String classidAttribute = atts.getValue("", "classid");
                 final String codebaseAttribute = atts.getValue("", "codebase");
+                final String classidAttribute = atts.getValue("", "classid");
                 final String dataAttribute = atts.getValue("", "data");
                 final String usemapAttribute = atts.getValue("", "usemap");
-                // NOTE: the @archive attribute is a space-separated list of URIs. We don't handle it here yet.
+                final String archiveAttribute = atts.getValue("", "archive");// space-separated
 
                 if (classidAttribute == null && codebaseAttribute == null && dataAttribute == null && usemapAttribute == null) break done;
 
                 ret = this;
                 final AttributesImpl newAtts = XMLUtils.getAttribsFromDefaultNamespace(atts);
-                if (classidAttribute != null) {
-                    final String newAttribute = response.rewriteResourceURL(classidAttribute, false);
-                    final int idx = newAtts.getIndex("", "classid");
-                    newAtts.setValue(idx, newAttribute);
-                }
                 if (codebaseAttribute != null) {
                     final String newAttribute = response.rewriteResourceURL(codebaseAttribute, false);
                     final int idx = newAtts.getIndex("", "codebase");
                     newAtts.setValue(idx, newAttribute);
+                } else {
+                    // We don't rewrite these attributes if there is a codebase
+                    if (classidAttribute != null) {
+                        final String newAttribute = response.rewriteResourceURL(classidAttribute, false);
+                        final int idx = newAtts.getIndex("", "classid");
+                        newAtts.setValue(idx, newAttribute);
+                    }
+                    if (dataAttribute != null) {
+                        final String newAttribute = response.rewriteResourceURL(dataAttribute, false);
+                        final int idx = newAtts.getIndex("", "data");
+                        newAtts.setValue(idx, newAttribute);
+                    }
+                    if (usemapAttribute != null) {
+                        final String newAttribute = response.rewriteResourceURL(usemapAttribute, false);
+                        final int idx = newAtts.getIndex("", "usemap");
+                        newAtts.setValue(idx, newAttribute);
+                    }
+                    if (archiveAttribute != null) {
+                        final StringTokenizer st = new StringTokenizer(archiveAttribute, " ");
+                        final FastStringBuffer sb = new FastStringBuffer(archiveAttribute.length() * 2);
+                        boolean first = true;
+                        while (st.hasMoreTokens()) {
+                            final String currentArchive = st.nextToken().trim();
+                            final String newArchive = response.rewriteResourceURL(currentArchive, false);
+                            if (!first) {
+                                sb.append(' ');
+                                first = false;
+                            }
+                            sb.append(newArchive);
+                        }
+                        final int idx = newAtts.getIndex("", "archive");
+                        newAtts.setValue(idx, sb.toString());
+                    }
                 }
-                if (dataAttribute != null) {
-                    final String newAttribute = response.rewriteResourceURL(dataAttribute, false);
-                    final int idx = newAtts.getIndex("", "data");
+
+                contentHandler.startElement(ns, lnam, qnam, newAtts);
+            }
+            return ret;
+        }
+
+        /**
+         * Handle xhtml:applet
+         */
+        private State2 handleApplet
+                (final String ns, final String lnam
+                        , final String qnam, final Attributes atts)
+                throws SAXException {
+            State2 ret = null;
+            done :
+            if ("applet".equals(lnam)) {
+
+                final String codebaseAttribute = atts.getValue("", "codebase");
+                final String archiveAttribute = atts.getValue("", "archive");// comma-separated
+//                final String codeAttribute = atts.getValue("", "code");// not clear whether this needs to be rewritten
+
+                if (archiveAttribute == null && codebaseAttribute == null) break done;
+
+                ret = this;
+                final AttributesImpl newAtts = XMLUtils.getAttribsFromDefaultNamespace(atts);
+                if (codebaseAttribute != null) {
+                    final String newAttribute = response.rewriteResourceURL(codebaseAttribute, false);
+                    final int idx = newAtts.getIndex("", "codebase");
                     newAtts.setValue(idx, newAttribute);
-                }
-                if (usemapAttribute != null) {
-                    final String newAttribute = response.rewriteResourceURL(usemapAttribute, false);
-                    final int idx = newAtts.getIndex("", "usemap");
-                    newAtts.setValue(idx, newAttribute);
+                } else {
+                    // We don't rewrite the @archive attribute if there is a codebase
+                    if (archiveAttribute != null) {
+                        final StringTokenizer st = new StringTokenizer(archiveAttribute, ",");
+                        final FastStringBuffer sb = new FastStringBuffer(archiveAttribute.length() * 2);
+                        boolean first = true;
+                        while (st.hasMoreTokens()) {
+                            final String currentArchive = st.nextToken().trim();
+                            final String newArchive = response.rewriteResourceURL(currentArchive, false);
+                            if (!first) {
+                                sb.append(' ');
+                                first = false;
+                            }
+                            sb.append(newArchive);
+                        }
+                        final int idx = newAtts.getIndex("", "archive");
+                        newAtts.setValue(idx, sb.toString());
+                    }
                 }
 
                 contentHandler.startElement(ns, lnam, qnam, newAtts);
@@ -756,6 +824,9 @@ abstract class AbstractRewrite extends ProcessorImpl {
                     if (ret != null) break done;
 
                     ret = handleObject(ns, lnam, qnam, atts);
+                    if (ret != null) break done;
+
+                    ret = handleApplet(ns, lnam, qnam, atts);
                     if (ret != null) break done;
                 }
                 ret = this;

@@ -414,6 +414,17 @@
                     of each option and for details on how to configure state handling.
                 </p>
             </section>
+            <a name="xforms-instance-src"/>
+            <section>
+                <title>Use <code>xforms:instance</code> to load dynamic instances</title>
+                <p>
+                    There are <a href="reference-xforms-ng#xforms-instance-initialization-pfc">several ways</a> of
+                    initializating XForms instances. For instances whose content is generated dynamically, try to use
+                    the <code>src</code> attribute of the <code>xforms:instance</code> instead of
+                    <code>xi:include</code> or XSLT. Alternatively, you can use a submission upon receiving
+                    <code>xforms-ready</code>. This helps ensures that the source XForms page is cacheable.
+                </p>
+            </section>
             <a name="xforms-cache"/>
             <section>
                 <title>Tune XForms caches</title>

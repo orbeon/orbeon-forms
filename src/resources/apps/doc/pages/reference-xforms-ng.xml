@@ -2126,12 +2126,6 @@
                 </section>
             </section>
             <section>
-                <title>Initializing XForms Instances from a URI</title>
-                <p>
-                    [TODO: xforms:instance/@src]
-                </p>
-            </section>
-            <section>
                 <title>Initializing XForms Instances with an XForms Submission</title>
                 <p>
                     [TODO]

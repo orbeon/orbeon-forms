@@ -122,16 +122,4 @@ public class XFormsElementContext extends XFormsControls {
     public String getRefValue() {
         return XFormsInstance.getValueForNodeInfo(getCurrentBindingContext().getSingleNode());
     }
-
-    public void destroy() {
-        // HACK: this is a temp XForms Classic hack to help with a memory leak (XPath cache -> FunctionLibrary issue)
-        pipelineContext = null;
-        contentHandler = null;
-        repeatIdToIndex = null;
-        elements = null;
-        namespaceSupport = null;
-        encryptionPassword = null;
-
-        super.destroy();
-    }
 }

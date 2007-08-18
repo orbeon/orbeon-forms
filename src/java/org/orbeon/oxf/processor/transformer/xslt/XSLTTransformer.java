@@ -781,7 +781,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                         // at the stream of tokens and look for doc (or a lexical QName whose local part is doc)
                         // followed by "("."
 
-                        // For now, we will probably have many false positive but we just est on "doc". The exact match
+                        // For now, we will probably have many false positive but we just test on "doc". The exact match
                         // is done by parsing the expression below anyway.
                         final boolean containsDocString = xpathString.indexOf("doc") != -1;
                         if (containsDocString) {

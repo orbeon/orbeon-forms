@@ -179,6 +179,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
             if (encodedDynamicState == null || encodedDynamicState.equals("")) {
                 // Just for tests, we allow the dynamic state to be empty
                 initialize(pipelineContext);
+                xformsControls.evaluateAllControlsIfNeeded(pipelineContext);
             } else {
                 // Regular case
                 restoreDynamicState(pipelineContext, encodedDynamicState);

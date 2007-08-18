@@ -78,7 +78,6 @@
                     </p:input>
                     <p:output name="response" ref="response"/>
                 </p:processor>
-
             </p:config>
         </input>
         <output name="response">
@@ -114,7 +113,7 @@
         </output>
     </test>
 
-    <test description="Default Instances" name="oxf:pipeline">
+    <test description="Default Instances" name="oxf:pipeline" only="true">
         <input name="config">
             <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <p:param name="response" type="output"/>
@@ -156,7 +155,7 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="main-instance" model-id="main-model">                            
+                            <instance id="main-instance" model-id="main-model">
                                 <equation>
                                     <screen>7</screen>
                                     <screenbuffer>7</screenbuffer>

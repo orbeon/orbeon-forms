@@ -1229,6 +1229,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         // Restore controls
         final Element divsElement = dynamicStateDocument.getRootElement().element("divs");
         xformsControls.initializeState(pipelineContext, divsElement, repeatIndexesElement, true);
+        xformsControls.evaluateAllControlsIfNeeded(pipelineContext);
     }
 
     /**

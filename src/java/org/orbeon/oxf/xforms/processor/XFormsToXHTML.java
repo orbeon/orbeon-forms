@@ -524,6 +524,7 @@ public class XFormsToXHTML extends ProcessorImpl {
         // Make sure we have up to date controls
         final XFormsControls xformsControls = containingDocument.getXFormsControls();
         xformsControls.rebuildCurrentControlsStateIfNeeded(pipelineContext);
+        xformsControls.evaluateAllControlsIfNeeded(pipelineContext);
 
         // Output XML response
         XFormsServer.outputResponse(containingDocument, false, null, pipelineContext, contentHandler, staticStateUUID, dynamicStateUUID, externalContext, xformsState, false, true);

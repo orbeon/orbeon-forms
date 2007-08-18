@@ -35,4 +35,5 @@ public interface CacheStatistics {
      */
     public int getMissCount();
     public int getAddCount();
+    public int getExpirationCount();
 }

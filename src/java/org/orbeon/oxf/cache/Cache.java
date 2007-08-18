@@ -23,6 +23,7 @@ public interface Cache {
     public static final int EXPIRATION_NO_EXPIRATION = -1;
     public static final int EXPIRATION_LAST_MODIFIED = -2;
 
+    public String getCacheName();
     public void add(PipelineContext context, CacheKey key, Object validity, Object object);
     public void remove(PipelineContext context, CacheKey key);
     public Object findValid(PipelineContext context, CacheKey key, Object validity);

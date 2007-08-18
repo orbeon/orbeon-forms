@@ -24,36 +24,48 @@ import java.util.*;
  */
 public class MemoryCacheImpl implements Cache {
 
-    public MemoryCacheImpl(int maxSize) {
-        this.maxSize = maxSize;
-    }
+    private String cacheName;
+    private int maxSize;
 
     private Map keyToEntryMap = new HashMap();
     private CacheLinkedList linkedList = new CacheLinkedList();
-    private int maxSize;
     private int currentSize;
 
-    private class Statistics implements CacheStatistics {
+    public MemoryCacheImpl(String cacheName, int maxSize) {
+        this.cacheName = cacheName;
+        this.maxSize = maxSize;
+    }
+
+    public String getCacheName() {
+        return cacheName;
+    }
+
+    private class MemoryCacheStatistics implements CacheStatistics {
 
         private int hitsCount;
         private int missCount;
         private int addCount;
+        private int expirationCount;
 
         public int getMaxSize() { return maxSize; }
         public int getCurrentSize() { return currentSize; }
+
         public int getHitCount() { return hitsCount; }
         public int getMissCount() { return missCount; }
         public int getAddCount() { return addCount; }
+        public int getExpirationCount() { return expirationCount; }
 
         public void incrementHitsCount() { hitsCount++; }
         public void incrementMissCount() { missCount++; }
         public void incrementAddCount() { addCount++; }
+        public void incrementExpirationCount() { expirationCount++; }
     };
 
-    public synchronized void add(PipelineContext context, CacheKey key, Object validity, Object object) {
+    public synchronized void add(PipelineContext pipelineContext, CacheKey key, Object validity, Object object) {
         if (key == null || validity == null) return;
-        if (context != null)
-            ((Statistics) getStatistics(context)).incrementAddCount();
+        final MemoryCacheStatistics statistics = (pipelineContext != null) ? (MemoryCacheStatistics) getStatistics(pipelineContext) : null;
+        if (statistics != null)
+            statistics.incrementAddCount();
         CacheEntry entry = (CacheEntry) keyToEntryMap.get(key);
         if (entry == null) {
             // No existing entry found
@@ -61,6 +73,8 @@ public class MemoryCacheImpl implements Cache {
                 entry = (CacheEntry) linkedList.getLast();
                 keyToEntryMap.remove(entry.key);
                 linkedList.removeLast();
+                if (statistics != null)
+                    statistics.incrementExpirationCount();
             } else {
                 currentSize++;
                 entry = new CacheEntry();
@@ -88,13 +102,13 @@ public class MemoryCacheImpl implements Cache {
         }
     }
 
-    public synchronized Object findValid(PipelineContext context, CacheKey key, Object validity) {
+    public synchronized Object findValid(PipelineContext pipelineContext, CacheKey key, Object validity) {
 
         CacheEntry entry = (CacheEntry) keyToEntryMap.get(key);
         if (entry != null && lowerOrEqual(validity, entry.validity)) {
             // Place in first position and return
-            if (context != null)
-                ((Statistics) getStatistics(context)).incrementHitsCount();
+            if (pipelineContext != null)
+                ((MemoryCacheStatistics) getStatistics(pipelineContext)).incrementHitsCount();
             if (linkedList.getFirst() != entry) {
                 linkedList.remove(entry.listEntry);
                 entry.listEntry = linkedList.addFirst(entry);
@@ -102,13 +116,13 @@ public class MemoryCacheImpl implements Cache {
             return entry.object;
         } else {
             // Not latest validity
-            if (context != null)
-                ((Statistics) getStatistics(context)).incrementMissCount();
+            if (pipelineContext != null)
+                ((MemoryCacheStatistics) getStatistics(pipelineContext)).incrementMissCount();
             return null;
         }
     }
 
-    public synchronized Object findValidWithExpiration(PipelineContext context, CacheKey key, long expiration) {
+    public synchronized Object findValidWithExpiration(PipelineContext pipelineContext, CacheKey key, long expiration) {
 
         Object result = null;
         CacheEntry entry = (CacheEntry) keyToEntryMap.get(key);
@@ -126,16 +140,16 @@ public class MemoryCacheImpl implements Cache {
 
         if (result != null) {
             // Place in first position and return
-            if (context != null)
-                ((Statistics) getStatistics(context)).incrementHitsCount();
+            if (pipelineContext != null)
+                ((MemoryCacheStatistics) getStatistics(pipelineContext)).incrementHitsCount();
             if (linkedList.getFirst() != entry) {
                 linkedList.remove(entry.listEntry);
                 entry.listEntry = linkedList.addFirst(entry);
             }
         } else {
             // Cache miss
-            if (context != null)
-                ((Statistics) getStatistics(context)).incrementMissCount();
+            if (pipelineContext != null)
+                ((MemoryCacheStatistics) getStatistics(pipelineContext)).incrementMissCount();
         }
         return result;
     }
@@ -161,12 +175,12 @@ public class MemoryCacheImpl implements Cache {
         });
     }
 
-    public synchronized CacheStatistics getStatistics(PipelineContext context) {
-        final String CONTEXT_KEY = "MEMORY_CACHE_STATISTICS";
-        Statistics statistics = (Statistics) context.getAttribute(CONTEXT_KEY);
+    public synchronized CacheStatistics getStatistics(PipelineContext pipelineContext) {
+        final String CONTEXT_KEY = "memory-cache-statistics." + cacheName;
+        MemoryCacheStatistics statistics = (MemoryCacheStatistics) pipelineContext.getAttribute(CONTEXT_KEY);
         if (statistics == null) {
-            statistics = new Statistics();
-            context.setAttribute(CONTEXT_KEY, statistics);
+            statistics = new MemoryCacheStatistics();
+            pipelineContext.setAttribute(CONTEXT_KEY, statistics);
         }
 
         return statistics;

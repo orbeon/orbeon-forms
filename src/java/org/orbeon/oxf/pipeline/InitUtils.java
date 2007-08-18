@@ -19,6 +19,7 @@ import org.dom4j.QName;
 import org.dom4j.Document;
 import org.orbeon.oxf.cache.CacheStatistics;
 import org.orbeon.oxf.cache.ObjectCache;
+import org.orbeon.oxf.cache.Cache;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
@@ -34,17 +35,23 @@ import org.orbeon.oxf.webapp.WebAppContext;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.saxon.om.FastStringBuffer;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 
 public class InitUtils {
 
 
     private static final String CACHE_SIZE_PROPERTY = "oxf.cache.size";
+
+    private static final String CACHE_DISPLAY_STATISTICS_PROPERTY = "oxf.cache.display-statistics";
+    private static final String DEFAULT_CACHE_DISPLAY_STATISTICS = "cache.main";
+
     public static final String PROLOGUE_PROPERTY = "oxf.prologue";
     public static final String DEFAULT_PROLOGUE = "oxf:/processors.xml";
 
@@ -108,22 +115,55 @@ public class InitUtils {
             StaticExternalContext.removeStaticContext();
 
             if (logger.isInfoEnabled()) {
-                // Display cache statistics
-                CacheStatistics statistics = ObjectCache.instance().getStatistics(pipelineContext);
-                int hitCount = statistics.getHitCount();
-                int missCount = statistics.getMissCount();
-                String successRate = null;
-                if (hitCount + missCount > 0)
-                    successRate = hitCount * 100 / (hitCount + missCount) + "%";
-                else
-                    successRate = "N/A";
-                long timing = System.currentTimeMillis() - tsBegin;
-                logger.info((requestPath != null ? requestPath : "Done running processor") + " - Timing: " + timing
-                        + " - Cache hits: " + hitCount
-                        + ", fault: " + missCount
-                        + ", adds: " + statistics.getAddCount()
-                        + ", success rate: " + successRate);
+                // Add timing
+                final long timing = System.currentTimeMillis() - tsBegin;
+                final FastStringBuffer sb = new FastStringBuffer(requestPath != null ? requestPath : "Done running processor");
+                sb.append(" - Timing: ");
+                sb.append(Long.toString(timing));
+
+                // Add cache statistics
+                final String cacheDisplayStatistics = OXFProperties.instance().getPropertySet().getString(CACHE_DISPLAY_STATISTICS_PROPERTY, DEFAULT_CACHE_DISPLAY_STATISTICS);
+                if (cacheDisplayStatistics.indexOf(' ') == -1) {
+                    // Single token
+                    if (cacheDisplayStatistics.length() > 0)
+                        appendCacheStatistics(pipelineContext, ObjectCache.instanceIfExists(cacheDisplayStatistics), sb);
+                } else {
+                    // Multiple tokens
+                    final StringTokenizer st = new StringTokenizer(cacheDisplayStatistics, " ");
+                    while (st.hasMoreTokens()) {
+                        final String cacheName = st.nextToken().trim();
+                        if (cacheName.length() > 0)
+                            appendCacheStatistics(pipelineContext, ObjectCache.instanceIfExists(cacheName), sb);
+                    }
+                }
+                logger.info(sb.toString());
             }
+        }
+    }
+
+    private static void appendCacheStatistics(PipelineContext pipelineContext, Cache cache, FastStringBuffer sb) {
+        if (cache != null) {
+            final CacheStatistics statistics = cache.getStatistics(pipelineContext);
+            final int hitCount = statistics.getHitCount();
+            final int missCount = statistics.getMissCount();
+            final String successRate;
+            if (hitCount + missCount > 0)
+                successRate = hitCount * 100 / (hitCount + missCount) + "%";
+            else
+                successRate = "N/A";
+
+            sb.append(" - Cache hits for ");
+            sb.append(cache.getCacheName());
+            sb.append(": ");
+            sb.append(Integer.toString(hitCount));
+            sb.append(", fault: ");
+            sb.append(Integer.toString(missCount));
+            sb.append(", adds: ");
+            sb.append(Integer.toString(statistics.getAddCount()));
+            sb.append(", expirations: ");
+            sb.append(Integer.toString(statistics.getExpirationCount()));
+            sb.append(", success rate: ");
+            sb.append(successRate);
         }
     }
 

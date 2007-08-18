@@ -23,13 +23,17 @@ import java.util.HashMap;
  */
 public class ObjectCache {
 
+    private static final String DEFAULT_CACHE_NAME = "cache.main";
+    private static final int DEFAULT_SIZE = 200;
+
     private static final String CACHE_PROPERTY_NAME_PREFIX = "oxf.";
     private static final String CACHE_PROPERTY_NAME_SIZE_SUFFIX = ".size";
 
-    private static final int DEFAULT_SIZE = 200;
+    private static Map namedObjectCaches = new HashMap();
 
-    private static Cache mainObjectCache = new MemoryCacheImpl(DEFAULT_SIZE);
-    private static Map namedObjectCaches;
+    static {
+        namedObjectCaches.put(DEFAULT_CACHE_NAME, new MemoryCacheImpl(DEFAULT_CACHE_NAME, DEFAULT_SIZE));
+    }
 
     private ObjectCache() {}
 
@@ -39,18 +43,8 @@ public class ObjectCache {
      * @return instance of cache
      */
     public static Cache instance() {
-        return mainObjectCache;
+        return (Cache) namedObjectCaches.get(DEFAULT_CACHE_NAME);
     }
-
-    /**
-     * Get the instance of the object cache specified.
-     *
-     * @param cacheName     name of the cache
-     * @return              instance of cache
-     */
-//    public synchronized static Cache instance(String cacheName) {
-//        return instance(cacheName, DEFAULT_SIZE);
-//    }
 
     /**
      * Get the instance of the object cache specified.
@@ -60,16 +54,23 @@ public class ObjectCache {
      * @return              instance of cache
      */
     public synchronized static Cache instance(String cacheName, int defaultSize) {
-
-        if (namedObjectCaches == null)
-            namedObjectCaches = new HashMap();
         Cache cache = (Cache) namedObjectCaches.get(cacheName);
         if (cache == null) {
             final String propertyName = CACHE_PROPERTY_NAME_PREFIX + cacheName + CACHE_PROPERTY_NAME_SIZE_SUFFIX;
             final Integer size = OXFProperties.instance().getPropertySet().getInteger(propertyName, defaultSize);
-            cache = new MemoryCacheImpl(size.intValue());
+            cache = new MemoryCacheImpl(cacheName, size.intValue());
             namedObjectCaches.put(cacheName, cache);
         }
         return cache;
+    }
+
+    /**
+     * Get the instance of the object cache specified if it exists.
+     *
+     * @param cacheName     name of the cache
+     * @return              instance of cache, null if did not exist
+     */
+    public synchronized static Cache instanceIfExists(String cacheName) {
+        return (namedObjectCaches == null) ? null : (Cache) namedObjectCaches.get(cacheName);
     }
 }

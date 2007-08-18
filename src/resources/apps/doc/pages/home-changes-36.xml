@@ -31,7 +31,7 @@
                 Welcome to Orbeon Forms 3.6!
             </p>
             <p>
-                Orbeon Forms 3.6 features well over <a href="#changes-36-full">100 improvements</a> since <a
+                Orbeon Forms 3.6 features well over <a href="#changes-36-full">120 improvements</a> since <a
                 href="home-changes-35">Orbeon Forms 3.5.1</a>, including major improvements in the areas of XML Schema
                 validation, error handling, and deployment within Java applications.
             </p>
@@ -329,7 +329,7 @@
             <section>
                 <title>Complete List of Issues Addressed in this Release</title>
                 <p>
-                    Orbeon Forms 3.6 addresses well over 100 bugs and features:
+                    Orbeon Forms 3.6 addresses well over 120 bugs and features:
                 </p>
                 <!--
 Request to extract bugs from SourceForge with http://www.orbeon.com/ops/xquery-the-web/ :
@@ -351,6 +351,91 @@ http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=2
 
                 -->
                 <ul>
+                     <li>
+                         <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307439&amp;group_id=168&amp;atid=350207">#307439:
+                             Rewrite does not change applet/@archive
+                         </a>
+                     </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307442&amp;group_id=168&amp;atid=350207">#307442:
+                            Government Forms example summary initially shows repeat index value of 0
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307434&amp;group_id=168&amp;atid=350207">#307434:
+                            Optimize refresh upon instance replacement
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307407&amp;group_id=168&amp;atid=350207">#307407:
+                            xforms-value-changes called more times than expected
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307431&amp;group_id=168&amp;atid=350207">#307431:
+                            Avoid dom4j conversion when using JTidy used by xforms:output
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=305176&amp;group_id=168&amp;atid=350207">#305176:
+                            Issue with handling of back button when XFormsToXHTML reads input:*
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=305588&amp;group_id=168&amp;atid=350207">#305588:
+                            RFE: Support instance/src="input:data"
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307425&amp;group_id=168&amp;atid=350207">#307425:
+                            SAXStore keeps references to Locator, causing memory leaks
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306695&amp;group_id=168&amp;atid=350207">#306695:
+                            XPathCache.getXPathExpression doesn't cache across requests
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307424&amp;group_id=168&amp;atid=350207">#307424:
+                            XFormsFunctionLibrary leaks by keeping references to XFormsModel and XFormsControls objects
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307367&amp;group_id=168&amp;atid=350207">#307367:
+                            Deployment in Liferay 4.3.0 is broken
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307416&amp;group_id=168&amp;atid=350207">#307416:
+                            java.lang.ClassCastException: ElementImpl cannot be cast to NodeWrapper
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307403&amp;group_id=168&amp;atid=350207">#307403:
+                            Non-relevant group label is initially visible
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307401&amp;group_id=168&amp;atid=350207">#307401:
+                            Regression: XInclude processor no longer caches
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307384&amp;group_id=168&amp;atid=350207">#307384:
+                            SOAPAction HTTP header is not set
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307355&amp;group_id=168&amp;atid=350207">#307355:
+                            RFE: dispatchEvent to provide additional attribute ignoreErrors
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307363&amp;group_id=168&amp;atid=350207">#307363:
+                            neighbor attribute should be on xxforms:show
+                        </a>
+                    </li>
                     <li>
                         <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307390&amp;group_id=168&amp;atid=350207">#307390:
                             RFE: Government Forms example needs button to discard changes and go back to summary

@@ -18,6 +18,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.xml.ForwardingContentHandler;
 import org.orbeon.oxf.xml.NamespaceSupport3;
+import org.orbeon.saxon.om.FastStringBuffer;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -87,9 +88,16 @@ public class QNameConverter extends ProcessorImpl {
                                 if (config.replacePrefix == null) {
                                     newQName = qName;
                                 } else if (colonIndex == -1) {
-                                    newQName = config.replacePrefix + ":" + qName;
+                                    final FastStringBuffer sb= new FastStringBuffer(config.replacePrefix.length() + qName.length() + 1);
+                                    sb.append(config.replacePrefix);
+                                    sb.append(':');
+                                    sb.append(qName);
+                                    newQName = sb.toString();
                                 } else {
-                                    newQName = config.replacePrefix + qName.substring(colonIndex);
+                                    final FastStringBuffer sb= new FastStringBuffer(config.replacePrefix.length() + qName.length());
+                                    sb.append(config.replacePrefix);
+                                    sb.append(qName.substring(colonIndex));
+                                    newQName = sb.toString();
                                 }
 
                                 checkNamespace(uri, newURI, prefix, (config.replacePrefix == null) ? prefix : config.replacePrefix, true);
@@ -117,9 +125,16 @@ public class QNameConverter extends ProcessorImpl {
                                 if (config.replacePrefix == null) {
                                     newQName = qName;
                                 } else if (colonIndex == -1) {
-                                    newQName = config.replacePrefix + ":" + qName;
+                                    final FastStringBuffer sb= new FastStringBuffer(config.replacePrefix.length() + qName.length() + 1);
+                                    sb.append(config.replacePrefix);
+                                    sb.append(':');
+                                    sb.append(qName);
+                                    newQName = sb.toString();
                                 } else {
-                                    newQName = config.replacePrefix + qName.substring(colonIndex);
+                                    final FastStringBuffer sb= new FastStringBuffer(config.replacePrefix.length() + qName.length());
+                                    sb.append(config.replacePrefix);
+                                    sb.append(qName.substring(colonIndex));
+                                    newQName = sb.toString();
                                 }
 
                                 super.endElement(newURI, localname, newQName);

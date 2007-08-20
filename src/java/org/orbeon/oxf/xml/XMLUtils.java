@@ -23,6 +23,7 @@ import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.xerces.XercesSAXParserFactoryImpl;
+import org.orbeon.saxon.om.FastStringBuffer;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -196,8 +197,14 @@ public class XMLUtils {
     public static String buildExplodedQName(String uri, String localname) {
         if ("".equals(uri))
             return localname;
-        else
-            return "{" + uri + "}" + localname;
+        else {
+            final FastStringBuffer sb = new FastStringBuffer(uri.length() + localname.length() + 2);
+            sb.append('{');
+            sb.append(uri);
+            sb.append('}');
+            sb.append(localname);
+            return sb.toString();
+        }
     }
 
     public static class EntityResolver implements org.xml.sax.EntityResolver {
@@ -987,6 +994,12 @@ public class XMLUtils {
     public static String escapeXMLMinimal(String str) {
         str = StringUtils.replace(str, "&", "&amp;");
         str = StringUtils.replace(str, "<", "&lt;");
+        return str;
+    }
+
+    public static String unescapeXMLMinimal(String str) {
+        str = StringUtils.replace(str, "&amp;", "&");
+        str = StringUtils.replace(str, "&lt;", "<");
         return str;
     }
 

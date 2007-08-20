@@ -21,11 +21,15 @@ import java.util.*;
 
 /**
  * Very simple cache implementation.
+ *
+ * @noinspection SimplifiableIfStatement
  */
 public class MemoryCacheImpl implements Cache {
 
-    private String cacheName;
+    private final String cacheName;
     private int maxSize;
+
+    private final String statisticsContextKey;
 
     private Map keyToEntryMap = new HashMap();
     private CacheLinkedList linkedList = new CacheLinkedList();
@@ -34,6 +38,8 @@ public class MemoryCacheImpl implements Cache {
     public MemoryCacheImpl(String cacheName, int maxSize) {
         this.cacheName = cacheName;
         this.maxSize = maxSize;
+
+        this.statisticsContextKey =  "memory-cache-statistics." + cacheName;
     }
 
     public String getCacheName() {
@@ -176,11 +182,10 @@ public class MemoryCacheImpl implements Cache {
     }
 
     public synchronized CacheStatistics getStatistics(PipelineContext pipelineContext) {
-        final String CONTEXT_KEY = "memory-cache-statistics." + cacheName;
-        MemoryCacheStatistics statistics = (MemoryCacheStatistics) pipelineContext.getAttribute(CONTEXT_KEY);
+        MemoryCacheStatistics statistics = (MemoryCacheStatistics) pipelineContext.getAttribute(statisticsContextKey);
         if (statistics == null) {
             statistics = new MemoryCacheStatistics();
-            pipelineContext.setAttribute(CONTEXT_KEY, statistics);
+            pipelineContext.setAttribute(statisticsContextKey, statistics);
         }
 
         return statistics;

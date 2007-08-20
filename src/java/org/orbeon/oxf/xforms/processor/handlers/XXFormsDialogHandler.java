@@ -57,7 +57,7 @@ public class XXFormsDialogHandler extends HandlerBase {
 
         if (!isMinimalAppearance) {
             // Child xhtml:div for label
-            final String labelValue = dialogXFormsControl.getLabel();
+            final String labelValue = dialogXFormsControl.getLabel(pipelineContext);
             if (labelValue != null) {
                 reusableAttributes.clear();
                 reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "hd");

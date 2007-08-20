@@ -35,6 +35,8 @@ import java.net.URI;
 
 /**
  * Represents an xforms:upload control.
+ *
+ * @noinspection SimplifiableIfStatement
  */
 public class XFormsUploadControl extends XFormsValueControl {
 
@@ -59,10 +61,10 @@ public class XFormsUploadControl extends XFormsValueControl {
     protected void evaluate(PipelineContext pipelineContext) {
         super.evaluate(pipelineContext);
 
-        this.state = getState(pipelineContext);
-        this.mediatype = getMediatype(pipelineContext);
-        this.size = getSize(pipelineContext);
-        this.filename  = getFilename(pipelineContext);
+        evaluateState();
+        evaluateMediatype(pipelineContext);
+        evaluateFilename(pipelineContext);
+        evaluateSize(pipelineContext);
     }
 
     public void setExternalValue(PipelineContext pipelineContext, String value, String type, boolean handleTemporaryFiles){
@@ -136,50 +138,41 @@ public class XFormsUploadControl extends XFormsValueControl {
         }
     }
 
-    public String getState() {
-        evaluateIfNeeded(null);// TODO: Statistics won't be gathered. Any other consequence?
+    public String getState(PipelineContext pipelineContext) {
+        evaluateIfNeeded(pipelineContext);
         return state;
     }
 
-    public String getMediatype() {
-        evaluateIfNeeded(null);// TODO: Statistics won't be gathered. Any other consequence?
+    public String getMediatype(PipelineContext pipelineContext) {
+        evaluateIfNeeded(pipelineContext);
         return mediatype;
     }
 
-    public String getSize() {
-        evaluateIfNeeded(null);// TODO: Statistics won't be gathered. Any other consequence?
-        return size;
-    }
-
-    public String getFilename() {
-        evaluateIfNeeded(null);// TODO: Statistics won't be gathered. Any other consequence?
+    public String getFilename(PipelineContext pipelineContext) {
+        evaluateIfNeeded(pipelineContext);
         return filename;
     }
 
-    public String getState(PipelineContext pipelineContext) {
-        final boolean isEmpty = getValue() == null || getValue().length() == 0;
-        return isEmpty ? "empty" : "file";
-    }
-
-    public String getMediatype(PipelineContext pipelineContext) {
-        if (mediatypeElement == null)
-            return null;
-        else
-            return getInfoValue(pipelineContext, mediatypeElement);
-    }
-
-    public String getFilename(PipelineContext pipelineContext) {
-        if (filenameElement == null)
-            return null;
-        else
-            return getInfoValue(pipelineContext, filenameElement);
-    }
-
     public String getSize(PipelineContext pipelineContext) {
-        if (sizeElement == null)
-            return null;
-        else
-            return getInfoValue(pipelineContext, sizeElement);
+        evaluateIfNeeded(pipelineContext);
+        return size;
+    }
+
+    private void evaluateState() {
+        final boolean isEmpty = getValue() == null || getValue().length() == 0;
+        this.state = isEmpty ? "empty" : "file";
+    }
+
+    private void evaluateMediatype(PipelineContext pipelineContext) {
+        this.mediatype = (mediatypeElement == null) ? null : getInfoValue(pipelineContext, mediatypeElement);
+    }
+
+    private void evaluateFilename(PipelineContext pipelineContext) {
+        this.filename = (filenameElement == null) ? null : getInfoValue(pipelineContext, filenameElement);
+    }
+
+    private void evaluateSize(PipelineContext pipelineContext) {
+        this.size = (sizeElement == null) ? null : getInfoValue(pipelineContext, sizeElement);
     }
 
     private String getInfoValue(PipelineContext pipelineContext, Element element) {

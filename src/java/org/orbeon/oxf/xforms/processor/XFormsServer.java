@@ -284,8 +284,16 @@ public class XFormsServer extends ProcessorImpl {
     }
 
     /**
-     * Execute an external event while preparing containing document and controls state if an event
-     * was already executed.
+     * Execute an external event while preparing containing document and controls state if an event was already
+     * executed.
+     *
+     * @param pipelineContext       current PipelineContext
+     * @param containingDocument    XFormsContainingDocument to which events must be dispatched
+     * @param eventName             name of the event
+     * @param controlId             effective control id to dispatch to
+     * @param otherControlId        other effective control id if any
+     * @param contextString         optional context string
+     * @param filesElement          optional files elements for upload
      */
     private void executeExternalEventPrepareIfNecessary(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, String eventName, String controlId, String otherControlId, String contextString, Element filesElement) {
         containingDocument.startOutermostActionHandler();
@@ -683,17 +691,18 @@ public class XFormsServer extends ProcessorImpl {
                             // Control children values
                             if (!(xformsSingleNodeControl2 instanceof RepeatIterationControl)) {
                                 {
-                                    final String labelValue1 = (xformsSingleNodeControl1 == null) ? null : xformsSingleNodeControl1.getLabel();
-                                    final String labelValue2 = xformsSingleNodeControl2.getLabel();
+                                    final String labelValue1 = (xformsSingleNodeControl1 == null) ? null : xformsSingleNodeControl1.getLabel(pipelineContext);
+                                    final String labelValue2 = xformsSingleNodeControl2.getLabel(pipelineContext);
 
                                     if (!((labelValue1 == null && labelValue2 == null) || (labelValue1 != null && labelValue2 != null && labelValue1.equals(labelValue2)))) {
-                                        attributesImpl.addAttribute("", "label", "label", ContentHandlerHelper.CDATA, labelValue2 != null ? labelValue2 : "");
+                                        final String escapedLabelValue2 = xformsSingleNodeControl2.getEscapedLabel(pipelineContext);
+                                        attributesImpl.addAttribute("", "label", "label", ContentHandlerHelper.CDATA, escapedLabelValue2 != null ? escapedLabelValue2 : "");
                                     }
                                 }
 
                                 {
-                                    final String helpValue1 = (xformsSingleNodeControl1 == null) ? null : xformsSingleNodeControl1.getHelp();
-                                    final String helpValue2 = xformsSingleNodeControl2.getHelp();
+                                    final String helpValue1 = (xformsSingleNodeControl1 == null) ? null : xformsSingleNodeControl1.getHelp(pipelineContext);
+                                    final String helpValue2 = xformsSingleNodeControl2.getHelp(pipelineContext);
 
                                     if (!((helpValue1 == null && helpValue2 == null) || (helpValue1 != null && helpValue2 != null && helpValue1.equals(helpValue2)))) {
                                         attributesImpl.addAttribute("", "help", "help", ContentHandlerHelper.CDATA, helpValue2 != null ? helpValue2 : "");
@@ -701,8 +710,8 @@ public class XFormsServer extends ProcessorImpl {
                                 }
 
                                 {
-                                    final String hintValue1 = (xformsSingleNodeControl1 == null) ? null : xformsSingleNodeControl1.getHint();
-                                    final String hintValue2 = xformsSingleNodeControl2.getHint();
+                                    final String hintValue1 = (xformsSingleNodeControl1 == null) ? null : xformsSingleNodeControl1.getHint(pipelineContext);
+                                    final String hintValue2 = xformsSingleNodeControl2.getHint(pipelineContext);
 
                                     if (!((hintValue1 == null && hintValue2 == null) || (hintValue1 != null && hintValue2 != null && hintValue1.equals(hintValue2)))) {
                                         attributesImpl.addAttribute("", "hint", "hint", ContentHandlerHelper.CDATA, hintValue2 != null ? hintValue2 : "");
@@ -710,11 +719,12 @@ public class XFormsServer extends ProcessorImpl {
                                 }
 
                                 {
-                                    final String alertValue1 = (xformsSingleNodeControl1 == null) ? null : xformsSingleNodeControl1.getAlert();
-                                    final String alertValue2 = xformsSingleNodeControl2.getAlert();
+                                    final String alertValue1 = (xformsSingleNodeControl1 == null) ? null : xformsSingleNodeControl1.getAlert(pipelineContext);
+                                    final String alertValue2 = xformsSingleNodeControl2.getAlert(pipelineContext);
 
                                     if (!((alertValue1 == null && alertValue2 == null) || (alertValue1 != null && alertValue2 != null && alertValue1.equals(alertValue2)))) {
-                                        attributesImpl.addAttribute("", "alert", "alert", ContentHandlerHelper.CDATA, alertValue2 != null ? alertValue2 : "");
+                                        final String escapedAlertValue2 = xformsSingleNodeControl2.getEscapedAlert(pipelineContext);
+                                        attributesImpl.addAttribute("", "alert", "alert", ContentHandlerHelper.CDATA, escapedAlertValue2 != null ? escapedAlertValue2 : "");
                                     }
                                 }
 
@@ -736,8 +746,8 @@ public class XFormsServer extends ProcessorImpl {
 
                                     {
                                         // State
-                                        final String stateValue1 = (uploadControlInfo1 == null) ? null : uploadControlInfo1.getState();
-                                        final String stateValue2 = uploadControlInfo2.getState();
+                                        final String stateValue1 = (uploadControlInfo1 == null) ? null : uploadControlInfo1.getState(pipelineContext);
+                                        final String stateValue2 = uploadControlInfo2.getState(pipelineContext);
 
                                         if (!((stateValue1 == null && stateValue2 == null) || (stateValue1 != null && stateValue2 != null && stateValue1.equals(stateValue2)))) {
                                             attributesImpl.addAttribute("", "state", "state", ContentHandlerHelper.CDATA, stateValue2 != null ? stateValue2 : "");
@@ -754,8 +764,8 @@ public class XFormsServer extends ProcessorImpl {
                                     }
                                     {
                                         // Filename
-                                        final String filenameValue1 = (uploadControlInfo1 == null) ? null : uploadControlInfo1.getFilename();
-                                        final String filenameValue2 = uploadControlInfo2.getFilename();
+                                        final String filenameValue1 = (uploadControlInfo1 == null) ? null : uploadControlInfo1.getFilename(pipelineContext);
+                                        final String filenameValue2 = uploadControlInfo2.getFilename(pipelineContext);
 
                                         if (!((filenameValue1 == null && filenameValue2 == null) || (filenameValue1 != null && filenameValue2 != null && filenameValue1.equals(filenameValue2)))) {
                                             attributesImpl.addAttribute("", "filename", "filename", ContentHandlerHelper.CDATA, filenameValue2 != null ? filenameValue2 : "");
@@ -763,8 +773,8 @@ public class XFormsServer extends ProcessorImpl {
                                     }
                                     {
                                         // Size
-                                        final String sizeValue1 = (uploadControlInfo1 == null) ? null : uploadControlInfo1.getSize();
-                                        final String sizeValue2 = uploadControlInfo2.getSize();
+                                        final String sizeValue1 = (uploadControlInfo1 == null) ? null : uploadControlInfo1.getSize(pipelineContext);
+                                        final String sizeValue2 = uploadControlInfo2.getSize(pipelineContext);
 
                                         if (!((sizeValue1 == null && sizeValue2 == null) || (sizeValue1 != null && sizeValue2 != null && sizeValue1.equals(sizeValue2)))) {
                                             attributesImpl.addAttribute("", "size", "size", ContentHandlerHelper.CDATA, sizeValue2 != null ? sizeValue2 : "");
@@ -1000,17 +1010,18 @@ public class XFormsServer extends ProcessorImpl {
                     // Control children values
                     if (!(xformsSingleNodeControl2 instanceof RepeatIterationControl)) {
                         {
-                            final String labelValue1 = (xformsSingleNodeControl1 == null) ? null : xformsSingleNodeControl1.getLabel();
-                            final String labelValue2 = xformsSingleNodeControl2.getLabel();
+                            final String labelValue1 = (xformsSingleNodeControl1 == null) ? null : xformsSingleNodeControl1.getLabel(pipelineContext);
+                            final String labelValue2 = xformsSingleNodeControl2.getLabel(pipelineContext);
 
                             if (!((labelValue1 == null && labelValue2 == null) || (labelValue1 != null && labelValue2 != null && labelValue1.equals(labelValue2)))) {
-                                attributesImpl.addAttribute("", "label", "label", ContentHandlerHelper.CDATA, labelValue2 != null ? labelValue2 : "");
+                                final String escapedLabelValue2 = xformsSingleNodeControl2.getEscapedLabel(pipelineContext);
+                                attributesImpl.addAttribute("", "label", "label", ContentHandlerHelper.CDATA, escapedLabelValue2 != null ? escapedLabelValue2 : "");
                             }
                         }
 
                         {
-                            final String helpValue1 = (xformsSingleNodeControl1 == null) ? null : xformsSingleNodeControl1.getHelp();
-                            final String helpValue2 = xformsSingleNodeControl2.getHelp();
+                            final String helpValue1 = (xformsSingleNodeControl1 == null) ? null : xformsSingleNodeControl1.getHelp(pipelineContext);
+                            final String helpValue2 = xformsSingleNodeControl2.getHelp(pipelineContext);
 
                             if (!((helpValue1 == null && helpValue2 == null) || (helpValue1 != null && helpValue2 != null && helpValue1.equals(helpValue2)))) {
                                 attributesImpl.addAttribute("", "help", "help", ContentHandlerHelper.CDATA, helpValue2 != null ? helpValue2 : "");
@@ -1018,8 +1029,8 @@ public class XFormsServer extends ProcessorImpl {
                         }
 
                         {
-                            final String hintValue1 = (xformsSingleNodeControl1 == null) ? null : xformsSingleNodeControl1.getHint();
-                            final String hintValue2 = xformsSingleNodeControl2.getHint();
+                            final String hintValue1 = (xformsSingleNodeControl1 == null) ? null : xformsSingleNodeControl1.getHint(pipelineContext);
+                            final String hintValue2 = xformsSingleNodeControl2.getHint(pipelineContext);
 
                             if (!((hintValue1 == null && hintValue2 == null) || (hintValue1 != null && hintValue2 != null && hintValue1.equals(hintValue2)))) {
                                 attributesImpl.addAttribute("", "hint", "hint", ContentHandlerHelper.CDATA, hintValue2 != null ? hintValue2 : "");
@@ -1027,11 +1038,12 @@ public class XFormsServer extends ProcessorImpl {
                         }
 
                         {
-                            final String alertValue1 = (xformsSingleNodeControl1 == null) ? null : xformsSingleNodeControl1.getAlert();
-                            final String alertValue2 = xformsSingleNodeControl2.getAlert();
+                            final String alertValue1 = (xformsSingleNodeControl1 == null) ? null : xformsSingleNodeControl1.getAlert(pipelineContext);
+                            final String alertValue2 = xformsSingleNodeControl2.getAlert(pipelineContext);
 
                             if (!((alertValue1 == null && alertValue2 == null) || (alertValue1 != null && alertValue2 != null && alertValue1.equals(alertValue2)))) {
-                                attributesImpl.addAttribute("", "alert", "alert", ContentHandlerHelper.CDATA, alertValue2 != null ? alertValue2 : "");
+                                final String escapedAlertValue2 = xformsSingleNodeControl2.getEscapedAlert(pipelineContext);
+                                attributesImpl.addAttribute("", "alert", "alert", ContentHandlerHelper.CDATA, escapedAlertValue2 != null ? escapedAlertValue2 : "");
                             }
                         }
 
@@ -1056,8 +1068,8 @@ public class XFormsServer extends ProcessorImpl {
 
                             {
                                 // State
-                                final String stateValue1 = (uploadControlInfo1 == null) ? null : uploadControlInfo1.getState();
-                                final String stateValue2 = uploadControlInfo2.getState();
+                                final String stateValue1 = (uploadControlInfo1 == null) ? null : uploadControlInfo1.getState(pipelineContext);
+                                final String stateValue2 = uploadControlInfo2.getState(pipelineContext);
 
                                 if (!((stateValue1 == null && stateValue2 == null) || (stateValue1 != null && stateValue2 != null && stateValue1.equals(stateValue2)))) {
                                     attributesImpl.addAttribute("", "state", "state", ContentHandlerHelper.CDATA, stateValue2 != null ? stateValue2 : "");
@@ -1074,8 +1086,8 @@ public class XFormsServer extends ProcessorImpl {
                             }
                             {
                                 // Filename
-                                final String filenameValue1 = (uploadControlInfo1 == null) ? null : uploadControlInfo1.getFilename();
-                                final String filenameValue2 = uploadControlInfo2.getFilename();
+                                final String filenameValue1 = (uploadControlInfo1 == null) ? null : uploadControlInfo1.getFilename(pipelineContext);
+                                final String filenameValue2 = uploadControlInfo2.getFilename(pipelineContext);
 
                                 if (!((filenameValue1 == null && filenameValue2 == null) || (filenameValue1 != null && filenameValue2 != null && filenameValue1.equals(filenameValue2)))) {
                                     attributesImpl.addAttribute("", "filename", "filename", ContentHandlerHelper.CDATA, filenameValue2 != null ? filenameValue2 : "");
@@ -1083,8 +1095,8 @@ public class XFormsServer extends ProcessorImpl {
                             }
                             {
                                 // Size
-                                final String sizeValue1 = (uploadControlInfo1 == null) ? null : uploadControlInfo1.getSize();
-                                final String sizeValue2 = uploadControlInfo2.getSize();
+                                final String sizeValue1 = (uploadControlInfo1 == null) ? null : uploadControlInfo1.getSize(pipelineContext);
+                                final String sizeValue2 = uploadControlInfo2.getSize(pipelineContext);
 
                                 if (!((sizeValue1 == null && sizeValue2 == null) || (sizeValue1 != null && sizeValue2 != null && sizeValue1.equals(sizeValue2)))) {
                                     attributesImpl.addAttribute("", "size", "size", ContentHandlerHelper.CDATA, sizeValue2 != null ? sizeValue2 : "");

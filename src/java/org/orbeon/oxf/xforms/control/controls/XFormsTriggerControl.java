@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.control.controls;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsConstants;
 import org.dom4j.Element;
 
 /**
@@ -24,5 +25,19 @@ import org.dom4j.Element;
 public class XFormsTriggerControl extends XFormsSingleNodeControl {
     public XFormsTriggerControl(XFormsContainingDocument containingDocument, XFormsControl parent, Element element, String name, String id) {
         super(containingDocument, parent, element, name, id);
+    }
+
+    public boolean isSupportHTMLLabels() {
+        final String appearance = getAppearance();
+        if (appearance != null && (XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME.equals(appearance) || XFormsConstants.XXFORMS_LINK_APPEARANCE_QNAME.equals(appearance))) {
+            // Minimal or link appearance
+            return true;
+        } else if (appearance != null && XFormsConstants.XXFORMS_IMAGE_APPEARANCE_QNAME.equals(appearance)) {
+            // Image appearance
+            return false;
+        } else {
+            // Default appearance (button)
+            return true;
+        }
     }
 }

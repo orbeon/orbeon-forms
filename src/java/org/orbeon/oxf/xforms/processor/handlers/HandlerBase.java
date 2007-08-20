@@ -18,6 +18,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsControls;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
@@ -354,22 +355,28 @@ public abstract class HandlerBase extends ElementHandler {
 
     protected void handleLabelHintHelpAlert(String parentId, String type, XFormsSingleNodeControl xformsControl, boolean placeholder) throws SAXException {
 
+        final boolean isHint = type.equals("hint");
+        final boolean isAlert = type.equals("alert");
+
         // Don't handle alerts and help in read-only mode
         // TODO: Removing hints and help could be optional depending on appearance
-        if (isStaticReadonly(xformsControl) && (type.equals("alert") || type.equals("hint")))
+        if (isStaticReadonly(xformsControl) && (isAlert || isHint))
             return;
+
+        final boolean isLabel = type.equals("label");
+        final boolean isHelp = type.equals("help");
 
         final String labelHintHelpAlertValue;
         if (xformsControl != null) {
             // Get actual value from control
-            if (type.equals("label")) {
-                labelHintHelpAlertValue = xformsControl.getLabel();
-            } else if (type.equals("help")) {
-                labelHintHelpAlertValue = xformsControl.getHelp();
-            } else if (type.equals("hint")) {
-                labelHintHelpAlertValue = xformsControl.getHint();
-            } else if (type.equals("alert")) {
-                labelHintHelpAlertValue = xformsControl.getAlert();
+            if (isLabel) {
+                labelHintHelpAlertValue = xformsControl.getLabel(pipelineContext);
+            } else if (isHelp) {
+                labelHintHelpAlertValue = xformsControl.getHelp(pipelineContext);
+            } else if (isHint) {
+                labelHintHelpAlertValue = xformsControl.getHint(pipelineContext);
+            } else if (isAlert) {
+                labelHintHelpAlertValue = xformsControl.getAlert(pipelineContext);
             } else {
                 throw new IllegalStateException("Illegal type requested");
             }
@@ -378,27 +385,27 @@ public abstract class HandlerBase extends ElementHandler {
             labelHintHelpAlertValue = null;
         }
 
-        // Find id
+        // Find attributes
         final Attributes labelHintHelpAlertAttributes;
-        if (type.equals("label")) {
+        if (isLabel) {
             labelHintHelpAlertAttributes = labelAttributes;
-        } else if (type.equals("help")) {
+        } else if (isHelp) {
             labelHintHelpAlertAttributes = helpAttributes;
-        } else if (type.equals("hint")) {
+        } else if (isHint) {
             labelHintHelpAlertAttributes = hintAttributes;
-        } else if (type.equals("alert")) {
+        } else if (isAlert) {
             labelHintHelpAlertAttributes = alertAttributes;
         } else {
             throw new IllegalStateException("Illegal type requested");
         }
 
-        if (labelHintHelpAlertAttributes != null || type.equals("alert")) {
+        if (labelHintHelpAlertAttributes != null || isAlert) {
             // If no attributes were found, there is no such label / help / hint / alert
 
             final StringBuffer classes = new StringBuffer();
 
             // Handle alert state
-            if (type.equals("alert")) {
+            if (isAlert) {
                 if (!handlerContext.isGenerateTemplate() && xformsControl != null && !xformsControl.isValid())
                     classes.append(" xforms-alert-active");
                 else
@@ -408,7 +415,7 @@ public abstract class HandlerBase extends ElementHandler {
             // Handle visibility
             // TODO: It would be great to actually know about the relevance of help, hint, and label. Right now, we just look at whether the value is empty
             if (!handlerContext.isGenerateTemplate() && xformsControl != null) {
-                if (type.equals("alert") || type.equals("label")) {
+                if (isAlert || isLabel) {
                     // Allow empty labels and alerts
                     if (!xformsControl.isRelevant())
                         classes.append(" xforms-disabled");
@@ -426,7 +433,7 @@ public abstract class HandlerBase extends ElementHandler {
 
             final String labelClasses = classes.toString();
 
-            if (type.equals("help")) {
+            if (isHelp) {
                 // HACK: For help, output XHTML image natively in order to help with the IE bug whereby IE reloads
                 // background images way too often.
 
@@ -456,12 +463,13 @@ public abstract class HandlerBase extends ElementHandler {
             // We handle null attributes as well because we want a placeholder for "alert" even if there is no xforms:alert
             final Attributes newAttributes = (labelHintHelpAlertAttributes != null) ? labelHintHelpAlertAttributes : (placeholder) ? new AttributesImpl() : null;
             if (newAttributes != null) {
-                outputLabelFor(handlerContext, getAttributes(newAttributes, labelClasses, null), parentId, labelHintHelpAlertValue);
+                outputLabelFor(handlerContext, getAttributes(newAttributes, labelClasses, null), parentId, labelHintHelpAlertValue,
+                        xformsControl != null && ((isLabel && xformsControl.isHTMLLabel(pipelineContext)) || (isAlert && xformsControl.isHTMLAlert(pipelineContext))));
             }
         }
     }
 
-    public static void outputLabelFor(HandlerContext handlerContext, AttributesImpl attributes, String forId, String value) throws SAXException {
+    public static void outputLabelFor(HandlerContext handlerContext, AttributesImpl attributes, String forId, String value, boolean isHTML) throws SAXException {
         attributes.addAttribute("", "for", "for", ContentHandlerHelper.CDATA, forId);
 
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
@@ -469,7 +477,11 @@ public abstract class HandlerBase extends ElementHandler {
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
         contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "label", labelQName, attributes);
         if (value != null) {
-            contentHandler.characters(value.toCharArray(), 0, value.length());
+            if (isHTML) {
+                XFormsUtils.streamHTMLFragment(contentHandler, value, null, xhtmlPrefix);
+            } else {
+                contentHandler.characters(value.toCharArray(), 0, value.length());
+            }
         }
         contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "label", labelQName);
     }

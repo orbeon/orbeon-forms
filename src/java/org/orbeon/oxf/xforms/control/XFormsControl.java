@@ -21,6 +21,7 @@ import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.*;
 import org.orbeon.saxon.om.NodeInfo;
 
 import java.util.*;
@@ -50,9 +51,11 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
 
     private boolean evaluated;
     private String label;
+    private boolean isHTMLLabel;
     private String help;
     private String hint;
     private String alert;
+    private boolean isHTMLAlert;
 
     // TODO: this should be handled in a subclass (e.g. ContainingControl)
     private List children;
@@ -113,24 +116,44 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
         return children;
     }
 
-    public String getAlert() {
-        evaluateIfNeeded(null);// TODO: Statistics won't be gathered. Any other consequence/
+    public String getAlert(PipelineContext pipelineContext) {
+        evaluateIfNeeded(pipelineContext);
         return alert;
     }
 
-    public String getHelp() {
-        evaluateIfNeeded(null);// TODO: Statistics won't be gathered. Any other consequence/
+    public String getEscapedAlert(PipelineContext pipelineContext) {
+        evaluateIfNeeded(pipelineContext);
+        return isHTMLAlert ? alert : XMLUtils.escapeXMLMinimal(alert);
+    }
+
+    public boolean isHTMLAlert(PipelineContext pipelineContext) {
+        evaluateIfNeeded(pipelineContext);
+        return isHTMLAlert;
+    }
+
+    public String getHelp(PipelineContext pipelineContext) {
+        evaluateIfNeeded(pipelineContext);
         return help;
     }
 
-    public String getHint() {
-        evaluateIfNeeded(null);// TODO: Statistics won't be gathered. Any other consequence/
+    public String getHint(PipelineContext pipelineContext) {
+        evaluateIfNeeded(pipelineContext);
         return hint;
     }
 
-    public String getLabel() {
-        evaluateIfNeeded(null);// TODO: Statistics won't be gathered. Any other consequence/
+    public String getLabel(PipelineContext pipelineContext) {
+        evaluateIfNeeded(pipelineContext);
         return label;
+    }
+
+    public String getEscapedLabel(PipelineContext pipelineContext) {
+        evaluateIfNeeded(pipelineContext);
+        return isHTMLLabel ? label : XMLUtils.escapeXMLMinimal(label);
+    }
+
+    public boolean isHTMLLabel(PipelineContext pipelineContext) {
+        evaluateIfNeeded(pipelineContext);
+        return isHTMLLabel;
     }
 
     public String getName() {
@@ -268,10 +291,24 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
         final XFormsControls xformsControls = containingDocument.getXFormsControls();
         xformsControls.setBinding(pipelineContext, this);
 
-        this.label = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, controlElement.element(XFormsConstants.XFORMS_LABEL_QNAME), false);// TODO: must support HTML
-        this.help = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, controlElement.element(XFormsConstants.XFORMS_HELP_QNAME), true);
-        this.hint = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, controlElement.element(XFormsConstants.XFORMS_HINT_QNAME), true);
-        this.alert = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, controlElement.element(XFormsConstants.XFORMS_ALERT_QNAME), false);
+        final boolean[] containsHTML = new boolean[1];
+        this.label = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, controlElement.element(XFormsConstants.XFORMS_LABEL_QNAME), isSupportHTMLLabels(), containsHTML);
+        this.isHTMLLabel = containsHTML[0];
+
+        this.help = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, controlElement.element(XFormsConstants.XFORMS_HELP_QNAME), true, null);
+        this.hint = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, controlElement.element(XFormsConstants.XFORMS_HINT_QNAME), true, null);
+
+        this.alert = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, controlElement.element(XFormsConstants.XFORMS_ALERT_QNAME), true, containsHTML);
+        this.isHTMLAlert = containsHTML[0];
+    }
+
+    /**
+     * Whether the control supports labels containing HTML. The default is true as most controls do support it.
+     *
+     * @return  true if HTML labels are supported, false otherwise
+     */
+    protected boolean isSupportHTMLLabels() {
+        return true;
     }
 
     public XFormsEventHandlerContainer getParentContainer(XFormsContainingDocument containingDocument) {

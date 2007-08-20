@@ -74,7 +74,7 @@ public class XFormsTriggerHandler extends HandlerBase {
         if (isConcreteControl && !xformsControl.hasLabel())
             throw new ValidationException("Missing label on xforms:trigger element.", xformsControl.getLocationData());
 
-        final String labelValue = handlerContext.isGenerateTemplate() ? "$xforms-template-label$" : isConcreteControl ? (xformsControl.getLabel() != null ? xformsControl.getLabel() : "") : "";
+        final String labelValue = handlerContext.isGenerateTemplate() ? "$xforms-template-label$" : isConcreteControl ? (xformsControl.getLabel(pipelineContext) != null ? xformsControl.getLabel(pipelineContext) : "") : "";
 
         final QName appearance = getAppearance(elementAttributes);
 
@@ -88,13 +88,13 @@ public class XFormsTriggerHandler extends HandlerBase {
 
         // Add title attribute if not yet present and there is a hint
         if (newAttributes.getValue("title") == null) {
-            final String hintValue = isConcreteControl ? xformsControl.getHint() : null;
+            final String hintValue = isConcreteControl ? xformsControl.getHint(pipelineContext) : null;
             if (hintValue != null)
                 newAttributes.addAttribute("", "title", "title", ContentHandlerHelper.CDATA, hintValue);
         }
 
         if (appearance != null && (XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME.equals(appearance) || XFormsConstants.XXFORMS_LINK_APPEARANCE_QNAME.equals(appearance))) {
-            // Minimal or link appearance (xxforms:link)
+            // Minimal or link appearance
 
             // TODO: probably needs f:url-norewrite="true"
             if (true) {

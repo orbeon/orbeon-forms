@@ -546,7 +546,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
 
             final String label = item.getLabel();
             reusableAttributes.clear();
-            outputLabelFor(handlerContext, reusableAttributes, itemEffectiveId, label);
+            outputLabelFor(handlerContext, reusableAttributes, itemEffectiveId, label, false);// TODO: may be HTML for full appearance
         }
 
         contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);

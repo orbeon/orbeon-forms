@@ -98,8 +98,9 @@ public class XFormsGroupHandler extends HandlerBase {
         if (!isGroupInTable) {
 
             final ContentHandler contentHandler = controller.getOutput();
-            final String labelValue = (handlerContext.isGenerateTemplate() || groupXFormsControl == null) ? null : groupXFormsControl.getLabel();
+            final String labelValue = (handlerContext.isGenerateTemplate() || groupXFormsControl == null) ? null : groupXFormsControl.getLabel(pipelineContext);
             if (isFieldsetAppearance) {
+                // Fieldset appearance
 
                 // Start xhtml:fieldset element
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, groupElementName, groupElementQName, getAttributes(attributes, classes.toString(), effectiveGroupId));
@@ -112,6 +113,7 @@ public class XFormsGroupHandler extends HandlerBase {
                     contentHandler.characters(labelValue.toCharArray(), 0, labelValue.length());
                 contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "legend", legendQName);
             } else {
+                // Default appearance
 
                 // TODO: Should find a way to find xforms:alert/@class
 
@@ -129,7 +131,7 @@ public class XFormsGroupHandler extends HandlerBase {
                         labelClasses.append(" xforms-disabled");
 
                     reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, labelClasses.toString());
-                    outputLabelFor(handlerContext, reusableAttributes, effectiveGroupId, labelValue);
+                    outputLabelFor(handlerContext, reusableAttributes, effectiveGroupId, labelValue, groupXFormsControl != null && groupXFormsControl.isHTMLLabel(pipelineContext));
                 }
 
                 // Start xhtml:span element

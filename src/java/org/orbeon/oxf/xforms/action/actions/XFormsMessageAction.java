@@ -60,7 +60,7 @@ public class XFormsMessageAction extends XFormsAction {
 
         // Get message value
         // TODO: In the future, we should support HTML
-        final String messageValue = XFormsUtils.getElementValue(pipelineContext, containingDocument, actionElement, false);
+        final String messageValue = XFormsUtils.getElementValue(pipelineContext, containingDocument, actionElement, false, null);
         if (messageValue != null) {
             // Store message for sending to client
             containingDocument.addMessageToRun(messageValue, level);

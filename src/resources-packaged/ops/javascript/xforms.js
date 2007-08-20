@@ -541,7 +541,7 @@ ORBEON.xforms.Controls = {
     _setMessage: function(control, className, message) {
         var label = ORBEON.xforms.Controls._getControlLabel(control, className);
         if (label != null) {
-            ORBEON.util.Dom.setStringValue(label, message);
+            label.innerHTML = message;
             var helpImage = ORBEON.xforms.Controls._getControlLabel(control, "xforms-help-image");
             if (message == "") {
                 ORBEON.util.Dom.addClass(label, "xforms-disabled");
@@ -570,7 +570,7 @@ ORBEON.xforms.Controls = {
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-dialog")) {
             // Dialog
             var labelDiv = ORBEON.util.Dom.getChildElementByIndex(control, 0);
-            ORBEON.util.Dom.setStringValue(labelDiv, message);
+            labelDiv.innerHTML = message;
         } else {
             ORBEON.xforms.Controls._setMessage(control, "xforms-label", message);
         }
@@ -648,7 +648,7 @@ ORBEON.xforms.Controls = {
 
     getAlertMessage: function(control) {
         var alertElement = ORBEON.xforms.Controls._getControlLabel(control, "xforms-alert");
-        return ORBEON.util.Dom.getStringValue(alertElement);
+        return alertElement.innerHTML;
     },
 
     setAlertMessage: function(control, message) {
@@ -1080,7 +1080,7 @@ ORBEON.xforms.Events = {
                 var control = ORBEON.util.Dom.getElementById(target.htmlFor);
                 var message = ORBEON.xforms.Controls.getAlertMessage(control);
                 if (message != "") {
-                    ORBEON.xforms.Events._showToolTip(event, target, "xforms-alert", ORBEON.xforms.Controls.getAlertMessage(control));
+                    ORBEON.xforms.Events._showToolTip(event, target, "xforms-alert", message);
                 }
             } else if (ORBEON.util.Dom.hasClass(target, "xforms-dialog-appearance-minimal")) {
                 // Minimal dialog: record more is back inside the dialog
@@ -2766,6 +2766,7 @@ ORBEON.xforms.Server = {
                                                         } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-mediatype-text-html")) {
                                                             documentElement.innerHTML = newOutputControlValue;
                                                         } else {
+                                                            // TODO: check whether we should use innerHTML instead
                                                             ORBEON.util.Dom.setStringValue(documentElement, newOutputControlValue);
                                                         }
                                                     } else if (ORBEON.xforms.Globals.changedIdsRequest[controlId] != null) {

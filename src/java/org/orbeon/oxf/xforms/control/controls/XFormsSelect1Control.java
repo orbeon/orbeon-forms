@@ -69,6 +69,10 @@ public class XFormsSelect1Control extends XFormsValueControl {
         if (setBinding)
             xformsControls.setBinding(pipelineContext, this);
 
+        // TODO: Work on dependencies
+//        final List existingItems = containingDocument.getXFormsControls().getConstantItems(getOriginalId());
+//        final boolean[] mayReuse = new boolean[] { existingItems != null };
+
         Dom4jUtils.visitSubtree(getControlElement(), new Dom4jUtils.VisitorListener() {
 
             private int hierarchyLevel = 0;
@@ -78,8 +82,10 @@ public class XFormsSelect1Control extends XFormsValueControl {
                 if ("item".equals(localname)) {
                     // xforms:item
 
-                    final String label = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, element.element(XFormsConstants.XFORMS_LABEL_QNAME), false);
-                    final String value = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, element.element(XFormsConstants.XFORMS_VALUE_QNAME), false);
+//                    mayReuse[0] = false;
+
+                    final String label = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, element.element(XFormsConstants.XFORMS_LABEL_QNAME), false, null);
+                    final String value = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, element.element(XFormsConstants.XFORMS_VALUE_QNAME), false, null);
 
                     newItems.add(new Item(false, element.attributes(), label, value, hierarchyLevel + 1));// TODO: must filter attributes on element.attributes()
 
@@ -107,7 +113,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
                                         if (labelElement == null)
                                             throw new ValidationException("xforms:itemset element must contain one xforms:label element.", getLocationData());
 
-                                        label = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, element.element(XFormsConstants.XFORMS_LABEL_QNAME), false);
+                                        label = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, element.element(XFormsConstants.XFORMS_LABEL_QNAME), false, null);
                                     }
 
                                     final Element valueCopyElement;
@@ -131,7 +137,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
 
                                     if (valueCopyElement.getName().equals("value")) {
                                         // Handle xforms:value
-                                        final String value = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, element.element(XFormsConstants.XFORMS_VALUE_QNAME), false);
+                                        final String value = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, element.element(XFormsConstants.XFORMS_VALUE_QNAME), false, null);
                                         newItems.add(new Item(true, element.attributes(), label != null ? label : "", value, newLevel));// TODO: must filter attributes on element.attributes()
                                     } else {
                                         // TODO: handle xforms:copy
@@ -151,7 +157,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
 
                     final Element labelElement = element.element(XFormsConstants.XFORMS_LABEL_QNAME);
                     if (labelElement != null) {
-                        final String label = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, element.element(XFormsConstants.XFORMS_LABEL_QNAME), false);
+                        final String label = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, element.element(XFormsConstants.XFORMS_LABEL_QNAME), false, null);
                         hierarchyLevel++;
                         newItems.add(new Item(false, element.attributes(), label, null, hierarchyLevel));// TODO: must filter attributes on element.attributes()
                     }

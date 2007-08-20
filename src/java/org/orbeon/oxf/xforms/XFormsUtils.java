@@ -58,7 +58,7 @@ public class XFormsUtils {
     private static final int SRC_CONTENT_BUFFER_SIZE = 1024;
 
     /**
-     * Return whether name encryption is enabled (legacy XForms engine only).
+     * @return  whether name encryption is enabled (legacy XForms engine only).
      */
     public static boolean isNameEncryptionEnabled() {
         return OXFProperties.instance().getPropertySet().getBoolean
@@ -66,7 +66,7 @@ public class XFormsUtils {
     }
 
     /**
-     * Return whether hidden fields encryption is enabled.
+     * @return  whether hidden fields encryption is enabled.
      */
     public static boolean isHiddenEncryptionEnabled() {
         return OXFProperties.instance().getPropertySet().getBoolean
@@ -313,9 +313,11 @@ public class XFormsUtils {
      * @param containingDocument    current XFormsContainingDocument
      * @param childElement          element to evaluate (xforms:label, etc.)
      * @param acceptHTML            whether the result may contain HTML
+     * @param containsHTML          whether the result actually contains HTML (null allowed)
      * @return                      string containing the result of the evaluation, null if evaluation failed
      */
-    public static String getChildElementValue(final PipelineContext pipelineContext, final XFormsContainingDocument containingDocument, final Element childElement, final boolean acceptHTML) {
+    public static String getChildElementValue(final PipelineContext pipelineContext, final XFormsContainingDocument containingDocument,
+                                              final Element childElement, final boolean acceptHTML, boolean[] containsHTML) {
 
         final XFormsControls xformsControls = containingDocument.getXFormsControls();
 
@@ -326,7 +328,7 @@ public class XFormsUtils {
         // Child element becomes the new binding
         xformsControls.pushBinding(pipelineContext, childElement);
         try {
-            return getElementValue(pipelineContext, containingDocument, childElement, acceptHTML);
+            return getElementValue(pipelineContext, containingDocument, childElement, acceptHTML, containsHTML);
         } finally {
             xformsControls.popBinding();
         }
@@ -334,17 +336,23 @@ public class XFormsUtils {
 
     /**
      * Get the value of an element by trying single-node binding, value attribute, linking attribute, and inline value
-     * (including nested xforms:output elements).
+     * (including nested XHTML and xforms:output elements).
+     *
+     * This may return an HTML string if HTML is accepted and found, or a plain string otherwise.
      *
      * @param pipelineContext       current PipelineContext
      * @param containingDocument    current XFormsContainingDocument
      * @param childElement          element to evaluate (xforms:label, etc.)
      * @param acceptHTML            whether the result may contain HTML
+     * @param containsHTML          whether the result actually contains HTML (null allowed)
      * @return                      string containing the result of the evaluation, null if evaluation failed
      */
-    public static String getElementValue(final PipelineContext pipelineContext, final XFormsContainingDocument containingDocument, final Element childElement, final boolean acceptHTML) {
+    public static String getElementValue(final PipelineContext pipelineContext, final XFormsContainingDocument containingDocument,
+                                         final Element childElement, final boolean acceptHTML, final boolean[] containsHTML) {
 
-        // NOTE: This returns an HTML string.
+        // No HTML found by default
+        if (containsHTML != null)
+            containsHTML[0] = false;
 
         final XFormsControls xformsControls = containingDocument.getXFormsControls();
         final XFormsControls.BindingContext currentBindingContext = xformsControls.getCurrentBindingContext();
@@ -356,9 +364,10 @@ public class XFormsUtils {
             final boolean hasSingleNodeBinding = currentBindingContext.isNewBind();
             if (hasSingleNodeBinding) {
                 final NodeInfo currentNode = currentBindingContext.getSingleNode();
-                if (currentNode != null)
-                    return XFormsInstance.getValueForNodeInfo(currentNode);
-                else
+                if (currentNode != null) {
+                    final String tempResult = XFormsInstance.getValueForNodeInfo(currentNode);
+                    return (acceptHTML && containsHTML == null) ? XMLUtils.escapeXMLMinimal(tempResult) : tempResult;
+                } else
                     return null;
             }
         }
@@ -377,7 +386,7 @@ public class XFormsUtils {
                             null, XFormsContainingDocument.getFunctionLibrary(), containingDocument.getXFormsControls(), null,
                             (LocationData) childElement.getData());
 
-                    return (acceptHTML) ? XMLUtils.escapeXMLMinimal(tempResult) : tempResult;
+                    return (acceptHTML && containsHTML == null) ? XMLUtils.escapeXMLMinimal(tempResult) : tempResult;
                 } else {
                     return null;
                 }
@@ -391,9 +400,11 @@ public class XFormsUtils {
             final boolean hasSrcAttribute = srcAttributeValue != null;
             if (hasSrcAttribute) {
                 try {
-                    // TODO: should cache this?
+                    // NOTE: This should probably be cached, but on the other hand almost nobody uses @src
                     final String tempResult  = retrieveSrcValue(srcAttributeValue);
-                    return (acceptHTML) ? XMLUtils.escapeXMLMinimal(tempResult) : tempResult;
+                    if (containsHTML != null)
+                        containsHTML[0] = false; // NOTE: we could support HTML if the media type returned is text/html
+                    return (acceptHTML && containsHTML == null) ? XMLUtils.escapeXMLMinimal(tempResult) : tempResult;
                 } catch (IOException e) {
                     // Dispatch xforms-link-error to model
                     final XFormsModel currentModel = currentBindingContext.getModel();
@@ -409,10 +420,10 @@ public class XFormsUtils {
 
             // Visit the subtree and serialize
 
-            // NOTE: It is a litte funny to do our own serialization here, but the alternative is to build a DOM
-            // and serialize it, which is not trivial because of the possible interleaved xforms:output's.
-            // Furthermore, we perform a very simple serialization of elements and text to simple (X)HTML, not
-            // full-fledged HTML or XML serialization.
+            // NOTE: It is a litte funny to do our own serialization here, but the alternative is to build a DOM and
+            // serialize it, which is not trivial because of the possible interleaved xforms:output's. Furthermore, we
+            // perform a very simple serialization of elements and text to simple (X)HTML, not full-fledged HTML or XML
+            // serialization.
             Dom4jUtils.visitSubtree(childElement, new Dom4jUtils.VisitorListener() {
 
                 public void startElement(Element element) {
@@ -427,13 +438,33 @@ public class XFormsUtils {
                         }
                         xformsControls.popBinding();
 
-                        // Escape only if the mediatype is not HTML
-                        if (acceptHTML && !"text/html".equals(outputControl.getMediatype()))
-                            sb.append(XMLUtils.escapeXMLMinimal(outputControl.getDisplayValueOrValue()));
-                        else
-                            sb.append(outputControl.getDisplayValueOrValue());
+                        if (acceptHTML) {
+                            if ("text/html".equals(outputControl.getMediatype())) {
+                                if (containsHTML != null)
+                                    containsHTML[0] = true; // this indicates for sure that there is some nested HTML
+                                sb.append(outputControl.getDisplayValueOrValue());
+                            } else {
+                                // Mediatype is not HTML so we don't escape
+                                sb.append(XMLUtils.escapeXMLMinimal(outputControl.getDisplayValueOrValue()));
+                            }
+                        } else {
+                            if ("text/html".equals(outputControl.getMediatype())) {
+                                // HTML is not allowed here, better tell the user
+                                throw new OXFException("HTML not allowed in element: " + childElement.getName());
+                            } else {
+                                // Mediatype is not HTML so we don't escape
+                                sb.append(outputControl.getDisplayValueOrValue());
+                            }
+                        }
                     } else {
                         // This is a regular element, just serialize the start tag to no namespace
+
+                        // If HTML is not allowed here, better tell the user
+                        if (!acceptHTML)
+                            throw new OXFException("HTML not allowed in element: " + childElement.getName());
+
+                        if (containsHTML != null)
+                            containsHTML[0] = true;// this indicates for sure that there is some nested HTML
 
                         sb.append('<');
                         sb.append(element.getName());
@@ -481,8 +512,14 @@ public class XFormsUtils {
                     sb.append(acceptHTML ? XMLUtils.escapeXMLMinimal(text.getStringValue()) : text.getStringValue());
                 }
             });
-
-            return sb.toString();
+            if (acceptHTML && containsHTML != null && !containsHTML[0]) {
+                // We went through the subtree and did not find any HTML
+                // If the caller supports the information, return a non-escaped string so we can optimize output later
+                return XMLUtils.unescapeXMLMinimal(sb.toString());
+            } else {
+                // We found some HTML, just return it
+                return sb.toString();
+            }
         }
     }
 
@@ -690,13 +727,13 @@ public class XFormsUtils {
     }
 
     public static String retrieveSrcValue(String src) throws IOException {
-        URL url = URLFactory.createURL(src);
+        final URL url = URLFactory.createURL(src);
 
         // Load file into buffer
-        InputStreamReader reader = new InputStreamReader(url.openStream());
+        final InputStreamReader reader = new InputStreamReader(url.openStream());
         try {
-            StringBuffer value = new StringBuffer();
-            char[] buff = new char[SRC_CONTENT_BUFFER_SIZE];
+            final StringBuffer value = new StringBuffer();
+            final char[] buff = new char[SRC_CONTENT_BUFFER_SIZE];
             int c = 0;
             while ((c = reader.read(buff, 0, SRC_CONTENT_BUFFER_SIZE - 1)) != -1) value.append(buff, 0, c);
             return value.toString();
@@ -862,6 +899,7 @@ public class XFormsUtils {
      * @param contextNode        context node for evaluation
      * @param variableToValueMap variables
      * @param functionLibrary    XPath function libary to use
+     * @param functionContext    context object to pass to the XForms function
      * @param element            element on which the AVT attribute is present
      * @param attributeValue     attribute value
      * @return                   resolved attribute value
@@ -1057,6 +1095,10 @@ public class XFormsUtils {
     /**
      * Return the underlying Node from the given NodeInfo if possible. If not, throw an exception with the given error
      * message.
+     *
+     * @param nodeInfo      NodeInfo to process
+     * @param errorMessage  error message to throw
+     * @return              Node if found
      */
     public static Node getNodeFromNodeInfo(NodeInfo nodeInfo, String errorMessage) {
         if (!(nodeInfo instanceof NodeWrapper))

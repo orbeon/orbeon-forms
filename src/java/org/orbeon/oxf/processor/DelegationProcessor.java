@@ -29,10 +29,8 @@ import org.dom4j.io.DOMWriter;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.processor.generator.SAXStoreGenerator;
 import org.orbeon.oxf.servicedirectory.ServiceDirectory;
 import org.orbeon.oxf.util.JMSUtils;
-import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xml.*;
@@ -50,6 +48,9 @@ import javax.naming.InitialContext;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.util.Enumeration;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DelegationProcessor extends ProcessorImpl {
 
@@ -81,8 +82,12 @@ public class DelegationProcessor extends ProcessorImpl {
                     ServiceDefinition service;
                     OperationDefinition operation;
                     SAXStore parameters;
+                    private NamespaceSupport3 namespaceSupport = new NamespaceSupport3();
 
                     public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
+
+                        namespaceSupport.startElement();
+
                         if (uri.equals(DELEGATION_NAMESPACE_URI) && localname.equals("execute")) {
 
                             // Find service
@@ -158,8 +163,7 @@ public class DelegationProcessor extends ProcessorImpl {
                                         final Node rootNode;
                                         {
                                             // Read in DOM4j content handler
-                                            final NonLazySAXContentHandler dom4jContentHandler 
-                                                = new NonLazySAXContentHandler();
+                                            final NonLazySAXContentHandler dom4jContentHandler = new NonLazySAXContentHandler();
                                             dom4jContentHandler.startDocument();
                                             dom4jContentHandler.startElement("", "dummy", "dummy", XMLUtils.EMPTY_ATTRIBUTES);
                                             parameters.replay(dom4jContentHandler);
@@ -305,31 +309,56 @@ public class DelegationProcessor extends ProcessorImpl {
                                     } else if (service.type == ServiceDefinition.STATELESS_EJB_TYPE
                                             || service.type == ServiceDefinition.JAVABEAN_TYPE) {
 
+                                        // TODO: The way we extract parameters is very awkward!
+
                                         // Create SAXStore with "real" document
-                                        SAXStore parametersWellFormed = new SAXStore();
-                                        parametersWellFormed.startDocument();
-                                        parametersWellFormed.startElement("", "parameters", "parameters", XMLUtils.EMPTY_ATTRIBUTES);
-                                        parameters.replay(parametersWellFormed);
-                                        parametersWellFormed.endElement("", "parameters", "parameters");
-                                        parametersWellFormed.endDocument();
+                                        final SAXStore parametersWellFormed = new SAXStore();
+                                        {
+                                            parametersWellFormed.startDocument();
+
+                                            {
+                                                // Handle namespaces in scope as of delegation:execute element
+                                                for (Enumeration e = namespaceSupport.getDeclaredPrefixes(); e.hasMoreElements();) {
+                                                    final String namespacePrefix = (String) e.nextElement();
+                                                    if (!namespacePrefix.startsWith("xml") && !namespacePrefix.equals(""))
+                                                        parametersWellFormed.startPrefixMapping(namespacePrefix, "");
+                                                }
+
+                                                final String defaultNS = namespaceSupport.getURI("");
+                                                if (defaultNS != null && defaultNS.length() > 0)
+                                                    super.startPrefixMapping("", "");
+                                            }
+
+                                            parametersWellFormed.startElement("", "parameters", "parameters", XMLUtils.EMPTY_ATTRIBUTES);
+                                            parameters.replay(parametersWellFormed);
+                                            parametersWellFormed.endElement("", "parameters", "parameters");
+
+                                            {
+                                                // Handle namespaces in scope as of delegation:execute element
+                                                for (Enumeration e = namespaceSupport.getDeclaredPrefixes(); e.hasMoreElements();) {
+                                                    final String namespacePrefix = (String) e.nextElement();
+                                                    if (!namespacePrefix.startsWith("xml") && !namespacePrefix.equals(""))
+                                                        parametersWellFormed.endPrefixMapping(namespacePrefix);
+                                                }
+
+                                                final String defaultNS = namespaceSupport.getURI("");
+                                                if (defaultNS != null && defaultNS.length() > 0)
+                                                    super.endPrefixMapping("");
+                                            }
+
+                                            parametersWellFormed.endDocument();
+                                        }
                                         parameters = null;
 
                                         // Put parameters in DOM
-                                        SAXStoreGenerator saxGenerator = new SAXStoreGenerator(parametersWellFormed);
-                                        DOMSerializer domSerializer = new DOMSerializer();
-                                        PipelineUtils.connect(saxGenerator, "data", domSerializer, "data");
-                                        final Document parametersDocument;
-                                        {
-                                            final PipelineContext tempContext = new PipelineContext();
-                                            domSerializer.start(tempContext);
-                                            parametersDocument = domSerializer.getDocument(tempContext);
-                                        }
+                                        final Document parametersDocument = TransformerUtils.saxStoreToDom4jDocument(parametersWellFormed);
+
                                         // Get parameter values and types
-                                        java.util.List parameterTypes = new java.util.ArrayList();
-                                        java.util.List parameterValues = new java.util.ArrayList();
+                                        final List parameterTypes = new ArrayList();
+                                        final List parameterValues = new ArrayList();
 
                                         // Go throught elements
-                                        for (java.util.Iterator i = parametersDocument.selectNodes("/parameters/*").iterator(); i.hasNext();) {
+                                        for (java.util.Iterator i = parametersDocument.selectNodes("/*/*").iterator(); i.hasNext();) {
                                             final org.dom4j.Element parameterElement = (org.dom4j.Element) i.next();
                                             final String parameterValue = parameterElement.getText();
                                             final QName type = Dom4jUtils.extractAttributeValueQName(parameterElement, XMLConstants.XSI_TYPE_QNAME);
@@ -382,6 +411,8 @@ public class DelegationProcessor extends ProcessorImpl {
                         } catch (Exception e) {
                             throw new OXFException(e);
                         }
+
+                        namespaceSupport.endElement();
                     }
 
                     public void characters(char[] chars, int start, int length) throws SAXException {
@@ -390,6 +421,23 @@ public class DelegationProcessor extends ProcessorImpl {
                             super.characters(chars, start, length);
                         } else {
                             parameters.characters(chars, start, length);
+                        }
+                    }
+
+                    public void startPrefixMapping(String prefix, String uri) throws SAXException {
+                        namespaceSupport.startPrefixMapping(prefix, uri);
+                        if (parameters == null) {
+                            super.startPrefixMapping(prefix, uri);
+                        } else {
+                            parameters.startPrefixMapping(prefix, uri);
+                        }
+                    }
+
+                    public void endPrefixMapping(String s) throws SAXException {
+                        if (parameters == null) {
+                            super.endPrefixMapping(s);
+                        } else {
+                            parameters.endPrefixMapping(s);
                         }
                     }
 

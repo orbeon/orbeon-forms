@@ -109,11 +109,14 @@ public class XFormsToXHTML extends ProcessorImpl {
 
             public KeyValidity getLocalKeyValidity(PipelineContext pipelineContext, URIReferences uriReferences) {
 
-                // Use the container namespace as a dependency
-                final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
-                final String containerNamespace = externalContext.getRequest().getContainerNamespace();
+                // TODO: For now we disable caching of the output, as migration from the application cache to the session cache has no be completed
+                return null;
 
-                return new KeyValidity(new InternalCacheKey(XFormsToXHTML.this, NAMESPACE_CACHE_KEY, containerNamespace), CONSTANT_VALIDITY);
+                // Use the container namespace as a dependency
+//                final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+//                final String containerNamespace = externalContext.getRequest().getContainerNamespace();
+//
+//                return new KeyValidity(new InternalCacheKey(XFormsToXHTML.this, NAMESPACE_CACHE_KEY, containerNamespace), CONSTANT_VALIDITY);
             }
         };
         addOutput(outputName, output);

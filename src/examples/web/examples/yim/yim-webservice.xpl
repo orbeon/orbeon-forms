@@ -47,7 +47,7 @@
     <p:processor name="oxf:xml-serializer">
         <p:input name="config"><config/></p:input>
         <p:input name="data">
-            <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/1999/XMLSchema-instance" xmlns:xsd="http://www.w3.org/1999/XMLSchema">
+            <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/1999/XMLSchema">
                 <SOAP-ENV:Body>
                     <ns1:sendYIMResponse xmlns:ns1="urn:avernet"
                         SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>

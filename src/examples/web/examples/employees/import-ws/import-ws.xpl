@@ -34,7 +34,7 @@
         <p:input name="config"><config/></p:input>
         <p:input name="data">
             <soapenv:Envelope
-                xmlns:xsi="http://www.w3.org/1999/XMLSchema-instance"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                 xmlns:xsd="http://www.w3.org/1999/XMLSchema">
                 <soapenv:Body/>
             </soapenv:Envelope>

@@ -14,7 +14,7 @@
 
     Please contact Orbeon at info@orbeon.com for more information.
 -->
-<document xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:delegation="http://orbeon.org/oxf/xml/delegation" xmlns:xsi="http://www.w3.org/1999/XMLSchema-instance" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<document xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:delegation="http://orbeon.org/oxf/xml/delegation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
     <header>
         <title>Delegation Processor</title>
     </header>

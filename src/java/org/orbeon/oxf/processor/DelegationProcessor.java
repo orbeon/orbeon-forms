@@ -23,6 +23,7 @@ import org.apache.axis.soap.SOAPConstants;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.Text;
+import org.dom4j.QName;
 import org.dom4j.io.DOMReader;
 import org.dom4j.io.DOMWriter;
 import org.orbeon.oxf.common.OXFException;
@@ -34,10 +35,7 @@ import org.orbeon.oxf.util.JMSUtils;
 import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPathCache;
-import org.orbeon.oxf.xml.ForwardingContentHandler;
-import org.orbeon.oxf.xml.SAXStore;
-import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.oxf.xml.XPathUtils;
+import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.*;
 import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
@@ -57,8 +55,6 @@ public class DelegationProcessor extends ProcessorImpl {
 
     public static final String DELEGATION_NAMESPACE_URI = "http://orbeon.org/oxf/xml/delegation";
 
-    private static final org.dom4j.QName xsiType = new org.dom4j.QName
-            ("type", new org.dom4j.Namespace("xsi", "http://www.w3.org/1999/XMLSchema-instance"));
     private static final String DEFAULT_SELECT_WEB_SERVICE_RPC = "/*:Envelope/*:Body/*[1]/text() | /*:Envelope/*:Body/*[1]/*";
     private static final String DEFAULT_SELECT_WEB_SERVICE_DOCUMENT = "/*:Envelope/*:Body/text() | /*:Envelope/*:Body/*";
     private static final String DEFAULT_SELECT_BUS = "/*:Envelope/*:Body/*";
@@ -334,15 +330,22 @@ public class DelegationProcessor extends ProcessorImpl {
 
                                         // Go throught elements
                                         for (java.util.Iterator i = parametersDocument.selectNodes("/parameters/*").iterator(); i.hasNext();) {
-                                            org.dom4j.Element parameterElement = (org.dom4j.Element) i.next();
-                                            String parameterValue = parameterElement.getText();
-                                            String type = parameterElement.attributeValue(xsiType);
-                                            if (type == null || "xsd:string".equals(type)) {
+                                            final org.dom4j.Element parameterElement = (org.dom4j.Element) i.next();
+                                            final String parameterValue = parameterElement.getText();
+                                            final QName type = Dom4jUtils.extractAttributeValueQName(parameterElement, XMLConstants.XSI_TYPE_QNAME);
+
+                                            if (type == null || XMLConstants.XS_STRING_QNAME.equals(type)) {
                                                 parameterTypes.add(String.class);
                                                 parameterValues.add(parameterValue);
-                                            } else if ("xsd:double".equals(type)) {
+                                            } else if (XMLConstants.XS_DOUBLE_QNAME.equals(type)) {
                                                 parameterTypes.add(Double.TYPE);
                                                 parameterValues.add(new Double(parameterValue));
+                                            } else if (XMLConstants.XS_BOOLEAN_QNAME.equals(type)) {
+                                                parameterTypes.add(Boolean.TYPE);
+                                                parameterValues.add(new Boolean(parameterValue));
+                                            } else if (XMLConstants.XS_INTEGER_QNAME.equals(type)) {
+                                                parameterTypes.add(Integer.TYPE);
+                                                parameterValues.add(new Integer(parameterValue));
                                             }
                                         }
 

@@ -81,6 +81,7 @@ public class XIncludeProcessor extends ProcessorImpl {
                         final URIReferences uriReferences = new URIReferences();
 
                         final SAXStore saxStore = new SAXStore();
+                        // TODO: Should be smarter and only buffer when we find a read of input:* (maybe pipeline API should do this automatically)
                         readInputAsSAX(pipelineContext, INPUT_CONFIG, saxStore);
                         try {
                             saxStore.replay(new XIncludeContentHandler(pipelineContext, contentHandler, uriReferences, uriResolver));
@@ -96,6 +97,7 @@ public class XIncludeProcessor extends ProcessorImpl {
                 // Read if not already read
                 if (!wasRead[0]) {
                     final SAXStore saxStore = new SAXStore();
+                    // TODO: Should be smarter and only buffer when we find a read of input:* (maybe pipeline API should do this automatically)
                     readInputAsSAX(pipelineContext, INPUT_CONFIG, saxStore);
                     try {
                         saxStore.replay(new XIncludeContentHandler(pipelineContext, contentHandler, null, uriResolver));

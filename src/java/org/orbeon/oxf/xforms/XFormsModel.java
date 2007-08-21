@@ -921,6 +921,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                                             throw new OXFException("Got invalid return code while loading instance: " + instanceResource + ", " + connectionResult.resultCode);
                                         }
 
+                                        // TODO: Handle validating and handleXInclude!
+
                                         // Read result as XML
                                         if (!isReadonlyHint) {
                                             instanceDocument = TransformerUtils.readDom4j(connectionResult.getResultInputStream(), connectionResult.resourceURI);
@@ -986,6 +988,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                                                 throw new OXFException("Got invalid return code while loading instance: " + instanceResource + ", " + connectionResult.resultCode);
                                             }
 
+                                            // TODO: Handle validating and handleXInclude!
+
                                             // Read result as XML
                                             if (!isReadonlyHint) {
                                                 instanceDocument = TransformerUtils.readDom4j(connectionResult.getResultInputStream(), connectionResult.resourceURI);
@@ -1009,6 +1013,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                                         XFormsServer.logger.debug("XForms - getting document from resolver for: " + absoluteResolvedURLString);
 
                                     try {
+                                        // TODO: Handle validating and handleXInclude!
+
                                         if (!isReadonlyHint) {
                                             instanceDocument = containingDocument.getURIResolver().readURLAsDocument(absoluteResolvedURLString, xxformsUsername, xxformsPassword);
                                         } else {

@@ -60,12 +60,20 @@ public class Dom4jUtils {
         NULL_DOCUMENT.setRootElement(nullElement);
     }
 
+    private static SAXReader createSAXReader(boolean validating, boolean handleXInclude) throws SAXException {
+        final SAXParser sxPrs = XMLUtils.newSAXParser(validating, handleXInclude);
+        final XMLReader xr = sxPrs.getXMLReader();
+        final SAXReader sxRdr = new SAXReader(xr);
+        final NonLazyUserDataDocumentFactory fctry = NonLazyUserDataDocumentFactory.getInstance(null);
+        sxRdr.setDocumentFactory(fctry);
+        return sxRdr;
+    }
+
     private static SAXReader createSAXReader() throws SAXException {
         final SAXParser sxPrs = XMLUtils.newSAXParser();
         final XMLReader xr = sxPrs.getXMLReader();
         final SAXReader sxRdr = new SAXReader(xr);
-        final NonLazyUserDataDocumentFactory fctry
-                = NonLazyUserDataDocumentFactory.getInstance(null);
+        final NonLazyUserDataDocumentFactory fctry = NonLazyUserDataDocumentFactory.getInstance(null);
         sxRdr.setDocumentFactory(fctry);
         return sxRdr;
     }
@@ -126,8 +134,8 @@ public class Dom4jUtils {
         return saxReader.read(inputStream);
     }
 
-    public static Document readDom4j(final InputStream inputStream, final String uri) throws SAXException, DocumentException {
-        final SAXReader saxReader = createSAXReader();
+    public static Document readDom4j(final InputStream inputStream, final String uri, boolean validating, boolean handleXInclude) throws SAXException, DocumentException {
+        final SAXReader saxReader = createSAXReader(validating, handleXInclude);
         return saxReader.read(inputStream, uri);
     }
 

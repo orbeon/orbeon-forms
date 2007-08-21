@@ -723,7 +723,15 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                                     if (XFormsServer.logger.isDebugEnabled())
                                                         XFormsServer.logger.debug("XForms - submission - replacing instance with mutable instance: " + replaceInstance.getEffectiveId());
 
-                                                    final Document resultingInstanceDocument = Dom4jUtils.readDom4j(connectionResult.getResultInputStream(), connectionResult.resourceURI);
+                                                    // TODO: Sure what default we want. In most cases, we don't use DTDs. Will XML Schema validate as well?
+                                                    final boolean validating = false;
+
+                                                    // We don't want XInclude automatically handled for security reasons
+                                                    final boolean handleXInclude = false;
+
+                                                    // TODO: Use TransformerUtils.readDom4j() instead?
+
+                                                    final Document resultingInstanceDocument = Dom4jUtils.readDom4j(connectionResult.getResultInputStream(), connectionResult.resourceURI, validating, handleXInclude);
                                                     newInstance = new XFormsInstance(replaceInstance.getModelId(), replaceInstance.getEffectiveId(), resultingInstanceDocument,
                                                             connectionResult.resourceURI, resolvedXXFormsUsername, resolvedXXFormsPassword, false, -1, replaceInstance.getValidation());
                                                 } else {
@@ -731,6 +739,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                                                     if (XFormsServer.logger.isDebugEnabled())
                                                         XFormsServer.logger.debug("XForms - submission - replacing instance with read-only instance: " + replaceInstance.getEffectiveId());
+
+                                                    // TODO: Handle validating and handleXInclude!
 
                                                     // NOTE: isApplicationSharedHint is always false when get get here. isApplicationSharedHint="true" is handled above.
                                                     final DocumentInfo resultingInstanceDocument = TransformerUtils.readTinyTree(connectionResult.getResultInputStream(), connectionResult.resourceURI);

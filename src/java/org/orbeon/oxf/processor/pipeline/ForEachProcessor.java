@@ -221,7 +221,7 @@ public class ForEachProcessor extends ProcessorImpl implements AbstractProcessor
                 if (state.domGenerators == null) {
                     Document dataInput = readInputAsDOM4J(context, getInputByName(FOR_EACH_DATA_INPUT));
                     state.domGenerators = new ArrayList();
-                    PooledXPathExpression expr = XPathCache.getXPathExpression(context,
+                    final PooledXPathExpression expr = XPathCache.getXPathExpression(context,
                             new DocumentWrapper(dataInput, null, new Configuration()),
                             select, namespaceContext, getLocationData());
                     try {
@@ -243,6 +243,8 @@ public class ForEachProcessor extends ProcessorImpl implements AbstractProcessor
                                     internalKey, internalValidity, state.domGenerators);
                     } catch (XPathException e) {
                         throw new OXFException(e);
+                    } finally {
+                        if (expr != null) expr.returnToPool();
                     }
                 }
             }

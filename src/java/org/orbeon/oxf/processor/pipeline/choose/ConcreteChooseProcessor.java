@@ -195,8 +195,7 @@ public class ConcreteChooseProcessor extends ProcessorImpl {
                 throw new OXFException(e);
             } finally{
                 try {
-                    if(expr != null)
-                        expr.returnToPool();
+                    if(expr != null) expr.returnToPool();
                 } catch (Exception e) {
                     throw new OXFException(e);
                 }

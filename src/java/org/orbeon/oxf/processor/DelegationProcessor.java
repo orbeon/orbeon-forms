@@ -25,7 +25,6 @@ import org.dom4j.Element;
 import org.dom4j.Text;
 import org.dom4j.QName;
 import org.dom4j.io.DOMReader;
-import org.dom4j.io.DOMWriter;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -51,6 +50,7 @@ import java.net.URL;
 import java.util.Enumeration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Iterator;
 
 public class DelegationProcessor extends ProcessorImpl {
 
@@ -133,7 +133,26 @@ public class DelegationProcessor extends ProcessorImpl {
                                 }
                             }
 
-                            parameters = new SAXStore();
+                            // Start building the parameters document
+                            {
+                                parameters = new SAXStore();
+                                parameters.startDocument();
+
+                                {
+                                    // Handle namespaces in scope as of delegation:execute element
+                                    for (Enumeration e = namespaceSupport.getPrefixes(); e.hasMoreElements();) {
+                                        final String namespacePrefix = (String) e.nextElement();
+                                        if (!namespacePrefix.startsWith("xml") && !namespacePrefix.equals(""))
+                                            parameters.startPrefixMapping(namespacePrefix, namespaceSupport.getURI(namespacePrefix));
+                                    }
+
+                                    final String defaultNS = namespaceSupport.getURI("");
+                                    if (defaultNS != null && defaultNS.length() > 0)
+                                        super.startPrefixMapping("", defaultNS);
+                                }
+
+                                parameters.startElement("", "parameters", "parameters", XMLUtils.EMPTY_ATTRIBUTES);
+                            }
 
                         } else {
                             // Store values if we are inside a <delegation:execute>
@@ -150,48 +169,55 @@ public class DelegationProcessor extends ProcessorImpl {
                             if (uri.equals(DELEGATION_NAMESPACE_URI)) {
                                 if (localname.equals("execute")) {
 
+                                    // Complete parameters document
+                                    {
+                                        parameters.endElement("", "parameters", "parameters");
+
+                                        {
+                                            // Handle namespaces in scope as of delegation:execute element
+                                            for (Enumeration e = namespaceSupport.getPrefixes(); e.hasMoreElements();) {
+                                                final String namespacePrefix = (String) e.nextElement();
+                                                if (!namespacePrefix.startsWith("xml") && !namespacePrefix.equals(""))
+                                                    parameters.endPrefixMapping(namespacePrefix);
+                                            }
+
+                                            final String defaultNS = namespaceSupport.getURI("");
+                                            if (defaultNS != null && defaultNS.length() > 0)
+                                                super.endPrefixMapping("");
+                                        }
+
+                                        parameters.endDocument();
+                                    }
+
                                     if (service.type == ServiceDefinition.WEB_SERVICE_TYPE
                                             || service.type == ServiceDefinition.BUS_SERVICE_TYPE) {
 
                                         // Call Web service
-                                        Service axisService = new Service();
-                                        Call call = (Call) axisService.createCall();
+                                        final Service axisService = new Service();
+                                        final Call call = (Call) axisService.createCall();
                                         if (operationTimeout != null)
                                             call.setTimeout(operationTimeout);
 
-                                        // Read all parameters in root node
-                                        final Node rootNode;
-                                        {
-                                            // Read in DOM4j content handler
-                                            final NonLazySAXContentHandler dom4jContentHandler = new NonLazySAXContentHandler();
-                                            dom4jContentHandler.startDocument();
-                                            dom4jContentHandler.startElement("", "dummy", "dummy", XMLUtils.EMPTY_ATTRIBUTES);
-                                            parameters.replay(dom4jContentHandler);
-                                            dom4jContentHandler.endElement("", "dummy", "dummy");
-                                            dom4jContentHandler.endDocument();
-
-                                            // Convert to DOM
-                                            rootNode = new DOMWriter().write
-                                                    (dom4jContentHandler.getDocument()).getDocumentElement();
-                                        }
+                                        // Get document containing the parameters
+                                        final org.w3c.dom.Element parametersElement = getParametersDomDocument().getDocumentElement();
 
                                         // Populate envelope
-                                        SOAPEnvelope requestEnvelope =
+                                        final SOAPEnvelope requestEnvelope =
                                                 service.soapVersion != null && service.soapVersion.equals("1.2")
                                                 ? new SOAPEnvelope(SOAPConstants.SOAP12_CONSTANTS)
                                                 : new SOAPEnvelope();
                                         if (service.type == ServiceDefinition.BUS_SERVICE_TYPE || "document".equals(service.style)) {
                                             // Add elements to directly to body
-                                            for (int i = 0; i < rootNode.getChildNodes().getLength(); i++) {
-                                                Node child = rootNode.getChildNodes().item(i);
+                                            for (int i = 0; i < parametersElement.getChildNodes().getLength(); i++) {
+                                                final Node child = parametersElement.getChildNodes().item(i);
                                                 if (child instanceof org.w3c.dom.Element)
                                                     requestEnvelope.addBodyElement(new SOAPBodyElement((org.w3c.dom.Element) child));
                                             }
                                         } else {
                                             // Create body element with operation name, and add elements as children
                                             final SOAPBodyElement requestBody = new SOAPBodyElement(new PrefixedQName(operation.nsuri, operation.name, "m"));
-                                            for (int i = 0; i < rootNode.getChildNodes().getLength(); i++) {
-                                                Node child = rootNode.getChildNodes().item(i);
+                                            for (int i = 0; i < parametersElement.getChildNodes().getLength(); i++) {
+                                                final Node child = parametersElement.getChildNodes().item(i);
                                                 if (child instanceof org.w3c.dom.Element) {
                                                     requestBody.addChild(new MessageElement((org.w3c.dom.Element) child));
                                                 } else if (child instanceof org.w3c.dom.Text) {
@@ -207,7 +233,6 @@ public class DelegationProcessor extends ProcessorImpl {
                                         SOAPEnvelope resultEnvelope = null;
                                         if (service.type == ServiceDefinition.WEB_SERVICE_TYPE) {
                                             // Call Web service
-                                            parameters = null;
                                             call.setTargetEndpointAddress(new URL(service.endpoint));
                                             if (operation != null && operation.soapAction != null) {
                                                 call.setUseSOAPAction(true);
@@ -274,91 +299,56 @@ public class DelegationProcessor extends ProcessorImpl {
                                             }
 
                                             // Send body from result envelope
-                                            LocationSAXWriter locationSAXWriter = new LocationSAXWriter();
+                                            final LocationSAXWriter locationSAXWriter = new LocationSAXWriter();
                                             locationSAXWriter.setContentHandler(contentHandler);
                                             final NonLazyUserDataDocumentFactory fctry = NonLazyUserDataDocumentFactory.getInstance(null);
-                                            Document resultEnvelopeDOM4j = new DOMReader(fctry).read(resultEnvelope.getAsDocument());
+                                            final Document resultEnvelopeDOM4j = new DOMReader(fctry).read(resultEnvelope.getAsDocument());
 
-                                            String xpath =
+                                            final String xpathString =
                                                     operation != null && operation.select != null
                                                     ? operation.select
                                                     : service.type == ServiceDefinition.WEB_SERVICE_TYPE
                                                     ? ("document".equals(service.style) ? DEFAULT_SELECT_WEB_SERVICE_DOCUMENT : DEFAULT_SELECT_WEB_SERVICE_RPC)
                                                     : DEFAULT_SELECT_BUS;
-                                            PooledXPathExpression expr = XPathCache.getXPathExpression(context,
+
+                                            final PooledXPathExpression expr = XPathCache.getXPathExpression(context,
                                                     new DocumentWrapper(resultEnvelopeDOM4j, null, new Configuration()),
-                                                    xpath,
+                                                    xpathString,
                                                     operation != null && operation.select != null
                                                             ? operation.selectNamespaceContext : null, getLocationData());
-                                            for (java.util.Iterator i = expr.evaluate().iterator(); i.hasNext();) {
 
-                                                // Create document with node from SOAP envelope
-                                                Object result = i.next();
-                                                if (result instanceof Element) {
-                                                    locationSAXWriter.write((Element) result);
-                                                } else if (result instanceof Document) {
-                                                    locationSAXWriter.write(((Document) result).getRootElement());
-                                                } else if (result instanceof Text) {
-                                                    locationSAXWriter.write((Text) result);
-                                                } else {
-                                                    throw new OXFException("Unsupported result from select expression: '" + result.getClass() + "'");
+                                            try {
+                                                for (Iterator i = expr.evaluate().iterator(); i.hasNext();) {
+
+                                                    // Create document with node from SOAP envelope
+                                                    final Object result = i.next();
+                                                    if (result instanceof Element) {
+                                                        locationSAXWriter.write((Element) result);
+                                                    } else if (result instanceof Document) {
+                                                        locationSAXWriter.write(((Document) result).getRootElement());
+                                                    } else if (result instanceof Text) {
+                                                        locationSAXWriter.write((Text) result);
+                                                    } else {
+                                                        throw new OXFException("Unsupported result from select expression: '" + result.getClass() + "'");
+                                                    }
                                                 }
+                                            } finally {
+                                                if (expr != null) expr.returnToPool();
                                             }
                                         }
 
                                     } else if (service.type == ServiceDefinition.STATELESS_EJB_TYPE
                                             || service.type == ServiceDefinition.JAVABEAN_TYPE) {
 
-                                        // TODO: The way we extract parameters is very awkward!
-
-                                        // Create SAXStore with "real" document
-                                        final SAXStore parametersWellFormed = new SAXStore();
-                                        {
-                                            parametersWellFormed.startDocument();
-
-                                            {
-                                                // Handle namespaces in scope as of delegation:execute element
-                                                for (Enumeration e = namespaceSupport.getDeclaredPrefixes(); e.hasMoreElements();) {
-                                                    final String namespacePrefix = (String) e.nextElement();
-                                                    if (!namespacePrefix.startsWith("xml") && !namespacePrefix.equals(""))
-                                                        parametersWellFormed.startPrefixMapping(namespacePrefix, "");
-                                                }
-
-                                                final String defaultNS = namespaceSupport.getURI("");
-                                                if (defaultNS != null && defaultNS.length() > 0)
-                                                    super.startPrefixMapping("", "");
-                                            }
-
-                                            parametersWellFormed.startElement("", "parameters", "parameters", XMLUtils.EMPTY_ATTRIBUTES);
-                                            parameters.replay(parametersWellFormed);
-                                            parametersWellFormed.endElement("", "parameters", "parameters");
-
-                                            {
-                                                // Handle namespaces in scope as of delegation:execute element
-                                                for (Enumeration e = namespaceSupport.getDeclaredPrefixes(); e.hasMoreElements();) {
-                                                    final String namespacePrefix = (String) e.nextElement();
-                                                    if (!namespacePrefix.startsWith("xml") && !namespacePrefix.equals(""))
-                                                        parametersWellFormed.endPrefixMapping(namespacePrefix);
-                                                }
-
-                                                final String defaultNS = namespaceSupport.getURI("");
-                                                if (defaultNS != null && defaultNS.length() > 0)
-                                                    super.endPrefixMapping("");
-                                            }
-
-                                            parametersWellFormed.endDocument();
-                                        }
-                                        parameters = null;
-
-                                        // Put parameters in DOM
-                                        final Document parametersDocument = TransformerUtils.saxStoreToDom4jDocument(parametersWellFormed);
+                                        // Get document containing the parameters
+                                        final Document parametersDocument = getParametersDocument();
 
                                         // Get parameter values and types
                                         final List parameterTypes = new ArrayList();
                                         final List parameterValues = new ArrayList();
 
                                         // Go throught elements
-                                        for (java.util.Iterator i = parametersDocument.selectNodes("/*/*").iterator(); i.hasNext();) {
+                                        for (Iterator i = XPathUtils.selectIterator(parametersDocument, "/*/*"); i.hasNext();) {
                                             final org.dom4j.Element parameterElement = (org.dom4j.Element) i.next();
                                             final String parameterValue = parameterElement.getText();
                                             final QName type = Dom4jUtils.extractAttributeValueQName(parameterElement, XMLConstants.XSI_TYPE_QNAME);
@@ -389,13 +379,14 @@ public class DelegationProcessor extends ProcessorImpl {
                                             final Method create = home.getClass().getDeclaredMethod("create", new Class[]{});
                                             final Object instance = create.invoke(home, new Object[]{});
                                             final String result = callMethod(instance.getClass(), operationName, parameterTypes, instance, parameterValues);
+
                                             super.characters(result.toCharArray(), 0, result.length());
                                         } else if (service.type == ServiceDefinition.JAVABEAN_TYPE) {
                                             // Call JavaBean method
-                                            Class clazz = Class.forName(service.clazz);
-                                            Object instance = clazz.newInstance();
-                                            String result = callMethod(clazz, operationName, parameterTypes,
-                                                    instance, parameterValues);
+                                            final Class clazz = Class.forName(service.clazz);
+                                            final Object instance = clazz.newInstance();
+                                            final String result = callMethod(clazz, operationName, parameterTypes, instance, parameterValues);
+
                                             super.characters(result.toCharArray(), 0, result.length());
                                         }
                                     }
@@ -443,6 +434,20 @@ public class DelegationProcessor extends ProcessorImpl {
 
                     public void setDocumentLocator(Locator locator) {
                         this.locator = locator;
+                    }
+
+                    private Document getParametersDocument() throws SAXException {
+                        // Create Document
+                        final Document result = TransformerUtils.saxStoreToDom4jDocument(parameters);
+                        parameters = null;
+                        return result;
+                    }
+
+                    private org.w3c.dom.Document getParametersDomDocument() throws SAXException {
+                        // Create DOM document
+                        final org.w3c.dom.Document result = TransformerUtils.saxStoreToDomDocument(parameters);
+                        parameters = null;
+                        return result;
                     }
                 });
             };

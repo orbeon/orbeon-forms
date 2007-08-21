@@ -377,11 +377,6 @@ http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=2
                         </a>
                     </li>
                     <li>
-                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=305176&amp;group_id=168&amp;atid=350207">#305176:
-                            Issue with handling of back button when XFormsToXHTML reads input:*
-                        </a>
-                    </li>
-                    <li>
                         <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=305588&amp;group_id=168&amp;atid=350207">#305588:
                             RFE: Support instance/src="input:data"
                         </a>
@@ -463,7 +458,7 @@ http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=2
                     </li>
                     <li>
                         <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307377&amp;group_id=168&amp;atid=350207">#307377:
-                            Cusor not visible in input fields
+                            Cursor not visible in input fields
                         </a>
                     </li>
                     <li>

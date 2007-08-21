@@ -221,7 +221,7 @@
 
       <jar destfile='${jar.file}' compress='false' >
           <manifest>
-            <attribute name='Class-Path' value='${jar.mf.cp}' />
+              <attribute name='Class-Path' value='${jar.mf.cp}'/>
           </manifest>
           <fileset dir="${java-src.dir}">
               <include name="**/*.xml"/>

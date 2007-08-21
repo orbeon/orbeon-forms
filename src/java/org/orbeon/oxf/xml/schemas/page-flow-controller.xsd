@@ -42,6 +42,7 @@
                                     <attribute name="ref" type="string" use="required"/>
                                     <attribute name="parameter" type="string" use="optional"/>
                                     <attribute name="matcher-group" type="positiveInteger" use="optional"/>
+                                    <attribute name="value" type="string" use="optional"/>
                                 </complexType>
                             </element>
                             <element name="action" minOccurs="0" maxOccurs="unbounded">

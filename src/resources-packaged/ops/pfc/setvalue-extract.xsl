@@ -1,5 +1,5 @@
 <!--
-    Copyright (C) 2005 Orbeon, Inc.
+    Copyright (C) 2005-2007 Orbeon, Inc.
 
     This program is free software; you can redistribute it and/or modify it under the terms of the
     GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -91,8 +91,16 @@
                 </xsl:choose>
             </xsl:when>
             <xsl:when test="$setvalues[$param-index]/@matcher-group">
-                <!-- Matcher group index -->
+                <!-- Matcher group -->
                 <xsl:value-of select="$matcher-results[xs:integer($setvalues[$param-index]/@matcher-group)]"/>
+            </xsl:when>
+            <xsl:when test="$setvalues[$param-index]/@value">
+                <!-- Value -->
+                <xsl:value-of select="function:evaluate($instance, $setvalues[$param-index]/@value, $setvalues[$param-index]/namespace::node()[name() != ''])[last()]"/>
+            </xsl:when>
+            <xsl:when test="local-name($setvalues[$param-index]) = 'setvalue'">
+                <!-- Literal value -->
+                <xsl:value-of select="$setvalues[$param-index]"/>
             </xsl:when>
             <xsl:otherwise>
                 <!-- Backward compatibility mode -->

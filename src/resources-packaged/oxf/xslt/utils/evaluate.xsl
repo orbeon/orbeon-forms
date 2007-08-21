@@ -27,7 +27,7 @@
        - @param namespaces  A sequence of namespaces, which prefix can be used
                             in the XPath expression
       -->
-	<xsl:function name="function:evaluate" as="node()*">
+	<xsl:function name="function:evaluate" as="item()*">
         <xsl:param name="node" as="node()"/>
         <xsl:param name="select" as="xs:string"/>
         <xsl:param name="namespaces" as="node()*"/>

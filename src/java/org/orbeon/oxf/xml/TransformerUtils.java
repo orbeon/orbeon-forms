@@ -274,6 +274,24 @@ public class TransformerUtils {
     }
 
     /**
+     * Transform a SAXStore into a DOM document
+     *
+     * @param   saxStore input SAXStore
+     * @return  DOM document
+     */
+    public static org.w3c.dom.Document saxStoreToDomDocument(SAXStore saxStore) {
+        final TransformerHandler identity = getIdentityTransformerHandler();
+        final DOMResult domResult = new DOMResult();
+        identity.setResult(domResult);
+        try {
+            saxStore.replay(identity);
+        } catch (SAXException e) {
+            throw new OXFException(e);
+        }
+        return domResult.getNode().getOwnerDocument();
+    }
+
+    /**
      * Transform a dom4j Document into a TinyTree.
      */
     public static DocumentInfo dom4jToTinyTree(Document document) {

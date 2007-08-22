@@ -323,6 +323,15 @@
                             href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=307152&amp;group_id=168&amp;atid=350207">#307152</a>.
                         </p>
                     </li>
+                    <li>
+                        <p>
+                            <b>Firebug Lite ships with Orbeon Forms.</b> If you wish to debug JavaScript with Firebug
+                            Lite, you don't need anymore to include your own copy of Firebug Lite. Instead you can use
+                            the one that <a
+                            href="https://wiki.objectweb.org/ops/Wiki.jsp?page=JavaScriptDebugging">comes by default
+                            with Orbeon Forms</a>.
+                        </p>
+                    </li>
                 </ul>
             </section>
             <a name="changes-36-full"/>

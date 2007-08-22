@@ -30,13 +30,13 @@
         <xhtml:style type="text/css">
             .show-drop-down img { border: 0; }
         </xhtml:style>
-        <xhtml:script language="javascript" type="text/javascript" src="/apps/firebug/firebug.js"/>
+        <xhtml:script language="javascript" type="text/javascript" src="/ops/firebug/firebug.js"/>
     </xhtml:head>
     <xhtml:body>
 
         <xforms:group id="my-group">
 
-            <xxforms:dialog id="dialog" neighbor="show-trigger" appearance="minimal" constrain="true">
+            <xxforms:dialog id="dialog" appearance="minimal">
                 Some text here.
                 <xhtml:a href="#">HTML link.</xhtml:a>
                 <xforms:trigger appearance="minimal">
@@ -53,10 +53,9 @@
                         <xhtml:span>Show drop-down dialog</xhtml:span>
                         <xhtml:img src="/apps/xforms-sandbox/samples/images/dialog-down.png"/>
                     </xforms:label>
-                    <xxforms:show ev:event="DOMActivate" dialog="dialog"/>
+                    <xxforms:show ev:event="DOMActivate" dialog="dialog" neighbor="show-trigger" constrain="true"/>
                 </xforms:trigger>
             </xhtml:div>
-
         </xforms:group>
 
     </xhtml:body>

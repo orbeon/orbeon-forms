@@ -1160,7 +1160,8 @@
                         <li>
                             <p>
                                 Instance values <i>cannot</i> be updated, and no Model Item Properties (MIPs) can be
-                                assigned with <code>&lt;xforms:bind></code> to the instance.
+                                assigned with <code>&lt;xforms:bind></code> to the instance. But a read-only instance
+                                can be replaced entirely by an <code>&lt;xforms:submission replace="instance"></code>
                             </p>
                         </li>
                         <li>
@@ -1171,16 +1172,20 @@
                         </li>
                     </ul>
                     <p>
-                        Note that a read-only instance can still be replaced in its entirety during an XForms
-                        submission.
-                    </p>
-                    <p>
                         Read-only instances are particularly appropriate for loading internationalization resources,
                         which can be large but don't change. Example:
                     </p>
                     <xml-source>
                         <xforms:instance id="resources-instance" src="/forms/resources/en" xxforms:readonly="true"/>
                     </xml-source>
+                    <p>
+                        The <code>xxforms:readonly</code> attribute on <code>&lt;xxforms:instance></code> determines if
+                        the instance is read-only until that instance is being replaced. After an instance is replaced,
+                        it can be read-only or not irrelevant of the of <code>xxforms:readonly</code> on
+                        <code>&lt;xxforms:instance></code>. When the instance is replaced, the replaced instance is
+                        read-only if and only if the <code>&lt;xforms:submission></code> that does the replacement has a
+                        attribute <code>xxforms:readonly="true"</code>.
+                    </p>
                 </section>
                 <a name="xxforms-shared"/>
                 <section>

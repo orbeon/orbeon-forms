@@ -330,12 +330,25 @@
                 <title>Customize the standard epilogue</title>
                 <p>
                     The <a href="reference-epilogue">standard Orbeon Forms epilogue</a> can be optimized for
-                    your own needs. For example, if you do not use <a
-                    href="#xforms-classic-ng">XForms Classic</a>, you can remove the test for the
-                    XForms classic engine; if you do not use "widgets", you can remove the inclusion
-                    of <code>xforms-widgets.xsl</code>; if you are not using portlets (which is
-                    likely), you can remove the test for portlets.
+                    your own needs. For example:
                 </p>
+                <ul>
+                    <li>
+                        If you do not use XForms Classic, you can remove the test for the XForms classic engine. (If
+                        you are wondering what XForms Classic is, you are probably not using it.)
+                    </li>
+                    <li>
+                        If you do not use "widgets" (i.e. tabs, as this is the only standard "widget" at this point),
+                        you can remove the inclusion of <code>xforms-widgets.xsl</code>.
+                    </li>
+                    <li>
+                        If you are not using portlets (which is likely), you can remove the test for portlets.
+                    </li>
+                    <li>
+                        If you are using the <code>theme-plain.xsl</code> theme and have not modified it, you can
+                        bypass completely the theme stylesheet.
+                    </li>
+                </ul>
             </section>
             <a name="your-app-debug"/>
             <section>

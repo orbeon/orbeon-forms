@@ -30,6 +30,7 @@
     <files path-info="*.java" mime-type="text/plain"/>
     <files path-info="*.txt" mime-type="text/plain"/>
     <files path-info="*.xq" mime-type="text/plain"/>
+    <files path-info="*.jar" mime-type="application/zip"/>
 
     <!-- Home redirects to Welcome application -->
     <page id="home" path-info="/">

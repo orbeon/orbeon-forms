@@ -53,7 +53,9 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
     private String label;
     private boolean isHTMLLabel;
     private String help;
+    private boolean isHTMLHelp;
     private String hint;
+    private boolean isHTMLHint;
     private String alert;
     private boolean isHTMLAlert;
 
@@ -136,9 +138,19 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
         return help;
     }
 
+    public boolean isHTMLHelp(PipelineContext pipelineContext) {
+        evaluateIfNeeded(pipelineContext);
+        return isHTMLHelp;
+    }
+
     public String getHint(PipelineContext pipelineContext) {
         evaluateIfNeeded(pipelineContext);
         return hint;
+    }
+
+    public boolean isHTMLHint(PipelineContext pipelineContext) {
+        evaluateIfNeeded(pipelineContext);
+        return isHTMLHint;
     }
 
     public String getLabel(PipelineContext pipelineContext) {
@@ -295,8 +307,11 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
         this.label = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, controlElement.element(XFormsConstants.XFORMS_LABEL_QNAME), isSupportHTMLLabels(), containsHTML);
         this.isHTMLLabel = containsHTML[0];
 
-        this.help = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, controlElement.element(XFormsConstants.XFORMS_HELP_QNAME), true, null);
-        this.hint = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, controlElement.element(XFormsConstants.XFORMS_HINT_QNAME), true, null);
+        this.help = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, controlElement.element(XFormsConstants.XFORMS_HELP_QNAME), true, containsHTML);
+        this.isHTMLHelp = containsHTML[0];
+
+        this.hint = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, controlElement.element(XFormsConstants.XFORMS_HINT_QNAME), true, containsHTML);
+        this.isHTMLHint = containsHTML[0];
 
         this.alert = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, controlElement.element(XFormsConstants.XFORMS_ALERT_QNAME), true, containsHTML);
         this.isHTMLAlert = containsHTML[0];

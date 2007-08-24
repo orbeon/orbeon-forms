@@ -464,7 +464,9 @@ public abstract class HandlerBase extends ElementHandler {
             final Attributes newAttributes = (labelHintHelpAlertAttributes != null) ? labelHintHelpAlertAttributes : (placeholder) ? new AttributesImpl() : null;
             if (newAttributes != null) {
                 outputLabelFor(handlerContext, getAttributes(newAttributes, labelClasses, null), parentId, labelHintHelpAlertValue,
-                        xformsControl != null && ((isLabel && xformsControl.isHTMLLabel(pipelineContext)) || (isAlert && xformsControl.isHTMLAlert(pipelineContext))));
+                        xformsControl != null && ((isLabel && xformsControl.isHTMLLabel(pipelineContext))
+                                                    || (isAlert && xformsControl.isHTMLAlert(pipelineContext))
+                                                    || (isHint && xformsControl.isHTMLHint(pipelineContext))));
             }
         }
     }

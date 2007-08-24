@@ -270,6 +270,10 @@ span.xforms-select-appearance-full.xforms-required-empty input, span.xforms-sele
 .xforms-upload-size { padding-left: .5em; }
 .xforms-upload-remove { vertical-align: -20%; padding-left: .5em; cursor: pointer; }
 
+.xforms-dialog-appearance-minimal { visibility:hidden; border: 1px outset #eef; }
+.xforms-dialog-appearance-minimal div { border: 0; padding: 5px; background-color: #dde; margin: 0; }
+.xforms-dialog-appearance-minimal div div { padding: 3px; background-color: #fff }
+
 select.xforms-required-empty {
     background-color: #fcc;
 }

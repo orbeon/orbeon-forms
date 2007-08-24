@@ -17,6 +17,8 @@ import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethodBase;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
+import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
+import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.*;
 import org.orbeon.oxf.common.OXFException;
@@ -32,6 +34,17 @@ import java.util.Iterator;
 import java.util.Map;
 
 public class HTTPURLConnection extends URLConnection {
+
+    private static HttpClient httpClient;
+    static {
+        MultiThreadedHttpConnectionManager connectionManager =
+      		new MultiThreadedHttpConnectionManager();
+        HttpConnectionManagerParams params = new HttpConnectionManagerParams();
+        params.setDefaultMaxConnectionsPerHost(Integer.MAX_VALUE);
+        params.setMaxTotalConnections(Integer.MAX_VALUE);
+        connectionManager.setParams(params);
+        httpClient = new HttpClient(connectionManager);
+    }
 
     private URL url;
     private boolean connected = false;
@@ -66,7 +79,6 @@ public class HTTPURLConnection extends URLConnection {
     public void connect() throws IOException {
         if (!connected) {
             String userinfo = url.getUserInfo();
-            HttpClient client = new HttpClient();
 
             if (userinfo != null) {
                 // Set username and optional password specified on URL
@@ -77,13 +89,13 @@ public class HTTPURLConnection extends URLConnection {
                 // are getting this from a URL. Now do the decoding.
                 username = URLDecoder.decode(username, "utf-8");
                 password = URLDecoder.decode(password, "utf-8");
-                client.getState().setCredentials(
+                httpClient.getState().setCredentials(
                     new AuthScope(url.getHost(), url.getPort()),
                     new UsernamePasswordCredentials(username, password)
                 );
             } else if (username != null) {
                 // Set username and password specified externally
-                client.getState().setCredentials(
+                httpClient.getState().setCredentials(
                     new AuthScope(url.getHost(), url.getPort()),
                     new UsernamePasswordCredentials(username, password == null ? "" : password)
                 );
@@ -107,7 +119,7 @@ public class HTTPURLConnection extends URLConnection {
             method.setDoAuthentication(true);
 
             // Make request
-            responseCode = client.executeMethod(method);
+            responseCode = httpClient.executeMethod(method);
             connected = true;
         }
     }

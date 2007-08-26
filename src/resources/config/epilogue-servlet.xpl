@@ -119,6 +119,8 @@
                                 <system-doctype>http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd</system-doctype>
                                 <encoding>utf-8</encoding>
                                 <content-type>application/xhtml+xml</content-type>
+                                <indent>false</indent>
+                                <indent-amount>0</indent-amount>
                             </config>
                         </p:input>
                         <p:input name="data" href="#xhtml-data"/>
@@ -147,6 +149,8 @@
                                 <public-doctype>-//W3C//DTD HTML 4.01 Transitional//EN</public-doctype>
                                 <version>4.01</version>
                                 <encoding>utf-8</encoding>
+                                <indent>true</indent>
+                                <indent-amount>0</indent-amount>
                             </config>
                         </p:input>
                         <p:input name="data" href="#html-data"/>
@@ -183,6 +187,8 @@
                         <!--<public-doctype>-//W3C//DTD HTML 4.01//EN</public-doctype>-->
                         <version>4.01</version>
                         <encoding>utf-8</encoding>
+                        <indent>true</indent>
+                        <indent-amount>0</indent-amount>
                     </config>
                 </p:input>
                 <p:input name="data" href="#html-data"/>
@@ -218,6 +224,8 @@
                         <public-doctype>-//W3C//DTD HTML 4.01 Transitional//EN</public-doctype>
                         <version>4.01</version>
                         <encoding>utf-8</encoding>
+                        <indent>true</indent>
+                        <indent-amount>0</indent-amount>
                     </config>
                 </p:input>
                 <p:input name="data" href="#rewritten-data"/>
@@ -288,6 +296,8 @@
                     <config>
                         <encoding>utf-8</encoding>
                         <content-type>application/atom+xml</content-type>
+                        <indent>false</indent>
+                        <indent-amount>0</indent-amount>
                     </config>
                 </p:input>
                 <p:input name="data" href="#xformed-data"/>
@@ -327,6 +337,8 @@
                 <p:input name="config">
                     <config>
                         <encoding>utf-8</encoding>
+                        <indent>false</indent>
+                        <indent-amount>0</indent-amount>
                     </config>
                 </p:input>
                 <p:input name="data" href="#xformed-data"/>

@@ -396,7 +396,7 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
                 throw new OXFException(e);
             }
 
-            HttpServletRequest wrapper = new HttpServletRequestStub() {
+            final HttpServletRequest wrapper = new HttpServletRequestStub() {
 
                 public String getHeader(String s) {
                     if ("content-type".equalsIgnoreCase(s)) {
@@ -425,6 +425,10 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
                             return inputStream.read();
                         }
                     };
+                }
+
+                public String getContentType() {
+                    return request.getContainerType();
                 }
             };
 

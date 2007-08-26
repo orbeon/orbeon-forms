@@ -41,7 +41,6 @@ import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
-import javax.xml.transform.Transformer;
 import javax.xml.transform.sax.TransformerHandler;
 import java.util.*;
 

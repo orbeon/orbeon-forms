@@ -38,7 +38,7 @@ public class DebugProcessor extends ProcessorImpl {
 
     public ProcessorOutput createOutput(final String name) {
         ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
-            public void readImpl(PipelineContext context, ContentHandler contentHandler) {
+            public void readImpl(PipelineContext pipelineContext, ContentHandler contentHandler) {
                 try {
                     if (logger.isInfoEnabled()) {
 
@@ -46,7 +46,7 @@ public class DebugProcessor extends ProcessorImpl {
                         final String debugMessage;
                         final LocationData debugLocationData;
                         {
-                            Element configElement = readInputAsDOM4J(context, INPUT_CONFIG).getRootElement();
+                            final Element configElement = readInputAsDOM4J(pipelineContext, INPUT_CONFIG).getRootElement();
                             debugMessage = configElement.element("message").getText();
                             if (configElement.element("system-id") != null) {
                                 debugLocationData = new LocationData(configElement.element("system-id").getText(),
@@ -57,10 +57,10 @@ public class DebugProcessor extends ProcessorImpl {
                             }
                         }
                         final Document loggedDocument;
-                        final SAXStore saxStore = new SAXStore();
+                        final SAXStore saxStore = new SAXStore();   
                         {
-                            readInputAsSAX(context, name, saxStore);
-                            LocationSAXContentHandler saxContentHandler = new LocationSAXContentHandler();
+                            readInputAsSAX(pipelineContext, name, saxStore);
+                            final LocationSAXContentHandler saxContentHandler = new LocationSAXContentHandler();
                             saxStore.replay(saxContentHandler);
                             loggedDocument = saxContentHandler.getDocument();
                             if (loggedDocument.getRootElement() == null)
@@ -77,7 +77,7 @@ public class DebugProcessor extends ProcessorImpl {
 
                     } else {
                         // No debugging, just pass-through
-                        readInputAsSAX(context, name, contentHandler);
+                        readInputAsSAX(pipelineContext, name, contentHandler);
                     }
                 } catch (SAXException e) {
                     throw new OXFException(e);

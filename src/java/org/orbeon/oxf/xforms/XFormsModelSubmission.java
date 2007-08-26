@@ -103,6 +103,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
     private String resolvedXXFormsReadonly;
     private String avtXXFormsShared;
     private String resolvedXXFormsShared;
+    private String avtXXFormsTarget;
+    private String resolvedXXFormsTarget;
 
     private boolean xxfShowProgress;
 
@@ -133,6 +135,10 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
     public String getReplace() {
         return replace;
+    }
+
+    public String getResolvedXXFormsTarget() {
+        return resolvedXXFormsTarget;
     }
 
     private void extractSubmissionElement() {
@@ -188,6 +194,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
             avtXXFormsReadonly = submissionElement.attributeValue(XFormsConstants.XXFORMS_READONLY_ATTRIBUTE_QNAME);
             avtXXFormsShared = submissionElement.attributeValue(XFormsConstants.XXFORMS_SHARED_QNAME);
+
+            avtXXFormsTarget = submissionElement.attributeValue(XFormsConstants.XXFORMS_TARGET_QNAME);
 
             // Whether we must show progress or not
             xxfShowProgress = !"false".equals(submissionElement.attributeValue(XFormsConstants.XXFORMS_SHOW_PROGRESS_QNAME));
@@ -356,6 +364,11 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                 // Deferred submission: end of the first pass
                 if (isDeferredSubmissionFirstPass) {
+
+                    // Resolve the target AVT if needed
+                    final FunctionLibrary functionLibrary = XFormsContainingDocument.getFunctionLibrary();
+                    resolvedXXFormsTarget = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, currentNodeInfo, null, functionLibrary, xformsControls, submissionElement, avtXXFormsTarget);
+
                     // When replace="all", we wait for the submission of an XXFormsSubmissionEvent from the client
                     containingDocument.setClientActiveSubmission(this);
                     return;

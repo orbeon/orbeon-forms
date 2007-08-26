@@ -2766,7 +2766,6 @@ ORBEON.xforms.Server = {
                                                         } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-mediatype-text-html")) {
                                                             documentElement.innerHTML = newOutputControlValue;
                                                         } else {
-                                                            // TODO: check whether we should use innerHTML instead
                                                             ORBEON.util.Dom.setStringValue(documentElement, newOutputControlValue);
                                                         }
                                                     } else if (ORBEON.xforms.Globals.changedIdsRequest[controlId] != null) {
@@ -3183,6 +3182,7 @@ ORBEON.xforms.Server = {
                                     var showProcess = ORBEON.util.Dom.getAttribute(submissionElement, "show-progress");
                                     var action = ORBEON.util.Dom.getAttribute(submissionElement, "action");
                                     var replace = ORBEON.util.Dom.getAttribute(submissionElement, "replace");
+                                    var target = ORBEON.util.Dom.getAttribute(submissionElement, "target");
                                     if (replace == null) replace = "all";
                                     ORBEON.xforms.Globals.formDynamicState[formID].value = newDynamicState;
                                     if (serverEventsIndex != -1) {
@@ -3192,12 +3192,18 @@ ORBEON.xforms.Server = {
                                     }
                                     if (replace == "all") {
                                         // Go to another page
-                                        if (showProcess != "false")
+                                        if (showProcess != "false") {
                                             // Display loading indicator unless the server tells us not to display it
                                             newDynamicStateTriggersReplace = true;
-                                        // Reset these as they may be changed by asyncRequest!
+                                        }
                                         ORBEON.xforms.Globals.requestForm.action = action;
-                                        ORBEON.xforms.Globals.requestForm.removeAttribute("target");
+                                        if (target == null) {
+                                            // Reset as this may have been changed before by asyncRequest
+                                            ORBEON.xforms.Globals.requestForm.removeAttribute("target");
+                                        } else {
+                                            // Set the requested target
+                                            ORBEON.xforms.Globals.requestForm.target = target;
+                                        }
                                         ORBEON.xforms.Globals.requestForm.submit();
                                     } else {
                                         // Submit form in the background

@@ -1297,6 +1297,7 @@ public class XFormsServer extends ProcessorImpl {
 
     private static void outputSubmissionInfo(ExternalContext externalContext, ContentHandlerHelper ch, XFormsModelSubmission activeSubmission) {
         final String clientSubmisssionURL;
+        final String target;
         if ("all".equals(activeSubmission.getReplace())) {
             // Replace all
 
@@ -1306,16 +1307,19 @@ public class XFormsServer extends ProcessorImpl {
                     PageFlowControllerProcessor.XFORMS_SUBMISSION_PATH_DEFAULT_VALUE);
 
             clientSubmisssionURL = externalContext.getResponse().rewriteResourceURL(submissionPath, false);
+            target = activeSubmission.getResolvedXXFormsTarget();
         } else {
             // Replace instance
             clientSubmisssionURL = externalContext.getRequest().getRequestURL();
+            target = null;
         }
 
         // Signal that we want a POST to the XForms Server
         ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "submission",
                 new String[]{"action", clientSubmisssionURL, "method", "POST",
                         "show-progress", (activeSubmission == null || activeSubmission.isXxfShowProgress()) ? null : "false",
-                        "replace", activeSubmission.getReplace()
+                        "replace", activeSubmission.getReplace(),
+                        (target != null) ? "target" : null, target
                 });
     }
 

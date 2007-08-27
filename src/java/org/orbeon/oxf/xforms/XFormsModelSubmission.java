@@ -497,7 +497,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                     documentToSubmit = initialDocumentToSubmit;
                 }
 
-                if (serialize) {
+                if (serialize && !isDeferredSubmissionSecondPass) { // we don't want any changes to happen to the document upon xxforms-submit
                     // Fire xforms-submit-serialize
 
                     // "The event xforms-submit-serialize is dispatched. If the submission-body property of the event
@@ -635,8 +635,11 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         //   except by using absolute URLs
 
                         final URI resolvedURI = XFormsUtils.resolveXMLBase(submissionElement, resolvedActionOrResource);
+
+                        // NOTE: We don't want any changes to happen to the document upon xxforms-submit so we don't
+                        // dispatch xforms-submit-done and pass a null XFormsModelSubmission in that case
                         connectionResult = XFormsSubmissionUtils.doOptimized(pipelineContext, externalContext,
-                                this, method, resolvedURI.toString(), (mediatype == null) ? defaultMediatype : mediatype, isReplaceAll,
+                                isDeferredSubmissionSecondPass ? null : this, method, resolvedURI.toString(), (mediatype == null) ? defaultMediatype : mediatype, isReplaceAll,
                                 messageBody, queryString);
 
                     } else {
@@ -700,7 +703,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                     // directly to an external context, if any.
 
                                     // "the event xforms-submit-done is dispatched"
-                                    containingDocument.dispatchEvent(pipelineContext, new XFormsSubmitDoneEvent(XFormsModelSubmission.this));
+                                    if (!isDeferredSubmissionSecondPass) // we don't want any changes to happen to the document upon xxforms-submit
+                                        containingDocument.dispatchEvent(pipelineContext, new XFormsSubmitDoneEvent(XFormsModelSubmission.this));
 
                                     final ExternalContext.Response response = externalContext.getResponse();
 
@@ -831,7 +835,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 }
             } finally {
                 // If submission succeeded, dispatch success event
-                if (submitDone) {
+                if (submitDone && !isDeferredSubmissionSecondPass) { // we don't want any changes to happen to the document upon xxforms-submit
                     containingDocument.dispatchEvent(pipelineContext, new XFormsSubmitDoneEvent(XFormsModelSubmission.this));
                 }
                 // Log total time spent in submission if needed

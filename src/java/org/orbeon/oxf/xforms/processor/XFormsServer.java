@@ -84,7 +84,7 @@ public class XFormsServer extends ProcessorImpl {
     }
 
     /**
-     * Case where the response is generated throug the ExternalContext.
+     * Case where the response is generated throug the ExternalContext (submission with replace="all").
      */
     public void start(PipelineContext pipelineContext) {
         doIt(pipelineContext, null);
@@ -262,10 +262,17 @@ public class XFormsServer extends ProcessorImpl {
                 }
             }
 
-            // Create resulting document if there is a ContentHandler
             if (contentHandler != null) {
+                // Create resulting document if there is a ContentHandler
                 outputResponse(containingDocument, allEvents, valueChangeControlIds, pipelineContext, contentHandler,
                         staticStateUUID, dynamicStateUUID, externalContext, xformsState, false, false);
+            } else {
+                // This is the second phase of a submission with replace="all". We make it so that the document is not
+                // modified. However, we must then return it to its pool.
+
+                if (XFormsUtils.isCacheDocument()) {
+                    XFormsServerDocumentCache.instance().add(pipelineContext, xformsState, containingDocument);
+                }
             }
         } catch (Throwable e) {
             // If an exception is caught, we need to discard the object as its state may be inconsistent

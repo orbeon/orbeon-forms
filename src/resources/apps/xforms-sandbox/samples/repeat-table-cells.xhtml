@@ -31,9 +31,16 @@
             </xforms:instance>
 
             <xforms:instance id="variable">
-                <column-count xmlns=""/>
+                <variable xmlns="">
+                    <iteration-count/>
+                    <column-count/>
+                </variable>
             </xforms:instance>
         </xforms:model>
+        <xhtml:script language="javascript" type="text/javascript" src="/ops/firebug/firebug.js"/>
+        <xhtml:script language="javascript">
+            
+        </xhtml:script>
     </xhtml:head>
     <xhtml:body>
 
@@ -43,10 +50,44 @@
         </xforms:trigger>
 
         <xforms:trigger>
+            <xforms:label>Insert 10 rows</xforms:label>
+            <xforms:action ev:event="DOMActivate">
+                <xforms:setvalue ref="instance('variable')/iteration-count">10</xforms:setvalue>
+                <xforms:action while="instance('variable')/iteration-count != 0">
+                    <xforms:insert ev:event="DOMActivate" nodeset="tr"/>
+                    <xforms:setvalue ref="instance('variable')/iteration-count" value=". - 1"/>
+                </xforms:action>
+            </xforms:action>
+        </xforms:trigger>
+
+        <xforms:trigger>
+            <xforms:label>Insert 100 rows</xforms:label>
+            <xforms:action ev:event="DOMActivate">
+                <xforms:setvalue ref="instance('variable')/iteration-count">100</xforms:setvalue>
+                <xforms:action while="instance('variable')/iteration-count != 0">
+                    <xforms:insert ev:event="DOMActivate" nodeset="tr"/>
+                    <xforms:setvalue ref="instance('variable')/iteration-count" value=". - 1"/>
+                </xforms:action>
+            </xforms:action>
+        </xforms:trigger>
+
+        <xforms:trigger>
             <xforms:label>Insert column</xforms:label>
             <xforms:action ev:event="DOMActivate">
-                <xforms:setvalue ref="instance('variable')" value="count(instance('main-instance')/tr[1]/td) + 1"/>
-                <xforms:insert while="tr[count(td) != instance('variable')]" nodeset="tr[count(td) != instance('variable')]/td"/>
+                <xforms:setvalue ref="instance('variable')/column-count" value="count(instance('main-instance')/tr[1]/td) + 1"/>
+                <xforms:insert while="tr[count(td) != instance('variable')/column-count]" nodeset="tr[count(td) != instance('variable')/column-count]/td"/>
+            </xforms:action>
+        </xforms:trigger>
+
+        <xforms:trigger>
+            <xforms:label>Insert 10 columns</xforms:label>
+            <xforms:action ev:event="DOMActivate">
+                <xforms:setvalue ref="instance('variable')/iteration-count">10</xforms:setvalue>
+                <xforms:action while="instance('variable')/iteration-count != 0">
+                    <xforms:setvalue ref="instance('variable')/column-count" value="count(instance('main-instance')/tr[1]/td) + 1"/>
+                    <xforms:insert while="tr[count(td) != instance('variable')/column-count]" nodeset="tr[count(td) != instance('variable')/column-count]/td"/>
+                    <xforms:setvalue ref="instance('variable')/iteration-count" value=". - 1"/>
+                </xforms:action>
             </xforms:action>
         </xforms:trigger>
 

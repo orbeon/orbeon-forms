@@ -52,7 +52,8 @@
             <return>Return to Forms</return>
             <discard>Forget Changes</discard>
             <language-choice>Language</language-choice>
-            <check-errors-in-form>Please check errors in form</check-errors-in-form>
+            <errors>Summary of errors</errors>
+            <check-errors-in-form>This form contains errors</check-errors-in-form>
             <error-details>View error details</error-details>
             <language-choice>Language</language-choice>
             <close>Close</close>

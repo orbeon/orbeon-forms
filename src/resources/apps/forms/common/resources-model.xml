@@ -28,12 +28,12 @@
 
     <!-- XForms instance containing text resources -->
     <xforms:instance id="resources-instance" src="/forms/service/resources/{doc('input:instance')/*/form-id}/en"
-                     xxforms:readonly="true" xxforms:shared="application"/>
+                     xxforms:readonly="false"/>
 
     <!-- Update language submission -->
     <xforms:submission id="update-language-submission" serialize="false"
                        action="/forms/service/resources/{{xxforms:instance('parameters-instance')/form-id}}/{{instance('language-instance')}}" validate="false"
                        method="get" replace="instance" instance="resources-instance"
-                       xxforms:readonly="true" xxforms:shared="application"/>
+                       xxforms:readonly="false"/>
 
 </xforms:model>

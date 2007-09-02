@@ -18,9 +18,9 @@ td { vertical-align: top }
 #main-action-table .forms-message-fatal { padding-left: 1em }
 #language-choice-td { width: 100%; text-align: right }
 
-.forms-errors-table { margin: 1em; padding: .5em; border: 1px dotted red; width: 50em; background: #fcc }
+.forms-errors-table { margin: 1em; padding: .5em; border: 1px dotted red; width: 60em; background: #fcc }
 .forms-errors-table .xforms-repeat-selected-item-1 { background: none }
-.forms-errors-table th { padding: 0; color: red }
+.forms-errors-table th { padding: 0; color: red; white-space: nowrap }
 .forms-error-actions { text-align: center; margin-bottom: .5em; }
 
 .forms-main-table { border: solid 2px #ffcc66; width: 64em }
@@ -45,6 +45,7 @@ td { vertical-align: top }
 .forms-hr { height: 2px; border: 0; background-color: #ffcc66; color: #ffcc66 }
 
 .xforms-label { margin-right: 1em; font-style: italic }
+.forms-hidden { display: none }
 .xforms-repeat-selected-item-1 td { cursor: default }
 .xforms-repeat-selected-item-2 td { cursor: default;  }
 .xforms-static.xforms-input { margin-right: 1em; font-variant: small-caps; text-decoration: underline }

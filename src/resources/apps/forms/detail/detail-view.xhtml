@@ -94,21 +94,21 @@
 
         <!-- Error summary -->
         <xxforms:dialog level="modal" close="true" id="error-summary-dialog">
-            <xforms:label>Errors</xforms:label>
+            <xforms:label model="resources-model" value="instance('resources-instance')/detail/labels/errors"/>
             <xforms:group model="common-model" ref="instance('errors-instance')/error">
                 <table class="forms-errors-table">
                     <xforms:repeat nodeset="instance('errors-instance')/error" id="errors-repeat">
                         <tr>
                             <th>
-                                <xforms:output value="@label"/>
+                                <!-- Use html mediatype as the value returned by event('label') can contain HTML -->
+                                <xforms:output value="@label" mediatype="text/html"/>
+                            </th>
+                            <th>
+                                <xforms:output value="if (string-length(@indexes) > 0) then concat('#', @indexes) else ''"/>
                             </th>
                             <td>
-                                <i>
-                                    <xforms:output value="if (string-length(@indexes) > 0) then concat('(Row ', @indexes, ')') else ''"/>
-                                </i>
-                            </td>
-                            <td>
-                                <xforms:output value="@alert"/>
+                                <!-- Use html mediatype as the value returned by event('alert') can contain HTML -->
+                                <xforms:output value="@alert" mediatype="text/html"/>
                             </td>
                         </tr>
                     </xforms:repeat>
@@ -169,9 +169,7 @@
                         <xforms:group ref="instance('control-instance')/errors-on-page">
                             <xforms:output class="forms-message-fatal" model="resources-model" ref="instance('resources-instance')/detail/labels/check-errors-in-form"/>
                             <xforms:trigger appearance="minimal" ref=".">
-                                <xforms:label>  
-                                    <xforms:output model="resources-model" ref="instance('resources-instance')/detail/labels/error-details"/>
-                                </xforms:label>
+                                <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/error-details"/>  
                                 <xforms:action ev:event="DOMActivate">
                                     <xxforms:show dialog="error-summary-dialog"/>
                                     <xforms:setfocus control="errors-close-trigger"/> 

@@ -109,6 +109,7 @@ ORBEON.xforms.Globals = ORBEON.xforms.Globals || {
     menuItemsets: {},                    // Maps menu id to structure defining the content of the menu
     menuYui: {},                         // Maps menu id to the YUI object for that menu
     treeYui: {},                         // Maps tree id to the YUI object for that tree
+    idToElement: {},                     // Maintain mapping from ID to element, so we don't lookup the sme ID more than once
 
     // Data relative to a form is stored in an array indexed by form id.
     formLoadingLoadingOverlay: {},       // Overlay for the loading indicator
@@ -257,22 +258,27 @@ ORBEON.util.Dom = {
      * See: http://www.csb7.com/test/ie_getelementbyid_bug/index.php
      */
     getElementById: function(controlId) {
-        var result = document.getElementById(controlId);
-        if (result && (result.id != controlId) && document.all) {
-            result = null;
-            documentAll = document.all[controlId];
-            if (documentAll) {
-                if (documentAll.length) {
-                    for (var i = 0; i < documentAll.length; i++) {
-                        if (documentAll[i].id == controlId) {
-                            result = documentAll[i];
-                            break;
+        var result = ORBEON.xforms.Globals.idToElement[controlId];
+        if (result == null || result.id != controlId) {
+            result = document.getElementById(controlId);
+            if (result && (result.id != controlId) && document.all) {
+                result = null;
+                documentAll = document.all[controlId];
+                if (documentAll) {
+                    if (documentAll.length) {
+                        for (var i = 0; i < documentAll.length; i++) {
+                            if (documentAll[i].id == controlId) {
+                                result = documentAll[i];
+                                break;
+                            }
                         }
+                    } else {
+                        result = documentAll;
                     }
-                } else {
-                    result = documentAll;
                 }
             }
+            if (result != null)
+                ORBEON.xforms.Globals.idToElement[controlId] = result;
         }
         return result;
     },
@@ -2379,8 +2385,9 @@ ORBEON.xforms.Server = {
                                                     afterInsertionPoint.parentNode.insertBefore(templateNode, afterInsertionPoint);
                                                     ORBEON.xforms.Init.insertedElement(templateNode);
                                                 }
-                                                // Initialize newly added form elements
-                                                if (! ORBEON.xforms.Globals.supportsCaptureEvents)
+                                                // Initialize newly added form elements. We don't need to do this for IE, because with
+                                                // IE when an element is cloned, the clone has the same event listeners as the original.
+                                                if (ORBEON.xforms.Globals.isRenderingEngineWebCore13)
                                                     ORBEON.xforms.Init.registerListenersOnFormElements();
                                                 break;
                                             }
@@ -3694,8 +3701,10 @@ function xformsAddSuffixToIds(element, idSuffix, repeatDepth) {
     var idSuffixWithDepth = idSuffix;
     for (var repeatDepthIndex = 0; repeatDepthIndex < repeatDepth; repeatDepthIndex++)
          idSuffixWithDepth += XFORMS_SEPARATOR_2 + "1";
-    if (element.id)
+    if (element.id) {
         element.id = xformsAppendRepeatSuffix(element.id, idSuffixWithDepth);
+        ORBEON.xforms.Globals.idToElement[element.id] = element;
+    }
     if (element.htmlFor)
         element.htmlFor = xformsAppendRepeatSuffix(element.htmlFor, idSuffixWithDepth);
     if (element.name) {

@@ -24,6 +24,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.dom4j.NodeWrapper;
@@ -31,6 +32,7 @@ import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.om.VirtualNode;
 import org.xml.sax.ContentHandler;
+import org.apache.log4j.Logger;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.sax.SAXResult;
@@ -44,6 +46,8 @@ import java.util.List;
  * Represent an XForms instance.
  */
 public class XFormsInstance implements XFormsEventTarget, XFormsEventHandlerContainer {
+
+    static public Logger logger = LoggerFactory.createLogger(XFormsInstance.class);
 
     private DocumentInfo documentInfo;
 
@@ -543,4 +547,12 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventHandlerCont
     public List getEventHandlers(XFormsContainingDocument containingDocument) {
         return getModel(containingDocument).getEventHandlersForInstance(instanceId);
     }
+
+    public void logIfNeeded(String message) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("XForms - " + message + ": model id='" + getModelId() +  "', instance id= '" + getEffectiveId() + "'\n"
+                    + TransformerUtils.tinyTreeToString(getInstanceRootElementInfo()));
+        }
+    }
+
 }

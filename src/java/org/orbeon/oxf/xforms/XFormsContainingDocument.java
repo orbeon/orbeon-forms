@@ -32,7 +32,6 @@ import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.processor.XFormsState;
 import org.orbeon.oxf.xforms.processor.XFormsURIResolver;
-import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
@@ -1050,12 +1049,9 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                         if (currentInstance.isReplaced() || !(currentInstance instanceof SharedXFormsInstance)) {
                             // Instance has been replaced, or it is not shared, so it has to go in the dynamic state
                             instancesElement.add(currentInstance.createContainerElement(!currentInstance.isApplicationShared()));
-                        }
 
-                        // Log instance if needed
-                        if (XFormsServer.logger.isDebugEnabled()) {
-                            XFormsServer.logger.debug("XForms - resulting instance: model id='" + currentModel.getEffectiveId() +  "', instance id= '" + currentInstance.getEffectiveId() + "'\n"
-                                    + TransformerUtils.tinyTreeToString(currentInstance.getInstanceRootElementInfo()));
+                            // Log instance if needed
+                            currentInstance.logIfNeeded("storing instance to dynamic state");
                         }
                     }
                 }
@@ -1189,6 +1185,9 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                         // Instance is initialized, just use it
                         getModel(newInstance.getModelId()).setInstance(newInstance, false);
                     }
+
+                    // Log instance if needed
+                    newInstance.logIfNeeded("restoring instance from dynamic state");
                 }
             }
 

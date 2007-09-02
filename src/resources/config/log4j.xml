@@ -67,6 +67,10 @@
         <!--<priority value="debug"/>-->
     <!--</category>-->
 
+    <!--<category name="org.orbeon.oxf.xforms.XFormsInstance">-->
+        <!--<priority value="debug"/>-->
+    <!--</category>-->
+
     <!--<category name="org.orbeon.oxf.xforms.processor.XFormsModelSubmission">-->
         <!--<priority value="debug"/>-->
     <!--</category>-->

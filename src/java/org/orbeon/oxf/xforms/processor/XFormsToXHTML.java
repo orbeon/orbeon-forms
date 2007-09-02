@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms.processor;
 import org.apache.commons.pool.ObjectPool;
 import org.apache.log4j.Logger;
 import org.dom4j.Document;
-import org.orbeon.oxf.cache.InternalCacheKey;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
@@ -57,8 +56,8 @@ public class XFormsToXHTML extends ProcessorImpl {
 
     private static final String OUTPUT_CACHE_KEY = "dynamicState";
 
-    private static final String NAMESPACE_CACHE_KEY = "containerNamespace";
-    private static final Long CONSTANT_VALIDITY = new Long(0);
+//    private static final String NAMESPACE_CACHE_KEY = "containerNamespace";
+//    private static final Long CONSTANT_VALIDITY = new Long(0);
 
     private static InputDependencies testCachingStaticStateInputDependencies;
 
@@ -134,7 +133,7 @@ public class XFormsToXHTML extends ProcessorImpl {
         // ContainingDocument and XFormsState created below
         final XFormsContainingDocument[] containingDocument = new XFormsContainingDocument[1];
         final XFormsState[] xformsState = new XFormsState[1];
-        final boolean[] cachedInput = new boolean[1];
+        final boolean[] cachedInput = new boolean[] { TEST_BYPASS_INPUT } ;
 
         // Read and try to cache the complete XForms+XHTML document with annotations
         final InputDependencies inputDependencies;
@@ -247,7 +246,7 @@ public class XFormsToXHTML extends ProcessorImpl {
             if (outputName.equals("document"))
                 outputResponseDocument(pipelineContext, externalContext, inputDependencies.getAnnotatedSAXStore(), containingDocument[0], contentHandler, xformsState[0], staticStateUUID, dynamicStateUUID);
             else
-                testOutputResponseState(pipelineContext, externalContext, inputDependencies.getAnnotatedSAXStore(), containingDocument[0], contentHandler, xformsState[0], staticStateUUID, dynamicStateUUID);
+                testOutputResponseState(pipelineContext, externalContext, containingDocument[0], contentHandler, xformsState[0], staticStateUUID, dynamicStateUUID);
 
         } catch (Throwable e) {
             if (containingDocument[0] != null) {
@@ -520,7 +519,7 @@ public class XFormsToXHTML extends ProcessorImpl {
     }
 
     private void testOutputResponseState(final PipelineContext pipelineContext, final ExternalContext externalContext,
-                                     final SAXStore annotatedDocument, final XFormsContainingDocument containingDocument,
+                                     final XFormsContainingDocument containingDocument,
                                      final ContentHandler contentHandler, final XFormsState xformsState,
                                      final String staticStateUUID, String dynamicStateUUID) throws SAXException {
 

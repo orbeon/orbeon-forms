@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.control;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.InstanceData;
 import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.saxon.om.NodeInfo;
 import org.dom4j.Element;
 
@@ -36,28 +37,33 @@ public class XFormsSingleNodeControl extends XFormsControl {
     }
 
     public boolean isReadonly() {
-        getMIPsIfNeeded();
+        getMIPsIfNeeded();// control should be evaluated so this should not be needed
         return readonly;
     }
 
     public boolean isRelevant() {
-        getMIPsIfNeeded();
+        getMIPsIfNeeded();// control should be evaluated so this should not be needed
         return relevant;
     }
 
     public boolean isRequired() {
-        getMIPsIfNeeded();
+        getMIPsIfNeeded();// control should be evaluated so this should not be needed
         return required;
     }
 
     public String getType() {
-        getMIPsIfNeeded();
+        getMIPsIfNeeded();// control should be evaluated so this should not be needed
         return type;
     }
 
     public boolean isValid() {
-        getMIPsIfNeeded();
+        getMIPsIfNeeded();// control should be evaluated so this should not be needed
         return valid;
+    }
+
+    protected void evaluate(PipelineContext pipelineContext) {
+        super.evaluate(pipelineContext);
+        getMIPsIfNeeded();
     }
 
     protected void getMIPsIfNeeded() {
@@ -107,8 +113,8 @@ public class XFormsSingleNodeControl extends XFormsControl {
         final XFormsSingleNodeControl other = (XFormsSingleNodeControl) obj;
 
         // Make sure the MIPs are up to date before comparing them
-        getMIPsIfNeeded();
-        other.getMIPsIfNeeded();
+        getMIPsIfNeeded();// control should be evaluated so this should not be needed
+        other.getMIPsIfNeeded();// control should be evaluated so this should not be needed
 
         if (readonly != other.readonly)
             return false;

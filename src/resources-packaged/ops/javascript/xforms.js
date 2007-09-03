@@ -21,6 +21,7 @@ var XFORMS_DELAY_BEFORE_GECKO_COMMUNICATION_ERROR_IN_MS = 5000;
 var XFORMS_DELAY_BEFORE_CLOSE_MINIMAL_DIALOG_IN_MS = 5000;
 var XFORMS_INTERNAL_SHORT_DELAY_IN_MS = 10;
 var XFORMS_DELAY_BEFORE_DISPLAY_LOADING_IN_MS = 500;
+var XFORMS_REQUEST_RETRIES = 3;
 var XFORMS_DEBUG_WINDOW_HEIGHT = 600;
 var XFORMS_DEBUG_WINDOW_WIDTH = 300;
 var XFORMS_LOADING_MIN_TOP_PADDING = 10;
@@ -80,6 +81,8 @@ ORBEON.xforms.Globals = ORBEON.xforms.Globals || {
     requestForm: null,                   // HTML for the request currently in progress
     requestIgnoreErrors: false,          // Should we ignore errors that result from running this request
     requestInProgress: false,            // Indicates wether an Ajax request is currently in process
+    requestDocument: "",                 // The last Ajax request, so we can resend it if necessary
+    requestRetries: 3,                   // How many retries we have left before we give up with this Ajax request
     executeEventFunctionQueued: 0,       // Number of ORBEON.xforms.Server.executeNextRequest waiting to be executed
     maskFocusEvents: false,              // Avoid catching focus event when we do it because the server told us to
     previousDOMFocusOut: null,           // We only send a focus out when we receive a focus in, or another focus out
@@ -1469,7 +1472,7 @@ ORBEON.xforms.Init = {
             "dialog": {
                 "": ORBEON.xforms.Init._dialog,
                 "full": ORBEON.xforms.Init._dialog,
-                "minimal": ORBEON.xforms.Init._dialog 
+                "minimal": ORBEON.xforms.Init._dialog
             }
         };
         return ORBEON.xforms.Init._specialControlsInitFunctions;
@@ -2141,7 +2144,7 @@ ORBEON.xforms.Server = {
                         break;
                     }
                 }
-                
+
                 // Build request
                 var requestDocumentString = "";
 
@@ -2212,18 +2215,9 @@ ORBEON.xforms.Server = {
 
                 // Send request
                 executedRequest = true;
-                try {
-                    YAHOO.util.Connect.setDefaultPostHeader(false);
-                    YAHOO.util.Connect.initHeader("Content-Type", "application/xml");
-                    var callback = {
-                        success: ORBEON.xforms.Server.handleResponse,
-                        failure: ORBEON.xforms.Server.handleFailure
-                    }
-                    YAHOO.util.Connect.asyncRequest("POST", XFORMS_SERVER_URL, callback, requestDocumentString);
-                } catch (e) {
-                    ORBEON.xforms.Globals.requestInProgress = false;
-                    ORBEON.xforms.Server.exceptionWhenTalkingToServer(e, formID);
-                }
+                ORBEON.xforms.Globals.requestRetries = XFORMS_REQUEST_RETRIES;
+                ORBEON.xforms.Globals.requestDocument = requestDocumentString;
+                ORBEON.xforms.Server.asyncRequest();
             }
         }
 
@@ -2234,21 +2228,47 @@ ORBEON.xforms.Server = {
             xformsDisplayIndicator("none");
     },
 
+    asyncRequest: function() {
+        try {
+            ORBEON.xforms.Globals.requestRetries--;
+            YAHOO.util.Connect.setDefaultPostHeader(false);
+            YAHOO.util.Connect.initHeader("Content-Type", "application/xml");
+            var callback =
+            {
+                success: ORBEON.xforms.Server.handleResponse,
+                failure: ORBEON.xforms.Server.handleFailure,
+                timeout: 10000
+            }
+            YAHOO.util.Connect.asyncRequest("POST", XFORMS_SERVER_URL, callback, ORBEON.xforms.Globals.requestDocument);
+        } catch (e) {
+            ORBEON.xforms.Globals.requestInProgress = false;
+            ORBEON.xforms.Server.exceptionWhenTalkingToServer(e, formID);
+        }
+    },
+
     handleFailure: function(o) {
-        ORBEON.xforms.Globals.requestInProgress = false;
-        var formID = ORBEON.xforms.Globals.requestForm.id;
-        var details = "Error while processing response: " + (o.responseText !== undefined ? o.responseText : o.statusText);
-        if (ORBEON.xforms.Globals.isRenderingEngineGecko && o.statusText == "communication failure") {
-            // On Firefox, when the user navigates to another page while an Ajax request is in progress,
-            // we receive an error here, which we don't want to display. We don't have a good way of knowning if we get
-            // this error because there was really a communication failure or if this is because the user is
-            // going to another page. So we wait some time before showing the error, hoping that if another page is
-            // loading, that other page will be loaded by the time our timeout expires.
-            window.setTimeout(function() { ORBEON.xforms.Server.showError(details, formID); },
-                XFORMS_DELAY_BEFORE_GECKO_COMMUNICATION_ERROR_IN_MS);
+        if (ORBEON.xforms.Globals.requestRetries > 0) {
+            // If the request fails, we are trying again up to 3 times
+            ORBEON.xforms.Globals.requestRetries--;
+            ORBEON.xforms.Server.asyncRequest();
         } else {
-            // Display alert right away
-            ORBEON.xforms.Server.showError(details, formID);
+            // We have tried this 3 times, give up.
+            ORBEON.xforms.Globals.requestInProgress = false;
+            ORBEON.xforms.Globals.requestDocument = "";
+            var formID = ORBEON.xforms.Globals.requestForm.id;
+            var details = "Error while processing response: " + (o.responseText !== undefined ? o.responseText : o.statusText);
+            if (ORBEON.xforms.Globals.isRenderingEngineGecko && o.statusText == "communication failure") {
+                // On Firefox, when the user navigates to another page while an Ajax request is in progress,
+                // we receive an error here, which we don't want to display. We don't have a good way of knowning if we get
+                // this error because there was really a communication failure or if this is because the user is
+                // going to another page. So we wait some time before showing the error, hoping that if another page is
+                // loading, that other page will be loaded by the time our timeout expires.
+                window.setTimeout(function() { ORBEON.xforms.Server.showError(details, formID); },
+                    XFORMS_DELAY_BEFORE_GECKO_COMMUNICATION_ERROR_IN_MS);
+            } else {
+                // Display alert right away
+                ORBEON.xforms.Server.showError(details, formID);
+            }
         }
     },
 
@@ -2264,7 +2284,6 @@ ORBEON.xforms.Server = {
     },
 
     handleResponse: function(o) {
-
         var formID = ORBEON.xforms.Globals.requestForm.id;
         var responseXML = o.responseXML;
         if (!responseXML || (responseXML && responseXML.documentElement && responseXML.documentElement.tagName.toLowerCase() == "html")) {
@@ -3217,7 +3236,8 @@ ORBEON.xforms.Server = {
                                         YAHOO.util.Connect.setForm(ORBEON.xforms.Globals.requestForm, true, true);
                                         var callback =  {
                                             upload: ORBEON.xforms.Server.handleUploadResponse,
-                                            failure: ORBEON.xforms.Server.handleFailure
+                                            failure: ORBEON.xforms.Server.handleFailure,
+                                            timeout: 300000
                                         }
                                         YAHOO.util.Connect.asyncRequest("POST", action, callback);
                                     }
@@ -3307,6 +3327,7 @@ ORBEON.xforms.Server = {
 
         // Go ahead with next request, if any
         ORBEON.xforms.Globals.requestInProgress = false;
+        ORBEON.xforms.Globals.requestDocument = "";
         ORBEON.xforms.Globals.executeEventFunctionQueued++;
         ORBEON.xforms.Server.executeNextRequest(false);
     },

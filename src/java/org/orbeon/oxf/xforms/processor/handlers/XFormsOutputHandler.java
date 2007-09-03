@@ -25,6 +25,8 @@ import org.xml.sax.helpers.AttributesImpl;
 
 /**
  * Handle xforms:output.
+ * 
+ * @noinspection SimplifiableIfStatement
  */
 public class XFormsOutputHandler extends XFormsValueControlHandler {
 
@@ -75,18 +77,13 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
                 || XFormsConstants.XXFORMS_HTML_APPEARANCE_QNAME.equals(getAppearance(elementAttributes));
 
         if (!handlerContext.isGenerateTemplate()) {
-
             // Find classes to add
             isDateOrTime = isConcreteControl && isDateOrTime(xformsOutputControl.getType());
-            handleMIPClasses(classes, xformsOutputControl);
-
-            newAttributes = getAttributes(elementAttributes, classes.toString(), effectiveId);
         } else {
             isDateOrTime = false;
-
-            // Find classes to add
-            newAttributes = getAttributes(elementAttributes, classes.toString(), effectiveId);
         }
+        handleMIPClasses(classes, xformsOutputControl);
+        newAttributes = getAttributes(elementAttributes, classes.toString(), effectiveId);
 
         // Create xhtml:span or xhtml:div
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();

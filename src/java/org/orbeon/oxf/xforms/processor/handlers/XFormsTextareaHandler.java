@@ -55,16 +55,9 @@ public class XFormsTextareaHandler extends XFormsValueControlHandler {
         final AttributesImpl newAttributes;
         {
             final StringBuffer classes = getInitialClasses(localname, elementAttributes, xformsControl);
-
-            if (!handlerContext.isGenerateTemplate()) {
-
-                handleMIPClasses(classes, xformsControl);
-
-                newAttributes = getAttributes(elementAttributes, classes.toString(), effectiveId);
-                handleReadOnlyAttribute(newAttributes, containingDocument, xformsControl);
-            } else {
-                newAttributes = getAttributes(elementAttributes, classes.toString(), effectiveId);
-            }
+            handleMIPClasses(classes, xformsControl);
+            newAttributes = getAttributes(elementAttributes, classes.toString(), effectiveId);
+            handleReadOnlyAttribute(newAttributes, containingDocument, xformsControl);
         }
 
         // Create xhtml:textarea

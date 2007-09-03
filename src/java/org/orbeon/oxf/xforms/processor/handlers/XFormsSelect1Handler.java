@@ -130,12 +130,8 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
             if (isTree)
                 classes.append(" xforms-initially-hidden");
 
-            if (!handlerContext.isGenerateTemplate()) {
-                handleMIPClasses(classes, xformsValueControl);
-                newAttributes = getAttributes(elementAttributes, classes.toString(), effectiveId);
-            } else {
-                newAttributes = getAttributes(elementAttributes, classes.toString(), effectiveId);
-            }
+            handleMIPClasses(classes, xformsValueControl);
+            newAttributes = getAttributes(elementAttributes, classes.toString(), effectiveId);
         }
 
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();

@@ -846,15 +846,19 @@ public class XFormsControls {
 
                 // Create XFormsControl with basic information
                 final XFormsControl xformsControl = XFormsControlFactory.createXFormsControl(containingDocument, currentControlsContainer, controlElement, controlName, effectiveControlId);
-                if (xformsControl instanceof XFormsRepeatControl)
-                    result.setHasRepeat(true);
-                else if (xformsControl instanceof XFormsUploadControl)
-                    result.addUploadControl((XFormsUploadControl) xformsControl);
 
-                // Make sure there are no duplicate ids
-                if (idsToXFormsControls.get(effectiveControlId) != null)
-                    throw new ValidationException("Duplicate id for XForms control: " + effectiveControlId, new ExtendedLocationData((LocationData) controlElement.getData(),
-                            "analyzing control element", controlElement, new String[] { "id", effectiveControlId }));
+                // TODO: the following block should be part of a static analysis
+                {
+                    if (xformsControl instanceof XFormsRepeatControl)
+                        result.setHasRepeat(true);
+                    else if (xformsControl instanceof XFormsUploadControl)
+                        result.addUploadControl((XFormsUploadControl) xformsControl);
+
+                    // Make sure there are no duplicate ids
+                    if (idsToXFormsControls.get(effectiveControlId) != null)
+                        throw new ValidationException("Duplicate id for XForms control: " + effectiveControlId, new ExtendedLocationData((LocationData) controlElement.getData(),
+                                "analyzing control element", controlElement, new String[] { "id", effectiveControlId }));
+                }
 
                 idsToXFormsControls.put(effectiveControlId, xformsControl);
 
@@ -940,13 +944,13 @@ public class XFormsControls {
 
             public void startRepeatIteration(int iteration) {
 
-                final XFormsControl repeatIterationXForms = new RepeatIterationControl(containingDocument, currentControlsContainer, iteration);
-                currentControlsContainer.addChild(repeatIterationXForms);
-                currentControlsContainer = repeatIterationXForms;
+                final XFormsControl repeatIterationControl = new RepeatIterationControl(containingDocument, currentControlsContainer, iteration);
+                currentControlsContainer.addChild(repeatIterationControl);
+                currentControlsContainer = repeatIterationControl;
 
-                // Set current binding for control element
+                // Set current binding for control
                 final BindingContext currentBindingContext = getCurrentBindingContext();
-                repeatIterationXForms.setBindingContext(currentBindingContext);
+                repeatIterationControl.setBindingContext(currentBindingContext);
             }
 
             public void endRepeatIteration(int iteration) {

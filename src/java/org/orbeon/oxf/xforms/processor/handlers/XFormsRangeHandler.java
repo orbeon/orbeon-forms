@@ -52,14 +52,9 @@ public class XFormsRangeHandler extends XFormsValueControlHandler {
         {
             final StringBuffer classes = getInitialClasses(localname, elementAttributes, xformsControl);
             classes.append(" xforms-range-background");
-            if (!handlerContext.isGenerateTemplate()) {
 
-                handleMIPClasses(classes, xformsControl);
-
-                newAttributes = getAttributes(elementAttributes, classes.toString(), effectiveId);
-            } else {
-                newAttributes = getAttributes(elementAttributes, classes.toString(), effectiveId);
-            }
+            handleMIPClasses(classes, xformsControl);
+            newAttributes = getAttributes(elementAttributes, classes.toString(), effectiveId);
         }
 
         // Create xhtml:div

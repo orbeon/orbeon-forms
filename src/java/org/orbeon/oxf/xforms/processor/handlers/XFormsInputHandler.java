@@ -72,12 +72,11 @@ public class XFormsInputHandler extends XFormsValueControlHandler {
                     isDate = false;
                     isBoolean = false;
                 }
-
-                handleMIPClasses(classes, xformsControl);
             } else {
                 isDate = false;
                 isBoolean = false;
             }
+            handleMIPClasses(classes, xformsControl);
             newAttributes = getAttributes(elementAttributes, classes.toString(), effectiveId);
         }
 

@@ -16,6 +16,10 @@ package org.orbeon.oxf.xforms.control.controls;
 import org.dom4j.Element;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
+
+import java.util.List;
+import java.util.Iterator;
 
 /**
  * Represents an xforms:repeat pseudo-control.
@@ -36,6 +40,21 @@ public class XFormsRepeatControl extends XFormsControl {
 
     public String getRepeatId() {
         return getOriginalId();
+    }
+
+    protected void evaluate(PipelineContext pipelineContext) {
+        
+        // For now, repeat does not support label, help, etc. so don't call super.evaluate()
+        //super.evaluate(pipelineContext);
+
+        // Evaluate iterations
+        final List children = getChildren();
+        if (children != null && children.size() > 0) {
+            for (Iterator i = children.iterator(); i.hasNext();) {
+                final RepeatIterationControl currentRepeatIteration = (RepeatIterationControl) i.next();
+                currentRepeatIteration.evaluate(pipelineContext);
+            }
+        }
     }
 
     public boolean equals(Object obj) {

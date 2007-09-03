@@ -54,15 +54,9 @@ public class XFormsUploadHandler extends XFormsValueControlHandler {
         final AttributesImpl newAttributes;
         {
             final StringBuffer classes = getInitialClasses(localname, elementAttributes, xformsControl);
-            if (!handlerContext.isGenerateTemplate()) {
-                // The control is initially empty
-                // TODO: can it be initially non-empty?
-                classes.append(" xforms-upload-state-empty");
-                handleMIPClasses(classes, xformsControl);
-                newAttributes = getAttributes(elementAttributes, classes.toString(), effectiveId);
-            } else {
-                newAttributes = getAttributes(elementAttributes, classes.toString(), effectiveId);
-            }
+            classes.append(" xforms-upload-state-empty");
+            handleMIPClasses(classes, xformsControl);
+            newAttributes = getAttributes(elementAttributes, classes.toString(), effectiveId);
         }
 
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();

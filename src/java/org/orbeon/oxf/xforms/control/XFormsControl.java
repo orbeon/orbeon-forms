@@ -290,7 +290,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
         return boundNode;
     }
 
-    public void evaluateIfNeeded(PipelineContext pipelineContext) {
+    public final void evaluateIfNeeded(PipelineContext pipelineContext) {
         if (!evaluated) {
             evaluated = true;// be careful with this flag, you can get into a recursion if you don't set it before calling evaluate()
             evaluate(pipelineContext);

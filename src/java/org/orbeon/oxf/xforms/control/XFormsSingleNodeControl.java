@@ -17,11 +17,14 @@ import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.InstanceData;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.common.OXFException;
 import org.orbeon.saxon.om.NodeInfo;
 import org.dom4j.Element;
 
 /**
  * Control with a single-node binding (possibly optional). Such controls can have MIPs.
+ * 
+ * @noinspection SimplifiableIfStatement
  */
 public class XFormsSingleNodeControl extends XFormsControl {
 
@@ -37,33 +40,42 @@ public class XFormsSingleNodeControl extends XFormsControl {
     }
 
     public boolean isReadonly() {
-        getMIPsIfNeeded();// control should be evaluated so this should not be needed
+        checkMIPsRead();
+//        getMIPsIfNeeded();// control should be evaluated so this should not be needed
         return readonly;
     }
 
     public boolean isRelevant() {
-        getMIPsIfNeeded();// control should be evaluated so this should not be needed
+        getMIPsIfNeeded();// this may be called before the control is evaluated
         return relevant;
     }
 
     public boolean isRequired() {
-        getMIPsIfNeeded();// control should be evaluated so this should not be needed
+        checkMIPsRead();
+//        getMIPsIfNeeded();// control should be evaluated so this should not be needed
         return required;
     }
 
     public String getType() {
-        getMIPsIfNeeded();// control should be evaluated so this should not be needed
+        checkMIPsRead();
+//        getMIPsIfNeeded();// control should be evaluated so this should not be needed
         return type;
     }
 
     public boolean isValid() {
-        getMIPsIfNeeded();// control should be evaluated so this should not be needed
+        checkMIPsRead();
+//        getMIPsIfNeeded();// control should be evaluated so this should not be needed
         return valid;
     }
 
     protected void evaluate(PipelineContext pipelineContext) {
         super.evaluate(pipelineContext);
         getMIPsIfNeeded();
+    }
+
+    private void checkMIPsRead() {
+        if (!mipsRead)
+            throw new OXFException("Control not evaluated when getting MIPs.");
     }
 
     protected void getMIPsIfNeeded() {
@@ -113,8 +125,10 @@ public class XFormsSingleNodeControl extends XFormsControl {
         final XFormsSingleNodeControl other = (XFormsSingleNodeControl) obj;
 
         // Make sure the MIPs are up to date before comparing them
-        getMIPsIfNeeded();// control should be evaluated so this should not be needed
-        other.getMIPsIfNeeded();// control should be evaluated so this should not be needed
+        checkMIPsRead();
+//        getMIPsIfNeeded();// control should be evaluated so this should not be needed
+        other.checkMIPsRead();
+//        other.getMIPsIfNeeded();// control should be evaluated so this should not be needed
 
         if (readonly != other.readonly)
             return false;
@@ -132,7 +146,7 @@ public class XFormsSingleNodeControl extends XFormsControl {
     }
 
     public boolean isStaticReadonly() {
-        // Static read-only if we are read-only and
+        // Static read-only if we are read-only and static (global or local setting)
         return isReadonly()
                 && (XFormsConstants.XXFORMS_READONLY_APPEARANCE_STATIC_VALUE.equals(containingDocument.getReadonlyAppearance())
                     || XFormsConstants.XXFORMS_READONLY_APPEARANCE_STATIC_VALUE.equals(getControlElement().attributeValue(XFormsConstants.XXFORMS_READONLY_APPEARANCE_ATTRIBUTE_QNAME)));

@@ -35,7 +35,12 @@ public class RepeatIterationControl extends XFormsSingleNodeControl {
     }
 
     protected void evaluate(PipelineContext pipelineContext) {
-        // NOP
+        // Just get the MIPs, don't call super.evaluate(), since that would also try to get label, etc.
+        getMIPsIfNeeded();
+    }
+
+    public boolean isStaticReadonly() {
+        return false;
     }
 
     public boolean equals(Object obj) {

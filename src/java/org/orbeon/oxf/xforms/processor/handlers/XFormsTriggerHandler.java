@@ -79,8 +79,7 @@ public class XFormsTriggerHandler extends HandlerBase {
         final QName appearance = getAppearance(elementAttributes);
 
         final StringBuffer classes = getInitialClasses(localname, elementAttributes, xformsControl);
-        if (!handlerContext.isGenerateTemplate())
-            handleMIPClasses(classes, xformsControl);
+        handleMIPClasses(classes, xformsControl);
         final AttributesImpl newAttributes = getAttributes(elementAttributes, classes.toString(), effectiveId);
 
         // Handle accessibility attributes

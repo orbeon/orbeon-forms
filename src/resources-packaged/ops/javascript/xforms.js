@@ -263,25 +263,30 @@ ORBEON.util.Dom = {
     getElementById: function(controlId) {
         var result = ORBEON.xforms.Globals.idToElement[controlId];
         if (result == null || result.id != controlId) {
-            result = document.getElementById(controlId);
-            if (result && (result.id != controlId) && document.all) {
-                result = null;
-                documentAll = document.all[controlId];
-                if (documentAll) {
-                    if (documentAll.length) {
-                        for (var i = 0; i < documentAll.length; i++) {
-                            if (documentAll[i].id == controlId) {
-                                result = documentAll[i];
-                                break;
-                            }
-                        }
-                    } else {
-                        result = documentAll;
-                    }
-                }
-            }
+            result = ORBEON.util.Dom.getElementByIdNoCache(controlId);
             if (result != null)
                 ORBEON.xforms.Globals.idToElement[controlId] = result;
+        }
+        return result;
+    },
+
+    getElementByIdNoCache: function(controlId) {
+        var result = document.getElementById(controlId);
+        if (result && (result.id != controlId) && document.all) {
+            result = null;
+            documentAll = document.all[controlId];
+            if (documentAll) {
+                if (documentAll.length) {
+                    for (var i = 0; i < documentAll.length; i++) {
+                        if (documentAll[i].id == controlId) {
+                            result = documentAll[i];
+                            break;
+                        }
+                    }
+                } else {
+                    result = documentAll;
+                }
+            }
         }
         return result;
     },
@@ -2567,7 +2572,9 @@ ORBEON.xforms.Server = {
                                                     documentElement.outerHTML.substring(0, documentElement.outerHTML.indexOf("</SELECT>"))
                                                     + sb.join("") + "</select>";
                                                 // Get again control, as it has been re-created
-                                                documentElement = ORBEON.util.Dom.getElementById(controlId);
+                                                documentElement = ORBEON.util.Dom.getElementByIdNoCache(controlId);
+                                                // Must now update the cache
+                                                ORBEON.xforms.Globals.idToElement[controlId] = documentElement;
                                                 // Re-register handlers on the newly created control
                                                 ORBEON.xforms.Init.registerListenersOnFormElement(documentElement);
                                             } else {

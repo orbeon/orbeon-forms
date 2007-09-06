@@ -426,6 +426,9 @@ public abstract class HandlerBase extends ElementHandler {
                         classes.append(" xforms-disabled");
                     }
                 }
+            } else {
+                // Repeat template or null control
+                classes.append(" xforms-disabled");
             }
 
             classes.append(" xforms-");

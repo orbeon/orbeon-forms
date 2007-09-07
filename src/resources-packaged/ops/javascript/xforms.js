@@ -2788,6 +2788,10 @@ ORBEON.xforms.Server = {
                                                             htmlEditor.ToolbarSet.Expand();
                                                             // TO-DO
                                                         }
+                                                    } else if(ORBEON.util.Dom.hasClass(documentElement, "xforms-upload")) {
+                                                        // Upload control
+                                                         setReadonlyOnFormElement(
+                                                            ORBEON.util.Dom.getChildElementByClass(documentElement, "xforms-upload-select"), isReadonly);
                                                     } else {
                                                         // Other controls
                                                         setReadonlyOnFormElement(documentElement, isReadonly);

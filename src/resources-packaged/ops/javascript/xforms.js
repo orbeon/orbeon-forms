@@ -256,9 +256,15 @@ ORBEON.util.Dom = {
     },
 
     /**
-     * This gets around a bug in IE and Opera 8.2 where getElementById by return an element with name equal to
-     * the specified id (instead of id equal to the specified id).
-     * See: http://www.csb7.com/test/ie_getelementbyid_bug/index.php
+     * This function should be used instead of document.getElementById for 2 reasons:
+     *
+     * 1) This gets around a bug in IE and Opera 8.2 where getElementById by return an element with name equal to
+     *    the specified id (instead of id equal to the specified id).
+     *    See: http://www.csb7.com/test/ie_getelementbyid_bug/index.php
+     *
+     * 2) This performs caching of element ids, so when the same element is requested many times in a row we'll be
+     *    able to respond just by looking at the cache, instead of calling document.getElementById. This has a=
+     *    significant impact in particular when copying many repeat items on Firefox.
      */
     getElementById: function(controlId) {
         var result = ORBEON.xforms.Globals.idToElement[controlId];

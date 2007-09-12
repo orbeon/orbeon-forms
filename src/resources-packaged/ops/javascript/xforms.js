@@ -382,6 +382,10 @@ ORBEON.util.Dom = {
         newInputElement.setAttribute("name", inputElement.name);
         newInputElement.setAttribute("size", inputElement.size);
         parentElement.replaceChild(newInputElement, inputElement);
+        // For non-w3c compliant browsers we must re-register listeners on the new upload element we just created
+        if (! ORBEON.xforms.Globals.supportsCaptureEvents) {
+            ORBEON.xforms.Init.registerListenersOnFormElement(newInputElement);
+        }
 
         return null;
     }

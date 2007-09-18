@@ -67,8 +67,6 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
     // Event handlers
     private Map eventHandlers;
 
-    private InstanceConstructListener instanceConstructListener;
-
     // Submission information
     private Map submissions;
 
@@ -80,6 +78,9 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
     // Containing document
     private XFormsContainingDocument containingDocument;
+
+    // For legacy XForms engine
+    private InstanceConstructListener instanceConstructListener;
 
     public XFormsModel(Document modelDocument) {
         this.modelDocument = modelDocument;
@@ -1051,8 +1052,12 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
             // Call special listener to update instance
             if (instanceConstructListener != null && getInstances() != null) {
                 int position = 0;
+                final InstanceConstructListener listener = instanceConstructListener;
+                // Make sure we don't keep a reference on this in case this is cache (legacy XForms engine)
+                instanceConstructListener = null;
+                // Use listener to update instances
                 for (Iterator i = getInstances().iterator(); i.hasNext(); position++) {
-                    instanceConstructListener.updateInstance(position, (XFormsInstance) i.next());
+                    listener.updateInstance(position, (XFormsInstance) i.next());
                 }
             }
 

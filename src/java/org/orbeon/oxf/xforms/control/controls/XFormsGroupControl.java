@@ -21,7 +21,9 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.dom4j.Element;
 
 /**
- * Represents an xforms:group pseudo-control.
+ * Represents an xforms:group control.
+ *
+ * TODO: Use inheritance to make this a single-node control that doesn't hold a value.
  */
 public class XFormsGroupControl extends XFormsSingleNodeControl {
 

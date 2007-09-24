@@ -30,4 +30,8 @@ public class XFormsGroupControl extends XFormsSingleNodeControl {
     public XFormsGroupControl(XFormsContainingDocument containingDocument, XFormsControl parent, Element element, String name, String id) {
         super(containingDocument, parent, element, name, id);
     }
+
+    public String getType() {
+        return null;
+    }
 }

@@ -25,4 +25,8 @@ public class XFormsSwitchControl extends XFormsSingleNodeControl {
     public XFormsSwitchControl(XFormsContainingDocument containingDocument, XFormsControl parent, Element element, String name, String id) {
         super(containingDocument, parent, element, name, id);
     }
+    
+    public String getType() {
+        return null;
+    }
 }

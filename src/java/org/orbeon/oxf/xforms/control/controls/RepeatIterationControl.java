@@ -43,6 +43,10 @@ public class RepeatIterationControl extends XFormsSingleNodeControl {
         return false;
     }
 
+    public String getType() {
+        return null;
+    }
+
     public boolean equals(Object obj) {
         if (!super.equals(obj))
             return false;

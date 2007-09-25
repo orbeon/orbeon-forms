@@ -595,6 +595,11 @@ ORBEON.xforms.Controls = {
             // Dialog
             var labelDiv = ORBEON.util.Dom.getChildElementByIndex(control, 0);
             labelDiv.innerHTML = message;
+        } else if (ORBEON.util.Dom.hasClass(control, "xforms-group-appearance-xxforms-fieldset")) {
+            // Group with fieldset/legend
+            var legend = ORBEON.util.Dom.getChildElementByIndex(control, 0);
+            if (legend != null)
+                legend.innerHTML = message;
         } else {
             ORBEON.xforms.Controls._setMessage(control, "xforms-label", message);
         }

@@ -142,7 +142,7 @@ public class EmailProcessor extends ProcessorImpl {
             	String password = credentials.element("password").getStringValue();
 
             	if(logger.isInfoEnabled())
-            		logger.info("Username: "+username+"; Password: "+password);
+                    logger.info("Username: " + username);
 
             	// Create an authenticator
             	Authenticator auth = new SMTPAuthenticator(username,password);

@@ -44,32 +44,29 @@ public class DatabaseContext {
      */
     public static Connection getConnection(PipelineContext pipelineContext, final String jndiName) {
         // Try to obtain connection from context
+        // We used to synchronize on DatabaseContext.class here, but this should not be necessary since pipelineContext
+        // is only used by one thread at a time.
         Connection connection = (Connection) getContext(pipelineContext).connections.get(jndiName);
         if (connection == null) {
-            synchronized (DatabaseContext.class) {
-                connection = (Connection) getContext(pipelineContext).connections.get(jndiName);
-                if (connection == null) {
-                    try {
-                        // Create connection from datasource
-                        javax.naming.Context initialContext = new InitialContext();
-                        javax.naming.Context envContext = (javax.naming.Context) initialContext.lookup("java:comp/env");
-                        DataSource ds = (DataSource) envContext.lookup(jndiName);
-                        if (ds == null) {
-                            throw new OXFException("Cannot find DataSource object by looking-up: " + jndiName);
-                        }
-                        Connection newConnection = ds.getConnection();
-                        // Set connection properties
-                        setConnectionProperties(newConnection, pipelineContext, jndiName);
-                        // Save connection into context
-                        getContext(pipelineContext).connections.put(jndiName, newConnection);
-
-                        connection = newConnection;
-                    } catch (OXFException e) {
-                        throw e;
-                    } catch (Exception e) {
-                         throw new OXFException(e);
-                    }
+            try {
+                // Create connection from datasource
+                javax.naming.Context initialContext = new InitialContext();
+                javax.naming.Context envContext = (javax.naming.Context) initialContext.lookup("java:comp/env");
+                DataSource ds = (DataSource) envContext.lookup(jndiName);
+                if (ds == null) {
+                    throw new OXFException("Cannot find DataSource object by looking-up: " + jndiName);
                 }
+                Connection newConnection = ds.getConnection();
+                // Set connection properties
+                setConnectionProperties(newConnection, pipelineContext, jndiName);
+                // Save connection into context
+                getContext(pipelineContext).connections.put(jndiName, newConnection);
+
+                connection = newConnection;
+            } catch (OXFException e) {
+                throw e;
+            } catch (Exception e) {
+                 throw new OXFException(e);
             }
         }
         return connection;

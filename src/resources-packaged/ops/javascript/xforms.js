@@ -2257,7 +2257,7 @@ ORBEON.xforms.Server = {
             {
                 success: ORBEON.xforms.Server.handleResponse,
                 failure: ORBEON.xforms.Server.handleFailure,
-                timeout: 10000
+                timeout: 60000
             }
             YAHOO.util.Connect.asyncRequest("POST", XFORMS_SERVER_URL, callback, ORBEON.xforms.Globals.requestDocument);
         } catch (e) {

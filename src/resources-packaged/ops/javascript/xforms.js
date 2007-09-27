@@ -19,6 +19,7 @@ var XFORMS_DELAY_BEFORE_INCREMENTAL_REQUEST_IN_MS = 500;
 var XFORMS_DELAY_BEFORE_FORCE_INCREMENTAL_REQUEST_IN_MS = 2000;
 var XFORMS_DELAY_BEFORE_GECKO_COMMUNICATION_ERROR_IN_MS = 5000;
 var XFORMS_DELAY_BEFORE_CLOSE_MINIMAL_DIALOG_IN_MS = 5000;
+var XFORMS_DELAY_BEFORE_AJAX_TIMEOUT_IN_MS = -1;
 var XFORMS_INTERNAL_SHORT_DELAY_IN_MS = 10;
 var XFORMS_DELAY_BEFORE_DISPLAY_LOADING_IN_MS = 500;
 var XFORMS_REQUEST_RETRIES = 3;
@@ -2253,12 +2254,12 @@ ORBEON.xforms.Server = {
             ORBEON.xforms.Globals.requestRetries--;
             YAHOO.util.Connect.setDefaultPostHeader(false);
             YAHOO.util.Connect.initHeader("Content-Type", "application/xml");
-            var callback =
-            {
+            var callback = {
                 success: ORBEON.xforms.Server.handleResponse,
-                failure: ORBEON.xforms.Server.handleFailure,
-                timeout: 60000
-            }
+                failure: ORBEON.xforms.Server.handleFailure
+            };
+            if (XFORMS_DELAY_BEFORE_AJAX_TIMEOUT_IN_MS != -1)
+                callback.timeout = XFORMS_DELAY_BEFORE_AJAX_TIMEOUT_IN_MS;
             YAHOO.util.Connect.asyncRequest("POST", XFORMS_SERVER_URL, callback, ORBEON.xforms.Globals.requestDocument);
         } catch (e) {
             ORBEON.xforms.Globals.requestInProgress = false;

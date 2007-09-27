@@ -29,6 +29,7 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.saxon.Configuration;
+import org.orbeon.saxon.functions.FunctionLibrary;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.om.NodeInfo;
@@ -46,6 +47,9 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {
 
     public static String DEFAULT_CONTENT_TYPE = "application/pdf";
     public static final String PDF_TEMPLATE_MODEL_NAMESPACE_URI = "http://www.orbeon.com/oxf/pdf-template/model";
+
+    // XPath function library
+    private static final PDFFunctionLibrary functionLibrary = new PDFFunctionLibrary();
 
     public PDFTemplateProcessor() {
         addInputInfo(new ProcessorInputOutputInfo("model", PDF_TEMPLATE_MODEL_NAMESPACE_URI));
@@ -66,7 +70,7 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {
 
         try {
             // Get reader
-            final String templateHref = XPathCache.evaluateAsString(pipelineContext, configDocumentInfo, "/*/template/@href", null, null, null, null, null, null);//TODO: LocationData
+            final String templateHref = XPathCache.evaluateAsString(pipelineContext, configDocumentInfo, "/*/template/@href", null, null, functionLibrary, null, null, null);//TODO: LocationData
             final PdfReader reader = new PdfReader(URLFactory.createURL(templateHref));
             // Get total number of pages
             final int pageCount = reader.getNumberOfPages();
@@ -75,7 +79,7 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {
             final float width = psize.width();
             final float height = psize.height();
 
-            final String showGrid = XPathCache.evaluateAsString(pipelineContext, configDocumentInfo, "/*/template/@show-grid", null, null, null, null, null, null);//TODO: LocationData
+            final String showGrid = XPathCache.evaluateAsString(pipelineContext, configDocumentInfo, "/*/template/@show-grid", null, null, functionLibrary, null, null, null);//TODO: LocationData
 
             // Create result document and writer
             final Document document = new Document(psize, 50, 50, 50, 50);
@@ -93,7 +97,7 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {
                 // Handle root group
                 final GroupContext initialGroupContext = new GroupContext(contentByte, height, currentPage,  Collections.singletonList(instanceDocumentInfo), 1,
                         0, 0, "Courier", 14, 15.9f);
-                handleGroup(pipelineContext, initialGroupContext, configDocument.getRootElement().elements());
+                handleGroup(pipelineContext, initialGroupContext, configDocument.getRootElement().elements(), functionLibrary);
 
                 // Handle preview grid (NOTE: This can be heavy in memory.)
                 if ("true".equalsIgnoreCase(showGrid)) {
@@ -192,7 +196,7 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {
         }
     }
 
-    private void handleGroup(PipelineContext pipelineContext, GroupContext groupContext, List statements) throws DocumentException, IOException {
+    private void handleGroup(PipelineContext pipelineContext, GroupContext groupContext, List statements, FunctionLibrary functionLibrary) throws DocumentException, IOException {
 
         final NodeInfo contextNode = (NodeInfo) groupContext.contextNodeSet.get(groupContext.contextPosition - 1);
         final Map variableToValueMap = new HashMap();
@@ -217,7 +221,7 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {
 
                 final String ref = currentElement.attributeValue("ref");
                 if (ref != null) {
-                    final NodeInfo newContextNode = (NodeInfo) XPathCache.evaluateSingle(pipelineContext, groupContext.contextNodeSet, groupContext.contextPosition, ref, namespaceMap, variableToValueMap, null, null, null, (LocationData) currentElement.getData());
+                    final NodeInfo newContextNode = (NodeInfo) XPathCache.evaluateSingle(pipelineContext, groupContext.contextNodeSet, groupContext.contextPosition, ref, namespaceMap, variableToValueMap, functionLibrary, null, null, (LocationData) currentElement.getData());
 
                     if (newContextNode == null)
                         continue;
@@ -248,14 +252,14 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {
                 if (fontSize != null)
                     newGroupContext.fontSize = Float.parseFloat(fontSize);
 
-                handleGroup(pipelineContext, newGroupContext, currentElement.elements());
+                handleGroup(pipelineContext, newGroupContext, currentElement.elements(), functionLibrary);
                 
             } else if (currentElement.getName().equals("repeat")) {
                 // Handle repeat
 
                 final String nodeset = currentElement.attributeValue("nodeset");
                 final List iterations = XPathCache.evaluate(pipelineContext, groupContext.contextNodeSet, groupContext.contextPosition, nodeset, namespaceMap,
-                        variableToValueMap, null, null, null, (LocationData) currentElement.getData());
+                        variableToValueMap, functionLibrary, null, null, (LocationData) currentElement.getData());
 
                 final String offsetXString = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, contextNode, variableToValueMap, null, null, currentElement, currentElement.attributeValue("offset-x"));
                 final String offsetYString = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, contextNode, variableToValueMap, null, null, currentElement, currentElement.attributeValue("offset-y"));
@@ -272,7 +276,7 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {
                     newGroupContext.offsetX = groupContext.offsetX + (iterationIndex - 1) * offsetIncrementX;
                     newGroupContext.offsetY = groupContext.offsetY + (iterationIndex - 1) * offsetIncrementY;
 
-                    handleGroup(pipelineContext, newGroupContext, currentElement.elements());
+                    handleGroup(pipelineContext, newGroupContext, currentElement.elements(), functionLibrary);
                 }
 
             } else if (currentElement.getName().equals("field")) {
@@ -324,7 +328,7 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {
                     final float yPosition = groupContext.pageHeight - (Float.parseFloat(topPosition) + groupContext.offsetY);
 
                     // Get value from instance
-                    final String text = XPathCache.evaluateAsString(pipelineContext, groupContext.contextNodeSet, groupContext.contextPosition, value, namespaceMap, variableToValueMap, null, null, null, (LocationData) currentElement.getData());
+                    final String text = XPathCache.evaluateAsString(pipelineContext, groupContext.contextNodeSet, groupContext.contextPosition, value, namespaceMap, variableToValueMap, functionLibrary, null, null, (LocationData) currentElement.getData());
 
                     // Iterate over characters and print them
                     if (text != null) {

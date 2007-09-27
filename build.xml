@@ -45,7 +45,7 @@
         <include name="xsltc-2_5_1_orbeon.jar"/>
 
         <include name="commons-collections-2_0.jar"/>
-        <include name="commons-lang-1_0-b1.jar"/>
+        <include name="commons-lang-2_3.jar"/>
         <include name="commons-cli-1_0.jar"/>
         <include name="commons-fileupload-1.0.jar"/>
         <include name="commons-io-1_1.jar"/>

@@ -45,19 +45,21 @@ public class ContentHandlerOutputStream extends OutputStream {
     public void startDocument(String contentType) throws SAXException {
         // Start document
         AttributesImpl attributes = new AttributesImpl();
-        contentHandler.startPrefixMapping(XMLConstants.XSI_PREFIX, XMLConstants.XSI_URI);
-        contentHandler.startPrefixMapping(XMLConstants.XSD_PREFIX, XMLConstants.XSD_URI);
         attributes.addAttribute(XMLConstants.XSI_URI, "type", "xsi:type", "CDATA", XMLConstants.XS_BASE64BINARY_QNAME.getQualifiedName());
         if (contentType != null)
             attributes.addAttribute("", "content-type", "content-type", "CDATA", contentType);
 
         contentHandler.startDocument();
+        contentHandler.startPrefixMapping(XMLConstants.XSI_PREFIX, XMLConstants.XSI_URI);
+        contentHandler.startPrefixMapping(XMLConstants.XSD_PREFIX, XMLConstants.XSD_URI);
         contentHandler.startElement("", DEFAULT_BINARY_DOCUMENT_ELEMENT, DEFAULT_BINARY_DOCUMENT_ELEMENT, attributes);
     }
 
     public void endDocument() throws SAXException {
         // End document
         contentHandler.endElement("", DEFAULT_BINARY_DOCUMENT_ELEMENT, DEFAULT_BINARY_DOCUMENT_ELEMENT);
+        contentHandler.endPrefixMapping(XMLConstants.XSI_PREFIX);
+        contentHandler.endPrefixMapping(XMLConstants.XSD_PREFIX);
         contentHandler.endDocument();
     }
 

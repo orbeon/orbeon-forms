@@ -422,6 +422,14 @@ ORBEON.util.String = {
      */
     escapeAttribute: function(text) {
         return ORBEON.util.String.replace(text, '"', '&quot;');
+    },
+
+    /**
+     * Escape text that apears in an HTML attribute which we use in an innerHTML.
+     */
+    escapeHTMLMinimal: function(text) {
+        text = ORBEON.util.String.replace(text, '&', '&amp;');
+        return ORBEON.util.String.replace(text, '<', '&lt;');
     }
 }
 
@@ -612,7 +620,8 @@ ORBEON.xforms.Controls = {
     },
 
     setHelpMessage: function(control, message) {
-        ORBEON.xforms.Controls._setMessage(control, "xforms-help", message);
+        // We escape the value because the help element is a little special, containing escaped HTML
+        ORBEON.xforms.Controls._setMessage(control, "xforms-help",  ORBEON.util.String.escapeHTMLMinimal(message));
     },
 
     setValid: function(control, isValid) {

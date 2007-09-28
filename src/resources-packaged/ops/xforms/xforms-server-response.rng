@@ -208,6 +208,7 @@
                             <choice>
                                 <value>all</value>
                                 <value>instance</value>
+                                <value>none</value>
                             </choice>
                         </attribute>
                         <optional>

@@ -759,6 +759,56 @@
                     it become supported by browsers.
                 </p>
             </section>
+            <a name="xforms-accessibility"/>
+            <section added="2007-10-05">
+                <title>Does Orbeon Forms support the Disability Discrimination Act (DDA) and/or W3C WCAG?</title>
+                <p>
+                    We do not guarantee that Orbeon Forms supports DDA, but it seems that the first step of DDA is to
+                    comply with <a href="http://www.w3.org/TR/WAI-WEBCONTENT/">WCAG 1.0</a> priority 1 and 2 (or
+                    AA).
+                </p>
+                <p>
+                    With Orbeon Forms, many points in WCAG 1.0 relate to HTML written by the page author. For those,
+                    Orbeon Forms is of course in theory compliant since this depends on how the page authors creates the
+                    HTML. Regarding the markup that Orbeon Forms generate automatically, we are doing everything we can
+                    to produce clean HTML, which helps a lot with making pages accessible. For example we generate
+                    HTML labels for all form controls.
+                </p>
+                <p>
+                    It seems that the most problematic point is point 6.3 of WCAG 1.0, which states that pages should
+                    be functional even if script is disabled. At the moment Orbeon Forms requires JavaScript and Ajax
+                    for its XForms pages to be functional. However:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            Based on feedback from people in the accessibility field, it seems that the requirement is
+                            being relaxed as JavaScript and Ajax take more importance, and as assistive technologies
+                            improve. For example, <a href="http://www.w3.org/TR/WCAG20/">WCAG 2.0</a> (still a working
+                            draft at W3C), is quite reasonably going in the direction of not preventing script. For
+                            example it states:
+                        </p>
+                        <blockquote>
+                            In choosing Web technologies (HTML, scripting, etc.) that will be used when creating
+                            content that will meet the WCAG 2.0 success criteria, authors must use technologies that
+                            are supported by users' assistive technologies as well as the accessibility features in
+                            browsers and other user agents. Such technologies are referred to as "accessibility
+                            supported."
+                        </blockquote>
+                    </li>
+                    <li>
+                        <p>
+                            We think that it is possible to improve the XForms engine to support a JavaScript-less
+                            option, which would be less functional but which could use the same XForms source. Please
+                            let us know if you are interested in sponsoring this feature.
+                        </p>
+                    </li>
+                </ul>
+                <p>
+                    Orbeon is interested in getting your input on accessibility issues. Please contact us or post to the
+                    mailing-list if you have any feedback on this topic.
+                </p>
+            </section>
         </section>
         <a name="xpl"/>
         <section>

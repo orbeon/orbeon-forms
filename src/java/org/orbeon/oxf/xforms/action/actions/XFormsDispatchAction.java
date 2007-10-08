@@ -19,6 +19,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsControls;
 import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEventFactory;
@@ -93,18 +94,24 @@ public class XFormsDispatchAction extends XFormsAction {
             } else {
                 // Otherwise, try effective id
                 final String newEventTargetEffectiveId = xformsControls.getCurrentControlsState().findEffectiveControlId(resolvedNewEventTargetId);
-                xformsEventTarget = (XFormsEventTarget) containingDocument.getObjectById(pipelineContext, newEventTargetEffectiveId);
+                if (newEventTargetEffectiveId != null) {
+                    xformsEventTarget = (XFormsEventTarget) containingDocument.getObjectById(pipelineContext, newEventTargetEffectiveId);
+                } else {
+                    xformsEventTarget = null;
+                }
             }
         }
 
-        if (xformsEventTarget == null)
-            throw new OXFException("Could not find actual event target on xforms:dispatch element for id: " + resolvedNewEventTargetId);
-
         if (xformsEventTarget instanceof XFormsEventTarget) {
-            // This can be anything
+            // Dispatch the event
             containingDocument.dispatchEvent(pipelineContext, XFormsEventFactory.createEvent(resolvedNewEventName, (XFormsEventTarget) xformsEventTarget, newEventBubbles, newEventCancelable));
         } else {
-            throw new OXFException("Invalid event target for id: " + resolvedNewEventTargetId);
+            // "If there is a null search result for the target object and the source object is an XForms action such as
+            // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."
+
+            if (XFormsServer.logger.isInfoEnabled())
+                XFormsServer.logger.info("XForms - xforms:dispatch cannot find target: " + resolvedNewEventTargetId + ". Ignoring action.");
         }
     }
 }
+    

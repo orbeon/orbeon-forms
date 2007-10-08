@@ -14,9 +14,9 @@
 package org.orbeon.oxf.xforms.action.actions;
 
 import org.dom4j.Element;
-import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
@@ -69,57 +69,62 @@ public class XFormsSetindexAction extends XFormsAction {
 
         final int index = Integer.parseInt(indexString);
 
-        final Map repeatIdToRepeatControlInfo = currentControlsState.getRepeatIdToRepeatXFormsControl();
-        final XFormsRepeatControl repeatControlInfo = (XFormsRepeatControl) repeatIdToRepeatControlInfo.get(repeatId);
+        final Map repeatIdToRepeatControl = currentControlsState.getRepeatIdToRepeatXFormsControl();
+        final XFormsRepeatControl repeatControl = (XFormsRepeatControl) repeatIdToRepeatControl.get(repeatId);
 
-        if (repeatControlInfo == null)
-            throw new OXFException("Invalid repeat id: " + repeatId);
-
-        if (index <= 0) {
-            // "If the selected index is 0 or less, an xforms-scroll-first event is dispatched
-            // and the index is set to 1."
-            containingDocument.dispatchEvent(pipelineContext, new XFormsScrollFirstEvent(repeatControlInfo));
-            currentControlsState.updateRepeatIndex(repeatId, 1);
-        } else {
-            final List children = repeatControlInfo.getChildren();
-
-            if (children != null && index > children.size()) {
-                // "If the selected index is greater than the index of the last repeat
-                // item, an xforms-scroll-last event is dispatched and the index is set to
-                // that of the last item."
-
-                containingDocument.dispatchEvent(pipelineContext, new XFormsScrollLastEvent(repeatControlInfo));
-                currentControlsState.updateRepeatIndex(repeatId, children.size());
+        if (repeatControl != null) {
+            // Found control for repeat id
+            if (index <= 0) {
+                // "If the selected index is 0 or less, an xforms-scroll-first event is dispatched
+                // and the index is set to 1."
+                containingDocument.dispatchEvent(pipelineContext, new XFormsScrollFirstEvent(repeatControl));
+                currentControlsState.updateRepeatIndex(repeatId, 1);
             } else {
-                // Otherwise just set the index
-                currentControlsState.updateRepeatIndex(repeatId, index);
-            }
-        }
+                final List children = repeatControl.getChildren();
 
-        // "The indexes for inner nested repeat collections are re-initialized to startindex."
-        {
-            // First step: set all children indexes to 0
-            final List nestedRepeatIds = currentControlsState.getNestedRepeatIds(xformsControls, repeatId);
-            final Map nestedRepeatIdsMap = new HashMap();
-            if (nestedRepeatIds != null) {
-                for (Iterator i = nestedRepeatIds.iterator(); i.hasNext();) {
-                    final String currentRepeatId = (String) i.next();
-                    nestedRepeatIdsMap.put(currentRepeatId, "");
-                    currentControlsState.updateRepeatIndex(currentRepeatId, 0);
+                if (children != null && index > children.size()) {
+                    // "If the selected index is greater than the index of the last repeat
+                    // item, an xforms-scroll-last event is dispatched and the index is set to
+                    // that of the last item."
+
+                    containingDocument.dispatchEvent(pipelineContext, new XFormsScrollLastEvent(repeatControl));
+                    currentControlsState.updateRepeatIndex(repeatId, children.size());
+                } else {
+                    // Otherwise just set the index
+                    currentControlsState.updateRepeatIndex(repeatId, index);
                 }
             }
 
-            // Adjust controls ids that could have gone out of bounds
-            XFormsIndexUtils.adjustRepeatIndexes(pipelineContext, xformsControls, nestedRepeatIdsMap);
-        }
+            // "The indexes for inner nested repeat collections are re-initialized to startindex."
+            {
+                // First step: set all children indexes to 0
+                final List nestedRepeatIds = currentControlsState.getNestedRepeatIds(xformsControls, repeatId);
+                final Map nestedRepeatIdsMap = new HashMap();
+                if (nestedRepeatIds != null) {
+                    for (Iterator i = nestedRepeatIds.iterator(); i.hasNext();) {
+                        final String currentRepeatId = (String) i.next();
+                        nestedRepeatIdsMap.put(currentRepeatId, "");
+                        currentControlsState.updateRepeatIndex(currentRepeatId, 0);
+                    }
+                }
 
-        // TODO: "The implementation data structures for tracking computational dependencies are
-        // rebuilt or updated as a result of this action."
-        for (Iterator i = containingDocument.getModels().iterator(); i.hasNext();) {
-            XFormsModel currentModel = (XFormsModel) i.next();
-            currentModel.applyComputedExpressionBinds(pipelineContext);
-        }
+                // Adjust controls ids that could have gone out of bounds
+                XFormsIndexUtils.adjustRepeatIndexes(pipelineContext, xformsControls, nestedRepeatIdsMap);
+            }
 
-        containingDocument.getXFormsControls().markDirty();
+            // TODO: "The implementation data structures for tracking computational dependencies are
+            // rebuilt or updated as a result of this action."
+            for (Iterator i = containingDocument.getModels().iterator(); i.hasNext();) {
+                XFormsModel currentModel = (XFormsModel) i.next();
+                currentModel.applyComputedExpressionBinds(pipelineContext);
+            }
+
+            containingDocument.getXFormsControls().markDirty();
+        } else {
+            // "If there is a null search result for the target object and the source object is an XForms action such as
+            // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."
+            if (XFormsServer.logger.isInfoEnabled())
+                XFormsServer.logger.info("XForms - xforms:setindex does not refer to an existing repeat control: " + repeatId + ". Ignoring action.");
+        }
     }
 }

@@ -19,6 +19,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsModelSubmission;
 import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
@@ -38,10 +39,16 @@ public class XFormsSendAction extends XFormsAction {
         if (submissionId == null)
             throw new OXFException("Missing mandatory submission attribute on xforms:send element.");
         final Object submission = containingDocument.getObjectById(pipelineContext, submissionId);
-        if (submission == null || !(submission instanceof XFormsModelSubmission))
-            throw new OXFException("Submission attribute on xforms:send element does not refer to existing xforms:submission element: " + submissionId);
 
-        // Dispatch event to submission object
-        containingDocument.dispatchEvent(pipelineContext, new XFormsSubmitEvent((XFormsEventTarget) submission));
+        if (submission instanceof XFormsModelSubmission) {
+            // Dispatch event to submission object
+            containingDocument.dispatchEvent(pipelineContext, new XFormsSubmitEvent((XFormsEventTarget) submission));
+        } else {
+            // "If there is a null search result for the target object and the source object is an XForms action such as
+            // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."
+
+            if (XFormsServer.logger.isInfoEnabled())
+                XFormsServer.logger.info("XForms - xforms:send submission does not refer to an existing xforms:submission element: " + submissionId + ". Ignoring action.");
+        }
     }
 }

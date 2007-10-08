@@ -18,6 +18,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsControls;
 import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
@@ -42,6 +43,11 @@ public class XFormsToggleAction extends XFormsAction {
         if (effectiveCaseId != null) { // can be null if the switch is not relevant
             // Update xforms:switch info and dispatch events
             xformsControls.activateCase(pipelineContext, effectiveCaseId);
+        } else {
+            // "If there is a null search result for the target object and the source object is an XForms action such as
+            // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."
+            if (XFormsServer.logger.isInfoEnabled())
+                XFormsServer.logger.info("XForms - xforms:toggle does not refer to an existing case: " + caseId + ". Ignoring action.");
         }
     }
 }

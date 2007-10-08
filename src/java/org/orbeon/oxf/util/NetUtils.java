@@ -136,19 +136,17 @@ public class NetUtils {
         return requestPath;
     }
 
-    public static long getLastModified(java.net.URL u) throws java.io.IOException {
-        final java.net.URLConnection uc = u.openConnection();
-        return getLastModified(uc);
+    public static long getLastModified(URL url) throws java.io.IOException {
+        return getLastModified(url.openConnection());
     }
 
-    public static Long getLastModified(java.net.URL u, Long notUsed) throws java.io.IOException {
-        final long modTim = getLastModified(u);
-        return new Long(modTim);
+    public static Long getLastModifiedAsLong(URL url) throws java.io.IOException {
+        return new Long(getLastModified(url));
     }
 
     /**
      * Get the last modification date of an open URLConnection.
-     * <p/>
+     *
      * This handles the (broken at some point) case of the file: protocol.
      */
     public static long getLastModified(URLConnection urlConnection) {

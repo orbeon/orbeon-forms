@@ -167,7 +167,7 @@ public class XFormsModelSchemaValidator {
         void addInclude(final URL u) throws java.io.IOException {
             // Get the time first.  This way if there's a problem the array lengths will remain
             // the same.
-            final Long modTim = NetUtils.getLastModified(u, (Long) null);
+            final Long modTim = NetUtils.getLastModifiedAsLong(u);
             includes.add(u);
             modTimes.add(modTim);
         }
@@ -178,7 +178,7 @@ public class XFormsModelSchemaValidator {
             for (int i = 0; ret && i < size; i++) {
                 final URL u = (URL) includes.get(i);
                 try {
-                    final Long crntTim = NetUtils.getLastModified(u, (Long) null);
+                    final Long crntTim = NetUtils.getLastModifiedAsLong(u);
                     final Long lstTim = (Long) modTimes.get(i);
                     ret = crntTim.equals(lstTim);
                 } catch (final java.io.IOException e) {
@@ -603,7 +603,7 @@ public class XFormsModelSchemaValidator {
     private Grammar loadCacheGrammar(final PipelineContext pipelineContext, final String schemaURI) {
         try {
             final URL url = URLFactory.createURL(schemaURI);
-            final Long modificationTime = NetUtils.getLastModified(url, (Long) null);
+            final Long modificationTime = NetUtils.getLastModifiedAsLong(url);
 
             final Cache cache = ObjectCache.instance();
             final SchemaKey schemaKey = new SchemaKey(url);

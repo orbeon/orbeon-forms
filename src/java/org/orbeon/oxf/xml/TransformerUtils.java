@@ -280,15 +280,23 @@ public class TransformerUtils {
      * @return  DOM document
      */
     public static org.w3c.dom.Document saxStoreToDomDocument(SAXStore saxStore) {
-        final TransformerHandler identity = getIdentityTransformerHandler();
-        final DOMResult domResult = new DOMResult();
-        identity.setResult(domResult);
         try {
-            saxStore.replay(identity);
-        } catch (SAXException e) {
+            // Convert to dom4j and then to DOM
+            return TransformerUtils.dom4jToDomDocument(saxStoreToDom4jDocument(saxStore));
+        } catch (TransformerException e) {
             throw new OXFException(e);
         }
-        return domResult.getNode().getOwnerDocument();
+
+        // NOTE: The more straight and efficient implementation below doesn't seem to work
+//        final TransformerHandler identity = getIdentityTransformerHandler();
+//        final DOMResult domResult = new DOMResult();
+//        identity.setResult(domResult);
+//        try {
+//            saxStore.replay(identity);
+//        } catch (SAXException e) {
+//            throw new OXFException(e);
+//        }
+//        return domResult.getNode().getOwnerDocument();
     }
 
     /**

@@ -809,6 +809,39 @@
                     mailing-list if you have any feedback on this topic.
                 </p>
             </section>
+            <a name="xforms-widgets"/>
+            <section added="2007-10-11">
+                <title>How do I add my own rich controls to Orbeon Forms?</title>
+                <p>
+                    We hope to add a good configurable component system to Orbeon Forms in the future, but at the
+                    moment Orbeon Forms unfortunately does not feature an easy way of adding custom controls.
+                </p>
+                <p>
+                    At this point, adding your own control involves either:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            Digging into the Orbeon Forms code, in particular the
+                            <code>org.orbeon.oxf.xforms.processor.handlers</code> package, <code>xforms.js</code>, and
+                            classes derived from <code>XFormsControl</code>.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Implementing everything with CSS and JavaScript. In some cases, if your control is simple
+                            enough and a variation on an existing control, you may be able to implement the added
+                            behavior with JavaScript and CSS.
+                        </p>
+                    </li>
+                </ul>
+                <p>
+                    Note that Orbeon Forms already features some rich components such as menus, trees, dialogs, and
+                    autocompletion fields, and we plan to add more. All these features were sponsored by customers, so
+                    if you have particular needs you may want to consider sponsoring as that may be the quickest way to
+                    get your widget in the Orbeon Forms code base.
+                </p>
+            </section>
         </section>
         <a name="xpl"/>
         <section>

@@ -360,6 +360,108 @@ http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=2
 
                 -->
                 <ul>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307674&amp;group_id=168&amp;atid=350207">#307674:
+                            Regression: Instance submission with upload no longer dispatches xforms-submit-done
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307644&amp;group_id=168&amp;atid=350207">#307644:
+                            NPE when dispatching
+                            event with xforms:dispatch to invalid target ID
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307612&amp;group_id=168&amp;atid=350207">#307612:
+                            HTML help does not update correctly upon Ajax response
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307608&amp;group_id=168&amp;atid=350207">#307608: oxf:pdf-template
+                            processor outputs malformed XML document
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307607&amp;group_id=168&amp;atid=350207">#307607: RFE:
+                            oxf:pdf-template does not support XSLT date and time formatting functions
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307604&amp;group_id=168&amp;atid=350207">#307604: Ajax retry code
+                            causes duplicate submission and JavaScript error
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307599&amp;group_id=168&amp;atid=350207">#307599: Reduce contention
+                            in DatabaseContext
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306446&amp;group_id=168&amp;atid=350207">#306446:
+                            xforms:group/@appearance="xxforms:fieldset" must support change of label value
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307556&amp;group_id=168&amp;atid=350207">#307556: Type of node a
+                            group is bound to (date) is incorrectly used for child controls of the group bound to nodes that are not of that type
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307524&amp;group_id=168&amp;atid=350207">#307524: XForms upload
+                            control does not become read-only when the read-only MIP is changed after the page loads
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306668&amp;group_id=168&amp;atid=350207">#306668: RFE: Instance
+                            Inspector should have XPath evaluator
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307503&amp;group_id=168&amp;atid=350207">#307503: RFE: Retry
+                            mechanism for Ajax queries
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307470&amp;group_id=168&amp;atid=350207">#307470: RFE: Optimize
+                            Ajax response to not include default attribute values
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307483&amp;group_id=168&amp;atid=350207">#307483: Turning off the
+                            XForms document cache causes invalid controls updates when relevance changes
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307482&amp;group_id=168&amp;atid=350207">#307482: Submission with
+                            replace="all" and xxforms:target causes source form to behave incorrectly
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306625&amp;group_id=168&amp;atid=350207">#306625: RFE: Support
+                            target window on xf:submission/@replace="all"
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307474&amp;group_id=168&amp;atid=350207">#307474: HTML and XHTML
+                            serialization in epilogue should have zero indent level to reduce document size
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307446&amp;group_id=168&amp;atid=350207">#307446: JavaScript
+                            exception when using innerHTML with non-escaped markup with XHTML in Firefox
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307472&amp;group_id=168&amp;atid=350207">#307472: RFE: Connection
+                            pooling for HTTP connections
+                        </a>
+                    </li>
                      <li>
                          <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307439&amp;group_id=168&amp;atid=350207">#307439:
                              Rewrite does not change applet/@archive

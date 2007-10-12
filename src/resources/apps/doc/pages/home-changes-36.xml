@@ -31,20 +31,20 @@
                 Welcome to Orbeon Forms 3.6!
             </p>
             <p>
-                Orbeon Forms 3.6 features well over <a href="#changes-36-full">120 improvements</a> since <a
+                Orbeon Forms 3.6 features well over <a href="#changes-36-full">140 improvements</a> since <a
                 href="home-changes-35">Orbeon Forms 3.5.1</a>, including major improvements in the areas of XML Schema
                 validation, error handling, deployment within Java applications, and performance.
             </p>
             <p>
                 This document describes changes made between Orbeon PresentationServer 3.5.1 and Orbeon Forms 3.6.
             </p>
+            <p>
+                <b style="color: red">NOTE: Orbeon Forms 3.6.1 is till UNDER DEVELOPMENT as of October 2007.</b>
+            </p>
         </section>
         <!--<a name="changes-361"/>-->
         <!--<section>-->
             <!--<title>Changes in Version 3.6.1</title>-->
-            <!--<p>-->
-                <!--Orbeon Forms 3.6.1 <b style="color: red">[UNDER DEVELOPMENT]</b> is an update to Orbeon Forms 3.6 -->
-            <!--</p>-->
         <!--</section>-->
         <a name="changes-36"/>
         <section>
@@ -338,7 +338,7 @@
             <section>
                 <title>Complete List of Issues Addressed in this Release</title>
                 <p>
-                    Orbeon Forms 3.6 addresses well over 120 bugs and features:
+                    Orbeon Forms 3.6 addresses well over 140 bugs and features:
                 </p>
                 <!--
 Request to extract bugs from SourceForge with http://www.orbeon.com/ops/xquery-the-web/ :

@@ -75,6 +75,7 @@ public class XFormsControls {
     private static final Map noSingleNodeControls = new HashMap();
     private static final Map mandatoryNodesetControls = new HashMap();
     private static final Map noNodesetControls = new HashMap();
+    private static final Map singleNodeOrValueControls = new HashMap();
 
     static {
         groupingControls.put("group", "");
@@ -106,6 +107,8 @@ public class XFormsControls {
         mandatorySingleNodeControls.put("filename", "");
         mandatorySingleNodeControls.put("mediatype", "");
         mandatorySingleNodeControls.put("setvalue", "");
+
+        singleNodeOrValueControls.put("output", "");
 
         optionalSingleNodeControls.putAll(noValueControls);
         optionalSingleNodeControls.put("output", "");  // can have @value attribute
@@ -490,6 +493,7 @@ public class XFormsControls {
                 : new ExtendedLocationData((LocationData) bindingElement.getData(), "pushing XForms control binding", bindingElement);
 
         // Check for mandatory and optional bindings
+        // TODO: This is static analysis to do only once and should be moved somewhere else
         if (bindingElement != null && XFormsConstants.XFORMS_NAMESPACE_URI.equals(bindingElement.getNamespaceURI())) {
             final String controlName = bindingElement.getName();
             if (mandatorySingleNodeControls.get(controlName) != null
@@ -507,6 +511,10 @@ public class XFormsControls {
             if (noNodesetControls.get(controlName) != null
                     && bindingElement.attribute("nodeset") != null) {
                 throw new ValidationException("Node-set binding is prohibited for element: " + bindingElement.getQualifiedName(), locationData);
+            }
+            if (singleNodeOrValueControls.get(controlName) != null
+                    && !(bindingElement.attribute("ref") != null || bindingElement.attribute("bind") != null || bindingElement.attribute("value") != null)) {
+                throw new ValidationException("Missing mandatory single node binding or value attribute for element: " + bindingElement.getQualifiedName(), locationData);
             }
         }
 
@@ -1304,22 +1312,22 @@ public class XFormsControls {
         return doContinue;
     }
 
-    private boolean isCaseSelectedByControlElement(Element controlElement, String caseElementEffectiveId, String idPostfix) {
-        final Element switchElement = controlElement.getParent();
-        final String switchId = switchElement.attributeValue("id");
-        final String switchElementEffectiveId = switchId + (idPostfix.equals("") ? "" : XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1 + idPostfix);
-
-        final XFormsControls.SwitchState switchState = containingDocument.getXFormsControls().getCurrentSwitchState();
-
-        // TODO: check @selected attribute, no?
-        if (switchState == null)
-            return true;
-
-        final Map switchIdToSelectedCaseIdMap = switchState.getSwitchIdToSelectedCaseIdMap();
-        final String selectedCaseId = (String) switchIdToSelectedCaseIdMap.get(switchElementEffectiveId);
-
-        return caseElementEffectiveId.equals(selectedCaseId);
-    }
+//    private boolean isCaseSelectedByControlElement(Element controlElement, String caseElementEffectiveId, String idPostfix) {
+//        final Element switchElement = controlElement.getParent();
+//        final String switchId = switchElement.attributeValue("id");
+//        final String switchElementEffectiveId = switchId + (idPostfix.equals("") ? "" : XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1 + idPostfix);
+//
+//        final XFormsControls.SwitchState switchState = containingDocument.getXFormsControls().getCurrentSwitchState();
+//
+//        // TODO: check @selected attribute, no?
+//        if (switchState == null)
+//            return true;
+//
+//        final Map switchIdToSelectedCaseIdMap = switchState.getSwitchIdToSelectedCaseIdMap();
+//        final String selectedCaseId = (String) switchIdToSelectedCaseIdMap.get(switchElementEffectiveId);
+//
+//        return caseElementEffectiveId.equals(selectedCaseId);
+//    }
 
     /**
      * Visit all the control elements without handling repeats or looking at the binding contexts.

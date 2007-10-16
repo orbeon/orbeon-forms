@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.state;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.XFormsSubmissionUtils;
 import org.orbeon.oxf.xforms.XFormsModelSubmission;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.pipeline.StaticExternalContext;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -209,14 +210,14 @@ public abstract class XFormsStateStore {
 
             // Make sure value is encrypted as it will be externalized
             final String encryptedValue;
-//            if (storeEntry.value.startsWith("X3") || storeEntry.value.startsWith("X4")) {
-//                // Data is currently not encrypted
-//                final String decodedValue = XFormsUtils.decodeString(pipelineContext, storeEntry.value);
-//                encryptedValue = XFormsUtils.encodeString(pipelineContext, decodedValue, XFormsUtils.getEncryptionKey());
-//            } else {
+            if (storeEntry.value.startsWith("X3") || storeEntry.value.startsWith("X4")) {
+                // Data is currently not encrypted, so encrypt it
+                final byte[] decodedValue = XFormsUtils.decodeBytes(pipelineContext, storeEntry.value, XFormsUtils.getEncryptionKey());
+                encryptedValue = XFormsUtils.encodeBytes(pipelineContext, decodedValue, XFormsUtils.getEncryptionKey());
+            } else {
                 // Data is already encrypted
                 encryptedValue = storeEntry.value;
-//            }
+            }
 
             sb.append(encryptedValue);
             sb.append("</value><is-initial-entry>");
@@ -258,7 +259,7 @@ public abstract class XFormsStateStore {
 
         final Document document = TransformerUtils.readDom4j(result.getResultInputStream(), result.resourceURI);
         final String value = document.getRootElement().element("value").getStringValue();
-        final boolean isInitialEntry = Boolean.parseBoolean(document.getRootElement().element("is-initial-entry").getStringValue());
+        final boolean isInitialEntry = new Boolean(document.getRootElement().element("is-initial-entry").getStringValue()).booleanValue();
 
         return new StoreEntry(key, value, isInitialEntry);
     }

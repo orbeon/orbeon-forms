@@ -36,6 +36,9 @@ import java.io.UnsupportedEncodingException;
  */
 public abstract class XFormsStateStore {
 
+    private static boolean TEMP_PERF_TEST = false;
+    private static int TEMP_PERF_ITERATIONS = 100;
+
     private boolean isPersistent;
     private int currentStoreSize = 0;
 
@@ -181,7 +184,15 @@ public abstract class XFormsStateStore {
 
             if (isPersistent) {
                 // Persist state
-                persistEntry(lastStoreEntry);
+                if (TEMP_PERF_TEST) {
+                    final long startTime = System.currentTimeMillis();
+                    for (int i = 0; i < TEMP_PERF_ITERATIONS; i ++) {
+                        persistEntry(lastStoreEntry);
+                    }
+                    System.out.println("Average write persistence time: " + ((System.currentTimeMillis() - startTime) / TEMP_PERF_ITERATIONS) + " ms." );
+                } else {
+                    persistEntry(lastStoreEntry);
+                }
             }
         }
     }
@@ -249,19 +260,42 @@ public abstract class XFormsStateStore {
         final String url = "/exist/rest/db/orbeon/xforms/cache/" + key;
         final String resolvedURL = externalContext.getResponse().rewriteResourceURL(url, true);
 
-        XFormsModelSubmission.ConnectionResult result = XFormsSubmissionUtils.doRegular(externalContext, "get", resolvedURL, null, null, null, null, null);
+        if (TEMP_PERF_TEST) {
+            final long startTime = System.currentTimeMillis();
+            for (int i = 0; i < TEMP_PERF_ITERATIONS; i ++) {
 
-        if (result.resultCode == 404)
-            return null;
+                XFormsModelSubmission.ConnectionResult result = XFormsSubmissionUtils.doRegular(externalContext, "get", resolvedURL, null, null, null, null, null);
 
-        if (result.resultCode < 200 || result.resultCode >= 300)
-            throw new OXFException("Got non-successful return code from store persistence layer: " + result.resultCode);
+                if (result.resultCode == 404)
+                    return null;
 
-        final Document document = TransformerUtils.readDom4j(result.getResultInputStream(), result.resourceURI);
-        final String value = document.getRootElement().element("value").getStringValue();
-        final boolean isInitialEntry = new Boolean(document.getRootElement().element("is-initial-entry").getStringValue()).booleanValue();
+                if (result.resultCode < 200 || result.resultCode >= 300)
+                    throw new OXFException("Got non-successful return code from store persistence layer: " + result.resultCode);
 
-        return new StoreEntry(key, value, isInitialEntry);
+                final Document document = TransformerUtils.readDom4j(result.getResultInputStream(), result.resourceURI);
+                final String value = document.getRootElement().element("value").getStringValue();
+                final boolean isInitialEntry = new Boolean(document.getRootElement().element("is-initial-entry").getStringValue()).booleanValue();
+
+                new StoreEntry(key, value, isInitialEntry);
+            }
+            System.out.println("Average read persistence time: " + ((System.currentTimeMillis() - startTime) / TEMP_PERF_ITERATIONS) + " ms." );
+        }
+
+        {
+            XFormsModelSubmission.ConnectionResult result = XFormsSubmissionUtils.doRegular(externalContext, "get", resolvedURL, null, null, null, null, null);
+
+            if (result.resultCode == 404)
+                return null;
+
+            if (result.resultCode < 200 || result.resultCode >= 300)
+                throw new OXFException("Got non-successful return code from store persistence layer: " + result.resultCode);
+
+            final Document document = TransformerUtils.readDom4j(result.getResultInputStream(), result.resourceURI);
+            final String value = document.getRootElement().element("value").getStringValue();
+            final boolean isInitialEntry = new Boolean(document.getRootElement().element("is-initial-entry").getStringValue()).booleanValue();
+
+            return new StoreEntry(key, value, isInitialEntry);
+        }
     }
 
     protected void debug(String message) {

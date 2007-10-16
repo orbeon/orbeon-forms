@@ -174,13 +174,13 @@ public class XFormsUtils {
         return encodeBytes(pipelineContext, bytes, encryptionPassword);
     }
 
-    public static String encodeString(PipelineContext pipelineContext, String stringToEncode, String encryptionPassword) {
-        try {
-            return encodeBytes(pipelineContext, stringToEncode.getBytes("utf-8"), encryptionPassword);
-        } catch (UnsupportedEncodingException e) {
-            throw new OXFException(e);// won't happen
-        }
-    }
+//    public static String encodeString(PipelineContext pipelineContext, String stringToEncode) {
+//        try {
+//            return encodeBytes(pipelineContext, stringToEncode.getBytes("utf-8"), XFormsUtils.getEncryptionKey());
+//        } catch (UnsupportedEncodingException e) {
+//            throw new OXFException(e);// won't happen
+//        }
+//    }
 
     public static String encodeBytes(PipelineContext pipelineContext, byte[] bytesToEncode, String encryptionPassword) {
         Deflater deflater = null;
@@ -671,13 +671,13 @@ public class XFormsUtils {
         return result.getDocument();
     }
 
-    public static String decodeString(PipelineContext pipelineContext, String encoded) {
-        try {
-            return new String(decodeBytes(pipelineContext, encoded,  getEncryptionKey()), "utf-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new OXFException(e);// won't happen
-        }
-    }
+//    public static String decodeString(PipelineContext pipelineContext, String encoded) {
+//        try {
+//            return new String(decodeBytes(pipelineContext, encoded,  getEncryptionKey()), "utf-8");
+//        } catch (UnsupportedEncodingException e) {
+//            throw new OXFException(e);// won't happen
+//        }
+//    }
 
     public static byte[] decodeBytes(PipelineContext pipelineContext, String encoded, String encryptionPassword) {
         try {

@@ -174,6 +174,14 @@ public class XFormsUtils {
         return encodeBytes(pipelineContext, bytes, encryptionPassword);
     }
 
+    public static String encodeString(PipelineContext pipelineContext, String stringToEncode, String encryptionPassword) {
+        try {
+            return encodeBytes(pipelineContext, stringToEncode.getBytes("utf-8"), encryptionPassword);
+        } catch (UnsupportedEncodingException e) {
+            throw new OXFException(e);// won't happen
+        }
+    }
+
     public static String encodeBytes(PipelineContext pipelineContext, byte[] bytesToEncode, String encryptionPassword) {
         Deflater deflater = null;
         try {
@@ -786,11 +794,12 @@ public class XFormsUtils {
 //                (XFormsConstants.XFORMS_OPTIMIZE_LOCAL_INSTANCE_LOADS_PROPERTY, true).booleanValue();
 //    }
 
-    public static boolean isCacheSession() {
+    public static boolean isServerStateHandling() {
         final String propertyValue = OXFProperties.instance().getPropertySet().getString
                 (XFormsConstants.XFORMS_STATE_HANDLING_PROPERTY, XFormsConstants.XXFORMS_STATE_HANDLING_CLIENT_VALUE);
 
-        return propertyValue.equals(XFormsConstants.XXFORMS_STATE_HANDLING_SESSION_VALUE);
+        return propertyValue.equals(XFormsConstants.XXFORMS_STATE_HANDLING_SESSION_VALUE)
+                || propertyValue.equals(XFormsConstants.XXFORMS_STATE_HANDLING_SERVER_VALUE);
     }
 
     public static boolean isExceptionOnInvalidClientControlId() {
@@ -808,9 +817,14 @@ public class XFormsUtils {
                 (XFormsConstants.XFORMS_AJAX_SHOW_ERRORS_PROPERTY, true).booleanValue();
     }
 
-    public static int getSessionCacheSize() {
+    public static int getSessionStoreSize() {
         return OXFProperties.instance().getPropertySet().getInteger
                 (XFormsConstants.XFORMS_CACHE_SESSION_SIZE_PROPERTY, XFormsConstants.DEFAULT_SESSION_STATE_CACHE_SIZE).intValue();
+    }
+
+    public static int getApplicationStateStoreSize() {
+        return OXFProperties.instance().getPropertySet().getInteger
+                (XFormsConstants.XFORMS_STORE_APPLICATION_SIZE_PROPERTY, XFormsConstants.DEFAULT_APPLICATION_STATE_STORE_SIZE).intValue();
     }
 
     public static int getApplicationCacheSize() {

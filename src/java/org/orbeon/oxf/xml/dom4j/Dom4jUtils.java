@@ -130,6 +130,7 @@ public class Dom4jUtils {
     }
 
     public static Document readDom4j(final InputStream inputStream) throws SAXException, DocumentException {
+        // TODO: See TransformerUtils.readDom4j() instead and remove?
         final SAXReader saxReader = createSAXReader();
         return saxReader.read(inputStream);
     }

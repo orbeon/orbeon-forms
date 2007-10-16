@@ -118,6 +118,7 @@ public class XFormsConstants {
     public static final String XFORMS_STATE_HANDLING_PROPERTY = "oxf.xforms.state-handling";
     public static final String XFORMS_CACHE_DOCUMENT_PROPERTY = "oxf.xforms.cache.document";
     public static final String XFORMS_CACHE_SESSION_SIZE_PROPERTY = "oxf.xforms.cache.session.size";
+    public static final String XFORMS_STORE_APPLICATION_SIZE_PROPERTY = "oxf.xforms.store.application.size";
     public static final String XFORMS_CACHE_APPLICATION_SIZE_PROPERTY = "oxf.xforms.cache.application.size";
     public static final String XFORMS_OPTIMIZE_POST_ALL_PROPERTY = "oxf.xforms.optimize-post-all";
     public static final String XFORMS_OPTIMIZE_GET_ALL_PROPERTY = "oxf.xforms.optimize-get-all";
@@ -137,6 +138,7 @@ public class XFormsConstants {
     public static final String XXFORMS_STATE_HANDLING_ATTRIBUTE_NAME = "state-handling";
     public static final String XXFORMS_STATE_HANDLING_CLIENT_VALUE = "client";
     public static final String XXFORMS_STATE_HANDLING_SESSION_VALUE = "session";
+    public static final String XXFORMS_STATE_HANDLING_SERVER_VALUE = "server";
 
     public static final String XXFORMS_READONLY_APPEARANCE_ATTRIBUTE_NAME = "readonly-appearance";
     public static final String XXFORMS_READONLY_APPEARANCE_STATIC_VALUE = "static";
@@ -187,8 +189,11 @@ public class XFormsConstants {
     public static final char REPEAT_HIERARCHY_SEPARATOR_2 = '-';
     public static final String DEFAULT_UPLOAD_TYPE_EXPLODED_QNAME = ProcessorUtils.XS_ANYURI_EXPLODED_QNAME;
     public static final QName DEFAULT_UPLOAD_TYPE_QNAME = XMLConstants.XS_ANYURI_QNAME;
+
     public static final int DEFAULT_SESSION_STATE_CACHE_SIZE = 1024 * 1024;
     public static final int DEFAULT_APPLICATION_STATE_CACHE_SIZE = 1024 * 1024;
+    public static final int DEFAULT_APPLICATION_STATE_STORE_SIZE = 20 * 1024 * 1024;
+
     public static final boolean DEFAULT_GZIP_STATE = true;
     public static final boolean DEFAULT_HOST_LANGUAGE_AVTS = false;
     public static final boolean DEFAULT_MINIMAL_RESOURCES = false;

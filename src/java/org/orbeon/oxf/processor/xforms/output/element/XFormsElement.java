@@ -114,7 +114,7 @@ public class XFormsElement {
                 {
                     // NOTE: We used to test on the existence of InstanceData here, but now that InstanceData works
                     // differently, we just test that we are not the document node. Will that work?
-                    if (!(contextNodeInfo instanceof DocumentInfo)) {
+                    if (contextNodeInfo != null && !(contextNodeInfo instanceof DocumentInfo)) {
                         final String typeAsString = InstanceData.getType(contextNodeInfo);
                         if (typeAsString != null)
                             addExtensionAttribute(newAttributes, XFormsConstants.XXFORMS_TYPE_ATTRIBUTE_NAME, typeAsString);

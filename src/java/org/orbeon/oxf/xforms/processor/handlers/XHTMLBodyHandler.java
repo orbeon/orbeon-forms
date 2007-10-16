@@ -17,10 +17,8 @@ import org.dom4j.Element;
 import org.dom4j.QName;
 import org.orbeon.oxf.processor.PageFlowControllerProcessor;
 import org.orbeon.oxf.resources.OXFProperties;
-import org.orbeon.oxf.util.UUIDUtils;
 import org.orbeon.oxf.xforms.*;
-import org.orbeon.oxf.xforms.processor.XFormsServer;
-import org.orbeon.oxf.xforms.processor.XFormsState;
+import org.orbeon.oxf.xforms.state.*;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.ElementHandlerController;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -97,59 +95,19 @@ public class XHTMLBodyHandler extends HandlerBase {
                 hasUpload ? "enctype" : null, hasUpload ? "multipart/form-data" : null});
 
         // Store private information used by the client-side JavaScript
-        final String currentPageGenerationId;
         {
-            final String staticStateString;
-            if (containingDocument.isSessionStateHandling()) {
-                // Produce UUID
-                if (handlerContext.getStaticStateUUID() == null) {
-                    currentPageGenerationId = UUIDUtils.createPseudoUUID();
-                    staticStateString = XFormsServer.SESSION_STATE_PREFIX + currentPageGenerationId;
-                } else {
-                    // In this case, we first store in the application scope, so that multiple requests can use the
-                    // same cached state.
-                    currentPageGenerationId = handlerContext.getStaticStateUUID();
-                    staticStateString = XFormsServer.APPLICATION_STATE_PREFIX + currentPageGenerationId;
-                }
-            } else {
-                // Produce encoded static state
-                staticStateString = xformsState.getStaticState();
-                currentPageGenerationId = null;
-            }
+            // Get encoded state for the client
+            final XFormsState encodedClientState = XFormsStateManager.getInitialEncodedClientState(containingDocument, externalContext, xformsState, handlerContext.getStaticStateUUID(), handlerContext.getDynamicStateUUID());
 
+            // Output encoded state
             helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[] {
-                    "type", "hidden", "name", "$static-state", "value", staticStateString
+                    "type", "hidden", "name", "$static-state", "value", encodedClientState.getStaticState()
             });
-        }
-
-        {
-            final String dynamicStateString;
-            {
-                if (containingDocument.isSessionStateHandling()) {
-
-                    if (handlerContext.getDynamicStateUUID() == null) {
-                        // In this case, we use session scope since not much sharing will occur, if at all.
-
-                        // Produce dynamic state key
-                        final String newRequestId = UUIDUtils.createPseudoUUID();
-                        final XFormsServerSessionStateCache sessionCache = XFormsServerSessionStateCache.instance(externalContext.getSession(true), true);
-                        sessionCache.add(currentPageGenerationId, null, newRequestId, xformsState);
-                        dynamicStateString = XFormsServer.SESSION_STATE_PREFIX + newRequestId;
-                    } else {
-                        // In this case, we first store in the application scope, so that multiple requests can use the
-                        // same cached state.
-                        dynamicStateString = XFormsServer.APPLICATION_STATE_PREFIX + handlerContext.getDynamicStateUUID();
-                        final XFormsServerApplicationStateCache applicationStateCache = XFormsServerApplicationStateCache.instance(externalContext, true);
-                        applicationStateCache.add(currentPageGenerationId, null, handlerContext.getDynamicStateUUID(), xformsState);
-                    }
-                } else {
-                    // Send state to the client
-                    dynamicStateString = xformsState.getDynamicState();
-                }
-            }
             helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[]{
-                    "type", "hidden", "name", "$dynamic-state", "value", dynamicStateString
+                    "type", "hidden", "name", "$dynamic-state", "value", encodedClientState.getDynamicState()
             });
+
+            // Other fields used by JavaScript
             helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[]{
                     "type", "hidden", "name", "$server-events", "value", ""
             });

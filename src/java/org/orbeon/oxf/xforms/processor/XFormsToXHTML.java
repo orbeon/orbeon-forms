@@ -24,6 +24,9 @@ import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.util.UUIDUtils;
 import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.state.XFormsDocumentCache;
+import org.orbeon.oxf.xforms.state.XFormsState;
+import org.orbeon.oxf.xforms.state.XFormsStateManager;
 import org.orbeon.oxf.xforms.processor.handlers.HandlerContext;
 import org.orbeon.oxf.xforms.processor.handlers.XHTMLBodyHandler;
 import org.orbeon.oxf.xforms.processor.handlers.XHTMLHeadHandler;
@@ -246,7 +249,7 @@ public class XFormsToXHTML extends ProcessorImpl {
             if (outputName.equals("document"))
                 outputResponseDocument(pipelineContext, externalContext, inputDependencies.getAnnotatedSAXStore(), containingDocument[0], contentHandler, xformsState[0], staticStateUUID, dynamicStateUUID);
             else
-                testOutputResponseState(pipelineContext, externalContext, containingDocument[0], contentHandler, xformsState[0], staticStateUUID, dynamicStateUUID);
+                testOutputResponseState(pipelineContext, containingDocument[0], contentHandler, new XFormsStateManager.XFormsDecodedClientState(xformsState[0], staticStateUUID, dynamicStateUUID));
 
         } catch (Throwable e) {
             if (containingDocument[0] != null) {
@@ -271,7 +274,7 @@ public class XFormsToXHTML extends ProcessorImpl {
 
         private SAXStore annotatedSAXStore;
         private XFormsStaticState xformsStaticState;
-        private boolean dependsOnSession;
+//        private boolean dependsOnSession;
 
         public InputDependencies(SAXStore annotatedSAXStore, XFormsStaticState xformsStaticState) {
             this.annotatedSAXStore = annotatedSAXStore;
@@ -286,13 +289,13 @@ public class XFormsToXHTML extends ProcessorImpl {
             return xformsStaticState;
         }
 
-        public boolean isDependsOnSession() {
-            return dependsOnSession;
-        }
-
-        public void setDependsOnSession(boolean dependsOnSession) {
-            this.dependsOnSession = dependsOnSession;
-        }
+//        public boolean isDependsOnSession() {
+//            return dependsOnSession;
+//        }
+//
+//        public void setDependsOnSession(boolean dependsOnSession) {
+//            this.dependsOnSession = dependsOnSession;
+//        }
     }
 
     private void setCachingDependencies(XFormsContainingDocument containingDocument, InputDependencies inputDependencies) {
@@ -344,9 +347,9 @@ public class XFormsToXHTML extends ProcessorImpl {
         }
 
         // Handle dependency on session id
-        if (containingDocument.isSessionStateHandling()) {
-            inputDependencies.setDependsOnSession(true);
-        }
+//        if (containingDocument.isServerStateHandling()) {
+//            inputDependencies.setDependsOnSession(true);
+//        }
     }
 
     private void createCacheContainingDocument(final PipelineContext pipelineContext, XFormsURIResolver uriResolver, XFormsStaticState xformsStaticState,
@@ -367,7 +370,7 @@ public class XFormsToXHTML extends ProcessorImpl {
         // Cache ContainingDocument if requested and possible
         {
             if (XFormsUtils.isCacheDocument()) {
-                XFormsServerDocumentCache.instance().add(pipelineContext, xformsState[0], containingDocument[0]);
+                XFormsDocumentCache.instance().add(pipelineContext, xformsState[0], containingDocument[0]);
             }
         }
     }
@@ -518,10 +521,8 @@ public class XFormsToXHTML extends ProcessorImpl {
         exceptionXFormsElements.put("alert", "");
     }
 
-    private void testOutputResponseState(final PipelineContext pipelineContext, final ExternalContext externalContext,
-                                     final XFormsContainingDocument containingDocument,
-                                     final ContentHandler contentHandler, final XFormsState xformsState,
-                                     final String staticStateUUID, String dynamicStateUUID) throws SAXException {
+    private void testOutputResponseState(final PipelineContext pipelineContext, final XFormsContainingDocument containingDocument,
+                                         final ContentHandler contentHandler, final XFormsStateManager.XFormsDecodedClientState xformsDecodedClientState) throws SAXException {
 
         // Make sure we have up to date controls
         final XFormsControls xformsControls = containingDocument.getXFormsControls();
@@ -529,6 +530,6 @@ public class XFormsToXHTML extends ProcessorImpl {
         xformsControls.evaluateAllControlsIfNeeded(pipelineContext);
 
         // Output XML response
-        XFormsServer.outputResponse(containingDocument, false, null, pipelineContext, contentHandler, staticStateUUID, dynamicStateUUID, externalContext, xformsState, false, true);
+        XFormsServer.outputResponse(containingDocument, false, null, pipelineContext, contentHandler, xformsDecodedClientState, false, true);
     }
 }

@@ -121,7 +121,7 @@ public class XFormsStaticState {
         final String stateHandlingAttribute = rootElement.attributeValue(XFormsConstants.XXFORMS_STATE_HANDLING_ATTRIBUTE_NAME);
         stateHandling = (stateHandlingAttribute != null)
                 ? stateHandlingAttribute
-                : XFormsUtils.isCacheSession() ? XFormsConstants.XXFORMS_STATE_HANDLING_SESSION_VALUE : XFormsConstants.XXFORMS_STATE_HANDLING_CLIENT_VALUE;
+                : XFormsUtils.isServerStateHandling() ? XFormsConstants.XXFORMS_STATE_HANDLING_SERVER_VALUE : XFormsConstants.XXFORMS_STATE_HANDLING_CLIENT_VALUE;
 
         final String readonlyAttribute = rootElement.attributeValue(XFormsConstants.XXFORMS_READONLY_ATTRIBUTE_NAME);
         readonly = (readonlyAttribute != null) && new Boolean(readonlyAttribute).booleanValue() ;
@@ -215,11 +215,9 @@ public class XFormsStaticState {
                 }
             }
 
-            // Serialize Document
-            final boolean isStateHandlingSession = stateHandling.equals(XFormsConstants.XXFORMS_STATE_HANDLING_SESSION_VALUE);
-
-            // Remember encoded state an discard Document
-            encodedStaticState = XFormsUtils.encodeXML(pipelineContext, staticStateDocument, isStateHandlingSession ? null : XFormsUtils.getEncryptionKey(), true);
+            // Remember encoded state and discard Document
+            final boolean isStateHandlingServer = stateHandling.equals(XFormsConstants.XXFORMS_STATE_HANDLING_SERVER_VALUE);
+            encodedStaticState = XFormsUtils.encodeXML(pipelineContext, staticStateDocument, isStateHandlingServer ? null : XFormsUtils.getEncryptionKey(), true);
             staticStateDocument = null;
             initialized = true;
         }

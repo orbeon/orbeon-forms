@@ -26,8 +26,8 @@ import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.processor.PageFlowControllerProcessor;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.util.UUIDUtils;
 import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.state.*;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.*;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
@@ -50,9 +50,6 @@ public class XFormsServer extends ProcessorImpl {
 
     private static final String INPUT_REQUEST = "request";
     //private static final String OUTPUT_RESPONSE = "response"; // optional
-
-    public static final String APPLICATION_STATE_PREFIX = "application:";
-    public static final String SESSION_STATE_PREFIX = "session:";
 
     public static final Map XFORMS_NAMESPACES = new HashMap();
 
@@ -89,15 +86,9 @@ public class XFormsServer extends ProcessorImpl {
 
     private void doIt(final PipelineContext pipelineContext, ContentHandler contentHandler) {
 
-        final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
-
         final Element filesElement;
         final Element actionElement;
         final Element serverEventsElement;
-        final XFormsContainingDocument containingDocument;
-        final XFormsState xformsState;
-        final String staticStateUUID;
-        final String dynamicStateUUID;
 
         // Use request input provided by client
         final Document requestDocument = readInputAsDOM4J(pipelineContext, INPUT_REQUEST);
@@ -111,71 +102,32 @@ public class XFormsServer extends ProcessorImpl {
         // Get server events if any
         serverEventsElement = requestDocument.getRootElement().element(XFormsConstants.XXFORMS_SERVER_EVENTS_QNAME);
 
-        // Retrieve state
+        // Get static state
+        final String encodedClientStaticStateString;
         {
-            // Get static state
-            final String staticStateString;
-            {
-                final Element staticStateElement = requestDocument.getRootElement().element(XFormsConstants.XXFORMS_STATIC_STATE_QNAME);
-                staticStateString = staticStateElement.getTextTrim();
-            }
-
-            // Get dynamic state
-            final String dynamicStateString;
-            {
-                final Element dynamicStateElement = requestDocument.getRootElement().element(XFormsConstants.XXFORMS_DYNAMIC_STATE_QNAME);
-                dynamicStateString = dynamicStateElement.getTextTrim();
-            }
-            
-            if (dynamicStateString.startsWith(APPLICATION_STATE_PREFIX)) {
-                //  State is currently stored in the application scope
-                dynamicStateUUID = dynamicStateString.substring(APPLICATION_STATE_PREFIX.length());
-
-                // Extract page generation id
-                staticStateUUID = staticStateString.substring(APPLICATION_STATE_PREFIX.length());
-
-                // We don't create the session cache at this point as it may not be necessary
-                final XFormsServerApplicationStateCache applicationStateCache = XFormsServerApplicationStateCache.instance(externalContext, false);
-                final XFormsState applicationFormsState = applicationStateCache.find(staticStateUUID, dynamicStateUUID);
-
-                // This is not going to be good when it happens, and we must create a caching heuristic that minimizes this
-                if (applicationFormsState == null)
-                    throw new OXFException("Unable to retrieve XForms engine state from application cache.");
-
-                xformsState = applicationFormsState;
-
-            } else if (dynamicStateString.startsWith(SESSION_STATE_PREFIX)) {
-                // State doesn't come with the request, we should look it up in the repository
-                dynamicStateUUID = dynamicStateString.substring(SESSION_STATE_PREFIX.length());
-
-                // Extract page generation id
-                staticStateUUID = staticStateString.startsWith(SESSION_STATE_PREFIX)
-                        ? staticStateString.substring(SESSION_STATE_PREFIX.length())
-                        : staticStateString.substring(APPLICATION_STATE_PREFIX.length());
-
-                // We don't create the session cache at this point as it may not be necessary
-                final XFormsServerSessionStateCache sessionStateCache = XFormsServerSessionStateCache.instance(externalContext.getSession(false), false);
-                final XFormsState sessionFormsState = (sessionStateCache == null) ? null : sessionStateCache.find(staticStateUUID, dynamicStateUUID);
-
-                // This is not going to be good when it happens, and we must create a caching heuristic that minimizes this
-                if (sessionFormsState == null)
-                    throw new OXFException("Unable to retrieve XForms engine state from session cache.");
-
-                xformsState = sessionFormsState;
-            } else {
-                // State comes with request
-                staticStateUUID = null;
-                dynamicStateUUID = null;
-                xformsState = new XFormsState(staticStateString, dynamicStateString);
-            }
+            final Element staticStateElement = requestDocument.getRootElement().element(XFormsConstants.XXFORMS_STATIC_STATE_QNAME);
+            encodedClientStaticStateString = staticStateElement.getTextTrim();
         }
 
+        // Get dynamic state
+        final String encodedClientDynamicStateString;
+        {
+            final Element dynamicStateElement = requestDocument.getRootElement().element(XFormsConstants.XXFORMS_DYNAMIC_STATE_QNAME);
+            encodedClientDynamicStateString = dynamicStateElement.getTextTrim();
+        }
+
+        // Decode state
+        final XFormsStateManager.XFormsDecodedClientState xformsDecodedClientState
+                = XFormsStateManager.decodeClientState(pipelineContext, encodedClientStaticStateString, encodedClientDynamicStateString);
+
+        // Get or create containing document
+        final XFormsContainingDocument containingDocument;
         if (XFormsUtils.isCacheDocument()) {
-            // Try to obtain containing document from cache
-            containingDocument = XFormsServerDocumentCache.instance().find(pipelineContext, xformsState);
+            // Obtain containing document through cache
+            containingDocument = XFormsDocumentCache.instance().find(pipelineContext, xformsDecodedClientState.getXFormsState());
         } else {
             // Otherwise we recreate the containing document from scratch
-            containingDocument = new XFormsContainingDocument(pipelineContext, xformsState);
+            containingDocument = new XFormsContainingDocument(pipelineContext, xformsDecodedClientState.getXFormsState());
         }
 
         try {
@@ -261,14 +213,13 @@ public class XFormsServer extends ProcessorImpl {
 
             if (contentHandler != null) {
                 // Create resulting document if there is a ContentHandler
-                outputResponse(containingDocument, allEvents, valueChangeControlIds, pipelineContext, contentHandler,
-                        staticStateUUID, dynamicStateUUID, externalContext, xformsState, false, false);
+                outputResponse(containingDocument, allEvents, valueChangeControlIds, pipelineContext, contentHandler, xformsDecodedClientState, false, false);
             } else {
                 // This is the second phase of a submission with replace="all". We make it so that the document is not
                 // modified. However, we must then return it to its pool.
 
                 if (XFormsUtils.isCacheDocument()) {
-                    XFormsServerDocumentCache.instance().add(pipelineContext, xformsState, containingDocument);
+                    XFormsDocumentCache.instance().add(pipelineContext, xformsDecodedClientState.getXFormsState(), containingDocument);
                 }
             }
         } catch (Throwable e) {
@@ -306,10 +257,10 @@ public class XFormsServer extends ProcessorImpl {
     }
 
     public static void outputResponse(XFormsContainingDocument containingDocument, boolean allEvents, Map valueChangeControlIds,
-                                PipelineContext pipelineContext, ContentHandler contentHandler, String requestPageGenerationId,
-                                String requestId,
-                                ExternalContext externalContext, XFormsState xformsState, boolean testOutputStaticState, boolean testOutputAllActions) {
+                                PipelineContext pipelineContext, ContentHandler contentHandler, XFormsStateManager.XFormsDecodedClientState xformsDecodedClientState,
+                                boolean testOutputStaticState, boolean testOutputAllActions) {
 
+        final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
         final XFormsControls xformsControls = containingDocument.getXFormsControls();
 
         try {
@@ -318,40 +269,24 @@ public class XFormsServer extends ProcessorImpl {
             contentHandler.startPrefixMapping("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI);
             ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "event-response");
 
-            // Output static state (for testing)
+            // Get encoded state to send to the client
+            // NOTE: This will also cache the containing document if needed
+            final XFormsState encodedClientState
+                    = XFormsStateManager.getEncodedClientStateDoCache(containingDocument, pipelineContext, xformsDecodedClientState, allEvents);
+
+            // Output static state (FOR TESTING ONLY)
             if (testOutputStaticState) {
                 ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "static-state", new String[] { "container-type", externalContext.getRequest().getContainerType() });
                 // NOTE: Should output static state the same way as XFormsToXHTML does, but it's just for tests for for now it's ok
-                ch.text(xformsState.getStaticState());
+                ch.text(encodedClientState.getStaticState());
                 ch.endElement();
             }
 
             // Output dynamic state
             {
-                // Produce page generation id if needed
-                final String currentPageGenerationId = (requestPageGenerationId != null) ? requestPageGenerationId : UUIDUtils.createPseudoUUID();
-
-                // Create and encode dynamic state
-                final String newEncodedDynamicState = containingDocument.createEncodedDynamicState(pipelineContext);
-                final XFormsState newXFormsState = new XFormsState(xformsState.getStaticState(), newEncodedDynamicState);
-
                 ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "dynamic-state");
-                if (containingDocument.isSessionStateHandling()) {
-                    // Produce dynamic state key (keep the same when allEvents!)
-                    final String newRequestId = allEvents ? requestId : UUIDUtils.createPseudoUUID();
-                    final XFormsServerSessionStateCache sessionStateCache = XFormsServerSessionStateCache.instance(externalContext.getSession(true), true);
-                    sessionStateCache.add(currentPageGenerationId, requestId, newRequestId, newXFormsState);
-                    ch.text(SESSION_STATE_PREFIX + newRequestId);
-                } else {
-                    // Send state to the client
-                    ch.text(newEncodedDynamicState);
-                }
+                ch.text(encodedClientState.getDynamicState());
                 ch.endElement();
-
-                // Cache document if requested and possible
-                if (XFormsUtils.isCacheDocument()) {
-                    XFormsServerDocumentCache.instance().add(pipelineContext, newXFormsState, containingDocument);
-                }
             }
 
             // Output action

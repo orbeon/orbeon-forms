@@ -18,7 +18,7 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.processor.XFormsState;
+import org.orbeon.oxf.xforms.state.XFormsState;
 import org.orbeon.oxf.xml.ElementHandlerController;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.LocationData;

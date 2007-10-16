@@ -30,7 +30,7 @@ import org.orbeon.oxf.xforms.control.controls.XXFormsDialogControl;
 import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
-import org.orbeon.oxf.xforms.processor.XFormsState;
+import org.orbeon.oxf.xforms.state.XFormsState;
 import org.orbeon.oxf.xforms.processor.XFormsURIResolver;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -280,13 +280,19 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     }
 
     /**
-     * Return the state handling strategy for this document, either "client" or "session".
+     * Return the state handling strategy for this document, either "client" or "session" or "server" ("").
      */
     public String getStateHandling() {
         return (xformsStaticState == null) ? null : xformsStaticState.getStateHandling();
     }
 
-    public boolean isSessionStateHandling() {
+    public boolean isServerStateHandling() {
+        return (xformsStaticState != null) &&
+                (xformsStaticState.getStateHandling().equals(XFormsConstants.XXFORMS_STATE_HANDLING_SESSION_VALUE)
+                        || xformsStaticState.getStateHandling().equals(XFormsConstants.XXFORMS_STATE_HANDLING_SERVER_VALUE));
+    }
+
+    public boolean isLegacyServerStateHandling() {
         return (xformsStaticState != null) && xformsStaticState.getStateHandling().equals(XFormsConstants.XXFORMS_STATE_HANDLING_SESSION_VALUE);
     }
 
@@ -1025,7 +1031,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
      */
     public String createEncodedDynamicState(PipelineContext pipelineContext) {
         return XFormsUtils.encodeXML(pipelineContext, createDynamicStateDocument(),
-            isSessionStateHandling() ? null : XFormsUtils.getEncryptionKey(), false);
+            isServerStateHandling() ? null : XFormsUtils.getEncryptionKey(), false);
     }
 
     private Document createDynamicStateDocument() {

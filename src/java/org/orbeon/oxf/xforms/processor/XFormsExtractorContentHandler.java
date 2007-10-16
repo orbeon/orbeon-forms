@@ -200,7 +200,9 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
             if (stateHandling == null) {
                 final String xxformsStateHandling = attributes.getValue(XFormsConstants.XXFORMS_NAMESPACE_URI, XFormsConstants.XXFORMS_STATE_HANDLING_ATTRIBUTE_NAME);
                 if (xxformsStateHandling != null) {
-                    if (!(xxformsStateHandling.equals(XFormsConstants.XXFORMS_STATE_HANDLING_CLIENT_VALUE) || xxformsStateHandling.equals(XFormsConstants.XXFORMS_STATE_HANDLING_SESSION_VALUE)))
+                    if (!(xxformsStateHandling.equals(XFormsConstants.XXFORMS_STATE_HANDLING_CLIENT_VALUE)
+                            || xxformsStateHandling.equals(XFormsConstants.XXFORMS_STATE_HANDLING_SESSION_VALUE)
+                            || xxformsStateHandling.equals(XFormsConstants.XXFORMS_STATE_HANDLING_SERVER_VALUE)))
                         throw new ValidationException("Invalid xxforms:" + XFormsConstants.XXFORMS_STATE_HANDLING_ATTRIBUTE_NAME + " attribute value: " + xxformsStateHandling, new LocationData(locator));
 
                     stateHandling = xxformsStateHandling;

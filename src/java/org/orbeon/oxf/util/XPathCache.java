@@ -281,6 +281,7 @@ public class XPathCache {
                                               String baseURI,
                                               boolean isAvt) {
         try {
+            // TODO: pool should have at least one hard reference
             final SoftReferenceObjectPool pool = new SoftReferenceObjectPool();
             pool.setFactory(new XFormsCachePoolableObjetFactory(pool, xpathString,
                     prefixToURIMap, variableToValueMap, functionLibrary, baseURI, isAvt));

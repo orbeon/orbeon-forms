@@ -1712,7 +1712,10 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                     XFormsServer.logger.debug("XForms - marking nodes for value change following instance replacement: " + newInstance.getEffectiveId());
 
                 // Rebuild controls if needed
-                // NOTE: This requires recalculate to have taken place above, for relevance handling
+                // NOTE: This requires recalculate and revalidate to take place for 1) relevance handling and 2) type handling
+                doRebuild(pipelineContext);
+                doRecalculate(pipelineContext);
+                doRevalidate(pipelineContext);
                 xformsControls.rebuildCurrentControlsStateIfNeeded(pipelineContext);
 
                 // Mark all nodes to which value controls are bound

@@ -111,18 +111,22 @@ public class XFormsUploadControl extends XFormsValueControl {
                         newFile.deleteOnExit();
                         final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
                         final ExternalContext.Session session = externalContext.getSession(false);
-                        session.addListener(new ExternalContext.Session.SessionListener() {
-                            public void sessionDestroyed() {
-                                final boolean success = newFile.delete();
-                                try {
-                                    if (!success)
-                                        XFormsServer.logger.debug("XForms - cannot delete temporary file upon session destruction: " + newFile.getCanonicalPath());
-                                    else
-                                        XFormsServer.logger.debug("XForms - deleted temporary file upon session destruction: " + newFile.getCanonicalPath());
-                                } catch (IOException e) {
+                        if (session != null) {
+                            session.addListener(new ExternalContext.Session.SessionListener() {
+                                public void sessionDestroyed() {
+                                    final boolean success = newFile.delete();
+                                    try {
+                                        if (!success)
+                                            XFormsServer.logger.debug("XForms - cannot delete temporary file upon session destruction: " + newFile.getCanonicalPath());
+                                        else
+                                            XFormsServer.logger.debug("XForms - deleted temporary file upon session destruction: " + newFile.getCanonicalPath());
+                                    } catch (IOException e) {
+                                    }
                                 }
-                            }
-                        });
+                            });
+                        } else {
+                            XFormsServer.logger.debug("XForms - no existing session found so cannot register temporary file deletion upon session destruction: " + newFile.getCanonicalPath());
+                        }
                     }
                     newValue = newFile.toURI().toString();
                 } else {

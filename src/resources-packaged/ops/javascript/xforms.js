@@ -3077,7 +3077,6 @@ ORBEON.xforms.Server = {
                                             // Extract data from server response
                                             for(var j = 0 ; j < repeatIterationElementslength; j++) {
                                                 var repeatIterationElement = repeatIterationElements[j];
-                                                var repeatIterationElement = controlValuesElement.childNodes[j];
                                                 var repeatId = ORBEON.util.Dom.getAttribute(repeatIterationElement, "id");
                                                 var iteration = ORBEON.util.Dom.getAttribute(repeatIterationElement, "iteration");
                                                 var relevant = ORBEON.util.Dom.getAttribute(repeatIterationElement, "relevant");

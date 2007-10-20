@@ -3323,7 +3323,14 @@ ORBEON.xforms.Server = {
                                             // Display loading indicator unless the server tells us not to display it
                                             if (showProcess != "false")
                                                 newDynamicStateTriggersReplace = true;
-                                            window.location.href = resource;
+                                            try {
+                                                window.location.href = resource;
+                                            } catch (e) {
+                                                // nop
+                                                //
+                                                // This is to prevent the error "Unspecified error" in IE. This can happen when navigating away
+                                                // is cancelled by the user pressing cancel on a dialog displayed on unload.
+                                            }
                                         } else {
                                             window.open(resource, target);
                                         }
@@ -3377,7 +3384,6 @@ ORBEON.xforms.Server = {
             }
         } catch (e) {
             ORBEON.xforms.Server.exceptionWhenTalkingToServer(e, formID);
-            throw e;
         }
 
         // Reset changes, as changes are included in this bach of events

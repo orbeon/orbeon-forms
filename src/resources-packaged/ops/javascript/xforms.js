@@ -3377,6 +3377,7 @@ ORBEON.xforms.Server = {
             }
         } catch (e) {
             ORBEON.xforms.Server.exceptionWhenTalkingToServer(e, formID);
+            throw e;
         }
 
         // Reset changes, as changes are included in this bach of events

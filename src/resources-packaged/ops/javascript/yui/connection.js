@@ -403,7 +403,7 @@ YAHOO.util.Connect =
 		}
 
 		if(httpStatus >= 200 && httpStatus < 300){
-			try
+			//try
 			{
 				responseObject = this.createResponseObject(o, callback.argument);
 				if(callback.success){
@@ -417,7 +417,7 @@ YAHOO.util.Connect =
 					}
 				}
 			}
-			catch(e){}
+			//catch(e){}
 		}
 		else{
 			try

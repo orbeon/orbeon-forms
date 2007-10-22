@@ -57,6 +57,13 @@ public class Datasource {
 
     }
 
+    public Datasource(String driverClassName, String uri, String username, String password) {
+        this.driverClassName = driverClassName;
+        this.uri = uri;
+        this.username = username;
+        this.password = password;
+    }
+
     private Datasource(ProcessorImpl processorImpl, Document datasourceDocument) {
 
         // Try local configuration first

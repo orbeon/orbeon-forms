@@ -175,7 +175,7 @@ public class SecureUtils {
             Cache cache = ObjectCache.instance();
             Long validity = new Long(0);
             InternalCacheKey key = new InternalCacheKey("Decryption cipher", password);
-            Cipher cipher = (Cipher) cache.findValid(pipelineContext, key, validity);
+                Cipher cipher = (Cipher) cache.findValid(pipelineContext, key, validity);
             if (cipher == null) {
                 cipher = Cipher.getInstance(CIPHER_TYPE);
                 cipher.init(Cipher.DECRYPT_MODE, getSecretKey(password), pbeParamSpec);

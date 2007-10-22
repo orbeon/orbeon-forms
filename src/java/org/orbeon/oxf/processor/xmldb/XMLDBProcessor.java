@@ -162,11 +162,11 @@ public abstract class XMLDBProcessor extends ProcessorImpl {
     /**
      * Query resources from the database.
      *
-     * @param datasource         the processor configuration
-     * @param collectionName identifies the collection in which resources are searched
-     * @param resourceId     optional resource id on which the query is run
-     * @param query          selects resources in the collection that must be searched
-     * @param contentHandler ContentHandler where the resources are output
+     * @param datasource        the processor configuration
+     * @param collectionName    identifies the collection in which resources are searched
+     * @param resourceId        optional resource id on which the query is run
+     * @param query             selects resources in the collection that must be searched
+     * @param contentHandler    ContentHandler where the resources are output
      */
     protected void query(PipelineContext pipelineContext, Datasource datasource, String collectionName, boolean createCollection, String resourceId, String query, Map namespaceContext, ContentHandler contentHandler) {
         ensureDriverRegistered(pipelineContext, datasource);
@@ -189,6 +189,49 @@ public abstract class XMLDBProcessor extends ProcessorImpl {
             throw new OXFException(e);
         }
     }
+
+    protected void getResource(PipelineContext pipelineContext, Datasource datasource, String collectionName, boolean createCollection, String resourceName, ContentHandler contentHandler) {
+        ensureDriverRegistered(pipelineContext, datasource);
+        try {
+            Collection collection = getCollection(pipelineContext, datasource, collectionName);
+            if (collection == null) {
+                if (!createCollection)
+                    throw new OXFException("Cannot find collection '" + collectionName + "'.");
+                else
+                    collection = createCollection(pipelineContext, datasource, collectionName);
+            }
+            final Resource resource = collection.getResource(resourceName);
+            if (resource instanceof XMLResource) {
+                ((XMLResource) resource).getContentAsSAX(new DatabaseReadContentHandler(contentHandler));
+            } else if (resource instanceof BinaryResource) {
+                XMLUtils.inputStreamToBase64Characters(new ByteArrayInputStream((byte[]) resource.getContent()), contentHandler);
+            } else {
+                throw new OXFException("Unsupported resource type: " + resource.getClass());
+            }
+        } catch (XMLDBException e) {
+            throw new OXFException(e);
+        }
+    }
+
+    protected void storeResource(PipelineContext pipelineContext, Datasource datasource, String collectionName, boolean createCollection, String resourceName, String document) {
+        ensureDriverRegistered(pipelineContext, datasource);
+        try {
+            Collection collection = getCollection(pipelineContext, datasource, collectionName);
+            if (collection == null) {
+                if (!createCollection)
+                    throw new OXFException("Cannot find collection '" + collectionName + "'.");
+                else
+                    collection = createCollection(pipelineContext, datasource, collectionName);
+            }
+            final Resource resource = collection.createResource(resourceName, XMLResource.RESOURCE_TYPE);
+            resource.setContent(document);
+            collection.storeResource(resource);
+
+        } catch (XMLDBException e) {
+            throw new OXFException(e);
+        }
+    }
+
 
 //    private static class EmptyResourceSet implements ResourceSet {
 //        public void addResource(Resource resource) throws XMLDBException {

@@ -22,7 +22,6 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.DebugProcessor;
 import org.orbeon.oxf.processor.ProcessorUtils;
-import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
@@ -56,22 +55,6 @@ import java.util.zip.GZIPInputStream;
 public class XFormsUtils {
 
     private static final int SRC_CONTENT_BUFFER_SIZE = 1024;
-
-    /**
-     * @return  whether name encryption is enabled (legacy XForms engine only).
-     */
-    public static boolean isNameEncryptionEnabled() {
-        return OXFProperties.instance().getPropertySet().getBoolean
-                (XFormsConstants.XFORMS_ENCRYPT_NAMES_PROPERTY, false).booleanValue();
-    }
-
-    /**
-     * @return  whether hidden fields encryption is enabled.
-     */
-    public static boolean isHiddenEncryptionEnabled() {
-        return OXFProperties.instance().getPropertySet().getBoolean
-                (XFormsConstants.XFORMS_ENCRYPT_HIDDEN_PROPERTY, false).booleanValue();
-    }
 
     // For XForms Classic only.
     public static void removeInstanceAttributes(final NodeInfo elementNodeInfo) {
@@ -130,14 +113,14 @@ public class XFormsUtils {
 
     public static String encodeXMLAsDOM(PipelineContext pipelineContext, org.w3c.dom.Node node) {
         try {
-            return encodeXML(pipelineContext, TransformerUtils.domToDom4jDocument(node), getEncryptionKey(), false);
+            return encodeXML(pipelineContext, TransformerUtils.domToDom4jDocument(node), XFormsProperties.getXFormsPassword(), false);
         } catch (TransformerException e) {
             throw new OXFException(e);
         }
     }
 
     public static String encodeXML(PipelineContext pipelineContext, Document documentToEncode, boolean encodeLocationData) {
-        return encodeXML(pipelineContext, documentToEncode, getEncryptionKey(), encodeLocationData);
+        return encodeXML(pipelineContext, documentToEncode, XFormsProperties.getXFormsPassword(), encodeLocationData);
     }
 
     // Use a Deflater pool as creating Deflaters is expensive
@@ -174,20 +157,12 @@ public class XFormsUtils {
         return encodeBytes(pipelineContext, bytes, encryptionPassword);
     }
 
-//    public static String encodeString(PipelineContext pipelineContext, String stringToEncode) {
-//        try {
-//            return encodeBytes(pipelineContext, stringToEncode.getBytes("utf-8"), XFormsUtils.getEncryptionKey());
-//        } catch (UnsupportedEncodingException e) {
-//            throw new OXFException(e);// won't happen
-//        }
-//    }
-
     public static String encodeBytes(PipelineContext pipelineContext, byte[] bytesToEncode, String encryptionPassword) {
         Deflater deflater = null;
         try {
             // Compress if needed
             final byte[] gzipByteArray;
-            if (isGZIPState()) {
+            if (XFormsProperties.isGZIPState()) {
                 deflater = (Deflater) deflaterPool.borrowObject();
                 final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                 final DeflaterGZIPOutputStream gzipOutputStream = new DeflaterGZIPOutputStream(deflater, byteArrayOutputStream, 1024);
@@ -638,7 +613,7 @@ public class XFormsUtils {
     }
 
     public static Document decodeXML(PipelineContext pipelineContext, String encodedXML) {
-        return decodeXML(pipelineContext, encodedXML, getEncryptionKey());
+        return decodeXML(pipelineContext, encodedXML, XFormsProperties.getXFormsPassword());
     }
 
     public static Document decodeXML(PipelineContext pipelineContext, String encodedXML, String encryptionPassword) {
@@ -651,11 +626,8 @@ public class XFormsUtils {
         final SAXStore saxStore;
         try {
             saxStore = new SAXStore(new ObjectInputStream(byteArrayInputStream));
-//            saxStore = (SAXStore) new ObjectInputStream(byteArrayInputStream).readObject();
         } catch (IOException e) {
             throw new OXFException(e);
-//        } catch (ClassNotFoundException e) {
-//            throw new OXFException(e);
         }
 
         // Deserialize SAXStore to dom4j document
@@ -727,13 +699,6 @@ public class XFormsUtils {
         }
     }
 
-    public static String getEncryptionKey() {
-        if (XFormsUtils.isHiddenEncryptionEnabled())
-            return OXFProperties.instance().getPropertySet().getString(XFormsConstants.XFORMS_PASSWORD_PROPERTY);
-        else
-            return null;
-    }
-
     public static String retrieveSrcValue(String src) throws IOException {
         final URL url = URLFactory.createURL(src);
 
@@ -766,105 +731,6 @@ public class XFormsUtils {
             // Convert from xs:anyURI to xs:base64Binary
             return XMLUtils.anyURIToBase64Binary(value);
         }
-    }
-
-    public static boolean isCacheDocument() {
-        return OXFProperties.instance().getPropertySet().getBoolean
-                (XFormsConstants.XFORMS_CACHE_DOCUMENT_PROPERTY, false).booleanValue();
-    }
-
-    public static boolean isOptimizePostAllSubmission() {
-        return OXFProperties.instance().getPropertySet().getBoolean
-                (XFormsConstants.XFORMS_OPTIMIZE_POST_ALL_PROPERTY, true).booleanValue();// default to true for backward compatibility
-    }
-
-    public static boolean isOptimizeGetAllSubmission() {
-        return OXFProperties.instance().getPropertySet().getBoolean
-                (XFormsConstants.XFORMS_OPTIMIZE_GET_ALL_PROPERTY, true).booleanValue();
-    }
-
-    public static boolean isOptimizeLocalSubmission() {
-        return OXFProperties.instance().getPropertySet().getBoolean
-                (XFormsConstants.XFORMS_OPTIMIZE_LOCAL_SUBMISSION_PROPERTY, true).booleanValue();
-    }
-
-    // This is not used currently
-//    public static boolean isOptimizeLocalInstanceLoads() {
-//        return OXFProperties.instance().getPropertySet().getBoolean
-//                (XFormsConstants.XFORMS_OPTIMIZE_LOCAL_INSTANCE_LOADS_PROPERTY, true).booleanValue();
-//    }
-
-    public static boolean isServerStateHandling() {
-        final String propertyValue = OXFProperties.instance().getPropertySet().getString
-                (XFormsConstants.XFORMS_STATE_HANDLING_PROPERTY, XFormsConstants.XXFORMS_STATE_HANDLING_CLIENT_VALUE);
-
-        return propertyValue.equals(XFormsConstants.XXFORMS_STATE_HANDLING_SESSION_VALUE)
-                || propertyValue.equals(XFormsConstants.XXFORMS_STATE_HANDLING_SERVER_VALUE);
-    }
-
-    public static boolean isExceptionOnInvalidClientControlId() {
-        return OXFProperties.instance().getPropertySet().getBoolean
-                (XFormsConstants.XFORMS_EXCEPTION_INVALID_CLIENT_CONTROL_PROPERTY, false).booleanValue();
-    }
-
-    public static boolean isAjaxShowLoadingIcon() {
-        return OXFProperties.instance().getPropertySet().getBoolean
-                (XFormsConstants.XFORMS_AJAX_SHOW_LOADING_ICON_PROPERTY, false).booleanValue();
-    }
-
-    public static boolean isAjaxShowErrors() {
-        return OXFProperties.instance().getPropertySet().getBoolean
-                (XFormsConstants.XFORMS_AJAX_SHOW_ERRORS_PROPERTY, true).booleanValue();
-    }
-
-    public static int getSessionStoreSize() {
-        return OXFProperties.instance().getPropertySet().getInteger
-                (XFormsConstants.XFORMS_CACHE_SESSION_SIZE_PROPERTY, XFormsConstants.DEFAULT_SESSION_STATE_CACHE_SIZE).intValue();
-    }
-
-    public static int getApplicationStateStoreSize() {
-        return OXFProperties.instance().getPropertySet().getInteger
-                (XFormsConstants.XFORMS_STORE_APPLICATION_SIZE_PROPERTY, XFormsConstants.DEFAULT_APPLICATION_STATE_STORE_SIZE).intValue();
-    }
-
-    public static int getApplicationCacheSize() {
-        return OXFProperties.instance().getPropertySet().getInteger
-                (XFormsConstants.XFORMS_CACHE_APPLICATION_SIZE_PROPERTY, XFormsConstants.DEFAULT_APPLICATION_STATE_CACHE_SIZE).intValue();
-    }
-
-    public static boolean isGZIPState() {
-        return OXFProperties.instance().getPropertySet().getBoolean
-                (XFormsConstants.XFORMS_GZIP_STATE_PROPERTY, XFormsConstants.DEFAULT_GZIP_STATE).booleanValue();
-    }
-
-    public static boolean isHostLanguageAVTs() {
-        return OXFProperties.instance().getPropertySet().getBoolean
-                (XFormsConstants.XFORMS_HOST_LANGUAGE_AVTS_PROPERTY, XFormsConstants.DEFAULT_HOST_LANGUAGE_AVTS).booleanValue();
-    }
-
-    public static boolean isMinimalResources() {
-        return OXFProperties.instance().getPropertySet().getBoolean
-                (XFormsConstants.XFORMS_MINIMAL_RESOURCES_PROPERTY, XFormsConstants.DEFAULT_MINIMAL_RESOURCES).booleanValue();
-    }
-
-    public static boolean isCombineResources() {
-        return OXFProperties.instance().getPropertySet().getBoolean
-                (XFormsConstants.XFORMS_COMBINE_RESOURCES_PROPERTY, XFormsConstants.DEFAULT_COMBINE_RESOURCES).booleanValue();
-    }
-
-    public static boolean isCacheCombinedResources() {
-        return OXFProperties.instance().getPropertySet().getBoolean
-                (XFormsConstants.XFORMS_CACHE_COMBINED_RESOURCES_PROPERTY, XFormsConstants.DEFAULT_CACHE_COMBINED_RESOURCES).booleanValue();
-    }
-
-    public static boolean isOptimizeRelevance() {
-        return OXFProperties.instance().getPropertySet().getBoolean
-                (XFormsConstants.XFORMS_OPTIMIZE_RELEVANCE_PROPERTY, XFormsConstants.DEFAULT_OPTIMIZE_RELEVANCE).booleanValue();
-    }
-
-    public static boolean isAjaxTest() {
-        return OXFProperties.instance().getPropertySet().getBoolean
-                (XFormsConstants.XFORMS_TEST_AJAX_PROPERTY, XFormsConstants.DEFAULT_TEST_AJAX).booleanValue();
     }
 
     public static String resolveURLDoReplace(XFormsContainingDocument containingDocument, PipelineContext pipelineContext, Element currentElement, String url) {
@@ -1158,52 +1024,6 @@ public class XFormsUtils {
         }
         return result;
     }
-
-//    public static String getFirstTextNodeValue(NodeInfo nodeInfo) {
-//        // NOTE: We could probably optimize this for dom4j
-//        if (nodeInfo.hasChildNodes()) {
-//            final AxisIterator i = nodeInfo.iterateAxis(Axis.CHILD);
-//            i.next();
-//            while (i.current() != null) {
-//                final Item current = i.current();
-//                if (current instanceof NodeInfo) {
-//                    final NodeInfo currentNodeInfo = (NodeInfo) current;
-//                    if (currentNodeInfo.getNodeKind() == org.w3c.dom.Document.TEXT_NODE) {
-//                        return currentNodeInfo.getStringValue();
-//                    }
-//                }
-//                i.next();
-//            }
-//        }
-//
-//        // "Element nodes: if text child nodes are present, returns the string-value of the first text child node.
-//        // Otherwise, returns "" (the empty string)"
-//
-//        return "";
-//    }
-
-//    public static String setFirstTextNodeValue(Element element, String newValue) {
-//
-//        // "10.1.9 The setvalue Element: Element nodes: If the element has any child text nodes, the first text node
-//        // is replaced with one corresponding to the new value. If no child text nodes are present, a text node is
-//        // created, corresponding to the new value, and appended as the first child node."
-//
-//        for (Iterator contentIterator = element.content().iterator(); contentIterator. hasNext();) {
-//            final Node currentNode = (Node) contentIterator.next();
-//            if (currentNode instanceof Text) {
-//                // This is the first text node, replace its value
-//                final Text textNode = (Text) currentNode;
-//                final String currentValue = textNode.getText();
-//                textNode.setText(newValue);
-//                return currentValue;
-//            }
-//        }
-//
-//        // No text node was found, create one a first child
-//        if (!"".equals(newValue)) // don't create empty text nodes
-//            element.content().add(0, Dom4jUtils.createText(newValue));
-//        return "";
-//    }
 
     /**
      * Create a JavaScript function name based on a script id.

@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.processor;
 
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control;
-import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.saxon.om.FastStringBuffer;
 
 import java.util.*;
@@ -284,7 +284,7 @@ public class XFormsFeatures {
     }
 
     public static String getCombinedResourcesPrefix(Map appearancesMap, boolean isMinimal) {
-        if (XFormsUtils.isCombineResources()) {
+        if (XFormsProperties.isCombineResources()) {
             final FastStringBuffer sb = new FastStringBuffer("/xforms-server/xforms");
             for (int i = 0; i < features.length; i++) {
                 final FeatureConfig currentFeature = features[i];

@@ -42,7 +42,7 @@ public class XFormsElementContext extends XFormsControls {
 
         this.pipelineContext = pipelineContext;
         this.contentHandler = contentHandler;
-        this.encryptionPassword = XFormsUtils.getEncryptionKey();
+        this.encryptionPassword = XFormsProperties.getXFormsPassword();
     }
 
     public ContentHandler getContentHandler() {

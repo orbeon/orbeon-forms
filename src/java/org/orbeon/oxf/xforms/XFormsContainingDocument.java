@@ -288,12 +288,12 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
 
     public boolean isServerStateHandling() {
         return (xformsStaticState != null) &&
-                (xformsStaticState.getStateHandling().equals(XFormsConstants.XXFORMS_STATE_HANDLING_SESSION_VALUE)
-                        || xformsStaticState.getStateHandling().equals(XFormsConstants.XXFORMS_STATE_HANDLING_SERVER_VALUE));
+                (xformsStaticState.getStateHandling().equals(XFormsProperties.STATE_HANDLING_SESSION_VALUE)
+                        || xformsStaticState.getStateHandling().equals(XFormsProperties.STATE_HANDLING_SERVER_VALUE));
     }
 
     public boolean isLegacyServerStateHandling() {
-        return (xformsStaticState != null) && xformsStaticState.getStateHandling().equals(XFormsConstants.XXFORMS_STATE_HANDLING_SESSION_VALUE);
+        return (xformsStaticState != null) && xformsStaticState.getStateHandling().equals(XFormsProperties.STATE_HANDLING_SESSION_VALUE);
     }
 
     /**
@@ -593,7 +593,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         {
             final Object eventTargetObject = getObjectById(pipelineContext, controlId);
             if (!(eventTargetObject instanceof XFormsEventTarget)) {
-                if (XFormsUtils.isExceptionOnInvalidClientControlId()) {
+                if (XFormsProperties.isExceptionOnInvalidClientControlId()) {
                     throw new ValidationException("Event target id '" + controlId + "' is not an XFormsEventTarget.", getLocationData());
                 } else {
                     if (XFormsServer.logger.isDebugEnabled()) {
@@ -680,7 +680,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
             if (otherEventTargetObject == null) {
                 otherEventTarget = null;
             } else if (!(otherEventTargetObject instanceof XFormsEventTarget)) {
-                if (XFormsUtils.isExceptionOnInvalidClientControlId()) {
+                if (XFormsProperties.isExceptionOnInvalidClientControlId()) {
                     throw new ValidationException("Other event target id '" + otherControlId + "' is not an XFormsEventTarget.", getLocationData());
                 } else {
                     if (XFormsServer.logger.isDebugEnabled()) {
@@ -711,7 +711,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         }
 
         // Create event
-        if (XFormsUtils.isAjaxTest()) {
+        if (XFormsProperties.isAjaxTest()) {
             if (eventName.equals(XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE)) {
                 if ("category-select1".equals(controlId)) {
                     if (testAjaxToggleValue == 0) {
@@ -1031,7 +1031,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
      */
     public String createEncodedDynamicState(PipelineContext pipelineContext) {
         return XFormsUtils.encodeXML(pipelineContext, createDynamicStateDocument(),
-            isServerStateHandling() ? null : XFormsUtils.getEncryptionKey(), false);
+            isServerStateHandling() ? null : XFormsProperties.getXFormsPassword(), false);
     }
 
     private Document createDynamicStateDocument() {

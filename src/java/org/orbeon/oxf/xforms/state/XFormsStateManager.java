@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.state;
 
 import org.orbeon.oxf.util.UUIDUtils;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.common.OXFException;
@@ -234,7 +234,7 @@ public class XFormsStateManager {
             }
 
             // Cache document if requested and possible
-            if (XFormsUtils.isCacheDocument()) {
+            if (XFormsProperties.isCacheDocument()) {
                 XFormsDocumentCache.instance().add(pipelineContext, newXFormsState, containingDocument);
             }
         }

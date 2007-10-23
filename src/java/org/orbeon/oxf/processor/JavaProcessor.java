@@ -24,9 +24,9 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.resources.ExpirationMap;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.URLFactory;
-import org.orbeon.oxf.resources.ExpirationMap;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.SystemUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -34,10 +34,7 @@ import org.xml.sax.ContentHandler;
 
 import java.io.*;
 import java.lang.reflect.Method;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.net.URLDecoder;
+import java.net.*;
 import java.util.*;
 
 /**
@@ -244,13 +241,13 @@ public class JavaProcessor extends ProcessorImpl {
 
                     ClassLoader classLoader;
                     {
-                        URL compilerJarURL = getPropertySet().getURL(COMPILER_JAR_PROPERTY);
-                        if (compilerJarURL != null) {
+                        URI compilerJarURI = getPropertySet().getURI(COMPILER_JAR_PROPERTY);
+                        if (compilerJarURI != null) {
                             // 1: Always honor user-specified compiler JAR if present
                             // Use special class loader pointing to this URL
-                            classLoader = new URLClassLoader(new URL[]{compilerJarURL}, JavaProcessor.class.getClassLoader());
+                            classLoader = new URLClassLoader(new URL[]{compilerJarURI.toURL()}, JavaProcessor.class.getClassLoader());
                             if (logger.isDebugEnabled())
-                                logger.debug("Java processor using user-specified compiler JAR: " + compilerJarURL.toExternalForm());
+                                logger.debug("Java processor using user-specified compiler JAR: " + compilerJarURI.toString());
                         } else {
                             // 2: Try to use the class loader that loaded this class
                             classLoader = JavaProcessor.class.getClassLoader();

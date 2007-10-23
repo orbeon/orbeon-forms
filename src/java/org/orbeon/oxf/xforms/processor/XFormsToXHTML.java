@@ -369,7 +369,7 @@ public class XFormsToXHTML extends ProcessorImpl {
 
         // Cache ContainingDocument if requested and possible
         {
-            if (XFormsUtils.isCacheDocument()) {
+            if (XFormsProperties.isCacheDocument()) {
                 XFormsDocumentCache.instance().add(pipelineContext, xformsState[0], containingDocument[0]);
             }
         }

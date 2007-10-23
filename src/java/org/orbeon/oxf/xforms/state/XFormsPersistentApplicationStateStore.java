@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.state;
 
 import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.XFormsProperties;
 
 /**
  * This store keeps XFormsState instances into an application store and persists data going over a given size.
@@ -46,7 +46,7 @@ public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
     }
 
     protected int getMaxSize() {
-        return XFormsUtils.getApplicationStateStoreSize();
+        return XFormsProperties.getApplicationStateStoreSize();
     }
 
     protected String getStoreDebugName() {

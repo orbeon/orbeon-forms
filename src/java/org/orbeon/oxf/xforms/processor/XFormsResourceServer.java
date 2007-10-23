@@ -19,7 +19,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.processor.ProcessorImpl;
-import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.XFormsProperties;
 
 import java.io.*;
 import java.net.URI;
@@ -89,7 +89,7 @@ public class XFormsResourceServer extends ProcessorImpl {
             final OutputStream responseOutputStream = response.getOutputStream();
             {
                 final boolean isDebugEnabled = XFormsServer.logger.isDebugEnabled();
-                if (XFormsUtils.isCacheCombinedResources()) {
+                if (XFormsProperties.isCacheCombinedResources()) {
                     // Caching requested
                     final File resourceFile = cacheResources(resources, response, requestPath, combinedLastModified, isCSS, isMinimal);
                     if (resourceFile != null) {

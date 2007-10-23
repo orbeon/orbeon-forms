@@ -19,7 +19,7 @@ import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 
-    /**
+/**
  * Constants useful for the XForms engine. 
  */
 public class XFormsConstants {
@@ -102,43 +102,7 @@ public class XFormsConstants {
     public static final String XFORMS_SUBMIT_REPLACE_INSTANCE = "instance";
     public static final String XFORMS_SUBMIT_REPLACE_NONE = "none";
 
-    public static final String XFORMS_PASSWORD_PROPERTY = "oxf.xforms.password";
-    public static final String XFORMS_ENCRYPT_NAMES_PROPERTY = "oxf.xforms.encrypt-names";
-    public static final String XFORMS_ENCRYPT_HIDDEN_PROPERTY = "oxf.xforms.encrypt-hidden";
-    public static final String XFORMS_VALIDATION_PROPERTY = "oxf.xforms.validate";
-
-    public static final String XFORMS_DEFAULT_DATE_FORMAT_PROPERTY = "oxf.xforms.format.date";
-    public static final String XFORMS_DEFAULT_DATETIME_FORMAT_PROPERTY = "oxf.xforms.format.dateTime";
-    public static final String XFORMS_DEFAULT_TIME_FORMAT_PROPERTY = "oxf.xforms.format.time";
-    public static final String XFORMS_DEFAULT_DECIMAL_FORMAT_PROPERTY = "oxf.xforms.format.decimal";
-    public static final String XFORMS_DEFAULT_INTEGER_FORMAT_PROPERTY = "oxf.xforms.format.integer";
-    public static final String XFORMS_DEFAULT_FLOAT_FORMAT_PROPERTY = "oxf.xforms.format.float";
-    public static final String XFORMS_DEFAULT_DOUBLE_FORMAT_PROPERTY = "oxf.xforms.format.double";
-
-    public static final String XFORMS_STATE_HANDLING_PROPERTY = "oxf.xforms.state-handling";
-    public static final String XFORMS_CACHE_DOCUMENT_PROPERTY = "oxf.xforms.cache.document";
-    public static final String XFORMS_CACHE_SESSION_SIZE_PROPERTY = "oxf.xforms.cache.session.size";
-    public static final String XFORMS_STORE_APPLICATION_SIZE_PROPERTY = "oxf.xforms.store.application.size";
-    public static final String XFORMS_CACHE_APPLICATION_SIZE_PROPERTY = "oxf.xforms.cache.application.size";
-    public static final String XFORMS_OPTIMIZE_POST_ALL_PROPERTY = "oxf.xforms.optimize-post-all";
-    public static final String XFORMS_OPTIMIZE_GET_ALL_PROPERTY = "oxf.xforms.optimize-get-all";
-    public static final String XFORMS_OPTIMIZE_LOCAL_SUBMISSION_PROPERTY = "oxf.xforms.optimize-local-submission";
-    public static final String XFORMS_OPTIMIZE_LOCAL_INSTANCE_LOADS_PROPERTY = "oxf.xforms.optimize-local-instance-loads";
-    public static final String XFORMS_AJAX_SHOW_LOADING_ICON_PROPERTY = "oxf.xforms.ajax.show-loading-icon";
-    public static final String XFORMS_AJAX_SHOW_ERRORS_PROPERTY = "oxf.xforms.ajax.show-errors";
-    public static final String XFORMS_EXCEPTION_INVALID_CLIENT_CONTROL_PROPERTY = "oxf.xforms.exception-invalid-client-control";
-    public static final String XFORMS_GZIP_STATE_PROPERTY = "oxf.xforms.gzip-state";
-    public static final String XFORMS_HOST_LANGUAGE_AVTS_PROPERTY = "oxf.xforms.host-language-avts";
-    public static final String XFORMS_MINIMAL_RESOURCES_PROPERTY = "oxf.xforms.minimal-resources";
-    public static final String XFORMS_COMBINE_RESOURCES_PROPERTY = "oxf.xforms.combine-resources";
-    public static final String XFORMS_CACHE_COMBINED_RESOURCES_PROPERTY = "oxf.xforms.cache-combined-resources";
-    public static final String XFORMS_OPTIMIZE_RELEVANCE_PROPERTY = "oxf.xforms.optimize-relevance";
-    public static final String XFORMS_TEST_AJAX_PROPERTY = "oxf.xforms.test.ajax";
-
     public static final String XXFORMS_STATE_HANDLING_ATTRIBUTE_NAME = "state-handling";
-    public static final String XXFORMS_STATE_HANDLING_CLIENT_VALUE = "client";
-    public static final String XXFORMS_STATE_HANDLING_SESSION_VALUE = "session";
-    public static final String XXFORMS_STATE_HANDLING_SERVER_VALUE = "server";
 
     public static final String XXFORMS_READONLY_APPEARANCE_ATTRIBUTE_NAME = "readonly-appearance";
     public static final String XXFORMS_READONLY_APPEARANCE_STATIC_VALUE = "static";
@@ -190,19 +154,7 @@ public class XFormsConstants {
     public static final String DEFAULT_UPLOAD_TYPE_EXPLODED_QNAME = ProcessorUtils.XS_ANYURI_EXPLODED_QNAME;
     public static final QName DEFAULT_UPLOAD_TYPE_QNAME = XMLConstants.XS_ANYURI_QNAME;
 
-    public static final int DEFAULT_SESSION_STATE_CACHE_SIZE = 1024 * 1024;
-    public static final int DEFAULT_APPLICATION_STATE_CACHE_SIZE = 1024 * 1024;
-    public static final int DEFAULT_APPLICATION_STATE_STORE_SIZE = 20 * 1024 * 1024;
-
-    public static final boolean DEFAULT_GZIP_STATE = true;
-    public static final boolean DEFAULT_HOST_LANGUAGE_AVTS = false;
-    public static final boolean DEFAULT_MINIMAL_RESOURCES = false;
-    public static final boolean DEFAULT_COMBINE_RESOURCES = false;
-    public static final boolean DEFAULT_CACHE_COMBINED_RESOURCES = false;
-    public static final boolean DEFAULT_OPTIMIZE_RELEVANCE = false;
-    public static final boolean DEFAULT_TEST_AJAX = false;
-
-    public static final String DUMMY_IMAGE_URI = "/ops/images/xforms/spacer.gif";
+        public static final String DUMMY_IMAGE_URI = "/ops/images/xforms/spacer.gif";
     public static final String HELP_IMAGE_URI = "/ops/images/xforms/help.gif";
     public static final String CALENDAR_IMAGE_URI = "/ops/images/xforms/calendar.gif";
 

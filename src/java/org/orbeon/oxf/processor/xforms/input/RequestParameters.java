@@ -22,8 +22,8 @@ import org.orbeon.oxf.processor.xforms.input.action.Set;
 import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.SecureUtils;
-import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
@@ -56,8 +56,8 @@ public class RequestParameters {
         try {
             final List parameters = requestDocument.getRootElement().element("parameters").elements("parameter");
 
-            if (XFormsUtils.isHiddenEncryptionEnabled()) {
-                encryptionKey = OXFProperties.instance().getPropertySet().getString(XFormsConstants.XFORMS_PASSWORD_PROPERTY);
+            if (XFormsProperties.isHiddenEncryptionEnabled()) {
+                encryptionKey = OXFProperties.instance().getPropertySet().getString(XFormsProperties.PASSWORD_PROPERTY);
             }
 
             // Go through parameters
@@ -181,7 +181,7 @@ public class RequestParameters {
         final String idString;
         {
             final String encryptedIdString = name.substring(name.indexOf('^') + 1);
-            idString = (XFormsUtils.isNameEncryptionEnabled())
+            idString = (XFormsProperties.isNameEncryptionEnabled())
                     ? SecureUtils.decryptAsString(pipelineContext, encryptionKey, encryptedIdString) :encryptedIdString;
         }
 

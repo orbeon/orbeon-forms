@@ -122,7 +122,7 @@ public class XFormsServer extends ProcessorImpl {
 
         // Get or create containing document
         final XFormsContainingDocument containingDocument;
-        if (XFormsUtils.isCacheDocument()) {
+        if (XFormsProperties.isCacheDocument()) {
             // Obtain containing document through cache
             containingDocument = XFormsDocumentCache.instance().find(pipelineContext, xformsDecodedClientState.getXFormsState());
         } else {
@@ -218,7 +218,7 @@ public class XFormsServer extends ProcessorImpl {
                 // This is the second phase of a submission with replace="all". We make it so that the document is not
                 // modified. However, we must then return it to its pool.
 
-                if (XFormsUtils.isCacheDocument()) {
+                if (XFormsProperties.isCacheDocument()) {
                     XFormsDocumentCache.instance().add(pipelineContext, xformsDecodedClientState.getXFormsState(), containingDocument);
                 }
             }
@@ -558,7 +558,7 @@ public class XFormsServer extends ProcessorImpl {
     }
 
     public static void diffControls(PipelineContext pipelineContext, ContentHandlerHelper ch, XFormsContainingDocument containingDocument, List state1, List state2, Map itemsetsFull1, Map itemsetsFull2, Map valueChangeControlIds) {
-        if (XFormsUtils.isOptimizeRelevance()) {
+        if (XFormsProperties.isOptimizeRelevance()) {
             new NewControlsComparator(pipelineContext, ch, containingDocument, itemsetsFull1, itemsetsFull2, valueChangeControlIds).diff(state1, state2);
         } else {
             new OldControlsComparator(pipelineContext, ch, containingDocument, itemsetsFull1, itemsetsFull2, valueChangeControlIds).diff(state1, state2);

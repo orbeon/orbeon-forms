@@ -250,7 +250,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 final boolean isReplaceAll = replace.equals(XFormsConstants.XFORMS_SUBMIT_REPLACE_ALL);
                 final boolean isReplaceInstance = replace.equals(XFormsConstants.XFORMS_SUBMIT_REPLACE_INSTANCE);
 
-                final boolean isHandlingOptimizedGet = XFormsUtils.isOptimizeGetAllSubmission() && XFormsSubmissionUtils.isGet(method)
+                final boolean isHandlingOptimizedGet = XFormsProperties.isOptimizeGetAllSubmission() && XFormsSubmissionUtils.isGet(method)
                         && isReplaceAll
                         && avtXXFormsUsername == null; // can't optimize if there are authentication credentials
 
@@ -618,7 +618,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                && !fURLNorewrite
                                && ((request.getContainerType().equals("portlet") && !"resource".equals(urlType))
                                     || (request.getContainerType().equals("servlet")
-                                        && (XFormsUtils.isOptimizeLocalSubmission() || isMethodOptimizedLocalSubmission())
+                                        && (XFormsProperties.isOptimizeLocalSubmission() || isMethodOptimizedLocalSubmission())
                                         &&  isReplaceAll))) {
 
                         // This is an "optimized" submission, i.e. one that does not use an actual
@@ -824,7 +824,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                     }
                 }
             } catch (Throwable e) {
-                if (isDeferredSubmissionSecondPassReplaceAll && XFormsUtils.isOptimizePostAllSubmission()) {
+                if (isDeferredSubmissionSecondPassReplaceAll && XFormsProperties.isOptimizePostAllSubmission()) {
                     // It doesn't serve any purpose here to dispatch an event, so we just propagate the exception
                     throw new XFormsSubmissionException(e, "Error while processing xforms:submission", "processing submission");
                 } else {

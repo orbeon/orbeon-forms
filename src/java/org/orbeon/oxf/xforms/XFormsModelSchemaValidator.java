@@ -18,7 +18,6 @@ import com.sun.msv.grammar.IDContextProvider2;
 import com.sun.msv.grammar.Expression;
 import com.sun.msv.grammar.xmlschema.*;
 import com.sun.msv.reader.GrammarReaderController;
-import com.sun.msv.reader.xmlschema.XMLSchemaReader;
 import com.sun.msv.reader.util.GrammarLoader;
 import com.sun.msv.util.DatatypeRef;
 import com.sun.msv.util.StartTagInfo;
@@ -49,7 +48,6 @@ import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.msv.IDConstraintChecker;
 import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -207,9 +205,6 @@ public class XFormsModelSchemaValidator {
 
         public void setCurrentElement(Element currentElement) {
             this.currentElement = currentElement;
-        }
-
-        public void onID(final Datatype dt, final String s) {
         }
 
         public String resolveNamespacePrefix(final String prefix) {
@@ -636,18 +631,17 @@ public class XFormsModelSchemaValidator {
         }
     }
 
-    private Grammar loadGrammar(final String baseURI, final NodeInfo schemaElementInfo) {
-
-        // TODO: Work in progress for loading inline schemas (?)
-        final SchemaInfo newSchemaInfo = new SchemaInfo();
-        final MSVGrammarReaderController controller = new MSVGrammarReaderController(baseURI, newSchemaInfo);
-        final SAXParserFactory saxParserFactory = XMLUtils.getSAXParserFactory(false, false);
-        final XMLSchemaReader reader = new XMLSchemaReader(controller, saxParserFactory);
-
-        TransformerUtils.writeTinyTree(schemaElementInfo, reader);
-
-        return reader.getResult();
-    }
+    // TODO: Work in progress for loading inline schemas (probably)
+//    private Grammar loadGrammar(final String baseURI, final NodeInfo schemaElementInfo) {
+//        final SchemaInfo newSchemaInfo = new SchemaInfo();
+//        final MSVGrammarReaderController controller = new MSVGrammarReaderController(baseURI, newSchemaInfo);
+//        final SAXParserFactory saxParserFactory = XMLUtils.getSAXParserFactory(false, false);
+//        final XMLSchemaReader reader = new XMLSchemaReader(controller, saxParserFactory);
+//
+//        TransformerUtils.writeTinyTree(schemaElementInfo, reader);
+//
+//        return reader.getResult();
+//    }
 
     /**
      * Apply schema validation to an instance. The instance may content a hint specifying whether to perform "lax",
@@ -810,7 +804,7 @@ public class XFormsModelSchemaValidator {
      */
     private boolean isSkipInstanceSchemaValidation() {
         final OXFProperties.PropertySet propertySet = OXFProperties.instance().getPropertySet();
-        final Boolean schmVldatdObj =  propertySet.getBoolean(XFormsConstants.XFORMS_VALIDATION_PROPERTY, true);
+        final Boolean schmVldatdObj =  propertySet.getBoolean(XFormsProperties.VALIDATION_PROPERTY, true);
         return !schmVldatdObj.booleanValue();
     }
 

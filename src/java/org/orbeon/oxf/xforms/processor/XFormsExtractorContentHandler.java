@@ -4,11 +4,10 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.servlet.OPSXFormsFilter;
-import org.orbeon.oxf.processor.ProcessorImpl;
-import org.orbeon.oxf.processor.xinclude.XIncludeProcessor;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
@@ -200,9 +199,9 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
             if (stateHandling == null) {
                 final String xxformsStateHandling = attributes.getValue(XFormsConstants.XXFORMS_NAMESPACE_URI, XFormsConstants.XXFORMS_STATE_HANDLING_ATTRIBUTE_NAME);
                 if (xxformsStateHandling != null) {
-                    if (!(xxformsStateHandling.equals(XFormsConstants.XXFORMS_STATE_HANDLING_CLIENT_VALUE)
-                            || xxformsStateHandling.equals(XFormsConstants.XXFORMS_STATE_HANDLING_SESSION_VALUE)
-                            || xxformsStateHandling.equals(XFormsConstants.XXFORMS_STATE_HANDLING_SERVER_VALUE)))
+                    if (!(xxformsStateHandling.equals(XFormsProperties.STATE_HANDLING_CLIENT_VALUE)
+                            || xxformsStateHandling.equals(XFormsProperties.STATE_HANDLING_SESSION_VALUE)
+                            || xxformsStateHandling.equals(XFormsProperties.STATE_HANDLING_SERVER_VALUE)))
                         throw new ValidationException("Invalid xxforms:" + XFormsConstants.XXFORMS_STATE_HANDLING_ATTRIBUTE_NAME + " attribute value: " + xxformsStateHandling, new LocationData(locator));
 
                     stateHandling = xxformsStateHandling;

@@ -13,14 +13,19 @@
  */
 package org.orbeon.oxf.resources;
 
+import org.dom4j.DocumentException;
+import org.dom4j.Element;
+import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.processor.OXFPropertiesSerializer;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.xml.sax.SAXException;
-import org.dom4j.DocumentException;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URL;
+import java.net.URLConnection;
 
 /**
  * This class provides access to global, configurable properties, as well as to processor-specific properties. This is
@@ -78,8 +83,8 @@ public class OXFProperties {
 
                 if (lastUpdate + RELOAD_DELAY >= current) break done;
 
-                final java.net.URL url = URLFactory.createURL(key);
-                final java.net.URLConnection uc = url.openConnection();
+                final URL url = URLFactory.createURL(key);
+                final URLConnection uc = url.openConnection();
 
                 if (propertyStore != null && uc.getLastModified() <= lastUpdate) {
                     lastUpdate = current;
@@ -114,7 +119,7 @@ public class OXFProperties {
         return propertyStore.getGlobalPropertySet();
     }
 
-    public PropertySet getPropertySet(final org.dom4j.QName processorName) {
+    public PropertySet getPropertySet(final QName processorName) {
         if (propertyStore == null)
             return null;
         update();
@@ -131,10 +136,10 @@ public class OXFProperties {
     public static class PropertySet {
 
         private static class TypeValue {
-            public final org.dom4j.QName type;
+            public final QName type;
             public Object value;
 
-            public TypeValue(final org.dom4j.QName typ, final Object val) {
+            public TypeValue(final QName typ, final Object val) {
                 type = typ;
                 value = val;
             }
@@ -163,19 +168,18 @@ public class OXFProperties {
             }
         }
 
-        public void setProperty
-                (final org.dom4j.Element elt, String name, final org.dom4j.QName typ, String value) {
+        public void setProperty(final Element elt, String name, final QName typ, String value) {
             final Object o = OXFPropertiesSerializer.getObject(value, typ, elt);
             properties.put(name, new TypeValue(typ, o));
         }
 
-        public Object getProperty(String name, final org.dom4j.QName typ) {
+        public Object getProperty(String name, final QName type) {
             TypeValue typeValue = (TypeValue) properties.get(name);
             if (typeValue == null)
                 return null;
-            if (typ != null && !typ.equals(typeValue.type))
+            if (type != null && !type.equals(typeValue.type))
                 throw new OXFException("Invalid attribute type requested for property '" + name + "': expected "
-                        + typ.getQualifiedName() + ", found " + typeValue.type.getQualifiedName());
+                        + type.getQualifiedName() + ", found " + typeValue.type.getQualifiedName());
             return typeValue.value;
         }
 
@@ -184,14 +188,14 @@ public class OXFProperties {
         }
 
         public String getStringOrURIAsString(String name) {
-            Object property = getObject(name);
+            final Object property = getObject(name);
             if (property == null)
                 return null;
 
             if (property instanceof String) {
                 return getString(name);
-            } else if (property instanceof java.net.URL) {
-                return getURL(name).toExternalForm();
+            } else if (property instanceof java.net.URI) {
+                return getURI(name).toString();
             } else {
                 throw new OXFException("Invalid attribute type requested for property '" + name + "': expected "
                         + XMLConstants.XS_STRING_QNAME.getQualifiedName()
@@ -199,16 +203,22 @@ public class OXFProperties {
             }
         }
 
-        public java.net.URL getStringOrURIAsURL(String name) {
-            String result = getStringOrURIAsString(name);
-            if (result == null)
-                return null;
-            try {
-                return URLFactory.createURL(name);
-            } catch (final java.net.MalformedURLException e) {
-                throw new OXFException(e);
-            }
+        public String getStringOrURIAsString(String name, String defaultValue) {
+            final String result = getStringOrURIAsString(name);
+            return (result == null) ? defaultValue : result;
         }
+
+        // This is not used
+//        public URL getStringOrURIAsURL(String name) {
+//            String result = getStringOrURIAsString(name);
+//            if (result == null)
+//                return null;
+//            try {
+//                return URLFactory.createURL(name);
+//            } catch (final java.net.MalformedURLException e) {
+//                throw new OXFException(e);
+//            }
+//        }
 
         public String getString(String name) {
             String result = (String) getProperty(name, XMLConstants.XS_STRING_QNAME);
@@ -249,16 +259,18 @@ public class OXFProperties {
             return (java.util.Date) getProperty(name, XMLConstants.XS_DATETIME_QNAME);
         }
 
-        public org.dom4j.QName getQName(String name) {
-            return (org.dom4j.QName) getProperty(name, XMLConstants.XS_QNAME_QNAME);
+        public QName getQName(String name) {
+            return (QName) getProperty(name, XMLConstants.XS_QNAME_QNAME);
+        }
+        
+        public URI getURI(String name) {
+            return (URI) getProperty(name, XMLConstants.XS_ANYURI_QNAME);
         }
 
-        /*
-         * For now, the type xs:anyURI is used, but we really expect URLs.
-         */
-        public java.net.URL getURL(String name) {
-            return (java.net.URL) getProperty(name, XMLConstants.XS_ANYURI_QNAME);
-        }
+//        public URI getURI(String name, URI defaultValue) {
+//            final URI result = (URI) getProperty(name, XMLConstants.XS_ANYURI_QNAME);
+//            return (result == null) ? defaultValue : result;
+//        }
 
         public Integer getNonNegativeInteger(final String nm) {
             return (Integer) getProperty(nm, XMLConstants.XS_NONNEGATIVEINTEGER_QNAME);

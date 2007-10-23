@@ -113,7 +113,6 @@ public abstract class XMLDBProcessor extends ProcessorImpl {
                     ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
                     String configurationFile = externalContext.getRealPath("WEB-INF/exist-conf.xml");
                     database.setProperty("create-database", "true");
-//                    database.setProperty("database-id", "oxf");
                     database.setProperty("configuration", configurationFile);
                 }
                 drivers.put(driverClassName, database);
@@ -205,6 +204,8 @@ public abstract class XMLDBProcessor extends ProcessorImpl {
                 ((XMLResource) resource).getContentAsSAX(new DatabaseReadContentHandler(contentHandler));
             } else if (resource instanceof BinaryResource) {
                 XMLUtils.inputStreamToBase64Characters(new ByteArrayInputStream((byte[]) resource.getContent()), contentHandler);
+            } else if (resource == null) {
+                throw new OXFException("Resource not found: " + resourceName);
             } else {
                 throw new OXFException("Unsupported resource type: " + resource.getClass());
             }

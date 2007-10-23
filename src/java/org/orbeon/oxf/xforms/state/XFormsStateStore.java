@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2005 Orbeon, Inc.
+ *  Copyright (C) 2005-2007 Orbeon, Inc.
  *
  *  This program is free software; you can redistribute it and/or modify it under the terms of the
  *  GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -23,6 +23,7 @@ import org.orbeon.oxf.processor.xmldb.XMLDBProcessor;
 import org.orbeon.oxf.xforms.XFormsModelSubmission;
 import org.orbeon.oxf.xforms.XFormsSubmissionUtils;
 import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
@@ -45,11 +46,8 @@ public abstract class XFormsStateStore {
     private static final int TEMP_PERF_ITERATIONS = 100;
     private static final boolean TEMP_USE_XMLDB = true;
 
+    // For now the driver is not configurable, but everything else (URI, username, password, collection) is configurable in properties
     private static final String EXIST_XMLDB_DRIVER = "org.exist.xmldb.DatabaseImpl";
-    private static final String EXIST_XMLDB_URI = "xmldb:exist:///";
-    private static final String EXIST_USERNAME = "admin";
-    private static final String EXIST_PASSWORD = "admin";
-    private static final String EXIST_COLLECTION = "/db/orbeon/xforms/cache/";
 
     private boolean isPersistent;
     private int currentStoreSize = 0;
@@ -226,7 +224,13 @@ public abstract class XFormsStateStore {
         }
 
         final String messageBody = encodeMessageBody(pipelineContext, storeEntry);
-        new XMLDBAccessor().storeResource(pipelineContext, new Datasource(EXIST_XMLDB_DRIVER, EXIST_XMLDB_URI, EXIST_USERNAME, EXIST_PASSWORD), EXIST_COLLECTION, true, storeEntry.key, messageBody);
+        try {
+            new XMLDBAccessor().storeResource(pipelineContext, new Datasource(EXIST_XMLDB_DRIVER,
+                    XFormsProperties.getStoreURI(), XFormsProperties.getStoreUsername(), XFormsProperties.getStorePassword()), XFormsProperties.getStoreCollection(),
+                    true, storeEntry.key, messageBody);
+        } catch (Exception e) {
+            throw new OXFException("Unable to store entry in persistent state store for key: " + storeEntry.key, e);
+        }
     }
 
     private void persistEntryExistHTTP(StoreEntry storeEntry) {
@@ -239,7 +243,7 @@ public abstract class XFormsStateStore {
             pipelineContext = staticContext.getPipelineContext();
         }
 
-        final String url = "/exist/rest" + EXIST_COLLECTION + storeEntry.key;
+        final String url = "/exist/rest" + XFormsProperties.getStoreCollection() + storeEntry.key;
         final String resolvedURL = externalContext.getResponse().rewriteResourceURL(url, true);
 
         final byte[] messageBody;
@@ -265,8 +269,8 @@ public abstract class XFormsStateStore {
         final String encryptedValue;
         if (storeEntry.value.startsWith("X3") || storeEntry.value.startsWith("X4")) {
             // Data is currently not encrypted, so encrypt it
-            final byte[] decodedValue = XFormsUtils.decodeBytes(pipelineContext, storeEntry.value, XFormsUtils.getEncryptionKey());
-            encryptedValue = XFormsUtils.encodeBytes(pipelineContext, decodedValue, XFormsUtils.getEncryptionKey());
+            final byte[] decodedValue = XFormsUtils.decodeBytes(pipelineContext, storeEntry.value, XFormsProperties.getXFormsPassword());
+            encryptedValue = XFormsUtils.encodeBytes(pipelineContext, decodedValue, XFormsProperties.getXFormsPassword());
         } else {
             // Data is already encrypted
             encryptedValue = storeEntry.value;
@@ -324,8 +328,14 @@ public abstract class XFormsStateStore {
         final LocationDocumentResult documentResult = new LocationDocumentResult();
         final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
         identity.setResult(documentResult);
-        
-        new XMLDBAccessor().getResource(pipelineContext, new Datasource(EXIST_XMLDB_DRIVER, EXIST_XMLDB_URI, EXIST_USERNAME, EXIST_PASSWORD), EXIST_COLLECTION, true, key, identity);
+
+        try {
+            new XMLDBAccessor().getResource(pipelineContext, new Datasource(EXIST_XMLDB_DRIVER,
+                    XFormsProperties.getStoreURI(), XFormsProperties.getStoreUsername(), XFormsProperties.getStorePassword()),
+                    XFormsProperties.getStoreCollection(), true, key, identity);
+        } catch (Exception e) {
+            throw new OXFException("Unable to find entry in persistent state store for key: " + key, e);
+        }
 
         final Document document = documentResult.getDocument();
         return getStoreEntryFromDocument(key, document);
@@ -339,7 +349,7 @@ public abstract class XFormsStateStore {
             externalContext = staticContext.getExternalContext();
         }
 
-        final String url = "/exist/rest" + EXIST_COLLECTION + key;
+        final String url = "/exist/rest" + XFormsProperties.getStoreCollection() + key;
         final String resolvedURL = externalContext.getResponse().rewriteResourceURL(url, true);
 
         XFormsModelSubmission.ConnectionResult result = XFormsSubmissionUtils.doRegular(externalContext, "get", resolvedURL, null, null, null, null, null);
@@ -386,13 +396,13 @@ public abstract class XFormsStateStore {
     }
 
     private static class XMLDBAccessor extends XMLDBProcessor {
-        public void update(PipelineContext pipelineContext, Datasource datasource, String collectionName, boolean createCollection, String resourceId, String query) {
-            super.update(pipelineContext, datasource, collectionName, createCollection, resourceId, query);
-        }
+//        public void update(PipelineContext pipelineContext, Datasource datasource, String collectionName, boolean createCollection, String resourceId, String query) {
+//            super.update(pipelineContext, datasource, collectionName, createCollection, resourceId, query);
+//        }
 
-        public void query(PipelineContext pipelineContext, Datasource datasource, String collectionName, boolean createCollection, String resourceId, String query, Map namespaceContext, ContentHandler contentHandler) {
-            super.query(pipelineContext, datasource, collectionName, createCollection, resourceId, query, namespaceContext, contentHandler);
-        }
+//        public void query(PipelineContext pipelineContext, Datasource datasource, String collectionName, boolean createCollection, String resourceId, String query, Map namespaceContext, ContentHandler contentHandler) {
+//            super.query(pipelineContext, datasource, collectionName, createCollection, resourceId, query, namespaceContext, contentHandler);
+//        }
 
         protected void getResource(PipelineContext pipelineContext, Datasource datasource, String collectionName, boolean createCollection, String resourceName, ContentHandler contentHandler) {
             super.getResource(pipelineContext, datasource, collectionName, createCollection, resourceName, contentHandler);

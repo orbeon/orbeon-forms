@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.processor.handlers;
 import org.orbeon.oxf.xforms.XFormsControls;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.processor.XFormsFeatures;
 import org.orbeon.oxf.xforms.processor.XFormsResourceServer;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
@@ -93,11 +94,11 @@ public class XHTMLHeadHandler extends HandlerBase {
         }
 
         // Create prefix for combined resources if needed
-        final boolean isMinimal = XFormsUtils.isMinimalResources();
+        final boolean isMinimal = XFormsProperties.isMinimalResources();
         final String combinedResourcesPrefix = XFormsFeatures.getCombinedResourcesPrefix(appearancesMap, isMinimal);
 
-        final boolean isCombineResources = XFormsUtils.isCombineResources();
-        final boolean isCacheCombinedResources = isCombineResources && XFormsUtils.isCacheCombinedResources();
+        final boolean isCombineResources = XFormsProperties.isCombineResources();
+        final boolean isCacheCombinedResources = isCombineResources && XFormsProperties.isCacheCombinedResources();
         if (isCombineResources) {
             XFormsServer.logger.debug("XForms resources - creating xhtml:head with combined resources.");
             if (isCacheCombinedResources) {

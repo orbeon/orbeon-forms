@@ -121,7 +121,7 @@ public class XFormsStaticState {
         final String stateHandlingAttribute = rootElement.attributeValue(XFormsConstants.XXFORMS_STATE_HANDLING_ATTRIBUTE_NAME);
         stateHandling = (stateHandlingAttribute != null)
                 ? stateHandlingAttribute
-                : XFormsUtils.isServerStateHandling() ? XFormsConstants.XXFORMS_STATE_HANDLING_SERVER_VALUE : XFormsConstants.XXFORMS_STATE_HANDLING_CLIENT_VALUE;
+                : XFormsProperties.isServerStateHandling() ? XFormsProperties.STATE_HANDLING_SERVER_VALUE : XFormsProperties.STATE_HANDLING_CLIENT_VALUE;
 
         final String readonlyAttribute = rootElement.attributeValue(XFormsConstants.XXFORMS_READONLY_ATTRIBUTE_NAME);
         readonly = (readonlyAttribute != null) && new Boolean(readonlyAttribute).booleanValue() ;
@@ -216,8 +216,8 @@ public class XFormsStaticState {
             }
 
             // Remember encoded state and discard Document
-            final boolean isStateHandlingServer = stateHandling.equals(XFormsConstants.XXFORMS_STATE_HANDLING_SERVER_VALUE);
-            encodedStaticState = XFormsUtils.encodeXML(pipelineContext, staticStateDocument, isStateHandlingServer ? null : XFormsUtils.getEncryptionKey(), true);
+            final boolean isStateHandlingServer = stateHandling.equals(XFormsProperties.STATE_HANDLING_SERVER_VALUE);
+            encodedStaticState = XFormsUtils.encodeXML(pipelineContext, staticStateDocument, isStateHandlingServer ? null : XFormsProperties.getXFormsPassword(), true);
             staticStateDocument = null;
             initialized = true;
         }

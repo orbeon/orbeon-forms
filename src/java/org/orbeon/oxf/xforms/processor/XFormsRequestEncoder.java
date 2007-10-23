@@ -20,6 +20,7 @@ import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.xml.sax.ContentHandler;
 
@@ -44,7 +45,7 @@ public class XFormsRequestEncoder extends ProcessorImpl {
                 // Encode static state here
                 contentHandlerHelper.startElement("xxforms", XFormsConstants.XXFORMS_NAMESPACE_URI, "static-state");
                 final Document document = readCacheInputAsDOM4J(pipelineContext, INPUT_DATA);
-                final String encoded = XFormsUtils.encodeXML(pipelineContext, document, XFormsUtils.getEncryptionKey(), false);
+                final String encoded = XFormsUtils.encodeXML(pipelineContext, document, XFormsProperties.getXFormsPassword(), false);
                 contentHandlerHelper.text(encoded);
                 contentHandlerHelper.endElement();
 

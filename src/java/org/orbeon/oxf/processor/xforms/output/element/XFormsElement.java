@@ -135,7 +135,7 @@ public class XFormsElement {
                             final String encryptedId;
                             {
                                 final String id = InstanceData.getId(contextNodeInfo);
-                                if (XFormsUtils.isNameEncryptionEnabled())
+                                if (XFormsProperties.isNameEncryptionEnabled())
                                     encryptedId = SecureUtils.encrypt(context.getPipelineContext(), context.getEncryptionPassword(), id);
                                 else
                                     encryptedId = id;
@@ -196,7 +196,7 @@ public class XFormsElement {
                             final String id = InstanceData.getId(nodeInfo);
                             if (id != null) {
                                 final String encryptedId;
-                                if (XFormsUtils.isNameEncryptionEnabled())
+                                if (XFormsProperties.isNameEncryptionEnabled())
                                     encryptedId = SecureUtils.encrypt(context.getPipelineContext(), context.getEncryptionPassword(), id);
                                 else
                                     encryptedId = id;
@@ -223,7 +223,7 @@ public class XFormsElement {
                     throw new ValidationException("'at' expression must return a number",
                             new LocationData(context.getLocator()));
                 String atString = at.toString();
-                if (XFormsUtils.isNameEncryptionEnabled())
+                if (XFormsProperties.isNameEncryptionEnabled())
                     atString = SecureUtils.encrypt(context.getPipelineContext(),
                             context.getEncryptionPassword(), atString);
                 addExtensionAttribute(newAttributes, "at-value", atString);

@@ -20,7 +20,7 @@ import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.ForwardingContentHandler;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -52,7 +52,7 @@ public class XFormsDocumentAnnotator extends ProcessorImpl {
 
                 final ExternalContext externalContext = ((ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT));
                 final boolean isPortlet = "portlet".equals(externalContext.getRequest().getContainerType());
-                final boolean isHostLanguageAVTs = XFormsUtils.isHostLanguageAVTs();
+                final boolean isHostLanguageAVTs = XFormsProperties.isHostLanguageAVTs();
                 final String containerNamespace = externalContext.getRequest().getContainerNamespace();
 
                 final Map ids = new HashMap();

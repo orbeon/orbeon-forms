@@ -25,7 +25,7 @@ import org.orbeon.oxf.util.SoftReferenceObjectPool;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.state.XFormsState;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.XFormsProperties;
 
 /**
  * This cache stores mappings XFormsState -> XFormsContainingDocument into a global cache.
@@ -55,7 +55,7 @@ public class XFormsDocumentCache {
 
         final Cache cache = ObjectCache.instance(XFORMS_DOCUMENT_CACHE_NAME, XFORMS_DOCUMENT_CACHE_DEFAULT_SIZE);
         // NOTE: For special Ajax test, key by static state only.
-        final String cacheKeyString = XFormsUtils.isAjaxTest() ? xformsState.getStaticState() : xformsState.toString();
+        final String cacheKeyString = XFormsProperties.isAjaxTest() ? xformsState.getStaticState() : xformsState.toString();
 
         final InternalCacheKey cacheKey = new InternalCacheKey(CONTAINING_DOCUMENT_KEY_TYPE, cacheKeyString);
         ObjectPool destinationPool = (ObjectPool) cache.findValid(pipelineContext, cacheKey, CONSTANT_VALIDITY);
@@ -103,7 +103,7 @@ public class XFormsDocumentCache {
 
         final Cache cache = ObjectCache.instance(XFORMS_DOCUMENT_CACHE_NAME, XFORMS_DOCUMENT_CACHE_DEFAULT_SIZE);
         // NOTE: For special Ajax test, key by static state only.
-        final String cacheKeyString = XFormsUtils.isAjaxTest() ? xformsState.getStaticState() : xformsState.toString();
+        final String cacheKeyString = XFormsProperties.isAjaxTest() ? xformsState.getStaticState() : xformsState.toString();
 
         // Try to find pool in cache, create it if not found
         final InternalCacheKey cacheKey = new InternalCacheKey(CONTAINING_DOCUMENT_KEY_TYPE, cacheKeyString);

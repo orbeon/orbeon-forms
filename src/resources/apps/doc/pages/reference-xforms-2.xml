@@ -1337,6 +1337,70 @@
                     <ul>
                         <li>
                             <p>
+                                <b>Server-side:</b> in this case, state information is stored on the server. Only very
+                                little state information circulates between client and server. The most frequently used
+                                state information is stored in memory. Less frequently used state information is stored
+                                on disk in a local database.
+                            </p>
+                            <p>
+                                Benefits of the approach:
+                            </p>
+                            <ul>
+                                <li>
+                                    <p>
+                                        Resulting HTML page are smaller. HTML pages increase in size as more XForms
+                                        controls are used, but they don't increase in size proportionally to the size of
+                                        XForms instances.
+                                    </p>
+                                </li>
+                                <li>
+                                    <p>
+                                        Small amounts of data circulate between the client browser and the Orbeon Forms
+                                        XForms server.
+                                    </p>
+                                </li>
+                                <li>
+                                    <p>
+                                        This means that very large XForms instances can be processed without any impact
+                                        on the amount of data that is transmitted between the client and the server.
+                                    </p>
+                                </li>
+                            </ul>
+                            <p>
+                                Drawbacks of the approach:
+                            </p>
+                            <ul>
+                                <li>
+                                    <p>
+                                        The Orbeon Forms XForms server needs to be stateful. It uses server memory to
+                                        store state information even when no request is being processed. This creates
+                                        additional demand for resources on the server and slightly complicates the task
+                                        of tuning the server.
+                                    </p>
+                                </li>
+                                <li>
+                                    <p>
+                                        State information can become unavailable when sessions expire or when the server
+                                        is restarted. When state information becomes unavailable for a page, that page
+                                        will no longer function unless it is reloaded.
+                                    </p>
+                                    <!--<note>-->
+                                        <!--With most servlet containers, it is possible to configure session handling to-->
+                                        <!--passivate sessions out of the application server memory to a persistent store.-->
+                                        <!--It is this way possible to partially alleviate the drawback above by making sure-->
+                                        <!--that a very large number of active but idle sessions can be kept, with a minimum-->
+                                        <!--impact on application server memory. It is this way also possible to make sure-->
+                                        <!--that sessions survive a servlet container restart.-->
+                                    <!--</note>-->
+                                </li>
+                            </ul>
+                            <note>
+                                Orbeon Forms ensures that it is possible to open multiple client browser windows
+                                showing the same page within the same session.
+                            </note>
+                        </li>
+                        <li>
+                            <p>
                                 <b>Client-side:</b> in this case, static initial state information is sent along with the
                                 initial HTML page, and dynamic state is exchanged over the wire between the client browser
                                 and the Orbeon Forms XForms server when necessary.
@@ -1365,9 +1429,9 @@
                             <ul>
                                 <li>
                                     <p>
-                                        Resulting HTML pages are larger. In particular, the size of
-                                        state data grows when XForms instances grow, regardless of
-                                        whether many XForms controls are bound to instance data.
+                                        Resulting HTML pages are larger. In particular, the size of state data grows
+                                        when XForms instances grow, regardless of whether many XForms controls are
+                                        bound to instance data.
                                     </p>
                                 </li>
                                 <li>
@@ -1380,97 +1444,30 @@
                                 Orbeon Forms compresses and encrypts XForms state information sent to the client.
                             </note>
                         </li>
-                        <li>
-                            <p>
-                                <b>Server-side:</b> in this case, state information is stored on the
-                                server, in association with an application session. Only very little
-                                state information circulates between client and server.
-                            </p>
-                            <p>
-                                Benefits of the approach:
-                            </p>
-                            <ul>
-                                <li>
-                                    <p>
-                                        Resulting HTML page are smaller. HTML pages increase in size as
-                                        more XForms controls are used, but they don't increase in size
-                                        proportionally to the size of XForms instances.
-                                    </p>
-                                </li>
-                                <li>
-                                    <p>
-                                        Small amounts of data circulate between the client browser and the Orbeon Forms
-                                        XForms server.
-                                    </p>
-                                </li>
-                                <li>
-                                    <p>
-                                        This means that very large XForms instances can be processed
-                                        without any impact on the amount of data that is transmitted
-                                        between the client and the server.
-                                    </p>
-                                </li>
-                            </ul>
-                            <p>
-                                Drawbacks of the approach:
-                            </p>
-                            <ul>
-                                <li>
-                                    <p>
-                                        The Orbeon Forms XForms server needs to be stateful. It uses server memory to store
-                                        state information in a session even when no request is being processed. The server
-                                        must be configured to determine how much state information is kept in a session, how
-                                        long session take to expire, etc. This creates additional demand for resources on
-                                        the server and complicates the task of tuning the server.
-                                    </p>
-                                </li>
-                                <li>
-                                    <p>
-                                        State information can become unavailable when sessions expire or
-                                        when the server is restarted (unless you setup the server to
-                                        persist session information). When state information becomes
-                                        unavailable for a page, that page will no longer function unless
-                                        it is reloaded.
-                                    </p>
-                                    <note>
-                                        With most servlet containers, it is possible to configure
-                                        session handling to passivate sessions out of the application
-                                        server memory to a persistent store. It is this way possible to
-                                        partially alleviate the drawback above by making sure that a
-                                        very large number of active but idle sessions can be kept, with
-                                        a minimum impact on application server memory. It is this way
-                                        also possible to make sure that sessions survive a servlet
-                                        container restart.
-                                    </note>
-                                </li>
-                            </ul>
-                            <note>
-                                Orbeon Forms ensures that it is possible to open multiple client browser windows showing
-                                the same page within the same session.
-                            </note>
-                        </li>
                     </ul>
+                    <p>
+                        By default, Orbeon forms store XForms state information on the server. Please change this
+                        default to client-side only if you have well understood the tradeoffs explained above.
+                    </p>
                 </section>
                 <section>
                     <title>Configuring State Handling</title>
                     <p>
-                        State handling can be configured globally for all pages, or locally for each
-                        individual page served. Global configuration is performed in
-                        <code>properties.xml</code> with the <code>oxf.xforms.state-handling</code>
-                        property. When missing or set to <code>client</code>, state is stored
-                        client-side. When set to <code>session</code>, state is stored server-side in a
-                        session. For example:
+                        State handling can be configured globally for all pages, or locally for each individual page
+                        served. Global configuration is performed in <code>properties.xml</code> with the
+                        <code>oxf.xforms.state-handling</code> property. When missing or set to <code>client</code>,
+                        state is stored client-side. When set to <code>server</code>, state is stored server-side. For
+                        example:
                     </p>
                     <xml-source>
-                        <comment> Store state in the session </comment>
-                        <property as="xs:string"  name="oxf.xforms.state-handling" value="session"/>
+                        <comment> Store state on the server </comment>
+                        <property as="xs:string" name="oxf.xforms.state-handling" value="server"/>
                     </xml-source>
                     <p>
                         The global configuration can be overridden for each page by setting the
-                        <code>xxforms:state-handling</code> attribute in the page. This attribute can be
-                        set for example on the root element of the XHTML page, or on the first
-                        <code>xforms:model</code> element. Only the first such attribute encountered by
-                        the XForms engine is used:
+                        <code>xxforms:state-handling</code> attribute in the page. This attribute can be set  on the
+                        root element of the XHTML page, or on the first <code>xforms:model</code> element. Only the
+                        first such attribute encountered by the XForms engine is used:
                     </p>
                     <xml-source show-namespaces="false">
                         <xforms:model xxforms:state-handling="client">
@@ -1478,13 +1475,25 @@
                         </xforms:model>
                     </xml-source>
                     <p>
-                        When storing state in a session, the maximum size of the data to be stored for
-                        each user can be selected using the <code>oxf.xforms.cache.session.size</code>
-                        property. The size is specified in bytes:
+                        When storing state on the server, the maximum size of the data to be stored globally in memory
+                        can be selected using the <code>oxf.xforms.store.application.size</code> property. The size is
+                        specified in bytes:
                     </p>
                     <xml-source>
-                        <comment> Allow a maximum of 500 KB of state information for each user </comment>
-                        <property as="xs:integer" name="oxf.xforms.cache.session.size"                   value="500000"/>
+                        <comment> Allow a maximum of 20 MB of state information among all users </comment>
+                        <property as="xs:integer" name="oxf.xforms.store.application.size"               value="20000000"/>
+                    </xml-source>
+                    <p>
+                        When the allowed memory space for state information is full, Orbeon passivates state information
+                        to a local eXist database. Configuration parameters for the connection to the eXist database
+                        can be changed. The defaults are as follows:
+                    </p>
+                    <xml-source>
+                        <comment> Persistent store connection information </comment>
+                        <property as="xs:string"  name="oxf.xforms.store.application.username"           value="guest"/>
+                        <property as="xs:string"  name="oxf.xforms.store.application.password"           value="guest"/>
+                        <property as="xs:anyURI"  name="oxf.xforms.store.application.uri"                value="xmldb:exist:///"/>
+                        <property as="xs:string"  name="oxf.xforms.store.application.collection"         value="/db/orbeon/xforms/cache/"/>
                     </xml-source>
                     <p>
                         Whether state information is kept client-side or server-side, a property controls whether the XForms
@@ -1496,16 +1505,16 @@
                         <property as="xs:boolean" name="oxf.xforms.cache.document"                       value="true"/>
                     </xml-source>
                     <p>
-                        If the above property is set to <code>true</code>, the number of XForms documents that can be held
-                        in that document cache at a given time is configured with the following property:
+                        If the above property is set to <code>true</code>, the number of XForms documents that can be
+                        held in that document cache at a given time is configured with the following property:
                     </p>
                     <xml-source>
                         <comment> Store at most 10 documents in the cache </comment>
                         <property as="xs:integer" name="oxf.xforms.cache.documents.size"                 value="10"/>
                     </xml-source>
                     <p>
-                        Note that this represents XForms documents in a particular state of interaction with a user, which
-                        means that if to users load the same XForms page two entries will be needed in the cache.
+                        Note that this represents XForms documents in a particular state of interaction with a user,
+                        which means that if to users load the same XForms page two entries will be needed in the cache.
                     </p>
                 </section>
                 <!--

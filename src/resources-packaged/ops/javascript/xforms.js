@@ -119,6 +119,8 @@ ORBEON.xforms.Globals = ORBEON.xforms.Globals || {
     formLoadingLoadingOverlay: {},       // Overlay for the loading indicator
     formLoadingLoadingInitialRightTop:{},// Initial number of pixel between the loading indicator and the top of the page
     formErrorPanel: {},                  // YUI panel used to report errors
+    formHelpPanel: {},                   // YUI panel used to display help message
+    formHelpPanelMessageDiv: {},         // YUI panel used to display help message
     formLoadingNone: {},                 // HTML element with the markup displayed when nothing is displayed
     formStaticState: {},                 // State that does not change for the life of the page
     formDynamicState: {},                // State that changes at every request
@@ -189,13 +191,6 @@ ORBEON.util.IEDom = {
      */
     getElementByName: function(element,localName,namespace) {
         return element.getElementsByTagName(namespace+":"+localName);
-    },
-
-    /**
-     * Orbeon version of setting text content
-     */
-    setTextContent: function(element, text) {
-    	element.innerText = text;
     }
 };
 
@@ -259,17 +254,12 @@ ORBEON.util.MozDom = {
     },
 
     /**
-     * Orbeon version of getting Elements by Name on Mozilla
+     * Optimized version of getting Elements by Name on Mozilla (hack: assumes there are no other
+     * elements with the same local name that are in a different namespace).
      */
-    getElementByName: function(element,localName,namespace) {
+    getElementByName: function(element, localName, namespace) {
         return element.getElementsByTagName(localName);
-    },
-
-
-    setTextContent: function(element, text) {
-        ORBEON.util.Dom.setStringValue(element,text);
-    }
-};
+    }};
 
 /**
  *  Utilities to deal with the DOM that supplement what is provided by YAHOO.util.Dom.
@@ -322,25 +312,6 @@ ORBEON.util.Dom = {
             }
         }
         return result;
-    },
-
-    getStringValue: function(element) {
-        var result = "";
-        for (var i = 0; i < element.childNodes.length; i++) {
-            var child = element.childNodes[i];
-            if (child.nodeType == TEXT_TYPE)
-                result += child.nodeValue;
-        }
-        return result;
-    },
-
-    setStringValue: function(element, text) {
-        // Remove content
-        while (element.childNodes.length > 0)
-            element.removeChild(element.firstChild);
-        // Add specified text
-        var textNode = element.ownerDocument.createTextNode(text);
-        element.appendChild(textNode);
     },
 
     /**
@@ -415,7 +386,45 @@ ORBEON.util.Dom = {
         }
 
         return null;
+    },
+
+    /**
+     * Use W3C DOM API to get the content of an element.
+     */
+    getStringValue: function(element) {
+        if (element.innerText == null) {
+            // Use W3C DOM API
+            var result = "";
+            for (var i = 0; i < element.childNodes.length; i++) {
+                var child = element.childNodes[i];
+                if (child.nodeType == TEXT_TYPE)
+                    result += child.nodeValue;
+            }
+            return result;
+        } else {
+            // Use IE's innerText, which is faster on IE
+            return element.innerText;
+        }
+    },
+
+    /**
+     * Use W3C DOM API to set the content of an element.
+     */
+    setStringValue: function(element, text) {
+        if (element.innerText == null) {
+            // Use W3C DOM API
+            // Remove content
+            while (element.childNodes.length > 0)
+                element.removeChild(element.firstChild);
+            // Add specified text
+            var textNode = element.ownerDocument.createTextNode(text);
+            element.appendChild(textNode);
+        } else {
+            // Use IE's innerText, which is faster on IE
+            element.innerText = text;
+        }
     }
+
 };
 
 (function () {
@@ -1134,13 +1143,7 @@ ORBEON.xforms.Events = {
     mouseover: function(event) {
         var target = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
         if (target != null) {
-            if (ORBEON.util.Dom.hasClass(target, "xforms-help-image")) {
-                // Help image: show help tool-tip
-                var label = target.nextSibling;
-                while (!ORBEON.util.Dom.isElement(label)) label = target.nextSibling;
-                var control = ORBEON.util.Dom.getElementById(label.htmlFor);
-                ORBEON.xforms.Events._showToolTip(event, label, "xforms-help", ORBEON.xforms.Controls.getHelpMessage(control));
-            } else if (ORBEON.util.Dom.hasClass(target, "xforms-alert-active")) {
+            if (ORBEON.util.Dom.hasClass(target, "xforms-alert-active")) {
                 // Alert image: show alert tool-tip
                 var control = ORBEON.util.Dom.getElementById(target.htmlFor);
                 var message = ORBEON.xforms.Controls.getAlertMessage(control);
@@ -1189,13 +1192,11 @@ ORBEON.xforms.Events = {
             // Activate hint
             ORBEON.xforms.Controls.hintActive(target, true);
 
-            // Click on output
             if (ORBEON.util.Dom.hasClass(target, "xforms-output")) {
+                // Click on output
                 xformsFireEvents([xformsCreateEventArray(target, "DOMFocusIn", null)], false);
-            }
-
-            // Click on trigger
-            if ((ORBEON.util.Dom.hasClass(target, "xforms-trigger") || ORBEON.util.Dom.hasClass(target, "xforms-submit"))) {
+            } else  if ((ORBEON.util.Dom.hasClass(target, "xforms-trigger") || ORBEON.util.Dom.hasClass(target, "xforms-submit"))) {
+                // Click on trigger
                 YAHOO.util.Event.preventDefault(event);
                 if (!ORBEON.util.Dom.hasClass(target, "xforms-readonly")) {
                     // If this is an anchor and we didn't get a chance to register the focus event,
@@ -1205,19 +1206,15 @@ ORBEON.xforms.Events = {
                     ORBEON.xforms.Events.focus(event);
                     xformsFireEvents([xformsCreateEventArray(target, "DOMActivate", null)], false);
                 }
-            }
-
-            // Click on checkbox or radio button
-            if (ORBEON.util.Dom.hasClass(target, "xforms-select1-appearance-full")
+            } else if (ORBEON.util.Dom.hasClass(target, "xforms-select1-appearance-full")
                     || ORBEON.util.Dom.hasClass(target, "xforms-select-appearance-full")
                     || ORBEON.util.Dom.hasClass(target, "xforms-input-appearance-full")) {
+                // Click on checkbox or radio button
                 xformsFireEvents(new Array(xformsCreateEventArray
                         (target, "xxforms-value-change-with-focus-change",
                                 ORBEON.xforms.Controls.getCurrentValue(target), null)), false);
-            }
-
-            // Click on calendar inside input field
-            if (ORBEON.util.Dom.hasClass(target, "xforms-input") && !ORBEON.util.Dom.hasClass(target, "xforms-type-boolean")) {
+            } else if (ORBEON.util.Dom.hasClass(target, "xforms-input") && !ORBEON.util.Dom.hasClass(target, "xforms-type-boolean")) {
+                // Click on calendar inside input field
 
                 // Initialize calendar when needed
                 var displayField = ORBEON.util.Dom.getChildElementByIndex(target, 0);
@@ -1250,15 +1247,11 @@ ORBEON.xforms.Events = {
                     // Event can be received on calendar picker span, or on the containing span
                     ORBEON.xforms.Globals.inputCalendarOnclick[target.id]();
                 }
-            }
-
-            // Click on remove icon in upload control
-            if (ORBEON.util.Dom.hasClass(target, "xforms-upload") && ORBEON.util.Dom.hasClass(originalTarget, "xforms-upload-remove")) {
+            } else if (ORBEON.util.Dom.hasClass(target, "xforms-upload") && ORBEON.util.Dom.hasClass(originalTarget, "xforms-upload-remove")) {
+                // Click on remove icon in upload control
                 xformsFireEvents(new Array(xformsCreateEventArray(target, "xxforms-value-change-with-focus-change", "")), false);
-            }
-
-            // Click on menu item
-            if (ORBEON.util.Dom.hasClass(target, "xforms-select1-appearance-xxforms-menu")) {
+            } else if (ORBEON.util.Dom.hasClass(target, "xforms-select1-appearance-xxforms-menu")) {
+                // Click on menu item
 
                 // Find what is the position in the hiearchy of the item
                 var positions = [];
@@ -1296,6 +1289,60 @@ ORBEON.xforms.Events = {
                 xformsFireEvents(new Array(xformsCreateEventArray(target, "xxforms-value-change-with-focus-change", itemValue)), false);
                 // Close the menu
                 ORBEON.xforms.Globals.menuYui[target.id].clearActiveItem();
+            } else if (ORBEON.util.Dom.hasClass(target, "xforms-help-image")) {
+                // Help image
+
+                // Get label and control for this help message
+                var label = target.nextSibling;
+                while (!ORBEON.util.Dom.isElement(label)) label = target.nextSibling;
+                var control = ORBEON.util.Dom.getElementById(label.htmlFor);
+                var form = ORBEON.xforms.Controls.getForm(control);
+
+                // Create help dialog if this hasn't been done already
+                if (ORBEON.xforms.Globals.formHelpPanel[form.id] == null) {
+                    // Look for help div in the page under the form
+                    for (var childIndex = 0; childIndex < form.childNodes.length; childIndex++) {
+                        var formChild = form.childNodes[childIndex];
+                        if (ORBEON.util.Dom.isElement(formChild) && ORBEON.util.Dom.hasClass(formChild, "xforms-help-panel")) {
+                            // Create YUI dialog for help based on template
+                            YAHOO.util.Dom.generateId(formChild);
+                            ORBEON.util.Dom.removeClass(formChild, "xforms-initially-hidden");
+                            var helpPanel = new YAHOO.widget.Panel(formChild.id, {
+                                modal: false,
+                                fixedcenter: false,
+                                underlay: "shadow",
+                                visible: false,
+                                constraintoviewport: true,
+                                draggable: true
+                            });
+                            helpPanel.render();
+                            helpPanel.element.style.display = "none";
+                            ORBEON.xforms.Globals.formHelpPanel[form.id] = helpPanel;
+
+                            // Find div for help body
+                            var bodyDiv = ORBEON.util.Dom.getChildElementByClass(formChild, "bd");
+                            var messageDiv = ORBEON.util.Dom.getChildElementByClass(bodyDiv, "xforms-help-panel-message");
+                            ORBEON.xforms.Globals.formHelpPanelMessageDiv[form.id] = messageDiv;
+
+                            // Get the close button and register listener on that button
+                            var closeDiv = ORBEON.util.Dom.getChildElementByClass(bodyDiv, "xforms-help-panel-close");
+                            var closeButton = ORBEON.util.Dom.getChildElementByIndex(closeDiv, 0);
+                            YAHOO.util.Event.addListener(closeButton, "click", ORBEON.xforms.Events.helpDialogButtonClose, form.id);
+
+                            // Register listener for when the panel is closed by a click on the "x"
+                            helpPanel.beforeHideEvent.subscribe(ORBEON.xforms.Events.helpDialogXClose, form.id);
+
+                            // We found what we were looking for, no need to continue searching
+                            break;
+                        }
+                    }
+                }
+
+                // Show dialog with appropriate help message
+                ORBEON.xforms.Globals.formHelpPanelMessageDiv[form.id].innerHTML = ORBEON.util.Dom.getStringValue(label);
+                ORBEON.xforms.Globals.formHelpPanel[form.id].element.style.display = "block";
+                ORBEON.xforms.Globals.formHelpPanel[form.id].show();
+                ORBEON.xforms.Globals.formHelpPanel[form.id].center();
             }
         }
     },
@@ -1359,6 +1406,25 @@ ORBEON.xforms.Events = {
         var dialogId = me;
         var dialog = ORBEON.util.Dom.getElementById(dialogId);
         xformsFireEvents([xformsCreateEventArray(dialog, "xxforms-dialog-close")], false);
+    },
+
+    /**
+     * Called when the "close" button is pressed in help dialog.
+     */
+    helpDialogButtonClose: function(_dummy, formID) {
+        // Close dialog. This will trigger a call to helpDialogXClose.
+        var formHelpPanel = ORBEON.xforms.Globals.formHelpPanel[formID];
+        formHelpPanel.hide();
+    },
+
+    /**
+     * Called when the help dialog is closed with the "x" button or after helpDialogButtonClose()
+     * runs formHelpPanel.hide().
+     */
+    helpDialogXClose: function(_dummy, _dummy, formID) {
+        // Fixes cursor Firefox issue; more on this in dialog init code
+        var formHelpPanel = ORBEON.xforms.Globals.formHelpPanel[formID];
+        formHelpPanel.element.style.display = "none";
     },
 
     /**
@@ -1657,9 +1723,7 @@ ORBEON.xforms.Init = {
                         formChild.style.right = "auto";
                         ORBEON.xforms.Globals.formLoadingLoadingOverlay[formID].cfg.setProperty("visible", false);
                         xformsLoadingCount++;
-                        continue;
-                    }
-                    if (ORBEON.util.Dom.isElement(formChild) && ORBEON.util.Dom.hasClass(formChild, "xforms-error-panel")) {
+                    } else if (ORBEON.util.Dom.isElement(formChild) && ORBEON.util.Dom.hasClass(formChild, "xforms-error-panel")) {
 
                         // Create and store error panel
                         YAHOO.util.Dom.generateId(formChild);
@@ -1702,12 +1766,9 @@ ORBEON.xforms.Init = {
                         }
 
                         xformsLoadingCount++;
-                        continue;
-                    }
-                    if (formChild.className == "xforms-loading-none") {
+                    } else if (formChild.className == "xforms-loading-none") {
                         ORBEON.xforms.Globals.formLoadingNone[formID] = formChild;
                         xformsLoadingCount++;
-                        continue;
                     }
                 }
 
@@ -2854,7 +2915,7 @@ ORBEON.xforms.Server = {
                                                     } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-mediatype-text-html")) {
                                                         documentElement.innerHTML = newOutputControlValue;
                                                     } else {
-                                                        ORBEON.util.Dom.setTextContent(documentElement, newOutputControlValue);
+                                                        ORBEON.util.Dom.setStringValue(documentElement, newOutputControlValue);
                                                     }
                                                 } else if (ORBEON.xforms.Globals.changedIdsRequest[controlId] != null) {
                                                     // User has modified the value of this control since we sent our request:

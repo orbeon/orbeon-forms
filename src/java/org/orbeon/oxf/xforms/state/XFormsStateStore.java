@@ -13,50 +13,25 @@
  */
 package org.orbeon.oxf.xforms.state;
 
-import org.dom4j.Document;
-import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.pipeline.StaticExternalContext;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.processor.Datasource;
-import org.orbeon.oxf.processor.xmldb.XMLDBProcessor;
-import org.orbeon.oxf.xforms.XFormsModelSubmission;
-import org.orbeon.oxf.xforms.XFormsSubmissionUtils;
-import org.orbeon.oxf.xforms.XFormsUtils;
-import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
-import org.orbeon.oxf.xml.TransformerUtils;
-import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
-import org.orbeon.saxon.om.FastStringBuffer;
-import org.xml.sax.ContentHandler;
 
-import javax.xml.transform.sax.TransformerHandler;
-import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 
 /**
- * Base class for XFormsState stores.
+ * Base class for XFormsState stores. This store only deals with storing items in memory
  */
 public abstract class XFormsStateStore {
 
-    private static final boolean TEMP_PERF_TEST = false;
-    private static final int TEMP_PERF_ITERATIONS = 100;
-    private static final boolean TEMP_USE_XMLDB = true;
-
-    // For now the driver is not configurable, but everything else (URI, username, password, collection) is configurable in properties
-    private static final String EXIST_XMLDB_DRIVER = "org.exist.xmldb.DatabaseImpl";
-
-    private boolean isPersistent;
     private int currentStoreSize = 0;
 
     private Map keyToEntryMap = new HashMap();
     private LinkedList linkedList = new LinkedList();
 
-    protected XFormsStateStore(boolean isPersistent) {
-        this.isPersistent = isPersistent;
+    protected XFormsStateStore() {
+        debug("created new store.");
     }
 
     protected abstract int getMaxSize();
@@ -85,7 +60,22 @@ public abstract class XFormsStateStore {
         }
     }
 
-    private void addOne(String key, String value, boolean isInitialEntry) {
+    public synchronized XFormsState find(String pageGenerationId, String requestId) {
+        if (XFormsServer.logger.isDebugEnabled()) {
+            debug("store size before finding: " + currentStoreSize + " bytes.");
+            debugDumpKeys();
+        }
+
+        final String staticState = findOne(pageGenerationId);
+        if (staticState == null)
+            return null;
+        final String dynamicState = findOne(requestId);
+        if (dynamicState == null)
+            return null;
+        return new XFormsState(staticState, dynamicState);
+    }
+
+    protected void addOne(String key, String value, boolean isInitialEntry) {
 
         // Remove existing entry if present
         {
@@ -119,22 +109,7 @@ public abstract class XFormsStateStore {
         currentStoreSize += size;
     }
 
-    public synchronized XFormsState find(String pageGenerationId, String requestId) {
-        if (XFormsServer.logger.isDebugEnabled()) {
-            debug("store size before finding: " + currentStoreSize + " bytes.");
-            debugDumpKeys();
-        }
-
-        final String staticState = findOne(pageGenerationId);
-        if (staticState == null)
-            return null;
-        final String dynamicState = findOne(requestId);
-        if (dynamicState == null)
-            return null;
-        return new XFormsState(staticState, dynamicState);
-    }
-
-    private String findOne(String key) {
+    protected String findOne(String key) {
         final StoreEntry existingStoreEntry = (StoreEntry) keyToEntryMap.get(key);
         if (existingStoreEntry != null) {
             // Move to the front (is this useful in our use case?)
@@ -144,21 +119,11 @@ public abstract class XFormsStateStore {
             }
             debug("found and refreshed entry for key: " + key);
             return existingStoreEntry.value;
-        } else if (isPersistent) {
-            // Try the persistent cache
-
-            final StoreEntry persistedStoreEntry = findPersistedEntry(key);
-            if (persistedStoreEntry != null) {
-                // Add the key to the list in memory
-                addOne(persistedStoreEntry.key, persistedStoreEntry.value, persistedStoreEntry.isInitialEntry);
-                debug("migrated persisted entry for key: " + key);
-                return persistedStoreEntry.value;
-            }
+        } else {
+            // Not found
+            debug("did not find entry in memory for key: " + key);
+            return null;
         }
-
-        // Not found
-        debug("did not find entry for key: " + key);
-        return null;
     }
 
     private void removeStoreEntry(StoreEntry existingStoreEntry) {
@@ -180,195 +145,13 @@ public abstract class XFormsStateStore {
             final StoreEntry lastStoreEntry = (StoreEntry) linkedList.getLast();
             removeStoreEntry(lastStoreEntry);
 
-            if (isPersistent) {
-                // Persist state
-                persistEntry(lastStoreEntry);
-            }
+            // Try to persist state
+            persistEntry(lastStoreEntry);
         }
     }
 
-    private void persistEntry(StoreEntry storeEntry) {
-
-        if (XFormsServer.logger.isDebugEnabled()) {
-            debug("persisting entry for key: " + storeEntry.key + " (" + (storeEntry.value.length() * 2) + " bytes).");
-        }
-
-        if (TEMP_PERF_TEST) {
-
-            // Do the operation TEMP_PERF_ITERATIONS times to test performance
-            final long startTime = System.currentTimeMillis();
-            for (int i = 0; i < TEMP_PERF_ITERATIONS; i ++) {
-                if (TEMP_USE_XMLDB) {
-                    persistEntryExistXMLDB(storeEntry);
-                } else {
-                    persistEntryExistHTTP(storeEntry);
-                }
-            }
-            debug("average write persistence time: " + ((System.currentTimeMillis() - startTime) / TEMP_PERF_ITERATIONS) + " ms." );
-
-        } else {
-            if (TEMP_USE_XMLDB) {
-                persistEntryExistXMLDB(storeEntry);
-            } else {
-                persistEntryExistHTTP(storeEntry);
-            }
-        }
-    }
-
-    private void persistEntryExistXMLDB(StoreEntry storeEntry) {
-
-        final PipelineContext pipelineContext;
-        {
-            final StaticExternalContext.StaticContext staticContext = StaticExternalContext.getStaticContext();
-            pipelineContext = staticContext.getPipelineContext();
-        }
-
-        final String messageBody = encodeMessageBody(pipelineContext, storeEntry);
-        try {
-            new XMLDBAccessor().storeResource(pipelineContext, new Datasource(EXIST_XMLDB_DRIVER,
-                    XFormsProperties.getStoreURI(), XFormsProperties.getStoreUsername(), XFormsProperties.getStorePassword()), XFormsProperties.getStoreCollection(),
-                    true, storeEntry.key, messageBody);
-        } catch (Exception e) {
-            throw new OXFException("Unable to store entry in persistent state store for key: " + storeEntry.key, e);
-        }
-    }
-
-    private void persistEntryExistHTTP(StoreEntry storeEntry) {
-
-        final ExternalContext externalContext;
-        final PipelineContext pipelineContext;
-        {
-            final StaticExternalContext.StaticContext staticContext = StaticExternalContext.getStaticContext();
-            externalContext = staticContext.getExternalContext();
-            pipelineContext = staticContext.getPipelineContext();
-        }
-
-        final String url = "/exist/rest" + XFormsProperties.getStoreCollection() + storeEntry.key;
-        final String resolvedURL = externalContext.getResponse().rewriteResourceURL(url, true);
-
-        final byte[] messageBody;
-        try {
-            messageBody = encodeMessageBody(pipelineContext, storeEntry).getBytes("utf-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new OXFException(e);// won't happen
-        }
-
-        // Put document into external storage
-        XFormsModelSubmission.ConnectionResult result = XFormsSubmissionUtils.doRegular(externalContext, "put", resolvedURL, null, null, "application/xml", messageBody, null);
-        if (result.resultCode < 200 || result.resultCode >= 300)
-            throw new OXFException("Got non-successful return code from store persistence layer: " + result.resultCode);
-    }
-
-    private String encodeMessageBody(PipelineContext pipelineContext, StoreEntry storeEntry) {
-
-        final FastStringBuffer sb = new FastStringBuffer("<entry><key>");
-        sb.append(storeEntry.key);
-        sb.append("</key><value>");
-
-        // Make sure value is encrypted as it will be externalized
-        final String encryptedValue;
-        if (storeEntry.value.startsWith("X3") || storeEntry.value.startsWith("X4")) {
-            // Data is currently not encrypted, so encrypt it
-            final byte[] decodedValue = XFormsUtils.decodeBytes(pipelineContext, storeEntry.value, XFormsProperties.getXFormsPassword());
-            encryptedValue = XFormsUtils.encodeBytes(pipelineContext, decodedValue, XFormsProperties.getXFormsPassword());
-        } else {
-            // Data is already encrypted
-            encryptedValue = storeEntry.value;
-        }
-
-        sb.append(encryptedValue);
-        sb.append("</value><is-initial-entry>");
-        sb.append(Boolean.toString(storeEntry.isInitialEntry));
-        sb.append("</is-initial-entry></entry>");
-
-        return sb.toString();
-    }
-
-    private StoreEntry findPersistedEntry(String key) {
-
-        if (XFormsServer.logger.isDebugEnabled()) {
-            debug("finding persisting entry for key: " + key + ".");
-        }
-
-        StoreEntry result = null;
-        if (TEMP_PERF_TEST) {
-
-            // Do the operation TEMP_PERF_ITERATIONS times to test performance
-            final long startTime = System.currentTimeMillis();
-            for (int i = 0; i < TEMP_PERF_ITERATIONS; i ++) {
-                if (TEMP_USE_XMLDB) {
-                    result = findPersistedEntryExistXMLDB(key);
-                } else {
-                    result = findPersistedEntryExistHTTP(key);
-                }
-                if (result == null)
-                    return null;
-            }
-            debug("average read persistence time: " + ((System.currentTimeMillis() - startTime) / TEMP_PERF_ITERATIONS) + " ms." );
-
-        } else {
-            if (TEMP_USE_XMLDB) {
-                result = findPersistedEntryExistXMLDB(key);
-            } else {
-                result = findPersistedEntryExistHTTP(key);
-            }
-        }
-
-        return result;
-    }
-
-    private StoreEntry findPersistedEntryExistXMLDB(String key) {
-
-        final PipelineContext pipelineContext;
-        {
-            final StaticExternalContext.StaticContext staticContext = StaticExternalContext.getStaticContext();
-            pipelineContext = staticContext.getPipelineContext();
-        }
-
-        final LocationDocumentResult documentResult = new LocationDocumentResult();
-        final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
-        identity.setResult(documentResult);
-
-        try {
-            new XMLDBAccessor().getResource(pipelineContext, new Datasource(EXIST_XMLDB_DRIVER,
-                    XFormsProperties.getStoreURI(), XFormsProperties.getStoreUsername(), XFormsProperties.getStorePassword()),
-                    XFormsProperties.getStoreCollection(), true, key, identity);
-        } catch (Exception e) {
-            throw new OXFException("Unable to find entry in persistent state store for key: " + key, e);
-        }
-
-        final Document document = documentResult.getDocument();
-        return getStoreEntryFromDocument(key, document);
-    }
-
-    private StoreEntry findPersistedEntryExistHTTP(String key) {
-
-        final ExternalContext externalContext;
-        {
-            final StaticExternalContext.StaticContext staticContext = StaticExternalContext.getStaticContext();
-            externalContext = staticContext.getExternalContext();
-        }
-
-        final String url = "/exist/rest" + XFormsProperties.getStoreCollection() + key;
-        final String resolvedURL = externalContext.getResponse().rewriteResourceURL(url, true);
-
-        XFormsModelSubmission.ConnectionResult result = XFormsSubmissionUtils.doRegular(externalContext, "get", resolvedURL, null, null, null, null, null);
-
-        if (result.resultCode == 404)
-            return null;
-
-        if (result.resultCode < 200 || result.resultCode >= 300)
-            throw new OXFException("Got non-successful return code from store persistence layer: " + result.resultCode);
-
-        final Document document = TransformerUtils.readDom4j(result.getResultInputStream(), result.resourceURI);
-        return getStoreEntryFromDocument(key, document);
-    }
-
-    private StoreEntry getStoreEntryFromDocument(String key, Document document) {
-        final String value = document.getRootElement().element("value").getStringValue();
-        final boolean isInitialEntry = new Boolean(document.getRootElement().element("is-initial-entry").getStringValue()).booleanValue();
-
-        return new StoreEntry(key, value, isInitialEntry);
+    protected void persistEntry(StoreEntry storeEntry) {
+        // NOP by default
     }
 
     protected void debug(String message) {
@@ -383,7 +166,7 @@ public abstract class XFormsStateStore {
         }
     }
 
-    private static class StoreEntry {
+    protected static class StoreEntry {
         public String key;
         public String value;
         public boolean isInitialEntry;
@@ -392,24 +175,6 @@ public abstract class XFormsStateStore {
             this.key = key;
             this.value = value;
             this.isInitialEntry = isInitialEntry;
-        }
-    }
-
-    private static class XMLDBAccessor extends XMLDBProcessor {
-//        public void update(PipelineContext pipelineContext, Datasource datasource, String collectionName, boolean createCollection, String resourceId, String query) {
-//            super.update(pipelineContext, datasource, collectionName, createCollection, resourceId, query);
-//        }
-
-//        public void query(PipelineContext pipelineContext, Datasource datasource, String collectionName, boolean createCollection, String resourceId, String query, Map namespaceContext, ContentHandler contentHandler) {
-//            super.query(pipelineContext, datasource, collectionName, createCollection, resourceId, query, namespaceContext, contentHandler);
-//        }
-
-        protected void getResource(PipelineContext pipelineContext, Datasource datasource, String collectionName, boolean createCollection, String resourceName, ContentHandler contentHandler) {
-            super.getResource(pipelineContext, datasource, collectionName, createCollection, resourceName, contentHandler);
-        }
-
-        protected void storeResource(PipelineContext pipelineContext, Datasource datasource, String collectionName, boolean createCollection, String resourceName, String document) {
-            super.storeResource(pipelineContext, datasource, collectionName, createCollection, resourceName, document);
         }
     }
 }

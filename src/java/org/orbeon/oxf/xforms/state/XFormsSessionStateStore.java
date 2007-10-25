@@ -35,18 +35,13 @@ public class XFormsSessionStateStore extends XFormsStateStore {
 
             }
             {
-                final XFormsStateStore newStateStore = new XFormsSessionStateStore(false);
-                newStateStore.debug("created new store.");
+                final XFormsStateStore newStateStore = new XFormsSessionStateStore();
                 session.getAttributesMap().put(SESSION_STATE_STORE_SESSION_KEY, newStateStore);
                 return newStateStore;
             }
         } else {
             return null;
         }
-    }
-
-    private XFormsSessionStateStore(boolean isPersistent) {
-        super(isPersistent);
     }
 
     protected int getMaxSize() {

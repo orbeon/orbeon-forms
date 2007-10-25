@@ -33,15 +33,10 @@ public class XFormsApplicationStateStore extends XFormsStateStore {
 
         }
         {
-            final XFormsStateStore newStateStore = new XFormsApplicationStateStore(false);
-            newStateStore.debug("created new store.");
+            final XFormsStateStore newStateStore = new XFormsApplicationStateStore();
             externalContext.getAttributesMap().put(APPLICATION_STATE_CACHE_APPLICATION_KEY, newStateStore);
             return newStateStore;
         }
-    }
-
-    private XFormsApplicationStateStore(boolean isPersistent) {
-        super(isPersistent);
     }
 
     protected int getMaxSize() {

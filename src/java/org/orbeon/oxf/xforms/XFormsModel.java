@@ -1096,7 +1096,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                             // NOTE: We add all shared instances, even the globally shared ones, and the static state
                             // decides of the amount of information to actually store
                             if (XFormsServer.logger.isDebugEnabled())
-                                XFormsServer.logger.debug("XForms - adding read-only instance to static state: " + currentInstance);
+                                XFormsServer.logger.debug("XForms - adding read-only instance to static state: " + currentInstance.getEffectiveId());
                             staticState.addInstance((SharedXFormsInstance) currentInstance);
                         } else if (modelHasReset) {
                             if (XFormsServer.logger.isDebugEnabled())

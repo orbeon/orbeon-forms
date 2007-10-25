@@ -302,10 +302,12 @@ public abstract class XMLDBProcessor extends ProcessorImpl {
         }
 
         // Set namespaces
-        for (Iterator i = namespaceContext.keySet().iterator(); i.hasNext();) {
-            String prefix = (String) i.next();
-            String uri = (String) namespaceContext.get(prefix);
-            xpathQueryService.setNamespace(prefix, uri);
+        if (namespaceContext != null) {
+            for (Iterator i = namespaceContext.keySet().iterator(); i.hasNext();) {
+                String prefix = (String) i.next();
+                String uri = (String) namespaceContext.get(prefix);
+                xpathQueryService.setNamespace(prefix, uri);
+            }
         }
 
         // Log for debug

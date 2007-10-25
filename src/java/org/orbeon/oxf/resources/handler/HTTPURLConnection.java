@@ -13,11 +13,7 @@
  */
 package org.orbeon.oxf.resources.handler;
 
-import org.apache.commons.httpclient.Header;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpMethodBase;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
-import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
+import org.apache.commons.httpclient.*;
 import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.*;
@@ -35,15 +31,14 @@ import java.util.Map;
 
 public class HTTPURLConnection extends URLConnection {
 
-    private static HttpClient httpClient;
+    // Use a single shared connection manager so we can have efficient connection pooling
+    private static HttpConnectionManager connectionManager;
     static {
-        MultiThreadedHttpConnectionManager connectionManager =
-      		new MultiThreadedHttpConnectionManager();
-        HttpConnectionManagerParams params = new HttpConnectionManagerParams();
+        connectionManager = new MultiThreadedHttpConnectionManager();
+        final HttpConnectionManagerParams params = new HttpConnectionManagerParams();
         params.setDefaultMaxConnectionsPerHost(Integer.MAX_VALUE);
         params.setMaxTotalConnections(Integer.MAX_VALUE);
         connectionManager.setParams(params);
-        httpClient = new HttpClient(connectionManager);
     }
 
     private URL url;
@@ -79,6 +74,15 @@ public class HTTPURLConnection extends URLConnection {
     public void connect() throws IOException {
         if (!connected) {
             String userinfo = url.getUserInfo();
+
+            // Create the HTTP client (this *should* be fairly lightweight)
+
+            // NOTE: This will also reset the client's state, including cookies and authorization stuff, as currently
+            // don't have the ability to keep this state for example in association with an XForms page.
+            final HttpClient httpClient = new HttpClient(connectionManager);
+
+            // Make authentification preemptive
+            httpClient.getParams().setAuthenticationPreemptive(true);
 
             if (userinfo != null) {
                 // Set username and optional password specified on URL

@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.processor;
 import org.apache.commons.pool.ObjectPool;
 import org.apache.log4j.Logger;
 import org.dom4j.Document;
+import org.orbeon.oxf.cache.InternalCacheKey;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
@@ -24,19 +25,19 @@ import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.util.UUIDUtils;
 import org.orbeon.oxf.xforms.*;
-import org.orbeon.oxf.xforms.state.XFormsDocumentCache;
-import org.orbeon.oxf.xforms.state.XFormsState;
-import org.orbeon.oxf.xforms.state.XFormsStateManager;
 import org.orbeon.oxf.xforms.processor.handlers.HandlerContext;
 import org.orbeon.oxf.xforms.processor.handlers.XHTMLBodyHandler;
 import org.orbeon.oxf.xforms.processor.handlers.XHTMLHeadHandler;
+import org.orbeon.oxf.xforms.state.XFormsDocumentCache;
+import org.orbeon.oxf.xforms.state.XFormsState;
+import org.orbeon.oxf.xforms.state.XFormsStateManager;
 import org.orbeon.oxf.xml.*;
-import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
+import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
-import org.xml.sax.SAXException;
 import org.xml.sax.Locator;
+import org.xml.sax.SAXException;
 
 import javax.xml.transform.sax.TransformerHandler;
 import java.util.HashMap;
@@ -50,7 +51,8 @@ import java.util.Map;
 public class XFormsToXHTML extends ProcessorImpl {
 
     private static final boolean TEST_BYPASS_INPUT = false;// TODO: for testing only
-//    private static final boolean IS_MIGRATE_TO_SESSION = false;// TODO: for testing only
+
+    private static final boolean ALLOW_CACHING_OUTPUT = false;
 
     public static Logger logger = XFormsServer.logger;
 
@@ -59,13 +61,10 @@ public class XFormsToXHTML extends ProcessorImpl {
 
     private static final String OUTPUT_CACHE_KEY = "dynamicState";
 
-//    private static final String NAMESPACE_CACHE_KEY = "containerNamespace";
-//    private static final Long CONSTANT_VALIDITY = new Long(0);
+    private static final String NAMESPACE_CACHE_KEY = "containerNamespace";
+    private static final Long CONSTANT_VALIDITY = new Long(0);
 
     private static InputDependencies testCachingStaticStateInputDependencies;
-
-//    private static final KeyValidity CONSTANT_KEY_VALIDITY
-//            = new KeyValidity(new InternalCacheKey("sessionId", "NO_SESSION_DEPENDENCY"), new Long(0));
 
     public XFormsToXHTML() {
         addInputInfo(new ProcessorInputOutputInfo(INPUT_ANNOTATED_DOCUMENT));
@@ -81,44 +80,21 @@ public class XFormsToXHTML extends ProcessorImpl {
                 doIt(pipelineContext, contentHandler, this, outputName);
             }
 
-//            protected OutputCacheKey getKeyImpl(PipelineContext pipelineContext) {
-//                final OutputCacheKey outputCacheKey = super.getKeyImpl(pipelineContext);
-//
-//                if (IS_MIGRATE_TO_SESSION && outputCacheKey != null) {
-//                    final InputDependencies inputDependencies = (InputDependencies) getCachedInputAsObject(pipelineContext, getInputByName(INPUT_ANNOTATED_DOCUMENT));
-//                    if (inputDependencies != null && inputDependencies.isDependsOnSession()) {
-//                        final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
-//                        final ExternalContext.Session session = externalContext.getSession(true);
-//
-//                        // Find cached info
-//                        final XFormsEngineStaticState staticState = inputDependencies.getXFormsEngineStaticState();
-//                        final String staticStateUUID = staticState.getUUID();
-//                        final String encodedStaticState = staticState.getEncodedStaticState();
-//
-//                        final String dynamicStateUUID = (String) getOutputObject(pipelineContext, this, OUTPUT_CACHE_KEY,
-//                                new KeyValidity(outputCacheKey, getValidityImpl(pipelineContext)));
-//
-//                        // Migrate data to current session
-//                    }
-//                }
-//
-//                return outputCacheKey;
-//            }
-
             protected boolean supportsLocalKeyValidity() {
                 return true;
             }
 
             public KeyValidity getLocalKeyValidity(PipelineContext pipelineContext, URIReferences uriReferences) {
+                if (ALLOW_CACHING_OUTPUT) {
+                    // Use the container namespace as a dependency
+                    final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+                    final String containerNamespace = externalContext.getRequest().getContainerNamespace();
 
-                // TODO: For now we disable caching of the output, as migration from the application cache to the session cache has no be completed
-                return null;
-
-                // Use the container namespace as a dependency
-//                final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
-//                final String containerNamespace = externalContext.getRequest().getContainerNamespace();
-//
-//                return new KeyValidity(new InternalCacheKey(XFormsToXHTML.this, NAMESPACE_CACHE_KEY, containerNamespace), CONSTANT_VALIDITY);
+                    return new KeyValidity(new InternalCacheKey(XFormsToXHTML.this, NAMESPACE_CACHE_KEY, containerNamespace), CONSTANT_VALIDITY);
+                } else {
+                    // Disable caching of the output
+                    return null;
+                }
             }
         };
         addOutput(outputName, output);
@@ -274,7 +250,6 @@ public class XFormsToXHTML extends ProcessorImpl {
 
         private SAXStore annotatedSAXStore;
         private XFormsStaticState xformsStaticState;
-//        private boolean dependsOnSession;
 
         public InputDependencies(SAXStore annotatedSAXStore, XFormsStaticState xformsStaticState) {
             this.annotatedSAXStore = annotatedSAXStore;
@@ -288,14 +263,6 @@ public class XFormsToXHTML extends ProcessorImpl {
         public XFormsStaticState getXFormsEngineStaticState() {
             return xformsStaticState;
         }
-
-//        public boolean isDependsOnSession() {
-//            return dependsOnSession;
-//        }
-//
-//        public void setDependsOnSession(boolean dependsOnSession) {
-//            this.dependsOnSession = dependsOnSession;
-//        }
     }
 
     private void setCachingDependencies(XFormsContainingDocument containingDocument, InputDependencies inputDependencies) {
@@ -345,11 +312,6 @@ public class XFormsToXHTML extends ProcessorImpl {
 
             // TODO: Add @src attributes from controls?
         }
-
-        // Handle dependency on session id
-//        if (containingDocument.isServerStateHandling()) {
-//            inputDependencies.setDependsOnSession(true);
-//        }
     }
 
     private void createCacheContainingDocument(final PipelineContext pipelineContext, XFormsURIResolver uriResolver, XFormsStaticState xformsStaticState,

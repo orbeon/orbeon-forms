@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="windows-1252"?>
 <!--
     Copyright (C) 2005 Orbeon, Inc.
 
@@ -25,13 +26,31 @@
             <xforms:instance id="instance">
                 <instance>
                     <show>false</show>
-                    <real-message>Help message</real-message>
+                    <real-message>
+                        Help message
+                        &lt;img src="http://www.google.com/intl/en_ALL/images/logo.gif">
+                    </real-message>
                     <empty-message/>
                 </instance>
             </xforms:instance>
         </xforms:model>
+        <xhtml:style type="text/css">
+            .xforms-help-panel { width: 600px; }
+        </xhtml:style>
     </xhtml:head>
     <xhtml:body>
+
+        <!-- Markup that will be inserted to in the page (similar to what we do for the error panel) -->
+        <xhtml:div class="xforms-help-panel xforms-initially-hidden">
+            <xhtml:div class="hd">Help</xhtml:div>
+            <xhtml:div class="bd">
+                <xhtml:div class="xforms-help-panel-message"/>
+                <xhtml:div class="xforms-help-panel-close">
+                    <xhtml:button>Close</xhtml:button>
+                </xhtml:div>
+            </xhtml:div>
+        </xhtml:div>
+
         <xforms:trigger>
             <xforms:label>Show</xforms:label>
             <xforms:setvalue ref="/instance/show" ev:event="DOMActivate">true</xforms:setvalue>
@@ -46,7 +65,6 @@
                     <xforms:label>Ref to real help</xforms:label>
                     <xforms:help ref="/instance/real-message"/>
                 </xforms:input>
-                <xforms:output ref="/instance/real-message"/>
             </xhtml:div>
             <xhtml:div>
                 <xforms:input ref="/instance/empty-message">
@@ -55,7 +73,7 @@
                 </xforms:input>
             </xhtml:div>
             <xhtml:div>
-                <xforms:input ref=".">
+                <xforms:input ref="/instance/empty-message">
                     <xforms:label>Ref to empty nodeset</xforms:label>
                     <xforms:help ref="inexistant-message"/>
                 </xforms:input>

@@ -98,6 +98,11 @@
 .xforms-error-panel-show-details, .xforms-error-panel-hide-details { cursor: pointer; }
 .xforms-error-panel-close { cursor: pointer; }
 
+.xforms-help-panel { width: 300px; }
+.xforms-help-panel-message { margin-bottom: 1em; margin-top: 1em; }
+.xforms-help-panel-message { margin-bottom: 1em; margin-top: 1em; }
+.xforms-help-panel-close { text-align: right; }
+
 .xforms-loading-none {
     display: block;
     height: 0;

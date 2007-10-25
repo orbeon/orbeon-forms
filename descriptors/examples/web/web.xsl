@@ -364,28 +364,6 @@
                 </init-param>
             </servlet>
 
-            <!--
-            <xsl:call-template name="comment">
-                <xsl:with-param name="caption" select="'Struts examples'"/>
-                <xsl:with-param name="commented" select="$target = 'war'"/>
-                <xsl:with-param name="content">
-                    <servlet>
-                        <servlet-name>struts-servlet</servlet-name>
-                        <servlet-class>org.apache.struts.action.ActionServlet</servlet-class>
-                        <init-param>
-                            <param-name>config</param-name>
-                            <param-value>/WEB-INF/struts-config.xml</param-value>
-                        </init-param>
-                        <init-param>
-                            <param-name>config/examples/struts/module</param-name>
-                            <param-value>/WEB-INF/struts-module.xml</param-value>
-                        </init-param>
-                        <load-on-startup>3</load-on-startup>
-                    </servlet>
-                </xsl:with-param>
-            </xsl:call-template>
-            -->
-
             <xsl:call-template name="comment">
                 <xsl:with-param name="caption" select="'SQL examples'"/>
                 <xsl:with-param name="commented" select="$target = 'war'"/>
@@ -436,19 +414,6 @@
                 <servlet-name>exist-atom-servlet</servlet-name>
                 <url-pattern>/exist/atom/*</url-pattern>
             </servlet-mapping>
-
-            <!--
-            <xsl:call-template name="comment">
-                <xsl:with-param name="caption" select="'Struts examples'"/>
-                <xsl:with-param name="commented" select="$target = 'war'"/>
-                <xsl:with-param name="content">
-                    <servlet-mapping>
-                        <servlet-name>struts-servlet</servlet-name>
-                        <url-pattern>/struts/*</url-pattern>
-                    </servlet-mapping>
-                </xsl:with-param>
-            </xsl:call-template>
-            -->
 
             <xsl:call-template name="comment">
                 <xsl:with-param name="caption" select="'SQL examples'"/>
@@ -504,6 +469,11 @@
                     </security-role>
                 </xsl:with-param>
             </xsl:call-template>
+
+            <session-config>
+                <session-timeout>30</session-timeout>
+            </session-config>
+
         </web-app>
     </xsl:template>
 
@@ -580,6 +550,5 @@
             </xsl:call-template>
         </xsl:if>
     </xsl:template>
-
 
 </xsl:stylesheet>

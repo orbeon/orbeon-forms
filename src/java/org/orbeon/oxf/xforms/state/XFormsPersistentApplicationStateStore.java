@@ -65,10 +65,20 @@ public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
     // For now the driver is not configurable, but everything else (URI, username, password, collection) is configurable in properties
     private static final String EXIST_XMLDB_DRIVER = "org.exist.xmldb.DatabaseImpl";
 
+    // Access to the XML:DB API
+    private static final XMLDBAccessor xmlDBAccessor = new XMLDBAccessor();
+
     // Map session ids -> Map of keys
     private final Map sessionToKeysMap = new HashMap();
 
+    /**
+     * Create an instance of this state store.
+     *
+     * @param externalContext   external context
+     * @return                  state store
+     */
     public synchronized static XFormsStateStore instance(ExternalContext externalContext) {
+        // Try to find existing store
         {
             final XFormsStateStore existingStateStore
                     = (XFormsStateStore) externalContext.getAttributesMap().get(PERSISTENT_STATE_STORE_APPLICATION_KEY);
@@ -76,8 +86,8 @@ public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
             if (existingStateStore != null)
                 return existingStateStore;
         }
+        // Create new store
         {
-            // Create new store
             final XFormsPersistentApplicationStateStore newStateStore = new XFormsPersistentApplicationStateStore();
 
             // Expire remaining persistent entries with session information
@@ -206,7 +216,7 @@ public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
     private void persistEntryExistXMLDB(PipelineContext pipelineContext, ExternalContext externalContext, StoreEntry storeEntry) {
         final String messageBody = encodeMessageBody(pipelineContext, externalContext, storeEntry);
         try {
-            new XMLDBAccessor().storeResource(pipelineContext, new Datasource(EXIST_XMLDB_DRIVER,
+            xmlDBAccessor.storeResource(pipelineContext, new Datasource(EXIST_XMLDB_DRIVER,
                     XFormsProperties.getStoreURI(), XFormsProperties.getStoreUsername(), XFormsProperties.getStorePassword()), XFormsProperties.getStoreCollection(),
                     true, storeEntry.key, messageBody);
         } catch (Exception e) {
@@ -317,7 +327,7 @@ public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
         final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
         identity.setResult(result);
 
-        new XMLDBAccessor().query(getPipelineContext(), new Datasource(EXIST_XMLDB_DRIVER,
+        xmlDBAccessor.query(getPipelineContext(), new Datasource(EXIST_XMLDB_DRIVER,
                 XFormsProperties.getStoreURI(), XFormsProperties.getStoreUsername(), XFormsProperties.getStorePassword()), XFormsProperties.getStoreCollection(),
                 true, null, query, null, identity);
 
@@ -428,7 +438,7 @@ public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
         identity.setResult(documentResult);
 
         try {
-            new XMLDBAccessor().getResource(pipelineContext, new Datasource(EXIST_XMLDB_DRIVER,
+            xmlDBAccessor.getResource(pipelineContext, new Datasource(EXIST_XMLDB_DRIVER,
                     XFormsProperties.getStoreURI(), XFormsProperties.getStoreUsername(), XFormsProperties.getStorePassword()),
                     XFormsProperties.getStoreCollection(), true, key, identity);
         } catch (Exception e) {
@@ -466,9 +476,6 @@ public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
     }
 
     private static class XMLDBAccessor extends XMLDBProcessor {
-//        public void update(PipelineContext pipelineContext, Datasource datasource, String collectionName, boolean createCollection, String resourceId, String query) {
-//            super.update(pipelineContext, datasource, collectionName, createCollection, resourceId, query);
-//        }
 
         public void query(PipelineContext pipelineContext, Datasource datasource, String collectionName, boolean createCollection, String resourceId, String query, Map namespaceContext, ContentHandler contentHandler) {
             super.query(pipelineContext, datasource, collectionName, createCollection, resourceId, query, namespaceContext, contentHandler);

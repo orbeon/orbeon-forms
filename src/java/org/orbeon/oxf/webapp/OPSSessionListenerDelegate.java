@@ -54,23 +54,23 @@ public class OPSSessionListenerDelegate implements HttpSessionListener {
 
     public void sessionDestroyed(HttpSessionEvent event) {
         final HttpSession httpSession = event.getSession();
-
-        // Run listeners if any
-        if (httpSession != null && httpSession.getAttribute(ServletExternalContext.SESSION_LISTENERS) != null) {
-            // Iterate through listeners
-            final List listeners = (List) httpSession.getAttribute(ServletExternalContext.SESSION_LISTENERS);
-            if (listeners != null) {
-                for (Iterator i = listeners.iterator(); i.hasNext();) {
-                    final ExternalContext.Session.SessionListener currentListener = (ExternalContext.Session.SessionListener) i.next();
-                    currentListener.sessionDestroyed();
+        try {
+            // Run listeners if any
+            if (httpSession != null && httpSession.getAttribute(ServletExternalContext.SESSION_LISTENERS) != null) {
+                // Iterate through listeners
+                final List listeners = (List) httpSession.getAttribute(ServletExternalContext.SESSION_LISTENERS);
+                if (listeners != null) {
+                    for (Iterator i = listeners.iterator(); i.hasNext();) {
+                        final ExternalContext.Session.SessionListener currentListener = (ExternalContext.Session.SessionListener) i.next();
+                        currentListener.sessionDestroyed();
+                    }
                 }
             }
-        }
 
-        // Run processor
-        final ServletContext servletContext = httpSession.getServletContext();
-        try {
+            // Run processor
+            final ServletContext servletContext = httpSession.getServletContext();
             InitUtils.run(servletContext, httpSession, null, logger, LOG_MESSAGE_PREFIX, "Session destroyed.", DESTROY_PROCESSOR_PROPERTY_PREFIX, DESTROY_PROCESSOR_INPUT_PROPERTY);
+
         } catch (Exception e) {
             logger.error(LOG_MESSAGE_PREFIX + " - Exception when running session destruction processor.", OXFException.getRootThrowable(e));
             throw new OXFException(e);

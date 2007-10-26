@@ -44,6 +44,10 @@ public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
     private static final int TEMP_PERF_ITERATIONS = 100;
     private static final boolean TEMP_USE_XMLDB = true;
 
+    // Ideally we wouldn't want to force session creation, but it's hard to implement the more elaborate expiration
+    // strategy without session. See https://wiki.objectweb.org/ops/Wiki.jsp?page=XFormsStateStoreImprovements
+    private static final boolean FORCE_SESSION_CREATION = true;
+
     private static final String PERSISTENT_STATE_STORE_APPLICATION_KEY = "oxf.xforms.state.store.persistent-application-key";
     private static final String XFORMS_STATE_STORE_LISTENER_STATE_KEY = "oxf.xforms.state.store.has-session-listeners-key";
 
@@ -86,13 +90,8 @@ public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
             debug("persisting entry for key: " + storeEntry.key + " (" + (storeEntry.value.length() * 2) + " bytes).");
         }
 
-        final ExternalContext externalContext;
-        final PipelineContext pipelineContext;
-        {
-            final StaticExternalContext.StaticContext staticContext = StaticExternalContext.getStaticContext();
-            externalContext = staticContext.getExternalContext();
-            pipelineContext = staticContext.getPipelineContext();
-        }
+        final PipelineContext pipelineContext = getPipelineContext();
+        final ExternalContext externalContext = getExternalContext();
 
         if (TEMP_PERF_TEST) {
 
@@ -171,7 +170,7 @@ public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
      *
      * @param sessionId     Servlet session id
      */
-    private synchronized void expirePersistentBySession(String sessionId) {
+    private void expirePersistentBySession(String sessionId) {
 
         final String query = "xquery version \"1.0\";" +
             "                 declare namespace xmldb=\"http://exist-db.org/xquery/xmldb\";" +
@@ -188,7 +187,7 @@ public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
         debug("expired " + count + " persistent entries for session (" + sessionId + ").");
     }
 
-    private synchronized void expireAllPersistentWithSession() {
+    private void expireAllPersistentWithSession() {
 
         final String query = "xquery version \"1.0\";" +
             "                 declare namespace xmldb=\"http://exist-db.org/xquery/xmldb\";" +
@@ -205,7 +204,7 @@ public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
         debug("expired " + count + " persistent entries with session information.");
     }
 
-    public synchronized void expireAllPersistent() {
+    public void expireAllPersistent() {
 
         final String query = "xquery version \"1.0\";" +
             "                 declare namespace xmldb=\"http://exist-db.org/xquery/xmldb\";" +
@@ -224,21 +223,28 @@ public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
 
     private Document executeQuery(String query) {
 
-        final PipelineContext pipelineContext;
-        {
-            final StaticExternalContext.StaticContext staticContext = StaticExternalContext.getStaticContext();
-            pipelineContext = staticContext.getPipelineContext();
-        }
-
         final DocumentResult result = new DocumentResult();
         final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
         identity.setResult(result);
 
-        new XMLDBAccessor().query(pipelineContext, new Datasource(EXIST_XMLDB_DRIVER,
+        new XMLDBAccessor().query(getPipelineContext(), new Datasource(EXIST_XMLDB_DRIVER,
                 XFormsProperties.getStoreURI(), XFormsProperties.getStoreUsername(), XFormsProperties.getStorePassword()), XFormsProperties.getStoreCollection(),
                 true, null, query, null, identity);
 
         return result.getDocument();
+    }
+
+    private PipelineContext getPipelineContext() {
+        // NOTE: We may not have a StaticContext when we are called from a session listener, but that should be ok
+        // (PipelineContext is used further down the line to ensure that the db drive is registered, but it should
+        // be.)
+        final StaticExternalContext.StaticContext staticContext = StaticExternalContext.getStaticContext();
+        return (staticContext != null) ? staticContext.getPipelineContext() : null;
+    }
+
+    private ExternalContext getExternalContext() {
+            final StaticExternalContext.StaticContext staticContext = StaticExternalContext.getStaticContext();
+            return (staticContext != null) ? staticContext.getExternalContext() : null;
     }
 
     private String encodeMessageBody(PipelineContext pipelineContext, ExternalContext externalContext, StoreEntry storeEntry) {
@@ -262,7 +268,7 @@ public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
         sb.append("</value>");
 
         // Store the session id if any
-        final ExternalContext.Session session = externalContext.getSession(false);
+        final ExternalContext.Session session = externalContext.getSession(FORCE_SESSION_CREATION);
         if (session != null) {
             sb.append("<session-id>");
             sb.append(session.getId());
@@ -323,11 +329,7 @@ public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
 
     private StoreEntry findPersistedEntryExistXMLDB(String key) {
 
-        final PipelineContext pipelineContext;
-        {
-            final StaticExternalContext.StaticContext staticContext = StaticExternalContext.getStaticContext();
-            pipelineContext = staticContext.getPipelineContext();
-        }
+        final PipelineContext pipelineContext = getPipelineContext();
 
         final LocationDocumentResult documentResult = new LocationDocumentResult();
         final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
@@ -347,11 +349,7 @@ public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
 
     private StoreEntry findPersistedEntryExistHTTP(String key) {
 
-        final ExternalContext externalContext;
-        {
-            final StaticExternalContext.StaticContext staticContext = StaticExternalContext.getStaticContext();
-            externalContext = staticContext.getExternalContext();
-        }
+        final ExternalContext externalContext = getExternalContext();
 
         final String url = "/exist/rest" + XFormsProperties.getStoreCollection() + key;
         final String resolvedURL = externalContext.getResponse().rewriteResourceURL(url, true);

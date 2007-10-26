@@ -21,7 +21,7 @@ import org.orbeon.oxf.xforms.XFormsUtils;
 import java.util.*;
 
 public class StaticExternalContext {
-    private static Map staticContextx = Collections.synchronizedMap(new HashMap());
+    private static Map staticContext = Collections.synchronizedMap(new HashMap());
 
     public static class StaticContext {
         private ExternalContext externalContext;
@@ -42,23 +42,23 @@ public class StaticExternalContext {
     }
 
     public static void setStaticContext(StaticContext staticContext) {
-        List current = (List) staticContextx.get(Thread.currentThread());
+        List current = (List) StaticExternalContext.staticContext.get(Thread.currentThread());
         if (current == null)
             current = new ArrayList();
         current.add(staticContext);
-        staticContextx.put(Thread.currentThread(), current);
+        StaticExternalContext.staticContext.put(Thread.currentThread(), current);
     }
 
     public static void removeStaticContext() {
-        List current = (List) staticContextx.get(Thread.currentThread());
+        final List current = (List) staticContext.get(Thread.currentThread());
         current.remove(current.size() - 1);
         if (current.size() == 0)
-            staticContextx.remove(Thread.currentThread());
+            staticContext.remove(Thread.currentThread());
     }
 
     public static StaticContext getStaticContext() {
-        List current = (List) staticContextx.get(Thread.currentThread());
-        return (StaticContext) current.get(current.size() - 1);
+        final List current = (List) staticContext.get(Thread.currentThread());
+        return (current != null) ? (StaticContext) current.get(current.size() - 1) : null;
     }
 
     public static String rewriteActionURL(String urlString) {

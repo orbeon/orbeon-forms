@@ -40,6 +40,14 @@ import java.util.Map;
 
 /**
  * This store keeps XFormsState instances into an application store and persists data going over a given size.
+ *
+ * This store leverages the underlying memory store.
+ *
+ * o When an entry from the memory store is expiring, it is migrated to the persistent store.
+ * o When an entry is not found in the memory store, it is searched for in the persistent store.
+ * o A session id is added when available.
+ * o When a session expires, both memory and persistent entries are expired.
+ * o Upon first use, all persistent entries with session information are expired.
  */
 public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
 
@@ -90,6 +98,7 @@ public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
         return "global application";
     }
 
+    // NOTE: The super() method doesn't do anything
     protected void persistEntry(StoreEntry storeEntry) {
 
         if (XFormsServer.logger.isDebugEnabled()) {
@@ -121,6 +130,7 @@ public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
         }
     }
 
+    // NOTE: This calls super() and handles session information
     protected void addOne(String key, String value, boolean isInitialEntry) {
 
         // Actually add
@@ -139,6 +149,8 @@ public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
         }
     }
 
+    // This calls super() (without the session id) and handles session information
+    // NOTE: This version is used when called from the session listener
     private void removeStoreEntry(String sessionId, CacheLinkedList.ListEntry existingListEntry) {
 
         // Actually remove
@@ -151,6 +163,7 @@ public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
         }
     }
 
+    // This calls super() and handles session information
     protected void removeStoreEntry(CacheLinkedList.ListEntry existingListEntry) {
 
         // Actually remove
@@ -167,6 +180,7 @@ public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
         }
     }
 
+    // This calls super() and if that fails, tries the persistent store
     protected String findOne(String key) {
 
         final String memoryValue = super.findOne(key);

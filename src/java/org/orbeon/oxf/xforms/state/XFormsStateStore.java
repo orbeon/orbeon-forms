@@ -13,11 +13,10 @@
  */
 package org.orbeon.oxf.xforms.state;
 
+import org.orbeon.oxf.cache.CacheLinkedList;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.Map;
 
 /**
@@ -28,7 +27,7 @@ public abstract class XFormsStateStore {
     private int currentStoreSize = 0;
 
     private Map keyToEntryMap = new HashMap();
-    private LinkedList linkedList = new LinkedList();
+    private CacheLinkedList linkedList = new CacheLinkedList();
 
     protected XFormsStateStore() {
         debug("created new store.");
@@ -45,9 +44,12 @@ public abstract class XFormsStateStore {
         // Remove old dynamic state if present as we keep only one entry per page generation
         // NOTE: We try to keep the initial dynamic state entry in the store however, because the client is still likely to request it
         if (oldRequestId != null) {
-            final StoreEntry oldStoredEntry = (StoreEntry) keyToEntryMap.get(oldRequestId);
-            if (oldStoredEntry != null && !oldStoredEntry.isInitialEntry)
-                removeStoreEntry(oldStoredEntry);
+            final CacheLinkedList.ListEntry oldListEntry = (CacheLinkedList.ListEntry) keyToEntryMap.get(oldRequestId);
+            if (oldListEntry != null) {
+                final StoreEntry oldStoredEntry = (StoreEntry) oldListEntry.element;
+                if (!oldStoredEntry.isInitialEntry)
+                    removeStoreEntry(oldListEntry);
+            }
         }
 
         // Add new dynamic state
@@ -79,9 +81,12 @@ public abstract class XFormsStateStore {
 
         // Remove existing entry if present
         {
-            final StoreEntry existingStoreEntry = (StoreEntry) keyToEntryMap.get(key);
-            if (existingStoreEntry != null)
-                removeStoreEntry(existingStoreEntry);
+            final CacheLinkedList.ListEntry existingListEntry = (CacheLinkedList.ListEntry) keyToEntryMap.get(key);
+            if (existingListEntry != null) {
+                final StoreEntry oldStoredEntry = (StoreEntry) existingListEntry.element;
+                if (!oldStoredEntry.isInitialEntry)
+                    removeStoreEntry(existingListEntry);
+            }
         }
 
         // Make room if needed
@@ -99,8 +104,8 @@ public abstract class XFormsStateStore {
         // Add new element to store
         final StoreEntry newStoreEntry = new StoreEntry(key, value, isInitialEntry);
 
-        linkedList.addFirst(newStoreEntry);
-        keyToEntryMap.put(key, newStoreEntry);
+        final CacheLinkedList.ListEntry listEntry = linkedList.addFirst(newStoreEntry);
+        keyToEntryMap.put(key, listEntry);
 
         if (XFormsServer.logger.isDebugEnabled())
             debug("added entry of " + size + " bytes.");
@@ -110,15 +115,16 @@ public abstract class XFormsStateStore {
     }
 
     protected String findOne(String key) {
-        final StoreEntry existingStoreEntry = (StoreEntry) keyToEntryMap.get(key);
-        if (existingStoreEntry != null) {
-            // Move to the front (is this useful in our use case?)
-            if (linkedList.getFirst() != existingStoreEntry) {
-                linkedList.remove(existingStoreEntry);
-                linkedList.addFirst(existingStoreEntry);
+        final CacheLinkedList.ListEntry existingListEntry = (CacheLinkedList.ListEntry) keyToEntryMap.get(key);
+        if (existingListEntry != null) {
+            // Move to the front
+            if (linkedList.getFirst() != existingListEntry.element) {
+                linkedList.remove(existingListEntry);
+                final CacheLinkedList.ListEntry listEntry = linkedList.addFirst(existingListEntry.element);
+                keyToEntryMap.put(key, listEntry);
             }
             debug("found and refreshed entry for key: " + key);
-            return existingStoreEntry.value;
+            return ((StoreEntry) existingListEntry.element).value;
         } else {
             // Not found
             debug("did not find entry in memory for key: " + key);
@@ -126,11 +132,17 @@ public abstract class XFormsStateStore {
         }
     }
 
-    private void removeStoreEntry(StoreEntry existingStoreEntry) {
+    protected CacheLinkedList.ListEntry findEntry(String key) {
+        return (CacheLinkedList.ListEntry) keyToEntryMap.get(key);
+    }
+
+    protected void removeStoreEntry(CacheLinkedList.ListEntry existingListEntry) {
+
+        final StoreEntry existingStoreEntry = (StoreEntry) existingListEntry.element;
 
         final int stateSize = existingStoreEntry.value.length() * 2;
 
-        linkedList.remove(existingStoreEntry);
+        linkedList.remove(existingListEntry);
         keyToEntryMap.remove(existingStoreEntry.key);
 
         // Update store size
@@ -142,11 +154,12 @@ public abstract class XFormsStateStore {
 
     private void expireOne() {
         if (linkedList.size() > 0) {
-            final StoreEntry lastStoreEntry = (StoreEntry) linkedList.getLast();
-            removeStoreEntry(lastStoreEntry);
+            // Remove last entry
+            final CacheLinkedList.ListEntry lastListEntry = linkedList.getLastEntry();
+            removeStoreEntry(lastListEntry);
 
             // Try to persist state
-            persistEntry(lastStoreEntry);
+            persistEntry((StoreEntry) lastListEntry.element);
         }
     }
 
@@ -154,16 +167,20 @@ public abstract class XFormsStateStore {
         // NOP by default
     }
 
+    protected int getCurrentStoreSize() {
+        return currentStoreSize;
+    }
+
     protected void debug(String message) {
         XFormsServer.logger.debug("XForms - " + getStoreDebugName() + " store: " + message);
     }
 
     protected void debugDumpKeys() {
-        int index = 1;
-        for (final Iterator i = linkedList.iterator(); i.hasNext(); index++) {
-            final StoreEntry currentEntry = (StoreEntry) i.next();
-            debug("key in store: " + index + ": " + currentEntry.key);
-        }
+//        int index = 1;
+//        for (final Iterator i = linkedList.iterator(); i.hasNext(); index++) {
+//            final StoreEntry currentEntry = (StoreEntry) i.next();
+//            debug("key in store: " + index + ": " + currentEntry.key);
+//        }
     }
 
     protected static class StoreEntry {

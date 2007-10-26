@@ -13,26 +13,29 @@
  */
 package org.orbeon.oxf.xforms.state;
 
+import org.dom4j.Document;
+import org.dom4j.io.DocumentResult;
+import org.orbeon.oxf.cache.CacheLinkedList;
+import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.pipeline.StaticExternalContext;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.pipeline.StaticExternalContext;
-import org.orbeon.oxf.xforms.XFormsProperties;
+import org.orbeon.oxf.processor.Datasource;
+import org.orbeon.oxf.processor.xmldb.XMLDBProcessor;
 import org.orbeon.oxf.xforms.XFormsModelSubmission;
+import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.XFormsSubmissionUtils;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
-import org.orbeon.oxf.processor.Datasource;
-import org.orbeon.oxf.processor.xmldb.XMLDBProcessor;
-import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
 import org.orbeon.saxon.om.FastStringBuffer;
-import org.dom4j.Document;
-import org.dom4j.io.DocumentResult;
 import org.xml.sax.ContentHandler;
 
 import javax.xml.transform.sax.TransformerHandler;
 import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -53,6 +56,9 @@ public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
 
     // For now the driver is not configurable, but everything else (URI, username, password, collection) is configurable in properties
     private static final String EXIST_XMLDB_DRIVER = "org.exist.xmldb.DatabaseImpl";
+
+    // Map session ids -> Map of keys
+    private final Map sessionToKeysMap = new HashMap();
 
     public synchronized static XFormsStateStore instance(ExternalContext externalContext) {
         {
@@ -115,6 +121,52 @@ public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
         }
     }
 
+    protected void addOne(String key, String value, boolean isInitialEntry) {
+
+        // Actually add
+        super.addOne(key, value, isInitialEntry);
+
+        final ExternalContext.Session session = getExternalContext().getSession(FORCE_SESSION_CREATION);
+        if (session != null) {
+            // Remember that this key is associated with a session
+            final String sessionId = session.getId();
+            Map sessionMap = (Map) sessionToKeysMap.get(sessionId);
+            if (sessionMap == null) {
+                sessionMap = new HashMap();
+                sessionToKeysMap.put(sessionId, sessionMap);
+            }
+            sessionMap.put(key, "");
+        }
+    }
+
+    private void removeStoreEntry(String sessionId, CacheLinkedList.ListEntry existingListEntry) {
+
+        // Actually remove
+        super.removeStoreEntry(existingListEntry);
+
+        // Remove the mapping of the session to this key, if any
+        final Map sessionMap = (Map) sessionToKeysMap.get(sessionId);
+        if (sessionMap != null) {
+            sessionMap.remove(((StoreEntry) existingListEntry.element).key);
+        }
+    }
+
+    protected void removeStoreEntry(CacheLinkedList.ListEntry existingListEntry) {
+
+        // Actually remove
+        super.removeStoreEntry(existingListEntry);
+
+        final ExternalContext.Session session = getExternalContext().getSession(false);
+        if (session != null) {
+            // Remove the mapping of the session to this key, if any
+            final String sessionId = session.getId();
+            final Map sessionMap = (Map) sessionToKeysMap.get(sessionId);
+            if (sessionMap != null) {
+                sessionMap.remove(((StoreEntry) existingListEntry.element).key);
+            }
+        }
+    }
+
     protected String findOne(String key) {
 
         final String memoryValue = super.findOne(key);
@@ -163,6 +215,30 @@ public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
         XFormsModelSubmission.ConnectionResult result = XFormsSubmissionUtils.doRegular(externalContext, "put", resolvedURL, null, null, "application/xml", messageBody, null);
         if (result.resultCode < 200 || result.resultCode >= 300)
             throw new OXFException("Got non-successful return code from store persistence layer: " + result.resultCode);
+    }
+
+    /**
+     * Remove all memory entries which have the given session id.
+     *
+     * @param sessionId     Servlet session id
+     */
+    private void expireMemoryBySession(String sessionId) {
+
+        final Map sessionMap = (Map) sessionToKeysMap.get(sessionId);
+        if (sessionMap != null) {
+            final int storeSizeBeforeExpire = getCurrentStoreSize();
+            int expiredCount = 0;
+            for (Iterator i = sessionMap.keySet().iterator(); i.hasNext();) {
+                final String currentKey = (String) i.next();
+                final CacheLinkedList.ListEntry currenEntry = findEntry(currentKey);
+                removeStoreEntry(sessionId, currenEntry);
+                expiredCount++;
+            }
+            sessionToKeysMap.remove(sessionId);
+
+            if (expiredCount > 0 && XFormsServer.logger.isDebugEnabled())
+                debug("expired " + expiredCount + " entries for session " + sessionId + " (" + (storeSizeBeforeExpire - getCurrentStoreSize()) + " bytes).");
+        }
     }
 
     /**
@@ -279,6 +355,8 @@ public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
             if (sessionAttributes.get(XFORMS_STATE_STORE_LISTENER_STATE_KEY) == null) {
                 session.addListener(new ExternalContext.Session.SessionListener() {
                     public void sessionDestroyed() {
+                        // Expire both memory and persistent entries
+                        expireMemoryBySession(session.getId());
                         expirePersistentBySession(session.getId());
                     }
                 });

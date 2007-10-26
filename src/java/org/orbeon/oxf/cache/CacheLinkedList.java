@@ -23,6 +23,7 @@ public class CacheLinkedList {
     }
 
     private ListEntry listHeader = new ListEntry();
+    private int size;
 
     public CacheLinkedList() {
         listHeader.next = listHeader.prev = listHeader;
@@ -36,8 +37,12 @@ public class CacheLinkedList {
         return listHeader.prev.element;
     }
 
+    public ListEntry getLastEntry() {
+        return listHeader.prev;
+    }
+
     public Object removeLast() {
-        Object last = listHeader.prev.element;
+        final Object last = listHeader.prev.element;
         remove(listHeader.prev);
         return last;
     }
@@ -47,9 +52,10 @@ public class CacheLinkedList {
     }
 
     private ListEntry addBefore(Object o, ListEntry e) {
-        ListEntry newEntry = new ListEntry(o, e, e.prev);
+        final ListEntry newEntry = new ListEntry(o, e, e.prev);
         newEntry.prev.next = newEntry;
         newEntry.next.prev = newEntry;
+        size++;
         return newEntry;
     }
 
@@ -59,5 +65,10 @@ public class CacheLinkedList {
 
         e.prev.next = e.next;
         e.next.prev = e.prev;
+        size--;
+    }
+
+    public int size() {
+        return size;
     }
 }

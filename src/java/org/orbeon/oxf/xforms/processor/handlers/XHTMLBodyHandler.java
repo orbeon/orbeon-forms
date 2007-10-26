@@ -203,6 +203,10 @@ public class XHTMLBodyHandler extends HandlerBase {
             // TODO: must send startPrefixMapping()/endPrefixMapping()?
             helper.element("", XMLConstants.XINCLUDE_URI, "include", new String[] { "href", "oxf:/config/error-dialog.xml" });
         }
+
+        // Help panel
+        // TODO: must send startPrefixMapping()/endPrefixMapping()?
+        helper.element("", XMLConstants.XINCLUDE_URI, "include", new String[] { "href", "oxf:/config/help-panel.xml" });
     }
 
     public void end(String uri, String localname, String qName) throws SAXException {

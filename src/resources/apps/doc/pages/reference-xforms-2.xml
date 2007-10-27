@@ -1384,14 +1384,6 @@
                                         is restarted. When state information becomes unavailable for a page, that page
                                         will no longer function unless it is reloaded.
                                     </p>
-                                    <!--<note>-->
-                                        <!--With most servlet containers, it is possible to configure session handling to-->
-                                        <!--passivate sessions out of the application server memory to a persistent store.-->
-                                        <!--It is this way possible to partially alleviate the drawback above by making sure-->
-                                        <!--that a very large number of active but idle sessions can be kept, with a minimum-->
-                                        <!--impact on application server memory. It is this way also possible to make sure-->
-                                        <!--that sessions survive a servlet container restart.-->
-                                    <!--</note>-->
                                 </li>
                             </ul>
                             <note>
@@ -1489,7 +1481,7 @@
                         can be changed. The defaults are as follows:
                     </p>
                     <xml-source>
-                        <comment> Persistent store connection information </comment>
+                        <comment> Disk-based store connection information </comment>
                         <property as="xs:string"  name="oxf.xforms.store.application.username"           value="guest"/>
                         <property as="xs:string"  name="oxf.xforms.store.application.password"           value="guest"/>
                         <property as="xs:anyURI"  name="oxf.xforms.store.application.uri"                value="xmldb:exist:///"/>

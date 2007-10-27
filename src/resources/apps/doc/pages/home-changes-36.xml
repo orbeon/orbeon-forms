@@ -58,21 +58,30 @@
                 <ul>
                     <li>
                         <p>
-                            <b>XForms features a persistent state store.</b> Before this version, when using
+                            <b>XForms features a disk-based state store.</b> Before this version, when using
                             <code>session</code> state handling, XForm state information was stored in the user's
                             session. Because the size of the session information was limited, state information could
                             expire and cause certain XForms pages to no longer function when too much memory was used.
                         </p>
                         <p>
-                            Orbeon Forms now implements a persistent state store, which allows state information to be
-                            stored on disk when the memory store becomes too large. You enable this state store with the
-                            new <code>server</code> configuration value for the <code>oxf.xforms.state-handling</code>
-                            property. This is now the default state handling configuration, and when migrating to this
-                            version or Orbeon Forms we recommend that you update your properties with the following:
+                            Orbeon Forms now implements a disk-based state store, which allows state information to be
+                            stored on disk when the memory state store becomes too large. You enable this state store
+                            with the new <code>server</code> configuration value for the
+                            <code>oxf.xforms.state-handling</code> property. This is now the default state handling
+                            configuration, and when migrating to this version or Orbeon Forms we recommend that you
+                            update your properties with the following:
                         </p>
                         <xml-source>
-                        <comment> Store state on the server </comment>
+                            <comment> Store state on the server </comment>
                             <property as="xs:string" name="oxf.xforms.state-handling" value="server"/>
+                        </xml-source>
+                        <p>
+                            The memory state store is now global and shared among all users and pages. Its size is
+                            configured with the following property:
+                        </p>
+                        <xml-source>
+                            <comment> Allow a maximum of 20 MB of state information among all users </comment>
+                            <property as="xs:integer" name="oxf.xforms.store.application.size" value="20000000"/>
                         </xml-source>
                         <p>
                             For more information about configuration, see <a

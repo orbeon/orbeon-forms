@@ -93,7 +93,7 @@ public class XFormsStateManager {
 
                         // Produce dynamic state key
                         final String newRequestId = UUIDUtils.createPseudoUUID();
-                        final XFormsSessionStateStore stateStore = XFormsSessionStateStore.instance(externalContext, true);
+                        final XFormsStateStore stateStore = XFormsSessionStateStore.instance(externalContext, true);
                         stateStore.add(currentPageGenerationId, null, newRequestId, xformsState, null);
                         dynamicStateString = SESSION_STATE_PREFIX + newRequestId;
                     } else {

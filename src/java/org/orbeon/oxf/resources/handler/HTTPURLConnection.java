@@ -13,10 +13,22 @@
  */
 package org.orbeon.oxf.resources.handler;
 
-import org.apache.commons.httpclient.*;
-import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
+import org.apache.commons.httpclient.Header;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpConnectionManager;
+import org.apache.commons.httpclient.HttpMethodBase;
+import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
+import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
-import org.apache.commons.httpclient.methods.*;
+import org.apache.commons.httpclient.methods.DeleteMethod;
+import org.apache.commons.httpclient.methods.EntityEnclosingMethod;
+import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.httpclient.methods.HeadMethod;
+import org.apache.commons.httpclient.methods.OptionsMethod;
+import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.methods.PutMethod;
+import org.apache.commons.httpclient.methods.TraceMethod;
+import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.orbeon.oxf.common.OXFException;
 
 import java.io.IOException;
@@ -38,6 +50,10 @@ public class HTTPURLConnection extends URLConnection {
         final HttpConnectionManagerParams params = new HttpConnectionManagerParams();
         params.setDefaultMaxConnectionsPerHost(Integer.MAX_VALUE);
         params.setMaxTotalConnections(Integer.MAX_VALUE);
+        // The code commented below isables retries. By default HttpClient will try 3 times, and it is not clear
+        // if this is a good thing or not in our case.
+        //DefaultHttpMethodRetryHandler retryHandler = new DefaultHttpMethodRetryHandler(0, false);
+        //params.setParameter(HttpMethodParams.RETRY_HANDLER, retryHandler);
         connectionManager.setParams(params);
     }
 

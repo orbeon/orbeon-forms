@@ -17,7 +17,7 @@
     <appender name="ConsoleAppender" class="org.apache.log4j.ConsoleAppender">
         <param name="Target" value="System.out"/>
         <layout class="org.apache.log4j.PatternLayout">
-            <param name="ConversionPattern" value="%d{ISO8601} %t %-5p %c{2} %x - %m%n"/>
+            <param name="ConversionPattern" value="%d{ISO8601} %-5p %c{1} %x - %m%n"/>
         </layout>
         <filter class="org.apache.log4j.varia.LevelRangeFilter">
             <param name="LevelMin" value="debug" />
@@ -47,7 +47,7 @@
         <param name="File" value="../logs/ops.log"/>
         <param name="Append" value="false" />
         <layout class="org.apache.log4j.PatternLayout">
-            <param name="ConversionPattern" value="%d{ISO8601} %t %-5p %c{2} %x - %m%n"/>
+            <param name="ConversionPattern" value="%d{ISO8601} %-5p %c{1} %x - %m%n"/>
         </layout>
     </appender>
 
@@ -59,7 +59,7 @@
         <param name="MaxFileSize" value="5MB"/>
         <param name="Append" value="false" />
         <layout class="org.apache.log4j.PatternLayout">
-            <param name="ConversionPattern" value="%d{ISO8601} %t %-5p %c{2} %x - %m%n"/>
+            <param name="ConversionPattern" value="%d{ISO8601} %-5p %c{1} %x - %m%n"/>
         </layout>
     </appender>
 

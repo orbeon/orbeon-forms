@@ -37,13 +37,14 @@ public abstract class XFormsStateStore {
 
     protected abstract String getStoreDebugName();
 
-    public synchronized void add(String pageGenerationId, String oldRequestId, String requestId, XFormsState xformsState) {
-        // Add static state and move it to the front
-        addOne(pageGenerationId, xformsState.getStaticState(), false);
+    public synchronized void add(String pageGenerationId, String oldRequestId, String requestId, XFormsState xformsState, String currentSessionId) {
+
+         // Whether this is an initial dynamic state entry which has preferential treatment
+        final boolean isInitialEntry = oldRequestId == null;
 
         // Remove old dynamic state if present as we keep only one entry per page generation
         // NOTE: We try to keep the initial dynamic state entry in the store however, because the client is still likely to request it
-        if (oldRequestId != null) {
+        if (!isInitialEntry) {
             final CacheLinkedList.ListEntry oldListEntry = (CacheLinkedList.ListEntry) keyToEntryMap.get(oldRequestId);
             if (oldListEntry != null) {
                 final StoreEntry oldStoredEntry = (StoreEntry) oldListEntry.element;
@@ -52,9 +53,11 @@ public abstract class XFormsStateStore {
             }
         }
 
-        // Add new dynamic state
-        final boolean isInitialEntry = oldRequestId == null; // tell whether this is an initial dynamic state entry which has preferential treatment
-        addOne(requestId, xformsState.getDynamicState(), isInitialEntry);
+        // Add static state and move it to the front
+        addOrReplaceOne(pageGenerationId, xformsState.getStaticState(), false, currentSessionId);
+
+        // Add new dynamic state and move it to the front
+        addOrReplaceOne(requestId, xformsState.getDynamicState(), isInitialEntry, currentSessionId);
 
         if (XFormsServer.logger.isDebugEnabled()) {
             debug("store size after adding: " + currentStoreSize + " bytes.");
@@ -77,18 +80,32 @@ public abstract class XFormsStateStore {
         return new XFormsState(staticState, dynamicState);
     }
 
-    protected void addOne(String key, String value, boolean isInitialEntry) {
+    protected void addOrReplaceOne(String key, String value, boolean isInitialEntry, String currentSessionId) {
 
-        // Remove existing entry if present
-        {
-            final CacheLinkedList.ListEntry existingListEntry = (CacheLinkedList.ListEntry) keyToEntryMap.get(key);
-            if (existingListEntry != null) {
-                final StoreEntry oldStoredEntry = (StoreEntry) existingListEntry.element;
-                if (!oldStoredEntry.isInitialEntry)
-                    removeStoreEntry(existingListEntry);
+        final CacheLinkedList.ListEntry existingListEntry = (CacheLinkedList.ListEntry) keyToEntryMap.get(key);
+        if (existingListEntry != null) {
+            // Entry already exists, move to the front
+            if (linkedList.getFirst() != existingListEntry.element) {
+                linkedList.remove(existingListEntry);
+                final CacheLinkedList.ListEntry listEntry = linkedList.addFirst(existingListEntry.element);
+                keyToEntryMap.put(key, listEntry);
+
+                // Add session information
+                ((StoreEntry) existingListEntry.element).addSessionId(currentSessionId);
             }
-        }
 
+            if (XFormsServer.logger.isDebugEnabled())
+                debug("added and refreshed entry for key: " + key);
+        } else {
+            // Entry doesn't exist, add it
+            final Map sessionIds = new HashMap();
+            if (currentSessionId != null)
+                sessionIds.put(currentSessionId, "");
+            addOne(key, value, isInitialEntry, sessionIds);
+        }
+    }
+
+    protected void addOne(String key, String value, boolean isInitialEntry, Map sessionIds) {
         // Make room if needed
         final int size = value.length() * 2;
         final int storeSizeBeforeExpire = currentStoreSize;
@@ -102,22 +119,20 @@ public abstract class XFormsStateStore {
            debug("expired " + expiredCount + " entries (" + (storeSizeBeforeExpire - currentStoreSize) + " bytes).");
 
         // Add new element to store
-        final StoreEntry newStoreEntry = new StoreEntry(key, value, isInitialEntry);
-
-        final CacheLinkedList.ListEntry listEntry = linkedList.addFirst(newStoreEntry);
+        final CacheLinkedList.ListEntry listEntry = linkedList.addFirst(new StoreEntry(key, value, isInitialEntry, sessionIds));
         keyToEntryMap.put(key, listEntry);
-
-        if (XFormsServer.logger.isDebugEnabled())
-            debug("added entry of " + size + " bytes.");
 
         // Update store size
         currentStoreSize += size;
+
+        if (XFormsServer.logger.isDebugEnabled())
+            debug("added new entry of " + size + " bytes for key: " + key);
     }
 
     protected String findOne(String key) {
         final CacheLinkedList.ListEntry existingListEntry = (CacheLinkedList.ListEntry) keyToEntryMap.get(key);
         if (existingListEntry != null) {
-            // Move to the front
+            // Found, move to the front
             if (linkedList.getFirst() != existingListEntry.element) {
                 linkedList.remove(existingListEntry);
                 final CacheLinkedList.ListEntry listEntry = linkedList.addFirst(existingListEntry.element);
@@ -126,9 +141,15 @@ public abstract class XFormsStateStore {
             debug("found and refreshed entry for key: " + key);
             return ((StoreEntry) existingListEntry.element).value;
         } else {
-            // Not found
-            debug("did not find entry in memory for key: " + key);
-            return null;
+            // Not found, try persistent store
+            final String persistedEntry = findPersistedEntry(key);
+            if (persistedEntry != null) {
+                return persistedEntry;
+            } else {
+                // Not found
+                debug("did not find entry for key: " + key);
+                return null;
+            }
         }
     }
 
@@ -167,6 +188,11 @@ public abstract class XFormsStateStore {
         // NOP by default
     }
 
+    protected String findPersistedEntry(String key) {
+        // NOP by default
+        return null;
+    }
+
     protected int getCurrentStoreSize() {
         return currentStoreSize;
     }
@@ -187,11 +213,21 @@ public abstract class XFormsStateStore {
         public String key;
         public String value;
         public boolean isInitialEntry;
+        public Map sessionIds;
 
-        public StoreEntry(String key, String value, boolean isInitialEntry) {
+        public StoreEntry(String key, String value, boolean isInitialEntry, Map sessionIds) {
             this.key = key;
             this.value = value;
             this.isInitialEntry = isInitialEntry;
+            this.sessionIds = sessionIds;
+        }
+
+        public void addSessionId(String sessionId) {
+            if (sessionId != null) {
+                if (sessionIds == null)
+                    sessionIds = new HashMap();
+                sessionIds.put(sessionId, "");
+            }
         }
     }
 }

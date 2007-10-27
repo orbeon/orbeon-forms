@@ -99,7 +99,7 @@ public abstract class XMLDBProcessor extends ProcessorImpl {
         });
     }
 
-    private synchronized static void ensureDriverRegistered(PipelineContext pipelineContext, Datasource datasource) {
+    protected synchronized static void ensureDriverRegistered(PipelineContext pipelineContext, Datasource datasource) {
         String driverClassName = datasource.getDriverClassName();
         if (drivers.get(driverClassName) == null) {
             // Initialize database driver
@@ -132,7 +132,7 @@ public abstract class XMLDBProcessor extends ProcessorImpl {
      *    /db/orbeon/bizdoc-example
      *    xmldb:exist://localhost:9999/exist/xmlrpc/db/orbeon/bizdoc-example
      */
-    private Collection getCollection(PipelineContext pipelineContext, Datasource datasource, String collection) {
+    protected Collection getCollection(PipelineContext pipelineContext, Datasource datasource, String collection) {
         ensureDriverRegistered(pipelineContext, datasource);
         try {
             String datasourceURI = datasource.getUri();
@@ -183,31 +183,6 @@ public abstract class XMLDBProcessor extends ProcessorImpl {
                 } else {
                     throw new OXFException("Unsupported resource type: " + resource.getClass());
                 }
-            }
-        } catch (XMLDBException e) {
-            throw new OXFException(e);
-        }
-    }
-
-    protected void getResource(PipelineContext pipelineContext, Datasource datasource, String collectionName, boolean createCollection, String resourceName, ContentHandler contentHandler) {
-        ensureDriverRegistered(pipelineContext, datasource);
-        try {
-            Collection collection = getCollection(pipelineContext, datasource, collectionName);
-            if (collection == null) {
-                if (!createCollection)
-                    throw new OXFException("Cannot find collection '" + collectionName + "'.");
-                else
-                    collection = createCollection(pipelineContext, datasource, collectionName);
-            }
-            final Resource resource = collection.getResource(resourceName);
-            if (resource instanceof XMLResource) {
-                ((XMLResource) resource).getContentAsSAX(new DatabaseReadContentHandler(contentHandler));
-            } else if (resource instanceof BinaryResource) {
-                XMLUtils.inputStreamToBase64Characters(new ByteArrayInputStream((byte[]) resource.getContent()), contentHandler);
-            } else if (resource == null) {
-                throw new OXFException("Resource not found: " + resourceName);
-            } else {
-                throw new OXFException("Unsupported resource type: " + resource.getClass());
             }
         } catch (XMLDBException e) {
             throw new OXFException(e);
@@ -359,7 +334,7 @@ public abstract class XMLDBProcessor extends ProcessorImpl {
         return getPropertySet().getBoolean("serialize-xml-11", false).booleanValue();
     }
 
-    private Collection createCollection(PipelineContext pipelineContext, Datasource datasource, String collectionName) throws XMLDBException {
+    protected Collection createCollection(PipelineContext pipelineContext, Datasource datasource, String collectionName) throws XMLDBException {
         Collection rootCollection = getCollection(pipelineContext, datasource, ROOT_COLLECTION_PATH);
         if (rootCollection == null)
             throw new OXFException("Cannot find root collection '" + ROOT_COLLECTION_PATH + "'.");

@@ -1105,7 +1105,6 @@ ORBEON.xforms.Events = {
                     ORBEON.xforms.Globals.hintTooltipForControl[target.id] =
                         new YAHOO.widget.Tooltip(target.id + "-orbeon-hint-tooltip", {
                             context: target.id, text: message, showDelay: 500 });
-                    console.log(ORBEON.xforms.Globals.hintTooltipForControl[target.id]);
                 } else {
                     // Remember we looked at this control already
                     ORBEON.xforms.Globals.hintTooltipForControl[target.id] = true;

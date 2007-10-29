@@ -25,27 +25,7 @@
 }
 
 .xforms-hint {
-    color: #666;
-    font-size: 85%;
-    min-height: 2em;
-    background-image: url(../../ops/images/xforms/greybracket.gif);
-    background-repeat: no-repeat;
-    background-position: left center;
-    margin-left: .25em;
-    padding-left: 1.5em;
-    vertical-align: middle;
-}
-
-.xforms-hint-active {
-    color: #000;
-    font-size: 85%;
-    min-height: 2em;
-    background-image: url(../../ops/images/xforms/bracket.gif);
-    background-repeat: no-repeat;
-    background-position: left center;
-    margin-left: .25em;
-    padding-left: 1.5em;
-    vertical-align: middle;
+    display: none;
 }
 
 .xforms-alert-inactive, .xforms-alert-active {

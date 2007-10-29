@@ -62,14 +62,18 @@
     <xsl:variable name="traces-all" as="element(trace)*">
         <xsl:for-each select="$traces-with-lines">
             <xsl:variable name="trace-id" as="xs:string" select="substring-before(substring-after(line[1], ' '), ':')"/>
-            <xsl:variable name="sample" as="element(sample)" select="$samples[@trace = $trace-id]"/>
-            <trace count="{$sample/@count}">
-                <xsl:for-each select="line[position() > 1]">
-                    <call method="{substring(substring-before(., '('), 2)}"
-                            file="{substring-before(substring-after(., '('), ':')}"
-                            line="{substring-before(substring-after(., ':'), ')')}"/>
-                </xsl:for-each>
-            </trace>
+            <xsl:variable name="sample" as="element(sample)?" select="$samples[@trace = $trace-id]"/>
+            <!-- We have cases where there are traces but no corresponding sample, e.g. if multiple dumps
+                 are done and some of the traces from previous dumps have sample in the current dump. -->
+            <xsl:if test="exists($sample)">
+                <trace count="{$sample/@count}">
+                    <xsl:for-each select="line[position() > 1]">
+                        <call method="{substring(substring-before(., '('), 2)}"
+                                file="{substring-before(substring-after(., '('), ':')}"
+                                line="{substring-before(substring-after(., ':'), ')')}"/>
+                    </xsl:for-each>
+                </trace>
+            </xsl:if>
         </xsl:for-each>
     </xsl:variable>
 

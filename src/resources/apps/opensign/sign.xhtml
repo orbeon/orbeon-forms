@@ -1,0 +1,65 @@
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:f="http://orbeon.org/oxf/xml/formatting"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:widget="http://orbeon.org/oxf/xml/widget"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xhtml:head>
+        <xforms:model>
+            <xforms:instance id="instance1">
+                <instance>
+                </instance>
+            </xforms:instance>
+            <xforms:instance id="instance2">
+                <instance>
+                </instance>
+            </xforms:instance>
+        </xforms:model>
+    </xhtml:head>
+    <xhtml:body>
+        <xhtml:applet name="signing_applet" code="org.openoces.opensign.client.applet.bootstrap.BootApplet" width="600"
+                height="400" codebase="/demo" archive="/ops/ops/opensign/OpenSign-bootstrapped.jar" mayscript="mayscript">
+
+            <xhtml:param name="cabbase" value="/ops/ops/opensign/OpenSign-bootstrapped.cab"/>
+            <xhtml:param name="locale" value="en,US"/>
+            <xhtml:param name="ZIP_FILE_ALIAS" value="OpenSign"/>
+            <xhtml:param name="ZIP_BASE_URL" value="/ops/ops/opensign/plugins"/>
+            <xhtml:param name="MS_SUPPORT" value="bcjce"/>
+            <xhtml:param name="SUN_SUPPORT" value="jsse"/>
+            <xhtml:param name="STRIP_ZIP" value="yes"/>
+            <xhtml:param name="EXTRA_ZIP_FILE_NAMES" value="capi,pkcs12,cdcard,oces,attachment"/>
+            <xhtml:param name="LOG_LEVEL" value="INFO"/>
+            <xhtml:param name="key.store.directory" value="null"/>
+            <xhtml:param name="loglevel" value="debug"/>
+            <xhtml:param name="signtext" value="RW50ZXIgdGV4dCB0byBiZSBzaWduZWQgaGVyZQ=="/>
+            <xhtml:param name="background" value="255,255,255"/>
+            <xhtml:param name="socialsecuritynumber" value="no"/>
+            <xhtml:param name="optionalid" value="no"/>
+            <xhtml:param name="opensign.doappletrequest" value="true"/>
+            <xhtml:param name="opensign.doappletrequestonmac" value="true"/>
+            <xhtml:param name="cdkortservice" value="demo"/>
+            <xhtml:param name="opensign.verifieruri" value="/ops/opensign/verify"/>
+            <xhtml:param name="opensign.canceluri" value="/ops/opensign/cancel"/>
+            <xhtml:param name="opensign.erroruri" value="/demo/servlet/Display?result=error"/>
+            <xhtml:param name="opensign.alerturi" value="/demo/servlet/Display?result=alert"/>
+            <xhtml:param name="opensign.verifiedokuri" value="/demo/servlet/Display?result=ok&amp;id=179"/>
+            <xhtml:param name="opensign.verifiederroruri" value="/demo/servlet/Display?result=error179"/>
+            <xhtml:param name="opensign.message.name" value="message"/>
+            <xhtml:param name="opensign.result.name" value="result"/>
+            <xhtml:param name="opensign.cookiecount" value="0"/>
+            <xhtml:param name="opensign.formdata.count" value="2"/>
+            <xhtml:param name="opensign.formdata.1.name" value="formfield1name"/>
+            <xhtml:param name="opensign.formdata.1.value" value="formfield1value"/>
+            <xhtml:param name="opensign.formdata.2.name" value="formfield2name"/>
+            <xhtml:param name="opensign.formdata.2.value" value="formfield2value"/>
+            <xhtml:param name="gui" value="modern"/>
+        </xhtml:applet>
+        <xhtml:form name="signedForm" method="post" action="/demo/servlet/Display">
+            <xhtml:input type="hidden" name="message"/>
+            <xhtml:input type="hidden" name="result"/>
+        </xhtml:form>
+        
+    </xhtml:body>
+</xhtml:html>

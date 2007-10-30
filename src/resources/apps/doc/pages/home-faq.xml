@@ -842,6 +842,29 @@
                     get your widget in the Orbeon Forms code base.
                 </p>
             </section>
+            <a name="xforms-javascript"/>
+            <section added="2007-10-30">
+                <title>I am not allowed to run JavaScript in the browser. Is Orbeon Forms a solution for me?</title>
+                <p>
+                    Currently, the Orbeon Forms XForms engine uses JavaScript on the client. In particular, it uses <a
+                    href="http://developer.yahoo.com/yui/">The Yahoo! User Interface Library (YUI)</a> as a foundation
+                    to Orbeon-specific JavaScript code. This is at the moment a required component of Orbeon Forms when
+                    you use the XForms functionality.
+                </p>
+                <p>
+                    So at the moment, Orbeon Forms does not support JavaScript-less operation with XForms. However, it
+                    would be possible to support much of the XForms functionality without JavaScript, and even to
+                    automatically fallback to this mode if the client does not support JavaScript.
+                </p>
+                <p>
+                    This would have some limitations, of course. Dynamic behavior in the user interface would be
+                    reduced, and the user might have to press buttons to perform udates, like with older-style web
+                    applications. Also, advanced widgets like dialogs, trees, and menus, might not be implemented.
+                </p>
+                <p>
+                    If you are interested in this feature, please consider sponsoring it.
+                </p>
+            </section>
         </section>
         <a name="xpl"/>
         <section>

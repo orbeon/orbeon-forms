@@ -1104,7 +1104,11 @@ ORBEON.xforms.Events = {
                     // We have a hint, initialize YUI tooltip
                     ORBEON.xforms.Globals.hintTooltipForControl[target.id] =
                         new YAHOO.widget.Tooltip(target.id + "-orbeon-hint-tooltip", {
-                            context: target.id, text: message, showDelay: 500 });
+                            context: target.id,
+                            text: message,
+                            showDelay: 200,
+                            effect: {effect:YAHOO.widget.ContainerEffect.FADE,duration: 0.2}
+                        });
                 } else {
                     // Remember we looked at this control already
                     ORBEON.xforms.Globals.hintTooltipForControl[target.id] = true;
@@ -1122,7 +1126,11 @@ ORBEON.xforms.Events = {
                     YAHOO.util.Dom.generateId(target);
                     ORBEON.xforms.Globals.alertTooltipForControl[target.id] =
                         new YAHOO.widget.Tooltip(target.id + "-orbeon-alert-tooltip", {
-                            context: target.id, text: message, showDelay: 500 });
+                            context: target.id,
+                            text: message,
+                            showDelay: 0,
+                            effect: {effect:YAHOO.widget.ContainerEffect.FADE,duration: 0.2}
+                        });
                 } else {
                     // Remember we looked at this control already
                     ORBEON.xforms.Globals.alertTooltipForControl[target.id] = true;
@@ -1283,7 +1291,8 @@ ORBEON.xforms.Events = {
                                 underlay: "shadow",
                                 visible: false,
                                 constraintoviewport: true,
-                                draggable: true
+                                draggable: true,
+                                effect: {effect:YAHOO.widget.ContainerEffect.FADE,duration: 0.3}
                             });
                             helpPanel.render();
                             helpPanel.element.style.display = "none";

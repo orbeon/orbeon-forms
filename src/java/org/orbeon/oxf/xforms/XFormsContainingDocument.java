@@ -756,20 +756,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
 
                 // Notify the control of the value change
                 final String eventValue = concreteEvent.getNewValue();
-                if (valueXFormsControl instanceof XFormsUploadControl) {
-                    final XFormsUploadControl uploadControl = (XFormsUploadControl) valueXFormsControl;
-                    uploadControl.setExternalValue(pipelineContext, eventValue, null, true);
-
-                    // If the value is being cleared, also clear the metadata
-                    if (eventValue.equals("")) {
-                        uploadControl.setFilename(pipelineContext, "");
-                        uploadControl.setMediatype(pipelineContext, "");
-                        uploadControl.setSize(pipelineContext, "");
-                    }
-
-                } else {
-                    valueXFormsControl.setExternalValue(pipelineContext, eventValue, null);
-                }
+                valueXFormsControl.setExternalValue(pipelineContext, eventValue, null);
             }
 
             {

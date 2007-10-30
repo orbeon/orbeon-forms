@@ -67,6 +67,19 @@ public class XFormsUploadControl extends XFormsValueControl {
         evaluateSize(pipelineContext);
     }
 
+    public void setExternalValue(PipelineContext pipelineContext, String value, String type) {
+
+        // Set value and handle temporary files
+        setExternalValue(pipelineContext, value, type, true);
+
+        // If the value is being cleared, also clear the metadata
+        if (value.equals("")) {
+            setFilename(pipelineContext, "");
+            setMediatype(pipelineContext, "");
+            setSize(pipelineContext, "");
+        }
+    }
+
     public void setExternalValue(PipelineContext pipelineContext, String value, String type, boolean handleTemporaryFiles){
 
         try {
@@ -136,6 +149,7 @@ public class XFormsUploadControl extends XFormsValueControl {
                 newValue = value;
             }
 
+            // Call the super method
             super.setExternalValue(pipelineContext, newValue, type);
         } catch (Exception e) {
             throw new OXFException(e);

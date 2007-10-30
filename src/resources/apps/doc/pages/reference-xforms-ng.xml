@@ -1092,8 +1092,8 @@
                             </td>
                             <td>
                                 <p>
-                                    You can specify a hint on each control, which is displayed next to the control and
-                                    becomes highlighted when the control is selected, or as a tooltip.
+                                    You can specify a hint on each control, which shows up as a hint when users mouse
+                                    over the control.
                                 </p>
                                 <xml-source border="false" show-namespaces="false">
                                     <xforms:textarea ref="textarea">
@@ -1110,20 +1110,42 @@
                             <td>
                                 <p>
                                     If you specify a help message for a control, an icon with a question mark is
-                                    displayed next to the control. A pop-up shows the help message when you position the
-                                    mouse cursor over the icon.
+                                    displayed next to the control. When users click on the help icon, a dialog is
+                                    displayed with the help message. The <code>&lt;xforms:help></code> can contain
+                                    XHTML, or if you bind it to a node, the node can contain escaped XHTML.
                                 </p>
                                 <xml-source border="false" show-namespaces="false">
                                     <xforms:input ref="date" class="xforms-date">
                                         <xforms:label class="fixed-width">Birth date:</xforms:label>
                                         <xforms:help>
-                                            This is supposed to be a help message explaining what a birth date is. But
-                                            since you already know, it mostly serves the purpose of showing how help
-                                            messages can be attached to controls, and that they can be pretty long as
-                                            they can be displayed on multiple lines.
+                                            <div>
+                                                <p>
+                                                    This field must contain:
+                                                </p>
+                                                <ul>
+                                                    <li>a valid date</li>
+                                                    <li>which is at most one day in the future</li>
+                                                </ul>
+                                            </div>
                                         </xforms:help>
                                     </xforms:input>
                                 </xml-source>
+                                <p>
+                                    The help dialog has a default with of 300px defined in <code>xforms.js</code>. To
+                                    use a different width, override this default with:
+                                </p>
+                                <p>
+                                    <code>.xforms-help-panel { width: 600px; }</code>
+                                </p>
+                                <p>
+                                    By default, the help dialog will stretch vertically as needed so all the text in
+                                    your help is visible. Then users can use the browser vertical scrollbar to
+                                    navigate through the text. If instead you want the dialog to have a fixed height and
+                                    scrollbars inside the dialog when the text doesn't fit that height, use CSS as in:
+                                </p>
+                                <p>
+                                    <code>.xforms-help-panel .bd { height: 300px; overflow: auto; }</code>
+                                </p>
                             </td>
                         </tr>
                     </table>

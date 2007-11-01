@@ -34,6 +34,7 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
 
     private String value;
     private String displayValue;
+    private String externalValue;
 
     protected XFormsValueControl(XFormsContainingDocument containingDocument, XFormsControl parent, Element element, String name, String effectiveId) {
         super(containingDocument, parent, element, name, effectiveId);
@@ -63,9 +64,10 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
     }
 
     /**
-     * Notify the control that its value has changed due to external user interaction.
+     * Notify the control that its value has changed due to external user interaction. The value passed is a value as
+     * understood by the UI layer.
      *
-     * @param value the new value
+     * @param value     the new external value
      */
     public void setExternalValue(PipelineContext pipelineContext, String value, String type) {
         // Set value into the instance
@@ -79,8 +81,15 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
         // the controls as dirty, and they will be evaluated when necessary later.
     }
 
-    public String convertToExternalValue(String internalValue) {
-        return internalValue;
+    /**
+     * Return the control's external value is the value as exposed to the UI layer. By default, this is the control's
+     * value.
+     *
+     * @param pipelineContext   current pipeline context
+     * @return                  external value
+     */
+    protected String evaluateExternalValue(PipelineContext pipelineContext) {
+        return getValue();
     }
 
     protected void evaluateDisplayValueUseFormat(PipelineContext pipelineContext, String format) {
@@ -176,10 +185,25 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
     }
 
     /**
-     * Return a formatted display value of the control value, or the raw control value if there is no such display value.
+     * Return the control's external value is the value as exposed to the UI layer.
+     *
+     * @return                  external value
      */
-    public String getDisplayValueOrValue() {
-        return displayValue != null ? displayValue : value;
+    public String getExternalValue() {
+        if (externalValue == null) {
+            // Lazily evaluate the external value
+            evaluateIfNeeded(null);// TODO: Statistics won't be gathered. Any other consequence?
+            externalValue = evaluateExternalValue(null);
+        }
+        return externalValue;
+    }
+
+    /**
+     * Return a formatted display value of the control value, or the external control value if there is no such display
+     * value.
+     */
+    public String getDisplayValueOrExternalValue() {
+        return displayValue != null ? displayValue : getExternalValue();
     }
 
     protected void setValue(String value) {
@@ -200,8 +224,8 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
 
         final XFormsValueControl other = (XFormsValueControl) obj;
 
-        final String displayValueOrValue = getDisplayValueOrValue();
-        final String otherDisplayValueOrValue = other.getDisplayValueOrValue();
+        final String displayValueOrValue = getDisplayValueOrExternalValue();
+        final String otherDisplayValueOrValue = other.getDisplayValueOrExternalValue();
 
         if (!((displayValueOrValue == null && otherDisplayValueOrValue == null)
                 || (displayValueOrValue != null && otherDisplayValueOrValue != null && displayValueOrValue.equals(otherDisplayValueOrValue))))

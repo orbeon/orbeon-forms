@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 20067 Orbeon, Inc.
+ *  Copyright (C) 2007 Orbeon, Inc.
  *
  *  This program is free software; you can redistribute it and/or modify it under the terms of the
  *  GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -181,8 +181,9 @@ public class XFormsStateManager {
             // Get state from store
             final XFormsState xformsState = (stateStore == null) ? null : stateStore.find(staticStateUUID, dynamicStateUUID);
 
-            // This is not going to be good when it happens, and we must create a caching heuristic that minimizes this
             if (xformsState == null) {
+                // Oops, we couldn't find the state in the store
+
                 final String UNABLE_TO_RETRIEVE_XFORMS_STATE_MESSAGE = "Unable to retrieve XForms engine state.";
                 final String PLEASE_RELOAD_PAGE_MESSAGE = "Please reload the current page. Note that you will lose any unsaved changes.";
 

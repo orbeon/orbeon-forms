@@ -425,10 +425,10 @@ public class XFormsUtils {
                             if ("text/html".equals(outputControl.getMediatype())) {
                                 if (containsHTML != null)
                                     containsHTML[0] = true; // this indicates for sure that there is some nested HTML
-                                sb.append(outputControl.getDisplayValueOrValue());
+                                sb.append(outputControl.getDisplayValueOrExternalValue());
                             } else {
                                 // Mediatype is not HTML so we don't escape
-                                sb.append(XMLUtils.escapeXMLMinimal(outputControl.getDisplayValueOrValue()));
+                                sb.append(XMLUtils.escapeXMLMinimal(outputControl.getDisplayValueOrExternalValue()));
                             }
                         } else {
                             if ("text/html".equals(outputControl.getMediatype())) {
@@ -436,7 +436,7 @@ public class XFormsUtils {
                                 throw new OXFException("HTML not allowed in element: " + childElement.getName());
                             } else {
                                 // Mediatype is not HTML so we don't escape
-                                sb.append(outputControl.getDisplayValueOrValue());
+                                sb.append(outputControl.getDisplayValueOrExternalValue());
                             }
                         }
                     } else {

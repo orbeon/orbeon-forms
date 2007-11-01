@@ -72,7 +72,8 @@ public class XFormsRangeControl extends XFormsValueControl {
         }
     }
 
-    public String convertToExternalValue(String internalValue) {
+    protected String evaluateExternalValue(PipelineContext pipelineContext) {
+        final String internalValue = getValue();
         if (internalValue == null) {
             return null;
         } else if (getStart() != null && getEnd() != null

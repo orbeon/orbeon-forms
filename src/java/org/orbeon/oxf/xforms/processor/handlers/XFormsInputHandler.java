@@ -118,7 +118,7 @@ public class XFormsInputHandler extends XFormsValueControlHandler {
                     reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, spanClasses.toString());// TODO: check whether like in the XSTL version we need to copy other classes as well
                     contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, reusableAttributes);
                     if (isConcreteControl && isDate) {
-                        final String displayValueOrValue = xformsControl.getDisplayValueOrValue();
+                        final String displayValueOrValue = xformsControl.getDisplayValueOrExternalValue();
                         if (displayValueOrValue != null && !displayValueOrValue.equals("")) {
                             contentHandler.characters(displayValueOrValue.toCharArray(), 0, displayValueOrValue.length());
                         } else {
@@ -167,7 +167,7 @@ public class XFormsInputHandler extends XFormsValueControlHandler {
                         // Read-only mode
                         if (isConcreteControl) {
                             // Output value only for concrete control
-                            final String value = xformsControl.getDisplayValueOrValue();
+                            final String value = xformsControl.getDisplayValueOrExternalValue();
                             if (value != null)
                                 contentHandler.characters(value.toCharArray(), 0, value.length());
                         }

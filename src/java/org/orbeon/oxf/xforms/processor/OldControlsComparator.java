@@ -22,7 +22,6 @@ import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.control.controls.*;
-import org.orbeon.oxf.common.ValidationException;
 import org.xml.sax.helpers.AttributesImpl;
 
 import java.util.List;
@@ -264,7 +263,7 @@ public class OldControlsComparator extends BaseControlsComparator {
                             final String value;
                             {
                                 // Value may become null when controls are unbound
-                                final String tempValue = xformsValueControl.convertToExternalValue(xformsValueControl.getValue());
+                                final String tempValue = xformsValueControl.getExternalValue();
                                 value = (tempValue == null) ? "" : tempValue;
                             }
                             if (doOutputElement || ! isNewRepeatIteration || (isNewRepeatIteration && !value.equals(""))) {

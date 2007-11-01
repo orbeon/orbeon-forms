@@ -116,7 +116,7 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
             } else if (isDateOrTime) {
                 // Display formatted value for dates
                 if (isConcreteControl) {
-                    final String displayValue = xformsOutputControl.getDisplayValueOrValue();
+                    final String displayValue = xformsOutputControl.getDisplayValueOrExternalValue();
                     if (displayValue != null)
                         contentHandler.characters(displayValue.toCharArray(), 0, displayValue.length());
                 }
@@ -124,13 +124,13 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
                 // HTML case
 
                 if (isConcreteControl) {
-                    final String displayValue = xformsOutputControl.getDisplayValueOrValue();
+                    final String displayValue = xformsOutputControl.getDisplayValueOrExternalValue();
                     XFormsUtils.streamHTMLFragment(contentHandler, displayValue, xformsOutputControl.getLocationData(), xhtmlPrefix);
                 }
             } else {
                 // Regular text case
                 if (isConcreteControl) {
-                    final String displayValue = xformsOutputControl.getDisplayValueOrValue();
+                    final String displayValue = xformsOutputControl.getDisplayValueOrExternalValue();
                     if (displayValue != null && displayValue.length() > 0)
                         contentHandler.characters(displayValue.toCharArray(), 0, displayValue.length());
                 }

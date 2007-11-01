@@ -98,7 +98,8 @@ public class HTTPURLConnection extends URLConnection {
             final HttpClient httpClient = new HttpClient(connectionManager);
 
             // Make authentification preemptive
-            httpClient.getParams().setAuthenticationPreemptive(true);
+            if (userinfo != null || username != null)
+                httpClient.getParams().setAuthenticationPreemptive(true);
 
             if (userinfo != null) {
                 // Set username and optional password specified on URL

@@ -13,15 +13,17 @@
  */
 package org.orbeon.oxf.xforms.state;
 
+import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.UUIDUtils;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsProperties;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.common.OXFException;
 
 /**
  * Centralize XForms state management.
+ *
+ * TODO: Get rid of the old "session" store code as it is replaced by the new persistent store.
  */
 public class XFormsStateManager {
 
@@ -180,8 +182,24 @@ public class XFormsStateManager {
             final XFormsState xformsState = (stateStore == null) ? null : stateStore.find(staticStateUUID, dynamicStateUUID);
 
             // This is not going to be good when it happens, and we must create a caching heuristic that minimizes this
-            if (xformsState == null)
-                throw new OXFException("Unable to retrieve XForms engine state.");
+            if (xformsState == null) {
+                final String UNABLE_TO_RETRIEVE_XFORMS_STATE_MESSAGE = "Unable to retrieve XForms engine state.";
+                final String PLEASE_RELOAD_PAGE_MESSAGE = "Please reload the current page. Note that you will lose any unsaved changes.";
+
+                if (staticStatePrefix.equals(PERSISTENT_STATE_PREFIX)) {
+                    final ExternalContext.Session currentSession =  externalContext.getSession(false);
+                    if (currentSession == null || currentSession.isNew()) {
+                        // This means that no session is currently existing, or a session exists but it is newly created
+                        throw new OXFException("Your session has expired. " + PLEASE_RELOAD_PAGE_MESSAGE);
+                    } else {
+                        // There is a session and it is still known by the client
+                        throw new OXFException(UNABLE_TO_RETRIEVE_XFORMS_STATE_MESSAGE + " " + PLEASE_RELOAD_PAGE_MESSAGE);
+                    }
+
+                } else {
+                    throw new OXFException(UNABLE_TO_RETRIEVE_XFORMS_STATE_MESSAGE + " " + PLEASE_RELOAD_PAGE_MESSAGE);
+                }
+            }
 
             xformsDecodedClientState = new XFormsDecodedClientState(xformsState, staticStateUUID, dynamicStateUUID);
 

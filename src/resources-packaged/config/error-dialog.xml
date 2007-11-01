@@ -20,7 +20,11 @@
         </p>
         <ul>
             <li><a class="xforms-error-panel-close">Close this dialog</a> and continue to use this page.</li>
-            <li>If this does not work, press the <code>ctrl</code> key (or <code>command</code> key on a Mac) and click on the Reload button in the toolbar.</li>
+            <li><a class="xforms-error-panel-reload">Reload this page</a>. Note that you will lose any unsaved changes.</li>
+            <li>
+                If the above does not work, press the <code>shift</code> key and click the Reload button in your browser
+                toolbar. Note that you will lose any unsaved changes.
+            </li>
             <li>Return <a href="/">home</a>.</li>
         </ul>
         <div class="xforms-error-panel-details-hidden">

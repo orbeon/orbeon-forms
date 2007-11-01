@@ -1512,6 +1512,10 @@ ORBEON.xforms.Events = {
         errorPanel.hide();
     },
 
+    errorReloadClicked: function(event, errorPanel) {
+        window.location.reload(true);// force reload
+    },
+
     /**
      * Called for each minimal dialog when there is a click on the document.
      * We have one listener per dialog, which listens to those events all the time,
@@ -1739,11 +1743,17 @@ ORBEON.xforms.Init = {
                         YAHOO.util.Event.addListener(showDetailsA.id, "click", ORBEON.xforms.Events.errorShowHideDetails);
                         YAHOO.util.Event.addListener(hideDetailsA.id, "click", ORBEON.xforms.Events.errorShowHideDetails);
 
-                        //
+                        // Handle listeners on error panel
                         var closeA = YAHOO.util.Dom.getElementsByClassName("xforms-error-panel-close", null, formChild);
                         if (closeA.length != 0) {
                             YAHOO.util.Dom.generateId(closeA[0]);
                             YAHOO.util.Event.addListener(closeA[0].id, "click", ORBEON.xforms.Events.errorCloseClicked, errorPanel);
+                        }
+
+                        var reloadA = YAHOO.util.Dom.getElementsByClassName("xforms-error-panel-reload", null, formChild);
+                        if (reloadA.length != 0) {
+                            YAHOO.util.Dom.generateId(reloadA[0]);
+                            YAHOO.util.Event.addListener(reloadA[0].id, "click", ORBEON.xforms.Events.errorReloadClicked, errorPanel);
                         }
 
                         xformsLoadingCount++;

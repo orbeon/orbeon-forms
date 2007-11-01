@@ -197,7 +197,7 @@ public class XHTMLBodyHandler extends HandlerBase {
             helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "span", new String[]{ "class", "xforms-loading-none" });
         }
 
-        // Ajax errors
+        // Ajax error panel
         if (XFormsProperties.isAjaxShowErrors()) {
             // XInclude dialog so users can configure it
             // TODO: must send startPrefixMapping()/endPrefixMapping()?

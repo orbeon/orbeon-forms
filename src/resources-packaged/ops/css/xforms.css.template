@@ -77,6 +77,7 @@
 .xforms-error-panel-details-hidden, .xforms-error-panel-details-shown { vertical-align: middle; }
 .xforms-error-panel-show-details, .xforms-error-panel-hide-details { cursor: pointer; }
 .xforms-error-panel-close { cursor: pointer; }
+.xforms-error-panel-reload { cursor: pointer; }
 
 .xforms-help-panel { width: 300px; }
 .xforms-help-panel-message { margin-bottom: 1em; margin-top: 1em; }

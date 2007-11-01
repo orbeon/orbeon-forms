@@ -120,6 +120,20 @@ public class XFormsServer extends ProcessorImpl {
         final XFormsStateManager.XFormsDecodedClientState xformsDecodedClientState
                 = XFormsStateManager.decodeClientState(pipelineContext, encodedClientStaticStateString, encodedClientDynamicStateString);
 
+        // Get initial dynamic state for "all events" event if needed
+        final XFormsStateManager.XFormsDecodedClientState xformsDecodedInitialClientState;
+        {
+            final Element initialDynamicStateElement = requestDocument.getRootElement().element(XFormsConstants.XXFORMS_INITIAL_DYNAMIC_STATE_QNAME);
+            if (initialDynamicStateElement != null) {
+                final String encodedClientInitialDynamicStateString = initialDynamicStateElement.getTextTrim();
+
+                xformsDecodedInitialClientState
+                    = XFormsStateManager.decodeClientState(pipelineContext, encodedClientStaticStateString, encodedClientInitialDynamicStateString);
+            } else {
+                xformsDecodedInitialClientState = null;
+            }
+        }
+
         // Get or create containing document
         final XFormsContainingDocument containingDocument;
         if (XFormsProperties.isCacheDocument()) {
@@ -145,7 +159,6 @@ public class XFormsServer extends ProcessorImpl {
             }
 
             // Run events if any
-            boolean allEvents = false;
             final Map valueChangeControlIds = new HashMap();
             if (eventElements.size() > 0) {
                 // NOTE: We store here the last xxforms-value-change-with-focus-change event so
@@ -166,7 +179,8 @@ public class XFormsServer extends ProcessorImpl {
 
                     if (XFormsEvents.XXFORMS_ALL_EVENTS_REQUIRED.equals(eventName)) {
                         // Special event telling us to resend the client all the events since initialization
-                        allEvents = true;
+                        if (xformsDecodedInitialClientState == null)
+                            throw new OXFException("Got xxforms-all-events-required event without initial dynamic state.");
                     } else if (sourceControlId != null && eventName != null) {
                         // An event is passed
                         if (eventName.equals(XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE) && otherControlId == null) {
@@ -213,7 +227,7 @@ public class XFormsServer extends ProcessorImpl {
 
             if (contentHandler != null) {
                 // Create resulting document if there is a ContentHandler
-                outputResponse(containingDocument, allEvents, valueChangeControlIds, pipelineContext, contentHandler, xformsDecodedClientState, false, false);
+                outputResponse(containingDocument, valueChangeControlIds, pipelineContext, contentHandler, xformsDecodedClientState, xformsDecodedInitialClientState, false, false);
             } else {
                 // This is the second phase of a submission with replace="all". We make it so that the document is not
                 // modified. However, we must then return it to its pool.
@@ -256,12 +270,15 @@ public class XFormsServer extends ProcessorImpl {
         containingDocument.endOutermostActionHandler(pipelineContext);
     }
 
-    public static void outputResponse(XFormsContainingDocument containingDocument, boolean allEvents, Map valueChangeControlIds,
+    public static void outputResponse(XFormsContainingDocument containingDocument, Map valueChangeControlIds,
                                 PipelineContext pipelineContext, ContentHandler contentHandler, XFormsStateManager.XFormsDecodedClientState xformsDecodedClientState,
+                                XFormsStateManager.XFormsDecodedClientState xformsDecodedInitialClientState,
                                 boolean testOutputStaticState, boolean testOutputAllActions) {
 
         final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
         final XFormsControls xformsControls = containingDocument.getXFormsControls();
+
+        final boolean allEvents = xformsDecodedInitialClientState != null;
 
         try {
             final ContentHandlerHelper ch = new ContentHandlerHelper(contentHandler);
@@ -292,12 +309,10 @@ public class XFormsServer extends ProcessorImpl {
             // Output action
             {
                 final XFormsContainingDocument initialContainingDocument;
-                if (!allEvents) {
+                if (xformsDecodedInitialClientState == null) {
                     initialContainingDocument = null;
                 } else {
-                    initialContainingDocument = new XFormsContainingDocument(pipelineContext, containingDocument.getStaticState(), null);// NOTE: URIResolver is not available. What are the consequences? 
-                    initialContainingDocument.getXFormsControls().rebuildCurrentControlsStateIfNeeded(pipelineContext);
-                    initialContainingDocument.getXFormsControls().evaluateAllControlsIfNeeded(pipelineContext);
+                    initialContainingDocument = new XFormsContainingDocument(pipelineContext, xformsDecodedInitialClientState.getXFormsState());
                 }
 
                 ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "action");

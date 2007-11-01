@@ -77,6 +77,7 @@ public class XFormsConstants {
 
     public static final QName XXFORMS_STATIC_STATE_QNAME = new QName("static-state", XFormsConstants.XXFORMS_NAMESPACE);
     public static final QName XXFORMS_DYNAMIC_STATE_QNAME = new QName("dynamic-state", XFormsConstants.XXFORMS_NAMESPACE);
+    public static final QName XXFORMS_INITIAL_DYNAMIC_STATE_QNAME = new QName("initial-dynamic-state", XFormsConstants.XXFORMS_NAMESPACE);
     public static final QName XXFORMS_ACTION_QNAME = new QName("action", XFormsConstants.XXFORMS_NAMESPACE);
     public static final QName XXFORMS_SERVER_EVENTS_QNAME = new QName("server-events", XFormsConstants.XXFORMS_NAMESPACE);
     public static final QName XXFORMS_FILES_QNAME = new QName("files", XFormsConstants.XXFORMS_NAMESPACE);

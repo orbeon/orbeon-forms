@@ -28,6 +28,11 @@
                 <data type="string"/>
             </element>
             <optional>
+                <element name="xxforms:initial-dynamic-state">
+                    <data type="string"/>
+                </element>
+            </optional>
+            <optional>
                 <element name="xxforms:files">
                     <oneOrMore>
                         <element name="parameter">

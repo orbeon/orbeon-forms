@@ -128,7 +128,7 @@ ORBEON.xforms.Globals = ORBEON.xforms.Globals || {
     formStaticState: {},                 // State that does not change for the life of the page
     formDynamicState: {},                // State that changes at every request
     formServerEvents: {},                // Server events information
-    formClientState: {}                  // Store for information we want to keep when the page reloaded
+    formClientState: {}                  // Store for information we want to keep when the page is reloaded
 };
 
 /**
@@ -1766,9 +1766,12 @@ ORBEON.xforms.Init = {
                         ORBEON.xforms.Globals.formServerEvents[formID] = element;
                     } else if (element.name.indexOf("$client-state") != -1) {
                         ORBEON.xforms.Globals.formClientState[formID] = element;
-                        if (element.value == "")
+                        if (element.value == "") {
                             xformsStoreInClientState(formID, "ajax-dynamic-state",
                                     ORBEON.xforms.Globals.formDynamicState[formID].value);
+                            xformsStoreInClientState(formID, "initial-dynamic-state",
+                                    ORBEON.xforms.Globals.formDynamicState[formID].value);
+                        }
                     } else if (element.name.indexOf("$repeat-tree") != -1) {
                         xformsRepeatTree = element;
                     } else if (element.name.indexOf("$repeat-indexes") != -1) {
@@ -2233,13 +2236,17 @@ ORBEON.xforms.Server = {
                         ORBEON.xforms.Globals.changedIdsRequest[id] = null;
                 }
 
-                // Figure out if we will be ignoring error during this request or not
                 ORBEON.xforms.Globals.requestIgnoreErrors = true;
+                var sendInitialDynamicState = false;
                 for (var eventIndex = 0; eventIndex < ORBEON.xforms.Globals.eventQueue.length; eventIndex++) {
                     var event = ORBEON.xforms.Globals.eventQueue[eventIndex];
+                    // Figure out if we will be ignoring error during this request or not
                     if (!event.ignoreErrors) {
                         ORBEON.xforms.Globals.requestIgnoreErrors = false;
-                        break;
+                    }
+                    // Figure out whether we need to send the initial dynamic state
+                    if (event.eventName == "xxforms-all-events-required") {
+                        sendInitialDynamicState = true;
                     }
                 }
 
@@ -2260,11 +2267,19 @@ ORBEON.xforms.Server = {
                     requestDocumentString += ORBEON.xforms.Globals.formStaticState[formID].value;
                     requestDocumentString += '</xxforms:static-state>\n';
 
-                    // Add dynamic state (element is just created and will be filled just before we send the request)
+                    // Add dynamic state
                     requestDocumentString += indent;
                     requestDocumentString += '<xxforms:dynamic-state>';
                     requestDocumentString += xformsGetFromClientState(formID, "ajax-dynamic-state");
                     requestDocumentString += '</xxforms:dynamic-state>\n';
+
+                    // Add initial dynamic state if needed
+                    if (sendInitialDynamicState) {
+                        requestDocumentString += indent;
+                        requestDocumentString += '<xxforms:initial-dynamic-state>';
+                        requestDocumentString += xformsGetFromClientState(formID, "initial-dynamic-state");
+                        requestDocumentString += '</xxforms:initial-dynamic-state>\n';
+                    }
 
                     // Start action
                     requestDocumentString += indent;

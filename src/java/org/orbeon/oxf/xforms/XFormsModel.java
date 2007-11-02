@@ -980,7 +980,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                                         XFormsServer.logger.debug("XForms - getting document from URI for: " + absoluteResolvedURLString);
 
                                     connectionResult = XFormsSubmissionUtils.doRegular(externalContext,
-                                            "get", absoluteResolvedURL, xxformsUsername, xxformsPassword, null, null);
+                                            "get", absoluteResolvedURL, xxformsUsername, xxformsPassword, null, null, null, null);
 
                                     try {
                                         try {

@@ -33,6 +33,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -146,16 +148,16 @@ public class XFormsSubmissionUtils {
      */
     public static XFormsModelSubmission.ConnectionResult doRegular(ExternalContext externalContext,
                                                                    String method, final String action, String username, String password, String mediatype,
-                                                                   byte[] messageBody, String queryString) {
+                                                                   byte[] messageBody, String queryString, List headerNames, Map headerNameValues) {
 
         // Compute absolute submission URL
         final URL submissionURL = createAbsoluteURL(action, queryString, externalContext);
-        return doRegular(externalContext, method, submissionURL, username, password, mediatype, messageBody);
+        return doRegular(externalContext, method, submissionURL, username, password, mediatype, messageBody, headerNames, headerNameValues);
     }
 
     public static XFormsModelSubmission.ConnectionResult doRegular(ExternalContext externalContext,
                                                                    String method, final URL submissionURL, String username, String password, String mediatype,
-                                                                   byte[] messageBody) {
+                                                                   byte[] messageBody, List headerNames, Map headerNameValues) {
 
         // Perform submission
         final String scheme = submissionURL.getProtocol();
@@ -242,6 +244,15 @@ public class XFormsSubmissionUtils {
 
                             // Set Accept header with optional charset
                             urlConnection.setRequestProperty("Accept", sb.toString());
+                        }
+                    }
+
+                    // Set headers if provided
+                    if (headerNames != null && headerNames.size() > 0) {
+                        for (Iterator i = headerNames.iterator(); i.hasNext();) {
+                            final String headerName = (String) i.next();
+                            final String headerValue = (String) headerNameValues.get(headerName);
+                            urlConnection.setRequestProperty(headerName, headerValue);
                         }
                     }
 

@@ -32,14 +32,14 @@ import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
-import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.functions.FunctionLibrary;
 import org.orbeon.saxon.om.DocumentInfo;
-import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.om.FastStringBuffer;
+import org.orbeon.saxon.om.NodeInfo;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.sax.TransformerHandler;
@@ -48,10 +48,7 @@ import java.io.*;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Represents an XForms model submission instance.
@@ -105,6 +102,9 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
     private String resolvedXXFormsShared;
     private String avtXXFormsTarget;
     private String resolvedXXFormsTarget;
+
+    private List headerNames;
+    private Map headerNameValues;
 
     private boolean xxfShowProgress;
 
@@ -187,6 +187,35 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 separator = submissionElement.attributeValue("separator");
             }
             includenamespaceprefixes = submissionElement.attributeValue("includenamespaceprefixes");
+
+            // Headers
+            {
+                final List headerElements = submissionElement.elements("header");
+                if (headerElements.size() > 0) {
+
+                    headerNames = new ArrayList();
+                    headerNameValues = new HashMap();
+
+                    for (Iterator i = headerElements.iterator(); i.hasNext();) {
+                        final Element headerElement = (Element) i.next();
+
+                        // TODO: Handle @nodeset
+                        final Element headerNameElement = headerElement.element("name");
+                        if (headerNameElement == null)
+                            throw new XFormsSubmissionException("Missing <name> child element of <header> element", "processing <header> elements");
+                        final Element headerValueElement = headerElement.element("value");
+                        if (headerValueElement == null)
+                            throw new XFormsSubmissionException("Missing <value> child element of <header> element", "processing <header> elements");
+
+                        // TODO: Handle @value
+                        final String headerName = headerNameElement.getStringValue();
+                        final String headerValue = headerValueElement.getStringValue();
+
+                        headerNames.add(headerName);
+                        headerNameValues.put(headerName, headerValue);
+                    }
+                }
+            }
 
             // Extension attributes
             avtXXFormsUsername = submissionElement.attributeValue(XFormsConstants.XXFORMS_USERNAME_QNAME);
@@ -616,6 +645,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                     } else if (!NetUtils.urlHasProtocol(resolvedActionOrResource)
                                && !fURLNorewrite
+                               && headerNames == null
                                && ((request.getContainerType().equals("portlet") && !"resource".equals(urlType))
                                     || (request.getContainerType().equals("servlet")
                                         && (XFormsProperties.isOptimizeLocalSubmission() || isMethodOptimizedLocalSubmission())
@@ -689,7 +719,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                             // Perform actual submission
                             connectionResult = XFormsSubmissionUtils.doRegular(externalContext,
                                     method, resolvedURL, resolvedXXFormsUsername, resolvedXXFormsPassword, (mediatype == null) ? defaultMediatype : mediatype,
-                                    messageBody, queryString);
+                                    messageBody, queryString, headerNames, headerNameValues);
                         }
                     }
 

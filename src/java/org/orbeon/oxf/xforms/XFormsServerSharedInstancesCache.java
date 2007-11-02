@@ -103,7 +103,7 @@ public class XFormsServerSharedInstancesCache {
 
             final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
             final XFormsModelSubmission.ConnectionResult connectionResult = XFormsSubmissionUtils.doRegular(externalContext,
-                    "get", sourceURL, null, null, null, null);
+                    "get", sourceURL, null, null, null, null, null, null);
 
             // Handle connection errors
             if (connectionResult.resultCode != 200) {

@@ -615,15 +615,19 @@ ORBEON.xforms.Controls = {
             label.innerHTML = message;
             var helpImage = ORBEON.xforms.Controls._getControlLabel(control, "xforms-help-image");
             if (message == "") {
+                // We always hide help, label, hint and alert with empty content
                 ORBEON.util.Dom.addClass(label, "xforms-disabled");
                 // If this is the help label, also disable help image
                 if (className == "xforms-help")
                     ORBEON.util.Dom.addClass(helpImage, "xforms-disabled");
             } else {
-                ORBEON.util.Dom.removeClass(label, "xforms-disabled");
-                // If this is the help label, also enable the help image
-                if (className == "xforms-help")
-                    ORBEON.util.Dom.removeClass(helpImage, "xforms-disabled");
+                // We show help, label, hint and alert with non-empty content, but ONLY if the control is relevant
+                if (ORBEON.xforms.Controls.isRelevant(control)) {
+                    ORBEON.util.Dom.removeClass(label, "xforms-disabled");
+                    // If this is the help label, also enable the help image
+                    if (className == "xforms-help")
+                        ORBEON.util.Dom.removeClass(helpImage, "xforms-disabled");
+                }
             }
         }
     },

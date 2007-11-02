@@ -129,7 +129,7 @@ public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
 
                 // Just a consistency check
                 if (session.getId() != sessionId)
-                    throw new OXFException("Inconsistent session ids when persiting XForms state store entry.");
+                    throw new OXFException("Inconsistent session ids when persisting XForms state store entry (entry session id: " + sessionId + ", actual session id: " + session.getId() + ").");
 
                 // We want to register only one expiration listener per session
                 final Map sessionAttributes = session.getAttributesMap(ExternalContext.Session.APPLICATION_SCOPE);

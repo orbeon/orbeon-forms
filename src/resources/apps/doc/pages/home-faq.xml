@@ -584,20 +584,10 @@
                     site</a> once you register.
                 </p>
                 <p>
-                    Our perception is that visual tools tend to be of little use for actual developers except for the
-                    first few steps of development (and this is not only true for XForms but also for other frameworks
-                    like JavaServer Faces), so we advise not to have too high expectations when it comes to visual
-                    tools.
-                </p>
-                <p>
-                    However, we reckon that helping developers during the first stages of application development is
-                    very valuable and we would like in the future to offer such a tool, which most likely will be a
-                    web-based tool (and itself implemented with XForms!). In fact, we already have a prototype, so stay
-                    tuned!
-                </p>
-                <p>
-                    If you have good experience with an existing visual tool, whether for XForms or not, please be sure
-                    to let us know.
+                    This said, one of our top priorities at the moment is to make it much easier to build forms with
+                    Orbeon Forms. We realize that there is a need for a visual form builder, and we would like to offer
+                    one in the short-term future. It will be web-based and itself implemented with XForms. In fact, we
+                    already have a prototype, so the only thing we can say is: stay tuned!
                 </p>
             </section>
             <a name="javascript-dom"/>

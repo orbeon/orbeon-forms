@@ -275,6 +275,7 @@
                 <xforms:group ref="instance('orbeon-xforms-instance-inspector-instance')">
                     <xforms:group ref="if (function = 'evaluate-xpath') then xml-output else
                             xxforms:instance(instance('orbeon-xforms-instance-inspector-instance')/current-instance)">
+
                         <!-- Display atomic value -->
                         <xforms:group ref=".[not(self::*)]">
                             <xforms:output value="."/>
@@ -337,7 +338,7 @@
                     <current-model/>
                     <current-instance/>
                     <mode>formatted</mode>
-                    <function/>
+                    <function>view-instance</function>
                     <xpath/>
                     <xml-output/>
                     <html-output/>
@@ -349,8 +350,6 @@
                              /model[@id = instance('orbeon-xforms-instance-inspector-instance')/current-model]/instance[1]/@id else ."/>
                 <xforms:bind nodeset="xpath" readonly="../function != 'evaluate-xpath'"/>
             </xforms:bind>
-            <xforms:setvalue ev:event="xforms-ready"
-                    ref="instance('orbeon-xforms-instance-inspector-instance')/function">view-instance</xforms:setvalue>
         </xforms:model>
 
     </xsl:template>

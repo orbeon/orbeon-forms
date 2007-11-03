@@ -27,6 +27,7 @@ import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
+import org.orbeon.oxf.xforms.action.actions.XFormsSetvalueAction;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
@@ -369,7 +370,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                             XFormsContainingDocument.getFunctionLibrary(), XFormsModel.this, modelBind.getLocationData().getSystemID(), modelBind.getLocationData());
 
                         // TODO: Detect if we have already handled this node and dispatch xforms-binding-exception
-                        XFormsInstance.setValueForNodeInfo(pipelineContext, nodeInfo, stringResult, null);
+                        XFormsSetvalueAction.doSetValue(pipelineContext, containingDocument, nodeInfo, stringResult, null, true);
 
                     } catch (Exception e) {
                         throw ValidationException.wrapException(e, new ExtendedLocationData(modelBind.getLocationData(), "evaluating XForms calculate bind",

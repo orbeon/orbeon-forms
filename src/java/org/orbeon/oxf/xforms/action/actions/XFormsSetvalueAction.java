@@ -79,27 +79,31 @@ public class XFormsSetvalueAction extends XFormsAction {
         final NodeInfo currentNode = xformsControls.getCurrentSingleNode();
         if (currentNode != null) {
             // Node exists, we can try to set the value
-            doSetValue(pipelineContext, containingDocument, currentNode, valueToSet, null);
+            doSetValue(pipelineContext, containingDocument, currentNode, valueToSet, null, false);
         } else {
             // Node doesn't exist, don't do anything
             // NOP
         }
     }
 
-    public static boolean doSetValue(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, NodeInfo currentNode, String valueToSet, String type) {
+    public static boolean doSetValue(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, NodeInfo currentNode, String valueToSet, String type, boolean isCalculate) {
         final String currentValue = XFormsInstance.getValueForNodeInfo(currentNode);
         if (!currentValue.equals(valueToSet)) {// TODO: Check if we are allowed to do this optimization
             XFormsInstance.setValueForNodeInfo(pipelineContext, currentNode, valueToSet, type);
 
-            final XFormsInstance modifiedInstance = containingDocument.getInstanceForNode(currentNode);
-            final XFormsModel.DeferredActionContext deferredActionContext = modifiedInstance.getModel(containingDocument).getDeferredActionContext();
+            if (!isCalculate) {
+                // When this is called from a calculate, we don't set the flags as revalidate and refresh will have been set already
 
-            // "XForms Actions that change only the value of an instance node results in setting the flags for
-            // recalculate, revalidate, and refresh to true and making no change to the flag for rebuild".
-            if (deferredActionContext != null) {
-                deferredActionContext.recalculate = true;
-                deferredActionContext.revalidate = true;
-                deferredActionContext.refresh = true;
+                final XFormsInstance modifiedInstance = containingDocument.getInstanceForNode(currentNode);
+                final XFormsModel.DeferredActionContext deferredActionContext = modifiedInstance.getModel(containingDocument).getDeferredActionContext();
+
+                // "XForms Actions that change only the value of an instance node results in setting the flags for
+                // recalculate, revalidate, and refresh to true and making no change to the flag for rebuild".
+                if (deferredActionContext != null) {
+                    deferredActionContext.recalculate = true;
+                    deferredActionContext.revalidate = true;
+                    deferredActionContext.refresh = true;
+                }
             }
 
             containingDocument.getXFormsControls().markDirty();

@@ -455,8 +455,10 @@ select first_name, last_name
                     </employee>
                 </xml-source>
             </section>
+            <a name="column-values"/>
             <section>
                 <title>Getting Column Values</title>
+                <a name="single-columns"/>
                 <section>
                     <title>Retrieving Single Columns</title>
                     <p>
@@ -505,6 +507,7 @@ select first_name, last_name
                         </p>
                     </note>
                 </section>
+                <a name="multiple-columns"/>
                 <section>
                     <title>Retrieving Multiple Columns</title>
                     <p>
@@ -597,6 +600,7 @@ select first_name, last_name
                         </employee>
                     </xml-source>
                 </section>
+                <a name="result-set-metadata"/>
                 <section>
                     <title>Result-Set Metadata</title>
                     <p>

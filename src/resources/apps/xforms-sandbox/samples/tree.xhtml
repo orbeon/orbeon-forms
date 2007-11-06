@@ -21,17 +21,21 @@
 
     <xhtml:head>
         <xhtml:title>Tree Widget</xhtml:title>
+        <xhtml:style type="text/css">
+            table td, table th { vertical-align: top }
+            .xforms-label { font-weight: bold; padding-right: 1em }
+        </xhtml:style>
         <xforms:model>
             <xforms:instance id="main-instance">
                 <instance>
                     <data-set>encyclopedia-instance</data-set>
                     <select1>ar1</select1>
-                    <select>en1 cu1 cr1 sc2</select>
+                    <select>"en1" cu1 cr1 sc2</select>
                 </instance>
             </xforms:instance>
             <xforms:instance id="encyclopedia-instance">
                 <items>
-                    <item label="Encyclopedia" value="en1">
+                    <item label="&quot;Cool&quot; Encyclopedia " value="&quot;en1&quot;">
                         <item label="Science" value="sc1"/>
                         <item label="Culture" value="cu1">
                             <item label="Art" value="ar1"/>

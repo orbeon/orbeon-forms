@@ -13,17 +13,18 @@
  */
 package org.orbeon.oxf.xforms;
 
-import org.orbeon.saxon.om.FastStringBuffer;
-import org.orbeon.saxon.om.NodeInfo;
-import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.apache.commons.lang.StringUtils;
+import org.dom4j.Element;
+import org.dom4j.Text;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.saxon.om.FastStringBuffer;
+import org.orbeon.saxon.om.NodeInfo;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
-import org.dom4j.Element;
-import org.dom4j.Text;
 
 import java.util.*;
 
@@ -71,10 +72,10 @@ public class XFormsItemUtils {
                     sb.append("[");
 
                     sb.append('"');
-                    sb.append(label);// TODO: escape quotes!
+                    sb.append(escapeJavaScriptQuotes(label));
                     sb.append("\",\"");
                     if (value != null)
-                        sb.append(value);// TODO: escape quotes!
+                        sb.append(escapeJavaScriptQuotes(value));
                     sb.append('\"');
 
                     if (controlValue != null) {
@@ -96,6 +97,10 @@ public class XFormsItemUtils {
             // Safer to return an empty array rather than en empty string
             return "[]";
         }
+    }
+
+    private static String escapeJavaScriptQuotes(String value) {
+        return StringUtils.replace(value, "\"", "\\\"");
     }
 
     /**

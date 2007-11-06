@@ -311,8 +311,11 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 final XFormsInstance currentInstance = xformsControls.getCurrentInstance();
 
                 // Determine if the instance to submit has one or more bound and relevant upload controls
+                
+                // NOTE: We only check this if we are not currently initializing the document because at that point
+                // the client cannot have any files to upload yet
                 boolean hasBoundRelevantUploadControl = false;
-                if (serialize) {
+                if (serialize && !containingDocument.isInitializing()) {
                     final List uploadControls = xformsControls.getCurrentControlsState().getUploadControls();
                     if (uploadControls != null) {
                         for (Iterator i = uploadControls.iterator(); i.hasNext();) {

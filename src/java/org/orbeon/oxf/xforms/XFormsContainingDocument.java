@@ -62,6 +62,9 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     // URI resolver
     private XFormsURIResolver uriResolver;
 
+    // Whether this document is currently being initialized
+    private boolean isInitializing;
+
     // A document contains models and controls
     private XFormsStaticState xformsStaticState;
     private List models = new ArrayList();
@@ -145,6 +148,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
 
         // Remember URI resolver for initialization
         this.uriResolver = uriResolver;
+        this.isInitializing = true;
 
         // Initialize the containing document
         try {
@@ -155,6 +159,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
 
         // Clear URI resolver, since it is of no use after initialization, and it may keep dangerous references (PipelineContext)
         this.uriResolver = null;
+        this.isInitializing = false;
     }
 
     /**
@@ -218,8 +223,8 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         return uriResolver;
     }
 
-    public void setURIResolver(XFormsURIResolver uriResolver) {
-        this.uriResolver = uriResolver;
+    public boolean isInitializing() {
+        return isInitializing;
     }
 
     /**

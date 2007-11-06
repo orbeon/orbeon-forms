@@ -14,8 +14,8 @@
 package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsItemUtils;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
-import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -88,7 +88,7 @@ public class XFormsInputHandler extends XFormsValueControlHandler {
             final boolean isMany = true;
 
             final List items = new ArrayList(2);
-            items.add(new XFormsSelect1Control.Item(false, Collections.EMPTY_LIST, "", "true", 1));
+            items.add(new XFormsItemUtils.Item(false, Collections.EMPTY_LIST, "", "true", 1));
 
             // NOTE: In the future, we may want to use other appearances provided by xforms:select
 //            items.add(new XFormsSelect1Control.Item(false, Collections.EMPTY_LIST, "False", "false", 1));

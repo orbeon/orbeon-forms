@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.control.controls;
 import org.dom4j.Element;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsItemUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.saxon.om.FastStringBuffer;
 
@@ -57,7 +58,7 @@ public class XFormsSelectControl extends XFormsSelect1Control {
         final String newValue;
         {
             for (Iterator i = items.iterator(); i.hasNext();) {
-                final Item currentItem = (Item) i.next();
+                final XFormsItemUtils.Item currentItem = (XFormsItemUtils.Item) i.next();
                 final String currentValue = currentItem.getValue();
                 if (uiValues.get(currentValue) != null) {
                     // Value is currently selected in the UI
@@ -104,7 +105,7 @@ public class XFormsSelectControl extends XFormsSelect1Control {
             final FastStringBuffer sb = new FastStringBuffer(getValue().length());
             int index = 0;
             for (Iterator i = items.iterator(); i.hasNext(); index++) {
-                final Item currentItem = (Item) i.next();
+                final XFormsItemUtils.Item currentItem = (XFormsItemUtils.Item) i.next();
                 final String currentValue = currentItem.getValue();
                 if (instanceValues.get(currentValue) != null) {
                     if (index > 0)

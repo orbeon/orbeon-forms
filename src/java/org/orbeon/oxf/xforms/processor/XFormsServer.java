@@ -653,7 +653,7 @@ public class XFormsServer extends ProcessorImpl {
                 final List items = (List) currentEntry.getValue();
 
                 ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "itemset", new String[]{"id", itemsetId});
-                final String result = XFormsSelect1Control.getJSONTreeInfo(items);
+                final String result = XFormsItemUtils.getJSONTreeInfo(items, null);// TODO: pass LocationData
                 if (result.length() > 0)
                     ch.text(result);
                 ch.endElement();

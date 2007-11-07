@@ -247,7 +247,7 @@
     <test description="Element around result of delegation processor" name="oxf:pipeline">
         <input name="call">
             <root>
-                <delegation:execute service="string" operation="indexOf">
+                <delegation:execute service="string" operation="indexOf" xmlns:xs="http://www.w3.org/2001/XMLSchema">
                     <str xsi:type="xs:string">dummy</str>
                 </delegation:execute>
             </root>

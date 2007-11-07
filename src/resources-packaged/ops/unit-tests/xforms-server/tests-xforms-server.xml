@@ -113,7 +113,7 @@
         </output>
     </test>
 
-    <test description="Default Instances" name="oxf:pipeline" only="true">
+    <test description="Default Instances" name="oxf:pipeline">
         <input name="config">
             <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <p:param name="response" type="output"/>
@@ -344,40 +344,40 @@
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
-                    <xxf:control-values>
-                        <xxf:control id="group111" readonly="false" required="false" relevant="true" valid="true" type=""/>
-                        <xxf:control id="group112" readonly="false" required="false" relevant="true" valid="true" type=""/>
-                        <xxf:control id="group113" readonly="false" required="false" relevant="true" valid="true" type=""/>
-                        <xxf:control id="id111" readonly="false" required="false" relevant="true" valid="true" type="">111</xxf:control>
-                        <xxf:control id="id112" readonly="false" required="false" relevant="true" valid="true" type="">112</xxf:control>
-                        <xxf:control id="id113" readonly="false" required="false" relevant="true" valid="true" type="">113</xxf:control>
-                        <xxf:control id="id114" readonly="false" required="false" relevant="true" valid="true" type="">114</xxf:control>
-                        <xxf:control id="group121" readonly="false" required="false" relevant="true" valid="true" type=""/>
-                        <xxf:control id="group122" readonly="false" required="false" relevant="true" valid="true" type=""/>
-                        <xxf:control id="id121" readonly="false" required="false" relevant="true" valid="true" type="">121</xxf:control>
-                        <xxf:control id="id122" readonly="false" required="false" relevant="true" valid="true" type="">122</xxf:control>
-                        <xxf:control id="id123" readonly="false" required="false" relevant="true" valid="true" type="">123</xxf:control>
-                        <xxf:control id="id124" readonly="false" required="false" relevant="true" valid="true" type="">124</xxf:control>
-                        <xxf:control id="group211" readonly="false" required="false" relevant="true" valid="true" type=""/>
-                        <xxf:control id="group212" readonly="false" required="false" relevant="true" valid="true" type=""/>
-                        <xxf:control id="group213" readonly="false" required="false" relevant="true" valid="true" type=""/>
-                        <xxf:control id="id211" readonly="false" required="false" relevant="true" valid="true" type="">211</xxf:control>
-                        <xxf:control id="id212" readonly="false" required="false" relevant="true" valid="true" type="">212</xxf:control>
-                        <xxf:control id="id213" readonly="false" required="false" relevant="true" valid="true" type="">213</xxf:control>
-                        <xxf:control id="id214" readonly="false" required="false" relevant="true" valid="true" type="">214</xxf:control>
-                        <xxf:control id="group214" readonly="false" required="false" relevant="true" valid="true" type=""/>
-                        <xxf:control id="group8" readonly="false" required="false" relevant="true" valid="true" type=""/>
-                        <xxf:control id="id221" readonly="false" required="false" relevant="true" valid="true" type="">221</xxf:control>
-                        <xxf:control id="id222" readonly="false" required="false" relevant="true" valid="true" type="">222</xxf:control>
-                        <xxf:control id="id223" readonly="false" required="false" relevant="true" valid="true" type="">223</xxf:control>
-                        <xxf:control id="id224" readonly="false" required="false" relevant="true" valid="true" type="">224</xxf:control>
-                        <xxf:control id="group215" readonly="false" required="false" relevant="true" valid="true" type=""/>
-                        <xxf:control id="group10" readonly="false" required="false" relevant="true" valid="true" type=""/>
-                        <xxf:control id="id211b" readonly="false" required="false" relevant="true" valid="true" type="">211</xxf:control>
-                        <xxf:control id="id212b" readonly="false" required="false" relevant="true" valid="true" type="">212</xxf:control>
-                        <xxf:control id="id213b" readonly="false" required="false" relevant="true" valid="true" type="">213</xxf:control>
-                        <xxf:control id="id214b" readonly="false" required="false" relevant="true" valid="true" type="">214</xxf:control>
-                    </xxf:control-values>
+                            <xxf:control-values>
+                                <xxf:control id="group111" relevant="true"/>
+                                <xxf:control id="group112" relevant="true"/>
+                                <xxf:control id="group113" relevant="true"/>
+                                <xxf:control id="id111" relevant="true">111</xxf:control>
+                                <xxf:control id="id112" relevant="true">112</xxf:control>
+                                <xxf:control id="id113" relevant="true">113</xxf:control>
+                                <xxf:control id="id114" relevant="true">114</xxf:control>
+                                <xxf:control id="group121" relevant="true"/>
+                                <xxf:control id="group122" relevant="true"/>
+                                <xxf:control id="id121" relevant="true">121</xxf:control>
+                                <xxf:control id="id122" relevant="true">122</xxf:control>
+                                <xxf:control id="id123" relevant="true">123</xxf:control>
+                                <xxf:control id="id124" relevant="true">124</xxf:control>
+                                <xxf:control id="group211" relevant="true"/>
+                                <xxf:control id="group212" relevant="true"/>
+                                <xxf:control id="group213" relevant="true"/>
+                                <xxf:control id="id211" relevant="true">211</xxf:control>
+                                <xxf:control id="id212" relevant="true">212</xxf:control>
+                                <xxf:control id="id213" relevant="true">213</xxf:control>
+                                <xxf:control id="id214" relevant="true">214</xxf:control>
+                                <xxf:control id="group214" relevant="true"/>
+                                <xxf:control id="group8" relevant="true"/>
+                                <xxf:control id="id221" relevant="true">221</xxf:control>
+                                <xxf:control id="id222" relevant="true">222</xxf:control>
+                                <xxf:control id="id223" relevant="true">223</xxf:control>
+                                <xxf:control id="id224" relevant="true">224</xxf:control>
+                                <xxf:control id="group215" relevant="true"/>
+                                <xxf:control id="group10" relevant="true"/>
+                                <xxf:control id="id211b" relevant="true">211</xxf:control>
+                                <xxf:control id="id212b" relevant="true">212</xxf:control>
+                                <xxf:control id="id213b" relevant="true">213</xxf:control>
+                                <xxf:control id="id214b" relevant="true">214</xxf:control>
+                            </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
         </output>
@@ -467,11 +467,11 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="group1" readonly="false" required="false" relevant="true" valid="true" type=""/>
-                        <xxf:control id="group2" readonly="false" required="false" relevant="true" valid="true" type=""/>
-                        <xxf:control id="1" readonly="false" required="false" relevant="true" valid="true" type="">0</xxf:control>
-                        <xxf:control id="2" label="M:" readonly="false" required="false" relevant="true" valid="true" type="">12</xxf:control>
-                        <xxf:control id="3" label="Clear" readonly="false" required="false" relevant="true" valid="true" type=""/>
+                        <xxf:control id="group1" relevant="true"/>
+                        <xxf:control id="group2" relevant="true"/>
+                        <xxf:control id="1" relevant="true">0</xxf:control>
+                        <xxf:control id="2" relevant="true" label="M:">12</xxf:control>
+                        <xxf:control id="3" relevant="true" label="Clear"/>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -683,34 +683,24 @@
                     <xxf:control-values>
                         <xxf:copy-repeat-template id="id123" parent-indexes="" id-suffix="2"/>
                         <xxf:copy-repeat-template id="id123" parent-indexes="" id-suffix="3"/>
-                        <xxf:repeat-iteration id="id123" readonly="false" required="false" relevant="true" valid="true" iteration="1"/>
                         <xxf:copy-repeat-template id="id124" parent-indexes="1" id-suffix="2"/>
-                        <xxf:repeat-iteration id="id124·1" readonly="false" required="false" relevant="true" valid="true" iteration="1"/>
-                        <xxf:control id="id125·1-1" readonly="false" required="false" relevant="true" valid="true" type="">f11</xxf:control>
-                        <xxf:control id="id126·1-1" readonly="false" required="false" relevant="true" valid="true" type="">l11</xxf:control>
-                        <xxf:repeat-iteration id="id124·1" readonly="false" required="false" relevant="true" valid="true" iteration="2"/>
-                        <xxf:control id="id125·1-2" readonly="false" required="false" relevant="true" valid="true" type="">f12</xxf:control>
-                        <xxf:control id="id126·1-2" readonly="false" required="false" relevant="true" valid="true" type="">l12</xxf:control>
-                        <xxf:repeat-iteration id="id123" readonly="false" required="false" relevant="true" valid="true" iteration="2"/>
-                        <xxf:repeat-iteration id="id124·2" readonly="false" required="false" relevant="true" valid="true" iteration="1"/>
-                        <xxf:control id="id125·2-1" readonly="false" required="false" relevant="true" valid="true" type="">f21</xxf:control>
-                        <xxf:control id="id126·2-1" readonly="false" required="false" relevant="true" valid="true" type="">l21</xxf:control>
-                        <xxf:repeat-iteration id="id123" readonly="false" required="false" relevant="true" valid="true" iteration="3"/>
+                        <xxf:control id="id125·1-1" relevant="true">f11</xxf:control>
+                        <xxf:control id="id126·1-1" relevant="true">l11</xxf:control>
+                        <xxf:control id="id125·1-2" relevant="true">f12</xxf:control>
+                        <xxf:control id="id126·1-2" relevant="true">l12</xxf:control>
+                        <xxf:control id="id125·2-1" relevant="true">f21</xxf:control>
+                        <xxf:control id="id126·2-1" relevant="true">l21</xxf:control>
                         <xxf:copy-repeat-template id="id124" parent-indexes="3" id-suffix="2"/>
                         <xxf:copy-repeat-template id="id124" parent-indexes="3" id-suffix="3"/>
                         <xxf:copy-repeat-template id="id124" parent-indexes="3" id-suffix="4"/>
-                        <xxf:repeat-iteration id="id124·3" readonly="false" required="false" relevant="true" valid="true" iteration="1"/>
-                        <xxf:control id="id125·3-1" readonly="false" required="false" relevant="true" valid="true" type="">f31</xxf:control>
-                        <xxf:control id="id126·3-1" readonly="false" required="false" relevant="true" valid="true" type="">l31</xxf:control>
-                        <xxf:repeat-iteration id="id124·3" readonly="false" required="false" relevant="true" valid="true" iteration="2"/>
-                        <xxf:control id="id125·3-2" readonly="false" required="false" relevant="true" valid="true" type="">f32</xxf:control>
-                        <xxf:control id="id126·3-2" readonly="false" required="false" relevant="true" valid="true" type="">l32</xxf:control>
-                        <xxf:repeat-iteration id="id124·3" readonly="false" required="false" relevant="true" valid="true" iteration="3"/>
-                        <xxf:control id="id125·3-3" readonly="false" required="false" relevant="true" valid="true" type="">f33</xxf:control>
-                        <xxf:control id="id126·3-3" readonly="false" required="false" relevant="true" valid="true" type="">l33</xxf:control>
-                        <xxf:repeat-iteration id="id124·3" readonly="false" required="false" relevant="true" valid="true" iteration="4"/>
-                        <xxf:control id="id125·3-4" readonly="false" required="false" relevant="true" valid="true" type="">f34</xxf:control>
-                        <xxf:control id="id126·3-4" readonly="false" required="false" relevant="true" valid="true" type="">l34</xxf:control>
+                        <xxf:control id="id125·3-1" relevant="true">f31</xxf:control>
+                        <xxf:control id="id126·3-1" relevant="true">l31</xxf:control>
+                        <xxf:control id="id125·3-2" relevant="true">f32</xxf:control>
+                        <xxf:control id="id126·3-2" relevant="true">l32</xxf:control>
+                        <xxf:control id="id125·3-3" relevant="true">f33</xxf:control>
+                        <xxf:control id="id126·3-3" relevant="true">l33</xxf:control>
+                        <xxf:control id="id125·3-4" relevant="true">f34</xxf:control>
+                        <xxf:control id="id126·3-4" relevant="true">l34</xxf:control>
                     </xxf:control-values>
                     <xxf:repeats>
                         <xxf:repeat-index id="id123" index="1"/>
@@ -789,30 +779,24 @@
                     <xxf:control-values>
                         <xxf:copy-repeat-template id="id123" parent-indexes="" id-suffix="4"/>
                         <xxf:copy-repeat-template id="id124" parent-indexes="1" id-suffix="3"/>
-                        <xxf:repeat-iteration id="id124·1" readonly="false" required="false" relevant="true" valid="true" iteration="3"/>
-                        <xxf:control id="id127·1-3" label="Insert" readonly="false" required="false" relevant="true" valid="true" type=""/>
-                        <xxf:control id="id125·1-3" readonly="false" required="false" relevant="true" valid="true" type="">f12</xxf:control>
-                        <xxf:control id="id126·1-3" readonly="false" required="false" relevant="true" valid="true" type="">l12</xxf:control>
-                        <xxf:repeat-iteration id="id123" readonly="false" required="false" relevant="true" valid="true" iteration="4"/>
+                        <xxf:control id="id127·1-3" relevant="true" label="Insert"/>
+                        <xxf:control id="id125·1-3" relevant="true">f12</xxf:control>
+                        <xxf:control id="id126·1-3" relevant="true">l12</xxf:control>
                         <xxf:copy-repeat-template id="id124" parent-indexes="4" id-suffix="2"/>
                         <xxf:copy-repeat-template id="id124" parent-indexes="4" id-suffix="3"/>
                         <xxf:copy-repeat-template id="id124" parent-indexes="4" id-suffix="4"/>
-                        <xxf:repeat-iteration id="id124·4" readonly="false" required="false" relevant="true" valid="true" iteration="1"/>
-                        <xxf:control id="id127·4-1" label="Insert" readonly="false" required="false" relevant="true" valid="true" type=""/>
-                        <xxf:control id="id125·4-1" readonly="false" required="false" relevant="true" valid="true" type="">f31</xxf:control>
-                        <xxf:control id="id126·4-1" readonly="false" required="false" relevant="true" valid="true" type="">l31</xxf:control>
-                        <xxf:repeat-iteration id="id124·4" readonly="false" required="false" relevant="true" valid="true" iteration="2"/>
-                        <xxf:control id="id127·4-2" label="Insert" readonly="false" required="false" relevant="true" valid="true" type=""/>
-                        <xxf:control id="id125·4-2" readonly="false" required="false" relevant="true" valid="true" type="">f32</xxf:control>
-                        <xxf:control id="id126·4-2" readonly="false" required="false" relevant="true" valid="true" type="">l32</xxf:control>
-                        <xxf:repeat-iteration id="id124·4" readonly="false" required="false" relevant="true" valid="true" iteration="3"/>
-                        <xxf:control id="id127·4-3" label="Insert" readonly="false" required="false" relevant="true" valid="true" type=""/>
-                        <xxf:control id="id125·4-3" readonly="false" required="false" relevant="true" valid="true" type="">f33</xxf:control>
-                        <xxf:control id="id126·4-3" readonly="false" required="false" relevant="true" valid="true" type="">l33</xxf:control>
-                        <xxf:repeat-iteration id="id124·4" readonly="false" required="false" relevant="true" valid="true" iteration="4"/>
-                        <xxf:control id="id127·4-4" label="Insert" readonly="false" required="false" relevant="true" valid="true" type=""/>
-                        <xxf:control id="id125·4-4" readonly="false" required="false" relevant="true" valid="true" type="">f34</xxf:control>
-                        <xxf:control id="id126·4-4" readonly="false" required="false" relevant="true" valid="true" type="">l34</xxf:control>
+                        <xxf:control id="id127·4-1" relevant="true" label="Insert"/>
+                        <xxf:control id="id125·4-1" relevant="true">f31</xxf:control>
+                        <xxf:control id="id126·4-1" relevant="true">l31</xxf:control>
+                        <xxf:control id="id127·4-2" relevant="true" label="Insert"/>
+                        <xxf:control id="id125·4-2" relevant="true">f32</xxf:control>
+                        <xxf:control id="id126·4-2" relevant="true">l32</xxf:control>
+                        <xxf:control id="id127·4-3" relevant="true" label="Insert"/>
+                        <xxf:control id="id125·4-3" relevant="true">f33</xxf:control>
+                        <xxf:control id="id126·4-3" relevant="true">l33</xxf:control>
+                        <xxf:control id="id127·4-4" relevant="true" label="Insert"/>
+                        <xxf:control id="id125·4-4" relevant="true">f34</xxf:control>
+                        <xxf:control id="id126·4-4" relevant="true">l34</xxf:control>
                     </xxf:control-values>
                     <xxf:repeat-indexes>
                         <xxf:repeat-index id="id123" old-index="1" new-index="3"/>
@@ -1114,8 +1098,8 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="id1" readonly="false" required="false" relevant="true" valid="true" type=""/>
-                        <xxf:control id="id2" label="test noFoundData:" readonly="true" required="false" relevant="true" valid="true" type="">1</xxf:control>
+                        <xxf:control id="id1" relevant="true"/>
+                        <xxf:control id="id2" readonly="true" relevant="true" label="test noFoundData:">1</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1168,9 +1152,8 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="id1" readonly="false" required="false" relevant="true" valid="true" type=""/>
-                        <xxf:control id="id2" readonly="false" required="false" relevant="true" valid="true" type=""/>
-                        <xxf:control id="id3" readonly="false" required="false" relevant="false" valid="true" type=""/>
+                        <xxf:control id="id1" relevant="true"/>
+                        <xxf:control id="id2" relevant="true"/>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>            
@@ -1540,7 +1523,6 @@
                         <xxf:delete-repeat-elements id="repeat2" parent-indexes="2" count="1"/>
                         <xxf:delete-repeat-elements id="repeat3" parent-indexes="" count="1"/>
                         <xxf:copy-repeat-template id="repeat5" parent-indexes="1" id-suffix="1"/>
-                        <xxf:repeat-iteration id="repeat5·1" readonly="false" required="false" relevant="true" valid="true" iteration="1"/>
                     </xxf:control-values>
                     <xxf:repeat-indexes>
                         <xxf:repeat-index id="repeat2" old-index="2" new-index="1"/>
@@ -1617,9 +1599,9 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="id1" readonly="false" required="false" relevant="true" valid="true" type="">gigi1</xxf:control>
-                        <xxf:control id="id2" readonly="false" required="false" relevant="false" valid="true" type="">gigi2</xxf:control>
-                        <xxf:control id="id3" readonly="true" required="false" relevant="true" valid="true" type="">gigi3</xxf:control>
+                        <xxf:control id="id1" relevant="true">gigi1</xxf:control>
+                        <xxf:control id="id2">gigi2</xxf:control>
+                        <xxf:control id="id3" readonly="true" relevant="true">gigi3</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1734,12 +1716,9 @@
                         <xxf:copy-repeat-template id="employee-repeat" parent-indexes="" id-suffix="1"/>
                         <xxf:copy-repeat-template id="employee-repeat" parent-indexes="" id-suffix="2"/>
                         <xxf:copy-repeat-template id="employee-repeat" parent-indexes="" id-suffix="3"/>
-                        <xxf:repeat-iteration id="employee-repeat" readonly="false" required="false" relevant="true" valid="true" iteration="1"/>
-                        <xxf:control id="first-name-input·1" readonly="false" required="false" relevant="true" valid="true" type="">Joe</xxf:control>
-                        <xxf:repeat-iteration id="employee-repeat" readonly="false" required="false" relevant="true" valid="true" iteration="2"/>
-                        <xxf:control id="first-name-input·2" readonly="false" required="false" relevant="true" valid="true" type="">Billy</xxf:control>
-                        <xxf:repeat-iteration id="employee-repeat" readonly="false" required="false" relevant="true" valid="true" iteration="3"/>
-                        <xxf:control id="first-name-input·3" readonly="false" required="false" relevant="true" valid="true" type="">Mary</xxf:control>
+                        <xxf:control id="first-name-input·1" relevant="true">Joe</xxf:control>
+                        <xxf:control id="first-name-input·2" relevant="true">Billy</xxf:control>
+                        <xxf:control id="first-name-input·3" relevant="true">Mary</xxf:control>
                     </xxf:control-values>
                     <xxf:repeat-indexes>
                         <xxf:repeat-index id="employee-repeat" old-index="0" new-index="2"/>

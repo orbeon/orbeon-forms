@@ -166,7 +166,8 @@ public class XFormsControls {
     
     public void markDirty() {
         this.dirty = true;
-        this.currentControlsState.markDirty();
+        if (this.currentControlsState != null)// case of legacy XForms engine
+            this.currentControlsState.markDirty();
     }
 
     /**

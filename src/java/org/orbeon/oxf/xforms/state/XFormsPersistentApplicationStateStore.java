@@ -25,7 +25,6 @@ import org.orbeon.oxf.processor.Datasource;
 import org.orbeon.oxf.processor.xmldb.XMLDBProcessor;
 import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.XFormsUtils;
-import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
 import org.orbeon.saxon.om.FastStringBuffer;
@@ -150,7 +149,7 @@ public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
     // NOTE: The super() method doesn't do anything
     protected void persistEntry(StoreEntry storeEntry) {
 
-        if (XFormsServer.logger.isDebugEnabled()) {
+        if (XFormsStateManager.logger.isDebugEnabled()) {
             debug("persisting entry for key: " + storeEntry.key + " (" + (storeEntry.value.length() * 2) + " bytes).");
         }
 
@@ -255,7 +254,7 @@ public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
             }
             sessionToKeysMap.remove(sessionId);
 
-            if (expiredCount > 0 && XFormsServer.logger.isDebugEnabled())
+            if (expiredCount > 0 && XFormsStateManager.logger.isDebugEnabled())
                 debug("expired " + expiredCount + " entries for session " + sessionId + " (" + (storeSizeBeforeExpire - getCurrentStoreSize()) + " bytes).");
         }
     }
@@ -387,7 +386,7 @@ public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
     // NOTE: The super() method doesn't do anything
     protected String findPersistedEntry(String key) {
 
-        if (XFormsServer.logger.isDebugEnabled()) {
+        if (XFormsStateManager.logger.isDebugEnabled()) {
             debug("finding persisting entry for key: " + key + ".");
         }
 

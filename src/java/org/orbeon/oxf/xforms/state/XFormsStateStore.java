@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms.state;
 
 import org.orbeon.oxf.cache.CacheLinkedList;
-import org.orbeon.oxf.xforms.processor.XFormsServer;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -59,14 +58,14 @@ public abstract class XFormsStateStore {
         // Add new dynamic state and move it to the front
         addOrReplaceOne(requestId, xformsState.getDynamicState(), isInitialEntry, currentSessionId);
 
-        if (XFormsServer.logger.isDebugEnabled()) {
+        if (XFormsStateManager.logger.isDebugEnabled()) {
             debug("store size after adding: " + currentStoreSize + " bytes.");
             debugDumpKeys();
         }
     }
 
     public synchronized XFormsState find(String pageGenerationId, String requestId) {
-        if (XFormsServer.logger.isDebugEnabled()) {
+        if (XFormsStateManager.logger.isDebugEnabled()) {
             debug("store size before finding: " + currentStoreSize + " bytes.");
             debugDumpKeys();
         }
@@ -94,7 +93,7 @@ public abstract class XFormsStateStore {
                 ((StoreEntry) existingListEntry.element).addSessionId(currentSessionId);
             }
 
-            if (XFormsServer.logger.isDebugEnabled())
+            if (XFormsStateManager.logger.isDebugEnabled())
                 debug("added and refreshed entry for key: " + key);
         } else {
             // Entry doesn't exist, add it
@@ -115,7 +114,7 @@ public abstract class XFormsStateStore {
             expiredCount++;
         }
 
-        if (storeSizeBeforeExpire != currentStoreSize && XFormsServer.logger.isDebugEnabled())
+        if (storeSizeBeforeExpire != currentStoreSize && XFormsStateManager.logger.isDebugEnabled())
            debug("expired " + expiredCount + " entries (" + (storeSizeBeforeExpire - currentStoreSize) + " bytes).");
 
         // Add new element to store
@@ -125,7 +124,7 @@ public abstract class XFormsStateStore {
         // Update store size
         currentStoreSize += size;
 
-        if (XFormsServer.logger.isDebugEnabled())
+        if (XFormsStateManager.logger.isDebugEnabled())
             debug("added new entry of " + size + " bytes for key: " + key);
     }
 
@@ -169,7 +168,7 @@ public abstract class XFormsStateStore {
         // Update store size
         currentStoreSize -= stateSize;
 
-        if (XFormsServer.logger.isDebugEnabled())
+        if (XFormsStateManager.logger.isDebugEnabled())
             debug("removed entry of " + stateSize + " bytes.");
     }
 
@@ -198,7 +197,7 @@ public abstract class XFormsStateStore {
     }
 
     protected void debug(String message) {
-        XFormsServer.logger.debug("XForms - " + getStoreDebugName() + " store: " + message);
+        XFormsStateManager.logger.debug("XForms - " + getStoreDebugName() + " store: " + message);
     }
 
     protected void debugDumpKeys() {

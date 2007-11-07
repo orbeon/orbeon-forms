@@ -13,9 +13,11 @@
  */
 package org.orbeon.oxf.xforms.state;
 
+import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.UUIDUtils;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsProperties;
@@ -26,6 +28,8 @@ import org.orbeon.oxf.xforms.XFormsProperties;
  * TODO: Get rid of the old "session" store code as it is replaced by the new persistent store.
  */
 public class XFormsStateManager {
+
+    public static Logger logger = LoggerFactory.createLogger(XFormsStateManager.class);
 
     // All these must have the same length
     public static final String SESSION_STATE_PREFIX = "sess:";
@@ -161,7 +165,9 @@ public class XFormsStateManager {
 
             // Both prefixes must be the same
             if (!staticStatePrefix.equals(dynamicStatePrefix)) {
-                throw new OXFException("Inconsistent XForms state prefixes: " + staticStatePrefix + ", " + dynamicStatePrefix);
+                final String message = "Inconsistent XForms state prefixes: " + staticStatePrefix + ", " + dynamicStatePrefix;
+                logger.debug(message);
+                throw new OXFException(message);
             }
 
             // Get relevant store
@@ -175,7 +181,9 @@ public class XFormsStateManager {
                 stateStore = XFormsApplicationStateStore.instance(externalContext);
             } else {
                 // Invalid prefix
-                throw new OXFException("Invalid state prefix: " + staticStatePrefix);
+                final String message = "Invalid state prefix: " + staticStatePrefix;
+                logger.debug(message);
+                throw new OXFException(message);
             }
 
             // Get state from store
@@ -186,19 +194,26 @@ public class XFormsStateManager {
 
                 final String UNABLE_TO_RETRIEVE_XFORMS_STATE_MESSAGE = "Unable to retrieve XForms engine state.";
                 final String PLEASE_RELOAD_PAGE_MESSAGE = "Please reload the current page. Note that you will lose any unsaved changes.";
+                final String UUIDS_MESSAGE = "Static state key: " + staticStateUUID + ", dynamic state key: " + dynamicStateUUID;
 
                 if (staticStatePrefix.equals(PERSISTENT_STATE_PREFIX)) {
                     final ExternalContext.Session currentSession =  externalContext.getSession(false);
                     if (currentSession == null || currentSession.isNew()) {
                         // This means that no session is currently existing, or a session exists but it is newly created
-                        throw new OXFException("Your session has expired. " + PLEASE_RELOAD_PAGE_MESSAGE);
+                        final String message = "Your session has expired. " + PLEASE_RELOAD_PAGE_MESSAGE + " " + UUIDS_MESSAGE;
+                        logger.debug(message);
+                        throw new OXFException(message);
                     } else {
                         // There is a session and it is still known by the client
-                        throw new OXFException(UNABLE_TO_RETRIEVE_XFORMS_STATE_MESSAGE + " " + PLEASE_RELOAD_PAGE_MESSAGE);
+                        final String message = UNABLE_TO_RETRIEVE_XFORMS_STATE_MESSAGE + " " + PLEASE_RELOAD_PAGE_MESSAGE + " " + UUIDS_MESSAGE;
+                        logger.debug(message);
+                        throw new OXFException(message);
                     }
 
                 } else {
-                    throw new OXFException(UNABLE_TO_RETRIEVE_XFORMS_STATE_MESSAGE + " " + PLEASE_RELOAD_PAGE_MESSAGE);
+                    final String message = UNABLE_TO_RETRIEVE_XFORMS_STATE_MESSAGE + " " + PLEASE_RELOAD_PAGE_MESSAGE + " " + UUIDS_MESSAGE;
+                    logger.debug(message);
+                    throw new OXFException(message);
                 }
             }
 

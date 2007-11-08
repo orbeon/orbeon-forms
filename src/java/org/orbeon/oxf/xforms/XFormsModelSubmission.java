@@ -337,6 +337,16 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 final boolean isDeferredSubmissionSecondPass = isDeferredSubmission && !isDeferredSubmissionFirstPass; // here we get XXFORMS_SUBMIT
                 isDeferredSubmissionSecondPassReplaceAll = isDeferredSubmissionSecondPass && isReplaceAll;
 
+                // If a submission requiring a second pass was already set, then we ignore a subsequent submission but
+                // issue a warning
+                {
+                    final XFormsModelSubmission existingSubmission = containingDocument.getClientActiveSubmission();
+                    if (isDeferredSubmission && existingSubmission != null) {
+                        logger.warn("XForms - submission - another submission requiring a second pass already exists (" + existingSubmission.getEffectiveId() + "). Ignoring new submission (" + this.getEffectiveId() + ").");
+                        return;
+                    }
+                }
+
                 // "The data model is updated"
                 final XFormsModel modelForInstance = currentInstance.getModel(containingDocument);
                 {

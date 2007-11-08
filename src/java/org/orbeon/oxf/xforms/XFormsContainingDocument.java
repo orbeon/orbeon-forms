@@ -395,7 +395,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     /**
      * Return the active submission if any or null.
      */
-    public XFormsModelSubmission getActiveSubmission() {
+    public XFormsModelSubmission getClientActiveSubmission() {
         return activeSubmission;
     }
 

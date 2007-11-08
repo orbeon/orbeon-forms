@@ -116,10 +116,10 @@ public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
         return "global application";
     }
 
-    public synchronized void add(String pageGenerationId, String oldRequestId, String requestId, XFormsState xformsState, final String sessionId) {
+    public synchronized void add(String pageGenerationId, String oldRequestId, String requestId, XFormsState xformsState, final String sessionId, boolean pinNewDynamicState) {
 
         // Do the operation
-        super.add(pageGenerationId, oldRequestId, requestId, xformsState, sessionId);
+        super.add(pageGenerationId, oldRequestId, requestId, xformsState, sessionId, pinNewDynamicState);
 
         // Add session listener if needed
         if (sessionId != null) {
@@ -170,10 +170,10 @@ public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
     }
 
     // NOTE: This calls super() and handles session information
-    protected void addOrReplaceOne(String key, String value, boolean isInitialEntry, String currentSessionId) {
+    protected void addOrReplaceOne(String key, String value, boolean isPinned, String currentSessionId) {
 
         // Actually add
-        super.addOrReplaceOne(key, value, isInitialEntry, currentSessionId);
+        super.addOrReplaceOne(key, value, isPinned, currentSessionId);
 
         // Remember that this key is associated with a session
         if (currentSessionId != null) {
@@ -375,10 +375,10 @@ public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
             }
         }
 
-        // Store the initial entry flag
-        sb.append("<is-initial-entry>");
-        sb.append(Boolean.toString(storeEntry.isInitialEntry));
-        sb.append("</is-initial-entry></entry>");
+        // Store the pinned entry flag
+        sb.append("<pinned>");
+        sb.append(Boolean.toString(storeEntry.isPinned));
+        sb.append("</pinned></entry>");
 
         return sb.toString();
     }
@@ -414,7 +414,7 @@ public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
         // Handle result
         if (persistedStoreEntry != null) {
             // Add the key to the list in memory
-            addOne(persistedStoreEntry.key, persistedStoreEntry.value, persistedStoreEntry.isInitialEntry, persistedStoreEntry.sessionIds);
+            addOne(persistedStoreEntry.key, persistedStoreEntry.value, persistedStoreEntry.isPinned, persistedStoreEntry.sessionIds);
             debug("migrated persisted entry for key: " + key);
             return persistedStoreEntry.value;
         } else {
@@ -444,7 +444,7 @@ public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
         final Element rootElement = document.getRootElement();
 
         final String value = rootElement.element("value").getStringValue();
-        final boolean isInitialEntry = new Boolean(rootElement.element("is-initial-entry").getStringValue()).booleanValue();
+        final boolean isPinned = new Boolean(rootElement.element("pinned").getStringValue()).booleanValue();
         final Map sessionIdsMap = new HashMap();
         {
             final List sessionIdsList = rootElement.elements("session-id");
@@ -455,7 +455,7 @@ public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
             }
         }
 
-        return new StoreEntry(key, value, isInitialEntry, sessionIdsMap);
+        return new StoreEntry(key, value, isPinned, sessionIdsMap);
     }
 
     private static class XMLDBAccessor extends XMLDBProcessor {

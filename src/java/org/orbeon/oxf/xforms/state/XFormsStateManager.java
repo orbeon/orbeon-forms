@@ -100,14 +100,14 @@ public class XFormsStateManager {
                         // Produce dynamic state key
                         final String newRequestId = UUIDUtils.createPseudoUUID();
                         final XFormsStateStore stateStore = XFormsSessionStateStore.instance(externalContext, true);
-                        stateStore.add(currentPageGenerationId, null, newRequestId, xformsState, null);
+                        stateStore.add(currentPageGenerationId, null, newRequestId, xformsState, null, false);
                         dynamicStateString = SESSION_STATE_PREFIX + newRequestId;
                     } else {
                         // In this case, we first store in the application scope, so that multiple requests can use the
                         // same cached state.
                         dynamicStateString = APPLICATION_STATE_PREFIX + dynamicStateUUID;
                         final XFormsStateStore applicationStateStore = XFormsApplicationStateStore.instance(externalContext);
-                        applicationStateStore.add(currentPageGenerationId, null, dynamicStateUUID, xformsState, null);
+                        applicationStateStore.add(currentPageGenerationId, null, dynamicStateUUID, xformsState, null, false);
                     }
                 } else {
                     // New server state handling with persistent store
@@ -122,13 +122,13 @@ public class XFormsStateManager {
 
                         // Produce dynamic state key
                         final String newRequestId = UUIDUtils.createPseudoUUID();
-                        stateStore.add(currentPageGenerationId, null, newRequestId, xformsState, sessionId);
+                        stateStore.add(currentPageGenerationId, null, newRequestId, xformsState, sessionId, false);
                         dynamicStateString = PERSISTENT_STATE_PREFIX + newRequestId;
                     } else {
                         // In this case, we first store in the application scope, so that multiple requests can use the
                         // same cached state.
                         dynamicStateString = PERSISTENT_STATE_PREFIX + dynamicStateUUID;
-                        stateStore.add(currentPageGenerationId, null, dynamicStateUUID, xformsState, sessionId);
+                        stateStore.add(currentPageGenerationId, null, dynamicStateUUID, xformsState, sessionId, false);
                     }
                 }
             } else {
@@ -235,10 +235,11 @@ public class XFormsStateManager {
      * @param pipelineContext           pipeline context
      * @param xformsDecodedClientState  decoded state as received in Ajax request
      * @param isAllEvents               whether this is a special "all events" request
+     * @param pinNewDynamicState        whether to "pin" the new dynamic state
      * @return                          XFormsState containing the encoded static and dynamic states
      */
     public static XFormsState getEncodedClientStateDoCache(XFormsContainingDocument containingDocument, PipelineContext pipelineContext,
-                                                    XFormsDecodedClientState xformsDecodedClientState, boolean isAllEvents) {
+                                                    XFormsDecodedClientState xformsDecodedClientState, boolean isAllEvents, boolean pinNewDynamicState) {
 
         final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
 
@@ -268,12 +269,12 @@ public class XFormsStateManager {
                 if (containingDocument.isLegacyServerStateHandling()) {
                     // Legacy session server handling
                     final XFormsStateStore stateStore = XFormsSessionStateStore.instance(externalContext, true);
-                    stateStore.add(currentPageGenerationId, requestId, newRequestId, newXFormsState, sessionId);
+                    stateStore.add(currentPageGenerationId, requestId, newRequestId, newXFormsState, sessionId, pinNewDynamicState);
                     dynamicStateString = SESSION_STATE_PREFIX + newRequestId;
                 } else {
                     // New server state handling with persistent store
                     final XFormsStateStore stateStore = XFormsPersistentApplicationStateStore.instance(externalContext);
-                    stateStore.add(currentPageGenerationId, requestId, newRequestId, newXFormsState, sessionId);
+                    stateStore.add(currentPageGenerationId, requestId, newRequestId, newXFormsState, sessionId, pinNewDynamicState);
                     dynamicStateString = PERSISTENT_STATE_PREFIX + newRequestId;
                 }
             } else {

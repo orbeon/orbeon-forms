@@ -36,7 +36,7 @@ public abstract class XFormsStateStore {
 
     protected abstract String getStoreDebugName();
 
-    public synchronized void add(String pageGenerationId, String oldRequestId, String requestId, XFormsState xformsState, String currentSessionId) {
+    public synchronized void add(String pageGenerationId, String oldRequestId, String requestId, XFormsState xformsState, String currentSessionId, boolean pinNewDynamicState) {
 
          // Whether this is an initial dynamic state entry which has preferential treatment
         final boolean isInitialEntry = oldRequestId == null;
@@ -47,7 +47,7 @@ public abstract class XFormsStateStore {
             final CacheLinkedList.ListEntry oldListEntry = (CacheLinkedList.ListEntry) keyToEntryMap.get(oldRequestId);
             if (oldListEntry != null) {
                 final StoreEntry oldStoredEntry = (StoreEntry) oldListEntry.element;
-                if (!oldStoredEntry.isInitialEntry)
+                if (!oldStoredEntry.isPinned)// remove unless pinned
                     removeStoreEntry(oldListEntry);
             }
         }
@@ -56,7 +56,7 @@ public abstract class XFormsStateStore {
         addOrReplaceOne(pageGenerationId, xformsState.getStaticState(), false, currentSessionId);
 
         // Add new dynamic state and move it to the front
-        addOrReplaceOne(requestId, xformsState.getDynamicState(), isInitialEntry, currentSessionId);
+        addOrReplaceOne(requestId, xformsState.getDynamicState(), isInitialEntry || pinNewDynamicState, currentSessionId);
 
         if (XFormsStateManager.logger.isDebugEnabled()) {
             debug("store size after adding: " + currentStoreSize + " bytes.");
@@ -79,7 +79,7 @@ public abstract class XFormsStateStore {
         return new XFormsState(staticState, dynamicState);
     }
 
-    protected void addOrReplaceOne(String key, String value, boolean isInitialEntry, String currentSessionId) {
+    protected void addOrReplaceOne(String key, String value, boolean isPinned, String currentSessionId) {
 
         final CacheLinkedList.ListEntry existingListEntry = (CacheLinkedList.ListEntry) keyToEntryMap.get(key);
         if (existingListEntry != null) {
@@ -100,11 +100,11 @@ public abstract class XFormsStateStore {
             final Map sessionIds = new HashMap();
             if (currentSessionId != null)
                 sessionIds.put(currentSessionId, "");
-            addOne(key, value, isInitialEntry, sessionIds);
+            addOne(key, value, isPinned, sessionIds);
         }
     }
 
-    protected void addOne(String key, String value, boolean isInitialEntry, Map sessionIds) {
+    protected void addOne(String key, String value, boolean isPinned, Map sessionIds) {
         // Make room if needed
         final int size = value.length() * 2;
         final int storeSizeBeforeExpire = currentStoreSize;
@@ -118,7 +118,7 @@ public abstract class XFormsStateStore {
            debug("expired " + expiredCount + " entries (" + (storeSizeBeforeExpire - currentStoreSize) + " bytes).");
 
         // Add new element to store
-        final CacheLinkedList.ListEntry listEntry = linkedList.addFirst(new StoreEntry(key, value, isInitialEntry, sessionIds));
+        final CacheLinkedList.ListEntry listEntry = linkedList.addFirst(new StoreEntry(key, value, isPinned, sessionIds));
         keyToEntryMap.put(key, listEntry);
 
         // Update store size
@@ -169,7 +169,7 @@ public abstract class XFormsStateStore {
         currentStoreSize -= stateSize;
 
         if (XFormsStateManager.logger.isDebugEnabled())
-            debug("removed entry of " + stateSize + " bytes.");
+            debug("removed entry of " + stateSize + " bytes for key: " + existingStoreEntry.key);
     }
 
     private void expireOne() {
@@ -211,13 +211,13 @@ public abstract class XFormsStateStore {
     protected static class StoreEntry {
         public String key;
         public String value;
-        public boolean isInitialEntry;
+        public boolean isPinned;
         public Map sessionIds;
 
-        public StoreEntry(String key, String value, boolean isInitialEntry, Map sessionIds) {
+        public StoreEntry(String key, String value, boolean isPinned, Map sessionIds) {
             this.key = key;
             this.value = value;
-            this.isInitialEntry = isInitialEntry;
+            this.isPinned = isPinned;
             this.sessionIds = sessionIds;
         }
 

@@ -144,111 +144,125 @@ public class XFormsServer extends ProcessorImpl {
             containingDocument = new XFormsContainingDocument(pipelineContext, xformsDecodedClientState.getXFormsState());
         }
 
-        try {
-            final List eventElements = new ArrayList();
+        // The synchronization is tricky: certainly, once we get a document, we don't want to allow multiple threads to
+        // it at the same time as a document is clearly not thread-safe. What could happen though in theory is two Ajax
+        // requests for the same document, one found in the cache, the other one not (because just expired due to other
+        // thread's activity). This would create a new document and would produce unexpected results. However, the
+        // client is meant to send only one Ajax request at a time, which should make this case very unlikely.
 
-            // Gather automatic events if any
-            if (serverEventsElement != null) {
-                final Document serverEventsDocument = XFormsUtils.decodeXML(pipelineContext, serverEventsElement.getStringValue());
-                eventElements.addAll(serverEventsDocument.getRootElement().elements(XFormsConstants.XXFORMS_EVENT_QNAME));
-            }
+        // Another situation is that if the ContentHandler is null, then the event is the second pass of a submission
+        // with replace="all" and does not modify the Containing Document. The event should in fact go straight to the
+        // Submission object. It should therefore be safe not to synchronize in this case. But do we want to take the
+        // risk?
 
-            // Gather client events if any
-            if (actionElement != null) {
-                eventElements.addAll(actionElement.elements(XFormsConstants.XXFORMS_EVENT_QNAME));
-            }
+//        final Object documentSyncronizationObject = (contentHandler != null) ? containingDocument : new Object();
+        synchronized (containingDocument) {
+            try {
+                final List eventElements = new ArrayList();
 
-            // Run events if any
-            final Map valueChangeControlIds = new HashMap();
-            if (eventElements.size() > 0) {
-                // NOTE: We store here the last xxforms-value-change-with-focus-change event so
-                // we can coalesce values in case several such events are sent for the same
-                // control. The client should not send us such series of events, but currently
-                // it may happen.
-                String lastSourceControlId = null;
-                String lastValueChangeEventValue = null;
+                // Gather automatic events if any
+                if (serverEventsElement != null) {
+                    final Document serverEventsDocument = XFormsUtils.decodeXML(pipelineContext, serverEventsElement.getStringValue());
+                    eventElements.addAll(serverEventsDocument.getRootElement().elements(XFormsConstants.XXFORMS_EVENT_QNAME));
+                }
 
-                containingDocument.prepareForExternalEventsSequence(pipelineContext);
+                // Gather client events if any
+                if (actionElement != null) {
+                    eventElements.addAll(actionElement.elements(XFormsConstants.XXFORMS_EVENT_QNAME));
+                }
 
-                for (Iterator i = eventElements.iterator(); i.hasNext();) {
-                    final Element eventElement = (Element) i.next();
-                    final String sourceControlId = eventElement.attributeValue("source-control-id");
-                    final String otherControlId = eventElement.attributeValue("other-control-id");
-                    final String eventName = eventElement.attributeValue("name");
-                    final String value = eventElement.getText();
+                // Run events if any
+                final Map valueChangeControlIds = new HashMap();
+                if (eventElements.size() > 0) {
+                    // NOTE: We store here the last xxforms-value-change-with-focus-change event so
+                    // we can coalesce values in case several such events are sent for the same
+                    // control. The client should not send us such series of events, but currently
+                    // it may happen.
+                    String lastSourceControlId = null;
+                    String lastValueChangeEventValue = null;
 
-                    if (XFormsEvents.XXFORMS_ALL_EVENTS_REQUIRED.equals(eventName)) {
-                        // Special event telling us to resend the client all the events since initialization
-                        if (xformsDecodedInitialClientState == null)
-                            throw new OXFException("Got xxforms-all-events-required event without initial dynamic state.");
-                    } else if (sourceControlId != null && eventName != null) {
-                        // An event is passed
-                        if (eventName.equals(XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE) && otherControlId == null) {
-                            // xxforms-value-change-with-focus-change event
-                            if (lastSourceControlId == null) {
-                                // Rember event
-                                lastSourceControlId = sourceControlId;
-                                lastValueChangeEventValue = value;
-                            } else if (lastSourceControlId.equals(sourceControlId)) {
-                                // Update event
-                                lastValueChangeEventValue = value;
+                    containingDocument.prepareForExternalEventsSequence(pipelineContext);
+
+                    for (Iterator i = eventElements.iterator(); i.hasNext();) {
+                        final Element eventElement = (Element) i.next();
+                        final String sourceControlId = eventElement.attributeValue("source-control-id");
+                        final String otherControlId = eventElement.attributeValue("other-control-id");
+                        final String eventName = eventElement.attributeValue("name");
+                        final String value = eventElement.getText();
+
+                        if (XFormsEvents.XXFORMS_ALL_EVENTS_REQUIRED.equals(eventName)) {
+                            // Special event telling us to resend the client all the events since initialization
+                            if (xformsDecodedInitialClientState == null)
+                                throw new OXFException("Got xxforms-all-events-required event without initial dynamic state.");
+                        } else if (sourceControlId != null && eventName != null) {
+                            // An event is passed
+                            if (eventName.equals(XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE) && otherControlId == null) {
+                                // xxforms-value-change-with-focus-change event
+                                if (lastSourceControlId == null) {
+                                    // Rember event
+                                    lastSourceControlId = sourceControlId;
+                                    lastValueChangeEventValue = value;
+                                } else if (lastSourceControlId.equals(sourceControlId)) {
+                                    // Update event
+                                    lastValueChangeEventValue = value;
+                                } else {
+                                    // Send old event
+                                    executeExternalEventPrepareIfNecessary(pipelineContext, containingDocument, XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE, lastSourceControlId, null, lastValueChangeEventValue, filesElement);
+                                    // Remember new event
+                                    lastSourceControlId = sourceControlId;
+                                    lastValueChangeEventValue = value;
+                                }
                             } else {
-                                // Send old event
-                                executeExternalEventPrepareIfNecessary(pipelineContext, containingDocument, XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE, lastSourceControlId, null, lastValueChangeEventValue, filesElement);
-                                // Remember new event
-                                lastSourceControlId = sourceControlId;
-                                lastValueChangeEventValue = value;
+                                if (lastSourceControlId != null) {
+                                    // Send old event
+                                    executeExternalEventPrepareIfNecessary(pipelineContext, containingDocument, XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE, lastSourceControlId, null, lastValueChangeEventValue, filesElement);
+                                    lastSourceControlId = null;
+                                    lastValueChangeEventValue = null;
+                                }
+                                // Send new event
+                                executeExternalEventPrepareIfNecessary(pipelineContext, containingDocument, eventName, sourceControlId, otherControlId, value, filesElement);
                             }
-                        } else {
-                            if (lastSourceControlId != null) {
-                                // Send old event
-                                executeExternalEventPrepareIfNecessary(pipelineContext, containingDocument, XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE, lastSourceControlId, null, lastValueChangeEventValue, filesElement);
-                                lastSourceControlId = null;
-                                lastValueChangeEventValue = null;
-                            }
-                            // Send new event
-                            executeExternalEventPrepareIfNecessary(pipelineContext, containingDocument, eventName, sourceControlId, otherControlId, value, filesElement);
-                        }
 
-                        if (eventName.equals(XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE)) {
-                            // Remember id of control of which value changed
-                            valueChangeControlIds.put(sourceControlId, "");
+                            if (eventName.equals(XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE)) {
+                                // Remember id of control of which value changed
+                                valueChangeControlIds.put(sourceControlId, "");
+                            }
+                        } else if (!(sourceControlId == null && eventName == null)) {
+                            throw new OXFException("<event> element must either have source-control-id and name attributes, or no attribute.");
                         }
-                    } else if (!(sourceControlId == null && eventName == null)) {
-                        throw new OXFException("<event> element must either have source-control-id and name attributes, or no attribute.");
+                    }
+                    // Flush stored event if needed
+                    if (lastSourceControlId != null) {
+                        // Send old event
+                        executeExternalEventPrepareIfNecessary(pipelineContext, containingDocument, XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE, lastSourceControlId, null, lastValueChangeEventValue, filesElement);
                     }
                 }
-                // Flush stored event if needed
-                if (lastSourceControlId != null) {
-                    // Send old event
-                    executeExternalEventPrepareIfNecessary(pipelineContext, containingDocument, XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE, lastSourceControlId, null, lastValueChangeEventValue, filesElement);
-                }
-            }
 
-            if (contentHandler != null) {
-                // Create resulting document if there is a ContentHandler
-                outputResponse(containingDocument, valueChangeControlIds, pipelineContext, contentHandler, xformsDecodedClientState, xformsDecodedInitialClientState, false, false);
-            } else {
-                // This is the second phase of a submission with replace="all". We make it so that the document is not
-                // modified. However, we must then return it to its pool.
+                if (contentHandler != null) {
+                    // Create resulting document if there is a ContentHandler
+                    outputResponse(containingDocument, valueChangeControlIds, pipelineContext, contentHandler, xformsDecodedClientState, xformsDecodedInitialClientState, false, false);
+                } else {
+                    // This is the second pass of a submission with replace="all". We make it so that the document is
+                    // not modified. However, we must then return it to its pool.
 
-                if (XFormsProperties.isCacheDocument()) {
-                    XFormsDocumentCache.instance().add(pipelineContext, xformsDecodedClientState.getXFormsState(), containingDocument);
+                    if (XFormsProperties.isCacheDocument()) {
+                        XFormsDocumentCache.instance().add(pipelineContext, xformsDecodedClientState.getXFormsState(), containingDocument);
+                    }
                 }
-            }
-        } catch (Throwable e) {
-            // If an exception is caught, we need to discard the object as its state may be inconsistent
-            final ObjectPool sourceObjectPool = containingDocument.getSourceObjectPool();
-            if (sourceObjectPool != null) {
-                logger.debug("XForms - containing document cache: throwable caught, discarding document from pool.");
-                try {
-                    sourceObjectPool.invalidateObject(containingDocument);
-                    containingDocument.setSourceObjectPool(null);
-                } catch (Exception e1) {
-                    throw new OXFException(e1);
+            } catch (Throwable e) {
+                // If an exception is caught, we need to discard the object as its state may be inconsistent
+                final ObjectPool sourceObjectPool = containingDocument.getSourceObjectPool();
+                if (sourceObjectPool != null) {
+                    logger.debug("XForms - containing document cache: throwable caught, discarding document from pool.");
+                    try {
+                        sourceObjectPool.invalidateObject(containingDocument);
+                        containingDocument.setSourceObjectPool(null);
+                    } catch (Exception e1) {
+                        throw new OXFException(e1);
+                    }
                 }
+                throw new OXFException(e);
             }
-            throw new OXFException(e);
         }
     }
 
@@ -286,10 +300,79 @@ public class XFormsServer extends ProcessorImpl {
             contentHandler.startPrefixMapping("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI);
             ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "event-response");
 
+            // Compute automatic events
+            boolean requireClientSubmission = false;
+            String serverEvents = null;
+            {
+                final XFormsModelSubmission activeSubmission = containingDocument.getClientActiveSubmission();
+                final List loads = containingDocument.getLoadsToRun();
+                if (activeSubmission != null || (loads != null && loads.size() > 0)) {
+                    final Document eventsDocument = Dom4jUtils.createDocument();
+                    final Element eventsElement = eventsDocument.addElement(XFormsConstants.XXFORMS_EVENTS_QNAME);
+
+                    // Check for xxforms-submit event
+                    {
+                        if (activeSubmission != null) {
+                            final Element eventElement = eventsElement.addElement(XFormsConstants.XXFORMS_EVENT_QNAME);
+                            eventElement.addAttribute("source-control-id", activeSubmission.getEffectiveId());
+                            eventElement.addAttribute("name", XFormsEvents.XXFORMS_SUBMIT);
+                            requireClientSubmission = true;
+                        }
+                    }
+                    // Check for xxforms-load event
+                    {
+                        if (loads != null && loads.size() > 0) {
+                            for (Iterator i = loads.iterator(); i.hasNext();) {
+                                final XFormsContainingDocument.Load load = (XFormsContainingDocument.Load) i.next();
+
+                                if (load.isReplace() && load.isPortletLoad() && !NetUtils.urlHasProtocol(load.getResource()) && !"resource".equals(load.getUrlType())) {
+                                    // We need to submit the event so that the portlet can load the new path
+                                    final Element eventElement = eventsElement.addElement(XFormsConstants.XXFORMS_EVENT_QNAME);
+                                    eventElement.addAttribute("source-control-id", XFormsContainingDocument.CONTAINING_DOCUMENT_PSEUDO_ID);
+                                    eventElement.addAttribute("resource", load.getResource());
+                                    // NOTE: don't care about the target for portlets
+                                    eventElement.addAttribute("name", XFormsEvents.XXFORMS_LOAD);
+                                    requireClientSubmission = true;
+
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    // Encode events so that the client cannot send back arbitrary events
+                    if (requireClientSubmission)
+                        serverEvents = XFormsUtils.encodeXML(pipelineContext, eventsDocument, false);
+                }
+            }
+
             // Get encoded state to send to the client
             // NOTE: This will also cache the containing document if needed
+
+            // The "pinning" of the dynamic state is done for the following scenario:
+            //
+            // o Submission with replace="all" is started.
+            // o Ajax response reaches the client with dynamic state "foo".
+            // o Client does HTML form submission (second pass of submission) with dynamic state "foo".
+            // o While this is happening user triggers new Ajax request with dynamic state "foo", replaced on the server by "bar" (and possibly other states).
+            // o The new page finally shows up. The server will have "bar", but the client may not have it.
+            // o User does a page back. This requests "foo", which has disappeared if we just expired it when replacing it with "bar".
+            //
+            // An algorithm to fix this could be:
+            //
+            // o Pin state for second pass (pin "foo")
+            // o Unpin the state (but do not delete it) when the second pass reaches the server.
+            //   NOTE: the HTML submission could be very slow and arrive to the server before or after the series of Ajax requests
+            // o If a submission is going on for a state (i.e. state was created while processing first pass), then keep last two states,
+            //   otherwise keep just one last state + initial.
+            //   NOTE: "second pass going on" for a state should be kept in the dynamic state.
+            // o Once second pass reaches the server, the "second pass going on" flag can be removed for the document.
+            //   NOTE: The document can have evolved since then - and you may not be able to find it. So the flag may never be cleared. This can also
+            //   happen if the HTML submission gets lost. But this should not happen too often.
+
+            //final boolean pinNewDynamicState = requireClientSubmission;
+            final boolean pinNewDynamicState = false;
             final XFormsState encodedClientState
-                    = XFormsStateManager.getEncodedClientStateDoCache(containingDocument, pipelineContext, xformsDecodedClientState, allEvents);
+                    = XFormsStateManager.getEncodedClientStateDoCache(containingDocument, pipelineContext, xformsDecodedClientState, allEvents, pinNewDynamicState);
 
             // Output static state (FOR TESTING ONLY)
             if (testOutputStaticState) {
@@ -383,56 +466,16 @@ public class XFormsServer extends ProcessorImpl {
                     outputItemsets(ch, itemsetUpdate);
                 }
 
-                boolean requireClientSubmission = false;
                 // Output automatic events
-                {
-                    final XFormsModelSubmission activeSubmission = containingDocument.getActiveSubmission();
-                    final List loads = containingDocument.getLoadsToRun();
-                    if (activeSubmission != null || (loads != null && loads.size() > 0)) {
-                        final Document eventsDocument = Dom4jUtils.createDocument();
-                        final Element eventsElement = eventsDocument.addElement(XFormsConstants.XXFORMS_EVENTS_QNAME);
-
-                        // Check for xxforms-submit event
-                        {
-                            if (activeSubmission != null) {
-                                final Element eventElement = eventsElement.addElement(XFormsConstants.XXFORMS_EVENT_QNAME);
-                                eventElement.addAttribute("source-control-id", activeSubmission.getEffectiveId());
-                                eventElement.addAttribute("name", XFormsEvents.XXFORMS_SUBMIT);
-                                requireClientSubmission = true;
-                            }
-                        }
-                        // Check for xxforms-load event
-                        {
-                            if (loads != null && loads.size() > 0) {
-                                for (Iterator i = loads.iterator(); i.hasNext();) {
-                                    final XFormsContainingDocument.Load load = (XFormsContainingDocument.Load) i.next();
-
-                                    if (load.isReplace() && load.isPortletLoad() && !NetUtils.urlHasProtocol(load.getResource()) && !"resource".equals(load.getUrlType())) {
-                                        // We need to submit the event so that the portlet can load the new path
-                                        final Element eventElement = eventsElement.addElement(XFormsConstants.XXFORMS_EVENT_QNAME);
-                                        eventElement.addAttribute("source-control-id", XFormsContainingDocument.CONTAINING_DOCUMENT_PSEUDO_ID);
-                                        eventElement.addAttribute("resource", load.getResource());
-                                        // NOTE: don't care about the target for portlets
-                                        eventElement.addAttribute("name", XFormsEvents.XXFORMS_LOAD);
-                                        requireClientSubmission = true;
-
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                        // Encode events so that the client cannot send back arbitrary events
-                        ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "server-events");
-                        ch.text(XFormsUtils.encodeXML(pipelineContext, eventsDocument, false));
-                        ch.endElement();
-
-                    }
+                if (serverEvents != null) {
+                    ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "server-events");
+                    ch.text(serverEvents);
+                    ch.endElement();
                 }
 
                 // Check if we want to require the client to perform a form submission
-                {
-                    if (requireClientSubmission)
-                        outputSubmissionInfo(externalContext, ch, containingDocument.getActiveSubmission());
+                if (requireClientSubmission) {
+                    outputSubmissionInfo(externalContext, ch, containingDocument.getClientActiveSubmission());
                 }
 
                 // TODO: the following should be correctly ordered in the order they were requested

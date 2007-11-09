@@ -14,11 +14,12 @@
 package org.orbeon.oxf.xforms.processor;
 
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.common.Version;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.xforms.XFormsProperties;
 
 import java.io.*;
@@ -203,6 +204,10 @@ public class XFormsResourceServer extends ProcessorImpl {
             }
 
             final Writer outputWriter = new OutputStreamWriter(os, "utf-8");
+
+            // Output Orbeon Forms version
+            outputWriter.write("/* This file was produced by Orbeon Forms " + Version.getVersion() + " */\n");
+
             for (Iterator i = resources.iterator(); i.hasNext();) {
                 final XFormsFeatures.ResourceConfig resourceConfig = (XFormsFeatures.ResourceConfig) i.next();
                 final String resourcePath = resourceConfig.getResourcePath(minimal);
@@ -254,6 +259,13 @@ public class XFormsResourceServer extends ProcessorImpl {
             outputWriter.flush();
         } else {
             // JavaScript, just send
+
+            // Output Orbeon Forms version
+            final Writer outputWriter = new OutputStreamWriter(os, "utf-8");
+            outputWriter.write("// This file was produced by Orbeon Forms " + Version.getVersion() + "\n");
+            outputWriter.flush();
+
+            // Output
             int index = 0;
             for (Iterator i = resources.iterator(); i.hasNext(); index++) {
                 final XFormsFeatures.ResourceConfig resourceConfig = (XFormsFeatures.ResourceConfig) i.next();

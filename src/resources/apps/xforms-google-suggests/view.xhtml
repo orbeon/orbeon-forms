@@ -23,11 +23,11 @@
         <xhtml:title>XForms Google Suggests</xhtml:title>
         <xforms:model>
 
-            <!-- Instance sent to our service that provide suggestions -->
+            <!-- Instance containing the query string -->
             <xforms:instance id="suggest-query">
                 <query/>
             </xforms:instance>
-            <!-- Instance with the suggestions we get back from our service -->
+            <!-- Instance with the suggestions we get back from Google -->
             <xforms:instance id="suggestions">
                 <suggestions/>
             </xforms:instance>
@@ -39,17 +39,17 @@
                 </google-search>
             </xforms:instance>
 
-            <!-- Copy query string in query we send to Google -->
-            <xforms:bind nodeset="instance('google-query')/q" calculate="instance('suggest-query')"/>
-
             <!-- Submission to our service that provides suggestions -->
             <xforms:submission id="suggest"
-                    method="post" action="/xforms-google-suggests/suggest"
-                    ref="instance('suggest-query')" instance="suggestions" replace="instance"/>
+                serialize="false"
+                method="get" action="http://google.com/complete/search?output=toolbar&amp;q={instance('suggest-query')}"
+                replace="instance" instance="suggestions"/>
+            
             <!-- Submission to Google to perform a search -->
             <xforms:submission id="google-search"
-                    method="get" action="http://www.google.com/search" separator="&amp;"
-                    ref="instance('google-query')" replace="all"/>
+                serialize="false"
+                method="get" action="http://www.google.com/search?hl=en&amp;q={instance('suggest-query')}"
+                replace="all"/>
 
         </xforms:model>
         <xhtml:style type="text/css">
@@ -73,16 +73,14 @@
                 <!-- Auto-complete text field -->
                 <xforms:select1 ref="instance('suggest-query')" selection="open" incremental="true"
                         appearance="xxforms:autocomplete" class="search-field">
-                    <xforms:itemset nodeset="instance('suggestions')/suggestion">
-                        <xforms:label ref="."/>
-                        <xforms:value ref="."/>
+                    <xforms:itemset nodeset="instance('suggestions')/CompleteSuggestion">
+                        <xforms:label ref="suggestion/@data"/>
+                        <xforms:value ref="suggestion/@data"/>
                     </xforms:itemset>
-                    <!-- Run the 'suggest' submission as text being typed -->
-                    <xforms:action ev:event="xforms-value-changed">
-                        <xforms:recalculate/>
-                        <xforms:send submission="suggest"/>
-                    </xforms:action>
-                    <xforms:send submission="google-search" ev:event="DOMActivate"/>
+                    <!-- Run the "suggest" submission as text being typed -->
+                    <xforms:send ev:event="xforms-value-changed" submission="suggest"/>
+                    <!-- Send the "google-search" submission when the user presses enter -->
+                    <xforms:send ev:event="DOMActivate" submission="google-search"/>
                 </xforms:select1>
 
             </xhtml:div>

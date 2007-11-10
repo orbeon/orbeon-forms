@@ -1,0 +1,99 @@
+<!--
+    Copyright (C) 2007 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xi="http://www.w3.org/2001/XInclude"
+    xmlns:saxon="http://saxon.sf.net/">
+
+    <xhtml:head>
+        <xhtml:title>Transformations Sandbox</xhtml:title>
+        <xforms:model>
+            <!-- Perform initial transformation -->
+            <xforms:send ev:event="xforms-ready" submission="run-submission"/>
+            <!-- Parameters from the URL (i.e. type of sandbox) -->
+            <xforms:instance id="parameters" src="input:instance"/>
+            <!-- Initial input document -->
+            <xforms:instance id="input" src="input"/>
+            <!-- Initial transformation -->
+            <xforms:instance id="transformation" src="transformation"/>
+            <!-- Request -->
+            <xforms:instance id="request">
+                <sandbox-instance/>
+            </xforms:instance>
+            <!-- Response -->
+            <xforms:instance id="response">
+                <div/>
+            </xforms:instance>
+            <!-- Message -->
+            <xforms:instance id="message">
+                <message/>
+            </xforms:instance>
+            <!-- Submission to run transformation -->
+            <xforms:submission id="run-submission" method="post" action="run"
+                    ref="instance('request')" replace="instance" instance="response">
+                <!-- Prepare request -->
+                <xforms:action ev:event="xforms-submit">
+                    <xforms:delete context="instance('request')" while="*" nodeset="*"/>
+                    <xforms:insert context="instance('request')" nodeset="*" origin="instance('input')"/>
+                    <xforms:insert context="instance('request')" nodeset="*" origin="instance('transformation')"/>
+                </xforms:action>
+                <!-- Handle success -->
+                <xforms:setvalue ev:event="xforms-submit-done" ref="instance('message')"/>
+                <!-- Handle failure -->
+                <xforms:setvalue ev:event="xforms-submit-error" ref="instance('message')">There is an error in one of the input documents.</xforms:setvalue>
+            </xforms:submission>
+        </xforms:model>
+        <xhtml:style type="text/css">
+            .xforms-label, .xforms-group legend { font-weight: bold }
+            .sandbox-error { color: red }
+        </xhtml:style>
+    </xhtml:head>
+    <xhtml:body>
+        <!-- Display messages -->
+        <xhtml:p class="sandbox-error">
+            <xforms:output value="instance('message')"/>
+        </xhtml:p>
+        <!-- Inputs -->
+        <xforms:group>
+            <xhtml:div>
+                <xforms:textarea ref="instance('input')" appearance="xxforms:autosize" incremental="true">
+                    <xforms:label>Input:</xforms:label>
+                </xforms:textarea>
+            </xhtml:div>
+            <xhtml:div>
+                <xforms:textarea ref="instance('transformation')" appearance="xxforms:autosize" incremental="true">
+                    <xforms:label>
+                        <xforms:output value="if (instance('parameters')/name = 'xpath') then 'XPath'
+                                              else if (instance('parameters')/name = 'schema') then 'XML Schema or Relax NG'
+                                              else if (instance('parameters')/name = 'xpath') then 'XPath'
+                                              else if (instance('parameters')/name = 'xpl') then 'XPL'
+                                              else if (instance('parameters')/name = 'xquery') then 'XQuery'
+                                              else if (instance('parameters')/name = 'xslt') then 'XSLT'
+                                              else if (instance('parameters')/name = 'xupdate') then 'XUpdate'
+                                              else ''"/>:
+                    </xforms:label>
+                </xforms:textarea>
+            </xhtml:div>
+            <!-- Run the transformation everytime a value changes -->
+            <xforms:send ev:event="xforms-value-changed" submission="run-submission"/>
+        </xforms:group>
+        <!-- Display result -->
+        <xforms:group appearance="xxforms:fieldset">
+            <xforms:label>Output</xforms:label>
+            <xforms:output value="saxon:serialize(instance('response'), 'html')" mediatype="text/html"/>
+        </xforms:group>
+    </xhtml:body>
+</xhtml:html>

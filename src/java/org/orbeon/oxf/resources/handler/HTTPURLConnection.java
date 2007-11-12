@@ -89,7 +89,8 @@ public class HTTPURLConnection extends URLConnection {
 
     public void connect() throws IOException {
         if (!connected) {
-            String userinfo = url.getUserInfo();
+            final String userinfo = url.getUserInfo();
+            final boolean isAuthenticationRequestedWithUsername = username != null && !username.equals("");
 
             // Create the HTTP client (this *should* be fairly lightweight)
 
@@ -98,7 +99,7 @@ public class HTTPURLConnection extends URLConnection {
             final HttpClient httpClient = new HttpClient(connectionManager);
 
             // Make authentification preemptive
-            if (userinfo != null || username != null)
+            if (userinfo != null || isAuthenticationRequestedWithUsername)
                 httpClient.getParams().setAuthenticationPreemptive(true);
 
             if (userinfo != null) {
@@ -114,7 +115,7 @@ public class HTTPURLConnection extends URLConnection {
                     new AuthScope(url.getHost(), url.getPort()),
                     new UsernamePasswordCredentials(username, password)
                 );
-            } else if (username != null) {
+            } else if (isAuthenticationRequestedWithUsername) {
                 // Set username and password specified externally
                 httpClient.getState().setCredentials(
                     new AuthScope(url.getHost(), url.getPort()),
@@ -133,7 +134,7 @@ public class HTTPURLConnection extends URLConnection {
             // Set headers
             for (Iterator keyIteratory = requestProperties.keySet().iterator(); keyIteratory.hasNext();) {
                 String key = (String) keyIteratory.next();
-                if (!"authorization".equalsIgnoreCase(key) || (userinfo == null && username == null))
+                if (!"authorization".equalsIgnoreCase(key) || (userinfo == null && username == null))// note that we don't forward the header if username is ""
                     method.setRequestHeader(key, (String) requestProperties.get(key));
             }
             // Handle authentication challenge
@@ -201,10 +202,10 @@ public class HTTPURLConnection extends URLConnection {
     }
 
     public void setUsername(String username) {
-        this.username = username;
+        this.username = username.trim();
     }
 
     public void setPassword(String password) {
-        this.password = password;
+        this.password = password.trim();
     }
 }

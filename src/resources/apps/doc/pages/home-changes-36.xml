@@ -31,15 +31,15 @@
                 Welcome to Orbeon Forms 3.6!
             </p>
             <p>
-                Orbeon Forms 3.6 features well over <a href="#changes-36-full">140 improvements</a> since <a
-                href="home-changes-35">Orbeon Forms 3.5.1</a>, including major improvements in the areas of XML Schema
-                validation, error handling, deployment within Java applications, and performance.
+                Orbeon Forms 3.6 features well over <a href="#changes-36-full">160 improvements</a> since <a
+                href="home-changes-35">Orbeon Forms 3.5.1</a>, including major improvements in the areas of state
+                handling, XML Schema validation, error handling, deployment within Java applications, and performance.
             </p>
             <p>
                 This document describes changes made between Orbeon PresentationServer 3.5.1 and Orbeon Forms 3.6.
             </p>
             <p>
-                <b style="color: red">NOTE: Orbeon Forms 3.6 is still UNDER DEVELOPMENT as of October 2007, but
+                <b style="color: red">NOTE: Orbeon Forms 3.6 is still UNDER DEVELOPMENT as of November 2007, but
                 we're getting there!</b>
             </p>
         </section>
@@ -58,7 +58,7 @@
                 <ul>
                     <li>
                         <p>
-                            <b>XForms features a disk-based state store.</b> Before this version, when using
+                            <b>The XForms engine features a disk-based state store.</b> Before this version, when using
                             <code>session</code> state handling, XForm state information was stored in the user's
                             session. Because the size of the session information was limited, state information could
                             expire and cause certain XForms pages to no longer function when too much memory was used.
@@ -371,7 +371,7 @@
             <section>
                 <title>Complete List of Issues Addressed in this Release</title>
                 <p>
-                    Orbeon Forms 3.6 addresses well over 140 bugs and features:
+                    Orbeon Forms 3.6 addresses well over 160 bugs and features:
                 </p>
                 <!--
 Request to extract bugs from SourceForge with http://www.orbeon.com/ops/xquery-the-web/ :
@@ -393,6 +393,135 @@ http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=2
 
                 -->
                 <ul>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307455&amp;group_id=168&amp;atid=350207">#307455:
+                            Logout example: still shows the page as if logged in after logging out
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306794&amp;group_id=168&amp;atid=350207">#306794:
+                            XPL, XQuery, XSLT, XPath and XUpdate sandboxes don't show results anymore
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307831&amp;group_id=168&amp;atid=350207">#307831:
+                            Google Suggests example doesn't work anymore
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307821&amp;group_id=168&amp;atid=350207">#307821:
+                            Combined JavaScript and CSS files should include an Orbeon Forms version number
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307812&amp;group_id=168&amp;atid=350207">#307812:
+                            Two submissions with replace="all" in a row throw an exception
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307811&amp;group_id=168&amp;atid=350207">#307811:
+                            "There is already an active submission." error when going back and forth quickly
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307803&amp;group_id=168&amp;atid=350207">#307803:
+                            Submitting an instance with bound upload controls doesn't work upon xforms-ready
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307701&amp;group_id=168&amp;atid=350207">#307701:
+                            Issue with adjacent itemsets
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307454&amp;group_id=168&amp;atid=350207">#307454:
+                            Inspector does not show initial XML (in some cases)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307579&amp;group_id=168&amp;atid=350207">#307579:
+                            Label is not hidden when repeat iteration is added
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307777&amp;group_id=168&amp;atid=350207">#307777:
+                            RFE: Client error dialog should provide a link to reload the page
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307744&amp;group_id=168&amp;atid=350207">#307744:
+                            Error when using browser back button when using xforms:instance[@src = 'input:*']
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307770&amp;group_id=168&amp;atid=350207">#307770:
+                            Control hints should display as tooltips
+                        </a>
+                    </li>
+                    <!--<li>-->
+                        <!--<a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=305566&amp;group_id=168&amp;atid=350207">#305566:-->
+                            <!--RFE: xxforms:readonly hint on instances -&gt; TinyTree + caching-->
+                        <!--</a>-->
+                    <!--</li>-->
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307766&amp;group_id=168&amp;atid=350207">#307766:
+                            Make xforms:select work in non-destructive mode
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307691&amp;group_id=168&amp;atid=350207">#307691:
+                            RFE: Implement persistent XForms state store
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307748&amp;group_id=168&amp;atid=350207">#307748:
+                            Upgrade log4j to latest 1.2
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307745&amp;group_id=168&amp;atid=350207">#307745:
+                            Cookies and authorization credentials may be sent across different page invocations
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307718&amp;group_id=168&amp;atid=350207">#307718:
+                            YUI connection: do not catch exception and do nothing
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307719&amp;group_id=168&amp;atid=350207">#307719:
+                            JS error in IE when canceling navigation away from current page
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307717&amp;group_id=168&amp;atid=350207">#307717:
+                            JavaScript error: element.hasAttribute is not a function
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307715&amp;group_id=168&amp;atid=350207">#307715:
+                            NPE upon submission with upload when no session is available
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307707&amp;group_id=168&amp;atid=350207">#307707:
+                            Instance replacement upon xforms-ready causes type="xs:date" bind to malfunction
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307690&amp;group_id=168&amp;atid=350207">#307690:
+                            xforms:output must require @ref or @value
+                        </a>
+                    </li>
                     <li>
                         <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307674&amp;group_id=168&amp;atid=350207">#307674:
                             Regression: Instance submission with upload no longer dispatches xforms-submit-done
@@ -1146,6 +1275,23 @@ http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=2
                     When upgrading from Orbeon Forms 3.6, please note the following:
                 </p>
                 <ul>
+                    <li>
+                        <p>
+                            We recommend that you update your properties with the following:
+                        </p>
+                        <xml-source>
+                            <comment> Store state on the server </comment>
+                            <property as="xs:string" name="oxf.xforms.state-handling" value="server"/>
+                        </xml-source>
+                        <xml-source>
+                            <comment> Allow a maximum of 20 MB of state information among all users </comment>
+                            <property as="xs:integer" name="oxf.xforms.store.application.size" value="20000000"/>
+                        </xml-source>
+                        <p>
+                            For more information about configuration, see <a
+                            href="reference-xforms-2#xforms-state-handling">State Handling</a>.
+                        </p>
+                    </li>
                     <li>
                         <p>
                             <b>Error resources moved to private location.</b> The files <code>error.xpl</code> and

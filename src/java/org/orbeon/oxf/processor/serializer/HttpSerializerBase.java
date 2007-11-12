@@ -104,12 +104,16 @@ public abstract class HttpSerializerBase extends CachedSerializer {
                 // Set caching headers and force revalidation
                 response.setCaching(lastModified, true, true);
 
-                // Check If-Modified-Since (conditional GET) and don't return content if condition is met
-                if (!response.checkIfModifiedSince(lastModified, true)) {
-                    response.setStatus(ExternalContext.SC_NOT_MODIFIED);
-                    if (logger.isDebugEnabled())
-                        logger.debug("Sending SC_NOT_MODIFIED");
-                    return;
+                // Check if we are processing a forward. If so, we cannot tell the client that the content has not been modified. 
+                final boolean isForward = externalContext.getRequest().getAttributesMap().get("javax.servlet.forward.request_uri") != null;
+                if (!isForward) {
+                    // Check If-Modified-Since (conditional GET) and don't return content if condition is met
+                    if (!response.checkIfModifiedSince(lastModified, true)) {
+                        response.setStatus(ExternalContext.SC_NOT_MODIFIED);
+                        if (logger.isDebugEnabled())
+                            logger.debug("Sending SC_NOT_MODIFIED");
+                        return;
+                    }
                 }
 
                 // Set status code

@@ -1328,12 +1328,27 @@
                     <xml-source show-namespaces="false">
                         <file filename="photo.jpg" mediatype="image/jpeg" size="2345">file:/C:/Tomcat/temp/upload_00000005.tmp</file>
                     </xml-source>
-                    <warning>
-                        The URL stored as the value of the upload is temporary and only valid for the duration of the
-                        current request. It is only accessible from the server side, and will not be accessible from a
-                        client such as a web browser. It is not guaranteed to be a <code>file:</code> URL, only that it
-                        can be read with Orbeon Forms's <a href="processors-generators-url">URL generator</a>.
-                    </warning>
+                    <note>
+                        <p>
+                            The URL stored as the value of the upload is temporary and only valid until either:
+                        </p>
+                        <ul>
+                            <li>
+                                the session expires,
+                            </li>
+                            <li>
+                                the Java VM quits,
+                            </li>
+                            <li>
+                                or a new file upload replaces the existing URI in the XForms instance.
+                            </li>
+                        </ul>
+                        <p>
+                            The URL is only accessible from the server side, and will not be accessible from a client
+                            such as a web browser. It is not guaranteed to be a <code>file:</code> URL, only that it can
+                            be read with Orbeon Forms's <a href="processors-generators-url">URL generator</a>.
+                        </p>
+                    </note>
                     <p>
                         The contents of the file can be retrieved using the URL Generator. The result
                         will be an XML document containing a single root element containing the uploaded

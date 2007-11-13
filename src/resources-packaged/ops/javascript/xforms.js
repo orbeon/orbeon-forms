@@ -1350,7 +1350,12 @@ ORBEON.xforms.Events = {
                     ORBEON.xforms.Globals.formHelpPanel[form.id].cfg.setProperty("context", [target, "tl", "tr"]);
                     ORBEON.xforms.Globals.formHelpPanel[form.id].show();
                 }
-//                ORBEON.xforms.Globals.formHelpPanelCloseButton[form.id].focus();
+
+                // Set focus on close button if visible (we don't want to set the focus on the close button if not
+                // visible as this would make the help panel scroll down to the close button)
+                var bdDiv = ORBEON.xforms.Globals.formHelpPanelMessageDiv[form.id].parentNode;
+                if (bdDiv.scrollHeight <= bdDiv.clientHeight)
+                    ORBEON.xforms.Globals.formHelpPanelCloseButton[form.id].focus();
             }
         }
     },

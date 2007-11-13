@@ -367,22 +367,30 @@ public abstract class HandlerBase extends ElementHandler {
         final boolean isHelp = type.equals("help");
 
         final String labelHintHelpAlertValue;
+        final boolean mustOutputHTMLFragment;
         if (xformsControl != null) {
             // Get actual value from control
             if (isLabel) {
                 labelHintHelpAlertValue = xformsControl.getLabel(pipelineContext);
+                mustOutputHTMLFragment = xformsControl.isHTMLLabel(pipelineContext);
             } else if (isHelp) {
-                labelHintHelpAlertValue = xformsControl.getHelp(pipelineContext);
+                // NOTE: Special case here where we get the escaped help to facilitate work below. Help is a special
+                // case because it is stored as escaped HTML within a <label> element.
+                labelHintHelpAlertValue = xformsControl.getEscapedHelp(pipelineContext);
+                mustOutputHTMLFragment = false;
             } else if (isHint) {
                 labelHintHelpAlertValue = xformsControl.getHint(pipelineContext);
+                mustOutputHTMLFragment = xformsControl.isHTMLLabel(pipelineContext);
             } else if (isAlert) {
                 labelHintHelpAlertValue = xformsControl.getAlert(pipelineContext);
+                mustOutputHTMLFragment = xformsControl.isHTMLAlert(pipelineContext);
             } else {
                 throw new IllegalStateException("Illegal type requested");
             }
         } else {
             // Placeholder
             labelHintHelpAlertValue = null;
+            mustOutputHTMLFragment = false;
         }
 
         // Find attributes
@@ -466,18 +474,12 @@ public abstract class HandlerBase extends ElementHandler {
             // We handle null attributes as well because we want a placeholder for "alert" even if there is no xforms:alert
             final Attributes newAttributes = (labelHintHelpAlertAttributes != null) ? labelHintHelpAlertAttributes : (placeholder) ? new AttributesImpl() : null;
             if (newAttributes != null) {
-                outputLabelFor(handlerContext, getAttributes(newAttributes, labelClasses, null), parentId,
-                        // Help is a special case because it is stored as escaped HTML within a <label> element
-                        (xformsControl != null && isHelp && !xformsControl.isHTMLHelp(pipelineContext)) ? XMLUtils.escapeXMLMinimal(labelHintHelpAlertValue): labelHintHelpAlertValue,
-                        // Whether to output an XHTML fragment
-                        xformsControl != null && ((isLabel && xformsControl.isHTMLLabel(pipelineContext))
-                                                    || (isAlert && xformsControl.isHTMLAlert(pipelineContext))
-                                                    || (isHint && xformsControl.isHTMLHint(pipelineContext))));
+                outputLabelFor(handlerContext, getAttributes(newAttributes, labelClasses, null), parentId, labelHintHelpAlertValue, mustOutputHTMLFragment);
             }
         }
     }
 
-    public static void outputLabelFor(HandlerContext handlerContext, AttributesImpl attributes, String forId, String value, boolean isHTML) throws SAXException {
+    public static void outputLabelFor(HandlerContext handlerContext, AttributesImpl attributes, String forId, String value, boolean mustOutputHTMLFragment) throws SAXException {
         attributes.addAttribute("", "for", "for", ContentHandlerHelper.CDATA, forId);
 
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
@@ -485,7 +487,7 @@ public abstract class HandlerBase extends ElementHandler {
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
         contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "label", labelQName, attributes);
         if (value != null) {
-            if (isHTML) {
+            if (mustOutputHTMLFragment) {
                 XFormsUtils.streamHTMLFragment(contentHandler, value, null, xhtmlPrefix);
             } else {
                 contentHandler.characters(value.toCharArray(), 0, value.length());

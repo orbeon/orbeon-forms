@@ -138,6 +138,11 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
         return help;
     }
 
+    public String getEscapedHelp(PipelineContext pipelineContext) {
+        evaluateIfNeeded(pipelineContext);
+        return isHTMLHelp ? help : XMLUtils.escapeXMLMinimal(help);
+    }
+
     public boolean isHTMLHelp(PipelineContext pipelineContext) {
         evaluateIfNeeded(pipelineContext);
         return isHTMLHelp;

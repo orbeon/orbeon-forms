@@ -178,7 +178,8 @@ public class NewControlsComparator extends BaseControlsComparator {
                                     final String helpValue2 = xformsSingleNodeControl2.getHelp(pipelineContext);
 
                                     if (!((helpValue1 == null && helpValue2 == null) || (helpValue1 != null && helpValue2 != null && helpValue1.equals(helpValue2)))) {
-                                        final String attributeValue = helpValue2 != null ? helpValue2 : "";
+                                final String escapedHelpValue2 = xformsSingleNodeControl2.getEscapedHelp(pipelineContext);
+                                final String attributeValue = escapedHelpValue2 != null ? escapedHelpValue2 : "";
                                         doOutputElement |= addAttributeIfNeeded(attributesImpl, "help", attributeValue, isNewRepeatIteration, attributeValue.equals(""));
                                     }
                                 }

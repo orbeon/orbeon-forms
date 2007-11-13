@@ -466,7 +466,10 @@ public abstract class HandlerBase extends ElementHandler {
             // We handle null attributes as well because we want a placeholder for "alert" even if there is no xforms:alert
             final Attributes newAttributes = (labelHintHelpAlertAttributes != null) ? labelHintHelpAlertAttributes : (placeholder) ? new AttributesImpl() : null;
             if (newAttributes != null) {
-                outputLabelFor(handlerContext, getAttributes(newAttributes, labelClasses, null), parentId, labelHintHelpAlertValue,
+                outputLabelFor(handlerContext, getAttributes(newAttributes, labelClasses, null), parentId,
+                        // Help is a special case because it is stored as escaped HTML within a <label> element
+                        (xformsControl != null && isHelp && !xformsControl.isHTMLHelp(pipelineContext)) ? XMLUtils.escapeXMLMinimal(labelHintHelpAlertValue): labelHintHelpAlertValue,
+                        // Whether to output an XHTML fragment
                         xformsControl != null && ((isLabel && xformsControl.isHTMLLabel(pipelineContext))
                                                     || (isAlert && xformsControl.isHTMLAlert(pipelineContext))
                                                     || (isHint && xformsControl.isHTMLHint(pipelineContext))));

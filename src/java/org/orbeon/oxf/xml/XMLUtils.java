@@ -921,9 +921,9 @@ public class XMLUtils {
                 try {
                     // Log when we delete files, as there is a transient issue with temporary files
                     // that seem to be deleted too early.
-                    if (logger.isInfoEnabled()) {
-                        String temporaryFileName = ((DeferredFileOutputStream) fileItem.getOutputStream()).getFile().getAbsolutePath();
-                        logger.info("Deleting temporary file: " + temporaryFileName);
+                    if (logger.isDebugEnabled()) {
+                        final String temporaryFileName = ((DeferredFileOutputStream) fileItem.getOutputStream()).getFile().getAbsolutePath();
+                        logger.debug("Deleting temporary file: " + temporaryFileName);
                     }
                     fileItem.delete();
                 } catch (IOException e) {

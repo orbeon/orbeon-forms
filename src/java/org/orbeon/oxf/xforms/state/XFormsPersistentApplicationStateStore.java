@@ -61,6 +61,43 @@ import java.util.Map;
  * o Merge session information upon persisting an entry
  * o Remove entry only once last session id is gone in memory
  * o Remove entry only once last session id is gone in the persistent store
+ *
+ * The store is basically a smarter HashMap. It is meant to store two types of mappings from to keys to two values:
+ *
+ * o static state key -> static state value
+ * o dynamic state key -> dynamic state value
+ *
+ * They keys are Strings (they look like UUIDs, so they are small), and the values are Strings as well (they are
+ * usually base-64 encoded content, and they can be very large).
+ *
+ * The add() method deals with both static and dynamic state at the same time partly for convenience, partly because
+ * the dynamic state is handled a little differently.
+ *
+ * "pageGenerationId" is in this case another name for "static state key". "requestId" is another name for "dynamic
+ * state key". The values are held in the XFormsState object when the add() method is called.
+ *
+ * When you add keys and values, they are first added to memory into a LRU list (using the base class). When an item is
+ * pushed out at the end of the list (because the size of the items in the list becomes larger than the allocated size),
+ * it is migrated to eXist.
+ *
+ * When items are read with find(), they are searched first in memory, then in eXist, and then they are migrated to the
+ * beginning of the LRU list.
+ *
+ * This is all and well, but if you don't do anything more, then the store would grow forever. So we implemented a
+ * session-based expiration strategy as a first expiration strategy.
+ *
+ * The store is used as a consequence of a user interacting with an XForms page. The user is associated with a session.
+ * So when calling add(), we pass the current session id.
+ *
+ * Static state keys can be reused among multiple users and sessions (dynamic state keys probably not at this time).
+ * Either way, the entries in the cache are tagged with zero, one or more session ids.
+ *
+ * This means that is user USER1 in session SESSION1 is adding a key KEY1, and user USER1 in session SESSION2 is
+ * adding KEY1 as well, KEY1 will be tagged with SESSION1 and SESSION2.
+ *
+ * Now when SESSION1 expires, what we want to do is remove all the mappings tagged with SESSION1, except those that
+ * are still tagged with other sessions. For those, we just remove the SESSION1 tag. This would be a good thing to
+ * test.
  */
 public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
 

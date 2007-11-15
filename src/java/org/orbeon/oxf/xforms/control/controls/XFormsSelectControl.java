@@ -45,8 +45,10 @@ public class XFormsSelectControl extends XFormsSelect1Control {
      */
     public void setExternalValue(PipelineContext pipelineContext, String value, String type) {
 
+        final String controlValue = getValue();
+
         // Current values in the instance
-        final Map instanceValues = tokenize(getValue());
+        final Map instanceValues = tokenize(controlValue);
 
         // Values currently selected in the UI
         final Map uiValues = tokenize(value);
@@ -69,7 +71,7 @@ public class XFormsSelectControl extends XFormsSelect1Control {
                 }
             }
             // Create resulting string
-            final FastStringBuffer sb = new FastStringBuffer(getValue().length() + value.length() * 2);
+            final FastStringBuffer sb = new FastStringBuffer(controlValue.length() + value.length() * 2);
             int index = 0;
             for (Iterator i = instanceValues.keySet().iterator(); i.hasNext(); index++) {
                 final String currentKey = (String) i.next();
@@ -92,8 +94,12 @@ public class XFormsSelectControl extends XFormsSelect1Control {
      */
     protected String evaluateExternalValue(PipelineContext pipelineContext) {
 
+        final String controlValue = getValue();
+        if (controlValue == null)
+            return null;
+
         // Current values in the instance
-        final Map instanceValues = tokenize(getValue());
+        final Map instanceValues = tokenize(controlValue);
 
         // Values in the itemset
         final List items = getItemset(pipelineContext, true);
@@ -102,7 +108,7 @@ public class XFormsSelectControl extends XFormsSelect1Control {
         final String newValue;
         {
             // Create resulting string
-            final FastStringBuffer sb = new FastStringBuffer(getValue().length());
+            final FastStringBuffer sb = new FastStringBuffer(controlValue.length());
             int index = 0;
             for (Iterator i = items.iterator(); i.hasNext(); index++) {
                 final XFormsItemUtils.Item currentItem = (XFormsItemUtils.Item) i.next();
@@ -120,9 +126,11 @@ public class XFormsSelectControl extends XFormsSelect1Control {
 
     private static Map tokenize(String value) {
         final Map result = new HashMap();
-        for (final StringTokenizer st = new StringTokenizer(value); st.hasMoreTokens();) {
-            final String token = st.nextToken();
-            result.put(token, "");
+        if (value != null) {
+            for (final StringTokenizer st = new StringTokenizer(value); st.hasMoreTokens();) {
+                final String token = st.nextToken();
+                result.put(token, "");
+            }
         }
         return result;
     }

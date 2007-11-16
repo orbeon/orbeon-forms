@@ -62,13 +62,13 @@ public abstract class SQLProcessorOracleDelegateBase implements DatabaseDelegate
     public void setClob(PreparedStatement stmt, int index, String value) throws SQLException {
 
         // Get an OraclePreparedStatement
-        OraclePreparedStatement oracleStmt = getOraclePreparedStatement(stmt);
+        final OraclePreparedStatement oracleStmt = getOraclePreparedStatement(stmt);
 
         // Create a temporary CLOB
-        CLOB clob = CLOB.createTemporary(oracleStmt.getConnection(), true, CLOB.DURATION_SESSION);
+        final CLOB clob = CLOB.createTemporary(oracleStmt.getConnection(), true, CLOB.DURATION_SESSION);
 
         // Write to the CLOB
-        Writer writer = clob.getCharacterOutputStream();
+        final Writer writer = clob.getCharacterOutputStream();
         try {
             NetUtils.copyStream(new StringReader(value), writer);
             writer.flush();
@@ -81,8 +81,7 @@ public abstract class SQLProcessorOracleDelegateBase implements DatabaseDelegate
     }
 
     public void setBlob(PreparedStatement stmt, int index, byte[] value) throws SQLException {
-        OutputStream os = getBlobOutputStream(stmt, index);
-
+        final OutputStream os = getBlobOutputStream(stmt, index);
         try {
             NetUtils.copyStream(new ByteArrayInputStream(value), os);
             os.close();
@@ -163,9 +162,9 @@ public abstract class SQLProcessorOracleDelegateBase implements DatabaseDelegate
 
     public void setDOM(PreparedStatement stmt, int index, String document) throws SQLException {
         // Get an OraclePreparedStatement
-        OraclePreparedStatement oracleStmt = getOraclePreparedStatement(stmt);
+        final OraclePreparedStatement oracleStmt = getOraclePreparedStatement(stmt);
 
-        XMLType xmlType = XMLType.createXML(oracleStmt.getConnection(), document);
+        final XMLType xmlType = XMLType.createXML(oracleStmt.getConnection(), document);
         oracleStmt.setObject(index, xmlType);
     }
 

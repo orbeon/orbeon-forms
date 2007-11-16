@@ -31,6 +31,7 @@
             <employment-outside>Insérer ci-dessous la dernière occupation a l'étranger si pas montré ci-dessus.</employment-outside>
             <father>Père</father>
             <mother>Mère</mother>
+            <spouse>Epoux</spouse>
         </titles>
         <labels>
             <first-name>Prénom</first-name>
@@ -60,6 +61,9 @@
             <remove-residence>Supprimer résidence</remove-residence>
             <add-employment>Ajouter emploi</add-employment>
             <remove-employment>Supprimer emploi</remove-employment>
+
+            <marriage-date>Date de mariage</marriage-date>
+            <marriage-place>Lieu de mariage</marriage-place>
         </labels>
         <alerts>
             <!--<first-name>First Name</first-name>-->

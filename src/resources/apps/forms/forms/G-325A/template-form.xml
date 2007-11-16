@@ -48,7 +48,10 @@
             </residence>
         </mother>
     </parents-information>
-    <marriages/><!-- TODO -->
+    <marriages>
+        <current/>
+        <past/>
+    </marriages>
     <residence-information>
         <last-five-years>
             <residence>

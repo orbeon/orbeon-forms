@@ -1,0 +1,15 @@
+<spouse>
+    <name>
+        <first/>
+        <last/>
+    </name>
+    <birth>
+        <date/>
+        <city/>
+        <country/>
+    </birth>
+    <marriage>
+        <date/>
+        <place/>
+    </marriage>
+</spouse>

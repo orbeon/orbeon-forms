@@ -1,4 +1,4 @@
-<xforms:model id="g-325a-model" schema="oxf:/apps/forms/forms/G-325A/schema.xsd"
+<xforms:model id="g-325a-model"
       xmlns:xs="http://www.w3.org/2001/XMLSchema"
       xmlns:xforms="http://www.w3.org/2002/xforms"
       xmlns:ev="http://www.w3.org/2001/xml-events"
@@ -48,6 +48,9 @@
 
     <!-- XForms instance containing the XML schema (for enumerations) -->
     <!--<xforms:instance id="schema-instance" src="oxf:/apps/forms/schema/dmv-schema.xsd"/>-->
+
+    <!-- XForms instance containing template for spouse -->
+    <xforms:instance id="spouse-template" src="oxf:/apps/forms/forms/G-325A/template-spouse.xml"/>
 
     <!-- XForms instance containing template for residence -->
     <xforms:instance id="residence-template" src="oxf:/apps/forms/forms/G-325A/template-residence.xml"/>

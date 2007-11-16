@@ -124,6 +124,7 @@
             <xs:element name="state" type="xs:string"/>
             <xs:element name="country" type="xs:string"/>
             <xs:element name="from" type="xs:gYearMonth"/>
+            <xs:element name="to" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
 
@@ -166,6 +167,7 @@
             <xs:element name="address" type="xs:string"/>
             <xs:element name="occupation" type="xs:string"/>
             <xs:element name="from" type="xs:gYearMonth"/>
+            <xs:element name="to" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
 

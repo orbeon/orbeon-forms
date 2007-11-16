@@ -26,7 +26,6 @@
                 <field left="306" top="114" size="100" value="concat(birth/city, ', ', birth/country)"/>
                 <field left="484" top="114" size="100" value="ssn"/>
 
-                <field left="46" top="190" size="100" value="'(none)'"/>
                 <field left="46" top="224" size="100" value="'(none)'"/>
             </group>
 
@@ -36,9 +35,23 @@
                 <field left="210" top="138" size="100" value="name/first"/>
                 <group ref="birth">
                     <field left="280" top="138" size="100" value="string-join((substring(date, 6, 2), substring(date, 9, 2), substring(date, 1, 4)), '/')"/>
+                    <field left="340" top="138" size="100" value="concat(city, ', ', country)"/>
                 </group>
-                <field left="340" top="138" size="100" value="concat(birth/city, ', ', birth/country)"/>
                 <field left="460" top="138" size="100" value="concat(residence/city, ', ', residence/country)"/>
+            </repeat>
+
+            <!-- Spouse information -->
+            <repeat nodeset="marriages/*/spouse" offset-y="12.5">
+                <field left="100" top="190" size="100" value="name/last"/>
+                <field left="230" top="190" size="100" value="name/first"/>
+                <group ref="birth">
+                    <field left="308" top="190" size="100" value="string-join((substring(date, 6, 2), substring(date, 9, 2), substring(date, 1, 4)), '/')"/>
+                    <field left="370" top="190" size="100" value="concat(city, ', ', country)"/>
+                </group>
+                <group ref="marriage">
+                    <field left="455" top="190" size="100" value="string-join((substring(date, 6, 2), substring(date, 9, 2), substring(date, 1, 4)), '/')"/>
+                    <field left="518" top="190" size="100" value="place"/>
+                </group>
             </repeat>
 
             <!-- Residence -->
@@ -62,7 +75,9 @@
                     <field left="484" top="374" size="100" value="substring(from, 1, 4)"/>
 
                     <!-- TODO: allow blank -->
-                    <field left="514" top="374" size="100" value="to"/>
+                    <field left="526" top="374" size="100" value="substring(to, 6, 2)"/>
+                    <field left="562" top="374" size="100" value="substring(to, 1, 4)"/>
+
                 </group>
             </group>
 
@@ -88,7 +103,7 @@
 
             <!-- Connection -->
             <group ref="connection">
-                <field left="192" top="520" size="100" value="other"/>
+                <field left="192" top="520" size="100" value="if (type = 'other') then other else ''"/>
                 <field left="47" top="519" size="100" value="if (type = 'naturalization') then 'X' else ''"/>
                 <field left="119" top="519" size="100" value="if (type = 'other') then 'X' else ''"/>
                 <field left="47" top="530" size="100" value="if (type = 'permanent') then 'X' else ''"/>

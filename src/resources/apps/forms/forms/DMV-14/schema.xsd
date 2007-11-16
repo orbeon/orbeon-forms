@@ -140,7 +140,7 @@
 
     <xs:simpleType name="requiredNonEmptyString">
         <xs:restriction base="xs:string">
-            <xs:minLength value="1" />
+            <xs:minLength value="1"/>
             <xs:whiteSpace value="collapse"/>
         </xs:restriction>
     </xs:simpleType>

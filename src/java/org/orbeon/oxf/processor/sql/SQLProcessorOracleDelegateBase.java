@@ -18,6 +18,7 @@ import oracle.jdbc.OracleResultSet;
 import oracle.jdbc.OracleTypes;
 import oracle.sql.BLOB;
 import oracle.sql.CLOB;
+import oracle.sql.OPAQUE;
 import oracle.xdb.XMLType;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.NetUtils;
@@ -141,15 +142,16 @@ public abstract class SQLProcessorOracleDelegateBase implements DatabaseDelegate
     }
 
     public Node getDOM(ResultSet resultSet, String columnName) throws SQLException {
-        OracleResultSet oracleResultSet = getOracleResultSet(resultSet);
+        final OracleResultSet oracleResultSet = getOracleResultSet(resultSet);
 
-        XMLType xmlType = (XMLType) oracleResultSet.getObject(columnName);
-//            OPAQUE opaque = orst.getOPAQUE(columnName);
-//            XMLType xmlType = XMLType.createXML(opaque);
-        Node doc = null;
-        if(xmlType.isFragment()) {
+//        XMLType xmlType = (XMLType) oracleResultSet.getObject(columnName);
+        final OPAQUE opaque = oracleResultSet.getOPAQUE(columnName);
+        final XMLType xmlType = XMLType.createXML(opaque);
+        final Node doc;
+        if(false && xmlType.isFragment()) {
             //  TODO: Handle XML fragment correctly
             //   doc = XMLUtils.parseDocumentFragment(xmlType.getStringVal());
+            doc = null;
         } else {
             // FIXME: Xerces throws when walking the tree if we return the DOM directly!!!
 //                doc = xmlType.getDOM();

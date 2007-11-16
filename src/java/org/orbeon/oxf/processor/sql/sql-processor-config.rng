@@ -181,10 +181,12 @@
                                             <!-- XML fragment -->
                                             <attribute name="type">
                                                 <choice>
-                                                    <value>oxf:xmlFragment</value>
+                                                    <data type="QName">
+                                                        <param name="pattern">.+:xmlFragment</param>
+                                                    </data>
                                                 </choice>
                                             </attribute>
-                                            <optional>
+                                            <optional>2
                                                 <attribute name="sql-type">
                                                     <choice>
                                                         <value>char</value>
@@ -224,7 +226,9 @@
                                     <attribute name="type">
                                         <choice>
                                             <value>xs:int</value>
-                                            <value>oxf:literalString</value>
+                                            <data type="QName">
+                                                <param name="pattern">.+:literalString</param>
+                                            </data>
                                         </choice>
                                     </attribute>
                                     <attribute name="replace">

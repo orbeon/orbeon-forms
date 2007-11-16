@@ -240,26 +240,23 @@
                     <li><code>xs:dateTime</code></li>
                     <li><code>xs:date</code></li>
                     <li><code>xs:base64Binary</code></li>
-                    <li><code>oxf:xmlFragment</code></li>
+                    <li><code>odt:xmlFragment</code></li>
                 </ul>
                 <note>
                     <p>
-                        By default, the <code>xs</code> and <code>oxf</code> prefixes must be
-                        declared, as is customary in XML. For backward compatiblity with versions of
-                        Orbeon Forms where the prefixes did not have to be declared, set the
-                        <code>legacy-implicit-prefixes</code> property as follows:
+                        By default, the <code>xs</code> and <code>odt</code> prefixes must be declared, as is customary
+                        in XML. For backward compatiblity with versions of Orbeon Forms where the prefixes did not have
+                        to be declared, set the <code>legacy-implicit-prefixes</code> property as follows:
                     </p>
                     <xml-source>
                         <property as="xs:boolean" processor-name="oxf:sql" name="legacy-implicit-prefixes" value="true"/>
                     </xml-source>
                     <p>
-                        When this property is missing or set to <code>false</code>, type prefixes
-                        must be mapped as is customary for XML vocabularies. Add the following
-                        namespace declarations:
+                        When this property is missing or set to <code>false</code>, type prefixes must be mapped as is
+                        customary for XML vocabularies. Add the following namespace declarations:
                         <code>xmlns:xs="http://www.w3.org/2001/XMLSchema"</code> and
-                        <code>xmlns:odt="http://orbeon.org/oxf/xml/datatypes"</code>. Doing so then
-                        allows using data types as before, for example <code>xs:string</code> or
-                        <code>odt:xmlFragment</code>.
+                        <code>xmlns:odt="http://orbeon.org/oxf/xml/datatypes"</code>. Doing so then allows using data
+                        types as before, for example <code>xs:string</code> or <code>odt:xmlFragment</code>.
                     </p>
                 </note>
                 <p>
@@ -289,15 +286,13 @@ select first_name, last_name
                 <p>Any number of <code>sql:param</code> elements may be used.</p>
 
                 <p>
-                    <code>sql:param</code> supports an optional boolean <code>replace</code>
-                    attribute, that can take the value <code>true</code> or <code>false</code> (the
-                    default). When <code>replace</code> is set to <code>true</code>, the parameter
-                    is simply replaced in the query, instead of being set on a JDBC
-                    <code>PreparedStatement</code>. This however works only with the
-                    <code>xs:int</code> and <code>oxf:literalString</code> types. This attribute is
-                    useful to dynamically generate parts of SQL queries, or to set parameters that
-                    do not allow being set via JDBC's <code>setYyy</code> methods. For example,
-                    with SQL Server:
+                    <code>sql:param</code> supports an optional boolean <code>replace</code> attribute, that can take
+                    the value <code>true</code> or <code>false</code> (the default). When <code>replace</code> is set to
+                    <code>true</code>, the parameter is simply replaced in the query, instead of being set on a JDBC
+                    <code>PreparedStatement</code>. This however works only with the <code>xs:int</code> and
+                    <code>odt:literalString</code> types. This attribute is useful to dynamically generate parts of SQL
+                    queries, or to set parameters that do not allow being set via JDBC's <code>setYyy</code> methods.
+                    For example, with SQL Server:
                 </p>
 
                 <xml-source>
@@ -478,12 +473,11 @@ select first_name, last_name
                         <li><code>xs:dateTime</code></li>
                         <li><code>xs:date</code></li>
                         <li><code>xs:base64Binary</code></li>
-                        <li><code>oxf:xmlFragment</code></li>
+                        <li><code>odt:xmlFragment</code></li>
                     </ul>
                     <note>
-                        The same remark applies to types used on <code>sql:param</code>: the prefixes
-                        must be declared unless the <code>legacy-implicit-prefixes</code> specifies
-                        otherwise.
+                        The same remark applies to types used on <code>sql:param</code>: the prefixes must be declared
+                        unless the <code>legacy-implicit-prefixes</code> specifies otherwise.
                     </note>
                     <p>
                         <code>xs:dateTime</code> returns a date in the following format:
@@ -494,9 +488,8 @@ select first_name, last_name
                         <code>CCYY-MM-DD</code>.
                     </p>
                     <p>
-                        <code>oxf:xmlFragment</code> is a special type that gets the column as a
-                        string, parses it as an XML fragment, and embeds the resulting XML in the SQL
-                        processor output.
+                        <code>odt:xmlFragment</code> is a special type that gets the column as a string, parses it as
+                        an XML fragment, and embeds the resulting XML in the SQL processor output.
                     </p>
                     <note>
                         <p>
@@ -681,22 +674,20 @@ select first_name, last_name
             <section>
                 <title>Reading and Writing XML Documents</title>
                 <p>
-                    As explained in the section about <code>sql-type</code> above, when text data,
-                    in particular XML data, is large, it is best stored as a CLOB type or, in the
-                    case of XML, as a native database XML data type such as the Oracle
-                    <code>XMLType</code> data type.
+                    As explained in the section about <code>sql-type</code> above, when text data, in particular XML
+                    data, is large, it is best stored as a CLOB type or, in the case of XML, as a native database XML
+                    data type such as the Oracle <code>XMLType</code> data type.
                 </p>
                 <p>
-                    Reading and writing XML data is supported to and from database CLOBs and, with
-                    Oracle 9, to and from <code>XMLType</code>. The <code>oxf:xmlFragment</code>
-                    type must be used. To write XML data to a CLOB, use the
-                    <code>oxf:xmlFragment</code> type as follows:
+                    Reading and writing XML data is supported to and from database CLOBs and, with Oracle 9, to and
+                    from <code>XMLType</code>. The <code>odt:xmlFragment</code> type must be used. To write XML data to
+                    a CLOB, use the <code>odt:xmlFragment</code> type as follows:
                 </p>
                 <xml-source>
                     <sql:execute xmlns:sql="http://orbeon.org/oxf/xml/sql">
                         <sql:update>
                             insert into test_clob_table (clob_column)
-                            values (<sql:param select="/*" type="oxf:xmlFragment" sql-type="clob"/>)
+                            values (<sql:param select="/*" type="odt:xmlFragment" sql-type="clob"/>)
                         </sql:update>
                     </sql:execute>
                 </xml-source>
@@ -707,7 +698,7 @@ select first_name, last_name
                     is then serialized to a character stream and stored as a CLOB.
                 </p>
                 <p>
-                    To read a document from a CLOB column, use the <code>oxf:xmlFragment</code>
+                    To read a document from a CLOB column, use the <code>odt:xmlFragment</code>
                     type as follows:
                 </p>
                 <xml-source>
@@ -719,7 +710,7 @@ select first_name, last_name
                             <rows>
                                 <sql:row-iterator>
                                     <row>
-                                        <sql:get-column-value type="oxf:xmlFragment" column="clob_column"/>
+                                        <sql:get-column-value type="odt:xmlFragment" column="clob_column"/>
                                     </row>
                                 </sql:row-iterator>
                             </rows>
@@ -740,7 +731,7 @@ select first_name, last_name
                     <sql:execute xmlns:sql="http://orbeon.org/oxf/xml/sql">
                         <sql:update>
                             insert into test_xmltype_table (xmltype_column)
-                            values (<sql:param select="/*" type="oxf:xmlFragment" sql-type="xmltype"/>)
+                            values (<sql:param select="/*" type="odt:xmlFragment" sql-type="xmltype"/>)
                         </sql:update>
                     </sql:execute>
                 </xml-source>
@@ -767,7 +758,7 @@ select first_name, last_name
                             <rows>
                                 <sql:row-iterator>
                                     <row>
-                                        <sql:get-column-value type="oxf:xmlFragment" column="xmltype_column"/>
+                                        <sql:get-column-value type="odt:xmlFragment" column="xmltype_column"/>
                                     </row>
                                 </sql:row-iterator>
                             </rows>
@@ -797,13 +788,11 @@ select first_name, last_name
             <section>
                 <title>Specifying a SQL Type</title>
                 <p>
-                    When setting a parameter of type <code>xs:string</code> or
-                    <code>oxf:xmlFragment</code>, it is possible to specify an additional attribute
-                    on <code>sql:param</code>: <code>sql-type</code>. By default, text is written
-                    using the JDBC setString() method. In case the data must be stored in the
-                    database as a Character Large OBject (CLOB) or other database-specific types,
-                    it is necessary to tell Orbeon Forms that a different API must be used. For example, to
-                    write a string into a CLOB:
+                    When setting a parameter of type <code>xs:string</code> or <code>odt:xmlFragment</code>, it is
+                    possible to specify an additional attribute on <code>sql:param</code>: <code>sql-type</code>. By
+                    default, text is written using the JDBC setString() method. In case the data must be stored in the
+                    database as a Character Large OBject (CLOB) or other database-specific types, it is necessary to
+                    tell Orbeon Forms that a different API must be used. For example, to write a string into a CLOB:
                 </p>
                 <xml-source>
                     <sql:execute xmlns:sql="http://orbeon.org/oxf/xml/sql">

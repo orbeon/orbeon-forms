@@ -492,9 +492,12 @@
                 <fileset dir="${test-src.dir}">
                     <include name="org/orbeon/oxf/**/*Test*.java"/>
                     <exclude name="org/orbeon/oxf/**/old/*Test*.java"/>
+                    <!--<exclude name="org/orbeon/oxf/test/XFormsPersistentApplicationStateStoreTest.java"/>-->
                 </fileset>
             </batchtest>
+
             <formatter type="plain" usefile="false"/>
+
             <sysproperty key="oxf.resources.factory" value="org.orbeon.oxf.resources.PriorityResourceManagerFactory"/>
             <!-- Put resources-packaged first, as we need to touch files and compile Java files there -->
             <sysproperty key="oxf.resources.priority.1" value="org.orbeon.oxf.resources.FilesystemResourceManagerFactory"/>
@@ -505,7 +508,7 @@
             <sysproperty key="oxf.resources.common.min-reload-interval" value="50"/>
             <sysproperty key="oxf.test.config" value="oxf:/ops/unit-tests/tests.xml"/>
         	<sysproperty key="java.io.tmpdir" value="${test.tmp.dir}" />
-            <!--            <arg line="-class org.orbeon.oxf.test.ProcessorTest"/>-->
+
             <classpath>
                 <path refid="class.path"/>
                 <pathelement location="${build.test-classes.dir}"/>
@@ -516,49 +519,7 @@
         </junit>
     </target>
 
-    <target name="anthill-release" depends="clean, orbeon-dist, test-classes, debug-enabled, debug-disabled">
-    	<!-- 11/14/2004 d : Found Processor was sorta invalid cause once it ran successully
-    	     				it would leave behind .class files in java.io.tmpdir.  This
-    	     				meant that on subsequent runs of the test it wouldn't try to
-    	     				compile anything.
-
-    	     				So now we delete,create,and specify a specific dir as the temp
-    	     				dir so that compiles always occur.
-    	 -->
-        <!-- TODO: This is a copy of what's in the "test" target, except for one class path element. Must avoid duplication. -->
-        <delete dir="${test.tmp.dir}"/>
-    	<mkdir dir="${test.tmp.dir}"/>
-        <delete dir="${test.exist-db.dir}"/>
-    	<mkdir dir="${test.exist-db.dir}"/>
-        <junit fork="yes" haltonerror="yes" haltonfailure="yes">
-            <batchtest>
-                <fileset dir="${test-src.dir}">
-                    <include name="org/orbeon/oxf/**/*Test*.java"/>
-                    <exclude name="org/orbeon/oxf/**/old/*Test*.java"/>
-                    <!-- TODO TEMP TO SEE BUILD SERVER STATUS -->
-                    <exclude name="org/orbeon/oxf/test/XFormsPersistentApplicationStateStoreTest.java"/>
-                </fileset>
-            </batchtest>
-
-            <formatter type="plain" usefile="false"/>
-            <sysproperty key="oxf.resources.factory" value="org.orbeon.oxf.resources.PriorityResourceManagerFactory"/>
-            <sysproperty key="oxf.resources.priority.1" value="org.orbeon.oxf.resources.FilesystemResourceManagerFactory"/>
-            <sysproperty key="oxf.resources.priority.1.oxf.resources.filesystem.sandbox-directory" value="${resources-packaged.dir}"/>
-            <sysproperty key="oxf.resources.priority.2" value="org.orbeon.oxf.resources.FilesystemResourceManagerFactory"/>
-            <sysproperty key="oxf.resources.priority.2.oxf.resources.filesystem.sandbox-directory" value="${resources.dir}"/>
-            <sysproperty key="oxf.resources.priority.3" value="org.orbeon.oxf.resources.ClassLoaderResourceManagerFactory"/>
-            <sysproperty key="oxf.resources.common.min-reload-interval" value="50"/>
-            <sysproperty key="oxf.test.config" value="oxf:/ops/unit-tests/tests.xml"/>
-        	<sysproperty key="java.io.tmpdir" value="${test.tmp.dir}" />
-            <!--            <arg line="-class org.orbeon.oxf.test.ProcessorTest"/>-->
-            <classpath>
-                <path refid="class.path"/>
-                <pathelement location="${build.test-classes.dir}"/>
-                <pathelement location="${resources-packaged.dir}"/>
-                <!-- FWIW tomcat 5 doesn't include this jar. -->
-                <pathelement location="${tomcat.dir}/common/lib/mailapi-1_3_2.jar"/>
-            </classpath>
-        </junit>
+    <target name="anthill-release" depends="clean, orbeon-dist, test-classes, debug-enabled, debug-disabled, test">
 
         <!-- dump version string with dots in into a file, then read that file convert -->
         <!-- the dots to underscores while reeading.   i.e. convert 2.5.4.3234 to      -->

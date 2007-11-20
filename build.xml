@@ -522,7 +522,8 @@
     	     				So now we delete,create,and specify a specific dir as the temp
     	     				dir so that compiles always occur.
     	 -->
-    	<delete dir="${test.tmp.dir}"/>
+        <!-- TODO: This is a copy of what's in the "test" target, except for one class path element. Must avoid duplication. -->
+        <delete dir="${test.tmp.dir}"/>
     	<mkdir dir="${test.tmp.dir}"/>
         <delete dir="${test.exist-db.dir}"/>
     	<mkdir dir="${test.exist-db.dir}"/>

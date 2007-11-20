@@ -1698,7 +1698,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         setInstance(newInstance, true);
 
         // The controls will be dirty
-        containingDocument.getXFormsControls().markDirty();
+        containingDocument.getXFormsControls().markDirtySinceLastRequest();
 
         // NOTE: The current spec specifies direct calls, but it might be updated to require setting flags instead.
         setAllDeferredFlags(true);

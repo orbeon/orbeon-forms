@@ -345,6 +345,13 @@ public class XFormsServer extends ProcessorImpl {
                 }
             }
 
+            // Rebuild and evaluate controls if needed, before we compute the dynamic state
+            // NOTE: This is in case rebuilding controls modifies repeat indexes. We want the indexes to be included in the state further down.that
+            if (allEvents || xformsControls.isDirtySinceLastRequest() || testOutputAllActions) {// TODO: Why do we rebuild anyway in case of allEvents?
+                xformsControls.rebuildCurrentControlsStateIfNeeded(pipelineContext);
+                xformsControls.evaluateAllControlsIfNeeded(pipelineContext);
+            }
+
             // Get encoded state to send to the client
             // NOTE: This will also cache the containing document if needed
 
@@ -409,22 +416,15 @@ public class XFormsServer extends ProcessorImpl {
                     if (!allEvents) {
                         // Common case
 
-                        if (xformsControls.isDirty() || testOutputAllActions) {
-                            // Only output changes if needed
-                            xformsControls.rebuildCurrentControlsStateIfNeeded(pipelineContext);
-                            xformsControls.evaluateAllControlsIfNeeded(pipelineContext);
+                        // Only output changes if needed
+                        if (xformsControls.isDirtySinceLastRequest() || testOutputAllActions) {
                             final XFormsControls.ControlsState currentControlsState = xformsControls.getCurrentControlsState();
-
                             diffControls(pipelineContext, ch, containingDocument, testOutputAllActions ? null : xformsControls.getInitialControlsState().getChildren(), currentControlsState.getChildren(), itemsetsFull1, itemsetsFull2, valueChangeControlIds);
                         }
                     } else {
-                        // Reload / back case
-                        xformsControls.rebuildCurrentControlsStateIfNeeded(pipelineContext);
-                        xformsControls.evaluateAllControlsIfNeeded(pipelineContext);
+                        // Reload / back case: diff between current state and initial state as obtained from initial dynamic state
                         final XFormsControls.ControlsState currentControlsState = xformsControls.getCurrentControlsState();
                         final XFormsControls.ControlsState initialControlsState = initialContainingDocument.getXFormsControls().getCurrentControlsState();
-
-                        // Output diffs
                         diffControls(pipelineContext, ch, containingDocument, initialControlsState.getChildren(), currentControlsState.getChildren(), itemsetsFull1, itemsetsFull2, null);
                     }
 
@@ -434,23 +434,29 @@ public class XFormsServer extends ProcessorImpl {
                 // Output divs information
                 {
                     if (!allEvents) {
-                        diffDivs(ch, xformsControls, testOutputAllActions ? null : xformsControls.getInitialSwitchState(), xformsControls.getCurrentSwitchState(), xformsControls.getInitialDialogState(), xformsControls.getCurrentDialogState());
+                        if (containingDocument.isDirtySinceLastRequest()) {
+                            // Only diff if we are dirty
+                            diffDivs(ch, xformsControls, testOutputAllActions ? null : xformsControls.getInitialSwitchState(), xformsControls.getCurrentSwitchState(), xformsControls.getInitialDialogState(), xformsControls.getCurrentDialogState());
+                        }
                     } else {
                         diffDivs(ch, xformsControls, initialContainingDocument.getXFormsControls().getCurrentSwitchState(), xformsControls.getCurrentSwitchState(),
                                 initialContainingDocument.getXFormsControls().getCurrentDialogState(), xformsControls.getCurrentDialogState());
                     }
                 }
 
-                // Output repeats information
+                // Output repeat indexes information
                 {
                     // Output index updates
                     // TODO: move index state out of ControlsState + handle diffs
-
                     if (!allEvents) {
-                        if (!testOutputAllActions)
-                            diffIndexState(ch, xformsControls.getInitialControlsState().getRepeatIdToIndex(), xformsControls.getCurrentControlsState().getRepeatIdToIndex());
-                        else
+                        if (!testOutputAllActions) {
+                            if (xformsControls.isDirtySinceLastRequest()) {
+                                // Only diff if controls are dirty
+                                diffIndexState(ch, xformsControls.getInitialControlsState().getRepeatIdToIndex(), xformsControls.getCurrentControlsState().getRepeatIdToIndex());
+                            }
+                        } else {
                             testOutputInitialRepeatInfo(ch, xformsControls.getCurrentControlsState());
+                        }
                     } else {
                         final XFormsControls.ControlsState currentControlsState = xformsControls.getCurrentControlsState();
                         final XFormsControls.ControlsState initialControlsState = initialContainingDocument.getXFormsControls().getCurrentControlsState();
@@ -459,7 +465,7 @@ public class XFormsServer extends ProcessorImpl {
                 }
 
                 // Output itemset information
-                {
+                if (allEvents || xformsControls.isDirtySinceLastRequest()) {
                     // Diff itemset information
                     final Map itemsetUpdate = diffItemsets(itemsetsFull1, itemsetsFull2);
                     // TODO: handle allEvents case

@@ -55,7 +55,7 @@ public class XFormsControls {
     private DialogState initialDialogState;
     private DialogState currentDialogState;
 
-    private boolean dirty;
+    private boolean dirtySinceLastRequest;
 
     private XFormsContainingDocument containingDocument;
     private Document controlsDocument;
@@ -160,13 +160,13 @@ public class XFormsControls {
         setRepeatIndexState(repeatIndexesElement);
     }
 
-    public boolean isDirty() {
-        return dirty;
+    public boolean isDirtySinceLastRequest() {
+        return dirtySinceLastRequest;
     }
     
-    public void markDirty() {
-        this.dirty = true;
-        if (this.currentControlsState != null)// case of legacy XForms engine
+    public void markDirtySinceLastRequest() {
+        dirtySinceLastRequest = true;
+        if (this.currentControlsState != null)// can be null for legacy XForms engine
             this.currentControlsState.markDirty();
     }
 
@@ -311,7 +311,8 @@ public class XFormsControls {
             }
 
             // We are now clean
-            dirty = false;
+            containingDocument.markCleanSinceLastRequest();
+            dirtySinceLastRequest = false;
             initialControlsState.dirty = false;
         }
 
@@ -1068,6 +1069,7 @@ public class XFormsControls {
         // TODO: if switch state changes AND we optimize relevance, then mark controls as dirty
 
         getCurrentSwitchState().updateSwitchInfo(pipelineContext, containingDocument, getCurrentControlsState(), caseId);
+        containingDocument.markDirtySinceLastRequest();
     }
 
 
@@ -1083,6 +1085,7 @@ public class XFormsControls {
             currentDialogState = new DialogState(new HashMap(initialDialogState.getDialogIdToVisibleMap()));
 
         currentDialogState.showHide(dialogId, show, neighbor, constrainToViewport);
+        containingDocument.markDirtySinceLastRequest();
     }
 
     /**

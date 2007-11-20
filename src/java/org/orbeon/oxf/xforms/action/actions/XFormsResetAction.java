@@ -41,7 +41,7 @@ public class XFormsResetAction extends XFormsAction {
 
             // "the reset action takes effect immediately and clears all of the flags."
             model.setAllDeferredFlags(false);
-            containingDocument.getXFormsControls().markDirty();
+            containingDocument.getXFormsControls().markDirtySinceLastRequest();
         } else {
             throw new OXFException("xforms:reset model attribute must point to an xforms:model element.");
         }

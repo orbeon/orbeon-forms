@@ -72,6 +72,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     private XFormsControls xformsControls;
 
     // Client state
+    private boolean dirtySinceLastRequest;
     private XFormsModelSubmission activeSubmission;
     private boolean gotSubmission;
     private List messagesToRun;
@@ -247,6 +248,23 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
      */
     public XFormsControls getXFormsControls() {
         return xformsControls;
+    }
+
+    /**
+     * Whether the document is dirty since the last request.
+     *
+     * @return  whether the document is dirty since the last request
+     */
+    public boolean isDirtySinceLastRequest() {
+        return dirtySinceLastRequest || xformsControls == null || xformsControls.isDirtySinceLastRequest();
+    }
+
+    public void markCleanSinceLastRequest() {
+        this.dirtySinceLastRequest = false;
+    }
+
+    public void markDirtySinceLastRequest() {
+        this.dirtySinceLastRequest = true;
     }
 
     /**

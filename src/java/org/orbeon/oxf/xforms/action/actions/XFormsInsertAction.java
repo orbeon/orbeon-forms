@@ -365,7 +365,7 @@ public class XFormsInsertAction extends XFormsAction {
 
             // "XForms Actions that change the tree structure of instance data result in setting all four flags to true"
             modifiedInstance.getModel(containingDocument).setAllDeferredFlags(true);
-            containingDocument.getXFormsControls().markDirty();
+            containingDocument.getXFormsControls().markDirtySinceLastRequest();
         }
     }
 

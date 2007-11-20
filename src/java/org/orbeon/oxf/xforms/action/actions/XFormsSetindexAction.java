@@ -119,7 +119,7 @@ public class XFormsSetindexAction extends XFormsAction {
                 currentModel.applyComputedExpressionBinds(pipelineContext);
             }
 
-            containingDocument.getXFormsControls().markDirty();
+            containingDocument.getXFormsControls().markDirtySinceLastRequest();
         } else {
             // "If there is a null search result for the target object and the source object is an XForms action such as
             // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."

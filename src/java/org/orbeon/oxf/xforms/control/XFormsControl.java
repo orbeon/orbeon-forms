@@ -433,7 +433,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
                         }
                         // TODO: Should try to use the code of the <setindex> action
 
-                        containingDocument.getXFormsControls().markDirty();
+                        containingDocument.getXFormsControls().markDirtySinceLastRequest();
                     }
                 }
 

@@ -135,6 +135,10 @@
         <property name="build.distrib.dir" value="${build.dir}/distrib"/>
         <property name="build.temp.dir" value="${build.dir}/temp"/>
         <property name="build.doc.dir" value="${build.dir}/doc"/>
+        
+        <property name="test.tmp.dir" location="${build.temp.dir}/test" />
+        <property name="test.exist-db.dir" location="${src.dir}/resources-packaged/ops/unit-tests/exist-data" />
+
         <property name="jar.file" value="${build.lib.dir}/${project.name}.jar"/>
         <property name="xforms-filter.jar.file" value="${build.lib.dir}/${project.name}-xforms-filter.jar"/>
         <property name="cli.jar.file" value="${build.lib.dir}/${project.name}-cli.jar"/>
@@ -474,14 +478,17 @@
     	     				So now we delete,create,and specify a specific dir as the temp
     	     				dir so that compiles always occur.
     	 -->
-    	<property name="test.tmp.dir" location="${build.temp.dir}/test" />
     	<delete dir="${test.tmp.dir}"/>
     	<mkdir dir="${test.tmp.dir}"/>
+
+	    <delete dir="${test.exist-db.dir}"/>
+    	<mkdir dir="${test.exist-db.dir}"/>
+
         <junit fork="yes" haltonerror="yes" haltonfailure="yes">
-<!--            <test name="org.orbeon.oxf.test.ProcessorTest"/>-->
             <batchtest>
                 <fileset dir="${test-src.dir}">
-                    <include name="org/orbeon/oxf/test/*Test*.java"/>
+                    <include name="org/orbeon/oxf/**/*Test*.java"/>
+                    <exclude name="org/orbeon/oxf/**/old/*Test*.java"/>
                 </fileset>
             </batchtest>
             <formatter type="plain" usefile="false"/>
@@ -814,7 +821,7 @@
     </target>
 
     <target name="orbeon-dist" depends="orbeon-dist-packages"/>
-    
+
     <target name="post-update" depends="orbeon-css-templates">
         <chmod dir="${war.dir}/WEB-INF/exist-data" perm="a+rw"/>
     </target>

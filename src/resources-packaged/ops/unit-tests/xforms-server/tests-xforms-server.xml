@@ -393,7 +393,7 @@
                     <p:input name="document">
                         <xhtml:html>
                             <xhtml:head>
-                                <xforms:model id="main-model">
+                                <xforms:model id="main-model" xxforms:state-handling="client">
                                     <xforms:dispatch ev:event="xforms-ready" name="DOMActivate" target="3"/>
                                     <xforms:instance>
                                         <equation xmlns="">
@@ -592,7 +592,7 @@
                     <p:input name="document">
                         <xhtml:html>
                             <xhtml:head>
-                                <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms" >
+                                <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms" xxforms:state-handling="client">
                                     <xforms:instance>
                                         <form>
                                             <departments>
@@ -1058,7 +1058,7 @@
                     <p:input name="document">
                         <xhtml:html>
                             <xhtml:head>
-                                <xforms:model id="main-model">
+                                <xforms:model id="main-model" xxforms:state-handling="client">
                                     <xforms:instance id="tests">
                                         <instance>
                                             <noFoundData>0</noFoundData>
@@ -1116,7 +1116,7 @@
                     <p:input name="document">
                         <xhtml:html>
                             <xhtml:head>
-                                <xforms:model id="main-model">
+                                <xforms:model id="main-model" xxforms:state-handling="client">
                                     <xforms:instance id="main-instance">
                                         <instance>
                                             <this-is-an-existing-node/>
@@ -1310,7 +1310,7 @@
                     <p:input name="document">
                         <xhtml:html>
                             <xhtml:head>
-                                <xforms:model id="main-model">
+                                <xforms:model id="main-model" xxforms:state-handling="client">
                                     <xforms:instance>
                                        <instance model-id="main-model">
                                            <r1/>
@@ -1544,7 +1544,7 @@
                     <p:input name="document">
                         <xhtml:html>
                             <xhtml:head>
-                                <xforms:model id="main-model">
+                                <xforms:model id="main-model" xxforms:state-handling="client">
                                     <xforms:instance id="instance">
                                         <e1 gege="gigi1">
                                             <e2>

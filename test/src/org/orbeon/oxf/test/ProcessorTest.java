@@ -313,7 +313,15 @@ public class ProcessorTest extends TestCase {
                     pipelineContext.setAttribute(PipelineContext.JNDI_CONTEXT, jndiContext);
 
                     // Create ExternalContext
-                    ExternalContext externalContext = new ServletExternalContext(new TestServletContext(), pipelineContext, new HashMap(), new TestHttpServletRequest(), new TestHttpServletResponse());
+                    ExternalContext externalContext = new ServletExternalContext(new TestServletContext(), pipelineContext, new HashMap(), new TestHttpServletRequest(), new TestHttpServletResponse()) {
+                        public String getRealPath(String path) {
+                            if (path.equals("WEB-INF/exist-conf.xml")) {
+                                return ResourceManagerWrapper.instance().getRealPath("/ops/unit-tests/exist-conf.xml");
+                            } else {
+                                return super.getRealPath(path);
+                            }
+                        }
+                    };
                     StaticExternalContext.setStaticContext(new StaticExternalContext.StaticContext(externalContext, pipelineContext));
                     pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, externalContext);
 

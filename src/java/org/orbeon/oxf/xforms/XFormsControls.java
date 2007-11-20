@@ -789,12 +789,12 @@ public class XFormsControls {
             final String idForContext = currentBindingContext.getIdForContext();
             if (bindingElement != null && idForContext != null) {
                 if (contextId == null || contextId.equals(idForContext)) {
-                    // Found binding context for relevant repeat iteration
+                    // Found matching binding context
                     return currentBindingContext.getNodeset();
                 }
             }
         }
-        // It is required that there is a relevant enclosing xforms:repeat
+        // It is required that there is a matching enclosing id?
         if (contextId == null)
             throw new ValidationException("Enclosing XForms element not found.", getCurrentBindingContext().getLocationData());
         else

@@ -15,6 +15,7 @@ package org.orbeon.oxf.test;
 
 import junit.framework.TestCase;
 import org.dom4j.Document;
+import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.StaticExternalContext;
 import org.orbeon.oxf.pipeline.api.ExternalContext.Session;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -52,14 +53,18 @@ public class XFormsPersistentApplicationStateStoreTest extends TestCase {
 	}
 
 	protected void setUp() {
-		pipelineContext = new PipelineContext();
-		externalContext = new ExtendedTestExternalContext(pipelineContext, null);
+        try {
+            pipelineContext = new PipelineContext();
+            externalContext = new ExtendedTestExternalContext(pipelineContext, null);
 
-		pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, externalContext);
-		StaticExternalContext.setStaticContext(new StaticExternalContext.StaticContext(
-						externalContext, pipelineContext));
-		fixture = XFormsPersistentApplicationStateStore .instance(externalContext);
-	}
+            pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, externalContext);
+            StaticExternalContext.setStaticContext(new StaticExternalContext.StaticContext(externalContext, pipelineContext));
+            fixture = XFormsPersistentApplicationStateStore.instance(externalContext);
+        } catch (RuntimeException e) {
+            OXFException.getRootThrowable(e).printStackTrace();
+            throw e;
+        }
+    }
 
 	protected void tearDown() throws Exception {
 		expireAllSessions();

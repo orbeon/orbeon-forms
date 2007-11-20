@@ -492,19 +492,13 @@
                 </fileset>
             </batchtest>
             <formatter type="plain" usefile="false"/>
-            <sysproperty key="oxf.resources.factory"
-                         value="org.orbeon.oxf.resources.PriorityResourceManagerFactory"/>
+            <sysproperty key="oxf.resources.factory" value="org.orbeon.oxf.resources.PriorityResourceManagerFactory"/>
             <!-- Put resources-packaged first, as we need to touch files and compile Java files there -->
-            <sysproperty key="oxf.resources.priority.1"
-                         value="org.orbeon.oxf.resources.FilesystemResourceManagerFactory"/>
-            <sysproperty key="oxf.resources.priority.1.oxf.resources.filesystem.sandbox-directory"
-                         value="${resources-packaged.dir}"/>
-            <sysproperty key="oxf.resources.priority.2"
-                         value="org.orbeon.oxf.resources.FilesystemResourceManagerFactory"/>
-            <sysproperty key="oxf.resources.priority.2.oxf.resources.filesystem.sandbox-directory"
-                         value="${resources.dir}"/>
-            <sysproperty key="oxf.resources.priority.3"
-                         value="org.orbeon.oxf.resources.ClassLoaderResourceManagerFactory"/>
+            <sysproperty key="oxf.resources.priority.1" value="org.orbeon.oxf.resources.FilesystemResourceManagerFactory"/>
+            <sysproperty key="oxf.resources.priority.1.oxf.resources.filesystem.sandbox-directory" value="${resources-packaged.dir}"/>
+            <sysproperty key="oxf.resources.priority.2" value="org.orbeon.oxf.resources.FilesystemResourceManagerFactory"/>
+            <sysproperty key="oxf.resources.priority.2.oxf.resources.filesystem.sandbox-directory" value="${resources.dir}"/>
+            <sysproperty key="oxf.resources.priority.3" value="org.orbeon.oxf.resources.ClassLoaderResourceManagerFactory"/>
             <sysproperty key="oxf.resources.common.min-reload-interval" value="50"/>
             <sysproperty key="oxf.test.config" value="oxf:/ops/unit-tests/tests.xml"/>
         	<sysproperty key="java.io.tmpdir" value="${test.tmp.dir}" />
@@ -528,15 +522,15 @@
     	     				So now we delete,create,and specify a specific dir as the temp
     	     				dir so that compiles always occur.
     	 -->
-    	<property name="test.tmp.dir" location="${build.temp.dir}/test" />
     	<delete dir="${test.tmp.dir}"/>
     	<mkdir dir="${test.tmp.dir}"/>
+        <delete dir="${test.exist-db.dir}"/>
+    	<mkdir dir="${test.exist-db.dir}"/>
         <junit fork="yes" haltonerror="yes" haltonfailure="yes">
-<!--            <test name="org.orbeon.oxf.test.ProcessorTest"/>-->
-
             <batchtest>
                 <fileset dir="${test-src.dir}">
-                    <include name="org/orbeon/oxf/test/*Test*.java"/>
+                    <include name="org/orbeon/oxf/**/*Test*.java"/>
+                    <exclude name="org/orbeon/oxf/**/old/*Test*.java"/>
                 </fileset>
             </batchtest>
 

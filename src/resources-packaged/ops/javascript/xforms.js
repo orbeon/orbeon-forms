@@ -963,14 +963,15 @@ ORBEON.xforms.Events = {
                         } else if (ORBEON.util.Dom.hasClass(previousDOMFocusOut, "xforms-select1-appearance-xxforms-tree")
                                 || ORBEON.util.Dom.hasClass(previousDOMFocusOut, "xforms-select-appearance-xxforms-tree")) {
                             xformsValueChanged(previousDOMFocusOut, null);
-                        } else if (ORBEON.xforms.Globals.isMac && ORBEON.xforms.Globals.isRenderingEngineGecko) {
+                        } else if (ORBEON.xforms.Globals.isMac && ORBEON.xforms.Globals.isRenderingEngineGecko
+                                && ORBEON.util.Dom.hasClass(previousDOMFocusOut, "xforms-control")
+                                && ! ORBEON.util.Dom.hasClass(previousDOMFocusOut, "xforms-trigger")) {
                             // On Firefox running on Mac, when users ctrl-tabs out of Firefox, comes back, and then changes the focus
                             // to another field, we don't receive a change event. On Windows that change event is sent then user tabs
                             // out of Firefox. So here, we make sure that a value change has been sent to the server for the previous control
                             // that had the focus when we get the focus event for another control.
                             xformsFireEvents([xformsCreateEventArray(previousDOMFocusOut, "xxforms-value-change-with-focus-change",
                                 ORBEON.xforms.Controls.getCurrentValue(previousDOMFocusOut))], false);
-
                         }
                         // Send focus out/focus in events
                         var events = new Array();

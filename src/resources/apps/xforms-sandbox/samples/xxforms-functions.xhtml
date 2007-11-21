@@ -1,0 +1,60 @@
+<!--
+    Copyright (C) 2007 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+        xmlns:f="http://orbeon.org/oxf/xml/formatting"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+        xmlns:widget="http://orbeon.org/oxf/xml/widget"
+        xmlns:ev="http://www.w3.org/2001/xml-events"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xhtml:head>
+        <xhtml:title>XForms Extension Functions</xhtml:title>
+        <xforms:model>
+            <xforms:instance id="main-instance">
+                <instance xmlns="">
+                    <group1>
+                        <group2>
+                            <value/>
+                        </group2>
+                    </group1>
+                </instance>
+            </xforms:instance>
+        </xforms:model>
+    </xhtml:head>
+    <xhtml:body>
+        <xforms:group ref="group1" id="group1">
+            <xforms:group ref="group2" id="group2">
+                <xhtml:p>
+                    Value: <xforms:output value="value"/>
+                </xhtml:p>
+                <xforms:trigger>
+                    <xforms:label>Set value of xxforms:context()</xforms:label>
+                    <xforms:setvalue ev:event="DOMActivate" ref="value" value="name(xxforms:context())"/>
+                </xforms:trigger>
+                <xforms:trigger>
+                    <xforms:label>Set value of xxforms:context('group2')</xforms:label>
+                    <xforms:setvalue ev:event="DOMActivate" ref="value" value="name(xxforms:context('group2'))"/>
+                </xforms:trigger>
+                <xforms:trigger>
+                    <xforms:label>Set value of xxforms:context('group1')</xforms:label>
+                    <xforms:setvalue ev:event="DOMActivate" ref="value" value="name(xxforms:context('group1'))"/>
+                </xforms:trigger>
+                <!--<xhtml:p>-->
+                    <!--Result of xxforms:repeat-current() function: <xforms:output value="name(xxforms:repeat-current())"/>-->
+                <!--</xhtml:p>-->
+            </xforms:group>
+        </xforms:group>
+    </xhtml:body>
+</xhtml:html>

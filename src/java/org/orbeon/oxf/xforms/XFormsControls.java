@@ -726,7 +726,7 @@ public class XFormsControls {
 
             final Element bindingElement = currentBindingContext.getControlElement();
             final String repeatIdForIteration = currentBindingContext.getIdForContext();
-            if (bindingElement == null && repeatIdForIteration != null) {
+            if (bindingElement == null && repeatIdForIteration != null) {// NOTE: test on bindingElement == null is just to detect whether this is a repeat iteration
                 if (repeatId == null || repeatId.equals(repeatIdForIteration)) {
                     // Found binding context for relevant repeat iteration
                     return currentBindingContext.getSingleNode();
@@ -751,7 +751,7 @@ public class XFormsControls {
 
             final Element bindingElement = currentBindingContext.getControlElement();
             final String repeatIdForIteration = currentBindingContext.getIdForContext();
-            if (bindingElement == null && repeatIdForIteration != null) {
+            if (bindingElement == null && repeatIdForIteration != null) {// NOTE: test on bindingElement == null is just to detect whether this is a repeat iteration
                 // Found binding context for relevant repeat iteration
                 return repeatIdForIteration;
             }
@@ -787,7 +787,7 @@ public class XFormsControls {
 
             final Element bindingElement = currentBindingContext.getControlElement();
             final String idForContext = currentBindingContext.getIdForContext();
-            if (bindingElement != null && idForContext != null) {
+            if (bindingElement != null && idForContext != null && groupingControls.get(bindingElement.getName()) != null) {
                 if (contextId == null || contextId.equals(idForContext)) {
                     // Found matching binding context
                     return currentBindingContext.getNodeset();
@@ -796,9 +796,9 @@ public class XFormsControls {
         }
         // It is required that there is a matching enclosing id?
         if (contextId == null)
-            throw new ValidationException("Enclosing XForms element not found.", getCurrentBindingContext().getLocationData());
+            throw new ValidationException("No enclosing container XForms control found.", getCurrentBindingContext().getLocationData());
         else
-            throw new ValidationException("Enclosing XForms element not found for id: " + contextId, getCurrentBindingContext().getLocationData());
+            throw new ValidationException("No enclosing container XForms control found for id: " + contextId, getCurrentBindingContext().getLocationData());
     }
 
     /**

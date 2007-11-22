@@ -130,7 +130,7 @@ public class XFormsPersistentApplicationStateStoreTest extends TestCase {
 	}
 
     
-    // TODO: temp commented out
+    // TODO: temp commented out as this fails on the build machine
 //	public void testLargeNumberOfSessions() {
 //		final int NUMBER_OF_SESSIONS = 10;
 //		final String pageIdPrefix = generateRandomString(25);

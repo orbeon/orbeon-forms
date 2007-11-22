@@ -36,7 +36,7 @@
                 handling, XML Schema validation, error handling, deployment within Java applications, and performance.
             </p>
             <p>
-                This document describes changes made between Orbeon PresentationServer 3.5.1 and Orbeon Forms 3.6.
+                This document describes changes made between Orbeon Forms 3.5.1 and Orbeon Forms 3.6.
             </p>
             <!--<p>-->
                 <!--<b style="color: red">NOTE: Orbeon Forms 3.6 is still UNDER DEVELOPMENT as of November 2007, but-->

@@ -17,15 +17,14 @@ import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.InitUtils;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.servlet.ServletExternalContext;
+import org.orbeon.oxf.util.LoggerFactory;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 import java.util.Iterator;
-import java.util.List;
 
 /**
  * This listener listens for HTTP session lifecycle changes.
@@ -58,7 +57,7 @@ public class OPSSessionListenerDelegate implements HttpSessionListener {
             // Run listeners if any
             if (httpSession != null && httpSession.getAttribute(ServletExternalContext.SESSION_LISTENERS) != null) {
                 // Iterate through listeners
-                final List listeners = (List) httpSession.getAttribute(ServletExternalContext.SESSION_LISTENERS);
+                final ServletExternalContext.SessionListeners listeners = (ServletExternalContext.SessionListeners) httpSession.getAttribute(ServletExternalContext.SESSION_LISTENERS);
                 if (listeners != null) {
                     for (Iterator i = listeners.iterator(); i.hasNext();) {
                         final ExternalContext.Session.SessionListener currentListener = (ExternalContext.Session.SessionListener) i.next();

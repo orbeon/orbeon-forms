@@ -159,7 +159,7 @@ public class PortletExternalContext extends PortletWebAppExternalContext impleme
                     // Special handling for multipart/form-data
 
                     // Decode the multipart data
-                    parameterMap = ServletExternalContext.getParameterMapMultipart(pipelineContext, request, null, ServletExternalContext.DEFAULT_FORM_CHARSET);
+                    parameterMap = ServletExternalContext.getParameterMapMultipart(pipelineContext, request, null, ServletExternalContext.DEFAULT_FORM_CHARSET_DEFAULT);
 
                 } else {
                     // Just use native request parameters
@@ -327,18 +327,18 @@ public class PortletExternalContext extends PortletWebAppExternalContext impleme
         }
 
         public void addListener(SessionListener sessionListener) {
-            List listeners = (List) portletSession.getAttribute(ServletExternalContext.SESSION_LISTENERS, PortletSession.APPLICATION_SCOPE);
+            ServletExternalContext.SessionListeners listeners = (ServletExternalContext.SessionListeners) portletSession.getAttribute(ServletExternalContext.SESSION_LISTENERS, PortletSession.APPLICATION_SCOPE);
             if (listeners == null) {
-                listeners = new ArrayList();
+                listeners = new ServletExternalContext.SessionListeners();
                 portletSession.setAttribute(ServletExternalContext.SESSION_LISTENERS, listeners, PortletSession.APPLICATION_SCOPE);
             }
-            listeners.add(sessionListener);
+            listeners.addListener(sessionListener);
         }
 
         public void removeListener(SessionListener sessionListener) {
-            final List listeners = (List) portletSession.getAttribute(ServletExternalContext.SESSION_LISTENERS, PortletSession.APPLICATION_SCOPE);
+            final ServletExternalContext.SessionListeners listeners = (ServletExternalContext.SessionListeners) portletSession.getAttribute(ServletExternalContext.SESSION_LISTENERS, PortletSession.APPLICATION_SCOPE);
             if (listeners != null)
-                listeners.remove(sessionListener);
+                listeners.removeListener(sessionListener);
         }
     }
 

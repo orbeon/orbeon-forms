@@ -85,11 +85,11 @@ public class MultipartFormDataBuilder {
                         size += 2 + boundary.length() + 2; // starting boundary + CRLF
                         if (f.getName() != null) {
                             size += contentDispositionFileString1.length() + contentDispositionFileString2.length() + contentDispositionFileString3.length() + 2; // Content-Disposition + CRLF
-                            size += f.getName().getBytes(ServletExternalContext.DEFAULT_FORM_CHARSET).length; // file name
+                            size += f.getName().getBytes(ServletExternalContext.DEFAULT_FORM_CHARSET_DEFAULT).length; // file name
                         } else {
                             size += contentDispositionFormString1.length() + contentDispositionFormString2.length() + 2; // Content-Disposition + CRLF
                         }
-                        size += newKey.getBytes(ServletExternalContext.DEFAULT_FORM_CHARSET).length; // parameter name
+                        size += newKey.getBytes(ServletExternalContext.DEFAULT_FORM_CHARSET_DEFAULT).length; // parameter name
 
                         size += contentTypeString.length() + 2; // Content-Type + CRLF
                         size += f.getContentType() != null ? f.getContentType().length() : "application/octet-stream".length(); // content type
@@ -103,9 +103,9 @@ public class MultipartFormDataBuilder {
                         for (int j = 0; j < s.length; j++) {
                             size += 2 + boundary.length() + 2; // starting boundary + CRLF
                             size += contentDispositionFormString1.length() + contentDispositionFormString2.length() + 2; // Content-Disposition + CRLF
-                            size += newKey.getBytes(ServletExternalContext.DEFAULT_FORM_CHARSET).length; // parameter name
+                            size += newKey.getBytes(ServletExternalContext.DEFAULT_FORM_CHARSET_DEFAULT).length; // parameter name
                             size += 2; // blank line
-                            size += s[j].getBytes(ServletExternalContext.DEFAULT_FORM_CHARSET).length; // value FIXME: FORM_ENCODING?
+                            size += s[j].getBytes(ServletExternalContext.DEFAULT_FORM_CHARSET_DEFAULT).length; // value FIXME: FORM_ENCODING?
                             size += 2; // blank line
                         }
                     }
@@ -129,7 +129,7 @@ public class MultipartFormDataBuilder {
         // Write content
         {
 //            Writer writer = new OutputStreamWriter(outputStream, "iso-8859-1");
-            Writer writer = new OutputStreamWriter(outputStream, ServletExternalContext.DEFAULT_FORM_CHARSET);
+            Writer writer = new OutputStreamWriter(outputStream, ServletExternalContext.DEFAULT_FORM_CHARSET_DEFAULT);
 
             for (Iterator i = parameters.keySet().iterator(); i.hasNext();) {
                 String key = (String) i.next();

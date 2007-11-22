@@ -48,10 +48,14 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
 
     public static Logger logger = LoggerFactory.createLogger(ServletExternalContext.class);
 
-    public static final String DEFAULT_FORM_CHARSET = "utf-8";
+    public static final String DEFAULT_HEADER_ENCODING = "utf-8";
+    public static final String DEFAULT_FORM_CHARSET_DEFAULT = "utf-8";
     public static final String DEFAULT_FORM_CHARSET_PROPERTY = "oxf.servlet.default-form-charset";
+
     public static final String EXTERNALIZE_FORM_VALUES_PREFIX_PROPERTY = "oxf.servlet.externalize-form-values-prefix";
     public static final String SESSION_LISTENERS = "oxf.servlet.session-listeners";
+
+    private static final String DEFAULT_FORM_CHARSET = OXFProperties.instance().getPropertySet().getString(DEFAULT_FORM_CHARSET_PROPERTY, DEFAULT_FORM_CHARSET_DEFAULT);
 
     private class Request implements ExternalContext.Request {
 
@@ -66,6 +70,7 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
 
         private boolean getParameterMapMultipartFormDataCalled;
         private boolean getInputStreamCalled;
+        private String inputStreamCharset;
 
         public String getContainerType() {
             return "servlet";
@@ -129,7 +134,6 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
         public synchronized Map getParameterMap() {
             if (parameterMap == null) {
                 // Two conditions: file upload ("multipart/form-data") or not
-                final String formCharset = OXFProperties.instance().getPropertySet().getString(DEFAULT_FORM_CHARSET_PROPERTY, DEFAULT_FORM_CHARSET);
                 if (getContentType() != null && getContentType().startsWith("multipart/form-data")) {
                     // Special handling for multipart/form-data
 
@@ -145,7 +149,7 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
                             localRepeater = new ServletInputStreamRepeater(request);
 
                         // Decode the multipart data
-                        parameterMap = getParameterMapMultipart(pipelineContext, request, localRepeater, formCharset);
+                        parameterMap = getParameterMapMultipart(pipelineContext, request, localRepeater, DEFAULT_HEADER_ENCODING);
 
                         if (enableInputStreamSaving)
                             repeater = localRepeater;
@@ -156,12 +160,9 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
                     // Remember that we were called, so we can display a meaningful exception if getInputStream() is called after this
                     getParameterMapMultipartFormDataCalled = true;
                 } else {
-                    // Try to set an appropriate encoding for forms and parameters
+                    // Set the input character encoding before getting the stream as this can cause issues with Jetty
                     try {
-//                        String acceptCharset = nativeRequest.getHeader("accept-charset");
-//                        if (acceptCharset != null && acceptCharset.toLowerCase().indexOf("utf-8") != -1)
-//                            nativeRequest.setCharacterEncoding("utf-8");
-                        nativeRequest.setCharacterEncoding(formCharset);
+                        handleInputEncoding();
                     } catch (UnsupportedEncodingException e) {
                         throw new OXFException(e);
                     }
@@ -210,6 +211,8 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
         public String getCharacterEncoding() {
             if (repeater != null)
                 return repeater.getCharacterEncoding();
+            else if (inputStreamCharset != null)
+                return inputStreamCharset;
             else
                 return nativeRequest.getCharacterEncoding();
         }
@@ -290,8 +293,13 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
             } else {
                 if (getParameterMapMultipartFormDataCalled)
                     throw new OXFException("Cannot call getInputStream() after getParameterMap() when a form was posted with multipart/form-data");
+
+                // Set the input character encoding before getting the stream as this can cause issues with Jetty
+                handleInputEncoding();
+
                 // Remember that we were called, so we can display a meaningful exception if getParameterMap() is called after this
                 getInputStreamCalled = true;
+
                 return nativeRequest.getInputStream();
             }
         }
@@ -327,6 +335,18 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
         public Object getNativeRequest() {
             return ServletExternalContext.this.getNativeRequest();
         }
+        
+        private void handleInputEncoding() throws UnsupportedEncodingException {
+            if (!getInputStreamCalled) {
+                final String requestCharacterEncoding = nativeRequest.getCharacterEncoding();
+                if (requestCharacterEncoding == null) {
+                    nativeRequest.setCharacterEncoding(DEFAULT_FORM_CHARSET);
+                    inputStreamCharset = DEFAULT_FORM_CHARSET;
+                } else  {
+                    inputStreamCharset = requestCharacterEncoding;
+                }
+            }
+        }
     }
 
     /**
@@ -336,7 +356,7 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
      * NOTE: This is used also by PortletExternalContext. Should probably remove this dependency
      * at some point.
      */
-    public static Map getParameterMapMultipart(PipelineContext pipelineContext, final ExternalContext.Request request, final ServletInputStreamRepeater repeater, String encoding) {
+    public static Map getParameterMapMultipart(PipelineContext pipelineContext, final ExternalContext.Request request, final ServletInputStreamRepeater repeater, String headerEncoding) {
 
         final Map uploadParameterMap = new HashMap();
         try {
@@ -359,7 +379,7 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
                     }
                 }
             };
-            upload.setHeaderEncoding(encoding);
+            upload.setHeaderEncoding(headerEncoding);
 
             // Read properties
             // NOTE: We use properties scoped in the Request generator for historical reasons. Not too good.
@@ -737,18 +757,38 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
 
 
         public void addListener(SessionListener sessionListener) {
-            List listeners = (List) httpSession.getAttribute(SESSION_LISTENERS);
+            SessionListeners listeners = (SessionListeners) httpSession.getAttribute(SESSION_LISTENERS);
+            if (listeners == null) {
+                listeners = new SessionListeners();
+                httpSession.setAttribute(SESSION_LISTENERS, listeners);
+            }
+            listeners.addListener(sessionListener);
+        }
+
+        public void removeListener(SessionListener sessionListener) {
+            final SessionListeners listeners = (SessionListeners) httpSession.getAttribute(SESSION_LISTENERS);
+            if (listeners != null)
+                listeners.removeListener(sessionListener);
+        }
+    }
+
+    public static class SessionListeners implements Serializable {
+        // Store this class instead of the List directly, so we can have a transient member
+        private transient List listeners;
+        public void addListener(ExternalContext.Session.SessionListener sessionListener) {
             if (listeners == null) {
                 listeners = new ArrayList();
-                httpSession.setAttribute(SESSION_LISTENERS, listeners);
             }
             listeners.add(sessionListener);
         }
 
-        public void removeListener(SessionListener sessionListener) {
-            final List listeners = (List) httpSession.getAttribute(SESSION_LISTENERS);
+        public void removeListener(ExternalContext.Session.SessionListener sessionListener) {
             if (listeners != null)
                 listeners.remove(sessionListener);
+        }
+
+        public Iterator iterator() {
+            return (listeners != null) ? listeners.iterator() : Collections.EMPTY_LIST.iterator();
         }
     }
 

@@ -38,10 +38,10 @@
             <p>
                 This document describes changes made between Orbeon PresentationServer 3.5.1 and Orbeon Forms 3.6.
             </p>
-            <p>
-                <b style="color: red">NOTE: Orbeon Forms 3.6 is still UNDER DEVELOPMENT as of November 2007, but
-                we're getting there!</b>
-            </p>
+            <!--<p>-->
+                <!--<b style="color: red">NOTE: Orbeon Forms 3.6 is still UNDER DEVELOPMENT as of November 2007, but-->
+                <!--we're getting there!</b>-->
+            <!--</p>-->
         </section>
         <!--<a name="changes-361"/>-->
         <!--<section>-->
@@ -381,7 +381,7 @@ http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=2
 <ul>
     {
         for $table in //table[tr/td/span/strong[. = 'ID']]
-            let $latest-id := '307140'
+            let $latest-id := '307767'
             let $latest-position := count(($table//tr)[td[normalize-space(.) = $latest-id]]/preceding-sibling::tr) + 1
             return
                 for $row in ($table//tr)[position() ge 2 and position() lt $latest-position and normalize-space(td[7]) = 'Fixed'] return
@@ -393,6 +393,26 @@ http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=2
 
                 -->
                 <ul>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307767&amp;group_id=168&amp;atid=350207">#307767:
+                            RFE: Make unit tests for persistent XForms state store
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307867&amp;group_id=168&amp;atid=350207">#307867:
+                            Activating an HTML link containing an xforms:output may cause later browser back to fail
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307810&amp;group_id=168&amp;atid=350207">#307810:
+                            Form field values are sometimes not sent to the Ajax server
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=305901&amp;group_id=168&amp;atid=350207">#305901:
+                            xforms:help does innerHTML instead of handling the content as text
+                        </a>
+                    </li>
                     <li>
                         <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307455&amp;group_id=168&amp;atid=350207">#307455:
                             Logout example: still shows the page as if logged in after logging out

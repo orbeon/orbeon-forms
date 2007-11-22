@@ -105,9 +105,6 @@
         </menu>
         <menu-item label="Validation" href="processors-validation"/>
         <menu-item label="Scheduler" href="processors-scheduler"/>
-        <!--
-        <menu-item label="Struts" href="processors-struts"/>
-        -->
         <menu-item label="Other Processors" href="processors-other"/>
     </menu>
     <menu label="API Reference">
@@ -123,15 +120,5 @@
         <menu-item label="JSR-168 Portlets" href="integration-portlets"/>
         <menu-item label="EJB Support" href="integration-ejb"/>
         <menu-item label="Development" href="integration-development"/>
-<!--        <menu-item label="Struts Support" href="model2x-struts"/>-->
     </menu>
-    <!--
-    <menu label="Internals">
-    </menu>
-    -->
-    <!--<menu label="Obsolete">-->
-        <!--<menu-item label="XForms Internal" href="internals-xforms" printed-book="false"/>-->
-        <!--<menu-item label="XUpdate JAXP Support" href="integration-xupdate" printed-book="false"/>-->
-<!--        <menu-item label="Orbeon Forms with JSF" href="model2x-jsf"/>-->
-    <!--</menu>-->
 </book>

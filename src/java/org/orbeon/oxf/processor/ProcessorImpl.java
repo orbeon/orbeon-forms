@@ -1041,9 +1041,9 @@ public abstract class ProcessorImpl implements Processor {
 
             // Handle debug
             if (getDebugMessage() != null || (getInput() != null && getInput().getDebugMessage() != null)) {
-                ProcessorFactory debugProcessorFactory = ProcessorFactoryRegistry.lookup("oxf/processor/debug");
+                ProcessorFactory debugProcessorFactory = ProcessorFactoryRegistry.lookup(XMLConstants.DEBUG_PROCESSOR_QNAME);
                 if (debugProcessorFactory == null)
-                    throw new OXFException("Cannot find debug processor factory at URI 'oxf/processor/debug'");
+                    throw new OXFException("Cannot find debug processor factory for QName: " + XMLConstants.DEBUG_PROCESSOR_QNAME);
 
                 for (int i = 0; i < 2; i++) {
                     String debugMessage = i == 0 ? getDebugMessage() :

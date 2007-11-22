@@ -13,10 +13,7 @@
  */
 package org.orbeon.oxf.processor.pipeline;
 
-import org.dom4j.Document;
-import org.dom4j.Element;
-import org.dom4j.Namespace;
-import org.dom4j.Node;
+import org.dom4j.*;
 import org.orbeon.oxf.cache.OutputCacheKey;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
@@ -32,6 +29,7 @@ import org.orbeon.oxf.processor.pipeline.choose.ConcreteChooseProcessor;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.xml.SchemaRepository;
+import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
@@ -296,7 +294,7 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
                         pin = processor.createInput(input.getName());
 
                         // NOTE: We should have a customizable mechanism to do this
-                        final String jndiName = "oxf/processor/xslt-2.0";
+                        final QName processorQName = XMLConstants.XSLT_PROCESSOR_QNAME;
                         // Experimental, doesn't work yet within XSLT configs!
                         // To solve this, maybe a flag specifying that we are
                         // using a template should be explicitly specified on
@@ -304,7 +302,7 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
                         if (false && XPathUtils.selectBooleanValue(doc, "/*/@*[local-name() = 'version' and namespace-uri() = 'http://www.w3.org/1999/XSL/Transform'] = '2.0'").booleanValue()) {
                             // It is embedded XSLT 2.0: connect through XSLT transformer
 
-                            ProcessorFactory processorFactory = ProcessorFactoryRegistry.lookup(jndiName);
+                            ProcessorFactory processorFactory = ProcessorFactoryRegistry.lookup(processorQName);
                             if (processorFactory == null) {
                                 throw new ValidationException("Cannot find processor factory with JNDI name \""
                                         + processorCall.getURI() + "\"", locationData);

@@ -235,7 +235,12 @@ public class XFormsItemUtils {
 //                    mayReuse[0] = false;
 
                     final String label = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, element.element(XFormsConstants.XFORMS_LABEL_QNAME), false, null);
+                    if (label == null)
+                        throw new ValidationException("xforms:item must contain an xforms:label element.", select1Control.getLocationData());
+
                     final String value = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, element.element(XFormsConstants.XFORMS_VALUE_QNAME), false, null);
+                    if (value == null)
+                        throw new ValidationException("xforms:item must contain an xforms:value element.", select1Control.getLocationData());
 
                     newItems.add(new Item(false, element.attributes(), label, value, hierarchyLevel + 1));// TODO: must filter attributes on element.attributes()
 

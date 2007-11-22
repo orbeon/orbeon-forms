@@ -208,6 +208,31 @@
                     </li>
                     <li>
                         <p>
+                            <b>Help displayed as separate help panel.</b> Orbeon Forms now displays help messages
+                            (defined with <code>xforms:help</code>) in a separate help panel:
+                        </p>
+                        <img src="../apps/doc/images/reference-xforms-help.png" alt="XForms Help Panel"/>
+                        <p>
+                            The help panel appears when the user selects a help icon. It stays open until closed by the
+                            user, and can be moved around the page. See the <a
+                            href="reference-xforms-ng#xforms-label-alert-help-hint">XForms Reference</a> for more
+                            information.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Hints displayed as tooltips.</b> Orbeon Forms now displays control hints (defined with
+                            <code>xforms:hint</code>) as tooltips:
+                        </p>
+                        <img src="../apps/doc/images/reference-xforms-hint.png" alt="XForms Hints"/>
+                        <p>
+                            Hints appear when you mouse over a field, and disappear after a while. See the <a
+                            href="reference-xforms-ng#xforms-label-alert-help-hint">XForms Reference</a> for more
+                            information.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
                             <b>Better display of JavaScript and Ajax errors.</b> Orbeon Forms now displays JavaScript
                             and Ajax errors in a user-friendly error dialog:
                         </p>

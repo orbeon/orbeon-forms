@@ -31,6 +31,7 @@ public class OPSXFormsFilter implements Filter {
 
     public static final String OPS_XFORMS_RENDERER_DOCUMENT_ATTRIBUTE_NAME = "oxf.xforms.renderer.document";
     public static final String OPS_XFORMS_RENDERER_BASE_URI_ATTRIBUTE_NAME = "oxf.xforms.renderer.base-uri";
+    public static final String OPS_XFORM_RENDRER_CONTENT_TYPE_ATTRIBUTE_NAME = "oxf.xforms.renderer.content-type";
 
     public static final String OPS_SERVLET_CONTEXT_ATTRIBUTE_NAME = "oxf.servlet.context";
     public static final String OPS_RENDERER_PATH = "/xforms-renderer";
@@ -76,8 +77,11 @@ public class OPSXFormsFilter implements Filter {
             if (opsContextPath != null)
                 httpRequest.setAttribute(OPS_SERVLET_CONTEXT_ATTRIBUTE_NAME, httpRequest.getContextPath() + opsContextPath);
 
-            // Set base URI
+            // Provide media type if available
+            if (responseWrapper.getMediaType() != null)
+                httpRequest.setAttribute(OPS_XFORM_RENDRER_CONTENT_TYPE_ATTRIBUTE_NAME, responseWrapper.getMediaType());
 
+            // Set base URI
             final String absoluteBaseURI = httpRequest.getRequestURL().toString();
             httpRequest.setAttribute(OPS_XFORMS_RENDERER_BASE_URI_ATTRIBUTE_NAME, absoluteBaseURI);
 
@@ -252,6 +256,10 @@ public class OPSXFormsFilter implements Filter {
         public String getCharacterEncoding() {
             // TODO: we don't support setLocale()
             return (encoding == null) ? DEFAULT_ENCODING : encoding;
+        }
+
+        public String getMediaType() {
+            return mediatype;
         }
 
         public ServletOutputStream getOutputStream() throws IOException {

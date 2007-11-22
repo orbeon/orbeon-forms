@@ -12,11 +12,12 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
-          xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+          xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+          xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
     <p:param type="output" name="data"/>
 
-    <p:processor uri="oxf/processor/identity">
+    <p:processor name="oxf:identity">
         <p:input name="data">
             <document/>
         </p:input>

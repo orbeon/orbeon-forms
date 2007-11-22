@@ -12,27 +12,28 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
-          xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+          xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+          xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
     <p:param type="input" name="number"/>
     <p:param type="output" name="data"/>
 
     <p:choose href="#number">
         <p:when test="number mod 2 = 1">
-            <p:processor uri="oxf/processor/identity">
+            <p:processor name="oxf:identity">
                 <p:input name="data"><root>odd</root></p:input>
                 <p:output name="data" id="result"/>
             </p:processor>
         </p:when>
         <p:otherwise>
-            <p:processor uri="oxf/processor/identity">
+            <p:processor name="oxf:identity">
                 <p:input name="data"><root>even</root></p:input>
                 <p:output name="data" id="result"/>
             </p:processor>
         </p:otherwise>
     </p:choose>
 
-    <p:processor uri="oxf/processor/identity">
+    <p:processor name="oxf:identity">
         <p:input name="data" href="#result"/>
         <p:output name="data" ref="data"/>
     </p:processor>

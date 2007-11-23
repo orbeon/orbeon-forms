@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.state;
 
 import org.apache.log4j.Logger;
+import org.dom4j.Document;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -21,6 +22,8 @@ import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.UUIDUtils;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsProperties;
+import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
 /**
  * Centralize XForms state management.
@@ -301,11 +304,19 @@ public class XFormsStateManager {
                     dynamicStateString = xformsDecodedClientState.getXFormsState().getDynamicState();
                 }
 
-                if (logger.isDebugEnabled()) {
+                if (logger.isDebugEnabled() && containingDocument.isServerStateHandling()) {
                     // Check that dynamic state is the same
                     final String newEncodedDynamicState = containingDocument.createEncodedDynamicState(pipelineContext);
-                    if (!newEncodedDynamicState.equals(xformsDecodedClientState.getXFormsState().getDynamicState()))
+                    if (!newEncodedDynamicState.equals(xformsDecodedClientState.getXFormsState().getDynamicState())) {
+
+                        final Document oldDocument = XFormsUtils.decodeXML(pipelineContext, xformsDecodedClientState.getXFormsState().getDynamicState());
+                        final Document newDocument = XFormsUtils.decodeXML(pipelineContext, newEncodedDynamicState);
+
+                        logger.debug("Old document:\n" + Dom4jUtils.domToString(oldDocument));
+                        logger.debug("New document:\n" + Dom4jUtils.domToString(newDocument));
+
                         throw new OXFException("Document is not dirty but dynamic state turns out to be different from original.");
+                    }
                 }
             }
 

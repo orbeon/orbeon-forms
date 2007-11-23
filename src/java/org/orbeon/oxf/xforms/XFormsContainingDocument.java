@@ -1076,8 +1076,11 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
 
         // Output divs information
         {
-            final Element divsElement = dynamicStateElement.addElement("divs");
+            final Element divsElement = Dom4jUtils.createElement("divs");
             outputSwitchesDialogs(divsElement, getXFormsControls());
+
+            if (divsElement.hasContent())
+                dynamicStateElement.add(divsElement);
         }
 
         // Output repeat index information

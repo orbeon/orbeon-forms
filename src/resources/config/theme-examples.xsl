@@ -20,8 +20,6 @@
     xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
     xmlns:version="java:org.orbeon.oxf.common.Version">
 
-    <!-- Get generic templates from plain theme -->
-    <xsl:import href="theme-plain.xsl"/>
     <!-- XML formatting -->
     <xsl:import href="oxf:/ops/utils/formatting/formatting.xsl"/>
 
@@ -168,6 +166,13 @@
                 <xhtml:p class="ops-version">Orbeon Forms <xsl:value-of select="$orbeon-forms-version"/></xhtml:p>
             </xhtml:body>
         </xhtml:html>
+    </xsl:template>
+
+    <!-- Simply copy everything that's not matched -->
+    <xsl:template match="@*|node()" priority="-2">
+        <xsl:copy>
+            <xsl:apply-templates select="@*|node()"/>
+        </xsl:copy>
     </xsl:template>
 
 </xsl:stylesheet>

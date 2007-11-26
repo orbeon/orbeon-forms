@@ -533,10 +533,10 @@
                 </tokenfilter>
             </filterchain>
         </loadproperties>
-        <echo message='${project.name}-version: ${ops-version}'/>
+        <echo message='${project.name}-version: ${orbeon-version}'/>
 
 
-        <cvs command='tag TAG_OPS_${ops-version}'
+        <cvs command='tag TAG_OPS_${orbeon-version}'
             cvsRoot='${local-repos}' failonerror='true'/>
 
         <echo message="Deploying to ${deployDir}/${release.number}"/>

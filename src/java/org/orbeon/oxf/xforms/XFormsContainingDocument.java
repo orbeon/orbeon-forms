@@ -1202,7 +1202,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
 
                     } else {
                         // Instance is initialized, just use it
-                        getModel(newInstance.getModelId()).setInstance(newInstance, false);
+                        getModel(newInstance.getModelId()).setInstance(newInstance, newInstance.isReplaced());
                     }
 
                     // Log instance if needed

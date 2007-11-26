@@ -63,6 +63,10 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventHandlerCont
     private String password;
     private String validation;
 
+    /**
+     * Whether the instance was ever replaced. This is useful so that we know whether we can use an instance from the
+     * static state or not: if it was ever replaced, then we can't use instance information from the static state.
+     */
     private boolean replaced;
 
     /**
@@ -255,7 +259,6 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventHandlerCont
     public String getPassword() {
         return password;
     }
-
 
     public String getValidation() {
         return validation;

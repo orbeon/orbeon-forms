@@ -419,6 +419,11 @@ http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=2
                 -->
                 <ul>
                     <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307917&amp;group_id=168&amp;atid=350207">#307917:
+                            Instance replaced flag is not correctly restored from dynamic state
+                        </a>
+                    </li>
+                    <li>
                         <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307913&amp;group_id=168&amp;atid=350207">#307913:
                             Use "orbeon" as project name instead of "ops"
                         </a>

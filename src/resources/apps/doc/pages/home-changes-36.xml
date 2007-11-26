@@ -406,7 +406,7 @@ http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=2
 <ul>
     {
         for $table in //table[tr/td/span/strong[. = 'ID']]
-            let $latest-id := '307767'
+            let $latest-id := '307913'
             let $latest-position := count(($table//tr)[td[normalize-space(.) = $latest-id]]/preceding-sibling::tr) + 1
             return
                 for $row in ($table//tr)[position() ge 2 and position() lt $latest-position and normalize-space(td[7]) = 'Fixed'] return
@@ -418,6 +418,16 @@ http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=2
 
                 -->
                 <ul>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307913&amp;group_id=168&amp;atid=350207">#307913:
+                            Use "orbeon" as project name instead of "ops"
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307915&amp;group_id=168&amp;atid=350207">#307915:
+                            Servlet initialization and destruction listeners must be commented out by default
+                        </a>
+                    </li>
                     <li>
                         <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307767&amp;group_id=168&amp;atid=350207">#307767:
                             RFE: Make unit tests for persistent XForms state store
@@ -1320,6 +1330,14 @@ http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=2
                     When upgrading from Orbeon Forms 3.6, please note the following:
                 </p>
                 <ul>
+                    <li>
+                        <p>
+                            The following files have been renamed: <code>ops.war</code> to <code>orbeon.war</code>,
+                            <code>ops.jar</code> to <code>orbeon.jar</code>, <code>ops-resources-public.jar</code> to
+                            <code>orbeon-resources-public.jar</code>, <code>ops-resources-private.jar</code> to
+                            <code>orbeon-resources-private.jar</code>
+                        </p>
+                    </li>
                     <li>
                         <p>
                             We recommend that you update your properties with the following:

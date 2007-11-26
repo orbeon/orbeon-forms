@@ -1,4 +1,4 @@
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+c<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:exslt="http://exslt.org/common"
     xmlns:xslt="http://xml.apache.org/xslt"
     exclude-result-prefixes="exslt xslt">
@@ -247,24 +247,29 @@
                     <param-name>oxf.http.accept-methods</param-name>
                     <param-value>get,post,head,put,delete</param-value>
                 </init-param>
-                <xsl:comment> Set initialization listener </xsl:comment>
-                <init-param>
-                    <param-name>oxf.servlet-initialized-processor.name</param-name>
-                    <param-value>{http://www.orbeon.com/oxf/processors}pipeline</param-value>
-                </init-param>
-                <init-param>
-                    <param-name>oxf.servlet-initialized-processor.input.config</param-name>
-                    <param-value>oxf:/apps/context/servlet-initialized.xpl</param-value>
-                </init-param>
-                <xsl:comment> Set destruction listener </xsl:comment>
-                <init-param>
-                    <param-name>oxf.servlet-destroyed-processor.name</param-name>
-                    <param-value>{http://www.orbeon.com/oxf/processors}pipeline</param-value>
-                </init-param>
-                <init-param>
-                    <param-name>oxf.servlet-destroyed-processor.input.config</param-name>
-                    <param-value>oxf:/apps/context/servlet-destroyed.xpl</param-value>
-                </init-param>
+                <xsl:comment> Set servlet initialization and destruction listeners </xsl:comment>
+                <xsl:call-template name="comment">
+                    <xsl:with-param name="caption" select="'servlet listener processors'"/>
+                    <xsl:with-param name="commented" select="$target = 'war'"/>
+                    <xsl:with-param name="content">
+                        <init-param>
+                            <param-name>oxf.servlet-initialized-processor.name</param-name>
+                            <param-value>{http://www.orbeon.com/oxf/processors}pipeline</param-value>
+                        </init-param>
+                        <init-param>
+                            <param-name>oxf.servlet-initialized-processor.input.config</param-name>
+                            <param-value>oxf:/apps/context/servlet-initialized.xpl</param-value>
+                        </init-param>
+                        <init-param>
+                            <param-name>oxf.servlet-destroyed-processor.name</param-name>
+                            <param-value>{http://www.orbeon.com/oxf/processors}pipeline</param-value>
+                        </init-param>
+                        <init-param>
+                            <param-name>oxf.servlet-destroyed-processor.input.config</param-name>
+                            <param-value>oxf:/apps/context/servlet-destroyed.xpl</param-value>
+                        </init-param>
+                    </xsl:with-param>
+                </xsl:call-template>
                 <load-on-startup>1</load-on-startup>
             </servlet>
 

@@ -31,7 +31,7 @@
                 Welcome to Orbeon Forms 3.6!
             </p>
             <p>
-                Orbeon Forms 3.6 features well over <a href="#changes-36-full">160 improvements</a> since <a
+                Orbeon Forms 3.6 features over <a href="#changes-36-full">170 improvements</a> since <a
                 href="home-changes-35">Orbeon Forms 3.5.1</a>, including major improvements in the areas of state
                 handling, XML Schema validation, error handling, deployment within Java applications, and performance.
             </p>
@@ -396,7 +396,7 @@
             <section>
                 <title>Complete List of Issues Addressed in this Release</title>
                 <p>
-                    Orbeon Forms 3.6 addresses well over 160 bugs and features:
+                    Orbeon Forms 3.6 addresses over 170 bugs and features:
                 </p>
                 <!--
 Request to extract bugs from SourceForge with http://www.orbeon.com/ops/xquery-the-web/ :

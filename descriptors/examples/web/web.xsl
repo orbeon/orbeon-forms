@@ -1,4 +1,4 @@
-c<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:exslt="http://exslt.org/common"
     xmlns:xslt="http://xml.apache.org/xslt"
     exclude-result-prefixes="exslt xslt">

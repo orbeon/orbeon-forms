@@ -553,7 +553,7 @@
         <cvs command='tag -d TAG_Dummy_For_OW_Sync'
             cvsRoot='${local-repos}' failonerror='true'/>
 
-        <copy file='${deployDir}/buildLogs/${project.name}-${version}-build.log' tofile='${deployDir}/${release.number}/build.log'/>
+        <copy file='${deployDir}/buildLogs/ops-${version}-build.log' tofile='${deployDir}/${release.number}/build.log'/>
 
         <!-- Move to generic file name so that rsync overwrites -->
         <move file="${deployDir}/${release.number}/${project.name}-${release.number}.zip" tofile="${deployDir}/${release.number}/${project.name}.zip"/>

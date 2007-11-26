@@ -88,7 +88,7 @@ import java.util.Hashtable;
  * o The above leads to load of this class, XercesJAXPSAXParser, which leads to load of JAXPConstants.
  *
  * Now since XercesJAXPSAXParserFactoryImpl.&lt;clinit&gt; hasn't run at the prior to the load of JAXPConstants we get
- * NoClassDefFoundException. (&lt;clinit&gt; adds jars in Class-Path of ops.jar manifest to TC's class loader since
+ * NoClassDefFoundException. (&lt;clinit&gt; adds jars in Class-Path of orbeon.jar manifest to TC's class loader since
  * it incorrectly ignores the Class-Path.)
  */
 public class XercesJAXPSAXParser extends javax.xml.parsers.SAXParser {

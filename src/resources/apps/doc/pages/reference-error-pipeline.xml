@@ -67,7 +67,7 @@
                 The default error processor is the <code>oxf:pipeline</code> processor, which runs
                 <code>oxf:/config/error.xpl</code> for entire pages, and
                 <code>oxf:/ops/xforms/xforms-server-error.xpl</code> for Ajax requests. These two pipelines are located
-                within <code>ops-resources-private.jar</code>.
+                within <code>orbeon-resources-private.jar</code>.
             </p>
             <p>
                 It is unlikely that you will need to change the configuration of the error processors.

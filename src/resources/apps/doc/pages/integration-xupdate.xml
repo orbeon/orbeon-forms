@@ -79,7 +79,7 @@
             your classpath:</p>
 
             <ul>
-                <li>Orbeon Forms: <code>ops.jar</code></li>
+                <li>Orbeon Forms: <code>orbeon.jar</code></li>
                 <li>dom4j: <code>dom4j-1_4.jar</code></li>
                 <li>Jaxen: <code>jaxen-1_1-beta-1-dev.jar</code></li>
                 <li>SAXPath: <code>saxpath-dev_orbeon.jar</code></li>

@@ -40,7 +40,7 @@
                             <p>
                                 Place the compiled class in <code>WEB-INF/classes</code> (or in any other location
                                 where it can be found by the classloader used to load the classes in
-                                <code>ops.jar</code>).
+                                <code>orbeon.jar</code>).
                             </p>
                         </li>
                         <li>
@@ -232,7 +232,7 @@
                         If the <code>WEB-INF/lib</code> directory is not found, all the JAR and ZIP
                         files in the same directory as the JAR file containing the Java processor.
                         Typically, when running from a command line, this is the
-                        <code>ops.jar</code> JAR file. If <code>ops.jar</code> is stored in a
+                        <code>orbeon.jar</code> JAR file. If <code>orbeon.jar</code> is stored in a
                         directory with all the JAR files it depends on, those will automatically be
                         added to the compilation class path.
                     </li>

@@ -41,19 +41,19 @@
 				</tr>
 				<tr>
 					<td>
-						<code>WEB-INF/lib/ops.jar</code>
+						<code>WEB-INF/lib/orbeon.jar</code>
 					</td>
 					<td>JAR file with all the Orbeon Forms classes.</td>
 				</tr>
                 <tr>
 					<td>
-						<code>WEB-INF/lib/ops-resources-public.jar</code>
+						<code>WEB-INF/lib/orbeon-resources-public.jar</code>
 					</td>
 					<td>JAR file with all the Orbeon Forms files that can be served to a web client, such as CSS and JavaScript files.</td>
 				</tr>
                 <tr>
 					<td>
-						<code>WEB-INF/lib/ops-resources-private.jar</code>
+						<code>WEB-INF/lib/orbeon-resources-private.jar</code>
 					</td>
 					<td>JAR file with all the Orbeon Forms files that can not be served to a web client.</td>
 				</tr>
@@ -162,7 +162,7 @@
 					<ul>
 						<li>Declares a Servlet named <code>ops-main-servlet</code>
                         implemented by the class <code>org.orbeon.oxf.servlet.OPSServlet</code> (loaded from
-                        <code>lib/ops.jar</code>)</li>
+                        <code>lib/orbeon.jar</code>)</li>
 						<li>Defines <code>ops-main-servlet</code> as the default Servlet
                         (i.e. the Servlet handling all the requests).</li>
 					</ul>
@@ -191,12 +191,12 @@
                                 What resource manager has to be used, and how this resource manager is configured. In
                                 the default WAR bundled in the Orbeon Forms distribution, Orbeon Forms loads resources
                                 from the <code>WEB-INF/resources</code> directory inside the WAR. If it can't find a
-                                resource in this directory, it will try to look for it inside <code>ops.jar</code> or
-                                <code>ops-resources-private.jar</code>. Only static resources that are part of Orbeon
-                                Forms are stored in <code>ops.jar</code> and <code>ops-resources-private.jar</code> (as
-                                opposed to Orbeon Forms applications). The <link
-                                href="reference-resource-managers">Resource Managers</link> section explains in detail
-                                how resource managers work.
+                                resource in this directory, it will try to look for it inside <code>orbeon.jar</code> or
+                                <code>orbeon-resources-private.jar</code>. Only static resources that are part of
+                                Orbeon Forms are stored in <code>orbeon.jar</code> and
+                                <code>orbeon-resources-private.jar</code> (as opposed to Orbeon Forms applications). The
+                                <link href="reference-resource-managers">Resource Managers</link> section explains in
+                                detail how resource managers work.
                             </p>
                         </li>
 						<li>

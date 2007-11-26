@@ -590,12 +590,12 @@
                                                     <p>
                                                         <b><code>xs:date</code></b> &#8213; The input field is
                                                         complemented by a pop-up calendar. The user can enter a date
-                                                        manually, or use the calendar to select a date in the past or in
-                                                        the future. You can customize the calendar by copying the files
-                                                        in ops-resources-public.jar under ops/javascript/jscalendar
-                                                        to your resources directory. Your modified files in the
-                                                        resources will have a precedence over those found in
-                                                        ops-resources-public.jar.
+                                                        manually, or use the calendar to select a date in the past or
+                                                        in the future. You can customize the calendar by copying the
+                                                        files in orbeon-resources-public.jar under
+                                                        ops/javascript/jscalendar to your resources directory. Your
+                                                        modified files in the resources will have a precedence over
+                                                        those found in orbeon-resources-public.jar.
                                                    </p>
                                                 </li>
                                                 <!--

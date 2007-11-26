@@ -20,10 +20,9 @@
     <!-- set global build.root to be dir containing this file. -->
     <dirname property="build.root" file="${ant.file}"/>
     <property name="lib.dir" location="lib"/>
-<!--    <property name='unstbl-bld-dst' value='/var/tmp/tomcat/ops-unstable/' /> -->
     <property name='local-repos' value=':local:/home/cvs/objectweb-src' />
     <property name="build.dir" value="build"/>
-    <property name="project.name" value="ops"/>
+    <property name="project.name" value="orbeon"/>
     <property name="war.dir" value="${build.dir}/${project.name}-war"/>
     <property name="war.inf" value="${war.dir}/WEB-INF"/>
     <property name="war.classes" value="${war.inf}/classes"/>
@@ -302,7 +301,7 @@
                 <include name="oxf/**/*.*"/>
                 <include name="config/**/*.*"/>
                 <exclude name="config/theme/**/*.*"/>
-                <!-- We keep these in ops.jar -->
+                <!-- We keep these in orbeon.jar -->
                 <exclude name="config/*-processors.xml"/>
             </fileset>
         </jar>
@@ -525,7 +524,7 @@
         <!-- the dots to underscores while reeading.   i.e. convert 2.5.4.3234 to      -->
         <!-- 2_5_4_3234                                                                -->
         <tempfile property='ops-temp-version-file'/>
-        <echo message='ops-version=${release.number}' file='${ops-temp-version-file}'/> 
+        <echo message='${project.name}-version=${release.number}' file='${ops-temp-version-file}'/>
 
         <loadproperties srcFile='${ops-temp-version-file}'>
             <filterchain>
@@ -534,7 +533,7 @@
                 </tokenfilter>
             </filterchain>
         </loadproperties>
-        <echo message='ops-version: ${ops-version}'/>
+        <echo message='${project.name}-version: ${ops-version}'/>
 
 
         <cvs command='tag TAG_OPS_${ops-version}'
@@ -554,10 +553,10 @@
         <cvs command='tag -d TAG_Dummy_For_OW_Sync'
             cvsRoot='${local-repos}' failonerror='true'/>
 
-        <copy file='${deployDir}/buildLogs/ops-${version}-build.log' tofile='${deployDir}/${release.number}/build.log'/>
+        <copy file='${deployDir}/buildLogs/${project.name}-${version}-build.log' tofile='${deployDir}/${release.number}/build.log'/>
 
         <!-- Move to generic file name so that rsync overwrites -->
-        <move file="${deployDir}/${release.number}/ops-${release.number}.zip" tofile="${deployDir}/${release.number}/ops.zip"/>
+        <move file="${deployDir}/${release.number}/${project.name}-${release.number}.zip" tofile="${deployDir}/${release.number}/${project.name}.zip"/>
 
         <!-- Post the unstable build -->
         <exec executable='rsync' failonerror='true' dir='${deployDir}/${release.number}' >
@@ -566,8 +565,8 @@
           <arg value='-c' />
           <arg value='--rsh=/usr/bin/ssh' />
           <arg value='build.log' />
-          <arg value='ops.war' />
-          <arg value='ops.zip' />
+          <arg value='${project.name}.war' />
+          <arg value='${project.name}.zip' />
           <arg value='orbeonbld2@forge.objectweb.org:/var/lib/gforge/chroot/home/groups/ops/htdocs/unstable/ops' />
         </exec>
 
@@ -653,9 +652,9 @@
     </target>
 
     <target name="orbeon-dist-packages" depends="orbeon-dist-war, orbeon-doc, orbeon-javadoc">
-        <property name="prefix" value="ops-${release.number}"/>
+        <property name="prefix" value="${project.name}-${release.number}"/>
         <!-- Create temporary zip file -->
-        <property name="tmp-zip" value="${build.distrib.dir}/ops-${release.number}-tmp.zip"/>
+        <property name="tmp-zip" value="${build.distrib.dir}/${project.name}-${release.number}-tmp.zip"/>
         <zip zipfile="${tmp-zip}">
             <zipfileset dir="${build.distrib.dir}" prefix="${prefix}">
                 <include name="${project.name}.war"/>
@@ -685,7 +684,7 @@
             <include name="**/*.xhtml"/>
             <include name="**/*.wsdl"/>
         </fixcrlf>
-        <zip zipfile="${build.distrib.dir}/ops-${release.number}.zip" basedir="${build.temp.dir}/distrib"/>
+        <zip zipfile="${build.distrib.dir}/${project.name}-${release.number}.zip" basedir="${build.temp.dir}/distrib"/>
         <!-- Fix EOL for Unix platform -->
         <fixcrlf srcDir="${build.temp.dir}/distrib" eol="lf">
             <include name="**/*.txt"/>
@@ -704,7 +703,7 @@
             <include name="**/*.xhtml"/>
             <include name="**/*.wsdl"/>
         </fixcrlf>
-        <tar tarfile="${build.distrib.dir}/ops-${release.number}.tar.gz" compression="gzip" basedir="${build.temp.dir}/distrib"/>
+        <tar tarfile="${build.distrib.dir}/${project.name}-${release.number}.tar.gz" compression="gzip" basedir="${build.temp.dir}/distrib"/>
         <delete file="${tmp-zip}"/>
     </target>
 
@@ -732,7 +731,7 @@
 
         <!-- Create directories -->
         <mkdir dir="${build.dir}/install"/>
-        <mkdir dir="${build.dir}/install/ops-${release.number}"/>
+        <mkdir dir="${build.dir}/install/${project.name}-${release.number}"/>
         <mkdir dir="${build.dir}/install/${install.tomcat}"/>
         <mkdir dir="${build.dir}/install/${install.jdk}"/>
 
@@ -752,11 +751,11 @@
         <copy file="lib/hsqldb-1_8_0_7.jar" todir="${build.dir}/install/${install.tomcat}/common/lib"/>
 
         <!-- Prepare Orbeon -->
-        <unzip src="build/distrib/${project.name}.war" dest="${build.dir}/install/ops-${release.number}"/>
+        <unzip src="build/distrib/${project.name}.war" dest="${build.dir}/install/${project.name}-${release.number}"/>
         <!--<copy file="lib/portlet-api_1.0.jar" todir="${build.dir}/install/ops-${release.number}/WEB-INF/lib"/>-->
-        <delete file="${build.dir}/install/ops-${release.number}/WEB-INF/web.xml"/>
+        <delete file="${build.dir}/install/${project.name}-${release.number}/WEB-INF/web.xml"/>
         <xslt in="build.xml" style="${descriptors.dir}/web.xsl"
-            out="${build.dir}/install/ops-${release.number}/WEB-INF/web.xml">
+            out="${build.dir}/install/${project.name}-${release.number}/WEB-INF/web.xml">
             <param name="target" expression="install"/>
             <param name="build-root" expression="${build.root}"/>
         </xslt>
@@ -790,7 +789,7 @@
     <target name="copy-distrib" depends="orbeon-dist">
         <copy todir="/home/httpd/html/public/oxf/secret">
             <fileset dir="${build.distrib.dir}">
-                <include name="ops-${release.number}.*"/>
+                <include name="${project.name}-${release.number}.*"/>
             </fileset>
         </copy>
     </target>

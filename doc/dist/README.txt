@@ -192,7 +192,7 @@ In addition, this product includes the following software:
 This software makes use of a schema for XSLT 2.0 provided under W3C
 Software License. The schema is available at the following location:
 
-    jar:ops.jar!/org/orbeon/oxf/xml/schemas/xslt-2_0.xsd
+    jar:orbeon.jar!/org/orbeon/oxf/xml/schemas/xslt-2_0.xsd
 
 Please consult the third-party-licenses directory for more information
 about individual licenses.

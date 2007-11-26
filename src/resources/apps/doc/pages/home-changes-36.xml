@@ -1341,22 +1341,22 @@ http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=2
                         <p>
                             <b>Error resources moved to private location.</b> The files <code>error.xpl</code> and
                             <code>error.xsl</code> under <code>RESOURCES/config</code> have been moved to
-                            <code>ops-resources-private.jar</code>. If you haven't modified these files, make sure that
-                            you remove the old files from <code>RESOURCES/config</code>. If you have made
+                            <code>orbeon-resources-private.jar</code>. If you haven't modified these files, make sure
+                            that you remove the old files from <code>RESOURCES/config</code>. If you have made
                             modification, you will have to merge the changes introduced in
-                            <code>ops-resources-private.jar</code>.
+                            <code>orbeon-resources-private.jar</code>.
                         </p>
                     </li>
                     <li>
                         <p>
                             <b>Theme CSS stylesheets moved to private location.</b> The files under
                             <code>RESOURCES/config/theme</code> have been moved to
-                            <code>ops-resources-public.jar</code>. This includes <code>xforms.css</code> and
+                            <code>orbeon-resources-public.jar</code>. This includes <code>xforms.css</code> and
                             <code>xforms-widgets.css</code>. If you haven't modified these files, make sure that you
                             remove the old files from <code>RESOURCES/config/theme</code>. If you have made
                             modification, you will have to merge the changes introduced in
-                            <code>ops-resources-public.jar</code>, or better, don't modify these CSS files but override
-                            CSS definitions in your own CSS files instead.
+                            <code>orbeon-resources-public.jar</code>, or better, don't modify these CSS files but
+                            override CSS definitions in your own CSS files instead.
                         </p>
                     </li>
                     <li>

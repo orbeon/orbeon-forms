@@ -2154,10 +2154,10 @@
                     </note>
                     <note>
                         <p>
-                            Whenever possible, the use of the <code>&lt;xforms:instance></code>'s
-                            <code>src</code>attribute is preferable. Doing so may have a positive impact on performance
-                            as more caching can take place. For performance reasons, we also recommend using static
-                            XHTML views instead of XSLT whenever possible.
+                            Whenever possible, the use of the <code>&lt;xforms:instance></code>'s <code>src</code>
+                            attribute is preferable. Doing so may have a positive impact on performance as more caching
+                            can take place. For performance reasons, we also recommend using static XHTML views instead
+                            of XSLT whenever possible.
                         </p>
                     </note>
                 </section>

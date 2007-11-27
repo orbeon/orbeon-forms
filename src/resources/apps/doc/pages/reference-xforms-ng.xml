@@ -2093,9 +2093,9 @@
                     </xml-source>
                     <note>
                         <p>
-                            Whenever possible, the use of the <code>&lt;xforms:instance></code>'s
-                            <code>src</code>attribute is preferable. Doing so may have a positive impact on performance
-                            as more caching can take place.
+                            Whenever possible, the use of the <code>&lt;xforms:instance></code>'s <code>src</code>
+                            attribute is preferable. Doing so may have a positive impact on performance as more caching
+                            can take place.
                         </p>
                     </note>
                 </section>

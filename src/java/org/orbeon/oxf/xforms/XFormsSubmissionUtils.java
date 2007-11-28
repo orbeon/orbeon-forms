@@ -258,6 +258,7 @@ public class XFormsSubmissionUtils {
 
                     // Forward cookies for session handling
                     // TODO: The Servlet spec mandates JSESSIONID as cookie name; we should only forward this cookie
+                    // TODO: We should also forward selected cookies such as JSESSIONIDSSO (Tomcat) and possibly more
                     if (username == null) {
                         final String[] cookies = (String[]) externalContext.getRequest().getHeaderValuesMap().get("cookie");
                         if (cookies != null) {

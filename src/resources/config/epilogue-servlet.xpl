@@ -54,7 +54,7 @@
             <!-- Apply theme -->
             <p:choose href="#request">
                 <p:when test="starts-with(/request/request-path, '/doc/') or starts-with(/request/request-path, '/fb/') or starts-with(/request/request-path, '/fr/') or /request/parameters/parameter[name = 'orbeon-theme']/value = 'plain'">
-                    <!-- Case of doc: use plain theme -->
+                    <!-- Case of doc: use doc theme -->
                     <p:processor name="oxf:unsafe-xslt">
                         <p:input name="data" href="#xformed-data"/>
                         <p:input name="request" href="#request"/>

@@ -34,21 +34,24 @@
         <section>
             <title>URL Serializer</title>
             <p>
-                The URL serializer mirrors the functionality of the <link href="processors-generators-url">URL
-                generator</link>. Instead of reading from of URL, it writes its <code>data</code> input as XML in a
-                URL. Note that only the <code>oxf:</code> and <code>http:</code> protocols allows writing at this time.
-
+                The URL serializer mirrors the functionality of the <a href="processors-generators-url">URL
+                generator</a>. Instead of reading from of URL, it writes its <code>data</code> input as XML into a
+                URL.
             </p>
             <note>
                 <p>
-                    The <link href="reference-resource-managers#filesystem">Filesystem</link>
-                    resource manager is the only Resource Manager supporting write operations.
+                    The <code>oxf:</code>, <code>file:</code> and <code>http:</code> protocols allow writing.
+                </p>
+                <p>
+                    When using the <code>oxf:</code> protocol, the <a
+                    href="reference-resource-managers#filesystem">Filesystem</a> and <a
+                    href="reference-resource-managers#webapp">WebApp</a> resource managers support write operations.
                 </p>
             </note>
             <p>
-                The URL serializer takes a <code>config</code> input with a single <code>url</code>
-                element containing the URL to write to. The <code>data</code> input is serialized
-                according the rules of the XML serializer.
+                The URL serializer takes a <code>config</code> input with a single <code>url</code> element containing
+                the URL to write to. The <code>data</code> input is serialized according the rules of the XML
+                serializer.
             </p>
             <xml-source>
                 <p:processor name="oxf:url-serializer" xmlns:p="http://www.orbeon.com/oxf/pipeline">

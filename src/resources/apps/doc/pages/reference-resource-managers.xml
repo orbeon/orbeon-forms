@@ -111,6 +111,7 @@
             </section>
         </section>
         <!--
+        <a name="jdbc"/>
         <section>
             <title>JDBC Database Resource Manager</title>
             <p>
@@ -208,6 +209,7 @@
             </section>
         </section>
         -->
+        <a name="classloader"/>
         <section>
             <title>ClassLoader Resource Manager</title>
             <p>
@@ -243,6 +245,7 @@
                 </xml-source>
             </section>
         </section>
+        <a name="webapp"/>
         <section>
             <title>WebApp Resource Manager</title>
             <p>
@@ -286,6 +289,7 @@
                 </xml-source>
             </section>
         </section>
+        <a name="url"/>
         <section>
             <title>URL Resource Manager</title>
             <p>
@@ -391,6 +395,7 @@
                 </p>
             </warning>
         </section>
+        <a name="priority"/>
         <section>
             <title>Priority Resource Manager</title>
             <p>
@@ -457,6 +462,7 @@
                 </xml-source>
             </section>
         </section>
+        <a name="cache"/>
         <section>
             <title>Cach&#233; Database Resource Manager</title>
             <p>

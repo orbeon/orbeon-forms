@@ -112,7 +112,17 @@
                     </p>
                     <ul>
                         <li>If this error occurred when you followed a link, press your browser's Back button.</li>
-                        <li>If this didn't work, press the <code>ctrl</code> key (or <code>command</code> key on a Mac) and click on the Reload button in the toolbar.</li>
+                        <li>
+                            If the above does not work, try reloading the page:
+                            <ul>
+                                <li>
+                                    With Firefox and Safari: hold down the <code>shift</code> key and click the Reload button in your browser toolbar.
+                                </li>
+                                <li>
+                                    With Internet Explorer: hold down the <code>control</code> key and click the Reload button in your browser toolbar.
+                                </li>
+                            </ul>
+                        </li>
                         <li>Return <a href="/">home</a>.</li>
                     </ul>
                     <!-- Details -->

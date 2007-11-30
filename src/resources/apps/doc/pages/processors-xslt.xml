@@ -18,7 +18,7 @@
           xmlns:xforms="http://www.w3.org/2002/xforms"
           xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
     <header>
-        <title>XSLT and JAXP Processors</title>
+        <title>XSLT and JAXP (TrAX) Processors</title>
     </header>
     <body>
         <section>
@@ -368,15 +368,15 @@
         <section>
             <title>Passing Parameters to XSLT Stylesheets</title>
             <p>
-                XSLT supports <code>xsl:param</code> elements at the top level of a stylesheet. They
-                allow passing parameters to the stylesheet, without modifying the stylesheet
-                itself. With API such as JAXP, a programmer can associate values to those
-                parameters, making them available to the stylesheet during execution.
+                XSLT supports <code>xsl:param</code> elements at the top level of a stylesheet. They allow passing
+                parameters to the stylesheet, without modifying the stylesheet itself. With API such as JAXP, a
+                programmer can associate values to those parameters, making them available to the stylesheet during
+                execution.
             </p>
             <p>
-                XPL does not have a particular mechanism to set such stylesheet parameters, but a
-                very simple workaround allows setting them. Assume you have a stylesheet with a
-                <code>start</code> parameter, in a file called <code>my-stylesheet.xsl</code>:
+                XPL does not have a particular mechanism to set such stylesheet parameters, but a simple workaround
+                allows setting them. Assume you have a stylesheet with a <code>start</code> parameter, in a file called
+                <code>my-stylesheet.xsl</code>:
             </p>
             <xml-source>
                 <xsl:transform>
@@ -401,10 +401,15 @@
                 </p:processor>
             </xml-source>
             <p>
-                The rules of XSLT's <code>import</code> statement will make sure that the imported
-                stylesheet, <code>my-stylesheet.xsl</code>, receives the <code>start</code>
-                parameter with the value "a2", as overridden in the importing stylesheet. Of course,
-                the value does not have to be static, it can be computed dynamically as well.
+                The rules of XSLT's <code>import</code> statement will make sure that the imported stylesheet,
+                <code>my-stylesheet.xsl</code>, receives the <code>start</code> parameter with the value "a2", as
+                overridden in the importing stylesheet. Of course, the value does not have to be static, it can be
+                computed dynamically as well.
+            </p>
+            <p>
+                Also note that while XPL does not have a native mechanism to pass XSLT parameters, it has a mechanism to
+                pass extra documents available through the <code>doc()</code> function and the <code>input:</code>
+                protocol. See <a href="#user-defined">User-Defined Inputs</a> for more information.
             </p>
         </section>
         <section>

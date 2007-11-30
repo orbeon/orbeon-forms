@@ -237,14 +237,19 @@
         <a name="debug-processor"/>
         <section>
             <title>Debug Processor</title>
+            <note>
+                <p>
+                    In most cases you do not need to use the <code>oxf:debug</code> processor: you can instead use the
+                    <code>debug</code> attribute on processor and pipeline inputs and outputs.
+                </p>
+            </note>
             <p>
-                The Debug processor logs XML documents using the <link
-                href="http://jakarta.apache.org/log4j/docs/">Log4j</link> library. It has 2 inputs:
-                <code>data</code> contains the XML document to log, and <code>config</code> has a
-                <code>config</code> root element that contains a message typically be used to
-                describe the XML document. The <code>data</code> output document is the exactly the
-                same as the <code>data</code> input document. Consequently the debug processor can
-                be easily inserted in a pipeline to log the XML data flow at a given point.
+                The <code>oxf:debug</code> processor logs XML documents to the Orbeon Forms log output. It has 2
+                inputs: <code>data</code> contains the XML document to log, and <code>config</code> has a
+                <code>config</code> root element that contains a message typically be used to describe the XML document.
+                The <code>data</code> output document is the exactly the same as the <code>data</code> input document.
+                Consequently the debug processor can be easily inserted in a pipeline to log the XML data flow at a
+                given point.
             </p>
             <img print-format="pdf" src="../apps/doc/images/processors-other-debug.png"/>
             <p>
@@ -269,19 +274,17 @@
             </p>
             <source>Employee:
 
-                &lt;employee>
-                &lt;firstname>John&lt;/firstname>
-                &lt;lastname>Smith&lt;/lastname>
-                &lt;/employee></source>
+    &lt;employee>
+        &lt;firstname>John&lt;/firstname>
+        &lt;lastname>Smith&lt;/lastname>
+    &lt;/employee></source>
             <p>
-                Using <code>debug</code> attributes in pipelines is a shortcut for actually
-                inserting the Debug processor in the pipeline: the Pipeline processor will insert a
-                Debug processor when encountering <code>debug</code> attributes. By changing the
-                <code>processors.xml</code> you can map the <code>oxf:debug</code> processor to your
-                own "Debug processor" and this processor will be called when you use
-                <code>debug</code> attributes in pipelines. If you decide to implement your own
-                debug processor, note that it must have the same interface as the default Debug
-                processor that comes with Orbeon Forms.
+                Using <code>debug</code> attributes in pipelines is a shortcut for inserting the <code>oxf:debug</code>
+                processor in the pipeline: the <code>oxf:pipeline</code> processor will automatically insert a
+                <code>oxf:debug</code> processor when encountering <code>debug</code> attributes. By changing
+                <code>processors.xml</code> you can map the <code>oxf:debug</code> processor to your own "Debug
+                processor". If you decide to implement your own <code>oxf:debug</code> processor, note that it must have
+                the same interface as the default <code>oxf:debug</code> processor that comes with Orbeon Forms.
             </p>
         </section>
         <a name="redirect-processor"/>

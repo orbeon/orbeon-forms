@@ -191,12 +191,6 @@
                         through the <code>processors.xml</code> file described in <link
                         href="integration-packaging">Packaging and Deployment</link>.
                     </p>
-                    <note>
-                        <p>
-                            For backward compatibility, the <code>uri</code> attribute is still
-                            supported.
-                        </p>
-                    </note>
                 </li>
                 <li>
                     <p>
@@ -234,12 +228,19 @@
                     a specific schema in the <link href="reference-properties">Orbeon Forms
                     properties file</link>.
                 </p></li>
-                <li><p>
-                    Optionally, <code>&lt;p:input&gt;</code> and <code>&lt;p:output&gt;</code> can
-                    have a <code>debug</code> attribute. When this attribute is present, the
-                    document that passes through that input or output is logged with Log4J. This is
-                    useful during development to watch XML documents going through the pipeline.
-                </p></li>
+                <li>
+                    <p>
+                        Optionally, <code>&lt;p:input&gt;</code> and <code>&lt;p:output&gt;</code> can have a
+                        <code>debug</code> attribute. When this attribute is present, the document that passes through
+                        that input or output is logged to the Orbeon Forms log output. This is useful during
+                        development to watch XML documents going through the pipeline.
+                    </p>
+                    <note>
+                        XPL uses a lazy evaluation model, and that having a <code>debug</code> attribute does not
+                        guarantee that a document will be logged at all: only <i>if</i> a document goes through the
+                        associated input or output, <i>then</i> it will be logged.
+                    </note>
+                </li>
             </ul>
             <p>
                 The following example feeds an XSLT processor with an inline document and an

@@ -337,13 +337,18 @@
                     <p:processor name="oxf:xslt">
                         <p:input name="config">
                             <address-book xsl:version="2.0">
+                                <comment> Access external XML document </comment>
                                 <xsl:variable name="document-1" select="doc('file:/document-1.xml')"/>
+                                <comment> Access oxf:xslt processor user-defined input </comment>
                                 <xsl:variable name="document-2" select="doc('input:my-input')"/>
                                 <comment> ... </comment>
                             </address-book>
                         </p:input>
+                        <comment> Standard oxf:xslt processor input </comment>
                         <p:input name="data" href="#some-id"/>
+                        <comment> Declare oxf:xslt processor user-defined input </comment>
                         <p:input name="my-input" href="#some-other-id"/>
+                        <comment> Standard oxf:xslt processor output </comment>
                         <p:output name="data" id="address-book"/>
                     </p:processor>
                 </xml-source>
@@ -363,6 +368,37 @@
                     processor to connect additional inputs as she sees fit, as long as their names
                     don't conflit with mandatory input and output names.
                 </p>
+                <note>
+                    <p>
+                        The user-defined input referenced from <code>doc('input:my-input')</code> <b>must</b> be
+                        declared as an input on the <code>oxf:xslt</code> processor, as shown above. If you wish to
+                        access a pipeline input using the <code>doc()</code> function, then you must first connect the
+                        pipeline input to the <code>oxf:xslt</code> processor input. For example:
+                    </p>
+                    <xml-source>
+                        <p:pipeline>
+                            <comment> Pipeline input </comment>
+                            <p:input name="my-pipeline-input" type="input"/>
+                            <comment> XSLT transformation </comment>
+                            <p:processor name="oxf:xslt">
+                                <p:input name="config">
+                                    <address-book xsl:version="2.0">
+                                        <comment> Access oxf:xslt processor user-defined input </comment>
+                                        <xsl:variable name="document-2" select="doc('input:my-input')"/>
+                                        <comment> ... </comment>
+                                    </address-book>
+                                </p:input>
+                                <comment> Standard oxf:xslt processor input </comment>
+                                <p:input name="data" href="#some-id"/>
+                                <comment> Connect the oxf:xslt processor input to the pipeline input </comment>
+                                <p:input name="my-input" href="#my-pipeline-input"/>
+                                <comment> Standard oxf:xslt processor output </comment>
+                                <p:output name="data" id="address-book"/>
+                            </p:processor>
+                            <comment> ... </comment>
+                        </p:pipeline>
+                    </xml-source>
+                </note>
             </section>
         </section>
         <section>

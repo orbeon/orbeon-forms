@@ -58,7 +58,7 @@
                     <p:processor name="oxf:unsafe-xslt">
                         <p:input name="data" href="#xformed-data"/>
                         <p:input name="request" href="#request"/>
-                        <p:input name="config" href="theme-doc.xsl"/>
+                        <p:input name="config" href="theme-plain.xsl"/>
                         <p:output name="data" id="themed-data"/>
                     </p:processor>
                     <!-- Rewrite all URLs in HTML and XHTML documents -->

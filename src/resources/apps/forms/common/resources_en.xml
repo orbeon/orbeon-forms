@@ -35,6 +35,7 @@
             <view-pdf>View PDF</view-pdf>
             <language-choice>Language</language-choice>
             <form-choice>Choose a form</form-choice>
+            <search>Search</search>
         </labels>
         <formats>
             <date>[MNn] [D], [Y]</date>

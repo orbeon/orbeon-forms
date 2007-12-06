@@ -16,6 +16,8 @@
         xquery version "1.0";
         declare namespace dmv="http://orbeon.org/oxf/examples/dmv";
         declare namespace xmldb="http://exist-db.org/xquery/xmldb";
+        declare namespace request="http://exist-db.org/xquery/request";
+        declare namespace text="http://exist-db.org/xquery/text";
         &lt;documents>
             &lt;headers>
                 &lt;header>name&lt;/header>
@@ -25,9 +27,11 @@
             &lt;/headers>
             {
                 let $collection-name := '/db/orbeon/forms/DMV-14/'
+                let $search := normalize-space(request:get-parameter('search', ''))
                 for $resource-name in xmldb:get-child-resources($collection-name)
                     let $resource-date := xmldb:last-modified($collection-name, $resource-name)
                     let $resource := doc(concat($collection-name, $resource-name))
+                    where $search = '' or text:match-any($resource, $search)
                     order by $resource-date descending
                     return
                     &lt;document>

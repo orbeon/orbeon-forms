@@ -35,6 +35,7 @@
             <view-pdf>Vue PDF</view-pdf>
             <language-choice>Langue</language-choice>
             <form-choice>Choisisez un formulaire</form-choice>
+            <search>Rechercher</search>
         </labels>
         <formats>
             <date>Le [D] [Mn] [Y]</date>

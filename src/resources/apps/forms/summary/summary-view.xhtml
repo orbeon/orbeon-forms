@@ -216,6 +216,11 @@
                             </xforms:action>
                         </xforms:select1>
 
+                        <xforms:input model="persistence-model" ref="instance('search-instance')" incremental="true">
+                            <xforms:label model="resources-model" ref="instance('resources-instance')/summary/labels/search"/>
+                            <xforms:send ev:event="xforms-value-changed" submission="list-documents-submission"/>
+                        </xforms:input>
+
                         <xforms:select1 model="resources-model" ref="instance('language-instance')">
                             <xforms:label ref="instance('resources-instance')/summary/labels/language-choice"/>
                             <xforms:item>

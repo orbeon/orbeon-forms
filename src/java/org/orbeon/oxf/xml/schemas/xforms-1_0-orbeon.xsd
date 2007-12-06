@@ -471,7 +471,6 @@
             <xsd:sequence>
                 <xsd:element ref="xforms:label"/>
                 <xsd:group ref="xforms:List.UI.Common" maxOccurs="unbounded"/>
-
                 <xsd:group ref="xforms:UI.Common" minOccurs="0" maxOccurs="unbounded"/>
             </xsd:sequence>
             <xsd:attributeGroup ref="xforms:Common.Attributes"/>
@@ -543,11 +542,11 @@
             <xsd:attributeGroup ref="xforms:UI.Common.Attrs"/>
         </xsd:complexType>
     </xsd:element>
-
     <xsd:element name="output">
         <xsd:complexType>
             <xsd:sequence minOccurs="0">
                 <xsd:element ref="xforms:label"/>
+                <xsd:group ref="xforms:UI.Common" minOccurs="0" maxOccurs="unbounded"/>
             </xsd:sequence>
             <xsd:attributeGroup ref="xforms:Common.Attributes"/>
             <xsd:attributeGroup ref="xforms:Single.Node.Binding.Attributes"/>

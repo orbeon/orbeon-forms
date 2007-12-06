@@ -58,15 +58,32 @@
             <section added="2006-02-04">
                 <title>Is Orbeon Forms an XForms Engine?</title>
                 <p>
-                    Orbeon Forms does contain an XForms engine, which we refer to as the Orbeon Forms XForms engine. It
-                    also contains an XML pipeline engine running the XPL pipeline language, an application controller
-                    (the Page Flow Controller or PFC), and built-in components to perform XSLT transformations,
-                    database access, and more. Needless to say, Orbeon Forms ships with examples and documentation.
+                    Orbeon Forms does contain an XForms engine (also known as an XForms processor), which we refer to
+                    as the Orbeon Forms XForms engine. It also contains an XML pipeline engine running the XPL pipeline
+                    language, an application controller (the Page Flow Controller or PFC), and built-in components to
+                    perform XSLT transformations, database access, and more. Needless to say, Orbeon Forms ships with
+                    examples and documentation.
                 </p>
                 <p>
                     You are free to use Orbeon Forms only for its XForms functionality, but you can also leverage more
                     of Orbeon Forms to build your forms-based application.
                 </p>
+            </section>
+            <section added="2007-12-05">
+                <title>Is there any cost associated with using Orbeon Forms?</title>
+                <p>
+                    No, Orbeon Forms is truly open source and free or charge whether your use it to build open source
+                    or commercial applications.
+                </p>
+                <p>
+                    You are free to <i>extend</i> the platform, and you are free to <i>build applications</i> on top of
+                    the platform as you please. Note however that if you make changes to the existing Orbeon Forms
+                    code, you are bound by the terms of the LGPL license, which requires you to redistribute changes to
+                    the open source community when you distribute your application.
+                </p>
+                <p>
+                    Orbeon does offer commercial support for Orbeon Forms. See the information about our <a
+                    href="#getting-support">support plans</a>. </p>
             </section>
             <a name="name-change"/>
             <section>
@@ -1790,7 +1807,7 @@
                 <ul>
                     <li>
                         <p>
-                            At <a href="http://mail-archive.objectweb.org/ops-users/index.html">ObjectWeb / OW2</a>.
+                            At <a href="http://www.ow2.org/wws/arc/ops-users">OW2</a>.
                             This is the primary archive.
                         </p>
                     </li>

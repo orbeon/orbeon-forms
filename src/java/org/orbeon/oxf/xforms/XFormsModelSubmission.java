@@ -892,7 +892,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
         } else if (XFormsEvents.XFORMS_BINDING_EXCEPTION.equals(eventName)) {
             // The default action for this event results in the following: Fatal error.
-            throw new OXFException("Binding exception.");// TODO: what location information should we provide here?
+            throw new ValidationException("Binding exception.", event.getTargetObject().getLocationData());
         }
     }
 

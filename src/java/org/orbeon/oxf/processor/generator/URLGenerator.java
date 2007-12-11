@@ -265,43 +265,40 @@ public class URLGenerator extends ProcessorImpl {
                             public Object read(PipelineContext context, ProcessorInput input) {
                                 Element configElement = readInputAsDOM4J(context, input).getRootElement();
 
+                                // Processor location data
+                                final LocationData locationData = URLGenerator.this.getLocationData();
+
                                 // Shortcut if the url is direct child of config
-                                String url = configElement.getTextTrim();
-                                if (url != null && !url.equals("")) {
-                                    try {
-                                        // Legacy, don't even care about handling relative URLs
-                                        return new ConfigURIReferences(new Config(URLFactory.createURL(url)));
-                                    } catch (MalformedURLException e) {
-                                        throw new OXFException(e);
+                                {
+                                    final String url = configElement.getTextTrim();
+                                    if (url != null && !url.equals("")) {
+                                        try {
+                                            // Legacy, don't even care about handling relative URLs
+                                            return new ConfigURIReferences(new Config(URLFactory.createURL(url)));
+                                        } catch (MalformedURLException e) {
+                                            throw new ValidationException(e, locationData);
+                                        }
                                     }
                                 }
 
                                 // We have the /config/url syntax
-                                url = XPathUtils.selectStringValueNormalize(configElement, "/config/url");
-
-                                // Processor location data
-                                final LocationData locationData = URLGenerator.this.getLocationData();
-
-                                // Check for null URL (this should really not happen)
+                                final String url = XPathUtils.selectStringValueNormalize(configElement, "/config/url");
                                 if (url == null) {
-                                    // TEMP: Log this to find out problems
-                                    final String locationString = (locationData == null) ? null : locationData.toString();
-                                    logger.error("URL generator found null URL for config (location: " + locationString + "):\n" + Dom4jUtils.domToString(configElement));
-                                    // TODO: Should raise an exception
+                                    throw new ValidationException("URL generator found null URL for config:\n" + Dom4jUtils.domToString(configElement), locationData);
                                 }
 
                                 // Get content-type
                                 String contentType = XPathUtils.selectStringValueNormalize(configElement, "/config/content-type");
                                 boolean forceContentType = ProcessorUtils.selectBooleanValue(configElement, "/config/force-content-type", DEFAULT_FORCE_CONTENT_TYPE);
                                 if (forceContentType && (contentType == null || contentType.equals("")))
-                                    throw new OXFException("The force-content-type element requires a content-type element.");
+                                    throw new ValidationException("The force-content-type element requires a content-type element.", locationData);
 
                                 // Get encoding
                                 String encoding = XPathUtils.selectStringValueNormalize(configElement, "/config/encoding");
                                 boolean forceEncoding = ProcessorUtils.selectBooleanValue(configElement, "/config/force-encoding", DEFAULT_FORCE_ENCODING);
                                 boolean ignoreConnectionEncoding = ProcessorUtils.selectBooleanValue(configElement, "/config/ignore-connection-encoding", DEFAULT_IGNORE_CONNECTION_ENCODING);
                                 if (forceEncoding && (encoding == null || encoding.equals("")))
-                                    throw new OXFException("The force-encoding element requires an encoding element.");
+                                    throw new ValidationException("The force-encoding element requires an encoding element.", locationData);
 
                                 // Get headers
                                 Map headers = new HashMap();
@@ -346,7 +343,7 @@ public class URLGenerator extends ProcessorImpl {
                                         logger.debug("Read configuration: " + config.toString());
                                     return new ConfigURIReferences(config);
                                 } catch (MalformedURLException e) {
-                                    throw new OXFException(e);
+                                    throw new ValidationException(e, locationData);
                                 }
                             }
                         });

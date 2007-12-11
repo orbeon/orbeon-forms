@@ -399,7 +399,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         }
                     } finally {
                         // Restore instance document
-                        modelForInstance.setInstance(currentInstance, false);
+                        modelForInstance.setInstance(currentInstance, currentInstance.isReplaced());
                     }
                 } else {
                     initialDocumentToSubmit = null;
@@ -533,7 +533,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         }
                     } finally {
                         // Restore instance document
-                        modelForInstance.setInstance(currentInstance, false);
+                        modelForInstance.setInstance(currentInstance, currentInstance.isReplaced());
                     }
                 } else {
                     // Don't recreate document

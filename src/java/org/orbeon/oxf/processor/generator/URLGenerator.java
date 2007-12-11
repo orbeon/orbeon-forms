@@ -24,9 +24,13 @@ import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.resources.handler.OXFHandler;
 import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.xml.*;
-import org.orbeon.oxf.xml.xerces.XIncludeHandler;
+import org.orbeon.oxf.xml.SAXStore;
+import org.orbeon.oxf.xml.TransformerUtils;
+import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.XPathUtils;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.xerces.XIncludeHandler;
 import org.w3c.dom.Document;
 import org.w3c.tidy.Tidy;
 import org.xml.sax.*;
@@ -275,6 +279,17 @@ public class URLGenerator extends ProcessorImpl {
                                 // We have the /config/url syntax
                                 url = XPathUtils.selectStringValueNormalize(configElement, "/config/url");
 
+                                // Processor location data
+                                final LocationData locationData = URLGenerator.this.getLocationData();
+
+                                // Check for null URL (this should really not happen)
+                                if (url == null) {
+                                    // TEMP: Log this to find out problems
+                                    final String locationString = (locationData == null) ? null : locationData.toString();
+                                    logger.error("URL generator found null URL for config (location: " + locationString + "):\n" + Dom4jUtils.domToString(configElement));
+                                    // TODO: Should raise an exception
+                                }
+
                                 // Get content-type
                                 String contentType = XPathUtils.selectStringValueNormalize(configElement, "/config/content-type");
                                 boolean forceContentType = ProcessorUtils.selectBooleanValue(configElement, "/config/force-content-type", DEFAULT_FORCE_CONTENT_TYPE);
@@ -319,7 +334,6 @@ public class URLGenerator extends ProcessorImpl {
                                     // NOTE: We check whether there is a protocol, because we have
                                     // some Java location data which are NOT to be interpreted as
                                     // base URIs
-                                    LocationData locationData = URLGenerator.this.getLocationData();
                                     URL fullURL = (locationData != null && locationData.getSystemID() != null && NetUtils.urlHasProtocol(locationData.getSystemID()))
                                             ? URLFactory.createURL(locationData.getSystemID(), url)
                                             : URLFactory.createURL(url);

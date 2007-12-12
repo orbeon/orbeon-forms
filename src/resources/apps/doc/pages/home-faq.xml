@@ -284,14 +284,14 @@
                 <title>How much of the XForms specification does Orbeon Forms support?</title>
                 <p>
                     The Orbeon Forms implementation is based on the <a href="http://www.w3.org/TR/xforms/">W3C XForms
-                    1.0 (Second Edition) Recommendation</a> (14 March 2006). The XForms NG engine in Orbeon Forms 3.5
-                    is close to supporting all of the XForms 1.0 specification. For more detailed information on what
-                    features are supported in the latest version of Orbeon Forms, see the <a
-                    href="reference-xforms-compliance">XForms Compliance</a> section of the documentation.
+                    1.1 Candidate Recommendation</a> (29 November 2007). The XForms NG engine in Orbeon Forms 3.6 is
+                    close to supporting all of the XForms 1.0 specification, and several XForms 1.1 features as well.
+                    For more detailed information on what features are supported in the latest version of Orbeon Forms,
+                    see the <a href="reference-xforms-compliance">XForms Compliance</a> section of the documentation.
                 </p>
                 <p>
-                    Orbeon Forms also supports several features from XForms 1.1 (in draft as of August 2006), as well as
-                    extensions such as new widgets (autocomplete, tree, menu, dialog, etc.).
+                    Orbeon Forms also supports extensions such as new widgets (autocomplete, tree, menu, dialog,
+                    etc.).
                 </p>
             </section>
             <a name="xforms-browsers"/>
@@ -384,7 +384,7 @@
                     the new XForms engine "XForms NG".
                 </p>
                 <p>
-                    For backward compatibility reasons, the XForms Classic engine is still present in Orbeon Forms 3.5.
+                    For backward compatibility reasons, the XForms Classic engine is still present in Orbeon Forms 3.6.
                     We plan over time to allow XForms NG to support non-JavaScript, non-Ajax browsers as well,
                     therefore making XForms Classic obsolete in Orbeon Forms.
                 </p>
@@ -406,14 +406,14 @@
                 <title>Should I keep using the XForms Classic engine?</title>
                 <p>
                     The XForms Classic engine is available only for backward compatibility. It is deprecated and may be
-                    removed in the future. If you are starting an application from scratch with Orbeon Forms 3.5, we
-                    strongly advise against using XForms Classic. If you are migrating to Orbeon Forms 3.5, we advise
+                    removed in the future. If you are starting an application from scratch with Orbeon Forms 3.6, we
+                    strongly advise against using XForms Classic. If you are migrating to Orbeon Forms 3.6, we advise
                     starting migrating XForms NG. You can keep your existing pages working with XForms Classic, and
                     write new pages with XForms NG. Over time, you can migrate existing XForms Classic pages to XForms
                     NG, making for a smooth transition.
                 </p>
                 <p>
-                    As of Orbeon Forms 3.5, only one feature of XForms Classic have not yet made it into XForms NG:
+                    As of Orbeon Forms 3.6, only one feature of XForms Classic have not yet made it into XForms NG:
                     support for browsers with very limited JavaScript functionality (non-Ajax mode). In time, we hope to
                     bring these features to XForms NG as well, therefore completely deprecating XForms Classic.
                 </p>
@@ -529,7 +529,7 @@
             <section>
                 <title>Can I run XForms within JSR-168 portlets?</title>
                 <p>
-                    As of Orbeon Forms 3.5, it is possible to use the Orbeon Forms XForms engine within the Java Portlet
+                    As of Orbeon Forms 3.6, it is possible to use the Orbeon Forms XForms engine within the Java Portlet
                     (JSR-168) compliant Liferay portal, thanks to kind sponsoring by Atkins Transport Systems.
                 </p>
                 <p>
@@ -556,7 +556,7 @@
                     container was available. So Orbeon developped a container based on draft specifications for testing.
                     This code was used until recently to run the Orbeon Forms examples portal: examples were actually
                     using the portlet code and running as portlets, and the examples portal is an early JSR-168 portal.
-                    Note that this is no longer the case with Orbeon Forms 3.5, where the example applications portal
+                    Note that this is no longer the case with Orbeon Forms 3.6, where the example applications portal
                     does not use JSR-168 for performance and simplicity reasons.</i>
                 </p>
             </section>
@@ -564,7 +564,7 @@
             <section>
                 <title>What web browsers does the Ajax-based XForms engine support?</title>
                 <p>
-                    Orbeon Forms 3.5's XForms engine supports Firefox (1.0.7 and later), IE 6, Safari (1.3 and later),
+                    Orbeon Forms 3.6's XForms engine supports Firefox (1.0.7 and later), IE 6, Safari (1.3 and later),
                     and Opera (8.5 and later).
                 </p>
                 <p>
@@ -578,9 +578,9 @@
                     that contain embedded XForms markup.
                 </p>
                 <p>
-                    Orbeon Forms 3.5 comes with a <a href="intro-tutorial">new tutorial</a> that explains step by step
-                    how to create your first forms. We recommend you also look at the other sample Orbeon Forms
-                    applications that you find under your WAR file's <code>WEB-INF/resources/apps</code> directory.
+                    Orbeon Forms 3.6 comes with a <a href="intro-tutorial">tutorial</a> which explains step by step how
+                    to create your first forms. We recommend you also look at the other sample Orbeon Forms applications
+                    that you find under your WAR file's <code>WEB-INF/resources/apps</code> directory.
                 </p>
                 <p>
                     Also note that Orbeon provides services around Orbeon Forms, including training. Please visit our

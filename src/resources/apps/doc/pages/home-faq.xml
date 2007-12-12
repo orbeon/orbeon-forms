@@ -298,14 +298,14 @@
             <section added="2006-10-27">
                 <title>I hear that XForms is not well supported in web browsers. This is a problem, right?</title>
                 <p>
-                    No, this is not a problem at all, because XForms can run on the server, in the same way that other
-                    web applications technologies like PHP, ASP, JavaServer Faces or Ruby run on the server.
+                    No, this is not a problem at all, because XForms runs great on the server, in the same way that
+                    other web applications technologies like PHP, ASP, JavaServer Faces or Ruby run on the server.
                 </p>
                 <p>
-                    You run XForms on the server by installing the Orbeon Forms XForms engine on your server. The XForms engine
-                    translates your XForms pages to HTML, CSS and JavaScript that your browser understands. Your web
-                    browser sees a regular Ajax application, but as a developer you write standard XForms instead of
-                    JavaScript!
+                    You run XForms on the server by installing the Orbeon Forms XForms engine on your server. The XForms
+                    engine translates your XForms pages to HTML, CSS and JavaScript that your browser understands.
+                    Your web browser sees a regular Ajax application, but as a developer you write standard XForms
+                    instead of JavaScript!
                 </p>
                 <p>
                     Running XForms on the server has even several benefits over running it in the client:
@@ -327,7 +327,7 @@
                     <li>
                         <p>
                             You can upgrade your XForms implementation at a single location on your server instead of
-                            waiting for users ot upgrade their browsers when bugs are fixed or new features are
+                            waiting for users to upgrade their browsers when bugs are fixed or new features are
                             implemented.
                         </p>
                     </li>
@@ -335,11 +335,11 @@
             </section>
             <a name="xforms-server-side"/>
             <section added="2006-01-10">
-                <title>What is a server-side XForms implementation?</title>
+                <title>What is a server-side / Ajax-based XForms implementation?</title>
                 <p>
                     Historically, the XForms specification assumed that XForms was implemented on the client-side,
                     natively within a web browser. But as discussed <a href="#xforms-browsers">here</a>, XForms-based
-                    applications can use server-side or hybrid implementations that share XForms processing between
+                    applications can use server-side Ajax-based implementations that share XForms processing between
                     server-side code and client-side code and rely on Ajax technology. Orbeon Forms features such an
                     Ajax-based implementation.
                 </p>
@@ -430,9 +430,10 @@
             <section>
                 <title>Do I need to use XForms to build forms?</title>
                 <p>
-                    It is not a requirement to use XForms. It is possible to generate HTML form elements and to examine
-                    request parameters manually. We recommend however using XForms whenever possible, because it
-                    provides an elegant abstraction that greatly simplifies form handling.
+                    It is not a requirement to use XForms with Orbeon Forms. It is possible to generate HTML form
+                    elements and to examine request parameters manually. We recommend however using XForms whenever
+                    possible, because it provides an elegant abstraction that greatly simplifies form handling, which is
+                    the point of Orbeon Forms.
                 </p>
             </section>
             <a name="file-upload"/>
@@ -444,23 +445,23 @@
                     href="/xforms-upload/">XForms upload example</a>
                 </p>
             </section>
-            <a name="xforms-upload-trouble"/>
-            <section added="2005-05-21">
-                <title>My XForms upload doesn't work. What can I do?</title>
-                <p>
-                    With Orbeon Forms 2.8 or earlier, or if you are using XForms Classic with Orbeon Forms 3.0 or
-                    later, make sure that you have the correct submission method and encoding in your XForms model:
-                </p>
-                <p>
-                    <xml-source show-namespaces="false" xmlns:xforms="http://www.w3.org/2002/xforms">
-                        <xforms:submission method="post" encoding="multipart/form-data"/>
-                    </xml-source>
-                </p>
-                <p>
-                    With Orbeon Forms 3.0 and XForms NG, uploaded files can only be retrieved with a submission with
-                    <code>replace="all"</code>.
-                </p>
-            </section>
+            <!--<a name="xforms-upload-trouble"/>-->
+            <!--<section added="2005-05-21">-->
+                <!--<title>My XForms upload doesn't work. What can I do?</title>-->
+                <!--<p>-->
+                    <!--With Orbeon Forms 2.8 or earlier, or if you are using XForms Classic with Orbeon Forms 3.0 or-->
+                    <!--later, make sure that you have the correct submission method and encoding in your XForms model:-->
+                <!--</p>-->
+                <!--<p>-->
+                    <!--<xml-source show-namespaces="false" xmlns:xforms="http://www.w3.org/2002/xforms">-->
+                        <!--<xforms:submission method="post" encoding="multipart/form-data"/>-->
+                    <!--</xml-source>-->
+                <!--</p>-->
+                <!--<p>-->
+                    <!--With Orbeon Forms 3.0 or later and XForms NG, uploaded files can only be retrieved with a-->
+                    <!--submission with <code>replace="all"</code>.-->
+                <!--</p>-->
+            <!--</section>-->
             <a name="xforms-xpath20"/>
             <section added="2007-03-29">
                 <title>I get errors when I use the XPath <code>if()</code> function in Orbeon Forms. What's wrong?</title>

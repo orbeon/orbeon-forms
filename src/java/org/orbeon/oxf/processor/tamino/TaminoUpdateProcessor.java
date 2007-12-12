@@ -42,22 +42,24 @@ public class TaminoUpdateProcessor extends TaminoProcessor {
     public void start(PipelineContext context) {
         try {
             // Read configuration
-            Config config = (Config) readCacheInputAsObject(context, getInputByName(INPUT_CONFIG), new CacheableInputReader() {
+            final Config config = (Config) readCacheInputAsObject(context, getInputByName(INPUT_CONFIG), new CacheableInputReader() {
                 public Object read(org.orbeon.oxf.pipeline.api.PipelineContext context, ProcessorInput input) {
                     return readConfig(readInputAsDOM4J(context, INPUT_CONFIG));
                 }
             });
 
             // Read data
-            Document queryDocument = readInputAsDOM4J(context, INPUT_DATA);
+            final Document queryDocument = readInputAsDOM4J(context, INPUT_DATA);
 
-            TConnection connection = getConnection(context, config);
-            TXMLObjectAccessor accessor = connection.newXMLObjectAccessor(config.getCollection(), TDOM4JObjectModel.getInstance());
+            final TConnection connection = getConnection(context, config);
+            final TXMLObjectAccessor accessor = connection.newXMLObjectAccessor(config.getCollection(), TDOM4JObjectModel.getInstance());
 
-            TXQuery xquery = TXQuery.newInstance(Dom4jUtils.objectToString(XPathUtils.selectObjectValue(queryDocument, "/xquery/text() | /xquery/*")));
-            System.out.println(xquery.getExpression());
-            TResponse response = accessor.xquery(xquery);
-            System.out.println("result: "+response.getQueryContentAsString());
+            final TXQuery xquery = TXQuery.newInstance(Dom4jUtils.objectToString(XPathUtils.selectObjectValue(queryDocument, "/xquery/text() | /xquery/*")));
+            if (logger.isDebugEnabled())
+                logger.debug("Tamino - Update - expression:\n" + xquery.getExpression());
+            final TResponse response = accessor.xquery(xquery);
+            if (logger.isDebugEnabled())
+                logger.debug("Tamino - Update - response:\n" + response.getQueryContentAsString());
 
         } catch (Exception e) {
             throw new OXFException(e);

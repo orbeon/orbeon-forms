@@ -28,7 +28,8 @@ import java.util.Map;
 
 public abstract class TaminoProcessor extends ProcessorImpl {
 
-    private static final Logger logger = LoggerFactory.createLogger(TaminoProcessor.class);
+    protected static final Logger logger = LoggerFactory.createLogger(TaminoProcessor.class);
+    
     private static final Map ISOLATION_DEGREE_VALUES = new HashMap();
     private static final Map LOCK_MODE_VALUES = new HashMap();
 	private static final Map LOCK_WAIT_VALUES = new HashMap();

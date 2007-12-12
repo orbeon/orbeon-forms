@@ -251,14 +251,15 @@
                 </p>
                 <p>
                     XForms is a W3C Recommendation since October 2003, with a second edition of the 1.0 published in
-                    March 2006. The XForms Working Group is, as of August 2006, working on XForms 1.1, due in late 2006
-                    or 2007, before embarking on XForms 1.2 or XForms 2.0! Please visit <a
-                    href="http://www.w3.org/TR/xforms/">XForms - The Next Generation of Web Forms</a> for more
-                    information about XForms direct from W3C.
+                    March 2006 and a third edition published in October 2007. As of December 2007, the Forms Working
+                    Group at W3C has published XForms 1.1 as a Candidate Recommendation. XForms 1.1 should therefore
+                    be an actual recommendation in 2008. The Forms Working Group is already embarking on XForms 1.2 or
+                    XForms 2.0! Please visit <a href="http://www.w3.org/MarkUp/Forms/">The Forms Working Group</a> for
+                    more information about XForms right from W3C.
                 </p>
                 <p>
-                    XForms aims at replacing HTML forms, but it is not strictly tied to HTML. The main goal of XForms is
-                    to make web forms design easier, allowing the developer to write less client-side scripting (or
+                    XForms aims at replacing HTML forms, but it is not strictly tied to HTML. The main goal of XForms
+                    is to make web forms design easier, allowing the developer to write less client-side scripting (or
                     none at all), and less server-side code thanks to a feature-rich declarative approach.
                 </p>
                 <p>

@@ -16,7 +16,7 @@
     <div class="hd">An error has occurred</div>
     <div class="bd">
         <p>
-            An error has occurred in Orbeon Forms. You may want to try one of the following:
+            You may want to try one of the following:
         </p>
         <ul>
             <li><a class="xforms-error-panel-close">Close this dialog</a> and continue to use this page.</li>

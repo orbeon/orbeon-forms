@@ -193,7 +193,7 @@ ORBEON.util.IEDom = {
     /**
      * Orbeon version of getting Elements by Name in IE
      */
-    getElementByName: function(element,localName,namespace) {
+    getElementsByName: function(element,localName,namespace) {
         return element.getElementsByTagName(namespace+":"+localName);
     }
 };
@@ -261,7 +261,7 @@ ORBEON.util.MozDom = {
      * Optimized version of getting Elements by Name on Mozilla (hack: assumes there are no other
      * elements with the same local name that are in a different namespace).
      */
-    getElementByName: function(element, localName, namespace) {
+    getElementsByName: function(element, localName, namespace) {
         return element.getElementsByTagName(localName);
     }};
 
@@ -1770,6 +1770,7 @@ ORBEON.xforms.Init = {
                         ORBEON.xforms.Globals.formErrorPanel[formID] = errorPanel;
 
                         // Find reference to elements in the deails hidden section
+                        var titleDiv = ORBEON.util.Dom.getChildElementByClass(formChild, "hd");
                         var bodyDiv = ORBEON.util.Dom.getChildElementByClass(formChild, "bd");
                         var detailsHiddenDiv = ORBEON.util.Dom.getChildElementByClass(bodyDiv, "xforms-error-panel-details-hidden");
                         var showDetailsA = ORBEON.util.Dom.getChildElementByIndex(ORBEON.util.Dom.getChildElementByIndex(detailsHiddenDiv, 0), 0);
@@ -1779,6 +1780,7 @@ ORBEON.xforms.Init = {
                         var detailsShownDiv = ORBEON.util.Dom.getChildElementByClass(bodyDiv, "xforms-error-panel-details-shown");
                         var hideDetailsA = ORBEON.util.Dom.getChildElementByIndex(ORBEON.util.Dom.getChildElementByIndex(detailsShownDiv, 0), 0);
                         YAHOO.util.Dom.generateId(hideDetailsA);
+                        errorPanel.errorTitleDiv = titleDiv;
                         errorPanel.errorDetailsDiv = ORBEON.util.Dom.getChildElementByClass(detailsShownDiv, "xforms-error-panel-details");
 
                         // Register listener that will show/hide the detail section
@@ -2186,16 +2188,17 @@ ORBEON.xforms.Server = {
         if (e.fileName != null) details += "<li>File: " + e.fileName + "</li>";
         if (e.lineNumber != null) details += "<li>Line number: " + e.lineNumber + "</li>";
         details += "</ul>";
-        ORBEON.xforms.Server.showError(details, formID);
+        ORBEON.xforms.Server.showError("Exception in client-side code", details, formID);
     },
 
     /**
      * Display the error panel and shows the specified detailed message in the detail section of the panel.
      */
-    showError: function(details, formID) {
+    showError: function(title, details, formID) {
         if (!ORBEON.xforms.Globals.requestIgnoreErrors) {
             if (ORBEON.xforms.Globals.formErrorPanel[formID]) {
                 ORBEON.xforms.Globals.formErrorPanel[formID].element.style.display = "block";
+                ORBEON.xforms.Globals.formErrorPanel[formID].errorTitleDiv.innerHTML = title;
                 ORBEON.xforms.Globals.formErrorPanel[formID].errorDetailsDiv.innerHTML = details;
                 ORBEON.xforms.Globals.formErrorPanel[formID].show();
                 ORBEON.xforms.Globals.formErrorPanel[formID].center();
@@ -2428,11 +2431,11 @@ ORBEON.xforms.Server = {
                 // this error because there was really a communication failure or if this is because the user is
                 // going to another page. So we wait some time before showing the error, hoping that if another page is
                 // loading, that other page will be loaded by the time our timeout expires.
-                window.setTimeout(function() { ORBEON.xforms.Server.showError(details, formID); },
+                window.setTimeout(function() { ORBEON.xforms.Server.showError("Error while processing response", details, formID); },
                     XFORMS_DELAY_BEFORE_GECKO_COMMUNICATION_ERROR_IN_MS);
             } else {
                 // Display alert right away
-                ORBEON.xforms.Server.showError(details, formID);
+                ORBEON.xforms.Server.showError("Error while processing response", details, formID);
             }
         }
     },
@@ -2500,7 +2503,7 @@ ORBEON.xforms.Server = {
 
                                 case "control-values": {
                                     var controlValuesElement = actionElement.childNodes[actionIndex];
-                                    var copyRepeatTemplateElements = ORBEON.util.Dom.getElementByName(controlValuesElement,"copy-repeat-template",xmlNamespace);
+                                    var copyRepeatTemplateElements = ORBEON.util.Dom.getElementsByName(controlValuesElement,"copy-repeat-template",xmlNamespace);
                                     var copyRepeatTemplateElementsLength = copyRepeatTemplateElements.length;
                                     for (var j = 0; j < copyRepeatTemplateElementsLength; j++) {
 
@@ -2584,7 +2587,7 @@ ORBEON.xforms.Server = {
                                             ORBEON.xforms.Init.registerListenersOnFormElements();
                                        }
 
-                                       var deleteRepeatTemplateElements = ORBEON.util.Dom.getElementByName(controlValuesElement,"delete-repeat-elements",xmlNamespace);
+                                       var deleteRepeatTemplateElements = ORBEON.util.Dom.getElementsByName(controlValuesElement,"delete-repeat-elements",xmlNamespace);
                                        var deleteRepeatTemplateElementsLength = deleteRepeatTemplateElements.length;
                                        for (var j = 0; j < deleteRepeatTemplateElementsLength; j++) {
 
@@ -2813,7 +2816,7 @@ ORBEON.xforms.Server = {
                                 // Update controls
                                 case "control-values": {
                                     var controlValuesElement = actionElement.childNodes[actionIndex];
-                                    var controlElements = ORBEON.util.Dom.getElementByName(controlValuesElement,"control",xmlNamespace);
+                                    var controlElements = ORBEON.util.Dom.getElementsByName(controlValuesElement,"control",xmlNamespace);
                                     var controlElementslength = controlElements.length;
                                     // Update control value and MIPs
 				                    for(var j = 0 ; j < controlElementslength; j++){
@@ -3181,7 +3184,7 @@ ORBEON.xforms.Server = {
                                         }
 
                                         // Model item properties on a repeat item
-                                        var repeatIterationElements = ORBEON.util.Dom.getElementByName(controlValuesElement,"repeat-iteration",xmlNamespace);
+                                        var repeatIterationElements = ORBEON.util.Dom.getElementsByName(controlValuesElement,"repeat-iteration",xmlNamespace);
                                         var repeatIterationElementslength = repeatIterationElements.length;
                                         // Extract data from server response
                                         for(var j = 0 ; j < repeatIterationElementslength; j++) {
@@ -3483,13 +3486,14 @@ ORBEON.xforms.Server = {
 
             } else if (responseXML && responseXML.documentElement
                     && responseXML.documentElement.tagName.indexOf("error") != -1) {
-                // Find an error message starting from the inner-most exception
-                var details = ORBEON.util.Dom.getStringValue(responseXML.documentElement);
-                ORBEON.xforms.Server.showError(details, formID);
+                // Extract and display error message
+                var title = ORBEON.util.Dom.getStringValue(ORBEON.util.Dom.getElementsByName(responseXML.documentElement, "title", null)[0]);
+                var details = ORBEON.util.Dom.getStringValue(ORBEON.util.Dom.getElementsByName(responseXML.documentElement, "body", null)[0]);
+                ORBEON.xforms.Server.showError(title, details, formID);
             } else {
                 // The server didn't send valid XML
                 ORBEON.xforms.Globals.lastRequestIsError = true;
-                ORBEON.xforms.Server.showError("Server didn't respond with valid XML", formID);
+                ORBEON.xforms.Server.showError("Server didn't respond with valid XML", "Server didn't respond with valid XML", formID);
             }
         } catch (e) {
             ORBEON.xforms.Server.exceptionWhenTalkingToServer(e, formID);

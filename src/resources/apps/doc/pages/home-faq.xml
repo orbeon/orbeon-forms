@@ -336,18 +336,23 @@
             </section>
             <a name="xforms-server-side"/>
             <section added="2006-01-10">
-                <title>What is a server-side / Ajax-based XForms implementation?</title>
+                <title>What is a server-side, Ajax-based XForms implementation?</title>
                 <p>
                     Historically, the XForms specification assumed that XForms was implemented on the client-side,
                     natively within a web browser. But as discussed <a href="#xforms-browsers">here</a>, XForms-based
                     applications can use server-side Ajax-based implementations that share XForms processing between
-                    server-side code and client-side code and rely on Ajax technology. Orbeon Forms features such an
-                    Ajax-based implementation.
+                    server-side code and client-side code and rely on Ajax technology.
                 </p>
                 <p>
-                    A server-side implementation of XForms translates your forms described in terms of the XForms
+                    Orbeon Forms features such an Ajax-based implementation and implements the XForms specification
+                    partly on the server (in Java), partly on the client (in JavaScript). Client and server communicate
+                    through Ajax requests. The client is fairly "dumb" compared to the server, which implements most of
+                    the XForms intelligence.
+                </p>
+                <p>
+                    The Orbeon Forms XForms processor translates your forms described in terms of the XForms
                     specification into HTML, CSS and JavaScript code understood by your web browser. The following
-                    diagram shows a high-level overview of the architecture of an Ajax-based  XForms implementation:
+                    diagram shows a high-level overview of the architecture of an Ajax-based XForms implementation:
                 </p>
                 <div class="image">
                     <img width="620" height="454" src="../apps/doc/images/xforms-hybrid.png"/>

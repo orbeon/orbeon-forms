@@ -380,7 +380,7 @@ public abstract class HandlerBase extends ElementHandler {
                 mustOutputHTMLFragment = false;
             } else if (isHint) {
                 labelHintHelpAlertValue = xformsControl.getHint(pipelineContext);
-                mustOutputHTMLFragment = xformsControl.isHTMLLabel(pipelineContext);
+                mustOutputHTMLFragment = xformsControl.isHTMLHint(pipelineContext);
             } else if (isAlert) {
                 labelHintHelpAlertValue = xformsControl.getAlert(pipelineContext);
                 mustOutputHTMLFragment = xformsControl.isHTMLAlert(pipelineContext);

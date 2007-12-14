@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.event.events;
 
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
@@ -81,16 +82,46 @@ public class XFormsSubmitErrorEvent extends XFormsEvent {
 
     public SequenceIterator getAttribute(String name) {
 
-        if ("body".equals(name)) {
+        if ("response-body".equals(name) || "body".equals(name)) {// NOTE: "body" for backward compatibility
             // Return the body of the response if possible
+
+            // "When the error response specifies an XML media type as defined by [RFC 3023], the response body is
+            // parsed into an XML document and the root element of the document is returned. If the parse fails, or if
+            // the error response specifies a text media type (starting with text/), then the response body is returned
+            // as a string. Otherwise, an empty string is returned."
+
             if (getBodyDocument() != null)
                 return new ListIterator(Collections.singletonList(getBodyDocument()));
             else if (getBodyString() != null)
                 return new ListIterator(Collections.singletonList(new StringValue(getBodyString())));
             else
-                return super.getAttribute(name);
+                return new ListIterator(Collections.singletonList(StringValue.EMPTY_STRING));
         } else if ("resource-uri".equals(name)) {
+            // "The submission resource URI that failed (xsd:anyURI)"
             return new ListIterator(Collections.singletonList(new StringValue(getUrlString())));
+        } else if ("error-type".equals(name)) {
+            // "One of the following: submission-in-progress, no-data, validation-error, parse-error, resource-error,
+            // target-error."
+            throw new ValidationException("Property Not implemented yet: " + name, getLocationData());
+            // TODO
+        } else if ("response-status-code".equals(name)) {
+            // "The protocol return code of the error response, or NaN if the failed submission did not receive an error
+            // response."
+            throw new ValidationException("Property Not implemented yet: " + name, getLocationData());
+            // TODO
+        } else if ("response-headers".equals(name)) {
+            // "Zero or more elements, each one representing a content header in the error response received by a
+            // failed submission. The returned node-set is empty if the failed submission did not receive an error
+            // response or if there were no headers. Each element has a local name of header with no namespace URI and
+            // two child elements, name and value, whose string contents are the name and value of the header,
+            // respectively."
+            throw new ValidationException("Property Not implemented yet: " + name, getLocationData());
+            // TODO
+        } else if ("response-reason-phrase".equals(name)) {
+            // "The protocol response reason phrase of the error response. The string is empty if the failed submission
+            // did not receive an error response or if the error response did not contain a reason phrase."
+            throw new ValidationException("Property Not implemented yet: " + name, getLocationData());
+            // TODO
         } else {
             return super.getAttribute(name);
         }

@@ -72,6 +72,7 @@ public class XFormsStaticState {
     public XFormsStaticState(PipelineContext pipelineContext, String encodedStaticState) {
         this(XFormsUtils.decodeXML(pipelineContext, encodedStaticState), encodedStaticState);
     }
+    
 
     /**
      * Create static state object from a Document.

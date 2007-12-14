@@ -76,7 +76,9 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
     private boolean validate = true;
     private boolean relevant = true;
-    private boolean serialize = true;
+
+    private String serialization;
+    private boolean serialize = true;// for backward compability only
 
     private String version;
     private boolean indent;
@@ -158,7 +160,14 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
             validate = !"false".equals(submissionElement.attributeValue("validate"));
             relevant = !"false".equals(submissionElement.attributeValue("relevant"));
-            serialize = !"false".equals(submissionElement.attributeValue("serialize"));
+
+            serialization = submissionElement.attributeValue("serialization");
+            if (serialization != null) {
+                serialize = !serialization.equals("none");
+            } else {
+                // For backward compability only, support @serialize if there is no @serialization attribute
+                serialize = !"false".equals(submissionElement.attributeValue("serialize"));
+            }
 
             version = submissionElement.attributeValue("version");
 
@@ -899,18 +908,28 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
     private XFormsSubmitErrorEvent createErrorEvent(ConnectionResult connectionResult) throws IOException {
         final XFormsSubmitErrorEvent submitErrorEvent = new XFormsSubmitErrorEvent(XFormsModelSubmission.this, resolvedActionOrResource);
         if (connectionResult.hasContent()) {
+
+            // "When the error response specifies an XML media type as defined by [RFC 3023], the response body is
+            // parsed into an XML document and the root element of the document is returned. If the parse fails, or if
+            // the error response specifies a text media type (starting with text/), then the response body is returned
+            // as a string. Otherwise, an empty string is returned."
+
+            boolean isXMLParseFailed = false;
             if (ProcessorUtils.isXMLContentType(connectionResult.resultMediaType)) {
                 // XML content-type
-                // TODO: XForms 1.1 may mandate that we always try to parse the body as XML first
                 // Read stream into Document
                 try {
                     final DocumentInfo responseBody = TransformerUtils.readTinyTree(connectionResult.getResultInputStream(), connectionResult.resourceURI);
                     submitErrorEvent.setBodyDocument(responseBody);
+                    return submitErrorEvent;
                 } catch (Exception e) {
-                    XFormsServer.logger.error("XForms - submission - error while parsing respond body ", e);
+                    XFormsServer.logger.error("XForms - submission - error while parsing response body as XML, defaulting to plain text.", e);
+                    isXMLParseFailed = true;
                 }
-            } else if (ProcessorUtils.isTextContentType(connectionResult.resultMediaType)) {
-                // Text content-type
+            }
+
+            if (isXMLParseFailed || ProcessorUtils.isTextContentType(connectionResult.resultMediaType)) {
+                // XML parsing failed, or we got a text content-type
                 // Read stream into String
                 try {
                     final String charset;
@@ -925,11 +944,11 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                     final String responseBody = NetUtils.readStreamAsString(reader);
                     submitErrorEvent.setBodyString(responseBody);
                 } catch (Exception e) {
-                    XFormsServer.logger.error("XForms - submission - error while reading respond body ", e);
+                    XFormsServer.logger.error("XForms - submission - error while reading response body ", e);
                 }
             } else {
                 // This is binary
-                // Don't store anything for now
+                // Don't store anything
             }
         }
         return submitErrorEvent;

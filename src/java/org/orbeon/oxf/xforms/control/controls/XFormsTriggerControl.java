@@ -40,4 +40,8 @@ public class XFormsTriggerControl extends XFormsSingleNodeControl {
             return true;
         }
     }
+
+    protected boolean isSupportHTMLHints() {
+        return false;
+    }
 }

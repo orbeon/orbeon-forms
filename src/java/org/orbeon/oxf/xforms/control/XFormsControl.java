@@ -315,7 +315,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
         this.help = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, controlElement.element(XFormsConstants.XFORMS_HELP_QNAME), true, containsHTML);
         this.isHTMLHelp = containsHTML[0];
 
-        this.hint = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, controlElement.element(XFormsConstants.XFORMS_HINT_QNAME), true, containsHTML);
+        this.hint = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, controlElement.element(XFormsConstants.XFORMS_HINT_QNAME), isSupportHTMLHints(), containsHTML);
         this.isHTMLHint = containsHTML[0];
 
         this.alert = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, controlElement.element(XFormsConstants.XFORMS_ALERT_QNAME), true, containsHTML);
@@ -328,6 +328,15 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
      * @return  true if HTML labels are supported, false otherwise
      */
     protected boolean isSupportHTMLLabels() {
+        return true;
+    }
+
+    /**
+     * Whether the control supports hints containing HTML. The default is true as most controls do support it.
+     *
+     * @return  true if HTML hints are supported, false otherwise
+     */
+    protected boolean isSupportHTMLHints() {
         return true;
     }
 

@@ -1,0 +1,106 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml"
+            xmlns:xforms="http://www.w3.org/2002/xforms"
+            xmlns:ev="http://www.w3.org/2001/xml-events"
+            xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+    <xhtml:head>
+        <xhtml:title>Enter PIN</xhtml:title>
+        <xforms:model>
+            <xforms:instance id="input">
+                <input>
+                    <text>Something worth writing</text>
+                    <scope>request</scope>
+                    <operation>write</operation>
+                    <url>file:///tmp/gaga.xml</url>
+                </input>
+            </xforms:instance>
+            <xforms:instance id="output">
+                <output>
+                    <url/>
+                    <text/>
+                </output>
+            </xforms:instance>
+            <xforms:submission id="run" method="post" action="run" ref="instance('input')" replace="instance" instance="output"/>
+        </xforms:model>
+    </xhtml:head>
+    <xhtml:body>
+        <xhtml:p>
+            <xforms:input ref="text">
+                <xforms:label>Text written to file: </xforms:label>
+            </xforms:input>
+        </xhtml:p>
+        <xhtml:p>
+            <xforms:select1 ref="scope" appearance="full">
+                <xforms:label>Scope: </xforms:label>
+                <xforms:item>
+                    <xforms:label>Request</xforms:label>
+                    <xforms:value>request</xforms:value>
+                </xforms:item>
+                <xforms:item>
+                    <xforms:label>Session</xforms:label>
+                    <xforms:value>session</xforms:value>
+                </xforms:item>
+                <xforms:item>
+                    <xforms:label>Application</xforms:label>
+                    <xforms:value>application</xforms:value>
+                </xforms:item>
+            </xforms:select1>
+        </xhtml:p>
+        <xhtml:p>
+            <xforms:select1 ref="operation" appearance="full">
+                <xforms:label>Operation: </xforms:label>
+                <xforms:item>
+                    <xforms:label>Write</xforms:label>
+                    <xforms:value>write</xforms:value>
+                </xforms:item>
+                <xforms:item>
+                    <xforms:label>Read</xforms:label>
+                    <xforms:value>read</xforms:value>
+                </xforms:item>
+                <xforms:item>
+                    <xforms:label>Write and read</xforms:label>
+                    <xforms:value>write-read</xforms:value>
+                </xforms:item>
+            </xforms:select1>
+        </xhtml:p>
+        <xforms:group ref="if (operation = 'read') then . else ()">
+            <xhtml:p>
+                <xforms:input ref="url">
+                    <xforms:label>URL to read from: </xforms:label>
+                </xforms:input>
+            </xhtml:p>
+        </xforms:group>
+        <xhtml:p>
+            <xforms:trigger>
+                <xforms:label>Run</xforms:label>
+                <xforms:send ev:event="DOMActivate" submission="run"/>
+            </xforms:trigger>
+        </xhtml:p>
+        <xforms:group ref="if (instance('output')/text != '') then . else ()">
+            <xhtml:p>
+                <xforms:output ref="instance('output')/text">
+                    <xforms:label>Text read: </xforms:label>
+                </xforms:output>
+            </xhtml:p>
+        </xforms:group>
+        <xforms:group ref="if (instance('output')/url != '') then . else ()">
+            <xhtml:p>
+                <xforms:output ref="instance('output')/url">
+                    <xforms:label>File read from: </xforms:label>
+                </xforms:output>
+            </xhtml:p>
+        </xforms:group>
+    </xhtml:body>
+</xhtml:html>

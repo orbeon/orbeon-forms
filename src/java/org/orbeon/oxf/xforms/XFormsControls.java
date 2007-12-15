@@ -668,10 +668,12 @@ public class XFormsControls {
         if (bindingContext != null)
             return bindingContext.getNodeset();
 
-        // If not found, return the document element of the model's default instance
+        // If there is no default instance, return an empty node-set
         final XFormsInstance defaultInstance = containingDocument.getModel(modelId).getDefaultInstance();
         if (defaultInstance == null)
-            throw new ValidationException("Cannot find default instance in model: " + modelId, bindingContext.getLocationData());
+            return Collections.EMPTY_LIST;
+        
+        // If not found, return the document element of the model's default instance
         return Collections.singletonList(defaultInstance.getInstanceRootElementInfo());
     }
 

@@ -21,7 +21,7 @@
     <!-- Execute REST submission -->
     <p:processor name="oxf:xforms-submission">
         <p:input name="submission">
-            <xforms:submission serialize="false" method="get"
+            <xforms:submission serialization="none" method="get"
                                action="/exist/rest/db/orbeon/forms/{/*/form-id}/{/*/document-id}"/>
         </p:input>
         <p:input name="request" href="#instance"/>

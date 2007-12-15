@@ -41,13 +41,13 @@
 
             <!-- Submission to our service that provides suggestions -->
             <xforms:submission id="suggest"
-                serialize="false"
+                serialization="none"
                 method="get" action="http://google.com/complete/search?output=toolbar&amp;q={instance('suggest-query')}"
                 replace="instance" instance="suggestions"/>
             
             <!-- Submission to Google to perform a search -->
             <xforms:submission id="google-search"
-                serialize="false"
+                serialization="none"
                 method="get" action="http://www.google.com/search?hl=en&amp;q={instance('suggest-query')}"
                 replace="all"/>
 

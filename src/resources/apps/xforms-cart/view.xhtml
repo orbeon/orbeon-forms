@@ -27,7 +27,7 @@
             <xforms:instance id="cart">
                 <cart/>
             </xforms:instance>
-            <xforms:submission id="get" action="/xforms-cart/get" method="get" serialize="false" replace="instance" instance="cart"/>
+            <xforms:submission id="get" action="/xforms-cart/get" method="get" serialization="none" replace="instance" instance="cart"/>
             <xforms:submission id="add" action="/xforms-cart/add" ref="instance('item')" method="post" replace="none"/>
             <xforms:submission id="clear" action="/xforms-cart/clear" ref="instance('item')" method="post" replace="none"/>
         </xforms:model>

@@ -77,7 +77,7 @@
                 <page-flow/>
             </xforms:instance>
 
-            <xforms:submission id="get-page-flow-submission" method="get" serialize="false"
+            <xforms:submission id="get-page-flow-submission" method="get" serialization="none"
                                action="oxf:/apps/{instance('parameters-instance')/application-id}/page-flow.xml"
                                replace="instance" instance="page-flow-instance"/>
 
@@ -86,7 +86,7 @@
                 <page-flow/>
             </xforms:instance>
 
-            <xforms:submission id="get-source-files-submission" method="get" serialize="false"
+            <xforms:submission id="get-source-files-submission" method="get" serialization="none"
                                action="/source-viewer/service/get-files?application-id={instance('parameters-instance')/application-id}"
                                replace="instance" instance="source-files-instance"/>
 

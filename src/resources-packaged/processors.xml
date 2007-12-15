@@ -515,10 +515,6 @@
         <class name="org.orbeon.oxf.xforms.processor.XFormsToXHTML"/>
     </processor>
 
-    <processor name="oxf:xforms-to-xhtml">
-        <class name="org.orbeon.oxf.xforms.processor.XFormsToXHTML"/>
-    </processor>
-
     <processor name="oxf:xforms-resource-server">
         <class name="org.orbeon.oxf.xforms.processor.XFormsResourceServer"/>
     </processor>

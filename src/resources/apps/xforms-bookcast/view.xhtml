@@ -99,7 +99,7 @@
             </xforms:instance>
 
             <!-- Submission to get the document containing all the books -->
-            <xforms:submission id="list-submission" serialize="false"
+            <xforms:submission id="list-submission" serialization="none"
                        method="get" action="/exist/rest/db/orbeon/xforms-bookcast/books.xml"
                        replace="instance" instance="books-instance"/>
 
@@ -111,7 +111,7 @@
             </xforms:submission>
 
             <!-- Submission to load the sample data -->
-            <xforms:submission id="sample-data-submission" serialize="false"
+            <xforms:submission id="sample-data-submission" serialization="none"
                        method="get" action="oxf:/apps/xforms-bookcast/sample-data.xml"
                        replace="instance" instance="books-instance"/>
 

@@ -133,7 +133,7 @@
                 </xforms:action>
             </xforms:submission>
 
-            <xforms:setvalue ev:event="xforms-submit-error" ref="xxforms:instance('control-instance')/error" value="event('body')"/>
+            <xforms:setvalue ev:event="xforms-submit-error" ref="xxforms:instance('control-instance')/error" value="event('response-body')"/>
 
         </xforms:model>
         <!-- Include Flickr API model -->

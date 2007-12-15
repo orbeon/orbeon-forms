@@ -77,7 +77,7 @@
                                action="/exist/rest/{instance('control-instance')/resource}" method="delete"
                                replace="none"/>
 
-            <xforms:setvalue ev:event="xforms-submit-error" ref="instance('control-instance')/error" value="event('body')"/>
+            <xforms:setvalue ev:event="xforms-submit-error" ref="instance('control-instance')/error" value="event('response-body')"/>
         </xforms:model>
         <xhtml:style type="text/css">
             .sandbox-url-input input { width: 30em }

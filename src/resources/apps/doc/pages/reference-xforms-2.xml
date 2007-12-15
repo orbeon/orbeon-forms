@@ -1230,7 +1230,7 @@
                         <code>method="get"</code> method and <code>replace="instance"</code>:
                     </p>
                     <xml-source>
-                        <xforms:submission serialize="false" action="/forms/resources/fr" method="get"
+                        <xforms:submission serialization="none" action="/forms/resources/fr" method="get"
                                            replace="instance" instance="resources-instance" xxforms:readonly="true" xxforms:shared="application"/>
                     </xml-source>
                     <p>

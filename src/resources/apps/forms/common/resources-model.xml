@@ -31,7 +31,7 @@
                      xxforms:readonly="false"/>
 
     <!-- Update language submission -->
-    <xforms:submission id="update-language-submission" serialize="false"
+    <xforms:submission id="update-language-submission" serialization="none"
                        action="/forms/service/resources/{{xxforms:instance('parameters-instance')/form-id}}/{{instance('language-instance')}}" validate="false"
                        method="get" replace="instance" instance="resources-instance"
                        xxforms:readonly="false"/>

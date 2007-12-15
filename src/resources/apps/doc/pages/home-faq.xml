@@ -89,7 +89,7 @@
             <section>
                 <title>Why did we rename Orbeon PresentationServer to Orbeon Forms?</title>
                 <p>
-                    Renaming a product is not something to be taken lightly. However we feel that:
+                    Renaming a product is not something to be taken lightly. However we felt that:
                 </p>
                 <ul>
                     <li>
@@ -109,9 +109,9 @@
                     </li>
                 </ul>
                 <p>
-                    We are encouraged in this decision by the fact that almost all current users build complex web forms
+                    We were encouraged in this decision by the fact that almost all current users build complex web forms
                     using our Ajax-based XForms engine. The name change also conveys that we plan to keep focusing on
-                    form-related capabilities in the future like we have done in the last two years.
+                    form-related capabilities in the future.
                 </p>
                 <p>
                     It is important to precise the following:
@@ -119,8 +119,8 @@
                 <ul>
                     <li>
                         <p>
-                            We are not creating a separate product: <i>Orbeon Forms</i> is simply the new name of
-                            Orbeon PresentationServer.
+                            <i>Orbeon Forms</i> is simply the new name of Orbeon PresentationServer, not a different
+                            product.
                         </p>
                     </li>
                     <li>
@@ -138,7 +138,7 @@
             <section added="2007-01-06">
                 <title>Where do I find the source code?</title>
                 <p>
-                    In the ObjectWeb CVS repository. <a href="http://forge.objectweb.org/scm/?group_id=168">This
+                    In the OW2 CVS repository. <a href="http://forge.objectweb.org/scm/?group_id=168">This
                     page</a> provides the instructions to retrieve it. You can also <a
                     href="http://cvs.forge.objectweb.org/cgi-bin/viewcvs.cgi/ops/">browse the repository</a> with your
                     web browser.
@@ -153,7 +153,7 @@
             <section added="2007-06-06">
                 <title>Is there a list of known issues?</title>
                 <p>
-                    Yes. You find it on the ObjectWeb site as well, <a
+                    Yes. You find it on the OW2 site as well, <a
                     href="http://forge.objectweb.org/tracker/index.php?set=custom&amp;_assigned_to=0&amp;_status=1&amp;_category=100&amp;_group=100&amp;_sort_col=priority&amp;_sort_ord=DESC&amp;submit=Browse&amp;atid=350207&amp;group_id=168&amp;func=browse">here
                     ordered by descending priority</a>.
                 </p>
@@ -165,35 +165,6 @@
                     In general, we recommend you do not add bugs or RFEs in the tracker yourself, as we may miss them,
                     and you may introduce duplicates. Please discuss bugs or issues on the Orbeon Forms <a
                     href="http://www.orbeon.com/forms/mailing-list">mailing-list</a> first.
-                </p>
-            </section>
-            <a name="issue-fixing"/>
-            <section added="2007-06-22">
-                <title>When are you going to fix/implement feature foobar?</title>
-                <p>
-                    Usually a feature gets implemented in Orbeon Forms when:
-                </p>
-                <ul>
-                    <li>
-                        <p>It is very easy to implement, so we just implement it along the way to make everybody happy.</p>
-                    </li>
-                    <li>
-                        <p>We need it for a project we are currently working on.</p>
-                    </li>
-                    <li>
-                        <p>We have put it on our roadmap and scheduled it because we think it is a crucial feature for Orbeon Forms.</p>
-                    </li>
-                    <li>
-                        <p>Somebody sponsors it.</p>
-                    </li>
-                    <li>
-                        <p>Somebody sends a patch for it.</p>
-                    </li>
-                </ul>
-                <p>
-                    We need help on Orbeon Forms by the way, and we definitely appreciate outside contributions. So
-                    check out the <a href="#source-code">source code</a> and start hacking away. You can ask your
-                    questions on the <a href="http://www.orbeon.com/forms/mailing-list">mailing-list</a>.
                 </p>
             </section>
             <a name="oxf"/>
@@ -236,6 +207,216 @@
                     resource paths, and the name of the Orbeon Forms <a
                     href="http://www.orbeon.com/forms/mailing-list">mailing-list</a>.
                 </p>
+            </section>
+        </section>
+        <a name="support"/>
+        <section>
+            <title>Support FAQ</title>
+            <a name="getting-support"/>
+            <section>
+                <title>How can I get support for Orbeon Forms?</title>
+                <ul>
+                    <li>
+                        <p>
+                            You can get support from the Orbeon Forms community on the ops-users mailing list. The
+                            ops-users mailing list is the hub of the Orbeon Forms community, and this is the best place
+                            to ask questions, share you experience, or post issues and requests for enhancements. Also
+                            see:
+                        </p>
+                        <ul>
+                            <li><p><a href="#mailing-list">How can I subscribe to the Orbeon Forms mailing list?</a></p></li>
+                            <li><p><a href="#reporting-issues">How to report issue in the Orbeon Forms mailing list?</a></p></li>
+                            <li><p><a href="#mailing-list-archives">Where are the Orbeon Forms mailing list have archives?</a></p></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <p>
+                            Orbeon can provide professional support for your company. Orbeon has two types of plans: <a
+                            href="http://www.orbeon.com/support-services/product">Product Support plans</a> are the most
+                            appropriate when your application is in production, while <a
+                            href="http://www.orbeon.com/support-services/proactive">Proactive Support plans</a> also
+                            covers issues during development, feature enhancements, and training. For more information
+                            contact Orbeon at <a href="mailto:info@orbeon.com">info@orbeon.com</a>.
+                        </p>
+                    </li>
+                </ul>
+            </section>
+            <a name="mailing-list"/>
+            <section>
+                <title>How can I subscribe to the Orbeon Forms mailing list?</title>
+                <ol>
+                    <li>
+                        <p>
+                            To subscribe, send an email to: <a
+                            href="mailto:ops-users-subscribe@objectweb.org">ops-users-subscribe@objectweb.org</a>. You
+                            can leave the subject and body of your email empty.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            You will receive a message from sympa@objectweb.org, asking you to confirm that you want to
+                            subscribe to the list. Confirm by following the instructions in that message. If you don't
+                            receive this message in an hour or so, you might want to check if it went to your spam
+                            folder.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            You should then start receiving messages from the list in the next few hours. You might
+                            receive 10 to 30 messages a day, so you might want to setup your mail client to
+                            automatically move those messages in a particular folder, so they don't all show up in your
+                            inbox.
+                        </p>
+                    </li>
+                </ol>
+                <p>
+                    If you are having any problem subscribing to the list, please contact at <a
+                    href="mailto:info@orbeon.com">info@orbeon.com</a>.
+                </p>
+            </section>
+            <a name="issue-fixing"/>
+            <section added="2007-06-22">
+                <title>When are you going to fix/implement feature foobar?</title>
+                <p>
+                    Usually a feature gets implemented in Orbeon Forms when:
+                </p>
+                <ul>
+                    <li>
+                        <p>It is very easy to implement, so we just implement it along the way to make everybody happy.</p>
+                    </li>
+                    <li>
+                        <p>We need it for a project we are currently working on.</p>
+                    </li>
+                    <li>
+                        <p>We have put it on our roadmap and scheduled it because we think it is a crucial feature for Orbeon Forms.</p>
+                    </li>
+                    <li>
+                        <p>Somebody sponsors it.</p>
+                    </li>
+                    <li>
+                        <p>Somebody sends a patch for it.</p>
+                    </li>
+                </ul>
+                <p>
+                    We need help on Orbeon Forms by the way, and we definitely appreciate outside contributions. So
+                    check out the <a href="#source-code">source code</a> and start hacking away. You can ask your
+                    questions on the <a href="http://www.orbeon.com/forms/mailing-list">mailing-list</a>.
+                </p>
+            </section>
+            <a name="reporting-issues"/>
+            <section>
+                <title>How to report an issue in the Orbeon Forms mailing list?</title>
+                <p>
+                    The key to effectively reporting an issue is to post in the ops-users mailing list a message with:
+                </p>
+                <ul>
+                    <li><p>A reproducible test case, attached to your message</p></li>
+                    <li><p>How to run this test case</p></li>
+                    <li><p>What is the behavior you observe when you run the test case</p></li>
+                    <li><p>What is the behavior you expect</p></li>
+                </ul>
+                <p>
+                    But why a reproducible test case? The alternative is to describe the issue in plain English with
+                    maybe the help of code snippets. The problem with this approach is that it requires of people who
+                    will be helping you on the mailing list to understand the context of your problem, which might be
+                    trivial to you, but can be hard to grasp quickly for someone else.
+                </p>
+                <p>You can provide two types of test cases:</p>
+                <ul>
+                    <li>
+                        <p>
+                            <b>An XHTML+XForms file</b> that runs in the <a
+                            href="http://www.orbeon.com/ops/xforms-sandbox/">XForms sandbox</a> - This is by far the
+                            preferred way of submitting a test case. Most problems with XForms can be shown in one
+                            single XHTML+XForms file. If you need the XForms to call a service with an
+                            <code>&lt;xforms:submission></code>, you can simulate this by placing an XML file that
+                            contains the response from that service on a public web site, and changing the
+                            <code>&lt;xforms:submission></code> to point to that file. If you don't have a server of
+                            your own that you can use for this, a free hosting service like <a
+                            href="http://geocities.yahoo.com/">GeoCities</a> will work.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>An application</b> - An Orbeon Forms application is stored under
+                            <code>resources/apps</code>. Assuming you have your application under
+                            <code>resources/apps/foo</code>, it can be accessed by going to
+                            <code>http://localhost:8080/ops/foo/</code>. If you can't create a test case that runs in
+                            the XForms sandbox, create a simple standalone application under directory foo, zip the
+                            content of that directory, and attach it to your email in the mailing list as
+                            <code>foo.zip</code>.
+                        </p>
+                    </li>
+                </ul>
+                <p>In both cases:</p>
+                <ul>
+                    <li>
+                        <p>
+                            Make your test case as simple as possible. Remember that people who will be helping you on
+                            the list often don't have much time, and you are more likely to receive feedback that is
+                            useful if your test case only contains the minimum amount of code required to reproduce the
+                            issue.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Keep your post focused on a single issue. If there are more issues you would like to report,
+                            post them in separate threads, or post the first one and wait to get that one resolved
+                            before you post the next one in another thread.
+                        </p>
+                    </li>
+                </ul>
+            </section>
+            <a name="mailing-list-archives"/>
+            <section>
+                <title>Where are the Orbeon Forms mailing list have archives?</title>
+                <p>
+                    At least in two places:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            At <a href="http://www.ow2.org/wws/arc/ops-users">OW2</a>.
+                            This is the primary archive.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            At <a href="http://www.nabble.com/ObjectWeb-OPS-f2535.html">Nabble</a>. This is an external
+                            archive powered by excellent software.
+                        </p>
+                    </li>
+                </ul>
+            </section>
+            <a name="support-orbeon-forms"/>
+            <section>
+                <title>How can I support Orbeon Forms?</title>
+                <p>You can help by:</p>
+                <ul>
+                    <li>
+                        <p>
+                            Subscribing to the <a href="#mailing-list">ops-users mailing list</a>, and helping other
+                            people in community.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Contributing to the open source effort. If you have a feature in mind and think it would
+                            benefit Orbeon Forms, you can implement it and contribute it. The best place to get started
+                            is to discuss your idea on the ops-users mailing list.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Get a Support Plan with Orbeon. If Orbeon Forms is what it is today, it is in great part
+                            thanks to companies who have financially supported Orbeon, allowing Orbeon developers to be
+                            paid to work on Orbeon Forms and make it a better product. For more information, see <a
+                            href="http://www.orbeon.com/support-services/overview">Support and Service</a> or contact
+                            Orbeon at <a href="mailto:info@orbeon.com">info@orbeon.com</a>.
+                        </p>
+                    </li>
+                </ul>
+                <p>Your support is greatly appreciated!</p>
             </section>
         </section>
         <a name="xforms"/>
@@ -974,17 +1155,16 @@
                     of discussion for an XPL 1.0 specification.
                 </p>
                 <p>
-                    As of December 2005, XML Processing Model Working Group meetings have started at
-                    W3C. This working group, of which Orbeon is a member, is in charge of working
-                    on a standard XML processing language. While the deliverable of the working
-                    group will certainly not be exactly XPL, we do hope that in its first version it
-                    will cover a significant number of use cases currently covered by the XPL
+                    As of December 2005, XML Processing Model Working Group meetings have started at W3C. This working
+                    group, of which Orbeon is a member, is in charge of working on a standard XML processing language.
+                    While the deliverable of the working group will certainly not be exactly XPL, we do hope that in its
+                    first version it will cover a significant number of use cases currently covered by the XPL
                     implementation found in Orbeon Forms.
                 </p>
                 <p>
-                    As of September 2006, the XML Processing Model Working Group (of which Orbeon is a member) has
-                    released a <a href="http://www.w3.org/TR/2006/WD-xproc-20060928/">first public draft</a> of the
-                    XProc XML Pipeline Language.
+                    As of November 2007, the XML Processing Model Working Group has released several working drafts of
+                    the <a href="http://www.w3.org/TR/xproc/">XProc XML Pipeline Language</a>. A Last Call should be
+                    coming very soon.
                 </p>
             </section>
             <a name="xpl-impl"/>
@@ -1540,30 +1720,25 @@
                     Where can I find more information about XUpdate?
                 </title>
                 <p>
-                    Efforts around the XUpdate language appear to be stalled. XML databases now
-                    tend to bid on proprietary extensions to the standard XQuery language (e.g. see
-                    what Tamino does, and there are talks about implementing something similar in
-                    the open source eXist database). In the future, XQuery will support standard
-                    update features.
+                    Efforts around the XUpdate language appear to be stalled. XML databases now tend to bid on
+                    proprietary extensions to the standard XQuery language (e.g. see what Tamino does, and there are
+                    talks about implementing something similar in the open source eXist database). In the future, XQuery
+                    will support standard update features.
                 </p>
                 <p>
-                    We do recognize that XUpdate has definite advantages over XSLT in certain use
-                    cases (which is why we implemented it in the first place), but it seems that the
-                    market is currently not supporting what is considered "yet another XML
-                    transformation language".
+                    We do recognize that XUpdate has definite advantages over XSLT in certain use cases (which is why we
+                    implemented it in the first place), but it seems that the market is currently not supporting what
+                    is considered "yet another XML transformation language".
                 </p>
                 <p>
-                    For use as a general-purpose XML update language with Orbeon Presentation
-                    Server, we now recommend using XSLT. Use either XSLT 1.0 or XSLT 2.0 (12
-                    November 2003 Draft as implemented by Saxon) instead of using the XUpdate
-                    processor. The only place where XUpdate is not deprecated is within Page Flow,
-                    but only a subset of XUpdate is required and you can simply consider that it is
-                    part of the Page Flow syntax.
+                    For use as a general-purpose XML update language with Orbeon Presentation Server, we now recommend
+                    using XSLT. Use either XSLT 1.0 or XSLT 2.0 instead of using the XUpdate processor. The only place
+                    where XUpdate is not deprecated is within Page Flow, but only a subset of XUpdate is required and
+                    you can simply consider that it is part of the Page Flow syntax.
                 </p>
                 <p>
-                    This being said, our XUpdate implementation is functional and of course anybody
-                    is free to use it or contribute to it. Like the rest of Orbeon Forms, it
-                    is available under the LGPL license.
+                    This being said, our XUpdate implementation is functional and of course anybody is free to use it or
+                    contribute to it. Like the rest of Orbeon Forms, it is available under the LGPL license.
                 </p>
             </section>
             <a name="xupdate-debug"/>
@@ -1610,9 +1785,8 @@
                 </title>
                 <p>
                     This usually happens when you use XInclude. As per the <a
-                    href="http://www.w3.org/TR/2004/REC-xinclude-20041220/">XInclude
-                    specification</a>, such attributes are added upon inclusion. You can get rid of
-                    them by using XSLT:
+                    href="http://www.w3.org/TR/xinclude/">XInclude specification</a>, such attributes are added upon
+                    inclusion. You can get rid of them by using XSLT:
                 </p>
                 <xml-source>
                     <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
@@ -1620,6 +1794,17 @@
                         <xsl:template match="@xml:base"/>
                     </xsl:stylesheet>
                 </xml-source>
+                <p>
+                    When using the <a href="processors-xinclude">XInclude processor</a>, you can
+                    also use the <code>xxi:omit-xml-base</code> extension attribute:
+                </p>
+                <xml-source>
+                    <xi:include xmlns:xxi="http://orbeon.org/oxf/xml/xinclude" xmlns:xi="http://www.w3.org/2001/XInclude"
+                                href="included-file.xml" xxi:omit-xml-base="true"/>
+                </xml-source>
+                <p>
+                    This works also from XForms page views.
+                </p>
             </section>
             <a name="jboss-log4j"/>
             <section>
@@ -1676,311 +1861,130 @@
                 </p>
             </section>
         </section>
-        <a name="support"/>
-        <section>
-            <title>Support FAQ</title>
-            <a name="getting-support"/>
-            <section>
-                <title>How can I get support for Orbeon Forms?</title>
-                <ul>
-                    <li>
-                        <p>
-                            You can get support from the Orbeon Forms community on the ops-users mailing list. The
-                            ops-users mailing list is the hub of the Orbeon Forms community, and this is the best place
-                            to ask questions, share you experience, or post issues and requests for enhancements. Also
-                            see:
-                        </p>
-                        <ul>
-                            <li><p><a href="#mailing-list">How can I subscribe to the Orbeon Forms mailing list?</a></p></li>
-                            <li><p><a href="#reporting-issues">How to report issue in the Orbeon Forms mailing list?</a></p></li>
-                            <li><p><a href="#mailing-list-archives">Where are the Orbeon Forms mailing list have archives?</a></p></li>
-                        </ul>
-                    </li>
-                    <li>
-                        <p>
-                            Orbeon can provide professional support for your company. Orbeon has two types of plans: <a
-                            href="http://www.orbeon.com/support-services/product">Product Support plans</a> are the most
-                            appropriate when your application is in production, while <a
-                            href="http://www.orbeon.com/support-services/proactive">Proactive Support plans</a> also
-                            covers issues during development, feature enhancements, and training. For more information
-                            contact Orbeon at <a href="mailto:info@orbeon.com">info@orbeon.com</a>.
-                        </p>
-                    </li>
-                </ul>
-            </section>
-            <a name="mailing-list"/>
-            <section>
-                <title>How can I subscribe to the Orbeon Forms mailing list?</title>
-                <ol>
-                    <li>
-                        <p>
-                            To subscribe, send an email to: <a
-                            href="mailto:ops-users-subscribe@objectweb.org">ops-users-subscribe@objectweb.org</a>. You
-                            can leave the subject and body of your email empty.
-                        </p>
-                    </li>
-                    <li>
-                        <p>
-                            You will receive a message from sympa@objectweb.org, asking you to confirm that you want to
-                            subscribe to the list. Confirm by following the instructions in that message. If you don't
-                            receive this message in an hour or so, you might want to check if it went to your spam
-                            folder.
-                        </p>
-                    </li>
-                    <li>
-                        <p>
-                            You should then start receiving messages from the list in the next few hours. You might
-                            receive 10 to 30 messages a day, so you might want to setup your mail client to
-                            automatically move those messages in a particular folder, so they don't all show up in your
-                            inbox.
-                        </p>
-                    </li>
-                </ol>
-                <p>
-                    If you are having any problem subscribing to the list, please contact at <a
-                    href="mailto:info@orbeon.com">info@orbeon.com</a>.
-                </p>
-            </section>
-            <a name="reporting-issues"/>
-            <section>
-                <title>How to report an issue in the Orbeon Forms mailing list?</title>
-                <p>
-                    The key to effectively reporting an issue is to post in the ops-users mailing list a message with:
-                </p>
-                <ul>
-                    <li><p>A reproducible test case, attached to your message</p></li>
-                    <li><p>How to run this test case</p></li>
-                    <li><p>What is the behavior you observe when you run the test case</p></li>
-                    <li><p>What is the behavior you expect</p></li>
-                </ul>
-                <p>
-                    But why a reproducible test case? The alternative is to describe the issue in plain English with
-                    maybe the help of code snippets. The problem with this approach is that it requires of people who
-                    will be helping you on the mailing list to understand the context of your problem, which might be
-                    trivial to you, but can be hard to grasp quickly for someone else.
-                </p>
-                <p>You can provide two types of test cases:</p>
-                <ul>
-                    <li>
-                        <p>
-                            <b>An XHTML+XForms file</b> that runs in the <a
-                            href="http://www.orbeon.com/ops/xforms-sandbox/">XForms sandbox</a> - This is by far the
-                            preferred way of submitting a test case. Most problems with XForms can be shown in one
-                            single XHTML+XForms file. If you need the XForms to call a service with an
-                            <code>&lt;xforms:submission></code>, you can simulate this by placing an XML file that
-                            contains the response from that service on a public web site, and changing the
-                            <code>&lt;xforms:submission></code> to point to that file. If you don't have a server of
-                            your own that you can use for this, a free hosting service like <a
-                            href="http://geocities.yahoo.com/">GeoCities</a> will work.
-                        </p>
-                    </li>
-                    <li>
-                        <p>
-                            <b>An application</b> - An Orbeon Forms application is stored under
-                            <code>resources/apps</code>. Assuming you have your application under
-                            <code>resources/apps/foo</code>, it can be accessed by going to
-                            <code>http://localhost:8080/ops/foo/</code>. If you can't create a test case that runs in
-                            the XForms sandbox, create a simple standalone application under directory foo, zip the
-                            content of that directory, and attach it to your email in the mailing list as
-                            <code>foo.zip</code>.
-                        </p>
-                    </li>
-                </ul>
-                <p>In both cases:</p>
-                <ul>
-                    <li>
-                        <p>
-                            Make your test case as simple as possible. Remember that people who will be helping you on
-                            the list often don't have much time, and you are more likely to receive feedback that is
-                            useful if your test case only contains the minimum amount of code required to reproduce the
-                            issue.
-                        </p>
-                    </li>
-                    <li>
-                        <p>
-                            Keep your post focused on a single issue. If there are more issues you would like to report,
-                            post them in separate threads, or post the first one and wait to get that one resolved
-                            before you post the next one in another thread.
-                        </p>
-                    </li>
-                </ul>
-            </section>
-            <a name="mailing-list-archives"/>
-            <section>
-                <title>Where are the Orbeon Forms mailing list have archives?</title>
-                <p>
-                    At least in two places:
-                </p>
-                <ul>
-                    <li>
-                        <p>
-                            At <a href="http://www.ow2.org/wws/arc/ops-users">OW2</a>.
-                            This is the primary archive.
-                        </p>
-                    </li>
-                    <li>
-                        <p>
-                            At <a href="http://www.nabble.com/ObjectWeb-OPS-f2535.html">Nabble</a>. This is an external
-                            archive powered by excellent software.
-                        </p>
-                    </li>
-                </ul>
-            </section>
-            <a name="support-orbeon-forms"/>
-            <section>
-                <title>How can I support Orbeon Forms?</title>
-                <p>You can help by:</p>
-                <ul>
-                    <li>
-                        <p>
-                            Subscribing to the <a href="#mailing-list">ops-users mailing list</a>, and helping other
-                            people in community.
-                        </p>
-                    </li>
-                    <li>
-                        <p>
-                            Contributing to the open source effort. If you have a feature in mind and think it would
-                            benefit Orbeon Forms, you can implement it and contribute it. The best place to get started
-                            is to discuss your idea on the ops-users mailing list.
-                        </p>
-                    </li>
-                    <li>
-                        <p>
-                            Get a Support Plan with Orbeon. If Orbeon Forms is what it is today, it is in great part
-                            thanks to companies who have financially supported Orbeon, allowing Orbeon developers to be
-                            paid to work on Orbeon Forms and make it a better product. For more information, see <a
-                            href="http://www.orbeon.com/support-services/overview">Support and Service</a> or contact
-                            Orbeon at <a href="mailto:info@orbeon.com">info@orbeon.com</a>.
-                        </p>
-                    </li>
-                </ul>
-                <p>Your support is greatly appreciated!</p>
-            </section>
-        </section>
-        <section>
-            <title>Studio FAQ</title>
-            <a name="studio-xpl-trace"/>
-            <section>
-                <title>In Studio, why nothing shows up in the XPL Trace Views?</title>
-                <p>
-                    The XPL Trace facility provides information for a given page served by Orbeon Forms. For that page,
-                    it shows a tree of processor calls and indicates on that tree how much time has been spent on each
-                    node. This information collected by XPL Trace can be either sent to the standard output, or to
-                    Studio. When sent to Studio, it will be shown in the XPL Trace Table and XPL Trace Tree views. For
-                    this to work as expected:
-                </p>
-                <ul>
-                    <li>
-                        You need to setup the port Studio listens to, from Preferences / Orbeon. That port must match
-                        the one you have setup in Orbeon Forms <a href="reference-properties#trace">properties</a>.
-                    </li>
-                    <li>
-                        After changing the port number in Studio, you might have to restart
-                        Eclipse.
-                    </li>
-                    <li>
-                        For Studio to listen on the specified port, you need to have two views (XPL
-                        Trace Table and XPL Trace Tree) open. You might also need to at least make
-                        one of the views active before Studio starts listening on the specified
-                        port. On Windows, you can check if Studio is listening on the port you
-                        specified using <a
-                        href="http://www.sysinternals.com/Utilities/TcpView.html">TCPView</a>.
-                    </li>
-                </ul>
-            </section>
-            <a name="studio-vm-args"/>
-            <section>
-                <title>
-                    In Studio, how can I add my own VM arguments (e.g. heap size, debugging)
-                </title>
-                <ul>
-                    <li>For version 1.0.3 or higher :
-                        <ol>
-                            <li>Select the menu item
-                                <code>Run | Run...</code>
-                            </li>
-                            <li>
-                                Either create a new J2EE Container Container for Orbeon Forms launch configuration
-                                or select an existing one.
-                            </li>
-                            <li>Select the Argguments tab.</li>
-                            <li>In the VM arguments field add your VM arguments.</li>
-                            <li>Click the Apply button to save the change.</li>
-                        </ol>
-                    </li>
-                    <li>For versions lower than 1.0.3 :
-                        <ol>
-                            <li>Open the
-                                <i>Window | Preferences</i> dialog.
-                            </li>
-                            <li>Under
-                                <i>Java | Installed JRE</i>, select the "Standard VM".
-                            </li>
-                            <li>Click on the
-                                <i>Edit</i> button.
-                            </li>
-                            <li>Enter your own VM arguments in the
-                                <i>Default VM Arguments</i> text field.
-                            </li>
-                        </ol>
-                        <p>
-                            Note that this sets the VM arguments for all the applications you run
-                            from Eclipse. At this point there is no way to set VM arguments that
-                            are only used when starting the J2EE container.
-                        </p>
-                    </li>
-                </ul>
-            </section>
-            <a name="studio-empty-events"/>
-            <section>
-                <title>
-                    In Studio, why is the Logging Events view always empty?
-                </title>
-                <p>Check the following:</p>
-                <ol>
-                    <li>
-                        <p>
-                            Make you don't have any "Address already in use" error in the Console
-                            view when you start the application server. If you do, it means that you
-                            already have another application (other program, or other Orbeon Forms
-                            application maybe deployed in the same application server) using the
-                            same port. On Windows, you can use <a
-                            href="http://www.sysinternals.com/ntw2k/source/tcpview.shtml">TCPView</a>
-                            to determine what application is using the port you mention in the
-                            <code>log4j.xml</code>.
-                        </p>
-                    </li>
-                    <li>
-                        <p>
-                            Make sure you don't have any filter setup in Logging Events view by
-                            right-clicking on the "down arrow" icon and selecting "Filters".
-                        </p>
-                    </li>
-                    <li>
-                        <p>
-                            To populate the Logging Events view, Studio connects to log4j, and
-                            log4j listens on the port specified in the log4j.xml file.
-                        </p>
-                        <p>
-                            There is nothing in the Studio preferences to tell Studio to which port
-                            it should connect. Instead, Studio finds the port by looking at all the
-                            log4j.xml files you have in all the open projects. It will then try to
-                            connect to all the ports specified those files.
-                        </p>
-                        <p>
-                            If log4j was able to listen on the port specified in your log4j.xml (see
-                            point 1 above) and still no messages appear in the Logging Events view,
-                            that might be because Studio cannot find your log4j.xml. So make sure
-                            that this file is in an open project defined in the Studio. Also note
-                            that if you modify this file outside of Eclipse with an external
-                            program, Studio won't pick up that modification. In that case, in the
-                            Navigator view, right click on the project that contains your log4j.xml
-                            and choose Refresh. Right after this, events should start to appear in
-                            the Logging Event view as you load pages in the browser.
-                        </p>
-                    </li>
-                </ol>
-            </section>
-        </section>
+        <!--<section>-->
+            <!--<title>Studio FAQ</title>-->
+            <!--<a name="studio-xpl-trace"/>-->
+            <!--<section>-->
+                <!--<title>In Studio, why nothing shows up in the XPL Trace Views?</title>-->
+                <!--<p>-->
+                    <!--The XPL Trace facility provides information for a given page served by Orbeon Forms. For that page,-->
+                    <!--it shows a tree of processor calls and indicates on that tree how much time has been spent on each-->
+                    <!--node. This information collected by XPL Trace can be either sent to the standard output, or to-->
+                    <!--Studio. When sent to Studio, it will be shown in the XPL Trace Table and XPL Trace Tree views. For-->
+                    <!--this to work as expected:-->
+                <!--</p>-->
+                <!--<ul>-->
+                    <!--<li>-->
+                        <!--You need to setup the port Studio listens to, from Preferences / Orbeon. That port must match-->
+                        <!--the one you have setup in Orbeon Forms <a href="reference-properties#trace">properties</a>.-->
+                    <!--</li>-->
+                    <!--<li>-->
+                        <!--After changing the port number in Studio, you might have to restart-->
+                        <!--Eclipse.-->
+                    <!--</li>-->
+                    <!--<li>-->
+                        <!--For Studio to listen on the specified port, you need to have two views (XPL-->
+                        <!--Trace Table and XPL Trace Tree) open. You might also need to at least make-->
+                        <!--one of the views active before Studio starts listening on the specified-->
+                        <!--port. On Windows, you can check if Studio is listening on the port you-->
+                        <!--specified using <a-->
+                        <!--href="http://www.sysinternals.com/Utilities/TcpView.html">TCPView</a>.-->
+                    <!--</li>-->
+                <!--</ul>-->
+            <!--</section>-->
+            <!--<a name="studio-vm-args"/>-->
+            <!--<section>-->
+                <!--<title>-->
+                    <!--In Studio, how can I add my own VM arguments (e.g. heap size, debugging)-->
+                <!--</title>-->
+                <!--<ul>-->
+                    <!--<li>For version 1.0.3 or higher :-->
+                        <!--<ol>-->
+                            <!--<li>Select the menu item-->
+                                <!--<code>Run | Run...</code>-->
+                            <!--</li>-->
+                            <!--<li>-->
+                                <!--Either create a new J2EE Container Container for Orbeon Forms launch configuration-->
+                                <!--or select an existing one.-->
+                            <!--</li>-->
+                            <!--<li>Select the Argguments tab.</li>-->
+                            <!--<li>In the VM arguments field add your VM arguments.</li>-->
+                            <!--<li>Click the Apply button to save the change.</li>-->
+                        <!--</ol>-->
+                    <!--</li>-->
+                    <!--<li>For versions lower than 1.0.3 :-->
+                        <!--<ol>-->
+                            <!--<li>Open the-->
+                                <!--<i>Window | Preferences</i> dialog.-->
+                            <!--</li>-->
+                            <!--<li>Under-->
+                                <!--<i>Java | Installed JRE</i>, select the "Standard VM".-->
+                            <!--</li>-->
+                            <!--<li>Click on the-->
+                                <!--<i>Edit</i> button.-->
+                            <!--</li>-->
+                            <!--<li>Enter your own VM arguments in the-->
+                                <!--<i>Default VM Arguments</i> text field.-->
+                            <!--</li>-->
+                        <!--</ol>-->
+                        <!--<p>-->
+                            <!--Note that this sets the VM arguments for all the applications you run-->
+                            <!--from Eclipse. At this point there is no way to set VM arguments that-->
+                            <!--are only used when starting the J2EE container.-->
+                        <!--</p>-->
+                    <!--</li>-->
+                <!--</ul>-->
+            <!--</section>-->
+            <!--<a name="studio-empty-events"/>-->
+            <!--<section>-->
+                <!--<title>-->
+                    <!--In Studio, why is the Logging Events view always empty?-->
+                <!--</title>-->
+                <!--<p>Check the following:</p>-->
+                <!--<ol>-->
+                    <!--<li>-->
+                        <!--<p>-->
+                            <!--Make you don't have any "Address already in use" error in the Console-->
+                            <!--view when you start the application server. If you do, it means that you-->
+                            <!--already have another application (other program, or other Orbeon Forms-->
+                            <!--application maybe deployed in the same application server) using the-->
+                            <!--same port. On Windows, you can use <a-->
+                            <!--href="http://www.sysinternals.com/ntw2k/source/tcpview.shtml">TCPView</a>-->
+                            <!--to determine what application is using the port you mention in the-->
+                            <!--<code>log4j.xml</code>.-->
+                        <!--</p>-->
+                    <!--</li>-->
+                    <!--<li>-->
+                        <!--<p>-->
+                            <!--Make sure you don't have any filter setup in Logging Events view by-->
+                            <!--right-clicking on the "down arrow" icon and selecting "Filters".-->
+                        <!--</p>-->
+                    <!--</li>-->
+                    <!--<li>-->
+                        <!--<p>-->
+                            <!--To populate the Logging Events view, Studio connects to log4j, and-->
+                            <!--log4j listens on the port specified in the log4j.xml file.-->
+                        <!--</p>-->
+                        <!--<p>-->
+                            <!--There is nothing in the Studio preferences to tell Studio to which port-->
+                            <!--it should connect. Instead, Studio finds the port by looking at all the-->
+                            <!--log4j.xml files you have in all the open projects. It will then try to-->
+                            <!--connect to all the ports specified those files.-->
+                        <!--</p>-->
+                        <!--<p>-->
+                            <!--If log4j was able to listen on the port specified in your log4j.xml (see-->
+                            <!--point 1 above) and still no messages appear in the Logging Events view,-->
+                            <!--that might be because Studio cannot find your log4j.xml. So make sure-->
+                            <!--that this file is in an open project defined in the Studio. Also note-->
+                            <!--that if you modify this file outside of Eclipse with an external-->
+                            <!--program, Studio won't pick up that modification. In that case, in the-->
+                            <!--Navigator view, right click on the project that contains your log4j.xml-->
+                            <!--and choose Refresh. Right after this, events should start to appear in-->
+                            <!--the Logging Event view as you load pages in the browser.-->
+                        <!--</p>-->
+                    <!--</li>-->
+                <!--</ol>-->
+            <!--</section>-->
+        <!--</section>-->
     </body>
 </document>

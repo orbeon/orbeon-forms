@@ -1111,7 +1111,8 @@ ORBEON.xforms.Events = {
         if (target != null) {
 
             // Control tooltip
-            if (ORBEON.xforms.Globals.hintTooltipForControl[target.id] == null) {
+            if (ORBEON.xforms.Globals.hintTooltipForControl[target.id] == null
+                    && ! ORBEON.util.Dom.hasClass(document.body, "xforms-disable-hint-as-tooltip")) {
                 // We haven't initialized the YUI tooltip for this control yet, see there is a hint, and maybe initialize YUI tooltip
                 var message = ORBEON.xforms.Controls.getHintMessage(target);
                 if (message != "") {

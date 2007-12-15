@@ -39,7 +39,7 @@ import java.util.*;
 /**
  * Represents all this XForms containing document controls and the context in which they operate.
  *
- * TODO: It would be nice to separate the context stack code from here.
+ * TODO: Refactor the context stack code out of this class.
  */
 public class XFormsControls {
 

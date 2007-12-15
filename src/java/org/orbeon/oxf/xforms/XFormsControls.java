@@ -776,31 +776,38 @@ public class XFormsControls {
     }
 
     /**
-     * Return the context node-set based on the enclosing xforms:repeat, xforms:group or
-     * xforms:switch, either the closest one if no argument is passed, or context at the level of
-     * the element with the given id passed.
+     * Return the context node-set based on the enclosing xforms:repeat, xforms:group or xforms:switch, either the
+     * closest one if no argument is passed, or context at the level of the element with the given id passed.
      *
      * @param contextId  enclosing context id, or null
      * @return           the node-set
      */
     public List getContextForId(String contextId) {
-        for (int i = contextStack.size() - 1; i >= 0; i--) {
-            final BindingContext currentBindingContext = (BindingContext) contextStack.get(i);
 
-            final Element bindingElement = currentBindingContext.getControlElement();
-            final String idForContext = currentBindingContext.getIdForContext();
-            if (bindingElement != null && idForContext != null && groupingControls.get(bindingElement.getName()) != null) {
-                if (contextId == null || contextId.equals(idForContext)) {
-                    // Found matching binding context
-                    return currentBindingContext.getNodeset();
+
+        if (contextId == null) {
+            // Return the single-node binding of the parent
+            // TODO: If the element uses @context to override the context, that attribute won't be taken into account
+            final XFormsControls.BindingContext bindingContext = getCurrentBindingContext();
+            return new ArrayList(Collections.singleton(bindingContext.getParent().getSingleNode()));
+        } else {
+            for (int i = contextStack.size() - 1; i >= 0; i--) {
+                final BindingContext currentBindingContext = (BindingContext) contextStack.get(i);
+
+                final Element bindingElement = currentBindingContext.getControlElement();
+                final String idForContext = currentBindingContext.getIdForContext();
+                if (bindingElement != null && idForContext != null && groupingControls.get(bindingElement.getName()) != null) {
+                    if (contextId == null || contextId.equals(idForContext)) {
+                        // Found matching binding context
+                        return currentBindingContext.getNodeset();
+                    }
                 }
+                // TODO: What should the context of a repeat be? Currently, it returns a node-set, not the repeat
+                // iteration. This is probably not very reasonable, and also incompatible with the case where contextId
+                // == null.
             }
-        }
-        // It is required that there is a matching enclosing id?
-        if (contextId == null)
-            throw new ValidationException("No enclosing container XForms control found.", getCurrentBindingContext().getLocationData());
-        else
             throw new ValidationException("No enclosing container XForms control found for id: " + contextId, getCurrentBindingContext().getLocationData());
+        }
     }
 
     /**

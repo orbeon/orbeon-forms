@@ -744,7 +744,7 @@ ORBEON.xforms.Controls = {
         } else {
             // Label for hint either has class="xforms-hint"
             var hintElement = ORBEON.xforms.Controls._getControlLabel(control, "xforms-hint");
-            return hintElement == null ? "" : ORBEON.util.Dom.getStringValue(hintElement);
+            return hintElement == null ? "" : hintElement.innerHTML;
         }
     },
 

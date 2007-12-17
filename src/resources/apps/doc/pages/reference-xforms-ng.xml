@@ -1901,15 +1901,15 @@
                     Two properties control some aspects of XForms submission in Orbeon Forms:
                 </p>
                 <xml-source>
-                    <property as="xs:boolean" name="oxf.xforms.optimize-post-all" value="true"/>
+                    <property as="xs:boolean" name="optimize-get-all" value="true"/>
                 </xml-source>
                 <p>
                     If set to <code>true</code> (the default), Orbeon Forms optimizes submissions with
-                    <code>replace="all"</code> by sending the response of the submission directly to the web browser.
-                    This however means that submission errors cannot be caught by XForms event handlers after Orbeon
-                    Forms has started connecting to the submission URL, as should be the case following XForms 1.0. If
-                    set to <code>false</code>, Orbeon Forms buffers the reply so that errors can be handled as per
-                    XForms 1.0. However, this solution is less efficient.
+                    <code>replace="all"</code> and the <code>get</code> method by sending URL of the submission action
+                    directly to the web browser. This however means that submission errors cannot be caught by XForms
+                    event handlers after Orbeon Forms has started connecting to the submission URL, as should be the
+                    case following the XForms specification. If set to <code>false</code>, Orbeon Forms buffers the
+                    reply so that errors can be handled as per XForms 1.0. However, this solution is less efficient.
                 </p>
                 <xml-source>
                     <property as="xs:boolean" name="oxf.xforms.optimize-local-submission" value="true"/>

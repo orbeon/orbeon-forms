@@ -22,7 +22,6 @@ public class XFormsProperties {
 
     private static final String CACHE_DOCUMENT_PROPERTY = "oxf.xforms.cache.document";
 
-    private static final String OPTIMIZE_POST_ALL_PROPERTY = "oxf.xforms.optimize-post-all";
     private static final String OPTIMIZE_GET_ALL_PROPERTY = "oxf.xforms.optimize-get-all";
     private static final String OPTIMIZE_LOCAL_SUBMISSION_PROPERTY = "oxf.xforms.optimize-local-submission";
 

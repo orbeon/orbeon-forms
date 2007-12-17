@@ -31,7 +31,8 @@ public class OPSXFormsFilter implements Filter {
 
     public static final String OPS_XFORMS_RENDERER_DOCUMENT_ATTRIBUTE_NAME = "oxf.xforms.renderer.document";
     public static final String OPS_XFORMS_RENDERER_BASE_URI_ATTRIBUTE_NAME = "oxf.xforms.renderer.base-uri";
-    public static final String OPS_XFORM_RENDRER_CONTENT_TYPE_ATTRIBUTE_NAME = "oxf.xforms.renderer.content-type";
+    public static final String OPS_XFORMS_RENDERER_CONTENT_TYPE_ATTRIBUTE_NAME = "oxf.xforms.renderer.content-type";
+    public static final String OPS_XFORMS_RENDERER_HAS_SESSION_ATTRIBUTE_NAME = "oxf.xforms.renderer.has-session";
 
     public static final String OPS_SERVLET_CONTEXT_ATTRIBUTE_NAME = "oxf.servlet.context";
     public static final String OPS_RENDERER_PATH = "/xforms-renderer";
@@ -77,9 +78,12 @@ public class OPSXFormsFilter implements Filter {
             if (opsContextPath != null)
                 httpRequest.setAttribute(OPS_SERVLET_CONTEXT_ATTRIBUTE_NAME, httpRequest.getContextPath() + opsContextPath);
 
+            // Tell whether there is a session
+            httpRequest.setAttribute(OPS_XFORMS_RENDERER_HAS_SESSION_ATTRIBUTE_NAME, new Boolean(httpRequest.getSession(false) != null).toString());
+
             // Provide media type if available
             if (responseWrapper.getMediaType() != null)
-                httpRequest.setAttribute(OPS_XFORM_RENDRER_CONTENT_TYPE_ATTRIBUTE_NAME, responseWrapper.getMediaType());
+                httpRequest.setAttribute(OPS_XFORMS_RENDERER_CONTENT_TYPE_ATTRIBUTE_NAME, responseWrapper.getMediaType());
 
             // Set base URI
             final String absoluteBaseURI = httpRequest.getRequestURL().toString();

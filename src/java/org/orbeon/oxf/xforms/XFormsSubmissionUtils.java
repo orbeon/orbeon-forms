@@ -260,14 +260,21 @@ public class XFormsSubmissionUtils {
                     // TODO: The Servlet spec mandates JSESSIONID as cookie name; we should only forward this cookie
                     // TODO: We should also forward selected cookies such as JSESSIONIDSSO (Tomcat) and possibly more
                     if (username == null) {
-                        final String[] cookies = (String[]) externalContext.getRequest().getHeaderValuesMap().get("cookie");
-                        if (cookies != null) {
-                            for (int i = 0; i < cookies.length; i++) {
-                                final String cookie = cookies[i];
-                                XFormsServer.logger.debug("XForms - forwarding cookie: " + cookie);
-                                urlConnection.setRequestProperty("Cookie", cookie);
-                            }
+
+                        final ExternalContext.Session session = externalContext.getSession(false);
+                        if (session != null) {
+                            XFormsServer.logger.debug("XForms - setting JSESSIONID cookie: " + session.getId());
+                            urlConnection.setRequestProperty("Cookie", "JSESSIONID=" + session.getId());
                         }
+
+//                        final String[] cookies = (String[]) externalContext.getRequest().getHeaderValuesMap().get("cookie");
+//                        if (cookies != null) {
+//                            for (int i = 0; i < cookies.length; i++) {
+//                                final String cookie = cookies[i];
+//                                XFormsServer.logger.debug("XForms - forwarding cookie: " + cookie);
+//                                urlConnection.setRequestProperty("Cookie", cookie);
+//                            }
+//                        }
                     }
 
                     // Forward authorization header

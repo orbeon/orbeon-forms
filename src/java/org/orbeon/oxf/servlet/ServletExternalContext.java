@@ -834,7 +834,13 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
 
     public ExternalContext.Session getSession(boolean create) {
         if (session == null) {
-            HttpSession nativeSession = nativeRequest.getSession(create);
+            // Force creation if whoever forwarded to us did have a session
+            // This is to work around a Tomcat issue whereby a session is newly created in the original servlet, but
+            // somehow we can't know about it when the request is forwarded to us.
+            if (!create && "true".equals(getRequest().getAttributesMap().get(OPSXFormsFilter.OPS_XFORMS_RENDERER_HAS_SESSION_ATTRIBUTE_NAME)))
+                create = true;
+
+            final HttpSession nativeSession = nativeRequest.getSession(create);
             if (nativeSession != null)
                 session = new Session(nativeSession);
         }

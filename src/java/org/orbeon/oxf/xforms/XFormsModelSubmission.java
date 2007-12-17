@@ -783,6 +783,11 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                             if (replaceInstance == null) {
                                                 // Replacement instance was specified but not found
                                                 // TODO: XForms 1.1 won't dispatch xforms-binding-exception here
+                                                // Not sure what's the right thing to do with 1.1, but this could be
+                                                // done as part of the model's static analysis if the instance value is
+                                                // not obtained through AVT, and dynmically otherwise. However, in the
+                                                // dynamic case, I think that this should be a (currently non-specified
+                                                // by XForms) xforms-binding-error.
                                                 containingDocument.dispatchEvent(pipelineContext, new XFormsBindingExceptionEvent(XFormsModelSubmission.this));
                                             } else {
 

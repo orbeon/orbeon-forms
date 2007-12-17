@@ -108,11 +108,6 @@ public class XFormsProperties {
                 (CACHE_DOCUMENT_PROPERTY, false).booleanValue();
     }
 
-    public static boolean isOptimizePostAllSubmission() {
-        return OXFProperties.instance().getPropertySet().getBoolean
-                (OPTIMIZE_POST_ALL_PROPERTY, true).booleanValue();// default to true for backward compatibility
-    }
-
     public static boolean isOptimizeGetAllSubmission() {
         return OXFProperties.instance().getPropertySet().getBoolean
                 (OPTIMIZE_GET_ALL_PROPERTY, true).booleanValue();

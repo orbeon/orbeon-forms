@@ -876,7 +876,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                     }
                 }
             } catch (Throwable e) {
-                if (isDeferredSubmissionSecondPassReplaceAll && XFormsProperties.isOptimizePostAllSubmission()) {
+                if (isDeferredSubmissionSecondPassReplaceAll && XFormsProperties.isOptimizeLocalSubmission()) {
                     // It doesn't serve any purpose here to dispatch an event, so we just propagate the exception
                     throw new XFormsSubmissionException(e, "Error while processing xforms:submission", "processing submission");
                 } else {

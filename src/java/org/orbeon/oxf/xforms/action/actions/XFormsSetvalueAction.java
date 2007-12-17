@@ -78,6 +78,11 @@ public class XFormsSetvalueAction extends XFormsAction {
         // Set value on current node
         final NodeInfo currentNode = xformsControls.getCurrentSingleNode();
         if (currentNode != null) {
+            // TODO: XForms 1.1: "Element nodes: If element child nodes are present, then an xforms-binding-exception
+            // occurs. Otherwise, regardless of how many child nodes the element has, the result is that the string
+            // becomes the new content of the element. In accord with the data model of [XPath 1.0], the element will
+            // have either a single non-empty text node child, or no children string was empty.
+
             // Node exists, we can try to set the value
             doSetValue(pipelineContext, containingDocument, currentNode, valueToSet, null, false);
         } else {

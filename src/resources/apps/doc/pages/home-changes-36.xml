@@ -36,17 +36,85 @@
                 handling, XML Schema validation, error handling, deployment within Java applications, and performance.
             </p>
             <p>
-                This document describes changes made between Orbeon Forms 3.5.1 and Orbeon Forms 3.6.
+                This document describes changes made between Orbeon Forms 3.5.1 and Orbeon Forms 3.6.1.
             </p>
-            <!--<p>-->
-                <!--<b style="color: red">NOTE: Orbeon Forms 3.6 is still UNDER DEVELOPMENT as of November 2007, but-->
-                <!--we're getting there!</b>-->
-            <!--</p>-->
+            <p>
+                <b style="color: red">NOTE: Orbeon Forms 3.6.1 is still UNDER DEVELOPMENT as of December 2007. The
+                latest stable release of Orbeon Forms is 3.6.</b>
+            </p>
         </section>
-        <!--<a name="changes-361"/>-->
-        <!--<section>-->
-            <!--<title>Changes in Version 3.6.1</title>-->
-        <!--</section>-->
+        <a name="changes-361"/>
+        <section>
+            <title>Changes in Version 3.6.1</title>
+            <a name="changes-361-full"/>
+            <p>
+                Orbeon Forms 3.6.1 is an update to Orbeon Forms 3.6.
+            </p>
+            <section>
+                <title>Complete List of Issues Addressed in this Release</title>
+                <p>
+                    Orbeon Forms 3.6.1 addresses the following bugs and features:
+                </p>
+                <!--
+Request to extract bugs from SourceForge with http://www.orbeon.com/ops/xquery-the-web/ :
+
+http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=2&_category=100&_group=100&_sort_col=close_date&_sort_ord=DESC&submit=Browse&atid=350207&group_id=168&func=browse
+
+<ul>
+    {
+        for $table in //table[tr/td/span/strong[. = 'ID']]
+            let $latest-id := '307983'
+            let $latest-position := count(($table//tr)[td[normalize-space(.) = $latest-id]]/preceding-sibling::tr) + 1
+            return
+                for $row in ($table//tr)[position() ge 2 and position() lt $latest-position and normalize-space(td[7]) = 'Fixed'] return
+                <li>
+                    <a href="http://forge.objectweb.org/{$row/td[2]/a/@href}">#{string($row/td[1])}: {string($row/td[2]/a)}</a>
+                </li>
+    }
+</ul>
+-->
+                <ul>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308078&amp;group_id=168&amp;atid=350207">
+                            #308078: Getting "Unable to retrieve XForms engine state" error when combining submission
+                            and xxforms:script
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308023&amp;group_id=168&amp;atid=350207">
+                            #308023: HTTP session is not available when submitting upon xforms-ready in separate
+                            deployment mode
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308051&amp;group_id=168&amp;atid=350207">
+                            #308051: Provide a way to disable hint shown as a tooltip
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308050&amp;group_id=168&amp;atid=350207">
+                            #308050: Support XForms 1.1 serialization="none" instead of serialize="false" on
+                            xforms:submission
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308049&amp;group_id=168&amp;atid=350207">
+                            #308049: Support models without instances
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308040&amp;group_id=168&amp;atid=350207">
+                            #308040: Allow displaying inline HTML hints with CSS
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307776&amp;group_id=168&amp;atid=350207">
+                            #307776: RFE: When session expires on Ajax requests, display different error dialog title
+                        </a>
+                    </li>
+                </ul>
+            </section>
+        </section>
         <a name="changes-36"/>
         <section>
             <title>Changes in Version 3.6</title>
@@ -398,25 +466,6 @@
                 <p>
                     Orbeon Forms 3.6 addresses over 170 bugs and features:
                 </p>
-                <!--
-Request to extract bugs from SourceForge with http://www.orbeon.com/ops/xquery-the-web/ :
-
-http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=2&_category=100&_group=100&_sort_col=close_date&_sort_ord=DESC&submit=Browse&atid=350207&group_id=168&func=browse
-
-<ul>
-    {
-        for $table in //table[tr/td/span/strong[. = 'ID']]
-            let $latest-id := '307913'
-            let $latest-position := count(($table//tr)[td[normalize-space(.) = $latest-id]]/preceding-sibling::tr) + 1
-            return
-                for $row in ($table//tr)[position() ge 2 and position() lt $latest-position and normalize-space(td[7]) = 'Fixed'] return
-                <li>
-                    <a href="http://forge.objectweb.org/{$row/td[2]/a/@href}">#{string($row/td[1])}: {string($row/td[2]/a)}</a>
-                </li>
-    }
-</ul>
-
-                -->
                 <ul>
                     <li>
                         <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307983&amp;group_id=168&amp;atid=350207">#307983:

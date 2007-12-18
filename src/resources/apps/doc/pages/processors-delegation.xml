@@ -106,6 +106,7 @@
                 </tr>
             </table>
         </section>
+        <a name="java-bean"/>
         <section>
         	<title>Calling a JavaBean</title>
             <p>
@@ -165,6 +166,7 @@
     			</li>
             </ul>
         </section>
+        <a name="ejb"/>
         <section>
         	<title>Calling an EJB</title>
             <p>
@@ -221,6 +223,7 @@
     			</li>
             </ul>
         </section>
+        <a name="web-service"/>
         <section>
         	<title>Calling a Web Service</title>
         	<section>

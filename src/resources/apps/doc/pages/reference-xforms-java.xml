@@ -288,7 +288,7 @@
                 </li>
                 <li>
                     <p>
-                        Copy <code>WEB-INF/lib/ops-xforms-filter.jar</code> from the Orbeon Forms WAR into your
+                        Copy <code>WEB-INF/lib/orbeon-xforms-filter.jar</code> from the Orbeon Forms WAR into your
                         application's <code>WEB-INF/lib/</code> directory.
                     </p>
                 </li>

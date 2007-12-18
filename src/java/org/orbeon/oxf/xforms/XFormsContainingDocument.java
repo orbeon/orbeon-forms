@@ -423,6 +423,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     private void clearClientState() {
         this.activeSubmission = null;
         this.gotSubmission = false;
+
         this.messagesToRun = null;
         this.loadsToRun = null;
         this.scriptsToRun = null;
@@ -437,6 +438,19 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     public void setClientActiveSubmission(XFormsModelSubmission activeSubmission) {
         if (this.activeSubmission != null)
             throw new ValidationException("There is already an active submission.", activeSubmission.getLocationData());
+
+        if (loadsToRun != null)
+            throw new ValidationException("Unable to run a two-pass submission and xforms:load within a same action sequence.", activeSubmission.getLocationData());
+
+        if (messagesToRun != null)
+            throw new ValidationException("Unable to run a two-pass submission and xforms:message within a same action sequence.", activeSubmission.getLocationData());
+
+        if (scriptsToRun != null)
+            throw new ValidationException("Unable to run a two-pass submission and xxforms:script within a same action sequence.", activeSubmission.getLocationData());
+
+        if (focusEffectiveControlId != null)
+            throw new ValidationException("Unable to run a two-pass submission and xforms:setfocus within a same action sequence.", activeSubmission.getLocationData());
+
         this.activeSubmission = activeSubmission;
     }
 
@@ -452,6 +466,10 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
      * Add an XForms message to send to the client.
      */
     public void addMessageToRun(String message, String level) {
+
+        if (activeSubmission != null)
+            throw new ValidationException("Unable to run a two-pass submission and xforms:message within a same action sequence.", activeSubmission.getLocationData());
+
         if (messagesToRun == null)
             messagesToRun = new ArrayList();
         messagesToRun.add(new Message(message, level));
@@ -483,6 +501,10 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     }
 
     public void addScriptToRun(String scriptId, String eventTargetId, String eventHandlerContainerId) {
+
+        if (activeSubmission != null)
+            throw new ValidationException("Unable to run a two-pass submission and xxforms:script within a same action sequence.", activeSubmission.getLocationData());
+
         if (scriptsToRun == null)
             scriptsToRun = new ArrayList();
         scriptsToRun.add(new Script(XFormsUtils.scriptIdToScriptName(scriptId), eventTargetId, eventHandlerContainerId));
@@ -520,6 +542,10 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
      * Add an XForms load to send to the client.
      */
     public void addLoadToRun(String resource, String target, String urlType, boolean isReplace, boolean isPortletLoad, boolean isShowProgress) {
+
+        if (activeSubmission != null)
+            throw new ValidationException("Unable to run a two-pass submission and xforms:load within a same action sequence.", activeSubmission.getLocationData());
+
         if (loadsToRun == null)
             loadsToRun = new ArrayList();
         loadsToRun.add(new Load(resource, target, urlType, isReplace, isPortletLoad, isShowProgress));
@@ -582,6 +608,10 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
      * @param effectiveControlId
      */
     public void setClientFocusEffectiveControlId(String effectiveControlId) {
+
+        if (activeSubmission != null)
+            throw new ValidationException("Unable to run a two-pass submission and xforms:setfocus within a same action sequence.", activeSubmission.getLocationData());
+
         this.focusEffectiveControlId = effectiveControlId;
     }
 

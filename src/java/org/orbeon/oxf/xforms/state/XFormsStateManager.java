@@ -203,20 +203,20 @@ public class XFormsStateManager {
                     final ExternalContext.Session currentSession =  externalContext.getSession(false);
                     if (currentSession == null || currentSession.isNew()) {
                         // This means that no session is currently existing, or a session exists but it is newly created
-                        final String message = "Your session has expired. " + PLEASE_RELOAD_PAGE_MESSAGE + " " + UUIDS_MESSAGE;
-                        logger.debug(message);
-                        throw new OXFException(message);
+                        final String message = "Your session has expired. " + PLEASE_RELOAD_PAGE_MESSAGE;
+                        logger.error(message);
+                        throw new OXFException(message + " " + UUIDS_MESSAGE);
                     } else {
                         // There is a session and it is still known by the client
-                        final String message = UNABLE_TO_RETRIEVE_XFORMS_STATE_MESSAGE + " " + PLEASE_RELOAD_PAGE_MESSAGE + " " + UUIDS_MESSAGE;
-                        logger.debug(message);
-                        throw new OXFException(message);
+                        final String message = UNABLE_TO_RETRIEVE_XFORMS_STATE_MESSAGE + " " + PLEASE_RELOAD_PAGE_MESSAGE;
+                        logger.error(message);
+                        throw new OXFException(message + " " + UUIDS_MESSAGE);
                     }
 
                 } else {
-                    final String message = UNABLE_TO_RETRIEVE_XFORMS_STATE_MESSAGE + " " + PLEASE_RELOAD_PAGE_MESSAGE + " " + UUIDS_MESSAGE;
-                    logger.debug(message);
-                    throw new OXFException(message);
+                    final String message = UNABLE_TO_RETRIEVE_XFORMS_STATE_MESSAGE + " " + PLEASE_RELOAD_PAGE_MESSAGE;
+                    logger.error(message);
+                    throw new OXFException(message + " " + UUIDS_MESSAGE);
                 }
             }
 

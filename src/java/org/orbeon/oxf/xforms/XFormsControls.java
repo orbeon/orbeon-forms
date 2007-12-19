@@ -118,8 +118,8 @@ public class XFormsControls {
         optionalSingleNodeControls.put("hint", "");    // can have linking or inline text
         optionalSingleNodeControls.put("alert", "");   // can have linking or inline text
         optionalSingleNodeControls.put("copy", "");
-        optionalSingleNodeControls.put("load", "");     // can have linking
-        optionalSingleNodeControls.put("message", "");  // can have linking or inline text
+        optionalSingleNodeControls.put("load", "");    // can have linking
+        optionalSingleNodeControls.put("message", ""); // can have linking or inline text
         optionalSingleNodeControls.put("group", "");
         optionalSingleNodeControls.put("switch", "");
 

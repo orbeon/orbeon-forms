@@ -13,11 +13,14 @@
  */
 package org.orbeon.oxf.cache;
 
-import org.apache.commons.collections.TransformIterator;
-import org.apache.commons.collections.Transformer;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.apache.commons.collections.iterators.TransformIterator;
+import org.apache.commons.collections.Transformer;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Very simple cache implementation.

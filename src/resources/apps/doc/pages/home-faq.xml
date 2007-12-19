@@ -55,6 +55,7 @@
                     high-performance XML pipeline engine for processing XML data.
                 </p>
             </section>
+            <a name="is-xforms"/>
             <section added="2006-02-04">
                 <title>Is Orbeon Forms an XForms Engine?</title>
                 <p>
@@ -69,6 +70,7 @@
                     of Orbeon Forms to build your forms-based application.
                 </p>
             </section>
+            <a name="costs"/>
             <section added="2007-12-05">
                 <title>Is there any cost associated with using Orbeon Forms?</title>
                 <p>

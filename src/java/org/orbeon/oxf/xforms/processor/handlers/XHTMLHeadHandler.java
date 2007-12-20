@@ -17,6 +17,7 @@ import org.orbeon.oxf.xforms.XFormsControls;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsProperties;
+import org.orbeon.oxf.xforms.state.XFormsStateManager;
 import org.orbeon.oxf.xforms.processor.XFormsFeatures;
 import org.orbeon.oxf.xforms.processor.XFormsResourceServer;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
@@ -174,10 +175,25 @@ public class XHTMLHeadHandler extends HandlerBase {
             // Configuration properties
             {
                 final Map nonDefaultProperties = containingDocument.getStaticState().getNonDefaultProperties();
-                if (nonDefaultProperties.size() > 0) {
 
-                    FastStringBuffer sb = null;
-                    boolean found = false;
+                // Handle heartbeat delay specially
+                final long heartbeatDelay = XFormsStateManager.getHeartbeatDelay(containingDocument, externalContext);
+
+                FastStringBuffer sb = null;
+                if (heartbeatDelay != -1) {
+                    // First property found
+                    helper.startElement(prefix, XMLConstants.XHTML_NAMESPACE_URI, "script", new String[] {
+                        "type", "text/javascript"});
+                    sb = new FastStringBuffer("var opsXFormsProperties = {");
+
+                    sb.append('\"');
+                    sb.append(XFormsProperties.SESSION_HEARTBEAT_DELAY_PROPERTY);
+                    sb.append("\",\"");
+                    sb.append(Long.toString(heartbeatDelay));
+                    sb.append('\"');
+                }
+
+                if (heartbeatDelay != -1 || nonDefaultProperties.size() > 0) {
 
                     for (Iterator i = nonDefaultProperties.entrySet().iterator(); i.hasNext();) {
                         final Map.Entry currentEntry = (Map.Entry) i.next();
@@ -187,7 +203,7 @@ public class XHTMLHeadHandler extends HandlerBase {
                         final XFormsProperties.PropertyDefinition propertyDefinition = (XFormsProperties.PropertyDefinition) XFormsProperties.SUPPORTED_DOCUMENT_PROPERTIES.get(propertyName);
                         if (propertyDefinition.isPropagateToClient()) {
 
-                            if (!found) {
+                            if (sb == null) {
                                 // First property found
                                 helper.startElement(prefix, XMLConstants.XHTML_NAMESPACE_URI, "script", new String[] {
                                     "type", "text/javascript"});
@@ -202,12 +218,10 @@ public class XHTMLHeadHandler extends HandlerBase {
                             sb.append("\",\"");
                             sb.append(propertyValue);
                             sb.append('\"');
-
-                            found = true;
                         }
                     }
 
-                    if (found) {
+                    if (sb != null) {
                         // Close everything
                         sb.append("};");
                         helper.text(sb.toString());

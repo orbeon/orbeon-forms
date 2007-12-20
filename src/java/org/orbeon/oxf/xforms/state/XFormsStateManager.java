@@ -121,15 +121,11 @@ public class XFormsStateManager {
 
                     final XFormsStateStore stateStore = XFormsPersistentApplicationStateStore.instance(externalContext);
                     if (dynamicStateUUID == null) {
-                        // In this case, we use session scope since not much sharing will occur, if at all.
-
                         // Produce dynamic state key
                         final String newRequestId = UUIDUtils.createPseudoUUID();
                         stateStore.add(currentPageGenerationId, null, newRequestId, xformsState, sessionId, false);
                         dynamicStateString = PERSISTENT_STATE_PREFIX + newRequestId;
                     } else {
-                        // In this case, we first store in the application scope, so that multiple requests can use the
-                        // same cached state.
                         dynamicStateString = PERSISTENT_STATE_PREFIX + dynamicStateUUID;
                         stateStore.add(currentPageGenerationId, null, dynamicStateUUID, xformsState, sessionId, false);
                     }
@@ -141,6 +137,28 @@ public class XFormsStateManager {
         }
 
         return new XFormsState(staticStateString, dynamicStateString);
+    }
+
+    /**
+     * Return the delay for the session heartbeat event.
+     *
+     * @param containingDocument    containing document
+     * @param externalContext       external context (for access to session and application scopes)
+     * @return                      delay in ms, or -1 is not applicable
+     */
+    public static long getHeartbeatDelay(XFormsContainingDocument containingDocument, ExternalContext externalContext) {
+        if (XFormsProperties.isClientStateHandling(containingDocument)) {
+            return -1;
+        } else {
+            final long heartbeatDelay;
+            final boolean isSessionHeartbeat = XFormsProperties.isSessionHeartbeat(containingDocument);
+            final ExternalContext.Session session = externalContext.getSession(FORCE_SESSION_CREATION);
+            if (isSessionHeartbeat && session != null)
+                heartbeatDelay = session.getMaxInactiveInterval() * 800; // 80% of session expiration time, in ms
+            else
+                heartbeatDelay = -1;
+            return heartbeatDelay;
+        }
     }
 
     /**

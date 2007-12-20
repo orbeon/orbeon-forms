@@ -174,7 +174,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         XFormsServer.logger.debug("XForms - creating new ContainingDocument (static state object not provided).");
 
         // Create static state object
-        // TODO: Handle caching of XFormsEngineStaticState object
+        // TODO: Handle caching of XFormsStaticState object
         xformsStaticState = new XFormsStaticState(pipelineContext, xformsState.getStaticState());
 
         // Restore the containing document's dynamic state

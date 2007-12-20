@@ -58,13 +58,14 @@ public class XFormsProperties {
     private static final String DOUBLE_FORMAT_PROPERTY = "format.double";
 
     private static final String SESSION_HEARTBEAT_PROPERTY = "session-heartbeat";
-    private static final String DELAY_BEFORE_INCREMENTAL_REQUEST_IN_MS_PROPERTY = "delay-before-incremental-request";
-    private static final String DELAY_BEFORE_FORCE_INCREMENTAL_REQUEST_IN_MS_PROPERTY = "delay-before-force-incremental-request";
-    private static final String DELAY_BEFORE_GECKO_COMMUNICATION_ERROR_IN_MS_PROPERTY = "delay-before-gecko-communication-error";
-    private static final String DELAY_BEFORE_CLOSE_MINIMAL_DIALOG_IN_MS_PROPERTY = "delay-before-close-minimal-dialog";
-    private static final String DELAY_BEFORE_AJAX_TIMEOUT_IN_MS_PROPERTY = "delay-before-ajax-timeout";
-    private static final String INTERNAL_SHORT_DELAY_IN_MS_PROPERTY = "internal-short-delay";
-    private static final String DELAY_BEFORE_DISPLAY_LOADING_IN_MS_PROPERTY = "delay-before-display-loading";
+    public static final String SESSION_HEARTBEAT_DELAY_PROPERTY = "session-heartbeat-delay";
+    private static final String DELAY_BEFORE_INCREMENTAL_REQUEST_PROPERTY = "delay-before-incremental-request";
+    private static final String DELAY_BEFORE_FORCE_INCREMENTAL_REQUEST_PROPERTY = "delay-before-force-incremental-request";
+    private static final String DELAY_BEFORE_GECKO_COMMUNICATION_ERROR_PROPERTY = "delay-before-gecko-communication-error";
+    private static final String DELAY_BEFORE_CLOSE_MINIMAL_DIALOG_PROPERTY = "delay-before-close-minimal-dialog";
+    private static final String DELAY_BEFORE_AJAX_TIMEOUT_PROPERTY = "delay-before-ajax-timeout";
+    private static final String INTERNAL_SHORT_DELAY_PROPERTY = "internal-short-delay";
+    private static final String DELAY_BEFORE_DISPLAY_LOADING_PROPERTY = "delay-before-display-loading";
     private static final String REQUEST_RETRIES_PROPERTY = "request-retries";
     private static final String DEBUG_WINDOW_HEIGHT_PROPERTY = "debug-window-height";
     private static final String DEBUG_WINDOW_WIDTH_PROPERTY = "debug-window-width";
@@ -131,13 +132,14 @@ public class XFormsProperties {
 
             // Properties to propagate to the client
             new PropertyDefinition(SESSION_HEARTBEAT_PROPERTY, true, true),
-            new PropertyDefinition(DELAY_BEFORE_INCREMENTAL_REQUEST_IN_MS_PROPERTY, 500, true),
-            new PropertyDefinition(DELAY_BEFORE_FORCE_INCREMENTAL_REQUEST_IN_MS_PROPERTY, 2000, true),
-            new PropertyDefinition(DELAY_BEFORE_GECKO_COMMUNICATION_ERROR_IN_MS_PROPERTY, 5000, true),
-            new PropertyDefinition(DELAY_BEFORE_CLOSE_MINIMAL_DIALOG_IN_MS_PROPERTY, 5000, true),
-            new PropertyDefinition(DELAY_BEFORE_AJAX_TIMEOUT_IN_MS_PROPERTY, -1, true),
-            new PropertyDefinition(INTERNAL_SHORT_DELAY_IN_MS_PROPERTY, 10, true),
-            new PropertyDefinition(DELAY_BEFORE_DISPLAY_LOADING_IN_MS_PROPERTY, 500, true),
+//            new PropertyDefinition(SESSION_HEARTBEAT_DELAY_PROPERTY, -1, true),
+            new PropertyDefinition(DELAY_BEFORE_INCREMENTAL_REQUEST_PROPERTY, 500, true),
+            new PropertyDefinition(DELAY_BEFORE_FORCE_INCREMENTAL_REQUEST_PROPERTY, 2000, true),
+            new PropertyDefinition(DELAY_BEFORE_GECKO_COMMUNICATION_ERROR_PROPERTY, 5000, true),
+            new PropertyDefinition(DELAY_BEFORE_CLOSE_MINIMAL_DIALOG_PROPERTY, 5000, true),
+            new PropertyDefinition(DELAY_BEFORE_AJAX_TIMEOUT_PROPERTY, -1, true),
+            new PropertyDefinition(INTERNAL_SHORT_DELAY_PROPERTY, 10, true),
+            new PropertyDefinition(DELAY_BEFORE_DISPLAY_LOADING_PROPERTY, 500, true),
             new PropertyDefinition(REQUEST_RETRIES_PROPERTY, 3, true),
             new PropertyDefinition(DEBUG_WINDOW_HEIGHT_PROPERTY, 600, true),
             new PropertyDefinition(DEBUG_WINDOW_WIDTH_PROPERTY, 300, true),
@@ -347,6 +349,10 @@ public class XFormsProperties {
 
     public static String getDoubleFormat(XFormsContainingDocument containingDocument) {
         return getStringProperty(containingDocument, DOUBLE_FORMAT_PROPERTY);
+    }
+
+    public static boolean isSessionHeartbeat(XFormsContainingDocument containingDocument) {
+        return getBooleanProperty(containingDocument, SESSION_HEARTBEAT_PROPERTY);
     }
 
     private static boolean getBooleanProperty(XFormsContainingDocument containingDocument, String propertyName) {

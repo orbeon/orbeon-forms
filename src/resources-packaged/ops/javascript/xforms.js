@@ -26,6 +26,7 @@ var XFORMS_REQUEST_RETRIES = 3;
 var XFORMS_DEBUG_WINDOW_HEIGHT = 600;
 var XFORMS_DEBUG_WINDOW_WIDTH = 300;
 var XFORMS_LOADING_MIN_TOP_PADDING = 10;
+var XFORMS_SESSION_HEARTBEAT = true;
 
 /**
  * Constants
@@ -2475,7 +2476,7 @@ ORBEON.xforms.Server = {
 
                 var xmlNamespace = null; // xforms namespace
                 //Getting xforms namespace
-                for(var j = 0; j < responseRoot.attributes.length; j++) {
+                for (var j = 0; j < responseRoot.attributes.length; j++) {
                     if (responseRoot.attributes[j].nodeValue == XXFORMS_NAMESPACE_URI) {
                         var attrName = responseRoot.attributes[j].name;
                         xmlNamespace = attrName.substr(attrName.indexOf(":") + 1);

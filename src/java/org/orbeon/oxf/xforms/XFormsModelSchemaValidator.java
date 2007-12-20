@@ -13,9 +13,11 @@
  */
 package org.orbeon.oxf.xforms;
 
+import com.sun.msv.datatype.xsd.DatatypeFactory;
+import com.sun.msv.datatype.xsd.XSDatatype;
+import com.sun.msv.grammar.Expression;
 import com.sun.msv.grammar.Grammar;
 import com.sun.msv.grammar.IDContextProvider2;
-import com.sun.msv.grammar.Expression;
 import com.sun.msv.grammar.xmlschema.*;
 import com.sun.msv.reader.GrammarReaderController;
 import com.sun.msv.reader.util.GrammarLoader;
@@ -23,14 +25,12 @@ import com.sun.msv.util.DatatypeRef;
 import com.sun.msv.util.StartTagInfo;
 import com.sun.msv.util.StringRef;
 import com.sun.msv.verifier.Acceptor;
-import com.sun.msv.verifier.regexp.REDocumentDeclaration;
-import com.sun.msv.verifier.regexp.StringToken;
 import com.sun.msv.verifier.regexp.ExpressionAcceptor;
+import com.sun.msv.verifier.regexp.REDocumentDeclaration;
 import com.sun.msv.verifier.regexp.SimpleAcceptor;
+import com.sun.msv.verifier.regexp.StringToken;
 import com.sun.msv.verifier.regexp.xmlschema.XSAcceptor;
 import com.sun.msv.verifier.regexp.xmlschema.XSREDocDecl;
-import com.sun.msv.datatype.xsd.DatatypeFactory;
-import com.sun.msv.datatype.xsd.XSDatatype;
 import org.apache.log4j.Logger;
 import org.dom4j.Attribute;
 import org.dom4j.Element;
@@ -42,15 +42,14 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.msv.IDConstraintChecker;
-import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.NodeInfo;
 import org.relaxng.datatype.Datatype;
 import org.relaxng.datatype.DatatypeException;
@@ -576,20 +575,19 @@ public class XFormsModelSchemaValidator {
      * @param pipelineContext       current PipelineContext
      */
     public void loadSchemas(final PipelineContext pipelineContext) {
-        if (!isSkipInstanceSchemaValidation()) {
-            final String schemaURI = schemaURIs;// TODO: check for multiple schemas
 
-            // External instance
-            final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+        final String schemaURI = schemaURIs;// TODO: check for multiple schemas
 
-            // Resolve URL
-            // TODO: We do not support "optimized" access here, we always use an URL, because loadGrammar() wants a URL
-            final String resolvedURLString = XFormsUtils.resolveResourceURL(pipelineContext, modelElement, schemaURI);
-            final URL resolvedURL = XFormsSubmissionUtils.createAbsoluteURL(resolvedURLString, null, externalContext);
+        // External instance
+        final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
 
-            // Load associated grammar
-            schemaGrammar = loadCacheGrammar(pipelineContext, resolvedURL.toExternalForm());
-        }
+        // Resolve URL
+        // TODO: We do not support "optimized" access here, we always use an URL, because loadGrammar() wants a URL
+        final String resolvedURLString = XFormsUtils.resolveResourceURL(pipelineContext, modelElement, schemaURI);
+        final URL resolvedURL = XFormsSubmissionUtils.createAbsoluteURL(resolvedURLString, null, externalContext);
+
+        // Load associated grammar
+        schemaGrammar = loadCacheGrammar(pipelineContext, resolvedURL.toExternalForm());
     }
 
     /**
@@ -650,7 +648,7 @@ public class XFormsModelSchemaValidator {
      * @param instance          instance to validate
      */
     public void validateInstance(XFormsInstance instance) {
-        if (!isSkipInstanceSchemaValidation() && schemaGrammar != null) {
+        if (schemaGrammar != null) {
 
             // Create REDocumentDeclaration if needed
             if (documentDeclaration == null) {
@@ -794,18 +792,6 @@ public class XFormsModelSchemaValidator {
             return new XSREDocDecl((XMLSchemaGrammar) grammar);
         else
             return new REDocumentDeclaration(grammar);
-    }
-
-    /**
-     * Return whether XForms instance validation should be skipped based on configuration
-     * properties.
-     *
-     * @return  whether validation should be skipped
-     */
-    private boolean isSkipInstanceSchemaValidation() {
-        final OXFProperties.PropertySet propertySet = OXFProperties.instance().getPropertySet();
-        final Boolean schmVldatdObj =  propertySet.getBoolean(XFormsProperties.VALIDATION_PROPERTY, true);
-        return !schmVldatdObj.booleanValue();
     }
 
     /**

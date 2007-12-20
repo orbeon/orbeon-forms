@@ -31,10 +31,7 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
     private Locator locator;
     private LocationData locationData;
 
-    private String stateHandling;
-    private String readonly;
-    private String readonlyAppearance;
-    private String externalEvents;
+    private Map properties = new HashMap();
 
     private int level;
     private String element0;
@@ -54,7 +51,6 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
 
     private boolean mustOutputFirstElement = true;
 
-    private final XFormsURIResolver uriResolver;
     private final ExternalContext externalContext;
     private Stack xmlBaseStack = new Stack();
 
@@ -63,11 +59,10 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
     private Map xxformsScriptMap;
     private StringBuffer xxformsScriptStringBuffer;
 
-    public XFormsExtractorContentHandler(PipelineContext pipelineContext, ContentHandler contentHandler, XFormsURIResolver uriResolver) {
+    public XFormsExtractorContentHandler(PipelineContext pipelineContext, ContentHandler contentHandler) {
         super(contentHandler);
 
         this.externalContext = ((ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT));
-        this.uriResolver = uriResolver;
 
         // Create xml:base stack
         try {
@@ -93,31 +88,29 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
     private void outputFirstElementIfNeeded() throws SAXException {
         if (mustOutputFirstElement) {
             final AttributesImpl attributesImpl = new AttributesImpl();
+
             // Add xml:base attribute
             attributesImpl.addAttribute(XMLConstants.XML_URI, "base", "xml:base", ContentHandlerHelper.CDATA, externalContext.getResponse().rewriteRenderURL(((URI) xmlBaseStack.get(0)).toString()));
             // Add container-type attribute
             attributesImpl.addAttribute("", "container-type", "container-type", ContentHandlerHelper.CDATA, externalContext.getRequest().getContainerType());
             // Add container-namespace attribute
             attributesImpl.addAttribute("", "container-namespace", "container-namespace", ContentHandlerHelper.CDATA, externalContext.getRequest().getContainerNamespace());
-            // Add state-handling attribute
-            if (stateHandling != null)
-                attributesImpl.addAttribute("", "state-handling", "state-handling", ContentHandlerHelper.CDATA, stateHandling);
-            // Add read-only attribute
-            if (readonly != null)
-                attributesImpl.addAttribute("", "readonly", "readonly", ContentHandlerHelper.CDATA, readonly);
-            // Add read-only appearance
-            if (readonlyAppearance != null)
-                attributesImpl.addAttribute("", "readonly-appearance", "readonly-appearance", ContentHandlerHelper.CDATA, readonlyAppearance);
-            // Add external-events configuration
-            if (externalEvents != null)
-                attributesImpl.addAttribute("", "external-events", "external-events", ContentHandlerHelper.CDATA, externalEvents);
+
             // Add location information
             if (locationData != null) {
                 attributesImpl.addAttribute("", "system-id", "system-id", ContentHandlerHelper.CDATA, locationData.getSystemID());
                 attributesImpl.addAttribute("", "line", "line", ContentHandlerHelper.CDATA, Integer.toString(locationData.getLine()));
                 attributesImpl.addAttribute("", "column", "column", ContentHandlerHelper.CDATA, Integer.toString(locationData.getCol()));
             }
+            
+            // Add properties
+            for (Iterator i = properties.entrySet().iterator(); i.hasNext();) {
+                final Map.Entry currentEntry = (Map.Entry) i.next();
+                final String propertyName = (String) currentEntry.getKey();
+                attributesImpl.addAttribute(XFormsConstants.XXFORMS_NAMESPACE_URI, propertyName, "xxforms:" + propertyName, ContentHandlerHelper.CDATA, (String) currentEntry.getValue());
+            }
 
+            super.startPrefixMapping("xxforms", XFormsConstants.XXFORMS_NAMESPACE_URI);
             super.startElement("", "static-state", "static-state", attributesImpl);
             mustOutputFirstElement = false;
         }
@@ -142,7 +135,6 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
         }
 
         if (xxformsScriptMap != null) {
-//            super.startPrefixMapping("xxforms", XFormsConstants.XXFORMS_NAMESPACE_URI);
             super.startElement("", "scripts", "scripts", XMLUtils.EMPTY_ATTRIBUTES);
 
             final AttributesImpl newAttributes = new AttributesImpl();
@@ -160,10 +152,10 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
             }
 
             super.endElement("", "scripts", "scripts");
-//            super.endPrefixMapping("xxforms");
         }
 
         super.endElement("", "static-state", "static-state");
+        super.endPrefixMapping("xxforms");
         super.endDocument();
     }
 
@@ -195,42 +187,18 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
                     }
                 }
             }
-            // Handle preferences
-            if (stateHandling == null) {
-                final String xxformsStateHandling = attributes.getValue(XFormsConstants.XXFORMS_NAMESPACE_URI, XFormsConstants.XXFORMS_STATE_HANDLING_ATTRIBUTE_NAME);
-                if (xxformsStateHandling != null) {
-                    if (!(xxformsStateHandling.equals(XFormsProperties.STATE_HANDLING_CLIENT_VALUE)
-                            || xxformsStateHandling.equals(XFormsProperties.STATE_HANDLING_SESSION_VALUE)
-                            || xxformsStateHandling.equals(XFormsProperties.STATE_HANDLING_SERVER_VALUE)))
-                        throw new ValidationException("Invalid xxforms:" + XFormsConstants.XXFORMS_STATE_HANDLING_ATTRIBUTE_NAME + " attribute value: " + xxformsStateHandling, new LocationData(locator));
 
-                    stateHandling = xxformsStateHandling;
-                }
-            }
-            // Handle extension attributes
-            if (readonly == null) {
-                final String xxformsReadonly = attributes.getValue(XFormsConstants.XXFORMS_NAMESPACE_URI, XFormsConstants.XXFORMS_READONLY_ATTRIBUTE_NAME);
-                if (xxformsReadonly != null) {
-                    if (!(xxformsReadonly.equals("true") || xxformsReadonly.equals("false")))
-                        throw new ValidationException("Invalid xxforms:" + XFormsConstants.XXFORMS_READONLY_ATTRIBUTE_NAME + " attribute value: " + xxformsReadonly, new LocationData(locator));
-
-                    readonly = xxformsReadonly;
-                }
-            }
-            if (readonlyAppearance == null) {
-                final String xxformsReadonlyAppearance = attributes.getValue(XFormsConstants.XXFORMS_NAMESPACE_URI, XFormsConstants.XXFORMS_READONLY_APPEARANCE_ATTRIBUTE_NAME);
-                if (xxformsReadonlyAppearance != null) {
-                    if (!(xxformsReadonlyAppearance.equals(XFormsConstants.XXFORMS_READONLY_APPEARANCE_DYNAMIC_VALUE)
-                            || xxformsReadonlyAppearance.equals(XFormsConstants.XXFORMS_READONLY_APPEARANCE_STATIC_VALUE)))
-                        throw new ValidationException("Invalid xxforms:" + XFormsConstants.XXFORMS_READONLY_APPEARANCE_ATTRIBUTE_NAME + " attribute value: " + xxformsReadonlyAppearance, new LocationData(locator));
-
-                    readonlyAppearance = xxformsReadonlyAppearance;
-                }
-            }
-            if (externalEvents == null) {
-                final String xxformsExternalEvents = attributes.getValue(XFormsConstants.XXFORMS_NAMESPACE_URI, XFormsConstants.XXFORMS_EXTERNAL_EVENTS_ATTRIBUTE_NAME);
-                if (xxformsExternalEvents != null) {
-                    externalEvents = xxformsExternalEvents;
+            // Handle properties of the form @xxforms:*
+            final int attributesCount = attributes.getLength();
+            for (int i = 0; i < attributesCount; i++) {
+                final String attributeURI = attributes.getURI(i);
+                if (XFormsConstants.XXFORMS_NAMESPACE_URI.equals(attributeURI)) {
+                    // Found xxforms:* attribute
+                    final String attributeLocalName = attributes.getLocalName(i);
+                    // Only take the first occurrence into account, and make sure the property is supported
+                    if (properties.get(attributeLocalName) == null && XFormsProperties.SUPPORTED_DOCUMENT_PROPERTIES.get(attributeLocalName) != null) { 
+                        properties.put(attributeLocalName, attributes.getValue(i));
+                    }
                 }
             }
         }

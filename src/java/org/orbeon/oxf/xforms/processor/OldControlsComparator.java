@@ -18,6 +18,7 @@ import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsControls;
+import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
@@ -58,7 +59,7 @@ public class OldControlsComparator extends BaseControlsComparator {
             throw new IllegalStateException("Illegal state when comparing controls.");
         }
 
-        final boolean isStaticReadonly = containingDocument.getReadonlyAppearance().equals(XFormsConstants.XXFORMS_READONLY_APPEARANCE_STATIC_VALUE);
+        final boolean isStaticReadonly = XFormsProperties.isStaticReadonlyAppearance(containingDocument);
         final AttributesImpl attributesImpl = new AttributesImpl();
         final Iterator j = (state1 == null) ? null : state1.iterator();
         for (Iterator i = state2.iterator(); i.hasNext();) {

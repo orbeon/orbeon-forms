@@ -55,7 +55,7 @@
                         <xxforms:static-state>
                             <xsl:variable name="static-state" as="document-node()">
                                 <xsl:document>
-                                    <static-state state-handling="client">
+                                    <static-state xxforms:state-handling="client">
                                         <controls>
                                             <xforms:trigger id="trigger">
                                                 <xforms:send submission="default-submission" ev:event="DOMActivate"/>

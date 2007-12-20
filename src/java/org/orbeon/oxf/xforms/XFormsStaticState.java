@@ -15,11 +15,14 @@ package org.orbeon.oxf.xforms;
 
 import org.dom4j.Document;
 import org.dom4j.Element;
+import org.dom4j.Attribute;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.UUIDUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.common.ValidationException;
+import org.orbeon.oxf.resources.OXFProperties;
 
 import java.util.*;
 
@@ -54,11 +57,10 @@ public class XFormsStaticState {
 
     private Map instancesMap;
 
-    private String baseURI;
-    private String stateHandling;
-    private boolean readonly;
-    private String readonlyAppearance;
+    private Map nonDefaultProperties = new HashMap();
     private Map externalEventsMap;
+
+    private String baseURI;
     private String containerType;
     private String containerNamespace;
     private LocationData locationData;
@@ -118,23 +120,60 @@ public class XFormsStaticState {
             }
         }
 
-        // Attributes
-        final String stateHandlingAttribute = rootElement.attributeValue(XFormsConstants.XXFORMS_STATE_HANDLING_ATTRIBUTE_NAME);
-        stateHandling = (stateHandlingAttribute != null)
-                ? stateHandlingAttribute
-                : XFormsProperties.isServerStateHandling() ? XFormsProperties.STATE_HANDLING_SERVER_VALUE : XFormsProperties.STATE_HANDLING_CLIENT_VALUE;
+        // Handle properties
+        for (Iterator i = rootElement.attributeIterator(); i.hasNext();) {
+            final Attribute currentAttribute = (Attribute) i.next();
+            if (XFormsConstants.XXFORMS_NAMESPACE_URI.equals(currentAttribute.getNamespaceURI()))
+                nonDefaultProperties.put(currentAttribute.getName(), currentAttribute.getValue());
+        }
 
-        final String readonlyAttribute = rootElement.attributeValue(XFormsConstants.XXFORMS_READONLY_ATTRIBUTE_NAME);
-        readonly = (readonlyAttribute != null) && new Boolean(readonlyAttribute).booleanValue() ;
+        // Handle default for properties
+        final OXFProperties.PropertySet propertySet = OXFProperties.instance().getPropertySet();
+        for (Iterator i = XFormsProperties.SUPPORTED_DOCUMENT_PROPERTIES.entrySet().iterator(); i.hasNext();) {
+            final Map.Entry currentEntry = (Map.Entry) i.next();
+            final String propertyName = (String) currentEntry.getKey();
+            final XFormsProperties.PropertyDefinition propertyDefinition = (XFormsProperties.PropertyDefinition) currentEntry.getValue();
 
-        final String readonlyAppearanceAttribute = rootElement.attributeValue(XFormsConstants.XXFORMS_READONLY_APPEARANCE_ATTRIBUTE_NAME);
-        readonlyAppearance = (readonlyAppearanceAttribute != null)
-                ? readonlyAppearanceAttribute
-                : XFormsConstants.XXFORMS_READONLY_APPEARANCE_DYNAMIC_VALUE;
+            final String defaultPropertyValue = propertyDefinition.getDefaultValue().toString(); // value can be String, Boolean, Integer
+            final String propertyValue = (String) nonDefaultProperties.get(propertyName);
+            if (propertyValue == null) {
+                // Property not defined in the document, try to obtain from global properties
+                final String globalPropertyValue = propertySet.getObject(XFormsProperties.XFORMS_PROPERTY_PREFIX + propertyName, defaultPropertyValue).toString();
 
-        final String externalEventsAttribute = rootElement.attributeValue(XFormsConstants.XXFORMS_EXTERNAL_EVENTS_ATTRIBUTE_NAME);
-        if (externalEventsAttribute != null) {
-            final StringTokenizer st = new StringTokenizer(externalEventsAttribute);
+                // If the global property is different from the default, add it
+                if (!globalPropertyValue.equals(defaultPropertyValue))
+                    nonDefaultProperties.put(propertyName, globalPropertyValue);
+
+            } else {
+                // Property defined in the document
+
+                // If the property is identical to the deault, remove it
+                if (propertyValue.equals(defaultPropertyValue))
+                    nonDefaultProperties.remove(propertyName);
+            }
+        }
+
+        // Check validity of properties of known type
+        {
+            {
+                final String stateHandling = getStringProperty(XFormsProperties.STATE_HANDLING_PROPERTY);
+                if (!(stateHandling.equals(XFormsProperties.STATE_HANDLING_CLIENT_VALUE)
+                                || stateHandling.equals(XFormsProperties.STATE_HANDLING_SESSION_VALUE)
+                                || stateHandling.equals(XFormsProperties.STATE_HANDLING_SERVER_VALUE)))
+                    throw new ValidationException("Invalid xxforms:" + XFormsProperties.STATE_HANDLING_PROPERTY + " attribute value: " + stateHandling, getLocationData());
+            }
+
+            {
+                final String readonlyAppearance = getStringProperty(XFormsProperties.READONLY_APPEARANCE_PROPERTY);
+                if (!(readonlyAppearance.equals(XFormsProperties.READONLY_APPEARANCE_STATIC_VALUE)
+                                || readonlyAppearance.equals(XFormsProperties.READONLY_APPEARANCE_DYNAMIC_VALUE)))
+                    throw new ValidationException("Invalid xxforms:" + XFormsProperties.READONLY_APPEARANCE_PROPERTY + " attribute value: " + readonlyAppearance, getLocationData());
+            }
+        }
+
+        final String externalEvents = getStringProperty(XFormsProperties.EXTERNAL_EVENTS_PROPERTY);
+        if (externalEvents != null) {
+            final StringTokenizer st = new StringTokenizer(externalEvents);
             while (st.hasMoreTokens()) {
                 if (externalEventsMap == null)
                     externalEventsMap = new HashMap();
@@ -217,8 +256,8 @@ public class XFormsStaticState {
             }
 
             // Remember encoded state and discard Document
-            final boolean isStateHandlingServer = stateHandling.equals(XFormsProperties.STATE_HANDLING_SERVER_VALUE);
-            encodedStaticState = XFormsUtils.encodeXML(pipelineContext, staticStateDocument, isStateHandlingServer ? null : XFormsProperties.getXFormsPassword(), true);
+            final boolean isStateHandlingClient = getStringProperty(XFormsProperties.STATE_HANDLING_PROPERTY).equals(XFormsProperties.STATE_HANDLING_CLIENT_VALUE);
+            encodedStaticState = XFormsUtils.encodeXML(pipelineContext, staticStateDocument, isStateHandlingClient ? XFormsProperties.getXFormsPassword() : null, true);
             staticStateDocument = null;
             initialized = true;
         }
@@ -249,18 +288,6 @@ public class XFormsStaticState {
         return baseURI;
     }
 
-    public String getStateHandling() {
-        return stateHandling;
-    }
-
-    public boolean isReadonly() {
-        return readonly;
-    }
-
-    public String getReadonlyAppearance() {
-        return readonlyAppearance;
-    }
-
     public Map getExternalEventsMap() {
         return externalEventsMap;
     }
@@ -275,5 +302,25 @@ public class XFormsStaticState {
 
     public LocationData getLocationData() {
         return locationData;
+    }
+
+    public Map getNonDefaultProperties() {
+        return nonDefaultProperties;
+    }
+
+    public String getStringProperty(String propertyName) {
+        final String documentProperty = (String) nonDefaultProperties.get(propertyName);
+        if (documentProperty != null)
+            return documentProperty;
+        else
+            return (String) ((XFormsProperties.PropertyDefinition) XFormsProperties.SUPPORTED_DOCUMENT_PROPERTIES.get(propertyName)).getDefaultValue();
+    }
+
+    public boolean getBooleanProperty(String propertyName) {
+        final String documentProperty = (String) nonDefaultProperties.get(propertyName);
+        if (documentProperty != null)
+            return new Boolean(documentProperty).booleanValue();
+        else
+            return ((Boolean) ((XFormsProperties.PropertyDefinition) XFormsProperties.SUPPORTED_DOCUMENT_PROPERTIES.get(propertyName)).getDefaultValue()).booleanValue();
     }
 }

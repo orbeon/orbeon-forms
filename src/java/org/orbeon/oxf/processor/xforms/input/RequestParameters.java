@@ -57,7 +57,7 @@ public class RequestParameters {
             final List parameters = requestDocument.getRootElement().element("parameters").elements("parameter");
 
             if (XFormsProperties.isHiddenEncryptionEnabled()) {
-                encryptionKey = OXFProperties.instance().getPropertySet().getString(XFormsProperties.PASSWORD_PROPERTY);
+                encryptionKey = XFormsProperties.getXFormsPassword();
             }
 
             // Go through parameters

@@ -137,7 +137,7 @@ public class XFormsToXHTML extends ProcessorImpl {
     //                    final XMLUtils.DigestContentHandler digestContentHandler = new XMLUtils.DigestContentHandler("MD5");
 
                         annotatedSAXStore = new SAXStore(new TeeContentHandler(new ContentHandler[] {
-                                new XFormsExtractorContentHandler(pipelineContext, identity, uriResolver)
+                                new XFormsExtractorContentHandler(pipelineContext, identity)
     //                            ,digestContentHandler
     //                            ,new SAXLoggerProcessor.DebugContentHandler()
                         }));

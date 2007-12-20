@@ -60,8 +60,8 @@ public class XFormsStateManager {
         final String currentPageGenerationId;
         final String staticStateString;
         {
-            if (containingDocument.isServerStateHandling()) {
-                if (containingDocument.isLegacyServerStateHandling()) {
+            if (!XFormsProperties.isClientStateHandling(containingDocument)) {
+                if (XFormsProperties.isLegacySessionStateHandling(containingDocument)) {
                     // Legacy session server handling
 
                     // Produce UUID
@@ -93,8 +93,8 @@ public class XFormsStateManager {
 
         final String dynamicStateString;
         {
-            if (containingDocument.isServerStateHandling()) {
-                if (containingDocument.isLegacyServerStateHandling()) {
+            if (!XFormsProperties.isClientStateHandling(containingDocument)) {
+                if (XFormsProperties.isLegacySessionStateHandling(containingDocument)) {
                     // Legacy session server handling
 
                     if (dynamicStateUUID == null) {
@@ -264,7 +264,7 @@ public class XFormsStateManager {
                 final String newEncodedDynamicState = containingDocument.createEncodedDynamicState(pipelineContext);
                 newXFormsState = new XFormsState(staticStateString, newEncodedDynamicState);
 
-                if (containingDocument.isServerStateHandling()) {
+                if (!XFormsProperties.isClientStateHandling(containingDocument)) {
                     final String requestId = xformsDecodedClientState.getDynamicStateUUID();
 
                     // Get session id if needed
@@ -274,7 +274,7 @@ public class XFormsStateManager {
                     // Produce dynamic state key (keep the same when allEvents!)
                     final String newRequestId = isAllEvents ? requestId : UUIDUtils.createPseudoUUID();
 
-                    if (containingDocument.isLegacyServerStateHandling()) {
+                    if (XFormsProperties.isLegacySessionStateHandling(containingDocument)) {
                         // Legacy session server handling
                         final XFormsStateStore stateStore = XFormsSessionStateStore.instance(externalContext, true);
                         stateStore.add(currentPageGenerationId, requestId, newRequestId, newXFormsState, sessionId, pinNewDynamicState);
@@ -294,8 +294,8 @@ public class XFormsStateManager {
                 logger.debug("Document is not dirty: keep existing dynamic state.");
                 newXFormsState = xformsDecodedClientState.getXFormsState();
 
-                if (containingDocument.isServerStateHandling()) {
-                    if (containingDocument.isLegacyServerStateHandling()) {
+                if (!XFormsProperties.isClientStateHandling(containingDocument)) {
+                    if (XFormsProperties.isLegacySessionStateHandling(containingDocument)) {
                         dynamicStateString = SESSION_STATE_PREFIX + xformsDecodedClientState.getDynamicStateUUID();
                     } else {
                         dynamicStateString = PERSISTENT_STATE_PREFIX + xformsDecodedClientState.getDynamicStateUUID();
@@ -304,7 +304,7 @@ public class XFormsStateManager {
                     dynamicStateString = xformsDecodedClientState.getXFormsState().getDynamicState();
                 }
 
-                if (logger.isDebugEnabled() && containingDocument.isServerStateHandling()) {
+                if (logger.isDebugEnabled() && !XFormsProperties.isClientStateHandling(containingDocument)) {
                     // Check that dynamic state is the same
                     final String newEncodedDynamicState = containingDocument.createEncodedDynamicState(pipelineContext);
                     if (!newEncodedDynamicState.equals(xformsDecodedClientState.getXFormsState().getDynamicState())) {

@@ -187,6 +187,11 @@ public class OXFProperties {
             return getProperty(name, null);
         }
 
+        public Object getObject(String name, Object defaultValue) {
+            final Object result = getObject(name);
+            return (result == null) ? defaultValue : result;
+        }
+
         public String getStringOrURIAsString(String name) {
             final Object property = getObject(name);
             if (property == null)

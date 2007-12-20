@@ -303,37 +303,6 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     }
 
     /**
-     * Return the state handling strategy for this document, either "client" or "session" or "server" ("").
-     */
-    public String getStateHandling() {
-        return (xformsStaticState == null) ? null : xformsStaticState.getStateHandling();
-    }
-
-    public boolean isServerStateHandling() {
-        return (xformsStaticState != null) &&
-                (xformsStaticState.getStateHandling().equals(XFormsProperties.STATE_HANDLING_SESSION_VALUE)
-                        || xformsStaticState.getStateHandling().equals(XFormsProperties.STATE_HANDLING_SERVER_VALUE));
-    }
-
-    public boolean isLegacyServerStateHandling() {
-        return (xformsStaticState != null) && xformsStaticState.getStateHandling().equals(XFormsProperties.STATE_HANDLING_SESSION_VALUE);
-    }
-
-    /**
-     * Return whether this form is read-only or not.
-     */
-    public boolean isReadonly() {
-        return (xformsStaticState != null) && xformsStaticState.isReadonly();
-    }
-
-    /**
-     * Return read-only appearance configuration attribute.
-     */
-    public String getReadonlyAppearance() {
-        return (xformsStaticState == null) ? null : xformsStaticState.getReadonlyAppearance();
-    }
-
-    /**
      * Return external-events configuration attribute.
      */
     private Map getExternalEventsMap() {
@@ -646,7 +615,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         {
             final Object eventTargetObject = getObjectById(pipelineContext, controlId);
             if (!(eventTargetObject instanceof XFormsEventTarget)) {
-                if (XFormsProperties.isExceptionOnInvalidClientControlId()) {
+                if (XFormsProperties.isExceptionOnInvalidClientControlId(this)) {
                     throw new ValidationException("Event target id '" + controlId + "' is not an XFormsEventTarget.", getLocationData());
                 } else {
                     if (XFormsServer.logger.isDebugEnabled()) {
@@ -733,7 +702,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
             if (otherEventTargetObject == null) {
                 otherEventTarget = null;
             } else if (!(otherEventTargetObject instanceof XFormsEventTarget)) {
-                if (XFormsProperties.isExceptionOnInvalidClientControlId()) {
+                if (XFormsProperties.isExceptionOnInvalidClientControlId(this)) {
                     throw new ValidationException("Other event target id '" + otherControlId + "' is not an XFormsEventTarget.", getLocationData());
                 } else {
                     if (XFormsServer.logger.isDebugEnabled()) {
@@ -1071,7 +1040,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
      */
     public String createEncodedDynamicState(PipelineContext pipelineContext) {
         return XFormsUtils.encodeXML(pipelineContext, createDynamicStateDocument(),
-            isServerStateHandling() ? null : XFormsProperties.getXFormsPassword(), false);
+            XFormsProperties.isClientStateHandling(this) ? XFormsProperties.getXFormsPassword() : null, false);
     }
 
     private Document createDynamicStateDocument() {

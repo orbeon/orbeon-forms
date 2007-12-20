@@ -1229,7 +1229,7 @@ public class XFormsControls {
      */
     public void visitAllControlsHandleRepeat(PipelineContext pipelineContext, ControlElementVisitorListener controlElementVisitorListener) {
         resetBindingContext();
-        final boolean isOptimizeRelevance = XFormsProperties.isOptimizeRelevance();
+        final boolean isOptimizeRelevance = XFormsProperties.isOptimizeRelevance(containingDocument);
         handleControls(pipelineContext, controlElementVisitorListener, isOptimizeRelevance, controlsDocument.getRootElement(), "");
     }
 

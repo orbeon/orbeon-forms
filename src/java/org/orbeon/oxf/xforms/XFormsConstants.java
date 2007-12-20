@@ -104,11 +104,7 @@ public class XFormsConstants {
     public static final String XFORMS_SUBMIT_REPLACE_NONE = "none";
 
     public static final String XXFORMS_STATE_HANDLING_ATTRIBUTE_NAME = "state-handling";
-
     public static final String XXFORMS_READONLY_APPEARANCE_ATTRIBUTE_NAME = "readonly-appearance";
-    public static final String XXFORMS_READONLY_APPEARANCE_STATIC_VALUE = "static";
-    public static final String XXFORMS_READONLY_APPEARANCE_DYNAMIC_VALUE = "dynamic";
-
     public static final QName XXFORMS_READONLY_APPEARANCE_ATTRIBUTE_QNAME = new QName(XXFORMS_READONLY_APPEARANCE_ATTRIBUTE_NAME, XFormsConstants.XXFORMS_NAMESPACE);
 
     public static final String XXFORMS_EXTERNAL_EVENTS_ATTRIBUTE_NAME = "external-events";

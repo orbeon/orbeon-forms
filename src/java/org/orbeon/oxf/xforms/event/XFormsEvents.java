@@ -23,6 +23,7 @@ public class XFormsEvents {
     public static final String XXFORMS_READY = "xxforms-ready";
 
     // Other custom events
+    public static final String XXFORMS_SESSION_HEARTBEAT = "xxforms-session-heartbeat";
     public static final String XXFORMS_SUBMIT = "xxforms-submit";
     public static final String XXFORMS_LOAD = "xxforms-load";
     public static final String XXFORMS_REPEAT_FOCUS = "xxforms-focus";

@@ -15,129 +15,196 @@ package org.orbeon.oxf.xforms;
 
 import org.orbeon.oxf.resources.OXFProperties;
 
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Collections;
+
 public class XFormsProperties {
 
-    private static final String ENCRYPT_NAMES_PROPERTY = "oxf.xforms.encrypt-names";
-    private static final String ENCRYPT_HIDDEN_PROPERTY = "oxf.xforms.encrypt-hidden";
+    public static final String XFORMS_PROPERTY_PREFIX = "oxf.xforms.";
 
-    private static final String CACHE_DOCUMENT_PROPERTY = "oxf.xforms.cache.document";
-
-    private static final String OPTIMIZE_GET_ALL_PROPERTY = "oxf.xforms.optimize-get-all";
-    private static final String OPTIMIZE_LOCAL_SUBMISSION_PROPERTY = "oxf.xforms.optimize-local-submission";
-
-    private static final String OPTIMIZE_RELEVANCE_PROPERTY = "oxf.xforms.optimize-relevance";
-    private static final boolean OPTIMIZE_RELEVANCE_DEFAULT = false;
-
-    private static final String EXCEPTION_INVALID_CLIENT_CONTROL_PROPERTY = "oxf.xforms.exception-invalid-client-control";
-    private static final String AJAX_SHOW_LOADING_ICON_PROPERTY = "oxf.xforms.ajax.show-loading-icon";
-    private static final String AJAX_SHOW_ERRORS_PROPERTY = "oxf.xforms.ajax.show-errors";
-
-    private static final String HOST_LANGUAGE_AVTS_PROPERTY = "oxf.xforms.host-language-avts";
-    private static final boolean HOST_LANGUAGE_AVTS_DEFAULT = false;
-
-    private static final String MINIMAL_RESOURCES_PROPERTY = "oxf.xforms.minimal-resources";
-    private static final boolean MINIMAL_RESOURCES_DEFAULT = false;
-    private static final String COMBINE_RESOURCES_PROPERTY = "oxf.xforms.combine-resources";
-    private static final boolean COMBINE_RESOURCES_DEFAULT = false;
-    private static final String CACHE_COMBINED_RESOURCES_PROPERTY = "oxf.xforms.cache-combined-resources";
-    private static final boolean CACHE_COMBINED_RESOURCES_DEFAULT = false;
-
-    public static final String PASSWORD_PROPERTY = "oxf.xforms.password";
-
-    public static final String DATE_FORMAT_PROPERTY_DEFAULT = "oxf.xforms.format.date";
-    public static final String DATETIME_FORMAT_PROPERTY_DEFAULT = "oxf.xforms.format.dateTime";
-    public static final String TIME_FORMAT_PROPERTY_DEFAULT = "oxf.xforms.format.time";
-    public static final String DECIMAL_FORMAT_PROPERTY_DEFAULT = "oxf.xforms.format.decimal";
-    public static final String INTEGER_FORMAT_PROPERTY_DEFAULT = "oxf.xforms.format.integer";
-    public static final String FLOAT_FORMAT_PROPERTY_DEFAULT = "oxf.xforms.format.float";
-    public static final String DOUBLE_FORMAT_PROPERTY_DEFAULT = "oxf.xforms.format.double";
-
-    private static final String GZIP_STATE_PROPERTY = "oxf.xforms.gzip-state";
-    private static final boolean GZIP_STATE_DEFAULT = true;
-
-    private static final String STATE_HANDLING_PROPERTY = "oxf.xforms.state-handling";
+    // Document properties
+    public static final String STATE_HANDLING_PROPERTY = "state-handling";
+    public static final String STATE_HANDLING_SERVER_VALUE = "server";
     public static final String STATE_HANDLING_CLIENT_VALUE = "client";
     public static final String STATE_HANDLING_SESSION_VALUE = "session"; // deprecated
-    public static final String STATE_HANDLING_SERVER_VALUE = "server";
 
-    private static final String STORE_APPLICATION_SIZE_PROPERTY = "oxf.xforms.store.application.size";
+    public static final String READONLY_APPEARANCE_PROPERTY = "readonly-appearance";
+    public static final String READONLY_APPEARANCE_STATIC_VALUE = "static";
+    public static final String READONLY_APPEARANCE_DYNAMIC_VALUE = "dynamic";
+
+    public static final String EXTERNAL_EVENTS_PROPERTY = "external-events";
+    private static final String READONLY_PROPERTY = "readonly";
+
+    private static final String OPTIMIZE_GET_ALL_PROPERTY = "optimize-get-all";
+    private static final String OPTIMIZE_LOCAL_SUBMISSION_PROPERTY = "optimize-local-submission";
+//    private static final String XFORMS_OPTIMIZE_LOCAL_INSTANCE_LOADS_PROPERTY = "optimize-local-instance-loads";
+    private static final String OPTIMIZE_RELEVANCE_PROPERTY = "optimize-relevance";
+    private static final String EXCEPTION_ON_INVALID_CLIENT_CONTROL_PROPERTY = "exception-invalid-client-control";
+    private static final String AJAX_SHOW_LOADING_ICON_PROPERTY = "ajax.show-loading-icon";
+    private static final String AJAX_SHOW_ERRORS_PROPERTY = "ajax.show-errors";
+
+    private static final String MINIMAL_RESOURCES_PROPERTY = "minimal-resources";
+    private static final String COMBINE_RESOURCES_PROPERTY = "combine-resources";
+
+    private static final String SKIP_SCHEMA_VALIDATION_PROPERTY = "skip-schema-validation";
+
+    private static final String DATE_FORMAT_PROPERTY = "format.date";
+    private static final String DATETIME_FORMAT_PROPERTY = "format.dateTime";
+    private static final String TIME_FORMAT_PROPERTY = "format.time";
+    private static final String DECIMAL_FORMAT_PROPERTY = "format.decimal";
+    private static final String INTEGER_FORMAT_PROPERTY = "format.integer";
+    private static final String FLOAT_FORMAT_PROPERTY = "format.float";
+    private static final String DOUBLE_FORMAT_PROPERTY = "format.double";
+
+    private static final String SESSION_HEARTBEAT_PROPERTY = "session-heartbeat";
+    private static final String DELAY_BEFORE_INCREMENTAL_REQUEST_IN_MS_PROPERTY = "delay-before-incremental-request";
+    private static final String DELAY_BEFORE_FORCE_INCREMENTAL_REQUEST_IN_MS_PROPERTY = "delay-before-force-incremental-request";
+    private static final String DELAY_BEFORE_GECKO_COMMUNICATION_ERROR_IN_MS_PROPERTY = "delay-before-gecko-communication-error";
+    private static final String DELAY_BEFORE_CLOSE_MINIMAL_DIALOG_IN_MS_PROPERTY = "delay-before-close-minimal-dialog";
+    private static final String DELAY_BEFORE_AJAX_TIMEOUT_IN_MS_PROPERTY = "delay-before-ajax-timeout";
+    private static final String INTERNAL_SHORT_DELAY_IN_MS_PROPERTY = "internal-short-delay";
+    private static final String DELAY_BEFORE_DISPLAY_LOADING_IN_MS_PROPERTY = "delay-before-display-loading";
+    private static final String REQUEST_RETRIES_PROPERTY = "request-retries";
+    private static final String DEBUG_WINDOW_HEIGHT_PROPERTY = "debug-window-height";
+    private static final String DEBUG_WINDOW_WIDTH_PROPERTY = "debug-window-width";
+    private static final String LOADING_MIN_TOP_PADDING_PROPERTY = "loading-min-top-padding";
+
+    public static class PropertyDefinition {
+
+        private String name;
+        private Object defaultValue;
+        private boolean isPropagateToClient;
+
+        public PropertyDefinition(String name, String defaultValue, boolean propagateToClient) {
+            this.name = name;
+            this.defaultValue = defaultValue;
+            isPropagateToClient = propagateToClient;
+        }
+
+        public PropertyDefinition(String name, boolean defaultValue, boolean propagateToClient) {
+            this.name = name;
+            this.defaultValue = new Boolean(defaultValue);
+            isPropagateToClient = propagateToClient;
+        }
+
+        public PropertyDefinition(String name, int defaultValue, boolean propagateToClient) {
+            this.name = name;
+            this.defaultValue = new Integer(defaultValue);
+            isPropagateToClient = propagateToClient;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public Object getDefaultValue() {
+            return defaultValue;
+        }
+
+        public boolean isPropagateToClient() {
+            return isPropagateToClient;
+        }
+    }
+
+    private static final PropertyDefinition[] SUPPORTED_DOCUMENT_PROPERTIES_DEFAULTS = {
+            new PropertyDefinition(STATE_HANDLING_PROPERTY, STATE_HANDLING_SERVER_VALUE, false),
+            new PropertyDefinition(READONLY_PROPERTY, false, false),
+            new PropertyDefinition(READONLY_APPEARANCE_PROPERTY, READONLY_APPEARANCE_DYNAMIC_VALUE, false),
+            new PropertyDefinition(EXTERNAL_EVENTS_PROPERTY, "", false),
+            new PropertyDefinition(OPTIMIZE_GET_ALL_PROPERTY, true, false),
+            new PropertyDefinition(OPTIMIZE_LOCAL_SUBMISSION_PROPERTY, true, false),
+            new PropertyDefinition(OPTIMIZE_RELEVANCE_PROPERTY, false, false),
+            new PropertyDefinition(EXCEPTION_ON_INVALID_CLIENT_CONTROL_PROPERTY, false, false),
+            new PropertyDefinition(AJAX_SHOW_LOADING_ICON_PROPERTY, true, false),
+            new PropertyDefinition(AJAX_SHOW_ERRORS_PROPERTY, true, false),
+            new PropertyDefinition(MINIMAL_RESOURCES_PROPERTY, true, false),
+            new PropertyDefinition(COMBINE_RESOURCES_PROPERTY, true, false),
+            new PropertyDefinition(SKIP_SCHEMA_VALIDATION_PROPERTY, false, false),
+            new PropertyDefinition(DATE_FORMAT_PROPERTY, "if (. castable as xs:date) then format-date(xs:date(.), '[FNn] [MNn] [D], [Y] [ZN]', 'en', (), ()) else .", false),
+            new PropertyDefinition(DATETIME_FORMAT_PROPERTY, "if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), '[FNn] [MNn] [D], [Y] [H01]:[m01]:[s01] [ZN]', 'en', (), ()) else .", false),
+            new PropertyDefinition(TIME_FORMAT_PROPERTY, "if (. castable as xs:time) then format-time(xs:time(.), '[H01]:[m01]:[s01] [ZN]', 'en', (), ()) else .", false),
+            new PropertyDefinition(DECIMAL_FORMAT_PROPERTY, "if (. castable as xs:decimal) then format-number(xs:decimal(.),'###,###,###,##0.00') else .", false),
+            new PropertyDefinition(INTEGER_FORMAT_PROPERTY, "if (. castable as xs:integer) then format-number(xs:integer(.),'###,###,###,##0') else .", false),
+            new PropertyDefinition(FLOAT_FORMAT_PROPERTY, "if (. castable as xs:float) then format-number(xs:float(.),'#,##0.000') else .", false),
+            new PropertyDefinition(DOUBLE_FORMAT_PROPERTY, "if (. castable as xs:double) then format-number(xs:double(.),'#,##0.000') else .", false),
+
+            // Properties to propagate to the client
+            new PropertyDefinition(SESSION_HEARTBEAT_PROPERTY, true, true),
+            new PropertyDefinition(DELAY_BEFORE_INCREMENTAL_REQUEST_IN_MS_PROPERTY, 500, true),
+            new PropertyDefinition(DELAY_BEFORE_FORCE_INCREMENTAL_REQUEST_IN_MS_PROPERTY, 2000, true),
+            new PropertyDefinition(DELAY_BEFORE_GECKO_COMMUNICATION_ERROR_IN_MS_PROPERTY, 5000, true),
+            new PropertyDefinition(DELAY_BEFORE_CLOSE_MINIMAL_DIALOG_IN_MS_PROPERTY, 5000, true),
+            new PropertyDefinition(DELAY_BEFORE_AJAX_TIMEOUT_IN_MS_PROPERTY, -1, true),
+            new PropertyDefinition(INTERNAL_SHORT_DELAY_IN_MS_PROPERTY, 10, true),
+            new PropertyDefinition(DELAY_BEFORE_DISPLAY_LOADING_IN_MS_PROPERTY, 500, true),
+            new PropertyDefinition(REQUEST_RETRIES_PROPERTY, 3, true),
+            new PropertyDefinition(DEBUG_WINDOW_HEIGHT_PROPERTY, 600, true),
+            new PropertyDefinition(DEBUG_WINDOW_WIDTH_PROPERTY, 300, true),
+            new PropertyDefinition(LOADING_MIN_TOP_PADDING_PROPERTY, 10, true)
+
+    };
+
+    public static final Map SUPPORTED_DOCUMENT_PROPERTIES;
+    static {
+        final Map tempMap = new HashMap();
+        for (int i = 0; i < SUPPORTED_DOCUMENT_PROPERTIES_DEFAULTS.length; i++) {
+            final PropertyDefinition propertyDefinition = SUPPORTED_DOCUMENT_PROPERTIES_DEFAULTS[i];
+            tempMap.put(propertyDefinition.name, propertyDefinition);
+        }
+        SUPPORTED_DOCUMENT_PROPERTIES = Collections.unmodifiableMap(tempMap);
+    }
+
+    // Global properties
+    private static final String PASSWORD_PROPERTY = XFORMS_PROPERTY_PREFIX + "password";
+    private static final String CACHE_DOCUMENT_PROPERTY = XFORMS_PROPERTY_PREFIX + "cache.document";
+    private static final boolean CACHE_DOCUMENT_DEFAULT = true;
+
+    private static final String STORE_APPLICATION_SIZE_PROPERTY = XFORMS_PROPERTY_PREFIX + "store.application.size";
     private static final int STORE_APPLICATION_SIZE_DEFAULT = 20 * 1024 * 1024;
 
-    private static final String STORE_APPLICATION_USERNAME_PROPERTY = "oxf.xforms.store.application.username";
-    private static final String STORE_APPLICATION_PASSWORD_PROPERTY = "oxf.xforms.store.application.password";
-    private static final String STORE_APPLICATION_URI_PROPERTY = "oxf.xforms.store.application.uri";
-    private static final String STORE_APPLICATION_COLLECTION_PROPERTY = "oxf.xforms.store.application.collection";
+    private static final String STORE_APPLICATION_USERNAME_PROPERTY = XFORMS_PROPERTY_PREFIX + "store.application.username";
+    private static final String STORE_APPLICATION_PASSWORD_PROPERTY = XFORMS_PROPERTY_PREFIX + "store.application.password";
+    private static final String STORE_APPLICATION_URI_PROPERTY = XFORMS_PROPERTY_PREFIX + "store.application.uri";
+    private static final String STORE_APPLICATION_COLLECTION_PROPERTY = XFORMS_PROPERTY_PREFIX + "store.application.collection";
 
     private static final String STORE_APPLICATION_USERNAME_DEFAULT = "guest";
     private static final String STORE_APPLICATION_PASSWORD_DEFAULT = "";
     private static final String STORE_APPLICATION_URI_DEFAULT = "xmldb:exist:///";
     private static final String STORE_APPLICATION_COLLECTION_DEFAULT = "/db/orbeon/xforms/cache/";
 
-    // The following are deprecated in favor of the persistent application store
-    private static final String CACHE_SESSION_SIZE_PROPERTY = "oxf.xforms.cache.session.size";
-    private static final int CACHE_SESSION_SIZE_DEFAULT = 1024 * 1024;
-    private static final String CACHE_APPLICATION_SIZE_PROPERTY = "oxf.xforms.cache.application.size";
-    private static final int CACHE_APPLICATION_SIZE_DEFAULT = 1024 * 1024;
+    private static final String GZIP_STATE_PROPERTY = XFORMS_PROPERTY_PREFIX + "gzip-state"; // global but could possibly be per document
+    private static final boolean GZIP_STATE_DEFAULT = true;
 
-    // TODO: This should probably be deprecated
-    public static final String VALIDATION_PROPERTY = "oxf.xforms.validate";
-//    public static final String XFORMS_OPTIMIZE_LOCAL_INSTANCE_LOADS_PROPERTY = "oxf.xforms.optimize-local-instance-loads";
+    private static final String HOST_LANGUAGE_AVTS_PROPERTY = XFORMS_PROPERTY_PREFIX + "host-language-avts"; // global but should be per document
+    private static final boolean HOST_LANGUAGE_AVTS_DEFAULT = false;
 
-    private static final String TEST_AJAX_PROPERTY = "oxf.xforms.test.ajax";
+    private static final String CACHE_COMBINED_RESOURCES_PROPERTY = XFORMS_PROPERTY_PREFIX + "cache-combined-resources"; // global but could possibly be per document
+    private static final boolean CACHE_COMBINED_RESOURCES_DEFAULT = false;
+
+    private static final String TEST_AJAX_PROPERTY = XFORMS_PROPERTY_PREFIX + "test.ajax";
     private static final boolean TEST_AJAX_DEFAULT = false;
 
-    /**
-     * @return  whether name encryption is enabled (legacy XForms engine only).
-     */
-    public static boolean isNameEncryptionEnabled() {
-        return OXFProperties.instance().getPropertySet().getBoolean
-                (ENCRYPT_NAMES_PROPERTY, false).booleanValue();
-    }
+    // The following global properties are deprecated in favor of the persistent application store
+    private static final String CACHE_SESSION_SIZE_PROPERTY = XFORMS_PROPERTY_PREFIX + "cache.session.size";
+    private static final int CACHE_SESSION_SIZE_DEFAULT = 1024 * 1024;
+    private static final String CACHE_APPLICATION_SIZE_PROPERTY = XFORMS_PROPERTY_PREFIX + "cache.application.size";
+    private static final int CACHE_APPLICATION_SIZE_DEFAULT = 1024 * 1024;
 
-    /**
-     * @return  whether hidden fields encryption is enabled.
-     */
-    public static boolean isHiddenEncryptionEnabled() {
-        return OXFProperties.instance().getPropertySet().getBoolean
-                (ENCRYPT_HIDDEN_PROPERTY, false).booleanValue();
+    // Legacy XForms Classic properties
+    private static final String ENCRYPT_NAMES_PROPERTY = XFORMS_PROPERTY_PREFIX + "encrypt-names";
+    private static final String ENCRYPT_HIDDEN_PROPERTY = XFORMS_PROPERTY_PREFIX + "encrypt-hidden";
+
+    public static String getXFormsPassword() {
+        if (isHiddenEncryptionEnabled())
+            return OXFProperties.instance().getPropertySet().getString(PASSWORD_PROPERTY);
+        else
+            return null;// TODO: is this needed?
     }
 
     public static boolean isCacheDocument() {
         return OXFProperties.instance().getPropertySet().getBoolean
-                (CACHE_DOCUMENT_PROPERTY, false).booleanValue();
-    }
-
-    public static boolean isOptimizeGetAllSubmission() {
-        return OXFProperties.instance().getPropertySet().getBoolean
-                (OPTIMIZE_GET_ALL_PROPERTY, true).booleanValue();
-    }
-
-    public static boolean isOptimizeLocalSubmission() {
-        return OXFProperties.instance().getPropertySet().getBoolean
-                (OPTIMIZE_LOCAL_SUBMISSION_PROPERTY, true).booleanValue();
-    }
-
-    public static boolean isServerStateHandling() {
-        final String propertyValue = OXFProperties.instance().getPropertySet().getString
-                (STATE_HANDLING_PROPERTY, STATE_HANDLING_CLIENT_VALUE);
-
-        return propertyValue.equals(STATE_HANDLING_SESSION_VALUE)
-                || propertyValue.equals(STATE_HANDLING_SERVER_VALUE);
-    }
-
-    public static boolean isExceptionOnInvalidClientControlId() {
-        return OXFProperties.instance().getPropertySet().getBoolean
-                (EXCEPTION_INVALID_CLIENT_CONTROL_PROPERTY, false).booleanValue();
-    }
-
-    public static boolean isAjaxShowLoadingIcon() {
-        return OXFProperties.instance().getPropertySet().getBoolean
-                (AJAX_SHOW_LOADING_ICON_PROPERTY, false).booleanValue();
-    }
-
-    public static boolean isAjaxShowErrors() {
-        return OXFProperties.instance().getPropertySet().getBoolean
-                (AJAX_SHOW_ERRORS_PROPERTY, true).booleanValue();
+                (CACHE_DOCUMENT_PROPERTY, CACHE_DOCUMENT_DEFAULT).booleanValue();
     }
 
     public static int getSessionStoreSize() {
@@ -160,47 +227,9 @@ public class XFormsProperties {
                 (GZIP_STATE_PROPERTY, GZIP_STATE_DEFAULT).booleanValue();
     }
 
-    public static boolean isHostLanguageAVTs() {
-        return OXFProperties.instance().getPropertySet().getBoolean
-                (HOST_LANGUAGE_AVTS_PROPERTY, HOST_LANGUAGE_AVTS_DEFAULT).booleanValue();
-    }
-
-    public static boolean isMinimalResources() {
-        return OXFProperties.instance().getPropertySet().getBoolean
-                (MINIMAL_RESOURCES_PROPERTY, MINIMAL_RESOURCES_DEFAULT).booleanValue();
-    }
-
-    public static boolean isCombineResources() {
-        return OXFProperties.instance().getPropertySet().getBoolean
-                (COMBINE_RESOURCES_PROPERTY, COMBINE_RESOURCES_DEFAULT).booleanValue();
-    }
-
-    public static boolean isCacheCombinedResources() {
-        return OXFProperties.instance().getPropertySet().getBoolean
-                (CACHE_COMBINED_RESOURCES_PROPERTY, CACHE_COMBINED_RESOURCES_DEFAULT).booleanValue();
-    }
-
-    public static boolean isOptimizeRelevance() {
-        return OXFProperties.instance().getPropertySet().getBoolean
-                (OPTIMIZE_RELEVANCE_PROPERTY, OPTIMIZE_RELEVANCE_DEFAULT).booleanValue();
-    }
-
     public static boolean isAjaxTest() {
         return OXFProperties.instance().getPropertySet().getBoolean
                 (TEST_AJAX_PROPERTY, TEST_AJAX_DEFAULT).booleanValue();
-    }
-
-    // This is not used currently
-//    public static boolean isOptimizeLocalInstanceLoads() {
-//        return OXFProperties.instance().getPropertySet().getBoolean
-//                (XFormsConstants.XFORMS_OPTIMIZE_LOCAL_INSTANCE_LOADS_PROPERTY, true).booleanValue();
-//    }
-
-    public static String getXFormsPassword() {
-        if (isHiddenEncryptionEnabled())
-            return OXFProperties.instance().getPropertySet().getString(PASSWORD_PROPERTY);
-        else
-            return null;
     }
 
     public static String getStoreUsername() {
@@ -221,5 +250,139 @@ public class XFormsProperties {
     public static String getStoreCollection() {
         return OXFProperties.instance().getPropertySet().getString
                 (STORE_APPLICATION_COLLECTION_PROPERTY, STORE_APPLICATION_COLLECTION_DEFAULT);
+    }
+
+    public static boolean isHostLanguageAVTs() {
+        return OXFProperties.instance().getPropertySet().getBoolean
+                (HOST_LANGUAGE_AVTS_PROPERTY, HOST_LANGUAGE_AVTS_DEFAULT).booleanValue();
+    }
+
+    public static boolean isCacheCombinedResources() {
+        return OXFProperties.instance().getPropertySet().getBoolean
+                (CACHE_COMBINED_RESOURCES_PROPERTY, CACHE_COMBINED_RESOURCES_DEFAULT).booleanValue();
+    }
+
+    public static String getStateHandling(XFormsContainingDocument containingDocument) {
+        return getStringProperty(containingDocument, STATE_HANDLING_PROPERTY);
+    }
+
+    public static boolean isClientStateHandling(XFormsContainingDocument containingDocument) {
+        return getStateHandling(containingDocument).equals(STATE_HANDLING_CLIENT_VALUE);
+    }
+
+    public static boolean isLegacySessionStateHandling(XFormsContainingDocument containingDocument) {
+        return getStateHandling(containingDocument).equals(STATE_HANDLING_SESSION_VALUE);
+    }
+
+    public static boolean isOptimizeGetAllSubmission(XFormsContainingDocument containingDocument) {
+        return getBooleanProperty(containingDocument, OPTIMIZE_GET_ALL_PROPERTY);
+    }
+
+    public static boolean isOptimizeLocalSubmission(XFormsContainingDocument containingDocument) {
+        return getBooleanProperty(containingDocument, OPTIMIZE_LOCAL_SUBMISSION_PROPERTY);
+    }
+
+    public static boolean isExceptionOnInvalidClientControlId(XFormsContainingDocument containingDocument) {
+        return getBooleanProperty(containingDocument, EXCEPTION_ON_INVALID_CLIENT_CONTROL_PROPERTY);
+    }
+
+    public static boolean isAjaxShowLoadingIcon(XFormsContainingDocument containingDocument) {
+        return getBooleanProperty(containingDocument, AJAX_SHOW_LOADING_ICON_PROPERTY);
+    }
+
+    public static boolean isAjaxShowErrors(XFormsContainingDocument containingDocument) {
+        return getBooleanProperty(containingDocument, AJAX_SHOW_ERRORS_PROPERTY);
+    }
+
+    public static boolean isMinimalResources(XFormsContainingDocument containingDocument) {
+        return getBooleanProperty(containingDocument, MINIMAL_RESOURCES_PROPERTY);
+    }
+
+    public static boolean isCombinedResources(XFormsContainingDocument containingDocument) {
+        return getBooleanProperty(containingDocument, COMBINE_RESOURCES_PROPERTY);
+    }
+
+    public static boolean isOptimizeRelevance(XFormsContainingDocument containingDocument) {
+        return getBooleanProperty(containingDocument, OPTIMIZE_RELEVANCE_PROPERTY);
+    }
+
+    public static boolean isSkipSchemaValidation(XFormsContainingDocument containingDocument) {
+        return getBooleanProperty(containingDocument, SKIP_SCHEMA_VALIDATION_PROPERTY);
+    }
+
+    public static boolean isReadonly(XFormsContainingDocument containingDocument) {
+        return getBooleanProperty(containingDocument, READONLY_PROPERTY);
+    }
+
+    public static String getReadonlyAppearance(XFormsContainingDocument containingDocument) {
+        return getStringProperty(containingDocument, READONLY_APPEARANCE_PROPERTY);
+    }
+
+    public static boolean isStaticReadonlyAppearance(XFormsContainingDocument containingDocument) {
+        return getReadonlyAppearance(containingDocument).equals(XFormsProperties.READONLY_APPEARANCE_STATIC_VALUE);
+    }
+
+    public static String getDateFormat(XFormsContainingDocument containingDocument) {
+        return getStringProperty(containingDocument, DATE_FORMAT_PROPERTY);
+    }
+
+    public static String getDateTimeFormat(XFormsContainingDocument containingDocument) {
+        return getStringProperty(containingDocument, DATETIME_FORMAT_PROPERTY);
+    }
+
+    public static String getTimeFormat(XFormsContainingDocument containingDocument) {
+        return getStringProperty(containingDocument, TIME_FORMAT_PROPERTY);
+    }
+
+    public static String getDecimalFormat(XFormsContainingDocument containingDocument) {
+        return getStringProperty(containingDocument, DECIMAL_FORMAT_PROPERTY);
+    }
+
+    public static String getIntegerFormat(XFormsContainingDocument containingDocument) {
+        return getStringProperty(containingDocument, INTEGER_FORMAT_PROPERTY);
+    }
+    public static String getFloatFormat(XFormsContainingDocument containingDocument) {
+        return getStringProperty(containingDocument, FLOAT_FORMAT_PROPERTY);
+    }
+
+    public static String getDoubleFormat(XFormsContainingDocument containingDocument) {
+        return getStringProperty(containingDocument, DOUBLE_FORMAT_PROPERTY);
+    }
+
+    private static boolean getBooleanProperty(XFormsContainingDocument containingDocument, String propertyName) {
+        if (containingDocument.getStaticState() != null)
+            return containingDocument.getStaticState().getBooleanProperty(propertyName);
+        else // case of legacy XForms engine which doesn't have a static state object
+            return OXFProperties.instance().getPropertySet().getBoolean(propertyName, ((Boolean) ((PropertyDefinition) SUPPORTED_DOCUMENT_PROPERTIES.get(propertyName)).getDefaultValue()).booleanValue()).booleanValue();
+    }
+
+    private static String getStringProperty(XFormsContainingDocument containingDocument, String propertyName) {
+        if (containingDocument.getStaticState() != null)
+            return containingDocument.getStaticState().getStringProperty(propertyName);
+        else // case of legacy XForms engine which doesn't have a static state object
+            return OXFProperties.instance().getPropertySet().getString(propertyName, ((PropertyDefinition) SUPPORTED_DOCUMENT_PROPERTIES.get(propertyName)).getDefaultValue().toString());
+    }
+
+    // This is not used currently
+//    public static boolean isOptimizeLocalInstanceLoads() {
+//        return OXFProperties.instance().getPropertySet().getBoolean
+//                (XFormsConstants.XFORMS_OPTIMIZE_LOCAL_INSTANCE_LOADS_PROPERTY, true).booleanValue();
+//    }
+
+
+    /**
+     * @return  whether name encryption is enabled (legacy XForms engine only).
+     */
+    public static boolean isNameEncryptionEnabled() {
+        return OXFProperties.instance().getPropertySet().getBoolean
+                (ENCRYPT_NAMES_PROPERTY, false).booleanValue();
+    }
+
+    /**
+     * @return  whether hidden fields encryption is enabled (legacy XForms engine only).
+     */
+    public static boolean isHiddenEncryptionEnabled() {
+        return OXFProperties.instance().getPropertySet().getBoolean
+                (ENCRYPT_HIDDEN_PROPERTY, false).booleanValue();
     }
 }

@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.control;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.InstanceData;
 import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.saxon.om.NodeInfo;
@@ -91,7 +92,7 @@ public class XFormsSingleNodeControl extends XFormsControl {
                     this.type = InstanceData.getType(currentNodeInfo);
 
                     // Handle global read-only setting
-                    if (containingDocument.isReadonly())
+                    if (XFormsProperties.isReadonly(containingDocument))
                         this.readonly = true;
                 } else {
                     // Control is not bound to a node - it becomes non-relevant
@@ -148,7 +149,7 @@ public class XFormsSingleNodeControl extends XFormsControl {
     public boolean isStaticReadonly() {
         // Static read-only if we are read-only and static (global or local setting)
         return isReadonly()
-                && (XFormsConstants.XXFORMS_READONLY_APPEARANCE_STATIC_VALUE.equals(containingDocument.getReadonlyAppearance())
-                    || XFormsConstants.XXFORMS_READONLY_APPEARANCE_STATIC_VALUE.equals(getControlElement().attributeValue(XFormsConstants.XXFORMS_READONLY_APPEARANCE_ATTRIBUTE_QNAME)));
+                && (XFormsProperties.isStaticReadonlyAppearance(containingDocument)
+                    || XFormsProperties.READONLY_APPEARANCE_STATIC_VALUE.equals(getControlElement().attributeValue(XFormsConstants.XXFORMS_READONLY_APPEARANCE_ATTRIBUTE_QNAME)));
     }
 }

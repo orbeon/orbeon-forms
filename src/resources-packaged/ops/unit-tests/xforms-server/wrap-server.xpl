@@ -38,7 +38,7 @@
                 <static-state>
                     <xsl:variable name="static-state" as="document-node()">
                         <xsl:document>
-                            <static-state xmlns="" state-handling="client">
+                            <static-state xmlns="" xxforms:state-handling="client">
                                 <xsl:copy-of select="doc('input:controls')/*"/>
                                 <xsl:copy-of select="doc('input:models')/*"/>
                             </static-state>

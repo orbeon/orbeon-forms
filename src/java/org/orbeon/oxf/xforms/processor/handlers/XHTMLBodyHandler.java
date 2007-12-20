@@ -188,7 +188,7 @@ public class XHTMLBodyHandler extends HandlerBase {
         }
 
         // Ajax loading indicator
-        if (XFormsProperties.isAjaxShowLoadingIcon()) {
+        if (XFormsProperties.isAjaxShowLoadingIcon(containingDocument)) {
 
             helper.startElement(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "span", new String[]{ "class", "xforms-loading-loading" });
             helper.text("Loading..."); // text is hardcoded, but you can rewrite it in the theme if needed 
@@ -198,7 +198,7 @@ public class XHTMLBodyHandler extends HandlerBase {
         }
 
         // Ajax error panel
-        if (XFormsProperties.isAjaxShowErrors()) {
+        if (XFormsProperties.isAjaxShowErrors(containingDocument)) {
             // XInclude dialog so users can configure it
             // TODO: must send startPrefixMapping()/endPrefixMapping()?
             helper.element("", XMLConstants.XINCLUDE_URI, "include", new String[] { "href", "oxf:/config/error-dialog.xml" });

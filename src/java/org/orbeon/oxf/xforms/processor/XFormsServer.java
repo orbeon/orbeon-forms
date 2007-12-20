@@ -102,6 +102,54 @@ public class XFormsServer extends ProcessorImpl {
         // Get server events if any
         serverEventsElement = requestDocument.getRootElement().element(XFormsConstants.XXFORMS_SERVER_EVENTS_QNAME);
 
+        // Get events requested by the client
+        final List eventElements = new ArrayList();
+
+        // Gather automatic events if any
+        if (serverEventsElement != null) {
+            final Document serverEventsDocument = XFormsUtils.decodeXML(pipelineContext, serverEventsElement.getStringValue());
+            eventElements.addAll(serverEventsDocument.getRootElement().elements(XFormsConstants.XXFORMS_EVENT_QNAME));
+        }
+
+        // Gather client events if any
+        if (actionElement != null) {
+            eventElements.addAll(actionElement.elements(XFormsConstants.XXFORMS_EVENT_QNAME));
+        }
+
+        // Check for heartbeat event
+        if (eventElements.size() > 0) {
+            for (Iterator i = eventElements.iterator(); i.hasNext();) {
+                final Element eventElement = (Element) i.next();
+                final String eventName = eventElement.attributeValue("name");
+                if (eventName.equals(XFormsEvents.XXFORMS_SESSION_HEARTBEAT)) {
+
+                    // This event must be sent on its own
+                    if (eventElements.size() > 1)
+                        throw new OXFException("Got xxforms-session-heartbeat event along with other events.");
+
+                    // Hit session if it exists
+                    final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+                    externalContext.getSession(false);
+
+                    // Output simple resulting document
+                    try {
+                        final ContentHandlerHelper ch = new ContentHandlerHelper(contentHandler);
+                        ch.startDocument();
+                        contentHandler.startPrefixMapping("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI);
+                        ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "event-response");
+                        ch.endElement();
+                        contentHandler.endPrefixMapping("xxf");
+                        ch.endDocument();
+                    } catch (SAXException e) {
+                        throw new OXFException(e);
+                    }
+
+                    // Don't do anything else
+                    return;
+                }
+            }
+        }
+
         // Get static state
         final String encodedClientStaticStateString;
         {
@@ -158,18 +206,6 @@ public class XFormsServer extends ProcessorImpl {
 //        final Object documentSyncronizationObject = (contentHandler != null) ? containingDocument : new Object();
         synchronized (containingDocument) {
             try {
-                final List eventElements = new ArrayList();
-
-                // Gather automatic events if any
-                if (serverEventsElement != null) {
-                    final Document serverEventsDocument = XFormsUtils.decodeXML(pipelineContext, serverEventsElement.getStringValue());
-                    eventElements.addAll(serverEventsDocument.getRootElement().elements(XFormsConstants.XXFORMS_EVENT_QNAME));
-                }
-
-                // Gather client events if any
-                if (actionElement != null) {
-                    eventElements.addAll(actionElement.elements(XFormsConstants.XXFORMS_EVENT_QNAME));
-                }
 
                 // Run events if any
                 final Map valueChangeControlIds = new HashMap();
@@ -622,7 +658,7 @@ public class XFormsServer extends ProcessorImpl {
     }
 
     public static void diffControls(PipelineContext pipelineContext, ContentHandlerHelper ch, XFormsContainingDocument containingDocument, List state1, List state2, Map itemsetsFull1, Map itemsetsFull2, Map valueChangeControlIds) {
-        if (XFormsProperties.isOptimizeRelevance()) {
+        if (XFormsProperties.isOptimizeRelevance(containingDocument)) {
             new NewControlsComparator(pipelineContext, ch, containingDocument, itemsetsFull1, itemsetsFull2, valueChangeControlIds).diff(state1, state2);
         } else {
             new OldControlsComparator(pipelineContext, ch, containingDocument, itemsetsFull1, itemsetsFull2, valueChangeControlIds).diff(state1, state2);

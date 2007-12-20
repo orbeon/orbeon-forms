@@ -25,6 +25,7 @@ import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.saxon.om.FastStringBuffer;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -94,10 +95,10 @@ public class XHTMLHeadHandler extends HandlerBase {
         }
 
         // Create prefix for combined resources if needed
-        final boolean isMinimal = XFormsProperties.isMinimalResources();
-        final String combinedResourcesPrefix = XFormsFeatures.getCombinedResourcesPrefix(appearancesMap, isMinimal);
+        final boolean isMinimal = XFormsProperties.isMinimalResources(containingDocument);
+        final String combinedResourcesPrefix = XFormsFeatures.getCombinedResourcesPrefix(containingDocument, appearancesMap, isMinimal);
 
-        final boolean isCombineResources = XFormsProperties.isCombineResources();
+        final boolean isCombineResources = XFormsProperties.isCombinedResources(containingDocument);
         final boolean isCacheCombinedResources = isCombineResources && XFormsProperties.isCacheCombinedResources();
         if (isCombineResources) {
             XFormsServer.logger.debug("XForms resources - creating xhtml:head with combined resources.");
@@ -137,7 +138,7 @@ public class XHTMLHeadHandler extends HandlerBase {
         }
 
         // Scripts
-        if (!containingDocument.isReadonly()) {
+        if (!XFormsProperties.isReadonly(containingDocument)) {
 
             if (isCombineResources) {
                 final String combinedResourceName = combinedResourcesPrefix + ".js";
@@ -169,6 +170,52 @@ public class XHTMLHeadHandler extends HandlerBase {
                 }
             }
 
+
+            // Configuration properties
+            {
+                final Map nonDefaultProperties = containingDocument.getStaticState().getNonDefaultProperties();
+                if (nonDefaultProperties.size() > 0) {
+
+                    FastStringBuffer sb = null;
+                    boolean found = false;
+
+                    for (Iterator i = nonDefaultProperties.entrySet().iterator(); i.hasNext();) {
+                        final Map.Entry currentEntry = (Map.Entry) i.next();
+                        final String propertyName = (String) currentEntry.getKey();
+                        final String propertyValue = (String) currentEntry.getValue();
+
+                        final XFormsProperties.PropertyDefinition propertyDefinition = (XFormsProperties.PropertyDefinition) XFormsProperties.SUPPORTED_DOCUMENT_PROPERTIES.get(propertyName);
+                        if (propertyDefinition.isPropagateToClient()) {
+
+                            if (!found) {
+                                // First property found
+                                helper.startElement(prefix, XMLConstants.XHTML_NAMESPACE_URI, "script", new String[] {
+                                    "type", "text/javascript"});
+                                sb = new FastStringBuffer("var opsXFormsProperties = {");
+                            } else {
+                                // Subsequent property found
+                                sb.append(',');
+                            }
+
+                            sb.append('\"');
+                            sb.append(propertyName);
+                            sb.append("\",\"");
+                            sb.append(propertyValue);
+                            sb.append('\"');
+
+                            found = true;
+                        }
+                    }
+
+                    if (found) {
+                        // Close everything
+                        sb.append("};");
+                        helper.text(sb.toString());
+                        helper.endElement();
+                    }
+                }
+            }
+
             // User-defined scripts (with xxforms:script)
             final Map scriptsToDeclare = containingDocument.getScripts();
             final String focusElementId = containingDocument.getClientFocusEffectiveControlId(pipelineContext);
@@ -188,7 +235,7 @@ public class XHTMLHeadHandler extends HandlerBase {
                 final List scriptsToRun = containingDocument.getScriptsToRun();
 
                 if (focusElementId != null || (scriptsToRun != null)) {
-                    final StringBuffer sb = new StringBuffer("\nfunction xformsPageLoadedServer() { ");
+                    final FastStringBuffer sb = new FastStringBuffer("\nfunction xformsPageLoadedServer() { ");
 
                     // Initial setfocus if present
                     if (focusElementId != null) {
@@ -218,60 +265,60 @@ public class XHTMLHeadHandler extends HandlerBase {
 
                 helper.endElement();
             }
-        }
 
-        // Store information about "special" controls that need JavaScript initialization
-        {
-            helper.startElement(prefix, XMLConstants.XHTML_NAMESPACE_URI, "script", new String[] {
-                    "type", "text/javascript"});
+            // Store information about "special" controls that need JavaScript initialization
+            {
+                helper.startElement(prefix, XMLConstants.XHTML_NAMESPACE_URI, "script", new String[] {
+                        "type", "text/javascript"});
 
-            // Produce JSON output
-            if (appearancesMap.size() > 0) {
-                final StringBuffer sb = new StringBuffer("var opsXFormsControls = {\"controls\":{");
+                // Produce JSON output
+                if (appearancesMap.size() > 0) {
+                    final FastStringBuffer sb = new FastStringBuffer("var opsXFormsControls = {\"controls\":{");
 
-                for (Iterator i = appearancesMap.entrySet().iterator(); i.hasNext();) {
-                    final Map.Entry currentEntry1 = (Map.Entry) i.next();
-                    final String controlName = (String) currentEntry1.getKey();
-                    final Map controlMap = (Map) currentEntry1.getValue();
+                    for (Iterator i = appearancesMap.entrySet().iterator(); i.hasNext();) {
+                        final Map.Entry currentEntry1 = (Map.Entry) i.next();
+                        final String controlName = (String) currentEntry1.getKey();
+                        final Map controlMap = (Map) currentEntry1.getValue();
 
-                    sb.append("\"");
-                    sb.append(controlName);
-                    sb.append("\":{");
+                        sb.append("\"");
+                        sb.append(controlName);
+                        sb.append("\":{");
 
-                    for (Iterator j = controlMap.entrySet().iterator(); j.hasNext();) {
-                        final Map.Entry currentEntry2 = (Map.Entry) j.next();
-                        final String controlAppearance = (String) currentEntry2.getKey();
-                        final List idsForAppearanceList = (List) currentEntry2.getValue();
+                        for (Iterator j = controlMap.entrySet().iterator(); j.hasNext();) {
+                            final Map.Entry currentEntry2 = (Map.Entry) j.next();
+                            final String controlAppearance = (String) currentEntry2.getKey();
+                            final List idsForAppearanceList = (List) currentEntry2.getValue();
 
-                        sb.append('"');
-                        sb.append(controlAppearance != null ? controlAppearance : "");
-                        sb.append("\":[");
-
-                        for (Iterator k = idsForAppearanceList.iterator(); k.hasNext();) {
-                            final String controlId = (String) k.next();
                             sb.append('"');
-                            sb.append(controlId);
-                            sb.append('"');
-                            if (k.hasNext())
+                            sb.append(controlAppearance != null ? controlAppearance : "");
+                            sb.append("\":[");
+
+                            for (Iterator k = idsForAppearanceList.iterator(); k.hasNext();) {
+                                final String controlId = (String) k.next();
+                                sb.append('"');
+                                sb.append(controlId);
+                                sb.append('"');
+                                if (k.hasNext())
+                                    sb.append(',');
+                            }
+
+                            sb.append(']');
+                            if (j.hasNext())
                                 sb.append(',');
                         }
 
-                        sb.append(']');
-                        if (j.hasNext())
+                        sb.append("}");
+                        if (i.hasNext())
                             sb.append(',');
                     }
 
-                    sb.append("}");
-                    if (i.hasNext())
-                        sb.append(',');
+                    sb.append("}};");
+
+                    helper.text(sb.toString());
                 }
 
-                sb.append("}};");
-
-                helper.text(sb.toString());
+                helper.endElement();
             }
-
-            helper.endElement();
         }
     }
 

@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms.control;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.action.actions.XFormsSetvalueAction;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -100,8 +99,6 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
             final Map prefixToURIMap = new HashMap();
             prefixToURIMap.put(XMLConstants.XSD_PREFIX, XMLConstants.XSD_URI);
 
-            final OXFProperties.PropertySet propertySet = OXFProperties.instance().getPropertySet();
-
             // Format according to type
             final String type = getType();
             if (type != null){
@@ -114,32 +111,25 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
 
                     if ("date".equals(typeName)) {
                         // Format a date
-                        final String DEFAULT_FORMAT = "if (. castable as xs:date) then format-date(xs:date(.), '[FNn] [MNn] [D], [Y] [ZN]', 'en', (), ()) else .";
-                        format = propertySet.getString(XFormsProperties.DATE_FORMAT_PROPERTY_DEFAULT, DEFAULT_FORMAT);
+                        format = XFormsProperties.getDateFormat(containingDocument);
                     } else if ("dateTime".equals(typeName)) {
                         // Format a dateTime
-                        final String DEFAULT_FORMAT = "if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), '[FNn] [MNn] [D], [Y] [H01]:[m01]:[s01] [ZN]', 'en', (), ()) else .";
-                        format = propertySet.getString(XFormsProperties.DATETIME_FORMAT_PROPERTY_DEFAULT, DEFAULT_FORMAT);
+                        format = XFormsProperties.getDateTimeFormat(containingDocument);
                     } else if ("time".equals(typeName)) {
                         // Format a time
-                        final String DEFAULT_FORMAT = "if (. castable as xs:time) then format-time(xs:time(.), '[H01]:[m01]:[s01] [ZN]', 'en', (), ()) else .";
-                        format = propertySet.getString(XFormsProperties.TIME_FORMAT_PROPERTY_DEFAULT, DEFAULT_FORMAT);
+                        format = XFormsProperties.getTimeFormat(containingDocument);
                     } else if ("decimal".equals(typeName)) {
                         // Format a decimal
-                        final String DEFAULT_FORMAT = "if (. castable as xs:decimal) then format-number(xs:decimal(.),'###,###,###,##0.00') else .";
-                        format = propertySet.getString(XFormsProperties.DECIMAL_FORMAT_PROPERTY_DEFAULT, DEFAULT_FORMAT);
+                        format = XFormsProperties.getDecimalFormat(containingDocument);
                     } else if ("integer".equals(typeName)) {
                         // Format an integer
-                        final String DEFAULT_FORMAT = "if (. castable as xs:integer) then format-number(xs:integer(.),'###,###,###,##0') else .";
-                        format = propertySet.getString(XFormsProperties.INTEGER_FORMAT_PROPERTY_DEFAULT, DEFAULT_FORMAT);
+                        format = XFormsProperties.getIntegerFormat(containingDocument);
                     } else if ("float".equals(typeName)) {
                         // Format a float
-                        final String DEFAULT_FORMAT = "if (. castable as xs:float) then format-number(xs:float(.),'#,##0.000') else .";
-                        format = propertySet.getString(XFormsProperties.FLOAT_FORMAT_PROPERTY_DEFAULT, DEFAULT_FORMAT);
+                        format = XFormsProperties.getFloatFormat(containingDocument);
                     } else if ("double".equals(typeName)) {
                         // Format a double
-                        final String DEFAULT_FORMAT = "if (. castable as xs:double) then format-number(xs:double(.),'#,##0.000') else .";
-                        format = propertySet.getString(XFormsProperties.DOUBLE_FORMAT_PROPERTY_DEFAULT, DEFAULT_FORMAT);
+                        format = XFormsProperties.getDoubleFormat(containingDocument);
                     }
                 }
             }

@@ -92,7 +92,7 @@
                 <li><link href="http://www.orbeon.com/oxf/download">Download
                 Orbeon Forms</link></li>
 
-                <li>Extract ops.war from the ZIP archive.</li>
+                <li>Extract orbeon.war from the ZIP archive.</li>
 
                 <li>Extract the JAR files from the WAR archive. They are
                 stored in the <code>WEB-INF/lib</code> directory.</li>

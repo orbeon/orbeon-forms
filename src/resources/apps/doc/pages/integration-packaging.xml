@@ -32,7 +32,7 @@
 		<section>
 			<title>WAR Structure</title>
             <p>
-                The following table lists the most important files contained in <code>ops.war</code>: 
+                The following table lists the most important files contained in <code>orbeon.war</code>: 
             </p>
             <table>
 				<tr>

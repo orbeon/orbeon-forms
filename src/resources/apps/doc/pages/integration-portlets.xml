@@ -142,8 +142,8 @@
             <ol>
                 <li>
                     <p>
-                        Either enable Auto Deploy in the Liferay Admin portlet and drop <code>ops.war</code> into the
-                        Deploy Directory, or upload <code>ops.war</code> directly from the Liferay Admin portlet:
+                        Either enable Auto Deploy in the Liferay Admin portlet and drop <code>orbeon.war</code> into the
+                        Deploy Directory, or upload <code>orbeon.war</code> directly from the Liferay Admin portlet:
                     </p>
                     <figure src="../apps/doc/images/portlets/liferay01.png"/>
                 </li>

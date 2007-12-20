@@ -60,7 +60,7 @@
 
                 <li>
                     <p>
-                        Unzip <code>ops.war</code> in the <code>ops</code> directory you just
+                        Unzip <code>orbeon.war</code> in the <code>ops</code> directory you just
                         created.
                     </p>
                 </li>
@@ -259,7 +259,7 @@
                 </li>
                 <li>
                     <p>
-                        Unzip <code>ops.war</code> into <code>C:/WebApps/ops</code>. There should
+                        Unzip <code>orbeon.war</code> into <code>C:/WebApps/ops</code>. There should
                         now be a directory called <code>WEB-INF</code> under
                         <code>C:/WebApps/ops</code>.
                     </p>
@@ -340,7 +340,7 @@
                 </li>
                 <li>
                     <p>
-                        Unzip <code>ops.war</code> in the <code>orbeon</code> directory you just
+                        Unzip <code>orbeon.war</code> in the <code>orbeon</code> directory you just
                         created.
                     </p>
                 </li>
@@ -575,11 +575,11 @@
                 </li>
                 <li>
                     <p>
-                        Install and deploy Orbeon Forms (<code>ops.war</code>).
+                        Install and deploy Orbeon Forms (<code>orbeon.war</code>).
                         <ul>
                             <li>Click on Applications / Install New Application.</li>
                             <li>
-                                Select the <code>ops.war</code> to upload, choose a context path
+                                Select the <code>orbeon.war</code> to upload, choose a context path
                                 like <code>/ops</code> (from now on we will assume this was your
                                 choice).
                             </li>
@@ -601,7 +601,7 @@
                                         </li>
                                         <li>
                                             The WAR file is uncompressed by WebSphere in
-                                            <code>WSAS_HOME/installedApps/NODE_NAME/ops_war.ear/ops.war</code> on
+                                            <code>WSAS_HOME/installedApps/NODE_NAME/ops_war.ear/orbeon.war</code> on
                                             WebSphere 5, where NODE_NAME if usualy your machine name.
                                         </li>
                                     </ul>
@@ -623,7 +623,7 @@
                                 You can modify the example applications resources as the application sever is running
                                 and see the results of your modifications on the fly. The resources are stored under
                                 <code>WSAS_HOME/profiles/default/installedApps/yourmachineNode01Cell/
-                                orbeon_war.ear/ops.war/WEB-INF/resources</code>. For instance, try to modify
+                                orbeon_war.ear/orbeon.war/WEB-INF/resources</code>. For instance, try to modify
                                 <code>apps/xforms-hello/view.xhtml</code>: replace "Please enter your first name:" by
                                 your own message, and reload the page in the browser to see the result.
                             </li>
@@ -822,12 +822,12 @@
                 <li>
                     <p>
                         Assuming that <code>JBOSS_HOME</code> represents the location of your JBoss installation:
-                        create a new <code>JBOSS_HOME/server/default/deploy/ops.war</code> directory.
+                        create a new <code>JBOSS_HOME/server/default/deploy/orbeon.war</code> directory.
                     </p>
                 </li>
                 <li>
                     <p>
-                        Unzip <code>ops.war</code> in the <code>ops.war</code> directory you just created.
+                        Unzip <code>orbeon.war</code> in the <code>orbeon.war</code> directory you just created.
                     </p>
                 </li>
                 <li>
@@ -874,7 +874,7 @@
                             <li>
                                 You can modify the example applications resources as the application sever is running
                                 and see the results of your modifications on the fly. The resources are stored under
-                                <code>JBOSS_HOME/server/default/deploy/ops.war/WEB-INF/resources</code>.
+                                <code>JBOSS_HOME/server/default/deploy/orbeon.war/WEB-INF/resources</code>.
                             </li>
                         </ul>
                     </p>
@@ -885,13 +885,13 @@
                         <ul>
                             <li>
                                 Open
-                                <code>JBOSS_HOME/server/default/deploy/ops.war/WEB-INF/web.xml</code>
+                                <code>JBOSS_HOME/server/default/deploy/orbeon.war/WEB-INF/web.xml</code>
                                 and uncomment the <code>security-constraint</code>,
                                <code>login-config</code> and <code>security-role</code>
                                declarations at the end of the file.
                             </li>
                             <li>
-                                Open <code>JBOSS_HOME/server/default/deploy/ops.war/WEB-INF/jboss-web.xml</code>
+                                Open <code>JBOSS_HOME/server/default/deploy/orbeon.war/WEB-INF/jboss-web.xml</code>
                                 and uncomment the <code>security-domain</code> element near the end of
                                 bottom of the file.
                             </li>

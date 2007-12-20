@@ -226,7 +226,7 @@
                     </li>
                     <li>
                         <p>
-                            Under <code>ORBEON_FORMS_HOME</code>, you find a file called <code>ops.war</code>. This
+                            Under <code>ORBEON_FORMS_HOME</code>, you find a file called <code>orbeon.war</code>. This
                             is the file to deploy into Tomcat. To do so, just copy it under
                             <code>TOMCAT_HOME/webapps</code> (alternatively, if you know what you are doing, you can
                             uncompress it at a location of your choice and configure a context in
@@ -507,7 +507,7 @@
                     <li>
                         <p>
                             The next part, <code>ops</code>, depends on what context you install Orbeon Forms into. By
-                            default, because the WAR file is called <code>ops.war</code>, the context is
+                            default, because the WAR file is called <code>orbeon.war</code>, the context is
                             <code>ops</code>. (You could as well configure your container to use a different context, or
                             an empty (default) context.)
                         </p>

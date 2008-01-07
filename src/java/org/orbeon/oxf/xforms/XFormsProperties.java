@@ -71,6 +71,11 @@ public class XFormsProperties {
     private static final String DEBUG_WINDOW_WIDTH_PROPERTY = "debug-window-width";
     private static final String LOADING_MIN_TOP_PADDING_PROPERTY = "loading-min-top-padding";
 
+    private static final String REVISIT_HANDLING_PROPERTY = "revisit-handling";
+    public static final String REVISIT_HANDLING_RESTORE_VALUE = "restore";
+    public static final String REVISIT_HANDLING_RELOAD_VALUE = "reload";
+
+
     public static class PropertyDefinition {
 
         private String name;
@@ -143,8 +148,8 @@ public class XFormsProperties {
             new PropertyDefinition(REQUEST_RETRIES_PROPERTY, 3, true),
             new PropertyDefinition(DEBUG_WINDOW_HEIGHT_PROPERTY, 600, true),
             new PropertyDefinition(DEBUG_WINDOW_WIDTH_PROPERTY, 300, true),
-            new PropertyDefinition(LOADING_MIN_TOP_PADDING_PROPERTY, 10, true)
-
+            new PropertyDefinition(LOADING_MIN_TOP_PADDING_PROPERTY, 10, true),
+            new PropertyDefinition(REVISIT_HANDLING_PROPERTY, REVISIT_HANDLING_RESTORE_VALUE, true)
     };
 
     public static final Map SUPPORTED_DOCUMENT_PROPERTIES;

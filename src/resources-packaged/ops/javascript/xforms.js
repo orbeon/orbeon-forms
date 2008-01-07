@@ -1873,7 +1873,11 @@ ORBEON.xforms.Init = {
                 if (xformsGetFromClientState(formID, "load-did-run") == null) {
                     xformsStoreInClientState(formID, "load-did-run", "true");
                 } else {
-                    xformsFireEvents(new Array(xformsCreateEventArray(form, "xxforms-all-events-required", null, null)), false);
+                    if (typeof opsXFormsProperties != "undefined" && opsXFormsProperties["revisit-handling"] == "reload") {
+                        window.location.reload(true)
+                    } else {
+                        xformsFireEvents(new Array(xformsCreateEventArray(form, "xxforms-all-events-required", null, null)), false);
+                    }
                 }
             }
         }

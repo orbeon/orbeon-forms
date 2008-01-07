@@ -390,32 +390,8 @@ public class XFormsServer extends ProcessorImpl {
 
             // Get encoded state to send to the client
             // NOTE: This will also cache the containing document if needed
-
-            // The "pinning" of the dynamic state is done for the following scenario:
-            //
-            // o Submission with replace="all" is started.
-            // o Ajax response reaches the client with dynamic state "foo".
-            // o Client does HTML form submission (second pass of submission) with dynamic state "foo".
-            // o While this is happening user triggers new Ajax request with dynamic state "foo", replaced on the server by "bar" (and possibly other states).
-            // o The new page finally shows up. The server will have "bar", but the client may not have it.
-            // o User does a page back. This requests "foo", which has disappeared if we just expired it when replacing it with "bar".
-            //
-            // An algorithm to fix this could be:
-            //
-            // o Pin state for second pass (pin "foo")
-            // o Unpin the state (but do not delete it) when the second pass reaches the server.
-            //   NOTE: the HTML submission could be very slow and arrive to the server before or after the series of Ajax requests
-            // o If a submission is going on for a state (i.e. state was created while processing first pass), then keep last two states,
-            //   otherwise keep just one last state + initial.
-            //   NOTE: "second pass going on" for a state should be kept in the dynamic state.
-            // o Once second pass reaches the server, the "second pass going on" flag can be removed for the document.
-            //   NOTE: The document can have evolved since then - and you may not be able to find it. So the flag may never be cleared. This can also
-            //   happen if the HTML submission gets lost. But this should not happen too often.
-
-            //final boolean pinNewDynamicState = requireClientSubmission;
-            final boolean pinNewDynamicState = false;
             final XFormsState encodedClientState
-                    = XFormsStateManager.getEncodedClientStateDoCache(containingDocument, pipelineContext, xformsDecodedClientState, allEvents, pinNewDynamicState);
+                    = XFormsStateManager.getEncodedClientStateDoCache(containingDocument, pipelineContext, xformsDecodedClientState, allEvents);
 
             // Output static state (FOR TESTING ONLY)
             if (testOutputStaticState) {

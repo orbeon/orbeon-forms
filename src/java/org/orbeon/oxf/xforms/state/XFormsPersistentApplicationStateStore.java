@@ -116,6 +116,11 @@ public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
     // Map session ids -> Map of keys
     private final Map sessionToKeysMap = new HashMap();
 
+    // Stats
+    // TODO
+    private int maxMemorySize;
+    private long timeSpentInPersistence;
+
     /**
      * Create an instance of this state store.
      *
@@ -153,10 +158,10 @@ public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
         return "global application";
     }
 
-    public synchronized void add(String pageGenerationId, String oldRequestId, String requestId, XFormsState xformsState, final String sessionId, boolean pinNewDynamicState) {
+    public synchronized void add(String pageGenerationId, String oldRequestId, String requestId, XFormsState xformsState, final String sessionId) {
 
         // Do the operation
-        super.add(pageGenerationId, oldRequestId, requestId, xformsState, sessionId, pinNewDynamicState);
+        super.add(pageGenerationId, oldRequestId, requestId, xformsState, sessionId);
 
         // Add session listener if needed
         if (sessionId != null) {
@@ -207,10 +212,10 @@ public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
     }
 
     // NOTE: This calls super() and handles session information
-    protected void addOrReplaceOne(String key, String value, boolean isPinned, String currentSessionId) {
+    protected void addOrReplaceOne(String key, String value, boolean isPinned, String currentSessionId, String previousKey) {
 
         // Actually add
-        super.addOrReplaceOne(key, value, isPinned, currentSessionId);
+        super.addOrReplaceOne(key, value, isPinned, currentSessionId, previousKey);
 
         // Remember that this key is associated with a session
         if (currentSessionId != null) {
@@ -412,6 +417,13 @@ public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
             }
         }
 
+        // Store the previous key if any
+        if (storeEntry.previousKey != null) {
+            sb.append("<previous-key>");
+            sb.append(storeEntry.previousKey);
+            sb.append("</previous-key>");
+        }
+
         // Store the pinned entry flag
         sb.append("<pinned>");
         sb.append(Boolean.toString(storeEntry.isPinned));
@@ -451,7 +463,7 @@ public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
         // Handle result
         if (persistedStoreEntry != null) {
             // Add the key to the list in memory
-            addOne(persistedStoreEntry.key, persistedStoreEntry.value, persistedStoreEntry.isPinned, persistedStoreEntry.sessionIds);
+            addOne(persistedStoreEntry.key, persistedStoreEntry.value, persistedStoreEntry.isPinned, persistedStoreEntry.sessionIds, persistedStoreEntry.previousKey);
             debug("migrated persisted entry for key: " + key);
             return persistedStoreEntry.value;
         } else {
@@ -492,7 +504,9 @@ public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
             }
         }
 
-        return new StoreEntry(key, value, isPinned, sessionIdsMap);
+        final Element previousKeyElement = rootElement.element("previousKey");
+
+        return new StoreEntry(key, value, isPinned, sessionIdsMap, previousKeyElement == null ? null : previousKeyElement.getStringValue());
     }
 
     private static class XMLDBAccessor extends XMLDBProcessor {

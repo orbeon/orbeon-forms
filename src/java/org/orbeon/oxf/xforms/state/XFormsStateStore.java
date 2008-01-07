@@ -36,27 +36,73 @@ public abstract class XFormsStateStore {
 
     protected abstract String getStoreDebugName();
 
-    public synchronized void add(String pageGenerationId, String oldRequestId, String requestId, XFormsState xformsState, String currentSessionId, boolean pinNewDynamicState) {
+    public synchronized void add(String pageGenerationId, String oldRequestId, String requestId, XFormsState xformsState, String currentSessionId) {
 
          // Whether this is an initial dynamic state entry which has preferential treatment
         final boolean isInitialEntry = oldRequestId == null;
 
         // Remove old dynamic state if present as we keep only one entry per page generation
         // NOTE: We try to keep the initial dynamic state entry in the store however, because the client is still likely to request it
+
+        // Here we attempt to remove the "previous previous" dynamic state. The idea is that we want to keep the last
+        // two dynamic states to handle funny synchronization cases between client and server, including two-pass
+        // submission and clicks on links when a concurrent Ajax request is fired. Example:
+        //
+        // o Submission with replace="all" is started.
+        // o Ajax response reaches the client with dynamic state "foo".
+        // o Client does HTML form submission (second pass of submission) with dynamic state "foo".
+        // o While this is happening user triggers new Ajax request with dynamic state "foo", replaced on the server by "bar" (and possibly other states).
+        // o The new page finally shows up. The server will have "bar", but the client may not have it.
+        // o User does a page back. This requests "foo", which has disappeared if we just expired it when replacing it with "bar".
+        //
+        // A smart algorithm to fix this could be:
+        //
+        // o Pin state for second pass (pin "foo")
+        // o Unpin the state (but do not delete it) when the second pass reaches the server.
+        //   NOTE: the HTML submission could be very slow and arrive to the server before or after the series of Ajax requests
+        // o If a submission is going on for a state (i.e. state was created while processing first pass), then keep last two states,
+        //   otherwise keep just one last state + initial.
+        //   NOTE: "second pass going on" for a state should be kept in the dynamic state.
+        // o Once second pass reaches the server, the "second pass going on" flag can be removed for the document.
+        //   NOTE: The document can have evolved since then - and you may not be able to find it. So the flag may never be cleared. This can also
+        //   happen if the HTML submission gets lost. But this should not happen too often.
+        //
+        // But we prefer the simpler solution:
+        //
+        // o Just keep the last two dynamic states
+        //   -> drawback is this uses more memory, but it solves the problem
+        //
+        // A non-working solution: you would think that you could prevent any user input on the client using a mask
+        // (container.js) and preventing Ajax requests while a submission is going on. BUT this wouldn't work for
+        // cases where the submission results in a new tab/window, it would only work when the target == '' AND the
+        // browser decides to create a new history entry. You can STILL have cases where the browser picks either
+        // way (case of PDF file with or w/o Adobe plugin). So this does not seem to be a real solution.
+
+        // NOTE: We don't remove old entries if they are already persisted. Is this a good strategy?
         if (!isInitialEntry) {
-            final CacheLinkedList.ListEntry oldListEntry = (CacheLinkedList.ListEntry) keyToEntryMap.get(oldRequestId);
-            if (oldListEntry != null) {
-                final StoreEntry oldStoredEntry = (StoreEntry) oldListEntry.element;
-                if (!oldStoredEntry.isPinned)// remove unless pinned
-                    removeStoreEntry(oldListEntry);
+            final CacheLinkedList.ListEntry previousListEntry = (CacheLinkedList.ListEntry) keyToEntryMap.get(oldRequestId);
+            if (previousListEntry != null) {
+                // Found previous entry
+                final StoreEntry previousStoredEntry = (StoreEntry) previousListEntry.element;
+
+                if (previousStoredEntry.previousKey != null) {
+                    // Found "previous previous" entry
+                    final CacheLinkedList.ListEntry previousPreviousListEntry = (CacheLinkedList.ListEntry) keyToEntryMap.get(previousStoredEntry.previousKey);
+                    if (previousPreviousListEntry != null) {
+                        final StoreEntry previousPreviousStoredEntry = (StoreEntry) previousPreviousListEntry.element;
+
+                        if (!previousPreviousStoredEntry.isPinned)// remove unless pinned
+                            removeStoreEntry(previousPreviousListEntry);
+                    }
+                }
             }
         }
 
         // Add static state and move it to the front
-        addOrReplaceOne(pageGenerationId, xformsState.getStaticState(), false, currentSessionId);
+        addOrReplaceOne(pageGenerationId, xformsState.getStaticState(), false, currentSessionId, null);
 
         // Add new dynamic state and move it to the front
-        addOrReplaceOne(requestId, xformsState.getDynamicState(), isInitialEntry || pinNewDynamicState, currentSessionId);
+        addOrReplaceOne(requestId, xformsState.getDynamicState(), isInitialEntry, currentSessionId, oldRequestId);
 
         if (XFormsStateManager.logger.isDebugEnabled()) {
             debug("store size after adding: " + currentStoreSize + " bytes.");
@@ -79,7 +125,7 @@ public abstract class XFormsStateStore {
         return new XFormsState(staticState, dynamicState);
     }
 
-    protected void addOrReplaceOne(String key, String value, boolean isPinned, String currentSessionId) {
+    protected void addOrReplaceOne(String key, String value, boolean isPinned, String currentSessionId, String previousKey) {
 
         final CacheLinkedList.ListEntry existingListEntry = (CacheLinkedList.ListEntry) keyToEntryMap.get(key);
         if (existingListEntry != null) {
@@ -100,11 +146,11 @@ public abstract class XFormsStateStore {
             final Map sessionIds = new HashMap();
             if (currentSessionId != null)
                 sessionIds.put(currentSessionId, "");
-            addOne(key, value, isPinned, sessionIds);
+            addOne(key, value, isPinned, sessionIds, previousKey);
         }
     }
 
-    protected void addOne(String key, String value, boolean isPinned, Map sessionIds) {
+    protected void addOne(String key, String value, boolean isPinned, Map sessionIds, String previousKey) {
         // Make room if needed
         final int size = value.length() * 2;
         final int storeSizeBeforeExpire = currentStoreSize;
@@ -118,7 +164,7 @@ public abstract class XFormsStateStore {
            debug("expired " + expiredCount + " entries (" + (storeSizeBeforeExpire - currentStoreSize) + " bytes).");
 
         // Add new element to store
-        final CacheLinkedList.ListEntry listEntry = linkedList.addFirst(new StoreEntry(key, value, isPinned, sessionIds));
+        final CacheLinkedList.ListEntry listEntry = linkedList.addFirst(new StoreEntry(key, value, isPinned, sessionIds, previousKey));
         keyToEntryMap.put(key, listEntry);
 
         // Update store size
@@ -214,11 +260,14 @@ public abstract class XFormsStateStore {
         public boolean isPinned;
         public Map sessionIds;
 
-        public StoreEntry(String key, String value, boolean isPinned, Map sessionIds) {
+        public String previousKey; // link to the previous key (for dynamic state only)
+
+        public StoreEntry(String key, String value, boolean isPinned, Map sessionIds, String previousKey) {
             this.key = key;
             this.value = value;
             this.isPinned = isPinned;
             this.sessionIds = sessionIds;
+            this.previousKey = previousKey;
         }
 
         public void addSessionId(String sessionId) {

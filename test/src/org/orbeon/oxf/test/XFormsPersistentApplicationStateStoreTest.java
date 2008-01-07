@@ -72,7 +72,7 @@ public class XFormsPersistentApplicationStateStoreTest extends TestCase {
 
 	public void testSimpleAddAndFind() {
 		final XFormsState xformsState = new XFormsState("staticState", "dynamicState");
-		fixture.add("pgid-1", null, "requestid-1", xformsState, "sessionid-1", false);
+		fixture.add("pgid-1", null, "requestid-1", xformsState, "sessionid-1");
 		final XFormsState retreivedState = fixture.find("pgid-1", "requestid-1");
 		assertNotNull("State not found", retreivedState);
 		assertEquals("Static state incorrect", xformsState.getStaticState(), retreivedState.getStaticState());
@@ -88,9 +88,9 @@ public class XFormsPersistentApplicationStateStoreTest extends TestCase {
 		// associated a new session id, same is true for request id and dynamic state (Should the code check and throw an
 		// exception if such an attempt is made?)
 		final XFormsState originalState = new XFormsState("staticState", "dynamicState");
-		fixture.add("pgid-1", null, "requestid-1", originalState, "sessionid-1", false);
+		fixture.add("pgid-1", null, "requestid-1", originalState, "sessionid-1");
 		final XFormsState modifiedState = new XFormsState("staticState" + "Modified", "dynamicState" + "Modified");
-		fixture.add("pgid-1", null, "requestid-1", modifiedState, "sessionid-1", false);
+		fixture.add("pgid-1", null, "requestid-1", modifiedState, "sessionid-1");
 
 		final XFormsState retreivedState = fixture.find("pgid-1", "requestid-1");
 		assertNotNull("State not found", retreivedState);
@@ -102,7 +102,7 @@ public class XFormsPersistentApplicationStateStoreTest extends TestCase {
 		final XFormsState xformsState = new XFormsState(
 				generateRandomString(100 * 1024),
 				generateRandomString(100 * 1024));
-		fixture.add("pgid-1", null, "requestid-1", xformsState, "sessionid-1", false);
+		fixture.add("pgid-1", null, "requestid-1", xformsState, "sessionid-1");
 		final XFormsState retreivedState = fixture.find("pgid-1", "requestid-1");
 		assertNotNull("State not found", retreivedState);
 		assertEquals("Static state incorrect", xformsState.getStaticState(), retreivedState.getStaticState());
@@ -115,11 +115,11 @@ public class XFormsPersistentApplicationStateStoreTest extends TestCase {
 		XFormsState xformStates[] = new XFormsState[NUMBER_OF_PAGES];
 		for (int i = 0; i < NUMBER_OF_PAGES; i++) {
 			xformStates[i] = new XFormsState("staticState" + i, "dynamicState-0-" + i);
-			fixture.add("pgid" + i, null, "requestid0", xformStates[i], "sessionid-1", false);
+			fixture.add("pgid" + i, null, "requestid0", xformStates[i], "sessionid-1");
 			for (int j = 1; j <= NUMBER_OF_REQUESTS; j++) {
 				xformStates[i] = new XFormsState(xformStates[i].getStaticState(), "dynamicState-" + j + "-" + i);
 				fixture.add("pgid" + i, "requestid" + (j - 1), "requestid" + i
-						+ "-" + j, xformStates[i], "sessionid-1", false);
+						+ "-" + j, xformStates[i], "sessionid-1");
 
 			}
 		}
@@ -172,7 +172,7 @@ public class XFormsPersistentApplicationStateStoreTest extends TestCase {
 		final XFormsState xformsState = new XFormsState(
 				generateRandomString(100 * 1024),
 				generateRandomString(100 * 1024));
-		fixture.add("pgid-1", null, "requestid-1", xformsState, "sessionid-1", false);
+		fixture.add("pgid-1", null, "requestid-1", xformsState, "sessionid-1");
 		final XFormsState retreivedState = fixture.find("pgid-1", "requestid-1");
 		fillUpInMemoryCache();
 		assertNotNull("State not found", retreivedState);
@@ -182,21 +182,33 @@ public class XFormsPersistentApplicationStateStoreTest extends TestCase {
 
 	public void testPreviousRequestDataCleared() {
 		XFormsState xformsState = new XFormsState("staticState", "dynamicState");
-		fixture.add("pgid-1", "requestid-0", "requestid-1", xformsState, "sessionid-1", false);
-		fixture.add("pgid-1", "requestid-1", "requestid-2", xformsState, "sessionid-1", false);
-		assertNull("Old request data not removed", fixture.find("pgid-1", "requestid-1"));
-	}
+        fixture.add("pgid-1", null, "requestid-0", xformsState, "sessionid-1");
+        fixture.add("pgid-1", "requestid-0", "requestid-1", xformsState, "sessionid-1");
+		fixture.add("pgid-1", "requestid-1", "requestid-2", xformsState, "sessionid-1");
+        fixture.add("pgid-1", "requestid-2", "requestid-3", xformsState, "sessionid-1");
+
+        assertNotNull("Initial request data removed", fixture.find("pgid-1", "requestid-0"));
+        assertNotNull("Previous request data removed", fixture.find("pgid-1", "requestid-2"));
+        assertNull("Previous previous request data not removed", fixture.find("pgid-1", "requestid-1"));
+
+        fixture.add("pgid-1", "requestid-3", "requestid-4", xformsState, "sessionid-1");
+
+        assertNotNull("Initial request data removed", fixture.find("pgid-1", "requestid-0"));
+        assertNotNull("Previous request data removed", fixture.find("pgid-1", "requestid-3"));
+        assertNull("Previous previous request data not removed", fixture.find("pgid-1", "requestid-2"));
+
+    }
 
 	public void testInitialEntryShouldNotBeCleared() {
 		final XFormsState xformsState = new XFormsState("staticState", "dynamicState");
-		fixture.add("pgid-1", null, "requestid-1", xformsState, "sessionid-1", false);
-		fixture.add("pgid-1", "requestid-1", "requestid-2", xformsState, "sessionid-1", false);
+		fixture.add("pgid-1", null, "requestid-1", xformsState, "sessionid-1");
+		fixture.add("pgid-1", "requestid-1", "requestid-2", xformsState, "sessionid-1");
 		assertNotNull("Initial entry should not be cleared", fixture.find("pgid-1", "requestid-1"));
 	}
 
 	public void testFindAfterStatePersistedToDB() {
 		final XFormsState xformsState = new XFormsState("staticState", "dynamicState");
-		fixture.add("pgid", null, "requestid", xformsState, "sessionid", false);
+		fixture.add("pgid", null, "requestid", xformsState, "sessionid");
 
 		fillUpInMemoryCache();
 
@@ -211,15 +223,15 @@ public class XFormsPersistentApplicationStateStoreTest extends TestCase {
 		for (int i = 0; i < XFormsProperties.getApplicationStateStoreSize() / (CHUNK_SIZE * 2); i++) {
 			fixture.add("pgid-" + i, null, "requestid-" + i, new XFormsState(
 					generateRandomString(CHUNK_SIZE),
-					generateRandomString(CHUNK_SIZE)), "sessionid-" + i, false);
+					generateRandomString(CHUNK_SIZE)), "sessionid-" + i);
 		}
 	}
 
 	public void testFindAfterSessionExpiry() {
 		final XFormsState xformsState = new XFormsState("staticState", "dynamicState");
 		externalContext.setSession(findOrCreateSession("sessionid-1"));
-		fixture.add("pgid-1", null, "requestid-0", xformsState, "sessionid-1", false);
-		fixture.add("pgid-1", "requestid-0", "requestid-1", xformsState, "sessionid-1", false);
+		fixture.add("pgid-1", null, "requestid-0", xformsState, "sessionid-1");
+		fixture.add("pgid-1", "requestid-0", "requestid-1", xformsState, "sessionid-1");
 		expireSession("sessionid-1");
 		assertNull("Initial State not removed even after session expiry", fixture.find("pgid-1", "requestid-0"));
 		assertNull("State not removed even after session expiry", fixture.find("pgid-1", "requestid-1"));
@@ -228,8 +240,8 @@ public class XFormsPersistentApplicationStateStoreTest extends TestCase {
 	public void testSessionExpiryOfPersistedState() {
 		final XFormsState xformsState = new XFormsState("staticState", "dynamicState");
 		externalContext.setSession(findOrCreateSession("sessionid-1"));
-		fixture.add("pgid-1", null, "requestid-0", xformsState, "sessionid-1", false);
-		fixture.add("pgid-1", "requestid-0", "requestid-1", xformsState, "sessionid-1", false);
+		fixture.add("pgid-1", null, "requestid-0", xformsState, "sessionid-1");
+		fixture.add("pgid-1", "requestid-0", "requestid-1", xformsState, "sessionid-1");
 		externalContext.setSession(null);
 		// This will cause the previous entries to be pushed to db
 		fillUpInMemoryCache();
@@ -241,9 +253,9 @@ public class XFormsPersistentApplicationStateStoreTest extends TestCase {
 	public void testStateSharedAcrossMultipleSessions() {
 		final XFormsState xformsState = new XFormsState("staticState", "dynamicState");
 		externalContext.setSession(findOrCreateSession("sessionid-1"));
-		fixture.add("pgid-1", "requestid-10", "requestid-1", xformsState, "sessionid-1", false);
+		fixture.add("pgid-1", "requestid-10", "requestid-1", xformsState, "sessionid-1");
 		externalContext.setSession(findOrCreateSession("sessionid-2"));
-		fixture.add("pgid-1", "requestid-20", "requestid-1", xformsState, "sessionid-2", false);
+		fixture.add("pgid-1", "requestid-20", "requestid-1", xformsState, "sessionid-2");
 		expireSession("sessionid-1");
 		assertNotNull("State removed even though it is refered to by a session",
 				fixture.find("pgid-1", "requestid-1"));
@@ -252,9 +264,9 @@ public class XFormsPersistentApplicationStateStoreTest extends TestCase {
 	public void testClearingOfStateSharedAcrossMultipleSessions() {
 		final XFormsState xformsState = new XFormsState("staticState", "dynamicState");
 		externalContext.setSession(findOrCreateSession("sessionid-1"));
-		fixture.add("pgid-1", "requestid-10", "requestid-1", xformsState, "sessionid-1", false);
+		fixture.add("pgid-1", "requestid-10", "requestid-1", xformsState, "sessionid-1");
 		externalContext.setSession(findOrCreateSession("sessionid-2"));
-		fixture.add("pgid-1", "requestid-20", "requestid-1", xformsState, "sessionid-2", false);
+		fixture.add("pgid-1", "requestid-20", "requestid-1", xformsState, "sessionid-2");
 		expireSession("sessionid-1");
 		expireSession("sessionid-2");
 		assertNull("State not removed even after expiration of all associated sessions",
@@ -264,7 +276,7 @@ public class XFormsPersistentApplicationStateStoreTest extends TestCase {
 	public void testClearingOfInitialRequestOnSessionExpiration() {
 		final XFormsState xformsState = new XFormsState("staticState", "dynamicState");
 		externalContext.setSession(findOrCreateSession("sessionid-1"));
-		fixture.add("pgid-1", null, "requestid-1", xformsState, "sessionid-1", false);
+		fixture.add("pgid-1", null, "requestid-1", xformsState, "sessionid-1");
 		expireSession("sessionid-1");
 		assertNull("Initial entry state not removed even after expiration of session",
 				fixture.find("pgid-1", "requestid-1"));

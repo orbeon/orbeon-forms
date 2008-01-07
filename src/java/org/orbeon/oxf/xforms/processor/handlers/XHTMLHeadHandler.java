@@ -188,7 +188,7 @@ public class XHTMLHeadHandler extends HandlerBase {
 
                     sb.append('\"');
                     sb.append(XFormsProperties.SESSION_HEARTBEAT_DELAY_PROPERTY);
-                    sb.append("\",\"");
+                    sb.append("\":\"");
                     sb.append(Long.toString(heartbeatDelay));
                     sb.append('\"');
                 }
@@ -215,7 +215,7 @@ public class XHTMLHeadHandler extends HandlerBase {
 
                             sb.append('\"');
                             sb.append(propertyName);
-                            sb.append("\",\"");
+                            sb.append("\":\"");
                             sb.append(propertyValue);
                             sb.append('\"');
                         }

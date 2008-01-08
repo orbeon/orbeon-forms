@@ -359,7 +359,12 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 // "The data model is updated"
                 final XFormsModel modelForInstance = currentInstance.getModel(containingDocument);
                 {
-                    // NOTE: As of 2007-07-30, the spec says this should happen regardless of whether we serialize or not.
+                    // NOTE: XForms 1.1 seems to say this should happen regardless of whether we serialize or not. If
+                    // the instance is not serialized and if no instance data is otherwise used for the submission,
+                    // this seems however unneeded.
+
+                    // TODO: XForms 1.1 says that we should rebuild/recalculate the "model containing this submission".
+
                     final XFormsModel.DeferredActionContext deferredActionContext = modelForInstance.getDeferredActionContext();
                     if (deferredActionContext != null) {
                         if (deferredActionContext.rebuild) {

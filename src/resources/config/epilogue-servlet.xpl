@@ -200,10 +200,6 @@
             <p:processor name="oxf:http-serializer">
                 <p:input name="config">
                     <config>
-                        <header>
-                            <name>Cache-Control</name>
-                            <value>post-check=0, pre-check=0</value>
-                        </header>
                         <!-- NOTE: converter specifies text/html content-type -->
                     </config>
                 </p:input>
@@ -234,10 +230,6 @@
             <p:processor name="oxf:http-serializer">
                 <p:input name="config">
                     <config>
-                        <header>
-                            <name>Cache-Control</name>
-                            <value>post-check=0, pre-check=0</value>
-                        </header>
                         <!-- NOTE: HTML converter specifies text/html content-type -->
                     </config>
                 </p:input>
@@ -254,10 +246,6 @@
             <p:processor name="oxf:http-serializer">
                 <p:input name="config">
                     <config>
-                        <header>
-                            <name>Cache-Control</name>
-                            <value>post-check=0, pre-check=0</value>
-                        </header>
                         <header>
                             <name>Content-Disposition</name>
                             <value>attachment; filename=document.pdf</value>
@@ -279,10 +267,6 @@
             <!--<p:processor name="oxf:http-serializer">-->
                 <!--<p:input name="config">-->
                     <!--<config>-->
-                        <!--<header>-->
-                            <!--<name>Cache-Control</name>-->
-                            <!--<value>post-check=0, pre-check=0</value>-->
-                        <!--</header>-->
                         <!-- NOTE: SVG converter specifies content-type, usually image/png -->
                     <!--</config>-->
                 <!--</p:input>-->
@@ -306,10 +290,7 @@
             <p:processor name="oxf:http-serializer">
                 <p:input name="config">
                     <config>
-                        <header>
-                            <name>Cache-Control</name>
-                            <value>post-check=0, pre-check=0</value>
-                        </header>
+                        <!-- NOTE: XML converter specifies content-type -->
                     </config>
                 </p:input>
                 <p:input name="data" href="#converted"/>
@@ -320,10 +301,6 @@
             <p:processor name="oxf:http-serializer">
                 <p:input name="config">
                     <config>
-                        <header>
-                            <name>Cache-Control</name>
-                            <value>post-check=0, pre-check=0</value>
-                        </header>
                         <!-- NOTE: use content-type specified on root element -->
                     </config>
                 </p:input>
@@ -347,10 +324,6 @@
             <p:processor name="oxf:http-serializer">
                 <p:input name="config">
                     <config>
-                        <header>
-                            <name>Cache-Control</name>
-                            <value>post-check=0, pre-check=0</value>
-                        </header>
                         <!-- NOTE: XML converter specifies application/xml content-type -->
                     </config>
                 </p:input>

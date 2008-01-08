@@ -1254,6 +1254,9 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
     public void doRebuild(PipelineContext pipelineContext) {
         // TODO: rebuild computational dependency data structures
 
+        if (XFormsServer.logger.isDebugEnabled())
+            XFormsServer.logger.debug("XForms - performing rebuild for model: " + getEffectiveId());
+
         // "Actions that directly invoke rebuild, recalculate, revalidate, or refresh always
         // have an immediate effect, and clear the corresponding flag."
         if (deferredActionContext != null)
@@ -1261,9 +1264,15 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
     }
 
     public void doRecalculate(PipelineContext pipelineContext) {
+
+        if (XFormsServer.logger.isDebugEnabled())
+            XFormsServer.logger.debug("XForms - performing recalculate for model: " + getEffectiveId());
+
         if (instances != null) {
             // NOTE: we do not correctly handle computational dependencies, but it doesn't hurt
             // to evaluate "calculate" binds before the other binds.
+
+            final long recalculateStartTime = XFormsServer.logger.isDebugEnabled() ? System.currentTimeMillis() : 0;
 
             // Clear state
             for (Iterator i = instances.iterator(); i.hasNext();) {
@@ -1279,6 +1288,11 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
             // Update computed expression binds
             applyComputedExpressionBinds(pipelineContext);
+
+            if (XFormsServer.logger.isDebugEnabled()) {
+                final long submissionTime = System.currentTimeMillis() - recalculateStartTime;
+                XFormsServer.logger.debug("XForms - recalculate time: " + submissionTime);
+            }
         }
 
         // "Actions that directly invoke rebuild, recalculate, revalidate, or refresh always
@@ -1289,7 +1303,12 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
 
     public void doRevalidate(final PipelineContext pipelineContext) {
+
+        if (XFormsServer.logger.isDebugEnabled())
+            XFormsServer.logger.debug("XForms - performing revalidate for model: " + getEffectiveId());
+
         if (instances != null) {
+            final long revalidateStartTime = XFormsServer.logger.isDebugEnabled() ? System.currentTimeMillis() : 0;
 
             // Clear validation state
             for (Iterator i = instances.iterator(); i.hasNext();) {
@@ -1307,6 +1326,11 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                     handleValidationBind(pipelineContext, modelBind, this);
                 }
             });
+
+            if (XFormsServer.logger.isDebugEnabled()) {
+                final long submissionTime = System.currentTimeMillis() - revalidateStartTime;
+                XFormsServer.logger.debug("XForms - revalidate time: " + submissionTime);
+            }
         }
 
         // "Actions that directly invoke rebuild, recalculate, revalidate, or refresh always

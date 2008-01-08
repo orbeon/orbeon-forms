@@ -34,7 +34,7 @@
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns:saxon="http://saxon.sf.net/" 
+    xmlns:saxon="http://saxon.sf.net/"
     xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
     xmlns:xforms="http://www.w3.org/2002/xforms">
 
@@ -51,6 +51,7 @@
             <xsl:stylesheet version="2.0">
                 <xsl:output name="xml-output" method="xml" version="1.0" encoding="UTF-8" indent="no" omit-xml-declaration="no"/>
                 <xsl:template match="/">
+                    <xsl:variable name="is-shared-result" select="exists(doc('input:submission')/xforms:submission[@xxforms:shared = 'application'])" as="xs:boolean"/>
                     <xxforms:event-request xmlns:context="java:org.orbeon.oxf.pipeline.StaticExternalContext">
                         <xxforms:static-state>
                             <xsl:variable name="static-state" as="document-node()">
@@ -66,10 +67,19 @@
                                                 <xforms:instance id="default-instance">
                                                     <xsl:copy-of select="doc('input:request')"/>
                                                 </xforms:instance>
+                                                <xsl:if test="$is-shared-result">
+                                                    <xforms:instance id="result-instance">
+                                                        <dummy/>
+                                                    </xforms:instance>
+                                                </xsl:if>
                                                 <xforms:submission id="default-submission" replace="instance">
                                                     <xsl:copy-of select="doc('input:submission')/xforms:submission/@*[local-name() != 'id' and local-name() != 'id']"/>
                                                     <xsl:copy-of select="doc('input:submission')/xforms:submission/namespace::*"/>
                                                     <xsl:copy-of select="doc('input:submission')/xforms:submission/*"/>
+                                                    <!-- If the result is shared, it's not directly present in the dynamic state, so we copy it to another instance -->
+                                                    <xsl:if test="$is-shared-result">
+                                                        <xforms:insert ev:event="xforms-submit-done" origin="instance('default-instance')" nodeset="instance('result-instance')"/>
+                                                    </xsl:if>
                                                 </xforms:submission>
                                             </xforms:model>
                                         </models>
@@ -86,6 +96,11 @@
                                             <instance id="default-instance" model-id="default-model">
                                                 <xsl:value-of select="saxon:serialize(doc('input:request'), 'xml-output')"/>
                                             </instance>
+                                            <xsl:if test="$is-shared-result">
+                                                <instance id="result-instance" model-id="default-model">
+                                                    <dummy/>
+                                                </instance>
+                                            </xsl:if>
                                         </instances>
                                     </dynamic-state>
                                 </xsl:document>
@@ -115,7 +130,7 @@
             <xsl:stylesheet version="2.0" xmlns:context="java:org.orbeon.oxf.pipeline.StaticExternalContext">
                 <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
                 <xsl:template match="/">
-                    <xsl:copy-of select="saxon:parse(context:decodeXML(normalize-space(xxforms:event-response/xxforms:dynamic-state))/dynamic-state/instances/instance[1])"/>
+                    <xsl:copy-of select="saxon:parse(context:decodeXML(normalize-space(xxforms:event-response/xxforms:dynamic-state))/dynamic-state/instances/instance[last()])"/>
                 </xsl:template>
             </xsl:stylesheet>
         </p:input>

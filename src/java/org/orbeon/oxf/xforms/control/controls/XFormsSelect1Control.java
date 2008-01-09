@@ -48,12 +48,6 @@ public class XFormsSelect1Control extends XFormsValueControl {
                 && (TREE_APPEARANCE.equals(appearance) || MENU_APPEARANCE.equals(appearance) || AUTOCOMPLETE_APPEARANCE.equals(appearance) || "compact".equals(appearance));
     }
 
-    public void markItemsetDirty() {
-        items = null;
-        if ("false".equals(xxformsRefresh))
-            containingDocument.getXFormsControls().setConstantItems(getOriginalId(), null);
-    }
-
     public List getItemset(PipelineContext pipelineContext, boolean setBinding) {
         try {
             if ("false".equals(xxformsRefresh)) {

@@ -292,6 +292,7 @@ public class XFormsItemUtils {
 
                                     if (valueCopyElement.getName().equals("value")) {
                                         // Handle xforms:value
+                                        // TODO: This could be optimized for xforms:value/@ref|@value as we could get the expression from the cache only once
                                         final String value = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, element.element(XFormsConstants.XFORMS_VALUE_QNAME), false, null);
                                         newItems.add(new Item(true, element.attributes(), label != null ? label : "", value, newLevel));// TODO: must filter attributes on element.attributes()
                                     } else {

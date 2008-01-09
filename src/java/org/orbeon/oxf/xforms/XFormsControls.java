@@ -904,7 +904,7 @@ public class XFormsControls {
                 if (xformsControl instanceof XFormsSelectControl || xformsControl instanceof XFormsSelect1Control) {
                     final XFormsSelect1Control select1Control = ((XFormsSelect1Control) xformsControl);
                     // NOTE: This is dirty anyway because we just created the control
-                    select1Control.markItemsetDirty();
+//                    select1Control.markItemsetDirty();
                     // Evaluate itemsets only if specified (case of restoring dynamic state)
                     if (evaluateItemsets)
                         select1Control.getItemset(pipelineContext, false);

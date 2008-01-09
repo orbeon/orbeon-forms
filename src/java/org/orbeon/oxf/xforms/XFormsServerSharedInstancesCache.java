@@ -64,7 +64,7 @@ public class XFormsServerSharedInstancesCache {
 
     public SharedXFormsInstance find(PipelineContext pipelineContext, String instanceId, String modelId, String sourceURI, long timeToLive, String validation) {
         // Try to find in cache
-        final SharedXFormsInstance existingInstance = findInCache(pipelineContext, instanceId, modelId, sourceURI, timeToLive, validation);
+        final SharedXFormsInstance existingInstance = findInCache(pipelineContext, instanceId, modelId, sourceURI);
         if (existingInstance != null) {
             // Found from the cache
             return existingInstance;
@@ -117,7 +117,7 @@ public class XFormsServerSharedInstancesCache {
         }
     }
 
-    private synchronized SharedXFormsInstance findInCache(PipelineContext pipelineContext, String instanceId, String modelId, String sourceURI, long timeToLive, String validation) {
+    private synchronized SharedXFormsInstance findInCache(PipelineContext pipelineContext, String instanceId, String modelId, String sourceURI) {
         final Cache cache = ObjectCache.instance(XFORMS_SHARED_INSTANCES_CACHE_NAME, XFORMS_SHARED_INSTANCES_CACHE_DEFAULT_SIZE);
         final InternalCacheKey cacheKey = new InternalCacheKey(SHARED_INSTANCE_KEY_TYPE, sourceURI);
         final CacheEntry cacheEntry = (CacheEntry) cache.findValid(pipelineContext, cacheKey, CONSTANT_VALIDITY);

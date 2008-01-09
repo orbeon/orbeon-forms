@@ -24,8 +24,8 @@
                 <include>/request/method</include>
             </config>
         </p:input>
-        <p:output name="request-metadata" id="request-metadata"/>
-        <!--<p:output name="request-metadata" id="request-metadata" debug="xxxparams"/>-->
+        <p:output name="data" id="request-metadata"/>
+        <!--<p:output name="data" id="request-metadata" debug="xxxparams"/>-->
     </p:processor>
 
     <p:choose href="#request-metadata">
@@ -63,6 +63,9 @@
                 <p:input name="config">
                     <config>
                         <content-type>application/xml</content-type>
+                        <cache-control>
+                            <use-local-cache>false</use-local-cache>
+                        </cache-control>
                     </config>
                 </p:input>
             </p:processor>
@@ -122,7 +125,7 @@
                 <!--<p:output name="response" id="xml-response" schema-href="xforms-server-response.rng" debug="xxxresponse"/>-->
             </p:processor>
 
-            <!-- Create XForms Server rxeponse -->
+            <!-- Create XForms Server response -->
             <p:processor name="oxf:unsafe-xslt">
                 <p:input name="data" href="#xml-response"/>
                 <p:input name="config">
@@ -148,6 +151,9 @@
                 <p:input name="config">
                     <config>
                         <content-type>text/html</content-type>
+                        <cache-control>
+                            <use-local-cache>false</use-local-cache>
+                        </cache-control>
                     </config>
                 </p:input>
             </p:processor>

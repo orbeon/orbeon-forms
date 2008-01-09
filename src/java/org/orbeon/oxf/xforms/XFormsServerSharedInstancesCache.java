@@ -62,34 +62,21 @@ public class XFormsServerSharedInstancesCache {
         cache.add(pipelineContext, cacheKey, CONSTANT_VALIDITY, new CacheEntry(sharedXFormsInstance, System.currentTimeMillis()));
     }
 
-    public synchronized SharedXFormsInstance find(PipelineContext pipelineContext, String instanceId, String modelId, String sourceURI, long timeToLive, String validation) {
-        final Cache cache = ObjectCache.instance(XFORMS_SHARED_INSTANCES_CACHE_NAME, XFORMS_SHARED_INSTANCES_CACHE_DEFAULT_SIZE);
-        final InternalCacheKey cacheKey = new InternalCacheKey(SHARED_INSTANCE_KEY_TYPE, sourceURI);
-        final CacheEntry cacheEntry = (CacheEntry) cache.findValid(pipelineContext, cacheKey, CONSTANT_VALIDITY);
-
-        // Whether there is an entry but it has expired
-        boolean isExpired = cacheEntry != null && cacheEntry.sharedInstance.getTimeToLive() >= 0
-                && ((cacheEntry.timestamp + cacheEntry.sharedInstance.getTimeToLive()) < System.currentTimeMillis());
-
-        // Remove expired entry if any
-        if (isExpired) {
-            if (XFormsServer.logger.isDebugEnabled())
-                XFormsServer.logger.debug("XForms - expiring application shared instance: " + sourceURI);
-            cache.remove(pipelineContext, cacheKey);
-        }
-
-        if (cacheEntry != null && !isExpired) {
-            // Instance was found
-            if (XFormsServer.logger.isDebugEnabled())
-                XFormsServer.logger.debug("XForms - application shared instance with id '" + instanceId + "' found in cache for URI: " + sourceURI);
-
-            final SharedXFormsInstance sharedInstance = cacheEntry.sharedInstance;
-
-            // Return a copy because id, etc. can be different
-            return new SharedXFormsInstance(modelId, instanceId, sharedInstance.getDocumentInfo(),
-                        sourceURI, null, null, sharedInstance.isApplicationShared(), sharedInstance.getTimeToLive(), sharedInstance.getValidation());
+    public SharedXFormsInstance find(PipelineContext pipelineContext, String instanceId, String modelId, String sourceURI, long timeToLive, String validation) {
+        // Try to find in cache
+        final SharedXFormsInstance existingInstance = findInCache(pipelineContext, instanceId, modelId, sourceURI, timeToLive, validation);
+        if (existingInstance != null) {
+            // Found from the cache
+            return existingInstance;
         } else {
-            // Instance was not found or has expired, load from URI and add to cache
+            // Not found from the cache, attempt to retrieve
+
+            // Note that this method is not synchronized. Scenario: if the method is synchronized, the resource URI may
+            // may reach an XForms page which itself needs to load a shared resource. The result would be a deadlock.
+            // Without synchronization, what can happen is that two concurrent requests load the same URI at the same
+            // time. In the worst case scenario, the results will be different, and the two requesting XForms instances
+            // will be different. The instance that is retrieved first will be stored in the cache for a very short
+            // amount of time, and the one retrieved last will win and be stored in the cache for a longer time.
 
             final URL sourceURL;
             try {
@@ -127,6 +114,38 @@ public class XFormsServerSharedInstancesCache {
                 // Clean-up
                 connectionResult.close();
             }
+        }
+    }
+
+    private synchronized SharedXFormsInstance findInCache(PipelineContext pipelineContext, String instanceId, String modelId, String sourceURI, long timeToLive, String validation) {
+        final Cache cache = ObjectCache.instance(XFORMS_SHARED_INSTANCES_CACHE_NAME, XFORMS_SHARED_INSTANCES_CACHE_DEFAULT_SIZE);
+        final InternalCacheKey cacheKey = new InternalCacheKey(SHARED_INSTANCE_KEY_TYPE, sourceURI);
+        final CacheEntry cacheEntry = (CacheEntry) cache.findValid(pipelineContext, cacheKey, CONSTANT_VALIDITY);
+
+        // Whether there is an entry but it has expired
+        boolean isExpired = cacheEntry != null && cacheEntry.sharedInstance.getTimeToLive() >= 0
+                && ((cacheEntry.timestamp + cacheEntry.sharedInstance.getTimeToLive()) < System.currentTimeMillis());
+
+        // Remove expired entry if any
+        if (isExpired) {
+            if (XFormsServer.logger.isDebugEnabled())
+                XFormsServer.logger.debug("XForms - expiring application shared instance: " + sourceURI);
+            cache.remove(pipelineContext, cacheKey);
+        }
+
+        if (cacheEntry != null && !isExpired) {
+            // Instance was found
+            if (XFormsServer.logger.isDebugEnabled())
+                XFormsServer.logger.debug("XForms - application shared instance with id '" + instanceId + "' found in cache for URI: " + sourceURI);
+
+            final SharedXFormsInstance sharedInstance = cacheEntry.sharedInstance;
+
+            // Return a copy because id, etc. can be different
+            return new SharedXFormsInstance(modelId, instanceId, sharedInstance.getDocumentInfo(),
+                        sourceURI, null, null, sharedInstance.isApplicationShared(), sharedInstance.getTimeToLive(), sharedInstance.getValidation());
+        } else {
+            // Not found
+            return null;
         }
     }
 

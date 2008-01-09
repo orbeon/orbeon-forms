@@ -74,12 +74,9 @@ public class OPS {
         // Initialize a basic logging configuration until the resource manager is setup
         LoggerFactory.initBasicLogger();
 
-        // Signal that we are starting
-        logger.info("Starting Orbeon XML Server " + Version.getVersion());
-
         // 2. Initialize resource manager
         // Resources are first searched in a file hierarchy, then from the classloader
-        Map props = new HashMap();
+        final Map props = new HashMap();
         props.put("oxf.resources.factory", "org.orbeon.oxf.resources.PriorityResourceManagerFactory");
         if (resourceManagerSandbox != null) {
             // Use a sandbox
@@ -103,7 +100,7 @@ public class OPS {
             processorDefinition = new ProcessorDefinition();
             processorDefinition.setName(new QName("pipeline", XMLConstants.OXF_PROCESSORS_NAMESPACE));
 
-            String configURL;
+            final String configURL;
             if (!NetUtils.urlHasProtocol(otherArgs[0])) {
                 // URL is considered relative to current directory
                 try {
@@ -124,21 +121,36 @@ public class OPS {
     }
 
     public void parseArgs(String[] args) {
-        Options options = new Options();
+        final Options options = new Options();
         {
-            Option o = new Option("r", "root", true, "Resource manager root");
+            final Option o = new Option("r", "root", true, "Specifies the resource manager root");
             o.setRequired(false);
             options.addOption(o);
         }
+        {
+            final Option o = new Option("v", "version", false, "Displays the version of Orbeon Forms");
+            o.setRequired(false);
+            options.addOption(o);
+        }
+
         try {
             // Parse the command line options
-            CommandLine cmd = new PosixParser().parse(options, args, true);
+            final CommandLine cmd = new PosixParser().parse(options, args, true);
 
             // Get resource manager root if any
             resourceManagerSandbox = cmd.getOptionValue('r');
 
             // Check for remaining args
             otherArgs = cmd.getArgs();
+
+            // Print version if asked
+            if (cmd.hasOption('v')) {
+                System.out.println("Orbeon Forms " + Version.getVersion());
+                // Terminate if there is no other argument and no pipeline URL
+                if (!cmd.hasOption('r') && (otherArgs == null || otherArgs.length == 0))
+                    System.exit(0);
+            }
+
             if (otherArgs == null || otherArgs.length != 1) {
                 new HelpFormatter().printHelp("Pipeline URL is required", options);
                 System.exit(1);
@@ -162,10 +174,10 @@ public class OPS {
     public void start() {
 
         // 6. Initialize a PipelineContext
-        PipelineContext pipelineContext = new PipelineContext();
+        final PipelineContext pipelineContext = new PipelineContext();
 
         // Some processors may require a JNDI context. In general, this is not required.
-        Context jndiContext;
+        final Context jndiContext;
         try {
             jndiContext = new InitialContext();
         } catch (NamingException e) {
@@ -179,9 +191,9 @@ public class OPS {
             PipelineEngineFactory.instance().executePipeline(processorDefinition, new CommandLineExternalContext(), pipelineContext, logger);
         } catch (Exception e) {
             // 8. Display exceptions if needed
-            LocationData locationData = ValidationException.getRootLocationData(e);
+            final LocationData locationData = ValidationException.getRootLocationData(e);
             Throwable throwable = OXFException.getRootThrowable(e);
-            String message = locationData == null
+            final String message = locationData == null
                     ? "Exception with no location data"
                     : "Exception at " + locationData.toString();
             logger.error(message, throwable);
@@ -190,7 +202,7 @@ public class OPS {
 
     public static void main(String[] args) {
         try {
-            OXF oxf = new OXF(args);
+            final OPS oxf = new OPS(args);
             oxf.init();
             oxf.start();
         } catch (Exception e) {

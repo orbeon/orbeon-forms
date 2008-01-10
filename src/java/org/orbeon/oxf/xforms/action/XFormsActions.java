@@ -46,6 +46,7 @@ public class XFormsActions {
     public static final String XXFORMS_SCRIPT_ACTION = "script";
     public static final String XXFORMS_SHOW_ACTION = "show";
     public static final String XXFORMS_HIDE_ACTION = "hide";
+    public static final String XXFORMS_INVALIDATE_INSTANCES_ACTION = "invalidate-instances";
 
     private static final Map actions = new HashMap();
 
@@ -70,6 +71,7 @@ public class XFormsActions {
         actions.put(XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, XXFORMS_SCRIPT_ACTION), new XXFormsScriptAction());
         actions.put(XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, XXFORMS_SHOW_ACTION), new XXFormsShowAction());
         actions.put(XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, XXFORMS_HIDE_ACTION), new XXFormsHideAction());
+        actions.put(XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, XXFORMS_INVALIDATE_INSTANCES_ACTION), new XXFormsInvalidateInstancesAction());
     }
 
     /**

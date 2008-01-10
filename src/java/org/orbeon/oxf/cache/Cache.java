@@ -24,11 +24,11 @@ public interface Cache {
     public static final int EXPIRATION_LAST_MODIFIED = -2;
 
     public String getCacheName();
-    public void add(PipelineContext context, CacheKey key, Object validity, Object object);
-    public void remove(PipelineContext context, CacheKey key);
-    public Object findValid(PipelineContext context, CacheKey key, Object validity);
-    public Iterator iterateCacheKeys(PipelineContext context);
-    public Iterator iterateCacheObjects(PipelineContext context);
-    public void setMaxSize(PipelineContext context, int maxSize);
-    public CacheStatistics getStatistics(PipelineContext context);
+    public void add(PipelineContext pipelineContext, CacheKey key, Object validity, Object object);
+    public void remove(PipelineContext pipelineContext, CacheKey key);
+    public Object findValid(PipelineContext pipelineContext, CacheKey key, Object validity);
+    public Iterator iterateCacheKeys(PipelineContext pipelineContext);
+    public Iterator iterateCacheObjects(PipelineContext pipelineContext);
+    public void setMaxSize(PipelineContext pipelineContext, int maxSize);
+    public CacheStatistics getStatistics(PipelineContext pipelineContext);
 }

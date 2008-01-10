@@ -1251,6 +1251,13 @@
                         </xforms:action>
                     </xml-source>
                     <p>
+                        It is also possible to remove all shared instances from the cache by using the
+                        <code>xxforms:invalidate-instances</code> action, for example:
+                    </p>
+                    <xml-source>
+                        <xxforms:invalidate-instances ev:event="DOMActivate"/>
+                    </xml-source>
+                    <p>
                         When using <code>xxforms:readonly="true"</code>, another attribute, <code>xxforms:ttl</code>,
                         can be used to set a <i>time to live</i> for the instance in cache. This duration is expressed
                         in milliseconds and has to be greater than zero. When a shared instance if found in cache but
@@ -1620,6 +1627,29 @@
                         front-end.
                     </p>
                 </section>
+            </section>
+            <a name="xforms-back-forward"/>
+            <section>
+                <title>Browser Navigation (Back and Forward) Handling</title>
+                <p>
+                    When visiting an XForms page by using your browser's Back and Forward buttons, or other
+                    browser-history mechanisms, Orbeon Forms by default restores the appearance of that page as it was
+                    when you left it. (Browsers don't automatically handle this behavior with Ajax applications!) This
+                    behavior best matches the usual user experience obtained when navigating regular web pages.
+                </p>
+                <p>
+                    In certain situations, it can be useful instead to ask the XForms page to reload entirely. You
+                    control this by using the <code>xxforms:revisit-handling</code> attribute on the first XForms model
+                    of the page you want to reload. This attribute supports two values: <code>restore</code> (the
+                    default) and <code>reload</code>. Example:
+                </p>
+                <xml-source>
+                    <xforms:model xxforms:revisit-handling="reload"/>
+                </xml-source>
+                <note>
+                    It is recommended to use the <code>reload</code> value carefully, as reloading pages upon browser
+                    navigation often does not match the expectation of the user.
+                </note>
             </section>
             <a name="xforms-debugging"/>
             <section>

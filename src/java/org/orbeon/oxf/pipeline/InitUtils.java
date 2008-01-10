@@ -171,12 +171,11 @@ public class InitUtils {
      * Create a processor and connect its inputs to static URLs.
      */
     public static Processor createProcessor(ProcessorDefinition processorDefinition) {
-        PipelineContext pipelineContext = new PipelineContext();
         Processor processor;
         if (processorDefinition.getName() != null) {
-            processor = ProcessorFactoryRegistry.lookup(processorDefinition.getName()).createInstance(pipelineContext);
+            processor = ProcessorFactoryRegistry.lookup(processorDefinition.getName()).createInstance();
         } else {
-            processor = ProcessorFactoryRegistry.lookup(processorDefinition.getUri()).createInstance(pipelineContext);
+            processor = ProcessorFactoryRegistry.lookup(processorDefinition.getUri()).createInstance();
         }
         for (java.util.Iterator i = processorDefinition.getEntries().keySet().iterator(); i.hasNext();) {
             final String inputName = (String) i.next();

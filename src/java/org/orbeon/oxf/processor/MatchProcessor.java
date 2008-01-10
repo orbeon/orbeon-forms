@@ -34,27 +34,33 @@ public abstract class MatchProcessor extends ProcessorImpl {
     }
 
     public ProcessorOutput createOutput(String name) {
-        ProcessorOutput output = new ProcessorImpl.CacheableTransformerOutputImpl(getClass(), name) {
-            public void readImpl(PipelineContext context, ContentHandler contentHandler) {
+        final ProcessorOutput output = new ProcessorImpl.CacheableTransformerOutputImpl(getClass(), name) {
+            public void readImpl(PipelineContext pipelineContext, ContentHandler contentHandler) {
 
                 try {
-                    Document data = readInputAsDOM4J(context, INPUT_DATA);
-                    Document config = readInputAsDOM4J(context, INPUT_CONFIG);
-                    String text = (String) data.selectObject("string(*)");
-                    Result result = match(config, text);
+                    // Read inputs
+                    final Document data = readInputAsDOM4J(pipelineContext, INPUT_DATA);
+                    final Document config = readInputAsDOM4J(pipelineContext, INPUT_CONFIG);
+
+                    // Compute result
+                    final String text = (String) data.selectObject("string(*)");
+                    final String regexp = (String) config.selectObject("string(*)");
+                    final Result result = match(regexp, text);
+
+                    // Output result
                     contentHandler.startDocument();
                     contentHandler.startElement("", "result", "result", XMLUtils.EMPTY_ATTRIBUTES);
 
                     // <matches>
                     contentHandler.startElement("", "matches", "matches", XMLUtils.EMPTY_ATTRIBUTES);
-                    String matches = new Boolean(result.matches).toString();
+                    final String matches = new Boolean(result.matches).toString();
                     contentHandler.characters(matches.toCharArray(), 0, matches.length());
                     contentHandler.endElement("", "matches", "matches");
 
                     // <group>
                     for (Iterator i = result.groups.iterator(); i.hasNext();) {
                         contentHandler.startElement("", "group", "group", XMLUtils.EMPTY_ATTRIBUTES);
-                        String group = (String) i.next();
+                        final String group = (String) i.next();
                         if (group != null)
                             contentHandler.characters(group.toCharArray(), 0, group.length());
                         contentHandler.endElement("", "group", "group");
@@ -71,36 +77,32 @@ public abstract class MatchProcessor extends ProcessorImpl {
         return output;
     }
 
-    protected static class Result {
-        boolean matches;
-        List groups = new ArrayList();
+    public static class Result {
+        public boolean matches;
+        public List groups = new ArrayList();
     }
 
     /**
      * The only method that subclasses need to implement.
      */
-    protected abstract Result match(Document config, String text);
+    public abstract Result match(String regexp, String text);
 
     /**
-     * Utility class that can be used to implement match() by
-     * subclasses using the ORO library.
+     * Utility class that can be used to implement match() by subclasses using the ORO library.
      */
-    protected Result oroMatch(Document config, String text,
-                              PatternCompiler compiler, PatternMatcher matcher) {
+    protected static Result oroMatch(String regexp, String text, PatternCompiler compiler, PatternMatcher matcher) {
         try {
-            Result result = new Result();
-            String regexp = (String) config.selectObject("string(*)");
-            Pattern pattern = null;
-
             // Note: It looks like the compiler is not thread safe
+            final Pattern pattern;
             synchronized (compiler) {
                 pattern = compiler.compile(regexp, Perl5Compiler.READ_ONLY_MASK);
             }
+            final Result result = new Result();
             synchronized (matcher) {
                 result.matches = matcher.matches(text, pattern);
                 if (result.matches) {
-                    MatchResult matchResult = matcher.getMatch();
-                    int groupCount = matchResult.groups();
+                    final MatchResult matchResult = matcher.getMatch();
+                    final int groupCount = matchResult.groups();
                     for (int i = 1; i < groupCount; i++)
                         result.groups.add(matchResult.group(i));
                 }

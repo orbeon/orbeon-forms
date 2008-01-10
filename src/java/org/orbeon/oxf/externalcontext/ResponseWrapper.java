@@ -80,6 +80,10 @@ public class ResponseWrapper implements ExternalContext.Response {
         return _response.rewriteResourceURL(urlString, generateAbsoluteURL);
     }
 
+    public String rewriteResourceURL(String urlString, int rewriteMode) {
+        return _response.rewriteResourceURL(urlString, rewriteMode);
+    }
+
     public void sendError(int len) throws IOException {
         _response.sendError(len);
     }

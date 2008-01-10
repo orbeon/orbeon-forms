@@ -26,6 +26,8 @@
     <property as="xs:string"  processor-name="oxf:page-flow" name="instance-passing"         value="redirect"/>
     <property as="xs:string"  processor-name="oxf:page-flow" name="xforms-submission-path"   value="/xforms-server-submit"/>
     <property as="xs:anyURI"  processor-name="oxf:page-flow" name="xforms-submission-model"  value="oxf:/ops/xforms/xforms-server-submit.xpl"/>
+    <property as="xs:boolean" processor-name="oxf:page-flow" name="versioned"                value="false"/>
+    <property as="xs:string"  processor-name="oxf:page-flow" name="files-version"            value="3.1415"/>
     <property as="xs:boolean" processor-name="oxf:saxon8"    name="generate-source-location" value="false"/>
     <property as="xs:boolean" processor-name="oxf:sql"       name="legacy-implicit-prefixes" value="false"/>
 
@@ -69,6 +71,7 @@
     <property as="xs:boolean" name="oxf.xforms.minimal-resources"                    value="true"/>
     <property as="xs:boolean" name="oxf.xforms.combine-resources"                    value="true"/>
     <property as="xs:boolean" name="oxf.xforms.cache-combined-resources"             value="false"/>
+    <property as="xs:boolean" name="oxf.xforms.version-combined-resources"           value="false"/>
     <property as="xs:boolean" name="oxf.xforms.optimize-relevance"                   value="false"/>
 
     <!-- Rarely used global properties -->

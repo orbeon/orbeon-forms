@@ -37,7 +37,7 @@ var XXFORMS_NAMESPACE_URI = "http://orbeon.org/oxf/xml/xforms";
 var BASE_URL = null;
 var XFORMS_SERVER_URL = null;
 var PATH_TO_JAVASCRIPT_1 = "/ops/javascript/xforms";
-var PATH_TO_JAVASCRIPT_2 = "/xforms-server/xforms";
+var PATH_TO_JAVASCRIPT_2 = "/xforms-server/";
 var XFORMS_IS_GECKO = navigator.userAgent.toLowerCase().indexOf("gecko") != -1;
 var ELEMENT_TYPE = document.createElement("dummy").nodeType;
 var ATTRIBUTE_TYPE = document.createAttribute("dummy").nodeType;

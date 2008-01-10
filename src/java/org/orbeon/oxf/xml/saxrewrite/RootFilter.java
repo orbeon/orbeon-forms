@@ -17,29 +17,26 @@ import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
+import java.util.List;
+
 /**
- * <!-- RootFilter -->
- * Ignores everything before start element.  On startElement switches to nextState.
- * So if this is used as the initial state then the result is that the prologue and epilogue
- * are ignored while the root element is passed to the next state.  nextState is initialized to
- * this, consequently nothing interesting will happen unless setNext is called.
+ * Ignores everything before start element. On startElement switches to nextState. So if this is used as the initial
+ * state then the result is that the prologue and epilogue are ignored while the root element is passed to the next
+ * state. nextState is initialized to this, consequently nothing interesting will happen unless setNext is called.
  */
 public class RootFilter extends State {
 
     protected State nextState = this;
 
     /**
-     * <!-- RootFilter -->
      * Simple calls super(...)
      *
      */
-    public RootFilter(final State stt, final ContentHandler cntntHnder) {
-        super(stt, cntntHnder);
+    public RootFilter(final State previousState, final ContentHandler contentHandler, List pageFlowContext) {
+        super(previousState, contentHandler, pageFlowContext);
     }
 
     /**
-     * <!-- startElementStart -->
-     *
      * @return nextState
      */
     protected State startElementStart
@@ -53,9 +50,7 @@ public class RootFilter extends State {
     }
 
     /**
-     * <!-- characters -->
-     *
-     * @return this.  Does nothing else.
+     * @return this. Does nothing else.
      */
     public State characters(final char[] ch, final int strt, final int len)
             throws SAXException {
@@ -63,9 +58,7 @@ public class RootFilter extends State {
     }
 
     /**
-     * <!-- ignorableWhitespace -->
-     *
-     * @return this.  Does nothing else.
+     * @return this. Does nothing else.
      */
     public State ignorableWhitespace(final char[] ch, final int strt, final int len)
             throws SAXException {
@@ -73,9 +66,7 @@ public class RootFilter extends State {
     }
 
     /**
-     * <!-- processingInstruction -->
-     *
-     * @return this.  Does nothing else.
+     * @return this. Does nothing else.
      */
     public State processingInstruction(final String trgt, final String dat)
             throws SAXException {

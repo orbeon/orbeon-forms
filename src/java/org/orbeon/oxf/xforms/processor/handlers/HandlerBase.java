@@ -24,6 +24,7 @@ import org.orbeon.oxf.xml.ElementHandler;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.common.ValidationException;
+import org.orbeon.oxf.util.URLRewriter;
 import org.orbeon.saxon.om.FastStringBuffer;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -31,6 +32,8 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 import org.dom4j.QName;
 import org.dom4j.Namespace;
+
+import java.util.List;
 
 /**
  *
@@ -55,6 +58,7 @@ public abstract class HandlerBase extends ElementHandler {
     protected PipelineContext pipelineContext;
     protected XFormsContainingDocument containingDocument;
     protected ExternalContext externalContext;
+    protected List pathMatchers;
 
     protected AttributesImpl reusableAttributes = new AttributesImpl();
 
@@ -69,6 +73,8 @@ public abstract class HandlerBase extends ElementHandler {
         this.pipelineContext = handlerContext.getPipelineContext();
         this.containingDocument = handlerContext.getContainingDocument();
         this.externalContext = handlerContext.getExternalContext();
+
+        pathMatchers = (List) pipelineContext.getAttribute(PipelineContext.PATH_MATCHERS);
 
         super.setContext(context);
     }
@@ -451,7 +457,7 @@ public abstract class HandlerBase extends ElementHandler {
                 final AttributesImpl imgAttributes = new AttributesImpl();
                 imgAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, helpImageClasses);
                 imgAttributes.addAttribute("", "src", "src", ContentHandlerHelper.CDATA,
-                        externalContext.getResponse().rewriteResourceURL(XFormsConstants.HELP_IMAGE_URI, false));
+                        rewriteResourceURL(XFormsConstants.HELP_IMAGE_URI));
                 imgAttributes.addAttribute("", "title", "title", ContentHandlerHelper.CDATA, "");
                 imgAttributes.addAttribute("", "alt", "alt", ContentHandlerHelper.CDATA, "Help");
 
@@ -512,5 +518,9 @@ public abstract class HandlerBase extends ElementHandler {
         final String appearanceURI = uriFromQName(appearanceValue);
 
         return new QName(appearanceLocalname, new Namespace(appearancePrefix, appearanceURI));
+    }
+
+    protected String rewriteResourceURL(String resourceURL) {
+        return URLRewriter.rewriteResourceURL(externalContext.getRequest(), externalContext.getResponse(), resourceURL, pathMatchers);
     }
 }

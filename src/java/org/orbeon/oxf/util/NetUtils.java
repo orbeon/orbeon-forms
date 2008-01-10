@@ -103,7 +103,8 @@ public class NetUtils {
     }
 
     /**
-     * Return a request path info that looks like what one would expect.
+     * Return a request path info that looks like what one would expect. The path starts with a "/".
+     *
      * Request path = servlet path + path info
      */
     public static String getRequestPathInfo(HttpServletRequest request) {

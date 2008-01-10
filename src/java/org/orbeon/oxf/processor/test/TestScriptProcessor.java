@@ -88,7 +88,7 @@ public class TestScriptProcessor extends ProcessorImpl {
     }
 
     private void handleProcessorCommand(ExecutionContext executionContext, Element commandElement) {
-        Processor mainProcessor = ProcessorUtils.createProcessorWithInputs(commandElement, new PipelineContext());
+        Processor mainProcessor = ProcessorUtils.createProcessorWithInputs(commandElement);
         mainProcessor.setLocationData((LocationData) commandElement.getData());
         mainProcessor.setId("Main Test Processor");
         executionContext.mainProcessor = mainProcessor;

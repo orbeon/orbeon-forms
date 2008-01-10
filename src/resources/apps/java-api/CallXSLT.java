@@ -12,28 +12,18 @@
  *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 
-import org.orbeon.oxf.processor.*;
-import org.orbeon.oxf.processor.generator.URLGenerator;
-import org.orbeon.oxf.processor.generator.DOMGenerator;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.xml.ContentHandlerHelper;
-import org.orbeon.oxf.xml.TransformerUtils;
-import org.orbeon.oxf.xml.dom4j.LocationDocumentSource;
-import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.util.PipelineUtils;
-import org.xml.sax.SAXException;
-import org.xml.sax.ContentHandler;
-import org.xml.sax.Attributes;
-import org.xml.sax.helpers.AttributesImpl;
-import org.dom4j.QName;
 import org.dom4j.Document;
-
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.sax.SAXResult;
-import java.util.Enumeration;
-import java.util.Properties;
+import org.dom4j.QName;
+import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.processor.generator.DOMGenerator;
+import org.orbeon.oxf.processor.generator.URLGenerator;
+import org.orbeon.oxf.util.PipelineUtils;
+import org.orbeon.oxf.xml.TransformerUtils;
+import org.orbeon.oxf.xml.XMLConstants;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.SAXException;
 
 /**
  * This class shows how you can call a processor and handle its inputs and outputs with the pipeline API.
@@ -57,7 +47,7 @@ public class CallXSLT extends SimpleProcessor {
                     + processorName.getNamespacePrefix() + ":" + processorName.getName() + "'");
 
         // Create processor
-        final Processor processor = processorFactory.createInstance(pipelineContext);
+        final Processor processor = processorFactory.createInstance();
 
         // Connect inputs (one from URL, the other one from a DOM)
         final URLGenerator urlGeneratorConfig = new URLGenerator("oxf:/apps/java-api/transform.xsl");

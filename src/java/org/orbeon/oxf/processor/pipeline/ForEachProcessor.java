@@ -53,7 +53,7 @@ public class ForEachProcessor extends ProcessorImpl implements AbstractProcessor
         setLocationData(forEachAST.getLocationData());
     }
 
-    public Processor createInstance(PipelineContext context) {
+    public Processor createInstance() {
         return new ConcreteForEachProcessor(forEachAST, validity);
     }
 

@@ -275,6 +275,10 @@ public class SimpleExternalContext implements ExternalContext {
             return "";
         }
 
+        public String rewriteResourceURL(String urlString, int rewriteMode) {
+            return "";
+        }
+
         public String getNamespacePrefix() {
             return "";
         }

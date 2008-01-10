@@ -93,11 +93,11 @@ public class ProcessorUtils {
         return (result == null) ? defaultValue : result.intValue();
     }
 
-    public static Processor createProcessorWithInputs(Element testNode, PipelineContext pipelineContext) {
-        return createProcessorWithInputs(testNode, pipelineContext, false);
+    public static Processor createProcessorWithInputs(Element testNode) {
+        return createProcessorWithInputs(testNode, false);
     }
 
-    public static Processor createProcessorWithInputs(Element testNode, PipelineContext pipelineContext, boolean saxDebug) {
+    public static Processor createProcessorWithInputs(Element testNode, boolean saxDebug) {
         // Create processor
         QName processorName = XMLProcessorRegistry.extractProcessorQName(testNode);
         ProcessorFactory processorFactory = ProcessorFactoryRegistry.lookup(processorName);
@@ -105,7 +105,7 @@ public class ProcessorUtils {
             throw new OXFException("Cannot find processor factory with name '"
                     + processorName.getNamespacePrefix() + ":" + processorName.getName() + "'");
 
-        Processor processor = processorFactory.createInstance(pipelineContext);
+        Processor processor = processorFactory.createInstance();
 
         // Connect inputs
         for (Iterator j = XPathUtils.selectIterator(testNode, "input"); j.hasNext();) {

@@ -13,17 +13,13 @@
  */
 package org.orbeon.oxf.processor.converter;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.StringTokenizer;
-
 import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.ExternalContext.Request;
 import org.orbeon.oxf.pipeline.api.ExternalContext.Response;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.portlet.PortletExternalContext;
-import org.orbeon.oxf.processor.ProcessorImpl;
-import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
-import org.orbeon.oxf.processor.ProcessorOutput;
+import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.util.URLRewriter;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.saxrewrite.RootFilter;
@@ -35,8 +31,10 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
+import java.util.List;
+import java.util.StringTokenizer;
+
 /**
- * <!-- AbstractRewrite -->
  * Java impl of oxf-rewrite.xsl.  Uses GOF state pattern + SAX to get the job done.
  * The state machine ad hoc and relies a bit on the simplicity of the transformation that we are
  * perfoming.
@@ -72,113 +70,66 @@ import org.xml.sax.helpers.AttributesImpl;
  */
 abstract class AbstractRewrite extends ProcessorImpl {
     /**
-     * <!-- REWRITE_IN -->
      * Name of the input that receives the content that is to be rewritten.
      */
     private static final String REWRITE_IN = "rewrite-in";
-    /**
-     * <!-- SCRIPT_ELT -->
-     * What you think.
-     */
     static final String SCRIPT_ELT = "script";
-    /**
-     * <!-- ACTION_ATT -->
-     * What you think.
-     */
     static final String ACTION_ATT = "action";
-    /**
-     * <!-- METHOD_ATT -->
-     * What you think.
-     */
     static final String METHOD_ATT = "method";
-    /**
-     * <!-- HREF_ATT -->
-     * What you think.
-     */
     static final String HREF_ATT = "href";
-    /**
-     * <!-- SRC_ATT -->
-     * What you think.
-     */
     static final String SRC_ATT = "src";
-    /**
-     * <!-- BACKGROUND_ATT -->
-     * What you think.
-     */
     static final String BACKGROUND_ATT = "background";
-    /**
-     * <!-- NOREWRITE_ATT -->
-     * What you think.
-     */
     static final String NOREWRITE_ATT = "url-norewrite";
 
     /**
-     * <!-- State2 -->
-     * Base state.  Simply forwards data to the destination content handler and returns itself.
-     * That is unless the ( element ) depth becomes negative after an end element event.  In this
-     * case the previous state is returned.  This means btw that we are really only considering
-     * state changes on start and end element events.
+     * Base state. Simply forwards data to the destination content handler and returns itself. That is unless the
+     * (element) depth becomes negative after an end element event. In this case the previous state is returned. This
+     * means btw that we are really only considering state changes on start and end element events.
      */
     protected static abstract class State2 extends State {
+
+        protected final Request request;
+
         /**
-         * <!-- response -->
          * Performs the URL rewrites.
          */
         protected final Response response;
         /**
-         * <!-- isPortlet -->
-         * A sub-state, if you will.  Didn't implement this as a sub-class of State as it doesn't
-         * change during the course of a transformation.
-         *
-         * @see AbstractRewrite
+         * A sub-state, if you will. Didn't implement this as a sub-class of State as it doesn't change during the
+         * course of a transformation.
          */
         protected final boolean isPortlet;
         /**
-         * <!-- scriptDepth -->
-         * Could have been another State.  However since the value is determined in one state and
-         * then used by a 'descendent' state doing so would have meant that descendent would have
-         * to walk it's ancestors to get the value.  So, since making this a field instead of
-         * a separate State sub-class was easier to implement and is faster a field was used.
-         *
-         * @see AbstractRewrite
+         * Could have been another State. However since the value is determined in one state and then used by a
+         * 'descendent' state doing so would have meant that descendent would have to walk it's ancestors to get the
+         * value. So, since making this a field instead of a separate State sub-class was easier to implement and is
+         * faster a field was used.
          */
         protected int scriptDepth;
         /**
-         * <!-- rewriteURI -->
-         *
-         * @see
          */
         protected final String rewriteURI;
 
         /**
-         * <!-- State -->
-         *
-         * @param stt        The previous state.
-         * @param cntntHndlr The destination for the rewrite transformation.
-         * @param rspns      Used to perform URL rewrites.
-         * @param isPrtlt    Whether or not the context is a portlet context.
-         * @param scrptDpth  How below script elt we are.
-         * @param rwrtURI    uri of elements ( i.e. xhtml uri or "" ) of elements that need
-         *                   rewriting.
-         * @see #previous
-         * @see #contentHandler
-         * @see #response
-         * @see #isPortlet
+         * @param previousState     The previous state.
+         * @param contentHandler    The destination for the rewrite transformation.
+         * @param response          Used to perform URL rewrites.
+         * @param isPortlet         Whether or not the context is a portlet context.
+         * @param scriptDepth       How below script elt we are.
+         * @param rewriteURI        URI of elements (i.e. xhtml uri or "") of elements that need rewriting.
          */
-        State2(final State stt, final ContentHandler cntntHndlr, final Response rspns
-                , final boolean isPrtlt, final int scrptDpth, final String rwrtURI) {
-            super(stt, cntntHndlr);
-            response = rspns;
-            isPortlet = isPrtlt;
-            scriptDepth = scrptDpth;
-            rewriteURI = rwrtURI;
+        State2(final State previousState, final ContentHandler contentHandler, final Request request, final Response response,
+               final boolean isPortlet, final int scriptDepth, final String rewriteURI, List pageFlowContext) {
+            super(previousState, contentHandler, pageFlowContext);
+            this.request = request;
+            this.response = response;
+            this.isPortlet = isPortlet;
+            this.scriptDepth = scriptDepth;
+            this.rewriteURI = rewriteURI;
         }
 
         /**
-         * <!-- scriptDepthOnStart -->
          * Adjusts scriptDepth
-         *
-         * @see #scriptDepth
          */
         final void scriptDepthOnStart(final String ns, final String lnam) {
             if (rewriteURI.equals(ns) && SCRIPT_ELT.equals(lnam)) {
@@ -187,10 +138,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
         }
 
         /**
-         * <!-- scriptDepthOnEnd -->
          * Adjusts scriptDepth
-         *
-         * @see #scriptDepth
          */
         final void scriptDepthOnEnd(final String ns, final String lnam) {
             if (rewriteURI.equals(ns) && SCRIPT_ELT.equals(lnam)) {
@@ -198,11 +146,6 @@ abstract class AbstractRewrite extends ProcessorImpl {
             }
         }
 
-        /**
-         * <!-- endElementStart -->
-         *
-         * @see State2
-         */
         protected void endElementStart(final String ns, final String lnam, final String qnam)
                 throws SAXException {
             scriptDepthOnEnd(ns, lnam);
@@ -211,9 +154,8 @@ abstract class AbstractRewrite extends ProcessorImpl {
     }
 
     /**
-     * <!-- RewriteState -->
      * The rewrite state.  Essentially this corresponds to the default mode of oxf-rewrite.xsl.
-     * Basically this :
+     * Basically this:
      * <ul>
      * <li>Rewrites attribs in start element event when need be.
      * <li>Accumulates text from characters events so that proper char content rewriting can
@@ -225,26 +167,8 @@ abstract class AbstractRewrite extends ProcessorImpl {
      * </ul>
      */
     static class RewriteState extends State2 {
+
         /**
-         * <!-- WSRP_REWRITE_REPLACMENT_CHARS -->
-         * Chars useD to replace "wsrp_rewrite" in text.
-         *
-         * @see AbstractRewrite
-         * @see RewriteState
-         * @see #flushCharacters()
-         */
-        private static final char[] WSRP_REWRITE_REPLACMENT_CHARS = new char[]
-                {'w', 's', 'r', 'p', '_', 'r', 'e', 'w', 'r', 'i', 't', 'e', 'w', 's', 'r', 'p', '_', 'r'
-                        , 'e', 'w', 'r', 'i', 't', 'e',};
-        /**
-         * <!-- wsrprewriteMatcher -->
-         * Used to find wsrp_rewrite in char data.
-         *
-         * @see RewriteState
-         */
-        private final Matcher wsrprewriteMatcher;
-        /**
-         * <!-- charactersBuf -->
          * Used to accumlate characters from characters event.  Lazily init'd in characters.
          * Btw we use CharacterBuffer instead of StringBuffer because :
          * <ul>
@@ -255,28 +179,20 @@ abstract class AbstractRewrite extends ProcessorImpl {
          * </ul>
          *
          * Btw if we didn't care about 1.4 we could use StringBuilder instead.
-         *
-         * @see RewriteState
-         * @see #characters(char[], int, int)
-         * @see #flushCharacters()
          */
         private java.nio.CharBuffer charactersBuf;
 
         /**
-         * <!-- RewriteState -->
          * Calls super( ... ) and initializes wsrprewriteMatcher with "wsrp_rewrite"
          *
-         * @param rwrtURI
+         * @param rewriteURI
          */
-        RewriteState(final State stt, final ContentHandler cntntHndlr, final Response rspns
-                , final boolean isPrtlt, final int scrptDpth, final String rwrtURI) {
-            super(stt, cntntHndlr, rspns, isPrtlt, scrptDpth, rwrtURI);
-            final Pattern ptrn = Pattern.compile("wsrp_rewrite");
-            wsrprewriteMatcher = ptrn.matcher("");
+        RewriteState(final State stt, final ContentHandler contentHandler, final Request request, final Response response
+                , final boolean isPortlet, final int scriptDepth, final String rewriteURI, List pageFlowContext) {
+            super(stt, contentHandler, request, response, isPortlet, scriptDepth, rewriteURI, pageFlowContext);
         }
 
         /**
-         * <!-- handleEltWithResource -->
          * Handler for {http://www.w3.org/1999/xhtml}{elt name}.  Assumes namespace test has already
          * happened.  Implements :
          * <pre>
@@ -295,7 +211,6 @@ abstract class AbstractRewrite extends ProcessorImpl {
          *
          * @return null if match is not satisfied and this otherwise.
          * @throws SAXException if destination contentHandler throws SAXException
-         * @see AbstractRewrite
          */
         private State2 handleEltWithResource
                 (final String elt, final String resAtt, final String ns, final String lnam
@@ -310,7 +225,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
 
                 ret = this;
                 final AttributesImpl newAtts = XMLUtils.getAttribsFromDefaultNamespace(atts);
-                final String newRes = response.rewriteResourceURL(res, false);
+                final String newRes = URLRewriter.rewriteResourceURL(request, response, res, pageFlowContext);
                 final int idx = newAtts.getIndex("", resAtt);
                 newAtts.setValue(idx, newRes);
                 contentHandler.startElement(ns, lnam, qnam, newAtts);
@@ -340,23 +255,23 @@ abstract class AbstractRewrite extends ProcessorImpl {
                 ret = this;
                 final AttributesImpl newAtts = XMLUtils.getAttribsFromDefaultNamespace(atts);
                 if (codebaseAttribute != null) {
-                    final String newAttribute = response.rewriteResourceURL(codebaseAttribute, false);
+                    final String newAttribute = URLRewriter.rewriteResourceURL(request, response, codebaseAttribute, pageFlowContext);
                     final int idx = newAtts.getIndex("", "codebase");
                     newAtts.setValue(idx, newAttribute);
                 } else {
                     // We don't rewrite these attributes if there is a codebase
                     if (classidAttribute != null) {
-                        final String newAttribute = response.rewriteResourceURL(classidAttribute, false);
+                        final String newAttribute = URLRewriter.rewriteResourceURL(request, response, classidAttribute, pageFlowContext);
                         final int idx = newAtts.getIndex("", "classid");
                         newAtts.setValue(idx, newAttribute);
                     }
                     if (dataAttribute != null) {
-                        final String newAttribute = response.rewriteResourceURL(dataAttribute, false);
+                        final String newAttribute = URLRewriter.rewriteResourceURL(request, response, dataAttribute, pageFlowContext);
                         final int idx = newAtts.getIndex("", "data");
                         newAtts.setValue(idx, newAttribute);
                     }
                     if (usemapAttribute != null) {
-                        final String newAttribute = response.rewriteResourceURL(usemapAttribute, false);
+                        final String newAttribute = URLRewriter.rewriteResourceURL(request, response, usemapAttribute, pageFlowContext);
                         final int idx = newAtts.getIndex("", "usemap");
                         newAtts.setValue(idx, newAttribute);
                     }
@@ -366,7 +281,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
                         boolean first = true;
                         while (st.hasMoreTokens()) {
                             final String currentArchive = st.nextToken().trim();
-                            final String newArchive = response.rewriteResourceURL(currentArchive, false);
+                            final String newArchive = URLRewriter.rewriteResourceURL(request, response, currentArchive, pageFlowContext);
                             if (!first) {
                                 sb.append(' ');
                                 first = false;
@@ -403,7 +318,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
                 ret = this;
                 final AttributesImpl newAtts = XMLUtils.getAttribsFromDefaultNamespace(atts);
                 if (codebaseAttribute != null) {
-                    final String newAttribute = response.rewriteResourceURL(codebaseAttribute, false);
+                    final String newAttribute = URLRewriter.rewriteResourceURL(request, response, codebaseAttribute, pageFlowContext);
                     final int idx = newAtts.getIndex("", "codebase");
                     newAtts.setValue(idx, newAttribute);
                 } else {
@@ -414,7 +329,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
                         boolean first = true;
                         while (st.hasMoreTokens()) {
                             final String currentArchive = st.nextToken().trim();
-                            final String newArchive = response.rewriteResourceURL(currentArchive, false);
+                            final String newArchive = URLRewriter.rewriteResourceURL(request, response, currentArchive, pageFlowContext);
                             if (!first) {
                                 sb.append(' ');
                                 first = false;
@@ -432,7 +347,6 @@ abstract class AbstractRewrite extends ProcessorImpl {
         }
 
         /**
-         * <!-- handleA -->
          * Handler for {http://www.w3.org/1999/xhtml}a.  Assumes namespace test has already
          * happened.  Implements :
          * <pre>
@@ -461,7 +375,6 @@ abstract class AbstractRewrite extends ProcessorImpl {
          *
          * @return null if match is not satisfied and this otherwise.
          * @throws SAXException if destination contentHandler throws SAXException
-         * @see AbstractRewrite
          */
         private State2 handleA
                 (final String ns, final String lnam, final String qnam, final Attributes atts)
@@ -485,7 +398,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
                 } else if ("action".equals(urlType)) {
                     newHref = response.rewriteActionURL(href, portletMode, windowState);
                 } else if ("resource".equals(urlType)) {
-                    newHref = response.rewriteResourceURL(href, false);
+                    newHref = URLRewriter.rewriteResourceURL(request, response, href, pageFlowContext);
                 } else {
                     newHref = null;
                 }
@@ -501,7 +414,6 @@ abstract class AbstractRewrite extends ProcessorImpl {
         }
 
         /**
-         * <!-- handleArea -->
          * Handler for {http://www.w3.org/1999/xhtml}area.  Assumes namespace test has already
          * happened.  Implements :
          * <pre>
@@ -520,7 +432,6 @@ abstract class AbstractRewrite extends ProcessorImpl {
          *
          * @return null if match is not satisfied and this otherwise.
          * @throws SAXException if destination contentHandler throws SAXException
-         * @see AbstractRewrite
          */
         private State2 handleArea
                 (final String ns, final String lnam, final String qnam, final Attributes atts)
@@ -543,7 +454,6 @@ abstract class AbstractRewrite extends ProcessorImpl {
         }
 
         /**
-         * <!-- handleInput -->
          * Handler for {http://www.w3.org/1999/xhtml}input.  Assumes namespace test has already
          * happened.  Implements :
          * <pre>
@@ -563,7 +473,6 @@ abstract class AbstractRewrite extends ProcessorImpl {
          * @return null if @type='image' test is not satisfied and
          *         handleEltWithResource( "input", "src", ... ) otherwise.
          * @throws SAXException if destination contentHandler throws SAXException
-         * @see AbstractRewrite
          */
         private State2 handleInput
                 (final String ns, final String lnam, final String qnam, final Attributes atts)
@@ -579,7 +488,6 @@ abstract class AbstractRewrite extends ProcessorImpl {
         }
 
         /**
-         * <!-- handleForm -->
          * Handler for {http://www.w3.org/1999/xhtml}input.  Assumes namespace test has already
          * happened.  Implements :
          * <pre>
@@ -621,7 +529,6 @@ abstract class AbstractRewrite extends ProcessorImpl {
          *         , haveScriptAncestor ) if is-portlet-form='true', and this
          *         otherwise.
          * @throws SAXException if destination contentHandler throws SAXException
-         * @see AbstractRewrite
          */
         private State2 handleForm
                 (final String ns, final String lnam, final String qnam, final Attributes atts)
@@ -650,7 +557,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
                         = atts.getValue("http://orbeon.org/oxf/xml/portlet", "is-portlet-form");
                 if ("true".equals(isPrtltFrm)) {
                     ret = new NoRewriteState
-                            (this, contentHandler, response, isPortlet, scriptDepth, rewriteURI);
+                            (this, contentHandler, request, response, isPortlet, scriptDepth, rewriteURI, pageFlowContext);
                 } else {
                     ret = this;
                 }
@@ -662,7 +569,6 @@ abstract class AbstractRewrite extends ProcessorImpl {
         }
 
         /**
-         * <!-- flushCharacters -->
          * If we have accumlated character data rewrite it and forward it.  Implements :
          * <pre>
          *   <xsl:template match="text()">
@@ -672,9 +578,6 @@ abstract class AbstractRewrite extends ProcessorImpl {
          *   </xsl:template>
          * </pre>
          * If there no character data has been accumulated do nothing.  Also clears buffer.
-         *
-         * @see AbstractRewrite
-         * @see RewriteState
          */
         private void flushCharacters() throws SAXException {
             final int bfLen = charactersBuf == null ? 0 : charactersBuf.position();
@@ -701,10 +604,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
         }
 
         /**
-         * <!-- endElement -->
          * Just calls flushCharacters and super.endElement( ... )
-         *
-         * @see State2#endElement(String, String, String)
          */
         protected void endElementStart(final String ns, final String lnam, final String qnam)
                 throws SAXException {
@@ -713,7 +613,6 @@ abstract class AbstractRewrite extends ProcessorImpl {
         }
 
         /**
-         * <!-- startElementStart -->
          * Just calls flushCharacters then tests the event data.  If
          * <ul>
          * <li>
@@ -752,7 +651,6 @@ abstract class AbstractRewrite extends ProcessorImpl {
          * simply forward the event as is to the destination content handler and return this.
          * </li>
          * </ul>
-         * @see State2#skippedEntity(String)
          */
         protected State startElementStart(final String ns, final String lnam, final String qnam, Attributes atts) throws SAXException {
 
@@ -770,7 +668,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
 
             done :
             if ("true".equals(noRewriteValue)) {
-                final State stt = new NoRewriteState(this, contentHandler, response, isPortlet, scriptDepth, rewriteURI);
+                final State stt = new NoRewriteState(this, contentHandler, request, response, isPortlet, scriptDepth, rewriteURI, pageFlowContext);
                 ret = stt.startElement(ns, lnam, qnam, atts);
             } else if (XMLConstants.OPS_FORMATTING_URI.equals(ns) && "rewrite".equals(lnam)) {
                 final String typ = atts.getValue("", "type");
@@ -782,7 +680,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
                     } else if ("render".equals(typ)) {
                         newURL = response.rewriteRenderURL(url);
                     } else {
-                        newURL = response.rewriteResourceURL(url, false);
+                        newURL = URLRewriter.rewriteResourceURL(request, response, url, pageFlowContext);
                     }
                     final char[] chs = newURL.toCharArray();
                     contentHandler.characters(chs, 0, chs.length);
@@ -836,14 +734,8 @@ abstract class AbstractRewrite extends ProcessorImpl {
         }
 
         /**
-         * <!-- characters -->
-         * If haveScriptAncestor then just forward data to destination contentHandler.  Otherwise
-         * store that data in the buffer and do not forward.  Also manages init'ing and growing
-         * charactersBuf as need be.
-         *
-         * @see #charactersBuf
-         * @see AbstractRewrite
-         * @see RewriteState
+         * If haveScriptAncestor then just forward data to destination contentHandler. Otherwise store that data in the
+         * buffer and do not forward. Also manages init'ing and growing charactersBuf as need be.
          */
         public State characters(final char[] ch, final int strt, final int len)
                 throws SAXException {
@@ -866,10 +758,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
         }
 
         /**
-         * <!-- ignorableWhitespace -->
          * Just calls flushCharacters and super.ignorableWhitespace( ... )
-         *
-         * @see State2#ignorableWhitespace(char[], int, int)
          */
         public State ignorableWhitespace(final char[] ch, final int strt, final int len)
                 throws SAXException {
@@ -878,10 +767,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
         }
 
         /**
-         * <!-- processingInstruction -->
          * Just calls flushCharacters and super.processingInstruction( ... )
-         *
-         * @see State2#processingInstruction(String, String)
          */
         public State processingInstruction(final String trgt, final String dat)
                 throws SAXException {
@@ -890,10 +776,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
         }
 
         /**
-         * <!-- skippedEntity -->
          * Just calls flushCharacters and super.skippedEntity( ... )
-         *
-         * @see State2#skippedEntity(String)
          */
         public State skippedEntity(final String nam) throws SAXException {
             flushCharacters();
@@ -902,23 +785,18 @@ abstract class AbstractRewrite extends ProcessorImpl {
     }
 
     /**
-     * <!-- NoRewriteState -->
-     * Essentially this corresponds to the norewrite mode of oxf-rewrite.xsl.  i.e.  Just forwards
-     * events to the destination content handler until we finish the initial element ( depth < 0 )
-     * or until it encounters @url-norewrite='false'.  In the first case transitions to the previous
-     * state and in the second case it transitions to
-     * new RewriteState( this, contentHandler, response, isPortlet, haveScriptAncestor ).
+     * Essentially this corresponds to the norewrite mode of oxf-rewrite.xsl. i.e. Just forwards events to the
+     * destination content handler until we finish the initial element (depth < 0) or until it encounters
+     * @url-norewrite='false'. In the first case transitions to the previous state and in the second case it transitions
+     * to new RewriteState(this, contentHandler, response, isPortlet, haveScriptAncestor).
      */
     static class NoRewriteState extends State2 {
-        NoRewriteState(final State2 stt, final ContentHandler cntntHndlr, final Response rspns
-                , final boolean isPrtlt, final int scrptDpth, final String rwrtURI) {
-            super(stt, cntntHndlr, rspns, isPrtlt, scrptDpth, rwrtURI);
+        NoRewriteState(final State2 previousState, final ContentHandler contentHandler, final Request request, final Response response,
+                final boolean isPortlet, final int scriptDepth, final String rewriteURI, List pageFlowContext) {
+            super(previousState, contentHandler, request, response, isPortlet, scriptDepth, rewriteURI, pageFlowContext);
         }
 
         /**
-         * <!-- startElement -->
-         *
-         * @see NoRewriteState
          */
         protected State startElementStart(final String ns, final String lnam, final String qnam, Attributes atts) throws SAXException {
 
@@ -934,7 +812,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
             }
 
             if ("false".equals(noRewriteValue)) {
-                final State stt = new RewriteState(this, contentHandler, response, isPortlet, scriptDepth, rewriteURI);
+                final State stt = new RewriteState(this, contentHandler, request, response, isPortlet, scriptDepth, rewriteURI, pageFlowContext);
                 ret = stt.startElement(ns, lnam, qnam, atts);
             } else {
                 scriptDepthOnStart(ns, lnam);
@@ -947,67 +825,17 @@ abstract class AbstractRewrite extends ProcessorImpl {
     }
 
     /**
-     * <!-- RewriteOutput -->
-     *
-     * @see #readImpl(PipelineContext, ContentHandler)
-     */
-    private final class RewriteOutput extends ProcessorImpl.CacheableTransformerOutputImpl {
-
-        final String rewriteURI;
-
-        /**
-         * <!-- RewriteOutput -->
-         * Just calls super( ... )
-         */
-        private RewriteOutput(final Class cls, final String nam, final String rwrtURI) {
-            super(cls, nam);
-            rewriteURI = rwrtURI;
-        }
-
-        /**
-         * <!-- readImpl -->
-         * Creates a StatefullHandler and uses that to translate the events from the input,
-         * rewrite-in, and then send them to the contentHandler ( the output ).
-         *
-         * @see AbstractRewrite
-         * @see StatefullHandler
-         */
-        public void readImpl(final PipelineContext ctxt, final ContentHandler cntntHndlr) {
-            final ExternalContext extrnlCtxt
-                    = (ExternalContext) ctxt.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
-
-            final Response rspns = extrnlCtxt.getResponse();
-
-            // Do the conversion
-            final boolean isPrtlt = extrnlCtxt instanceof PortletExternalContext;
-            final RootFilter initStt = new RootFilter(null, cntntHndlr);
-            final State aftRt = new RewriteState
-                    (initStt, cntntHndlr, rspns, isPrtlt, 0, rewriteURI);
-            initStt.setNextState(aftRt);
-
-            final StatefullHandler stFlHndlr
-                    = new StatefullHandler(initStt);
-
-            readInputAsSAX(ctxt, REWRITE_IN, stFlHndlr);
-        }
-    }
-
-    /**
-     * <!-- rewriteURI -->
      * Namespace of the elements that are to be rewritten.
-     *
-     * @see #AbstractRewrite(String)
      */
     final String rewriteURI;
 
     /**
-     * <!-- AbstractRewrite -->
      * Just declares input 'rewrite-in' and output 'rewrite-out'.
      *
-     * @param rwrtURI e.g. "http://www.w3.org/1999/xhtml" or ""
+     * @param rewriteURI e.g. "http://www.w3.org/1999/xhtml" or ""
      */
-    public AbstractRewrite(final String rwrtURI) {
-        rewriteURI = rwrtURI;
+    public AbstractRewrite(final String rewriteURI) {
+        this.rewriteURI = rewriteURI;
         final ProcessorInputOutputInfo in = new ProcessorInputOutputInfo(REWRITE_IN);
         addInputInfo(in);
         final ProcessorInputOutputInfo out = new ProcessorInputOutputInfo("rewrite-out");
@@ -1015,13 +843,37 @@ abstract class AbstractRewrite extends ProcessorImpl {
     }
 
     /**
-     * <!-- createOutput -->
-     *
      * @return new RewriteOutput( cls, nam ) after adding it with addOutput.
      */
     public ProcessorOutput createOutput(final String nam) {
         final Class cls = getClass();
-        final ProcessorOutput ret = new RewriteOutput(cls, nam, rewriteURI);
+
+        final ProcessorOutput ret = new ProcessorImpl.CacheableTransformerOutputImpl(cls, nam) {
+
+            /**
+             * Creates a StatefullHandler and uses that to translate the events from the input, rewrite-in, and then
+             * send them to the contentHandler (the output).
+             */
+            public void readImpl(final PipelineContext pipelineContext, final ContentHandler contentHandler) {
+
+                // Get ExternalContext
+                final ExternalContext externalContext
+                        = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+
+                // Get PFC resource rewriting information if needed
+                final List pageFlowContext = (List) pipelineContext.getAttribute(PipelineContext.PATH_MATCHERS);
+
+                // Do the conversion
+                final boolean isPortlet = externalContext instanceof PortletExternalContext;
+                final RootFilter initialState = new RootFilter(null, contentHandler, pageFlowContext);
+                final State aftRt = new RewriteState(initialState, contentHandler, externalContext.getRequest(), externalContext.getResponse(), isPortlet, 0, rewriteURI, pageFlowContext);
+                initialState.setNextState(aftRt);
+
+                final StatefullHandler statefullHandler = new StatefullHandler(initialState);
+
+                readInputAsSAX(pipelineContext, REWRITE_IN, statefullHandler);
+            }
+        };
         addOutput(nam, ret);
         return ret;
     }

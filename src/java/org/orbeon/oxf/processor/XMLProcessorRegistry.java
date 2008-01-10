@@ -66,7 +66,7 @@ public class XMLProcessorRegistry extends ProcessorImpl {
                     final QName defaultQName = (processorQName != null) ? processorQName : new QName(processorURI);
 
                     ProcessorFactory processorFactory = new ProcessorFactory() {
-                        public Processor createInstance(PipelineContext context) {
+                        public Processor createInstance() {
                             try {
                                 Processor processor = (Processor) Class.forName(className).newInstance();
                                 processor.setName(defaultQName);
@@ -96,7 +96,7 @@ public class XMLProcessorRegistry extends ProcessorImpl {
                 if (instantiationDef != null) {
 
                     ProcessorFactory processorFactory = new ProcessorFactory() {
-                        public Processor createInstance(PipelineContext context) {
+                        public Processor createInstance() {
                             try {
                                 // Find base processor
                                 final QName processorQName = extractProcessorQName(instantiationDef);
@@ -113,7 +113,7 @@ public class XMLProcessorRegistry extends ProcessorImpl {
 
                                 Processor baseProcessor = ((processorQName != null)
                                         ? ProcessorFactoryRegistry.lookup(processorQName)
-                                        : ProcessorFactoryRegistry.lookup(processorURI)).createInstance(context);
+                                        : ProcessorFactoryRegistry.lookup(processorURI)).createInstance();
                                 // Override the name - can this have unexpected consequences?
                                 baseProcessor.setName(defaultQName);
 

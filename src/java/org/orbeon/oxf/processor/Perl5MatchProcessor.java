@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.processor;
 
-import org.dom4j.Document;
 import org.orbeon.oro.text.regex.Perl5Compiler;
 import org.orbeon.oro.text.regex.Perl5Matcher;
 
@@ -22,7 +21,7 @@ public class Perl5MatchProcessor extends MatchProcessor {
     private static Perl5Compiler compiler = new Perl5Compiler();
     private static Perl5Matcher matcher = new Perl5Matcher();
 
-    protected MatchProcessor.Result match(Document config, String text) {
-        return oroMatch(config, text, compiler, matcher);
+    public Result match(String regexp, String text) {
+        return oroMatch(regexp, text, compiler, matcher);
     }
 }

@@ -11,6 +11,7 @@ import org.orbeon.oxf.processor.EmailProcessor;
 import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.util.URLRewriter;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 
@@ -53,7 +54,7 @@ public class TestExternalContext implements ExternalContext  {
         private long bodyContentLength;
         private Reader bodyReader;
         private boolean getInputStreamCalled;
-        private boolean getREaderCalled;
+        private boolean getReaderCalled;
 
         public Map getAttributesMap() {
             if (attributesMap == null) {
@@ -93,7 +94,7 @@ public class TestExternalContext implements ExternalContext  {
         }
 
         public InputStream getInputStream() throws IOException {
-            if (getREaderCalled)
+            if (getReaderCalled)
                 throw new IllegalStateException("Cannot call getInputStream() after getReader() has been called.");
             if (bodyInputStream == null)
                 setupBody();
@@ -174,7 +175,7 @@ public class TestExternalContext implements ExternalContext  {
                 setupBody();
             if (bodyReader == null)
                 bodyReader = new InputStreamReader(bodyInputStream, bodyEncoding);
-            getREaderCalled = true;
+            getReaderCalled = true;
             return bodyReader;
         }
 
@@ -372,23 +373,27 @@ public class TestExternalContext implements ExternalContext  {
         }
 
         public String rewriteActionURL(String urlString) {
-            return null;
+            return rewriteResourceURL(urlString, false);
         }
 
         public String rewriteRenderURL(String urlString) {
-            return null;
+            return rewriteResourceURL(urlString, false);
         }
 
         public String rewriteActionURL(String urlString, String portletMode, String windowState) {
-            return null;
+            return rewriteResourceURL(urlString, false);
         }
 
         public String rewriteRenderURL(String urlString, String portletMode, String windowState) {
-            return null;
+            return rewriteResourceURL(urlString, false);
         }
 
         public String rewriteResourceURL(String urlString, boolean absolute) {
-            return null;
+            return rewriteResourceURL(urlString, absolute ? REWRITE_MODE_ABSOLUTE : REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
+        }
+
+        public String rewriteResourceURL(String urlString, int rewriteMode) {
+            return URLRewriter.rewriteURL(getRequest(), urlString, rewriteMode);
         }
 
         public void sendError(int len) throws IOException {

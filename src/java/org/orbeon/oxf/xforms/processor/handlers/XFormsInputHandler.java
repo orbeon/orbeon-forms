@@ -187,7 +187,7 @@ public class XFormsInputHandler extends XFormsValueControlHandler {
                     // HACK: Output XHTML image natively in order to help with the IE bug whereby IE reloads
                     // background images way too often.
                     reusableAttributes.addAttribute("", "src", "src", ContentHandlerHelper.CDATA,
-                            externalContext.getResponse().rewriteResourceURL(XFormsConstants.CALENDAR_IMAGE_URI, false));
+                            rewriteResourceURL(XFormsConstants.CALENDAR_IMAGE_URI));
 
                     // TODO: xmlns:f declaration should be placed on xhtml:body
                     final String formattingPrefix = handlerContext.findFormattingPrefixDeclare();

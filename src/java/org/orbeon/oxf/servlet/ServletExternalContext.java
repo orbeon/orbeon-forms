@@ -24,10 +24,7 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.generator.RequestGenerator;
 import org.orbeon.oxf.resources.OXFProperties;
-import org.orbeon.oxf.util.HttpServletRequestStub;
-import org.orbeon.oxf.util.LoggerFactory;
-import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.util.SystemUtils;
+import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.webapp.ProcessorService;
 
 import javax.servlet.ServletContext;
@@ -37,7 +34,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.*;
-import java.net.URL;
 import java.security.Principal;
 import java.util.*;
 
@@ -633,59 +629,27 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
         }
 
         public String rewriteActionURL(String urlString) {
-            return rewriteURL(urlString, false);
+            return URLRewriter.rewriteURL(getRequest(), urlString, REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
         }
 
         public String rewriteRenderURL(String urlString) {
-            return rewriteURL(urlString, false);
+            return URLRewriter.rewriteURL(getRequest(), urlString, REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
         }
 
         public String rewriteActionURL(String urlString, String portletMode, String windowState) {
-            return rewriteURL(urlString, false);
+            return URLRewriter.rewriteURL(getRequest(), urlString, REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
         }
 
         public String rewriteRenderURL(String urlString, String portletMode, String windowState) {
-            return rewriteURL(urlString, false);
+            return URLRewriter.rewriteURL(getRequest(), urlString, REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
         }
 
         public String rewriteResourceURL(String urlString, boolean generateAbsoluteURL) {
-            return rewriteURL(urlString, generateAbsoluteURL);
+            return URLRewriter.rewriteURL(getRequest(), urlString, generateAbsoluteURL ? REWRITE_MODE_ABSOLUTE : REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
         }
 
-        private String rewriteURL(String urlString, boolean generateAbsoluteURL) {
-            // Case where a protocol is specified: the URL is left untouched
-            if (NetUtils.urlHasProtocol(urlString))
-                return urlString;
-
-            try {
-                ExternalContext.Request request = getRequest();
-
-                URL absoluteBaseURL = generateAbsoluteURL ? new URL(new URL(request.getRequestURL()), "/") : null;
-                String baseURLString = generateAbsoluteURL ? absoluteBaseURL.toExternalForm() : "";
-                if (baseURLString.endsWith("/"))
-                    baseURLString = baseURLString.substring(0, baseURLString.length() - 1);
-
-                // Return absolute path URI with query string and fragment identifier if needed
-                if (urlString.startsWith("?")) {
-                    // This is a special case that appears to be implemented
-                    // in Web browsers as a convenience. Users may use it.
-                    return baseURLString + request.getContextPath() + request.getRequestPath() + urlString;
-                } else if (!urlString.startsWith("/") && !generateAbsoluteURL && !"".equals(urlString)) {
-                    // Don't change the URL if it is a relative path and we don't force absolute URLs
-                    return urlString;
-                } else {
-                    // Regular case, parse the URL
-                    URL baseURLWithPath = new URL("http", "example.org", request.getRequestPath());
-                    URL u = new URL(baseURLWithPath, urlString);
-
-                    String tempResult = u.getFile();
-                    if (u.getRef() != null)
-                        tempResult += "#" + u.getRef();
-                    return baseURLString + request.getContextPath() + tempResult;
-                }
-            } catch (Exception e) {
-                throw new OXFException(e);
-            }
+        public String rewriteResourceURL(String urlString, int rewriteMode) {
+            return URLRewriter.rewriteURL(getRequest(), urlString, rewriteMode);
         }
 
         public String getNamespacePrefix() {

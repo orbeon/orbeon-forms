@@ -158,9 +158,6 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
         // Perform sanity check on the connection in the pipeline
         astPipeline.getIdInfo();
 
-        // Context used by pipeline factories (do not need to be the request context)
-        PipelineContext context = new PipelineContext();
-
         // Create new configuration object
         PipelineConfig config = new PipelineConfig();
         PipelineBlock block = new PipelineBlock();
@@ -208,7 +205,7 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
                         if (processorFactory == null) {
                             throw new ValidationException("Cannot find processor factory with name \"" + processorNameOrURI + "\"", processorLocationData);
                         }
-                        processor = processorFactory.createInstance(context);
+                        processor = processorFactory.createInstance();
                     } else {
                         processor = processorCall.getProcessor();
                     }
@@ -218,7 +215,7 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
                     proxyProcessor.setJNDIName(processorCall.getURI());
                     proxyProcessor.setInputs(processorCall.getInputs());
                     proxyProcessor.setOutputs(processorCall.getOutputs());
-                    processor = proxyProcessor.createInstance(context);
+                    processor = proxyProcessor.createInstance();
                 }
 
                 // Set info on processor
@@ -307,7 +304,7 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
                                 throw new ValidationException("Cannot find processor factory with JNDI name \""
                                         + processorCall.getURI() + "\"", locationData);
                             }
-                            Processor templateProcessor = processorFactory.createInstance(context);
+                            Processor templateProcessor = processorFactory.createInstance();
 
                             // Set info on processor
                             //processor.setId(processorCall.getId()); // what id, if any?
@@ -348,7 +345,7 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
                 ASTChoose choose = (ASTChoose) statement;
                 AbstractProcessor chooseAbstractProcessor = new AbstractChooseProcessor(choose, astPipeline.getValidity());
                 ConcreteChooseProcessor chooseProcessor =
-                        (ConcreteChooseProcessor) chooseAbstractProcessor.createInstance(context);
+                        (ConcreteChooseProcessor) chooseAbstractProcessor.createInstance();
                 processor = chooseProcessor;
 
                 // Connect special $data input (document on which the decision is made, or iterated on)
@@ -383,7 +380,7 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
                 LocationData forEachLocationData = forEach.getLocationData();
                 AbstractProcessor forEachAbstractProcessor = new ForEachProcessor(forEach, astPipeline.getValidity());
                 ForEachProcessor.ConcreteForEachProcessor forEachProcessor =
-                        (ForEachProcessor.ConcreteForEachProcessor) forEachAbstractProcessor.createInstance(context);
+                        (ForEachProcessor.ConcreteForEachProcessor) forEachAbstractProcessor.createInstance();
                 processor = forEachProcessor;
 
                 // Connect special $data input (document on which the decision is made, or iterated on)

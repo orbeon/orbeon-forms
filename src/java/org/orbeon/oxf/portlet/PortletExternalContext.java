@@ -22,6 +22,7 @@ import org.orbeon.oxf.processor.serializer.CachedSerializer;
 import org.orbeon.oxf.servlet.ServletExternalContext;
 import org.orbeon.oxf.util.AttributesToMap;
 import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.util.URLRewriter;
 import org.orbeon.oxf.webapp.ProcessorService;
 
 import javax.portlet.*;
@@ -425,41 +426,15 @@ public class PortletExternalContext extends PortletWebAppExternalContext impleme
         }
 
         public String rewriteResourceURL(String urlString, boolean generateAbsoluteURL) {
+            return rewriteResourceURL(urlString, generateAbsoluteURL ? REWRITE_MODE_ABSOLUTE : REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
+        }
 
-            // Case where a protocol is specified: the URL is left untouched
-            if (NetUtils.urlHasProtocol(urlString))
-                return urlString;
+        public String rewriteResourceURL(String urlString, int rewriteMode) {
+            // NOTE: We could encode the URL a la WSRP, but for resources, we can always produce an URL here, so we
+            // just do so!
 
-            try {
-                ExternalContext.Request request = getRequest();
-
-                // Return absolute path URI with query string and fragment identifier if needed
-                String finalResult;
-                if (urlString.startsWith("?")) {
-                    // This is a special case that appears to be implemented
-                    // in Web browsers as a convenience. Users may use it.
-                    finalResult = request.getContextPath() + request.getRequestPath() + urlString;
-                } else if (!urlString.startsWith("/") && !generateAbsoluteURL && !"".equals(urlString)) {
-                    // Don't change the URL if it is a relative path and we don't force absolute URLs
-                    finalResult = urlString;
-                } else {
-                    // Regular case, parse the URL
-                    URL baseURLWithPath = new URL("http", "example.org", request.getRequestPath());
-                    URL u = new URL(baseURLWithPath, urlString);
-
-                    String tempResult = u.getFile();
-                    if (u.getRef() != null)
-                        tempResult += "#" + u.getRef();
-
-                    finalResult = request.getContextPath() + tempResult;
-                }
-
-                // We could encode the URL a la WSRP, but for resources, we can always produce an
-                // URL here, so just do so!
-                return finalResult;
-            } catch (Exception e) {
-                throw new OXFException(e);
-            }
+            // It seems reasonable to always produce an absolute path unless the URL is already absolute.
+            return URLRewriter.rewriteURL(getRequest(), urlString, Response.REWRITE_MODE_ABSOLUTE_PATH);
         }
 
         public String getNamespacePrefix() {

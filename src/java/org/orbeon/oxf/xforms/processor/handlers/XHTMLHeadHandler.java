@@ -97,7 +97,8 @@ public class XHTMLHeadHandler extends HandlerBase {
 
         // Create prefix for combined resources if needed
         final boolean isMinimal = XFormsProperties.isMinimalResources(containingDocument);
-        final String combinedResourcesPrefix = XFormsFeatures.getCombinedResourcesPrefix(containingDocument, appearancesMap, isMinimal);
+        final boolean isVersioned = XFormsProperties.isVersionCombinedResources();
+        final String combinedResourcesPrefix = XFormsFeatures.getCombinedResourcesPrefix(containingDocument, appearancesMap, isMinimal, isVersioned);
 
         final boolean isCombineResources = XFormsProperties.isCombinedResources(containingDocument);
         final boolean isCacheCombinedResources = isCombineResources && XFormsProperties.isCacheCombinedResources();
@@ -124,7 +125,7 @@ public class XHTMLHeadHandler extends HandlerBase {
                 // Do it at this point so that deployments using an HTTP server front-end can access the resource on disk directly
                 final List resources = XFormsFeatures.getCSSResources(appearancesMap);
                 final long combinedLastModified = XFormsResourceServer.computeCombinedLastModified(resources, isMinimal);
-                XFormsResourceServer.cacheResources(resources, response, combinedResourceName, combinedLastModified, true, isMinimal);
+                XFormsResourceServer.cacheResources(resources, pipelineContext, combinedResourceName, combinedLastModified, true, isMinimal);
             }
         } else {
             for (Iterator i = XFormsFeatures.getCSSResources(appearancesMap).iterator(); i.hasNext();) {
@@ -155,7 +156,7 @@ public class XHTMLHeadHandler extends HandlerBase {
                     // Do it at this point so that deployments using an HTTP server front-end can access the resource on disk directly
                     final List resources = XFormsFeatures.getJavaScriptResources(appearancesMap);
                     final long combinedLastModified = XFormsResourceServer.computeCombinedLastModified(resources, isMinimal);
-                    XFormsResourceServer.cacheResources(resources, response, combinedResourceName, combinedLastModified, false, isMinimal);
+                    XFormsResourceServer.cacheResources(resources, pipelineContext, combinedResourceName, combinedLastModified, false, isMinimal);
                 }
 
             } else {

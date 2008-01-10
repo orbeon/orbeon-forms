@@ -53,28 +53,26 @@ public class PipelineContext {
      */
     public static final String EXTERNAL_CONTEXT = "external-context";
 
-    // Used by ServletFilterGenerator and OXFServletFilter
-    public static final String FILTER_CHAIN = "filter-chain";
-
-    // Used only for pipelines called within portlets
-    public static final String PORTLET_CONFIG = "portlet-config";
-
-    // Used by Delegation processors
-    public static final String JNDI_CONTEXT = "context";
-
-    // Internal pipeline engine use
+    /**
+     * This is for internal pipeline engine use.
+     */
     public static final String PARENT_PROCESSORS = "parent-processors";
 
-    // Throwable passed set by ProcessorService
+    /**
+     * Throwable passed set by ProcessorService.
+     */
     public static final String THROWABLE = "throwable";
 
-    public static final String REQUEST_GENERATOR_CONTEXT = "request-generator-context";
-    public static final String SQL_PROCESSOR_CONTEXT = "sql-processor-context";
-    public static final String XSLT_STYLESHEET_URI_LISTENER = "xslt-stylesheet-uri-listener";
-
-    public static final String DATASOURCE_CONTEXT = "datasource-context";
-
-    public static final String REQUEST = "request";
+    // TODO: All those definitions should not be in PipelineContext
+    public static final String PATH_MATCHERS = "path-matchers"; // used by PageFlowController
+    public static final String XSLT_STYLESHEET_URI_LISTENER = "xslt-stylesheet-uri-listener"; // used by XSLTTransformer
+    public static final String REQUEST_GENERATOR_CONTEXT = "request-generator-context"; // used by RequestGenerator
+    public static final String FILTER_CHAIN = "filter-chain"; // used by ServletFilterGenerator and OPSServletFilter
+    public static final String PORTLET_CONFIG = "portlet-config"; // used only for pipelines called within portlets
+    public static final String JNDI_CONTEXT = "context"; // used by Delegation processor and related
+    public static final String SQL_PROCESSOR_CONTEXT = "sql-processor-context"; // used by SQLProcessor and related
+    public static final String DATASOURCE_CONTEXT = "datasource-context"; // used by DatabaseContext
+    public static final String STRUTS_REQUEST = "struts-request"; // used by StrutsActionFormGenerator (obsolete)
 
     /**
      * ContextListener interface to listen on PipelineContext events.

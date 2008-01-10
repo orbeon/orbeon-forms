@@ -512,6 +512,10 @@ class ResponseAdapter implements ExternalContext.Response {
         return null;
     }
 
+    public String rewriteResourceURL(String urlString, int rewriteMode) {
+        return null;
+    }
+
     public void sendError(int sc) throws IOException {
         this.status = sc;
     }

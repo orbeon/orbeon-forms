@@ -124,7 +124,7 @@ public class ProcessorTest extends TestCase {
                     throw new OXFException("Cannot find processor factory with name '"
                             + xincludeProcessorName.getNamespacePrefix() + ":" + xincludeProcessorName.getName() + "'");
 
-                final Processor xincludeProcessor = xincludeProcessorFactory.createInstance(pipelineContext);
+                final Processor xincludeProcessor = xincludeProcessorFactory.createInstance();
 
                 // Connect input
                 final URLGenerator urlGenerator = new URLGenerator(System.getProperty(TEST_CONFIG));
@@ -158,7 +158,7 @@ public class ProcessorTest extends TestCase {
                 currentTestError = "Error when executing test with description: '" + description + "'";
 
                 // Create processor and connect its inputs
-                Processor processor = ProcessorUtils.createProcessorWithInputs(testNode, pipelineContext);
+                Processor processor = ProcessorUtils.createProcessorWithInputs(testNode);
                 processor.setId("Main Test Processor");
 
                 // Connect outputs

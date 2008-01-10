@@ -1019,7 +1019,7 @@ public abstract class ProcessorImpl implements Processor {
             }
         }
 
-        private ProcessorFilter createFilter(PipelineContext context) {
+        private ProcessorFilter createFilter() {
 
             // Get inspector instance
 
@@ -1051,7 +1051,7 @@ public abstract class ProcessorImpl implements Processor {
                     LocationData debugLocationData = i == 0 ? getLocationData() :
                             getInput() == null ? null : getInput().getLocationData();
                     if (debugMessage != null) {
-                        Processor debugProcessor = debugProcessorFactory.createInstance(context);
+                        Processor debugProcessor = debugProcessorFactory.createInstance();
                         debugProcessor.createInput(INPUT_DATA);
                         debugProcessor.createOutput(OUTPUT_DATA);
 
@@ -1184,9 +1184,9 @@ public abstract class ProcessorImpl implements Processor {
          */
         ProcessorFilter filter = null;
 
-        private ProcessorFilter getFilter(PipelineContext context) {
+        private ProcessorFilter getFilter() {
             if (filter == null)
-                filter = createFilter(context);
+                filter = createFilter();
             return filter;
         }
 
@@ -1210,7 +1210,7 @@ public abstract class ProcessorImpl implements Processor {
                 trc.add( tinf );
             }
             try {
-                getFilter(context).read(context, contentHandler);
+                getFilter().read(context, contentHandler);
             } catch (AbstractMethodError e) {
                 logger.error(e);
             } catch (Exception e) {
@@ -1221,11 +1221,11 @@ public abstract class ProcessorImpl implements Processor {
         }
 
         public final OutputCacheKey getKey(PipelineContext context) {
-            return getFilter(context).getKey(context);
+            return getFilter().getKey(context);
         }
 
         public final Object getValidity(PipelineContext context) {
-            return getFilter(context).getValidity(context);
+            return getFilter().getValidity(context);
         }
 
         public final KeyValidity getKeyValidityImpl(PipelineContext context) {

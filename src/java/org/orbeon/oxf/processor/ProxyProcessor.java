@@ -41,7 +41,7 @@ public class ProxyProcessor extends ProcessorImpl implements ProcessorFactory {
     }
 
 
-    public Processor createInstance(org.orbeon.oxf.pipeline.api.PipelineContext context) {
+    public Processor createInstance() {
         return new ConcreteProxyProcessor();
     }
 

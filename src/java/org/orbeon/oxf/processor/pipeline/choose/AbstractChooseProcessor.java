@@ -16,7 +16,6 @@ package org.orbeon.oxf.processor.pipeline.choose;
 import org.apache.commons.collections.CollectionUtils;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.AbstractProcessor;
 import org.orbeon.oxf.processor.Processor;
 import org.orbeon.oxf.processor.ProcessorImpl;
@@ -25,7 +24,6 @@ import org.orbeon.oxf.processor.pipeline.ast.*;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 
 import java.util.*;
 
@@ -69,7 +67,7 @@ public class AbstractChooseProcessor extends ProcessorImpl implements AbstractPr
         setLocationData(chooseAST.getLocationData());
     }
 
-    public Processor createInstance(PipelineContext context) {
+    public Processor createInstance() {
 
         // We store here the "refs with no id" and "ids with no ref" for each branch.
         // Those are list of collections (one collection for each branch).

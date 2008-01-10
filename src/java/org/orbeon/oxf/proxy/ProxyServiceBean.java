@@ -44,7 +44,7 @@ public class ProxyServiceBean extends SessionBeanAdapter {
             Context jndiContext = new InitialContext();
             org.orbeon.oxf.pipeline.api.PipelineContext pipelineContext = new org.orbeon.oxf.pipeline.api.PipelineContext();
             pipelineContext.setAttribute(org.orbeon.oxf.pipeline.api.PipelineContext.JNDI_CONTEXT, jndiContext);
-            Processor processor = ProcessorFactoryRegistry.lookup(jndiName).createInstance(pipelineContext);
+            Processor processor = ProcessorFactoryRegistry.lookup(jndiName).createInstance();
 
             // Connect inputs
             for (Iterator i = inputs.keySet().iterator(); i.hasNext();) {

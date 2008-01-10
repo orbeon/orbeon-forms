@@ -86,6 +86,12 @@ public interface ExternalContext extends WebAppExternalContext {
     }
 
     public interface Response {
+
+        public static final int REWRITE_MODE_ABSOLUTE = 1;
+        public static final int REWRITE_MODE_ABSOLUTE_PATH = 2;
+        public static final int REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE = 3;
+        public static final int REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT = 4;
+
         public PrintWriter getWriter() throws IOException;
         public OutputStream getOutputStream() throws IOException;
         public boolean isCommitted();
@@ -107,6 +113,7 @@ public interface ExternalContext extends WebAppExternalContext {
         public String rewriteActionURL(String urlString, String portletMode, String windowState);
         public String rewriteRenderURL(String urlString, String portletMode, String windowState);
         public String rewriteResourceURL(String urlString, boolean absolute);
+        public String rewriteResourceURL(String urlString, int rewriteMode);
         public String getNamespacePrefix();
         public void setTitle(String title);
 

@@ -26,15 +26,13 @@ import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.transformer.xupdate.XUpdateConstants;
 import org.orbeon.oxf.util.LoggerFactory;
+import org.orbeon.oxf.util.URLRewriter;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.*;
 import org.xml.sax.SAXException;
 
 import java.net.MalformedURLException;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class PageFlowControllerProcessor extends ProcessorImpl {
 
@@ -59,8 +57,13 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
     private final static String INSTANCE_PASSING_REDIRECT_PORTAL = "redirect-exit-portal";
     private final static String DEFAULT_INSTANCE_PASSING = INSTANCE_PASSING_REDIRECT;
 
+    // Versioned configuration
+    private final static boolean DEFAULT_VERSIONED = false;
+
     // Properties
     private static final String INSTANCE_PASSING_PROPERTY_NAME = "instance-passing";
+    private static final String VERSIONED_PROPERTY_NAME = "versioned";
+    private static final String VERSION_PROPERTY_NAME = "files-version";
     private static final String EPILOGUE_PROPERTY_NAME = "epilogue";
     private static final String NOT_FOUND_PROPERTY_NAME = "not-found";
     private static final String XFORMS_SUBMISSION_MODEL_PROPERTY_NAME = "xforms-submission-model";
@@ -85,8 +88,8 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
         addInputInfo(new ProcessorInputOutputInfo(INPUT_CONTROLER, CONTROLLER_NAMESPACE_URI));
     }
 
-    public void start(PipelineContext context) {
-        PipelineProcessor pipelineProcessor = (PipelineProcessor) readCacheInputAsObject(context, getInputByName(INPUT_CONTROLER), new CacheableInputReader() {
+    public void start(PipelineContext pipelineContext) {
+        final PageFlow pageFlow = (PageFlow) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_CONTROLER), new CacheableInputReader() {
             public Object read(final PipelineContext context, ProcessorInput input) {
                 final Document controllerDocument = readInputAsDOM4J(context, INPUT_CONTROLER);
                 final Object controllerValidity = getInputValidity(context, getInputByName(INPUT_CONTROLER));
@@ -95,12 +98,20 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                 final String controllerContext = locationData == null ? null : locationData.getSystemID();
 
                 // Get global "parameters" of the controller, fall back to properties
-                final String _instancePassing; {
-                    String attributeValue = controllerDocument.getRootElement().attributeValue("instance-passing");
-                    _instancePassing = attributeValue != null ? attributeValue
+                final String globalInstancePassing; {
+                    final String attributeValue = controllerDocument.getRootElement().attributeValue(INSTANCE_PASSING_PROPERTY_NAME);
+                    globalInstancePassing = attributeValue != null ? attributeValue
                             : getPropertySet().getString(INSTANCE_PASSING_PROPERTY_NAME, DEFAULT_INSTANCE_PASSING);
                 }
-                final String instancePassing = _instancePassing;
+                final boolean globalIsVersioned; {
+                    final String attributeValue = controllerDocument.getRootElement().attributeValue(VERSIONED_PROPERTY_NAME);
+                    globalIsVersioned = attributeValue != null ? new Boolean(attributeValue).booleanValue()
+                            : getPropertySet().getBoolean(VERSIONED_PROPERTY_NAME, DEFAULT_VERSIONED).booleanValue();
+                }
+                final String globalVersion; {
+                    final String attributeValue = controllerDocument.getRootElement().attributeValue(VERSION_PROPERTY_NAME);
+                    globalVersion = attributeValue != null ? attributeValue : getPropertySet().getString(VERSION_PROPERTY_NAME);
+                }
                 final String epilogueURL;
                 final Element epilogueElement;
                 {
@@ -109,16 +120,17 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                         : getPropertySet().getString(EPILOGUE_PROPERTY_NAME);
                 }
                 final String notFoundPipeline = getPropertySet().getString(NOT_FOUND_PROPERTY_NAME);
-                final String _notFoundPageId;
+                final String notFoundPageId;
                 {
                     final Element notFoundHandlerElement = controllerDocument.getRootElement().element("not-found-handler");
-                    _notFoundPageId = notFoundHandlerElement != null ? notFoundHandlerElement.attributeValue("page") : null;
+                    notFoundPageId = notFoundHandlerElement != null ? notFoundHandlerElement.attributeValue("page") : null;
                 }
-                final String notFoundPageId = _notFoundPageId;
 //                final String errorPageId; {
 //                    Element errorHandlerElement = controllerDocument.getRootElement().element("error-handler");
 //                    errorPageId = errorHandlerElement != null ? errorHandlerElement.attributeValue("page") : null;
 //                }
+
+                final List versionedFilesInfo = new ArrayList();
 
                 // XForms Submission page
                 {
@@ -213,6 +225,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                     // Is the previous <files> or <page> using simple matching
                     boolean previousIsSimple = true;
                     boolean previousIsFile = false;
+                    boolean previousFileIsVersioned = false;
                     boolean isFirst = true;
                     ASTChoose currentChoose = null;
                     int matcherCount = 0;
@@ -228,24 +241,46 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                             // Extract matcher URI or QName
                             // URI is supported for backward compatibility only. We use a poor
                             // heuristic to detect whether a QName is present.
-                            String matcherURI = element.attributeValue("matcher");
-                            QName matcherQName = (matcherURI != null && matcherURI.indexOf(':') != -1)
-                                ? Dom4jUtils.extractAttributeValueQName(element, "matcher") : null;
-                            if (matcherQName != null)
-                                matcherURI = null;
+                            final String matcherURI;
+                            final QName matcherQName;
+                            {
+                                final String matcherAttribute = element.attributeValue("matcher");
+                                if (matcherAttribute != null && matcherAttribute.indexOf(':') != -1) {
+                                    matcherQName = Dom4jUtils.extractAttributeValueQName(element, "matcher");
+                                    matcherURI = null;
+                                } else {
+                                    matcherQName = null;
+                                    matcherURI = matcherAttribute;
+                                }
+                            }
 
-                            String mimeType = element.attributeValue("mime-type");
+                            final String mimeType = element.attributeValue("mime-type");
                             final String pathInfo = element.attributeValue("path-info");
+
+                            final boolean currentIsFile = "files".equals(element.getName());
+                            final boolean currentFileIsVersioned; {
+                                // If this is a file, then check "versioned" property, local and then global
+                                final String currentIsVersionedAttribute = currentIsFile ? element.attributeValue(VERSIONED_PROPERTY_NAME) : null;
+                                currentFileIsVersioned = (currentIsVersionedAttribute != null) ? "true".equals(currentIsVersionedAttribute) : globalIsVersioned;
+                            }
+
+                            // Remember this FilesInfo if needed
+                            if (currentFileIsVersioned) {
+                                versionedFilesInfo.add(new URLRewriter.PathMatcher(pathInfo, matcherQName, mimeType, currentFileIsVersioned, globalVersion));
+                            }
 
                             // Can we just add this condition to the previous "when" statement?
                             boolean canAddToPreviousWhen =
-                                    previousIsFile  && "files".equals(element.getName()) &&
+                                    previousIsFile  && currentIsFile &&
+                                    previousFileIsVersioned == currentFileIsVersioned &&
                                     previousIsSimple && matcherURI == null && matcherQName == null && mimeType ==null;
 
                             // Create <p:when>
                             ASTWhen when;
                             final ASTOutput _matcherOutput;
                             if (matcherURI == null && matcherQName == null) {
+                                // There is no matcher, use basic rules
+
                                 _matcherOutput = dummyMatcherOutput;
 
                                 // Add <p:choose> / <p:otherwise> when necessary
@@ -264,23 +299,27 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                                 }
 
                                 // Compute test
-                                String test;
+                                final String test;
                                 if (pathInfo.startsWith("*")) {
-                                    test = "ends-with( /request/request-path, '"
-                                           + pathInfo.substring( 1 )
-                                           + "' )";
+                                    // Extension match
+                                    test = "ends-with(/request/request-path, '"
+                                            + pathInfo.substring(1)
+                                            + "' )";
                                 } else if (pathInfo.endsWith("*")) {
+                                    // Partial match
                                     final int len = pathInfo.length() - 1;
-                                    test = "starts-with( /request/request-path, '"
-                                           + pathInfo.substring( 0,  len )
-                                           + "' )";
+                                    test = "starts-with(/request/request-path, '"
+                                            + pathInfo.substring(0, len)
+                                            + "' )";
                                 } else {
+                                    // Exact match
                                     test = "(/request/request-path = '" + pathInfo + "')";
                                 }
 
                                 // Add <p:when>
                                 when = new ASTWhen(test);
                             } else {
+                                // Use matcher
 
                                 previousIsSimple = false;
 
@@ -315,14 +354,16 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
 
                             if (canAddToPreviousWhen) {
                                 // Do not create new "when", add current condition to previous "when"
-                                ASTWhen previousWhen = (ASTWhen) currentChoose.getWhen().get(currentChoose.getWhen().size() - 1);
+                                final ASTWhen previousWhen = (ASTWhen) currentChoose.getWhen().get(currentChoose.getWhen().size() - 1);
                                 previousWhen.setTest(previousWhen.getTest() + " or " + when.getTest());
                             } else {
                                 // Create new "when"
                                 currentChoose.getWhen().add(when);
-                                if ("files".equals(element.getName())) {
+                                if (currentIsFile) {
                                     previousIsFile = true;
-                                    handleFile(when, request, mimeType, epilogueData, epilogueModelData, epilogueInstance, epilogueXFormsModel);
+                                    previousFileIsVersioned = currentFileIsVersioned;
+
+                                    handleFile(when, request, mimeType, epilogueData, epilogueModelData, epilogueInstance, epilogueXFormsModel, currentFileIsVersioned);
                                 } else if ("page".equals(element.getName())) {
                                     previousIsFile = false;
                                     // Get unique page number
@@ -330,7 +371,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                                     handlePage(stepProcessorContext, controllerContext, when.getStatements(), element,
                                             pageNumber, requestWithParameters, matcherOutput, epilogueData, epilogueModelData,
                                             epilogueInstance, epilogueXFormsModel, pageIdToPathInfo, pageIdToXFormsModel, pageIdToSetvaluesDocument,
-                                            instancePassing);
+                                            globalInstancePassing);
                                 }
                             }
                         }
@@ -359,7 +400,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                             handlePage(stepProcessorContext, controllerContext, statementsList, notFoundPageElement,
                                     pageCount, requestWithParameters, dummyMatcherOutput, epilogueData, epilogueModelData,
                                     epilogueInstance, epilogueXFormsModel, pageIdToPathInfo, pageIdToXFormsModel, pageIdToSetvaluesDocument,
-                                    instancePassing);
+                                    globalInstancePassing);
                         } else {
                             // [BACKWARD COMPATIBILITY] - Execute simple "not-found" page coming from properties
                             final ASTOutput notFoundHTML = new ASTOutput(null, "not-found-html");
@@ -423,11 +464,28 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                             + Dom4jUtils.domToString(astDocumentHandler.getDocument()));
                 }
 
-                return new PipelineProcessor(astPipeline);
+                return new PageFlow(new PipelineProcessor(astPipeline), versionedFilesInfo);
             }
         });
-        pipelineProcessor.reset(context);
-        pipelineProcessor.start(context);
+
+        // If required, store information about resources to rewrite in the pipeline context for downstream use, e.g.
+        // by oxf:x?html-rewrite
+        final List versionedFilesInfo = pageFlow.getPathMatchers();
+        if (versionedFilesInfo != null && versionedFilesInfo.size() > 0) {
+            final List existingFileInfos = (List) pipelineContext.getAttribute(PipelineContext.PATH_MATCHERS);
+            if (existingFileInfos == null) {
+                // Set if we are the first
+                pipelineContext.setAttribute(PipelineContext.PATH_MATCHERS, versionedFilesInfo);
+            } else {
+                // Add if we come after others (in case of nested page flows)
+                existingFileInfos.addAll(versionedFilesInfo);
+            }
+        }
+
+        // Launch pipeline
+        final PipelineProcessor pipelineProcessor = pageFlow.getPipelineProcessor();
+        pipelineProcessor.reset(pipelineContext);
+        pipelineProcessor.start(pipelineContext);
     }
 
     private static void handleEpilogue(final String controllerContext, List statements, final String epilogueURL, final Element epilogueElement,
@@ -1155,14 +1213,25 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
      */
     private void handleFile(ASTWhen when, final ASTOutput request, final String mimeType,
                             final ASTOutput epilogueData, final ASTOutput epilogueModelData,
-                            final ASTOutput epilogueInstance, final ASTOutput epilogueXFormsModel) {
+                            final ASTOutput epilogueInstance, final ASTOutput epilogueXFormsModel,
+                            final boolean isVersioned) {
         when.addStatement(new ASTProcessorCall(XMLConstants.RESOURCE_SERVER_PROCESSOR_QNAME) {{
-            addInput(new ASTInput("config", new ASTHrefAggregate("path", new ASTHrefXPointer
-                    (new ASTHrefId(request), "string(/request/request-path)"))));
+            if (isVersioned) {
+                // Path is versioned, i.e. of the form /3.6.0.200801092029/..., so remove the version prefix
+                addInput(new ASTInput("config",
+                            new ASTHrefAggregate("path", new ASTHrefXPointer(new ASTHrefId(request), "concat('/', for $path in string(/request/request-path) return substring-after(substring($path, 2), '/'))"))
+                ));
+            } else {
+                // Pass the path as is
+                addInput(new ASTInput("config",
+                            new ASTHrefAggregate("path", new ASTHrefXPointer(new ASTHrefId(request), "string(/request/request-path)"))
+                ));
+            }
+
             if (mimeType == null) {
                 addInput(new ASTInput(ResourceServer.MIMETYPE_INPUT, new ASTHrefURL("oxf:/oxf/mime-types.xml")));
             } else {
-                Document mimeTypeConfig = new NonLazyUserDataDocument(new NonLazyUserDataElement("mime-types") {{
+                final Document mimeTypeConfig = new NonLazyUserDataDocument(new NonLazyUserDataElement("mime-types") {{
                     add(new NonLazyUserDataElement("mime-type") {{
                         add(new NonLazyUserDataElement("name") {{
                             addText(mimeType);
@@ -1485,6 +1554,24 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
             } catch (MalformedURLException e) {
                 throw new OXFException(e);
             }
+        }
+    }
+
+    private static class PageFlow {
+        private PipelineProcessor pipelineProcessor;
+        private List pathMatchers;
+
+        public PageFlow(PipelineProcessor pipelineProcessor, List pathMatchers) {
+            this.pipelineProcessor = pipelineProcessor;
+            this.pathMatchers = pathMatchers;
+        }
+
+        public PipelineProcessor getPipelineProcessor() {
+            return pipelineProcessor;
+        }
+
+        public List getPathMatchers() {
+            return pathMatchers;
         }
     }
 }

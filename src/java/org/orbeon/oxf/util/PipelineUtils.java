@@ -32,8 +32,8 @@ public class PipelineUtils {
     }
 
     public static void connect(Processor producer, String outputName, Processor consumer, String inputName) {
-        ProcessorOutput output = producer.createOutput(outputName);
-        ProcessorInput input = consumer.createInput(inputName);
+        final ProcessorOutput output = producer.createOutput(outputName);
+        final ProcessorInput input = consumer.createInput(inputName);
         output.setInput(input);
         input.setOutput(output);
     }

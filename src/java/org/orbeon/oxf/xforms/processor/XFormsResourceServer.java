@@ -20,6 +20,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.util.URLRewriter;
 import org.orbeon.oxf.xforms.XFormsProperties;
 
 import java.io.*;
@@ -35,8 +36,8 @@ public class XFormsResourceServer extends ProcessorImpl {
     public XFormsResourceServer() {
     }
 
-    public void start(PipelineContext context) {
-        final ExternalContext externalContext = (ExternalContext) context.getAttribute(org.orbeon.oxf.pipeline.api.PipelineContext.EXTERNAL_CONTEXT);
+    public void start(PipelineContext pipelineContext) {
+        final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
         final ExternalContext.Request request = externalContext.getRequest();
         final ExternalContext.Response response = externalContext.getResponse();
 
@@ -92,7 +93,7 @@ public class XFormsResourceServer extends ProcessorImpl {
                 final boolean isDebugEnabled = XFormsServer.logger.isDebugEnabled();
                 if (XFormsProperties.isCacheCombinedResources()) {
                     // Caching requested
-                    final File resourceFile = cacheResources(resources, response, requestPath, combinedLastModified, isCSS, isMinimal);
+                    final File resourceFile = cacheResources(resources, pipelineContext, requestPath, combinedLastModified, isCSS, isMinimal);
                     if (resourceFile != null) {
                         // Caching could take place, send out cached result
                         if (isDebugEnabled)
@@ -105,13 +106,13 @@ public class XFormsResourceServer extends ProcessorImpl {
                         // Was unable to cache, just serve
                         if (isDebugEnabled)
                             XFormsServer.logger.debug("XForms resources - caching requested but not possible, serving directly " + requestPath + ".");
-                        generate(resources, response, responseOutputStream, isCSS, isMinimal);
+                        generate(resources, pipelineContext, responseOutputStream, isCSS, isMinimal);
                     }
                 } else {
                     // Should not cache, just serve
                     if (isDebugEnabled)
                         XFormsServer.logger.debug("XForms resources - caching not requested, serving directly " + requestPath + ".");
-                    generate(resources, response, responseOutputStream, isCSS, isMinimal);
+                    generate(resources, pipelineContext, responseOutputStream, isCSS, isMinimal);
                 }
             }
         } catch (OXFException e) {
@@ -144,14 +145,14 @@ public class XFormsResourceServer extends ProcessorImpl {
      * Try to cache the combined resources on disk.
      *
      * @param resources             list of XFormsFeatures.ResourceConfig to consider
-     * @param response              Response (used for rewriting)
+     * @param pipelineContext       current PipelineContext (used for rewriting and matchers)
      * @param resourcePath          path to store the cached resource to
      * @param combinedLastModified  last modification date of the resources to combine
      * @param isCSS                 whether to generate CSS or JavaScript resources
      * @param isMinimal             whether to use minimal resources
      * @return                      File pointing to the generated resource, null if caching could not take place
      */
-    public static File cacheResources(List resources, ExternalContext.Response response, String resourcePath, long combinedLastModified, boolean isCSS, boolean isMinimal) {
+    public static File cacheResources(List resources, PipelineContext pipelineContext, String resourcePath, long combinedLastModified, boolean isCSS, boolean isMinimal) {
         try {
             final File resourceFile;
             final String realPath = ResourceManagerWrapper.instance().getRealPath(resourcePath);
@@ -167,7 +168,7 @@ public class XFormsResourceServer extends ProcessorImpl {
                         if (isDebugEnabled)
                             XFormsServer.logger.debug("XForms resources - cached combined resources out of date, saving " + resourcePath + ".");
                         final FileOutputStream fos = new FileOutputStream(resourceFile);
-                        generate(resources, response, fos, isCSS, isMinimal);
+                        generate(resources, pipelineContext, fos, isCSS, isMinimal);
                         fos.close();
                     } else {
                         if (isDebugEnabled)
@@ -180,7 +181,7 @@ public class XFormsResourceServer extends ProcessorImpl {
                     resourceFile.getParentFile().mkdirs();
                     resourceFile.createNewFile();
                     final FileOutputStream fos = new FileOutputStream(resourceFile);
-                    generate(resources, response, fos, isCSS, isMinimal);
+                    generate(resources, pipelineContext, fos, isCSS, isMinimal);
                     fos.close();
                 }
             } else {
@@ -194,14 +195,14 @@ public class XFormsResourceServer extends ProcessorImpl {
         }
     }
 
-    private static void generate(List resources, ExternalContext.Response response, OutputStream os, boolean CSS, boolean minimal) throws URISyntaxException, IOException {
+    private static void generate(List resources, PipelineContext pipelineContext, OutputStream os, boolean CSS, boolean minimal) throws URISyntaxException, IOException {
         if (CSS) {
-            // CSS, rewrite content
-            final URI applicationBaseURI;
-            {
-                final String applicationBase = response.rewriteResourceURL("/", true);
-                applicationBaseURI = new URI(applicationBase);
-            }
+            // CSS: rewrite url() in content
+
+            final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+
+            // Get PFC resource rewriting information if needed
+            final List pathMatchers = (List) pipelineContext.getAttribute(PipelineContext.PATH_MATCHERS);
 
             final Writer outputWriter = new OutputStreamWriter(os, "utf-8");
 
@@ -222,7 +223,7 @@ public class XFormsResourceServer extends ProcessorImpl {
                     content = stringWriter.toString();
                 }
 
-                final URI resourceURI = applicationBaseURI.resolve(resourcePath.startsWith("/") ? resourcePath.substring(1) : resourcePath);
+                final URI unresolvedResourceURI = new URI(resourcePath);
                 {
                     int index = 0;
                     while (true) {
@@ -251,14 +252,17 @@ public class XFormsResourceServer extends ProcessorImpl {
                             index = closingIndex + 1;
                         }
                         // Rewrite URL and output it as an absolute path
-                        final URI resolvedURI = resourceURI.resolve(url.trim());
-                        outputWriter.write("url(" + resolvedURI.getPath() + ")");
+                        final URI resolvedResourceURI = unresolvedResourceURI.resolve(url.trim());
+
+                        final String rewrittenURI = URLRewriter.rewriteResourceURL(externalContext.getRequest(), externalContext.getResponse(), resolvedResourceURI.toString(), pathMatchers);
+
+                        outputWriter.write("url(" + rewrittenURI + ")");
                     }
                 }
             }
             outputWriter.flush();
         } else {
-            // JavaScript, just send
+            // JavaScript: just send out
 
             // Output Orbeon Forms version
             final Writer outputWriter = new OutputStreamWriter(os, "utf-8");

@@ -13,12 +13,9 @@
  */
 package org.orbeon.oxf.pipeline;
 
-import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.util.URLRewriter;
 
 import java.io.*;
-import java.net.URL;
 
 /**
  * Simple ExternalContext for command-line applications.
@@ -64,64 +61,31 @@ public class CommandLineExternalContext extends SimpleExternalContext {
         }
 
         public String rewriteActionURL(String urlString) {
-            return rewriteURL(urlString, false);
+            return rewriteResourceURL(urlString, false);
         }
 
         public String rewriteRenderURL(String urlString) {
-            return rewriteURL(urlString, false);
+            return rewriteResourceURL(urlString, false);
         }
 
         public String rewriteActionURL(String urlString, String portletMode, String windowState) {
-            return rewriteURL(urlString, false);
+            return rewriteResourceURL(urlString, false);
         }
 
         public String rewriteRenderURL(String urlString, String portletMode, String windowState) {
-            return rewriteURL(urlString, false);
+            return rewriteResourceURL(urlString, false);
         }
 
         public String rewriteResourceURL(String urlString) {
-            return rewriteURL(urlString, false);
+            return rewriteResourceURL(urlString, false);
         }
 
         public String rewriteResourceURL(String urlString, boolean generateAbsoluteURL) {
-            return rewriteURL(urlString, generateAbsoluteURL);
+            return rewriteResourceURL(urlString, generateAbsoluteURL ? Response.REWRITE_MODE_ABSOLUTE : Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
         }
-    }
 
-    private String rewriteURL(String urlString, boolean generateAbsoluteURL) {
-        // Case where a protocol is specified: the URL is left untouched
-        // We consider that a protocol consists only of ASCII letters
-        if (NetUtils.urlHasProtocol(urlString))
-            return urlString;
-
-        try {
-            ExternalContext.Request request = getRequest();
-
-            URL absoluteBaseURL = generateAbsoluteURL ? new URL(new URL(request.getRequestURL()), "/") : null;
-            String baseURLString = generateAbsoluteURL ? absoluteBaseURL.toExternalForm() : "";
-            if (baseURLString.endsWith("/"))
-                baseURLString = baseURLString.substring(0, baseURLString.length() - 1);
-
-            // Return absolute path URI with query string and fragment identifier if needed
-            if (urlString.startsWith("?")) {
-                // This is a special case that appears to be implemented
-                // in Web browsers as a convenience. Users may use it.
-                return baseURLString + request.getContextPath() + request.getRequestPath() + urlString;
-            } else if (!urlString.startsWith("/") && !generateAbsoluteURL && !"".equals(urlString)) {
-                // Don't change the URL if it is a relative path and we don't force absolute URLs
-                return urlString;
-            } else {
-                // Regular case, parse the URL
-                URL baseURLWithPath = new URL("http", "example.org", request.getRequestPath());
-                URL u = new URL(baseURLWithPath, urlString);
-
-                String tempResult = u.getFile();
-                if (u.getRef() != null)
-                    tempResult += "#" + u.getRef();
-                return baseURLString + request.getContextPath() + tempResult;
-            }
-        } catch (Exception e) {
-            throw new OXFException(e);
+        public String rewriteResourceURL(String urlString, int rewriteMode) {
+            return URLRewriter.rewriteURL(getRequest(), urlString, rewriteMode);
         }
     }
 }

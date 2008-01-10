@@ -14,13 +14,10 @@
 package org.orbeon.oxf.processor.converter;
 
 /**
- * <!-- HTMLRewrite -->
- *
- * @see AbstractRewrite
+ * Rewrite URLs in an HTML document.
  */
 public class HTMLRewrite extends AbstractRewrite {
     /**
-     * <!-- HTMLRewrite -->
      * Just calls super("")
      */
     public HTMLRewrite() {

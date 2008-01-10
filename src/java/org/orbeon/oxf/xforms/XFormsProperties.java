@@ -189,6 +189,9 @@ public class XFormsProperties {
     private static final String CACHE_COMBINED_RESOURCES_PROPERTY = XFORMS_PROPERTY_PREFIX + "cache-combined-resources"; // global but could possibly be per document
     private static final boolean CACHE_COMBINED_RESOURCES_DEFAULT = false;
 
+    private static final String VERSION_COMBINED_RESOURCES_PROPERTY = XFORMS_PROPERTY_PREFIX + "version-combined-resources";
+    private static final boolean VERSION_COMBINED_RESOURCES_DEFAULT = false;
+
     private static final String TEST_AJAX_PROPERTY = XFORMS_PROPERTY_PREFIX + "test.ajax";
     private static final boolean TEST_AJAX_DEFAULT = false;
 
@@ -267,6 +270,11 @@ public class XFormsProperties {
     public static boolean isCacheCombinedResources() {
         return OXFProperties.instance().getPropertySet().getBoolean
                 (CACHE_COMBINED_RESOURCES_PROPERTY, CACHE_COMBINED_RESOURCES_DEFAULT).booleanValue();
+    }
+
+    public static boolean isVersionCombinedResources() {
+        return OXFProperties.instance().getPropertySet().getBoolean
+                (VERSION_COMBINED_RESOURCES_PROPERTY, VERSION_COMBINED_RESOURCES_DEFAULT).booleanValue();
     }
 
     public static String getStateHandling(XFormsContainingDocument containingDocument) {

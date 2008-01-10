@@ -13,8 +13,6 @@
  */
 package org.orbeon.oxf.processor;
 
-import org.orbeon.oxf.pipeline.api.PipelineContext;
-
 public interface ProcessorFactory {
-    public Processor createInstance(PipelineContext context);
+    public Processor createInstance();
 }

@@ -51,6 +51,20 @@
                 Orbeon Forms 3.6.1 is an update to Orbeon Forms 3.6.
             </p>
             <section>
+                <title>Noteworthy Changes</title>
+                <ul>
+                    <li>
+                        <p>
+                            <b>Support for temporary files in the file serializer.</b> The file serializer can now
+                            automatically create temporary files and write to those temporary files. It will also delete
+                            temporary files, based on a "scope" parameter you specify in the configuration. As with the
+                            Scope generator and Scope serializer, you can set the scope to either "request", "session",
+                            or "application".
+                        </p>
+                    </li>
+                </ul>
+            </section>
+            <section>
                 <title>Complete List of Issues Addressed in this Release</title>
                 <p>
                     Orbeon Forms 3.6.1 addresses the following bugs and features:

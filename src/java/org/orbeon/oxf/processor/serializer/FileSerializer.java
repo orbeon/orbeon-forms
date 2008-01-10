@@ -14,6 +14,12 @@
 package org.orbeon.oxf.processor.serializer;
 
 import org.apache.log4j.Logger;
+import org.apache.commons.fileupload.FileItemFactory;
+import org.apache.commons.fileupload.DeferredFileOutputStream;
+import org.apache.commons.fileupload.DefaultFileItem;
+import org.apache.commons.fileupload.DefaultFileItemFactory;
+import org.apache.commons.fileupload.FileItem;
+import org.xml.sax.SAXException;
 import org.dom4j.Document;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -23,12 +29,21 @@ import org.orbeon.oxf.processor.serializer.store.ResultStoreOutputStream;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.resources.OXFProperties;
+import org.orbeon.oxf.util.SystemUtils;
+import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.xforms.processor.XFormsServer;
+import org.orbeon.oxf.resources.ResourceManagerWrapper;
+import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.pipeline.api.WebAppExternalContext;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-
+import java.io.InputStream;
+import org.xml.sax.ContentHandler;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.servlet.ServletContext;
 /**
  * The File Serializer serializes text and binary documents to files on disk.
  */
@@ -50,15 +65,34 @@ public class FileSerializer extends ProcessorImpl {
     private static final boolean DEFAULT_APPEND = false;
     private static final boolean DEFAULT_MAKE_DIRECTORIES = false;
 
+    private static FileItemFactory fileItemFactory;
+    private static DocumentBuilderFactory documentBuilderFactory;
+
+
+  static {
+        try {
+            // Create factory
+            documentBuilderFactory = (DocumentBuilderFactory) Class.forName("orbeon.apache.xerces.jaxp.DocumentBuilderFactoryImpl").newInstance();
+            // Configure factory
+            documentBuilderFactory.setNamespaceAware(true);
+        }
+        catch (Exception e) {
+            throw new OXFException(e);
+        }
+    }
+
     public FileSerializer() {
         addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG, FILE_SERIALIZER_CONFIG_NAMESPACE_URI));
         addInputInfo(new ProcessorInputOutputInfo(INPUT_DATA));
+        addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
     }
 
     private static class Config {
 
         private String directory;
         private String file;
+        private String scope;
+        private String url;
         private boolean append;
         private boolean makeDirectories;
 
@@ -77,6 +111,11 @@ public class FileSerializer extends ProcessorImpl {
             // Directory and file
             directory = XPathUtils.selectStringValueNormalize(document, "/config/directory");
             file = XPathUtils.selectStringValueNormalize(document, "/config/file");
+
+            //Scope
+            scope = XPathUtils.selectStringValueNormalize(document, "/config/scope");
+            //URL
+            url = XPathUtils.selectStringValueNormalize(document, "/config/url");
 
             // Cache control
             cacheUseLocalCache = ProcessorUtils.selectBooleanValue(document, "/config/cache-control/use-local-cache", CachedSerializer.DEFAULT_CACHE_USE_LOCAL_CACHE);
@@ -111,10 +150,17 @@ public class FileSerializer extends ProcessorImpl {
             return file;
         }
 
+        public String getScope() {
+            return scope;
+        }
+
+        public String getUrl() {
+          return url;
+        }
+
         public boolean isAppend() {
             return append;
         }
-
 
         public boolean isMakeDirectories() {
             return makeDirectories;
@@ -191,7 +237,7 @@ public class FileSerializer extends ProcessorImpl {
             if (!config.isAppend() && file.exists()) {
                 final boolean deleted = file.delete();
                 // We test on file.exists() here again so we don't complain that the file can't be deleted if it got
-                // deleted just between our last test and the delete operation.  
+                // deleted just between our last test and the delete operation.
                 if (!deleted && file.exists())
                     throw new OXFException("Can't delete file: " + file);
             }
@@ -257,6 +303,166 @@ public class FileSerializer extends ProcessorImpl {
         }
     }
 
+
+    /**
+     * Case where a response must be generated.
+     */
+    public ProcessorOutput createOutput(String name) {
+
+      final ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
+        public void readImpl(PipelineContext pipelineContext, ContentHandler contentHandler) {
+          OutputStream fileOutputStream = null;
+          try {
+            //Get the input and config
+            final Config config = getConfig(pipelineContext);
+            final ProcessorInput dataInput = getInputByName(INPUT_DATA);
+            final Document configDocument = readInputAsDOM4J(pipelineContext,dataInput);
+            final String text = XPathUtils.selectStringValueNormalize(configDocument, "/text");
+            // We use the commons fileupload utilities to write to file
+            if (fileItemFactory == null)
+              fileItemFactory = new DefaultFileItemFactory(0,SystemUtils.getTemporaryDirectory());
+            final FileItem fileItem = fileItemFactory.createItem("dummy", "dummy", false, null);
+
+            if("request".equals(config.getScope())) {
+              deleteFileOnRequestEnd(pipelineContext, fileItem);
+            }
+            else if("session".equals(config.getScope())) {
+              deleteFileOnSessionTermination(pipelineContext,fileItem);
+            }
+            else if("application".equals(config.getScope())) {
+              deleteFileOnContextDestroyed(pipelineContext,fileItem);
+            }
+
+            fileOutputStream = fileItem.getOutputStream();
+            fileOutputStream.write(text.getBytes());
+            fileOutputStream.flush();
+            // Create file if it doesn't exist
+            final File storeLocation = ( (DefaultFileItem) fileItem).getStoreLocation();
+            storeLocation.createNewFile();
+            // Get the url of the file
+            final String url = ( (DefaultFileItem) fileItem).getStoreLocation().toURI().toString();
+            contentHandler.startDocument();
+            contentHandler.startElement("", "url", "url", XMLUtils.EMPTY_ATTRIBUTES);
+            contentHandler.characters(url.toCharArray(), 0, url.length());
+            contentHandler.endElement("", "url", "url");
+            contentHandler.endDocument();
+          }
+          catch (SAXException e) {
+            throw new OXFException(e);
+          }
+          catch (IOException e) {
+            throw new OXFException(e);
+          }
+          finally {
+            if (fileOutputStream != null) {
+              try {
+                fileOutputStream.close();
+              }
+              catch (IOException e) {
+                throw new OXFException(e);
+              }
+            }
+          }
+        }
+      };
+      addOutput(name, output);
+      return output;
+    }
+
+    protected Config getConfig(PipelineContext pipelineContext) {
+      // Read config
+      final Config config = (Config) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_CONFIG), new CacheableInputReader() {
+          public Object read(PipelineContext context, ProcessorInput input) {
+              return new Config(readInputAsDOM4J(context, input));
+          }
+        });
+      return config;
+    }
+
+    /**
+     * Add listener to fileItem which is going to be automatically destroyed at the end of request
+     * @param pipelineContext PipelineContext
+     * @param fileItem FileItem
+     */
+    private void deleteFileOnRequestEnd(PipelineContext pipelineContext, final FileItem fileItem) {
+        // Make sure the file is deleted at the end of request
+        pipelineContext.addContextListener(new PipelineContext.ContextListenerAdapter() {
+            public void contextDestroyed(boolean success) {
+                try {
+                    // Log when we delete files
+                    if (logger.isDebugEnabled()) {
+                        final String temporaryFileName = ((DeferredFileOutputStream) fileItem.getOutputStream()).getFile().getAbsolutePath();
+                        logger.debug("Deleting temporary file: " + temporaryFileName);
+                    }
+                    fileItem.delete();
+                } catch (IOException e) {
+                    throw new OXFException(e);
+                }
+            }
+        });
+    }
+
+    /**
+     * Add listener to fileItem which is going to be automatically destroyed on session destruction
+     * @param pipelineContext PipelineContext
+     * @param fileItem FileItem
+     */
+    private void deleteFileOnSessionTermination(PipelineContext pipelineContext, final FileItem fileItem) {
+        // Try to delete the file on exit and on session termination
+        final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+        final ExternalContext.Session session = externalContext.getSession(false);
+        if (session != null) {
+          session.addListener(new ExternalContext.Session.SessionListener() {
+            public void sessionDestroyed() {
+              try {
+                if (logger.isDebugEnabled()) {
+                final String temporaryFileName = ((DeferredFileOutputStream) fileItem.getOutputStream()).getFile().getAbsolutePath();
+                logger.debug("Deleting temporary Session file: " + temporaryFileName);
+                }
+                fileItem.delete();
+              }
+              catch (IOException e) {
+                throw new OXFException(e);
+              }
+            }
+          });
+        }
+        else {
+          XFormsServer.logger.debug("XForms - no existing session found so cannot register temporary file deletion upon session destruction: " + fileItem.getName());
+        }
+    }
+
+    /**
+     * Add listener to fileItem which is going to be automatically destroyed when the servlet is destroyed
+     * @param pipelineContext PipelineContext
+     * @param fileItem FileItem
+     */
+    private void deleteFileOnContextDestroyed(PipelineContext pipelineContext, final FileItem fileItem) {
+        // Try to delete the file on exit and on session termination
+        final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+        WebAppExternalContext.Application application = externalContext.getApplication();
+        if (application != null) {
+          application.addListener(new WebAppExternalContext.Application.ApplicationListener() {
+            public void servletDestroyed() {
+              try {
+                if (logger.isDebugEnabled()) {
+                  final String temporaryFileName = ( (DeferredFileOutputStream) fileItem.getOutputStream()).getFile().getAbsolutePath();
+                  logger.debug("Deleting temporary Application file: " + temporaryFileName);
+                }
+                fileItem.delete();
+              }
+              catch (IOException e) {
+                throw new OXFException(e);
+              }
+            }
+          });
+        }
+        else {
+          XFormsServer.logger.debug("XForms - no Application object found so cannot register temporary file deletion upon session destruction: " +
+                                    fileItem.getName());
+        }
+      }
+
     public static File getFile(String configDirectory, String configFile, boolean makeDirectories, OXFProperties.PropertySet propertySet) {
         final File file;
         final String directoryProperty = (propertySet != null) ? propertySet.getString(DIRECTORY_PROPERTY) : null;
@@ -290,4 +496,83 @@ public class FileSerializer extends ProcessorImpl {
 
         return file;
     }
+
+    private interface ResourceHandler {
+       public Object getValidity() throws IOException;
+
+       public String getResourceContentType() throws IOException;
+
+       public String getConnectionEncoding() throws IOException;
+
+       public void destroy() throws IOException;
+
+       public void readText(ContentHandler output, String contentType) throws IOException;
+
+       public void readXML(PipelineContext pipelineContext, ContentHandler output) throws IOException;
+
+
+       public void readBinary(ContentHandler output, String contentType) throws IOException;
+   }
+
+   private static class OXFResourceHandler implements ResourceHandler {
+       private Config config;
+       private String resourceManagerKey;
+       private InputStream inputStream;
+
+       public OXFResourceHandler(Config config) {
+           this.config = config;
+       }
+
+       public String getResourceContentType() throws IOException {
+           // We generally don't know the "connection" content-type
+           return null;
+       }
+
+       public String getConnectionEncoding() throws IOException {
+           // We generally don't know the "connection" encoding
+           // NOTE: We could know, if the underlying protocol was for example HTTP. But we may
+           // want to abstract that anyway, so that the behavior is consistent whatever the sandbox
+           // is.
+           return null;
+       }
+
+       public Object getValidity() throws IOException {
+           getKey();
+           if (logger.isDebugEnabled())
+               logger.debug("OXF Protocol: Using ResourceManager for key " + getKey());
+
+           long result = ResourceManagerWrapper.instance().lastModified(getKey(), false);
+           // Zero and negative values often have a special meaning, make sure to normalize here
+           return (result <= 0) ? null : new Long(result);
+       }
+
+       public void destroy() throws IOException {
+           if (inputStream != null) {
+               inputStream.close();
+           }
+       }
+
+       public void readText(ContentHandler output, String contentType) throws IOException {
+           inputStream = ResourceManagerWrapper.instance().getContentAsStream(getKey());
+           ProcessorUtils.readText(inputStream, null, output, contentType);
+       }
+
+       public void readXML(PipelineContext pipelineContext, ContentHandler output) throws IOException {
+         // Regular case, the resource manager does the job and autodetects the encoding
+         ResourceManagerWrapper.instance().getContentAsSAX(getKey(), output, true, false);
+       }
+
+       public void readBinary(ContentHandler output, String contentType) throws IOException {
+           inputStream = ResourceManagerWrapper.instance().getContentAsStream(getKey());
+           ProcessorUtils.readBinary(inputStream, output, contentType);
+       }
+
+       private String getKey() {
+           if (resourceManagerKey == null)
+               resourceManagerKey = config.getUrl();
+             System.err.println("resourceManagerKey="+resourceManagerKey);
+           return resourceManagerKey;
+       }
+   }
+
 }

@@ -22,7 +22,7 @@
     <p:processor name="oxf:xslt">
         <p:input name="data" href="#instance"/>
         <p:input name="config">
-            <config>
+            <config xsl:version="2.0">
                 <scope>
                     <xsl:value-of select="/input/scope"/>
                 </scope>
@@ -56,6 +56,8 @@
                 <p:input name="config">
                     <config xsl:version="2.0">
                         <xsl:copy-of select="/url"/>
+						<content-type>text/plain</content-type>
+						<force-content-type>true</force-content-type>
                     </config>
                 </p:input>
                 <p:output name="data" id="url-generator-config"/>

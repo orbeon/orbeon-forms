@@ -21,6 +21,7 @@ import org.orbeon.oxf.servlet.ServletWebAppExternalContext;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
 import java.util.Map;
+import org.orbeon.oxf.pipeline.api.WebAppExternalContext;
 
 /**
  * This context provides access to the Servlet context, and optionaly the session.
@@ -37,6 +38,7 @@ public class ServletContextExternalContext implements ExternalContext {
     private ExternalContext delegatingExternalContext;
 
     private Session session;
+    private Application application;
 
     private Map attributesMap;
     private Map initAttributesMap;
@@ -141,6 +143,15 @@ public class ServletContextExternalContext implements ExternalContext {
         return session;
     }
 
+    public ExternalContext.Application getApplication() {
+        if (servletContext == null)
+            throw new UnsupportedOperationException();
+        if (application == null)
+            application = new Application(servletContext);
+
+        return application;
+    }
+
     public void log(String message, Throwable throwable) {
         if (servletContext != null)
             servletContext.log(message, throwable);
@@ -212,6 +223,22 @@ public class ServletContextExternalContext implements ExternalContext {
 
         public void removeListener(SessionListener sessionListener) {
             throw new UnsupportedOperationException();
+        }
+    }
+
+    private class Application implements WebAppExternalContext.Application {
+        private ServletContext servletContext;
+
+        public Application(ServletContext servletContext) {
+          this.servletContext = servletContext;
+        }
+
+        public void addListener(ApplicationListener applicationListener) {
+          throw new UnsupportedOperationException();
+        }
+
+        public void removeListener(ApplicationListener applicationListener) {
+          throw new UnsupportedOperationException();
         }
     }
 }

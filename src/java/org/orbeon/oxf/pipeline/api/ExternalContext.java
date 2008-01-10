@@ -18,6 +18,7 @@ import java.security.Principal;
 import java.util.Enumeration;
 import java.util.Locale;
 import java.util.Map;
+import javax.servlet.ServletContext;
 
 /**
  * ExternalContext abstracts context, request and response information so that compile-time
@@ -158,6 +159,7 @@ public interface ExternalContext extends WebAppExternalContext {
     public Request getRequest();
     public Response getResponse();
     public Session getSession(boolean create);
+    public Application getApplication();
 
     public String getStartLoggerString();
     public String getEndLoggerString();

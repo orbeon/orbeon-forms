@@ -21,6 +21,7 @@ import org.orbeon.oxf.util.LoggerFactory;
 import java.io.*;
 import java.security.Principal;
 import java.util.*;
+import org.orbeon.oxf.pipeline.api.WebAppExternalContext;
 
 /**
  * Simple implementation of the ExternalContext and related interfaces. When embedding
@@ -340,9 +341,19 @@ public class SimpleExternalContext implements ExternalContext {
         }
     }
 
+    protected class Application implements WebAppExternalContext.Application {
+
+        public void addListener(ApplicationListener applicationListener) {
+        }
+
+        public void removeListener(ApplicationListener applicationListener) {
+        }
+    }
+
     protected Request request = new Request();
     protected Response response = new Response();
     protected Session session = new Session();
+    protected Application application = new Application();
 
     public Object getNativeContext() {
         return null;
@@ -370,6 +381,10 @@ public class SimpleExternalContext implements ExternalContext {
 
     public ExternalContext.Session getSession(boolean create) {
         return session;
+    }
+
+    public ExternalContext.Application getApplication() {
+        return application;
     }
 
     public Map getSessionMap() {

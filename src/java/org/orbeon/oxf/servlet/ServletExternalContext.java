@@ -36,6 +36,7 @@ import javax.servlet.http.HttpSession;
 import java.io.*;
 import java.security.Principal;
 import java.util.*;
+import org.orbeon.oxf.pipeline.api.WebAppExternalContext;
 
 /*
  * Servlet-specific implementation of ExternalContext.
@@ -50,6 +51,7 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
 
     public static final String EXTERNALIZE_FORM_VALUES_PREFIX_PROPERTY = "oxf.servlet.externalize-form-values-prefix";
     public static final String SESSION_LISTENERS = "oxf.servlet.session-listeners";
+    public static final String APPLICATION_LISTENERS = "oxf.servlet.application-listeners";
 
     private static final String DEFAULT_FORM_CHARSET = OXFProperties.instance().getPropertySet().getString(DEFAULT_FORM_CHARSET_PROPERTY, DEFAULT_FORM_CHARSET_DEFAULT);
 
@@ -331,7 +333,7 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
         public Object getNativeRequest() {
             return ServletExternalContext.this.getNativeRequest();
         }
-        
+
         private void handleInputEncoding() throws UnsupportedEncodingException {
             if (!getInputStreamCalled) {
                 final String requestCharacterEncoding = nativeRequest.getCharacterEncoding();
@@ -736,6 +738,30 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
         }
     }
 
+    private class Application implements WebAppExternalContext.Application {
+        private ServletContext servletContext;
+
+        public Application(ServletContext servletContext) {
+          this.servletContext = servletContext;
+        }
+
+        public void addListener(ApplicationListener applicationListener) {
+
+            ApplicationListeners listeners = (ApplicationListeners) servletContext.getAttribute(APPLICATION_LISTENERS);
+            if (listeners == null) {
+                listeners = new ApplicationListeners();
+                servletContext.setAttribute(APPLICATION_LISTENERS, listeners);
+            }
+            listeners.addListener(applicationListener);
+        }
+
+        public void removeListener(ApplicationListener applicationListener) {
+            final ApplicationListeners listeners = (ApplicationListeners) servletContext.getAttribute(APPLICATION_LISTENERS);
+            if (listeners != null)
+                listeners.removeListener(applicationListener);
+        }
+    }
+
     public static class SessionListeners implements Serializable {
         // Store this class instead of the List directly, so we can have a transient member
         private transient List listeners;
@@ -756,9 +782,29 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
         }
     }
 
+    public static class ApplicationListeners implements Serializable {
+        private transient List listeners;
+        public void addListener(ExternalContext.Application.ApplicationListener applicationListener) {
+            if (listeners == null) {
+                listeners = new ArrayList();
+            }
+            listeners.add(applicationListener);
+        }
+
+        public void removeListener(ExternalContext.Application.ApplicationListener applicationListener) {
+            if (listeners != null)
+                listeners.remove(applicationListener);
+        }
+
+        public Iterator iterator() {
+            return (listeners != null) ? listeners.iterator() : Collections.EMPTY_LIST.iterator();
+        }
+    }
+
     private Request request;
     private Response response;
     private Session session;
+    private Application application;
 
     private PipelineContext pipelineContext;
     private HttpServletRequest nativeRequest;
@@ -811,6 +857,12 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
         return session;
     }
 
+    public ExternalContext.Application getApplication() {
+        if (application == null)
+                application = new Application(super.servletContext);
+
+        return application;
+    }
     public String getStartLoggerString() {
         return getRequest().getRequestPath() + " - Received request";
     }

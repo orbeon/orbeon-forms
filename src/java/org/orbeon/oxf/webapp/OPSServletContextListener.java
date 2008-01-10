@@ -16,8 +16,12 @@ package org.orbeon.oxf.webapp;
 import org.orbeon.oxf.pipeline.api.WebAppExternalContext;
 import org.orbeon.oxf.servlet.ServletWebAppExternalContext;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.servlet.ServletExternalContext;
+import java.util.Iterator;
 
 /**
  * This listener listens for HTTP context lifecycle changes.
@@ -55,6 +59,18 @@ public class OPSServletContextListener implements ServletContextListener {
         ClassLoader oldThreadContextClassLoader = currentThread.getContextClassLoader();
         try {
             currentThread.setContextClassLoader(OXFClassLoader.getClassLoader(webAppExternalContext));
+            // Run listeners if any
+            ServletContext servletContext = event.getServletContext();
+            if (servletContext != null && servletContext.getAttribute(ServletExternalContext.APPLICATION_LISTENERS) != null) {
+              // Iterate through listeners
+              final ServletExternalContext.ApplicationListeners listeners = (ServletExternalContext.ApplicationListeners) servletContext.getAttribute(ServletExternalContext.APPLICATION_LISTENERS);
+              if (listeners != null) {
+                for (Iterator i = listeners.iterator(); i.hasNext();) {
+                  final ExternalContext.Application.ApplicationListener currentListener = (ExternalContext.Application.ApplicationListener) i.next();
+                  currentListener.servletDestroyed();
+                }
+              }
+            }
             servletContextListenerDelegate.contextDestroyed(event);
         } finally {
             currentThread.setContextClassLoader(oldThreadContextClassLoader);

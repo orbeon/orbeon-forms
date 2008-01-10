@@ -30,6 +30,7 @@ import java.io.*;
 import java.net.URL;
 import java.security.Principal;
 import java.util.*;
+import org.orbeon.oxf.pipeline.api.WebAppExternalContext;
 
 /*
  * Portlet-specific implementation of ExternalContext.
@@ -343,6 +344,31 @@ public class PortletExternalContext extends PortletWebAppExternalContext impleme
         }
     }
 
+
+    private class Application implements WebAppExternalContext.Application {
+        private PortletContext portletContext;
+
+        public Application(PortletContext portletContext) {
+          this.portletContext = portletContext;
+        }
+
+        public void addListener(ApplicationListener applicationListener) {
+
+            ServletExternalContext.ApplicationListeners listeners = (ServletExternalContext.ApplicationListeners) portletContext.getAttribute(ServletExternalContext.APPLICATION_LISTENERS);
+            if (listeners == null) {
+                listeners = new ServletExternalContext.ApplicationListeners();
+                portletContext.setAttribute(ServletExternalContext.APPLICATION_LISTENERS, listeners);
+            }
+            listeners.addListener(applicationListener);
+        }
+
+        public void removeListener(ApplicationListener applicationListener) {
+            final ServletExternalContext.ApplicationListeners listeners = (ServletExternalContext.ApplicationListeners) portletContext.getAttribute(ServletExternalContext.APPLICATION_LISTENERS);
+            if (listeners != null)
+                listeners.removeListener(applicationListener);
+        }
+    }
+
     public abstract class BaseResponse implements Response {
         public boolean checkIfModifiedSince(long lastModified, boolean allowOverride) {
             // NIY / FIXME
@@ -630,6 +656,7 @@ public class PortletExternalContext extends PortletWebAppExternalContext impleme
     private ExternalContext.Request request;
     private ExternalContext.Response response;
     private ExternalContext.Session session;
+    private ExternalContext.Application application;
 
     private ProcessorService processorService;
     private PipelineContext pipelineContext;
@@ -728,6 +755,15 @@ public class PortletExternalContext extends PortletWebAppExternalContext impleme
                 session = new Session(nativeSession);
         }
         return session;
+    }
+
+    public ExternalContext.Application getApplication() {
+        if (portletContext == null && portletRequest.getPortletSession() != null)
+          portletContext = portletRequest.getPortletSession().getPortletContext();
+        if (portletContext != null)
+          application = new Application(portletContext);
+
+        return application;
     }
 
     public String getStartLoggerString() {

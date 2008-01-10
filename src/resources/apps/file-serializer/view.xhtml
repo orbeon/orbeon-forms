@@ -88,9 +88,9 @@
                 <xforms:send ev:event="DOMActivate" submission="run"/>
             </xforms:trigger>
         </xhtml:p>
-        <xforms:group ref="if (instance('output')/text != '') then . else ()">
+        <xforms:group ref="if (instance('output')/document != '') then . else ()">
             <xhtml:p>
-                <xforms:output ref="instance('output')/text">
+                <xforms:output ref="instance('output')/document">
                     <xforms:label>Text read: </xforms:label>
                 </xforms:output>
             </xhtml:p>

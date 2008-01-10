@@ -12,26 +12,33 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <element name="config" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes"
-    xmlns="http://relaxng.org/ns/structure/1.0">
+        xmlns="http://relaxng.org/ns/structure/1.0">
     <interleave>
-        <element name="file">
-            <data type="string"/>
-        </element>
-        <optional>
-            <element name="directory">
+        <choice>
+            <interleave>
+                <element name="file">
+                    <data type="string"/>
+                </element>
+                <optional>
+                    <element name="directory">
+                        <data type="string"/>
+                    </element>
+                </optional>
+                <optional>
+                    <element name="append">
+                        <data type="boolean"/>
+                    </element>
+                </optional>
+                <optional>
+                    <element name="make-directories">
+                        <data type="boolean"/>
+                    </element>
+                </optional>
+            </interleave>
+            <element name="scope">
                 <data type="string"/>
             </element>
-        </optional>
-        <optional>
-            <element name="append">
-                <data type="boolean"/>
-            </element>
-        </optional>
-        <optional>
-            <element name="make-directories">
-                <data type="boolean"/>
-            </element>
-        </optional>
+        </choice>
         <optional>
             <element name="content-type">
                 <data type="string"/>

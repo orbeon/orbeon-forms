@@ -442,6 +442,10 @@ public class TestExternalContext implements ExternalContext  {
         return null;
     }
 
+    public ExternalContext.Application getApplication() {
+        return null;
+    }
+
     public RequestDispatcher getRequestDispatcher(String path) {
         // NIY
         return null;

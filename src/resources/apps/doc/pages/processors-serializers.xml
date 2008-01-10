@@ -69,19 +69,24 @@
             <title>File Serializer</title>
             <p>
                 The File serializer supports decoding <a href="reference-formats">binary or text data</a> encapsulated
-                in XML documents and writing it to a file on disk.
+                in XML documents and writing it to a file on disk. The file serializer can write to a file you choose or
+                to a temporary file. When writting to a temporary file, you need to read the <i>data</i> output to
+                get the URL of the temporary file that was produced and which will consist of an element
+                <i>url</i> containing URL of the temporary file, such as:
+                <code>&lt;url>file:/tmp/gaga.tmp&lt;/url></code>.
             </p>
             <p>
                 The configuration consists of the following elements:
             </p>
             <table>
                 <tr>
-                    <th>Element Name</th>
+                    <th colspan="2">Element Name</th>
                     <th>Type</th>
                     <th>Purpose</th>
                     <th>Default Value</th>
                 </tr>
                 <tr>
+                    <td rowspan="4">If data written to a file you specify</td>
                     <td>file</td>
                     <td>Absolute or relative path to a file</td>
                     <td>Specifies the file to write to.</td>
@@ -112,7 +117,20 @@
                     <td>false</td>
                 </tr>
                 <tr>
-                    <td>content-type</td>
+                    <td>If data written to a temporary file</td>
+                    <td>scope</td>
+                    <td>Can be <code>request</code>, <code>session</code>, or <code>application</code></td>
+                    <td>
+                        <ul>
+                            <li>If set to <code>request</code>, then the temporary file is removed at the end of the HTTP request.</li>
+                            <li>If set to <code>session</code>, then the temporary file is removed when the session of the current user expires.</li>
+                            <li>If set to <code>application</code>, then the temporary file is removed when the servlet is stopped (typically when the application server is stopped).</li>
+                        </ul>
+                    </td>
+                    <td><i>none</i></td>
+                </tr>
+                <tr>
+                    <td colspan="2">content-type</td>
                     <td>content type, without any attributes</td>
                     <td>
                         Indicates the content type to use.
@@ -120,7 +138,7 @@
                     <td><code>application/octet-stream</code> for binary mode, <code>text/plain</code> for text mode</td>
                 </tr>
                 <tr>
-                    <td>force-content-type</td>
+                    <td colspan="2">force-content-type</td>
                     <td>boolean</td>
                     <td>
                         Indicates whether the content type provided has precedence. This requires a
@@ -129,7 +147,7 @@
                     <td>false</td>
                 </tr>
                 <tr>
-                    <td>ignore-document-content-type</td>
+                    <td colspan="2">ignore-document-content-type</td>
                     <td>boolean</td>
                     <td>
                         Indicates whether the content type provided by the input document should be ignored.
@@ -137,7 +155,7 @@
                     <td>false</td>
                 </tr>
                 <tr>
-                    <td>encoding</td>
+                    <td colspan="2">encoding</td>
                     <td>valid encoding name</td>
                     <td>
                         Indicates the text encoding to use.
@@ -145,7 +163,7 @@
                     <td>utf-8</td>
                 </tr>
                 <tr>
-                    <td>force-encoding</td>
+                    <td colspan="2">force-encoding</td>
                     <td>boolean</td>
                     <td>
                         Indicates whether the encoding provided has precedence. This requires an <code>encoding</code>
@@ -154,7 +172,7 @@
                     <td>false</td>
                 </tr>
                 <tr>
-                    <td>ignore-document-encoding</td>
+                    <td colspan="2">ignore-document-encoding</td>
                     <td>boolean</td>
                     <td>
                         Indicates whether the encoding provided by the input document should be ignored.
@@ -162,7 +180,7 @@
                     <td>false</td>
                 </tr>
                 <tr>
-                    <td>cache-control/use-local-cache</td>
+                    <td colspan="2">cache-control/use-local-cache</td>
                     <td>boolean</td>
                     <td>
                         Whether the resulting stream must be locally cached. For documents or binaries that are large
@@ -227,9 +245,21 @@
                 </p:processor>
             </xml-source>
             <p>
-                The File serializer is most useful in a <link href="integration-command-line">command-line
-                application</link>, but can be used in web applications as well.
+                In the following example, data is written to a temporary file which will be deleted when the session of the
+                current user expires. The URL of the temporary file is returned by the File serializer through its
+                <i>data</i> output.
             </p>
+            <xml-source>
+                <p:processor name="oxf:file-serializer">
+                    <p:input name="config">
+                        <config>
+                            <scope>session</scope>
+                        </config>
+                    </p:input>
+                    <p:input name="data" href="#data-to-write"/>
+                    <p:output name="data" id="url-written"/>
+                </p:processor>
+            </xml-source>
         </section>
         <a name="scope-serializer"/>
         <section>

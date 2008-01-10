@@ -21,6 +21,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
+import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -475,6 +476,8 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventHandlerCont
             // Invalidate instance if it is shared read-only
             if (applicationShared) {
                 XFormsServerSharedInstancesCache.instance().remove(pipelineContext, sourceURI);
+            } else {
+                XFormsServer.logger.warn("XForms - xxforms-instance-invalidate event dispatched to non-shared instance with id: " + getEffectiveId());
             }
         }
     }

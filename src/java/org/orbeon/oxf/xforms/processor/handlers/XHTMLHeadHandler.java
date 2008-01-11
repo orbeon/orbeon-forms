@@ -31,6 +31,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
+import org.apache.commons.collections.map.CompositeMap;
 
 import java.util.*;
 
@@ -175,33 +176,56 @@ public class XHTMLHeadHandler extends HandlerBase {
 
             // Configuration properties
             {
-                final Map nonDefaultProperties = containingDocument.getStaticState().getNonDefaultProperties();
+                final Map clientPropertiesMap;
+                {
+                    // Dynamic properties
+                    final Map dynamicProperties = new HashMap();
+                    {
+                        // Heartbeat delay
+                        {
+                            final long heartbeatDelay = XFormsStateManager.getHeartbeatDelay(containingDocument, externalContext);
+                            dynamicProperties.put(XFormsProperties.SESSION_HEARTBEAT_DELAY_PROPERTY, Long.toString(heartbeatDelay));
+                        }
 
-                // Handle heartbeat delay specially
-                final long heartbeatDelay = XFormsStateManager.getHeartbeatDelay(containingDocument, externalContext);
+                        // Produce JavaScript paths for use on the client
+                        {
+                            // FCKeditor path
+                            {
+                                final String fckEditorPath; {
+                                    final String rewritten = rewriteResourceURL("/ops/fckeditor/foobar.html");// representative of FCKeditor path
+                                    fckEditorPath = rewritten.substring(0, rewritten.lastIndexOf('/') + 1);
+                                }
+                                final XFormsProperties.PropertyDefinition propertyDefinition = XFormsProperties.getPropertyDefinition(XFormsProperties.FCK_EDITOR_BASE_PATH_PROPERTY);
+                                if (!fckEditorPath.equals(propertyDefinition.getDefaultValue()))
+                                    dynamicProperties.put(XFormsProperties.FCK_EDITOR_BASE_PATH_PROPERTY, fckEditorPath);
+                            }
 
-                FastStringBuffer sb = null;
-                if (heartbeatDelay != -1) {
-                    // First property found
-                    helper.startElement(prefix, XMLConstants.XHTML_NAMESPACE_URI, "script", new String[] {
-                        "type", "text/javascript"});
-                    sb = new FastStringBuffer("var opsXFormsProperties = {");
+                            // YUI base path
+                            {
+                                final String yuiBasePath; {
+                                    final String rewritten = rewriteResourceURL("/ops/images/yui/foobar.gif");// representative of YUI images
+                                    yuiBasePath = rewritten.substring(0, rewritten.lastIndexOf('/') + 1);
+                                }
+                                final XFormsProperties.PropertyDefinition propertyDefinition = XFormsProperties.getPropertyDefinition(XFormsProperties.YUI_BASE_PATH_PROPERTY);
+                                if (!yuiBasePath.equals(propertyDefinition.getDefaultValue()))
+                                    dynamicProperties.put(XFormsProperties.YUI_BASE_PATH_PROPERTY, yuiBasePath);
+                            }
+                        }
+                    }
 
-                    sb.append('\"');
-                    sb.append(XFormsProperties.SESSION_HEARTBEAT_DELAY_PROPERTY);
-                    sb.append("\":\"");
-                    sb.append(Long.toString(heartbeatDelay));
-                    sb.append('\"');
+                    final Map nonDefaultProperties = containingDocument.getStaticState().getNonDefaultProperties();
+                    clientPropertiesMap = new CompositeMap(new Map[] { nonDefaultProperties, dynamicProperties });
                 }
 
-                if (heartbeatDelay != -1 || nonDefaultProperties.size() > 0) {
+                FastStringBuffer sb = null;
+                if (clientPropertiesMap.size() > 0) {
 
-                    for (Iterator i = nonDefaultProperties.entrySet().iterator(); i.hasNext();) {
+                    for (Iterator i = clientPropertiesMap.entrySet().iterator(); i.hasNext();) {
                         final Map.Entry currentEntry = (Map.Entry) i.next();
                         final String propertyName = (String) currentEntry.getKey();
                         final String propertyValue = (String) currentEntry.getValue();
 
-                        final XFormsProperties.PropertyDefinition propertyDefinition = (XFormsProperties.PropertyDefinition) XFormsProperties.SUPPORTED_DOCUMENT_PROPERTIES.get(propertyName);
+                        final XFormsProperties.PropertyDefinition propertyDefinition = XFormsProperties.getPropertyDefinition(propertyName);
                         if (propertyDefinition.isPropagateToClient()) {
 
                             if (sb == null) {

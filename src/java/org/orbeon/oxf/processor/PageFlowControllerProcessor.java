@@ -468,17 +468,18 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
             }
         });
 
-        // If required, store information about resources to rewrite in the pipeline context for downstream use, e.g.
-        // by oxf:x?html-rewrite
-        final List versionedFilesInfo = pageFlow.getPathMatchers();
-        if (versionedFilesInfo != null && versionedFilesInfo.size() > 0) {
+        // If required, store information about resources to rewrite in the pipeline context for downstream use, e.g. by
+        // oxf:x?html-rewrite. This allows consumers who would like to rewrite resources into versioned resources to
+        // actually know what a "resource" is.
+        final List pathMatchers = pageFlow.getPathMatchers();
+        if (pathMatchers != null && pathMatchers.size() > 0) {
             final List existingFileInfos = (List) pipelineContext.getAttribute(PipelineContext.PATH_MATCHERS);
             if (existingFileInfos == null) {
                 // Set if we are the first
-                pipelineContext.setAttribute(PipelineContext.PATH_MATCHERS, versionedFilesInfo);
+                pipelineContext.setAttribute(PipelineContext.PATH_MATCHERS, pathMatchers);
             } else {
                 // Add if we come after others (in case of nested page flows)
-                existingFileInfos.addAll(versionedFilesInfo);
+                existingFileInfos.addAll(pathMatchers);
             }
         }
 

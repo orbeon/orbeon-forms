@@ -196,7 +196,7 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
                     // Found xxforms:* attribute
                     final String attributeLocalName = attributes.getLocalName(i);
                     // Only take the first occurrence into account, and make sure the property is supported
-                    if (properties.get(attributeLocalName) == null && XFormsProperties.SUPPORTED_DOCUMENT_PROPERTIES.get(attributeLocalName) != null) { 
+                    if (properties.get(attributeLocalName) == null && XFormsProperties.getPropertyDefinition(attributeLocalName) != null) { 
                         properties.put(attributeLocalName, attributes.getValue(i));
                     }
                 }

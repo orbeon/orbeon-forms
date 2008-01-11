@@ -18,6 +18,7 @@ import org.orbeon.oxf.resources.OXFProperties;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Collections;
+import java.util.Iterator;
 
 public class XFormsProperties {
 
@@ -59,6 +60,8 @@ public class XFormsProperties {
 
     private static final String SESSION_HEARTBEAT_PROPERTY = "session-heartbeat";
     public static final String SESSION_HEARTBEAT_DELAY_PROPERTY = "session-heartbeat-delay";
+    public static final String FCK_EDITOR_BASE_PATH_PROPERTY = "fck-editor-base-path";
+    public static final String YUI_BASE_PATH_PROPERTY = "yui-base-path";
     private static final String DELAY_BEFORE_INCREMENTAL_REQUEST_PROPERTY = "delay-before-incremental-request";
     private static final String DELAY_BEFORE_FORCE_INCREMENTAL_REQUEST_PROPERTY = "delay-before-force-incremental-request";
     private static final String DELAY_BEFORE_GECKO_COMMUNICATION_ERROR_PROPERTY = "delay-before-gecko-communication-error";
@@ -137,7 +140,9 @@ public class XFormsProperties {
 
             // Properties to propagate to the client
             new PropertyDefinition(SESSION_HEARTBEAT_PROPERTY, true, true),
-//            new PropertyDefinition(SESSION_HEARTBEAT_DELAY_PROPERTY, -1, true),
+            new PropertyDefinition(SESSION_HEARTBEAT_DELAY_PROPERTY, 30 * 60 * 800, true), // 80 % of 30 minutes in ms
+            new PropertyDefinition(FCK_EDITOR_BASE_PATH_PROPERTY, "/ops/fckeditor/", true),
+            new PropertyDefinition(YUI_BASE_PATH_PROPERTY, "/ops/images/yui/", true),
             new PropertyDefinition(DELAY_BEFORE_INCREMENTAL_REQUEST_PROPERTY, 500, true),
             new PropertyDefinition(DELAY_BEFORE_FORCE_INCREMENTAL_REQUEST_PROPERTY, 2000, true),
             new PropertyDefinition(DELAY_BEFORE_GECKO_COMMUNICATION_ERROR_PROPERTY, 5000, true),
@@ -152,7 +157,7 @@ public class XFormsProperties {
             new PropertyDefinition(REVISIT_HANDLING_PROPERTY, REVISIT_HANDLING_RESTORE_VALUE, true)
     };
 
-    public static final Map SUPPORTED_DOCUMENT_PROPERTIES;
+    private static final Map SUPPORTED_DOCUMENT_PROPERTIES;
     static {
         final Map tempMap = new HashMap();
         for (int i = 0; i < SUPPORTED_DOCUMENT_PROPERTIES_DEFAULTS.length; i++) {
@@ -204,6 +209,25 @@ public class XFormsProperties {
     // Legacy XForms Classic properties
     private static final String ENCRYPT_NAMES_PROPERTY = XFORMS_PROPERTY_PREFIX + "encrypt-names";
     private static final String ENCRYPT_HIDDEN_PROPERTY = XFORMS_PROPERTY_PREFIX + "encrypt-hidden";
+
+    /**
+     * Return a PropertyDefinition given a property nam.
+     *
+     * @param propertyName  property name
+     * @return              PropertyDefinition
+     */
+    public static PropertyDefinition getPropertyDefinition(String propertyName) {
+        return (XFormsProperties.PropertyDefinition) SUPPORTED_DOCUMENT_PROPERTIES.get(propertyName);
+    }
+
+    /**
+     * Return an iterator over property definition entries.
+     *
+     * @return  Iterator<Entry<String,PropertyDefinition>> mapping a property name to a definition
+     */
+    public static Iterator getPropertyDefinitionEntryIterator() {
+        return SUPPORTED_DOCUMENT_PROPERTIES.entrySet().iterator();
+    }
 
     public static String getXFormsPassword() {
         if (isHiddenEncryptionEnabled())
@@ -372,14 +396,14 @@ public class XFormsProperties {
         if (containingDocument.getStaticState() != null)
             return containingDocument.getStaticState().getBooleanProperty(propertyName);
         else // case of legacy XForms engine which doesn't have a static state object
-            return OXFProperties.instance().getPropertySet().getBoolean(propertyName, ((Boolean) ((PropertyDefinition) SUPPORTED_DOCUMENT_PROPERTIES.get(propertyName)).getDefaultValue()).booleanValue()).booleanValue();
+            return OXFProperties.instance().getPropertySet().getBoolean(propertyName, ((Boolean) (XFormsProperties.getPropertyDefinition(propertyName)).getDefaultValue()).booleanValue()).booleanValue();
     }
 
     private static String getStringProperty(XFormsContainingDocument containingDocument, String propertyName) {
         if (containingDocument.getStaticState() != null)
             return containingDocument.getStaticState().getStringProperty(propertyName);
         else // case of legacy XForms engine which doesn't have a static state object
-            return OXFProperties.instance().getPropertySet().getString(propertyName, ((PropertyDefinition) SUPPORTED_DOCUMENT_PROPERTIES.get(propertyName)).getDefaultValue().toString());
+            return OXFProperties.instance().getPropertySet().getString(propertyName, (XFormsProperties.getPropertyDefinition(propertyName)).getDefaultValue().toString());
     }
 
     // This is not used currently

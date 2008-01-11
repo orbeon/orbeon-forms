@@ -28,6 +28,11 @@ var XFORMS_DEBUG_WINDOW_WIDTH = 300;
 var XFORMS_LOADING_MIN_TOP_PADDING = 10;
 var XFORMS_SESSION_HEARTBEAT = true;
 
+// NOTE: Default values below MUST match the ones in XFormsProperties
+var XFORMS_SESSION_HEARTBEAT_DELAY = 30 * 60 * 800; // 80 % of 30 minutes in ms
+var FCK_EDITOR_BASE_PATH = "/ops/fckeditor/";
+var YUI_BASE_PATH = "/ops/images/yui/";
+
 /**
  * Constants
  */
@@ -1691,7 +1696,13 @@ ORBEON.xforms.Init = {
         }
 
         // Override image location for YUI to use local images
-        var yuiBaseURL = BASE_URL + "/ops/images/yui/";
+
+        var yuiBaseURL;
+        if (typeof opsXFormsProperties != "undefined" && typeof opsXFormsProperties["yui-base-path"] != "undefined")
+            yuiBaseURL = opsXFormsProperties["yui-base-path"];
+        else
+            yuiBaseURL = BASE_URL + YUI_BASE_PATH;
+
         if (YAHOO && YAHOO.widget) {
             if (YAHOO.widget.Module) {
                 YAHOO.widget.Module.IMG_ROOT = yuiBaseURL;
@@ -1886,7 +1897,6 @@ ORBEON.xforms.Init = {
         if (typeof xformsPageLoadedServer != "undefined" && !ORBEON.xforms.Globals.fckEditorLoading)
             xformsPageLoadedServer();
     },
-
 
     /**
      * Initialize a newly copied subtree.
@@ -2089,7 +2099,12 @@ ORBEON.xforms.Init = {
         var fckEditor = new FCKeditor(htmlArea.name);
         if (!xformsArrayContains(ORBEON.xforms.Globals.htmlAreaNames, htmlArea.name))
             ORBEON.xforms.Globals.htmlAreaNames.push(htmlArea.name);
-        fckEditor.BasePath = BASE_URL + "/ops/fckeditor/";
+
+        if (typeof opsXFormsProperties != "undefined" && typeof opsXFormsProperties["fck-editor-base-path"] != "undefined")
+            fckEditor.BasePath = opsXFormsProperties["fck-editor-base-path"];
+        else
+            fckEditor.BasePath = BASE_URL + FCK_EDITOR_BASE_PATH;
+
         fckEditor.ToolbarSet = "OPS";
 
         // Change the language of the FCK Editor for its spellchecker, based on the USER_LANGUAGE variable

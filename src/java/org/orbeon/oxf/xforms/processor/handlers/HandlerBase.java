@@ -36,7 +36,7 @@ import org.dom4j.Namespace;
 import java.util.List;
 
 /**
- *
+ * Base class for all XHTML and XForms handlers.
  */
 public abstract class HandlerBase extends ElementHandler {
 
@@ -74,6 +74,7 @@ public abstract class HandlerBase extends ElementHandler {
         this.containingDocument = handlerContext.getContainingDocument();
         this.externalContext = handlerContext.getExternalContext();
 
+        // This is used for URL rewriting
         pathMatchers = (List) pipelineContext.getAttribute(PipelineContext.PATH_MATCHERS);
 
         super.setContext(context);

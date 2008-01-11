@@ -129,7 +129,7 @@ public class XFormsStaticState {
 
         // Handle default for properties
         final OXFProperties.PropertySet propertySet = OXFProperties.instance().getPropertySet();
-        for (Iterator i = XFormsProperties.SUPPORTED_DOCUMENT_PROPERTIES.entrySet().iterator(); i.hasNext();) {
+        for (Iterator i = XFormsProperties.getPropertyDefinitionEntryIterator(); i.hasNext();) {
             final Map.Entry currentEntry = (Map.Entry) i.next();
             final String propertyName = (String) currentEntry.getKey();
             final XFormsProperties.PropertyDefinition propertyDefinition = (XFormsProperties.PropertyDefinition) currentEntry.getValue();
@@ -313,7 +313,7 @@ public class XFormsStaticState {
         if (documentProperty != null)
             return documentProperty;
         else
-            return (String) ((XFormsProperties.PropertyDefinition) XFormsProperties.SUPPORTED_DOCUMENT_PROPERTIES.get(propertyName)).getDefaultValue();
+            return (String) (XFormsProperties.getPropertyDefinition(propertyName)).getDefaultValue();
     }
 
     public boolean getBooleanProperty(String propertyName) {
@@ -321,6 +321,6 @@ public class XFormsStaticState {
         if (documentProperty != null)
             return new Boolean(documentProperty).booleanValue();
         else
-            return ((Boolean) ((XFormsProperties.PropertyDefinition) XFormsProperties.SUPPORTED_DOCUMENT_PROPERTIES.get(propertyName)).getDefaultValue()).booleanValue();
+            return ((Boolean) (XFormsProperties.getPropertyDefinition(propertyName)).getDefaultValue()).booleanValue();
     }
 }

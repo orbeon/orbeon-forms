@@ -36,7 +36,7 @@ public abstract class State {
     /**
      * Page Flow context information.
      */
-    protected final List pageFlowContext;
+    protected final List pathMatchers;
     /**
      * The destination of the rewrite transformation.
      */
@@ -54,10 +54,10 @@ public abstract class State {
      * @see #previousState
      * @see #contentHandler
      */
-    public State(final State previousState, final ContentHandler contentHandler, List pageFlowContext) {
+    public State(final State previousState, final ContentHandler contentHandler, List pathMatchers) {
         this.previousState = previousState;
         this.contentHandler = contentHandler;
-        this.pageFlowContext = pageFlowContext;
+        this.pathMatchers = pathMatchers;
     }
 
     /**

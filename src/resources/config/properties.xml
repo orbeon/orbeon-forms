@@ -19,6 +19,8 @@
     <property as="xs:integer" name="oxf.cache.size"                                  value="300"/>
     <property as="xs:integer" name="oxf.cache.xpath.size"                            value="600"/>
     <property as="xs:boolean" name="oxf.sax.inspection"                              value="false"/>
+    <property as="xs:boolean" name="oxf.resources.versioned"                         value="true"/>
+    <property as="xs:string"  name="oxf.resources.version-number"                    value="3.1415"/>
 
     <!-- Processor-specific properties -->
     <property as="xs:integer" processor-name="oxf:request"   name="max-upload-size"          value="100000000"/>
@@ -26,8 +28,6 @@
     <property as="xs:string"  processor-name="oxf:page-flow" name="instance-passing"         value="redirect"/>
     <property as="xs:string"  processor-name="oxf:page-flow" name="xforms-submission-path"   value="/xforms-server-submit"/>
     <property as="xs:anyURI"  processor-name="oxf:page-flow" name="xforms-submission-model"  value="oxf:/ops/xforms/xforms-server-submit.xpl"/>
-    <property as="xs:boolean" processor-name="oxf:page-flow" name="versioned"                value="false"/>
-    <property as="xs:string"  processor-name="oxf:page-flow" name="files-version"            value="3.1415"/>
     <property as="xs:boolean" processor-name="oxf:saxon8"    name="generate-source-location" value="false"/>
     <property as="xs:boolean" processor-name="oxf:sql"       name="legacy-implicit-prefixes" value="false"/>
 
@@ -71,7 +71,6 @@
     <property as="xs:boolean" name="oxf.xforms.minimal-resources"                    value="true"/>
     <property as="xs:boolean" name="oxf.xforms.combine-resources"                    value="true"/>
     <property as="xs:boolean" name="oxf.xforms.cache-combined-resources"             value="false"/>
-    <property as="xs:boolean" name="oxf.xforms.version-combined-resources"           value="false"/>
     <property as="xs:boolean" name="oxf.xforms.optimize-relevance"                   value="false"/>
 
     <!-- Rarely used global properties -->

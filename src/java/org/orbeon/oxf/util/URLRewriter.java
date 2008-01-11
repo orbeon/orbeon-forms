@@ -17,6 +17,7 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.Version;
 import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.resources.OXFProperties;
 import org.dom4j.QName;
 
 import java.net.URI;
@@ -28,6 +29,12 @@ import java.util.Iterator;
  * Utility class to rewrite URLs.
  */
 public class URLRewriter {
+
+    // Versioned resources configuration
+    public static final String RESOURCES_VERSIONED_PROPERTY = "oxf.resources.versioned";
+    public final static boolean RESOURCES_VERSIONED_DEFAULT = false;
+
+    public static final String RESOURCES_VERSION_NUMBER_PROPERTY = "oxf.resources.version-number";
 
     /**
      * Rewrite a URL based on the request URL, a URL string, and a rewriting mode.
@@ -106,7 +113,7 @@ public class URLRewriter {
         if (pathMatchers != null && pathMatchers.size() > 0) {
             // We need to match the URL string against the matcher
 
-            // 1. Rewrite to absolute URI without context
+            // 1. Rewrite to absolute path URI without context
             final String absoluteURINoContext = response.rewriteResourceURL(urlString, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT);
             if (NetUtils.urlHasProtocol(absoluteURINoContext))
                 return absoluteURINoContext;
@@ -126,7 +133,7 @@ public class URLRewriter {
             // 2. Determine if URL is a platform or application URL based on reserved paths
             final boolean isPlatformURL = absolutePathNoContext.startsWith("/ops/") || absolutePathNoContext.startsWith("/config/");
 
-            final String applicationVersion = ((PathMatcher) pathMatchers.get(0)).filesVersion;
+            final String applicationVersion = OXFProperties.instance().getPropertySet().getString(RESOURCES_VERSION_NUMBER_PROPERTY);
             if (!isPlatformURL && (applicationVersion == null || applicationVersion.length() == 0)) {
                 // There is no application version so do usual rewrite
                 return response.rewriteResourceURL(urlString, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
@@ -189,19 +196,21 @@ public class URLRewriter {
         }
     }
 
+    public static boolean isResourcesVersioned() {
+        return OXFProperties.instance().getPropertySet().getBoolean(RESOURCES_VERSIONED_PROPERTY, RESOURCES_VERSIONED_DEFAULT).booleanValue();
+    }
+
     public static class PathMatcher {
         public String pathInfo;
         public QName matcher;
         public String mimeType;
         public boolean versioned;
-        public String filesVersion;
 
-        public PathMatcher(String pathInfo, QName matcher, String mimeType, boolean versioned, String filesVersion) {
+        public PathMatcher(String pathInfo, QName matcher, String mimeType, boolean versioned) {
             this.pathInfo = pathInfo;
             this.matcher = matcher;
             this.mimeType = mimeType;
             this.versioned = versioned;
-            this.filesVersion = filesVersion;
         }
     }
 }

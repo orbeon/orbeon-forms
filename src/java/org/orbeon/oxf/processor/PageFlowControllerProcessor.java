@@ -57,13 +57,8 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
     private final static String INSTANCE_PASSING_REDIRECT_PORTAL = "redirect-exit-portal";
     private final static String DEFAULT_INSTANCE_PASSING = INSTANCE_PASSING_REDIRECT;
 
-    // Versioned configuration
-    private final static boolean DEFAULT_VERSIONED = false;
-
     // Properties
     private static final String INSTANCE_PASSING_PROPERTY_NAME = "instance-passing";
-    private static final String VERSIONED_PROPERTY_NAME = "versioned";
-    private static final String VERSION_PROPERTY_NAME = "files-version";
     private static final String EPILOGUE_PROPERTY_NAME = "epilogue";
     private static final String NOT_FOUND_PROPERTY_NAME = "not-found";
     private static final String XFORMS_SUBMISSION_MODEL_PROPERTY_NAME = "xforms-submission-model";
@@ -104,13 +99,9 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                             : getPropertySet().getString(INSTANCE_PASSING_PROPERTY_NAME, DEFAULT_INSTANCE_PASSING);
                 }
                 final boolean globalIsVersioned; {
-                    final String attributeValue = controllerDocument.getRootElement().attributeValue(VERSIONED_PROPERTY_NAME);
-                    globalIsVersioned = attributeValue != null ? new Boolean(attributeValue).booleanValue()
-                            : getPropertySet().getBoolean(VERSIONED_PROPERTY_NAME, DEFAULT_VERSIONED).booleanValue();
-                }
-                final String globalVersion; {
-                    final String attributeValue = controllerDocument.getRootElement().attributeValue(VERSION_PROPERTY_NAME);
-                    globalVersion = attributeValue != null ? attributeValue : getPropertySet().getString(VERSION_PROPERTY_NAME);
+                    final String attributeValue = controllerDocument.getRootElement().attributeValue(URLRewriter.RESOURCES_VERSIONED_PROPERTY);
+                    // NOTE: We use a global property, not an oxf:page-flow scoped one
+                    globalIsVersioned = attributeValue != null ? new Boolean(attributeValue).booleanValue() : URLRewriter.isResourcesVersioned();
                 }
                 final String epilogueURL;
                 final Element epilogueElement;
@@ -260,13 +251,13 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                             final boolean currentIsFile = "files".equals(element.getName());
                             final boolean currentFileIsVersioned; {
                                 // If this is a file, then check "versioned" property, local and then global
-                                final String currentIsVersionedAttribute = currentIsFile ? element.attributeValue(VERSIONED_PROPERTY_NAME) : null;
+                                final String currentIsVersionedAttribute = currentIsFile ? element.attributeValue(URLRewriter.RESOURCES_VERSIONED_PROPERTY) : null;
                                 currentFileIsVersioned = (currentIsVersionedAttribute != null) ? "true".equals(currentIsVersionedAttribute) : globalIsVersioned;
                             }
 
                             // Remember this FilesInfo if needed
                             if (currentFileIsVersioned) {
-                                versionedFilesInfo.add(new URLRewriter.PathMatcher(pathInfo, matcherQName, mimeType, currentFileIsVersioned, globalVersion));
+                                versionedFilesInfo.add(new URLRewriter.PathMatcher(pathInfo, matcherQName, mimeType, currentFileIsVersioned));
                             }
 
                             // Can we just add this condition to the previous "when" statement?

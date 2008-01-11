@@ -201,10 +201,16 @@ public class XFormsResourceServer extends ProcessorImpl {
 
             final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
 
-            // Get PFC resource rewriting information if needed
-            final List pathMatchers = (List) pipelineContext.getAttribute(PipelineContext.PATH_MATCHERS);
-
             final Writer outputWriter = new OutputStreamWriter(os, "utf-8");
+
+            // Create matcher that matches all paths in case resources are versioned
+            final List matchAllPathMatcher;
+            if (URLRewriter.isResourcesVersioned()) {
+                matchAllPathMatcher = new ArrayList(1);
+                matchAllPathMatcher.add(new URLRewriter.PathMatcher("/*", null, null, true));
+            } else {
+                matchAllPathMatcher = null;
+            }
 
             // Output Orbeon Forms version
             outputWriter.write("/* This file was produced by Orbeon Forms " + Version.getVersion() + " */\n");
@@ -254,7 +260,8 @@ public class XFormsResourceServer extends ProcessorImpl {
                         // Rewrite URL and output it as an absolute path
                         final URI resolvedResourceURI = unresolvedResourceURI.resolve(url.trim());
 
-                        final String rewrittenURI = URLRewriter.rewriteResourceURL(externalContext.getRequest(), externalContext.getResponse(), resolvedResourceURI.toString(), pathMatchers);
+                        final String rewrittenURI = URLRewriter.rewriteResourceURL(externalContext.getRequest(),
+                                externalContext.getResponse(), resolvedResourceURI.toString(), matchAllPathMatcher);
 
                         outputWriter.write("url(" + rewrittenURI + ")");
                     }

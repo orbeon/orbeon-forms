@@ -1699,7 +1699,7 @@ ORBEON.xforms.Init = {
 
         var yuiBaseURL;
         if (typeof opsXFormsProperties != "undefined" && typeof opsXFormsProperties["yui-base-path"] != "undefined")
-            yuiBaseURL = opsXFormsProperties["yui-base-path"];
+            yuiBaseURL = BASE_URL + opsXFormsProperties["yui-base-path"];
         else
             yuiBaseURL = BASE_URL + YUI_BASE_PATH;
 
@@ -2101,7 +2101,7 @@ ORBEON.xforms.Init = {
             ORBEON.xforms.Globals.htmlAreaNames.push(htmlArea.name);
 
         if (typeof opsXFormsProperties != "undefined" && typeof opsXFormsProperties["fck-editor-base-path"] != "undefined")
-            fckEditor.BasePath = opsXFormsProperties["fck-editor-base-path"];
+            fckEditor.BasePath = BASE_URL + opsXFormsProperties["fck-editor-base-path"];
         else
             fckEditor.BasePath = BASE_URL + FCK_EDITOR_BASE_PATH;
 

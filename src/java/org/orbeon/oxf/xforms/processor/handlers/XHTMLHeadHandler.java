@@ -26,6 +26,8 @@ import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.util.URLRewriter;
+import org.orbeon.oxf.common.Version;
 import org.orbeon.saxon.om.FastStringBuffer;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -98,8 +100,8 @@ public class XHTMLHeadHandler extends HandlerBase {
 
         // Create prefix for combined resources if needed
         final boolean isMinimal = XFormsProperties.isMinimalResources(containingDocument);
-        final boolean isVersioned = XFormsProperties.isVersionCombinedResources();
-        final String combinedResourcesPrefix = XFormsFeatures.getCombinedResourcesPrefix(containingDocument, appearancesMap, isMinimal, isVersioned);
+        final boolean isVersionedResources = URLRewriter.isResourcesVersioned();
+        final String combinedResourcesPrefix = XFormsFeatures.getCombinedResourcesPrefix(containingDocument, appearancesMap, isMinimal, isVersionedResources);
 
         final boolean isCombineResources = XFormsProperties.isCombinedResources(containingDocument);
         final boolean isCacheCombinedResources = isCombineResources && XFormsProperties.isCacheCombinedResources();
@@ -189,24 +191,19 @@ public class XHTMLHeadHandler extends HandlerBase {
 
                         // Produce JavaScript paths for use on the client
                         {
+                            final boolean isVersionResources = URLRewriter.isResourcesVersioned();
                             // FCKeditor path
                             {
-                                final String fckEditorPath; {
-                                    final String rewritten = rewriteResourceURL("/ops/fckeditor/foobar.html");// representative of FCKeditor path
-                                    fckEditorPath = rewritten.substring(0, rewritten.lastIndexOf('/') + 1);
-                                }
                                 final XFormsProperties.PropertyDefinition propertyDefinition = XFormsProperties.getPropertyDefinition(XFormsProperties.FCK_EDITOR_BASE_PATH_PROPERTY);
+                                final String fckEditorPath = isVersionResources ? "/" + Version.getVersion() + propertyDefinition.getDefaultValue() : (String) propertyDefinition.getDefaultValue();
                                 if (!fckEditorPath.equals(propertyDefinition.getDefaultValue()))
                                     dynamicProperties.put(XFormsProperties.FCK_EDITOR_BASE_PATH_PROPERTY, fckEditorPath);
                             }
 
                             // YUI base path
                             {
-                                final String yuiBasePath; {
-                                    final String rewritten = rewriteResourceURL("/ops/images/yui/foobar.gif");// representative of YUI images
-                                    yuiBasePath = rewritten.substring(0, rewritten.lastIndexOf('/') + 1);
-                                }
                                 final XFormsProperties.PropertyDefinition propertyDefinition = XFormsProperties.getPropertyDefinition(XFormsProperties.YUI_BASE_PATH_PROPERTY);
+                                final String yuiBasePath = isVersionResources ? "/" + Version.getVersion() + propertyDefinition.getDefaultValue() : (String) propertyDefinition.getDefaultValue();
                                 if (!yuiBasePath.equals(propertyDefinition.getDefaultValue()))
                                     dynamicProperties.put(XFormsProperties.YUI_BASE_PATH_PROPERTY, yuiBasePath);
                             }

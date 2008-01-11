@@ -21,7 +21,6 @@ import org.orbeon.oxf.servlet.ServletWebAppExternalContext;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
 import java.util.Map;
-import org.orbeon.oxf.pipeline.api.WebAppExternalContext;
 
 /**
  * This context provides access to the Servlet context, and optionaly the session.
@@ -226,7 +225,7 @@ public class ServletContextExternalContext implements ExternalContext {
         }
     }
 
-    private class Application implements WebAppExternalContext.Application {
+    private class Application implements ExternalContext.Application {
         private ServletContext servletContext;
 
         public Application(ServletContext servletContext) {

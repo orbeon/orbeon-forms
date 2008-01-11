@@ -443,6 +443,7 @@ public class TestExternalContext implements ExternalContext  {
     }
 
     public ExternalContext.Application getApplication() {
+        // NIY
         return null;
     }
 

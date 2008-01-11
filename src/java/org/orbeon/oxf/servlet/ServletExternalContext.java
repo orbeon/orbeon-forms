@@ -36,7 +36,6 @@ import javax.servlet.http.HttpSession;
 import java.io.*;
 import java.security.Principal;
 import java.util.*;
-import org.orbeon.oxf.pipeline.api.WebAppExternalContext;
 
 /*
  * Servlet-specific implementation of ExternalContext.
@@ -738,7 +737,7 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
         }
     }
 
-    private class Application implements WebAppExternalContext.Application {
+    private class Application implements ExternalContext.Application {
         private ServletContext servletContext;
 
         public Application(ServletContext servletContext) {

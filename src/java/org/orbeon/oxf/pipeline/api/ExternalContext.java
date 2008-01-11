@@ -18,7 +18,6 @@ import java.security.Principal;
 import java.util.Enumeration;
 import java.util.Locale;
 import java.util.Map;
-import javax.servlet.ServletContext;
 
 /**
  * ExternalContext abstracts context, request and response information so that compile-time
@@ -144,6 +143,15 @@ public interface ExternalContext extends WebAppExternalContext {
         }
     }
 
+    public interface Application {
+        public void addListener(ApplicationListener applicationListener);
+        public void removeListener(ApplicationListener applicationListener);
+
+        public interface ApplicationListener {
+            public void servletDestroyed();
+        }
+    }
+
     public interface RequestDispatcher {
         public abstract void forward(Request request, Response response) throws IOException;
         public void include(Request request, Response response) throws IOException;
@@ -163,4 +171,5 @@ public interface ExternalContext extends WebAppExternalContext {
 
     public String getStartLoggerString();
     public String getEndLoggerString();
+
 }

@@ -34,7 +34,6 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.oxf.pipeline.api.WebAppExternalContext;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -43,7 +42,7 @@ import java.io.OutputStream;
 import java.io.InputStream;
 import org.xml.sax.ContentHandler;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.servlet.ServletContext;
+
 /**
  * The File Serializer serializes text and binary documents to files on disk.
  */
@@ -440,9 +439,9 @@ public class FileSerializer extends ProcessorImpl {
     private void deleteFileOnContextDestroyed(PipelineContext pipelineContext, final FileItem fileItem) {
         // Try to delete the file on exit and on session termination
         final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
-        WebAppExternalContext.Application application = externalContext.getApplication();
+        ExternalContext.Application application = externalContext.getApplication();
         if (application != null) {
-          application.addListener(new WebAppExternalContext.Application.ApplicationListener() {
+          application.addListener(new ExternalContext.Application.ApplicationListener() {
             public void servletDestroyed() {
               try {
                 if (logger.isDebugEnabled()) {

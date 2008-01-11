@@ -16,7 +16,7 @@ package org.orbeon.oxf.portlet;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 
 import javax.portlet.PortletContext;
-import org.orbeon.oxf.pipeline.api.WebAppExternalContext;
+
 import org.orbeon.oxf.servlet.ServletExternalContext;
 
 /**
@@ -61,7 +61,7 @@ public class PortletContextExternalContext extends PortletWebAppExternalContext 
         throw new UnsupportedOperationException();
     }
 
-    public Application getApplication() {
+    public ExternalContext.Application getApplication() {
         if (portletContext == null)
           throw new UnsupportedOperationException();
         if (application == null)
@@ -78,27 +78,27 @@ public class PortletContextExternalContext extends PortletWebAppExternalContext 
         return "";
     }
 
-    private class Application implements WebAppExternalContext.Application {
-    private PortletContext portletContext;
+    private class Application implements ExternalContext.Application {
+        private PortletContext portletContext;
 
-    public Application(PortletContext portletContext) {
-      this.portletContext = portletContext;
-    }
-
-    public void addListener(ApplicationListener applicationListener) {
-
-        ServletExternalContext.ApplicationListeners listeners = (ServletExternalContext.ApplicationListeners) portletContext.getAttribute(ServletExternalContext.APPLICATION_LISTENERS);
-        if (listeners == null) {
-            listeners = new ServletExternalContext.ApplicationListeners();
-            portletContext.setAttribute(ServletExternalContext.APPLICATION_LISTENERS, listeners);
+        public Application(PortletContext portletContext) {
+            this.portletContext = portletContext;
         }
-        listeners.addListener(applicationListener);
-    }
 
-    public void removeListener(ApplicationListener applicationListener) {
-        final ServletExternalContext.ApplicationListeners listeners = (ServletExternalContext.ApplicationListeners) portletContext.getAttribute(ServletExternalContext.APPLICATION_LISTENERS);
-        if (listeners != null)
-            listeners.removeListener(applicationListener);
+        public void addListener(ApplicationListener applicationListener) {
+
+            ServletExternalContext.ApplicationListeners listeners = (ServletExternalContext.ApplicationListeners) portletContext.getAttribute(ServletExternalContext.APPLICATION_LISTENERS);
+            if (listeners == null) {
+                listeners = new ServletExternalContext.ApplicationListeners();
+                portletContext.setAttribute(ServletExternalContext.APPLICATION_LISTENERS, listeners);
+            }
+            listeners.addListener(applicationListener);
+        }
+
+        public void removeListener(ApplicationListener applicationListener) {
+            final ServletExternalContext.ApplicationListeners listeners = (ServletExternalContext.ApplicationListeners) portletContext.getAttribute(ServletExternalContext.APPLICATION_LISTENERS);
+            if (listeners != null)
+                listeners.removeListener(applicationListener);
         }
     }
 }

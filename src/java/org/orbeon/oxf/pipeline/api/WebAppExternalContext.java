@@ -17,13 +17,4 @@ public interface WebAppExternalContext {
 
     public Object getNativeContext();
 
-    public interface Application {
-        public void addListener(ApplicationListener applicationListener);
-        public void removeListener(ApplicationListener applicationListener);
-
-        public interface ApplicationListener {
-            public void servletDestroyed();
-        }
-    }
-
 }

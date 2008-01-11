@@ -30,7 +30,6 @@ import java.io.*;
 import java.net.URL;
 import java.security.Principal;
 import java.util.*;
-import org.orbeon.oxf.pipeline.api.WebAppExternalContext;
 
 /*
  * Portlet-specific implementation of ExternalContext.
@@ -345,7 +344,7 @@ public class PortletExternalContext extends PortletWebAppExternalContext impleme
     }
 
 
-    private class Application implements WebAppExternalContext.Application {
+    private class Application implements ExternalContext.Application {
         private PortletContext portletContext;
 
         public Application(PortletContext portletContext) {

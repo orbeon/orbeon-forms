@@ -57,6 +57,9 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
     private final static String INSTANCE_PASSING_REDIRECT_PORTAL = "redirect-exit-portal";
     private final static String DEFAULT_INSTANCE_PASSING = INSTANCE_PASSING_REDIRECT;
 
+    // Attributes
+    private final static String VERSIONED_ATTRIBUTE = "versioned";
+
     // Properties
     private static final String INSTANCE_PASSING_PROPERTY_NAME = "instance-passing";
     private static final String EPILOGUE_PROPERTY_NAME = "epilogue";
@@ -99,7 +102,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                             : getPropertySet().getString(INSTANCE_PASSING_PROPERTY_NAME, DEFAULT_INSTANCE_PASSING);
                 }
                 final boolean globalIsVersioned; {
-                    final String attributeValue = controllerDocument.getRootElement().attributeValue(URLRewriter.RESOURCES_VERSIONED_PROPERTY);
+                    final String attributeValue = controllerDocument.getRootElement().attributeValue(VERSIONED_ATTRIBUTE);
                     // NOTE: We use a global property, not an oxf:page-flow scoped one
                     globalIsVersioned = attributeValue != null ? new Boolean(attributeValue).booleanValue() : URLRewriter.isResourcesVersioned();
                 }
@@ -251,7 +254,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                             final boolean currentIsFile = "files".equals(element.getName());
                             final boolean currentFileIsVersioned; {
                                 // If this is a file, then check "versioned" property, local and then global
-                                final String currentIsVersionedAttribute = currentIsFile ? element.attributeValue(URLRewriter.RESOURCES_VERSIONED_PROPERTY) : null;
+                                final String currentIsVersionedAttribute = currentIsFile ? element.attributeValue(VERSIONED_ATTRIBUTE) : null;
                                 currentFileIsVersioned = (currentIsVersionedAttribute != null) ? "true".equals(currentIsVersionedAttribute) : globalIsVersioned;
                             }
 

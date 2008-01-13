@@ -19,7 +19,7 @@
     <property as="xs:integer" name="oxf.cache.size"                                  value="300"/>
     <property as="xs:integer" name="oxf.cache.xpath.size"                            value="600"/>
     <property as="xs:boolean" name="oxf.sax.inspection"                              value="false"/>
-    <property as="xs:boolean" name="oxf.resources.versioned"                         value="true"/>
+    <property as="xs:boolean" name="oxf.resources.versioned"                         value="false"/>
     <property as="xs:string"  name="oxf.resources.version-number"                    value="3.1415"/>
 
     <!-- Processor-specific properties -->

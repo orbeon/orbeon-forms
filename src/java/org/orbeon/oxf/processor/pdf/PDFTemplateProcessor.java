@@ -81,21 +81,14 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {
 
             final String showGrid = XPathCache.evaluateAsString(pipelineContext, configDocumentInfo, "/*/template/@show-grid", null, null, functionLibrary, null, null, null);//TODO: LocationData
 
-            // Create result document and writer
-            final Document document = new Document(psize, 50, 50, 50, 50);
-            final PdfWriter writer = PdfWriter.getInstance(document, outputStream);
-            document.open();
-
-            // Add content to the resulting document
-            final PdfContentByte contentByte = writer.getDirectContent();
-
+             final PdfStamper stamper = new PdfStamper(reader,outputStream);
+             stamper.setFormFlattening(true);
+ 
             for (int currentPage = 1; currentPage <= pageCount; currentPage++) {
-                document.newPage();
-                PdfImportedPage page1 = writer.getImportedPage(reader, currentPage);
-                contentByte.addTemplate(page1, 0, 0);
-
+            	final PdfContentByte contentByte = stamper.getOverContent(currentPage);
                 // Handle root group
-                final GroupContext initialGroupContext = new GroupContext(contentByte, height, currentPage,  Collections.singletonList(instanceDocumentInfo), 1,
+                final GroupContext initialGroupContext = new GroupContext(contentByte,stamper.getAcroFields(), height, currentPage,  
+                		Collections.singletonList(instanceDocumentInfo), 1,
                         0, 0, "Courier", 14, 15.9f);
                 handleGroup(pipelineContext, initialGroupContext, configDocument.getRootElement().elements(), functionLibrary);
 
@@ -146,7 +139,8 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {
             }
 
             // Close the document
-            document.close();
+//            document.close();
+            stamper.close();	
         } catch (Exception e) {
             throw new OXFException(e);
         }
@@ -154,6 +148,7 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {
 
     private static class GroupContext {
         public PdfContentByte contentByte;
+        public AcroFields acroFields;
         
         public float pageHeight;
         public int pageNumber;
@@ -168,7 +163,7 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {
         public float fontSize;
         public float fontPitch;
 
-        public GroupContext(PdfContentByte contentByte, float pageHeight, int pageNumber, List contextNodeSet, int contextPosition,
+        public GroupContext(PdfContentByte contentByte,AcroFields acroFields, float pageHeight, int pageNumber, List contextNodeSet, int contextPosition,
                             float offsetX, float offsetY, String fontFamily, float fontSize, float fontPitch) {
             this.contentByte = contentByte;
             this.pageHeight = pageHeight;
@@ -180,6 +175,7 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {
             this.fontPitch = fontPitch;
             this.fontFamily = fontFamily;
             this.fontSize = fontSize;
+            this.acroFields = acroFields;
         }
 
         public GroupContext(GroupContext other) {
@@ -193,6 +189,7 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {
             this.fontPitch = other.fontPitch;
             this.fontFamily = other.fontFamily;
             this.fontSize = other.fontSize;
+            this.acroFields = other.acroFields;
         }
     }
 
@@ -280,64 +277,77 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {
                 }
 
             } else if (currentElement.getName().equals("field")) {
-                // Handle field
+            	
+            	final String fieldNameStr = currentElement.attributeValue("acro-field-name");
+            	
+            	if (fieldNameStr != null) {
+            		final String value = currentElement.attributeValue("value") == null ? currentElement.attributeValue("ref") : currentElement.attributeValue("value");
+            		// Get value from instance
 
-                final String leftAttribute = currentElement.attributeValue("left") == null ? currentElement.attributeValue("left-position") : currentElement.attributeValue("left");
-                final String topAttribute = currentElement.attributeValue("top") == null ? currentElement.attributeValue("top-position") : currentElement.attributeValue("top");
-
-                final String leftPosition = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, contextNode, variableToValueMap, null, null, currentElement, leftAttribute);
-                final String topPosition = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, contextNode, variableToValueMap, null, null, currentElement, topAttribute);
-
-                final String size = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, contextNode, variableToValueMap, null, null, currentElement, currentElement.attributeValue("size"));
-                final String value = currentElement.attributeValue("value") == null ? currentElement.attributeValue("ref") : currentElement.attributeValue("value");
-
-                final float fontPitch;
-                {
-                    final String fontPitchAttribute = currentElement.attributeValue("font-pitch") == null ? currentElement.attributeValue("spacing") : currentElement.attributeValue("font-pitch");
-                    if (fontPitchAttribute != null)
-                        fontPitch = Float.parseFloat(XFormsUtils.resolveAttributeValueTemplates(pipelineContext, contextNode, variableToValueMap, null, null, currentElement, fontPitchAttribute));
-                    else
-                        fontPitch = groupContext.fontPitch;
-                }
-
-                final String fontFamily;
-                {
-                    final String fontFamilyAttribute = currentElement.attributeValue("font-family");
-                    if (fontFamilyAttribute != null)
-                        fontFamily = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, contextNode, variableToValueMap, null, null, currentElement, fontFamilyAttribute);
-                    else
-                        fontFamily = groupContext.fontFamily;
-                }
-
-                final float fontSize;
-                {
-                    final String fontSizeAttribute = currentElement.attributeValue("font-size");
-                    if (fontSizeAttribute != null)
-                        fontSize = Float.parseFloat(XFormsUtils.resolveAttributeValueTemplates(pipelineContext, contextNode, variableToValueMap, null, null, currentElement, fontSizeAttribute));
-                    else
-                        fontSize = groupContext.fontSize;
-                }
-
-                // Output value
-                final BaseFont baseFont = BaseFont.createFont(fontFamily, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
-                groupContext.contentByte.beginText();
-                {
-                    groupContext.contentByte.setFontAndSize(baseFont, fontSize);
-
-                    final float xPosition = Float.parseFloat(leftPosition) + groupContext.offsetX;
-                    final float yPosition = groupContext.pageHeight - (Float.parseFloat(topPosition) + groupContext.offsetY);
-
-                    // Get value from instance
                     final String text = XPathCache.evaluateAsString(pipelineContext, groupContext.contextNodeSet, groupContext.contextPosition, value, namespaceMap, variableToValueMap, functionLibrary, null, null, (LocationData) currentElement.getData());
-
-                    // Iterate over characters and print them
-                    if (text != null) {
-                        int len = Math.min(text.length(), (size != null) ? Integer.parseInt(size) : Integer.MAX_VALUE);
-                        for (int j = 0; j < len; j++)
-                            groupContext.contentByte.showTextAligned(PdfContentByte.ALIGN_CENTER, text.substring(j, j + 1), xPosition + ((float) j) * fontPitch, yPosition, 0);
-                    }
-                }
-                groupContext.contentByte.endText();
+                    final String fieldName = XPathCache.evaluateAsString(pipelineContext, groupContext.contextNodeSet, groupContext.contextPosition, fieldNameStr, namespaceMap, variableToValueMap, functionLibrary, null, null, (LocationData) currentElement.getData());
+                    groupContext.acroFields.setField(fieldName, text);
+                    
+            	} else {	
+	                // Handle field
+	
+	                final String leftAttribute = currentElement.attributeValue("left") == null ? currentElement.attributeValue("left-position") : currentElement.attributeValue("left");
+	                final String topAttribute = currentElement.attributeValue("top") == null ? currentElement.attributeValue("top-position") : currentElement.attributeValue("top");
+	
+	                final String leftPosition = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, contextNode, variableToValueMap, null, null, currentElement, leftAttribute);
+	                final String topPosition = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, contextNode, variableToValueMap, null, null, currentElement, topAttribute);
+	
+	                final String size = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, contextNode, variableToValueMap, null, null, currentElement, currentElement.attributeValue("size"));
+	                final String value = currentElement.attributeValue("value") == null ? currentElement.attributeValue("ref") : currentElement.attributeValue("value");
+	
+	                final float fontPitch;
+	                {
+	                    final String fontPitchAttribute = currentElement.attributeValue("font-pitch") == null ? currentElement.attributeValue("spacing") : currentElement.attributeValue("font-pitch");
+	                    if (fontPitchAttribute != null)
+	                        fontPitch = Float.parseFloat(XFormsUtils.resolveAttributeValueTemplates(pipelineContext, contextNode, variableToValueMap, null, null, currentElement, fontPitchAttribute));
+	                    else
+	                        fontPitch = groupContext.fontPitch;
+	                }
+	
+	                final String fontFamily;
+	                {
+	                    final String fontFamilyAttribute = currentElement.attributeValue("font-family");
+	                    if (fontFamilyAttribute != null)
+	                        fontFamily = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, contextNode, variableToValueMap, null, null, currentElement, fontFamilyAttribute);
+	                    else
+	                        fontFamily = groupContext.fontFamily;
+	                }
+	
+	                final float fontSize;
+	                {
+	                    final String fontSizeAttribute = currentElement.attributeValue("font-size");
+	                    if (fontSizeAttribute != null)
+	                        fontSize = Float.parseFloat(XFormsUtils.resolveAttributeValueTemplates(pipelineContext, contextNode, variableToValueMap, null, null, currentElement, fontSizeAttribute));
+	                    else
+	                        fontSize = groupContext.fontSize;
+	                }
+	
+	                // Output value
+	                final BaseFont baseFont = BaseFont.createFont(fontFamily, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
+	                groupContext.contentByte.beginText();
+	                {
+	                    groupContext.contentByte.setFontAndSize(baseFont, fontSize);
+	
+	                    final float xPosition = Float.parseFloat(leftPosition) + groupContext.offsetX;
+	                    final float yPosition = groupContext.pageHeight - (Float.parseFloat(topPosition) + groupContext.offsetY);
+	
+	                    // Get value from instance
+	                    final String text = XPathCache.evaluateAsString(pipelineContext, groupContext.contextNodeSet, groupContext.contextPosition, value, namespaceMap, variableToValueMap, functionLibrary, null, null, (LocationData) currentElement.getData());
+	
+	                    // Iterate over characters and print them
+	                    if (text != null) {
+	                        int len = Math.min(text.length(), (size != null) ? Integer.parseInt(size) : Integer.MAX_VALUE);
+	                        for (int j = 0; j < len; j++)
+	                            groupContext.contentByte.showTextAligned(PdfContentByte.ALIGN_CENTER, text.substring(j, j + 1), xPosition + ((float) j) * fontPitch, yPosition, 0);
+	                    }
+	                }
+	                groupContext.contentByte.endText();
+            	}
             } else {
                 // NOP
             }

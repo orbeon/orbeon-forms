@@ -49,35 +49,43 @@
                     </choice>
                 </attribute>
             </optional>
-            <attribute>
-                <choice>
-                    <name>left</name>
-                    <name>left-position</name><!-- deprecated -->
-                </choice>
-                <choice>
-                    <data type="decimal"/>
-                    <ref name="avt"/>
-                </choice>
-            </attribute>
-            <attribute>
-                <choice>
-                    <name>top</name>
-                    <name>top-position</name><!-- deprecated -->
-                </choice>
-                <choice>
-                    <data type="decimal"/>
-                    <ref name="avt"/>
-                </choice>
-            </attribute>
-            <ref name="font-attributes"/>
-            <optional>
-                <attribute name="size">
-                    <choice>
-                        <data type="positiveInteger"/>
-                        <ref name="avt"/>
-                    </choice>
-                </attribute>
-            </optional>
+            <choice>
+            	<attribute>
+            		<name>acro-field-name</name>
+            		<data type="string"/>
+            	</attribute>
+            	<group>
+		            <attribute>
+		                <choice>
+		                    <name>left</name>
+		                    <name>left-position</name><!-- deprecated -->
+		                </choice>
+		                <choice>
+		                    <data type="decimal"/>
+		                    <ref name="avt"/>
+		                </choice>
+		            </attribute>
+		            <attribute>
+		                <choice>
+		                    <name>top</name>
+		                    <name>top-position</name><!-- deprecated -->
+		                </choice>
+		                <choice>
+		                    <data type="decimal"/>
+		                    <ref name="avt"/>
+		                </choice>
+		            </attribute>
+		            <ref name="font-attributes"/>
+		            <optional>
+		                <attribute name="size">
+		                    <choice>
+		                        <data type="positiveInteger"/>
+		                        <ref name="avt"/>
+		                    </choice>
+		                </attribute>
+		            </optional>
+				</group>
+			</choice>		        
             <choice>
                 <attribute name="value">
                     <data type="string"/>

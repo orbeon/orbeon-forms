@@ -118,6 +118,7 @@ ORBEON.xforms.Globals = ORBEON.xforms.Globals || {
     alertTooltipForControl: {},          // Map from element id -> YUI alert or true, that tells us if we have already created a Tooltip for an element
     debugDiv: null,                      // Points to the div when debug messages are displayed
     debugLastTime: new Date().getTime(), // Timestamp when the last debug message was printed
+    lastEventSentTime: new Date().getTime(), // Timestamp when the last event was sent to server
     pageLoadedRegistered: false,         // If the page loaded listener has been registered already, to avoid running it more than once
     menuItemsets: {},                    // Maps menu id to structure defining the content of the menu
     menuYui: {},                         // Maps menu id to the YUI object for that menu
@@ -490,6 +491,27 @@ ORBEON.util.Utils = {
             console.log(message); // Normal use; do not remove
             console.log(exception);  // Normal use; do not remove
         }
+    },
+
+    /**
+     * A convenience method for getting values of property supplied as inline script.
+     * If the property value is not supplied, then the default value will be returned.
+     */
+
+    getProperty: function(propertyName) {
+        // Check if the value for the property was supplied in inline script
+        if (typeof opsXFormsProperties != "undefined" && typeof opsXFormsProperties[propertyName] != "undefined")
+            return opsXFormsProperties[propertyName];
+
+        // Return default value for the property
+        switch (propertyName) {
+            case "session-heartbeat-delay": { return XFORMS_SESSION_HEARTBEAT_DELAY;  }
+            case "session-heartbeat": { return XFORMS_SESSION_HEARTBEAT; }
+            case "fck-editor-base-path": { return FCK_EDITOR_BASE_PATH; }
+            case "yui-base-path": { return YUI_BASE_PATH; }
+        }
+    	// Neither the property's value was supplied, nor a default value exists for the property
+        return null;
     }
 }
 
@@ -1602,6 +1624,32 @@ ORBEON.xforms.Events = {
                 && current - ORBEON.xforms.Globals.dialogMinimalLastMouseOut[yuiDialog.element.id] >= XFORMS_DELAY_BEFORE_CLOSE_MINIMAL_DIALOG_IN_MS) {
             xformsFireEvents([xformsCreateEventArray(yuiDialog.element, "xxforms-dialog-close")], false);
         }
+    },
+
+    /**
+     * A method for sending a heartbeat event if no event has sent to server in
+     * the last time interval determined by session-heartbeat-delay property
+     */
+    sendHeartBeatIfNeeded: function(heartBeatDelay) {
+        var currentTime = new Date().getTime();
+        if((currentTime - ORBEON.xforms.Globals.lastEventSentTime) >= heartBeatDelay ) {
+            var heartBeatDiv = ORBEON.util.Dom.getElementById("xforms-heartbeat");
+            if (heartBeatDiv == null) {
+                var form;
+                for (var formIndex = 0; formIndex < document.forms.length; formIndex++) {
+                    var candidateForm = document.forms[formIndex];
+                    if (ORBEON.util.Dom.hasClass(candidateForm, "xforms-form")) {
+                        form = candidateForm;
+                        break;
+                    }
+                }
+                var heartBeatDiv = document.createElement("div");
+                heartBeatDiv.className = "xforms-heartbeat";
+                heartBeatDiv.id = "xforms-heartbeat";
+                form.appendChild(heartBeatDiv);
+            }
+            xformsFireEvents([xformsCreateEventArray(heartBeatDiv, "xxforms-session-heartbeat")], false);
+        }
     }
 };
 
@@ -1696,7 +1744,6 @@ ORBEON.xforms.Init = {
         }
 
         // Override image location for YUI to use local images
-
         var yuiBaseURL;
         if (typeof opsXFormsProperties != "undefined" && typeof opsXFormsProperties["yui-base-path"] != "undefined")
             yuiBaseURL = BASE_URL + opsXFormsProperties["yui-base-path"];
@@ -1716,6 +1763,12 @@ ORBEON.xforms.Init = {
                 YAHOO.widget.MenuModuleItem.prototype.IMG_ROOT = yuiBaseURL;
                 YAHOO.widget.MenuModuleItem.prototype.IMG_ROOT_SSL = yuiBaseURL;
             }
+        }
+
+        // A heartbeat event - An AJAX request for letting server know that "I'm still alive"
+        if (ORBEON.util.Utils.getProperty("session-heartbeat")) {
+            var heartBeatDelay = ORBEON.util.Utils.getProperty("session-heartbeat-delay");
+            window.setInterval(function() { ORBEON.xforms.Events.sendHeartBeatIfNeeded(heartBeatDelay); }, 60000); // Check every minute
         }
 
         // Initialize special controls
@@ -2258,6 +2311,7 @@ ORBEON.xforms.Server = {
             window.setTimeout(function() { ORBEON.xforms.Server.executeNextRequest(true); },
                 XFORMS_INTERNAL_SHORT_DELAY_IN_MS);
         }
+        ORBEON.xforms.Globals.lastEventSentTime = new Date().getTime(); // Update the last event sent time
         return false;
     },
 
@@ -4000,4 +4054,5 @@ if (!ORBEON.xforms.Globals.pageLoadedRegistered) {
     // If the browser does not provide a console object, create one which delegates log() to xformsLog()
     YAHOO.util.Event.addListener(window, "load", ORBEON.xforms.Init.document);
     ORBEON.xforms.Globals.debugLastTime = new Date().getTime();
+    ORBEON.xforms.Globals.lastEventSentTime = new Date().getTime();
 }

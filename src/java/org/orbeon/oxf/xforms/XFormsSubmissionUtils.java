@@ -29,9 +29,7 @@ import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.FastStringBuffer;
 
 import java.io.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
+import java.net.*;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -166,8 +164,22 @@ public class XFormsSubmissionUtils {
             // https SHOULD be supported
             // file SHOULD be supported
             try {
-                if (XFormsServer.logger.isDebugEnabled())
-                    XFormsServer.logger.debug("XForms - opening URL connection for: " + submissionURL.toExternalForm());
+                if (XFormsServer.logger.isDebugEnabled()) {
+                    final URI submissionURI;
+                    try {
+                        String userInfo = submissionURL.getUserInfo();
+                        if (userInfo != null) {
+                            final int colonIndex = userInfo.indexOf(':');
+                            if (colonIndex != -1)
+                                userInfo = userInfo.substring(0, colonIndex + 1) + "xxxxxxxx";
+                        }
+                        submissionURI = new URI(submissionURL.getProtocol(), userInfo, submissionURL.getHost(),
+                                submissionURL.getPort(), submissionURL.getPath(), submissionURL.getQuery(), submissionURL.getRef());
+                    } catch (URISyntaxException e) {
+                        throw new OXFException(e);
+                    }
+                    XFormsServer.logger.debug("XForms - opening URL connection for: " + submissionURI.toString());
+                }
 
                 final URLConnection urlConnection = submissionURL.openConnection();
                 final HTTPURLConnection httpURLConnection = (urlConnection instanceof HTTPURLConnection) ? (HTTPURLConnection) urlConnection : null;

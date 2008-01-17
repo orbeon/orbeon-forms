@@ -632,6 +632,27 @@
                                 </xforms:repeat>
                             </xml-source>
                         </li>
+                        <li>
+                            <a name="xxforms-property"/>
+                            <p>
+                                <code>xxforms:property($property-name as xs:string) as xs:string?</code>.
+                            </p>
+                            <p>
+                                The <code>xxforms:property()</code> function retrieves the value of a property defined
+                                in <code>properties.xml</code>. If no property exists with the given name, returns an
+                                empty sequence.
+                            </p>
+                            <xml-source show-namespaces="false">
+                                <xforms:repeat nodeset="employee" id="employee-repeat">
+                                    <div>
+                                        <xforms:trigger>
+                                            <xforms:label>Read Property</xforms:label>
+                                            <xforms:setvalue ev:event="DOMActivate" ref="my-property" value="xxforms:property('my.property.name')"/>
+                                        </xforms:trigger>
+                                    </div>
+                                </xforms:repeat>
+                            </xml-source>
+                        </li>
                     </ul>
                 </section>
                 <section>

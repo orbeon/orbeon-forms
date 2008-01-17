@@ -21,6 +21,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPathCache;
@@ -79,7 +80,7 @@ public class XPathProcessor extends ProcessorImpl {
                 PooledXPathExpression xpath = null;
                 try {
                     final String baseURI = (locationData == null) ? null : locationData.getSystemID();
-                    xpath = XPathCache.getXPathExpression(context, wrapper, config.getExpression(), config.getNamespaces(), null, null, baseURI, locationData);
+                    xpath = XPathCache.getXPathExpression(context, wrapper, config.getExpression(), config.getNamespaces(), null, PipelineFunctionLibrary.instance(), baseURI, locationData);
                     List results = xpath.evaluate();
                     contentHandler.startDocument();
                     // WARNING: Here we break the rule that processors must output valid XML documents, because

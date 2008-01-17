@@ -20,6 +20,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary;
 import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -185,7 +186,7 @@ public class ConcreteChooseProcessor extends ProcessorImpl {
             PooledXPathExpression expr = null;
             final Map namespaces = (Map) branchNamespaces.get(branchIndex);
             try {
-                expr = XPathCache.getXPathExpression(context, hrefDocumentInfo, "boolean(" + condition + ")", namespaces, getLocationData());
+                expr = XPathCache.getXPathExpression(context, hrefDocumentInfo, "boolean(" + condition + ")", namespaces, null, PipelineFunctionLibrary.instance(), null, getLocationData());
                 if( ((Boolean)expr.evaluateSingle()).booleanValue()) {
                     selectedBranch = branchIndex;
                     break;

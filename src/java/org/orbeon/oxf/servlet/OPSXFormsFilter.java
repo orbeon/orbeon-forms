@@ -14,12 +14,9 @@
 package org.orbeon.oxf.servlet;
 
 import javax.servlet.*;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServletResponseWrapper;
-import javax.servlet.http.Cookie;
+import javax.servlet.http.*;
 import java.io.*;
-import java.util.Locale;
+import java.util.*;
 
 /**
  * This filter allows forwarding requests from your web app to an separate Orbeon Forms context.
@@ -64,7 +61,7 @@ public class OPSXFormsFilter implements Filter {
             final MyHttpServletResponseWrapper responseWrapper = new MyHttpServletResponseWrapper(httpResponse);
 
             // Execute filter
-            filterChain.doFilter(servletRequest, responseWrapper);
+            filterChain.doFilter(new MyHttpServletRequestWrapper(httpRequest), responseWrapper);
 
             // Set document if not present AND output was intercepted
             if (httpRequest.getAttribute(OPS_XFORMS_RENDERER_DOCUMENT_ATTRIBUTE_NAME) == null) {
@@ -161,6 +158,55 @@ public class OPSXFormsFilter implements Filter {
         if (semicolumnIndex == -1)
             return contentType;
         return contentType.substring(0, semicolumnIndex).trim();
+    }
+
+    private static class MyHttpServletRequestWrapper extends HttpServletRequestWrapper {
+
+        private Enumeration headerNames;
+
+        public MyHttpServletRequestWrapper(HttpServletRequest httpServletRequest) {
+            super(httpServletRequest);
+
+        }
+
+        public String getHeader(String s) {
+            // Filter conditional get headers so that we always get content
+            if (s.toLowerCase().startsWith("if-") )
+                return null;
+            else
+                return super.getHeader(s);
+        }
+
+        public Enumeration getHeaders(String s) {
+            // Filter conditional get headers so that we always get content
+            if (s.toLowerCase().startsWith("if-"))
+                return null;
+            else
+                return super.getHeaders(s);
+        }
+
+        public Enumeration getHeaderNames() {
+            if (headerNames == null) {
+                // Filter conditional get headers so that we always get content
+                final List newHeaderNames = new ArrayList();
+                for (Enumeration e = super.getHeaderNames(); e.hasMoreElements();) {
+                    final String currentName = (String) e.nextElement();
+                    if (!currentName.toLowerCase().startsWith("if-"))
+                        newHeaderNames.add(newHeaderNames);
+                }
+                headerNames = Collections.enumeration(newHeaderNames);
+
+            }
+            return headerNames;
+        }
+
+        public long getDateHeader(String s) {
+            // Filter conditional get headers so that we always get content
+            if (s.toLowerCase().startsWith("if-"))
+                return -1;
+            else
+                return super.getDateHeader(s);
+        }
     }
 
     private static class MyHttpServletResponseWrapper extends HttpServletResponseWrapper {

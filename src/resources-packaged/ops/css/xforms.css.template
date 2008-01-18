@@ -85,8 +85,7 @@
 .xforms-help-panel-close { text-align: right; }
 
 .xforms-loading-none {
-    display: block;
-    height: 0;
+    display: none;
 }
 
 .xforms-input {

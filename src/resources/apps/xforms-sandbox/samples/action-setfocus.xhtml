@@ -41,5 +41,45 @@
                 <xforms:setfocus ev:event="DOMActivate" control="first"/>
             </xforms:trigger>
         </xhtml:p>
+        <xhtml:p>
+            <xforms:select appearance="full" ref="." id="select">
+                <xforms:item>
+                    <xforms:label>First</xforms:label>
+                    <xforms:value>1</xforms:value>
+                </xforms:item>
+                <xforms:item>
+                    <xforms:label>Second</xforms:label>
+                    <xforms:value>2</xforms:value>
+                </xforms:item>
+                <xforms:item>
+                    <xforms:label>Third</xforms:label>
+                    <xforms:value>3</xforms:value>
+                </xforms:item>
+            </xforms:select>
+            <xforms:trigger>
+                <xforms:label>Set focus</xforms:label>
+                <xforms:setfocus ev:event="DOMActivate" control="select"/>
+            </xforms:trigger>
+        </xhtml:p>
+        <xhtml:p>
+            <xforms:select1 appearance="full" ref="." id="select1">
+                <xforms:item>
+                    <xforms:label>First</xforms:label>
+                    <xforms:value>1</xforms:value>
+                </xforms:item>
+                <xforms:item>
+                    <xforms:label>Second</xforms:label>
+                    <xforms:value>2</xforms:value>
+                </xforms:item>
+                <xforms:item>
+                    <xforms:label>Third</xforms:label>
+                    <xforms:value>3</xforms:value>
+                </xforms:item>
+            </xforms:select1>
+            <xforms:trigger>
+                <xforms:label>Set focus</xforms:label>
+                <xforms:setfocus ev:event="DOMActivate" control="select1"/>
+            </xforms:trigger>
+        </xhtml:p>
     </xhtml:body>
 </xhtml:html>

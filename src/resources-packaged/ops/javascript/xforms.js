@@ -824,7 +824,21 @@ ORBEON.xforms.Controls = {
         if (ORBEON.util.Dom.hasClass(control, "xforms-input") && !ORBEON.util.Dom.hasClass(control, "xforms-type-boolean")) {
             ORBEON.util.Dom.getChildElementByIndex(control, 1).focus();
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-select-appearance-full") || ORBEON.util.Dom.hasClass(control, "xforms-select1-appearance-full")) {
-            ORBEON.util.Dom.getChildElementByIndex(ORBEON.util.Dom.getChildElementByIndex(control, 0), 0).focus();
+            // Find for radio button or check box that is is checked
+            var itemIndex = 0;
+            var foundSelected = false;
+            while (true) {
+                var item = ORBEON.util.Dom.getChildElementByIndex(control, itemIndex);
+                if (item == null) break;
+                var formInput = ORBEON.util.Dom.getChildElementByIndex(item, 0);
+                if (formInput.checked) {
+                    foundSelected = true;
+                    break;
+                }
+                itemIndex++;
+            }
+            // Set focus on either selected item if we found one or on first item otherwise
+            ORBEON.util.Dom.getChildElementByIndex(ORBEON.util.Dom.getChildElementByIndex(control, foundSelected ? itemIndex : 0), 0).focus();
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-select1-appearance-xxforms-autocomplete")) {
             ORBEON.util.Dom.getChildElementByIndex(control, 0).focus();
         } else if (typeof control.focus != "undefined") {

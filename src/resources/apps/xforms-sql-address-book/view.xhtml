@@ -105,6 +105,8 @@
                     </xhtml:td>
                 </xhtml:tr>
             </xforms:group>
+            <!-- Workaround for IE CSS issue with border collapse (border at the bottom of the table not showing) -->
+            <xhtml:tr/>
         </xhtml:table>
         <xhtml:p>
             Status: <xforms:output ref="instance('status')/message"/>

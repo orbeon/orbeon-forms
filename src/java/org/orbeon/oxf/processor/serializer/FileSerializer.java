@@ -83,7 +83,8 @@ public class FileSerializer extends ProcessorImpl {
     public FileSerializer() {
         addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG, FILE_SERIALIZER_CONFIG_NAMESPACE_URI));
         addInputInfo(new ProcessorInputOutputInfo(INPUT_DATA));
-        addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
+        // We don't declare the "data" output here, as this is an optional output.
+        // If we declare it, we'll the XPL engine won't be happy when don't connect anything to that output.
     }
 
     private static class Config {

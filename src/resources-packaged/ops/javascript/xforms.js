@@ -1703,7 +1703,8 @@ ORBEON.xforms.Init = {
         for (var i = 0; i < document.forms.length; i++) {
             var form = document.forms[i];
             if (ORBEON.util.Dom.hasClass(form, "xforms-form")) {
-                for (var j = 0; j < form.elements.length; j++) {
+                var elementCount = form.elements.length;
+                for (var j = 0; j < elementCount; j++) {
                     var element = form.elements[j];
                     ORBEON.xforms.Init.registerListenersOnFormElement((element));
                 }

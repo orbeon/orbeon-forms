@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2008 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:table class="error-buttons"
+        xmlns:ev="http://www.w3.org/2001/xml-events"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+        xmlns:xforms="http://www.w3.org/2002/xforms"
+        xmlns:xi="http://www.w3.org/2001/XInclude"
+        xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+        xmlns:saxon="http://saxon.sf.net/">
+    <xhtml:tr>
+        <xhtml:td colspan="2">
+            <xforms:switch>
+                <xforms:case id="orbeon-message-none">
+                    <span/>
+                </xforms:case>
+                <xforms:case id="orbeon-message-success">
+                    <span class="orbeon-message-success">
+                        <xforms:output model="fr-persistence-model" ref="instance('persistence-instance')/message"/>
+                    </span>
+                </xforms:case>
+                <xforms:case id="orbeon-message-validation-error">
+                    <span class="orbeon-message-validation-error">
+                        <xforms:output model="fr-persistence-model" ref="instance('persistence-instance')/message"/>
+                    </span>
+                </xforms:case>
+                <xforms:case id="orbeon-message-fatal-error">
+                    <span class="orbeon-message-fatal-error">
+                        <xforms:output model="fr-persistence-model" ref="instance('persistence-instance')/message"/>
+                    </span>
+                </xforms:case>
+            </xforms:switch>
+        </xhtml:td>
+    </xhtml:tr>
+    <xhtml:tr>
+        <xhtml:td>
+            <xforms:group model="fr-persistence-model" ref=".[instance('persistence-instance')/save-attempted = 'true']">
+                <xforms:group model="error-summary-model" ref="instance('errors-instance')[error]">
+                    <xhtml:span class="orbeon-error-title">Issues with form</xhtml:span>
+                    <xhtml:ol class="orbeon-error-list">
+                        <xforms:repeat nodeset="error" id="errors-repeat">
+                            <xhtml:li>
+                                <xhtml:i>
+                                    <xforms:output value="@label"/>
+                                    <xforms:group ref=".[string-length(@indexes) > 0]">
+                                        <xforms:output value="concat('(Row ', @indexes, ')')"/>
+                                    </xforms:group>
+                                </xhtml:i>
+                                <xforms:group ref=".[normalize-space(@alert) != '']">
+                                    - <xforms:output value="@alert"/>
+                                </xforms:group>
+                            </xhtml:li>
+                        </xforms:repeat>
+                    </xhtml:ol>
+                </xforms:group>
+                <xforms:group model="error-summary-model" ref="instance('errors-instance')[not(error)]">
+                    <!--<table class="orbeon-no-errors-table">-->
+                        <!--<tr>-->
+                            <!--<th colspan="3" class="no-error-title">Form valid</th>-->
+                        <!--</tr>-->
+                    <!--</table>-->
+                </xforms:group>
+            </xforms:group>
+        </xhtml:td>
+        <xhtml:td>
+            <xhtml:div class="buttons">
+                <xforms:trigger>
+                    <xforms:label><xhtml:img src="/apps/fr/style/run.gif" alt=""/> <xhtml:span>Save Form</xhtml:span></xforms:label>
+                    <xforms:action ev:event="DOMActivate">
+                        <xforms:dispatch target="fr-persistence-model" name="orbeon-save"/>
+                    </xforms:action>
+                </xforms:trigger>
+            </xhtml:div>
+        </xhtml:td>
+    </xhtml:tr>
+</xhtml:table>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2007 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:script type="text/javascript" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+    function collapse() {
+        // Get current element
+        var element = ORBEON.util.Dom.getElementById(ORBEON.xforms.Document.getValue("current"));
+        var anim = new YAHOO.util.Anim(element.id, { height: { to: 0 } }, 0.2);
+        anim.onComplete.subscribe(function() { ORBEON.xforms.Document.dispatchEvent("fr-sections-model", "after-collapse"); });
+        anim.animate();
+    }
+
+    function expand() {
+        // Get current element
+        var element = ORBEON.util.Dom.getElementById(ORBEON.xforms.Document.getValue("current"));
+        // Remove height style if we have one
+        element.style.height = "auto";
+        // Figure out what its natural height is
+        var region = YAHOO.util.Dom.getRegion(element);
+        var fullHeight = region.bottom - region.top;
+        // Set height to 0 and animate back to natural height
+        element.style.height = 0;
+        var anim = new YAHOO.util.Anim(element.id, { height: {  to: fullHeight } }, .2);
+        // Set back the height to auto when the animation is finished
+        anim.onComplete.subscribe(function() { element.style.height = "auto"; });
+        anim.animate();
+    }
+</xhtml:script>

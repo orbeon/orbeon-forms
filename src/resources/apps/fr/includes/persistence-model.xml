@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2007 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xforms:model id="fr-persistence-model"
+              xmlns:xs="http://www.w3.org/2001/XMLSchema"
+              xmlns:xforms="http://www.w3.org/2002/xforms"
+              xmlns:ev="http://www.w3.org/2001/xml-events"
+              xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+              xmlns:xi="http://www.w3.org/2001/XInclude"
+              xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+              xmlns:f="http://orbeon.org/oxf/xml/formatting"
+              xmlns:exist="http://exist.sourceforge.net/NS/exist">
+
+    <!-- Respond to model initialization -->
+    <!-- TODO: Should not do this on summary page -->
+    <xforms:action ev:event="xforms-ready">
+        <!-- Get configuration for the current form -->
+        <xforms:send submission="get-configuration-submission"/>
+        <!-- A document id is provided -->
+        <xforms:action if="instance('parameters-instance')/document != ''">
+            <!-- Display document with that id -->
+            <xforms:send submission="get-document-submission"/>
+        </xforms:action>
+        <!-- No document id is provided -->
+        <xforms:action if="instance('parameters-instance')/document = ''">
+            <!-- Create new empty document -->
+            <xforms:send submission="get-template-submission"/>
+        </xforms:action>
+    </xforms:action>
+
+    <!-- Respond to orbeon-save event -->
+    <xforms:action ev:event="orbeon-save">
+        <xforms:setvalue ref="instance('persistence-instance')/save-attempted">true</xforms:setvalue>
+        <xforms:action if="instance('parameters-instance')/document != ''">
+            <!-- Update -->
+            <xforms:send submission="update-submission"/>
+        </xforms:action>
+        <xforms:action if="instance('parameters-instance')/document = ''">
+            <!-- Create -->
+            <xforms:send submission="create-submission"/>
+        </xforms:action>
+    </xforms:action>
+
+    <xforms:action ev:event="orbeon-create">
+        <xforms:recalculate/>
+        <xforms:load resource="/fr/{instance('parameters-instance')/app}/{instance('parameters-instance')/form}/new/"/>
+    </xforms:action>
+
+    <xforms:action ev:event="orbeon-edit">
+        <xforms:recalculate/>
+        <xforms:load resource="/fr/{instance('parameters-instance')/app}/{instance('parameters-instance')/form}/{instance('summary-instance')/document[index('documents-repeat')]/@name}/edit"/>
+    </xforms:action>
+
+    <xforms:action ev:event="orbeon-delete">
+        <xforms:send submission="delete-document-submission"/>
+        <xforms:send submission="search-submission"/>
+    </xforms:action>
+
+    <xforms:action ev:event="orbeon-view">
+        <xforms:recalculate/>
+        <!-- TODO -->
+        <!--<xforms:load resource="xxx" f:url-type="resource"/>-->
+    </xforms:action>
+
+    <xforms:action ev:event="orbeon-xml">
+        <xforms:recalculate/>
+        <!-- TODO -->
+        <!--<xforms:load resource="xxx" f:url-type="resource"/>-->
+    </xforms:action>
+
+    <xforms:action ev:event="orbeon-pdf">
+        <xforms:recalculate/>
+        <!-- TODO -->
+        <!--<xforms:load resource="xxx" f:url-type="resource" xxforms:show-progress="false"/>-->
+    </xforms:action>
+
+    <!-- Parameters passed to this page -->
+    <xforms:instance id="parameters-instance" src="input:instance"/>
+
+    <!-- Get document template -->
+    <xforms:submission id="get-template-submission"
+            method="get" serialization="none"
+            action="/fr/service/template/{instance('parameters-instance')/app}/{instance('parameters-instance')/form}"
+            replace="instance" xxforms:instance="form-instance"/>
+
+    <!-- Get document -->
+    <xforms:submission id="get-document-submission"
+            method="get" serialization="none"
+            action="/fr/service/crud/exist/{instance('parameters-instance')/app}/{instance('parameters-instance')/form}/{instance('parameters-instance')/document}"
+            replace="instance" xxforms:instance="form-instance"/>
+
+    <!-- Create document -->
+    <xforms:instance id="create-instance">
+        <dummy xmlns=""/>
+    </xforms:instance>
+
+    <xforms:submission id="create-submission"
+            validate="true"
+            method="put" ref="xxforms:instance('form-instance')"
+            action="/fr/service/crud/exist/{instance('parameters-instance')/app}/{instance('parameters-instance')/form}"
+            replace="instance" instance="create-instance">
+        <xforms:setvalue ev:event="xforms-submit" ref="instance('persistence-instance')/save-progress">started</xforms:setvalue>
+        <xforms:setvalue ev:event="xforms-submit-done" ref="instance('parameters-instance')/document" value="instance('create-instance')"/>
+    </xforms:submission>
+
+    <!-- Update document -->
+    <xforms:submission id="update-submission"
+            validate="true"
+            method="put" ref="xxforms:instance('form-instance')"
+            action="/fr/service/crud/exist/{instance('parameters-instance')/app}/{instance('parameters-instance')/form}/{instance('parameters-instance')/document}"
+            replace="none">
+        <xforms:setvalue ev:event="xforms-submit" ref="instance('persistence-instance')/save-progress">started</xforms:setvalue>
+    </xforms:submission>
+
+    <!-- Delete document -->
+    <xforms:submission id="delete-document-submission"
+            method="delete" serialization="none"
+            action="/fr/service/crud/exist/{instance('parameters-instance')/app}/{instance('parameters-instance')/form}/{instance('summary-instance')/document[index('documents-repeat')]/@name}"
+            replace="none"/>
+
+    <!-- Instance to track search results and paging -->
+    <xforms:instance id="search-instance">
+        <search xmlns="">
+            <app/>
+            <form/>
+            <!-- Search query to execute -->
+            <query/>
+            <!-- Paging -->
+            <page-size>2</page-size>
+            <page-number>1</page-number>
+            <!-- Sorting -->
+            <sort-key/>
+        </search>
+    </xforms:instance>
+
+    <xforms:instance id="paging-instance">
+        <search xmlns="">
+            <total>0</total>
+            <from>0</from>
+            <to>0</to>
+        </search>
+    </xforms:instance>
+
+    <xforms:instance id="configuration-instance">
+        <dummy xmlns=""/>
+    </xforms:instance>
+
+    <xforms:submission id="get-configuration-submission"
+            method="get" serialization="none"
+            action="/fr/service/configuration/{
+                instance('parameters-instance')/app}/{
+                instance('parameters-instance')/form}"
+            replace="instance" instance="configuration-instance">
+        <!-- Copy the search configuration to the search instance -->
+        <xforms:action ev:event="xforms-submit-done">
+            <xforms:insert context="instance('search-instance')" nodeset="query"
+                origin="instance('configuration-instance')/search"/>
+        </xforms:action>
+    </xforms:submission>
+
+    <!-- Calculations for page navigation -->
+    <xforms:bind nodeset="instance('paging-instance')">
+        <xforms:bind nodeset="total" calculate="(instance('summary-instance')/@total, 0)[1]"/>
+        <xforms:bind nodeset="page" calculate="if ((. - 1) * ../page-size + 1 gt number(../total)) then 1 else ."/>
+        <xforms:bind nodeset="from" calculate="if (../total = 0) then 0 else (../page-number - 1)*../page-size + 1"/>
+        <xforms:bind nodeset="to" calculate="min((../page-number *../page-size, ../total))"/>
+    </xforms:bind>
+
+    <!-- Summary data -->
+    <xforms:instance id="summary-instance">
+        <documents xmlns="" total="0">
+            <headers>
+                <header/>
+                <header/>
+            </headers>
+            <document name="" created="" last-modified="">
+                <id/>
+                <details>
+                    <detail/>
+                    <detail/>
+                </details>
+            </document>
+        </documents>
+    </xforms:instance>
+
+    <xforms:submission id="search-submission"
+            ref="instance('search-instance')"
+            method="post"
+            action="/fr/service/search/exist/{
+                instance('parameters-instance')/app}/{
+                instance('parameters-instance')/form}"
+            replace="instance" instance="summary-instance"/>
+
+    <xforms:instance id="persistence-instance">
+        <save xmlns="">
+            <!-- Whether an attempt to submit was ever done -->
+            <save-attempted>false</save-attempted>
+            <!-- Whether form data is clean or dirty -->
+            <data-status>clean</data-status>
+            <!-- Success or error message to display -->
+            <message/>
+            <!-- Whether the data has been validated -->
+            <save-progress/>
+            <!-- Error document returned -->
+            <error/>
+        </save>
+    </xforms:instance>
+
+    <!-- React to instance serialization when saving -->
+    <xforms:action ev:event="xforms-submit-serialize" if="instance('persistence-instance')/save-progress != ''">
+        <xforms:setvalue ref="instance('persistence-instance')/save-progress">validated</xforms:setvalue>
+    </xforms:action>
+
+    <!-- React to successful submission when saving -->
+    <xforms:action ev:event="xforms-submit-done" if="instance('persistence-instance')/save-progress != ''">
+        <xforms:setvalue ref="instance('persistence-instance')/message">Document saved.</xforms:setvalue><!-- TODO: i18n -->
+        <xforms:setvalue ref="instance('control-instance')/data-status">clean</xforms:setvalue>
+        <xforms:toggle case="orbeon-message-success"/>
+        <xforms:setvalue ref="instance('persistence-instance')/save-progress"/>
+    </xforms:action>
+
+    <!-- React to failed submission when saving -->
+    <xforms:action ev:event="xforms-submit-error" if="instance('persistence-instance')/save-progress != ''">
+        <xforms:setvalue ref="instance('persistence-instance')/error" value="event('body')"/>
+        <xforms:action if="not(instance('persistence-instance')/save-progress = 'validated')">
+            <xforms:setvalue ref="instance('persistence-instance')/message">There are errors in your form.</xforms:setvalue><!-- TODO: i18n -->
+            <xforms:toggle case="orbeon-message-validation-error"/>
+        </xforms:action>
+        <xforms:action if="instance('persistence-instance')/save-progress = 'validated'">
+            <xforms:setvalue ref="instance('persistence-instance')/message">Unable to save document. Please contact your system administrator.</xforms:setvalue><!-- TODO: i18n -->
+            <xforms:toggle case="orbeon-message-fatal-error"/>
+        </xforms:action>
+        <xforms:setvalue ref="instance('persistence-instance')/save-progress"/>
+    </xforms:action>
+
+</xforms:model>

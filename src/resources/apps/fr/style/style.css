@@ -1,0 +1,238 @@
+body, body table, textarea.xforms-textarea {
+    font-size: small;
+    font-family: "Lucida Grande", Tahoma, Arial, Verdana, sans-serif;
+}
+
+#container, #top, #bottom, #footer {
+    margin: 0 auto;
+    width: 750px;
+}
+
+#top, #bottom {
+    width: 750px;
+    height: 10px !important;
+    display: block !important;
+}
+
+#top {
+    margin-top: 0;
+}
+#container {
+    background: #ffffff
+}
+
+#container {
+    border: 1px solid #cccccc
+}
+
+h1 { margin-top: 0 }
+
+.body .info h2 {
+    font-size: 160%;
+    font-family: inherit;
+    color: #000000
+}
+
+.body .info p {
+    font-size: 95%;
+    font-family: inherit;
+    color: #444444
+}
+
+.body .section h3 {
+    font-size: 110%;
+    font-family: inherit;
+    background: #ffffff;
+    color: #000000
+}
+
+.body .section p {
+    font-size: 85%;
+    font-family: inherit;
+    color: #444444
+}
+
+html { overflow: scroll; }
+
+body {
+    background-color: #eee;
+}
+
+.logo {
+    background-image: url(logo-bg.gif);
+    background-position: top;
+    height: 150px;
+}
+
+.logo img { padding: .5em 1em .5em 1em; float: right }
+
+.separator {
+    background-color: #3598d4;
+    min-height: 1em;
+    clear: both;
+}
+
+.xforms-label, h4  {
+    display: block;
+    font-weight: bold;
+    padding-bottom: .2em;
+    margin-top: .5em;
+    text-align: left;
+    margin-bottom: 0;
+}
+
+div.body {
+    margin: 20px 10px 0 10px;
+    padding: 0 0 20px 0;
+}
+
+div.footer {
+    margin: 0px 10px 10px 10px;
+    padding: 0;
+}
+
+.section-body {
+    display: block;
+    overflow: hidden;
+    margin: 0 1.5em 1em 1.7em;
+    padding: 0 0 0 0;
+}
+
+.grid tr th {
+    text-align: left;
+}
+
+.grid {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.grid tr td {
+    vertical-align: top;
+}
+
+/* Make sure xforms-disabled  and xforms-repeat-template takes precendence over display: block on other classes */
+label.xforms-disabled, span.xforms-disabled, div.xforms-disabled  { display: none; }
+label.xforms-repeat-template { display: none; }
+
+.xforms-trigger img { padding-right: 5px; }
+
+.layout-table tr td { width: auto }
+.grid .layout-table tr td { width: auto }
+
+.grid-2-columns tr td {
+    width: 50%;
+}
+
+.grid-3-columns tr td {
+    width: 33.3%;
+}
+
+.grid-4-columns tr td {
+    width: 25%;
+}
+
+.grid-5-columns tr td {
+    width: 20%;
+}
+
+.grid-6-columns tr td {
+    width: 16.6%;
+}
+
+h2 a, h3 a, h4 a {
+    color: black;
+    vertical-align: middle;
+}
+
+h2 {
+    font-weight: normal;
+    font-size: 160%;
+    margin: 1em 0 1em 0;
+    clear: left;
+}
+
+h3, h4 {
+    font-weight: normal;
+    font-size: 110%;
+    line-height: 135%;
+    margin: 1em 0 1em 0;
+    padding: 0 0 0 0;
+}
+
+.xforms-repeat-selected-item-1 { background: transparent }
+.xforms-repeat-selected-item-2 { background: transparent }
+
+.fr-summary-table .xforms-repeat-selected-item-1 { background: #3598D4 }
+.fr-summary-table .xforms-repeat-selected-item-2 { background: #3598D4 }
+
+.fr-summary-table tr:hover { background: red }
+.fr-summary-table tr:hover { background: red }
+
+hr {
+    border: 1px solid #eee;
+}
+
+/* Make sure xforms-disabled takes precendence over display: block on other classes */
+label.xforms-disabled, span.xforms-disabled, div.xforms-disabled  {
+    display: none;
+}
+
+textarea {
+    width: 23em;
+}
+
+.error-buttons {
+    margin-top: 2em;
+    width: 100%;
+}
+
+.buttons {
+    text-align: right;
+    padding-top: 1em;
+    padding-right: 2em;
+}
+
+
+
+.buttons button { padding: 7px; }
+.buttons button img { vertical-align: -20%; }
+
+.orbeon-error-title { color: #f90; font-size: 160%; }
+.orbeon-error-list li { margin-bottom: .5em; }
+
+.orbeon-repeat-table .xforms-label { margin-top: 0 }
+
+.orbeon-message-success { color: green  }
+.orbeon-message-validation-error { color: orange }
+.orbeon-message-fatal-error { color: red }
+
+
+.tabular, .tabular tr td, .tabular tr th {
+    border-color: #600;
+    border-style: solid;
+}
+
+.tabular tr th {
+    background-color: #f8f8f8;
+}
+
+.tabular {
+    border-width: 0 0 1px 1px;
+    border-spacing: 1px;
+    border-collapse: collapse;
+    /* Fix for Firefox in cases where the right-most border of the table is not displayed */
+    width: 99.9%;
+}
+
+.tabular tr td, .tabular tr th {
+    margin: 0;
+    padding: 4px;
+    border-width: 1px 1px 0 0;
+}
+
+.tabular .xforms-label { display: none; }
+.non-collapsible { padding-left: 1.1em; }
+
+/*.xforms-group { display: inline }*/
+/*.xforms-help-image { display: inline }*/

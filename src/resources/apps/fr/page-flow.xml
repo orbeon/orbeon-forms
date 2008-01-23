@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2007 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<config xmlns="http://www.orbeon.com/oxf/controller"
+        xmlns:xu="http://www.xmldb.org/xupdate"
+        xmlns:oxf="http://www.orbeon.com/oxf/processors">
+
+    <!-- ==== Pages ==== -->
+
+    <!-- Summary -->
+    <page path-info="/fr/([^/]+)/" matcher="oxf:perl5-matcher"
+          default-submission="summary/submission-page-summary.xml"
+          view="summary/view.xhtml">
+        <setvalue ref="/*/app" matcher-group="1"/>
+    </page>
+
+    <page path-info="/fr/([^/]+)/([^/]+)" matcher="oxf:perl5-matcher"
+          default-submission="summary/submission-page-summary.xml"
+          view="summary/view.xhtml">
+        <setvalue ref="/*/app" matcher-group="1"/>
+        <setvalue ref="/*/form" matcher-group="2"/>
+    </page>
+
+    <!-- New document -->
+    <page path-info="/fr/([^/]+)/([^/]+)/new(/)?" matcher="oxf:perl5-matcher"
+          default-submission="submission-page-edit.xml"
+          model="/forms/${1}/${2}/view.xhtml"
+          view="/forms/${1}/components.xpl">
+        <setvalue ref="/*/app" matcher-group="1"/>
+        <setvalue ref="/*/form" matcher-group="2"/>
+    </page>
+
+    <!-- Edit document -->
+    <page path-info="/fr/([^/]+)/([^/]+)/([^/]+)/edit" matcher="oxf:perl5-matcher"
+          default-submission="submission-page-edit.xml"
+          model="/forms/${1}/${2}/view.xhtml"
+          view="/forms/${1}/components.xpl">
+        <setvalue ref="/*/app" matcher-group="1"/>
+        <setvalue ref="/*/form" matcher-group="2"/>
+        <setvalue ref="/*/document" matcher-group="3"/>
+    </page>
+
+    <!-- ==== Services ==== -->
+
+    <!-- i18n resources -->
+    <page path-info="/fr/service/resources/([^/]+)/([^/]+)/([^/]+)" matcher="oxf:perl5-matcher"
+          view="/forms/${1}/${2}/resources_${3}.xml"/>
+
+    <!-- Template instance -->
+    <page path-info="/fr/service/template/([^/]+)/([^/]+)(/([^/]+))?" matcher="oxf:perl5-matcher"
+          default-submission="submission-service-empty.xml"
+          view="/forms/${1}/service/template.xpl">
+        <setvalue ref="/*/app" matcher-group="1"/>
+        <setvalue ref="/*/form" matcher-group="2"/>
+        <setvalue ref="/*/template" matcher-group="4"/>
+    </page>
+
+    <!-- Create operation -->
+    <page path-info="/fr/service/crud/([^/]+)/([^/]+)/([^/]+)" matcher="oxf:perl5-matcher"
+          view="persistence/${1}/create.xpl"/>
+
+    <!-- Read, Update and Delete operations -->
+    <page path-info="/fr/service/crud/([^/]+)/([^/]+)/([^/]+)/([^/]+)" matcher="oxf:perl5-matcher"
+          view="persistence/${1}/read-update-delete.xpl"/>
+
+    <!-- Search -->
+    <page path-info="/fr/service/search/([^/]+)/([^/]+)/([^/]+)" matcher="oxf:perl5-matcher"
+          view="persistence/${1}/search.xpl">
+        <setvalue ref="/*/app" matcher-group="1"/>
+        <setvalue ref="/*/form" matcher-group="2"/>
+        <!--<setvalue ref="/*/query" parameter="query"/>-->
+        <!--<setvalue ref="/*/page-size" parameter="page-size"/>-->
+        <!--<setvalue ref="/*/page-number" parameter="page-number"/>-->
+        <!--<setvalue ref="/*/sort-key" parameter="sort-key"/>-->
+    </page>
+
+    <!-- Configuration -->
+    <page path-info="/fr/service/configuration/([^/]+)/([^/]+)" matcher="oxf:perl5-matcher"
+          view="/forms/${1}/${2}/configuration.xml">
+    </page>
+
+    <!-- ==== Custom services ==== -->
+
+    <!-- Custom services provided by the project -->
+    <page path-info="/fr/service/custom/([^/]+)/.*" matcher="oxf:perl5-matcher"
+          model="/forms/${1}/service/page-flow.xml"/>
+
+    <!-- Custom pages provided by the project -->
+    <page path-info="/fr/page/custom/([^/]+)/.*" matcher="oxf:perl5-matcher"
+          model="/forms/${1}/page/page-flow.xml"/>
+
+    <epilogue url="oxf:/config/epilogue.xpl"/>
+
+</config>

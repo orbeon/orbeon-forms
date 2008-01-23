@@ -1,0 +1,128 @@
+<config>
+    <template href="oxf:/apps/forms/forms/G-325A/g-325a.pdf" show-grid="false"/>
+
+    <group ref="/*" font-pitch="5" font-family="Courier" font-size="9">
+
+        <group ref=".[$page-number le 4]" offset-x="{if ($page-number = 1) then 0 else 3}"
+               offset-y="{if ($page-number = 1) then 0 else 6}">
+            <!-- Personal information -->
+            <group ref="personal-information">
+                <group ref="name">
+                    <field acro-field-name="'lastName'" value="last"/>
+                    <field acro-field-name="'firstName'" value="first"/>
+                    <field acro-field-name="'middleName'" value="if (initial != '') then initial else '(none)'"/>
+                    <field acro-field-name="'otherNames'" value="if (other != '') then other else '(none)'"/>
+                </group>
+
+                <field acro-field-name="'gender.male'" value="if (gender = 'male') then 'X' else ''"/>
+                <field acro-field-name="'gender.female'" value="if (gender = 'female') then 'X' else ''"/>
+
+                <group ref="birth">
+                    <field acro-field-name="'dob'" value="string-join((substring(date, 6, 2), substring(date, 9, 2), substring(date, 1, 4)), '/')"/>
+                </group>
+                <field acro-field-name="'citizenship'" value="citizenship"/>
+                <field acro-field-name="'fileNumber'" value="if (file-number != '') then file-number else '(none)'"/>
+
+                <field acro-field-name="'cityAndCountryOfBirth'" value="concat(birth/city, ', ', birth/country)"/>
+                <field acro-field-name="'ssn'" value="ssn"/>
+
+                <!-- <field left="46" top="224" size="100" value="'(none)'"/> -->
+            </group>
+
+            <!-- Parents information -->
+            <repeat nodeset="parents-information/*" offset-y="12.5">
+                <field acro-field-name="concat('parent.lastName.',string(position()))" value="name/last"/>
+                <field acro-field-name="concat('parent.firstName.',string(position()))" value="name/first"/>
+                <group ref="birth">
+                    <field acro-field-name="concat('parent.dob.',string(position()))" value="string-join((substring(date, 6, 2), substring(date, 9, 2), substring(date, 1, 4)), '/')"/>
+                    <field acro-field-name="concat('parent.birthCityAndCountry.',string(position()))" value="concat(city, ', ', country)"/>
+                </group>
+                <field acro-field-name="concat('parent.resisdenceCityAndCountry.',string(position()))" value="concat(residence/city, ', ', residence/country)"/>
+            </repeat>
+
+            <!-- Spouse information -->
+            <repeat nodeset="marriages/*/spouse" offset-y="12.5">
+                <field acro-field-name="concat('spouse.name.last.',string(position()))" value="name/last"/>
+                <field acro-field-name="concat('spouse.name.first.',string(position()))" value="name/first"/>
+                <group ref="birth">
+                    <field acro-field-name="concat('spouse.dob.',string(position()))" value="string-join((substring(date, 6, 2), substring(date, 9, 2), substring(date, 1, 4)), '/')"/>
+                    <!--<field acro-field-name="concat('spouse.cityAndCountryOfBirth.',string(position()))" value="concat(city, ', ', country)"/>-->
+                </group>
+                <group ref="marriage">
+                    <field acro-field-name="concat('marriage.date.',string(position()))" value="string-join((substring(date, 6, 2), substring(date, 9, 2), substring(date, 1, 4)), '/')"/>
+                    <field acro-field-name="concat('marriage.place.',string(position()))" value="place"/>
+                </group>
+            </repeat>
+
+            <!-- Residence -->
+            <group ref="residence-information">
+                <repeat nodeset="last-five-years/residence" offset-y="12.5">
+                    <field acro-field-name="concat('residence.address.streetNumber.',string(position()))" value="street"/>
+                    <field acro-field-name="concat('residence.address.city.',string(position()))" value="city"/>
+                    <field acro-field-name="concat('residence.address.provinceOrState.',string(position()))" value="state"/>
+                    <field acro-field-name="concat('residence.address.country.',string(position()))" value="country"/>
+                    <field acro-field-name="concat('residence.from.month.',string(position()))" value="substring(from, 6, 2)"/>
+                    <field acro-field-name="concat('residence.from.year.',string(position()))" value="substring(from, 1, 4)"/>
+                    <field acro-field-name="concat('residence.to.month.',string(position()))" value="substring(to, 6, 2)"/>
+                    <field acro-field-name="concat('residence.to.year.',string(position()))" value="substring(to, 1, 4)"/>
+                </repeat>
+                <group ref="last-abroad/residence">
+                    <field acro-field-name="'lastAddressOutsideUs.streetNumber'" value="street"/>
+                    <field acro-field-name="'lastAddressOutsideUs.city'" value="city"/>
+                    <field acro-field-name="'lastAddressOutsideUs.provinceOrState'" value="state"/>
+                    <field acro-field-name="'lastAddressOutsideUs.country'" value="country"/>
+                    <field acro-field-name="'lastAddressOutsideUs.from.month'" value="substring(from, 6, 2)"/>
+                    <field acro-field-name="'lastAddressOutsideUs.from.year'" value="substring(from, 1, 4)"/>
+
+                    <!-- TODO: allow blank -->
+                    <field acro-field-name="'lastAddressOutsideUs.to.month'" value="substring(to, 6, 2)"/>
+                    <field acro-field-name="'lastAddressOutsideUs.to.year'" value="substring(to, 1, 4)"/>
+
+                </group>
+            </group>
+
+            <!-- Employment -->
+            <group ref="employment-information">
+                <repeat nodeset="last-five-years/employment" offset-y="12.5">
+                    <field acro-field-name="concat('employment.employerNameAndAddress.',string(position()))"  value="concat(name, if (address != '') then ', ' else '', address)"/>
+                    <field acro-field-name="concat('employment.occupation.',string(position()))" value="occupation"/>
+                    <field acro-field-name="concat('employment.from.month.',string(position()))" value="substring(from, 6, 2)"/>
+                    <field acro-field-name="concat('employment.from.year.',string(position()))" value="substring(from, 1, 4)"/>
+                    <field acro-field-name="concat('employment.to.month.',string(position()))" value="substring(to, 6, 2)"/>
+                    <field acro-field-name="concat('employment.to.year.',string(position()))" value="substring(to, 1, 4)"/>
+                </repeat>
+                <group ref="last-abroad/employment">
+                    <field acro-field-name="'lastEmploymentAbroad.employerNameAndAddress'" value="concat(name, if (address != '') then ', ' else '', address)"/>
+                    <field acro-field-name="'lastEmploymentAbroad.occupation'" value="occupation"/>
+                    <field acro-field-name="'lastEmploymentAbroad.from.month'" value="substring(from, 6, 2)"/>
+                    <field acro-field-name="'lastEmploymentAbroad.from.year'" value="substring(from, 1, 4)"/>
+                    <field acro-field-name="'lastEmploymentAbroad.to.month'" value="substring(to, 6, 2)"/>
+                    <field acro-field-name="'lastEmploymentAbroad.to.year'" value="substring(to, 1, 4)"/>
+                </group>
+            </group>
+
+            <!-- Connection -->
+            <group ref="connection">
+                <field acro-field-name="'purpose.others.specify'" value="if (type = 'other') then other else ''"/>
+                <field acro-field-name="'purpose.naturalization'" value="if (type = 'naturalization') then 'X' else ''"/>
+                <field acro-field-name="'purpose.other'" value="if (type = 'other') then 'X' else ''"/>
+                <field acro-field-name="'purpose.permanent'" value="if (type = 'permanent') then 'X' else ''"/>
+            </group>
+
+            <!-- Native alphabet -->
+            <field left="196" top="554" size="100" value="'N/A'"/>
+
+            <!-- Signature -->
+            <group ref="personal-information">
+                <group ref="name">
+                    <field acro-field-name="'applicant.lastName'" value="last"/>
+                    <field acro-field-name="'applicant.firstName'" value="first"/>
+                    <field acro-field-name="'applicant.middleName'" value="if (initial != '') then initial else '(none)'"/>
+                </group>
+                <field acro-field-name="'applicant.alienRegistrationNumber'" value="if (file-number != '') then file-number else '(none)'"/>
+            </group>
+        </group>
+
+    </group>
+
+</config>

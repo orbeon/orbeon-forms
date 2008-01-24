@@ -22,6 +22,12 @@
     <property as="xs:boolean" name="oxf.resources.versioned"                         value="false"/>
     <property as="xs:string"  name="oxf.resources.version-number"                    value="3.1415"/>
 
+    <!-- Epilogue configuration -->
+    <property as="xs:anyURI"  name="oxf.epilogue.theme"                              value="oxf:/config/theme-examples.xsl"/>
+    <property as="xs:boolean" name="oxf.epilogue.output-xhtml"                       value="false"/>
+    <property as="xs:boolean" name="oxf.epilogue.renderer-rewrite"                   value="false"/>
+    <property as="xs:boolean" name="oxf.epilogue.process-svg"                        value="true"/>
+
     <!-- Processor-specific properties -->
     <property as="xs:integer" processor-name="oxf:request"   name="max-upload-size"          value="100000000"/>
     <property as="xs:integer" processor-name="oxf:request"   name="max-upload-memory-size"   value="10240"/>
@@ -72,6 +78,7 @@
     <property as="xs:boolean" name="oxf.xforms.combine-resources"                    value="true"/>
     <property as="xs:boolean" name="oxf.xforms.cache-combined-resources"             value="false"/>
     <property as="xs:boolean" name="oxf.xforms.optimize-relevance"                   value="false"/>
+    <property as="xs:boolean" name="oxf.xforms.session-heartbeat"                    value="true"/>
 
     <!-- Rarely used global properties -->
     <property as="xs:string"  name="oxf.servlet.externalize-form-values-prefix"      value="$extnode^"/>

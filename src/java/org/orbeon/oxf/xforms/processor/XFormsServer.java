@@ -127,9 +127,16 @@ public class XFormsServer extends ProcessorImpl {
                     if (eventElements.size() > 1)
                         throw new OXFException("Got xxforms-session-heartbeat event along with other events.");
 
-                    // Hit session if it exists
+                    // Hit session if it exists (it's probably not even necessary to do so)
                     final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
-                    externalContext.getSession(false);
+                    final ExternalContext.Session session = externalContext.getSession(false);
+
+                    if (logger.isDebugEnabled()) {
+                        if (session != null)
+                            logger.debug("XForms - received heartbeat from client for session: " + session.getId());
+                        else
+                            logger.debug("XForms - received heartbeat from client (no session available).");
+                    }
 
                     // Output simple resulting document
                     try {

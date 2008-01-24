@@ -24,12 +24,14 @@ import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationSAXWriter;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.ParserAdapter;
+import org.xml.sax.helpers.AttributesImpl;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.dom.DOMSource;
@@ -141,8 +143,16 @@ public class ScopeGenerator extends ScopeProcessorBase {
                             // Store empty document
                             if (nullDocumentSAXStore == null) {
                                 nullDocumentSAXStore = new SAXStore();
-                                Transformer identity = TransformerUtils.getIdentityTransformer();
-                                identity.transform(new DocumentSource(Dom4jUtils.NULL_DOCUMENT), new SAXResult(nullDocumentSAXStore));
+
+                                nullDocumentSAXStore.startDocument();
+                                nullDocumentSAXStore.startPrefixMapping(XMLConstants.XSI_PREFIX, XMLConstants.XSI_URI);
+                                final AttributesImpl attributes = new AttributesImpl();
+                                attributes.addAttribute(XMLConstants.XSI_URI, "nil", "xsi:nil", "CDATA", "true");
+                                nullDocumentSAXStore.startElement("", "null", "null", attributes);
+                                nullDocumentSAXStore.endElement("", "null", "null");
+                                nullDocumentSAXStore.endPrefixMapping(XMLConstants.XSI_PREFIX);
+                                nullDocumentSAXStore.endDocument();
+
                             }
                             state.saxStore = nullDocumentSAXStore;
                         }

@@ -46,6 +46,7 @@ import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.msv.IDConstraintChecker;
+import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -235,15 +236,21 @@ public class XFormsModelSchemaValidator {
         } else {
             newErrorMessage = errMsg;
         }
+        if (XFormsServer.logger.isDebugEnabled())
+            XFormsServer.logger.debug("Schema validation error: " + newErrorMessage);
         InstanceData.addSchemaError(element, newErrorMessage, element.getStringValue(), null);
     }
 
     private void addSchemaError(final Attribute attribute, final String schemaError) {
+        if (XFormsServer.logger.isDebugEnabled())
+            XFormsServer.logger.debug("Schema validation error: " + schemaError);
         InstanceData.addSchemaError(attribute, schemaError, attribute.getStringValue(), null);
     }
 
     private void handleIDErrors(final IDConstraintChecker icc) {
         for (ErrorInfo errorInfo = icc.clearErrorInfo(); errorInfo != null; errorInfo = icc.clearErrorInfo()) {
+            if (XFormsServer.logger.isDebugEnabled())
+                XFormsServer.logger.debug("Schema validation error: " + errorInfo.message);
             addSchemaError(errorInfo.element, errorInfo.message);
         }
     }

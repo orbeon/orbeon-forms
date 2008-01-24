@@ -85,7 +85,8 @@
 .xforms-help-panel-close { text-align: right; }
 
 .xforms-loading-none {
-    display: none;
+    display: block;
+    height: 0;
 }
 
 .xforms-input {
@@ -94,6 +95,23 @@
 
 .xforms-trigger-appearance-minimal img { border: 0 }
 .xforms-submit-appearance-minimal img { border: 0 }
+
+.xforms-showcalendar {
+    margin-left: .5em;
+    margin-right: .5em;
+    /*background-image: url(../../ops/images/xforms/calendar.gif);*/
+    /*background-repeat: no-repeat;*/
+    /*background-position: left center;*/
+    /*display: -moz-inline-box;*/
+    /*display: inline-block;*/
+    /*width: 26px;*/
+    /*height: 19px;*/
+    vertical-align: middle;
+}
+
+.xforms-showcalendar-readonly {
+    display: none;
+}
 
 .xforms-input input {
     border: 1px solid #7f9db9;
@@ -267,16 +285,8 @@ a.xforms-trigger span { vertical-align: middle }
 }
 
 .xforms-type-date .xforms-showcalendar {
-    margin-left: .5em;
-    margin-right: .5em;
-    vertical-align: middle;
     display: -moz-inline-box;
     display: inline-block;
-}
-
-/* With good CSS support, this can be written: .xform-type-date.xforms-readonly .xforms-showcalendar { ... } */
-.xforms-type-date .xforms-showcalendar-readonly {
-    display: none;
 }
 
 a.xforms-readonly {

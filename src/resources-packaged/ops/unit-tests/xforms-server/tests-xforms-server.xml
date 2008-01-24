@@ -291,6 +291,7 @@
                     </p:input>
                     <p:output name="response" ref="response"/>
                 </p:processor>
+
             </p:config>
         </input>
         <output name="response">
@@ -339,6 +340,7 @@
                                 </nested221>
                             </instance>
                         </instances>
+                        <divs/>
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
@@ -391,7 +393,7 @@
                     <p:input name="document">
                         <xhtml:html>
                             <xhtml:head>
-                                <xforms:model id="main-model" xxforms:state-handling="client">
+                                <xforms:model id="main-model">
                                     <xforms:dispatch ev:event="xforms-ready" name="DOMActivate" target="3"/>
                                     <xforms:instance>
                                         <equation xmlns="">
@@ -460,6 +462,7 @@
                                 </other-instance>
                             </instance>
                         </instances>
+                        <divs/>
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
@@ -569,6 +572,7 @@
                                 </other-instance>
                             </instance>
                         </instances>
+                        <divs/>
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
@@ -588,7 +592,7 @@
                     <p:input name="document">
                         <xhtml:html>
                             <xhtml:head>
-                                <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms" xxforms:state-handling="client">
+                                <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms" >
                                     <xforms:instance>
                                         <form>
                                             <departments>
@@ -668,6 +672,7 @@
                                 </form>
                             </instance>
                         </instances>
+                        <divs/>
                         <repeat-indexes>
                             <repeat-index id="id123" index="1"/>
                             <repeat-index id="id124" index="2"/>
@@ -763,6 +768,7 @@
                                 </form>
                             </instance>
                         </instances>
+                        <divs/>
                         <repeat-indexes>
                             <repeat-index id="id123" index="3"/>
                             <repeat-index id="id124" index="2"/>
@@ -864,6 +870,7 @@
                                 </form>
                             </instance>
                         </instances>
+                        <divs/>
                         <repeat-indexes>
                             <repeat-index id="id123" index="1"/>
                             <repeat-index id="id124" index="1"/>
@@ -947,6 +954,7 @@
                                 </form>
                             </instance>
                         </instances>
+                        <divs/>
                         <repeat-indexes>
                             <repeat-index id="id123" index="3"/>
                             <repeat-index id="id124" index="4"/>
@@ -1022,6 +1030,7 @@
                                 </form>
                             </instance>
                         </instances>
+                        <divs/>
                         <repeat-indexes>
                             <repeat-index id="id123" index="3"/>
                             <repeat-index id="id124" index="2"/>
@@ -1049,7 +1058,7 @@
                     <p:input name="document">
                         <xhtml:html>
                             <xhtml:head>
-                                <xforms:model id="main-model" xxforms:state-handling="client">
+                                <xforms:model id="main-model">
                                     <xforms:instance id="tests">
                                         <instance>
                                             <noFoundData>0</noFoundData>
@@ -1084,6 +1093,7 @@
                                 </instance>
                             </instance>
                         </instances>
+                        <divs/>
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
@@ -1106,7 +1116,7 @@
                     <p:input name="document">
                         <xhtml:html>
                             <xhtml:head>
-                                <xforms:model id="main-model" xxforms:state-handling="client">
+                                <xforms:model id="main-model">
                                     <xforms:instance id="main-instance">
                                         <instance>
                                             <this-is-an-existing-node/>
@@ -1137,6 +1147,7 @@
                                 </instance>
                             </instance>
                         </instances>
+                        <divs/>
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
@@ -1208,6 +1219,7 @@
                                 <!--<date>2005-10-11</date>-->
                             <!--</instance>-->
                         <!--</instances>-->
+                        <!--<divs/>-->
                     <!--</dynamic-state>-->
                 <!--</xxf:dynamic-state>-->
                 <!--<xxf:action>-->
@@ -1277,6 +1289,7 @@
                                 <value>existing value</value>
                             </instance>
                         </instances>
+                        <divs/>
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
@@ -1297,7 +1310,7 @@
                     <p:input name="document">
                         <xhtml:html>
                             <xhtml:head>
-                                <xforms:model id="main-model" xxforms:state-handling="client">
+                                <xforms:model id="main-model">
                                     <xforms:instance>
                                        <instance model-id="main-model">
                                            <r1/>
@@ -1495,6 +1508,7 @@
                                 </instance>
                             </instance>
                         </instances>
+                        <divs/>
                         <repeat-indexes>
                             <repeat-index id="repeat1" index="2"/>
                             <repeat-index id="repeat2" index="1"/>
@@ -1530,7 +1544,7 @@
                     <p:input name="document">
                         <xhtml:html>
                             <xhtml:head>
-                                <xforms:model id="main-model" xxforms:state-handling="client">
+                                <xforms:model id="main-model">
                                     <xforms:instance id="instance">
                                         <e1 gege="gigi1">
                                             <e2>
@@ -1580,6 +1594,7 @@
                                 </e1>
                             </instance>
                         </instances>
+                        <divs/>
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
@@ -1690,6 +1705,7 @@
                                 </employee>
                             </instance>
                         </instances>
+                        <divs/>
                         <repeat-indexes>
                             <repeat-index id="employee-repeat" index="2"/>
                         </repeat-indexes>
@@ -1766,6 +1782,7 @@
                                 </instance>
                             </instance>
                         </instances>
+                        <divs/>
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>

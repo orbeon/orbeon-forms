@@ -30,21 +30,9 @@
                 <xsl:import href="oxf:/config/error.xsl"/>
                 <xsl:template match="/">
                     <error>
-                        <title>
-                            <xsl:variable name="message" select="/exceptions/exception[last()]/message"/>
-                            <xsl:choose>
-                                <!-- This is a bit of a hack to display a nicer "session expired" message (see XFormsStateManager) -->
-                                <xsl:when test="contains($message, 'Your session has expired')">Your session has expired</xsl:when>
-                                <xsl:otherwise>
-                                    <xsl:value-of select="$message"/>
-                                </xsl:otherwise>
-                            </xsl:choose>
-                        </title>
-                        <body>
-                            <xsl:call-template name="format-xforms-error-panel-body">
-                                <xsl:with-param name="exceptions" select="/exceptions/exception"/>
-                            </xsl:call-template>
-                        </body>
+                        <xsl:call-template name="format-xforms-error-panel-body">
+                            <xsl:with-param name="exceptions" select="/exceptions/exception"/>
+                        </xsl:call-template>
                     </error>
                 </xsl:template>
             </xsl:stylesheet>
@@ -60,7 +48,7 @@
                 <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
                 <xsl:import href="oxf:/ops/utils/formatting/formatting.xsl"/>
                 <xsl:output method="html" name="html"/>
-                <xsl:template match="/error/body">
+                <xsl:template match="/error">
                     <xsl:copy>
                         <xsl:variable name="xhtml-body" as="element()" select="*[1]"/>
                         <xsl:variable name="html-body" as="element()">

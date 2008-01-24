@@ -17,7 +17,7 @@
         <p:config>
             <p:param name="result" type="output"/>
 
-            <p:processor name="oxf:xslt-2.0">
+            <p:processor uri="oxf/processor/xslt-2.0">
                 <p:input name="data">
                     <dummy/>
                 </p:input>
@@ -95,7 +95,7 @@
                 <p:output name="data" id="instance"/>
             </p:processor>
 
-            <p:processor name="oxf:identity">
+            <p:processor uri="oxf/processor/identity">
                 <p:input name="data">
 <!--                    <xf:group ref="/form">-->
                         <xf:repeat nodeset="/form/sub-tasks/task[task-id != '' and task-status-code = 'A']" id="subtask-set">
@@ -252,7 +252,7 @@
                 <p:output name="data" id="annotated"/>
             </p:processor>
 
-            <p:processor name="oxf:xslt-2.0">
+            <p:processor uri="oxf/processor/xslt-2.0">
                 <p:input name="data" href="#annotated"/>
                 <p:input name="config">
                     <xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">

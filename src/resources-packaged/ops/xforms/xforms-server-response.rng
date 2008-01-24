@@ -31,245 +31,240 @@
                     <data type="string"/>
                 </element>
             </optional>
-            <optional>
-                <!-- Dynamic state must be sent if there are actions, otherwise content is optional -->
-                <element name="xxforms:dynamic-state">
-                    <data type="string"/>
-                </element>
-                <element name="xxforms:action">
-                    <optional>
-                        <element name="xxforms:control-values">
-                            <zeroOrMore>
-                                <choice>
-                                    <element name="xxforms:control">
-                                        <attribute name="id">
-                                            <data type="string"/>
-                                        </attribute>
-                                        <optional>
-                                            <attribute name="hint"/>
-                                        </optional>
-                                        <optional>
-                                            <attribute name="alert"/>
-                                        </optional>
-                                        <optional>
-                                            <attribute name="label"/>
-                                        </optional>
-                                        <optional>
-                                            <attribute name="help"/>
-                                        </optional>
-                                        <optional>
-                                            <attribute name="mediatype"/>
-                                        </optional>
-                                        <optional>
-                                            <attribute name="state">
-                                                <choice>
-                                                    <value>empty</value>
-                                                    <value>file</value>
-                                                </choice>
-                                            </attribute>
-                                        </optional>
-                                        <optional>
-                                            <attribute name="size">
-                                                <optional>
-                                                    <data type="nonNegativeInteger"/>
-                                                </optional>
-                                            </attribute>
-                                        </optional>
-                                        <optional>
-                                            <attribute name="filename"/>
-                                        </optional>
-                                        <optional>
-                                            <attribute name="display-value"/>
-                                        </optional>
-                                        <ref name="model-item-properties"/>
-                                        <optional>
-                                            <attribute name="static">
-                                                <choice>
-                                                    <value>true</value>
-                                                    <value>false</value>
-                                                </choice>
-                                            </attribute>
-                                        </optional>
-                                        <optional>
-                                            <data type="string"/>
-                                        </optional>
-                                    </element>
-                                    <element name="xxforms:copy-repeat-template">
-                                        <attribute name="id">
-                                            <data type="string"/>
-                                        </attribute>
-                                        <attribute name="parent-indexes">
-                                            <data type="string"/>
-                                        </attribute>
-                                        <attribute name="id-suffix">
-                                            <data type="string"/>
-                                        </attribute>
-                                    </element>
-                                    <element name="xxforms:delete-repeat-elements">
-                                        <attribute name="id">
-                                            <data type="string"/>
-                                        </attribute>
-                                        <attribute name="parent-indexes">
-                                            <data type="string"/>
-                                        </attribute>
-                                        <attribute name="count">
-                                            <data type="positiveInteger"/>
-                                        </attribute>
-                                    </element>
-                                    <element name="xxforms:repeat-iteration">
-                                        <attribute name="id">
-                                            <data type="string"/>
-                                        </attribute>
-                                        <attribute name="iteration">
-                                            <data type="positiveInteger"/>
-                                        </attribute>
-                                        <ref name="model-item-properties"/>
-                                    </element>
-                                </choice>
-                            </zeroOrMore>
-                        </element>
-                    </optional>
-                    <optional>
-                        <element name="xxforms:divs">
-                            <zeroOrMore>
-                                <element name="xxforms:div">
-                                    <attribute name="id"/>
-                                    <attribute name="visibility">
+            <element name="xxforms:dynamic-state">
+                <data type="string"/>
+            </element>
+            <element name="xxforms:action">
+                <element name="xxforms:control-values">
+                    <zeroOrMore>
+                        <choice>
+                            <element name="xxforms:control">
+                                <attribute name="id">
+                                    <data type="string"/>
+                                </attribute>
+                                <optional>
+                                    <attribute name="hint"/>
+                                </optional>
+                                <optional>
+                                    <attribute name="alert"/>
+                                </optional>
+                                <optional>
+                                    <attribute name="label"/>
+                                </optional>
+                                <optional>
+                                    <attribute name="help"/>
+                                </optional>
+                                <optional>
+                                    <attribute name="mediatype"/>
+                                </optional>
+                                <optional>
+                                    <attribute name="state">
                                         <choice>
-                                            <value>hidden</value>
-                                            <value>visible</value>
+                                            <value>empty</value>
+                                            <value>file</value>
                                         </choice>
                                     </attribute>
-                                    <!-- For dialog positioning -->
-                                    <optional>
-                                        <attribute name="neighbor"/>
-                                    </optional>
-                                    <!-- For constraining to viewport -->
-                                    <optional>
-                                        <attribute name="constrain">
-                                            <data type="boolean"/>
-                                        </attribute>
-                                    </optional>
-                                </element>
-                            </zeroOrMore>
-                        </element>
-                    </optional>
-                    <optional>
-                        <element name="xxforms:repeats">
-                            <zeroOrMore>
-                                <element name="xxforms:repeat-index">
-                                    <attribute name="id"/>
-                                    <attribute name="index">
-                                        <data type="nonNegativeInteger"/>
+                                </optional>
+                                <optional>
+                                    <attribute name="size">
+                                        <optional>
+                                            <data type="nonNegativeInteger"/>
+                                        </optional>
                                     </attribute>
-                                </element>
-                            </zeroOrMore>
-                            <zeroOrMore>
-                                <element name="xxforms:repeat-iteration">
-                                    <attribute name="id"/>
-                                    <attribute name="occurs">
-                                        <data type="nonNegativeInteger"/>
+                                </optional>
+                                <optional>
+                                    <attribute name="filename"/>
+                                </optional>
+                                <optional>
+                                    <attribute name="display-value"/>
+                                </optional>
+                                <ref name="model-item-properties"/>
+                                <optional>
+                                    <attribute name="static">
+                                        <choice>
+                                            <value>true</value>
+                                            <value>false</value>
+                                        </choice>
                                     </attribute>
-                                </element>
-                            </zeroOrMore>
-                        </element>
-                    </optional>
-                    <optional>
-                        <element name="xxforms:repeat-indexes">
-                            <zeroOrMore>
-                                <element name="xxforms:repeat-index">
-                                    <attribute name="id"/>
-                                    <attribute name="old-index">
-                                        <data type="nonNegativeInteger"/>
-                                    </attribute>
-                                    <attribute name="new-index">
-                                        <data type="nonNegativeInteger"/>
-                                    </attribute>
-                                </element>
-                            </zeroOrMore>
-                        </element>
-                    </optional>
-                    <optional>
-                        <element name="xxforms:itemsets">
-                            <zeroOrMore>
-                                <element name="xxforms:itemset">
-                                    <attribute name="id"/>
+                                </optional>
+                                <optional>
                                     <data type="string"/>
-                                </element>
-                            </zeroOrMore>
-                        </element>
-                    </optional>
-                    <optional>
-                        <element name="xxforms:server-events">
-                            <data type="string"/>
-                        </element>
-                    </optional>
-                    <optional>
-                        <element name="xxforms:submission">
-                            <attribute name="action"/>
-                            <attribute name="method"/>
-                            <attribute name="replace">
-                                <choice>
-                                    <value>all</value>
-                                    <value>instance</value>
-                                    <value>none</value>
-                                </choice>
-                            </attribute>
-                            <optional>
-                                <attribute name="show-progress">
-                                    <choice>
-                                        <value>true</value>
-                                        <value>false</value>
-                                    </choice>
+                                </optional>
+                            </element>
+                            <element name="xxforms:copy-repeat-template">
+                                <attribute name="id">
+                                    <data type="string"/>
                                 </attribute>
-                            </optional>
-                            <optional>
-                                <attribute name="target"/>
-                            </optional>
-                        </element>
-                    </optional>
-                    <zeroOrMore>
-                        <element name="xxforms:message">
-                            <attribute name="level"/>
-                            <data type="string"/>
-                        </element>
-                    </zeroOrMore>
-                    <zeroOrMore>
-                        <element name="xxforms:load">
-                            <attribute name="resource"/>
-                            <attribute name="show">
-                                <choice>
-                                    <value>replace</value>
-                                    <value>new</value>
-                                </choice>
-                            </attribute>
-                            <optional>
-                                <attribute name="target"/>
-                            </optional>
-                            <optional>
-                                <attribute name="show-progress">
-                                    <choice>
-                                        <value>true</value>
-                                        <value>false</value>
-                                    </choice>
+                                <attribute name="parent-indexes">
+                                    <data type="string"/>
                                 </attribute>
-                            </optional>
-                        </element>
+                                <attribute name="id-suffix">
+                                    <data type="string"/>
+                                </attribute>
+                            </element>
+                            <element name="xxforms:delete-repeat-elements">
+                                <attribute name="id">
+                                    <data type="string"/>
+                                </attribute>
+                                <attribute name="parent-indexes">
+                                    <data type="string"/>
+                                </attribute>
+                                <attribute name="count">
+                                    <data type="positiveInteger"/>
+                                </attribute>
+                            </element>
+                            <element name="xxforms:repeat-iteration">
+                                <attribute name="id">
+                                    <data type="string"/>
+                                </attribute>
+                                <attribute name="iteration">
+                                    <data type="positiveInteger"/>
+                                </attribute>
+                                <ref name="model-item-properties"/>
+                            </element>
+                        </choice>
                     </zeroOrMore>
-                    <zeroOrMore>
-                        <element name="xxforms:script">
-                            <attribute name="name"/>
-                            <attribute name="target-id"/>
-                            <attribute name="observer-id"/>
-                        </element>
-                    </zeroOrMore>
-                    <optional>
-                        <element name="xxforms:setfocus">
-                            <attribute name="control-id"/>
-                        </element>
-                    </optional>
                 </element>
-            </optional>
+                <optional>
+                    <element name="xxforms:divs">
+                        <zeroOrMore>
+                            <element name="xxforms:div">
+                                <attribute name="id"/>
+                                <attribute name="visibility">
+                                    <choice>
+                                        <value>hidden</value>
+                                        <value>visible</value>
+                                    </choice>
+                                </attribute>
+                                <!-- For dialog positioning -->
+                                <optional>
+                                    <attribute name="neighbor"/>
+                                </optional>
+                                <!-- For constraining to viewport -->
+                                <optional>
+                                    <attribute name="constrain">
+                                        <data type="boolean"/>
+                                    </attribute>
+                                </optional>
+                            </element>
+                        </zeroOrMore>
+                    </element>
+                </optional>
+                <optional>
+                    <element name="xxforms:repeats">
+                        <zeroOrMore>
+                            <element name="xxforms:repeat-index">
+                                <attribute name="id"/>
+                                <attribute name="index">
+                                    <data type="nonNegativeInteger"/>
+                                </attribute>
+                            </element>
+                        </zeroOrMore>
+                        <zeroOrMore>
+                            <element name="xxforms:repeat-iteration">
+                                <attribute name="id"/>
+                                <attribute name="occurs">
+                                    <data type="nonNegativeInteger"/>
+                                </attribute>
+                            </element>
+                        </zeroOrMore>
+                    </element>
+                </optional>
+                <optional>
+                    <element name="xxforms:repeat-indexes">
+                        <zeroOrMore>
+                            <element name="xxforms:repeat-index">
+                                <attribute name="id"/>
+                                <attribute name="old-index">
+                                    <data type="nonNegativeInteger"/>
+                                </attribute>
+                                <attribute name="new-index">
+                                    <data type="nonNegativeInteger"/>
+                                </attribute>
+                            </element>
+                        </zeroOrMore>
+                    </element>
+                </optional>
+                <optional>
+                    <element name="xxforms:itemsets">
+                        <zeroOrMore>
+                            <element name="xxforms:itemset">
+                                <attribute name="id"/>
+                                <data type="string"/>
+                            </element>
+                        </zeroOrMore>
+                    </element>
+                </optional>
+                <optional>
+                    <element name="xxforms:server-events">
+                        <data type="string"/>
+                    </element>
+                </optional>
+                <optional>
+                    <element name="xxforms:submission">
+                        <attribute name="action"/>
+                        <attribute name="method"/>
+                        <attribute name="replace">
+                            <choice>
+                                <value>all</value>
+                                <value>instance</value>
+                                <value>none</value>
+                            </choice>
+                        </attribute>
+                        <optional>
+                            <attribute name="show-progress">
+                                <choice>
+                                    <value>true</value>
+                                    <value>false</value>
+                                </choice>
+                            </attribute>
+                        </optional>
+                        <optional>
+                            <attribute name="target"/>
+                        </optional>
+                    </element>
+                </optional>
+                <zeroOrMore>
+                    <element name="xxforms:message">
+                        <attribute name="level"/>
+                        <data type="string"/>
+                    </element>
+                </zeroOrMore>
+                <zeroOrMore>
+                    <element name="xxforms:load">
+                        <attribute name="resource"/>
+                        <attribute name="show">
+                            <choice>
+                                <value>replace</value>
+                                <value>new</value>
+                            </choice>
+                        </attribute>
+                        <optional>
+                            <attribute name="target"/>
+                        </optional>
+                        <optional>
+                            <attribute name="show-progress">
+                                <choice>
+                                    <value>true</value>
+                                    <value>false</value>
+                                </choice>
+                            </attribute>
+                        </optional>
+                    </element>
+                </zeroOrMore>
+                <zeroOrMore>
+                    <element name="xxforms:script">
+                        <attribute name="name"/>
+                        <attribute name="target-id"/>
+                        <attribute name="observer-id"/>
+                    </element>
+                </zeroOrMore>
+                <optional>
+                    <element name="xxforms:setfocus">
+                        <attribute name="control-id"/>
+                    </element>
+                </optional>
+            </element>
         </element>
     </start>
     

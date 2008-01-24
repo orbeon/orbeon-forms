@@ -234,15 +234,17 @@ public class XFormsItemUtils {
 
 //                    mayReuse[0] = false;
 
-                    final String label = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, element.element(XFormsConstants.XFORMS_LABEL_QNAME), false, null);
-                    if (label == null)
+                    final Element labelElement = element.element(XFormsConstants.XFORMS_LABEL_QNAME);
+                    if (labelElement == null)
                         throw new ValidationException("xforms:item must contain an xforms:label element.", select1Control.getLocationData());
+                    final String label = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, labelElement, false, null);
 
-                    final String value = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, element.element(XFormsConstants.XFORMS_VALUE_QNAME), false, null);
-                    if (value == null)
+                    final Element valueElement = element.element(XFormsConstants.XFORMS_VALUE_QNAME);
+                    if (valueElement == null)
                         throw new ValidationException("xforms:item must contain an xforms:value element.", select1Control.getLocationData());
+                    final String value = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, valueElement, false, null);
 
-                    newItems.add(new Item(false, element.attributes(), label, value, hierarchyLevel + 1));// TODO: must filter attributes on element.attributes()
+                    newItems.add(new Item(false, element.attributes(), label != null ? label : "", value != null ? value : "", hierarchyLevel + 1));// TODO: must filter attributes on element.attributes()
 
                 } else if ("itemset".equals(localname)) {
                     // xforms:itemset

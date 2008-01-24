@@ -16,10 +16,7 @@ package org.orbeon.oxf.xforms;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
-import org.orbeon.oxf.cache.Cache;
-import org.orbeon.oxf.cache.ObjectCache;
-import org.orbeon.oxf.cache.InternalCacheKey;
-import org.orbeon.oxf.cache.CacheEntry;
+import org.orbeon.oxf.cache.*;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.xml.TransformerUtils;
@@ -166,9 +163,9 @@ public class XFormsServerSharedInstancesCache {
 
         int count = 0;
         final Cache cache = ObjectCache.instance(XFORMS_SHARED_INSTANCES_CACHE_NAME, XFORMS_SHARED_INSTANCES_CACHE_DEFAULT_SIZE);
-        for (Iterator i = cache.iterateCacheObjects(pipelineContext); i.hasNext(); count++) {
-            final CacheEntry currentEntry = (CacheEntry) i.next();
-            cache.remove(pipelineContext, currentEntry.key);
+        for (Iterator i = cache.iterateCacheKeys(pipelineContext); i.hasNext(); count++) {
+            final CacheKey currentKey = (CacheKey) i.next();
+            cache.remove(pipelineContext, currentKey);
         }
 
         if (XFormsServer.logger.isDebugEnabled())

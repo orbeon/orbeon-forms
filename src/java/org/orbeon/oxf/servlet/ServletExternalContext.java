@@ -596,7 +596,8 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
             if (revalidate) {
                 // Try to force revalidation from the client
                 nativeResponse.setDateHeader("Expires", now);
-                nativeResponse.setHeader("Cache-Control", "must-revalidate");
+                // NOTE: We do not set "must-revalidate" because this seems to cause IE 6/7 to lose form data
+//                nativeResponse.setHeader("Cache-Control", "must-revalidate");
             } else {
                 // Regular expiration strategy. We use the HTTP spec heuristic
                 // to calculate the "Expires" header value (10% of the

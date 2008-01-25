@@ -86,12 +86,16 @@
         <section>
             <title>Basics</title>
             <section>
-                <title>Configuration</title>
+                <title>Configuration and Properties</title>
                 <p>
                     The epilogue pipeline is specified with the <a
                     href="reference-page-flow#epilogue-element"><code>&lt;epilogue&gt;</code> element</a> in your page
                     flow. By default, the <i>standard epilogue</i> located under <code>oxf:/config/epilogue.xpl</code>
                     is used.
+                </p>
+                <p>
+                    The epilogue can be used to configured with a series of <a
+                    href="reference-properties#epilogue">properties</a>.
                 </p>
             </section>
             <section>
@@ -323,9 +327,9 @@
                             </li>
                             <li>
                                 <p>
-                                    <b>Option 2: browser detection with native XHTML output
-                                    option.</b> This option is commented out so that the default is
-                                    just to send plain HTML to the client.
+                                    <b>Option 2: browser detection with native XHTML output option.</b> This option is
+                                    enabled with a <a href="reference-properties#epilogue">property</a> so that the
+                                    default is just to send plain HTML to the client.
                                 </p>
                                 <ol>
                                     <li>
@@ -671,15 +675,15 @@
                     <ul>
                         <li>
                             <p>
-                                <b>xforms.css.</b> These are definitions related to XForms controls. These
-                                definitions may be changed by users if they are not happy with the defaults.
+                                <b>xforms.css.</b> These are definitions related to XForms controls. These definitions
+                                may be overridden by users if they are not happy with the defaults.
                             </p>
                         </li>
                         <li>
                             <p>
-                                <b>xforms-widgets.css.</b> These are definitions related to XForms
-                                pseudo-controls created by the <code>xforms-widgets.xsl</code> stylesheet. These
-                                definitions may be changed by users if they are not happy with the defaults.
+                                <b>xforms-widgets.css.</b> These are definitions related to XForms pseudo-controls
+                                created by the <code>xforms-widgets.xsl</code> stylesheet. These definitions may be
+                                overridden by users if they are not happy with the defaults.
                             </p>
                         </li>
                         <li>
@@ -707,9 +711,9 @@
                 </li>
             </ul>
             <p>
-                You can configure the standard theme at your leisure for your own application. You typically get started
-                by modifying <code>theme-plain.xsl</code> and/or referring to your own stylesheet from the epilogue
-                pipeline.
+                You can configure the theme at your leisure for your own application. You typically get started by
+                copying <code>theme-plain.xsl</code> to a new file and changing the <code>oxf.epilogue.theme</code>
+                property to refer to that file.
             </p>
         </section>
     </body>

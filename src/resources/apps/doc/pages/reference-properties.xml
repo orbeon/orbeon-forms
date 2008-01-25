@@ -78,25 +78,23 @@
             <a name="log4j"/>
             <section>
                 <title>oxf.log4j-config</title>
-                <p>
-                    <table ca="|l|p{0.5\textwidth}|">
-                        <tr>
-                            <th>Purpose</th>
-                            <td>Configures the logging system</td>
-                        </tr>
-                        <tr>
-                            <th>Type</th>
-                            <td>
-                                <code>xs:anyURI</code>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>Default Value</th>
-                            <td>The logging system not initialized with a warning if this property
-                            is not present.</td>
-                        </tr>
-                    </table>
-                </p>
+                <table>
+                    <tr>
+                        <th>Purpose</th>
+                        <td>Configures the logging system</td>
+                    </tr>
+                    <tr>
+                        <th>Type</th>
+                        <td>
+                            <code>xs:anyURI</code>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Default Value</th>
+                        <td>The logging system not initialized with a warning if this property
+                        is not present.</td>
+                    </tr>
+                </table>
                 <p>
                     Orbeon Forms uses the <fork
                     href="http://jakarta.apache.org/log4j/docs/index.html">Log4J</fork> logging
@@ -131,7 +129,7 @@
             <section>
                 <title>oxf.cache.size</title>
                 <p>
-                    <table ca="|l|p{0.5\textwidth}|">
+                    <table>
                         <tr>
                             <th>Purpose</th>
                             <td>Setup the size of the Orbeon Forms cache</td>
@@ -161,7 +159,7 @@
             <section>
                 <title>oxf.validation.processor</title>
                 <p>
-                    <table ca="|l|p{0.5\textwidth}|">
+                    <table>
                         <tr>
                             <th>Purpose</th>
                             <td>Controls the automatic processor validation</td>
@@ -189,7 +187,7 @@
             <section>
                 <title>oxf.validation.user</title>
                 <p>
-                    <table ca="|l|p{0.5\textwidth}|">
+                    <table>
                         <tr>
                             <th>Purpose</th>
                             <td>Controls user-defined validation</td>
@@ -218,7 +216,7 @@
             <section>
                 <title>oxf.prologue</title>
                 <p>
-                    <table ca="|l|p{0.5\textwidth}|">
+                    <table>
                         <tr>
                             <th>Purpose</th>
                             <td>Defines Orbeon Forms processors</td>
@@ -255,7 +253,7 @@
             <section>
                 <title>sax.inspection</title>
                 <p>
-                    <table ca="|l|p{0.5\textwidth}|">
+                    <table>
                         <tr>
                             <th>Purpose</th>
                             <td>Enable inspection SAX events</td>
@@ -298,7 +296,7 @@
             <section>
                 <title>processor.trace</title>
                 <p>
-                    <table ca="|l|p{0.5\textwidth}|">
+                    <table>
                         <tr>
                             <th>Purpose</th>
                             <td>
@@ -336,7 +334,7 @@
             <section>
                 <title>processor.trace.host</title>
                 <p>
-                    <table ca="|l|p{0.5\textwidth}|">
+                    <table>
                         <tr>
                             <th>Purpose</th>
                             <td>
@@ -359,7 +357,7 @@
             <section>
                 <title>processor.trace.port</title>
                 <p>
-                    <table ca="|l|p{0.5\textwidth}|">
+                    <table>
                         <tr>
                             <th>Purpose</th>
                             <td>
@@ -380,6 +378,105 @@
                 </p>
             </section>
         </section>
+        <a name="epilogue"/>
+        <section>
+            <title>Epilogue Properties</title>
+            <section>
+                <title>oxf.epilogue.theme</title>
+                <table>
+                    <tr>
+                        <th>Name</th>
+                        <td><code>oxf.epilogue.theme</code></td>
+                    </tr>
+                    <tr>
+                        <th>Purpose</th>
+                        <td>Specifies the theme stylesheet</td>
+                    </tr>
+                    <tr>
+                        <th>Type</th>
+                        <td>
+                            <code>xs:anyURI</code>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Default Value</th>
+                        <td><code>oxf:/config/theme-examples.xsl</code></td>
+                    </tr>
+                </table>
+            </section>
+            <section>
+                <title>oxf.epilogue.output-xhtml</title>
+                <table>
+                    <tr>
+                        <th>Name</th>
+                        <td><code>oxf.epilogue.output-xhtml</code></td>
+                    </tr>
+                    <tr>
+                        <th>Purpose</th>
+                        <td>Whether to output XHTML to the browser or not</td>
+                    </tr>
+                    <tr>
+                        <th>Type</th>
+                        <td>
+                            <code>xs:boolean</code>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Default Value</th>
+                        <td><code>false</code></td>
+                    </tr>
+                </table>
+            </section>
+            <section>
+                <title>oxf.epilogue.renderer-rewrite</title>
+                <table>
+                    <tr>
+                        <th>Name</th>
+                        <td><code>oxf.epilogue.renderer-rewrite</code></td>
+                    </tr>
+                    <tr>
+                        <th>Purpose</th>
+                        <td>
+                            Whether the XForms renderer used in <a href="reference-xforms-java">separate deployment</a>
+                            must rewrite URLs
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Type</th>
+                        <td>
+                            <code>xs:boolean</code>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Default Value</th>
+                        <td><code>false</code></td>
+                    </tr>
+                </table>
+            </section>
+            <section>
+                <title>oxf.epilogue.process-svg</title>
+                <table>
+                    <tr>
+                        <th>Name</th>
+                        <td><code>oxf.epilogue.process-svg</code></td>
+                    </tr>
+                    <tr>
+                        <th>Purpose</th>
+                        <td>Whether SVG content must be converted server-side to images</td>
+                    </tr>
+                    <tr>
+                        <th>Type</th>
+                        <td>
+                            <code>xs:boolean</code>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Default Value</th>
+                        <td><code>true</code></td>
+                    </tr>
+                </table>
+            </section>
+        </section>
         <a name="java-processor"/>
         <section>
             <title>Java Processor Properties</title>
@@ -387,7 +484,7 @@
             <section>
                 <title>Class Path</title>
                 <p>
-                    <table ca="|l|p{0.5\textwidth}|">
+                    <table>
                         <tr>
                             <th>Name</th>
                             <td><code>classpath</code></td>
@@ -420,7 +517,7 @@
             <section>
                 <title>JAR Path</title>
                 <p>
-                    <table ca="|l|p{0.5\textwidth}|">
+                    <table>
                         <tr>
                             <th>Name</th>
                             <td><code>jarpath</code></td>
@@ -455,7 +552,7 @@
             <section>
                 <title>Compiler JAR</title>
                 <p>
-                    <table ca="|l|p{0.5\textwidth}|">
+                    <table>
                         <tr>
                             <th>Name</th>
                             <td><code>compiler-jar</code></td>
@@ -499,7 +596,7 @@
             <section>
                 <title>Compiler Main Class</title>
                 <p>
-                    <table ca="|l|p{0.5\textwidth}|">
+                    <table>
                         <tr>
                             <th>Name</th>
                             <td><code>compiler-class</code></td>
@@ -542,7 +639,7 @@
                     being part of the processor configuration:
                 </p>
                 <p>
-                    <table ca="|l|p{0.5\textwidth}|">
+                    <table>
                         <tr>
                             <th>Name</th>
                             <td><code>smtp-host</code></td>
@@ -575,7 +672,7 @@
             <section>
                 <title>Test SMTP host</title>
                 <p>
-                    <table ca="|l|p{0.5\textwidth}|">
+                    <table>
                         <tr>
                             <th>Name</th>
                             <td><code>test-smtp-host</code></td>
@@ -612,7 +709,7 @@
             <section>
                 <title>Test Recipient</title>
                 <p>
-                    <table ca="|l|p{0.5\textwidth}|">
+                    <table>
                         <tr>
                             <th>Name</th>
                             <td><code>test-to</code></td>

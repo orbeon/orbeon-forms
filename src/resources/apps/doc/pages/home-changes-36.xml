@@ -62,6 +62,13 @@
                             or "application".
                         </p>
                     </li>
+                    <li>
+                        <p>
+                            <b>The epilogue pipeline is configurable with properties.</b> The epilogue pipeline is now
+                            configurable with <a href="reference-properties#epilogue">properties</a>. Those in
+                            particular allow you to pick the theme stylesheet, enable XHTML output, etc.
+                        </p>
+                    </li>
                 </ul>
             </section>
             <section>

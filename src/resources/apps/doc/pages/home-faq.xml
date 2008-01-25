@@ -250,16 +250,15 @@
                     <li>
                         <p>
                             To subscribe, send an email to: <a
-                            href="mailto:ops-users-subscribe@objectweb.org">ops-users-subscribe@objectweb.org</a>. You
+                            href="mailto:ops-users-subscribe@ow2.org">ops-users-subscribe@ow2.org</a>. You
                             can leave the subject and body of your email empty.
                         </p>
                     </li>
                     <li>
                         <p>
-                            You will receive a message from sympa@objectweb.org, asking you to confirm that you want to
-                            subscribe to the list. Confirm by following the instructions in that message. If you don't
-                            receive this message in an hour or so, you might want to check if it went to your spam
-                            folder.
+                            You will receive a message asking you to confirm that you want to subscribe to the list.
+                            Confirm by following the instructions in that message. If you don't receive this message in
+                            an hour or so, you might want to check if it went to your spam folder.
                         </p>
                     </li>
                     <li>
@@ -268,6 +267,13 @@
                             receive 10 to 30 messages a day, so you might want to setup your mail client to
                             automatically move those messages in a particular folder, so they don't all show up in your
                             inbox.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            To unsubscribe, send an email to: <a
+                            href="mailto:ops-users-unsubscribe@ow2.org">ops-users-unsubscribe@ow2.org</a> from the email
+                            address you used to subscribe. You can leave the subject and body of your email empty.
                         </p>
                     </li>
                 </ol>

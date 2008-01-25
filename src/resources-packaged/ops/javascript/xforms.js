@@ -1812,7 +1812,9 @@ ORBEON.xforms.Init = {
         // A heartbeat event - An AJAX request for letting server know that "I'm still alive"
         if (ORBEON.util.Utils.getProperty(SESSION_HEARTBEAT_PROPERTY)) {
             var heartBeatDelay = ORBEON.util.Utils.getProperty(SESSION_HEARTBEAT_DELAY_PROPERTY);
-            window.setInterval(function() { ORBEON.xforms.Events.sendHeartBeatIfNeeded(heartBeatDelay); }, heartBeatDelay / 10); // say session is 30 mn, heartbeat must come after 24 mn, we check every 2.4 mn so we should
+            if (heartBeatDelay > 0) {
+                window.setInterval(function() { ORBEON.xforms.Events.sendHeartBeatIfNeeded(heartBeatDelay); }, heartBeatDelay / 10); // say session is 30 mn, heartbeat must come after 24 mn, we check every 2.4 mn so we should
+            }
         }
 
         // Initialize special controls

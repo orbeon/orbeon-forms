@@ -37,7 +37,7 @@
 <!--        </output>-->
 <!--    </test>-->
 
-    <test description="Empty output, loop simulation, multiple pipelines with same config but different data" name="oxf:pipeline">
+    <test description="Empty output, loop simulation, multiple pipelines with same config but different data" name="oxf:pipeline" only="true">
         <input name="numbers">
             <numbers>
                 <number>42</number>

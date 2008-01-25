@@ -123,8 +123,11 @@ public class XFormsStaticState {
         // Handle properties
         for (Iterator i = rootElement.attributeIterator(); i.hasNext();) {
             final Attribute currentAttribute = (Attribute) i.next();
-            if (XFormsConstants.XXFORMS_NAMESPACE_URI.equals(currentAttribute.getNamespaceURI()))
-                nonDefaultProperties.put(currentAttribute.getName(), currentAttribute.getValue());
+            if (XFormsConstants.XXFORMS_NAMESPACE_URI.equals(currentAttribute.getNamespaceURI())) {
+
+                final Object propertyValue = XFormsProperties.parseProperty(currentAttribute.getName(), currentAttribute.getValue());
+                nonDefaultProperties.put(currentAttribute.getName(), propertyValue);
+            }
         }
 
         // Handle default for properties
@@ -134,11 +137,11 @@ public class XFormsStaticState {
             final String propertyName = (String) currentEntry.getKey();
             final XFormsProperties.PropertyDefinition propertyDefinition = (XFormsProperties.PropertyDefinition) currentEntry.getValue();
 
-            final String defaultPropertyValue = propertyDefinition.getDefaultValue().toString(); // value can be String, Boolean, Integer
-            final String propertyValue = (String) nonDefaultProperties.get(propertyName);
-            if (propertyValue == null) {
+            final Object defaultPropertyValue = propertyDefinition.getDefaultValue(); // value can be String, Boolean, Integer
+            final Object actualPropertyValue = nonDefaultProperties.get(propertyName); // value can be String, Boolean, Integer
+            if (actualPropertyValue == null) {
                 // Property not defined in the document, try to obtain from global properties
-                final String globalPropertyValue = propertySet.getObject(XFormsProperties.XFORMS_PROPERTY_PREFIX + propertyName, defaultPropertyValue).toString();
+                final Object globalPropertyValue = propertySet.getObject(XFormsProperties.XFORMS_PROPERTY_PREFIX + propertyName, defaultPropertyValue);
 
                 // If the global property is different from the default, add it
                 if (!globalPropertyValue.equals(defaultPropertyValue))
@@ -148,7 +151,7 @@ public class XFormsStaticState {
                 // Property defined in the document
 
                 // If the property is identical to the deault, remove it
-                if (propertyValue.equals(defaultPropertyValue))
+                if (actualPropertyValue.equals(defaultPropertyValue))
                     nonDefaultProperties.remove(propertyName);
             }
         }
@@ -317,9 +320,9 @@ public class XFormsStaticState {
     }
 
     public boolean getBooleanProperty(String propertyName) {
-        final String documentProperty = (String) nonDefaultProperties.get(propertyName);
+        final Boolean documentProperty = (Boolean) nonDefaultProperties.get(propertyName);
         if (documentProperty != null)
-            return new Boolean(documentProperty).booleanValue();
+            return documentProperty.booleanValue();
         else
             return ((Boolean) (XFormsProperties.getPropertyDefinition(propertyName)).getDefaultValue()).booleanValue();
     }

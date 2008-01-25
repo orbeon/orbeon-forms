@@ -185,8 +185,10 @@ public class XHTMLHeadHandler extends HandlerBase {
                     {
                         // Heartbeat delay
                         {
+                            final XFormsProperties.PropertyDefinition propertyDefinition = XFormsProperties.getPropertyDefinition(XFormsProperties.SESSION_HEARTBEAT_DELAY_PROPERTY);
                             final long heartbeatDelay = XFormsStateManager.getHeartbeatDelay(containingDocument, externalContext);
-                            dynamicProperties.put(XFormsProperties.SESSION_HEARTBEAT_DELAY_PROPERTY, Long.toString(heartbeatDelay));
+                            if (heartbeatDelay != ((Number) propertyDefinition.getDefaultValue()).longValue())
+                                dynamicProperties.put(XFormsProperties.SESSION_HEARTBEAT_DELAY_PROPERTY, new Long(heartbeatDelay));
                         }
 
                         // Produce JavaScript paths for use on the client
@@ -220,7 +222,7 @@ public class XHTMLHeadHandler extends HandlerBase {
                     for (Iterator i = clientPropertiesMap.entrySet().iterator(); i.hasNext();) {
                         final Map.Entry currentEntry = (Map.Entry) i.next();
                         final String propertyName = (String) currentEntry.getKey();
-                        final String propertyValue = (String) currentEntry.getValue();
+                        final Object propertyValue = currentEntry.getValue();
 
                         final XFormsProperties.PropertyDefinition propertyDefinition = XFormsProperties.getPropertyDefinition(propertyName);
                         if (propertyDefinition.isPropagateToClient()) {
@@ -237,9 +239,16 @@ public class XHTMLHeadHandler extends HandlerBase {
 
                             sb.append('\"');
                             sb.append(propertyName);
-                            sb.append("\":\"");
-                            sb.append(propertyValue);
-                            sb.append('\"');
+                            sb.append("\":");
+                            if (propertyValue instanceof String) {
+                                // This is a string, add quotes
+                                sb.append('\"');
+                                sb.append(propertyValue.toString());
+                                sb.append('\"');
+                            } else {
+                                // Don't need quotes
+                                sb.append(propertyValue.toString());
+                            }
                         }
                     }
 

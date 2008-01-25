@@ -114,6 +114,16 @@ public class XFormsProperties {
         public boolean isPropagateToClient() {
             return isPropagateToClient;
         }
+
+        public Object parseProperty(String value) {
+            if (getDefaultValue() instanceof Integer) {
+                return new Integer(value);
+            } else if (getDefaultValue() instanceof Boolean) {
+                return new Boolean(value);
+            } else {
+                return value;
+            }
+        }
     }
 
     private static final PropertyDefinition[] SUPPORTED_DOCUMENT_PROPERTIES_DEFAULTS = {
@@ -224,6 +234,11 @@ public class XFormsProperties {
      */
     public static Iterator getPropertyDefinitionEntryIterator() {
         return SUPPORTED_DOCUMENT_PROPERTIES.entrySet().iterator();
+    }
+
+    public  static Object parseProperty(String propertyName, String propertyValue) {
+        final PropertyDefinition propertyDefinition = getPropertyDefinition(propertyName);
+        return propertyDefinition.parseProperty(propertyValue);
     }
 
     public static String getXFormsPassword() {

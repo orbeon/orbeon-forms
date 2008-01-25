@@ -10,7 +10,6 @@
     </db-connection>
     <indexer caseSensitive="yes" index-depth="5" preserve-whitespace-mixed-content="no" stemming="no" suppress-whitespace="both"
              tokenizer="org.exist.storage.analysis.SimpleTokenizer" track-term-freq="yes" validation="auto">
-
         <stopwords file="stopword"/>
         <index>
             <fulltext attributes="true" default="all">
@@ -20,7 +19,6 @@
         <entity-resolver>
         </entity-resolver>
     </indexer>
-
     <serializer add-exist-id="none" compress-output="no" enable-xinclude="yes" enable-xsl="no" indent="yes" match-tagging-attributes="no"
                 match-tagging-elements="yes"/>
     <transformer class="org.apache.xalan.processor.TransformerFactoryImpl"/>
@@ -31,7 +29,6 @@
             <module class="org.exist.xquery.functions.xmldb.XMLDBModule" uri="http://exist-db.org/xquery/xmldb"/>
             <module class="org.exist.xquery.functions.request.RequestModule" uri="http://exist-db.org/xquery/request"/>
             <module class="org.exist.xquery.functions.response.ResponseModule" uri="http://exist-db.org/xquery/response"/>
-
             <module class="org.exist.xquery.functions.session.SessionModule" uri="http://exist-db.org/xquery/session"/>
             <module class="org.exist.xquery.functions.text.TextModule" uri="http://exist-db.org/xquery/text"/>
             <module class="org.exist.xquery.modules.example.ExampleModule" uri="http://exist-db.org/xquery/examples"/>
@@ -41,4 +38,3 @@
     </xquery>
     <xupdate allowed-fragmentation="5" enable-consistency-checks="no" growth-factor="20"/>
 </exist>
-

@@ -248,22 +248,35 @@ public class XFormsResourceServer extends ProcessorImpl {
                         }
 
                         // Get URL
-                        final String url;
+                        String uriString;
                         {
                             final int closingIndex = content.indexOf(")", newIndex + 4);
                             if (closingIndex == -1)
                                 throw new OXFException("Missing closing parenthesis in url() in resource: " + resourceConfig.getResourcePath(minimal));
 
-                            url = content.substring(newIndex + 4, closingIndex);
+                            uriString = content.substring(newIndex + 4, closingIndex);
+
+                            // Some URLs seem to start and end with quotes
+                            if (uriString.startsWith("\""))
+                                uriString = uriString.substring(1);
+
+                            if (uriString.endsWith("\""))
+                                uriString = uriString.substring(0, uriString.length() - 1);
+
                             index = closingIndex + 1;
                         }
                         // Rewrite URL and output it as an absolute path
-                        final URI resolvedResourceURI = unresolvedResourceURI.resolve(url.trim());
+                        try {
+                            final URI resolvedResourceURI = unresolvedResourceURI.resolve(uriString.trim());
 
-                        final String rewrittenURI = URLRewriter.rewriteResourceURL(externalContext.getRequest(),
-                                externalContext.getResponse(), resolvedResourceURI.toString(), matchAllPathMatcher);
+                            final String rewrittenURI = URLRewriter.rewriteResourceURL(externalContext.getRequest(),
+                                    externalContext.getResponse(), resolvedResourceURI.toString(), matchAllPathMatcher);
 
-                        outputWriter.write("url(" + rewrittenURI + ")");
+                            outputWriter.write("url(" + rewrittenURI + ")");
+                        } catch (Exception e) {
+                            XFormsServer.logger.warn("XForms resources - found invalid URI in CSS file: " + uriString);
+                            outputWriter.write("url(" + uriString + ")");
+                        }
                     }
                 }
             }

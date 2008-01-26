@@ -77,8 +77,8 @@
     <!-- Search -->
     <page path-info="/fr/service/search/([^/]+)/([^/]+)/([^/]+)" matcher="oxf:perl5-matcher"
           view="persistence/${1}/search.xpl">
-        <setvalue ref="/*/app" matcher-group="1"/>
-        <setvalue ref="/*/form" matcher-group="2"/>
+        <setvalue ref="/*/app" matcher-group="2"/>
+        <setvalue ref="/*/form" matcher-group="3"/>
         <!--<setvalue ref="/*/query" parameter="query"/>-->
         <!--<setvalue ref="/*/page-size" parameter="page-size"/>-->
         <!--<setvalue ref="/*/page-number" parameter="page-number"/>-->

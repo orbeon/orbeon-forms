@@ -25,7 +25,7 @@
     <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
 
     <xsl:template match="xxforms:view">
-        <xforms:input ref="instance('sections')/@current" id="current" class="xforms-disabled"/>
+        <xforms:input model="fr-sections-model" ref="instance('fr-sections-instance')/@current" id="fr-current-section-input" class="xforms-disabled"/>
 
         <xhtml:img id="top" src="/apps/fr/style/top.png" alt=""/>
 
@@ -81,7 +81,7 @@
                         <xforms:group>
                             <xforms:action ev:event="DOMActivate">
                                 <xforms:setvalue ref="instance('fr-sections-instance')/@current" value="xxforms:context()/local-name()"/>
-                                <xforms:dispatch target="fr-sections-model" name="collapse-expand" />
+                                <xforms:dispatch target="fr-sections-model" name="fr-collapse-expand" />
                             </xforms:action>
                             <xforms:group ref="if (@open = 'true') then . else ()">
                                 <xforms:trigger appearance="minimal">
@@ -156,21 +156,25 @@
                 <!-- at="index('{@id}')" position="after" -->
             </xforms:group>
             <xforms:repeat nodeset="{@nodeset}" id="{@id}">
-                <xhtml:tr>
-                    <xhtml:td>
-                        <xforms:output value="count(preceding-sibling::{$tokenized-path[last()]}) + 1"/>
-                    </xhtml:td>
-                    <xhtml:td>
-                        <xforms:group>
-                            <xforms:trigger appearance="minimal" ref=".[count(../{@nodeset}) gt {$min-occurs}]">
-                                <xforms:label><xhtml:img src="../../../../apps/fr/style/remove.gif"/></xforms:label>
-                            </xforms:trigger>
-                            <xforms:delete ev:event="DOMActivate" nodeset="."/>
-                        </xforms:group>
-                    </xhtml:td>
-                    <xsl:apply-templates select="xhtml:tr[1]/xhtml:td"/>
-                </xhtml:tr>
-                <xsl:apply-templates select="xhtml:tr except xhtml:tr[1] | xhtml:td" mode="prepend-td"/>
+                <xhtml:tbody>
+                    <xhtml:tr>
+                        <xhtml:td>
+                            <xforms:output value="count(preceding-sibling::{$tokenized-path[last()]}) + 1"/>
+                        </xhtml:td>
+                        <xhtml:td>
+                            <xforms:group>
+                                <xforms:trigger appearance="minimal" ref=".[count(../{@nodeset}) gt {$min-occurs}]">
+                                    <xforms:label><xhtml:img src="../../../../apps/fr/style/remove.gif"/></xforms:label>
+                                </xforms:trigger>
+                                <xforms:delete ev:event="DOMActivate" nodeset="."/>
+                            </xforms:group>
+                        </xhtml:td>
+                        <xsl:apply-templates select="xhtml:tr[1]/xhtml:td"/>
+                    </xhtml:tr>
+                </xhtml:tbody>
+                <xhtml:tbody>
+                    <xsl:apply-templates select="xhtml:tr except xhtml:tr[1] | xhtml:td" mode="prepend-td"/>
+                </xhtml:tbody>
             </xforms:repeat>
         </xhtml:table>
     </xsl:template>
@@ -181,36 +185,30 @@
             <xsl:apply-templates select="@*|node()"/>
         </xsl:copy>
 
-        <xforms:model id="fr-sections-model" xxforms:external-events="after-collapse">
+        <xforms:model id="fr-sections-model" xxforms:external-events="fr-after-collapse">
             <xforms:instance id="fr-sections-instance">
-                <sections current="" xmlns="">
+                <sections current="{(//xxforms:section)[1]/@id}" xmlns="">
                     <xsl:for-each select="//xxforms:section">
                         <xsl:element name="{@id}" namespace="">
                             <xsl:attribute name="open">true</xsl:attribute>
                         </xsl:element>
                     </xsl:for-each>
-                    <!--<meeting-information open="true" label="Meeting Information"/>-->
-                    <!--<attendees open="true" label="Attendees"/>-->
-                    <!--<regrets open="true" label="Regrets"/>-->
-                    <!--<agenda open="true" label="Agenda"/>-->
-                    <!--<documents open="true" label="Documents"/>-->
-                    <!--<actions open="true" label="Actions"/>-->
                 </sections>
             </xforms:instance>
 
             <!-- Handle section collapse -->
-            <xforms:action ev:event="after-collapse">
+            <xforms:action ev:event="fr-after-collapse">
                 <xforms:setvalue ref="saxon:evaluate(concat('instance(''fr-sections-instance'')/', instance('fr-sections-instance')/@current, '/@open'))">false</xforms:setvalue>
             </xforms:action>
-            <xforms:action ev:event="collapse-expand">
+            <xforms:action ev:event="fr-collapse-expand">
                 <!-- Close section -->
                 <xforms:action if="saxon:evaluate(concat('instance(''fr-sections-instance'')/', instance('fr-sections-instance')/@current, '/@open')) = 'true'">
-                    <xxforms:script>document.body.blur(); collapse();</xxforms:script>
+                    <xxforms:script>document.body.blur(); frCollapse();</xxforms:script>
                 </xforms:action>
                 <!-- Open section -->
                 <xforms:action if="saxon:evaluate(concat('instance(''fr-sections-instance'')/', instance('fr-sections-instance')/@current, '/@open')) = 'false'">
                     <xforms:setvalue ref="saxon:evaluate(concat('instance(''fr-sections-instance'')/', instance('fr-sections-instance')/@current, '/@open'))">true</xforms:setvalue>
-                    <xxforms:script>document.body.blur(); expand();</xxforms:script>
+                    <xxforms:script>document.body.blur(); frExpand();</xxforms:script>
                 </xforms:action>
             </xforms:action>
         </xforms:model>
@@ -226,6 +224,7 @@
 
     <xsl:template match="xhtml:tr" mode="prepend-td">
         <xsl:copy>
+            <xsl:copy-of select="@*"/>
             <xhtml:td/>
             <xhtml:td/>
             <xsl:apply-templates/>

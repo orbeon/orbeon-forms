@@ -207,6 +207,19 @@ textarea {
 .orbeon-message-validation-error { color: orange }
 .orbeon-message-fatal-error { color: red }
 
+.orbeon-repeat-table {
+    background-color:#F5FAF7;
+    border:1px solid #D5E0D9;
+    margin:0 0 1em;
+    width: 100%;
+}
+.orbeon-repeat-table .orbeon-repeat-table {
+    background-color:#AECCBA;
+    border:1px solid #D5E0D9;
+    margin:0 0 1em;
+    width: 100%;
+}
+.orbeon-repeat-table td { vertical-align: top }
 
 .tabular, .tabular tr td, .tabular tr th {
     border-color: #600;

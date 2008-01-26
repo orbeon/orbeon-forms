@@ -13,17 +13,17 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <xhtml:script type="text/javascript" xmlns:xhtml="http://www.w3.org/1999/xhtml">
-    function collapse() {
+    function frCollapse() {
         // Get current element
-        var element = ORBEON.util.Dom.getElementById(ORBEON.xforms.Document.getValue("current"));
+        var element = ORBEON.util.Dom.getElementById("section-" + ORBEON.xforms.Document.getValue("fr-current-section-input"));
         var anim = new YAHOO.util.Anim(element.id, { height: { to: 0 } }, 0.2);
-        anim.onComplete.subscribe(function() { ORBEON.xforms.Document.dispatchEvent("fr-sections-model", "after-collapse"); });
+        anim.onComplete.subscribe(function() { ORBEON.xforms.Document.dispatchEvent("fr-sections-model", "fr-after-collapse"); });
         anim.animate();
     }
 
-    function expand() {
+    function frExpand() {
         // Get current element
-        var element = ORBEON.util.Dom.getElementById(ORBEON.xforms.Document.getValue("current"));
+        var element = ORBEON.util.Dom.getElementById("section-" + ORBEON.xforms.Document.getValue("fr-current-section-input"));
         // Remove height style if we have one
         element.style.height = "auto";
         // Figure out what its natural height is

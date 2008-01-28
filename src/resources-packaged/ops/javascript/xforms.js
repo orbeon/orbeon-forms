@@ -221,8 +221,8 @@ ORBEON.util.IEDom = {
     /**
      * Orbeon version of getting Elements by Name in IE
      */
-    getElementsByName: function(element,localName,namespace) {
-        return element.getElementsByTagName(namespace+":"+localName);
+    getElementsByName: function(element, localName, namespace) {
+        return element.getElementsByTagName(namespace + ":" + localName);
     }
 };
 
@@ -292,7 +292,7 @@ ORBEON.util.MozDom = {
      * been fixed in Firefox 3. See https://bugzilla.mozilla.org/show_bug.cgi?id=206053
      */
     getElementsByName: function(element, localName, namespace) {
-        return element.getElementsByTagName((ORBEON.xforms.Globals.isFF3? namespace +":" : "") +localName);
+        return element.getElementsByTagName((ORBEON.xforms.Globals.isFF3 && namespace != null ? namespace + ":" : "") + localName);
     }
 };
 
@@ -1679,7 +1679,7 @@ ORBEON.xforms.Events = {
      */
     sendHeartBeatIfNeeded: function(heartBeatDelay) {
         var currentTime = new Date().getTime();
-        if((currentTime - ORBEON.xforms.Globals.lastEventSentTime) >= heartBeatDelay ) {
+        if ((currentTime - ORBEON.xforms.Globals.lastEventSentTime) >= heartBeatDelay ) {
             var heartBeatDiv = ORBEON.util.Dom.getElementById("xforms-heartbeat");
             if (heartBeatDiv == null) {
                 var form;

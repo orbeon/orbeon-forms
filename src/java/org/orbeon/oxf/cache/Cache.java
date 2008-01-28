@@ -26,6 +26,7 @@ public interface Cache {
     public String getCacheName();
     public void add(PipelineContext pipelineContext, CacheKey key, Object validity, Object object);
     public void remove(PipelineContext pipelineContext, CacheKey key);
+    public int removeAll(PipelineContext pipelineContext);
     public Object findValid(PipelineContext pipelineContext, CacheKey key, Object validity);
     public Iterator iterateCacheKeys(PipelineContext pipelineContext);
     public Iterator iterateCacheObjects(PipelineContext pipelineContext);

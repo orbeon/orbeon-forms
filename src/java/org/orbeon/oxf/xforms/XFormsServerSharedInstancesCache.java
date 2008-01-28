@@ -160,13 +160,8 @@ public class XFormsServerSharedInstancesCache {
     }
 
     public synchronized void removeAll(PipelineContext pipelineContext) {
-
-        int count = 0;
         final Cache cache = ObjectCache.instance(XFORMS_SHARED_INSTANCES_CACHE_NAME, XFORMS_SHARED_INSTANCES_CACHE_DEFAULT_SIZE);
-        for (Iterator i = cache.iterateCacheKeys(pipelineContext); i.hasNext(); count++) {
-            final CacheKey currentKey = (CacheKey) i.next();
-            cache.remove(pipelineContext, currentKey);
-        }
+        final int count = cache.removeAll(pipelineContext);
 
         if (XFormsServer.logger.isDebugEnabled())
             XFormsServer.logger.debug("XForms - removed " + count + "application shared instances");

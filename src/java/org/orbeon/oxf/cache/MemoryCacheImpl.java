@@ -111,6 +111,14 @@ public class MemoryCacheImpl implements Cache {
         }
     }
 
+    public synchronized int removeAll(PipelineContext pipelineContext) {
+        final int previousSize = currentSize;
+        keyToEntryMap = new HashMap();
+        linkedList = new CacheLinkedList();
+        currentSize = 0;
+        return previousSize;
+    }
+
     public synchronized Object findValid(PipelineContext pipelineContext, CacheKey key, Object validity) {
 
         CacheEntry entry = (CacheEntry) keyToEntryMap.get(key);

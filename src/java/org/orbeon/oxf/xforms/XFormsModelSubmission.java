@@ -855,6 +855,14 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                             } else {
                                 // There is no body, notify that processing is terminated
+
+                                if (isReplaceInstance) {
+                                    // XForms 1.1 says it is fine not to have a body, but in most cases you will want
+                                    // to know that no instance replacement took place
+                                    XFormsServer.logger.warn("XForms - submission - instance replacement did not take place upon successful response because no body was provided. Submission: "
+                                            + getEffectiveId());
+                                }
+
                                 submitDone = true;
                             }
                         } else if (connectionResult.resultCode == 302 || connectionResult.resultCode == 301) {

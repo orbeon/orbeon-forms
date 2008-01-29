@@ -52,38 +52,37 @@
         <!-- XHTML detection. Apply the theme, rewrite URLs, and serialize to HTML or XHTML. -->
         <p:when test="/xhtml:html">
             <!-- Apply theme and perform URL rewriting -->
+
+            <!-- Pick theme -->
             <p:choose href="#request">
                 <p:when test="starts-with(/request/request-path, '/doc/')
                               or starts-with(/request/request-path, '/fb/')
                               or starts-with(/request/request-path, '/fr/')
-                              or (p:property('oxf.epilogue.renderer-rewrite') = 'true' and starts-with(/request/request-path, '/xforms-renderer'))
+                              or starts-with(/request/request-path, '/xforms-renderer')
                               or /request/parameters/parameter[name = 'orbeon-theme']/value = 'plain'">
-                    <!-- Plain theme and regular URL rewriting -->
-                    <p:processor name="oxf:unsafe-xslt">
-                        <p:input name="data" href="#xformed-data"/>
-                        <p:input name="request" href="#request"/>
-                        <p:input name="config" href="theme-plain.xsl"/>
-                        <p:output name="data" id="themed-data"/>
-                    </p:processor>
-                    <!-- Rewrite all URLs in HTML and XHTML documents -->
-                    <p:processor name="oxf:xhtml-rewrite">
-                        <p:input name="rewrite-in" href="#themed-data"/>
-                        <p:output name="rewrite-out" id="rewritten-data"/>
-                    </p:processor>
-                </p:when>
-                <p:when test="starts-with(/request/request-path, '/xforms-renderer')">
-                    <!-- Plain theme and no URL rewriting -->
-                    <p:processor name="oxf:unsafe-xslt">
-                        <p:input name="data" href="#xformed-data"/>
-                        <p:input name="request" href="#request"/>
-                        <p:input name="config" href="theme-plain.xsl"/>
-                        <p:output name="data" id="rewritten-data"/>
+                    <!-- Plain theme -->
+                    <p:processor name="oxf:identity">
+                        <p:input name="data">
+                            <config>oxf:/config/theme-plain.xsl</config>
+                        </p:input>
+                        <p:output name="data" id="theme-config"/>
                     </p:processor>
                 </p:when>
                 <p:otherwise>
-                    <!-- Default case: use configured theme and does URL rewriting -->
+                    <!-- Get theme from property -->
+                    <p:processor name="oxf:identity">
+                        <p:input name="data" href="aggregate('config', #request#xpointer(p:property('oxf.epilogue.theme')))"/>
+                        <p:output name="data" id="theme-config"/>
+                    </p:processor>
+                </p:otherwise>
+            </p:choose>
+
+            <!-- Apply theme if needed -->
+            <p:choose href="#request"><!-- dummy test input -->
+                <p:when test="not(p:property('oxf.epilogue.use-theme') = 'false')">
+                    <!-- Theme -->
                     <p:processor name="oxf:url-generator">
-                        <p:input name="config" href="aggregate('config', #request#xpointer(p:property('oxf.epilogue.theme')))"/>
+                        <p:input name="config" href="#theme-config"/>
                         <p:output name="data" id="theme"/>
                     </p:processor>
                     <p:processor name="oxf:unsafe-xslt">
@@ -92,10 +91,30 @@
                         <p:input name="config" href="#theme"/>
                         <p:output name="data" id="themed-data"/>
                     </p:processor>
-                    <!-- Rewrite all URLs in HTML and XHTML documents -->
+                </p:when>
+                <p:otherwise>
+                    <!-- No theme -->
+                    <p:processor name="oxf:identity">
+                        <p:input name="data" href="#xformed-data"/>
+                        <p:output name="data" id="themed-data"/>
+                    </p:processor>
+                </p:otherwise>
+            </p:choose>
+
+            <!-- Perform URL rewriting if needed -->
+            <p:choose href="#request">
+                <p:when test="not(starts-with(/request/request-path, '/xforms-renderer') and p:property('oxf.epilogue.renderer-rewrite') != 'true')">
+                    <!-- Rewriting -->
                     <p:processor name="oxf:xhtml-rewrite">
                         <p:input name="rewrite-in" href="#themed-data"/>
                         <p:output name="rewrite-out" id="rewritten-data"/>
+                    </p:processor>
+                </p:when>
+                <p:otherwise>
+                    <!-- No rewriting -->
+                    <p:processor name="oxf:identity">
+                        <p:input name="data" href="#themed-data"/>
+                        <p:output name="data" id="rewritten-data"/>
                     </p:processor>
                 </p:otherwise>
             </p:choose>

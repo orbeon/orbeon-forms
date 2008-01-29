@@ -88,9 +88,9 @@
                 <xforms:send ev:event="DOMActivate" submission="run"/>
             </xforms:trigger>
         </xhtml:p>
-        <xforms:group ref="if (instance('output')/document != '') then . else ()">
+        <xforms:group ref="if (instance('output')/text != '') then . else ()">
             <xhtml:p>
-                <xforms:output ref="instance('output')/document">
+                <xforms:output ref="instance('output')/text">
                     <xforms:label>Text read: </xforms:label>
                 </xforms:output>
             </xhtml:p>
@@ -102,5 +102,8 @@
                 </xforms:output>
             </xhtml:p>
         </xforms:group>
+
+        <!--<widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>-->
+        
     </xhtml:body>
 </xhtml:html>

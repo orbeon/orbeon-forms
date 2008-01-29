@@ -108,7 +108,13 @@
                     <h1><xsl:value-of select="$title"/></h1>
                     <!-- User-friendly message -->
                     <p>
-                        An error has occurred in Orbeon Forms. You may want to try one of the following:
+                        An error has occurred in Orbeon Forms:
+                    </p>
+                    <cite>
+                        <xsl:value-of select="/exceptions/exception[1]/message"/>
+                    </cite>
+                    <p>
+                        You may want to try one of the following:
                     </p>
                     <ul>
                         <li>If this error occurred when you followed a link, press your browser's Back button.</li>

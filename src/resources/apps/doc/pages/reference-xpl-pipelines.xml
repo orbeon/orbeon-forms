@@ -598,6 +598,34 @@
                 <img print-format="pdf" src="../apps/doc/images/reference-xpl-pipelines-tee.png"/>
             </section>
         </section>
+        <a name="xpath-functions"/>
+        <section>
+            <title>XPath functions</title>
+            <p>
+                The standard XPath 2.0 function library can be used in XPL wherever XPath expressions are supported.
+            </p>
+            <p>
+                The following extension functions are implemented:
+            </p>
+            <ul>
+                <li>
+                    <a name="p-property"/>
+                    <p>
+                        <code>p:property($property-name as xs:string) as xs:string?</code>.
+                    </p>
+                    <p>
+                        The <code>p:property()</code> function retrieves the value of a property defined
+                        in <code>properties.xml</code>. If no property exists with the given name, returns an
+                        empty sequence.
+                    </p>
+                    <xml-source show-namespaces="false" xmlns:p="http://www.orbeon.com/oxf/pipeline">
+                        <p:when test="p:property('oxf.epilogue.output-xhtml') = 'true'">
+                            ...
+                        </p:when>
+                    </xml-source>
+                </li>
+            </ul>
+        </section>
         <section>
             <title>Processor Inputs and Outputs</title>
             <section>

@@ -405,6 +405,29 @@
                 </table>
             </section>
             <section>
+                <title>oxf.epilogue.use-theme</title>
+                <table>
+                    <tr>
+                        <th>Name</th>
+                        <td><code>oxf.epilogue.theme</code></td>
+                    </tr>
+                    <tr>
+                        <th>Purpose</th>
+                        <td>Specifies whether a theme stylesheet must be applied</td>
+                    </tr>
+                    <tr>
+                        <th>Type</th>
+                        <td>
+                            <code>xs:boolean</code>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Default Value</th>
+                        <td><code>true</code></td>
+                    </tr>
+                </table>
+            </section>
+            <section>
                 <title>oxf.epilogue.output-xhtml</title>
                 <table>
                     <tr>

@@ -32,14 +32,12 @@ import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.oxf.util.SystemUtils;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
-import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.xml.XMLUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.InputStream;
 import org.xml.sax.ContentHandler;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -65,13 +63,11 @@ public class FileSerializer extends ProcessorImpl {
     private static final boolean DEFAULT_MAKE_DIRECTORIES = false;
 
     private static FileItemFactory fileItemFactory;
-    private static DocumentBuilderFactory documentBuilderFactory;
 
-
-  static {
+    static {
         try {
             // Create factory
-            documentBuilderFactory = (DocumentBuilderFactory) Class.forName("orbeon.apache.xerces.jaxp.DocumentBuilderFactoryImpl").newInstance();
+            DocumentBuilderFactory documentBuilderFactory = (DocumentBuilderFactory) Class.forName("orbeon.apache.xerces.jaxp.DocumentBuilderFactoryImpl").newInstance();
             // Configure factory
             documentBuilderFactory.setNamespaceAware(true);
         }
@@ -112,9 +108,9 @@ public class FileSerializer extends ProcessorImpl {
             directory = XPathUtils.selectStringValueNormalize(document, "/config/directory");
             file = XPathUtils.selectStringValueNormalize(document, "/config/file");
 
-            //Scope
+            // Scope
             scope = XPathUtils.selectStringValueNormalize(document, "/config/scope");
-            //URL
+            // URL
             url = XPathUtils.selectStringValueNormalize(document, "/config/url");
 
             // Cache control
@@ -130,7 +126,7 @@ public class FileSerializer extends ProcessorImpl {
             requestedContentType = XPathUtils.selectStringValueNormalize(document, "/config/content-type");
 
             forceContentType = ProcessorUtils.selectBooleanValue(document, "/config/force-content-type", DEFAULT_FORCE_CONTENT_TYPE);
-            if (forceContentType && (document == null || document.equals("")))
+            if (forceContentType)
                 throw new OXFException("The force-content-type element requires a content-type element.");
             ignoreDocumentContentType = ProcessorUtils.selectBooleanValue(document, "/config/ignore-document-content-type", DEFAULT_IGNORE_DOCUMENT_CONTENT_TYPE);
 
@@ -155,7 +151,7 @@ public class FileSerializer extends ProcessorImpl {
         }
 
         public String getUrl() {
-          return url;
+            return url;
         }
 
         public boolean isAppend() {
@@ -215,24 +211,6 @@ public class FileSerializer extends ProcessorImpl {
             // o then when we check whether we need to modify the file, check against the key
             //   AND the validity
 
-            // Compute last modified
-//            Object validity = getInputValidity(context, dataInput);
-//            long now = System.currentTimeMillis();
-//            long lastModified = (validity != null) ? findLastModified(validity) : now;
-//            boolean cacheable = validity != null && lastModified != 0;
-//            if (lastModified == 0)
-//                lastModified = now;
-//
-//            if (logger.isDebugEnabled())
-//                logger.debug("Last modified: " + lastModified);
-//
-//            // Check lastModified and don't return content if condition is met
-//            if (cacheable && (lastModified <= (file.lastModified() + 1000))) {
-//                if (logger.isDebugEnabled())
-//                    logger.debug("File doesn't need rewrite");
-//                return;
-//            }
-
             // Delete file if it exists, unless we append
             if (!config.isAppend() && file.exists()) {
                 final boolean deleted = file.delete();
@@ -244,21 +222,16 @@ public class FileSerializer extends ProcessorImpl {
 
             // Create file if needed
             file.createNewFile();
-//            if (!file.createNewFile())
-//                throw new OXFException("Can't create file: " + file);
+            FileOutputStream fileOutputStream = new FileOutputStream(file, config.isAppend());
+            writeToFile(context, config, dataInput, fileOutputStream);
 
-            // Create Writer and make sure it is closed when the pipeline terminates
-            final OutputStream fileOutputStream = new FileOutputStream(file, config.isAppend());
-            context.addContextListener(new PipelineContext.ContextListenerAdapter() {
-                public void contextDestroyed(boolean success) {
-                    try {
-                        fileOutputStream.close();
-                    } catch (IOException e) {
-                        throw new OXFException(e);
-                    }
-                }
-            });
+        } catch (Exception e) {
+            throw new OXFException(e);
+        }
+    }
 
+    private void writeToFile(PipelineContext context, final Config config, ProcessorInput dataInput, final OutputStream fileOutputStream) throws IOException {
+        try {
             if (config.cacheUseLocalCache) {
                 // If caching of the data is enabled, use the caching API
                 // We return a ResultStore
@@ -270,11 +243,9 @@ public class FileSerializer extends ProcessorImpl {
                             logger.debug("Output not cached");
                         try {
                             ResultStoreOutputStream resultStoreOutputStream = new ResultStoreOutputStream(fileOutputStream);
-
                             readInputAsSAX(context, input, new BinaryTextContentHandler(null, resultStoreOutputStream,
                                     config.forceContentType, config.requestedContentType, config.ignoreDocumentContentType,
                                     config.forceEncoding, config.requestedEncoding, config.ignoreDocumentEncoding));
-
                             resultStoreOutputStream.close();
                             return resultStoreOutputStream;
                         } catch (IOException e) {
@@ -297,9 +268,9 @@ public class FileSerializer extends ProcessorImpl {
 
                 fileOutputStream.close();
             }
-
-        } catch (Exception e) {
-            throw new OXFException(e);
+        } finally {
+            if (fileOutputStream != null)
+                fileOutputStream.close();
         }
     }
 
@@ -309,74 +280,72 @@ public class FileSerializer extends ProcessorImpl {
      */
     public ProcessorOutput createOutput(String name) {
 
-      final ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
-        public void readImpl(PipelineContext pipelineContext, ContentHandler contentHandler) {
-          OutputStream fileOutputStream = null;
-          try {
-            //Get the input and config
-            final Config config = getConfig(pipelineContext);
-            final ProcessorInput dataInput = getInputByName(INPUT_DATA);
-            final Document configDocument = readInputAsDOM4J(pipelineContext,dataInput);
-            final String text = XPathUtils.selectStringValueNormalize(configDocument, "/text");
-            // We use the commons fileupload utilities to write to file
-            if (fileItemFactory == null)
-              fileItemFactory = new DefaultFileItemFactory(0,SystemUtils.getTemporaryDirectory());
-            final FileItem fileItem = fileItemFactory.createItem("dummy", "dummy", false, null);
+        final ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
+            public void readImpl(PipelineContext pipelineContext, ContentHandler contentHandler) {
+                OutputStream fileOutputStream = null;
+                try {
+                    //Get the input and config
+                    final Config config = getConfig(pipelineContext);
+                    final ProcessorInput dataInput = getInputByName(INPUT_DATA);
+                    final Document configDocument = readInputAsDOM4J(pipelineContext,dataInput);
+                    final String text = XPathUtils.selectStringValueNormalize(configDocument, "/text");
+                    // We use the commons fileupload utilities to write to file
+                    if (fileItemFactory == null)
+                        fileItemFactory = new DefaultFileItemFactory(0,SystemUtils.getTemporaryDirectory());
+                    final FileItem fileItem = fileItemFactory.createItem("dummy", "dummy", false, null);
 
-            if("request".equals(config.getScope())) {
-              deleteFileOnRequestEnd(pipelineContext, fileItem);
-            }
-            else if("session".equals(config.getScope())) {
-              deleteFileOnSessionTermination(pipelineContext,fileItem);
-            }
-            else if("application".equals(config.getScope())) {
-              deleteFileOnContextDestroyed(pipelineContext,fileItem);
-            }
+                    if("request".equals(config.getScope())) {
+                        deleteFileOnRequestEnd(pipelineContext, fileItem);
+                    }
+                    else if("session".equals(config.getScope())) {
+                        deleteFileOnSessionTermination(pipelineContext,fileItem);
+                    }
+                    else if("application".equals(config.getScope())) {
+                        deleteFileOnContextDestroyed(pipelineContext,fileItem);
+                    }
 
-            fileOutputStream = fileItem.getOutputStream();
-            fileOutputStream.write(text.getBytes());
-            fileOutputStream.flush();
-            // Create file if it doesn't exist
-            final File storeLocation = ( (DefaultFileItem) fileItem).getStoreLocation();
-            storeLocation.createNewFile();
-            // Get the url of the file
-            final String url = ( (DefaultFileItem) fileItem).getStoreLocation().toURI().toString();
-            contentHandler.startDocument();
-            contentHandler.startElement("", "url", "url", XMLUtils.EMPTY_ATTRIBUTES);
-            contentHandler.characters(url.toCharArray(), 0, url.length());
-            contentHandler.endElement("", "url", "url");
-            contentHandler.endDocument();
-          }
-          catch (SAXException e) {
-            throw new OXFException(e);
-          }
-          catch (IOException e) {
-            throw new OXFException(e);
-          }
-          finally {
-            if (fileOutputStream != null) {
-              try {
-                fileOutputStream.close();
-              }
-              catch (IOException e) {
-                throw new OXFException(e);
-              }
+                    fileOutputStream = fileItem.getOutputStream();
+                    writeToFile(pipelineContext, config, dataInput, fileOutputStream);
+                    // Create file if it doesn't exist
+                    final File storeLocation = ( (DefaultFileItem) fileItem).getStoreLocation();
+                    storeLocation.createNewFile();
+                    // Get the url of the file
+                    final String url = ( (DefaultFileItem) fileItem).getStoreLocation().toURI().toString();
+                    contentHandler.startDocument();
+                    contentHandler.startElement("", "url", "url", XMLUtils.EMPTY_ATTRIBUTES);
+                    contentHandler.characters(url.toCharArray(), 0, url.length());
+                    contentHandler.endElement("", "url", "url");
+                    contentHandler.endDocument();
+                }
+                catch (SAXException e) {
+                    throw new OXFException(e);
+                }
+                catch (IOException e) {
+                    throw new OXFException(e);
+                }
+                finally {
+                    if (fileOutputStream != null) {
+                        try {
+                            fileOutputStream.close();
+                        }
+                        catch (IOException e) {
+                            throw new OXFException(e);
+                        }
+                    }
+                }
             }
-          }
-        }
-      };
-      addOutput(name, output);
-      return output;
+        };
+        addOutput(name, output);
+        return output;
     }
 
     protected Config getConfig(PipelineContext pipelineContext) {
-      // Read config
-      final Config config = (Config) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_CONFIG), new CacheableInputReader() {
-          public Object read(PipelineContext context, ProcessorInput input) {
-              return new Config(readInputAsDOM4J(context, input));
-          }
+        // Read config
+        return (Config) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_CONFIG), new CacheableInputReader() {
+            public Object read(PipelineContext context, ProcessorInput input) {
+                return new Config(readInputAsDOM4J(context, input));
+            }
         });
-      return config;
     }
 
     /**
@@ -412,23 +381,23 @@ public class FileSerializer extends ProcessorImpl {
         final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
         final ExternalContext.Session session = externalContext.getSession(false);
         if (session != null) {
-          session.addListener(new ExternalContext.Session.SessionListener() {
-            public void sessionDestroyed() {
-              try {
-                if (logger.isDebugEnabled()) {
-                final String temporaryFileName = ((DeferredFileOutputStream) fileItem.getOutputStream()).getFile().getAbsolutePath();
-                logger.debug("Deleting temporary Session file: " + temporaryFileName);
+            session.addListener(new ExternalContext.Session.SessionListener() {
+                public void sessionDestroyed() {
+                    try {
+                        if (logger.isDebugEnabled()) {
+                            final String temporaryFileName = ((DeferredFileOutputStream) fileItem.getOutputStream()).getFile().getAbsolutePath();
+                            logger.debug("Deleting temporary Session file: " + temporaryFileName);
+                        }
+                        fileItem.delete();
+                    }
+                    catch (IOException e) {
+                        throw new OXFException(e);
+                    }
                 }
-                fileItem.delete();
-              }
-              catch (IOException e) {
-                throw new OXFException(e);
-              }
-            }
-          });
+            });
         }
         else {
-          XFormsServer.logger.debug("XForms - no existing session found so cannot register temporary file deletion upon session destruction: " + fileItem.getName());
+            XFormsServer.logger.debug("XForms - no existing session found so cannot register temporary file deletion upon session destruction: " + fileItem.getName());
         }
     }
 
@@ -442,26 +411,26 @@ public class FileSerializer extends ProcessorImpl {
         final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
         ExternalContext.Application application = externalContext.getApplication();
         if (application != null) {
-          application.addListener(new ExternalContext.Application.ApplicationListener() {
-            public void servletDestroyed() {
-              try {
-                if (logger.isDebugEnabled()) {
-                  final String temporaryFileName = ( (DeferredFileOutputStream) fileItem.getOutputStream()).getFile().getAbsolutePath();
-                  logger.debug("Deleting temporary Application file: " + temporaryFileName);
+            application.addListener(new ExternalContext.Application.ApplicationListener() {
+                public void servletDestroyed() {
+                    try {
+                        if (logger.isDebugEnabled()) {
+                            final String temporaryFileName = ( (DeferredFileOutputStream) fileItem.getOutputStream()).getFile().getAbsolutePath();
+                            logger.debug("Deleting temporary Application file: " + temporaryFileName);
+                        }
+                        fileItem.delete();
+                    }
+                    catch (IOException e) {
+                        throw new OXFException(e);
+                    }
                 }
-                fileItem.delete();
-              }
-              catch (IOException e) {
-                throw new OXFException(e);
-              }
-            }
-          });
+            });
         }
         else {
-          XFormsServer.logger.debug("XForms - no Application object found so cannot register temporary file deletion upon session destruction: " +
-                                    fileItem.getName());
+            XFormsServer.logger.debug("XForms - no Application object found so cannot register temporary file deletion upon session destruction: " +
+                    fileItem.getName());
         }
-      }
+    }
 
     public static File getFile(String configDirectory, String configFile, boolean makeDirectories, OXFProperties.PropertySet propertySet) {
         final File file;
@@ -496,83 +465,4 @@ public class FileSerializer extends ProcessorImpl {
 
         return file;
     }
-
-    private interface ResourceHandler {
-       public Object getValidity() throws IOException;
-
-       public String getResourceContentType() throws IOException;
-
-       public String getConnectionEncoding() throws IOException;
-
-       public void destroy() throws IOException;
-
-       public void readText(ContentHandler output, String contentType) throws IOException;
-
-       public void readXML(PipelineContext pipelineContext, ContentHandler output) throws IOException;
-
-
-       public void readBinary(ContentHandler output, String contentType) throws IOException;
-   }
-
-   private static class OXFResourceHandler implements ResourceHandler {
-       private Config config;
-       private String resourceManagerKey;
-       private InputStream inputStream;
-
-       public OXFResourceHandler(Config config) {
-           this.config = config;
-       }
-
-       public String getResourceContentType() throws IOException {
-           // We generally don't know the "connection" content-type
-           return null;
-       }
-
-       public String getConnectionEncoding() throws IOException {
-           // We generally don't know the "connection" encoding
-           // NOTE: We could know, if the underlying protocol was for example HTTP. But we may
-           // want to abstract that anyway, so that the behavior is consistent whatever the sandbox
-           // is.
-           return null;
-       }
-
-       public Object getValidity() throws IOException {
-           getKey();
-           if (logger.isDebugEnabled())
-               logger.debug("OXF Protocol: Using ResourceManager for key " + getKey());
-
-           long result = ResourceManagerWrapper.instance().lastModified(getKey(), false);
-           // Zero and negative values often have a special meaning, make sure to normalize here
-           return (result <= 0) ? null : new Long(result);
-       }
-
-       public void destroy() throws IOException {
-           if (inputStream != null) {
-               inputStream.close();
-           }
-       }
-
-       public void readText(ContentHandler output, String contentType) throws IOException {
-           inputStream = ResourceManagerWrapper.instance().getContentAsStream(getKey());
-           ProcessorUtils.readText(inputStream, null, output, contentType);
-       }
-
-       public void readXML(PipelineContext pipelineContext, ContentHandler output) throws IOException {
-         // Regular case, the resource manager does the job and autodetects the encoding
-         ResourceManagerWrapper.instance().getContentAsSAX(getKey(), output, true, false);
-       }
-
-       public void readBinary(ContentHandler output, String contentType) throws IOException {
-           inputStream = ResourceManagerWrapper.instance().getContentAsStream(getKey());
-           ProcessorUtils.readBinary(inputStream, output, contentType);
-       }
-
-       private String getKey() {
-           if (resourceManagerKey == null)
-               resourceManagerKey = config.getUrl();
-             System.err.println("resourceManagerKey="+resourceManagerKey);
-           return resourceManagerKey;
-       }
-   }
-
 }

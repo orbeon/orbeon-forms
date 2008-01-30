@@ -17,7 +17,8 @@
       xmlns:xforms="http://www.w3.org/2002/xforms"
       xmlns:xs="http://www.w3.org/2001/XMLSchema"
       xmlns:ev="http://www.w3.org/2001/xml-events"
-      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+      xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
     <head>
         <title>XForms Bookcast</title>
         <xhtml:link rel="stylesheet" href="/apps/fr/style/style.css" type="text/css"/>
@@ -114,7 +115,7 @@
         </style>
     </head>
     <body>
-        <xxforms:view>
+        <fr:view>
             <xforms:label>XForms Bookcast</xforms:label>
             <p>
                 <i>This example is described in details in the <a href="/doc/intro-tutorial">Orbeon Forms Tutorial</a>.</i>
@@ -130,10 +131,10 @@
                 </tr>
             </table>
 
-            <xxforms:section id="books" columns="2">
+            <fr:section id="books" columns="2">
                 <xforms:label>Books</xforms:label>
 
-                <xxforms:repeat nodeset="book" id="book-repeat" origin="instance('book-template')">
+                <fr:repeat nodeset="book" id="book-repeat" origin="instance('book-template')">
                     <xforms:label>Book</xforms:label>
                         <tr>
                             <td>
@@ -187,8 +188,8 @@
                                 </xforms:textarea>
                             </td>
                         </tr>
-                </xxforms:repeat>
-            </xxforms:section>
-        </xxforms:view>
+                </fr:repeat>
+            </fr:section>
+        </fr:view>
     </body>
 </html>

@@ -17,6 +17,7 @@
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
         xmlns:xforms="http://www.w3.org/2002/xforms"
         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+        xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
         xmlns:xhtml="http://www.w3.org/1999/xhtml"
         xmlns:xi="http://www.w3.org/2001/XInclude"
         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
@@ -24,7 +25,7 @@
 
     <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
 
-    <xsl:template match="xxforms:view">
+    <xsl:template match="fr:view">
         <xforms:input model="fr-sections-model" ref="instance('fr-sections-instance')/@current" id="fr-current-section-input" class="xforms-disabled"/>
 
         <xhtml:img id="top" src="/apps/fr/style/top.png" alt=""/>
@@ -73,7 +74,7 @@
         <xhtml:img id="bottom" src="/apps/fr/style/bottom.png" alt=""/>
     </xsl:template>
 
-    <xsl:template match="xxforms:section">
+    <xsl:template match="fr:section">
         <xhtml:div class="section-container">
             <xforms:group ref="{if (@ref) then @ref else '.'}">
                 <xhtml:h2>
@@ -110,7 +111,7 @@
         </xhtml:div>
     </xsl:template>
 
-    <xsl:template match="xxforms:optional-element">
+    <xsl:template match="fr:optional-element">
         <xforms:input ref="{@ref}">
             <xsl:apply-templates select="xforms:label"/>
         </xforms:input>
@@ -129,7 +130,7 @@
     </xsl:template>
 
     <!-- Helper for repeats -->
-    <xsl:template match="xxforms:repeat">
+    <xsl:template match="fr:repeat">
         <xsl:variable name="tokenized-path" select="tokenize(@nodeset, '/')"/>
         <xsl:variable name="min-occurs" select="if (@minOccurs) then @minOccurs else 0"/>
         <xsl:variable name="max-occurs" select="if (@maxOccurs) then @maxOccurs else 'unbounded'"/>
@@ -187,8 +188,8 @@
 
         <xforms:model id="fr-sections-model" xxforms:external-events="fr-after-collapse">
             <xforms:instance id="fr-sections-instance">
-                <sections current="{(//xxforms:section)[1]/@id}" xmlns="">
-                    <xsl:for-each select="//xxforms:section">
+                <sections current="{(//fr:section)[1]/@id}" xmlns="">
+                    <xsl:for-each select="//fr:section">
                         <xsl:element name="{@id}" namespace="">
                             <xsl:attribute name="open">true</xsl:attribute>
                         </xsl:element>

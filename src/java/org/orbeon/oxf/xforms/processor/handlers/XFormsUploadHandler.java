@@ -122,6 +122,7 @@ public class XFormsUploadHandler extends XFormsValueControlHandler {
                     reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-upload-remove");
                     reusableAttributes.addAttribute("", "src", "src", ContentHandlerHelper.CDATA, "/ops/images/xforms/remove.gif");
                     reusableAttributes.addAttribute("", "alt", "alt", ContentHandlerHelper.CDATA, "Remove File");
+                    reusableAttributes.addAttribute("", "title", "title", ContentHandlerHelper.CDATA, "Remove File");
                     final String imgQName = XMLUtils.buildQName(xhtmlPrefix, "img");
                     contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "img", imgQName, reusableAttributes);
                     contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "img", imgQName);

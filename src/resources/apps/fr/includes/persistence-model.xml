@@ -226,7 +226,7 @@
     <xforms:action ev:event="xforms-submit-done" if="instance('persistence-instance')/save-progress != ''">
         <xforms:setvalue ref="instance('persistence-instance')/message">Document saved.</xforms:setvalue><!-- TODO: i18n -->
         <xforms:setvalue ref="instance('control-instance')/data-status">clean</xforms:setvalue>
-        <xforms:toggle case="orbeon-message-success"/>
+        <xforms:toggle case="fr-message-success"/>
         <xforms:setvalue ref="instance('persistence-instance')/save-progress"/>
     </xforms:action>
 
@@ -235,11 +235,11 @@
         <xforms:setvalue ref="instance('persistence-instance')/error" value="event('body')"/>
         <xforms:action if="not(instance('persistence-instance')/save-progress = 'validated')">
             <xforms:setvalue ref="instance('persistence-instance')/message">There are errors in your form.</xforms:setvalue><!-- TODO: i18n -->
-            <xforms:toggle case="orbeon-message-validation-error"/>
+            <xforms:toggle case="fr-message-validation-error"/>
         </xforms:action>
         <xforms:action if="instance('persistence-instance')/save-progress = 'validated'">
             <xforms:setvalue ref="instance('persistence-instance')/message">Unable to save document. Please contact your system administrator.</xforms:setvalue><!-- TODO: i18n -->
-            <xforms:toggle case="orbeon-message-fatal-error"/>
+            <xforms:toggle case="fr-message-fatal-error"/>
         </xforms:action>
         <xforms:setvalue ref="instance('persistence-instance')/save-progress"/>
     </xforms:action>

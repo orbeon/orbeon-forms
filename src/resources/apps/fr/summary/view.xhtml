@@ -106,13 +106,13 @@
     </head>
     <body>
 
-        <xhtml:img id="top" src="/apps/fr/style/top.png" alt=""/>
-        <xhtml:div id="container">
-            <xhtml:div class="logo">
+        <xhtml:img id="fr-top" src="/apps/fr/style/top.png" alt=""/>
+        <xhtml:div id="fr-container">
+            <xhtml:div class="fr-logo">
                 <xhtml:h1>Orbeon Forms - Form Runner</xhtml:h1>
             </xhtml:div>
-            <xhtml:div class="separator"/>
-            <xhtml:div class="body">
+            <xhtml:div class="fr-separator"/>
+            <xhtml:div class="fr-body">
                 <p>
                     <!-- Select form -->
                     <xforms:select1 ref="instance('parameters-instance')/form" appearance="full">
@@ -140,7 +140,7 @@
                     </xforms:select1>
 
                     <!-- Free-text search -->
-                    <xforms:input model="fr-persistence-model" ref="instance('search-instance')/query" incremental="true">
+                    <xforms:input model="fr-persistence-model" ref="instance('search-instance')/query" incremental="true" class="fr-search-input">
                         <xforms:label model="resources-model" ref="instance('common-resources')/summary/labels/search"/>
                         <xforms:send ev:event="xforms-value-changed" submission="search-submission"/>
                     </xforms:input>
@@ -175,7 +175,7 @@
                     <p>
                         <xforms:output model="resources-model" mediatype="text/html" value="saxon:serialize(instance('common-resources')/summary/messages/intro/node(), 'html')"/>
                     </p>
-                    <table class="tabular fr-summary-table">
+                    <table class="fr-tabular fr-summary-table">
                         <tr>
                             <th><xforms:output model="resources-model" value="instance('common-resources')/summary/titles/row-number"/></th>
                             <th><xforms:output model="resources-model" value="instance('common-resources')/summary/titles/created"/></th>
@@ -246,13 +246,13 @@
                     <xforms:output model="resources-model" mediatype="text/html" value="saxon:serialize(instance('common-resources')/summary/messages/no-form-found/node(), 'html')"/>
                 </xforms:group>
             </xhtml:div>
-            <xhtml:div class="separator"/>
-            <xhtml:div class="footer">
+            <xhtml:div class="fr-separator"/>
+            <xhtml:div class="fr-footer">
                 <!-- Display the toolbar -->
                 <xhtml:table>
                     <xhtml:tr>
                         <xhtml:td>
-                            <xhtml:div class="buttons">
+                            <xhtml:div class="fr-buttons">
                                 <xforms:trigger>
                                     <xforms:label>
                                         <xhtml:img src="/apps/fr/style/add.gif" alt="Create"/>
@@ -304,7 +304,7 @@
                 </xhtml:table>
             </xhtml:div>
         </xhtml:div>
-        <xhtml:img id="bottom" src="/apps/fr/style/bottom.png" alt=""/>
+        <xhtml:img id="fr-bottom" src="/apps/fr/style/bottom.png" alt=""/>
 
         <!--<table class="forms-action-table">-->
             <!--<tr>-->

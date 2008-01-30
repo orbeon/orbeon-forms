@@ -28,17 +28,17 @@
     <xsl:template match="fr:view">
         <xforms:input model="fr-sections-model" ref="instance('fr-sections-instance')/@current" id="fr-current-section-input" class="xforms-disabled"/>
 
-        <xhtml:img id="top" src="/apps/fr/style/top.png" alt=""/>
+        <xhtml:img id="fr-top" src="/apps/fr/style/top.png" alt=""/>
 
-        <xhtml:div id="container">
+        <xhtml:div id="fr-container">
 
-            <xhtml:div class="logo">
+            <xhtml:div class="fr-logo">
                 <xhtml:h1><xsl:value-of select="xforms:label"/></xhtml:h1>
                 <!-- Configurable logo -->
                 <xhtml:img src="/forms/logo.gif" alt="Logo"/>
             </xhtml:div>
-            <xhtml:div class="separator"/>
-            <xhtml:div class="body">
+            <xhtml:div class="fr-separator"/>
+            <xhtml:div class="fr-body">
 
                 <xforms:group ref="/*">
                     <!-- Error summary: handle xforms-invalid event -->
@@ -65,13 +65,13 @@
 
                 </xforms:group>
             </xhtml:div>
-            <xhtml:div class="separator"/>
-            <xhtml:div class="footer">
+            <xhtml:div class="fr-separator"/>
+            <xhtml:div class="fr-footer">
                 <!-- Display the toolbar and errors -->
                 <xi:include href="oxf:/apps/fr/includes/toolbar-and-errors-view.xml" xxi:omit-xml-base="true"/>
             </xhtml:div>
         </xhtml:div>
-        <xhtml:img id="bottom" src="/apps/fr/style/bottom.png" alt=""/>
+        <xhtml:img id="fr-bottom" src="/apps/fr/style/bottom.png" alt=""/>
     </xsl:template>
 
     <xsl:template match="fr:section">
@@ -102,7 +102,7 @@
                 </xhtml:h2>
                 <xforms:group ref=".[xxforms:instance('fr-sections-instance')/{@id}/@open = 'true']" class="section-{@id}" id="section-{@id}">
 
-                    <xhtml:table class="grid grid-{@columns}-columns">
+                    <xhtml:table class="fr-grid fr-grid-{@columns}-columns">
                         <!-- Section content -->
                         <xsl:apply-templates select="* except xforms:label"/>
                     </xhtml:table>
@@ -134,7 +134,7 @@
         <xsl:variable name="tokenized-path" select="tokenize(@nodeset, '/')"/>
         <xsl:variable name="min-occurs" select="if (@minOccurs) then @minOccurs else 0"/>
         <xsl:variable name="max-occurs" select="if (@maxOccurs) then @maxOccurs else 'unbounded'"/>
-        <xhtml:table class="orbeon-repeat-table">
+        <xhtml:table class="fr-repeat-table">
             <xforms:group appearance="xxforms:internal">
                 <xhtml:tr>
                     <xhtml:td/>

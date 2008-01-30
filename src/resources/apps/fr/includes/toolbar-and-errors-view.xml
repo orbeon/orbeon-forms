@@ -12,7 +12,7 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:table class="error-buttons"
+<xhtml:table class="fr-error-buttons"
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
         xmlns:xhtml="http://www.w3.org/1999/xhtml"
@@ -27,18 +27,18 @@
                 <xforms:case id="orbeon-message-none">
                     <span/>
                 </xforms:case>
-                <xforms:case id="orbeon-message-success">
-                    <span class="orbeon-message-success">
+                <xforms:case id="fr-message-success">
+                    <span class="fr-message-success">
                         <xforms:output model="fr-persistence-model" ref="instance('persistence-instance')/message"/>
                     </span>
                 </xforms:case>
-                <xforms:case id="orbeon-message-validation-error">
-                    <span class="orbeon-message-validation-error">
+                <xforms:case id="fr-message-validation-error">
+                    <span class="fr-message-validation-error">
                         <xforms:output model="fr-persistence-model" ref="instance('persistence-instance')/message"/>
                     </span>
                 </xforms:case>
-                <xforms:case id="orbeon-message-fatal-error">
-                    <span class="orbeon-message-fatal-error">
+                <xforms:case id="fr-message-fatal-error">
+                    <span class="fr-message-fatal-error">
                         <xforms:output model="fr-persistence-model" ref="instance('persistence-instance')/message"/>
                     </span>
                 </xforms:case>
@@ -49,8 +49,8 @@
         <xhtml:td>
             <xforms:group model="fr-persistence-model" ref=".[instance('persistence-instance')/save-attempted = 'true']">
                 <xforms:group model="error-summary-model" ref="instance('errors-instance')[error]">
-                    <xhtml:span class="orbeon-error-title">Issues with form</xhtml:span>
-                    <xhtml:ol class="orbeon-error-list">
+                    <xhtml:span class="fr-error-title">Issues with form</xhtml:span>
+                    <xhtml:ol class="fr-error-list">
                         <xforms:repeat nodeset="error" id="errors-repeat">
                             <xhtml:li>
                                 <xhtml:i>
@@ -76,7 +76,7 @@
             </xforms:group>
         </xhtml:td>
         <xhtml:td>
-            <xhtml:div class="buttons">
+            <xhtml:div class="fr-buttons">
                 <xforms:trigger>
                     <xforms:label><xhtml:img src="/apps/fr/style/run.gif" alt=""/> <xhtml:span>Save Form</xhtml:span></xforms:label>
                     <xforms:action ev:event="DOMActivate">

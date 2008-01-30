@@ -528,11 +528,19 @@ public class XFormsServer extends ProcessorImpl {
                     }
                 }
 
-                // Output focus instructions
+                // Output focus instruction
                 {
                     final String focusEffectiveControlId = containingDocument.getClientFocusEffectiveControlId(pipelineContext);
                     if (focusEffectiveControlId != null) {
                         outputFocusInfo(ch, focusEffectiveControlId);
+                    }
+                }
+
+                // Output help instruction
+                {
+                    final String helpEffectiveControlId = containingDocument.getClientHelpEffectiveControlId(pipelineContext);
+                    if (helpEffectiveControlId != null) {
+                        outputHelpInfo(ch, helpEffectiveControlId);
                     }
                 }
 
@@ -708,6 +716,11 @@ public class XFormsServer extends ProcessorImpl {
     private static void outputFocusInfo(ContentHandlerHelper ch, String focusEffectiveControlId) {
         ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "setfocus",
                 new String[]{"control-id", focusEffectiveControlId});
+    }
+
+    private static void outputHelpInfo(ContentHandlerHelper ch, String helpEffectiveControlId) {
+        ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "help",
+                new String[]{"control-id", helpEffectiveControlId});
     }
 
     private static void outputItemsets(ContentHandlerHelper ch, Map itemsetIdToItemsetInfoMap) {

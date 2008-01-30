@@ -59,9 +59,10 @@ public class XFormsControls {
 
     private XFormsContainingDocument containingDocument;
     private Document controlsDocument;
-    private Map eventsMap;
+    private Map eventsMap;// TODO: this must go into XFormsStaticState
     
     private Map constantItems;
+//    private Map
 
     protected Stack contextStack = new Stack();
 

@@ -219,6 +219,16 @@ public class XFormsEventFactory {
                 return new XFormsFocusEvent(targetObject);
             }
         });
+        nameToClassMap.put(XFormsEvents.XFORMS_HELP, new Factory() {
+            public XFormsEvent createEvent(String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Element filesElement) {
+                return new XFormsHelpEvent(targetObject);
+            }
+        });
+        nameToClassMap.put(XFormsEvents.XFORMS_HINT, new Factory() {
+            public XFormsEvent createEvent(String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Element filesElement) {
+                return new XFormsHintEvent(targetObject);
+            }
+        });
         nameToClassMap.put(XFormsEvents.XFORMS_SCROLL_FIRST, new Factory() {
             public XFormsEvent createEvent(String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Element filesElement) {
                 return new XFormsScrollFirstEvent(targetObject);

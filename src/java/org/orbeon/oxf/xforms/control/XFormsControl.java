@@ -35,6 +35,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
 
     // Static information (never changes for the lifetime of the containing document)
     private Element controlElement;
+    //private NodeInfo controlNodeInfo; TODO
     private String originalId;
     private String name;
     private String appearance;// could become more dynamic in the future
@@ -308,18 +309,26 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
         final XFormsControls xformsControls = containingDocument.getXFormsControls();
         xformsControls.setBinding(pipelineContext, this);
 
-        final boolean[] containsHTML = new boolean[1];
-        this.label = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, controlElement.element(XFormsConstants.XFORMS_LABEL_QNAME), isSupportHTMLLabels(), containsHTML);
-        this.isHTMLLabel = containsHTML[0];
+//        if (false) {
+//            // XXX TEST don't run expressions to compute labels and helps assuming they will be
+//            this.label="foobarlabel";
+//            this.help="foobarhelp";
+//            this.hint="";
+//            this.alert="";
+//        } else {
+            final boolean[] containsHTML = new boolean[1];
+            this.label = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, controlElement.element(XFormsConstants.XFORMS_LABEL_QNAME), isSupportHTMLLabels(), containsHTML);
+            this.isHTMLLabel = containsHTML[0];
 
-        this.help = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, controlElement.element(XFormsConstants.XFORMS_HELP_QNAME), true, containsHTML);
-        this.isHTMLHelp = containsHTML[0];
+            this.help = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, controlElement.element(XFormsConstants.XFORMS_HELP_QNAME), true, containsHTML);
+            this.isHTMLHelp = containsHTML[0];
 
-        this.hint = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, controlElement.element(XFormsConstants.XFORMS_HINT_QNAME), isSupportHTMLHints(), containsHTML);
-        this.isHTMLHint = containsHTML[0];
+            this.hint = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, controlElement.element(XFormsConstants.XFORMS_HINT_QNAME), isSupportHTMLHints(), containsHTML);
+            this.isHTMLHint = containsHTML[0];
 
-        this.alert = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, controlElement.element(XFormsConstants.XFORMS_ALERT_QNAME), true, containsHTML);
-        this.isHTMLAlert = containsHTML[0];
+            this.alert = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, controlElement.element(XFormsConstants.XFORMS_ALERT_QNAME), true, containsHTML);
+            this.isHTMLAlert = containsHTML[0];
+//        }
     }
 
     /**
@@ -451,6 +460,8 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
                     containingDocument.setClientFocusEffectiveControlId(getEffectiveId());
                 }
             }
+        } else if (XFormsEvents.XFORMS_HELP.equals(event.getEventName())) {
+            containingDocument.setClientHelpEffectiveControlId(getEffectiveId());
         }
     }
 

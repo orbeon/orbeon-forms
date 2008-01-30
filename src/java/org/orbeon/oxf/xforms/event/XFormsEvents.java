@@ -69,6 +69,9 @@ public class XFormsEvents {
     public static final String XFORMS_SCROLL_FIRST = "xforms-scroll-first";
     public static final String XFORMS_SCROLL_LAST = "xforms-scroll-last";
 
+    public static final String XFORMS_HELP = "xforms-help";
+    public static final String XFORMS_HINT = "xforms-hint";
+
     // DOM events
     public static final String XFORMS_DOM_ACTIVATE = "DOMActivate";
     public static final String XFORMS_DOM_FOCUS_OUT = "DOMFocusOut";

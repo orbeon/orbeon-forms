@@ -79,6 +79,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     private List loadsToRun;
     private List scriptsToRun;
     private String focusEffectiveControlId;
+    private String helpEffectiveControlId;
 
     private XFormsActionInterpreter actionInterpreter;
 
@@ -110,6 +111,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         // External events allowed on other controls
         allowedExternalEvents.putAll(allowedXFormsOutputExternalEvents);
         allowedExternalEvents.put(XFormsEvents.XFORMS_DOM_ACTIVATE, "");
+        allowedExternalEvents.put(XFormsEvents.XFORMS_HELP, "");
         allowedExternalEvents.put(XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE, "");
 
         // External events allowed on xforms:submission
@@ -397,6 +399,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         this.loadsToRun = null;
         this.scriptsToRun = null;
         this.focusEffectiveControlId = null;
+        this.helpEffectiveControlId = null;
     }
 
     /**
@@ -419,6 +422,9 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
 
         if (focusEffectiveControlId != null)
             throw new ValidationException("Unable to run a two-pass submission and xforms:setfocus within a same action sequence.", activeSubmission.getLocationData());
+
+        if (helpEffectiveControlId != null)
+            throw new ValidationException("Unable to run a two-pass submission and xforms-help within a same action sequence.", activeSubmission.getLocationData());
 
         this.activeSubmission = activeSubmission;
     }
@@ -606,6 +612,42 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     }
 
     /**
+     * Tell the client that help must be shown for the given effective control id.
+     *
+     * This can be called several times, but only the last controld id is remembered.
+     *
+     * @param effectiveControlId
+     */
+    public void setClientHelpEffectiveControlId(String effectiveControlId) {
+
+        if (activeSubmission != null)
+            throw new ValidationException("Unable to run a two-pass submission and xforms-help within a same action sequence.", activeSubmission.getLocationData());
+
+        this.helpEffectiveControlId = effectiveControlId;
+    }
+
+    /**
+     * Return the effective control id of the control to help for, or null.
+     */
+    public String getClientHelpEffectiveControlId(PipelineContext pipelineContext) {
+
+        if (helpEffectiveControlId == null)
+            return null;
+
+        final XFormsControl xformsControl = (XFormsControl) getObjectById(pipelineContext, helpEffectiveControlId);
+        // It doesn't make sense to tell the client to show help for an element that is non-relevant, but we allow readonly
+        if (xformsControl != null && xformsControl instanceof XFormsSingleNodeControl) {
+            final XFormsSingleNodeControl xformsSingleNodeControl = (XFormsSingleNodeControl) xformsControl;
+            if (xformsSingleNodeControl.isRelevant())
+                return helpEffectiveControlId;
+            else
+                return null;
+        } else {
+            return null;
+        }
+    }
+
+    /**
      * Execute an external event on element with id targetElementId and event eventName.
      */
     public void executeExternalEvent(PipelineContext pipelineContext, String eventName, String controlId, String otherControlId, String contextString, Element filesElement) {
@@ -743,7 +785,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                         testAjaxToggleValue = 0;
                         contextString = "customer";
                     }
-                } else if ("name".equals(controlId)) {
+                } else if (("xforms-element-287" + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1 + "1").equals(controlId)) {
                     contextString = "value" + System.currentTimeMillis();
                 }
             }

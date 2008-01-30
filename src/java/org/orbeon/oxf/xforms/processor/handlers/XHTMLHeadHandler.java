@@ -17,6 +17,7 @@ import org.orbeon.oxf.xforms.XFormsControls;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsProperties;
+import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.state.XFormsStateManager;
 import org.orbeon.oxf.xforms.processor.XFormsFeatures;
 import org.orbeon.oxf.xforms.processor.XFormsResourceServer;
@@ -208,6 +209,14 @@ public class XHTMLHeadHandler extends HandlerBase {
                                 final String yuiBasePath = isVersionResources ? "/" + Version.getVersion() + propertyDefinition.getDefaultValue() : (String) propertyDefinition.getDefaultValue();
                                 if (!yuiBasePath.equals(propertyDefinition.getDefaultValue()))
                                     dynamicProperties.put(XFormsProperties.YUI_BASE_PATH_PROPERTY, yuiBasePath);
+                            }
+                        }
+
+                        // Help events
+                        {
+                            final boolean hasHandlerForXFormsHelp = containingDocument.getXFormsControls().hasHandlerForEvent(XFormsEvents.XFORMS_HELP);
+                            if (hasHandlerForXFormsHelp) {
+                                dynamicProperties.put(XFormsProperties.HELP_HANDLER_PROPERTY, Boolean.TRUE);
                             }
                         }
                     }

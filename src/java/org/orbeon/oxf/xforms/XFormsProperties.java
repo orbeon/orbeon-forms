@@ -78,6 +78,7 @@ public class XFormsProperties {
     public static final String REVISIT_HANDLING_RESTORE_VALUE = "restore";
     public static final String REVISIT_HANDLING_RELOAD_VALUE = "reload";
 
+    public static final String HELP_HANDLER_PROPERTY = "help-handler";
 
     public static class PropertyDefinition {
 
@@ -164,7 +165,8 @@ public class XFormsProperties {
             new PropertyDefinition(DEBUG_WINDOW_HEIGHT_PROPERTY, 600, true),
             new PropertyDefinition(DEBUG_WINDOW_WIDTH_PROPERTY, 300, true),
             new PropertyDefinition(LOADING_MIN_TOP_PADDING_PROPERTY, 10, true),
-            new PropertyDefinition(REVISIT_HANDLING_PROPERTY, REVISIT_HANDLING_RESTORE_VALUE, true)
+            new PropertyDefinition(REVISIT_HANDLING_PROPERTY, REVISIT_HANDLING_RESTORE_VALUE, true),
+            new PropertyDefinition(HELP_HANDLER_PROPERTY, false, true)
     };
 
     private static final Map SUPPORTED_DOCUMENT_PROPERTIES;

@@ -31,7 +31,7 @@
                 <xsl:template match="/">
                     <error>
                         <title>
-                            <xsl:variable name="message" select="/exceptions/exception[last()]/message"/>
+                            <xsl:variable name="message" select="(/exceptions/exception[last()]/message, 'An error has occurred')[normalize-space(.) != ''][1]"/>
                             <xsl:choose>
                                 <!-- This is a bit of a hack to display a nicer "session expired" message (see XFormsStateManager) -->
                                 <xsl:when test="contains($message, 'Your session has expired')">Your session has expired</xsl:when>
@@ -85,7 +85,6 @@
 
     <!-- Generate response -->
     <p:processor name="oxf:xml-serializer">
-        <!--<p:input name="data" href="#exception" debug="xxxerror"/>-->
         <p:input name="data" href="#response-message"/>
         <p:input name="config">
             <config/>

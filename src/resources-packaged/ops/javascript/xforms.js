@@ -34,6 +34,7 @@ var DEBUG_WINDOW_HEIGHT_PROPERTY = "debug-window-height";
 var DEBUG_WINDOW_WIDTH_PROPERTY = "debug-window-width";
 var LOADING_MIN_TOP_PADDING_PROPERTY = "loading-min-top-padding";
 var REVISIT_HANDLING_PROPERTY = "revisit-handling";
+var HELP_HANDLER_PROPERTY = "help-handler";
 
 // Parameter defaults
 // NOTE: Default values below MUST match the ones in XFormsProperties
@@ -53,6 +54,7 @@ var XFORMS_DEBUG_WINDOW_HEIGHT = 600;
 var XFORMS_DEBUG_WINDOW_WIDTH = 300;
 var XFORMS_LOADING_MIN_TOP_PADDING = 10;
 var XFORMS_REVISIT_HANDLING = "restore";
+var XFORMS_HELP_HANDLER = false;
 
 /**
  * Constants
@@ -542,6 +544,7 @@ ORBEON.util.Utils = {
             case DEBUG_WINDOW_HEIGHT_PROPERTY: { return XFORMS_DEBUG_WINDOW_HEIGHT; }
             case DEBUG_WINDOW_WIDTH_PROPERTY: { return XFORMS_DEBUG_WINDOW_WIDTH; }
             case LOADING_MIN_TOP_PADDING_PROPERTY: { return XFORMS_LOADING_MIN_TOP_PADDING; }
+            case HELP_HANDLER_PROPERTY: { return XFORMS_HELP_HANDLER; }
         }
     	// Neither the property's value was supplied, nor a default value exists for the property
         return null;

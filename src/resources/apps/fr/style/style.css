@@ -66,6 +66,8 @@ body {
 
 .logo img { padding: .5em 1em .5em 1em; float: right }
 
+.logo h1 { padding-top: 2.3em; padding-left: 1em }
+
 .separator {
     background-color: #3598d4;
     min-height: 1em;

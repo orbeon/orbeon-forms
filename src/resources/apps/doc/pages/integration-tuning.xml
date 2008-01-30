@@ -349,6 +349,10 @@
                         bypass completely the theme stylesheet.
                     </li>
                 </ul>
+                <p>
+                    Some of these aspects are configured with properties. Visit the with <a
+                    href="reference-properties#epilogue">epilogue properties</a> section for details.
+                </p>
             </section>
             <a name="your-app-debug"/>
             <section>

@@ -55,6 +55,16 @@
                 <ul>
                     <li>
                         <p>
+                            <b>Session heartbeat feature for XForms pages.</b> [TODO]
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Versioned resources.</b> [TODO]
+                        </p>
+                    </li>
+                    <li>
+                        <p>
                             <b>Support for temporary files in the file serializer.</b> The file serializer can now
                             automatically create temporary files and write to those temporary files. It will also delete
                             temporary files, based on a "scope" parameter you specify in the configuration. As with the

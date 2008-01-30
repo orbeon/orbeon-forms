@@ -499,6 +499,29 @@
                     </tr>
                 </table>
             </section>
+            <section>
+                <title>oxf.epilogue.xforms.widgets</title>
+                <table>
+                    <tr>
+                        <th>Name</th>
+                        <td><code>oxf.epilogue.xforms.widgets</code></td>
+                    </tr>
+                    <tr>
+                        <th>Purpose</th>
+                        <td>Whether the XForms widgets XSLT stylesheet must be applied</td>
+                    </tr>
+                    <tr>
+                        <th>Type</th>
+                        <td>
+                            <code>xs:boolean</code>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Default Value</th>
+                        <td><code>true</code></td>
+                    </tr>
+                </table>
+            </section>
         </section>
         <a name="java-processor"/>
         <section>

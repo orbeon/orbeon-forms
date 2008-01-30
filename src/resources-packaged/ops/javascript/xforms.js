@@ -3254,8 +3254,12 @@ ORBEON.xforms.Server = {
                                                             ORBEON.util.Dom.setStringValue(fileNameSpan, filename);
                                                         if (mediatype != null)
                                                             ORBEON.util.Dom.setStringValue(mediatypeSpan, mediatype);
-                                                        if (size != null)
-                                                            ORBEON.util.Dom.setStringValue(sizeSpan, size);
+                                                        if (size != null) {
+                                                            var displaySize = size > 1024*1024 ? Math.round(size / (1024*1024) * 10)/10 + " MB"
+                                                                    : size > 1024 ? Math.round(size / 1024 * 10)/10 + " KB"
+                                                                    : size + " B";
+                                                            ORBEON.util.Dom.setStringValue(sizeSpan, displaySize);
+                                                        }
                                                     } else if (typeof(documentElement.value) == "string") {
                                                         // Textarea, password
                                                         if (xformsNormalizeEndlines(documentElement.value) != xformsNormalizeEndlines(newControlValue)) {

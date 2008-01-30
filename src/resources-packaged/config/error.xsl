@@ -108,13 +108,7 @@
                     <h1><xsl:value-of select="$title"/></h1>
                     <!-- User-friendly message -->
                     <p>
-                        An error has occurred in Orbeon Forms:
-                    </p>
-                    <cite>
-                        <xsl:value-of select="/exceptions/exception[1]/message"/>
-                    </cite>
-                    <p>
-                        You may want to try one of the following:
+                        An error has occurred in Orbeon Forms. You may want to try one of the following:
                     </p>
                     <ul>
                         <li>If this error occurred when you followed a link, press your browser's Back button.</li>
@@ -131,6 +125,13 @@
                         </li>
                         <li>Return <a href="/">home</a>.</li>
                     </ul>
+                    <!-- Error message -->
+                    <h2>Error Message</h2>
+                    <p class="orbeon-error-panel-message">
+                        <xsl:call-template name="format-message">
+                            <xsl:with-param name="exceptions" select="/exceptions/exception"/>
+                        </xsl:call-template>
+                    </p>
                     <!-- Details -->
                     <div id="orbeon-error-panel-details-hidden">
                         <p>
@@ -148,13 +149,6 @@
                             </a>
                         </p>
                         <div class="orbeon-error-panel-details">
-                            <!-- Error message -->
-                            <h2>Error Message</h2>
-                            <p class="orbeon-error-panel-message">
-                                <xsl:call-template name="format-message">
-                                    <xsl:with-param name="exceptions" select="/exceptions/exception"/>
-                                </xsl:call-template>
-                            </p>
                             <!-- Call stack -->
                             <h2>Call Stack</h2>
                             <div class="orbeon-error-panel-call-stack">

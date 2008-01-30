@@ -83,12 +83,24 @@
                         <!--<p:output name="data" id="data2"/>-->
                     <!--</p:processor>-->
 
-                    <p:processor name="oxf:xslt">
-                        <!--<p:input name="data" href="#data2"/>-->
-                        <p:input name="data" href="#data"/>
-                        <p:input name="config" href="/config/xforms-widgets.xsl"/>
-                        <p:output name="data" id="widgeted-view"/>
-                    </p:processor>
+                    <!-- Apply XForms widgets if needed -->
+                    <p:choose href="#request-info"><!-- dummy test input -->
+                        <p:when test="not(p:property('oxf.epilogue.xforms.widgets') = 'false')">
+                            <p:processor name="oxf:xslt">
+                                <!--<p:input name="data" href="#data2"/>-->
+                                <p:input name="data" href="#data"/>
+                                <p:input name="config" href="/config/xforms-widgets.xsl"/>
+                                <p:output name="data" id="widgeted-view"/>
+                            </p:processor>
+                        </p:when>
+                        <p:otherwise>
+                            <!-- No theme -->
+                            <p:processor name="oxf:identity">
+                                <p:input name="data" href="#data"/>
+                                <p:output name="data" id="widgeted-view"/>
+                            </p:processor>
+                        </p:otherwise>
+                    </p:choose>
 
                     <!--<p:processor name="oxf:sax-logger">-->
                         <!--<p:input name="data" href="#widgeted-view"/>-->

@@ -205,7 +205,14 @@
                                         </attribute>
                                     </optional>
                                     <optional>
-                                        <attribute name="null-if"/>
+                                        <attribute>
+                                            <choice>
+                                                <!-- New name -->
+                                                <name>null</name>
+                                                <!-- Legacy name -->
+                                                <name>null-if</name>
+                                            </choice>
+                                        </attribute>
                                     </optional>
                                     <choice>
                                         <group>
@@ -235,7 +242,14 @@
                                         <value>true</value>
                                     </attribute>
                                     <optional>
-                                        <attribute name="null-if"/>
+                                        <attribute>
+                                            <choice>
+                                                <!-- New name -->
+                                                <name>null</name>
+                                                <!-- Legacy name -->
+                                                <name>null-if</name>
+                                            </choice>
+                                        </attribute>
                                     </optional>
                                     <choice>
                                         <attribute name="select"/>

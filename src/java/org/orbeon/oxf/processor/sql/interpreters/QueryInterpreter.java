@@ -85,7 +85,11 @@ public class QueryInterpreter extends SQLProcessor.InterpreterContentHandler {
                 String select = attributes.getValue("select");
                 String separator = attributes.getValue("separator");
                 boolean replace = Boolean.valueOf(attributes.getValue("replace")).booleanValue();
-                String nullIf = attributes.getValue("null-if");
+                String nullIf; {
+                    nullIf = attributes.getValue("null");
+                    if (nullIf == null)
+                        nullIf = attributes.getValue("null-if");// legacy attribute name
+                }
                 if (replace || separator != null) {
                     // Remember that we have to replace at least once
                     hasReplaceOrSeparator = true;

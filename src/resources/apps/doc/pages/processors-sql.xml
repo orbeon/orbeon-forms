@@ -269,22 +269,32 @@
                     <li><code>CCYY-MM-DD</code></li>
                 </ul>
                 <p>
-                    Unless a getter is nested in the <code>sql:param</code> element (see the section
-                    about nested queries below), a <code>select</code> attribute is mandatory. Its
-                    content is evaluated as an XPath expression against the input XML document:
+                    Unless a getter is nested in the <code>sql:param</code> element (see the section about nested
+                    queries below), a <code>select</code> attribute is mandatory. Its content is evaluated as an XPath
+                    expression against the input XML document:
                 </p>
-
                 <xml-source>
-<sql:query xmlns:sql="http://orbeon.org/oxf/xml/sql">
-select first_name, last_name
-  from employee
- where employee_id in (<sql:param type="xs:int" select="/query/employee-id[1]"/>,
-                       <sql:param type="xs:int" select="/query/employee-id[2]"/>)
-</sql:query>
+                    <sql:query xmlns:sql="http://orbeon.org/oxf/xml/sql">
+                        select first_name, last_name
+                          from employee
+                         where employee_id in (<sql:param type="xs:int" select="/query/employee-id[1]"/>,
+                                               <sql:param type="xs:int" select="/query/employee-id[2]"/>)
+                    </sql:query>
                 </xml-source>
-
                 <p>Any number of <code>sql:param</code> elements may be used.</p>
-
+                <p>
+                    <code>sql:param</code> supports an optional boolean <code>null</code> attribute, which contains a
+                    boolean XPath expression. If the expression returns true, then the query parameter is set to the
+                    null value:
+                </p>
+                <xml-source>
+                    <sql:query xmlns:sql="http://orbeon.org/oxf/xml/sql">
+                        select *
+                          from employee
+                         where foobar = <sql:param type="xs:int" select="/query/foobar"
+                                                   null="normalize-space(/query/foobar) = ''"/>
+                    </sql:query>
+                </xml-source>
                 <p>
                     <code>sql:param</code> supports an optional boolean <code>replace</code> attribute, that can take
                     the value <code>true</code> or <code>false</code> (the default). When <code>replace</code> is set to
@@ -294,14 +304,12 @@ select first_name, last_name
                     queries, or to set parameters that do not allow being set via JDBC's <code>setYyy</code> methods.
                     For example, with SQL Server:
                 </p>
-
                 <xml-source>
 <sql:query xmlns:sql="http://orbeon.org/oxf/xml/sql">
     select top&#160;<sql:param type="xs:int" select="/query/max-rows" replace="true"/>&#160;*
       from employee
 </sql:query>
                 </xml-source>
-
                 <p>
                     <code>sql:param</code> supports an optional <code>separator</code> attribute.
                     When that attribute is present, the result of the XPath expression in the

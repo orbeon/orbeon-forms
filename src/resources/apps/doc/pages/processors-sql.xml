@@ -202,14 +202,13 @@
 <comment>Optional user content</comment>
                 </xml-source>
             </section>
-
+            <a name="sql-query-update"/>
             <section>
                 <title>sql:query and sql:update</title>
                 <p>
-                    <code>sql:query</code> and <code>sql:update</code> encapsulate SQL statements.
-                    Like with JDBC, a distinction is made between queries (SQL
-                    <code>select</code>) and updates (SQL <code>update</code>, <code>insert</code>
-                    and <code>delete</code>):
+                    <code>sql:query</code> and <code>sql:update</code> encapsulate SQL statements. Like with JDBC, a
+                    distinction is made between queries (SQL <code>select</code>) and updates (SQL <code>update</code>,
+                    <code>insert</code> and <code>delete</code>):
                 </p>
                 <xml-source>
 <sql:query xmlns:sql="http://orbeon.org/oxf/xml/sql">

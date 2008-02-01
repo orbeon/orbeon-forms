@@ -278,7 +278,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
             boolean isDeferredSubmissionSecondPassReplaceAll = false;
             XFormsSubmitErrorEvent submitErrorEvent = null;
-            boolean submitDone = false;
+            XFormsSubmitDoneEvent submitDoneEvent = null;
             final long submissionStartTime = XFormsServer.logger.isDebugEnabled() ? System.currentTimeMillis() : 0;
 
             // Make sure submission element info is extracted
@@ -741,7 +741,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                             replaceModel.handleNewInstanceDocuments(pipelineContext, sharedInstance);
 
                             connectionResult = null;
-                            submitDone = true;
+                            submitDoneEvent = new XFormsSubmitDoneEvent(XFormsModelSubmission.this, absoluteResolvedURLString);
                         } else {
                             // Perform actual submission
                             connectionResult = XFormsSubmissionUtils.doRegular(externalContext,
@@ -763,7 +763,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                                     // "the event xforms-submit-done is dispatched"
                                     if (!isDeferredSubmissionSecondPassReplaceAll) // we don't want any changes to happen to the document upon xxforms-submit when producing a new document
-                                        containingDocument.dispatchEvent(pipelineContext, new XFormsSubmitDoneEvent(XFormsModelSubmission.this));
+                                        containingDocument.dispatchEvent(pipelineContext, new XFormsSubmitDoneEvent(XFormsModelSubmission.this, connectionResult.resourceURI));
 
                                     final ExternalContext.Response response = externalContext.getResponse();
 
@@ -834,7 +834,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                                 replaceModel.handleNewInstanceDocuments(pipelineContext, newInstance);
 
                                                 // Notify that submission is done
-                                                submitDone = true;
+                                                submitDoneEvent = new XFormsSubmitDoneEvent(XFormsModelSubmission.this, connectionResult.resourceURI);
                                             }
                                         } catch (Exception e) {
                                             submitErrorEvent = createErrorEvent(connectionResult);
@@ -847,7 +847,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                     }
                                 } else if (replace.equals(XFormsConstants.XFORMS_SUBMIT_REPLACE_NONE)) {
                                     // Just notify that processing is terminated
-                                    submitDone = true;
+                                    submitDoneEvent = new XFormsSubmitDoneEvent(XFormsModelSubmission.this, connectionResult.resourceURI);
                                 } else {
                                     submitErrorEvent = createErrorEvent(connectionResult);
                                     throw new XFormsSubmissionException("xforms:submission: invalid replace attribute: " + replace, "processing instance replacement");
@@ -863,7 +863,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                             + getEffectiveId());
                                 }
 
-                                submitDone = true;
+                                submitDoneEvent = new XFormsSubmitDoneEvent(XFormsModelSubmission.this, connectionResult.resourceURI);
                             }
                         } else if (connectionResult.resultCode == 302 || connectionResult.resultCode == 301) {
                             // Got a redirect
@@ -907,8 +907,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 }
             } finally {
                 // If submission succeeded, dispatch success event
-                if (submitDone && !isDeferredSubmissionSecondPassReplaceAll) { // we don't want any changes to happen to the document upon xxforms-submit when producing a new document
-                    containingDocument.dispatchEvent(pipelineContext, new XFormsSubmitDoneEvent(XFormsModelSubmission.this));
+                if (submitDoneEvent != null && !isDeferredSubmissionSecondPassReplaceAll) { // we don't want any changes to happen to the document upon xxforms-submit when producing a new document
+                    containingDocument.dispatchEvent(pipelineContext, submitDoneEvent);
                 }
                 // Log total time spent in submission if needed
                 if (XFormsServer.logger.isDebugEnabled()) {

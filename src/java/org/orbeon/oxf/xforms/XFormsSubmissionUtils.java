@@ -102,7 +102,7 @@ public class XFormsSubmissionUtils {
                 if (doReplace) {
                     // "the event xforms-submit-done is dispatched"
                     if (xformsModelSubmission != null)
-                        xformsModelSubmission.getContainingDocument().dispatchEvent(pipelineContext, new XFormsSubmitDoneEvent(xformsModelSubmission));
+                        xformsModelSubmission.getContainingDocument().dispatchEvent(pipelineContext, new XFormsSubmitDoneEvent(xformsModelSubmission, connectionResult.resourceURI));
                     // Just forward the reply
                     requestDispatcher.forward(requestAdapter, externalContext.getResponse());
                     connectionResult.dontHandleResponse = true;

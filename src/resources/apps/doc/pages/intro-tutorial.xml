@@ -269,7 +269,7 @@
                     your name and displays it back. You run the Hello application by selecting the link "XForms Hello"
                     in the list of applications. Here are direct links for running XForms Hello <a
                     href="/xforms-hello/">on your local Orbeon Forms install</a> or <a
-                    href="http://www.orbeon.com/ops/xforms-hello/">online on the Orbeon web site</a>.
+                    href="/xforms-hello/">online on the Orbeon web site</a>.
                 </p>
                 <p>
                     Simply enter your first name in the input field, for example "Joe". You should promptly see a

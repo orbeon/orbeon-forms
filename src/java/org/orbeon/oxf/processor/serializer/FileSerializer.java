@@ -126,6 +126,8 @@ public class FileSerializer extends ProcessorImpl {
             requestedContentType = XPathUtils.selectStringValueNormalize(document, "/config/content-type");
 
             forceContentType = ProcessorUtils.selectBooleanValue(document, "/config/force-content-type", DEFAULT_FORCE_CONTENT_TYPE);
+            // TODO: We don't seem to be using the content type in the file serializer.
+            // Maybe this is something that was left over from the days when the file serializer was also serializing XML.
             if (forceContentType)
                 throw new OXFException("The force-content-type element requires a content-type element.");
             ignoreDocumentContentType = ProcessorUtils.selectBooleanValue(document, "/config/ignore-document-content-type", DEFAULT_IGNORE_DOCUMENT_CONTENT_TYPE);

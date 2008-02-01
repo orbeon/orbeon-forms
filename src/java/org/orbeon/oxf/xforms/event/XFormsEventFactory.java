@@ -96,7 +96,7 @@ public class XFormsEventFactory {
         });
         nameToClassMap.put(XFormsEvents.XFORMS_SUBMIT_DONE, new Factory() {
             public XFormsEvent createEvent(String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Element filesElement) {
-                return new XFormsSubmitDoneEvent(targetObject);
+                return new XFormsSubmitDoneEvent(targetObject, contextString);
             }
         });
         nameToClassMap.put(XFormsEvents.XXFORMS_READY, new Factory() {

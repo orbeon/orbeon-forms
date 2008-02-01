@@ -88,7 +88,7 @@ public class PooledXPathExpression {
      * Evaluate and return a List of native Java objects, but keep NodeInfo objects.
      */
     public List evaluateKeepNodeInfo(Object functionContext) throws XPathException {
-        final NodeInfo contextNode = (NodeInfo) contextNodeSet.get(contextPosition - 1);
+        final NodeInfo contextNode = (contextNodeSet.size() > contextPosition - 1) ? (NodeInfo) contextNodeSet.get(contextPosition - 1) : null;
         final XPathContextMajor xpathContext = new XPathContextMajor(contextNode, this.configuration);
         final SequenceIterator iter = evaluate(xpathContext, functionContext);
 
@@ -208,7 +208,7 @@ public class PooledXPathExpression {
         }
 
         public Item current() {
-            if (currentPosition != -1)
+            if (currentPosition != -1 && contextNodeset.size() > currentPosition - 1)
                 return (NodeInfo) contextNodeset.get(currentPosition - 1);
             else
                 return null;

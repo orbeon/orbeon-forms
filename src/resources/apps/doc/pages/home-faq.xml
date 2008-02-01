@@ -349,7 +349,7 @@
                     <li>
                         <p>
                             <b>An XHTML+XForms file</b> that runs in the <a
-                            href="http://www.orbeon.com/ops/xforms-sandbox/">XForms sandbox</a> - This is by far the
+                            href="/xforms-sandbox/">XForms sandbox</a> - This is by far the
                             preferred way of submitting a test case. Most problems with XForms can be shown in one
                             single XHTML+XForms file. If you need the XForms to call a service with an
                             <code>&lt;xforms:submission></code>, you can simulate this by placing an XML file that
@@ -1366,7 +1366,7 @@
                     own pipelines: the PFC has to know the names of the inputs and outputs to
                     connect to. Therefore, you have to use the names ( <code>data</code> and
                     <code>instance</code>) <a
-                    href="http://www.orbeon.com/ops/doc/processors-controller">documented</a>.
+                    href="/doc/processors-controller">documented</a>.
                 </p>
                 <p>
                     If you implement a pipeline or write a new processor in Java, and you don't

@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2006 Orbeon, Inc.
+ *  Copyright (C) 2008 Orbeon, Inc.
  *
  *  This program is free software; you can redistribute it and/or modify it under the terms of the
  *  GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -1372,82 +1372,87 @@ ORBEON.xforms.Events = {
                 var control = ORBEON.util.Dom.getElementById(label.htmlFor);
                 var form = ORBEON.xforms.Controls.getForm(control);
 
-                // Create help dialog if this hasn't been done already
-                if (ORBEON.xforms.Globals.formHelpPanel[form.id] == null) {
-                    // Look for help div in the page under the form
-                    for (var childIndex = 0; childIndex < form.childNodes.length; childIndex++) {
-                        var formChild = form.childNodes[childIndex];
-                        if (ORBEON.util.Dom.isElement(formChild) && ORBEON.util.Dom.hasClass(formChild, "xforms-help-panel")) {
-                            // Create YUI dialog for help based on template
-                            YAHOO.util.Dom.generateId(formChild);
-                            ORBEON.util.Dom.removeClass(formChild, "xforms-initially-hidden");
-                            var helpPanel = new YAHOO.widget.Panel(formChild.id, {
-                                modal: false,
-                                fixedcenter: false,
-                                underlay: "shadow",
-                                visible: false,
-                                constraintoviewport: false,
-                                draggable: true,
-                                effect: {effect:YAHOO.widget.ContainerEffect.FADE,duration: 0.3}
-                            });
-                            helpPanel.render();
-                            helpPanel.element.style.display = "none";
-                            ORBEON.xforms.Globals.formHelpPanel[form.id] = helpPanel;
+                if (ORBEON.util.Utils.getProperty(HELP_HANDLER_PROPERTY)) {
+                    // We are sending the xforms-help event to the server and the server will tell us what do to
+                    xformsFireEvents(new Array(xformsCreateEventArray(control, "xforms-help")), false);
+                } else {
+                    // Create help dialog if this hasn't been done already
+                    if (ORBEON.xforms.Globals.formHelpPanel[form.id] == null) {
+                        // Look for help div in the page under the form
+                        for (var childIndex = 0; childIndex < form.childNodes.length; childIndex++) {
+                            var formChild = form.childNodes[childIndex];
+                            if (ORBEON.util.Dom.isElement(formChild) && ORBEON.util.Dom.hasClass(formChild, "xforms-help-panel")) {
+                                // Create YUI dialog for help based on template
+                                YAHOO.util.Dom.generateId(formChild);
+                                ORBEON.util.Dom.removeClass(formChild, "xforms-initially-hidden");
+                                var helpPanel = new YAHOO.widget.Panel(formChild.id, {
+                                    modal: false,
+                                    fixedcenter: false,
+                                    underlay: "shadow",
+                                    visible: false,
+                                    constraintoviewport: false,
+                                    draggable: true,
+                                    effect: {effect:YAHOO.widget.ContainerEffect.FADE,duration: 0.3}
+                                });
+                                helpPanel.render();
+                                helpPanel.element.style.display = "none";
+                                ORBEON.xforms.Globals.formHelpPanel[form.id] = helpPanel;
 
-                            // Find div for help body
-                            var bodyDiv = ORBEON.util.Dom.getChildElementByClass(formChild, "bd");
-                            var messageDiv = ORBEON.util.Dom.getChildElementByClass(bodyDiv, "xforms-help-panel-message");
-                            ORBEON.xforms.Globals.formHelpPanelMessageDiv[form.id] = messageDiv;
+                                // Find div for help body
+                                var bodyDiv = ORBEON.util.Dom.getChildElementByClass(formChild, "bd");
+                                var messageDiv = ORBEON.util.Dom.getChildElementByClass(bodyDiv, "xforms-help-panel-message");
+                                ORBEON.xforms.Globals.formHelpPanelMessageDiv[form.id] = messageDiv;
 
-                            // Get the close button and register listener on that button
-                            var closeDiv = ORBEON.util.Dom.getChildElementByClass(bodyDiv, "xforms-help-panel-close");
-                            var closeButton = ORBEON.util.Dom.getChildElementByIndex(closeDiv, 0);
-                            ORBEON.xforms.Globals.formHelpPanelCloseButton[form.id] = closeButton;
-                            YAHOO.util.Event.addListener(closeButton, "click", ORBEON.xforms.Events.helpDialogButtonClose, form.id);
+                                // Get the close button and register listener on that button
+                                var closeDiv = ORBEON.util.Dom.getChildElementByClass(bodyDiv, "xforms-help-panel-close");
+                                var closeButton = ORBEON.util.Dom.getChildElementByIndex(closeDiv, 0);
+                                ORBEON.xforms.Globals.formHelpPanelCloseButton[form.id] = closeButton;
+                                YAHOO.util.Event.addListener(closeButton, "click", ORBEON.xforms.Events.helpDialogButtonClose, form.id);
 
-                            // Register listener for when the panel is closed by a click on the "x"
-                            helpPanel.beforeHideEvent.subscribe(ORBEON.xforms.Events.helpDialogXClose, form.id);
+                                // Register listener for when the panel is closed by a click on the "x"
+                                helpPanel.beforeHideEvent.subscribe(ORBEON.xforms.Events.helpDialogXClose, form.id);
 
-                            // We found what we were looking for, no need to continue searching
-                            break;
+                                // We found what we were looking for, no need to continue searching
+                                break;
+                            }
                         }
                     }
-                }
 
-                // Update message in help panel
-                ORBEON.xforms.Globals.formHelpPanelMessageDiv[form.id].innerHTML = ORBEON.util.Dom.getStringValue(label);
-                // Check where and if the panel is showing on the page
-                var formHelpPanelRegion = YAHOO.util.Dom.getRegion(ORBEON.xforms.Globals.formHelpPanel[form.id].element);
-                var showAndRepositionPanel;
-                if (formHelpPanelRegion.top == null) {
-                    // Panel is not open
-                    showAndRepositionPanel = true;
-                } else {
-                    // Panel is shown. Check if it is visible.
-                    // Get information about viewport
-                    var viewPortWidth = YAHOO.util.Dom.getViewportWidth();
-                    var viewPortHeight = YAHOO.util.Dom.getViewportHeight();
-                    var scrollX = document.body.scrollLeft;
-                    var scrollY = document.body.scrollTop;
-                    // Check that top left corner and bottom right corner of dialog is in viewport
-                    var verticalConstraint = formHelpPanelRegion.top >= scrollY && formHelpPanelRegion.bottom <= scrollY + viewPortHeight;
-                    var horizontalContraint = formHelpPanelRegion.left >= scrollX && formHelpPanelRegion.right <= scrollX + viewPortWidth;
-                    // Reposition if any constraint is not met
-                    showAndRepositionPanel = !verticalConstraint || !horizontalContraint;
-                }
+                    // Update message in help panel
+                    ORBEON.xforms.Globals.formHelpPanelMessageDiv[form.id].innerHTML = ORBEON.util.Dom.getStringValue(label);
+                    // Check where and if the panel is showing on the page
+                    var formHelpPanelRegion = YAHOO.util.Dom.getRegion(ORBEON.xforms.Globals.formHelpPanel[form.id].element);
+                    var showAndRepositionPanel;
+                    if (formHelpPanelRegion.top == null) {
+                        // Panel is not open
+                        showAndRepositionPanel = true;
+                    } else {
+                        // Panel is shown. Check if it is visible.
+                        // Get information about viewport
+                        var viewPortWidth = YAHOO.util.Dom.getViewportWidth();
+                        var viewPortHeight = YAHOO.util.Dom.getViewportHeight();
+                        var scrollX = document.body.scrollLeft;
+                        var scrollY = document.body.scrollTop;
+                        // Check that top left corner and bottom right corner of dialog is in viewport
+                        var verticalConstraint = formHelpPanelRegion.top >= scrollY && formHelpPanelRegion.bottom <= scrollY + viewPortHeight;
+                        var horizontalContraint = formHelpPanelRegion.left >= scrollX && formHelpPanelRegion.right <= scrollX + viewPortWidth;
+                        // Reposition if any constraint is not met
+                        showAndRepositionPanel = !verticalConstraint || !horizontalContraint;
+                    }
 
-                // Show and reposition dialog when needed
-                if (showAndRepositionPanel) {
-                ORBEON.xforms.Globals.formHelpPanel[form.id].element.style.display = "block";
-                ORBEON.xforms.Globals.formHelpPanel[form.id].cfg.setProperty("context", [target, "tl", "tr"]);
-                ORBEON.xforms.Globals.formHelpPanel[form.id].show();
-                }
+                    // Show and reposition dialog when needed
+                    if (showAndRepositionPanel) {
+                    ORBEON.xforms.Globals.formHelpPanel[form.id].element.style.display = "block";
+                    ORBEON.xforms.Globals.formHelpPanel[form.id].cfg.setProperty("context", [target, "tl", "tr"]);
+                    ORBEON.xforms.Globals.formHelpPanel[form.id].show();
+                    }
 
-                // Set focus on close button if visible (we don't want to set the focus on the close button if not
-                // visible as this would make the help panel scroll down to the close button)
-                var bdDiv = ORBEON.xforms.Globals.formHelpPanelMessageDiv[form.id].parentNode;
-                if (bdDiv.scrollHeight <= bdDiv.clientHeight)
-                ORBEON.xforms.Globals.formHelpPanelCloseButton[form.id].focus();
+                    // Set focus on close button if visible (we don't want to set the focus on the close button if not
+                    // visible as this would make the help panel scroll down to the close button)
+                    var bdDiv = ORBEON.xforms.Globals.formHelpPanelMessageDiv[form.id].parentNode;
+                    if (bdDiv.scrollHeight <= bdDiv.clientHeight)
+                    ORBEON.xforms.Globals.formHelpPanelCloseButton[form.id].focus();
+                }
             }
         }
     },

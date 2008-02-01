@@ -91,6 +91,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     private String legacyContainerNamespace;
 
     // Event information
+    private static final Map ignoredXFormsOutputExternalEvents = new HashMap();
     private static final Map allowedXFormsOutputExternalEvents = new HashMap();
     private static final Map allowedXFormsUploadExternalEvents = new HashMap();
     private static final Map allowedExternalEvents = new HashMap();
@@ -98,10 +99,13 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     private static final Map allowedXFormsContainingDocumentExternalEvents = new HashMap();
     private static final Map allowedXXFormsDialogExternalEvents = new HashMap();
     static {
+        // External events ignored on xforms:output
+        ignoredXFormsOutputExternalEvents.put(XFormsEvents.XFORMS_DOM_FOCUS_IN, "");
+        ignoredXFormsOutputExternalEvents.put(XFormsEvents.XFORMS_DOM_FOCUS_OUT, "");
 
         // External events allowed on xforms:output
-        allowedXFormsOutputExternalEvents.put(XFormsEvents.XFORMS_DOM_FOCUS_IN, "");
-        allowedXFormsOutputExternalEvents.put(XFormsEvents.XFORMS_DOM_FOCUS_OUT, "");
+        allowedXFormsOutputExternalEvents.putAll(ignoredXFormsOutputExternalEvents);
+        allowedXFormsOutputExternalEvents.put(XFormsEvents.XFORMS_HELP, "");
 
         // External events allowed on xforms:upload
         allowedXFormsUploadExternalEvents.putAll(allowedXFormsOutputExternalEvents);
@@ -111,7 +115,6 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         // External events allowed on other controls
         allowedExternalEvents.putAll(allowedXFormsOutputExternalEvents);
         allowedExternalEvents.put(XFormsEvents.XFORMS_DOM_ACTIVATE, "");
-        allowedExternalEvents.put(XFormsEvents.XFORMS_HELP, "");
         allowedExternalEvents.put(XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE, "");
 
         // External events allowed on xforms:submission
@@ -764,7 +767,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         }
 
         // Don't actually dispatch event to xforms:output (but repeat focus may have been dispatched)
-        if (eventTarget instanceof XFormsOutputControl) {
+        if (eventTarget instanceof XFormsOutputControl && ignoredXFormsOutputExternalEvents.equals(eventName)) {
             return;
 
             // NOTE: We always receive DOMFocusIn from the client on xforms:output. Would it make sense to turn this

@@ -224,7 +224,7 @@ ORBEON.util.IEDom = {
      * Orbeon version of getting Elements by Name in IE
      */
     getElementsByName: function(element, localName, namespace) {
-        return element.getElementsByTagName(namespace + ":" + localName);
+        return element.getElementsByTagName(namespace == null ? localName : namespace + ":" + localName);
     }
 };
 

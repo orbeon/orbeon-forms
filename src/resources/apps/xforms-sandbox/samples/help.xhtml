@@ -40,17 +40,6 @@
     </xhtml:head>
     <xhtml:body>
 
-        <!-- Markup that will be inserted to in the page (similar to what we do for the error panel) -->
-        <xhtml:div class="xforms-help-panel xforms-initially-hidden">
-            <xhtml:div class="hd">Help</xhtml:div>
-            <xhtml:div class="bd">
-                <xhtml:div class="xforms-help-panel-message"/>
-                <xhtml:div class="xforms-help-panel-close">
-                    <xhtml:button>Close</xhtml:button>
-                </xhtml:div>
-            </xhtml:div>
-        </xhtml:div>
-
         <xforms:trigger>
             <xforms:label>Show</xforms:label>
             <xforms:setvalue ref="/instance/show" ev:event="DOMActivate">true</xforms:setvalue>
@@ -60,24 +49,39 @@
             <xforms:setvalue ref="/instance/show" ev:event="DOMActivate">false</xforms:setvalue>
         </xforms:trigger>
         <xforms:group ref=".[/instance/show = 'true']">
-            <xhtml:div>
-                <xforms:input ref="/instance/real-message">
-                    <xforms:label>Ref to real help</xforms:label>
+            <xhtml:p>
+                <xforms:output ref="/instance/empty-message">
+                    <xforms:label>Ref to real help (should show HTML markup)</xforms:label>
                     <xforms:help ref="/instance/real-message"/>
-                </xforms:input>
-            </xhtml:div>
-            <xhtml:div>
-                <xforms:input ref="/instance/empty-message">
+                </xforms:output>
+            </xhtml:p>
+            <xhtml:p>
+                <xforms:output ref="/instance/empty-message">
+                    <xforms:label>Ref to real help (should show rendered HTML)</xforms:label>
+                    <xforms:help><xforms:output mediatype="text/html" value="/instance/real-message"/></xforms:help>
+                </xforms:output>
+            </xhtml:p>
+            <xhtml:p>
+                <xforms:output ref="/instance/empty-message">
                     <xforms:label>Ref to empty help</xforms:label>
                     <xforms:help ref="/instance/empty-message"/>
-                </xforms:input>
-            </xhtml:div>
-            <xhtml:div>
-                <xforms:input ref="/instance/empty-message">
+                </xforms:output>
+            </xhtml:p>
+            <xhtml:p>
+                <xforms:output ref="/instance/empty-message">
                     <xforms:label>Ref to empty nodeset</xforms:label>
                     <xforms:help ref="inexistant-message"/>
-                </xforms:input>
-            </xhtml:div>
+                </xforms:output>
+            </xhtml:p>
+            <xhtml:p>
+                <xforms:output ref="/instance/empty-message" id="output-with-help-handler">
+                    <xforms:label>Has xforms-help handler</xforms:label>
+                    <xforms:help>Help message</xforms:help>
+                    <xforms:action ev:event="xforms-help" ev:propagate="false">
+                        <xforms:message level="modal">Help triggered</xforms:message>
+                    </xforms:action>
+                </xforms:output>
+            </xhtml:p>
         </xforms:group>
     </xhtml:body>
 </xhtml:html>

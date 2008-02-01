@@ -1883,6 +1883,30 @@
                     use the Servlet (or Portlet) session to store and retrieve information.
                 </p>
             </section>
+            <a name="orbeon-version"/>
+            <section added="2008-01-31">
+                <title>How can I know which version of Orbeon Forms I am running?</title>
+                <p>
+                    If you have downloaded a war of Orbeon Forms, and you would like to know exactly which version it
+                    is, you can either:
+                </p>
+                <ul>
+                    <li>
+                        If you have deployed Orbeon Forms, go to the example home page; the version number will be
+                        displayed at the bottom of the page.
+                    </li>
+                    <li>
+                        From the command line, uncompress <code>orbeon.war</code>, go to the <code>WEB-INF</code>
+                        directory and run <code>java -jar orbeon-cli.jar -v</code>.
+                    </li>
+                </ul>
+                <p>
+                    The version number looks like 3.6.0.200801230314. The last part tells you exactly at what time this
+                    version of Orbeon Forms was built, in UTC time. You can check if the version you have a nightly
+                    build or a release by comparing that time stamp to the time stamp on the <a
+                    href="http://forge.objectweb.org/project/showfiles.php?group_id=168">Orbeon Forms releases</a>.
+                </p>
+            </section>
         </section>
         <!--<section>-->
             <!--<title>Studio FAQ</title>-->

@@ -79,6 +79,14 @@
                             particular allow you to pick the theme stylesheet, enable XHTML output, etc.
                         </p>
                     </li>
+                    <li>
+                        <p>
+                            <b>Orbeon Forms version.</b> You can know the exact version number of the Orbeon Forms you
+                            are running by running <code>java -jar orbeon-cli.jar -v</code> from the command line. The
+                            FAQ has more on how to know <a href="/doc/home-faq#orbeon-version">which version of Orbeon
+                            Forms</a> you are running.
+                        </p>
+                    </li>
                 </ul>
             </section>
             <section>

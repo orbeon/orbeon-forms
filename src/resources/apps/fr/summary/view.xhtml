@@ -22,11 +22,14 @@
       xmlns:xhtml="http://www.w3.org/1999/xhtml"
       xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
       xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+      xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
       xmlns="http://www.w3.org/1999/xhtml">
 
     <head>
         <title>Orbeon Forms - Form Runner</title>
-        <link rel="stylesheet" type="text/css" href="/apps/fr/style/style.css"/>
+        <xhtml:link rel="stylesheet" href="/ops/css/yui/reset-fonts-grids.css" type="text/css"/>
+        <xhtml:link rel="stylesheet" href="/ops/css/yui/base-min.css" type="text/css"/>
+        <xhtml:link rel="stylesheet" href="/apps/fr/style/form-runner.css" type="text/css"/>
         <!-- Main XForms model -->
         <xforms:model id="common-model">
 
@@ -102,17 +105,12 @@
 
         </xforms:model>
         <!-- Model to handle persistence -->
-        <xi:include href="oxf:/apps/fr/includes/persistence-model.xml" xxi:omit-xml-base="true"/>
+        <!--<xi:include href="oxf:/apps/fr/includes/persistence-model.xml" xxi:omit-xml-base="true"/>-->
     </head>
     <body>
-
-        <xhtml:img id="fr-top" src="/apps/fr/style/top.png" alt=""/>
-        <xhtml:div id="fr-container">
-            <xhtml:div class="fr-logo">
-                <xhtml:h1>Orbeon Forms - Form Runner</xhtml:h1>
-            </xhtml:div>
-            <xhtml:div class="fr-separator"/>
-            <xhtml:div class="fr-body">
+        <fr:view>
+            <xforms:label>Orbeon Forms - Form Runner</xforms:label>
+            <fr:body>
                 <p>
                     <!-- Select form -->
                     <xforms:select1 ref="instance('parameters-instance')/form" appearance="full">
@@ -245,10 +243,8 @@
                 <xforms:group model="fr-persistence-model" ref="instance('summary-instance')[not(document)]">
                     <xforms:output model="resources-model" mediatype="text/html" value="saxon:serialize(instance('common-resources')/summary/messages/no-form-found/node(), 'html')"/>
                 </xforms:group>
-            </xhtml:div>
-            <xhtml:div class="fr-separator"/>
-            <xhtml:div class="fr-footer">
-                <!-- Display the toolbar -->
+            </fr:body>
+            <fr:buttons>
                 <xhtml:table>
                     <xhtml:tr>
                         <xhtml:td>
@@ -256,21 +252,21 @@
                                 <xforms:trigger>
                                     <xforms:label>
                                         <xhtml:img src="/apps/fr/style/add.gif" alt="Create"/>
-                                        <xforms:output model="resources-model" ref="instance('common-resources')/summary/labels/new-form"/>
+                                        <xhtml:span><xforms:output model="resources-model" ref="instance('common-resources')/summary/labels/new-form"/></xhtml:span>
                                     </xforms:label>
                                     <xforms:dispatch ev:event="DOMActivate" target="fr-persistence-model" name="orbeon-create"/>
                                 </xforms:trigger>
                                 <xforms:trigger>
                                     <xforms:label>
                                         <xhtml:img src="/apps/fr/style/run.gif" alt="Edit"/>
-                                        <xforms:output model="resources-model" ref="instance('common-resources')/summary/labels/edit-form"/>
+                                        <xhtml:span><xforms:output model="resources-model" ref="instance('common-resources')/summary/labels/edit-form"/></xhtml:span>
                                     </xforms:label>
                                     <xforms:dispatch ev:event="DOMActivate" target="fr-persistence-model" name="orbeon-edit"/>
                                 </xforms:trigger>
                                 <xforms:trigger>
                                     <xforms:label>
                                         <xhtml:img src="/apps/fr/style/delete.gif" alt="Delete"/>
-                                        <xforms:output model="resources-model" ref="instance('common-resources')/summary/labels/delete-form"/>
+                                        <xhtml:span><xforms:output model="resources-model" ref="instance('common-resources')/summary/labels/delete-form"/></xhtml:span>
                                     </xforms:label>
                                     <xforms:dispatch ev:event="DOMActivate" target="fr-persistence-model" name="orbeon-delete"/>
                                 </xforms:trigger>
@@ -302,9 +298,8 @@
                         </xhtml:td>
                     </xhtml:tr>
                 </xhtml:table>
-            </xhtml:div>
-        </xhtml:div>
-        <xhtml:img id="fr-bottom" src="/apps/fr/style/bottom.png" alt=""/>
+            </fr:buttons>
+        </fr:view>
 
         <!--<table class="forms-action-table">-->
             <!--<tr>-->

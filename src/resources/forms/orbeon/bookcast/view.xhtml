@@ -21,7 +21,9 @@
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
     <head>
         <title>XForms Bookcast</title>
-        <xhtml:link rel="stylesheet" href="/apps/fr/style/style.css" type="text/css"/>
+        <xhtml:link rel="stylesheet" href="/ops/css/yui/reset-fonts-grids.css" type="text/css"/>
+        <xhtml:link rel="stylesheet" href="/ops/css/yui/base-min.css" type="text/css"/>
+        <xhtml:link rel="stylesheet" href="/apps/fr/style/form-runner.css" type="text/css"/>
         <link rel="alternate" type="application/atom+xml" title="Orbeon XForms Bookcast Tutorial Feed" href="atom"/>
         <xforms:model schema="oxf:/apps/xforms-bookcast/schema.xsd">
 
@@ -43,8 +45,8 @@
             </xforms:instance>
 
             <xforms:bind nodeset="instance('form-instance')/book">
-                <xforms:bind nodeset="title" required="true()"/>
-                <xforms:bind nodeset="author" required="true()"/>
+                <xforms:bind id="title-bind" nodeset="title" required="true()"/>
+                <xforms:bind id="author-bind" nodeset="author" required="true()"/>
             </xforms:bind>
 
             <xforms:instance id="book-template">
@@ -117,79 +119,87 @@
     <body>
         <fr:view>
             <xforms:label>XForms Bookcast</xforms:label>
-            <p>
-                <i>This example is described in details in the <a href="/doc/intro-tutorial">Orbeon Forms Tutorial</a>.</i>
-            </p>
-            <!-- This table contains the main actions for the page  -->
-            <table class="books-action-table">
-                <tr>
-                    <td>
-                        <xforms:submit submission="sample-data-submission" appearance="minimal">
-                            <xforms:label><img src="/apps/fr/style/add-all.gif" alt="Load Sample Data"/> Load Sample Data</xforms:label>
-                        </xforms:submit>
-                    </td>
-                </tr>
-            </table>
+            <fr:body>
+                <p>
+                    <i>This example is described in details in the <a href="/doc/intro-tutorial">Orbeon Forms Tutorial</a>.</i>
+                </p>
+                <!-- This table contains the main actions for the page  -->
+                <table class="books-action-table">
+                    <tr>
+                        <td>
+                            <xforms:submit submission="sample-data-submission" appearance="minimal">
+                                <xforms:label><img src="/apps/fr/style/add-all.gif" alt="Load Sample Data"/> Load Sample Data</xforms:label>
+                            </xforms:submit>
+                        </td>
+                    </tr>
+                </table>
 
-            <fr:section id="books" columns="2">
-                <xforms:label>Books</xforms:label>
+                <fr:section id="books" columns="2">
+                    <xforms:label>Books</xforms:label>
 
-                <fr:repeat nodeset="book" id="book-repeat" origin="instance('book-template')">
-                    <xforms:label>Book</xforms:label>
-                        <tr>
-                            <td>
-                                <xforms:input ref="title">
-                                    <xforms:label class="books-label">Title</xforms:label>
-                                </xforms:input>
-                            </td>
-                            <td>
-                                <xforms:input ref="author">
-                                    <xforms:label class="books-label">Author</xforms:label>
-                                </xforms:input>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <xforms:select1 ref="language">
-                                    <xforms:label class="books-label">Language</xforms:label>
-                                    <xforms:item>
-                                        <xforms:label>Choose One...</xforms:label>
-                                        <xforms:value/>
-                                    </xforms:item>
-                                    <xforms:itemset nodeset="instance('languages-instance')/language">
-                                        <xforms:label ref="name"/>
-                                        <xforms:value ref="value"/>
-                                    </xforms:itemset>
-                                </xforms:select1>
-                            </td>
-                            <td>
-                                <xforms:input ref="link">
-                                    <xforms:label class="books-label">Link</xforms:label>
-                                </xforms:input>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <xforms:select1 ref="rating" appearance="full">
-                                    <xforms:label class="books-label">Rating</xforms:label>
-                                    <xforms:item>
-                                        <xforms:label>None</xforms:label>
-                                        <xforms:value/>
-                                    </xforms:item>
-                                    <xforms:itemset nodeset="instance('ratings-instance')/rating">
-                                        <xforms:label ref="name"/>
-                                        <xforms:value ref="value"/>
-                                    </xforms:itemset>
-                                </xforms:select1>
-                            </td>
-                            <td>
-                                <xforms:textarea ref="notes" appearance="xxforms:autosize">
-                                    <xforms:label class="books-label">Notes</xforms:label>
-                                </xforms:textarea>
-                            </td>
-                        </tr>
-                </fr:repeat>
-            </fr:section>
+                    <fr:repeat nodeset="book" id="book-repeat" origin="instance('book-template')">
+                        <xforms:label>Book</xforms:label>
+                            <tr>
+                                <td>
+                                    <xforms:input bind="title-bind">
+                                        <xforms:label class="books-label">Title</xforms:label>
+                                        <xforms:hint>Book title</xforms:hint>
+                                    </xforms:input>
+                                </td>
+                                <td>
+                                    <xforms:input bind="author-bind">
+                                        <xforms:label class="books-label">Author</xforms:label>
+                                        <xforms:hint>Book author</xforms:hint>
+                                    </xforms:input>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <xforms:select1 ref="language">
+                                        <xforms:label class="books-label">Language</xforms:label>
+                                        <xforms:hint>Book language</xforms:hint>
+                                        <xforms:item>
+                                            <xforms:label>Choose One...</xforms:label>
+                                            <xforms:value/>
+                                        </xforms:item>
+                                        <xforms:itemset nodeset="instance('languages-instance')/language">
+                                            <xforms:label ref="name"/>
+                                            <xforms:value ref="value"/>
+                                        </xforms:itemset>
+                                    </xforms:select1>
+                                </td>
+                                <td>
+                                    <xforms:input ref="link">
+                                        <xforms:label class="books-label">Link</xforms:label>
+                                        <xforms:hint>Optional link to external resource</xforms:hint>
+                                    </xforms:input>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <xforms:select1 ref="rating" appearance="full">
+                                        <xforms:label class="books-label">Rating</xforms:label>
+                                        <xforms:hint>Your rating</xforms:hint>
+                                        <xforms:item>
+                                            <xforms:label>None</xforms:label>
+                                            <xforms:value/>
+                                        </xforms:item>
+                                        <xforms:itemset nodeset="instance('ratings-instance')/rating">
+                                            <xforms:label ref="name"/>
+                                            <xforms:value ref="value"/>
+                                        </xforms:itemset>
+                                    </xforms:select1>
+                                </td>
+                                <td>
+                                    <xforms:textarea ref="notes" appearance="xxforms:autosize">
+                                        <xforms:label class="books-label">Notes</xforms:label>
+                                        <xforms:hint>Notes about this book</xforms:hint>
+                                    </xforms:textarea>
+                                </td>
+                            </tr>
+                    </fr:repeat>
+                </fr:section>
+            </fr:body>
         </fr:view>
     </body>
 </html>

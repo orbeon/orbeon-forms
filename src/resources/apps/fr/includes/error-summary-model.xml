@@ -15,7 +15,7 @@
 <!--
     This XForms model implements the error summary data structures.
 -->
-<xforms:model id="error-summary-model"
+<xforms:model id="fr-error-summary-model"
         xmlns:xforms="http://www.w3.org/2002/xforms"
         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
         xmlns:exforms="http://www.exforms.org/exf/1-0"

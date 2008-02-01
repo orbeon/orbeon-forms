@@ -43,18 +43,18 @@
     <p:processor name="oxf:xforms-submission">
         <p:input name="submission">
             <xforms:submission ref="/*/*[1]" method="put" replace="none"
-                    action="{xxforms:property('oxf.fr.persistence.exist.uri')}/{/*/group[2]}/{/*/group[3]}/{/*/*[1]/@id}">
-                <xforms:setvalue ev:event="xforms-submit-error" ref="." value="event('body')"/>
+                    action="{xxforms:property('oxf.fr.persistence.exist.uri')}/{/*/group[2]}/{/*/group[3]}/{digest(string(random(true)), 'MD5', 'hex')}">
+                <xforms:setvalue ev:event="xforms-submit-error" ref="." value="event('response-body')"/>
                 <!-- TODO: Propagate error to caller -->
+                <xforms:action ev:event="xforms-submit-done">
+                    <xforms:setvalue ref="/*" value="tokenize(event('resource-uri'), '/')[last()]"/>
+                    <xforms:delete nodeset="/*/group" while="/*/group"/>
+                    <xforms:delete nodeset="/*/*"/>
+                </xforms:action>
             </xforms:submission>
         </p:input>
-        <p:input name="request" href="aggregate('root', #instance, #matcher-groups#xpointer(/*/group))"/>
-        <p:output name="response" id="response"/>
-    </p:processor>
-
-    <p:processor name="oxf:identity">
-        <p:input name="data" href="aggregate('id', #response#xpointer(string(/*/@id)))"/>
-        <p:output name="data" ref="data"/>
+        <p:input name="request" href="aggregate('id', #instance, #matcher-groups#xpointer(/*/group))"/>
+        <p:output name="response" ref="data" debug="xxxxid"/>
     </p:processor>
 
 </p:config>

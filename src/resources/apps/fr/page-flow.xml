@@ -21,13 +21,15 @@
     <!-- Summary -->
     <page path-info="/fr/([^/]+)/" matcher="oxf:perl5-matcher"
           default-submission="summary/submission-page-summary.xml"
-          view="summary/view.xhtml">
+          model="summary/view.xhtml"
+          view="components.xpl">
         <setvalue ref="/*/app" matcher-group="1"/>
     </page>
 
     <page path-info="/fr/([^/]+)/([^/]+)" matcher="oxf:perl5-matcher"
           default-submission="summary/submission-page-summary.xml"
-          view="summary/view.xhtml">
+          model="summary/view.xhtml"
+          view="components.xpl">
         <setvalue ref="/*/app" matcher-group="1"/>
         <setvalue ref="/*/form" matcher-group="2"/>
     </page>
@@ -87,8 +89,14 @@
 
     <!-- Configuration -->
     <page path-info="/fr/service/configuration/([^/]+)/([^/]+)" matcher="oxf:perl5-matcher"
-          view="/forms/${1}/${2}/configuration.xml">
+          default-submission="submission-service-empty.xml"
+          model="summary/load-form.xpl">
+        <setvalue ref="/*/app" matcher-group="1"/>
+        <setvalue ref="/*/form" matcher-group="2"/>
     </page>
+
+    <!--<service path-info="/fr/service/configuration/([^/]+)/([^/]+)" matcher="oxf:perl5-matcher"-->
+             <!--implementation="/forms/${1}/${2}/view.xhtml"/>-->
 
     <!-- ==== Custom services ==== -->
 

@@ -28,50 +28,66 @@
     <xsl:template match="fr:view">
         <xforms:input model="fr-sections-model" ref="instance('fr-sections-instance')/@current" id="fr-current-section-input" class="xforms-disabled"/>
 
-        <xhtml:img id="fr-top" src="/apps/fr/style/top.png" alt=""/>
-
-        <xhtml:div id="fr-container">
-
-            <xhtml:div class="fr-logo">
-                <xhtml:h1><xsl:value-of select="xforms:label"/></xhtml:h1>
-                <!-- Configurable logo -->
-                <xhtml:img src="/forms/logo.gif" alt="Logo"/>
+        <xhtml:div id="doc" class="yui-t7">
+            <xhtml:div id="hd" class="fr-top">
             </xhtml:div>
-            <xhtml:div class="fr-separator"/>
-            <xhtml:div class="fr-body">
+            <xhtml:div id="bd" class="fr-container">
+                <!--<xhtml:div id="yui-main">-->
+                    <xhtml:div class="yui-b">
+                        <xhtml:div class="yui-g fr-logo">
+                            <xhtml:h1><xsl:value-of select="xforms:label"/></xhtml:h1>
+                            <!--<xhtml:img src="http://www.orbeon.com/orbeon-theme/images/orbeon-small-blueorange.gif" alt="Logo"/>-->
+                        </xhtml:div>
+                        <xhtml:div class="yui-g fr-separator">
+                        </xhtml:div>
+                        <xhtml:div class="yui-g fr-body">
+                            <xforms:group ref="/*">
+                                <!-- Error summary: handle xforms-invalid event -->
+                                <xforms:action ev:event="xforms-invalid" if="normalize-space(event('label')) != ''">
+                                    <xforms:action if="not(xxforms:instance('errors-instance')/error[@id = event('target') and @indexes = string-join(event('repeat-indexes'), '-')])">
+                                        <xforms:insert context="xxforms:instance('errors-instance')" nodeset="error" origin="xxforms:instance('error-template')"/>
+                                        <xforms:setvalue ref="xxforms:instance('errors-instance')/error[index('errors-repeat')]/@id" value="event('target')"/>
+                                        <xforms:setvalue ref="xxforms:instance('errors-instance')/error[index('errors-repeat')]/@indexes" value="string-join(event('repeat-indexes'), '-')"/>
+                                    </xforms:action>
+                                    <xforms:setvalue ref="xxforms:instance('errors-instance')/error[@id = event('target') and @indexes = string-join(event('repeat-indexes'), '-')]/@alert" value="event('alert')"/>
+                                    <xforms:setvalue ref="xxforms:instance('errors-instance')/error[@id = event('target') and @indexes = string-join(event('repeat-indexes'), '-')]/@label" value="event('label')"/>
+                                </xforms:action>
+                                <!-- Error summary: handle xforms-valid -->
+                                <xforms:action ev:event="xforms-valid" if="xxforms:instance('errors-instance')/error[@id = event('target') and @indexes = string-join(event('repeat-indexes'), '-')]">
+                                    <xforms:delete nodeset="xxforms:instance('errors-instance')/error[@id = event('target') and @indexes = string-join(event('repeat-indexes'), '-')]"/>
+                                </xforms:action>
 
-                <xforms:group ref="/*">
-                    <!-- Error summary: handle xforms-invalid event -->
-                    <xforms:action ev:event="xforms-invalid" if="normalize-space(event('label')) != ''">
-                        <xforms:action if="not(xxforms:instance('errors-instance')/error[@id = event('target') and @indexes = string-join(event('repeat-indexes'), '-')])">
-                            <xforms:insert context="xxforms:instance('errors-instance')" nodeset="error" origin="xxforms:instance('error-template')"/>
-                            <xforms:setvalue ref="xxforms:instance('errors-instance')/error[index('errors-repeat')]/@id" value="event('target')"/>
-                            <xforms:setvalue ref="xxforms:instance('errors-instance')/error[index('errors-repeat')]/@indexes" value="string-join(event('repeat-indexes'), '-')"/>
-                        </xforms:action>
-                        <xforms:setvalue ref="xxforms:instance('errors-instance')/error[@id = event('target') and @indexes = string-join(event('repeat-indexes'), '-')]/@alert" value="event('alert')"/>
-                        <xforms:setvalue ref="xxforms:instance('errors-instance')/error[@id = event('target') and @indexes = string-join(event('repeat-indexes'), '-')]/@label" value="event('label')"/>
-                    </xforms:action>
-                    <!-- Error summary: handle xforms-valid -->
-                    <xforms:action ev:event="xforms-valid" if="xxforms:instance('errors-instance')/error[@id = event('target') and @indexes = string-join(event('repeat-indexes'), '-')]">
-                        <xforms:delete nodeset="xxforms:instance('errors-instance')/error[@id = event('target') and @indexes = string-join(event('repeat-indexes'), '-')]"/>
-                    </xforms:action>
-
-                    <xforms:group appearance="xxforms:internal">
-                        <!-- Clear message upon user interaction -->
-                        <xforms:setvalue ev:event="DOMFocusIn" model="fr-persistence-model" ref="instance('persistence-instance')/message"/>
-                        <!-- Main form content -->
-                        <xsl:apply-templates select="* except xforms:label"/>
-                    </xforms:group>
-
-                </xforms:group>
+                                <xforms:group appearance="xxforms:internal">
+                                    <!-- Clear message upon user interaction -->
+                                    <xforms:setvalue ev:event="DOMFocusIn" model="fr-persistence-model" ref="instance('persistence-instance')/message"/>
+                                    <!-- Main form content -->
+                                    <xsl:apply-templates select="fr:body/node()"/>
+                                </xforms:group>
+                            </xforms:group>
+                        </xhtml:div>
+                        <xhtml:div class="yui-g fr-separator">
+                        </xhtml:div>
+                        <xhtml:div class="yui-g">
+                            <xsl:choose>
+                                <xsl:when test="fr:buttons">
+                                    <xsl:apply-templates select="fr:buttons/node()"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <!-- Display the toolbar and errors -->
+                                    <xi:include href="oxf:/apps/fr/includes/toolbar-and-errors-view.xml" xxi:omit-xml-base="true"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </xhtml:div>
+                    </xhtml:div>
+                <!--</xhtml:div>-->
+                <!--<xhtml:div class="yui-b">-->
+                    <!--left bar-->
+                <!--</xhtml:div>-->
             </xhtml:div>
-            <xhtml:div class="fr-separator"/>
-            <xhtml:div class="fr-footer">
-                <!-- Display the toolbar and errors -->
-                <xi:include href="oxf:/apps/fr/includes/toolbar-and-errors-view.xml" xxi:omit-xml-base="true"/>
+            <xhtml:div id="ft" class="fr-bottom">
             </xhtml:div>
+
         </xhtml:div>
-        <xhtml:img id="fr-bottom" src="/apps/fr/style/bottom.png" alt=""/>
     </xsl:template>
 
     <xsl:template match="fr:section">

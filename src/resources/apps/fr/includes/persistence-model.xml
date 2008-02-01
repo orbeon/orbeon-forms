@@ -180,17 +180,17 @@
     <!-- Summary data -->
     <xforms:instance id="summary-instance">
         <documents xmlns="" total="0">
-            <headers>
-                <header/>
-                <header/>
-            </headers>
-            <document name="" created="" last-modified="">
-                <id/>
-                <details>
-                    <detail/>
-                    <detail/>
-                </details>
-            </document>
+            <!--<headers>-->
+                <!--<header/>-->
+                <!--<header/>-->
+            <!--</headers>-->
+            <!--<document name="" created="" last-modified="">-->
+                <!--<id/>-->
+                <!--<details>-->
+                    <!--<detail/>-->
+                    <!--<detail/>-->
+                <!--</details>-->
+            <!--</document>-->
         </documents>
     </xforms:instance>
 
@@ -232,7 +232,7 @@
 
     <!-- React to failed submission when saving -->
     <xforms:action ev:event="xforms-submit-error" if="instance('persistence-instance')/save-progress != ''">
-        <xforms:setvalue ref="instance('persistence-instance')/error" value="event('body')"/>
+        <xforms:setvalue ref="instance('persistence-instance')/error" value="event('response-body')"/>
         <xforms:action if="not(instance('persistence-instance')/save-progress = 'validated')">
             <xforms:setvalue ref="instance('persistence-instance')/message">There are errors in your form.</xforms:setvalue><!-- TODO: i18n -->
             <xforms:toggle case="fr-message-validation-error"/>

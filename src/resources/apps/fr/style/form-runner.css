@@ -1,0 +1,270 @@
+html { overflow: scroll; }
+
+body {
+    background-color: #eee;
+}
+
+body, body table, textarea.xforms-textarea {
+    font-family: "Lucida Grande", Tahoma, Arial, Verdana, sans-serif;
+}
+
+.fr-top {
+    background-image: url(top.png);
+    height: 10px !important;
+    display: block !important;
+}
+
+.fr-bottom {
+    background-image: url(bottom.png);
+    height: 10px !important;
+    display: block !important;
+}
+.fr-container {
+    background-color: white;
+    border: 1px solid #cccccc
+}
+
+.fr-separator {
+    background-color: #3598d4;
+    min-height: 1em;
+}
+
+.fr-body {
+    padding: 1em
+}
+
+h1 { margin-top: 0 }
+
+.fr-body .info h2 {
+    font-size: 160%;
+    font-family: inherit;
+    color: #000000
+}
+
+.fr-body .info p {
+    font-size: 95%;
+    font-family: inherit;
+    color: #444444
+}
+
+.fr-body .section h3 {
+    font-size: 110%;
+    font-family: inherit;
+    background: #ffffff;
+    color: #000000
+}
+
+.fr-body .section p {
+    font-size: 85%;
+    font-family: inherit;
+    color: #444444
+}
+
+.fr-logo {
+    background-image: url(logo-bg.gif);
+    background-position: top;
+    height: 150px;
+}
+
+.fr-logo img { padding: .5em 1em .5em 1em; float: right }
+
+.fr-logo h1 { padding-top: 2.3em; padding-left: 1em }
+
+.fr-separator {
+    background-color: #3598d4;
+    min-height: 1em;
+    clear: both;
+}
+
+.xforms-label, h4  {
+    display: block;
+    font-weight: bold;
+    padding-bottom: .2em;
+    margin-top: .5em;
+    text-align: left;
+    margin-bottom: 0;
+}
+
+div.fr-body {
+    margin: 20px 10px 0 10px;
+    padding: 0 0 20px 0;
+}
+
+.fr-section-body {
+    display: block;
+    overflow: hidden;
+    margin: 0 1.5em 1em 1.7em;
+    padding: 0 0 0 0;
+}
+
+.fr-grid tr th {
+    text-align: left;
+}
+
+.fr-grid {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.fr-grid tr td {
+    vertical-align: top;
+}
+
+/* Make sure xforms-disabled  and xforms-repeat-template takes precendence over display: block on other classes */
+label.xforms-disabled, span.xforms-disabled, div.xforms-disabled  { display: none; }
+label.xforms-repeat-template { display: none; }
+
+.xforms-trigger img { padding-right: 5px; }
+
+.fr-layout-table tr td { width: auto }
+.fr-grid .fr-layout-table tr td { width: auto }
+
+.fr-grid-2-columns tr td {
+    width: 50%;
+}
+
+.fr-grid-3-columns tr td {
+    width: 33.3%;
+}
+
+.fr-grid-4-columns tr td {
+    width: 25%;
+}
+
+.fr-grid-5-columns tr td {
+    width: 20%;
+}
+
+.fr-grid-6-columns tr td {
+    width: 16.6%;
+}
+
+h2 a, h3 a, h4 a {
+    color: black;
+    vertical-align: middle;
+}
+
+h2 {
+    font-weight: normal;
+    font-size: 160%;
+    margin: 1em 0 1em 0;
+    clear: left;
+}
+
+h3, h4 {
+    font-weight: normal;
+    font-size: 110%;
+    line-height: 135%;
+    margin: 1em 0 1em 0;
+    padding: 0 0 0 0;
+}
+
+.xforms-repeat-selected-item-1 { background: transparent }
+.xforms-repeat-selected-item-2 { background: transparent }
+
+.fr-summary-table .xforms-repeat-selected-item-1 { background: #3598D4 }
+.fr-summary-table .xforms-repeat-selected-item-2 { background: #3598D4 }
+
+.fr-summary-table tr:hover { background: red }
+.fr-summary-table tr:hover { background: red }
+
+hr {
+    border: 1px solid #eee;
+}
+
+/* Make sure xforms-disabled takes precendence over display: block on other classes */
+label.xforms-disabled, span.xforms-disabled, div.xforms-disabled  {
+    display: none;
+}
+
+textarea {
+    width: 23em;
+}
+
+.fr-error-buttons {
+    margin-top: 2em;
+    width: 100%;
+}
+
+.fr-buttons {
+    text-align: right;
+    padding-top: 1em;
+    padding-right: 2em;
+}
+
+.fr-buttons button {
+    width: 12em
+}
+
+.fr-error-title { color: #f90; font-size: 160%; }
+.fr-error-list li { margin-bottom: .5em; }
+
+.fr-repeat-table .xforms-label { margin-top: 0 }
+
+.fr-message-success { color: green  }
+.fr-message-validation-error { color: orange }
+.fr-message-fatal-error { color: red }
+
+.fr-repeat-table {
+    background-color:#F5FAF7;
+    border:1px solid #D5E0D9;
+    margin:0 0 1em;
+    width: 100%;
+}
+.fr-repeat-table .fr-repeat-table {
+    background-color:#AECCBA;
+    border:1px solid #D5E0D9;
+    margin:0 0 1em;
+    width: 100%;
+}
+.fr-repeat-table td { vertical-align: top }
+
+.fr-tabular, .fr-tabular tr td, .fr-tabular tr th {
+    border-color: #600;
+    border-style: solid;
+}
+
+.fr-tabular tr th {
+    background-color: #f8f8f8;
+}
+
+.fr-tabular {
+    border-width: 0 0 1px 1px;
+    border-spacing: 1px;
+    border-collapse: collapse;
+    /* Fix for Firefox in cases where the right-most border of the table is not displayed */
+    width: 99.9%;
+}
+
+.fr-tabular tr td, .fr-tabular tr th {
+    margin: 0;
+    padding: 4px;
+    border-width: 1px 1px 0 0;
+}
+
+.fr-tabular .xforms-label { display: none; }
+.fr-non-collapsible { padding-left: 1.1em; }
+
+.fr-search-input input {
+    background-image: url(search.gif);
+    background-position: right center;
+    background-repeat: no-repeat;
+}
+
+/*.xforms-group { display: inline }*/
+/*.xforms-help-image { display: inline }*/
+
+td { border: 0 }
+h1 { font-size: 167% }
+i { font-style: italic }
+/* Not sure why the YUI resets this to center */
+body { text-align: left }
+
+/* Display hints under each control */
+.xforms-hint {
+    display: block;
+    font-size: smaller;
+    font-style: italic;
+    margin-left: .5em;
+    width: 22em
+}

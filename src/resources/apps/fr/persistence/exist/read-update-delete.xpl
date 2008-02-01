@@ -79,7 +79,7 @@
                 <p:input name="submission">
                     <xforms:submission ref="/*/*[1]" method="put" replace="none"
                             action="{xxforms:property('oxf.fr.persistence.exist.uri')}/{/*/group[2]}/{/*/group[3]}/{/*/group[4]}">
-                        <xforms:setvalue ev:event="xforms-submit-error" ref="." value="event('body')"/>
+                        <xforms:setvalue ev:event="xforms-submit-error" ref="." value="event('response-body')"/>
                         <!-- TODO: Propagate error to caller -->
                     </xforms:submission>
                 </p:input>

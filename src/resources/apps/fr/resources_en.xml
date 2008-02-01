@@ -24,7 +24,7 @@
         </titles>
         <messages>
             <intro><i>Please select a form in order to perform an operation, or select "New Form" to create a new blank form.</i></intro>
-            <no-form-found><i>No form was found.</i></no-form-found>
+            <no-form-found><i>No form data was found.</i></no-form-found>
         </messages>
         <labels>
             <new-form>New Form</new-form>

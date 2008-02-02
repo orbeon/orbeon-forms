@@ -21,7 +21,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvents;
  *
  * Target: form control / Bubbles: Yes / Cancelable: No / Context Info: None
  */
-public class XFormsReadwriteEvent extends XFormsMIPEvent {
+public class XFormsReadwriteEvent extends XFormsUIEvent {
     public XFormsReadwriteEvent(XFormsControl targetObject) {
         super(XFormsEvents.XFORMS_READWRITE, targetObject);
     }

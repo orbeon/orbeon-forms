@@ -16,14 +16,15 @@ package org.orbeon.oxf.xforms.event.events;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
+import org.orbeon.oxf.xforms.control.XFormsControl;
 
 /**
  * 4.3.8 The xforms-help and xforms-hint Events
  *
  * Target: Core Form Control / Bubbles: Yes / Cancelable: Yes / Context Info: None
  */
-public class XFormsHintEvent extends XFormsEvent {
-    public XFormsHintEvent(XFormsEventTarget targetObject) {
+public class XFormsHintEvent extends XFormsUIEvent {
+    public XFormsHintEvent(XFormsControl targetObject) {
         super(XFormsEvents.XFORMS_HINT, targetObject, true, true);
     }
 }

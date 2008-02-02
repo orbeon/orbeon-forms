@@ -21,7 +21,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvents;
  *
  * Target: form control / Bubbles: Yes / Cancelable: No / Context Info: None
  */
-public class XFormsReadonlyEvent extends XFormsMIPEvent {
+public class XFormsReadonlyEvent extends XFormsUIEvent {
     public XFormsReadonlyEvent(XFormsControl targetObject) {
         super(XFormsEvents.XFORMS_READONLY, targetObject);
     }

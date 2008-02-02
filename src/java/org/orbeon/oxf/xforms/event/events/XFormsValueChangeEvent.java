@@ -22,7 +22,7 @@ import org.orbeon.oxf.xforms.control.XFormsControl;
  *
  * Target: form control / Bubbles: Yes / Cancelable: No / Context Info: None
  */
-public class XFormsValueChangeEvent extends XFormsMIPEvent {
+public class XFormsValueChangeEvent extends XFormsUIEvent {
     public XFormsValueChangeEvent(XFormsControl targetObject) {
         super(XFormsEvents.XFORMS_VALUE_CHANGED, targetObject);
     }

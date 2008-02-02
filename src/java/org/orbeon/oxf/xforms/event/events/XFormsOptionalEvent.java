@@ -21,7 +21,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvents;
  *
  * Target: form control / Bubbles: Yes / Cancelable: No / Context Info: None
  */
-public class XFormsOptionalEvent extends XFormsMIPEvent {
+public class XFormsOptionalEvent extends XFormsUIEvent {
     public XFormsOptionalEvent(XFormsControl targetObject) {
         super(XFormsEvents.XFORMS_OPTIONAL, targetObject);
     }

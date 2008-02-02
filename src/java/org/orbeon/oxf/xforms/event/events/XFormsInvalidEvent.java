@@ -21,7 +21,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvents;
  *
  * Target: form control / Bubbles: Yes / Cancelable: No / Context Info: None
  */
-public class XFormsInvalidEvent extends XFormsMIPEvent {
+public class XFormsInvalidEvent extends XFormsUIEvent {
 
     public XFormsInvalidEvent(XFormsControl targetObject) {
         super(XFormsEvents.XFORMS_INVALID, targetObject);

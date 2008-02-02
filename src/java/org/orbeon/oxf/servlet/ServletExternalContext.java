@@ -587,17 +587,22 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
             }
 
             // Get current time and adjust lastModified
-            long now = System.currentTimeMillis();
+            final long now = System.currentTimeMillis();
             if (lastModified <= 0) lastModified = now;
 
             // Set last-modified
             nativeResponse.setDateHeader("Last-Modified", lastModified);
 
             if (revalidate) {
-                // Try to force revalidation from the client
+                // Make sure the client does not load from cache
                 nativeResponse.setDateHeader("Expires", now);
-                // NOTE: We do not set "must-revalidate" because this seems to cause IE 6/7 to lose form data
-//                nativeResponse.setHeader("Cache-Control", "must-revalidate");
+
+                // IMPORTANT NOTE #1: We set a public here because with IE 6/7, when BASIC auth is enabled, form
+                // fields are not restored upon browser history navigation. Is there a better way?
+                nativeResponse.setHeader("Cache-Control", "public");
+
+                // IMPORTANT NOTE #2: We do not set "must-revalidate" because is so with IE 6/7 form fields are not
+                // restored upon browser history navigation.
             } else {
                 // Regular expiration strategy. We use the HTTP spec heuristic
                 // to calculate the "Expires" header value (10% of the

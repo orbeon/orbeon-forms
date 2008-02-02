@@ -611,6 +611,7 @@ ORBEON.xforms.Controls = {
     isValid:    function (control) { return !ORBEON.util.Dom.hasClass(control, "xforms-invalid"); },
 
     getForm: function(control) {
+        // If the control is not an HTML form control look for an ancestor whch is a form
         if (typeof control.form == "undefined") {
             // There is a span around the control go through parents until we find the form element
             var candidateForm = control;
@@ -1111,7 +1112,7 @@ ORBEON.xforms.Events = {
                     ORBEON.xforms.Globals.serverValue[target.id] = target.value;
                 }
                 // Send focus events
-                var previousDOMFocusOut = ORBEON.xforms.Globals.previousDOMFocusOut;
+                var previousDOMFocusOut = ORBEON.util.Dom.getElementById(ORBEON.xforms.Globals.previousDOMFocusOut);
                 if (previousDOMFocusOut) {
                     if (previousDOMFocusOut != target) {
                         // HTML area and trees does not throw value change event, so we send the value change to the server
@@ -1137,6 +1138,7 @@ ORBEON.xforms.Events = {
                         }
                         // Send focus out/focus in events
                         var events = new Array();
+                        if (ORBEON.xforms.Controls.getForm(previousDOMFocusOut) == null) debugger;
                         events.push(xformsCreateEventArray(previousDOMFocusOut, "DOMFocusOut", null));
                         events.push(xformsCreateEventArray(target, "DOMFocusIn", null));
                         xformsFireEvents(events, true);
@@ -1159,7 +1161,7 @@ ORBEON.xforms.Events = {
             var target = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
             if (target != null) {
                 // This is an event for an XForms control
-                ORBEON.xforms.Globals.previousDOMFocusOut = target;
+                ORBEON.xforms.Globals.previousDOMFocusOut = target.id;
             }
         }
     },
@@ -1557,7 +1559,7 @@ ORBEON.xforms.Events = {
         }
         // Preemptively store current control in previousDOMFocusOut, so when another control gets
         // the focus it will send the value of this control to the server
-        ORBEON.xforms.Globals.previousDOMFocusOut = control;
+        ORBEON.xforms.Globals.previousDOMFocusOut = control.id;
     },
 
     treeClickValueUpdated: function(control) {

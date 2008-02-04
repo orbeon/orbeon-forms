@@ -27,6 +27,7 @@ import org.orbeon.oxf.xforms.action.actions.XFormsLoadAction;
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
 import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.*;
+import org.orbeon.oxf.xforms.event.events.XFormsSubmitErrorEvent.ErrorType;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -309,10 +310,12 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                     // Check that we have a current node and that it is pointing to a document or an element
                     if (currentNodeInfo == null)
-                        throw new XFormsSubmissionException("Empty single-node binding on xforms:submission for submission id: " + id, "getting submission single-node binding");
+                        throw new XFormsSubmissionException("Empty single-node binding on xforms:submission for submission id: " + id, "getting submission single-node binding",
+                        		 XFormsSubmitErrorEvent.ErrorType.NO_DATA);
 
                     if (!(currentNodeInfo instanceof DocumentInfo || currentNodeInfo.getNodeKind() == org.w3c.dom.Document.ELEMENT_NODE)) {
-                        throw new XFormsSubmissionException("xforms:submission: single-node binding must refer to a document node or an element.", "getting submission single-node binding");
+                        throw new XFormsSubmissionException("xforms:submission: single-node binding must refer to a document node or an element.", "getting submission single-node binding",
+                        		XFormsSubmitErrorEvent.ErrorType.NO_DATA);
                     }
                 }
 
@@ -409,7 +412,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                 logger.debug("XForms - submission - instance document or subset thereof cannot be submitted:\n" + documentString);
                             }
                             throw new XFormsSubmissionException("xforms:submission: instance to submit does not satisfy valid and/or required model item properties.",
-                                    "checking instance validity");
+                                    "checking instance validity", XFormsSubmitErrorEvent.ErrorType.VALIDATION_ERROR);
                         }
                     } finally {
                         // Restore instance document
@@ -543,7 +546,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                 logger.debug("XForms - submission - instance document or subset thereof cannot be submitted:\n" + documentString);
                             }
                             throw new XFormsSubmissionException("xforms:submission: instance to submit does not satisfy valid and/or required model item properties.",
-                                    "checking instance validity");
+                                    "checking instance validity", XFormsSubmitErrorEvent.ErrorType.VALIDATION_ERROR);
                         }
                     } finally {
                         // Restore instance document
@@ -782,22 +785,21 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                                     if (ProcessorUtils.isXMLContentType(connectionResult.resultMediaType)) {
                                         // Handling of XML media type
-                                        try {
-                                            // Set new instance document to replace the one submitted
+                                        // Set new instance document to replace the one submitted
 
-                                            if (replaceInstance == null) {
-                                                // Replacement instance was specified but not found
-                                                // TODO: XForms 1.1 won't dispatch xforms-binding-exception here
-                                                // Not sure what's the right thing to do with 1.1, but this could be
-                                                // done as part of the model's static analysis if the instance value is
-                                                // not obtained through AVT, and dynmically otherwise. However, in the
-                                                // dynamic case, I think that this should be a (currently non-specified
-                                                // by XForms) xforms-binding-error.
-                                                containingDocument.dispatchEvent(pipelineContext, new XFormsBindingExceptionEvent(XFormsModelSubmission.this));
-                                            } else {
-
+                                        if (replaceInstance == null) {
+                                            // Replacement instance was specified but not found
+                                            // TODO: XForms 1.1 won't dispatch xforms-binding-exception here
+                                            // Not sure what's the right thing to do with 1.1, but this could be
+                                            // done as part of the model's static analysis if the instance value is
+                                            // not obtained through AVT, and dynmically otherwise. However, in the
+                                            // dynamic case, I think that this should be a (currently non-specified
+                                            // by XForms) xforms-binding-error.
+                                            containingDocument.dispatchEvent(pipelineContext, new XFormsBindingExceptionEvent(XFormsModelSubmission.this));
+                                        } else {
+                                            final XFormsInstance newInstance;
+                                            try {
                                                 // Read stream into Document
-                                                final XFormsInstance newInstance;
                                                 if (!isReadonlyHint) {
                                                     // Resulting instance is not read-only
 
@@ -827,29 +829,29 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                                     final DocumentInfo resultingInstanceDocument = TransformerUtils.readTinyTree(connectionResult.getResultInputStream(), connectionResult.resourceURI);
                                                     newInstance = new SharedXFormsInstance(replaceInstance.getModelId(), replaceInstance.getEffectiveId(), resultingInstanceDocument,
                                                             connectionResult.resourceURI, resolvedXXFormsUsername, resolvedXXFormsPassword, false, -1, replaceInstance.getValidation());
-                                                }
-
-                                                // Handle new instance and associated events
-                                                final XFormsModel replaceModel = newInstance.getModel(containingDocument);
-                                                replaceModel.handleNewInstanceDocuments(pipelineContext, newInstance);
-
-                                                // Notify that submission is done
-                                                submitDoneEvent = new XFormsSubmitDoneEvent(XFormsModelSubmission.this, connectionResult.resourceURI);
+                                                }    
+                                            } catch (Exception e) {
+                                                submitErrorEvent = createErrorEvent(connectionResult, XFormsSubmitErrorEvent.ErrorType.PARSE_ERROR);
+                                                throw new XFormsSubmissionException(e, "xforms:submission: exception while serializing XML to instance.", "processing instance replacement");
                                             }
-                                        } catch (Exception e) {
-                                            submitErrorEvent = createErrorEvent(connectionResult);
-                                            throw new XFormsSubmissionException(e, "xforms:submission: exception while serializing XML to instance.", "processing instance replacement");
+
+                                            // Handle new instance and associated events
+                                            final XFormsModel replaceModel = newInstance.getModel(containingDocument);
+                                            replaceModel.handleNewInstanceDocuments(pipelineContext, newInstance);
+
+                                            // Notify that submission is done
+                                            submitDoneEvent = new XFormsSubmitDoneEvent(XFormsModelSubmission.this, connectionResult.resourceURI);
                                         }
                                     } else {
                                         // Other media type
-                                        submitErrorEvent = createErrorEvent(connectionResult);
+                                        submitErrorEvent = createErrorEvent(connectionResult, XFormsSubmitErrorEvent.ErrorType.RESOURCE_ERROR);
                                         throw new XFormsSubmissionException("Body received with non-XML media type for replace=\"instance\": " + connectionResult.resultMediaType, "processing instance replacement");
                                     }
                                 } else if (replace.equals(XFormsConstants.XFORMS_SUBMIT_REPLACE_NONE)) {
                                     // Just notify that processing is terminated
                                     submitDoneEvent = new XFormsSubmitDoneEvent(XFormsModelSubmission.this, connectionResult.resourceURI);
                                 } else {
-                                    submitErrorEvent = createErrorEvent(connectionResult);
+                                    submitErrorEvent = createErrorEvent(connectionResult, XFormsSubmitErrorEvent.ErrorType.XXFORMS_INTERNAL_ERROR);
                                     throw new XFormsSubmissionException("xforms:submission: invalid replace attribute: " + replace, "processing instance replacement");
                                 }
 
@@ -878,7 +880,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                         } else {
                             // Error code received
-                            submitErrorEvent = createErrorEvent(connectionResult);
+                            submitErrorEvent = createErrorEvent(connectionResult, XFormsSubmitErrorEvent.ErrorType.RESOURCE_ERROR);
                             throw new XFormsSubmissionException("xforms:submission for submission id: " + id + ", error code received when submitting instance: " + connectionResult.resultCode, "processing submission response");
                         }
                     }
@@ -900,8 +902,11 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 } else {
                     // Any exception will cause an error event to be dispatched
                     if (submitErrorEvent == null)
-                        submitErrorEvent = new XFormsSubmitErrorEvent(XFormsModelSubmission.this, resolvedActionOrResource);
-
+                        submitErrorEvent = new XFormsSubmitErrorEvent(XFormsModelSubmission.this, resolvedActionOrResource,
+                                (e instanceof XFormsSubmissionException)
+                                        ? ((XFormsSubmissionException) e).getErrorType()
+                                        : XFormsSubmitErrorEvent.ErrorType.XXFORMS_INTERNAL_ERROR);
+                    
                     submitErrorEvent.setThrowable(e);
                     containingDocument.dispatchEvent(pipelineContext, submitErrorEvent);
                 }
@@ -921,55 +926,6 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
             // The default action for this event results in the following: Fatal error.
             throw new ValidationException("Binding exception for target: " + event.getTargetObject().getEffectiveId(), event.getTargetObject().getLocationData());
         }
-    }
-
-    private XFormsSubmitErrorEvent createErrorEvent(ConnectionResult connectionResult) throws IOException {
-        final XFormsSubmitErrorEvent submitErrorEvent = new XFormsSubmitErrorEvent(XFormsModelSubmission.this, resolvedActionOrResource);
-        if (connectionResult.hasContent()) {
-
-            // "When the error response specifies an XML media type as defined by [RFC 3023], the response body is
-            // parsed into an XML document and the root element of the document is returned. If the parse fails, or if
-            // the error response specifies a text media type (starting with text/), then the response body is returned
-            // as a string. Otherwise, an empty string is returned."
-
-            boolean isXMLParseFailed = false;
-            if (ProcessorUtils.isXMLContentType(connectionResult.resultMediaType)) {
-                // XML content-type
-                // Read stream into Document
-                try {
-                    final DocumentInfo responseBody = TransformerUtils.readTinyTree(connectionResult.getResultInputStream(), connectionResult.resourceURI);
-                    submitErrorEvent.setBodyDocument(responseBody);
-                    return submitErrorEvent;
-                } catch (Exception e) {
-                    XFormsServer.logger.error("XForms - submission - error while parsing response body as XML, defaulting to plain text.", e);
-                    isXMLParseFailed = true;
-                }
-            }
-
-            if (isXMLParseFailed || ProcessorUtils.isTextContentType(connectionResult.resultMediaType)) {
-                // XML parsing failed, or we got a text content-type
-                // Read stream into String
-                try {
-                    final String charset;
-                    {
-                        final String connectionCharset = NetUtils.getContentTypeCharset(connectionResult.resultMediaType);
-                        if (connectionCharset != null)
-                            charset = connectionCharset;
-                        else
-                            charset = DEFAULT_TEXT_READING_ENCODING;
-                    }
-                    final Reader reader = new InputStreamReader(connectionResult.getResultInputStream(), charset);
-                    final String responseBody = NetUtils.readStreamAsString(reader);
-                    submitErrorEvent.setBodyString(responseBody);
-                } catch (Exception e) {
-                    XFormsServer.logger.error("XForms - submission - error while reading response body ", e);
-                }
-            } else {
-                // This is binary
-                // Don't store anything
-            }
-        }
-        return submitErrorEvent;
     }
 
     private Document createDocumentToSubmit(final NodeInfo currentNodeInfo, final XFormsInstance currentInstance) {
@@ -1162,6 +1118,55 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
         return sb.toString();
     }
 
+    private XFormsSubmitErrorEvent createErrorEvent(ConnectionResult connectionResult, ErrorType errorType) throws IOException {
+        final XFormsSubmitErrorEvent submitErrorEvent = new XFormsSubmitErrorEvent(XFormsModelSubmission.this, resolvedActionOrResource, errorType);
+        if (connectionResult.hasContent()) {
+
+            // "When the error response specifies an XML media type as defined by [RFC 3023], the response body is
+            // parsed into an XML document and the root element of the document is returned. If the parse fails, or if
+            // the error response specifies a text media type (starting with text/), then the response body is returned
+            // as a string. Otherwise, an empty string is returned."
+
+            boolean isXMLParseFailed = false;
+            if (ProcessorUtils.isXMLContentType(connectionResult.resultMediaType)) {
+                // XML content-type
+                // Read stream into Document
+                try {
+                    final DocumentInfo responseBody = TransformerUtils.readTinyTree(connectionResult.getResultInputStream(), connectionResult.resourceURI);
+                    submitErrorEvent.setBodyDocument(responseBody);
+                    return submitErrorEvent;
+                } catch (Exception e) {
+                    XFormsServer.logger.error("XForms - submission - error while parsing response body as XML, defaulting to plain text.", e);
+                    isXMLParseFailed = true;
+                }
+            }
+
+            if (isXMLParseFailed || ProcessorUtils.isTextContentType(connectionResult.resultMediaType)) {
+                // XML parsing failed, or we got a text content-type
+                // Read stream into String
+                try {
+                    final String charset;
+                    {
+                        final String connectionCharset = NetUtils.getContentTypeCharset(connectionResult.resultMediaType);
+                        if (connectionCharset != null)
+                            charset = connectionCharset;
+                        else
+                            charset = DEFAULT_TEXT_READING_ENCODING;
+                    }
+                    final Reader reader = new InputStreamReader(connectionResult.getResultInputStream(), charset);
+                    final String responseBody = NetUtils.readStreamAsString(reader);
+                    submitErrorEvent.setBodyString(responseBody);
+                } catch (Exception e) {
+                    XFormsServer.logger.error("XForms - submission - error while reading response body ", e);
+                }
+            } else {
+                // This is binary
+                // Don't store anything
+            }
+        }
+        return submitErrorEvent;
+    }
+
     public static class ConnectionResult {
         public boolean dontHandleResponse;
         public int resultCode;
@@ -1261,15 +1266,31 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
     }
 
     private class XFormsSubmissionException extends ValidationException {
-        public XFormsSubmissionException(String message, String description) {
-            super(message, new ExtendedLocationData(XFormsModelSubmission.this.getLocationData(), description,
-                    XFormsModelSubmission.this.getSubmissionElement()));
+
+        private final ErrorType errorType;
+
+        public XFormsSubmissionException(final String message, final String description) {
+            this(message, description, XFormsSubmitErrorEvent.ErrorType.XXFORMS_INTERNAL_ERROR);
         }
 
-        public XFormsSubmissionException(Throwable e, String message, String description) {
+        public XFormsSubmissionException(final String message, final String description, final XFormsSubmitErrorEvent.ErrorType errorType) {
+            super(message, new ExtendedLocationData(XFormsModelSubmission.this.getLocationData(), description,
+                    XFormsModelSubmission.this.getSubmissionElement()));
+            this.errorType = errorType;
+        }
+
+        public XFormsSubmissionException(final Throwable e, final String message, final String description) {
+            this(e, message, description, XFormsSubmitErrorEvent.ErrorType.XXFORMS_INTERNAL_ERROR);
+        }
+
+        public XFormsSubmissionException(final Throwable e, final String message, final String description, final XFormsSubmitErrorEvent.ErrorType errorType) {
             super(message, e, new ExtendedLocationData(XFormsModelSubmission.this.getLocationData(), description,
                     XFormsModelSubmission.this.getSubmissionElement()));
+            this.errorType = errorType;
+        }
+
+        public ErrorType getErrorType() {
+            return errorType;
         }
     }
 }
-

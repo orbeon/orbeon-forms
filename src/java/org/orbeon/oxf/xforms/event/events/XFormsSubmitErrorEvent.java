@@ -42,10 +42,12 @@ public class XFormsSubmitErrorEvent extends XFormsEvent {
     private String urlString;
     private DocumentInfo bodyDocument;
     private String bodyString;
+    private final ErrorType errorType;
 
-    public XFormsSubmitErrorEvent(XFormsEventTarget targetObject, String urlString) {
+    public XFormsSubmitErrorEvent(XFormsEventTarget targetObject, String urlString, ErrorType errorType) {
         super(XFormsEvents.XFORMS_SUBMIT_ERROR, targetObject, true, false);
         this.urlString = urlString;
+        this.errorType = errorType;
     }
 
     public Throwable getThrowable() {
@@ -107,8 +109,7 @@ public class XFormsSubmitErrorEvent extends XFormsEvent {
         } else if ("error-type".equals(name)) {
             // "One of the following: submission-in-progress, no-data, validation-error, parse-error, resource-error,
             // target-error."
-            throw new ValidationException("Property Not implemented yet: " + name, getLocationData());
-            // TODO
+            return new ListIterator(Collections.singletonList(new StringValue(String.valueOf(errorType))));
         } else if ("response-status-code".equals(name)) {
             // "The protocol return code of the error response, or NaN if the failed submission did not receive an error
             // response."
@@ -130,5 +131,27 @@ public class XFormsSubmitErrorEvent extends XFormsEvent {
         } else {
             return super.getAttribute(name);
         }
+    }
+
+    /** Enumeration of possible error-type values. */
+    public static class ErrorType {
+
+    	public static final ErrorType SUBMISSION_IN_PROGRESS = new ErrorType("submission-in-progress");
+    	public static final ErrorType NO_DATA = new ErrorType("no-data");
+    	public static final ErrorType VALIDATION_ERROR = new ErrorType("validation-error");
+    	public static final ErrorType RESOURCE_ERROR = new ErrorType("resource-error");
+    	public static final ErrorType PARSE_ERROR = new ErrorType("parse-error");
+        public static final ErrorType TARGET_ERROR = new ErrorType("target-error");
+        public static final ErrorType XXFORMS_INTERNAL_ERROR = new ErrorType("xxforms-internal-error");
+
+        private final String errorType;
+
+    	private ErrorType(final String errorType) {
+    		this.errorType = errorType;
+        }
+
+		public String toString() {
+			return errorType;
+		}
     }
 }

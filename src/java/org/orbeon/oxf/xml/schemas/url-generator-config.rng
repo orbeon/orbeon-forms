@@ -19,111 +19,107 @@
             <choice>
                 <!-- URL is directly under the config element -->
                 <data type="string"/>
-                <group>
-                    <!-- If there are other options, the URL must be in a child element -->
-                    <!-- Case of XML -->
+                <interleave>
                     <element name="url">
                         <data type="string"/>
                     </element>
-                    <interleave>
-                        <optional>
-                            <element name="content-type">
-                                <data type="string">
-                                    <!-- See: http://www.faqs.org/rfcs/rfc2045.html -->
-                                    <param name="pattern">[\p{IsBasicLatin}-[&#09;- ()&lt;>@,;:\\"/\[\]=?]]+/[\p{IsBasicLatin}-[&#09;- ()&lt;>@,;:\\"/\[\]=?]]+</param>
-                                </data>
+                    <optional>
+                        <element name="content-type">
+                            <data type="string">
+                                <!-- See: http://www.faqs.org/rfcs/rfc2045.html -->
+                                <param name="pattern">[\p{IsBasicLatin}-[&#09;- ()&lt;>@,;:\\"/\[\]=?]]+/[\p{IsBasicLatin}-[&#09;- ()&lt;>@,;:\\"/\[\]=?]]+</param>
+                            </data>
+                        </element>
+                    </optional>
+                    <optional>
+                        <!-- This must be set to true only if a content-type was set manually -->
+                        <element name="force-content-type">
+                            <choice>
+                                <value>true</value>
+                                <value>false</value>
+                            </choice>
+                        </element>
+                    </optional>
+                    <optional>
+                        <element name="encoding">
+                            <text/>
+                        </element>
+                    </optional>
+                    <optional>
+                        <!-- This must be set to true only if an encoding was set manually -->
+                        <element name="force-encoding">
+                            <choice>
+                                <value>true</value>
+                                <value>false</value>
+                            </choice>
+                        </element>
+                    </optional>
+                    <optional>
+                        <element name="ignore-connection-encoding">
+                            <choice>
+                                <value>true</value>
+                                <value>false</value>
+                            </choice>
+                        </element>
+                    </optional>
+                    <optional>
+                        <!-- This will make sense only if the source is XML -->
+                        <element name="validating">
+                            <data type="boolean"/>
+                        </element>
+                    </optional>
+                    <optional>
+                        <!-- This will make sense only if the source is XML -->
+                        <element name="handle-xinclude">
+                            <data type="boolean"/>
+                        </element>
+                    </optional>
+                    <zeroOrMore>
+                        <element name="header">
+                            <element name="name">
+                                <data type="string"/>
                             </element>
-                        </optional>
-                        <optional>
-                            <!-- This must be set to true only if a content-type was set manually -->
-                            <element name="force-content-type">
-                                <choice>
-                                    <value>true</value>
-                                    <value>false</value>
-                                </choice>
+                            <element name="value">
+                                <data type="string"/>
                             </element>
-                        </optional>
-                        <optional>
-                            <element name="encoding">
-                                <text/>
-                            </element>
-                        </optional>
-                        <optional>
-                            <!-- This must be set to true only if an encoding was set manually -->
-                            <element name="force-encoding">
-                                <choice>
-                                    <value>true</value>
-                                    <value>false</value>
-                                </choice>
-                            </element>
-                        </optional>
-                        <optional>
-                            <element name="ignore-connection-encoding">
-                                <choice>
-                                    <value>true</value>
-                                    <value>false</value>
-                                </choice>
-                            </element>
-                        </optional>
-                        <optional>
-                            <!-- This will make sense only if the source is XML -->
-                            <element name="validating">
-                                <data type="boolean"/>
-                            </element>
-                        </optional>
-                        <optional>
-                            <!-- This will make sense only if the source is XML -->
-                            <element name="handle-xinclude">
-                                <data type="boolean"/>
-                            </element>
-                        </optional>
-                        <zeroOrMore>
-                            <element name="header">
-                                <element name="name">
-                                    <data type="string"/>
+                        </element>
+                    </zeroOrMore>
+                    <optional>
+                        <element name="cache-control">
+                            <optional>
+                                <element name="use-local-cache">
+                                    <choice>
+                                        <value>true</value>
+                                        <value>false</value>
+                                    </choice>
                                 </element>
-                                <element name="value">
-                                    <data type="string"/> 
-                                </element>
-                            </element>
-                        </zeroOrMore>
-                        <optional>
-                            <element name="cache-control">
+                            </optional>
+                        </element>
+                    </optional>
+                    <optional>
+                        <!-- This will make sense only if the source is text/html -->
+                        <element name="tidy-options">
+                            <interleave>
                                 <optional>
-                                    <element name="use-local-cache">
+                                    <element name="show-warnings">
                                         <choice>
                                             <value>true</value>
                                             <value>false</value>
                                         </choice>
                                     </element>
-                                </optional>
-                            </element>
-                        </optional>
-                        <optional>
-                            <!-- This will make sense only if the source is text/html -->
-                            <element name="tidy-options">
-                                <interleave>
                                     <optional>
-                                        <element name="show-warnings">
+                                        <element name="quiet">
                                             <choice>
                                                 <value>true</value>
                                                 <value>false</value>
                                             </choice>
                                         </element>
-                                        <optional>
-                                            <element name="quiet">
-                                                <choice>
-                                                    <value>true</value>
-                                                    <value>false</value>
-                                                </choice>
-                                            </element>
-                                        </optional>
                                     </optional>
-                                </interleave>
-                            </element>
-                        </optional>
-                    </interleave>
-                </group>
+                                </optional>
+                            </interleave>
+                        </element>
+                    </optional>
+                </interleave>
             </choice>
         </element>
     </start>

@@ -141,6 +141,7 @@ ORBEON.xforms.Globals = ORBEON.xforms.Globals || {
     dialogMinimalLastMouseOut: {},       // Map for minimal dialog id -> -1 or timestamp of last time the mouse got out of the dialog
     hintTooltipForControl: {},           // Map from element id -> YUI tooltip or true, that tells us if we have already created a Tooltip for an element
     alertTooltipForControl: {},          // Map from element id -> YUI alert or true, that tells us if we have already created a Tooltip for an element
+    helpTooltipForControl: {},           // Map from element id -> YUI help or true, that tells us if we have already created a Tooltip for an element
     debugDiv: null,                      // Points to the div when debug messages are displayed
     debugLastTime: new Date().getTime(), // Timestamp when the last debug message was printed
     lastEventSentTime: new Date().getTime(), // Timestamp when the last event was sent to server
@@ -735,7 +736,9 @@ ORBEON.xforms.Controls = {
 
     setHelpMessage: function(control, message) {
         // We escape the value because the help element is a little special, containing escaped HTML
-        ORBEON.xforms.Controls._setMessage(control, "xforms-help",  ORBEON.util.String.escapeHTMLMinimal(message));
+        message = ORBEON.util.String.escapeHTMLMinimal(message);
+        ORBEON.xforms.Controls._setMessage(control, "xforms-help", message);
+        ORBEON.xforms.Controls._setTooltipMessage(control, message, ORBEON.xforms.Globals.helpTooltipForControl);
     },
 
     setValid: function(control, isValid) {
@@ -806,7 +809,7 @@ ORBEON.xforms.Controls = {
 
     setAlertMessage: function(control, message) {
         ORBEON.xforms.Controls._setMessage(control, "xforms-alert", message);
-        ORBEON.xforms.Controls._setHintAlertMessage(control, message, ORBEON.xforms.Globals.alertTooltipForControl);
+        ORBEON.xforms.Controls._setTooltipMessage(control, message, ORBEON.xforms.Globals.alertTooltipForControl);
     },
 
     getHintMessage: function(control) {
@@ -824,11 +827,11 @@ ORBEON.xforms.Controls = {
             control.title = message;
         } else {
             ORBEON.xforms.Controls._setMessage(control, "xforms-hint", message);
-            ORBEON.xforms.Controls._setHintAlertMessage(control, message, ORBEON.xforms.Globals.hintTooltipForControl);
+            ORBEON.xforms.Controls._setTooltipMessage(control, message, ORBEON.xforms.Globals.hintTooltipForControl);
         }
     },
 
-    _setHintAlertMessage: function(control, message, tooltipForControl) {
+    _setTooltipMessage: function(control, message, tooltipForControl) {
         // If we have a YUI tooltip for this control, update the tooltip
         var currentTooltip = tooltipForControl[control.id];
         if (currentTooltip) {
@@ -1273,6 +1276,22 @@ ORBEON.xforms.Events = {
         }
     },
 
+    _showToolTip: function(tooltipForControl, controlId, targetId, toolTipSuffix, message, delay, event) {
+        if (message != "") {
+            // We have a hint, initialize YUI tooltip
+            tooltipForControl[controlId] =
+                new YAHOO.widget.Tooltip(controlId + toolTipSuffix, {
+                    context: targetId,
+                    text: message,
+                    showDelay: delay,
+                    effect: {effect: YAHOO.widget.ContainerEffect.FADE, duration: 0.2}
+                });
+        } else {
+            // Remember we looked at this control already
+            tooltipForControl[controlId] = true;
+        }
+    },
+
     mouseover: function(event) {
         var target = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
         if (target != null) {
@@ -1280,46 +1299,35 @@ ORBEON.xforms.Events = {
             // Control tooltip
             if (ORBEON.xforms.Globals.hintTooltipForControl[target.id] == null
                     && ! ORBEON.util.Dom.hasClass(document.body, "xforms-disable-hint-as-tooltip")) {
-                // We haven't initialized the YUI tooltip for this control yet, see there is a hint, and maybe initialize YUI tooltip
                 var message = ORBEON.xforms.Controls.getHintMessage(target);
-                if (message != "") {
-                    // We have a hint, initialize YUI tooltip
-                    ORBEON.xforms.Globals.hintTooltipForControl[target.id] =
-                        new YAHOO.widget.Tooltip(target.id + "-orbeon-hint-tooltip", {
-                            context: target.id,
-                            text: message,
-                            showDelay: 200,
-                            effect: {effect:YAHOO.widget.ContainerEffect.FADE,duration: 0.2}
-                        });
-                } else {
-                    // Remember we looked at this control already
-                    ORBEON.xforms.Globals.hintTooltipForControl[target.id] = true;
-                }
+                ORBEON.xforms.Events._showToolTip(ORBEON.xforms.Globals.hintTooltipForControl, target.id, target.id, "-orbeon-hint-tooltip", message, 200, event);
             }
 
             // Alert tooltip
-            if (ORBEON.util.Dom.hasClass(target, "xforms-alert-active") &&
-                    ORBEON.xforms.Globals.alertTooltipForControl[target.id] == null) {
-                // We haven't initialized the YUI tooltip for this control yet, see there is an alert, and maybe initialize YUI tooltip
+            if (ORBEON.util.Dom.hasClass(target, "xforms-alert-active")) {
                 var control = ORBEON.util.Dom.getElementById(target.htmlFor);
-                var message = ORBEON.xforms.Controls.getAlertMessage(control);
-                if (message != "") {
-                    // We have a hint, initialize YUI tooltip
+                if (ORBEON.xforms.Globals.alertTooltipForControl[control.id] == null) {
+                    var message = ORBEON.xforms.Controls.getAlertMessage(control);
                     YAHOO.util.Dom.generateId(target);
-                    ORBEON.xforms.Globals.alertTooltipForControl[target.id] =
-                        new YAHOO.widget.Tooltip(target.id + "-orbeon-alert-tooltip", {
-                            context: target.id,
-                            text: message,
-                            showDelay: 0,
-                            effect: {effect:YAHOO.widget.ContainerEffect.FADE,duration: 0.2}
-                        });
-                } else {
-                    // Remember we looked at this control already
-                    ORBEON.xforms.Globals.alertTooltipForControl[target.id] = true;
+                    ORBEON.xforms.Events._showToolTip(ORBEON.xforms.Globals.alertTooltipForControl, control.id, target.id, "-orbeon-alert-tooltip", message, 10, event);
                 }
             } else if (ORBEON.util.Dom.hasClass(target, "xforms-dialog-appearance-minimal")) {
                 // Minimal dialog: record more is back inside the dialog
                 ORBEON.xforms.Globals.dialogMinimalLastMouseOut[target.id] = -1;
+            }
+
+            // Help tooltip
+            if (ORBEON.util.Utils.getProperty(HELP_TOOLTIP_PROPERTY)
+                    &&  ORBEON.util.Dom.hasClass(target, "xforms-help-image")) {
+                // Get control, assuming it is right before the help icon
+                var control = target.previousSibling;
+                while (control != null && ! ORBEON.util.Dom.hasClass(control, "xforms-control"))
+                    control = control.previousSibling;
+                if (ORBEON.xforms.Globals.helpTooltipForControl[control.id] == null) {
+                    var message = ORBEON.xforms.Controls.getHelpMessage(control);
+                    YAHOO.util.Dom.generateId(target);
+                    ORBEON.xforms.Events._showToolTip(ORBEON.xforms.Globals.helpTooltipForControl, control.id, target.id, "-orbeon-help-tooltip", message, 10, event);
+                }
             }
 
             // Check if this control is inside a minimal dialog, in which case we are also inside that dialog

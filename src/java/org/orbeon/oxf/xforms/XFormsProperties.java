@@ -152,7 +152,7 @@ public class XFormsProperties {
 
             // Properties to propagate to the client
             new PropertyDefinition(SESSION_HEARTBEAT_PROPERTY, true, true),
-            new PropertyDefinition(SESSION_HEARTBEAT_DELAY_PROPERTY, 30 * 60 * 800, true), // 80 % of 30 minutes in ms
+            new PropertyDefinition(SESSION_HEARTBEAT_DELAY_PROPERTY, 12 * 60 * 60 * 800, true), // 80 % of 12 hours in ms
             new PropertyDefinition(FCK_EDITOR_BASE_PATH_PROPERTY, "/ops/fckeditor/", true),
             new PropertyDefinition(YUI_BASE_PATH_PROPERTY, "/ops/images/yui/", true),
             new PropertyDefinition(DELAY_BEFORE_INCREMENTAL_REQUEST_PROPERTY, 500, true),

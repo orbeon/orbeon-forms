@@ -20,20 +20,43 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
+import java.util.Map;
+import java.util.HashMap;
+
 /**
  * 10.12 The message Element
  */
 public class XFormsMessageAction extends XFormsAction {
+
+    private static final Map SUPPORTED_APPEARANCES = new HashMap();
+    private static final Map LOG_APPEARANCES = new HashMap();
+
+    static {
+        // Standard levels
+        SUPPORTED_APPEARANCES.put(XFormsConstants.XFORMS_MODAL_LEVEL_QNAME, "");
+        SUPPORTED_APPEARANCES.put(XFormsConstants.XFORMS_MODELESS_LEVEL_QNAME, "");
+        SUPPORTED_APPEARANCES.put(XFormsConstants.XFORMS_EPHEMERAL_LEVEL_QNAME, "");
+
+        // Extension levels
+        LOG_APPEARANCES.put(XFormsConstants.XXFORMS_LOG_DEBUG_LEVEL_QNAME, "");
+        LOG_APPEARANCES.put(XFormsConstants.XXFORMS_LOG_INFO_DEBUG_LEVEL_QNAME, "");
+        LOG_APPEARANCES.put(XFormsConstants.XXFORMS_LOG_WARN_DEBUG_LEVEL_QNAME, "");
+        LOG_APPEARANCES.put(XFormsConstants.XXFORMS_LOG_ERROR_DEBUG_LEVEL_QNAME, "");
+
+        SUPPORTED_APPEARANCES.putAll(LOG_APPEARANCES);
+    }
+
     public void execute(XFormsActionInterpreter actionInterpreter, PipelineContext pipelineContext, String targetId, XFormsEventHandlerContainer eventHandlerContainer, Element actionElement) {
 
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
 
-        final String level;
+
         {
             final String levelAttribute;
             final QName levelQName;
@@ -48,27 +71,48 @@ public class XFormsMessageAction extends XFormsAction {
                     levelQName = Dom4jUtils.extractAttributeValueQName(actionElement, "level");
                 }
             }
-            if (levelQName.getNamespacePrefix().equals("")) {
-                if (!("ephemeral".equals(levelAttribute) || "modeless".equals(levelAttribute) || "modal".equals(levelAttribute))) {
-                    throw new OXFException("xforms:message element's 'level' attribute must have value: 'ephemeral'|'modeless'|'modal'|QName-but-not-NCName.");
+
+            // Get message value
+            // TODO: In the future, we should support HTML
+            final String messageValue = XFormsUtils.getElementValue(pipelineContext, containingDocument, actionElement, false, null);
+
+            if (LOG_APPEARANCES.get(levelQName) != null) {
+                // Special log appearance
+
+                final String messagePrefix = "XForms - log message - ";
+                if (XFormsConstants.XXFORMS_LOG_DEBUG_LEVEL_QNAME.equals(levelQName)) {
+                    XFormsServer.logger.debug(messagePrefix + messageValue);
+                } else if (XFormsConstants.XXFORMS_LOG_INFO_DEBUG_LEVEL_QNAME.equals(levelQName)) {
+                    XFormsServer.logger.info(messagePrefix + messageValue);
+                } else if (XFormsConstants.XXFORMS_LOG_WARN_DEBUG_LEVEL_QNAME.equals(levelQName)) {
+                    XFormsServer.logger.warn(messagePrefix + messageValue);
+                } else if (XFormsConstants.XXFORMS_LOG_ERROR_DEBUG_LEVEL_QNAME.equals(levelQName)) {
+                    XFormsServer.logger.error(messagePrefix + messageValue);
                 }
-                level = levelAttribute;
+
+            } else if (SUPPORTED_APPEARANCES.get(levelQName) != null) {
+                // Any other supported appearance are sent to the client
+
+                final String level;
+                if (levelQName.getNamespacePrefix().equals("")) {
+                    level = levelAttribute;
+                } else {
+                    level = "{" + levelQName.getNamespaceURI() + "}" + levelQName.getName();
+                }
+
+                if (messageValue != null) {
+                    // Store message for sending to client
+                    containingDocument.addMessageToRun(messageValue, level);
+
+                    // NOTE: In the future, we *may* want to save and resume the event state before and after
+                    // displaying a message, in order to possibly provide a behavior which is more consistent with what
+                    // users may expect regarding actions executed after xforms:message.
+                }
+
             } else {
-                level = "{" + levelQName.getNamespaceURI() + "}" + levelQName.getName();
+                // Unsupported appearance
+                throw new OXFException("xforms:message element's 'level' attribute must have value: 'ephemeral'|'modeless'|'modal'|'xxforms:log-debug'|'xxforms:log-info'|'xxforms:log-warn'|'xxforms:log-error'.");
             }
-        }
-
-        // Get message value
-        // TODO: In the future, we should support HTML
-        final String messageValue = XFormsUtils.getElementValue(pipelineContext, containingDocument, actionElement, false, null);
-        if (messageValue != null) {
-            // Store message for sending to client
-            containingDocument.addMessageToRun(messageValue, level);
-
-            // NOTE: In the future, we *may* want to save and resume the event state before and
-            // after displaying a message, in order to possibly provide a behavior which is more
-            // consistent with what users may expect regarding actions executed after
-            // xforms:message.
         }
     }
 }

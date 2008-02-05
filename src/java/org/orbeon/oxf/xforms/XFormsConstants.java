@@ -114,6 +114,13 @@ public class XFormsConstants {
     public static final QName XFORMS_MINIMAL_APPEARANCE_QNAME = new QName("minimal");
 
     public static final QName XFORMS_MODAL_LEVEL_QNAME = new QName("modal");
+    public static final QName XFORMS_MODELESS_LEVEL_QNAME = new QName("modeless");
+    public static final QName XFORMS_EPHEMERAL_LEVEL_QNAME = new QName("ephemeral");
+
+    public static final QName XXFORMS_LOG_DEBUG_LEVEL_QNAME = new QName("log-debug", XFormsConstants.XXFORMS_NAMESPACE);
+    public static final QName XXFORMS_LOG_INFO_DEBUG_LEVEL_QNAME = new QName("log-info", XFormsConstants.XXFORMS_NAMESPACE);
+    public static final QName XXFORMS_LOG_WARN_DEBUG_LEVEL_QNAME = new QName("log-warn", XFormsConstants.XXFORMS_NAMESPACE);
+    public static final QName XXFORMS_LOG_ERROR_DEBUG_LEVEL_QNAME = new QName("log-error", XFormsConstants.XXFORMS_NAMESPACE);
 
     public static final QName XXFORMS_TREE_APPEARANCE_QNAME = new QName("tree", XFormsConstants.XXFORMS_NAMESPACE);
     public static final QName XXFORMS_MENU_APPEARANCE_QNAME = new QName("menu", XFormsConstants.XXFORMS_NAMESPACE);

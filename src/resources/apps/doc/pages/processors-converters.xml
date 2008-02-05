@@ -334,6 +334,7 @@
 <!---->
 <!--            </p>-->
 <!--        </section>-->
+        <!--
         <a name="xls-converters"/>
         <section>
             <title>XLS Converters</title>
@@ -408,20 +409,6 @@
                     <code>repeat-row</code> elements with two attributes, <code>row-num</code> and
                     <code>for-each</code>.
                 </p>
-<!--                <table>-->
-<!--                    <tr>-->
-<!--                        <th>-->
-<!--                            <code>row-num</code>-->
-<!--                        </th>-->
-<!--                        <td></td>-->
-<!--                    </tr>-->
-<!--                    <tr>-->
-<!--                        <th>-->
-<!--                            <code>for-each</code>-->
-<!--                        </th>-->
-<!--                        <td></td>-->
-<!--                    </tr>-->
-<!--                </table>-->
                 <p>
                     The To XLS converter is typically connected to the HTTP serializer. This allows
                     specifying headers such as <code>Content-Disposition</code>:
@@ -535,5 +522,6 @@
                 </xml-source>
             </section>
         </section>
+        -->
     </body>
 </document>

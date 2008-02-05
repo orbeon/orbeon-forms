@@ -81,7 +81,7 @@ public class XFormsEventFactory {
         });
         nameToClassMap.put(XFormsEvents.XFORMS_SUBMIT_ERROR, new Factory() {
             public XFormsEvent createEvent(String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Element filesElement) {
-                return new XFormsSubmitErrorEvent(targetObject, contextString);
+                return new XFormsSubmitErrorEvent(targetObject, contextString, XFormsSubmitErrorEvent.ErrorType.XXFORMS_INTERNAL_ERROR);
             }
         });
         nameToClassMap.put(XFormsEvents.XFORMS_SUBMIT, new Factory() {

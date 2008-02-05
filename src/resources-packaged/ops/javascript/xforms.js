@@ -35,11 +35,12 @@ var DEBUG_WINDOW_WIDTH_PROPERTY = "debug-window-width";
 var LOADING_MIN_TOP_PADDING_PROPERTY = "loading-min-top-padding";
 var REVISIT_HANDLING_PROPERTY = "revisit-handling";
 var HELP_HANDLER_PROPERTY = "help-handler";
+var HELP_TOOLTIP_PROPERTY = "help-tooltip";
 
 // Parameter defaults
 // NOTE: Default values below MUST match the ones in XFormsProperties
 var XFORMS_SESSION_HEARTBEAT = true;
-var XFORMS_SESSION_HEARTBEAT_DELAY = 30 * 60 * 800; // 80 % of 30 minutes in ms
+var XFORMS_SESSION_HEARTBEAT_DELAY = 12 * 60 * 60 * 800; // 80 % of 12 hours in ms
 var FCK_EDITOR_BASE_PATH = "/ops/fckeditor/";
 var YUI_BASE_PATH = "/ops/images/yui/";
 var XFORMS_DELAY_BEFORE_INCREMENTAL_REQUEST_IN_MS = 500;
@@ -55,6 +56,7 @@ var XFORMS_DEBUG_WINDOW_WIDTH = 300;
 var XFORMS_LOADING_MIN_TOP_PADDING = 10;
 var XFORMS_REVISIT_HANDLING = "restore";
 var XFORMS_HELP_HANDLER = false;
+var XFORMS_HELP_TOOLTIP = false;
 
 /**
  * Constants
@@ -545,6 +547,7 @@ ORBEON.util.Utils = {
             case DEBUG_WINDOW_WIDTH_PROPERTY: { return XFORMS_DEBUG_WINDOW_WIDTH; }
             case LOADING_MIN_TOP_PADDING_PROPERTY: { return XFORMS_LOADING_MIN_TOP_PADDING; }
             case HELP_HANDLER_PROPERTY: { return XFORMS_HELP_HANDLER; }
+            case HELP_TOOLTIP_PROPERTY: { return XFORMS_HELP_TOOLTIP; }
         }
     	// Neither the property's value was supplied, nor a default value exists for the property
         return null;

@@ -36,31 +36,36 @@
             <xsl:if test="$has-xforms-instance-inspector">
                 <xsl:call-template name="widget:xforms-instance-inspector-model"/>
                 <xhtml:script language="Javascript" type="text/javascript">
-                    window.onload = sourceInit;
-                    window.onresize = sourceResize;
-
-                    function sourceInit() {
-                        sourceResize();
-                    }
-
-                    function sourceResize() {
-                        var divElement = document.getElementById('widgets-xforms-instance-inspector');
-                        var height = document.body.clientHeight - findTopPosition(divElement) - 18;
-                        divElement.style.height = (height &lt; 100 ? 100 : height) + "px";
-                    }
-
-                    function findTopPosition(element) {
-                        var curtop = 0;
-                        if (element.offsetParent) {
-                            while (element.offsetParent) {
-                                curtop += element.offsetTop
-                                element = element.offsetParent;
-                            }
-                        } else if (element.y) {
-                            curtop += element.y;
-                        }
-                        return curtop;
-                    }
+//                    YAHOO.util.Event.addListener(window, "load", sourceInit);
+//                    YAHOO.util.Event.addListener(window, "resize", sourceResize);
+//
+//                    function sourceInit() {
+//                        sourceResize();
+//                    }
+//
+//                    function sourceResize() {
+//                        var divElement = document.getElementById('widgets-xforms-instance-inspector');
+//                        var height = document.body.clientHeight - findTopPosition(divElement) - 18;
+//                        var adjustedHeight = (height &lt; 100 ? 100 : height);
+//
+//                        alert("divElement.style.height = " + divElement.style.height);
+//
+//                        if (divElement.style.height != adjustedHeight + "px")
+//                            divElement.style.height = adjustedHeight + "px";
+//                    }
+//
+//                    function findTopPosition(element) {
+//                        var curtop = 0;
+//                        if (element.offsetParent) {
+//                            while (element.offsetParent) {
+//                                curtop += element.offsetTop
+//                                element = element.offsetParent;
+//                            }
+//                        } else if (element.y) {
+//                            curtop += element.y;
+//                        }
+//                        return curtop;
+//                    }
                 </xhtml:script>
             </xsl:if>
             <xsl:if test="$has-widgets">

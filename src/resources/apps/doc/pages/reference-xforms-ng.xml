@@ -1862,35 +1862,67 @@
                 <a name="xforms-message"/>
                 <section>
                     <title>Displaying Messages with the <code>xforms:message</code> Action</title>
+                    <img src="../apps/doc/images/reference-xforms-message.png" style="clear: both; float: right"/>
                     <p>
-                        The XForms message action displays a message to the user. <img print-format="pdf"
-                        src="../apps/doc/images/reference-xforms-message.png" style="clear: both; float: right"/>
-                    </p>
-                    <p>
-                        Typically, the content of the <code>message</code> element is the message to
-                        render. It can also come from the binding attributes (<code>ref</code> or
-                        <code>bind</code>), or from the linking attribute (<code>src</code>). The order
-                        of preference is the following:
+                        The XForms message action (<code>xforms:message</code>) displays a message to the user.
+                        The message to render can be specified in different ways, in order of precedence:
                     </p>
                     <ul>
-                        <li>Binding attributes</li>
-                        <li>Linking attribute</li>
-                        <li>Inline text</li>
+                        <li>Binding attributes (<code>ref</code> or <code>bind</code>)</li>
+                        <li>Linking attribute (<code>src</code>)</li>
+                        <li>Inline content, including optional <code>xforms:output</code> elements</li>
                     </ul>
+                    <p>
+                        <code>xforms:message</code> supports the following values on the <code>level</code> attribute:
+                    </p>
+                    <ul>
+                        <li>
+                            <p>
+                                <code>modal</code>. This standard level specifies taht the message needs to be closed
+                                by the user before any further interaction can take place with the form.
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                <code>xxforms:log-debug</code>, <code>xxforms:log-info</code>,
+                                <code>xxforms:log-warn</code> and <code>xxforms:log-error</code>. These values cause the
+                                message to be logged on the server using the levels "debug", "info", "warn" and "error"
+                                as per the log4j terminology. Messages output with these levels appear in the
+                                Orbeon Forms logs depending on the configuration of <code>log4j.xml</code>.
+                            </p>
+                        </li>
+                    </ul>
+                    <p>
+                        The <code>level</code> is optional and defaults to <code>modal</code>.
+                    </p>
                     <note>
-                        <ul>
-                            <li>The only value currently supported for the <code>level</code>
-                            attribute is <code>modal</code>. This attribute is optional.</li>
-                            <li>When using the linking attribute (<code>src</code>), the value must
-                            be an absolute URL, starting with <code>oxf:</code>, <code>http:</code>
-                            or other supported protocols.</li>
-                        </ul>
+                        <p>When using the linking attribute (<code>src</code>), the value must be an absolute URL,
+                        starting with <code>oxf:</code>, <code>http:</code> or other supported protocols. It is not
+                        recommended to use the <code>src</code> attribute to specify the content of the message.</p>
                     </note>
                     <xml-source show-namespaces="false">
                         <xforms:trigger>
                             <xforms:label>Test</xforms:label>
                             <xforms:message ev:event="DOMActivate" ref="taste"/>
                         </xforms:trigger>
+                    </xml-source>
+                    <xml-source show-namespaces="false">
+                        <xforms:trigger>
+                            <xforms:label>Test</xforms:label>
+                            <xforms:message ev:event="DOMActivate" level="modal">
+                                This is your first name:
+                                <xforms:output value="first-name"/>
+                            </xforms:message>
+                        </xforms:trigger>
+                    </xml-source>
+                    <xml-source show-namespaces="false">
+                        <xforms:submission>
+                            ...
+                            <xforms:message ev:event="xforms-submit-error" level="xxforms:log-error">
+                                A submission error occurred:
+                                <xforms:output value="event('error-type')"/>
+                            </xforms:message>
+                        </xforms:submission>
                     </xml-source>
                 </section>
             </section>

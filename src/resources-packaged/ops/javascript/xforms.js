@@ -150,7 +150,7 @@ ORBEON.xforms.Globals = ORBEON.xforms.Globals || {
     menuYui: {},                         // Maps menu id to the YUI object for that menu
     treeYui: {},                         // Maps tree id to the YUI object for that tree
     idToElement: {},                     // Maintain mapping from ID to element, so we don't lookup the sme ID more than once
-
+    isReloading: false,                  // Whether the form is being reloaded from the server
     // Data relative to a form is stored in an array indexed by form id.
     formLoadingLoadingOverlay: {},       // Overlay for the loading indicator
     formLoadingLoadingInitialRightTop:{},// Initial number of pixel between the loading indicator and the top of the page
@@ -603,6 +603,13 @@ ORBEON.xforms.Document = {
         if (control == null) throw "ORBEON.xforms.Document.setValue: can't find control id '" + controlId + "'";
         xformsFireEvents(new Array(xformsCreateEventArray
                 (control, "xxforms-value-change-with-focus-change", String(newValue), null)), false);
+    },
+
+    /**
+     * Returns whether the document is being reloaded.
+     */
+    isReloading: function() {
+        return ORBEON.xforms.Globals.isReloading;
     }
 };
 
@@ -1663,6 +1670,7 @@ ORBEON.xforms.Events = {
     },
 
     errorReloadClicked: function(event, errorPanel) {
+        ORBEON.xforms.Globals.isReloading = true;
         window.location.reload(true);// force reload
     },
 
@@ -2013,6 +2021,7 @@ ORBEON.xforms.Init = {
                     xformsStoreInClientState(formID, "load-did-run", "true");
                 } else {
                     if (ORBEON.util.Utils.getProperty(REVISIT_HANDLING_PROPERTY) == "reload") {
+                        ORBEON.xforms.Globals.isReloading = true;
                         window.location.reload(true)
                     } else {
                         xformsFireEvents(new Array(xformsCreateEventArray(form, "xxforms-all-events-required", null, null)), false);

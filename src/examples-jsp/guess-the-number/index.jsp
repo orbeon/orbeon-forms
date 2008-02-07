@@ -54,7 +54,7 @@
                     <xforms:group ref="if (xs:integer(answer) > xs:integer(guess)) then . else ()">
                         <xforms:output value="/number/guess"/>&#160;is a bit too low.</xforms:group>
                     <xforms:group ref="if (xs:integer(guess) > xs:integer(answer)) then . else ()">
-                        <xforms:output value="/number/guess"/>&#160;is a tat too high.
+                        <xforms:output value="/number/guess"/>&#160;is a tad too high.
                     </xforms:group>
                     <xforms:group ref="if (guess = answer) then . else ()">
                         <xforms:output value="/number/guess"/>

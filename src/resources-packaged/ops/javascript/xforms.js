@@ -4055,6 +4055,9 @@ function FCKeditor_OnComplete(editorInstance) {
         if (typeof xformsPageLoadedServer != "undefined")
             xformsPageLoadedServer();
     }
+
+    if (ORBEON.xforms.Globals.isRenderingEngineTridend)
+        document.body.className = document.body.className;
 }
 
 function xformsGetLocalName(element) {

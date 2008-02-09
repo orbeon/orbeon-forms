@@ -44,7 +44,10 @@
         <p:input name="submission">
             <xforms:submission ref="/*/*[1]" method="put" replace="none"
                     action="{xxforms:property('oxf.fr.persistence.exist.uri')}/{/*/group[2]}/{/*/group[3]}/{digest(string(random(true)), 'MD5', 'hex')}">
-                <xforms:setvalue ev:event="xforms-submit-error" ref="." value="event('response-body')"/>
+                <xforms:action ev:event="xforms-submit-error">
+                    <xforms:setvalue ref="." value="event('response-body')"/>
+                    <xforms:message level="xxforms:log-error"><xforms:output value="event('response-body')"/></xforms:message>
+                </xforms:action>
                 <!-- TODO: Propagate error to caller -->
                 <xforms:action ev:event="xforms-submit-done">
                     <xforms:setvalue ref="/*" value="tokenize(event('resource-uri'), '/')[last()]"/>

@@ -25,7 +25,7 @@
         <xhtml:link rel="stylesheet" href="/ops/css/yui/base-min.css" type="text/css"/>
         <xhtml:link rel="stylesheet" href="/apps/fr/style/form-runner.css" type="text/css"/>
         <link rel="alternate" type="application/atom+xml" title="Orbeon XForms Bookcast Tutorial Feed" href="atom"/>
-        <xforms:model schema="oxf:/apps/xforms-bookcast/schema.xsd">
+        <xforms:model schema="oxf:/apps/xforms-bookcast/schema.xsd" xxforms:help-tooltip="true">
 
             <!-- Load list of books when the XForms engine is ready -->
             <xforms:send ev:event="xforms-ready" submission="list-submission"/>
@@ -45,6 +45,7 @@
             </xforms:instance>
 
             <xforms:bind nodeset="instance('form-instance')/book">
+                <!-- TODO: issue with referring to these bind ids from repeated controls -->
                 <xforms:bind id="title-bind" nodeset="title" required="true()"/>
                 <xforms:bind id="author-bind" nodeset="author" required="true()"/>
             </xforms:bind>
@@ -134,20 +135,21 @@
                     </tr>
                 </table>
 
-                <fr:section id="books" columns="2">
+                <fr:section id="books-section" columns="2">
                     <xforms:label>Books</xforms:label>
 
                     <fr:repeat nodeset="book" id="book-repeat" origin="instance('book-template')">
                         <xforms:label>Book</xforms:label>
                             <tr>
                                 <td>
-                                    <xforms:input bind="title-bind">
+                                    <xforms:input id="title-control" bind="title-bind" class="fr-summary fr-search">
                                         <xforms:label class="books-label">Title</xforms:label>
                                         <xforms:hint>Book title</xforms:hint>
+                                        <xforms:help>This input contains the book title. For example...</xforms:help>
                                     </xforms:input>
                                 </td>
                                 <td>
-                                    <xforms:input bind="author-bind">
+                                    <xforms:input id="author-control" bind="author-bind" class="fr-summary fr-search">
                                         <xforms:label class="books-label">Author</xforms:label>
                                         <xforms:hint>Book author</xforms:hint>
                                     </xforms:input>
@@ -155,9 +157,10 @@
                             </tr>
                             <tr>
                                 <td>
-                                    <xforms:select1 ref="language">
+                                    <xforms:select1 id="language-control" ref="language" class="fr-summary fr-search">
                                         <xforms:label class="books-label">Language</xforms:label>
                                         <xforms:hint>Book language</xforms:hint>
+                                        <xforms:help>This contains the book language. For example...</xforms:help>
                                         <xforms:item>
                                             <xforms:label>Choose One...</xforms:label>
                                             <xforms:value/>
@@ -172,6 +175,7 @@
                                     <xforms:input ref="link">
                                         <xforms:label class="books-label">Link</xforms:label>
                                         <xforms:hint>Optional link to external resource</xforms:hint>
+                                        <xforms:help>This input contains a link to an external resource. For example...</xforms:help>
                                     </xforms:input>
                                 </td>
                             </tr>
@@ -180,6 +184,7 @@
                                     <xforms:select1 ref="rating" appearance="full">
                                         <xforms:label class="books-label">Rating</xforms:label>
                                         <xforms:hint>Your rating</xforms:hint>
+                                        <xforms:help>This contains your rating about the book. For example...</xforms:help>
                                         <xforms:item>
                                             <xforms:label>None</xforms:label>
                                             <xforms:value/>
@@ -194,11 +199,15 @@
                                     <xforms:textarea ref="notes" appearance="xxforms:autosize">
                                         <xforms:label class="books-label">Notes</xforms:label>
                                         <xforms:hint>Notes about this book</xforms:hint>
+                                        <xforms:help>This area contains your own comments about the book. For example...</xforms:help>
                                     </xforms:textarea>
                                 </td>
                             </tr>
                     </fr:repeat>
                 </fr:section>
+
+                <!--<widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>-->
+
             </fr:body>
         </fr:view>
     </body>

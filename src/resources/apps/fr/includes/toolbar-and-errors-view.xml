@@ -23,33 +23,43 @@
         xmlns:saxon="http://saxon.sf.net/">
     <xhtml:tr>
         <xhtml:td colspan="2">
-            <xforms:switch>
-                <xforms:case id="orbeon-message-none">
-                    <span/>
-                </xforms:case>
-                <xforms:case id="fr-message-success">
-                    <span class="fr-message-success">
-                        <xforms:output model="fr-persistence-model" ref="instance('persistence-instance')/message"/>
-                    </span>
-                </xforms:case>
-                <xforms:case id="fr-message-validation-error">
-                    <span class="fr-message-validation-error">
-                        <xforms:output model="fr-persistence-model" ref="instance('persistence-instance')/message"/>
-                    </span>
-                </xforms:case>
-                <xforms:case id="fr-message-fatal-error">
-                    <span class="fr-message-fatal-error">
-                        <xforms:output model="fr-persistence-model" ref="instance('persistence-instance')/message"/>
-                    </span>
-                </xforms:case>
-            </xforms:switch>
+            <xforms:group model="fr-persistence-model" appearance="xxforms:internal">
+                <!-- Display clean/dirty status -->
+                <xforms:group ref="instance('fr-persistence-instance')[data-status = 'dirty']">
+                    <!-- TODO: i18n or use icon instead -->
+                    <xhtml:p class="fr-unsaved-data">Your forms contains unsaved changes.</xhtml:p>
+                </xforms:group>
+                <xforms:group ref="instance('fr-persistence-instance')[data-status = 'clean']"/>
+                <!-- Display messages -->
+                <xforms:switch>
+                    <xforms:case id="orbeon-message-none">
+                        <xhtml:p/>
+                    </xforms:case>
+                    <xforms:case id="fr-message-success">
+                        <xhtml:p class="fr-message-success">
+                            <xforms:output value="instance('fr-persistence-instance')/message"/>
+                        </xhtml:p>
+                    </xforms:case>
+                    <xforms:case id="fr-message-validation-error">
+                        <xhtml:p class="fr-message-validation-error">
+                            <xforms:output value="instance('fr-persistence-instance')/message"/>
+                        </xhtml:p>
+                    </xforms:case>
+                    <xforms:case id="fr-message-fatal-error">
+                        <xhtml:p class="fr-message-fatal-error">
+                            <xforms:output value="instance('fr-persistence-instance')/message"/>
+                        </xhtml:p>
+                    </xforms:case>
+                </xforms:switch>
+            </xforms:group>
         </xhtml:td>
     </xhtml:tr>
     <xhtml:tr>
         <xhtml:td>
-            <xforms:group model="fr-persistence-model" ref=".[instance('persistence-instance')/save-attempted = 'true']">
+            <xforms:group model="fr-persistence-model" ref=".[instance('fr-persistence-instance')/save-attempted = 'true']">
                 <xforms:group model="fr-error-summary-model" ref="instance('errors-instance')[error]">
-                    <xhtml:span class="fr-error-title">Issues with form</xhtml:span>
+                    <!-- TODO: i18n -->
+                    <xhtml:span class="fr-error-title">Your form has the following issues:</xhtml:span>
                     <xhtml:ol class="fr-error-list">
                         <xforms:repeat nodeset="error" id="errors-repeat">
                             <xhtml:li>

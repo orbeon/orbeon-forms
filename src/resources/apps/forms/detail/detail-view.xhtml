@@ -28,7 +28,7 @@
         <title>Government Forms - Detail Page</title>
         <link rel="stylesheet" type="text/css" href="/apps/forms/style.css"/>
         <!-- Global model -->
-        <xforms:model id="common-model"
+        <xforms:model id="common-model" xxforms:state-handling="server"
                       xxforms:readonly-appearance="{if (doc('input:instance')/*/readonly = 'true') then 'static' else 'dynamic'}">
 
             <!-- This is called when the XForms engine is ready -->
@@ -42,9 +42,7 @@
             </xforms:action>
 
             <!-- Instance containing the page parameters -->
-            <xforms:instance id="parameters-instance">
-                <xi:include href="input:instance" xxi:omit-xml-base="true"/>
-            </xforms:instance>
+            <xforms:instance id="parameters-instance" src="input:instance"/>
 
             <!-- XForms instance for widget control information -->
             <xforms:instance id="control-instance">

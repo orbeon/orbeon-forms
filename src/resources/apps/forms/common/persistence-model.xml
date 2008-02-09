@@ -37,7 +37,9 @@
 
     <xforms:submission id="list-documents-submission" ref="instance('list-documents-query')"
                        method="post" action="/exist/rest/db/orbeon/forms/?search={{instance('search-instance')}}"
-                       replace="instance" xxforms:instance="documents-instance" f:url-type="resource" xxforms:readonly="true"/>
+                       replace="instance" xxforms:instance="documents-instance" f:url-type="resource" xxforms:readonly="true">
+        <xforms:message ev:event="xforms-submit-error" value="event('document-body')"/>
+    </xforms:submission>
 
     <xforms:submission id="delete-document-submission" serialization="none" method="delete" replace="none" f:url-type="resource"
                        action="/exist/rest/db/orbeon/forms/{{xxforms:instance('parameters-instance')/form-id}}/{{xxforms:instance('documents-instance')/documents/document[index('documents-repeat')]/id}}"/>

@@ -104,13 +104,15 @@
             </xforms:action>
 
         </xforms:model>
-        <!-- Model to handle persistence -->
-        <!--<xi:include href="oxf:/apps/fr/includes/persistence-model.xml" xxi:omit-xml-base="true"/>-->
     </head>
     <body>
         <fr:view>
             <xforms:label>Orbeon Forms - Form Runner</xforms:label>
             <fr:body>
+                <h2>
+                    Summary for form:
+                    <xforms:output model="fr-persistence-model" value="instance('source-form-instance')/xhtml:head/xhtml:title"/>
+                </h2>
                 <p>
                     <!-- Select form -->
                     <xforms:select1 ref="instance('parameters-instance')/form" appearance="full">
@@ -144,7 +146,9 @@
                     </xforms:input>
 
                     <!-- Structured search -->
-                    <xforms:repeat model="fr-persistence-model" nodeset="instance('search-instance')/search" id="search-repeat">
+                    <xforms:repeat model="fr-persistence-model" nodeset="instance('configuration-instance')/xforms:*[tokenize(@class, ' ') = 'fr-search']" id="search-repeat">
+                        xxx
+                        <!-- TODO:  -->
                         <xforms:input ref="@value">
                             <xforms:label>
                                 <xforms:output model="resources-model" value="for $header in xxforms:repeat-current()/@header return instance('form-resources')/summary/titles/*[local-name() = $header]"/>
@@ -178,9 +182,13 @@
                             <th><xforms:output model="resources-model" value="instance('common-resources')/summary/titles/row-number"/></th>
                             <th><xforms:output model="resources-model" value="instance('common-resources')/summary/titles/created"/></th>
                             <th><xforms:output model="resources-model" value="instance('common-resources')/summary/titles/last-modified"/></th>
-                            <xforms:repeat nodeset="headers/header" id="headers-repeat">
+                            <xforms:repeat nodeset="instance('configuration-instance')/xforms:*[tokenize(@class, ' ') = 'fr-summary']">
                                 <th>
-                                    <xforms:output model="resources-model" value="for $header in xxforms:context() return instance('form-resources')/summary/titles/*[local-name() = $header]"/>
+                                    <!-- Iterate through specially marked controls and derive resource id then resource -->
+                                    <xforms:output model="resources-model"
+                                                   value="for $id in substring-before(xxforms:context()/@id, '-control')
+                                                          return for $resource in (instance('form-resources')/summary/titles/*[local-name() = $id], '')
+                                                                 return if ($resource != '') then $resource else concat('[', $id, ']')"/>
                                 </th>
                             </xforms:repeat>
                         </tr>
@@ -200,6 +208,7 @@
                                     </xforms:group>
                                 </td>
                                 <xforms:repeat nodeset="details/detail">
+                                <!--<xforms:repeat nodeset="instance('source-form-instance')/xforms:*">-->
                                     <td>
                                         <xforms:group ref=".">
                                             <xforms:output value="if (. castable as xs:date) then format-date(xs:date(.), xxforms:instance('common-resources')/summary/formats/date, xxforms:instance('language-instance'), (), ()) else ."/>
@@ -243,6 +252,9 @@
                 <xforms:group model="fr-persistence-model" ref="instance('summary-instance')[not(document)]">
                     <xforms:output model="resources-model" mediatype="text/html" value="saxon:serialize(instance('common-resources')/summary/messages/no-form-found/node(), 'html')"/>
                 </xforms:group>
+
+                <widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>
+
             </fr:body>
             <fr:buttons>
                 <xhtml:table>
@@ -299,6 +311,7 @@
                     </xhtml:tr>
                 </xhtml:table>
             </fr:buttons>
+
         </fr:view>
 
         <!--<table class="forms-action-table">-->
@@ -319,8 +332,6 @@
                 <!--</td>-->
             <!--</tr>-->
         <!--</table>-->
-
-        <widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>
 
     </body>
 </html>

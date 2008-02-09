@@ -20,7 +20,8 @@
               xmlns:xi="http://www.w3.org/2001/XInclude"
               xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
               xmlns:f="http://orbeon.org/oxf/xml/formatting"
-              xmlns:exist="http://exist.sourceforge.net/NS/exist">
+              xmlns:exist="http://exist.sourceforge.net/NS/exist"
+              xmlns:xhtml="http://www.w3.org/1999/xhtml">
 
     <!-- Respond to model initialization -->
     <!-- TODO: Should not do this on summary page -->
@@ -37,11 +38,20 @@
             <!-- Create new empty document -->
             <xforms:send submission="get-template-submission"/>
         </xforms:action>
+
+        <!-- Force all this so we can safely mark the data status as clean -->
+        <xforms:rebuild/>
+        <xforms:recalculate/>
+        <xforms:revalidate/>
+        <xforms:refresh/>
+
+        <!-- Mark the initial data status as clean -->
+        <xforms:setvalue ref="instance('fr-persistence-instance')/data-status">clean</xforms:setvalue>
     </xforms:action>
 
     <!-- Respond to orbeon-save event -->
     <xforms:action ev:event="orbeon-save">
-        <xforms:setvalue ref="instance('persistence-instance')/save-attempted">true</xforms:setvalue>
+        <xforms:setvalue ref="instance('fr-persistence-instance')/save-attempted">true</xforms:setvalue>
         <xforms:action if="instance('parameters-instance')/document != ''">
             <!-- Update -->
             <xforms:send submission="update-submission"/>
@@ -92,7 +102,9 @@
     <xforms:submission id="get-template-submission"
             method="get" serialization="none"
             action="/fr/service/template/{instance('parameters-instance')/app}/{instance('parameters-instance')/form}"
-            replace="instance" xxforms:instance="form-instance"/>
+            replace="instance" xxforms:instance="form-instance">
+        <xforms:message ev:event="xforms-submit-error" level="xxforms:log-error"><xforms:output value="event('error-type')"/></xforms:message>
+    </xforms:submission>
 
     <!-- Get document -->
     <xforms:submission id="get-document-submission"
@@ -110,7 +122,7 @@
             method="put" ref="xxforms:instance('form-instance')"
             action="/fr/service/crud/exist/{instance('parameters-instance')/app}/{instance('parameters-instance')/form}"
             replace="instance" instance="create-instance">
-        <xforms:setvalue ev:event="xforms-submit" ref="instance('persistence-instance')/save-progress">started</xforms:setvalue>
+        <xforms:setvalue ev:event="xforms-submit" ref="instance('fr-persistence-instance')/save-progress">started</xforms:setvalue>
         <xforms:setvalue ev:event="xforms-submit-done" ref="instance('parameters-instance')/document" value="instance('create-instance')"/>
     </xforms:submission>
 
@@ -120,7 +132,7 @@
             method="put" ref="xxforms:instance('form-instance')"
             action="/fr/service/crud/exist/{instance('parameters-instance')/app}/{instance('parameters-instance')/form}/{instance('parameters-instance')/document}"
             replace="none">
-        <xforms:setvalue ev:event="xforms-submit" ref="instance('persistence-instance')/save-progress">started</xforms:setvalue>
+        <xforms:setvalue ev:event="xforms-submit" ref="instance('fr-persistence-instance')/save-progress">started</xforms:setvalue>
     </xforms:submission>
 
     <!-- Delete document -->
@@ -152,8 +164,16 @@
         </search>
     </xforms:instance>
 
-    <xforms:instance id="configuration-instance">
+    <xforms:instance id="source-form-instance">
         <dummy xmlns=""/>
+    </xforms:instance>
+
+    <xforms:instance id="summary-headers-instance">
+        <dummy xmlns=""/>
+    </xforms:instance>
+
+    <xforms:instance id="configuration-instance">
+        <configuration xmlns=""/>
     </xforms:instance>
 
     <xforms:submission id="get-configuration-submission"
@@ -161,11 +181,19 @@
             action="/fr/service/configuration/{
                 instance('parameters-instance')/app}/{
                 instance('parameters-instance')/form}"
-            replace="instance" instance="configuration-instance">
-        <!-- Copy the search configuration to the search instance -->
+            replace="instance" instance="source-form-instance" xxforms:readonly="true">
+
+        <!-- Extract summary configuration information from the XHTML document -->
         <xforms:action ev:event="xforms-submit-done">
-            <xforms:insert context="instance('search-instance')" nodeset="query"
-                origin="instance('configuration-instance')/search"/>
+            <!--<xforms:insert context="instance('search-instance')" nodeset="query"-->
+                <!--origin="instance('source-form-instance')/search"/>-->
+
+            <!-- Extract fields which must appear in the summary -->
+            <xforms:insert context="instance('configuration-instance')" nodeset="*"
+                origin="instance('source-form-instance')/xhtml:body//xforms:*[@class and tokenize(@class, ' ') = ('fr-summary', 'fr-search')]"/>
+
+            <!-- xxx TODO extract other information -->
+
         </xforms:action>
     </xforms:submission>
 
@@ -202,7 +230,7 @@
                 instance('parameters-instance')/form}"
             replace="instance" instance="summary-instance"/>
 
-    <xforms:instance id="persistence-instance">
+    <xforms:instance id="fr-persistence-instance">
         <save xmlns="">
             <!-- Whether an attempt to submit was ever done -->
             <save-attempted>false</save-attempted>
@@ -218,30 +246,31 @@
     </xforms:instance>
 
     <!-- React to instance serialization when saving -->
-    <xforms:action ev:event="xforms-submit-serialize" if="instance('persistence-instance')/save-progress != ''">
-        <xforms:setvalue ref="instance('persistence-instance')/save-progress">validated</xforms:setvalue>
+    <xforms:action ev:event="xforms-submit-serialize" if="instance('fr-persistence-instance')/save-progress != ''">
+        <xforms:setvalue ref="instance('fr-persistence-instance')/save-progress">validated</xforms:setvalue>
     </xforms:action>
 
     <!-- React to successful submission when saving -->
-    <xforms:action ev:event="xforms-submit-done" if="instance('persistence-instance')/save-progress != ''">
-        <xforms:setvalue ref="instance('persistence-instance')/message">Document saved.</xforms:setvalue><!-- TODO: i18n -->
-        <xforms:setvalue ref="instance('control-instance')/data-status">clean</xforms:setvalue>
+    <xforms:action ev:event="xforms-submit-done" if="instance('fr-persistence-instance')/save-progress != ''">
+        <xforms:setvalue ref="instance('fr-persistence-instance')/message">Document saved.</xforms:setvalue><!-- TODO: i18n -->
+        <xforms:setvalue ref="instance('fr-persistence-instance')/data-status">clean</xforms:setvalue>
         <xforms:toggle case="fr-message-success"/>
-        <xforms:setvalue ref="instance('persistence-instance')/save-progress"/>
+        <xforms:setvalue ref="instance('fr-persistence-instance')/save-progress"/>
     </xforms:action>
 
-    <!-- React to failed submission when saving -->
-    <xforms:action ev:event="xforms-submit-error" if="instance('persistence-instance')/save-progress != ''">
-        <xforms:setvalue ref="instance('persistence-instance')/error" value="event('response-body')"/>
-        <xforms:action if="not(instance('persistence-instance')/save-progress = 'validated')">
-            <xforms:setvalue ref="instance('persistence-instance')/message">There are errors in your form.</xforms:setvalue><!-- TODO: i18n -->
+    <!-- React to failed submission -->
+    <xforms:action ev:event="xforms-submit-error" if="instance('fr-persistence-instance')/save-progress != ''">
+        <xforms:setvalue ref="instance('fr-persistence-instance')/error" value="event('response-body')"/>
+        <xforms:message level="xxforms:log-error"><xforms:output value="event('response-body')"/></xforms:message>
+        <xforms:action if="not(instance('fr-persistence-instance')/save-progress = 'validated')">
+            <xforms:setvalue ref="instance('fr-persistence-instance')/message">There are errors in your form.</xforms:setvalue><!-- TODO: i18n -->
             <xforms:toggle case="fr-message-validation-error"/>
         </xforms:action>
-        <xforms:action if="instance('persistence-instance')/save-progress = 'validated'">
-            <xforms:setvalue ref="instance('persistence-instance')/message">Unable to save document. Please contact your system administrator.</xforms:setvalue><!-- TODO: i18n -->
+        <xforms:action if="instance('fr-persistence-instance')/save-progress = 'validated'">
+            <xforms:setvalue ref="instance('fr-persistence-instance')/message">Unable to save document. Please contact your system administrator.</xforms:setvalue><!-- TODO: i18n -->
             <xforms:toggle case="fr-message-fatal-error"/>
         </xforms:action>
-        <xforms:setvalue ref="instance('persistence-instance')/save-progress"/>
+        <xforms:setvalue ref="instance('fr-persistence-instance')/save-progress"/>
     </xforms:action>
 
 </xforms:model>

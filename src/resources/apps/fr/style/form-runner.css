@@ -147,7 +147,7 @@ h2 a, h3 a, h4 a {
 h2 {
     font-weight: normal;
     font-size: 160%;
-    margin: 1em 0 1em 0;
+    margin: .5em 0 .5em 0;
     clear: left;
 }
 
@@ -182,7 +182,7 @@ textarea {
 }
 
 .fr-error-buttons {
-    margin-top: 2em;
+    margin-top: 1em;
     width: 100%;
 }
 
@@ -204,6 +204,7 @@ textarea {
 .fr-message-success { color: green  }
 .fr-message-validation-error { color: orange }
 .fr-message-fatal-error { color: red }
+.fr-unsaved-data { color: red }
 
 .fr-repeat-table {
     background-color:#F5FAF7;
@@ -268,3 +269,6 @@ body { text-align: left }
     margin-left: .5em;
     width: 22em
 }
+
+/* Do this for collapsible sections so that YUI animations work */
+div.fr-collapsible { overflow: hidden }

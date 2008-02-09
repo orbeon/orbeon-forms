@@ -26,13 +26,16 @@
     <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
 
     <xsl:template match="fr:view">
-        <xforms:input model="fr-sections-model" ref="instance('fr-sections-instance')/@current" id="fr-current-section-input" class="xforms-disabled"/>
+        <!--  Hidden field to communicate to the client the current section to collapse or expand -->
+        <xforms:input model="fr-sections-model" ref="instance('fr-current-section-instance')" id="fr-current-section-input" class="xforms-disabled"/>
+        <!-- Hidden field to communicate to the client whether the data is clean or dirty -->
+        <xforms:input model="fr-persistence-model" ref="instance('fr-persistence-instance')/data-status" id="fr-data-status-input" class="xforms-disabled"/>
 
-        <xhtml:div id="doc" class="yui-t7">
+        <xhtml:div id="doc4" class="yui-t5xxx">
             <xhtml:div id="hd" class="fr-top">
             </xhtml:div>
             <xhtml:div id="bd" class="fr-container">
-                <!--<xhtml:div id="yui-main">-->
+                <xhtml:div id="yui-main">
                     <xhtml:div class="yui-b">
                         <xhtml:div class="yui-g fr-logo">
                             <xhtml:h1><xsl:value-of select="xforms:label"/></xhtml:h1>
@@ -59,7 +62,14 @@
 
                                 <xforms:group appearance="xxforms:internal">
                                     <!-- Clear message upon user interaction -->
-                                    <xforms:setvalue ev:event="DOMFocusIn" model="fr-persistence-model" ref="instance('persistence-instance')/message"/>
+                                    <xforms:setvalue ev:event="DOMFocusIn" model="fr-persistence-model" ref="instance('fr-persistence-instance')/message"/>
+                                    <!-- Mark status as dirty if data changes -->
+                                    <xforms:setvalue ev:event="xforms-value-changed" model="fr-persistence-model" ref="instance('fr-persistence-instance')/data-status">dirty</xforms:setvalue>
+                                    <!-- Take action upon xforms-help -->
+                                    <!--<xforms:action ev:event="xforms-help" ev:defaultAction="cancel">-->
+                                        <!--<xforms:setvalue model="fr-help-model" ref="instance('fr-help-instance')/label" value="event('label')"/>-->
+                                        <!--<xforms:setvalue model="fr-help-model" ref="instance('fr-help-instance')/help" value="event('help')"/>-->
+                                    <!--</xforms:action>-->
                                     <!-- Main form content -->
                                     <xsl:apply-templates select="fr:body/node()"/>
                                 </xforms:group>
@@ -79,10 +89,17 @@
                             </xsl:choose>
                         </xhtml:div>
                     </xhtml:div>
-                <!--</xhtml:div>-->
-                <!--<xhtml:div class="yui-b">-->
-                    <!--left bar-->
-                <!--</xhtml:div>-->
+                </xhtml:div>
+                <xhtml:div class="yui-b">
+                    <!--<xhtml:div class="yui-g fr-logo">-->
+                    <!--</xhtml:div>-->
+                    <!--<xhtml:div class="yui-g fr-separator">-->
+                    <!--</xhtml:div>-->
+                    <!--<xhtml:h2><xforms:output model="fr-help-model" value="instance('fr-help-instance')/label"/></xhtml:h2>-->
+                    <!--<xhtml:div>-->
+                        <!--<xforms:output model="fr-help-model" value="instance('fr-help-instance')/help"/>-->
+                    <!--</xhtml:div>-->
+                </xhtml:div>
             </xhtml:div>
             <xhtml:div id="ft" class="fr-bottom">
             </xhtml:div>
@@ -92,38 +109,46 @@
 
     <xsl:template match="fr:section">
         <xhtml:div class="section-container">
-            <xforms:group ref="{if (@ref) then @ref else '.'}">
-                <xhtml:h2>
-                    <xforms:group model="fr-sections-model" ref="instance('fr-sections-instance')/{@id}">
-                        <xforms:group>
-                            <xforms:action ev:event="DOMActivate">
-                                <xforms:setvalue ref="instance('fr-sections-instance')/@current" value="xxforms:context()/local-name()"/>
-                                <xforms:dispatch target="fr-sections-model" name="fr-collapse-expand" />
-                            </xforms:action>
-                            <xforms:group ref="if (@open = 'true') then . else ()">
-                                <xforms:trigger appearance="minimal">
-                                    <xforms:label><xhtml:img src="../../../../apps/fr/style/minus.png" alt=""/></xforms:label>
-                                </xforms:trigger>
-                            </xforms:group>
-                            <xforms:group ref="if (@open = 'false') then . else ()">
-                                <xforms:trigger appearance="minimal">
-                                    <xforms:label><xhtml:img src="../../../../apps/fr/style/plus.png" alt=""/></xforms:label>
-                                </xforms:trigger>
-                            </xforms:group>
+            <xforms:switch id="section-{@id}" ref="{if (@ref) then @ref else '.'}">
+                <xforms:case id="case-{@id}-closed" selected="{if (@open = 'false') then 'true' else 'false'}">
+                    <xhtml:div>
+                        <xhtml:h2>
                             <xforms:trigger appearance="minimal">
-                                <xsl:apply-templates select="xforms:label"/>
+                                <xforms:label>
+                                    <xhtml:img src="../../../../apps/fr/style/plus.png" alt=""/>
+                                    <xsl:apply-templates select="xforms:label"/>
+                                </xforms:label>
+                                <xforms:action ev:event="DOMActivate">
+                                    <xforms:setvalue model="fr-sections-model" ref="instance('fr-current-section-instance')" value="'{@id}'"/>
+                                    <xforms:dispatch target="fr-sections-model" name="fr-expand"/>
+                                </xforms:action>
                             </xforms:trigger>
-                        </xforms:group>
-                    </xforms:group>
-                </xhtml:h2>
-                <xforms:group ref=".[xxforms:instance('fr-sections-instance')/{@id}/@open = 'true']" class="section-{@id}" id="section-{@id}">
-
-                    <xhtml:table class="fr-grid fr-grid-{@columns}-columns">
-                        <!-- Section content -->
-                        <xsl:apply-templates select="* except xforms:label"/>
-                    </xhtml:table>
-                </xforms:group>
-            </xforms:group>
+                        </xhtml:h2>
+                    </xhtml:div>
+                </xforms:case>
+                <xforms:case id="case-{@id}-open" selected="{if (not(@open = 'false')) then 'true' else 'false'}">
+                    <xhtml:div>
+                        <xhtml:h2>
+                            <xforms:trigger appearance="minimal">
+                                <xforms:label>
+                                    <xhtml:img src="../../../../apps/fr/style/minus.png" alt=""/>
+                                    <xsl:apply-templates select="xforms:label"/>
+                                </xforms:label>
+                                <xforms:action ev:event="DOMActivate">
+                                    <xforms:setvalue model="fr-sections-model" ref="instance('fr-current-section-instance')" value="'{@id}'"/>
+                                    <xforms:dispatch target="fr-sections-model" name="fr-collapse" />
+                                </xforms:action>
+                            </xforms:trigger>
+                        </xhtml:h2>
+                        <xhtml:div class="fr-collapsible">
+                            <xhtml:table class="fr-grid fr-grid-{@columns}-columns">
+                                <!-- Section content -->
+                                <xsl:apply-templates select="* except xforms:label"/>
+                            </xhtml:table>
+                        </xhtml:div>
+                    </xhtml:div>
+                </xforms:case>
+            </xforms:switch>
         </xhtml:div>
     </xsl:template>
 
@@ -198,43 +223,72 @@
 
     <!-- This not a component really, but  -->
     <xsl:template match="xforms:model[1]">
+
+        <!-- Add script to check dirty status -->
+        <xhtml:script type="text/javascript">
+            <![CDATA[
+            function unload_handler(){
+                try{
+                    if (!ORBEON.xforms.Document.isReloading() && ORBEON.xforms.Document.getValue('fr-data-status-input') == 'dirty'){
+                      return "You may lose some unsaved changes.";
+                    }
+                } catch (ex) {
+                }
+            }
+
+            window.onbeforeunload = unload_handler;
+            ]]>
+        </xhtml:script>
+
         <xsl:copy>
+            <xsl:attribute name="xxforms:external-events" select="'fr-after-collapse'"/>
             <xsl:apply-templates select="@*|node()"/>
+
+            <!-- Mark status as dirty if data changes -->
+            <xforms:setvalue ev:observer="form-instance" ev:event="xforms-insert" ref="xxforms:instance('fr-persistence-instance')/data-status">dirty</xforms:setvalue>
+            <xforms:setvalue ev:observer="form-instance" ev:event="xforms-delete" ref="xxforms:instance('fr-persistence-instance')/data-status">dirty</xforms:setvalue>
+
         </xsl:copy>
 
-        <xforms:model id="fr-sections-model" xxforms:external-events="fr-after-collapse">
-            <xforms:instance id="fr-sections-instance">
-                <sections current="{(//fr:section)[1]/@id}" xmlns="">
-                    <xsl:for-each select="//fr:section">
-                        <xsl:element name="{@id}" namespace="">
-                            <xsl:attribute name="open">true</xsl:attribute>
-                        </xsl:element>
-                    </xsl:for-each>
-                </sections>
+        <!-- This model handles form sections -->
+        <xforms:model id="fr-sections-model">
+            <!-- Contain section being currently expanded/collapsed -->
+            <!-- TODO: This probably doesn't quite work for sections within repeats -->
+            <xforms:instance id="fr-current-section-instance">
+                <section xmlns=""/>
             </xforms:instance>
 
             <!-- Handle section collapse -->
             <xforms:action ev:event="fr-after-collapse">
-                <xforms:setvalue ref="saxon:evaluate(concat('instance(''fr-sections-instance'')/', instance('fr-sections-instance')/@current, '/@open'))">false</xforms:setvalue>
+                <xforms:toggle case="case-{{instance('fr-current-section-instance')}}-closed"/>
             </xforms:action>
-            <xforms:action ev:event="fr-collapse-expand">
-                <!-- Close section -->
-                <xforms:action if="saxon:evaluate(concat('instance(''fr-sections-instance'')/', instance('fr-sections-instance')/@current, '/@open')) = 'true'">
-                    <xxforms:script>document.body.blur(); frCollapse();</xxforms:script>
-                </xforms:action>
-                <!-- Open section -->
-                <xforms:action if="saxon:evaluate(concat('instance(''fr-sections-instance'')/', instance('fr-sections-instance')/@current, '/@open')) = 'false'">
-                    <xforms:setvalue ref="saxon:evaluate(concat('instance(''fr-sections-instance'')/', instance('fr-sections-instance')/@current, '/@open'))">true</xforms:setvalue>
-                    <xxforms:script>document.body.blur(); frExpand();</xxforms:script>
-                </xforms:action>
+
+            <!-- Close section -->
+            <xforms:action ev:event="fr-collapse">
+                <xxforms:script>document.body.blur(); frCollapse();</xxforms:script>
             </xforms:action>
+            
+            <!-- Open section -->
+            <xforms:action ev:event="fr-expand">
+                <xforms:toggle case="case-{{instance('fr-current-section-instance')}}-open"/>
+                <xxforms:script>document.body.blur(); frExpand();</xxforms:script>
+            </xforms:action>
+        </xforms:model>
+
+        <xforms:model id="fr-help-model">
+            <xforms:instance id="fr-help-instance">
+                <help xmlns="">
+                    <label/>
+                    <help/>
+                </help>
+            </xforms:instance>
         </xforms:model>
 
         <!-- Handle document persistence -->
         <xi:include href="oxf:/apps/fr/includes/persistence-model.xml" xxi:omit-xml-base="true"/>
         <!-- Handle error summary -->
         <xi:include href="oxf:/apps/fr/includes/error-summary-model.xml" xxi:omit-xml-base="true"/>
-        <!-- Handle collapsable sections -->
+        <!-- Handle collapsible sections -->
         <xi:include href="oxf:/apps/fr/includes/collapse-script.xhtml" xxi:omit-xml-base="true"/>
 
     </xsl:template>

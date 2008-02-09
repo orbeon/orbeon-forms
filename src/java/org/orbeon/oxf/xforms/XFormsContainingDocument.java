@@ -684,6 +684,9 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                 // Target is a dialog
                 // Check for implicitly allowed events
                 if (allowedXXFormsDialogExternalEvents.get(eventName) == null) {
+                    if (XFormsServer.logger.isDebugEnabled()) {
+                        XFormsServer.logger.debug("XForms - ignoring invalid client event on xxforms:dialog: " + eventName);
+                    }
                     return;
                 }
             } else {
@@ -691,6 +694,9 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
 
                 // Only single-node controls accept events from the client
                 if (!(eventTarget instanceof XFormsSingleNodeControl)) {
+                    if (XFormsServer.logger.isDebugEnabled()) {
+                        XFormsServer.logger.debug("XForms - ignoring client event on non-single-node control: " + eventName);
+                    }
                     return;
                 }
 
@@ -698,6 +704,9 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
 
                 if (!xformsControl.isRelevant() || (xformsControl.isReadonly() && !(xformsControl instanceof XFormsOutputControl))) {
                     // Controls accept event only if they are relevant and not readonly, except for xforms:output which may be readonly
+                    if (XFormsServer.logger.isDebugEnabled()) {
+                        XFormsServer.logger.debug("XForms - ignoring client event on non-relevant or read-only control: " + eventName);
+                    }
                     return;
                 }
 
@@ -705,14 +714,23 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                     // The event is not explicitly allowed: check for implicitly allowed events
                     if (xformsControl instanceof XFormsOutputControl) {
                         if (allowedXFormsOutputExternalEvents.get(eventName) == null) {
+                            if (XFormsServer.logger.isDebugEnabled()) {
+                                XFormsServer.logger.debug("XForms - ignoring invalid client event on xforms:output: " + eventName);
+                            }
                             return;
                         }
                     } else if (xformsControl instanceof XFormsUploadControl) {
                         if (allowedXFormsUploadExternalEvents.get(eventName) == null) {
+                            if (XFormsServer.logger.isDebugEnabled()) {
+                                XFormsServer.logger.debug("XForms - ignoring invalid client event on xforms:upload: " + eventName);
+                            }
                             return;
                         }
                     } else {
                         if (allowedExternalEvents.get(eventName) == null) {
+                            if (XFormsServer.logger.isDebugEnabled()) {
+                                XFormsServer.logger.debug("XForms - ignoring invalid client event: " + eventName);
+                            }
                             return;
                         }
                     }
@@ -723,6 +741,9 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
             if (!isExplicitlyAllowedExternalEvent(eventName)) {
                 // The event is not explicitly allowed: check for implicitly allowed events
                 if (allowedXFormsSubmissionExternalEvents.get(eventName) == null) {
+                    if (XFormsServer.logger.isDebugEnabled()) {
+                        XFormsServer.logger.debug("XForms - ignoring invalid client event on xforms:submission: " + eventName);
+                    }
                     return;
                 }
             }
@@ -730,12 +751,18 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
             // Target is the containing document
             // Check for implicitly allowed events
             if (allowedXFormsContainingDocumentExternalEvents.get(eventName) == null) {
+                if (XFormsServer.logger.isDebugEnabled()) {
+                    XFormsServer.logger.debug("XForms - ignoring invalid client event on containing document: " + eventName);
+                }
                 return;
             }
         } else {
             // Target is not a control
             if (!isExplicitlyAllowedExternalEvent(eventName)) {
                 // The event is not explicitly allowed
+                if (XFormsServer.logger.isDebugEnabled()) {
+                    XFormsServer.logger.debug("XForms - ignoring invalid client event: " + eventName);
+                }
                 return;
             }
         }
@@ -876,6 +903,13 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         for (Iterator i = getModels().iterator(); i.hasNext();) {
             final XFormsModel currentModel = (XFormsModel) i.next();
             currentModel.endOutermostActionHandler(pipelineContext);
+        }
+    }
+
+    public void synchronizeInstanceDataEventState() {
+        for (Iterator i = getModels().iterator(); i.hasNext();) {
+            final XFormsModel currentModel = (XFormsModel) i.next();
+            currentModel.synchronizeInstanceDataEventState();
         }
     }
 

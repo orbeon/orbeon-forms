@@ -19,6 +19,7 @@ import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsControls;
 import org.orbeon.oxf.xforms.XFormsInstance;
 import org.orbeon.oxf.xforms.XFormsModel;
+import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
@@ -94,6 +95,10 @@ public class XFormsSetvalueAction extends XFormsAction {
     public static boolean doSetValue(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, NodeInfo currentNode, String valueToSet, String type, boolean isCalculate) {
         final String currentValue = XFormsInstance.getValueForNodeInfo(currentNode);
         if (!currentValue.equals(valueToSet)) {// TODO: Check if we are allowed to do this optimization
+
+            if (XFormsServer.logger.isDebugEnabled())
+                XFormsServer.logger.debug("XForms - setting instance value to: " + valueToSet);
+
             XFormsInstance.setValueForNodeInfo(pipelineContext, currentNode, valueToSet, type);
 
             if (!isCalculate) {

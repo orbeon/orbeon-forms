@@ -1242,7 +1242,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         }
     }
 
-    private void synchronizeInstanceDataEventState() {
+    public void synchronizeInstanceDataEventState() {
         if (instances != null) {
             for (Iterator i = instances.iterator(); i.hasNext();) {
                 final XFormsInstance currentInstance = (XFormsInstance) i.next();
@@ -1508,7 +1508,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
             });
 
             // Clear InstanceData event state
-            synchronizeInstanceDataEventState();
+            // NOTE: We clear for all models, as we are processing refresh events for all models here. This may have to be changed in the future.
+            containingDocument.synchronizeInstanceDataEventState();
             xformsControls.getCurrentControlsState().setEventsToDispatch(null);
 
             // "Actions that directly invoke rebuild, recalculate, revalidate, or refresh always
@@ -1680,7 +1681,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
             // No UI events to send because there is no event handlers for any of them
             XFormsServer.logger.debug("XForms - skipping sending of UI events because no listener was found.");
 
-            synchronizeInstanceDataEventState();
+            // NOTE: We clear for all models, as we are processing refresh events for all models here. This may have to be changed in the future.
+            containingDocument.synchronizeInstanceDataEventState();
             xformsControls.getCurrentControlsState().setEventsToDispatch(null);
 
             // "Actions that directly invoke rebuild, recalculate, revalidate, or refresh always

@@ -32,11 +32,21 @@ public class XFormsToggleAction extends XFormsAction {
 
         final XFormsControls xformsControls = actionInterpreter.getXFormsControls();
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
+        final XFormsControls.BindingContext bindingContext = xformsControls.getCurrentBindingContext();
 
-        final String caseId = XFormsUtils.namespaceId(containingDocument, actionElement.attributeValue("case"));
-
-        if (caseId == null)
+        final String caseAttribute = actionElement.attributeValue("case");
+        if (caseAttribute == null)
             throw new OXFException("Missing mandatory case attribute on xforms:toggle element.");
+
+        final String caseId;
+        if (bindingContext.getSingleNode() != null) {
+            final String resolvedCaseId = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, bindingContext.getSingleNode(),
+                    null, XFormsContainingDocument.getFunctionLibrary(), xformsControls, actionElement, caseAttribute);
+            caseId = XFormsUtils.namespaceId(containingDocument, resolvedCaseId);
+        } else {
+            // TODO: Presence of context is not the right way to decide whether to evaluate AVTs or not
+            caseId = caseAttribute;
+        }
 
         final String effectiveCaseId = xformsControls.findEffectiveCaseId(caseId);
 

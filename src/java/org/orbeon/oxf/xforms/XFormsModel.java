@@ -661,8 +661,11 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         return (LocationData) modelDocument.getRootElement().getData();
     }
 
-    public List getBindNodeset(PipelineContext pipelineContext, ModelBind modelBind) {
-        // Get a list of parents, ordered by grandfather first
+    public List getBindNodeset(PipelineContext pipelineContext, ModelBind modelBind, NodeInfo contextNode) {
+
+        // TODO: This is not efficient for nested binds, as each @bind attribute causes several XPath evaluations.
+
+        // Get a list of ancestor-or-self ModelBind objects, ordered by ancestor first
         final List parents = new ArrayList();
         {
             parents.add(modelBind);
@@ -670,30 +673,61 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
             while ((parent = parent.getParent()) != null) {
                 parents.add(parent);
             }
-            Collections.reverse(parents);
+            if (parents.size() > 1)
+                Collections.reverse(parents);
         }
 
-        final List nodeset = new ArrayList();
-
-        // Find the root node
+        // Find the default instance
         final XFormsInstance defaultInstance = getDefaultInstance();
         if (defaultInstance == null)
             throw new ValidationException("No default instance found for xforms:bind element with id: " + modelBind.getId(), modelBind.getLocationData());
-        nodeset.add(defaultInstance.getInstanceRootElementInfo());
+
+        // Create initial nodeset and initialize with default instance root element
+        List nodeset = Collections.singletonList(defaultInstance.getInstanceRootElementInfo());
 
         for (Iterator i = parents.iterator(); i.hasNext();) {
-            final ModelBind current = (ModelBind) i.next();
-            final List currentModelBindResults = new ArrayList();
-            for (Iterator j = nodeset.iterator(); j.hasNext();) {
-                final NodeInfo node = (NodeInfo) j.next();
-                // Execute XPath expresssion
-                currentModelBindResults.addAll(XPathCache.evaluate(pipelineContext, node, current.getNodeset(),
-                        current.getNamespaceMap(), null, XFormsContainingDocument.getFunctionLibrary(), XFormsModel.this, current.getLocationData().getSystemID(), current.getLocationData()));
+            final ModelBind currentModelBind = (ModelBind) i.next();
+
+            if (!i.hasNext() && nodeset.size() > 1) {
+                // Leaf bind element and there is more than one context to choose from
+
+                // "4.7.2 References to Elements within a bind Element [...] From among the bind objects associated
+                // with the target bind element, if there exists a bind object created with the same in-scope evaluation
+                // context node as the source object, then that bind object is the desired target bind object.
+                // Otherwise, the IDREF resolution produced a null search result."
+
+                // Find matching node
+                for (Iterator k = nodeset.iterator(); k.hasNext();) {
+                    final NodeInfo o2 = (NodeInfo) k.next();
+                    if (o2.isSameNodeInfo(contextNode)) {
+                        // Found one
+                        return XPathCache.evaluate(pipelineContext, contextNode, currentModelBind.getNodeset(),
+                                currentModelBind.getNamespaceMap(), null, XFormsContainingDocument.getFunctionLibrary(),
+                                XFormsModel.this, currentModelBind.getLocationData().getSystemID(), currentModelBind.getLocationData());
+                    }
+                }
+
+                return Collections.EMPTY_LIST;
+
+            } else {
+                // This is either a parent bind, or a leaf bind with only one context noe to choose from
+
+                // "4.7.2 References to Elements within a bind Element [...] If a target bind element is outermost,
+                // or if all of its ancestor bind elements have nodeset attributes that select only one node, then the
+                // target bind only has one associated bind object, so this is the desired target bind object whose
+                // nodeset is used in the Single Node Binding or Node Set Binding."
+
+                final List currentModelBindResults = new ArrayList();
+                for (Iterator j = nodeset.iterator(); j.hasNext();) {
+                    final NodeInfo currentNode = (NodeInfo) j.next();
+                    // Execute XPath expresssion
+                    currentModelBindResults.addAll(XPathCache.evaluate(pipelineContext, currentNode, currentModelBind.getNodeset(),
+                            currentModelBind.getNamespaceMap(), null, XFormsContainingDocument.getFunctionLibrary(),
+                            XFormsModel.this, currentModelBind.getLocationData().getSystemID(), currentModelBind.getLocationData()));
+                }
+
+                nodeset = currentModelBindResults;
             }
-            nodeset.addAll(currentModelBindResults);
-            // Last iteration of i: remove all except last
-            if (!i.hasNext())
-                nodeset.retainAll(currentModelBindResults);
         }
         return nodeset;
     }

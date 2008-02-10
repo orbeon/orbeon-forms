@@ -1775,4 +1775,102 @@
         </output>
     </test>
 
+    <test description="Test reference to nested binds" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-server-init.xpl"/>
+                    <p:input name="document">
+                        <xhtml:html>
+                            <xhtml:head>
+                                <xforms:model id="main-model" xxforms:state-handling="client">
+                                    <xforms:instance id="main-instance">
+                                        <instance xmlns="">
+                                            <book>
+                                                <title>Don Quixote de la Mancha</title>
+                                                <author>Miguel de Cervantes Saavedra</author>
+                                            </book>
+                                            <book>
+                                                <title>Jacques le fataliste et son maître</title>
+                                                <author>Denis Diderot</author>
+                                            </book>
+                                            <book>
+                                                <title>Childhood's End</title>
+                                                <author>Arthur C. Clarke</author>
+                                            </book>
+                                        </instance>
+                                    </xforms:instance>
+
+                                    <xforms:bind nodeset="book">
+                                        <xforms:bind id="title-bind" nodeset="title" required="true()"/>
+                                        <xforms:bind id="author-bind" nodeset="author" required="true()"/>
+                                    </xforms:bind>
+                                </xforms:model>
+                            </xhtml:head>
+                            <xhtml:body>
+                                <xforms:repeat nodeset="book">
+                                    <xforms:input id="title-control" bind="title-bind">
+                                        <xforms:label>Title</xforms:label>
+                                    </xforms:input>
+                                    <xforms:input id="author-control" bind="author-bind">
+                                        <xforms:label>Author</xforms:label>
+                                    </xforms:input>
+                                </xforms:repeat>
+                            </xhtml:body>
+                        </xhtml:html>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+
+            </p:config>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="main-instance" model-id="main-model">
+                                <instance>
+                                    <book>
+                                        <title>Don Quixote de la Mancha</title>
+                                        <author>Miguel de Cervantes Saavedra</author>
+                                    </book>
+                                    <book>
+                                        <title>Jacques le fataliste et son maître</title>
+                                        <author>Denis Diderot</author>
+                                    </book>
+                                    <book>
+                                        <title>Childhood's End</title>
+                                        <author>Arthur C. Clarke</author>
+                                    </book>
+                                </instance>
+                            </instance>
+                        </instances>
+                        <repeat-indexes>
+                            <repeat-index id="xforms-element-6" index="1"/>
+                        </repeat-indexes>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:copy-repeat-template id="xforms-element-6" parent-indexes="" id-suffix="2"/>
+                        <xxf:copy-repeat-template id="xforms-element-6" parent-indexes="" id-suffix="3"/>
+                        <xxf:control id="title-control·1" required="true" relevant="true" label="Title">Don Quixote de la Mancha</xxf:control>
+                        <xxf:control id="author-control·1" required="true" relevant="true" label="Author">Miguel de Cervantes Saavedra</xxf:control>
+                        <xxf:control id="title-control·2" required="true" relevant="true" label="Title">Jacques le fataliste et son maître</xxf:control>
+                        <xxf:control id="author-control·2" required="true" relevant="true" label="Author">Denis Diderot</xxf:control>
+                        <xxf:control id="title-control·3" required="true" relevant="true" label="Title">Childhood's End</xxf:control>
+                        <xxf:control id="author-control·3" required="true" relevant="true" label="Author">Arthur C. Clarke</xxf:control>
+                    </xxf:control-values>
+                    <xxf:repeats>
+                        <xxf:repeat-index id="xforms-element-6" index="1"/>
+                        <xxf:repeat-iteration id="xforms-element-6" occurs="3"/>
+                    </xxf:repeats>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>

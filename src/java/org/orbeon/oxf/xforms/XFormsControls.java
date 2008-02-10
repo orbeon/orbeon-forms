@@ -547,7 +547,7 @@ public class XFormsControls {
                 final ModelBind modelBind = newModel.getModelBindById(bindId);
                 if (modelBind == null)
                     throw new ValidationException("Cannot find bind for id: " + bindId, locationData);
-                newNodeset = newModel.getBindNodeset(pipelineContext, modelBind);
+                newNodeset = newModel.getBindNodeset(pipelineContext, modelBind, currentBindingContext.getSingleNode());
                 isNewBind = true;
                 newPosition = 1;
             } else if (ref != null || nodeset != null) {

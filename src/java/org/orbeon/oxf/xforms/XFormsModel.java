@@ -621,7 +621,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         // Handle children binds
         try {
             // Iterate through all current context nodes
-            for (int index = 1; index <= contextStack.getCurrentNodeset().size(); index++) {
+            final int iterationCount = contextStack.getCurrentNodeset().size();
+            for (int index = 1; index <= iterationCount; index++) {
 
                 contextStack.pushIteration(index, modelBind.getId());
 

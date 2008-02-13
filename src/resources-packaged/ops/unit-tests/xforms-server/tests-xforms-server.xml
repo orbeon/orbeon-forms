@@ -381,7 +381,7 @@
         </output>
     </test>
 
-    <test description="Test for instance() function" name="oxf:pipeline">
+    <test description="instance() function" name="oxf:pipeline">
         <input name="config">
             <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xs="http://www.w3.org/2001/XMLSchema">
                 <p:param name="response" type="output"/>
@@ -475,7 +475,7 @@
         </output>
     </test>
 
-    <test description="Test for call-xpl() function" name="oxf:pipeline">
+    <test description="call-xpl() function" name="oxf:pipeline">
         <input name="config">
             <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <p:param name="response" type="output"/>
@@ -578,7 +578,7 @@
         </output>
     </test>
 
-    <test description="Test for xforms:repeat initialization" name="oxf:pipeline">
+    <test description="xforms:repeat initialization" name="oxf:pipeline">
         <input name="config">
             <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xforms="http://www.w3.org/2002/xforms">
                 <p:param name="response" type="output"/>
@@ -710,7 +710,7 @@
         </output>
     </test>
 
-    <test description="Test for xforms:repeat insert action" name="oxf:pipeline">
+    <test description="xforms:repeat insert action" name="oxf:pipeline">
         <input name="config">
             <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xforms="http://www.w3.org/2002/xforms">
                 <p:param name="response" type="output"/>
@@ -800,7 +800,7 @@
         </output>
     </test>
 
-    <test description="Test for xforms:repeat delete action" name="oxf:pipeline">
+    <test description="xforms:repeat delete action" name="oxf:pipeline">
         <input name="config">
             <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xforms="http://www.w3.org/2002/xforms">
                 <p:param name="response" type="output"/>
@@ -882,7 +882,7 @@
         </output>
     </test>
 
-    <test description="Test for xforms:repeat setindex action" name="oxf:pipeline">
+    <test description="xforms:repeat setindex action" name="oxf:pipeline">
         <input name="config">
             <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xforms="http://www.w3.org/2002/xforms">
                 <p:param name="response" type="output"/>
@@ -964,7 +964,7 @@
         </output>
     </test>
 
-    <test description="Test for repeat index change upon focus change" name="oxf:pipeline">
+    <test description="Repeat index change upon focus change" name="oxf:pipeline">
         <input name="config">
             <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xforms="http://www.w3.org/2002/xforms">
                 <p:param name="response" type="output"/>
@@ -1039,7 +1039,7 @@
         </output>
     </test>
 
-    <test description="Test for calculate upon initialization" name="oxf:pipeline">
+    <test description="Calculate upon initialization" name="oxf:pipeline">
         <input name="config">
             <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xforms="http://www.w3.org/2002/xforms">
                 <p:param name="response" type="output"/>
@@ -1096,7 +1096,7 @@
         </output>
     </test>
 
-    <test description="Test for non-relevant controls when bound to empty node-set" name="oxf:pipeline">
+    <test description="Non-relevant controls when bound to empty node-set" name="oxf:pipeline">
         <input name="config">
             <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xforms="http://www.w3.org/2002/xforms">
                 <p:param name="response" type="output"/>
@@ -1152,7 +1152,7 @@
     <!-- FIXME TODO: this test is disabled because the comparison on namespaces fail. To fix!
     http://forge.objectweb.org/tracker/index.php?func=detail&aid=305435&group_id=168&atid=350207
     -->
-    <!--<test description="Test for xxforms:format attribute" name="oxf:pipeline">-->
+    <!--<test description="xxforms:format attribute" name="oxf:pipeline">-->
         <!--<input name="config">-->
             <!--<p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xforms="http://www.w3.org/2002/xforms">-->
                 <!--<p:param name="response" type="output"/>-->
@@ -1224,7 +1224,7 @@
 
     <!-- This test makes sure that in case the value of a control is changed by the client, but then
          an action resets that value to the same value as the original value, then the proper response is sent. -->
-    <test description="Test for xforms:setvalue to same initial value" name="oxf:pipeline">
+    <test description="xforms:setvalue to same initial value" name="oxf:pipeline">
         <input name="config">
             <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xforms="http://www.w3.org/2002/xforms">
                 <p:param name="response" type="output"/>
@@ -1520,7 +1520,7 @@
         </output>
     </test>
 
-    <test description="Test for bind readonly and relevant inheritance" name="oxf:pipeline">
+    <test description="Bind readonly and relevant inheritance" name="oxf:pipeline">
         <input name="config">
             <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xforms="http://www.w3.org/2002/xforms">
                 <p:param name="response" type="output"/>
@@ -1712,7 +1712,7 @@
         </output>
     </test>
 
-    <test description="Test that submitting required but empty values fails submission" name="oxf:pipeline">
+    <test description="Submitting required but empty values fails submission" name="oxf:pipeline">
         <input name="config">
             <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <p:param name="response" type="output"/>
@@ -1775,7 +1775,7 @@
         </output>
     </test>
 
-    <test description="Test reference to nested binds" name="oxf:pipeline">
+    <test description="Reference to nested binds from repeat" name="oxf:pipeline">
         <input name="config">
             <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <p:param name="response" type="output"/>
@@ -1868,6 +1868,88 @@
                         <xxf:repeat-index id="xforms-element-6" index="1"/>
                         <xxf:repeat-iteration id="xforms-element-6" occurs="3"/>
                     </xxf:repeats>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="xxforms:iterate attribute on action and current() function" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-server-init.xpl"/>
+                    <p:input name="document">
+                        <xhtml:html>
+                            <xhtml:head>
+                                <xforms:model id="main-model" xxforms:state-handling="client">
+                                    <xforms:instance id="main-instance">
+                                        <instance xmlns=""/>
+                                    </xforms:instance>
+
+                                    <xforms:instance id="template-instance" xxforms:readonly="true">
+                                        <book xmlns="">
+                                            <title/>
+                                            <author/>
+                                        </book>
+                                    </xforms:instance>
+
+                                    <xforms:instance id="source-instance" xxforms:readonly="true">
+                                        <instance xmlns="">
+                                            <title>Don Quixote de la Mancha</title>
+                                            <author>Miguel de Cervantes Saavedra</author>
+                                            <title>Jacques le fataliste et son maître</title>
+                                            <author>Denis Diderot</author>
+                                            <title>Childhood's End</title>
+                                            <author>Arthur C. Clarke</author>
+                                        </instance>
+                                    </xforms:instance>
+
+                                    <!-- Show how you can easily reformat data from one instance to the other -->
+                                    <xforms:action ev:event="xforms-ready" xxforms:iterate="instance('source-instance')/title">
+                                        <xforms:insert context="instance('main-instance')" nodeset="book" origin="instance('template-instance')"/>
+                                        <xforms:setvalue ref="instance('main-instance')/book[last()]/title" value="context()"/>
+                                        <xforms:setvalue ref="instance('main-instance')/book[last()]/author" value="context()/following-sibling::author"/>
+                                    </xforms:action>
+                                </xforms:model>
+                            </xhtml:head>
+                            <xhtml:body>
+                                
+                            </xhtml:body>
+                        </xhtml:html>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+
+            </p:config>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="main-instance" model-id="main-model">
+                                <instance>
+                                    <book>
+                                        <title>Don Quixote de la Mancha</title>
+                                        <author>Miguel de Cervantes Saavedra</author>
+                                    </book>
+                                    <book>
+                                        <title>Jacques le fataliste et son maître</title>
+                                        <author>Denis Diderot</author>
+                                    </book>
+                                    <book>
+                                        <title>Childhood's End</title>
+                                        <author>Arthur C. Clarke</author>
+                                    </book>
+                                </instance>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
                 </xxf:action>
             </xxf:event-response>
         </output>

@@ -138,9 +138,9 @@ public class XFormsActionInterpreter {
                 // We have to restore the context to the in-scope evaluation context, then push @model/@context/@iterate
                 final XFormsContextStack.BindingContext actionBindingContext = contextStack.popBinding();
                 pushIterateAttribute(pipelineContext, actionElement, iterateIterationAttribute);
-                try {
-
-                    for (int index = 1; index <= contextStack.getCurrentNodeset().size(); index++) {
+                {
+                    final int iterationCount = contextStack.getCurrentNodeset().size();
+                    for (int index = 1; index <= iterationCount; index++) {
                         contextStack.pushIteration(index, idAttribute);
 
                         final NodeInfo overriddenContextNodeInfo = contextStack.getCurrentSingleNode();
@@ -150,11 +150,10 @@ public class XFormsActionInterpreter {
                         contextStack.popBinding();
                     }
 
-                } finally {
-                    // Restore context stack
-                    contextStack.popBinding();
-                    contextStack.restoreBinding(actionBindingContext);
                 }
+                // Restore context stack
+                contextStack.popBinding();
+                contextStack.restoreBinding(actionBindingContext);
             } else {
                 // Do a single run
 

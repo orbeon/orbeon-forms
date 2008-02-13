@@ -395,7 +395,7 @@ public class XFormsContextStack {
 
     public XFormsContextStack.BindingContext popBinding() {
         if (contextStack.size() == 1)
-            throw new OXFException("Attempt to clear XForms controls context stack.");
+            throw new OXFException("Attempt to clear context stack.");
         return (XFormsContextStack.BindingContext) contextStack.pop();
     }
 

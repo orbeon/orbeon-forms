@@ -787,7 +787,7 @@ public class XFormsControls {
 
                 // Push binding for xforms:repeat
                 contextStack.pushBinding(pipelineContext, controlElement);
-                try {
+                {
                     // Visit xforms:repeat element
                     doContinue = controlElementVisitorListener.startVisitControl(controlElement, effectiveControlId);
 
@@ -797,7 +797,7 @@ public class XFormsControls {
                         for (int currentPosition = 1; currentPosition <= currentNodeSet.size(); currentPosition++) {
                             // Push "artificial" binding with just current node in nodeset
                             contextStack.pushIteration(currentPosition, controlId);
-                            try {
+                            {
                                 // Handle children of xforms:repeat
                                 if (doContinue) {
                                     // TODO: handle isOptimizeRelevance()
@@ -806,9 +806,8 @@ public class XFormsControls {
                                     doContinue = handleControls(pipelineContext, controlElementVisitorListener, isOptimizeRelevance, controlElement, newIdPostfix);
                                     controlElementVisitorListener.endRepeatIteration(currentPosition);
                                 }
-                            } finally {
-                                contextStack.popBinding();
                             }
+                            contextStack.popBinding();
                             if (!doContinue)
                                 break;
                         }
@@ -816,14 +815,13 @@ public class XFormsControls {
 
                     doContinue = doContinue && controlElementVisitorListener.endVisitControl(controlElement, effectiveControlId);
 
-                } finally {
-                    contextStack.popBinding();
                 }
+                contextStack.popBinding();
 
             } else  if (isGroupingControl(controlName)) {
                 // Handle XForms grouping controls
                 contextStack.pushBinding(pipelineContext, controlElement);
-                try {
+                {
                     doContinue = controlElementVisitorListener.startVisitControl(controlElement, effectiveControlId);
                     final XFormsContextStack.BindingContext currentBindingContext = contextStack.getCurrentBindingContext();
                     if (doContinue) {
@@ -843,18 +841,16 @@ public class XFormsControls {
                         }
                     }
                     doContinue = doContinue && controlElementVisitorListener.endVisitControl(controlElement, effectiveControlId);
-                } finally {
-                    contextStack.popBinding();
                 }
+                contextStack.popBinding();
             } else if (isLeafControl(controlName)) {
                 // Handle leaf control
                 contextStack.pushBinding(pipelineContext, controlElement);
-                try {
+                {
                     doContinue = controlElementVisitorListener.startVisitControl(controlElement, effectiveControlId);
                     doContinue = doContinue && controlElementVisitorListener.endVisitControl(controlElement, effectiveControlId);
-                } finally {
-                    contextStack.popBinding();
                 }
+                contextStack.popBinding();
             }
             if (!doContinue)
                 break;

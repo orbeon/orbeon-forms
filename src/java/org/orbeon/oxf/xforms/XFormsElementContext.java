@@ -74,16 +74,16 @@ public class XFormsElementContext extends XFormsControls {
     }
 
     public void pushBinding(String ref, String context, String nodeset, String model, String bind) {
-        super.pushBinding(pipelineContext, ref, context, nodeset, model, bind, null, getCurrentPrefixToURIMap());
+        getContextStack().pushBinding(pipelineContext, ref, context, nodeset, model, bind, null, getCurrentPrefixToURIMap());
     }
 
     public void setRepeatIdIndex(String repeatId, int index) {
         // Update current element of nodeset in stack
-        popBinding();
+        getContextStack().popBinding();
         final List newNodeset = new ArrayList();
-        newNodeset.add(getCurrentNodeset().get(index - 1));
-        final BindingContext currentBindingContext = getCurrentBindingContext();
-        contextStack.push(new BindingContext(currentBindingContext, currentBindingContext.getModel(), newNodeset, 1, repeatId, true, null, null));//TODO: check this
+        newNodeset.add(getContextStack().getCurrentNodeset().get(index - 1));
+        final XFormsContextStack.BindingContext currentBindingContext = getContextStack().getCurrentBindingContext();
+        getContextStack().getStack().push(new XFormsContextStack.BindingContext(currentBindingContext, currentBindingContext.getModel(), newNodeset, 1, repeatId, true, null, null));//TODO: check this
 
         if (repeatId != null)
             repeatIdToIndex.put(repeatId, new Integer(index));
@@ -92,11 +92,11 @@ public class XFormsElementContext extends XFormsControls {
     public void endRepeatId(String repeatId) {
         if (repeatId != null)
             repeatIdToIndex.remove(repeatId);
-        popBinding();
+        getContextStack().popBinding();
     }
 
     public void startRepeatId(String repeatId) {
-        contextStack.push(null);
+        getContextStack().getStack().push(null);
     }
 
     public Map getRepeatIdToIndex() {
@@ -120,6 +120,6 @@ public class XFormsElementContext extends XFormsControls {
      * Returns the text value of the currently referenced node in the instance.
      */
     public String getRefValue() {
-        return XFormsInstance.getValueForNodeInfo(getCurrentBindingContext().getSingleNode());
+        return XFormsInstance.getValueForNodeInfo(getContextStack().getCurrentBindingContext().getSingleNode());
     }
 }

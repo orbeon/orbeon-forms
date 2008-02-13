@@ -19,6 +19,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsElementContext;
 import org.orbeon.oxf.xforms.XFormsModel;
 import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.event.events.XFormsComputeExceptionEvent;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.StaticContext;
 import org.orbeon.saxon.expr.XPathContext;
@@ -43,11 +44,11 @@ public class Index extends XFormsFunction {
 
     public Item evaluateItem(XPathContext xpathContext) throws XPathException {
 
-        final String repeatId = XFormsUtils.namespaceId(getXFormsContainingDocument(xpathContext), argument[0].evaluateAsString(xpathContext));
+        final String repeatId = XFormsUtils.namespaceId(getContainingDocument(xpathContext), argument[0].evaluateAsString(xpathContext));
 
-        if (getXFormsControls(xpathContext) instanceof XFormsElementContext) {
+        if (getControls(xpathContext) instanceof XFormsElementContext) {
             // Legacy implementation
-            XFormsElementContext xFormsElementContext = (XFormsElementContext) getXFormsControls(xpathContext);
+            XFormsElementContext xFormsElementContext = (XFormsElementContext) getControls(xpathContext);
 
             return new IntegerValue(((Integer) xFormsElementContext.getRepeatIdToIndex().get(repeatId)).intValue());
         } else {
@@ -57,7 +58,7 @@ public class Index extends XFormsFunction {
     }
 
     protected Item findIndexForRepeatId(XPathContext xpathContext, String repeatId) {
-        final int index = getXFormsControls(xpathContext).getRepeatIdIndex(repeatId);
+        final int index = getControls(xpathContext).getRepeatIdIndex(repeatId);
 
         if (index == -1) {
             // Dispatch exception event
@@ -69,9 +70,9 @@ public class Index extends XFormsFunction {
             final StaticExternalContext.StaticContext staticContext = StaticExternalContext.getStaticContext();
             PipelineContext pipelineContext = (staticContext != null) ? staticContext.getPipelineContext() : null;
 
-            final XFormsModel currentModel = getXFormsControls(xpathContext).getCurrentModel();
+            final XFormsModel currentModel = getContextStack(xpathContext).getCurrentModel();
             currentModel.getContainingDocument().dispatchEvent(pipelineContext,
-                    new org.orbeon.oxf.xforms.event.events.XFormsComputeExceptionEvent(currentModel, message, exception));
+                    new XFormsComputeExceptionEvent(currentModel, message, exception));
 
             // TODO: stop processing!
             // How do we do this: throw special exception? Or should throw exception with

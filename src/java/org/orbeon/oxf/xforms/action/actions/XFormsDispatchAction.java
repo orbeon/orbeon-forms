@@ -19,18 +19,22 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsControls;
 import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEventFactory;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
+import org.orbeon.saxon.om.Item;
 
 /**
  * 10.1.2 The dispatch Element
  */
 public class XFormsDispatchAction extends XFormsAction {
-    public void execute(XFormsActionInterpreter actionInterpreter, PipelineContext pipelineContext, String targetId, XFormsEventHandlerContainer eventHandlerContainer, Element actionElement) {
+    public void execute(XFormsActionInterpreter actionInterpreter, PipelineContext pipelineContext, String targetId,
+                        XFormsEventHandlerContainer eventHandlerContainer, Element actionElement,
+                        boolean hasOverriddenContext, Item overriddenContext) {
 
         final XFormsControls xformsControls = actionInterpreter.getXFormsControls();
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
@@ -43,7 +47,7 @@ public class XFormsDispatchAction extends XFormsAction {
         if (newEventTargetIdValue == null)
             throw new OXFException("Missing mandatory target attribute on xforms:dispatch element.");
 
-        final XFormsControls.BindingContext bindingContext = xformsControls.getCurrentBindingContext();
+        final XFormsContextStack.BindingContext bindingContext = actionInterpreter.getContextStack().getCurrentBindingContext();
 
         final String resolvedNewEventName;
         {
@@ -53,7 +57,7 @@ public class XFormsDispatchAction extends XFormsAction {
 
             // Resolve AVT
             resolvedNewEventName = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, bindingContext.getSingleNode(),
-                    null, XFormsContainingDocument.getFunctionLibrary(), xformsControls, actionElement, newEventNameAttributeValue);
+                    null, XFormsContainingDocument.getFunctionLibrary(), actionInterpreter.getFunctionContext(), actionElement, newEventNameAttributeValue);
         }
 
         final String resolvedNewEventTargetId;
@@ -65,7 +69,7 @@ public class XFormsDispatchAction extends XFormsAction {
             // Resolve AVT
             resolvedNewEventTargetId = XFormsUtils.namespaceId(containingDocument,
                     XFormsUtils.resolveAttributeValueTemplates(pipelineContext, bindingContext.getSingleNode(),
-                    null, XFormsContainingDocument.getFunctionLibrary(), xformsControls, actionElement, newEventTargetIdValue));
+                    null, XFormsContainingDocument.getFunctionLibrary(), actionInterpreter.getFunctionContext(), actionElement, newEventTargetIdValue));
         }
 
         // Optional attributes

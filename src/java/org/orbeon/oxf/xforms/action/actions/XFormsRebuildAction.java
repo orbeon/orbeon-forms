@@ -25,18 +25,20 @@ import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
 import org.orbeon.oxf.xforms.event.events.XFormsRebuildEvent;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.saxon.om.Item;
 
 /**
  * 10.1.3 The rebuild Element
  */
 public class XFormsRebuildAction extends XFormsAction {
-    public void execute(XFormsActionInterpreter actionInterpreter, PipelineContext pipelineContext, String targetId, XFormsEventHandlerContainer eventHandlerContainer, Element actionElement) {
+    public void execute(XFormsActionInterpreter actionInterpreter, PipelineContext pipelineContext, String targetId,
+                        XFormsEventHandlerContainer eventHandlerContainer, Element actionElement,
+                        boolean hasOverriddenContext, Item overriddenContext) {
 
-        final XFormsControls xformsControls = actionInterpreter.getXFormsControls();
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
 
         final String modelId = XFormsUtils.namespaceId(containingDocument, actionElement.attributeValue("model"));
-        final XFormsModel model = (modelId != null) ? containingDocument.getModel(modelId) : xformsControls.getCurrentModel();
+        final XFormsModel model = (modelId != null) ? containingDocument.getModel(modelId) : actionInterpreter.getContextStack().getCurrentModel();
 
         if (model == null)
             throw new ValidationException("Invalid model id: " + modelId, (LocationData) actionElement.getData());

@@ -16,10 +16,13 @@ package org.orbeon.oxf.xforms.action;
 import org.dom4j.Element;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
+import org.orbeon.saxon.om.Item;
 
 /**
  * Base class for all actions.
  */
 public abstract class XFormsAction {
-    public abstract void execute(XFormsActionInterpreter actionInterpreter, PipelineContext pipelineContext, String targetId, XFormsEventHandlerContainer eventHandlerContainer, Element actionElement);
+    public abstract void execute(XFormsActionInterpreter actionInterpreter, PipelineContext pipelineContext,
+                                 String targetId, XFormsEventHandlerContainer eventHandlerContainer, Element actionElement,
+                                 boolean hasOverriddenContext, Item overriddenContext);
 }

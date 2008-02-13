@@ -18,6 +18,8 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
+import org.orbeon.oxf.xforms.XFormsContextStack;
+import org.orbeon.saxon.om.Item;
 
 import java.util.Iterator;
 
@@ -25,11 +27,22 @@ import java.util.Iterator;
  * 10.1.1 The action Element
  */
 public class XFormsActionAction extends XFormsAction {
-    public void execute(XFormsActionInterpreter actionInterpreter, PipelineContext pipelineContext, String targetId, XFormsEventHandlerContainer eventHandlerContainer, Element actionElement) {
+    public void execute(XFormsActionInterpreter actionInterpreter, PipelineContext pipelineContext, String targetId,
+                        XFormsEventHandlerContainer eventHandlerContainer, Element actionElement,
+                        boolean hasOverriddenContext, Item overriddenContext) {
         // Iterate over child actions
+        final XFormsContextStack contextStack = actionInterpreter.getContextStack();
         for (Iterator i = actionElement.elementIterator(); i.hasNext();) {
-            final Element embeddedActionElement = (Element) i.next();
-            actionInterpreter.runAction(pipelineContext, targetId, eventHandlerContainer, embeddedActionElement);
+            final Element currentActionElement = (Element) i.next();
+
+            // Set context on action element
+            contextStack.pushBinding(pipelineContext, currentActionElement);
+
+            // Run action
+            actionInterpreter.runAction(pipelineContext, targetId, eventHandlerContainer, currentActionElement);
+
+            // Restore context
+            contextStack.popBinding();
         }
     }
 }

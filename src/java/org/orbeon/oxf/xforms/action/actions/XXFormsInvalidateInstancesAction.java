@@ -19,12 +19,15 @@ import org.orbeon.oxf.xforms.XFormsServerSharedInstancesCache;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
+import org.orbeon.saxon.om.Item;
 
 /**
  * Extension xxforms:invalidate-instances action.
  */
 public class XXFormsInvalidateInstancesAction extends XFormsAction {
-    public void execute(XFormsActionInterpreter actionInterpreter, PipelineContext pipelineContext, String targetId, XFormsEventHandlerContainer eventHandlerContainer, Element actionElement) {
+    public void execute(XFormsActionInterpreter actionInterpreter, PipelineContext pipelineContext, String targetId,
+                        XFormsEventHandlerContainer eventHandlerContainer, Element actionElement,
+                        boolean hasOverriddenContext, Item overriddenContext) {
         XFormsServerSharedInstancesCache.instance().removeAll(pipelineContext);
     }
 }

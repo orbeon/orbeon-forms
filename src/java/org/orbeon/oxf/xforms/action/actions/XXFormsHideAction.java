@@ -23,13 +23,16 @@ import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.events.XXFormsDialogCloseEvent;
+import org.orbeon.saxon.om.Item;
 
 /**
  * Extension xxforms:hide action.
  */
 public class XXFormsHideAction extends XFormsAction {
 
-    public void execute(XFormsActionInterpreter actionInterpreter, PipelineContext pipelineContext, String targetId, XFormsEventHandlerContainer eventHandlerContainer, Element actionElement) {
+    public void execute(XFormsActionInterpreter actionInterpreter, PipelineContext pipelineContext, String targetId,
+                        XFormsEventHandlerContainer eventHandlerContainer, Element actionElement,
+                        boolean hasOverriddenContext, Item overriddenContext) {
 
         final XFormsControls xformsControls = actionInterpreter.getXFormsControls();
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();

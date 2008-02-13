@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.function;
 import org.orbeon.oxf.xforms.XFormsInstance;
 import org.orbeon.oxf.xforms.XFormsModel;
 import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.StaticContext;
 import org.orbeon.saxon.expr.XPathContext;
@@ -34,9 +35,9 @@ import java.util.Collections;
 public class Instance extends XFormsFunction {
 
     /**
-    * preEvaluate: this method suppresses compile-time evaluation by doing nothing
-    * (because the value of the expression depends on the runtime context)
-    */
+     * preEvaluate: this method suppresses compile-time evaluation by doing nothing
+     * (because the value of the expression depends on the runtime context)
+     */
     public Expression preEvaluate(StaticContext env) {
         return this;
     }
@@ -44,7 +45,7 @@ public class Instance extends XFormsFunction {
     public SequenceIterator iterate(XPathContext xpathContext) throws XPathException {
         // Get instance id
         final Expression instanceIdExpression = argument[0];
-        final String instanceId = XFormsUtils.namespaceId(getXFormsContainingDocument(xpathContext), instanceIdExpression.evaluateAsString(xpathContext));
+        final String instanceId = XFormsUtils.namespaceId(getContainingDocument(xpathContext), instanceIdExpression.evaluateAsString(xpathContext));
 
         // Get model and instance with given id for that model only
         
@@ -52,7 +53,7 @@ public class Instance extends XFormsFunction {
         // current context node, this function returns a node-set containing just the root element node (also called the
         // document element node) of the referenced instance data. In all other cases, an empty node-set is returned."
 
-        final XFormsModel model = (getXFormsModel(xpathContext) != null) ? getXFormsModel(xpathContext) : getXFormsControls(xpathContext).getCurrentModel();
+        final XFormsModel model = (getContainingModel(xpathContext) != null) ? getContainingModel(xpathContext) : getContextStack(xpathContext).getCurrentModel();
         final XFormsInstance instance = model.getInstance(instanceId);
 
         // Return instance document if found
@@ -61,6 +62,8 @@ public class Instance extends XFormsFunction {
             return new ListIterator(Collections.singletonList(instance.getInstanceRootElementInfo()));
         } else {
             // "an empty node-set is returned"
+
+            XFormsServer.logger.warn("XForms - Instance not found with instance() function for id: " + instanceId);
             return new ListIterator(Collections.EMPTY_LIST);
         }
     }

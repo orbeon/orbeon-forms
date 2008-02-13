@@ -22,14 +22,16 @@ import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.saxon.om.Item;
 
 /**
  * 10.1.8 The load Element
  */
 public class XFormsLoadAction extends XFormsAction {
-    public void execute(XFormsActionInterpreter actionInterpreter, PipelineContext pipelineContext, String targetId, XFormsEventHandlerContainer eventHandlerContainer, Element actionElement) {
+    public void execute(XFormsActionInterpreter actionInterpreter, PipelineContext pipelineContext, String targetId,
+                        XFormsEventHandlerContainer eventHandlerContainer, Element actionElement,
+                        boolean hasOverriddenContext, Item overriddenContext) {
 
-        final XFormsControls xformsControls = actionInterpreter.getXFormsControls();
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
 
         final String resourceAttributeValue = actionElement.attributeValue("resource");
@@ -48,7 +50,7 @@ public class XFormsLoadAction extends XFormsAction {
         final boolean isShowProgress = !"false".equals(actionElement.attributeValue(XFormsConstants.XXFORMS_SHOW_PROGRESS_QNAME));
 
         // "If both are present, the action has no effect."
-        final XFormsControls.BindingContext bindingContext = xformsControls.getCurrentBindingContext();
+        final XFormsContextStack.BindingContext bindingContext = actionInterpreter.getContextStack().getCurrentBindingContext();
         if (bindingContext.isNewBind() && resourceAttributeValue != null)
             return;
 
@@ -73,7 +75,7 @@ public class XFormsLoadAction extends XFormsAction {
 
             // Resolve AVT
             final String resolvedResource = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, bindingContext.getSingleNode(),
-                    null, XFormsContainingDocument.getFunctionLibrary(), xformsControls, actionElement, resourceAttributeValue);
+                    null, XFormsContainingDocument.getFunctionLibrary(), actionInterpreter.getFunctionContext(), actionElement, resourceAttributeValue);
             final String encodedResource = XFormsUtils.encodeHRRI(resolvedResource, true);
             resolveLoadValue(containingDocument, pipelineContext, actionElement, doReplace, encodedResource, target, urlType, urlNorewrite, isShowProgress);
             // NOTE: We are supposed to throw an xforms-link-error in case of failure. Can we do it?

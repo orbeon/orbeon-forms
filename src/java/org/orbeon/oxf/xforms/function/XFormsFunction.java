@@ -16,7 +16,9 @@ package org.orbeon.oxf.xforms.function;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsControls;
 import org.orbeon.oxf.xforms.XFormsModel;
+import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.util.PooledXPathExpression;
+import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.saxon.functions.SystemFunction;
 import org.orbeon.saxon.expr.XPathContext;
 
@@ -28,29 +30,82 @@ abstract public class XFormsFunction extends SystemFunction {
     protected XFormsFunction() {
     }
 
-    public XFormsModel getXFormsModel(XPathContext xpathContext) {
+    public XFormsModel getContainingModel(XPathContext xpathContext) {
         final Object functionContext = PooledXPathExpression.getFunctionContext(xpathContext);
         return (XFormsModel) ((functionContext instanceof XFormsModel) ? functionContext : null);
     }
 
-    public XFormsControls getXFormsControls(XPathContext xpathContext) {
+    public XFormsControls getControls(XPathContext xpathContext) {
         final Object functionContext = PooledXPathExpression.getFunctionContext(xpathContext);
-        if (functionContext instanceof XFormsControls)
+        if (functionContext instanceof XFormsControls) {
+            // Deprecated
             return (XFormsControls) functionContext;
-        if (functionContext instanceof XFormsModel) {
+        } else if (functionContext instanceof XFormsModel) {
+            // Deprecated
             final XFormsModel xformsModel = (XFormsModel) functionContext;
             return xformsModel.getContainingDocument().getXFormsControls();
+        } else if (functionContext instanceof Context) {
+            // The "right" way to do it
+            return ((Context) functionContext).getControls();
         }
         return null;
     }
 
-    public XFormsContainingDocument getXFormsContainingDocument(XPathContext xpathContext) {
-        final XFormsModel xformsModel = getXFormsModel(xpathContext);
+    public XFormsContainingDocument getContainingDocument(XPathContext xpathContext) {
+        final XFormsModel xformsModel = getContainingModel(xpathContext);
         if (xformsModel != null && xformsModel.getContainingDocument() != null)
             return xformsModel.getContainingDocument();
-        final XFormsControls xformsControls = getXFormsControls(xpathContext);
+        final XFormsControls xformsControls = getControls(xpathContext);
         if (xformsControls != null)
             return xformsControls.getContainingDocument();
+
         return null;
+    }
+
+    public XFormsContextStack getContextStack(XPathContext xpathContext) {
+        final Object functionContext = PooledXPathExpression.getFunctionContext(xpathContext);
+
+        if (functionContext instanceof Context) {
+            // Return specific context
+            return ((Context) functionContext).getContextStack();
+        } else if (functionContext instanceof XFormsControls) {
+            // Return controls context
+            return getControls(xpathContext).getContextStack();
+        } else {
+            return null;
+        }
+    }
+
+    public static class Context implements XPathCache.FunctionContext {
+
+        private XFormsContainingDocument containingDocument;
+        private XFormsModel containingModel;
+        private XFormsContextStack contextStack;
+
+        public Context(XFormsContainingDocument containingDocument, XFormsContextStack contextStack) {
+            this.containingDocument = containingDocument;
+            this.contextStack = contextStack;
+        }
+
+        public Context(XFormsModel containingModel, XFormsContextStack contextStack) {
+            this.containingModel = containingModel;
+            this.contextStack = contextStack;
+        }
+
+        public XFormsContainingDocument getContainingDocument() {
+            return (containingDocument != null) ? containingDocument : containingModel.getContainingDocument();
+        }
+
+        public XFormsControls getControls() {
+            return getContainingDocument().getXFormsControls();
+        }
+
+        public XFormsModel getContainingModel() {
+            return containingModel;
+        }
+
+        public XFormsContextStack getContextStack() {
+            return contextStack;
+        }
     }
 }

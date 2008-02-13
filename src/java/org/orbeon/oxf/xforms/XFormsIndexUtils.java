@@ -58,7 +58,7 @@ public class XFormsIndexUtils {
                     // Found an xforms:repeat
                     final XFormsRepeatControl repeatControlInfo = (XFormsRepeatControl) XFormsControl;
                     final String repeatId = repeatControlInfo.getOriginalId();
-                    final List repeatNodeSet = xformsControls.getCurrentNodeset();
+                    final List repeatNodeSet = xformsControls.getContextStack().getCurrentNodeset();
 
                     // Make sure the bounds of this xforms:repeat are correct
                     // for the rest of the visit.
@@ -125,7 +125,7 @@ public class XFormsIndexUtils {
                     // Found an xforms:repeat
                     final XFormsRepeatControl repeatControlInfo = (XFormsRepeatControl) XFormsControl;
                     final String repeatId = repeatControlInfo.getOriginalId();
-                    final List repeatNodeSet = xformsControls.getCurrentNodeset();
+                    final List repeatNodeSet = xformsControls.getContextStack().getCurrentNodeset();
 
                     if (foundXFormsControl == null) {
                         // We are not yet inside a matching xforms:repeat
@@ -271,7 +271,7 @@ public class XFormsIndexUtils {
                     final XFormsRepeatControl repeatControlInfo = (XFormsRepeatControl) XFormsControl;
                     final String repeatId = repeatControlInfo.getOriginalId();
 
-                    final List repeatNodeSet = xformsControls.getCurrentNodeset();
+                    final List repeatNodeSet = xformsControls.getContextStack().getCurrentNodeset();
                     if (foundXFormsControl == null) {
                         // We are not yet inside a matching xforms:repeat
 
@@ -380,7 +380,7 @@ public class XFormsIndexUtils {
                     final XFormsRepeatControl repeatControlInfo = (XFormsRepeatControl) XFormsControl;
                     final String repeatId = repeatControlInfo.getOriginalId();
 
-                    final List repeatNodeSet = xformsControls.getCurrentNodeset();
+                    final List repeatNodeSet = xformsControls.getContextStack().getCurrentNodeset();
 
                     if (repeatNodeSet != null && repeatNodeSet.size() > 0) {
                         // Node-set is non-empty

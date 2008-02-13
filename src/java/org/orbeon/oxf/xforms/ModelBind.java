@@ -18,7 +18,6 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.saxon.om.NodeInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +43,6 @@ public class ModelBind {
     private Map namespaceMap;
     private ModelBind parent;
     private List children = new ArrayList();
-    private NodeInfo currentNodeInfo;
 
     public ModelBind(Element bindElement, ModelBind parent) {
         this(bindElement, bindElement.attributeValue("id"), bindElement.attributeValue("nodeset"),
@@ -134,14 +132,6 @@ public class ModelBind {
 
     public List getChildren() {
         return children;
-    }
-
-    public NodeInfo getCurrentNodeInfo() {
-        return currentNodeInfo;
-    }
-
-    public void setCurrentNodeInfo(NodeInfo currentNodeInfo) {
-        this.currentNodeInfo = currentNodeInfo;
     }
 
     public ModelBind getParent() {

@@ -140,7 +140,8 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
                     result = null;
                 } else {
                     result = XPathCache.evaluateAsString(pipelineContext, boundNode,
-                            format, prefixToURIMap, null, XFormsContainingDocument.getFunctionLibrary(), containingDocument.getXFormsControls(), null, getLocationData());
+                            format, prefixToURIMap, null, XFormsContainingDocument.getFunctionLibrary(),
+                            getContextStack().getFunctionContext(), null, getLocationData());
                 }
             } else {
                 result = null;
@@ -155,7 +156,8 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
                 result = null;
             } else {
                 result = XPathCache.evaluateAsString(pipelineContext, boundNode,
-                        format, prefixToURIMap, null, XFormsContainingDocument.getFunctionLibrary(), containingDocument.getXFormsControls(), null, getLocationData());
+                        format, prefixToURIMap, null, XFormsContainingDocument.getFunctionLibrary(),
+                        getContextStack().getFunctionContext(), null, getLocationData());
             }
         }
         setDisplayValue(result);

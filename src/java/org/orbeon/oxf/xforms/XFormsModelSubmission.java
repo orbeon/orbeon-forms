@@ -29,6 +29,7 @@ import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitErrorEvent.ErrorType;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
+import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -293,20 +294,17 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         && isReplaceAll
                         && avtXXFormsUsername == null; // can't optimize if there are authentication credentials
 
-                final XFormsControls xformsControls = containingDocument.getXFormsControls();
-
-                // Get current node for xforms:submission
+                // Get current node for xforms:submission and instance containing the node to submit
                 final NodeInfo currentNodeInfo;
+                final XFormsInstance currentInstance;
+                final XFormsFunction.Context functionContext;
                 {
-                    // TODO FIXME: the submission element is not a control, so we shouldn't use XFormsControls.
-                    // "The default value is '/'."
-                    final String refAttribute = (submissionElement.attributeValue("ref") != null)
-                            ? submissionElement.attributeValue("ref") : "/";
-                    xformsControls.resetBindingContext();
-                    xformsControls.pushBinding(pipelineContext, refAttribute, null, null, model.getEffectiveId(), null, submissionElement,
-                            Dom4jUtils.getNamespaceContextNoDefault(submissionElement));
+                    // Create context (should we simply reuse that of the model?)
+                    final XFormsContextStack contextStack = new XFormsContextStack(model);
+                    contextStack.setBinding(pipelineContext, XFormsModelSubmission.this);
 
-                    currentNodeInfo = xformsControls.getCurrentSingleNode();
+                    currentNodeInfo = contextStack.getCurrentSingleNode();
+                    functionContext = contextStack.getFunctionContext();
 
                     // Check that we have a current node and that it is pointing to a document or an element
                     if (currentNodeInfo == null)
@@ -317,10 +315,9 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         throw new XFormsSubmissionException("xforms:submission: single-node binding must refer to a document node or an element.", "getting submission single-node binding",
                         		XFormsSubmitErrorEvent.ErrorType.NO_DATA);
                     }
-                }
 
-                // Get instance containing the node to submit
-                final XFormsInstance currentInstance = xformsControls.getCurrentInstance();
+                    currentInstance = contextStack.getCurrentInstance();
+                }
 
                 // Determine if the instance to submit has one or more bound and relevant upload controls
                 
@@ -328,6 +325,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 // the client cannot have any files to upload yet
                 boolean hasBoundRelevantUploadControl = false;
                 if (serialize && !containingDocument.isInitializing()) {
+                    final XFormsControls xformsControls = containingDocument.getXFormsControls();
                     final List uploadControls = xformsControls.getCurrentControlsState().getUploadControls();
                     if (uploadControls != null) {
                         for (Iterator i = uploadControls.iterator(); i.hasNext();) {
@@ -427,7 +425,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                     // Resolve the target AVT if needed
                     final FunctionLibrary functionLibrary = XFormsContainingDocument.getFunctionLibrary();
-                    resolvedXXFormsTarget = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, currentNodeInfo, null, functionLibrary, xformsControls, submissionElement, avtXXFormsTarget);
+                    resolvedXXFormsTarget = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, currentNodeInfo, null, functionLibrary, functionContext, submissionElement, avtXXFormsTarget);
 
                     // When replace="all", we wait for the submission of an XXFormsSubmissionEvent from the client
                     containingDocument.setClientActiveSubmission(this);
@@ -435,17 +433,16 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 }
 
                 // Evaluate AVTs
-                // TODO FIXME: the submission element is not a control, so we shouldn't use XFormsControls.
                 {
                     final FunctionLibrary functionLibrary = XFormsContainingDocument.getFunctionLibrary();
 
-                    final String tempActionOrResource = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, currentNodeInfo, null, functionLibrary, xformsControls, submissionElement, avtActionOrResource);
+                    final String tempActionOrResource = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, currentNodeInfo, null, functionLibrary, functionContext, submissionElement, avtActionOrResource);
                     resolvedActionOrResource = XFormsUtils.encodeHRRI(tempActionOrResource, true);
 
-                    resolvedXXFormsUsername = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, currentNodeInfo, null, functionLibrary, xformsControls, submissionElement, avtXXFormsUsername);
-                    resolvedXXFormsPassword = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, currentNodeInfo, null, functionLibrary, xformsControls, submissionElement, avtXXFormsPassword);
-                    resolvedXXFormsReadonly = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, currentNodeInfo, null, functionLibrary, xformsControls, submissionElement, avtXXFormsReadonly);
-                    resolvedXXFormsShared = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, currentNodeInfo, null, functionLibrary, xformsControls, submissionElement, avtXXFormsShared);
+                    resolvedXXFormsUsername = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, currentNodeInfo, null, functionLibrary, functionContext, submissionElement, avtXXFormsUsername);
+                    resolvedXXFormsPassword = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, currentNodeInfo, null, functionLibrary, functionContext, submissionElement, avtXXFormsPassword);
+                    resolvedXXFormsReadonly = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, currentNodeInfo, null, functionLibrary, functionContext, submissionElement, avtXXFormsReadonly);
+                    resolvedXXFormsShared = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, currentNodeInfo, null, functionLibrary, functionContext, submissionElement, avtXXFormsShared);
                 }
 
                 // Check read-only and shared hints

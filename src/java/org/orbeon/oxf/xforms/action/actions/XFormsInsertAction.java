@@ -25,6 +25,7 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 
 import java.util.List;
@@ -39,10 +40,13 @@ public class XFormsInsertAction extends XFormsAction {
 
     public static final String CANNOT_INSERT_READONLY_MESSAGE = "Cannot perform insertion into read-only instance.";
 
-    public void execute(XFormsActionInterpreter actionInterpreter, PipelineContext pipelineContext, String targetId, XFormsEventHandlerContainer eventHandlerContainer, Element actionElement) {
+    public void execute(XFormsActionInterpreter actionInterpreter, PipelineContext pipelineContext, String targetId,
+                        XFormsEventHandlerContainer eventHandlerContainer, Element actionElement,
+                        boolean hasOverriddenContext, Item overriddenContext) {
 
         final XFormsControls xformsControls = actionInterpreter.getXFormsControls();
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
+        final XFormsContextStack contextStack = actionInterpreter.getContextStack();
 
         final String atAttribute = actionElement.attributeValue("at");
         final String positionAttribute = actionElement.attributeValue("position");
@@ -56,10 +60,11 @@ public class XFormsInsertAction extends XFormsAction {
             binding = (bindAttribute != null) ? bindAttribute : nodesetAttribute;
         }
 
-        final XFormsControls.BindingContext curBindingContext = xformsControls.getCurrentBindingContext();
-
         // "2. The Node Set Binding node-set is determined."
-        final List collectionToBeUpdated = curBindingContext.isNewBind() ? curBindingContext.getNodeset() : Collections.EMPTY_LIST;
+        final List collectionToBeUpdated; {
+            final XFormsContextStack.BindingContext currentBindingContext = contextStack.getCurrentBindingContext();
+            collectionToBeUpdated = currentBindingContext.isNewBind() ? currentBindingContext.getNodeset() : Collections.EMPTY_LIST;
+        }
         final boolean isEmptyNodesetBinding = collectionToBeUpdated == null || collectionToBeUpdated.size() == 0;
 
         // "1. The insert context is determined."
@@ -69,22 +74,16 @@ public class XFormsInsertAction extends XFormsAction {
         if (contextAttribute == null && isEmptyNodesetBinding)
             return;
 
-        // Now that we have evaluated the nodeset, restore context to in-scope evaluation context
-        xformsControls.popBinding();
-
-        // Handle @context attribute
-        actionInterpreter.pushContextAttributeIfNeeded(pipelineContext, actionElement);
-
-        // We are now in the insert context
+        // Handle insert context (with @context attribute)
         final NodeInfo insertContextNodeInfo;
-        {
-            final List insertContextNodeset = xformsControls.getCurrentNodeset();
-
+        if (hasOverriddenContext) {
             // "If the result is an empty nodeset or not a nodeset, then the insert action is terminated with no effect. "
-            if (insertContextNodeset == null || insertContextNodeset.size() == 0 || !(insertContextNodeset.get(0) instanceof NodeInfo))
+            if (overriddenContext == null || !(overriddenContext instanceof NodeInfo))
                 return;
-
-            insertContextNodeInfo = xformsControls.getCurrentSingleNode();
+            else
+                insertContextNodeInfo = (NodeInfo) overriddenContext;
+        } else {
+            insertContextNodeInfo = contextStack.getCurrentSingleNode();
         }
 
         // "The insert action is terminated with no effect if [...] b. The context attribute is given, the insert
@@ -126,8 +125,10 @@ public class XFormsInsertAction extends XFormsAction {
                     // origin attribute in the insert context."
 
                     originObjects = XPathCache.evaluate(pipelineContext, insertContextNodeInfo,
-                        originAttribute, Dom4jUtils.getNamespaceContextNoDefault(actionElement), null, XFormsContainingDocument.getFunctionLibrary(), xformsControls,
-                        null, (LocationData) actionElement.getData());
+                            originAttribute, Dom4jUtils.getNamespaceContextNoDefault(actionElement), null,
+                            XFormsContainingDocument.getFunctionLibrary(),
+                            actionInterpreter.getFunctionContext(),
+                            null, (LocationData) actionElement.getData());
                     //XFormsUtils.resolveXMLBase(actionElement, ".").toString()
 
                     // "The insert action is terminated with no effect if the origin node-set is the empty node-set."
@@ -198,8 +199,9 @@ public class XFormsInsertAction extends XFormsAction {
 
                     // "b. The return value is processed according to the rules of the XPath function round()"
                     final String insertionIndexString = XPathCache.evaluateAsString(pipelineContext,
-                        collectionToBeUpdated, 1,
-                        "round(" + atAttribute + ")", Dom4jUtils.getNamespaceContextNoDefault(actionElement), null, XFormsContainingDocument.getFunctionLibrary(), xformsControls, null,
+                            collectionToBeUpdated, 1,
+                            "round(" + atAttribute + ")", Dom4jUtils.getNamespaceContextNoDefault(actionElement), null,
+                            XFormsContainingDocument.getFunctionLibrary(), actionInterpreter.getFunctionContext(), null,
                             (LocationData) actionElement.getData());
 
                     // "c. If the result is in the range 1 to the Node Set Binding node-set size, then the insert

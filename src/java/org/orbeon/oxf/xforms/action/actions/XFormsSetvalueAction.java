@@ -15,10 +15,7 @@ package org.orbeon.oxf.xforms.action.actions;
 
 import org.dom4j.Element;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsControls;
-import org.orbeon.oxf.xforms.XFormsInstance;
-import org.orbeon.oxf.xforms.XFormsModel;
+import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
@@ -27,6 +24,7 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.saxon.om.Item;
 
 import java.util.Collections;
 import java.util.List;
@@ -36,10 +34,12 @@ import java.util.Map;
  * 10.1.9 The setvalue Element
  */
 public class XFormsSetvalueAction extends XFormsAction {
-    public void execute(XFormsActionInterpreter actionInterpreter, PipelineContext pipelineContext, String targetId, XFormsEventHandlerContainer eventHandlerContainer, Element actionElement) {
+    public void execute(XFormsActionInterpreter actionInterpreter, PipelineContext pipelineContext, String targetId,
+                        XFormsEventHandlerContainer eventHandlerContainer, Element actionElement,
+                        boolean hasOverriddenContext, Item overriddenContext) {
 
-        final XFormsControls xformsControls = actionInterpreter.getXFormsControls();
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
+        final XFormsContextStack contextStack = actionInterpreter.getContextStack();
 
         final String value = actionElement.attributeValue("value");
         final String content = actionElement.getStringValue();
@@ -51,9 +51,9 @@ public class XFormsSetvalueAction extends XFormsAction {
 
             final List currentNodeset;
             {
-                final XFormsInstance currentInstance = xformsControls.getCurrentInstance();// TODO: we should not use this
-                currentNodeset = (xformsControls.getCurrentNodeset() != null && xformsControls.getCurrentNodeset().size() > 0)
-                        ? xformsControls.getCurrentNodeset()
+                final XFormsInstance currentInstance = contextStack.getCurrentInstance();// TODO: we should not use this
+                currentNodeset = (contextStack.getCurrentNodeset() != null && contextStack .getCurrentNodeset().size() > 0)
+                        ? contextStack.getCurrentNodeset()
                         : Collections.singletonList(currentInstance.getDocumentInfo());
 
                 // NOTE: The above is actually not correct: the context should not become null or empty. This is
@@ -68,8 +68,8 @@ public class XFormsSetvalueAction extends XFormsAction {
             }
 
             valueToSet = XPathCache.evaluateAsString(pipelineContext,
-                    currentNodeset, xformsControls.getCurrentPosition(),
-                    value, namespaceContext, null, XFormsContainingDocument.getFunctionLibrary(), xformsControls, null,
+                    currentNodeset, contextStack.getCurrentPosition(),
+                    value, namespaceContext, null, XFormsContainingDocument.getFunctionLibrary(), actionInterpreter.getFunctionContext(), null,
                     (LocationData) actionElement.getData());
         } else {
             // Value to set is static content
@@ -77,7 +77,7 @@ public class XFormsSetvalueAction extends XFormsAction {
         }
 
         // Set value on current node
-        final NodeInfo currentNode = xformsControls.getCurrentSingleNode();
+        final NodeInfo currentNode = contextStack.getCurrentSingleNode();
         if (currentNode != null) {
             // TODO: XForms 1.1: "Element nodes: If element child nodes are present, then an xforms-binding-exception
             // occurs. Otherwise, regardless of how many child nodes the element has, the result is that the string

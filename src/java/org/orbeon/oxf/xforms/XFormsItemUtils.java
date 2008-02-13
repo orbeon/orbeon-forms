@@ -212,12 +212,11 @@ public class XFormsItemUtils {
     public static List evaluateItemsets(final PipelineContext pipelineContext, final XFormsContainingDocument containingDocument, final XFormsSelect1Control select1Control, boolean setBinding) {
 
         final List newItems = new ArrayList();
-
-        final XFormsControls xformsControls = containingDocument.getXFormsControls();
+        final XFormsContextStack contextStack = containingDocument.getXFormsControls().getContextStack();
 
         // Set binding on this control if required
         if (setBinding)
-            xformsControls.setBinding(pipelineContext, select1Control);
+            contextStack.setBinding(select1Control);
 
         // TODO: Work on dependencies
 //        final List existingItems = containingDocument.getXFormsControls().getConstantItems(getOriginalId());
@@ -250,9 +249,9 @@ public class XFormsItemUtils {
                     // xforms:itemset
 
                     final int itemsetLevel = hierarchyLevel;
-                    xformsControls.pushBinding(pipelineContext, element);
+                    contextStack.pushBinding(pipelineContext, element);
                     {
-                        final XFormsControls.BindingContext currentBindingContext = xformsControls.getCurrentBindingContext();
+                        final XFormsContextStack.BindingContext currentBindingContext = contextStack.getCurrentBindingContext();
 
                         //if (model == null || model == currentBindingContext.getModel()) { // it is possible to filter on a particular model
                         final List currentNodeSet = currentBindingContext.getNodeset();
@@ -261,7 +260,7 @@ public class XFormsItemUtils {
                             for (int currentPosition = 1; currentPosition <= currentNodeSet.size(); currentPosition++) {
 
                                 // Push "artificial" binding with just current node in nodeset
-                                xformsControls.getContextStack().push(new XFormsControls.BindingContext(currentBindingContext, currentBindingContext.getModel(), xformsControls.getCurrentNodeset(), currentPosition, null, true, null, currentBindingContext.getLocationData()));
+                                contextStack.getStack().push(new XFormsContextStack.BindingContext(currentBindingContext, currentBindingContext.getModel(), contextStack.getCurrentNodeset(), currentPosition, null, true, null, currentBindingContext.getLocationData()));
                                 {
                                     // Handle children of xforms:itemset
                                     final String label;
@@ -304,11 +303,11 @@ public class XFormsItemUtils {
                                     nodeStack.push(currentNodeInfo);
                                     hierarchyLevel = newLevel;
                                 }
-                                xformsControls.getContextStack().pop();
+                                contextStack.getStack().pop();
                             }
                         }
                     }
-                    xformsControls.popBinding();
+                    contextStack.popBinding();
                     hierarchyLevel = itemsetLevel; // restore to level of xforms:itemset
 
                 } else if ("choices".equals(localname)) {

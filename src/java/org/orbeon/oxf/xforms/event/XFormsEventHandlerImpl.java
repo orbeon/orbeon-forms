@@ -18,6 +18,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.action.XFormsActions;
+import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 
 import java.util.*;
 
@@ -150,7 +151,9 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
     }
 
     public void handleEvent(PipelineContext pipelineContext, XFormsEvent event) {
-        containingDocument.runAction(pipelineContext, event.getTargetObject().getEffectiveId(), eventHandlerContainer, eventHandlerElement);
+        // Create a new top-level action interpreter to handle this event
+        new XFormsActionInterpreter(pipelineContext, containingDocument, eventHandlerContainer, eventHandlerElement)
+                .runAction(pipelineContext, event.getTargetObject().getEffectiveId(), eventHandlerContainer, eventHandlerElement);
     }
 
     public String getEventName() {

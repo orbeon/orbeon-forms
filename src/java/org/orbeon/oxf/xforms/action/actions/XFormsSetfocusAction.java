@@ -19,6 +19,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsControls;
 import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
@@ -26,12 +27,15 @@ import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.events.XFormsFocusEvent;
+import org.orbeon.saxon.om.Item;
 
 /**
  * 10.1.7 The setfocus Element
  */
 public class XFormsSetfocusAction extends XFormsAction {
-    public void execute(XFormsActionInterpreter actionInterpreter, PipelineContext pipelineContext, String targetId, XFormsEventHandlerContainer eventHandlerContainer, Element actionElement) {
+    public void execute(XFormsActionInterpreter actionInterpreter, PipelineContext pipelineContext, String targetId,
+                        XFormsEventHandlerContainer eventHandlerContainer, Element actionElement,
+                        boolean hasOverriddenContext, Item overriddenContext) {
 
         final XFormsControls xformsControls = actionInterpreter.getXFormsControls();
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
@@ -41,7 +45,7 @@ public class XFormsSetfocusAction extends XFormsAction {
         if (controlIdAttributeValue == null)
             throw new OXFException("Missing mandatory 'control' attribute on xforms:control element.");
 
-        final XFormsControls.BindingContext bindingContext = xformsControls.getCurrentBindingContext();
+        final XFormsContextStack.BindingContext bindingContext = actionInterpreter.getContextStack().getCurrentBindingContext();
         final String resolvedControlId;
         {
             // NOP if there is an AVT but no context node
@@ -50,7 +54,7 @@ public class XFormsSetfocusAction extends XFormsAction {
 
             // Resolve AVT
             resolvedControlId = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, bindingContext.getSingleNode(),
-                    null, XFormsContainingDocument.getFunctionLibrary(), xformsControls, actionElement, controlIdAttributeValue);
+                    null, XFormsContainingDocument.getFunctionLibrary(), actionInterpreter.getFunctionContext(), actionElement, controlIdAttributeValue);
         }
 
         final String effectiveControlId = xformsControls.getCurrentControlsState().findEffectiveControlId(resolvedControlId);

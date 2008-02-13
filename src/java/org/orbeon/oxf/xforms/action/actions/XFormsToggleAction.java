@@ -18,21 +18,26 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsControls;
 import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.saxon.om.Item;
 
 /**
  * 9.2.3 The toggle Element
  */
 public class XFormsToggleAction extends XFormsAction {
-    public void execute(XFormsActionInterpreter actionInterpreter, PipelineContext pipelineContext, String targetId, XFormsEventHandlerContainer eventHandlerContainer, Element actionElement) {
+    public void execute(XFormsActionInterpreter actionInterpreter, PipelineContext pipelineContext, String targetId,
+                        XFormsEventHandlerContainer eventHandlerContainer, Element actionElement,
+                        boolean hasOverriddenContext, Item overriddenContext) {
 
         final XFormsControls xformsControls = actionInterpreter.getXFormsControls();
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
-        final XFormsControls.BindingContext bindingContext = xformsControls.getCurrentBindingContext();
+        final XFormsContextStack contextStack = actionInterpreter.getContextStack();
+        final XFormsContextStack.BindingContext bindingContext = contextStack.getCurrentBindingContext();
 
         final String caseAttribute = actionElement.attributeValue("case");
         if (caseAttribute == null)
@@ -41,7 +46,7 @@ public class XFormsToggleAction extends XFormsAction {
         final String caseId;
         if (bindingContext.getSingleNode() != null) {
             final String resolvedCaseId = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, bindingContext.getSingleNode(),
-                    null, XFormsContainingDocument.getFunctionLibrary(), xformsControls, actionElement, caseAttribute);
+                    null, XFormsContainingDocument.getFunctionLibrary(), actionInterpreter.getFunctionContext(), actionElement, caseAttribute);
             caseId = XFormsUtils.namespaceId(containingDocument, resolvedCaseId);
         } else {
             // TODO: Presence of context is not the right way to decide whether to evaluate AVTs or not

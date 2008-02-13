@@ -14,10 +14,7 @@
 package org.orbeon.oxf.xforms.control.controls;
 
 import org.dom4j.Element;
-import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsInstance;
-import org.orbeon.oxf.xforms.XFormsControls;
+import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.action.actions.XFormsSetvalueAction;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.control.XFormsControl;
@@ -195,15 +192,15 @@ public class XFormsUploadControl extends XFormsValueControl {
     }
 
     private String getInfoValue(PipelineContext pipelineContext, Element element) {
-        final XFormsControls xformsControls = containingDocument.getXFormsControls();
-        xformsControls.setBinding(pipelineContext, this);
-        xformsControls.pushBinding(pipelineContext, element);
-        final NodeInfo currentSingleNode = xformsControls.getCurrentSingleNode();
+        final XFormsContextStack contextStack = getContextStack();
+        contextStack.setBinding(this);
+        contextStack.pushBinding(pipelineContext, element);
+        final NodeInfo currentSingleNode = contextStack.getCurrentSingleNode();
         if (currentSingleNode == null) {
             return null;
         } else {
             final String value = XFormsInstance.getValueForNodeInfo(currentSingleNode);
-            xformsControls.popBinding();
+            contextStack.popBinding();
             return value;
         }
     }
@@ -231,13 +228,13 @@ public class XFormsUploadControl extends XFormsValueControl {
         if (element == null || value == null)
             return;
 
-        final XFormsControls xformsControls = containingDocument.getXFormsControls();
-        xformsControls.setBinding(pipelineContext, this);
-        xformsControls.pushBinding(pipelineContext, element);
-        final NodeInfo currentSingleNode = xformsControls.getCurrentSingleNode();
+        final XFormsContextStack contextStack = getContextStack();
+        contextStack.setBinding(this);
+        contextStack.pushBinding(pipelineContext, element);
+        final NodeInfo currentSingleNode = contextStack.getCurrentSingleNode();
         if (currentSingleNode != null) {
             XFormsSetvalueAction.doSetValue(pipelineContext, containingDocument, currentSingleNode, value, null, false);
-            xformsControls.popBinding();
+            contextStack.popBinding();
         }
     }
 

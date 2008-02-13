@@ -28,6 +28,7 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.saxon.om.Item;
 
 import java.util.*;
 
@@ -38,10 +39,13 @@ public class XFormsDeleteAction extends XFormsAction {
 
     public static final String CANNOT_DELETE_READONLY_MESSAGE = "Cannot perform deletion in read-only instance.";
 
-    public void execute(XFormsActionInterpreter actionInterpreter, PipelineContext pipelineContext, String targetId, XFormsEventHandlerContainer eventHandlerContainer, Element actionElement) {
+    public void execute(XFormsActionInterpreter actionInterpreter, PipelineContext pipelineContext, String targetId,
+                        XFormsEventHandlerContainer eventHandlerContainer, Element actionElement,
+                        boolean hasOverriddenContext, Item overriddenContext) {
 
         final XFormsControls xformsControls = actionInterpreter.getXFormsControls();
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
+        final XFormsContextStack contextStack = actionInterpreter.getContextStack();
 
         final String atAttribute = actionElement.attributeValue("at");
         final String contextAttribute = actionElement.attributeValue("context");
@@ -53,7 +57,7 @@ public class XFormsDeleteAction extends XFormsAction {
             binding = (bindAttribute != null) ? bindAttribute : nodesetAttribute;
         }
 
-        final List collectionToUpdate = xformsControls.getCurrentNodeset();
+        final List collectionToUpdate = contextStack.getCurrentNodeset();
         final boolean isEmptyNodesetBinding = collectionToUpdate == null || collectionToUpdate.size() == 0;
 
         // "The delete action is terminated with no effect if [...] the context attribute is not given and the Node
@@ -61,17 +65,9 @@ public class XFormsDeleteAction extends XFormsAction {
         if (contextAttribute == null && isEmptyNodesetBinding)
             return;
 
-        // Now that we have evaluated the nodeset, restore context to in-scope evaluation context
-        xformsControls.popBinding();
-
-        // Handle @context attribute
-        actionInterpreter.pushContextAttributeIfNeeded(pipelineContext, actionElement);
-
-        // We are now in the insert context
-
+        // Handle insert context (with @context attribute)
         // "The delete action is terminated with no effect if the insert context is the empty node-set [...]."
-        final NodeInfo currentSingleNode = xformsControls.getCurrentSingleNode();
-        if (currentSingleNode == null)
+        if (hasOverriddenContext && (overriddenContext == null || !(overriddenContext instanceof NodeInfo)))
             return;
 
         {
@@ -95,8 +91,11 @@ public class XFormsDeleteAction extends XFormsAction {
 
                         // "2. The return value is processed according to the rules of the XPath function round()"
                         final String insertionIndexString = XPathCache.evaluateAsString(pipelineContext,
-                            collectionToUpdate, 1,
-                            "round(" + atAttribute + ")", Dom4jUtils.getNamespaceContextNoDefault(actionElement), null, XFormsContainingDocument.getFunctionLibrary(), xformsControls, null, (LocationData) actionElement.getData());
+                                collectionToUpdate, 1,
+                                "round(" + atAttribute + ")",
+                                Dom4jUtils.getNamespaceContextNoDefault(actionElement), null,
+                                XFormsContainingDocument.getFunctionLibrary(), actionInterpreter.getFunctionContext(), null,
+                                (LocationData) actionElement.getData());
 
                         // "3. If the result is in the range 1 to the Node Set Binding node-set size, then the insert
                         // location is equal to the result. If the result is non-positive, then the insert location is

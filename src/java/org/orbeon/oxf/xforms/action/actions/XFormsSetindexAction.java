@@ -27,6 +27,7 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.saxon.om.Item;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -37,21 +38,23 @@ import java.util.Map;
  * 9.3.7 The setindex Element
  */
 public class XFormsSetindexAction extends XFormsAction {
-    public void execute(XFormsActionInterpreter actionInterpreter, PipelineContext pipelineContext, String targetId, XFormsEventHandlerContainer eventHandlerContainer, Element actionElement) {
+    public void execute(XFormsActionInterpreter actionInterpreter, PipelineContext pipelineContext, String targetId,
+                        XFormsEventHandlerContainer eventHandlerContainer, Element actionElement,
+                        boolean hasOverriddenContext, Item overriddenContext) {
 
-        final XFormsControls xformsControls = actionInterpreter.getXFormsControls();
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
 
         final String repeatId = XFormsUtils.namespaceId(containingDocument, actionElement.attributeValue("repeat"));
         final String indexXPath = actionElement.attributeValue("index");
 
-        final NodeInfo currentSingleNode = xformsControls.getCurrentSingleNode();
+        final NodeInfo currentSingleNode = actionInterpreter.getContextStack().getCurrentSingleNode();
         if (currentSingleNode == null)
             return;
 
         final String indexString = XPathCache.evaluateAsString(pipelineContext,
-                xformsControls.getCurrentNodeset(), xformsControls.getCurrentPosition(),
-                "number(" + indexXPath + ")", Dom4jUtils.getNamespaceContextNoDefault(actionElement), null, XFormsContainingDocument.getFunctionLibrary(), xformsControls, null,
+                actionInterpreter.getContextStack().getCurrentNodeset(), actionInterpreter.getContextStack().getCurrentPosition(),
+                "number(" + indexXPath + ")", Dom4jUtils.getNamespaceContextNoDefault(actionElement), null, XFormsContainingDocument.getFunctionLibrary(),
+                actionInterpreter.getContextStack().getFunctionContext(), null,
                 (LocationData) actionElement.getData());
 
         executeSetindexAction(pipelineContext, containingDocument, repeatId, indexString);

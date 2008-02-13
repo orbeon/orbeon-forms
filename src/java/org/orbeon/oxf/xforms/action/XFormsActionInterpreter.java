@@ -17,7 +17,7 @@ import org.dom4j.Element;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.*;
-import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -26,20 +26,40 @@ import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.saxon.om.Item;
 
 import java.util.List;
+import java.util.Collections;
 
 /**
- * Dispatch XForms actions.
+ * Execute a top-level XForms action and the included nested actions if any.
  */
 public class XFormsActionInterpreter {
 
     private XFormsContainingDocument containingDocument;
-    private XFormsControls xformsControls;
 
-    public XFormsActionInterpreter(XFormsContainingDocument containingDocument) {
+    private XFormsControls xformsControls;
+    private XFormsContextStack contextStack;
+
+    public XFormsActionInterpreter(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, XFormsEventHandlerContainer eventHandlerContainer, Element actionElement) {
         this.containingDocument = containingDocument;
+
         this.xformsControls = containingDocument.getXFormsControls();
+        this.contextStack = new XFormsContextStack(containingDocument);
+
+        // Set context on top-level action
+        setActionBindingContext(pipelineContext, containingDocument, eventHandlerContainer.getEffectiveId(), actionElement);
+    }
+
+    private void setActionBindingContext(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, String eventHandlerContainerId, Element actionElement) {
+        // Get "fresh" event handler container
+        final XFormsEventHandlerContainer eventHandlerContainer = (XFormsEventHandlerContainer) containingDocument.getObjectById(pipelineContext, eventHandlerContainerId);
+
+        // Set context on container element
+        contextStack.setBinding(pipelineContext, eventHandlerContainer);
+
+        // Push binding for outermost action
+        contextStack.pushBinding(pipelineContext, actionElement);
     }
 
     public XFormsContainingDocument getContainingDocument() {
@@ -48,6 +68,14 @@ public class XFormsActionInterpreter {
 
     public XFormsControls getXFormsControls() {
         return xformsControls;
+    }
+
+    public XFormsContextStack getContextStack() {
+        return contextStack;
+    }
+
+    public XFormsFunction.Context getFunctionContext() {
+        return contextStack.getFunctionContext();
     }
 
     /**
@@ -71,61 +99,67 @@ public class XFormsActionInterpreter {
 
         try {
             // Handle conditional action (@if / @exf:if)
-            final String conditionAttribute;
+            final String ifConditionAttribute;
             {
                 final String ifAttribute = actionElement.attributeValue("if");
                 if (ifAttribute != null)
-                    conditionAttribute = ifAttribute;
+                    ifConditionAttribute = ifAttribute;
                 else
-                    conditionAttribute = actionElement.attributeValue(XFormsConstants.EXFORMS_IF_ATTRIBUTE_QNAME);
+                    ifConditionAttribute = actionElement.attributeValue(XFormsConstants.EXFORMS_IF_ATTRIBUTE_QNAME);
             }
 
             // Handle iterated action (@while / @exf:while)
-            final String iterationAttribute;
+            final String whileIterationAttribute;
             {
                 final String whileAttribute = actionElement.attributeValue("while");
                 if (whileAttribute != null)
-                    iterationAttribute = whileAttribute;
+                    whileIterationAttribute = whileAttribute;
                 else
-                    iterationAttribute = actionElement.attributeValue(XFormsConstants.EXFORMS_WHILE_ATTRIBUTE_QNAME);
+                    whileIterationAttribute = actionElement.attributeValue(XFormsConstants.EXFORMS_WHILE_ATTRIBUTE_QNAME);
             }
 
-            final String eventHandlerContainerId = eventHandlerContainer.getEffectiveId();
-            int iteration = 1;
-            while (true) {
-                // Check if the conditionAttribute attribute exists and stop if false
-                if (conditionAttribute != null) {
-                    boolean result = evaluateCondition(pipelineContext, eventHandlerContainerId, actionElement, actionName, conditionAttribute, "if");
-                    if (!result)
-                        break;
+            // Handle iterated action (@xxforms:iterate / @exf:iterate)
+            final String iterateIterationAttribute;
+            {
+                final String xxformsIterateAttribute = actionElement.attributeValue(XFormsConstants.XXFORMS_ITERATE_ATTRIBUTE_QNAME);
+                if (xxformsIterateAttribute != null)
+                    iterateIterationAttribute = xxformsIterateAttribute;
+                else
+                    iterateIterationAttribute = actionElement.attributeValue(XFormsConstants.EXFORMS_ITERATE_ATTRIBUTE_QNAME);
+            }
+
+            final String idAttribute = actionElement.attributeValue("id");
+
+            // NOTE: At this point, the context has already been set to the current action element
+
+            if (iterateIterationAttribute != null) {
+                // Gotta iterate
+
+                // We have to restore the context to the in-scope evaluation context, then push @model/@context/@iterate
+                final XFormsContextStack.BindingContext actionBindingContext = contextStack.popBinding();
+                pushIterateAttribute(pipelineContext, actionElement, iterateIterationAttribute);
+                try {
+
+                    for (int index = 1; index <= contextStack.getCurrentNodeset().size(); index++) {
+                        contextStack.pushIteration(index, idAttribute);
+
+                        final NodeInfo overriddenContextNodeInfo = contextStack.getCurrentSingleNode();
+                        runSingleIteration(pipelineContext, targetId, eventHandlerContainer, actionElement, actionNamespaceURI,
+                                actionName, ifConditionAttribute, whileIterationAttribute, true, overriddenContextNodeInfo);
+
+                        contextStack.popBinding();
+                    }
+
+                } finally {
+                    // Restore context stack
+                    contextStack.popBinding();
+                    contextStack.restoreBinding(actionBindingContext);
                 }
-                // Check if the iterationAttribute attribute exists and stop if false
-                if (iterationAttribute != null) {
-                    boolean result = evaluateCondition(pipelineContext, eventHandlerContainerId, actionElement, actionName, iterationAttribute, "while");
-                    if (!result)
-                        break;
-                }
+            } else {
+                // Do a single run
 
-                // Set binding context to action element
-                setActionBindingContext(pipelineContext, containingDocument, eventHandlerContainerId, actionElement);
-
-                // We are executing the action
-                if (XFormsServer.logger.isDebugEnabled()) {
-                    if (iterationAttribute == null)
-                        XFormsServer.logger.debug("XForms - executing action: " + actionName);
-                    else
-                        XFormsServer.logger.debug("XForms - executing action (iteration " + iteration  +"): " + actionName);
-                }
-
-                // Get action and execute it
-                final XFormsAction xformsAction = XFormsActions.getAction(actionNamespaceURI, actionName);
-                xformsAction.execute(this, pipelineContext, targetId, eventHandlerContainer, actionElement);
-
-                // Stop if there is no iteration
-                if (iterationAttribute == null)
-                    break;
-
-                iteration++;
+                runSingleIteration(pipelineContext, targetId, eventHandlerContainer, actionElement, actionNamespaceURI,
+                        actionName, ifConditionAttribute, whileIterationAttribute, contextStack.hasOverriddenContext(), contextStack.getOverriddenContextItem());
             }
         } catch (Exception e) {
             throw ValidationException.wrapException(e, new ExtendedLocationData((LocationData) actionElement.getData(), "running XForms action", actionElement,
@@ -133,81 +167,59 @@ public class XFormsActionInterpreter {
         }
     }
 
-    private static void setActionBindingContext(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, String eventHandlerContainerId, Element actionElement) {
+    private void runSingleIteration(PipelineContext pipelineContext, String targetId, XFormsEventHandlerContainer eventHandlerContainer,
+                                    Element actionElement, String actionNamespaceURI, String actionName, String ifConditionAttribute,
+                                    String whileIterationAttribute, boolean hasOverriddenContext, Item overriddenContextItem) {
 
-        final XFormsControls xformsControls = containingDocument.getXFormsControls();
-
-        // Get "fresh" event handler container
-        final XFormsEventHandlerContainer eventHandlerContainer = (XFormsEventHandlerContainer) containingDocument.getObjectById(pipelineContext, eventHandlerContainerId);
-
-        if (eventHandlerContainer instanceof XFormsControl) {
-            // The event handler is contained within a control. Bindings are relative to that control
-
-            // TODO: Not sure whether an event handler within a repeat must be in the context of the iteratino or not.
-            // If in the iteration, then it may be in no context if there is no iteration.
-//            if (eventHandlerContainer instanceof XFormsRepeatControl) {
-//                final XFormsRepeatControl repeatControl = (XFormsRepeatControl) eventHandlerContainer;
-//                final List children = repeatControl.getChildren();
-//
-//                final Integer repeatIndexInteger = (Integer) xformsControls.getCurrentControlsState().getRepeatIdToIndex().get(eventHandlerContainerId);
-//                if (repeatIndexInteger != null && children != null && children.size() > 0) {
-//                    final int index = repeatIndexInteger.intValue();
-//                    final int childrenSize = children.size();
-//                    if (index > 0 && index < childrenSize) {
-//                        final RepeatIterationControl repeatIteration = (RepeatIterationControl) children.get(index);
-//                        xformsControls.setBinding(pipelineContext, repeatIteration);
-//                    } else {
-//                        xformsControls.setBinding(pipelineContext, (XFormsControl) eventHandlerContainer);
-//                    }
-//                } else {
-//                    xformsControls.setBinding(pipelineContext, (XFormsControl) eventHandlerContainer);
-//                }
-//            } else {
-                xformsControls.setBinding(pipelineContext, (XFormsControl) eventHandlerContainer);
-//            }
-        } else {
-            // The event handler is not contained within a control (e.g. model or submission)
-            // TODO: Separate context handling from XFormsControls
-            if (eventHandlerContainer instanceof XFormsModel) {
-                final XFormsModel xformsModel = (XFormsModel) eventHandlerContainer;
-                xformsControls.resetBindingContext(xformsModel);
-            } else if (eventHandlerContainer instanceof XFormsModelSubmission) {
-                final XFormsModelSubmission submission = (XFormsModelSubmission) eventHandlerContainer;
-                final XFormsModel xformsModel = (XFormsModel) submission.getParentContainer(containingDocument);
-                xformsControls.resetBindingContext(xformsModel);
-                xformsControls.pushBinding(pipelineContext, submission.getSubmissionElement());
-            } else {
-                // TODO: Other possible contexts?
-                xformsControls.resetBindingContext();
+        // The context is now the overridden context
+        int whileIteration = 1;
+        while (true) {
+            // Check if the conditionAttribute attribute exists and stop if false
+            if (ifConditionAttribute != null) {
+                boolean result = evaluateCondition(pipelineContext, actionElement, actionName, ifConditionAttribute, "if", hasOverriddenContext, overriddenContextItem);
+                if (!result)
+                    break;
             }
+            // Check if the iterationAttribute attribute exists and stop if false
+            if (whileIterationAttribute != null) {
+                boolean result = evaluateCondition(pipelineContext, actionElement, actionName, whileIterationAttribute, "while", hasOverriddenContext, overriddenContextItem);
+                if (!result)
+                    break;
+            }
+
+            // We are executing the action
+            if (XFormsServer.logger.isDebugEnabled()) {
+                if (whileIterationAttribute == null)
+                    XFormsServer.logger.debug("XForms - executing action: " + actionName);
+                else
+                    XFormsServer.logger.debug("XForms - executing action (while iteration " + whileIteration +"): " + actionName);
+            }
+
+            // Get action and execute it
+            final XFormsAction xformsAction = XFormsActions.getAction(actionNamespaceURI, actionName);
+            xformsAction.execute(this, pipelineContext, targetId, eventHandlerContainer, actionElement, hasOverriddenContext, overriddenContextItem);
+
+            // Stop if there is no iteration
+            if (whileIterationAttribute == null)
+                break;
+
+            whileIteration++;
         }
-        xformsControls.pushBinding(pipelineContext, actionElement);
     }
 
-    public void pushContextAttributeIfNeeded(PipelineContext pipelineContext, Element actionElement) {
+    public void pushIterateAttribute(PipelineContext pipelineContext, Element actionElement, String iterateAttribute) {
         final String contextAttribute = actionElement.attributeValue("context");
-        if (contextAttribute != null) {
-            xformsControls.pushBinding(pipelineContext, null, null, contextAttribute, null, null, null, Dom4jUtils.getNamespaceContextNoDefault(actionElement));
-        }
+        final String modelAttribute = actionElement.attributeValue("model");
+        contextStack.pushBinding(pipelineContext, null, contextAttribute, iterateAttribute, modelAttribute, null, actionElement,Dom4jUtils.getNamespaceContextNoDefault(actionElement));
     }
 
-    private boolean evaluateCondition(PipelineContext pipelineContext, String eventHandlerContainerId, Element actionElement,
-                                      String actionName, String conditionAttribute, String conditionType) {
-        // Set binding context to action element (including @context/@nodeset, @ref, or @bind)
-        setActionBindingContext(pipelineContext, containingDocument, eventHandlerContainerId, actionElement);
-
-        // Get into context set by the parent of the action
-        // "It contains an XPath 1.0 expression that is evaluated using the in-scope evaluation context before
-        // the action is executed"
-        xformsControls.popBinding();
-        // But the @context attribute actually _replaces_ that context
-        pushContextAttributeIfNeeded(pipelineContext, actionElement);
-        // TODO: also push @model
-        // We are now in the right context to evaluate the condition
+    private boolean evaluateCondition(PipelineContext pipelineContext, Element actionElement,
+                                      String actionName, String conditionAttribute, String conditionType,
+                                      boolean hasOverriddenContext, Item overriddenContextItem) {
 
         // Don't evaluate the condition if the context has gone missing
         {
-            final NodeInfo currentSingleNode = xformsControls.getCurrentSingleNode();
+            final NodeInfo currentSingleNode = contextStack.getCurrentSingleNode();
             if (currentSingleNode == null || containingDocument.getInstanceForNode(currentSingleNode) == null) {
                 if (XFormsServer.logger.isDebugEnabled())
                     XFormsServer.logger.debug("XForms - not executing \"" + conditionType + "\" conditional action (missing context): " + actionName);
@@ -215,10 +227,29 @@ public class XFormsActionInterpreter {
             }
         }
 
-        final XFormsControls.BindingContext currentBindingContext = xformsControls.getCurrentBindingContext();
+        // Execute condition relative to the overridden context if it exists, or the in-scope context if not
+        final List contextNodeset;
+        final int contextPosition;
+        {
+            if (hasOverriddenContext && overriddenContextItem != null) {
+                // Use provided context item
+                contextNodeset = Collections.singletonList(overriddenContextItem);
+                contextPosition = 1;
+            } else if (hasOverriddenContext && overriddenContextItem == null) {
+                // Use empty context
+                contextNodeset = Collections.EMPTY_LIST;
+                contextPosition = 0;
+            } else {
+                // Use regular context
+                contextNodeset = contextStack.getCurrentNodeset();
+                contextPosition = contextStack.getCurrentPosition();
+            }
+        }
+
         final List conditionResult = XPathCache.evaluate(pipelineContext,
-            currentBindingContext.getNodeset(), currentBindingContext.getPosition(), "boolean(" + conditionAttribute + ")",
-            Dom4jUtils.getNamespaceContextNoDefault(actionElement), null, XFormsContainingDocument.getFunctionLibrary(), xformsControls, null, (LocationData) actionElement.getData());
+                contextNodeset, contextPosition, "boolean(" + conditionAttribute + ")",
+            Dom4jUtils.getNamespaceContextNoDefault(actionElement), null, XFormsContainingDocument.getFunctionLibrary(),
+            contextStack.getFunctionContext(), null, (LocationData) actionElement.getData());
 
         if (!((Boolean) conditionResult.get(0)).booleanValue()) {
             // Don't execute action
@@ -227,9 +258,9 @@ public class XFormsActionInterpreter {
                 XFormsServer.logger.debug("XForms - not executing \"" + conditionType + "\" conditional action (condition evaluated to 'false'). Action name: " + actionName + ", condition: " + conditionAttribute);
 
             return false;
+        } else {
+            // Condition is true
+            return true;
         }
-
-        // Condition is true
-        return true;
     }
 }

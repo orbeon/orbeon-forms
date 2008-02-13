@@ -116,14 +116,15 @@ public class XFormsTriggerHandler extends HandlerBase {
                                 hrefValue = resource;
                             } else if (resource != null) {
                                 // Computed resource URL
-                                final XFormsControls.BindingContext curBindingContext = xformsControl.getBindingContext();
-                                if (curBindingContext != null && curBindingContext.getSingleNode() != null) {
-                                    hrefValue = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, curBindingContext.getSingleNode(),
-                                            null, XFormsContainingDocument.getFunctionLibrary(), containingDocument.getXFormsControls(), loadElement, resource);
+                                final XFormsContextStack.BindingContext currentBindingContext = xformsControl.getBindingContext();
+                                if (currentBindingContext != null && currentBindingContext.getSingleNode() != null) {
+                                    hrefValue = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, currentBindingContext.getSingleNode(),
+                                            null, XFormsContainingDocument.getFunctionLibrary(),
+                                            containingDocument.getXFormsControls().getContextStack().getFunctionContext(), loadElement, resource);
                                 }
                             } else {
                                 // Assume single-node binding
-                                final XFormsControls.BindingContext curBindingContext = xformsControl.getBindingContext();
+                                final XFormsContextStack.BindingContext curBindingContext = xformsControl.getBindingContext();
                                 if (curBindingContext != null && curBindingContext.getSingleNode() != null) {
                                     hrefValue = XFormsInstance.getValueForNodeInfo(curBindingContext.getSingleNode());
                                 }

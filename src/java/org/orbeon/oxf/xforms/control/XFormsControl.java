@@ -47,7 +47,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
     // Dynamic information (changes depending on the content of XForms instances)
     private String effectiveId;
     private List eventHandlers;// this needs to be split into static info and non-static
-    protected XFormsControls.BindingContext bindingContext;
+    protected XFormsContextStack.BindingContext bindingContext;
     private NodeInfo boundNode;
 
     private boolean evaluated;
@@ -76,6 +76,10 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
             // Extract event handlers
             eventHandlers = XFormsEventHandlerImpl.extractEventHandlers(containingDocument, this, element);
         }
+    }
+
+    protected XFormsContextStack getContextStack() {
+        return containingDocument.getXFormsControls().getContextStack();
     }
 
 //    protected XFormsControl(XFormsControl xformsControl) {
@@ -252,7 +256,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
     /**
      * Set this control's binding context.
      */
-    public void setBindingContext(XFormsControls.BindingContext bindingContext) {
+    public void setBindingContext(XFormsContextStack.BindingContext bindingContext) {
         this.bindingContext = bindingContext;
         // Set the bound node at this time as well. This won't change until next refresh.
         setBoundNode();
@@ -261,7 +265,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
     /**
      * Return the binding context for this control.
      */
-    public XFormsControls.BindingContext getBindingContext() {
+    public XFormsContextStack.BindingContext getBindingContext() {
         return bindingContext;
     }
 
@@ -306,8 +310,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
     protected void evaluate(PipelineContext pipelineContext) {
 
         // Set context to this control
-        final XFormsControls xformsControls = containingDocument.getXFormsControls();
-        xformsControls.setBinding(pipelineContext, this);
+        getContextStack().setBinding(this);
 
 //        if (false) {
 //            // XXX TEST don't run expressions to compute labels and helps assuming they will be

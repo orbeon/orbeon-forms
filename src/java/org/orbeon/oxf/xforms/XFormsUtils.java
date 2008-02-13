@@ -302,18 +302,17 @@ public class XFormsUtils {
     public static String getChildElementValue(final PipelineContext pipelineContext, final XFormsContainingDocument containingDocument,
                                               final Element childElement, final boolean acceptHTML, boolean[] containsHTML) {
 
-        final XFormsControls xformsControls = containingDocument.getXFormsControls();
-
         // Check that there is a current child element
         if (childElement == null)
             return null;
 
         // Child element becomes the new binding
-        xformsControls.pushBinding(pipelineContext, childElement);
+        final XFormsContextStack contextStack = containingDocument.getXFormsControls().getContextStack();
+        contextStack.pushBinding(pipelineContext, childElement);
         try {
-            return getElementValue(pipelineContext, containingDocument, childElement, acceptHTML, containsHTML);
+            return getElementValue(pipelineContext, containingDocument, contextStack, childElement, acceptHTML, containsHTML);
         } finally {
-            xformsControls.popBinding();
+            contextStack.popBinding();
         }
     }
 
@@ -325,20 +324,21 @@ public class XFormsUtils {
      *
      * @param pipelineContext       current PipelineContext
      * @param containingDocument    current XFormsContainingDocument
+     * @param contextStack          context stack for XPath evaluation
      * @param childElement          element to evaluate (xforms:label, etc.)
      * @param acceptHTML            whether the result may contain HTML
      * @param containsHTML          whether the result actually contains HTML (null allowed)
      * @return                      string containing the result of the evaluation, null if evaluation failed
      */
     public static String getElementValue(final PipelineContext pipelineContext, final XFormsContainingDocument containingDocument,
+                                         final XFormsContextStack contextStack,
                                          final Element childElement, final boolean acceptHTML, final boolean[] containsHTML) {
 
         // No HTML found by default
         if (containsHTML != null)
             containsHTML[0] = false;
 
-        final XFormsControls xformsControls = containingDocument.getXFormsControls();
-        final XFormsControls.BindingContext currentBindingContext = xformsControls.getCurrentBindingContext();
+        final XFormsContextStack.BindingContext currentBindingContext = contextStack.getCurrentBindingContext();
 
         // "the order of precedence is: single node binding attributes, linking attributes, inline text."
 
@@ -366,7 +366,8 @@ public class XFormsUtils {
                     final String tempResult = XPathCache.evaluateAsString(pipelineContext,
                             currentNodeset, currentBindingContext.getPosition(),
                             valueAttribute, Dom4jUtils.getNamespaceContextNoDefault(childElement),
-                            null, XFormsContainingDocument.getFunctionLibrary(), containingDocument.getXFormsControls(), null,
+                            null, XFormsContainingDocument.getFunctionLibrary(),
+                            contextStack.getFunctionContext(), null,
                             (LocationData) childElement.getData());
 
                     return (acceptHTML && containsHTML == null) ? XMLUtils.escapeXMLMinimal(tempResult) : tempResult;
@@ -414,12 +415,12 @@ public class XFormsUtils {
                         // This is an xforms:output nested among other markup
 
                         final XFormsOutputControl outputControl = new XFormsOutputControl(containingDocument, null, element, element.getName(), null);
-                        xformsControls.pushBinding(pipelineContext, element);
+                        contextStack.pushBinding(pipelineContext, element);
                         {
-                            outputControl.setBindingContext(xformsControls.getCurrentBindingContext());
+                            outputControl.setBindingContext(contextStack.getCurrentBindingContext());
                             outputControl.evaluateIfNeeded(pipelineContext);
                         }
-                        xformsControls.popBinding();
+                        contextStack.popBinding();
 
                         if (acceptHTML) {
                             if ("text/html".equals(outputControl.getMediatype())) {
@@ -784,12 +785,13 @@ public class XFormsUtils {
      * @param attributeValue     attribute value
      * @return                   resolved attribute value
      */
-    public static String resolveAttributeValueTemplates(PipelineContext pipelineContext, NodeInfo contextNode, Map variableToValueMap, FunctionLibrary functionLibrary, Object functionContext, Element element, String attributeValue) {
+    public static String resolveAttributeValueTemplates(PipelineContext pipelineContext, NodeInfo contextNode, Map variableToValueMap, FunctionLibrary functionLibrary, XPathCache.FunctionContext functionContext, Element element, String attributeValue) {
 
         if (attributeValue == null)
             return null;
 
-        return XPathCache.evaluateAsAvt(pipelineContext, contextNode, attributeValue, Dom4jUtils.getNamespaceContextNoDefault(element), variableToValueMap, functionLibrary, functionContext, null, (LocationData) element.getData());
+        return XPathCache.evaluateAsAvt(pipelineContext, contextNode, attributeValue, Dom4jUtils.getNamespaceContextNoDefault(element),
+                variableToValueMap, functionLibrary, functionContext, null, (LocationData) element.getData());
     }
 
     /**

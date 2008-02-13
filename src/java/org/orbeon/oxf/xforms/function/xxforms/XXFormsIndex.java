@@ -38,11 +38,11 @@ public class XXFormsIndex extends Index {
     public Item evaluateItem(XPathContext xpathContext) throws XPathException {
 
         final Expression repeatIdExpression = (argument == null || argument.length == 0) ? null : argument[0];
-        final String repeatId = (repeatIdExpression == null) ? null : XFormsUtils.namespaceId(getXFormsContainingDocument(xpathContext), repeatIdExpression.evaluateAsString(xpathContext));
+        final String repeatId = (repeatIdExpression == null) ? null : XFormsUtils.namespaceId(getContainingDocument(xpathContext), repeatIdExpression.evaluateAsString(xpathContext));
 
         if (repeatId == null) {
             // Find closest enclosing id
-            return findIndexForRepeatId(xpathContext, getXFormsControls(xpathContext).getEnclosingRepeatId());
+            return findIndexForRepeatId(xpathContext, getContextStack(xpathContext).getEnclosingRepeatId());
         } else {
             return super.evaluateItem(xpathContext);
         }

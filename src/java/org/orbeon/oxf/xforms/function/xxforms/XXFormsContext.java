@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms;
 
-import org.orbeon.oxf.xforms.XFormsControls;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.saxon.expr.Expression;
@@ -46,11 +45,10 @@ public class XXFormsContext extends XFormsFunction {
 
         // Get instance id
         final Expression contextIdExpression = (argument == null || argument.length == 0) ? null : argument[0];
-        final String contextId = (contextIdExpression == null) ? null : XFormsUtils.namespaceId(getXFormsContainingDocument(xpathContext), contextIdExpression.evaluateAsString(xpathContext));
+        final String contextId = (contextIdExpression == null) ? null : XFormsUtils.namespaceId(getContainingDocument(xpathContext), contextIdExpression.evaluateAsString(xpathContext));
 
         // Get context for id
-        final XFormsControls xformsControls = getXFormsControls(xpathContext);
-        final List currentNodeset = xformsControls.getContextForId(contextId);
+        final List currentNodeset = getContextStack(xpathContext).getContextForId(contextId);
 
         return new ListIterator(currentNodeset);
     }

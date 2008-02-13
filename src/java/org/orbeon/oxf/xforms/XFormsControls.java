@@ -22,15 +22,13 @@ import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsControlFactory;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.controls.*;
-import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerImpl;
+import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.events.XFormsDeselectEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsSelectEvent;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.saxon.om.NodeInfo;
 import org.xml.sax.Locator;
 
@@ -38,8 +36,6 @@ import java.util.*;
 
 /**
  * Represents all this XForms containing document controls and the context in which they operate.
- *
- * TODO: Refactor the context stack code out of this class.
  */
 public class XFormsControls {
 
@@ -59,24 +55,26 @@ public class XFormsControls {
 
     private XFormsContainingDocument containingDocument;
     private Document controlsDocument;
+
+    private XFormsContextStack contextStack;
+
     private Map eventsMap;// TODO: this must go into XFormsStaticState
     
     private Map constantItems;
 //    private Map
 
-    protected Stack contextStack = new Stack();
-
-    private static final Map groupingControls = new HashMap();
+    public static final Map groupingControls = new HashMap();
     private static final Map valueControls = new HashMap();
     private static final Map noValueControls = new HashMap();
     private static final Map leafControls = new HashMap();
     private static final Map actualControls = new HashMap();
-    private static final Map mandatorySingleNodeControls = new HashMap();
+    public static final Map mandatorySingleNodeControls = new HashMap();
     private static final Map optionalSingleNodeControls = new HashMap();
-    private static final Map noSingleNodeControls = new HashMap();
-    private static final Map mandatoryNodesetControls = new HashMap();
-    private static final Map noNodesetControls = new HashMap();
-    private static final Map singleNodeOrValueControls = new HashMap();
+    public static final Map noSingleNodeControls = new HashMap();
+
+    public static final Map mandatoryNodesetControls = new HashMap();
+    public static final Map noNodesetControls = new HashMap();
+    public static final Map singleNodeOrValueControls = new HashMap();
 
     static {
         groupingControls.put("group", "");
@@ -141,6 +139,8 @@ public class XFormsControls {
     public XFormsControls(XFormsContainingDocument containingDocument, Document controlsDocument, Element repeatIndexesElement) {
         this.containingDocument = containingDocument;
         this.controlsDocument = controlsDocument;
+
+        this.contextStack = new XFormsContextStack(containingDocument);
 
         // Build minimal state with repeat indexes so that index() function works in XForms models
         // initialization
@@ -317,7 +317,7 @@ public class XFormsControls {
             initialControlsState.dirty = false;
         }
 
-        resetBindingContext();
+        contextStack.resetBindingContext();// not sure we actually need to do this
 
         initialized = true;
     }
@@ -335,29 +335,12 @@ public class XFormsControls {
         }
     }
 
-
-    /**
-     * Reset the binding context to the root of the containing document.
-     */
-    public void resetBindingContext() {
-        resetBindingContext(containingDocument.getModel(""));
-    }
-
-    public void resetBindingContext(XFormsModel xformsModel) {
-        // Clear existing stack
-        contextStack.clear();
-
-        // Push the default context
-        if (xformsModel.getInstanceCount() > 0) {
-            final List defaultNodeset = Arrays.asList(new Object[]{xformsModel.getDefaultInstance().getInstanceRootElementInfo()});
-            contextStack.push(new BindingContext(null, xformsModel, defaultNodeset, 1, null, true, null, xformsModel.getDefaultInstance().getLocationData()));
-        } else {
-            contextStack.push(new BindingContext(null, xformsModel, Collections.EMPTY_LIST, 0, null, true, null, xformsModel.getLocationData()));
-        }
-    }
-
     public XFormsContainingDocument getContainingDocument() {
         return containingDocument;
+    }
+
+    public XFormsContextStack getContextStack() {
+        return contextStack;
     }
 
     public static boolean isValueControl(String controlName) {
@@ -377,393 +360,6 @@ public class XFormsControls {
     }
 
     /**
-     * Set the binding context to the current control.
-     *
-     * @param pipelineContext   current PipelineContext
-     * @param xformsControl       control to bind
-     */
-    public void setBinding(PipelineContext pipelineContext, XFormsControl xformsControl) {
-
-        // Create ancestors-or-self list
-        final List ancestorsOrSelf = new ArrayList();
-        BindingContext controlBindingContext = xformsControl.getBindingContext();
-        while (controlBindingContext != null) {
-            ancestorsOrSelf.add(controlBindingContext);
-            controlBindingContext = controlBindingContext.getParent();
-        }
-        Collections.reverse(ancestorsOrSelf);
-
-        // Bind up to the specified element
-        contextStack.clear();
-        contextStack.addAll(ancestorsOrSelf);
-    }
-
-    private void pushBinding(PipelineContext pipelineContext, XFormsControl xformsControl) {
-
-        final Element bindingElement = xformsControl.getControlElement();
-        if (!(xformsControl instanceof RepeatIterationControl)) {
-            // Regular XFormsControl backed by an element
-
-            final String ref = bindingElement.attributeValue("ref");
-            final String context = bindingElement.attributeValue("context");
-            final String nodeset = bindingElement.attributeValue("nodeset");
-            final String modelId = XFormsUtils.namespaceId(containingDocument, bindingElement.attributeValue("model"));
-            final String bindId = XFormsUtils.namespaceId(containingDocument, bindingElement.attributeValue("bind"));
-
-            final Map bindingElementNamespaceContext =
-                    (ref != null || nodeset != null) ? Dom4jUtils.getNamespaceContextNoDefault(bindingElement) : null;
-
-            pushBinding(pipelineContext, ref, context, nodeset, modelId, bindId, bindingElement, bindingElementNamespaceContext);
-        } else {
-            // RepeatIterationInfo
-
-            final XFormsControl repeatXFormsControl = xformsControl.getParent();
-            final List repeatChildren = repeatXFormsControl.getChildren();
-            final BindingContext currentBindingContext = getCurrentBindingContext();
-            final List currentNodeset = currentBindingContext.getNodeset();
-
-            final int repeatChildrenSize = (repeatChildren == null) ? 0 : repeatChildren.size();
-            final int currentNodesetSize = (currentNodeset == null) ? 0 : currentNodeset.size();
-
-            if (repeatChildrenSize != currentNodesetSize)
-                throw new ValidationException("repeatChildren and newNodeset have different sizes.", xformsControl.getLocationData());
-
-            // Push "artificial" binding with just current node in nodeset
-            final XFormsModel newModel = currentBindingContext.getModel();
-            final int position = ((RepeatIterationControl) xformsControl).getIteration();
-            contextStack.push(new BindingContext(currentBindingContext, newModel, currentNodeset, position, xformsControl.getParent().getOriginalId(), true, null, repeatXFormsControl.getLocationData()));
-        }
-    }
-
-    /**
-     * Push an element containing either single-node or nodeset binding attributes.
-     */
-    public void pushBinding(PipelineContext pipelineContext, Element bindingElement) {
-        pushBinding(pipelineContext, bindingElement, null);
-    }
-
-    /**
-     * Push an element containing either single-node or nodeset binding attributes.
-     *
-     * @param pipelineContext   current PipelineContext
-     * @param bindingElement    current element containing node binding attributes
-     * @param model             if specified, overrides a potential @model attribute on the element
-     */
-    public void pushBinding(PipelineContext pipelineContext, Element bindingElement, String model) {
-        final String ref = bindingElement.attributeValue("ref");
-        final String context = bindingElement.attributeValue("context");
-        final String nodeset = bindingElement.attributeValue("nodeset");
-        if (model == null)
-            model = XFormsUtils.namespaceId(containingDocument, bindingElement.attributeValue("model"));
-        final String bind = XFormsUtils.namespaceId(containingDocument, bindingElement.attributeValue("bind"));
-
-        // TODO: PERF: Dom4jUtils.getNamespaceContextNoDefault() takes time. We should maybe cache those?
-        final Map bindingElementNamespaceContext;
-        bindingElementNamespaceContext = Dom4jUtils.getNamespaceContextNoDefault(bindingElement);
-//        if (ref != null || nodeset != null) {
-//            if (bindingElement instanceof NonLazyUserDataElement) {
-//                final NonLazyUserDataElement dataElement = (NonLazyUserDataElement) bindingElement;
-//                final Object data = dataElement.getData();
-//
-//                if (data == null) {
-//                    // Get data and cache it
-//                    bindingElementNamespaceContext = Dom4jUtils.getNamespaceContextNoDefault(bindingElement);
-//                    dataElement.setData(bindingElementNamespaceContext);
-//                } else if (data instanceof TreeMap) {
-//                    // Use cached data
-//                    bindingElementNamespaceContext = (Map) data;
-//                } else {
-//                    // Just compute the data
-//                    bindingElementNamespaceContext = Dom4jUtils.getNamespaceContextNoDefault(bindingElement);
-//                }
-//            } else {
-//                // Just compute the data
-//                bindingElementNamespaceContext = Dom4jUtils.getNamespaceContextNoDefault(bindingElement);
-//            }
-//        } else {
-//            // No need for the data
-//            bindingElementNamespaceContext = null;
-//        }
-        pushBinding(pipelineContext, ref, context, nodeset, model, bind, bindingElement, bindingElementNamespaceContext);
-    }
-
-    public void pushBinding(PipelineContext pipelineContext, String ref, String context, String nodeset, String modelId, String bindId,
-                            Element bindingElement, Map bindingElementNamespaceContext) {
-
-        // Get location data for error reporting
-        final LocationData locationData = (bindingElement == null)
-                ? containingDocument.getLocationData()
-                : new ExtendedLocationData((LocationData) bindingElement.getData(), "pushing XForms control binding", bindingElement);
-
-        // Check for mandatory and optional bindings
-        // TODO: This is static analysis to do only once and should be moved somewhere else
-        if (bindingElement != null && XFormsConstants.XFORMS_NAMESPACE_URI.equals(bindingElement.getNamespaceURI())) {
-            final String controlName = bindingElement.getName();
-            if (mandatorySingleNodeControls.get(controlName) != null
-                    && !(bindingElement.attribute("ref") != null || bindingElement.attribute("bind") != null)) {
-                throw new ValidationException("Missing mandatory single node binding for element: " + bindingElement.getQualifiedName(), locationData);
-            }
-            if (noSingleNodeControls.get(controlName) != null
-                    && (bindingElement.attribute("ref") != null || bindingElement.attribute("bind") != null)) {
-                throw new ValidationException("Single node binding is prohibited for element: " + bindingElement.getQualifiedName(), locationData);
-            }
-            if (mandatoryNodesetControls.get(controlName) != null
-                    && !(bindingElement.attribute("nodeset") != null || bindingElement.attribute("bind") != null)) {
-                throw new ValidationException("Missing mandatory nodeset binding for element: " + bindingElement.getQualifiedName(), locationData);
-            }
-            if (noNodesetControls.get(controlName) != null
-                    && bindingElement.attribute("nodeset") != null) {
-                throw new ValidationException("Node-set binding is prohibited for element: " + bindingElement.getQualifiedName(), locationData);
-            }
-            if (singleNodeOrValueControls.get(controlName) != null
-                    && !(bindingElement.attribute("ref") != null || bindingElement.attribute("bind") != null || bindingElement.attribute("value") != null)) {
-                throw new ValidationException("Missing mandatory single node binding or value attribute for element: " + bindingElement.getQualifiedName(), locationData);
-            }
-        }
-
-        // Determine current context
-        final BindingContext currentBindingContext = getCurrentBindingContext();
-
-        // Handle model
-        final XFormsModel newModel;
-        final boolean isNewModel;
-        if (modelId != null) {
-            newModel = containingDocument.getModel(modelId);
-            if (newModel == null)
-                throw new ValidationException("Invalid model id: " + modelId, locationData);
-            isNewModel = newModel != currentBindingContext.getModel();// don't say it's a new model unless it has really changed
-        } else {
-            newModel = currentBindingContext.getModel();
-            isNewModel = false;
-        }
-
-        // Handle nodeset
-        final boolean isNewBind;
-        final int newPosition;
-        final List newNodeset;
-        {
-            if (bindId != null) {
-                // Resolve the bind id to a nodeset
-                final ModelBind modelBind = newModel.getModelBindById(bindId);
-                if (modelBind == null)
-                    throw new ValidationException("Cannot find bind for id: " + bindId, locationData);
-                newNodeset = newModel.getBindNodeset(pipelineContext, modelBind, currentBindingContext.getSingleNode());
-                isNewBind = true;
-                newPosition = 1;
-            } else if (ref != null || nodeset != null) {
-
-                // Check whether there is an optional context
-                if (nodeset != null && context != null) {
-                    pushBinding(pipelineContext, null, null, context, modelId, null, null, bindingElementNamespaceContext);
-                }
-
-                // Evaluate new XPath in context
-                if (isNewModel) {
-                    // Model was switched
-
-                    final NodeInfo currentSingleNodeForModel = getCurrentSingleNode(newModel.getEffectiveId());
-                    if (currentSingleNodeForModel != null) {
-
-                        // Temporarily update the context so that the function library's instance() function works
-                        final BindingContext modelBindingContext = getCurrentBindingContextForModel(newModel.getEffectiveId());
-                        if (modelBindingContext != null)
-                            contextStack.push(new BindingContext(currentBindingContext, newModel, modelBindingContext.getNodeset(), modelBindingContext.getPosition(), null, false, null, locationData));
-                        else
-                            contextStack.push(new BindingContext(currentBindingContext, newModel, getCurrentNodeset(newModel.getEffectiveId()), 1, null, false, null, locationData));
-
-                        // Evaluate new node-set
-                        newNodeset = XPathCache.evaluate(pipelineContext, Collections.singletonList(currentSingleNodeForModel), 1,
-                                ref != null ? ref : nodeset, bindingElementNamespaceContext, null, XFormsContainingDocument.getFunctionLibrary(), XFormsControls.this, null, locationData);
-
-                        // Restore context
-                        contextStack.pop();
-                    } else {
-                        newNodeset = Collections.EMPTY_LIST;
-                    }
-
-                } else {
-                    // Simply evaluate new node-set
-                    final BindingContext contextBindingContext = getCurrentBindingContext();
-                    if (contextBindingContext != null && contextBindingContext.getNodeset().size() > 0) {
-                        newNodeset = XPathCache.evaluate(pipelineContext, contextBindingContext.getNodeset(), contextBindingContext.getPosition(),
-                                ref != null ? ref : nodeset, bindingElementNamespaceContext, null, XFormsContainingDocument.getFunctionLibrary(), XFormsControls.this, null, locationData);
-                    } else {
-                        newNodeset = Collections.EMPTY_LIST;
-                    }
-                }
-
-                // Restore optional context
-                if (nodeset != null && context != null) {
-                    popBinding();
-                }
-                isNewBind = true;
-                newPosition = 1;
-            } else if (isNewModel) {
-                // Only the model has changed
-                final NodeInfo currentSingleNodeForModel = getCurrentSingleNode(newModel.getEffectiveId());
-                if (currentSingleNodeForModel != null) {
-                    newNodeset = Collections.singletonList(currentSingleNodeForModel);
-                    newPosition = 1;
-                } else {
-                    newNodeset = Collections.EMPTY_LIST;
-                    newPosition = -1;// this is not a valid position and nobody should use the node-set anyway
-                }
-                isNewBind = false;
-            } else {
-                // No change to current nodeset
-                newNodeset = currentBindingContext.getNodeset();
-                isNewBind = false;
-                newPosition = currentBindingContext.getPosition();
-            }
-        }
-
-        // Push new context
-        final String id = (bindingElement == null) ? null : bindingElement.attributeValue("id");
-        contextStack.push(new BindingContext(currentBindingContext, newModel, newNodeset, newPosition, id, isNewBind, bindingElement, locationData));
-    }
-
-    /**
-     * NOTE: Not sure this should be exposed.
-     */
-    public Stack getContextStack() {
-        return contextStack;
-    }
-
-    /**
-     * NOTE: Not sure this should be exposed.
-     */
-    public BindingContext getCurrentBindingContext() {
-        return (BindingContext) contextStack.peek();
-    }
-
-    public BindingContext popBinding() {
-        if (contextStack.size() == 1)
-            throw new OXFException("Attempt to clear XForms controls context stack.");
-        return (BindingContext) contextStack.pop();
-    }
-
-    /**
-     * Get the current node-set binding for the given model id.
-     */
-    public BindingContext getCurrentBindingContextForModel(String modelId) {
-
-        for (int i = contextStack.size() - 1; i >= 0; i--) {
-            final BindingContext currentBindingContext = (BindingContext) contextStack.get(i);
-
-            final String currentModelId = currentBindingContext.getModel().getEffectiveId();
-            if ((currentModelId == null && modelId == null) || (modelId != null && modelId.equals(currentModelId)))
-                return currentBindingContext;
-        }
-
-        return null;
-    }
-
-    /**
-     * Get the current node-set binding for the given model id.
-     */
-    public List getCurrentNodeset(String modelId) {
-
-        final BindingContext bindingContext = getCurrentBindingContextForModel(modelId);
-
-        // If a context exists, return its node-set
-        if (bindingContext != null)
-            return bindingContext.getNodeset();
-
-        // If there is no default instance, return an empty node-set
-        final XFormsInstance defaultInstance = containingDocument.getModel(modelId).getDefaultInstance();
-        if (defaultInstance == null)
-            return Collections.EMPTY_LIST;
-        
-        // If not found, return the document element of the model's default instance
-        return Collections.singletonList(defaultInstance.getInstanceRootElementInfo());
-    }
-
-    /**
-     * Get the current single node binding for the given model id.
-     */
-    public NodeInfo getCurrentSingleNode(String modelId) {
-        final List currentNodeset = getCurrentNodeset(modelId);
-        return (NodeInfo) ((currentNodeset == null || currentNodeset.size() == 0) ? null : currentNodeset.get(0));
-    }
-
-    /**
-     * Get the current single node binding, if any.
-     */
-    public NodeInfo getCurrentSingleNode() {
-        return getCurrentBindingContext().getSingleNode();
-    }
-
-    public String getCurrentSingleNodeValue() {
-        final NodeInfo currentSingleNode = getCurrentSingleNode();
-        if (currentSingleNode != null)
-            return XFormsInstance.getValueForNodeInfo(currentSingleNode);
-        else
-            return null;
-    }
-
-    /**
-     * Get the current nodeset binding, if any.
-     */
-    public List getCurrentNodeset() {
-        return getCurrentBindingContext().getNodeset();
-    }
-
-    /**
-     * Get the current position in current nodeset binding.
-     */
-    public int getCurrentPosition() {
-        return getCurrentBindingContext().getPosition();
-    }
-
-    /**
-     * Return the single node associated with the iteration of the repeat specified. If a null
-     * repeat id is passed, return the single node associated with the closest enclosing repeat
-     * iteration.
-     *
-     * @param repeatId  enclosing repeat id, or null
-     * @return          the single node
-     */
-    public NodeInfo getRepeatCurrentSingleNode(String repeatId) {
-        for (int i = contextStack.size() - 1; i >= 0; i--) {
-            final BindingContext currentBindingContext = (BindingContext) contextStack.get(i);
-
-            final Element bindingElement = currentBindingContext.getControlElement();
-            final String repeatIdForIteration = currentBindingContext.getIdForContext();
-            if (bindingElement == null && repeatIdForIteration != null) {// NOTE: test on bindingElement == null is just to detect whether this is a repeat iteration
-                if (repeatId == null || repeatId.equals(repeatIdForIteration)) {
-                    // Found binding context for relevant repeat iteration
-                    return currentBindingContext.getSingleNode();
-                }
-            }
-        }
-        // It is required that there is a relevant enclosing xforms:repeat
-        if (repeatId == null)
-            throw new ValidationException("No enclosing xforms:repeat found.", getCurrentBindingContext().getLocationData());
-        else
-            throw new ValidationException("No enclosing xforms:repeat found for repeat id: " + repeatId, getCurrentBindingContext().getLocationData());
-    }
-
-    /**
-     * Return the closest enclosing repeat id.
-     *
-     * @return  repeat id, throw if not found
-     */
-    public String getEnclosingRepeatId() {
-        for (int i = contextStack.size() - 1; i >= 0; i--) {
-            final BindingContext currentBindingContext = (BindingContext) contextStack.get(i);
-
-            final Element bindingElement = currentBindingContext.getControlElement();
-            final String repeatIdForIteration = currentBindingContext.getIdForContext();
-            if (bindingElement == null && repeatIdForIteration != null) {// NOTE: test on bindingElement == null is just to detect whether this is a repeat iteration
-                // Found binding context for relevant repeat iteration
-                return repeatIdForIteration;
-            }
-        }
-        // It is required that there is a relevant enclosing xforms:repeat
-        throw new ValidationException("Enclosing xforms:repeat not found.", getCurrentBindingContext().getLocationData());
-    }
-
-    /**
      * For the given case id and the current binding, try to find an effective case id.
      *
      * The effective case id is for now the effective case id following repeat branches. This can be improved in the
@@ -774,64 +370,6 @@ public class XFormsControls {
      */
     public String findEffectiveCaseId(String caseId) {
         return getCurrentControlsState().findEffectiveControlId(caseId);
-    }
-
-    /**
-     * Return the context node-set based on the enclosing xforms:repeat, xforms:group or xforms:switch, either the
-     * closest one if no argument is passed, or context at the level of the element with the given id passed.
-     *
-     * @param contextId  enclosing context id, or null
-     * @return           the node-set
-     */
-    public List getContextForId(String contextId) {
-
-
-        if (contextId == null) {
-            // Return the single-node binding of the parent
-            // TODO: If the element uses @context to override the context, that attribute won't be taken into account
-            final XFormsControls.BindingContext bindingContext = getCurrentBindingContext();
-            return new ArrayList(Collections.singleton(bindingContext.getParent().getSingleNode()));
-        } else {
-            for (int i = contextStack.size() - 1; i >= 0; i--) {
-                final BindingContext currentBindingContext = (BindingContext) contextStack.get(i);
-
-                final Element bindingElement = currentBindingContext.getControlElement();
-                final String idForContext = currentBindingContext.getIdForContext();
-                if (bindingElement != null && idForContext != null && groupingControls.get(bindingElement.getName()) != null) {
-                    if (contextId == null || contextId.equals(idForContext)) {
-                        // Found matching binding context
-                        return currentBindingContext.getNodeset();
-                    }
-                }
-                // TODO: What should the context of a repeat be? Currently, it returns a node-set, not the repeat
-                // iteration. This is probably not very reasonable, and also incompatible with the case where contextId
-                // == null.
-            }
-            throw new ValidationException("No enclosing container XForms control found for id: " + contextId, getCurrentBindingContext().getLocationData());
-        }
-    }
-
-    /**
-     * Return the currrent model for the current nodeset binding.
-     */
-    public XFormsModel getCurrentModel() {
-        return getCurrentBindingContext().getModel();
-    }
-
-    /**
-     * Return the current instance for the current nodeset binding.
-     *
-     * This method goes up the context stack until it finds a node, and returns the instance associated with that node.
-     */
-    public XFormsInstance getCurrentInstance() {
-        for (int i = contextStack.size() - 1; i >= 0; i--) {
-            final BindingContext currentBindingContext = (BindingContext) contextStack.get(i);
-            final NodeInfo currentSingleNode = currentBindingContext.getSingleNode();
-
-            if (currentSingleNode != null)
-                return getContainingDocument().getInstanceForNode(currentSingleNode);
-        }
-        return null;
     }
 
     private ControlsState buildControlsState(final PipelineContext pipelineContext, final boolean evaluateItemsets) {
@@ -912,7 +450,7 @@ public class XFormsControls {
                 }
 
                 // Set current binding for control element
-                final BindingContext currentBindingContext = getCurrentBindingContext();
+                final XFormsContextStack.BindingContext currentBindingContext = contextStack.getCurrentBindingContext();
                 xformsControl.setBindingContext(currentBindingContext);
 
                 // Add to current controls container
@@ -969,7 +507,7 @@ public class XFormsControls {
                 currentControlsContainer = repeatIterationControl;
 
                 // Set current binding for control
-                final BindingContext currentBindingContext = getCurrentBindingContext();
+                final XFormsContextStack.BindingContext currentBindingContext = contextStack.getCurrentBindingContext();
                 repeatIterationControl.setBindingContext(currentBindingContext);
             }
 
@@ -1229,7 +767,7 @@ public class XFormsControls {
      * Visit all the effective controls elements.
      */
     public void visitAllControlsHandleRepeat(PipelineContext pipelineContext, ControlElementVisitorListener controlElementVisitorListener) {
-        resetBindingContext();
+        contextStack.resetBindingContext();
         final boolean isOptimizeRelevance = XFormsProperties.isOptimizeRelevance(containingDocument);
         handleControls(pipelineContext, controlElementVisitorListener, isOptimizeRelevance, controlsDocument.getRootElement(), "");
     }
@@ -1248,19 +786,17 @@ public class XFormsControls {
                 // Handle xforms:repeat
 
                 // Push binding for xforms:repeat
-                pushBinding(pipelineContext, controlElement);
+                contextStack.pushBinding(pipelineContext, controlElement);
                 try {
-                    final BindingContext currentBindingContext = getCurrentBindingContext();
-
                     // Visit xforms:repeat element
                     doContinue = controlElementVisitorListener.startVisitControl(controlElement, effectiveControlId);
 
                     // Iterate over current xforms:repeat nodeset
-                    final List currentNodeSet = getCurrentNodeset();
+                    final List currentNodeSet = contextStack.getCurrentNodeset();
                     if (currentNodeSet != null) {
                         for (int currentPosition = 1; currentPosition <= currentNodeSet.size(); currentPosition++) {
                             // Push "artificial" binding with just current node in nodeset
-                            contextStack.push(new BindingContext(currentBindingContext, currentBindingContext.getModel(), currentNodeSet, currentPosition, controlId, true, null, (LocationData) controlElement.getData()));
+                            contextStack.pushIteration(currentPosition, controlId);
                             try {
                                 // Handle children of xforms:repeat
                                 if (doContinue) {
@@ -1271,7 +807,7 @@ public class XFormsControls {
                                     controlElementVisitorListener.endRepeatIteration(currentPosition);
                                 }
                             } finally {
-                                contextStack.pop();
+                                contextStack.popBinding();
                             }
                             if (!doContinue)
                                 break;
@@ -1281,15 +817,15 @@ public class XFormsControls {
                     doContinue = doContinue && controlElementVisitorListener.endVisitControl(controlElement, effectiveControlId);
 
                 } finally {
-                    popBinding();
+                    contextStack.popBinding();
                 }
 
             } else  if (isGroupingControl(controlName)) {
                 // Handle XForms grouping controls
-                pushBinding(pipelineContext, controlElement);
+                contextStack.pushBinding(pipelineContext, controlElement);
                 try {
                     doContinue = controlElementVisitorListener.startVisitControl(controlElement, effectiveControlId);
-                    final BindingContext currentBindingContext = getCurrentBindingContext();
+                    final XFormsContextStack.BindingContext currentBindingContext = contextStack.getCurrentBindingContext();
                     if (doContinue) {
                         // Recurse into grouping control if we don't optimize relevance, OR if we do optimize and we are
                         // not bound to a node OR we are bound to a relevant node
@@ -1308,16 +844,16 @@ public class XFormsControls {
                     }
                     doContinue = doContinue && controlElementVisitorListener.endVisitControl(controlElement, effectiveControlId);
                 } finally {
-                    popBinding();
+                    contextStack.popBinding();
                 }
             } else if (isLeafControl(controlName)) {
                 // Handle leaf control
-                pushBinding(pipelineContext, controlElement);
+                contextStack.pushBinding(pipelineContext, controlElement);
                 try {
                     doContinue = controlElementVisitorListener.startVisitControl(controlElement, effectiveControlId);
                     doContinue = doContinue && controlElementVisitorListener.endVisitControl(controlElement, effectiveControlId);
                 } finally {
-                    popBinding();
+                    contextStack.popBinding();
                 }
             }
             if (!doContinue)
@@ -1397,86 +933,6 @@ public class XFormsControls {
                 handleControl(xformsControlVisitorListener, XFormsControl.getChildren());
                 xformsControlVisitorListener.endVisitControl(XFormsControl);
             }
-        }
-    }
-
-    public static class BindingContext {
-        private BindingContext parent;
-        private XFormsModel model;
-        private List nodeset;
-        private int position = 1;
-        private String idForContext;
-        private boolean newBind;
-        private Element controlElement;
-        private LocationData locationData;
-
-        public BindingContext(BindingContext parent, XFormsModel model, List nodeSet, int position, String idForContext, boolean newBind, Element controlElement, LocationData locationData) {
-            this.parent = parent;
-            this.model = model;
-            this.nodeset = nodeSet;
-            this.position = position;
-            this.idForContext = idForContext;
-            this.newBind = newBind;
-            this.controlElement = controlElement;
-            this.locationData = (locationData != null) ? locationData : (controlElement != null) ? (LocationData) controlElement.getData() : null;
-
-            if (nodeset != null && nodeset.size() > 0) {
-                // TODO: PERF: This seems to take some significant time
-                for (Iterator i = nodeset.iterator(); i.hasNext();) {
-                    final Object currentItem = i.next();
-                    if (!(currentItem instanceof NodeInfo))
-                        throw new ValidationException("A reference to a node (such as text, element, or attribute) is required in a binding. Attempted to bind to the invalid item type: " + currentItem.getClass(), this.locationData);
-                }
-            }
-        }
-
-        public BindingContext getParent() {
-            return parent;
-        }
-
-        public XFormsModel getModel() {
-            return model;
-        }
-
-        public List getNodeset() {
-            return nodeset;
-        }
-
-        public int getPosition() {
-            return position;
-        }
-
-        public String getIdForContext() {
-            return idForContext;
-        }
-
-        public boolean isNewBind() {
-            return newBind;
-        }
-
-        public Element getControlElement() {
-            return controlElement;
-        }
-
-        /**
-         * Convenience method returning the location data associated with the XForms element (typically, a control)
-         * associated with the binding. If location data was passed during construction, pass that, otherwise try to get
-         * location data from passed element.
-         *
-         * @return  LocationData object, or null if not found
-         */
-        public LocationData getLocationData() {
-            return locationData;
-        }
-
-        /**
-         * Get the current single node binding, if any.
-         */
-        public NodeInfo getSingleNode() {
-            if (nodeset == null || nodeset.size() == 0)
-                return null;
-
-            return (NodeInfo) nodeset.get(position - 1);
         }
     }
 
@@ -1828,15 +1284,18 @@ public class XFormsControls {
             if (this.children == null)
                 return;
 
-            xformsControls.resetBindingContext();
+            xformsControls.contextStack.resetBindingContext();
             visitControlsFollowRepeats(pipelineContext, xformsControls, this.children, xformsControlVisitorListener);
         }
 
         private void visitControlsFollowRepeats(PipelineContext pipelineContext, XFormsControls xformsControls, List children, XFormsControlVisitorListener xformsControlVisitorListener) {
+
+            final XFormsContextStack contextStack = xformsControls.contextStack;
+
             for (Iterator i = children.iterator(); i.hasNext();) {
                 final XFormsControl currentXFormsControl = (XFormsControl) i.next();
 
-                xformsControls.pushBinding(pipelineContext, currentXFormsControl);
+                contextStack.pushBinding(pipelineContext, currentXFormsControl);
                 xformsControlVisitorListener.startVisitControl(currentXFormsControl);
                 {
                     if (currentXFormsControl instanceof XFormsRepeatControl) {
@@ -1857,7 +1316,7 @@ public class XFormsControls {
                     }
                 }
                 xformsControlVisitorListener.endVisitControl(currentXFormsControl);
-                xformsControls.popBinding();
+                contextStack.popBinding();
             }
         }
 

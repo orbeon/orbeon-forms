@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2006 Orbeon, Inc.
+ *  Copyright (C) 2007 Orbeon, Inc.
  *
  *  This program is free software; you can redistribute it and/or modify it under the terms of the
  *  GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -11,23 +11,19 @@
  *
  *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.xforms.function.xxforms;
+package org.orbeon.oxf.xforms.function;
 
-import org.orbeon.oxf.xforms.XFormsUtils;
-import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.StaticContext;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.trans.XPathException;
+import org.orbeon.oxf.xforms.XFormsContextStack;
 
 /**
- * Return the current node of one of the enclosing xforms:repeat iteration, either the closest
- * iteration if no argument is passed, or the iteration for the repeat id passed.
- *
- * This function must be called from within an xforms:repeat.
+ * XForms 1.1 context() function.
  */
-public class XXFormsRepeatCurrent extends XFormsFunction {
+public class Context extends XFormsFunction {
 
     /**
      * preEvaluate: this method suppresses compile-time evaluation by doing nothing
@@ -39,11 +35,13 @@ public class XXFormsRepeatCurrent extends XFormsFunction {
 
     public Item evaluateItem(XPathContext xpathContext) throws XPathException {
 
-        // Get instance id
-        final Expression repeatIdExpression = (argument == null || argument.length == 0) ? null : argument[0];
-        final String repeatId = (repeatIdExpression == null) ? null : XFormsUtils.namespaceId(getContainingDocument(xpathContext), repeatIdExpression.evaluateAsString(xpathContext));
+        // "7.10.4 The context() Function [...] This function returns the in-scope evaluation context node of the
+        // nearest ancestor element of the node containing the XPath expression that invokes this function. The nearest
+        // ancestor element may have been created dynamically as part of the run-time expansion of repeated content as
+        // described in Section 4.7 Resolving ID References in XForms."
 
-        // Get current single node
-        return getContextStack(xpathContext).getRepeatCurrentSingleNode(repeatId);
+        final XFormsContextStack contextStack = getContextStack(xpathContext);
+        final XFormsContextStack.BindingContext currentBindingContext = contextStack.getCurrentBindingContext();
+        return currentBindingContext.getParent().getSingleNode();
     }
 }

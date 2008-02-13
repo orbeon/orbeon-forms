@@ -43,7 +43,7 @@ public class PooledXPathExpression {
 
     // Dynamic context
     private Map variableToValueMap;
-    private List contextNodeSet;
+    private List contextItems;
     private int contextPosition;
 
     public PooledXPathExpression(Expression expression, ObjectPool pool, IndependentContext context, Map variables) {
@@ -61,7 +61,7 @@ public class PooledXPathExpression {
         try {
             // Free up dynamic context references
             variableToValueMap = null;
-            contextNodeSet = null;
+            contextItems = null;
 
             // Return object to pool
             if (pool != null) // may be null for testing
@@ -76,8 +76,8 @@ public class PooledXPathExpression {
      */
     public List evaluate() throws XPathException {
 
-        final NodeInfo contextNode = (NodeInfo) contextNodeSet.get(contextPosition - 1);
-        final XPathContextMajor xpathContext = new XPathContextMajor(contextNode, this.configuration);
+        final Item contextItem = (Item) contextItems.get(contextPosition - 1);
+        final XPathContextMajor xpathContext = new XPathContextMajor(contextItem, this.configuration);
         final SequenceIterator iter = evaluate(xpathContext, null);
 
         final SequenceExtent extent = new SequenceExtent(iter);
@@ -88,8 +88,8 @@ public class PooledXPathExpression {
      * Evaluate and return a List of native Java objects, but keep NodeInfo objects.
      */
     public List evaluateKeepNodeInfo(Object functionContext) throws XPathException {
-        final NodeInfo contextNode = (contextNodeSet.size() > contextPosition - 1) ? (NodeInfo) contextNodeSet.get(contextPosition - 1) : null;
-        final XPathContextMajor xpathContext = new XPathContextMajor(contextNode, this.configuration);
+        final Item contextItem = (contextItems.size() > contextPosition - 1) ? (Item) contextItems.get(contextPosition - 1) : null;
+        final XPathContextMajor xpathContext = new XPathContextMajor(contextItem, this.configuration);
         final SequenceIterator iter = evaluate(xpathContext, functionContext);
 
         final SequenceExtent extent = new SequenceExtent(iter);
@@ -118,8 +118,8 @@ public class PooledXPathExpression {
      */
     public Object evaluateSingle() throws XPathException {
 
-        final NodeInfo contextNode = (NodeInfo) contextNodeSet.get(contextPosition - 1);
-        final XPathContextMajor xpathContext = new XPathContextMajor(contextNode, this.configuration);
+        final Item contextItem = (Item) contextItems.get(contextPosition - 1);
+        final XPathContextMajor xpathContext = new XPathContextMajor(contextItem, this.configuration);
         final SequenceIterator iter = evaluate(xpathContext, null);
 
         final Item firstItem = iter.next();
@@ -136,8 +136,8 @@ public class PooledXPathExpression {
      */
     public Object evaluateSingleKeepNodeInfo(Object functionContext) throws XPathException {
 
-        final NodeInfo contextNode = (NodeInfo) contextNodeSet.get(contextPosition - 1);
-        final XPathContextMajor xpathContext = new XPathContextMajor(contextNode, this.configuration);
+        final Item contextItem = (Item) contextItems.get(contextPosition - 1);
+        final XPathContextMajor xpathContext = new XPathContextMajor(contextItem, this.configuration);
         final SequenceIterator iter = evaluate(xpathContext, functionContext);
 
         final Item firstItem = iter.next();
@@ -166,7 +166,7 @@ public class PooledXPathExpression {
 
         // Use low-level Expression object and implement context node-set and context position
         final SlotManager slotManager = this.stackFrameMap; // this is already set on XPathExpressionImpl but we can't get to it
-        xpathContext.setCurrentIterator(new ListSequenceIterator(contextNodeSet, contextPosition));
+        xpathContext.setCurrentIterator(new ListSequenceIterator(contextItems, contextPosition));
         xpathContext.openStackFrame(slotManager);
 
         // Set variable values if any
@@ -239,11 +239,11 @@ public class PooledXPathExpression {
     /**
      * Set context node-set and initial position.
      *
-     * @param contextNodeSet        List of NodeInfo
+     * @param contextItems          List of Item
      * @param contextPosition       1-based current position
      */
-    public void setContextNodeSet(List contextNodeSet, int contextPosition) {
-        this.contextNodeSet = contextNodeSet;
+    public void setContextItems(List contextItems, int contextPosition) {
+        this.contextItems = contextItems;
         this.contextPosition = contextPosition;
     }
 
@@ -265,6 +265,6 @@ public class PooledXPathExpression {
         variables = null;
 
         variableToValueMap = null;
-        contextNodeSet = null;
+        contextItems = null;
     }
 }

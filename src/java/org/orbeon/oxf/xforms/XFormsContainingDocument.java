@@ -20,7 +20,6 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
@@ -80,8 +79,6 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     private List scriptsToRun;
     private String focusEffectiveControlId;
     private String helpEffectiveControlId;
-
-    private XFormsActionInterpreter actionInterpreter;
 
     // Global flag used during initialization only
     private boolean mustPerformInitializationFirstRefresh;
@@ -332,7 +329,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         // Search in models
         for (Iterator i = models.iterator(); i.hasNext();) {
             XFormsModel model = (XFormsModel) i.next();
-            final Object resultObject = model.getObjectByid(pipelineContext, id);
+            final Object resultObject = model.getObjectByid(id);
             if (resultObject != null)
                 return resultObject;
         }
@@ -1095,20 +1092,6 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
      */
     public XFormsEvent getCurrentEvent() {
         return (eventStack.size() == 0) ? null : (XFormsEvent) eventStack.peek();
-    }
-
-    /**
-     * Execute an XForms action.
-     *
-     * @param pipelineContext       current PipelineContext
-     * @param targetId              id of the target control
-     * @param eventHandlerContainer event handler containe this action is running in
-     * @param actionElement         Element specifying the action to execute
-     */
-    public void runAction(final PipelineContext pipelineContext, String targetId, XFormsEventHandlerContainer eventHandlerContainer, Element actionElement) {
-        if (actionInterpreter == null)
-            actionInterpreter = new XFormsActionInterpreter(this);
-        actionInterpreter.runAction(pipelineContext, targetId, eventHandlerContainer, actionElement);
     }
 
     /**

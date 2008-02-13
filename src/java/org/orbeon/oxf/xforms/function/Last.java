@@ -32,7 +32,7 @@ public class Last extends XFormsFunction {
     public Item evaluateItem(XPathContext xpathContext) throws XPathException {
         if (xpathContext.getCurrentIterator() instanceof SingletonIterator) {
             // We have a top level expression and Saxon does not know about the context nodeset
-            return new IntegerValue(getXFormsControls(xpathContext).getCurrentNodeset().size());
+            return new IntegerValue(getContextStack(xpathContext).getCurrentNodeset().size());
         } else {
             return new IntegerValue(xpathContext.getLast());
         }

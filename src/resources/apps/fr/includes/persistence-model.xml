@@ -102,7 +102,7 @@
     <xforms:submission id="get-template-submission"
             method="get" serialization="none"
             action="/fr/service/template/{instance('parameters-instance')/app}/{instance('parameters-instance')/form}"
-            replace="instance" xxforms:instance="form-instance">
+            replace="instance" xxforms:instance="fr-form-instance">
         <xforms:message ev:event="xforms-submit-error" level="xxforms:log-error"><xforms:output value="event('error-type')"/></xforms:message>
     </xforms:submission>
 
@@ -110,7 +110,7 @@
     <xforms:submission id="get-document-submission"
             method="get" serialization="none"
             action="/fr/service/crud/exist/{instance('parameters-instance')/app}/{instance('parameters-instance')/form}/{instance('parameters-instance')/document}"
-            replace="instance" xxforms:instance="form-instance"/>
+            replace="instance" xxforms:instance="fr-form-instance"/>
 
     <!-- Create document -->
     <xforms:instance id="create-instance">
@@ -119,20 +119,18 @@
 
     <xforms:submission id="create-submission"
             validate="true"
-            method="put" ref="xxforms:instance('form-instance')"
+            method="put" ref="xxforms:instance('fr-form-instance')"
             action="/fr/service/crud/exist/{instance('parameters-instance')/app}/{instance('parameters-instance')/form}"
             replace="instance" instance="create-instance">
-        <xforms:setvalue ev:event="xforms-submit" ref="instance('fr-persistence-instance')/save-progress">started</xforms:setvalue>
         <xforms:setvalue ev:event="xforms-submit-done" ref="instance('parameters-instance')/document" value="instance('create-instance')"/>
     </xforms:submission>
 
     <!-- Update document -->
     <xforms:submission id="update-submission"
             validate="true"
-            method="put" ref="xxforms:instance('form-instance')"
+            method="put" ref="xxforms:instance('fr-form-instance')"
             action="/fr/service/crud/exist/{instance('parameters-instance')/app}/{instance('parameters-instance')/form}/{instance('parameters-instance')/document}"
             replace="none">
-        <xforms:setvalue ev:event="xforms-submit" ref="instance('fr-persistence-instance')/save-progress">started</xforms:setvalue>
     </xforms:submission>
 
     <!-- Delete document -->
@@ -142,7 +140,7 @@
             replace="none"/>
 
     <!-- Instance to track search results and paging -->
-    <xforms:instance id="search-instance">
+    <xforms:instance id="fr-search-instance">
         <search xmlns="">
             <app/>
             <form/>
@@ -154,6 +152,10 @@
             <!-- Sorting -->
             <sort-key/>
         </search>
+    </xforms:instance>
+
+    <xforms:instance id="fr-search-template">
+        <query xmlns="" path="" type=""/>
     </xforms:instance>
 
     <xforms:instance id="paging-instance">
@@ -172,7 +174,7 @@
         <dummy xmlns=""/>
     </xforms:instance>
 
-    <xforms:instance id="configuration-instance">
+    <xforms:instance id="fr-configuration-instance">
         <configuration xmlns=""/>
     </xforms:instance>
 
@@ -185,12 +187,21 @@
 
         <!-- Extract summary configuration information from the XHTML document -->
         <xforms:action ev:event="xforms-submit-done">
-            <!--<xforms:insert context="instance('search-instance')" nodeset="query"-->
+            <!--<xforms:insert context="instance('fr-search-instance')" nodeset="query"-->
                 <!--origin="instance('source-form-instance')/search"/>-->
 
             <!-- Extract fields which must appear in the summary -->
-            <xforms:insert context="instance('configuration-instance')" nodeset="*"
+            <xforms:insert context="instance('fr-configuration-instance')" nodeset="*"
                 origin="instance('source-form-instance')/xhtml:body//xforms:*[@class and tokenize(@class, ' ') = ('fr-summary', 'fr-search')]"/>
+
+            <!-- Create elements holding structured search data -->
+            <xforms:action xxforms:iterate="instance('source-form-instance')/xhtml:body//xforms:*[@class and tokenize(@class, ' ') = ('fr-search')]">
+                <xforms:insert context="instance('fr-search-instance')" nodeset="query" origin="instance('fr-search-template')"/>
+                <xforms:action context="for $current in . return instance('source-form-instance')/xhtml:head/xforms:model//xforms:bind[@id = $current/@bind]">
+                    <xforms:setvalue ref="instance('fr-search-instance')/query[last()]/@path" value="string-join(context()/ancestor-or-self::xforms:bind/@nodeset, '/')"/>
+                    <xforms:setvalue ref="instance('fr-search-instance')/query[last()]/@type" value="if (context()/@type) then context()/@type else 'xs:string'"/>
+                </xforms:action>
+            </xforms:action>
 
             <!-- xxx TODO extract other information -->
 
@@ -223,7 +234,7 @@
     </xforms:instance>
 
     <xforms:submission id="search-submission"
-            ref="instance('search-instance')"
+            ref="instance('fr-search-instance')"
             method="post"
             action="/fr/service/search/exist/{
                 instance('parameters-instance')/app}/{
@@ -238,39 +249,42 @@
             <data-status>clean</data-status>
             <!-- Success or error message to display -->
             <message/>
-            <!-- Whether the data has been validated -->
-            <save-progress/>
             <!-- Error document returned -->
             <error/>
         </save>
     </xforms:instance>
 
-    <!-- React to instance serialization when saving -->
-    <xforms:action ev:event="xforms-submit-serialize" if="instance('fr-persistence-instance')/save-progress != ''">
-        <xforms:setvalue ref="instance('fr-persistence-instance')/save-progress">validated</xforms:setvalue>
-    </xforms:action>
+    <xforms:instance id="fr-triggers-instance">
+        <triggers xmlns="">
+            <save/>
+            <discard/>
+        </triggers>
+    </xforms:instance>
+
+    <xforms:bind nodeset="instance('fr-triggers-instance')">
+        <xforms:bind nodeset="save" readonly="instance('fr-persistence-instance')/data-status = 'clean'"/>
+        <!--<xforms:bind nodeset="discard" readonly="xxx"/>-->
+    </xforms:bind>
 
     <!-- React to successful submission when saving -->
-    <xforms:action ev:event="xforms-submit-done" if="instance('fr-persistence-instance')/save-progress != ''">
+    <xforms:action ev:event="xforms-submit-done" if="event('target') = ('create-submission', 'update-submission')">
         <xforms:setvalue ref="instance('fr-persistence-instance')/message">Document saved.</xforms:setvalue><!-- TODO: i18n -->
         <xforms:setvalue ref="instance('fr-persistence-instance')/data-status">clean</xforms:setvalue>
         <xforms:toggle case="fr-message-success"/>
-        <xforms:setvalue ref="instance('fr-persistence-instance')/save-progress"/>
     </xforms:action>
 
     <!-- React to failed submission -->
-    <xforms:action ev:event="xforms-submit-error" if="instance('fr-persistence-instance')/save-progress != ''">
+    <xforms:action ev:event="xforms-submit-error" if="event('target') = ('create-submission', 'update-submission')">
         <xforms:setvalue ref="instance('fr-persistence-instance')/error" value="event('response-body')"/>
         <xforms:message level="xxforms:log-error"><xforms:output value="event('response-body')"/></xforms:message>
-        <xforms:action if="not(instance('fr-persistence-instance')/save-progress = 'validated')">
-            <xforms:setvalue ref="instance('fr-persistence-instance')/message">There are errors in your form.</xforms:setvalue><!-- TODO: i18n -->
+        <xforms:action if="event('error-type') = 'validation-error'">
+            <xforms:setvalue ref="instance('fr-persistence-instance')/message">Your document could not be saved because errors were found.</xforms:setvalue><!-- TODO: i18n -->
             <xforms:toggle case="fr-message-validation-error"/>
         </xforms:action>
-        <xforms:action if="instance('fr-persistence-instance')/save-progress = 'validated'">
+        <xforms:action if="event('error-type') != 'validation-error'">
             <xforms:setvalue ref="instance('fr-persistence-instance')/message">Unable to save document. Please contact your system administrator.</xforms:setvalue><!-- TODO: i18n -->
             <xforms:toggle case="fr-message-fatal-error"/>
         </xforms:action>
-        <xforms:setvalue ref="instance('fr-persistence-instance')/save-progress"/>
     </xforms:action>
 
 </xforms:model>

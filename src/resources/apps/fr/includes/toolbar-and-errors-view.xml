@@ -21,13 +21,14 @@
         xmlns:xi="http://www.w3.org/2001/XInclude"
         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
         xmlns:saxon="http://saxon.sf.net/">
-    <xhtml:tr>
-        <xhtml:td colspan="2">
-            <xforms:group model="fr-persistence-model" appearance="xxforms:internal">
+
+    <xforms:group model="fr-persistence-model" appearance="xxforms:internal">
+        <xhtml:tr>
+            <xhtml:td colspan="2">
                 <!-- Display clean/dirty status -->
                 <xforms:group ref="instance('fr-persistence-instance')[data-status = 'dirty']">
                     <!-- TODO: i18n or use icon instead -->
-                    <xhtml:p class="fr-unsaved-data">Your forms contains unsaved changes.</xhtml:p>
+                    <xhtml:p class="fr-unsaved-data">Your document contains unsaved changes.</xhtml:p>
                 </xforms:group>
                 <xforms:group ref="instance('fr-persistence-instance')[data-status = 'clean']"/>
                 <!-- Display messages -->
@@ -51,56 +52,63 @@
                         </xhtml:p>
                     </xforms:case>
                 </xforms:switch>
-            </xforms:group>
-        </xhtml:td>
-    </xhtml:tr>
-    <xhtml:tr>
-        <xhtml:td>
-            <xforms:group model="fr-persistence-model" ref=".[instance('fr-persistence-instance')/save-attempted = 'true']">
-                <xforms:group model="fr-error-summary-model" ref="instance('errors-instance')[error]">
-                    <!-- TODO: i18n -->
-                    <xhtml:span class="fr-error-title">Your form has the following issues:</xhtml:span>
-                    <xhtml:ol class="fr-error-list">
-                        <xforms:repeat nodeset="error" id="errors-repeat">
-                            <xhtml:li>
-                                <xhtml:i>
-                                    <xforms:output value="@label"/>
-                                    <xforms:group ref=".[string-length(@indexes) > 0]">
-                                        <xforms:output value="concat('(Row ', @indexes, ')')"/>
+            </xhtml:td>
+        </xhtml:tr>
+        <xhtml:tr>
+            <xhtml:td>
+                <xforms:group ref=".[instance('fr-persistence-instance')/save-attempted = 'true']">
+                    <xforms:group model="fr-error-summary-model" ref="instance('errors-instance')[error]">
+                        <!-- TODO: i18n -->
+                        <xhtml:span class="fr-error-title">Your document has the following issues:</xhtml:span>
+                        <xhtml:ol class="fr-error-list">
+                            <xforms:repeat nodeset="error" id="fr-errors-repeat">
+                                <xhtml:li>
+                                    <xforms:output value="@label" class="fr-error-label"/>
+                                    <xforms:group ref=".[string-length(@indexes) > 0]" class="fr-error-row">
+                                        <xforms:output value="concat('(row ', @indexes, ')')"/>
                                     </xforms:group>
-                                </xhtml:i>
-                                <xforms:group ref=".[normalize-space(@alert) != '']">
-                                    - <xforms:output value="@alert"/>
-                                </xforms:group>
-                            </xhtml:li>
-                        </xforms:repeat>
-                    </xhtml:ol>
+                                    <xforms:group ref=".[normalize-space(@alert) != '']" class="fr-error-alert">
+                                        - <xforms:output value="@alert"/>
+                                    </xforms:group>
+                                </xhtml:li>
+                            </xforms:repeat>
+                        </xhtml:ol>
+                    </xforms:group>
+                    <xforms:group model="fr-error-summary-model" ref="instance('errors-instance')[not(error)]">
+                        <!--<table class="orbeon-no-errors-table">-->
+                            <!--<tr>-->
+                                <!--<th colspan="3" class="no-error-title">Form valid</th>-->
+                            <!--</tr>-->
+                        <!--</table>-->
+                    </xforms:group>
                 </xforms:group>
-                <xforms:group model="fr-error-summary-model" ref="instance('errors-instance')[not(error)]">
-                    <!--<table class="orbeon-no-errors-table">-->
-                        <!--<tr>-->
-                            <!--<th colspan="3" class="no-error-title">Form valid</th>-->
-                        <!--</tr>-->
-                    <!--</table>-->
-                </xforms:group>
-            </xforms:group>
-        </xhtml:td>
-        <xhtml:td>
-            <xhtml:div class="fr-buttons">
-                <xforms:trigger>
-                    <xforms:label><xhtml:img src="/apps/fr/style/previous.gif" alt=""/> <xhtml:span>Discard</xhtml:span></xforms:label>
-                    <!-- TODO -->
-                    <!--<xforms:action ev:event="DOMActivate">-->
-                        <!--<xforms:dispatch target="fr-persistence-model" name="orbeon-save"/>-->
-                    <!--</xforms:action>-->
-                </xforms:trigger>
-                <xforms:trigger>
-                    <xforms:label><xhtml:img src="/apps/fr/style/run.gif" alt=""/> <xhtml:span>Save Form</xhtml:span></xforms:label>
-                    <xforms:action ev:event="DOMActivate">
-                        <xforms:dispatch target="fr-persistence-model" name="orbeon-save"/>
-                    </xforms:action>
-                </xforms:trigger>
-            </xhtml:div>
-        </xhtml:td>
-    </xhtml:tr>
+            </xhtml:td>
+            <xhtml:td>
+                <xhtml:div class="fr-buttons">
+                    <!-- Trigger shown to go back if the data is dirty -->
+                    <xforms:trigger ref="instance('fr-persistence-instance')[data-status = 'dirty']">
+                        <xforms:label><xhtml:img src="/apps/fr/style/previous.gif" alt=""/> <xhtml:span>Discard</xhtml:span></xforms:label>
+                        <!-- TODO -->
+                        <!--<xforms:action ev:event="DOMActivate">-->
+                            <!--<xforms:dispatch target="fr-persistence-model" name="orbeon-save"/>-->
+                        <!--</xforms:action>-->
+                    </xforms:trigger>
+                    <!-- Trigger shown to go back if the data is clean -->
+                    <xforms:trigger ref="instance('fr-persistence-instance')[data-status = 'clean']">
+                        <xforms:label><xhtml:img src="/apps/fr/style/previous.gif" alt=""/> <xhtml:span>Back</xhtml:span></xforms:label>
+                        <!-- TODO -->
+                        <!--<xforms:action ev:event="DOMActivate">-->
+                            <!--<xforms:dispatch target="fr-persistence-model" name="orbeon-save"/>-->
+                        <!--</xforms:action>-->
+                    </xforms:trigger>
+                    <xforms:trigger ref="instance('fr-triggers-instance')/save">
+                        <xforms:label><xhtml:img src="/apps/fr/style/run.gif" alt=""/> <xhtml:span>Save Form</xhtml:span></xforms:label>
+                        <xforms:action ev:event="DOMActivate">
+                            <xforms:dispatch target="fr-persistence-model" name="orbeon-save"/>
+                        </xforms:action>
+                    </xforms:trigger>
+                </xhtml:div>
+            </xhtml:td>
+        </xhtml:tr>
+    </xforms:group>
 </xhtml:table>

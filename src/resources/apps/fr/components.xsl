@@ -38,8 +38,10 @@
                 <xhtml:div id="yui-main">
                     <xhtml:div class="yui-b">
                         <xhtml:div class="yui-g fr-logo">
+                            <xsl:if test="xhtml:img">
+                                <xhtml:img src="{xhtml:img/@src}" alt="Logo"/>
+                            </xsl:if>
                             <xhtml:h1><xsl:value-of select="xforms:label"/></xhtml:h1>
-                            <!--<xhtml:img src="http://www.orbeon.com/orbeon-theme/images/orbeon-small-blueorange.gif" alt="Logo"/>-->
                         </xhtml:div>
                         <xhtml:div class="yui-g fr-separator">
                         </xhtml:div>
@@ -49,8 +51,8 @@
                                 <xforms:action ev:event="xforms-invalid" if="normalize-space(event('label')) != ''">
                                     <xforms:action if="not(xxforms:instance('errors-instance')/error[@id = event('target') and @indexes = string-join(event('repeat-indexes'), '-')])">
                                         <xforms:insert context="xxforms:instance('errors-instance')" nodeset="error" origin="xxforms:instance('error-template')"/>
-                                        <xforms:setvalue ref="xxforms:instance('errors-instance')/error[index('errors-repeat')]/@id" value="event('target')"/>
-                                        <xforms:setvalue ref="xxforms:instance('errors-instance')/error[index('errors-repeat')]/@indexes" value="string-join(event('repeat-indexes'), '-')"/>
+                                        <xforms:setvalue ref="xxforms:instance('errors-instance')/error[index('fr-errors-repeat')]/@id" value="event('target')"/>
+                                        <xforms:setvalue ref="xxforms:instance('errors-instance')/error[index('fr-errors-repeat')]/@indexes" value="string-join(event('repeat-indexes'), '-')"/>
                                     </xforms:action>
                                     <xforms:setvalue ref="xxforms:instance('errors-instance')/error[@id = event('target') and @indexes = string-join(event('repeat-indexes'), '-')]/@alert" value="event('alert')"/>
                                     <xforms:setvalue ref="xxforms:instance('errors-instance')/error[@id = event('target') and @indexes = string-join(event('repeat-indexes'), '-')]/@label" value="event('label')"/>
@@ -77,7 +79,7 @@
                         </xhtml:div>
                         <xhtml:div class="yui-g fr-separator">
                         </xhtml:div>
-                        <xhtml:div class="yui-g">
+                        <xhtml:div class="yui-g fr-buttons-block">
                             <xsl:choose>
                                 <xsl:when test="fr:buttons">
                                     <xsl:apply-templates select="fr:buttons/node()"/>
@@ -115,7 +117,7 @@
                         <xhtml:h2>
                             <xforms:trigger appearance="minimal">
                                 <xforms:label>
-                                    <xhtml:img src="../../../../apps/fr/style/plus.png" alt=""/>
+                                    <xhtml:img src="../../../../apps/fr/style/plus.png" alt="Open section" title="Open section"/>
                                     <xsl:apply-templates select="xforms:label"/>
                                 </xforms:label>
                                 <xforms:action ev:event="DOMActivate">
@@ -131,7 +133,7 @@
                         <xhtml:h2>
                             <xforms:trigger appearance="minimal">
                                 <xforms:label>
-                                    <xhtml:img src="../../../../apps/fr/style/minus.png" alt=""/>
+                                    <xhtml:img src="../../../../apps/fr/style/minus.png" alt="Close section" title="Close section"/>
                                     <xsl:apply-templates select="xforms:label"/>
                                 </xforms:label>
                                 <xforms:action ev:event="DOMActivate">
@@ -245,8 +247,8 @@
             <xsl:apply-templates select="@*|node()"/>
 
             <!-- Mark status as dirty if data changes -->
-            <xforms:setvalue ev:observer="form-instance" ev:event="xforms-insert" ref="xxforms:instance('fr-persistence-instance')/data-status">dirty</xforms:setvalue>
-            <xforms:setvalue ev:observer="form-instance" ev:event="xforms-delete" ref="xxforms:instance('fr-persistence-instance')/data-status">dirty</xforms:setvalue>
+            <xforms:setvalue ev:observer="fr-form-instance" ev:event="xforms-insert" ref="xxforms:instance('fr-persistence-instance')/data-status">dirty</xforms:setvalue>
+            <xforms:setvalue ev:observer="fr-form-instance" ev:event="xforms-delete" ref="xxforms:instance('fr-persistence-instance')/data-status">dirty</xforms:setvalue>
 
         </xsl:copy>
 

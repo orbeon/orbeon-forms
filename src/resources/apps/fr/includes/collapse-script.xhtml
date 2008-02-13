@@ -22,7 +22,7 @@
 
         var anim = new YAHOO.util.Anim(elementToAnimate, { height: { to: 0 } }, 0.2);
         anim.onComplete.subscribe(function() {
-//            elementToAnimate.style.display = "none";
+            elementToAnimate.style.display = "none";
             ORBEON.xforms.Document.dispatchEvent("fr-sections-model", "fr-after-collapse");
         });
         anim.animate();

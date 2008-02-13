@@ -108,6 +108,7 @@
     <body>
         <fr:view>
             <xforms:label>Orbeon Forms - Form Runner</xforms:label>
+            <xhtml:img src="http://www.orbeon.com/orbeon-theme/images/orbeon-small-blueorange.gif"/> 
             <fr:body>
                 <h2>
                     Summary for form:
@@ -140,13 +141,13 @@
                     </xforms:select1>
 
                     <!-- Free-text search -->
-                    <xforms:input model="fr-persistence-model" ref="instance('search-instance')/query" incremental="true" class="fr-search-input">
+                    <xforms:input model="fr-persistence-model" ref="instance('fr-search-instance')/query" incremental="true" class="fr-search-input">
                         <xforms:label model="resources-model" ref="instance('common-resources')/summary/labels/search"/>
                         <xforms:send ev:event="xforms-value-changed" submission="search-submission"/>
                     </xforms:input>
 
                     <!-- Structured search -->
-                    <xforms:repeat model="fr-persistence-model" nodeset="instance('configuration-instance')/xforms:*[tokenize(@class, ' ') = 'fr-search']" id="search-repeat">
+                    <xforms:repeat model="fr-persistence-model" nodeset="instance('fr-configuration-instance')/xforms:*[tokenize(@class, ' ') = 'fr-search']" id="search-repeat">
                         xxx
                         <!-- TODO:  -->
                         <xforms:input ref="@value">
@@ -182,7 +183,7 @@
                             <th><xforms:output model="resources-model" value="instance('common-resources')/summary/titles/row-number"/></th>
                             <th><xforms:output model="resources-model" value="instance('common-resources')/summary/titles/created"/></th>
                             <th><xforms:output model="resources-model" value="instance('common-resources')/summary/titles/last-modified"/></th>
-                            <xforms:repeat nodeset="instance('configuration-instance')/xforms:*[tokenize(@class, ' ') = 'fr-summary']">
+                            <xforms:repeat nodeset="instance('fr-configuration-instance')/xforms:*[tokenize(@class, ' ') = 'fr-summary']">
                                 <th>
                                     <!-- Iterate through specially marked controls and derive resource id then resource -->
                                     <xforms:output model="resources-model"
@@ -233,7 +234,7 @@
                     <xforms:trigger>
                         <xforms:label>Previous</xforms:label>
                         <xforms:action ev:event="DOMActivate">
-                            <xforms:setvalue ref="instance('search-instance')/page-number" value=". - 1"/>
+                            <xforms:setvalue ref="instance('fr-search-instance')/page-number" value=". - 1"/>
                             <xforms:send submission="search-submission"/>
                         </xforms:action>
                     </xforms:trigger>
@@ -241,7 +242,7 @@
                     <xforms:trigger>
                         <xforms:label>Next</xforms:label>
                         <xforms:action ev:event="DOMActivate">
-                            <xforms:setvalue ref="instance('search-instance')/page-number" value=". + 1"/>
+                            <xforms:setvalue ref="instance('fr-search-instance')/page-number" value=". + 1"/>
                             <xforms:send submission="search-submission"/>
                         </xforms:action>
                     </xforms:trigger>

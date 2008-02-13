@@ -29,7 +29,7 @@ body, body table, textarea.xforms-textarea {
     min-height: 1em;
 }
 
-.fr-body {
+.fr-body, .fr-buttons-block {
     padding: 1em
 }
 
@@ -63,12 +63,11 @@ h1 { margin-top: 0 }
 .fr-logo {
     background-image: url(logo-bg.gif);
     background-position: top;
-    height: 150px;
+    height: 75px;
 }
 
-.fr-logo img { padding: .5em 1em .5em 1em; float: right }
-
-.fr-logo h1 { padding-top: 2.3em; padding-left: 1em }
+.fr-logo img { margin: .5em 1em .5em 1em; float: left }
+.fr-logo h1 { margin-right: 1em; margin-top: 1em; padding-bottom: 0; margin-bottom: 0; float: right }
 
 .fr-separator {
     background-color: #3598d4;
@@ -181,11 +180,6 @@ textarea {
     width: 23em;
 }
 
-.fr-error-buttons {
-    margin-top: 1em;
-    width: 100%;
-}
-
 .fr-buttons {
     text-align: right;
     padding-top: 1em;
@@ -196,29 +190,21 @@ textarea {
     width: 12em
 }
 
-.fr-error-title { color: #f90; font-size: 160%; }
-.fr-error-list li { margin-bottom: .5em; }
-
 .fr-repeat-table .xforms-label { margin-top: 0 }
 
-.fr-message-success { color: green  }
-.fr-message-validation-error { color: orange }
-.fr-message-fatal-error { color: red }
-.fr-unsaved-data { color: red }
-
 .fr-repeat-table {
-    background-color:#F5FAF7;
-    border:1px solid #D5E0D9;
+    background-color:#DDDDEE;
+    border:1px solid #3598D4;
     margin:0 0 1em;
     width: 100%;
 }
 .fr-repeat-table .fr-repeat-table {
-    background-color:#AECCBA;
-    border:1px solid #D5E0D9;
+    background-color:#DDDDEE;
+    border:1px solid #3598D4;
     margin:0 0 1em;
     width: 100%;
 }
-.fr-repeat-table td { vertical-align: top }
+.fr-repeat-table td { vertical-align: top; padding: 0.2em }
 
 .fr-tabular, .fr-tabular tr td, .fr-tabular tr th {
     border-color: #600;
@@ -256,8 +242,10 @@ textarea {
 /*.xforms-help-image { display: inline }*/
 
 td { border: 0 }
-h1 { font-size: 167% }
+h1 { font-size: 197% }
 i { font-style: italic }
+a { color: #3598D4 }
+
 /* Not sure why the YUI resets this to center */
 body { text-align: left }
 
@@ -267,8 +255,25 @@ body { text-align: left }
     font-size: smaller;
     font-style: italic;
     margin-left: .5em;
-    width: 22em
+    width: 22em;
+    color: gray
 }
 
 /* Do this for collapsible sections so that YUI animations work */
 div.fr-collapsible { overflow: hidden }
+
+/* Messages */
+.fr-message-success { color: green  }
+.fr-message-validation-error { color: orange }
+.fr-message-fatal-error { color: red }
+.fr-unsaved-data { color: red }
+
+/* Errors */
+.fr-error-buttons { width: 100% }
+.fr-error-buttons td { padding: 0.2em }
+.fr-error-title { color: #f90; font-size: 160%; }
+.fr-error-list li { margin-bottom: .5em; }
+.fr-error-list label { display: none }
+.fr-error-label { font-weight: bold }
+.fr-error-row { font-weight: bold }
+.fr-error-alert {}

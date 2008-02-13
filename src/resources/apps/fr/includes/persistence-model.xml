@@ -29,12 +29,12 @@
         <!-- Get configuration for the current form -->
         <xforms:send submission="get-configuration-submission"/>
         <!-- A document id is provided -->
-        <xforms:action if="instance('parameters-instance')/document != ''">
+        <xforms:action if="instance('fr-parameters-instance')/document != ''">
             <!-- Display document with that id -->
             <xforms:send submission="get-document-submission"/>
         </xforms:action>
         <!-- No document id is provided -->
-        <xforms:action if="instance('parameters-instance')/document = ''">
+        <xforms:action if="instance('fr-parameters-instance')/document = ''">
             <!-- Create new empty document -->
             <xforms:send submission="get-template-submission"/>
         </xforms:action>
@@ -52,11 +52,11 @@
     <!-- Respond to orbeon-save event -->
     <xforms:action ev:event="orbeon-save">
         <xforms:setvalue ref="instance('fr-persistence-instance')/save-attempted">true</xforms:setvalue>
-        <xforms:action if="instance('parameters-instance')/document != ''">
+        <xforms:action if="instance('fr-parameters-instance')/document != ''">
             <!-- Update -->
             <xforms:send submission="update-submission"/>
         </xforms:action>
-        <xforms:action if="instance('parameters-instance')/document = ''">
+        <xforms:action if="instance('fr-parameters-instance')/document = ''">
             <!-- Create -->
             <xforms:send submission="create-submission"/>
         </xforms:action>
@@ -64,12 +64,12 @@
 
     <xforms:action ev:event="orbeon-create">
         <xforms:recalculate/>
-        <xforms:load resource="/fr/{instance('parameters-instance')/app}/{instance('parameters-instance')/form}/new/"/>
+        <xforms:load resource="/fr/{instance('fr-parameters-instance')/app}/{instance('fr-parameters-instance')/form}/new/"/>
     </xforms:action>
 
     <xforms:action ev:event="orbeon-edit">
         <xforms:recalculate/>
-        <xforms:load resource="/fr/{instance('parameters-instance')/app}/{instance('parameters-instance')/form}/{instance('summary-instance')/document[index('documents-repeat')]/@name}/edit"/>
+        <xforms:load resource="/fr/{instance('fr-parameters-instance')/app}/{instance('fr-parameters-instance')/form}/{instance('fr-summary-instance')/document[index('documents-repeat')]/@name}/edit"/>
     </xforms:action>
 
     <xforms:action ev:event="orbeon-delete">
@@ -96,12 +96,12 @@
     </xforms:action>
 
     <!-- Parameters passed to this page -->
-    <xforms:instance id="parameters-instance" src="input:instance"/>
+    <xforms:instance id="fr-parameters-instance" src="input:instance"/>
 
     <!-- Get document template -->
     <xforms:submission id="get-template-submission"
             method="get" serialization="none"
-            action="/fr/service/template/{instance('parameters-instance')/app}/{instance('parameters-instance')/form}"
+            action="/fr/service/template/{instance('fr-parameters-instance')/app}/{instance('fr-parameters-instance')/form}"
             replace="instance" xxforms:instance="fr-form-instance">
         <xforms:message ev:event="xforms-submit-error" level="xxforms:log-error"><xforms:output value="event('error-type')"/></xforms:message>
     </xforms:submission>
@@ -109,34 +109,34 @@
     <!-- Get document -->
     <xforms:submission id="get-document-submission"
             method="get" serialization="none"
-            action="/fr/service/crud/exist/{instance('parameters-instance')/app}/{instance('parameters-instance')/form}/{instance('parameters-instance')/document}"
+            action="/fr/service/crud/exist/{instance('fr-parameters-instance')/app}/{instance('fr-parameters-instance')/form}/{instance('fr-parameters-instance')/document}"
             replace="instance" xxforms:instance="fr-form-instance"/>
 
     <!-- Create document -->
-    <xforms:instance id="create-instance">
+    <xforms:instance id="fr-create-instance">
         <dummy xmlns=""/>
     </xforms:instance>
 
     <xforms:submission id="create-submission"
             validate="true"
             method="put" ref="xxforms:instance('fr-form-instance')"
-            action="/fr/service/crud/exist/{instance('parameters-instance')/app}/{instance('parameters-instance')/form}"
-            replace="instance" instance="create-instance">
-        <xforms:setvalue ev:event="xforms-submit-done" ref="instance('parameters-instance')/document" value="instance('create-instance')"/>
+            action="/fr/service/crud/exist/{instance('fr-parameters-instance')/app}/{instance('fr-parameters-instance')/form}"
+            replace="instance" instance="fr-create-instance">
+        <xforms:setvalue ev:event="xforms-submit-done" ref="instance('fr-parameters-instance')/document" value="instance('fr-create-instance')"/>
     </xforms:submission>
 
     <!-- Update document -->
     <xforms:submission id="update-submission"
             validate="true"
             method="put" ref="xxforms:instance('fr-form-instance')"
-            action="/fr/service/crud/exist/{instance('parameters-instance')/app}/{instance('parameters-instance')/form}/{instance('parameters-instance')/document}"
+            action="/fr/service/crud/exist/{instance('fr-parameters-instance')/app}/{instance('fr-parameters-instance')/form}/{instance('fr-parameters-instance')/document}"
             replace="none">
     </xforms:submission>
 
     <!-- Delete document -->
     <xforms:submission id="delete-document-submission"
             method="delete" serialization="none"
-            action="/fr/service/crud/exist/{instance('parameters-instance')/app}/{instance('parameters-instance')/form}/{instance('summary-instance')/document[index('documents-repeat')]/@name}"
+            action="/fr/service/crud/exist/{instance('fr-parameters-instance')/app}/{instance('fr-parameters-instance')/form}/{instance('fr-summary-instance')/document[index('documents-repeat')]/@name}"
             replace="none"/>
 
     <!-- Instance to track search results and paging -->
@@ -155,10 +155,10 @@
     </xforms:instance>
 
     <xforms:instance id="fr-search-template">
-        <query xmlns="" path="" type=""/>
+        <query xmlns="" name="" path="" type="" control=""/>
     </xforms:instance>
 
-    <xforms:instance id="paging-instance">
+    <xforms:instance id="fr-paging-instance">
         <search xmlns="">
             <total>0</total>
             <from>0</from>
@@ -166,11 +166,11 @@
         </search>
     </xforms:instance>
 
-    <xforms:instance id="source-form-instance">
+    <xforms:instance id="fr-source-form-instance">
         <dummy xmlns=""/>
     </xforms:instance>
 
-    <xforms:instance id="summary-headers-instance">
+    <xforms:instance id="fr-summary-headers-instance">
         <dummy xmlns=""/>
     </xforms:instance>
 
@@ -181,23 +181,28 @@
     <xforms:submission id="get-configuration-submission"
             method="get" serialization="none"
             action="/fr/service/configuration/{
-                instance('parameters-instance')/app}/{
-                instance('parameters-instance')/form}"
-            replace="instance" instance="source-form-instance" xxforms:readonly="true">
+                instance('fr-parameters-instance')/app}/{
+                instance('fr-parameters-instance')/form}"
+            replace="instance" instance="fr-source-form-instance" xxforms:readonly="true">
 
         <!-- Extract summary configuration information from the XHTML document -->
         <xforms:action ev:event="xforms-submit-done">
             <!--<xforms:insert context="instance('fr-search-instance')" nodeset="query"-->
-                <!--origin="instance('source-form-instance')/search"/>-->
+                <!--origin="instance('fr-source-form-instance')/search"/>-->
 
             <!-- Extract fields which must appear in the summary -->
             <xforms:insert context="instance('fr-configuration-instance')" nodeset="*"
-                origin="instance('source-form-instance')/xhtml:body//xforms:*[@class and tokenize(@class, ' ') = ('fr-summary', 'fr-search')]"/>
+                origin="instance('fr-source-form-instance')/xhtml:body//xforms:*[@class and tokenize(@class, ' ') = ('fr-summary', 'fr-search')]"/>
 
             <!-- Create elements holding structured search data -->
-            <xforms:action xxforms:iterate="instance('source-form-instance')/xhtml:body//xforms:*[@class and tokenize(@class, ' ') = ('fr-search')]">
+            <xforms:action xxforms:iterate="instance('fr-source-form-instance')/xhtml:body//xforms:*[@class and tokenize(@class, ' ') = ('fr-search')]">
+                <!-- Insert empty template -->
                 <xforms:insert context="instance('fr-search-instance')" nodeset="query" origin="instance('fr-search-template')"/>
-                <xforms:action context="for $current in . return instance('source-form-instance')/xhtml:head/xforms:model//xforms:bind[@id = $current/@bind]">
+                <!-- Add control information to template -->
+                <xforms:setvalue ref="instance('fr-search-instance')/query[last()]/@control" value="context()/local-name()"/>
+                <!-- Add meta-information to template -->
+                <xforms:action context="instance('fr-source-form-instance')/xhtml:head/xforms:model//xforms:bind[@id = context()/@bind]">
+                    <xforms:setvalue ref="instance('fr-search-instance')/query[last()]/@name" value="substring-before(context()/@id, '-bind')"/>
                     <xforms:setvalue ref="instance('fr-search-instance')/query[last()]/@path" value="string-join(context()/ancestor-or-self::xforms:bind/@nodeset, '/')"/>
                     <xforms:setvalue ref="instance('fr-search-instance')/query[last()]/@type" value="if (context()/@type) then context()/@type else 'xs:string'"/>
                 </xforms:action>
@@ -209,15 +214,15 @@
     </xforms:submission>
 
     <!-- Calculations for page navigation -->
-    <xforms:bind nodeset="instance('paging-instance')">
-        <xforms:bind nodeset="total" calculate="(instance('summary-instance')/@total, 0)[1]"/>
+    <xforms:bind nodeset="instance('fr-paging-instance')">
+        <xforms:bind nodeset="total" calculate="(instance('fr-summary-instance')/@total, 0)[1]"/>
         <xforms:bind nodeset="page" calculate="if ((. - 1) * ../page-size + 1 gt number(../total)) then 1 else ."/>
         <xforms:bind nodeset="from" calculate="if (../total = 0) then 0 else (../page-number - 1)*../page-size + 1"/>
         <xforms:bind nodeset="to" calculate="min((../page-number *../page-size, ../total))"/>
     </xforms:bind>
 
     <!-- Summary data -->
-    <xforms:instance id="summary-instance">
+    <xforms:instance id="fr-summary-instance">
         <documents xmlns="" total="0">
             <!--<headers>-->
                 <!--<header/>-->
@@ -237,9 +242,9 @@
             ref="instance('fr-search-instance')"
             method="post"
             action="/fr/service/search/exist/{
-                instance('parameters-instance')/app}/{
-                instance('parameters-instance')/form}"
-            replace="instance" instance="summary-instance"/>
+                instance('fr-parameters-instance')/app}/{
+                instance('fr-parameters-instance')/form}"
+            replace="instance" instance="fr-summary-instance"/>
 
     <xforms:instance id="fr-persistence-instance">
         <save xmlns="">

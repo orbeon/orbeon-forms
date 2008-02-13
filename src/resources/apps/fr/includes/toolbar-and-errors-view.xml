@@ -57,7 +57,7 @@
         <xhtml:tr>
             <xhtml:td>
                 <xforms:group ref=".[instance('fr-persistence-instance')/save-attempted = 'true']">
-                    <xforms:group model="fr-error-summary-model" ref="instance('errors-instance')[error]">
+                    <xforms:group model="fr-error-summary-model" ref="instance('fr-errors-instance')[error]">
                         <!-- TODO: i18n -->
                         <xhtml:span class="fr-error-title">Your document has the following issues:</xhtml:span>
                         <xhtml:ol class="fr-error-list">
@@ -74,7 +74,7 @@
                             </xforms:repeat>
                         </xhtml:ol>
                     </xforms:group>
-                    <xforms:group model="fr-error-summary-model" ref="instance('errors-instance')[not(error)]">
+                    <xforms:group model="fr-error-summary-model" ref="instance('fr-errors-instance')[not(error)]">
                         <!--<table class="orbeon-no-errors-table">-->
                             <!--<tr>-->
                                 <!--<th colspan="3" class="no-error-title">Form valid</th>-->

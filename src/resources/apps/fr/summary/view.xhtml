@@ -31,14 +31,14 @@
         <xhtml:link rel="stylesheet" href="/ops/css/yui/base-min.css" type="text/css"/>
         <xhtml:link rel="stylesheet" href="/apps/fr/style/form-runner.css" type="text/css"/>
         <!-- Main XForms model -->
-        <xforms:model id="common-model">
+        <xforms:model id="fr-summary-page-model">
 
             <xforms:action ev:event="xforms-ready">
                 <!-- Query list of documents -->
                 <xforms:send submission="search-submission"/>
             </xforms:action>
 
-            <xforms:bind nodeset="instance('summary-instance')">
+            <xforms:bind nodeset="instance('fr-summary-instance')">
                 <xforms:bind nodeset="documents/document/document-date" type="xs:dateTime"/>
             </xforms:bind>
 
@@ -53,54 +53,54 @@
             </xforms:instance>
 
             <xforms:bind nodeset="instance('control-instance')">
-                <xforms:bind nodeset="non-empty" relevant="count(instance('summary-instance')/documents/document) > 0"/>
-                <xforms:bind nodeset="empty" relevant="count(instance('summary-instance')/documents/document) = 0"/>
+                <xforms:bind nodeset="non-empty" relevant="count(instance('fr-summary-instance')/documents/document) > 0"/>
+                <xforms:bind nodeset="empty" relevant="count(instance('fr-summary-instance')/documents/document) = 0"/>
 
-                <xforms:bind nodeset="non-empty-triggers" readonly="not(count(instance('summary-instance')/documents/document) > 0)"/>
-                <xforms:bind nodeset="empty-triggers" readonly="not(count(instance('summary-instance')/documents/document) = 0)"/>
+                <xforms:bind nodeset="non-empty-triggers" readonly="not(count(instance('fr-summary-instance')/documents/document) > 0)"/>
+                <xforms:bind nodeset="empty-triggers" readonly="not(count(instance('fr-summary-instance')/documents/document) = 0)"/>
             </xforms:bind>
 
         </xforms:model>
         <!-- Model to handle resources -->
-        <xforms:model id="resources-model">
+        <xforms:model id="fr-resources-model">
 
             <xforms:action ev:event="xforms-ready">
-                <xforms:send submission="update-form-resources-submission"/>
+                <xforms:send submission="update-fr-form-resources-submission"/>
             </xforms:action>
 
             <!-- XForms instance containing the current language -->
-            <xforms:instance id="language-instance">
+            <xforms:instance id="fr-language-instance">
                 <language xmlns="">en</language>
             </xforms:instance>
 
             <!-- XForms instance containing generic resources -->
-            <xforms:instance id="common-resources"
+            <xforms:instance id="fr-common-resources"
                              src="oxf:/apps/fr/resources_en.xml"
                              xxforms:readonly="true"/>
 
             <!-- XForms instance containing text resources -->
-            <xforms:instance id="form-resources">
+            <xforms:instance id="fr-form-resources">
                 <resources xmlns=""/>
             </xforms:instance>
 
             <!-- Submissions to update the language -->
-            <xforms:submission id="update-common-resources-submission" serialization="none"
-                               action="oxf:/apps/fr/resources_{instance('language-instance')}.xml"
-                               method="get" replace="instance" instance="common-resources"
+            <xforms:submission id="update-fr-common-resources-submission" serialization="none"
+                               action="oxf:/apps/fr/resources_{instance('fr-language-instance')}.xml"
+                               method="get" replace="instance" instance="fr-common-resources"
                                xxforms:readonly="true"/>
 
 
-            <xforms:submission id="update-form-resources-submission" serialization="none"
+            <xforms:submission id="update-fr-form-resources-submission" serialization="none"
                                action="/fr/service/resources/{
-                                    xxforms:instance('parameters-instance')/app}/{
-                                    xxforms:instance('parameters-instance')/form}/{instance('language-instance')}"
-                               method="get" replace="instance" instance="form-resources"
+                                    xxforms:instance('fr-parameters-instance')/app}/{
+                                    xxforms:instance('fr-parameters-instance')/form}/{instance('fr-language-instance')}"
+                               method="get" replace="instance" instance="fr-form-resources"
                                xxforms:readonly="true"/>
 
             <!-- Respond to orbeon-update-language event -->
             <xforms:action ev:event="orbeon-update-language">
-                <xforms:send submission="update-common-resources-submission"/>
-                <xforms:send submission="update-form-resources-submission"/>
+                <xforms:send submission="update-fr-common-resources-submission"/>
+                <xforms:send submission="update-fr-form-resources-submission"/>
             </xforms:action>
 
         </xforms:model>
@@ -112,12 +112,12 @@
             <fr:body>
                 <h2>
                     Summary for form:
-                    <xforms:output model="fr-persistence-model" value="instance('source-form-instance')/xhtml:head/xhtml:title"/>
+                    <xforms:output model="fr-persistence-model" value="instance('fr-source-form-instance')/xhtml:head/xhtml:title"/>
                 </h2>
                 <p>
                     <!-- Select form -->
-                    <xforms:select1 ref="instance('parameters-instance')/form" appearance="full">
-                        <xforms:label model="resources-model" ref="instance('common-resources')/summary/labels/form-choice"/>
+                    <xforms:select1 ref="instance('fr-parameters-instance')/form" appearance="full">
+                        <xforms:label model="fr-resources-model" ref="instance('fr-common-resources')/summary/labels/form-choice"/>
                         <!-- TODO: get list of forms through service -->
                         <xforms:item>
                             <xforms:label>DMV-14</xforms:label>
@@ -130,11 +130,11 @@
                         <xforms:action ev:event="xforms-value-changed">
                             <!-- Set summary query -->
                             <xforms:insert nodeset="xxforms:instance('list-documents-query')"
-                                           origin="doc(concat('oxf:/apps/forms/forms/', instance('parameters-instance')/form-id, '/summary-query.xml'))"/>
+                                           origin="doc(concat('oxf:/apps/forms/forms/', instance('fr-parameters-instance')/form-id, '/summary-query.xml'))"/>
                             <!-- Query list of documents -->
                             <xforms:send submission="search-submission"/>
                             <!-- Get up to date resources for this form -->
-                            <xforms:dispatch name="orbeon-update-language" target="resources-model"/>
+                            <xforms:dispatch name="orbeon-update-language" target="fr-resources-model"/>
                             <!-- Reset index -->
                             <xforms:setindex repeat="documents-repeat" index="1"/>
                         </xforms:action>
@@ -142,17 +142,16 @@
 
                     <!-- Free-text search -->
                     <xforms:input model="fr-persistence-model" ref="instance('fr-search-instance')/query" incremental="true" class="fr-search-input">
-                        <xforms:label model="resources-model" ref="instance('common-resources')/summary/labels/search"/>
+                        <xforms:label model="fr-resources-model" ref="instance('fr-common-resources')/summary/labels/search"/>
                         <xforms:send ev:event="xforms-value-changed" submission="search-submission"/>
                     </xforms:input>
 
                     <!-- Structured search -->
-                    <xforms:repeat model="fr-persistence-model" nodeset="instance('fr-configuration-instance')/xforms:*[tokenize(@class, ' ') = 'fr-search']" id="search-repeat">
-                        xxx
+                    <xforms:repeat model="fr-persistence-model" nodeset="instance('fr-search-instance')/query[@path]" id="search-repeat">
                         <!-- TODO:  -->
-                        <xforms:input ref="@value">
+                        <xforms:input ref=".[@type = 'xs:string']">
                             <xforms:label>
-                                <xforms:output model="resources-model" value="for $header in xxforms:repeat-current()/@header return instance('form-resources')/summary/titles/*[local-name() = $header]"/>
+                                <xforms:output model="fr-resources-model" value="for $header in context()/@name return instance('fr-form-resources')/summary/titles/*[local-name() = $header]"/>
                             </xforms:label>
                         </xforms:input>
                         <xforms:send ev:event="xforms-value-changed" submission="search-submission"/>
@@ -160,8 +159,8 @@
 
                     <!-- Switch languages -->
                     <!-- TODO: get list of languages through service -->
-                    <xforms:select1 model="resources-model" ref="instance('language-instance')">
-                        <xforms:label ref="instance('common-resources')/summary/labels/language-choice"/>
+                    <xforms:select1 model="fr-resources-model" ref="instance('fr-language-instance')">
+                        <xforms:label ref="instance('fr-common-resources')/summary/labels/language-choice"/>
                         <xforms:item>
                             <xforms:label>en</xforms:label>
                             <xforms:value>en</xforms:value>
@@ -170,25 +169,25 @@
                             <xforms:label>fr</xforms:label>
                             <xforms:value>fr</xforms:value>
                         </xforms:item>
-                        <xforms:dispatch ev:event="xforms-value-changed" name="orbeon-update-language" target="resources-model"/>
+                        <xforms:dispatch ev:event="xforms-value-changed" name="orbeon-update-language" target="fr-resources-model"/>
                     </xforms:select1>
                 </p>
 
-                <xforms:group model="fr-persistence-model" ref="instance('summary-instance')[document]">
+                <xforms:group model="fr-persistence-model" ref="instance('fr-summary-instance')[document]">
                     <p>
-                        <xforms:output model="resources-model" mediatype="text/html" value="saxon:serialize(instance('common-resources')/summary/messages/intro/node(), 'html')"/>
+                        <xforms:output model="fr-resources-model" mediatype="text/html" value="saxon:serialize(instance('fr-common-resources')/summary/messages/intro/node(), 'html')"/>
                     </p>
                     <table class="fr-tabular fr-summary-table">
                         <tr>
-                            <th><xforms:output model="resources-model" value="instance('common-resources')/summary/titles/row-number"/></th>
-                            <th><xforms:output model="resources-model" value="instance('common-resources')/summary/titles/created"/></th>
-                            <th><xforms:output model="resources-model" value="instance('common-resources')/summary/titles/last-modified"/></th>
+                            <th><xforms:output model="fr-resources-model" value="instance('fr-common-resources')/summary/titles/row-number"/></th>
+                            <th><xforms:output model="fr-resources-model" value="instance('fr-common-resources')/summary/titles/created"/></th>
+                            <th><xforms:output model="fr-resources-model" value="instance('fr-common-resources')/summary/titles/last-modified"/></th>
                             <xforms:repeat nodeset="instance('fr-configuration-instance')/xforms:*[tokenize(@class, ' ') = 'fr-summary']">
                                 <th>
                                     <!-- Iterate through specially marked controls and derive resource id then resource -->
-                                    <xforms:output model="resources-model"
+                                    <xforms:output model="fr-resources-model"
                                                    value="for $id in substring-before(xxforms:context()/@id, '-control')
-                                                          return for $resource in (instance('form-resources')/summary/titles/*[local-name() = $id], '')
+                                                          return for $resource in (instance('fr-form-resources')/summary/titles/*[local-name() = $id], '')
                                                                  return if ($resource != '') then $resource else concat('[', $id, ']')"/>
                                 </th>
                             </xforms:repeat>
@@ -200,19 +199,19 @@
                                 </td>
                                 <td>
                                     <xforms:group ref="@created">
-                                        <xforms:output value="if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), xxforms:instance('common-resources')/summary/formats/save-datetime, xxforms:instance('language-instance'), (), ()) else ."/>
+                                        <xforms:output value="if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), xxforms:instance('fr-common-resources')/summary/formats/save-datetime, xxforms:instance('fr-language-instance'), (), ()) else ."/>
                                     </xforms:group>
                                 </td>
                                 <td>
                                     <xforms:group ref="@last-modified">
-                                        <xforms:output value="if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), xxforms:instance('common-resources')/summary/formats/save-datetime, xxforms:instance('language-instance'), (), ()) else ."/>
+                                        <xforms:output value="if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), xxforms:instance('fr-common-resources')/summary/formats/save-datetime, xxforms:instance('fr-language-instance'), (), ()) else ."/>
                                     </xforms:group>
                                 </td>
                                 <xforms:repeat nodeset="details/detail">
-                                <!--<xforms:repeat nodeset="instance('source-form-instance')/xforms:*">-->
+                                <!--<xforms:repeat nodeset="instance('fr-source-form-instance')/xforms:*">-->
                                     <td>
                                         <xforms:group ref=".">
-                                            <xforms:output value="if (. castable as xs:date) then format-date(xs:date(.), xxforms:instance('common-resources')/summary/formats/date, xxforms:instance('language-instance'), (), ()) else ."/>
+                                            <xforms:output value="if (. castable as xs:date) then format-date(xs:date(.), xxforms:instance('fr-common-resources')/summary/formats/date, xxforms:instance('fr-language-instance'), (), ()) else ."/>
                                         </xforms:group>
                                     </td>
                                 </xforms:repeat>
@@ -222,13 +221,13 @@
                     </table>
 
                     <p>
-                        <xforms:output model="resources-model" value="instance('common-resources')/summary/titles/selected"/>:
+                        <xforms:output model="fr-resources-model" value="instance('fr-common-resources')/summary/titles/selected"/>:
                         <xforms:output value="index('documents-repeat')"/>
-                        <xforms:output model="resources-model" value="instance('common-resources')/summary/titles/of"/>
-                        <xforms:output value="count(instance('summary-instance')/document)"/>
+                        <xforms:output model="fr-resources-model" value="instance('fr-common-resources')/summary/titles/of"/>
+                        <xforms:output value="count(instance('fr-summary-instance')/document)"/>
                         <!-- TODO: i18n -->
                         (total
-                        <xforms:output value="instance('summary-instance')/@total"/>)
+                        <xforms:output value="instance('fr-summary-instance')/@total"/>)
                     </p>
 
                     <xforms:trigger>
@@ -250,8 +249,8 @@
                 </xforms:group>
 
                 <!-- Display this when no form is found -->
-                <xforms:group model="fr-persistence-model" ref="instance('summary-instance')[not(document)]">
-                    <xforms:output model="resources-model" mediatype="text/html" value="saxon:serialize(instance('common-resources')/summary/messages/no-form-found/node(), 'html')"/>
+                <xforms:group model="fr-persistence-model" ref="instance('fr-summary-instance')[not(document)]">
+                    <xforms:output model="fr-resources-model" mediatype="text/html" value="saxon:serialize(instance('fr-common-resources')/summary/messages/no-form-found/node(), 'html')"/>
                 </xforms:group>
 
                 <widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>
@@ -265,21 +264,21 @@
                                 <xforms:trigger>
                                     <xforms:label>
                                         <xhtml:img src="/apps/fr/style/add.gif" alt="Create"/>
-                                        <xhtml:span><xforms:output model="resources-model" ref="instance('common-resources')/summary/labels/new-form"/></xhtml:span>
+                                        <xhtml:span><xforms:output model="fr-resources-model" ref="instance('fr-common-resources')/summary/labels/new-form"/></xhtml:span>
                                     </xforms:label>
                                     <xforms:dispatch ev:event="DOMActivate" target="fr-persistence-model" name="orbeon-create"/>
                                 </xforms:trigger>
                                 <xforms:trigger>
                                     <xforms:label>
                                         <xhtml:img src="/apps/fr/style/run.gif" alt="Edit"/>
-                                        <xhtml:span><xforms:output model="resources-model" ref="instance('common-resources')/summary/labels/edit-form"/></xhtml:span>
+                                        <xhtml:span><xforms:output model="fr-resources-model" ref="instance('fr-common-resources')/summary/labels/edit-form"/></xhtml:span>
                                     </xforms:label>
                                     <xforms:dispatch ev:event="DOMActivate" target="fr-persistence-model" name="orbeon-edit"/>
                                 </xforms:trigger>
                                 <xforms:trigger>
                                     <xforms:label>
                                         <xhtml:img src="/apps/fr/style/delete.gif" alt="Delete"/>
-                                        <xhtml:span><xforms:output model="resources-model" ref="instance('common-resources')/summary/labels/delete-form"/></xhtml:span>
+                                        <xhtml:span><xforms:output model="fr-resources-model" ref="instance('fr-common-resources')/summary/labels/delete-form"/></xhtml:span>
                                     </xforms:label>
                                     <xforms:dispatch ev:event="DOMActivate" target="fr-persistence-model" name="orbeon-delete"/>
                                 </xforms:trigger>
@@ -288,21 +287,21 @@
                                 <xforms:trigger>
                                     <xforms:label>
                                         <xhtml:img src="/apps/fr/style/lockedstate.gif" alt="View"/>
-                                        <xforms:output model="resources-model" ref="instance('common-resources')/summary/labels/view-readonly"/>
+                                        <xforms:output model="fr-resources-model" ref="instance('fr-common-resources')/summary/labels/view-readonly"/>
                                     </xforms:label>
                                     <xforms:dispatch ev:event="DOMActivate" target="fr-persistence-model" name="orbeon-view"/>
                                 </xforms:trigger>
                                 <xforms:trigger>
                                     <xforms:label>
                                         <xhtml:img src="/apps/fr/style/view-xml.gif" alt="XML"/>
-                                        <xforms:output model="resources-model" ref="instance('common-resources')/summary/labels/view-xml"/>
+                                        <xforms:output model="fr-resources-model" ref="instance('fr-common-resources')/summary/labels/view-xml"/>
                                     </xforms:label>
                                     <xforms:dispatch ev:event="DOMActivate" target="fr-persistence-model" name="orbeon-xml"/>
                                 </xforms:trigger>
                                 <xforms:trigger>
                                     <xforms:label>
                                         <xhtml:img src="/apps/fr/style/pdf.png" alt="PDF"/>
-                                        <xforms:output model="resources-model" ref="instance('common-resources')/summary/labels/view-pdf"/>
+                                        <xforms:output model="fr-resources-model" ref="instance('fr-common-resources')/summary/labels/view-pdf"/>
                                     </xforms:label>
                                     <xforms:dispatch ev:event="DOMActivate" target="fr-persistence-model" name="orbeon-pdf"/>
                                 </xforms:trigger>
@@ -326,7 +325,7 @@
                         <!--<xforms:trigger appearance="minimal" ref=".">-->
                             <!--<xforms:label>-->
                                 <!--<xhtml:img src="../apps/forms/images/add-all.gif" alt="Import Forms"/>-->
-                                <!--<xforms:output model="resources-model" ref="instance('common-resources')/summary/labels/import-forms"/>-->
+                                <!--<xforms:output model="fr-resources-model" ref="instance('fr-common-resources')/summary/labels/import-forms"/>-->
                             <!--</xforms:label>-->
                         <!--</xforms:trigger>-->
                     <!--</xforms:group>-->

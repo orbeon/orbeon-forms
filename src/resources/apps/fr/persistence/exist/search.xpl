@@ -38,7 +38,7 @@
                                             }/{/*/form
                                             }/?page-size={/*/page-size
                                             }&amp;page-number={/*/page-number
-                                            }&amp;query={/*/query
+                                            }&amp;query={/*/query[1]
                                             }&amp;sort-key={/*/sort-key}" replace="instance">
                 <!-- Move resulting <document> element as root element -->
                 <xforms:insert ev:event="xforms-submit-done" nodeset="/*" origin="/*/*[1]"/>

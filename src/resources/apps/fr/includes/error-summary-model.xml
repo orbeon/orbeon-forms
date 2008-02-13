@@ -28,12 +28,12 @@
         xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
 
     <!-- XForms instance for error information -->
-    <xforms:instance id="errors-instance" xxforms:validation="skip">
+    <xforms:instance id="fr-errors-instance" xxforms:validation="skip">
         <errors xmlns=""/>
     </xforms:instance>
 
     <!-- Template for error information -->
-    <xforms:instance id="error-template" xxforms:validation="skip" xxforms:readonly="true">
+    <xforms:instance id="fr-error-template" xxforms:validation="skip" xxforms:readonly="true">
         <error xmlns="" id="" indexes="" label="" alert=""/>
     </xforms:instance>
 

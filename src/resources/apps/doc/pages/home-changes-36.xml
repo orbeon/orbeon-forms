@@ -65,6 +65,15 @@
                     </li>
                     <li>
                         <p>
+                            <b>Support for the <code>exforms:iterate</code> attribute and the XForms 1.1
+                            <code>context()</code> function.</b> In particular, these additions make it much easier to
+                            iterate over nodes within actions. See the <a
+                            href="reference-xforms-2#exforms-iterate">Iteration of XForms Actions over Nodesets</a> for
+                            a complete example.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
                             <b>Support for temporary files in the file serializer.</b> The file serializer can now
                             automatically create temporary files and write to those temporary files. It will also delete
                             temporary files, based on a "scope" parameter you specify in the configuration. As with the

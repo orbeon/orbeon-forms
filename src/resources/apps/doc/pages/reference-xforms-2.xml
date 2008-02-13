@@ -218,7 +218,7 @@
             </section>
             <a name="xforms11-extensions"/>
             <section>
-                <title>XForms 1.1 Extensions</title>
+                <title>XForms 1.1 Support</title>
                 <a name="output-mediatype"/>
                 <section>
                     <title>Media Type for <code>xforms:output</code></title>
@@ -415,6 +415,76 @@
                         href="http://www.w3.org/TR/xforms11/#action-conditional">XForms 1.1 specification</a>.
                     </p>
                 </section>
+            </section>
+            <a name="exforms-iterate"/>
+            <section>
+                <title>Iteration of XForms Actions over Nodesets</title>
+                <p>
+                    Orbeon Forms supports the <code>exforms:iterate</code> attribute, also available as
+                    <code>xxforms:iterate</code> attribute, on XForms action elements. Consider the following
+                    instances:
+                </p>
+                <xml-source>
+                    <xforms:instance id="main-instance">
+                        <instance xmlns=""/>
+                    </xforms:instance>
+
+                    <xforms:instance id="template-instance" xxforms:readonly="true">
+                        <book xmlns="">
+                            <title/>
+                            <author/>
+                        </book>
+                    </xforms:instance>
+
+                    <xforms:instance id="source-instance" xxforms:readonly="true">
+                        <instance xmlns="">
+                            <title>Don Quixote de la Mancha</title>
+                            <author>Miguel de Cervantes Saavedra</author>
+                            <title>Jacques le fataliste et son maître</title>
+                            <author>Denis Diderot</author>
+                            <title>Childhood's End</title>
+                            <author>Arthur C. Clarke</author>
+                        </instance>
+                    </xforms:instance>
+                </xml-source>
+                <p>
+                    The following action iterates over the <code>&lt;title></code> elements of
+                    <code>source-instance</code>. For each of those, a new <code>&lt;book></code> element, copied from
+                    the template stored in <code>template-instance</code>, is inserted into <code>main-instance</code>.
+                    Then values from the <code>&lt;title></code> and <code>&lt;author></code> elements are copied over
+                    to the new structure. The XForms 1.1 <code>context()</code> function provides access to each of the
+                    iterated nodes:
+                </p>
+                <xml-source>
+                    <xforms:action ev:event="xforms-ready" xxforms:iterate="instance('source-instance')/title">
+                        <xforms:insert context="instance('main-instance')" nodeset="book" origin="instance('template-instance')"/>
+                        <xforms:setvalue ref="instance('main-instance')/book[last()]/title" value="context()"/>
+                        <xforms:setvalue ref="instance('main-instance')/book[last()]/author" value="context()/following-sibling::author"/>
+                    </xforms:action>
+                </xml-source>
+                <p>
+                    The resulting <code>main-instance</code> is as follows:
+                </p>
+                <xml-source>
+                    <instance>
+                        <book>
+                            <title>Don Quixote de la Mancha</title>
+                            <author>Miguel de Cervantes Saavedra</author>
+                        </book>
+                        <book>
+                            <title>Jacques le fataliste et son maître</title>
+                            <author>Denis Diderot</author>
+                        </book>
+                        <book>
+                            <title>Childhood's End</title>
+                            <author>Arthur C. Clarke</author>
+                        </book>
+                    </instance>
+                </xml-source>
+                <p>
+                    For more information about eXforms extensions, please visit the <a
+                    href="http://www.exforms.org/conditionals.html#id4484032">eXforms site</a>.
+                </p>
             </section>
             <a name="xpath-extensions"/>
             <section>

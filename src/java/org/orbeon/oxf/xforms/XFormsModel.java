@@ -35,6 +35,7 @@ import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.sxpath.XPathEvaluator;
 import org.orbeon.saxon.trans.IndependentContext;
 import org.orbeon.saxon.style.StandardNames;
@@ -671,7 +672,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         return (LocationData) modelDocument.getRootElement().getData();
     }
 
-    public List getBindNodeset(PipelineContext pipelineContext, ModelBind modelBind, NodeInfo contextNode) {
+    public List getBindNodeset(PipelineContext pipelineContext, ModelBind modelBind, Item contextItem) {
 
         // TODO: This is not efficient for nested binds, as each @bind attribute causes several XPath evaluations.
 
@@ -707,13 +708,16 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                 // Otherwise, the IDREF resolution produced a null search result."
 
                 // Find matching node
-                for (Iterator k = nodeset.iterator(); k.hasNext();) {
-                    final NodeInfo o2 = (NodeInfo) k.next();
-                    if (o2.isSameNodeInfo(contextNode)) {
-                        // Found one
-                        return XPathCache.evaluate(pipelineContext, contextNode, currentModelBind.getNodeset(),
-                                currentModelBind.getNamespaceMap(), null, XFormsContainingDocument.getFunctionLibrary(),
-                                contextStack.getFunctionContext(), currentModelBind.getLocationData().getSystemID(), currentModelBind.getLocationData());
+                if (contextItem instanceof NodeInfo) {
+                    final NodeInfo contextNode = (NodeInfo) contextItem;
+                    for (Iterator k = nodeset.iterator(); k.hasNext();) {
+                        final NodeInfo o2 = (NodeInfo) k.next();
+                        if (o2.isSameNodeInfo(contextNode)) {
+                            // Found one
+                            return XPathCache.evaluate(pipelineContext, contextNode, currentModelBind.getNodeset(),
+                                    currentModelBind.getNamespaceMap(), null, XFormsContainingDocument.getFunctionLibrary(),
+                                    contextStack.getFunctionContext(), currentModelBind.getLocationData().getSystemID(), currentModelBind.getLocationData());
+                        }
                     }
                 }
 

@@ -141,7 +141,7 @@ public class XFormsActionInterpreter {
                     for (int index = 1; index <= iterationCount; index++) {
                         contextStack.pushIteration(index);
 
-                        final NodeInfo overriddenContextNodeInfo = contextStack.getCurrentSingleNode();
+                        final Item overriddenContextNodeInfo = contextStack.getCurrentSingleItem();
                         runSingleIteration(pipelineContext, targetId, eventHandlerContainer, actionElement, actionNamespaceURI,
                                 actionName, ifConditionAttribute, whileIterationAttribute, true, overriddenContextNodeInfo);
 

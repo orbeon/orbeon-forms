@@ -32,8 +32,8 @@ import org.orbeon.saxon.expr.*;
 import org.orbeon.saxon.functions.FunctionLibrary;
 import org.orbeon.saxon.functions.FunctionLibraryList;
 import org.orbeon.saxon.functions.Doc;
-import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.om.FastStringBuffer;
+import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.sxpath.XPathEvaluator;
 import org.orbeon.saxon.sxpath.XPathExpression;
 import org.orbeon.saxon.trans.IndependentContext;
@@ -65,7 +65,7 @@ public class XPathCache {
     /**
      * Evaluate an XPath expression on the document.
      */
-    public static List evaluate(PipelineContext pipelineContext, NodeInfo contextNode, String xpathString,
+    public static List evaluate(PipelineContext pipelineContext, Item contextNode, String xpathString,
                          Map prefixToURIMap, Map variableToValueMap, FunctionLibrary functionLibrary, FunctionContext functionContext, String baseURI, LocationData locationData) {
         return evaluate(pipelineContext, Collections.singletonList(contextNode), 1, xpathString, prefixToURIMap, variableToValueMap, functionLibrary, functionContext, baseURI, locationData);
     }
@@ -89,9 +89,27 @@ public class XPathCache {
     }
 
     /**
+     * Evaluate an XPath expression on the document and keep Item objects in the result.
+     */
+    public static List evaluateKeepItems(PipelineContext pipelineContext, List contextItems, int contextPosition, String xpathString,
+                         Map prefixToURIMap, Map variableToValueMap, FunctionLibrary functionLibrary, FunctionContext functionContext, String baseURI, LocationData locationData) {
+
+        final PooledXPathExpression xpathExpression = XPathCache.getXPathExpression(pipelineContext, contextItems, contextPosition,
+                xpathString, prefixToURIMap, variableToValueMap, functionLibrary, baseURI, false, false, locationData);
+        try {
+            return xpathExpression.evaluateKeepItems(functionContext);
+        } catch (Exception e) {
+            throw handleXPathException(e, xpathString, "evaluating XPath expression", locationData);
+        } finally {
+            if (xpathExpression != null)
+                xpathExpression.returnToPool();
+        }
+    }
+
+    /**
      * Evaluate an XPath expression on the document.
      */
-    public static Object evaluateSingle(PipelineContext pipelineContext, NodeInfo contextNode, String xpathString,
+    public static Object evaluateSingle(PipelineContext pipelineContext, Item contextNode, String xpathString,
                                  Map prefixToURIMap, Map variableToValueMap, FunctionLibrary functionLibrary, FunctionContext functionContext, String baseURI, LocationData locationData) {
         return evaluateSingle(pipelineContext, Collections.singletonList(contextNode), 1, xpathString, prefixToURIMap, variableToValueMap, functionLibrary, functionContext, baseURI, locationData);
     }
@@ -117,7 +135,7 @@ public class XPathCache {
     /**
      * Evaluate an XPath expression on the document as an attribute value template, and return its string value.
      */
-    public static String evaluateAsAvt(PipelineContext pipelineContext, NodeInfo contextNode, String xpathString, Map prefixToURIMap, Map variableToValueMap, FunctionLibrary functionLibrary, FunctionContext functionContext, String baseURI, LocationData locationData) {
+    public static String evaluateAsAvt(PipelineContext pipelineContext, Item contextNode, String xpathString, Map prefixToURIMap, Map variableToValueMap, FunctionLibrary functionLibrary, FunctionContext functionContext, String baseURI, LocationData locationData) {
         return evaluateAsAvt(pipelineContext, Collections.singletonList(contextNode), 1, xpathString, prefixToURIMap, variableToValueMap, functionLibrary, functionContext, baseURI, locationData);
     }
 
@@ -139,7 +157,7 @@ public class XPathCache {
     /**
      * Evaluate an XPath expression on the document and return its string value.
      */
-    public static String evaluateAsString(PipelineContext pipelineContext, NodeInfo contextNode, String xpathString, Map prefixToURIMap, Map variableToValueMap, FunctionLibrary functionLibrary, FunctionContext functionContext, String baseURI, LocationData locationData) {
+    public static String evaluateAsString(PipelineContext pipelineContext, Item contextNode, String xpathString, Map prefixToURIMap, Map variableToValueMap, FunctionLibrary functionLibrary, FunctionContext functionContext, String baseURI, LocationData locationData) {
         return evaluateAsString(pipelineContext, Collections.singletonList(contextNode), 1, xpathString, prefixToURIMap, variableToValueMap, functionLibrary, functionContext, baseURI, locationData);
     }
 
@@ -159,14 +177,14 @@ public class XPathCache {
     }
 
     public static PooledXPathExpression getXPathExpression(PipelineContext pipelineContext,
-                                                           NodeInfo contextNode,
+                                                           Item contextNode,
                                                            String xpathString,
                                                            LocationData locationData) {
         return getXPathExpression(pipelineContext, contextNode, xpathString, null, null, null, null, locationData);
     }
 
     public static PooledXPathExpression getXPathExpression(PipelineContext pipelineContext,
-                                                           NodeInfo contextNode,
+                                                           Item contextNode,
                                                            String xpathString,
                                                            Map prefixToURIMap,
                                                            LocationData locationData) {
@@ -174,7 +192,7 @@ public class XPathCache {
     }
 
     public static PooledXPathExpression getXPathExpression(PipelineContext pipelineContext,
-                                                           NodeInfo contextNode,
+                                                           Item contextNode,
                                                            String xpathString,
                                                            Map prefixToURIMap,
                                                            Map variableToValueMap,

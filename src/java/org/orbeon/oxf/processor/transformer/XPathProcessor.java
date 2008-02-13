@@ -148,7 +148,7 @@ public class XPathProcessor extends ProcessorImpl {
                     throw new OXFException(xpe);
                 } catch (SAXException e) {
                     throw new ValidationException(e, locationData);
-                }finally{
+                } finally{
                     if(xpath != null)
                         xpath.returnToPool();
                 }

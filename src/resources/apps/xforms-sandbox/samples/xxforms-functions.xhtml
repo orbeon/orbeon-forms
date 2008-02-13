@@ -40,6 +40,10 @@
                     Value: <xforms:output value="value"/>
                 </xhtml:p>
                 <xforms:trigger>
+                    <xforms:label>Set value of context()</xforms:label>
+                    <xforms:setvalue ev:event="DOMActivate" ref="value" value="name(context())"/>
+                </xforms:trigger>
+                <xforms:trigger>
                     <xforms:label>Set value of xxforms:context()</xforms:label>
                     <xforms:setvalue ev:event="DOMActivate" ref="value" value="name(xxforms:context())"/>
                 </xforms:trigger>

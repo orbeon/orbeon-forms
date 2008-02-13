@@ -96,6 +96,22 @@ public class PooledXPathExpression {
         return convertToJavaKeepNodeInfo(extent, xpathContext);
     }
 
+    /**
+     * Evaluate and return a List of Item objects.
+     */
+    public List evaluateKeepItems(Object functionContext) throws XPathException {
+        final Item contextItem = (contextItems.size() > contextPosition - 1) ? (Item) contextItems.get(contextPosition - 1) : null;
+        final XPathContextMajor xpathContext = new XPathContextMajor(contextItem, this.configuration);
+        final SequenceIterator iter = evaluate(xpathContext, functionContext);
+
+        final ArrayList result = new ArrayList();
+        Item next;
+        while ((next = iter.next()) != null) {
+            result.add(next);
+        }
+        return result;
+    }
+
     private List convertToJavaKeepNodeInfo(SequenceExtent extent, XPathContext context) throws XPathException {
         final List result = new ArrayList(extent.getLength());
         final SequenceIterator iter = extent.iterate(null);

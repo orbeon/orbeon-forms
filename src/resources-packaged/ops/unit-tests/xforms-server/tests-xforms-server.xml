@@ -1958,6 +1958,69 @@
         </output>
     </test>
 
+    <test description="xxforms:iterate and current() function on strings" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-server-init.xpl"/>
+                    <p:input name="document">
+                        <xhtml:html>
+                            <xhtml:head>
+                                <xforms:model id="main-model" xxforms:state-handling="client">
+
+                                    <xforms:instance id="url" xxforms:readonly="true">
+                                        <url>http://example.com/?orbeon=foo&amp;forms=bar&amp;version=3.6</url>
+                                    </xforms:instance>
+
+                                    <xforms:instance id="name">
+                                        <name/>
+                                    </xforms:instance>
+
+                                    <xforms:instance id="element-template" xxforms:readonly="true">
+                                        <element name=""/>
+                                    </xforms:instance>
+
+                                    <xforms:action ev:event="xforms-ready" xxforms:iterate="tokenize(substring-after(instance('url'), '?'), '&amp;')">
+                                        <xforms:insert context="instance('name')" origin="instance('element-template')" nodeset="element"/>
+                                        <xforms:setvalue ref="instance('name')/element[not(following-sibling::*)]/@name" value="substring-before(context(), '=')"/>
+                                        <xforms:setvalue ref="instance('name')/element[not(following-sibling::*)]" value="substring-after(context(), '=')"/>
+                                    </xforms:action>
+                                </xforms:model>
+                            </xhtml:head>
+                            <xhtml:body>
+
+                            </xhtml:body>
+                        </xhtml:html>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+
+            </p:config>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="name" model-id="main-model">
+                                <name>
+                                    <element name="orbeon">foo</element>
+                                    <element name="forms">bar</element>
+                                    <element name="version">3.6</element>
+                                </name>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
     <test description="position() function within repeat" name="oxf:pipeline">
         <input name="config">
             <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">

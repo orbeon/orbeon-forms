@@ -1970,23 +1970,23 @@
                             <xhtml:head>
                                 <xforms:model id="main-model" xxforms:state-handling="client">
 
-                                    <xforms:instance id="url" xxforms:readonly="true">
-                                        <url>http://example.com/?orbeon=foo&amp;forms=bar&amp;version=3.6</url>
-                                    </xforms:instance>
+                                <xforms:instance id="url" xxforms:readonly="true">
+                                    <url>http://example.com/?orbeon=foo&amp;forms=bar&amp;version=3.6</url>
+                                </xforms:instance>
 
-                                    <xforms:instance id="name">
-                                        <name/>
-                                    </xforms:instance>
+                                <xforms:instance id="name">
+                                    <name/>
+                                </xforms:instance>
 
-                                    <xforms:instance id="element-template" xxforms:readonly="true">
-                                        <element name=""/>
-                                    </xforms:instance>
+                                <xforms:instance id="element-template" xxforms:readonly="true">
+                                    <element name=""/>
+                                </xforms:instance>
 
-                                    <xforms:action ev:event="xforms-ready" xxforms:iterate="tokenize(substring-after(instance('url'), '?'), '&amp;')">
-                                        <xforms:insert context="instance('name')" origin="instance('element-template')" nodeset="element"/>
-                                        <xforms:setvalue ref="instance('name')/element[not(following-sibling::*)]/@name" value="substring-before(context(), '=')"/>
-                                        <xforms:setvalue ref="instance('name')/element[not(following-sibling::*)]" value="substring-after(context(), '=')"/>
-                                    </xforms:action>
+                                <xforms:action ev:event="xforms-ready" xxforms:iterate="tokenize(substring-after(instance('url'), '?'), '&amp;')">
+                                    <xforms:insert context="instance('name')" origin="instance('element-template')" nodeset="element"/>
+                                    <xforms:setvalue ref="instance('name')/element[last()]/@name" value="substring-before(context(), '=')"/>
+                                    <xforms:setvalue ref="instance('name')/element[last()]" value="substring-after(context(), '=')"/>
+                                </xforms:action>
                                 </xforms:model>
                             </xhtml:head>
                             <xhtml:body>

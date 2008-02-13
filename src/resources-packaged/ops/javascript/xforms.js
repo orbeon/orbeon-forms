@@ -4056,13 +4056,27 @@ function FCKeditor_OnComplete(editorInstance) {
             xformsPageLoadedServer();
     }
 
-    // Work ardound for bug #308473 (http://tinyurl.com/2jv62f)
+    // Work around for bug #308473 (http://tinyurl.com/2jv62f)
+    //
+    // About the bug:
+    //
     // On IE6 (but not IE7), when a FCK editor is used on the page, the first time we change a class on a tr around
     // the drop-down a "death flash" happens and if the drop-down was open it gets closed and its value is set to
     // empty string. This creates the "death flash" right when the page is first loaded instead of doing it later,
     // to avoid the issue described in bug #308473.
-    if (ORBEON.xforms.Globals.isRenderingEngineTridend)
-        document.body.className = document.body.className;
+    //
+    // Issue with the fix:
+    //
+    // On some deployments with some versions of IE this is causing the page to load and become blank until users
+    // move around the mouse on the page. Since this is caused by the FCK editor and we will be moving to using the
+    // YUI RTE, we will leave this open for now.
+    //
+    // When to remove this:
+    //
+    // This comment can be removed after the switch to YUI RTE.
+    //
+    //if (ORBEON.xforms.Globals.isRenderingEngineTridend)
+    //    document.body.className = document.body.className;
 }
 
 function xformsGetLocalName(element) {

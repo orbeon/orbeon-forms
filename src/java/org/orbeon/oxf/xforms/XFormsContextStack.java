@@ -31,7 +31,7 @@ import org.orbeon.saxon.om.Item;
 import java.util.*;
 
 /**
- * Handle a stack of XPath evaluation context information.
+ * Handle a stack of XPath evaluation context information. This can be used by controls, models, and actions.
  */
 public class XFormsContextStack {
 
@@ -67,9 +67,9 @@ public class XFormsContextStack {
         // Push the default context
         if (xformsModel.getInstanceCount() > 0) {
             final List defaultNodeset = Arrays.asList(new Object[]{xformsModel.getDefaultInstance().getInstanceRootElementInfo()});
-            contextStack.push(new BindingContext(null, xformsModel, defaultNodeset, 1, null, true, null, xformsModel.getDefaultInstance().getLocationData()));
+            contextStack.push(new BindingContext(null, xformsModel, defaultNodeset, 1, null, true, null, xformsModel.getDefaultInstance().getLocationData(), false, null));
         } else {
-            contextStack.push(new BindingContext(null, xformsModel, Collections.EMPTY_LIST, 0, null, true, null, xformsModel.getLocationData()));
+            contextStack.push(new BindingContext(null, xformsModel, Collections.EMPTY_LIST, 0, null, true, null, xformsModel.getLocationData(), false, null));
         }
     }
 
@@ -179,10 +179,9 @@ public class XFormsContextStack {
             if (repeatChildrenSize != currentNodesetSize)
                 throw new ValidationException("repeatChildren and newNodeset have different sizes.", xformsControl.getLocationData());
 
-            // Push "artificial" binding with just current node in nodeset
-            final XFormsModel newModel = currentBindingContext.getModel();
+            // Push iteration
             final int position = ((RepeatIterationControl) xformsControl).getIteration();
-            contextStack.push(new XFormsContextStack.BindingContext(currentBindingContext, newModel, currentNodeset, position, xformsControl.getParent().getOriginalId(), true, null, repeatXFormsControl.getLocationData()));
+            pushIteration(position);
         }
     }
 
@@ -292,7 +291,8 @@ public class XFormsContextStack {
         final boolean isNewBind;
         final int newPosition;
         final List newNodeset;
-        final List overriddenContext;
+        final boolean hasOverriddenContext;
+        final Item contextItem;
         {
             if (bindId != null) {
                 // Resolve the bind id to a nodeset
@@ -300,73 +300,65 @@ public class XFormsContextStack {
                 if (modelBind == null)
                     throw new ValidationException("Cannot find bind for id: " + bindId, locationData);
                 newNodeset = newModel.getBindNodeset(pipelineContext, modelBind, currentBindingContext.getSingleNode());
-                overriddenContext = null;
+                hasOverriddenContext = false;
+                contextItem = currentBindingContext.getSingleNode();
                 isNewBind = true;
                 newPosition = 1;
             } else if (ref != null || nodeset != null) {
 
                 // Check whether there is an optional context (XForms 1.1, likely generalized in XForms 1.2)
                 if (context != null) {
+                    // Push model and context
+
+                    pushTemporaryContext(currentBindingContext.getSingleNode());// provide context information for the current() function
                     pushBinding(pipelineContext, null, null, context, modelId, null, null, bindingElementNamespaceContext);
-                    overriddenContext = getCurrentNodeset();
+                    hasOverriddenContext = true;
+                    contextItem = getCurrentSingleNode();
+                } else if (isNewModel) {
+                    // Push model only
+                    pushBinding(pipelineContext, null, null, null, modelId, null, null, bindingElementNamespaceContext);
+                    hasOverriddenContext = false;
+                    contextItem = currentBindingContext.getSingleNode();
                 } else {
-                    overriddenContext = null;
+                    hasOverriddenContext = false;
+                    contextItem = currentBindingContext.getSingleNode();
                 }
 
                 // Evaluate new XPath in context
-                if (isNewModel) {
-                    // Model was switched
+                final XFormsContextStack.BindingContext contextBindingContext = getCurrentBindingContext();
 
-                    final NodeInfo currentSingleNodeForModel = getCurrentSingleNode(newModel.getEffectiveId());
-                    if (currentSingleNodeForModel != null) {
-
-                        // Temporarily update the context so that the function library's instance() function works
-                        final XFormsContextStack.BindingContext modelBindingContext = getCurrentBindingContextForModel(newModel.getEffectiveId());
-                        if (modelBindingContext != null)
-                            contextStack.push(new XFormsContextStack.BindingContext(currentBindingContext, newModel, modelBindingContext.getNodeset(), modelBindingContext.getPosition(), null, false, null, locationData));
-                        else
-                            contextStack.push(new XFormsContextStack.BindingContext(currentBindingContext, newModel, getCurrentNodeset(newModel.getEffectiveId()), 1, null, false, null, locationData));
-
-                        // Evaluate new node-set
-                        newNodeset = XPathCache.evaluate(pipelineContext, Collections.singletonList(currentSingleNodeForModel), 1,
-                                ref != null ? ref : nodeset, bindingElementNamespaceContext, null, XFormsContainingDocument.getFunctionLibrary(), functionContext, null, locationData);
-
-                        // Restore context
-                        contextStack.pop();
-                    } else {
-                        newNodeset = Collections.EMPTY_LIST;
-                    }
-
+                if (contextBindingContext != null && contextBindingContext.getNodeset().size() > 0) {
+                    pushTemporaryContext(contextBindingContext.getSingleNode());// provide context information for the current() function
+                    newNodeset = XPathCache.evaluate(pipelineContext, contextBindingContext.getNodeset(), contextBindingContext.getPosition(),
+                            ref != null ? ref : nodeset, bindingElementNamespaceContext, null, XFormsContainingDocument.getFunctionLibrary(),
+                            functionContext, null, locationData);
+                    popBinding();
                 } else {
-                    // Simply evaluate new node-set
-                    final XFormsContextStack.BindingContext contextBindingContext = getCurrentBindingContext();
-                    if (contextBindingContext != null && contextBindingContext.getNodeset().size() > 0) {
-                        newNodeset = XPathCache.evaluate(pipelineContext, contextBindingContext.getNodeset(), contextBindingContext.getPosition(),
-                                ref != null ? ref : nodeset, bindingElementNamespaceContext, null, XFormsContainingDocument.getFunctionLibrary(), functionContext, null, locationData);
-                    } else {
-                        newNodeset = Collections.EMPTY_LIST;
-                    }
+                    newNodeset = Collections.EMPTY_LIST;
                 }
 
                 // Restore optional context
-                if (context != null) {
+                if (context != null || isNewModel) {
                     popBinding();
+                    if (context != null)
+                        popBinding();
                 }
                 isNewBind = true;
                 newPosition = 1;
             } else if (isNewModel && context == null) {
-                // Only the model has changed, and possibly the context
+                // Only the model has changed
 
-                final NodeInfo currentSingleNodeForModel = getCurrentSingleNode(newModel.getEffectiveId());
-                if (currentSingleNodeForModel != null) {
-                    newNodeset = Collections.singletonList(currentSingleNodeForModel);
-                    newPosition = 1;
+                final XFormsContextStack.BindingContext modelBindingContext = getCurrentBindingContextForModel(newModel.getEffectiveId());
+                if (modelBindingContext != null) {
+                    newNodeset = modelBindingContext.getNodeset();
+                    newPosition = modelBindingContext.getPosition();
                 } else {
-                    newNodeset = Collections.EMPTY_LIST;
-                    newPosition = -1;// this is not a valid position and nobody should use the node-set anyway
+                    newNodeset = getCurrentNodeset(newModel.getEffectiveId());
+                    newPosition = 1;
                 }
 
-                overriddenContext = null;
+                hasOverriddenContext = false;
+                contextItem = currentBindingContext.getSingleNode();
                 isNewBind = false;
 
             } else if (context != null) {
@@ -376,13 +368,16 @@ public class XFormsContextStack {
                     newNodeset = getCurrentNodeset();
                     newPosition = getCurrentPosition();
                     isNewBind = false;
-                    overriddenContext = newNodeset;
+                    hasOverriddenContext = true;
+                    contextItem = getCurrentSingleNode();
                 }
                 popBinding();
+
             } else {
                 // No change to anything
                 newNodeset = currentBindingContext.getNodeset();
-                overriddenContext = null;
+                hasOverriddenContext = false;
+                contextItem = currentBindingContext.getContextItem();
                 isNewBind = false;
                 newPosition = currentBindingContext.getPosition();
             }
@@ -390,18 +385,29 @@ public class XFormsContextStack {
 
         // Push new context
         final String id = (bindingElement == null) ? null : bindingElement.attributeValue("id");
-        contextStack.push(new XFormsContextStack.BindingContext(currentBindingContext, newModel, newNodeset, newPosition, id, isNewBind, bindingElement, locationData, overriddenContext));
+        contextStack.push(new XFormsContextStack.BindingContext(currentBindingContext, newModel, newNodeset, newPosition, id, isNewBind, bindingElement, locationData, hasOverriddenContext, contextItem));
     }
 
-    public void pushIteration(int currentPosition, String elementId) {
+    private void pushTemporaryContext(Item contextItem) {
         final BindingContext currentBindingContext = getCurrentBindingContext();
         contextStack.push(new XFormsContextStack.BindingContext(currentBindingContext, currentBindingContext.getModel(),
-                currentBindingContext.getNodeset(), currentPosition, elementId, true, null, currentBindingContext.getLocationData()));
+                currentBindingContext.getNodeset(), currentBindingContext.getPosition(), currentBindingContext.getIdForContext(),
+                false, currentBindingContext.getControlElement(), currentBindingContext.getLocationData(),
+                false, contextItem));
     }
 
     /**
-     * NOTE: Not sure this should be exposed.
+     * Push an iteration of the current node-set. Used for example by xforms:repeat, xforms:bind, xxforms:iterate.
+     *
+     * @param currentPosition   1-based iteration index
      */
+    public void pushIteration(int currentPosition) {
+        final BindingContext currentBindingContext = getCurrentBindingContext();
+        contextStack.push(new XFormsContextStack.BindingContext(currentBindingContext, currentBindingContext.getModel(),
+                currentBindingContext.getNodeset(), currentPosition, currentBindingContext.getIdForContext(), true, null, currentBindingContext.getLocationData(),
+                false, currentBindingContext.getSingleNode()));
+    }
+
     public XFormsContextStack.BindingContext getCurrentBindingContext() {
         return (XFormsContextStack.BindingContext) contextStack.peek();
     }
@@ -457,8 +463,20 @@ public class XFormsContextStack {
      * Get the current single node binding for the given model id.
      */
     public NodeInfo getCurrentSingleNode(String modelId) {
-        final List currentNodeset = getCurrentNodeset(modelId);
-        return (NodeInfo) ((currentNodeset == null || currentNodeset.size() == 0) ? null : currentNodeset.get(0));
+
+        final XFormsContextStack.BindingContext bindingContext = getCurrentBindingContextForModel(modelId);
+
+        // If a context exists, use it
+        if (bindingContext != null)
+            return bindingContext.getSingleNode();
+
+        // If there is no default instance, return null
+        final XFormsInstance defaultInstance = containingDocument.getModel(modelId).getDefaultInstance();
+        if (defaultInstance == null)
+            return null;
+
+        // Otherwise return the document element of the model's default instance
+        return defaultInstance.getInstanceRootElementInfo();
     }
 
     /**
@@ -469,24 +487,17 @@ public class XFormsContextStack {
     }
 
     /**
-     * Get the overridden context if any, null if there is none or if the overridden context size is 0.
+     * Get the context, whether in-scope or overridden.
      */
-    public Item getOverriddenContextItem() {
-        final BindingContext currentBindingContext = getCurrentBindingContext();
-        final List overridenContext = currentBindingContext.getOverriddenContext();
-        if (overridenContext != null && overridenContext.size() > 0)
-            return (Item) overridenContext.get(0);
-        else
-            return null;
+    public Item getContextItem() {
+        return getCurrentBindingContext().getContextItem();
     }
 
     /**
      * Return whether there is an overridden context, whether empty or not.
      */
     public boolean hasOverriddenContext() {
-        final BindingContext currentBindingContext = getCurrentBindingContext();
-        final List overridenContext = currentBindingContext.getOverriddenContext();
-        return overridenContext != null;
+        return getCurrentBindingContext().hasOverriddenContext();
     }
 
     public String getCurrentSingleNodeValue() {
@@ -568,7 +579,6 @@ public class XFormsContextStack {
      */
     public List getContextForId(String contextId) {
 
-
         if (contextId == null) {
             // Return the single-node binding of the parent
             // TODO: If the element uses @context to override the context, that attribute won't be taken into account
@@ -618,9 +628,9 @@ public class XFormsContextStack {
     }
 
     /**
-     * NOTE: Not sure this should be exposed.
+     * Do not use. Only called by legacy XForms engine.
      */
-    public Stack getStack() {
+    public Stack legacyGetStack() {
         return contextStack;
     }
 
@@ -633,7 +643,8 @@ public class XFormsContextStack {
         private boolean newBind;
         private Element controlElement;
         private LocationData locationData;
-        private List overriddenContext;
+        private boolean hasOverriddenContext;
+        private Item contextItem;
 
         public BindingContext(BindingContext parent, XFormsModel model, List nodeSet, int position, String idForContext, boolean newBind, Element controlElement, LocationData locationData) {
             this.parent = parent;
@@ -655,9 +666,10 @@ public class XFormsContextStack {
             }
         }
 
-        public BindingContext(BindingContext parent, XFormsModel model, List nodeSet, int position, String idForContext, boolean newBind, Element controlElement, LocationData locationData, List overriddenContext) {
+        public BindingContext(BindingContext parent, XFormsModel model, List nodeSet, int position, String idForContext, boolean newBind, Element controlElement, LocationData locationData, boolean hasOverriddenContext, Item contextItem) {
             this(parent, model, nodeSet, position, idForContext, newBind, controlElement, locationData);
-            this.overriddenContext = overriddenContext;
+            this.hasOverriddenContext = hasOverriddenContext;
+            this.contextItem = contextItem;
         }
 
         public BindingContext getParent() {
@@ -688,14 +700,18 @@ public class XFormsContextStack {
             return controlElement;
         }
 
-        public List getOverriddenContext() {
-            return overriddenContext;
+        public Item getContextItem() {
+            return contextItem;
+        }
+
+        public boolean hasOverriddenContext() {
+            return hasOverriddenContext;
         }
 
         /**
          * Convenience method returning the location data associated with the XForms element (typically, a control)
-         * associated with the binding. If location data was passed during construction, pass that, otherwise try to get
-         * location data from passed element.
+         * associated with the binding. If location data was passed during construction, pass that, otherwise try to
+         * get location data from passed element.
          *
          * @return  LocationData object, or null if not found
          */

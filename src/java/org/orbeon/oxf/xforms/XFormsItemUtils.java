@@ -257,10 +257,11 @@ public class XFormsItemUtils {
                         final List currentNodeSet = currentBindingContext.getNodeset();
                         if (currentNodeSet != null) {
                             final Stack nodeStack = new Stack();
-                            for (int currentPosition = 1; currentPosition <= currentNodeSet.size(); currentPosition++) {
+                            final int iterationCount = currentNodeSet.size();
+                            for (int currentPosition = 1; currentPosition <= iterationCount; currentPosition++) {
 
-                                // Push "artificial" binding with just current node in nodeset
-                                contextStack.getStack().push(new XFormsContextStack.BindingContext(currentBindingContext, currentBindingContext.getModel(), contextStack.getCurrentNodeset(), currentPosition, null, true, null, currentBindingContext.getLocationData()));
+                                // Push iteration
+                                contextStack.pushIteration(currentPosition);
                                 {
                                     // Handle children of xforms:itemset
                                     final String label;
@@ -303,7 +304,7 @@ public class XFormsItemUtils {
                                     nodeStack.push(currentNodeInfo);
                                     hierarchyLevel = newLevel;
                                 }
-                                contextStack.getStack().pop();
+                                contextStack.popBinding();
                             }
                         }
                     }

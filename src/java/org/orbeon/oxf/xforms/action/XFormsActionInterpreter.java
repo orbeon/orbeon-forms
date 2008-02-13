@@ -128,8 +128,6 @@ public class XFormsActionInterpreter {
                     iterateIterationAttribute = actionElement.attributeValue(XFormsConstants.EXFORMS_ITERATE_ATTRIBUTE_QNAME);
             }
 
-            final String idAttribute = actionElement.attributeValue("id");
-
             // NOTE: At this point, the context has already been set to the current action element
 
             if (iterateIterationAttribute != null) {
@@ -141,7 +139,7 @@ public class XFormsActionInterpreter {
                 {
                     final int iterationCount = contextStack.getCurrentNodeset().size();
                     for (int index = 1; index <= iterationCount; index++) {
-                        contextStack.pushIteration(index, idAttribute);
+                        contextStack.pushIteration(index);
 
                         final NodeInfo overriddenContextNodeInfo = contextStack.getCurrentSingleNode();
                         runSingleIteration(pipelineContext, targetId, eventHandlerContainer, actionElement, actionNamespaceURI,
@@ -158,7 +156,7 @@ public class XFormsActionInterpreter {
                 // Do a single run
 
                 runSingleIteration(pipelineContext, targetId, eventHandlerContainer, actionElement, actionNamespaceURI,
-                        actionName, ifConditionAttribute, whileIterationAttribute, contextStack.hasOverriddenContext(), contextStack.getOverriddenContextItem());
+                        actionName, ifConditionAttribute, whileIterationAttribute, contextStack.hasOverriddenContext(), contextStack.getContextItem());
             }
         } catch (Exception e) {
             throw ValidationException.wrapException(e, new ExtendedLocationData((LocationData) actionElement.getData(), "running XForms action", actionElement,
@@ -216,16 +214,6 @@ public class XFormsActionInterpreter {
                                       String actionName, String conditionAttribute, String conditionType,
                                       boolean hasOverriddenContext, Item overriddenContextItem) {
 
-        // Don't evaluate the condition if the context has gone missing
-        {
-            final NodeInfo currentSingleNode = contextStack.getCurrentSingleNode();
-            if (currentSingleNode == null || containingDocument.getInstanceForNode(currentSingleNode) == null) {
-                if (XFormsServer.logger.isDebugEnabled())
-                    XFormsServer.logger.debug("XForms - not executing \"" + conditionType + "\" conditional action (missing context): " + actionName);
-                return false;
-            }
-        }
-
         // Execute condition relative to the overridden context if it exists, or the in-scope context if not
         final List contextNodeset;
         final int contextPosition;
@@ -242,6 +230,15 @@ public class XFormsActionInterpreter {
                 // Use regular context
                 contextNodeset = contextStack.getCurrentNodeset();
                 contextPosition = contextStack.getCurrentPosition();
+            }
+        }
+
+        // Don't evaluate the condition if the context has gone missing
+        {
+            if (contextNodeset.size() == 0 || containingDocument.getInstanceForNode((NodeInfo) contextNodeset.get(contextPosition - 1)) == null) {
+                if (XFormsServer.logger.isDebugEnabled())
+                    XFormsServer.logger.debug("XForms - not executing \"" + conditionType + "\" conditional action (missing context): " + actionName);
+                return false;
             }
         }
 

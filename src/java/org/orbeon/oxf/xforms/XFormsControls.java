@@ -796,7 +796,7 @@ public class XFormsControls {
                     if (currentNodeSet != null) {
                         for (int currentPosition = 1; currentPosition <= currentNodeSet.size(); currentPosition++) {
                             // Push "artificial" binding with just current node in nodeset
-                            contextStack.pushIteration(currentPosition, controlId);
+                            contextStack.pushIteration(currentPosition);
                             {
                                 // Handle children of xforms:repeat
                                 if (doContinue) {

@@ -1909,8 +1909,11 @@
                                     <!-- Show how you can easily reformat data from one instance to the other -->
                                     <xforms:action ev:event="xforms-ready" xxforms:iterate="instance('source-instance')/title">
                                         <xforms:insert context="instance('main-instance')" nodeset="book" origin="instance('template-instance')"/>
-                                        <xforms:setvalue ref="instance('main-instance')/book[last()]/title" value="context()"/>
-                                        <xforms:setvalue ref="instance('main-instance')/book[last()]/author" value="context()/following-sibling::author"/>
+                                        <!-- Make things a bit trickier by changing the context -->
+                                        <xforms:action context="context()/following-sibling::author">
+                                            <xforms:setvalue ref="instance('main-instance')/book[last()]/title" value="context()/preceding-sibling::title[1]"/>
+                                            <xforms:setvalue ref="instance('main-instance')/book[last()]/author" value="context()"/>
+                                        </xforms:action>
                                     </xforms:action>
                                 </xforms:model>
                             </xhtml:head>
@@ -1950,6 +1953,73 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="position() function within repeat" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-server-init.xpl"/>
+                    <p:input name="document">
+                        <xhtml:html>
+                            <xhtml:head>
+                                <xforms:model xxforms:state-handling="client">
+                                    <xforms:instance id="cities-instance" xxforms:readonly="true">
+                                        <cities>
+                                            <city>San Francisco</city>
+                                            <city>Los Angeles</city>
+                                            <city>San Diego</city>
+                                        </cities>
+                                    </xforms:instance>
+                                </xforms:model>
+                            </xhtml:head>
+                            <xhtml:body>
+                                <xforms:repeat nodeset="city">
+                                    <xforms:input ref=".">
+                                        <xforms:label>City: </xforms:label>
+                                    </xforms:input>
+                                    <xforms:output value="position()">
+                                        <xforms:label>Position: </xforms:label>
+                                    </xforms:output>
+                                </xforms:repeat>
+                            </xhtml:body>
+                        </xhtml:html>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+
+            </p:config>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances/>
+                        <repeat-indexes>
+                            <repeat-index id="xforms-element-3" index="1"/>
+                        </repeat-indexes>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:copy-repeat-template id="xforms-element-3" parent-indexes="" id-suffix="2"/>
+                        <xxf:copy-repeat-template id="xforms-element-3" parent-indexes="" id-suffix="3"/>
+                        <xxf:control id="xforms-element-4·1" relevant="true" label="City: ">San Francisco</xxf:control>
+                        <xxf:control id="xforms-element-6·1" relevant="true" label="Position: ">1</xxf:control>
+                        <xxf:control id="xforms-element-4·2" relevant="true" label="City: ">Los Angeles</xxf:control>
+                        <xxf:control id="xforms-element-6·2" relevant="true" label="Position: ">2</xxf:control>
+                        <xxf:control id="xforms-element-4·3" relevant="true" label="City: ">San Diego</xxf:control>
+                        <xxf:control id="xforms-element-6·3" relevant="true" label="Position: ">3</xxf:control>
+                    </xxf:control-values>
+                    <xxf:repeats>
+                        <xxf:repeat-index id="xforms-element-3" index="1"/>
+                        <xxf:repeat-iteration id="xforms-element-3" occurs="3"/>
+                    </xxf:repeats>
                 </xxf:action>
             </xxf:event-response>
         </output>

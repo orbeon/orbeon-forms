@@ -624,7 +624,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
             final int iterationCount = contextStack.getCurrentNodeset().size();
             for (int index = 1; index <= iterationCount; index++) {
 
-                contextStack.pushIteration(index, modelBind.getId());
+                contextStack.pushIteration(index);
 
                 // Iterate through all children binds
                 for (Iterator childIterator = modelBind.getChildren().iterator(); childIterator.hasNext();) {
@@ -649,7 +649,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
             for (Iterator j = contextStack.getCurrentNodeset().iterator(); j.hasNext(); index++) {
                 final NodeInfo currentNodeInfo = (NodeInfo) j.next();
 
-                contextStack.pushIteration(index, modelBind.getId());
+                contextStack.pushIteration(index);
                 nodeHandler.handleNode(currentNodeInfo); // == contextStack.getCurrentSingleNode()
                 contextStack.popBinding();
             }

@@ -113,8 +113,8 @@ public class XFormsContextStack {
             resetBindingContext(xformsModel);
             pushBinding(pipelineContext, submission.getSubmissionElement());
         } else {
-            // TODO: Are there any other possible contexts?
-            resetBindingContext();
+            // Should not happen
+            throw new OXFException("Invalid XFormsEventHandlerContainer type: " + eventHandlerContainer.getClass());
         }
 
         // TODO: Some code here which attempts to set iteration context for handlers within repeats. Check if needed.
@@ -305,7 +305,7 @@ public class XFormsContextStack {
                 newPosition = 1;
             } else if (ref != null || nodeset != null) {
 
-                // Check whether there is an optional context (XForms 1.1, likely generalized XForms 1.2)
+                // Check whether there is an optional context (XForms 1.1, likely generalized in XForms 1.2)
                 if (context != null) {
                     pushBinding(pipelineContext, null, null, context, modelId, null, null, bindingElementNamespaceContext);
                     overriddenContext = getCurrentNodeset();
@@ -354,8 +354,9 @@ public class XFormsContextStack {
                 }
                 isNewBind = true;
                 newPosition = 1;
-            } else if (isNewModel) {
-                // Only the model has changed
+            } else if (isNewModel && context == null) {
+                // Only the model has changed, and possibly the context
+
                 final NodeInfo currentSingleNodeForModel = getCurrentSingleNode(newModel.getEffectiveId());
                 if (currentSingleNodeForModel != null) {
                     newNodeset = Collections.singletonList(currentSingleNodeForModel);
@@ -364,12 +365,24 @@ public class XFormsContextStack {
                     newNodeset = Collections.EMPTY_LIST;
                     newPosition = -1;// this is not a valid position and nobody should use the node-set anyway
                 }
-                overriddenContext = null; // TODO: handle @context, relative to @model
+
+                overriddenContext = null;
                 isNewBind = false;
+
+            } else if (context != null) {
+                // Only the context has changed, and possibly the model
+                pushBinding(pipelineContext, null, null, context, modelId, null, null, bindingElementNamespaceContext);
+                {
+                    newNodeset = getCurrentNodeset();
+                    newPosition = getCurrentPosition();
+                    isNewBind = false;
+                    overriddenContext = newNodeset;
+                }
+                popBinding();
             } else {
-                // No change to current nodeset
+                // No change to anything
                 newNodeset = currentBindingContext.getNodeset();
-                overriddenContext = null; // TODO: handle @context
+                overriddenContext = null;
                 isNewBind = false;
                 newPosition = currentBindingContext.getPosition();
             }

@@ -40,8 +40,16 @@ public class Context extends XFormsFunction {
         // ancestor element may have been created dynamically as part of the run-time expansion of repeated content as
         // described in Section 4.7 Resolving ID References in XForms."
 
-        final XFormsContextStack contextStack = getContextStack(xpathContext);
-        final XFormsContextStack.BindingContext currentBindingContext = contextStack.getCurrentBindingContext();
-        return currentBindingContext.getParent().getSingleNode();
+        // TODO: This is partially broken. It will work if context() is called from expressions after a binding node-set
+        // has been evaluated. However, it will not work from within @ref, @nodeset, or @context.
+
+        final XFormsContextStack.BindingContext parentBindingContext; {
+            final XFormsContextStack contextStack = getContextStack(xpathContext);
+            final XFormsContextStack.BindingContext currentBindingContext = contextStack.getCurrentBindingContext();
+            parentBindingContext = currentBindingContext.getParent();
+        }
+
+        // Take position into account so that repeats and iterations are handled
+        return (Item) parentBindingContext.getNodeset().get(parentBindingContext.getPosition() - 1);
     }
 }

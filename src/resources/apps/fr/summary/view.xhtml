@@ -186,7 +186,7 @@
                                 <th>
                                     <!-- Iterate through specially marked controls and derive resource id then resource -->
                                     <xforms:output model="fr-resources-model"
-                                                   value="for $id in substring-before(xxforms:context()/@id, '-control')
+                                                   value="for $id in substring-before(context()/@id, '-control')
                                                           return for $resource in (instance('fr-form-resources')/summary/titles/*[local-name() = $id], '')
                                                                  return if ($resource != '') then $resource else concat('[', $id, ']')"/>
                                 </th>

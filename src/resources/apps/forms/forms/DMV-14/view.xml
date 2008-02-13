@@ -336,7 +336,7 @@
                                         <tr>
                                             <td>
                                                 <span class="dmv-plate-span">
-                                                    <xforms:repeat nodeset="instance('plates-instance')/plate[count(xxforms:repeat-current('vehicles-repeat')/preceding-sibling::dmv:vehicle) + 1]/character[normalize-space(.) != '']">
+                                                    <xforms:repeat nodeset="instance('plates-instance')/plate[count(context()/preceding-sibling::dmv:vehicle) + 1]/character[normalize-space(.) != '']">
                                                         <xforms:output mediatype="image/gif" value="concat('/apps/forms/images/_', if (string-to-codepoints(upper-case(.)) = string-to-codepoints('ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789')) then upper-case(.) else '_', '_small.gif')"/>
                                                     </xforms:repeat>
                                                 </span>

@@ -580,10 +580,8 @@ public class XFormsContextStack {
     public List getContextForId(String contextId) {
 
         if (contextId == null) {
-            // Return the single-node binding of the parent
-            // TODO: If the element uses @context to override the context, that attribute won't be taken into account
-            final XFormsContextStack.BindingContext bindingContext = getCurrentBindingContext();
-            return new ArrayList(Collections.singleton(bindingContext.getParent().getSingleNode()));
+            // Return the context item like the XForms 1.1 context() function
+            return new ArrayList(Collections.singleton(getContextItem()));
         } else {
             for (int i = contextStack.size() - 1; i >= 0; i--) {
                 final XFormsContextStack.BindingContext currentBindingContext = (XFormsContextStack.BindingContext) contextStack.get(i);

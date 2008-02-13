@@ -13,9 +13,9 @@
  */
 package org.orbeon.oxf.xforms.event.events;
 
-import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
+import org.orbeon.oxf.xforms.control.XFormsControl;
 
 
 /**
@@ -24,9 +24,9 @@ import org.orbeon.oxf.xforms.event.XFormsEvents;
  * Target: form control / Bubbles: Yes / Cancelable: Yes / Context Info: None
  * The default action for this event results in the following: None; notification event only.
  */
-public class XFormsDOMActivateEvent extends XFormsEvent {
+public class XFormsDOMActivateEvent extends XFormsUIEvent {
 
     public XFormsDOMActivateEvent(XFormsEventTarget targetObject) {
-        super(XFormsEvents.XFORMS_DOM_ACTIVATE, targetObject, true, true);
+        super(XFormsEvents.XFORMS_DOM_ACTIVATE, (XFormsControl) targetObject, true, true);
     }
 }

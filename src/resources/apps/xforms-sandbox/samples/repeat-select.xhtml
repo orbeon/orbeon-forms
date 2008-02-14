@@ -21,9 +21,10 @@
 
     <xhtml:head>
         <xhtml:title>Repeat With Select</xhtml:title>
+        <!--<xhtml:script language="javascript" type="text/javascript" src="/ops/firebug/firebug.js"/>-->
         <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms">
             <xforms:instance id="instance">
-                <fruits>
+                <fruits gaga="gaga">
                     <fruit>
                         <name>Pear</name>
                         <selected-type>green</selected-type>
@@ -43,17 +44,23 @@
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
-        <xforms:repeat nodeset="fruit" id="fruit">
-            <xhtml:div>
-                <xforms:select1 ref="selected-type" id="type-of-fruit">
-                    <xforms:label>Type: </xforms:label>
-                    <xforms:itemset nodeset="../type">
-                        <xforms:label ref="."/>
-                        <xforms:value ref="."/>
-                    </xforms:itemset>
-                </xforms:select1>
-            </xhtml:div>
-        </xforms:repeat>
+
+        <xhtml:table>
+            <xforms:repeat nodeset="fruit" id="fruit">
+                <xhtml:tr>
+                    <xhtml:td>
+                        <xforms:select1 ref="selected-type" id="type-of-fruit">
+                            <xforms:label>Type: </xforms:label>
+                            <xforms:itemset nodeset="../type">
+                                <xforms:label ref="."/>
+                                <xforms:value ref="."/>
+                            </xforms:itemset>
+                        </xforms:select1>
+                    </xhtml:td>
+                </xhtml:tr>
+            </xforms:repeat>
+        </xhtml:table>
+
         <xforms:trigger>
             <xforms:label>Add fruit</xforms:label>
             <xforms:insert nodeset="fruit" at="index('fruit')" position="after" ev:event="DOMActivate"/>
@@ -62,5 +69,8 @@
             <xforms:label>Remove fruit</xforms:label>
             <xforms:delete nodeset="fruit" at="index('fruit')" ev:event="DOMActivate"/>
         </xforms:trigger>
+        <xhtml:div>
+            <xforms:textarea mediatype="text/html" ref="/fruits/@gaga"/>
+        </xhtml:div>
     </xhtml:body>
 </xhtml:html>

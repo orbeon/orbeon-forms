@@ -115,7 +115,7 @@
 
     <xsl:template match="fr:section">
         <xhtml:div class="section-container">
-            <xforms:switch id="section-{@id}" ref="{if (@ref) then @ref else '.'}">
+            <xforms:switch id="switch-{@id}" ref="{if (@ref) then @ref else '.'}">
                 <xforms:case id="case-{@id}-closed" selected="{if (@open = 'false') then 'true' else 'false'}">
                     <xhtml:div>
                         <xhtml:h2>
@@ -125,7 +125,8 @@
                                     <xsl:apply-templates select="xforms:label"/>
                                 </xforms:label>
                                 <xforms:action ev:event="DOMActivate">
-                                    <xforms:setvalue model="fr-sections-model" ref="instance('fr-current-section-instance')" value="'{@id}'"/>
+                                    <xforms:setvalue model="fr-sections-model" ref="instance('fr-current-section-instance')"
+                                                     value="concat('{@id}', if (empty(event('repeat-indexes'))) then '' else concat('·', string-join(event('repeat-indexes'), '-')))"/>
                                     <xforms:dispatch target="fr-sections-model" name="fr-expand"/>
                                 </xforms:action>
                             </xforms:trigger>
@@ -141,7 +142,8 @@
                                     <xsl:apply-templates select="xforms:label"/>
                                 </xforms:label>
                                 <xforms:action ev:event="DOMActivate">
-                                    <xforms:setvalue model="fr-sections-model" ref="instance('fr-current-section-instance')" value="'{@id}'"/>
+                                    <xforms:setvalue model="fr-sections-model" ref="instance('fr-current-section-instance')"
+                                                     value="concat('{@id}', if (empty(event('repeat-indexes'))) then '' else concat('·', string-join(event('repeat-indexes'), '-')))"/>
                                     <xforms:dispatch target="fr-sections-model" name="fr-collapse" />
                                 </xforms:action>
                             </xforms:trigger>

@@ -151,10 +151,6 @@
 
         <property name="build.portlet-classes.dir" value="${build.dir}/portlet-classes"/>
 
-        <property name="install.tomcat" value="tomcat-4.1.27"/>
-        <property name="install.jdk" value="jdk-1.4.2_01"/>
-        <property name="xml-renderkit.version.number" value="1.0"/>
-
         <property name="build.compiler" value="modern"/>
         <property name="build.compiler.pedantic" value="false"/>
         <property name="build.compiler.fulldepend" value="true"/>
@@ -710,79 +706,6 @@
         </fixcrlf>
         <tar tarfile="${build.distrib.dir}/${project.name}-${release.number}.tar.gz" compression="gzip" basedir="${build.temp.dir}/distrib"/>
         <delete file="${tmp-zip}"/>
-    </target>
-
-    <!--<target name="test-crlf">-->
-        <!--<fixcrlf srcDir="c:/temp/opswar" eol="crlf">-->
-            <!--<include name="**/*.txt"/>-->
-            <!--<include name="**/*.xml"/>-->
-            <!--<include name="**/*.xsl"/>-->
-            <!--<include name="**/*.xpl"/>-->
-            <!--<include name="**/*.jsp"/>-->
-            <!--<include name="**/*.jspx"/>-->
-            <!--<include name="**/*.html"/>-->
-            <!--<include name="**/*.js"/>-->
-            <!--<include name="**/*.css"/>-->
-            <!--<include name="**/*.java"/>-->
-            <!--<include name="**/*.properties"/>-->
-            <!--<include name="**/*.rng"/>-->
-            <!--<include name="**/*.xsd"/>-->
-            <!--<include name="**/*.xhtml"/>-->
-            <!--<include name="**/*.wsdl"/>-->
-        <!--</fixcrlf>-->
-    <!--</target>-->
-
-    <target name="orbeon-dist-install" depends="orbeon-dist-war">
-
-        <!-- Create directories -->
-        <mkdir dir="${build.dir}/install"/>
-        <mkdir dir="${build.dir}/install/${project.name}-${release.number}"/>
-        <mkdir dir="${build.dir}/install/${install.tomcat}"/>
-        <mkdir dir="${build.dir}/install/${install.jdk}"/>
-
-        <!-- Prepare JDK -->
-        <unzip src="descriptors/install/${install.jdk}.zip" dest="${build.dir}/install/${install.jdk}"/>
-
-        <!-- Prepare Tomcat -->
-        <unzip src="descriptors/install/${install.tomcat}.zip" dest="${build.dir}/install/${install.tomcat}"/>
-        <copy file="descriptors/install/server.xml" todir="${build.dir}/install/${install.tomcat}/conf">
-            <filterset>
-                <filter token="VERSION" value="${release.number}"/>
-            </filterset>
-        </copy>
-        <copy file="descriptors/install/tomcat-users.xml" todir="${build.dir}/install/${install.tomcat}/conf"/>
-        <copy file="descriptors/install/oxf.ico" todir="${build.dir}/install"/>
-        <copy file="descriptors/install/startOXF.bat" todir="${build.dir}/install"/>
-        <copy file="lib/hsqldb-1_8_0_7.jar" todir="${build.dir}/install/${install.tomcat}/common/lib"/>
-
-        <!-- Prepare Orbeon -->
-        <unzip src="build/distrib/${project.name}.war" dest="${build.dir}/install/${project.name}-${release.number}"/>
-        <!--<copy file="lib/portlet-api_1.0.jar" todir="${build.dir}/install/ops-${release.number}/WEB-INF/lib"/>-->
-        <delete file="${build.dir}/install/${project.name}-${release.number}/WEB-INF/web.xml"/>
-        <xslt in="build.xml" style="${descriptors.dir}/web.xsl"
-            out="${build.dir}/install/${project.name}-${release.number}/WEB-INF/web.xml">
-            <param name="target" expression="install"/>
-            <param name="build-root" expression="${build.root}"/>
-        </xslt>
-
-        <!-- Make sure that text files are in the Windows encoding -->
-        <fixcrlf srcDir="${build.dir}/install/" eol="crlf">
-            <include name="**/*.txt"/>
-            <include name="**/*.xml"/>
-            <include name="**/*.xsl"/>
-            <include name="**/*.xpl"/>
-            <include name="**/*.jsp"/>
-            <include name="**/*.jspx"/>
-            <include name="**/*.html"/>
-            <include name="**/*.js"/>
-            <include name="**/*.css"/>
-            <include name="**/*.java"/>
-        </fixcrlf>
-
-        <!-- Run install tool -->
-        <exec dir="descriptors/install" executable="${nsis.home}/makensis.exe">
-            <arg value="oxf.nsi"/>
-        </exec>
     </target>
 
     <target name="orbeon-dist" depends="orbeon-dist-packages"/>

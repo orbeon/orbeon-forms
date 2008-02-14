@@ -81,5 +81,28 @@
                 <xforms:setfocus ev:event="DOMActivate" control="select1"/>
             </xforms:trigger>
         </xhtml:p>
+        <xhtml:p>
+            <xforms:trigger appearance="minimal">
+                <xforms:setvalue ev:event="DOMActivate" ref=".">1</xforms:setvalue>
+                <xforms:label>
+                    <xhtml:b><xforms:output value="if (. = '1') then 'One' else ''"/></xhtml:b>
+                    <xforms:output value="if (. != '1') then 'One' else ''"/>
+                </xforms:label>
+            </xforms:trigger>
+            <xforms:trigger appearance="minimal">
+                <xforms:setvalue ev:event="DOMActivate" ref=".">2</xforms:setvalue>
+                <xforms:label>
+                    <xhtml:b><xforms:output value="if (. = '2') then 'Two' else ''"/></xhtml:b>
+                    <xforms:output value="if (. != '2') then 'Two' else ''"/>
+                </xforms:label>
+            </xforms:trigger>
+            <xforms:trigger appearance="minimal">
+                <xforms:setvalue ev:event="DOMActivate" ref=".">3</xforms:setvalue>
+                <xforms:label>
+                    <xhtml:b><xforms:output value="if (. = '3') then 'Three' else ''"/></xhtml:b>
+                    <xforms:output value="if (. != '3') then 'Three' else ''"/>
+                </xforms:label>
+            </xforms:trigger>
+        </xhtml:p>
     </xhtml:body>
 </xhtml:html>

@@ -82,6 +82,7 @@
 }
 
 .widgets-xforms-instance-inspector .xforms-label {
+    display: inline;
     font-weight: bold;
     font-style: italic;
     margin-right: .5em
@@ -89,4 +90,8 @@
 
 .widgets-xforms-instance-inspector .xforms-output {
     margin-right: 1em
+}
+
+.widgets-xforms-instance-inspector td {
+    padding: .5em
 }

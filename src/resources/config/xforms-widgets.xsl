@@ -175,9 +175,9 @@
                                 </xforms:item>
                             </xforms:select1>
                         </xhtml:td>
-                        <xhtml:td>
-                            <xforms:group>
-                                <xforms:dispatch ev:event="xforms-value-changed" name="DOMActivate" target="orbeon-xforms-instance-inspector-xpath"/>
+                        <xforms:group appearance="xxforms:internal">
+                            <xforms:dispatch ev:event="xforms-value-changed" name="DOMActivate" target="orbeon-xforms-instance-inspector-xpath"/>
+                            <xhtml:td>
                                 <!-- Model section -->
                                 <xforms:group ref=".[count(instance('orbeon-xforms-instance-inspector-itemset')/model) gt 1]">
                                     <xforms:select1 ref="instance('orbeon-xforms-instance-inspector-instance')/current-model">
@@ -196,7 +196,8 @@
                                         <xforms:label>Model: </xforms:label>
                                     </xforms:output>
                                 </xforms:group>
-                                <xhtml:span>&#160;</xhtml:span>
+                            </xhtml:td>
+                            <xhtml:td>
                                 <!-- Instance selection -->
                                 <xforms:group ref=".[count(instance('orbeon-xforms-instance-inspector-itemset')/model[@id = instance('orbeon-xforms-instance-inspector-instance')/current-model]/instance) gt 1]">
                                     <xforms:select1 ref="instance('orbeon-xforms-instance-inspector-instance')/current-instance">
@@ -212,8 +213,8 @@
                                         <xforms:label>Instance: </xforms:label>
                                     </xforms:output>
                                 </xforms:group>
-                            </xforms:group>
-                        </xhtml:td>
+                            </xhtml:td>
+                        </xforms:group>
                     </xhtml:tr>
                     <xhtml:tr>
                         <xhtml:td>
@@ -226,9 +227,9 @@
                                         control="orbeon-xforms-instance-inspector-xpath"/>
                             </xforms:select1>
                         </xhtml:td>
-                        <xhtml:td>
-                            <!-- XPath expression and trigger -->
-                            <xforms:group ref="instance('orbeon-xforms-instance-inspector-instance')/xpath">
+                        <xforms:group ref="instance('orbeon-xforms-instance-inspector-instance')/xpath" appearance="xxforms:internal">
+                            <xhtml:td>
+                                <!-- XPath expression and trigger -->
                                 <xforms:action ev:event="DOMActivate">
                                     <xforms:delete while="exists(instance('orbeon-xforms-instance-inspector-instance')/xml-output/node())"
                                             nodeset="instance('orbeon-xforms-instance-inspector-instance')/xml-output/node()"/>
@@ -240,6 +241,8 @@
                                 <xforms:input ref="." id="orbeon-xforms-instance-inspector-xpath">
                                     <xforms:label>XPath expression: </xforms:label>
                                 </xforms:input>
+                            </xhtml:td>
+                            <xhtml:td>
                                 <xforms:trigger ref=".">
                                     <xforms:label>Run XPath</xforms:label>
                                     <xforms:help>
@@ -254,8 +257,8 @@
                                         </xhtml:ul>
                                     </xforms:help>
                                 </xforms:trigger>
-                            </xforms:group>
-                        </xhtml:td>
+                            </xhtml:td>
+                        </xforms:group>
                     </xhtml:tr>
                     <xhtml:tr>
                         <xhtml:td/>

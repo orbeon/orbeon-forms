@@ -429,14 +429,14 @@
                         <instance xmlns=""/>
                     </xforms:instance>
 
-                    <xforms:instance id="template-instance" xxforms:readonly="true">
+                    <xforms:instance id="template-instance">
                         <book xmlns="">
                             <title/>
                             <author/>
                         </book>
                     </xforms:instance>
 
-                    <xforms:instance id="source-instance" xxforms:readonly="true">
+                    <xforms:instance id="source-instance">
                         <instance xmlns="">
                             <title>Don Quixote de la Mancha</title>
                             <author>Miguel de Cervantes Saavedra</author>

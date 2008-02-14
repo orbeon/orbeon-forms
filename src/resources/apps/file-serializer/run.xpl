@@ -34,9 +34,19 @@
     <!-- Write if necessary -->
     <p:choose href="#instance">
         <p:when test="/input/operation = ('write', 'write-read')">
+            <!-- Serialize XML -->
+            <p:processor name="oxf:xml-converter">
+                <p:input name="config">
+                    <config>
+                        <encoding>utf-8</encoding>
+                    </config>
+                </p:input>
+                <p:input name="data" href="#instance#xpointer(/input/text)"/>
+                <p:output name="data" id="converted"/>
+            </p:processor>
             <p:processor name="oxf:file-serializer">
                 <p:input name="config" href="#file-serializer-config"/>
-                <p:input name="data" href="#instance#xpointer(/input/text)"/>
+                <p:input name="data" href="#converted"/>
                 <p:output name="data" id="url-written"/>
             </p:processor>
         </p:when>
@@ -64,7 +74,14 @@
             </p:processor>
             <p:processor name="oxf:url-generator">
                 <p:input name="config" href="#url-generator-config"/>
-                <p:output name="data" id="text-read"/>
+                <p:output name="data" id="binary-read" debug="binary read"/>
+            </p:processor>
+            <p:processor name="oxf:to-xml-converter">
+                <p:input name="data" href="#binary-read"/>
+                <p:input name="config">
+                    <config/>
+                </p:input>
+                <p:output name="data" id="text-read" debug="text read"/>
             </p:processor>
         </p:when>
         <p:otherwise>
@@ -86,7 +103,7 @@
                 <xsl:copy-of select="doc('input:text')"/>
             </output>
         </p:input>
-        <p:output name="data" ref="data"/>
+        <p:output name="data" ref="data" debug="returned"/>
     </p:processor>
 
 </p:config>

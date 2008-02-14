@@ -224,10 +224,6 @@
     <!-- Summary data -->
     <xforms:instance id="fr-summary-instance">
         <documents xmlns="" total="0">
-            <!--<headers>-->
-                <!--<header/>-->
-                <!--<header/>-->
-            <!--</headers>-->
             <!--<document name="" created="" last-modified="">-->
                 <!--<id/>-->
                 <!--<details>-->

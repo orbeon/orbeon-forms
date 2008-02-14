@@ -30,35 +30,17 @@
         <xhtml:link rel="stylesheet" href="/ops/css/yui/reset-fonts-grids.css" type="text/css"/>
         <xhtml:link rel="stylesheet" href="/ops/css/yui/base-min.css" type="text/css"/>
         <xhtml:link rel="stylesheet" href="/apps/fr/style/form-runner.css" type="text/css"/>
-        <!-- Main XForms model -->
+        <!-- Summary page XForms model -->
         <xforms:model id="fr-summary-page-model">
+
+            <xforms:instance id="fr-dummy-instance">
+                <dummy/>
+            </xforms:instance>
 
             <xforms:action ev:event="xforms-ready">
                 <!-- Query list of documents -->
                 <xforms:send submission="search-submission"/>
             </xforms:action>
-
-            <xforms:bind nodeset="instance('fr-summary-instance')">
-                <xforms:bind nodeset="documents/document/document-date" type="xs:dateTime"/>
-            </xforms:bind>
-
-            <xforms:instance id="control-instance">
-                <control xmlns="">
-                    <non-empty-triggers/>
-                    <empty-triggers/>
-                    <non-empty/>
-                    <empty/>
-                    <error/>
-                </control>
-            </xforms:instance>
-
-            <xforms:bind nodeset="instance('control-instance')">
-                <xforms:bind nodeset="non-empty" relevant="count(instance('fr-summary-instance')/documents/document) > 0"/>
-                <xforms:bind nodeset="empty" relevant="count(instance('fr-summary-instance')/documents/document) = 0"/>
-
-                <xforms:bind nodeset="non-empty-triggers" readonly="not(count(instance('fr-summary-instance')/documents/document) > 0)"/>
-                <xforms:bind nodeset="empty-triggers" readonly="not(count(instance('fr-summary-instance')/documents/document) = 0)"/>
-            </xforms:bind>
 
         </xforms:model>
         <!-- Model to handle resources -->
@@ -114,31 +96,6 @@
                     Summary for form:
                     <xforms:output model="fr-persistence-model" value="instance('fr-source-form-instance')/xhtml:head/xhtml:title"/>
                 </h2>
-                <!-- Select form -->
-                <xforms:select1 ref="instance('fr-parameters-instance')/form" appearance="full">
-                    <xforms:label model="fr-resources-model" ref="instance('fr-common-resources')/summary/labels/form-choice"/>
-                    <!-- TODO: get list of forms through service -->
-                    <xforms:item>
-                        <xforms:label>DMV-14</xforms:label>
-                        <xforms:value>DMV-14</xforms:value>
-                    </xforms:item>
-                    <xforms:item>
-                        <xforms:label>G-325A</xforms:label>
-                        <xforms:value>G-325A</xforms:value>
-                    </xforms:item>
-                    <xforms:action ev:event="xforms-value-changed">
-                        <!-- Set summary query -->
-                        <xforms:insert nodeset="xxforms:instance('list-documents-query')"
-                                       origin="doc(concat('oxf:/apps/forms/forms/', instance('fr-parameters-instance')/form-id, '/summary-query.xml'))"/>
-                        <!-- Query list of documents -->
-                        <xforms:send submission="search-submission"/>
-                        <!-- Get up to date resources for this form -->
-                        <xforms:dispatch name="orbeon-update-language" target="fr-resources-model"/>
-                        <!-- Reset index -->
-                        <xforms:setindex repeat="documents-repeat" index="1"/>
-                    </xforms:action>
-                </xforms:select1>
-
                 <!-- Free-text search -->
                 <xforms:input model="fr-persistence-model" ref="instance('fr-search-instance')/query" incremental="true" class="fr-search-input">
                     <xforms:label model="fr-resources-model" ref="instance('fr-common-resources')/summary/labels/search"/>

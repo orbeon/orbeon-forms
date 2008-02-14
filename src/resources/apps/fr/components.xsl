@@ -32,8 +32,7 @@
         <xforms:input model="fr-persistence-model" ref="instance('fr-persistence-instance')/data-status" id="fr-data-status-input" class="xforms-disabled"/>
 
         <xhtml:div id="doc4" class="yui-t5xxx">
-            <xhtml:div id="hd" class="fr-top">
-            </xhtml:div>
+            <xhtml:div id="hd" class="fr-top"/>
             <xhtml:div id="bd" class="fr-container">
                 <xhtml:div id="yui-main">
                     <xhtml:div class="yui-b">
@@ -65,13 +64,19 @@
                                 <xforms:group appearance="xxforms:internal">
                                     <!-- Clear message upon user interaction -->
                                     <xforms:setvalue ev:event="DOMFocusIn" model="fr-persistence-model" ref="instance('fr-persistence-instance')/message"/>
-                                    <!-- Mark status as dirty if data changes -->
-                                    <xforms:setvalue ev:event="xforms-value-changed" model="fr-persistence-model" ref="instance('fr-persistence-instance')/data-status">dirty</xforms:setvalue>
+                                    
+                                    <!-- Mark status as dirty if data changes in fr-form-instance instance only -->
+                                    <xforms:setvalue ev:event="xforms-value-changed"
+                                                     if="event('target-ref')/ancestor::*[last()] is xxforms:instance('fr-form-instance')"
+                                                     model="fr-persistence-model"
+                                                     ref="instance('fr-persistence-instance')/data-status">dirty</xforms:setvalue>
+
                                     <!-- Take action upon xforms-help -->
                                     <!--<xforms:action ev:event="xforms-help" ev:defaultAction="cancel">-->
                                         <!--<xforms:setvalue model="fr-help-model" ref="instance('fr-help-instance')/label" value="event('label')"/>-->
                                         <!--<xforms:setvalue model="fr-help-model" ref="instance('fr-help-instance')/help" value="event('help')"/>-->
                                     <!--</xforms:action>-->
+
                                     <!-- Main form content -->
                                     <xsl:apply-templates select="fr:body/node()"/>
                                 </xforms:group>
@@ -103,8 +108,7 @@
                     <!--</xhtml:div>-->
                 </xhtml:div>
             </xhtml:div>
-            <xhtml:div id="ft" class="fr-bottom">
-            </xhtml:div>
+            <xhtml:div id="ft" class="fr-bottom"/>
 
         </xhtml:div>
     </xsl:template>

@@ -332,10 +332,6 @@
     <!-- WAR -->
     <target name="war" depends="jars">
         <echo message="war.dir: ${war.dir}"/>
-        <mkdir dir="${war.classes}"/>
-        <copy todir="${war.classes}">
-            <fileset dir="descriptors/examples/web/jboss-security" includes="*.properties"/>
-        </copy>
 
         <copy todir="${war.lib}">
           <fileset refid='war.libs' />
@@ -381,20 +377,10 @@
 
     <target name="war-copy-descriptors" depends="prepare">
         <copy todir="${war.inf}">
-            <fileset dir="${descriptors.dir}">
-                <include name="*.xml"/>
-            </fileset>
-        </copy>
-        <!-- eXist database -->
-        <mkdir dir="${war.inf}/exist-data"/>
-        <copy todir="${war.inf}/exist-data">
-            <fileset dir="${descriptors.dir}/exist-data">
-                <include name="README.txt"/>
-                <exclude name="*.dbx"/>
-            </fileset>
+            <fileset dir="descriptors/web-inf/static"/>
         </copy>
         <echo message="Target: ${target}"/>
-        <xslt in="build.xml" style="${descriptors.dir}/web.xsl" out="${war.inf}/web.xml" force="true">
+        <xslt in="build.xml" style="descriptors/web-inf/dynamic/web.xsl" out="${war.inf}/web.xml" force="true">
             <param name="target" expression="${target}"/>
             <param name="build-root" expression="${build.root}"/>
             <param name="build-root" expression="${build.root}"/>
@@ -404,12 +390,8 @@
 
     <!-- WAR file -->
     <target name="orbeon-war" depends="classes" description="Create uncompressed WAR file">
-        <antcall target="war">
-            <param name="descriptors.dir" value="descriptors/examples/web"/>
-        </antcall>
-
+        <antcall target="war"/>
         <antcall target="war-copy-descriptors">
-            <param name="descriptors.dir" value="descriptors/examples/web"/>
             <param name="target" value="devel"/>
             <param name="build.root" value="${build.root}"/>
         </antcall>
@@ -630,11 +612,8 @@
     <target name="orbeon-dist-war" depends="init">
         <mkdir dir="${build.distrib.dir}"/>
 
-        <antcall target="war">
-            <param name="descriptors.dir" value="descriptors/examples/web"/>
-        </antcall>
+        <antcall target="war"/>
         <antcall target="war-copy-descriptors">
-            <param name="descriptors.dir" value="descriptors/examples/web"/>
             <param name="target" value="war"/>
             <param name="build.root" value="${build.root}"/>
         </antcall>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    Copyright (C) 2007 Orbeon, Inc.
+    Copyright (C) 2008 Orbeon, Inc.
 
     This program is free software; you can redistribute it and/or modify it under the terms of the
     GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -114,69 +114,90 @@
                     Summary for form:
                     <xforms:output model="fr-persistence-model" value="instance('fr-source-form-instance')/xhtml:head/xhtml:title"/>
                 </h2>
-                <p>
-                    <!-- Select form -->
-                    <xforms:select1 ref="instance('fr-parameters-instance')/form" appearance="full">
-                        <xforms:label model="fr-resources-model" ref="instance('fr-common-resources')/summary/labels/form-choice"/>
-                        <!-- TODO: get list of forms through service -->
-                        <xforms:item>
-                            <xforms:label>DMV-14</xforms:label>
-                            <xforms:value>DMV-14</xforms:value>
-                        </xforms:item>
-                        <xforms:item>
-                            <xforms:label>G-325A</xforms:label>
-                            <xforms:value>G-325A</xforms:value>
-                        </xforms:item>
-                        <xforms:action ev:event="xforms-value-changed">
-                            <!-- Set summary query -->
-                            <xforms:insert nodeset="xxforms:instance('list-documents-query')"
-                                           origin="doc(concat('oxf:/apps/forms/forms/', instance('fr-parameters-instance')/form-id, '/summary-query.xml'))"/>
-                            <!-- Query list of documents -->
-                            <xforms:send submission="search-submission"/>
-                            <!-- Get up to date resources for this form -->
-                            <xforms:dispatch name="orbeon-update-language" target="fr-resources-model"/>
-                            <!-- Reset index -->
-                            <xforms:setindex repeat="documents-repeat" index="1"/>
-                        </xforms:action>
-                    </xforms:select1>
+                <!-- Select form -->
+                <xforms:select1 ref="instance('fr-parameters-instance')/form" appearance="full">
+                    <xforms:label model="fr-resources-model" ref="instance('fr-common-resources')/summary/labels/form-choice"/>
+                    <!-- TODO: get list of forms through service -->
+                    <xforms:item>
+                        <xforms:label>DMV-14</xforms:label>
+                        <xforms:value>DMV-14</xforms:value>
+                    </xforms:item>
+                    <xforms:item>
+                        <xforms:label>G-325A</xforms:label>
+                        <xforms:value>G-325A</xforms:value>
+                    </xforms:item>
+                    <xforms:action ev:event="xforms-value-changed">
+                        <!-- Set summary query -->
+                        <xforms:insert nodeset="xxforms:instance('list-documents-query')"
+                                       origin="doc(concat('oxf:/apps/forms/forms/', instance('fr-parameters-instance')/form-id, '/summary-query.xml'))"/>
+                        <!-- Query list of documents -->
+                        <xforms:send submission="search-submission"/>
+                        <!-- Get up to date resources for this form -->
+                        <xforms:dispatch name="orbeon-update-language" target="fr-resources-model"/>
+                        <!-- Reset index -->
+                        <xforms:setindex repeat="documents-repeat" index="1"/>
+                    </xforms:action>
+                </xforms:select1>
 
-                    <!-- Free-text search -->
-                    <xforms:input model="fr-persistence-model" ref="instance('fr-search-instance')/query" incremental="true" class="fr-search-input">
-                        <xforms:label model="fr-resources-model" ref="instance('fr-common-resources')/summary/labels/search"/>
-                        <xforms:send ev:event="xforms-value-changed" submission="search-submission"/>
-                    </xforms:input>
+                <!-- Free-text search -->
+                <xforms:input model="fr-persistence-model" ref="instance('fr-search-instance')/query" incremental="true" class="fr-search-input">
+                    <xforms:label model="fr-resources-model" ref="instance('fr-common-resources')/summary/labels/search"/>
+                    <xforms:send ev:event="xforms-value-changed" submission="search-submission"/>
+                </xforms:input>
 
-                    <!-- Structured search -->
-                    <xforms:repeat model="fr-persistence-model" nodeset="instance('fr-search-instance')/query[@path]" id="search-repeat">
-                        <!-- TODO:  -->
-                        <xforms:input ref=".[@type = 'xs:string']">
-                            <xforms:label>
-                                <xforms:output model="fr-resources-model" value="for $header in context()/@name return instance('fr-form-resources')/summary/titles/*[local-name() = $header]"/>
-                            </xforms:label>
-                        </xforms:input>
-                        <xforms:send ev:event="xforms-value-changed" submission="search-submission"/>
-                    </xforms:repeat>
+                <!-- Structured search -->
+                <table>
+                    <tr>
+                        <xforms:repeat model="fr-persistence-model" nodeset="instance('fr-search-instance')/query[@path]" id="search-repeat">
+                            <td>
+                                <!-- input field -->
+                                <xforms:input ref=".[@control = 'input']">
+                                    <xforms:label>
+                                        <xforms:output model="fr-resources-model" value="instance('fr-form-resources')/summary/titles/*[local-name() = context()/@name]"/>
+                                    </xforms:label>
+                                </xforms:input>
+                                <!-- select1 field -->
+                                <xforms:select1 ref=".[@control = 'select1']">
+                                    <xforms:label>
+                                        <xforms:output model="fr-resources-model" value="instance('fr-form-resources')/summary/titles/*[local-name() = context()/@name]"/>
+                                    </xforms:label>
+                                    <xforms:item>
+                                        <xforms:label>[Any]</xforms:label>
+                                        <xforms:value/>
+                                    </xforms:item>
+                                    <xforms:itemset nodeset="instance('fr-source-form-instance')/xhtml:head/xforms:model/xforms:instance[@id = concat(context()/@name, 's-itemset')]/*/*">
+                                        <xforms:label ref="name"/>
+                                        <xforms:value ref="value"/>
+                                    </xforms:itemset>
+                                </xforms:select1>
+                                <xforms:send ev:event="xforms-value-changed" submission="search-submission"/>
+                            </td>
+                        </xforms:repeat>
+                    </tr>
+                </table>
 
-                    <!-- Switch languages -->
-                    <!-- TODO: get list of languages through service -->
-                    <xforms:select1 model="fr-resources-model" ref="instance('fr-language-instance')">
-                        <xforms:label ref="instance('fr-common-resources')/summary/labels/language-choice"/>
-                        <xforms:item>
-                            <xforms:label>en</xforms:label>
-                            <xforms:value>en</xforms:value>
-                        </xforms:item>
-                        <xforms:item>
-                            <xforms:label>fr</xforms:label>
-                            <xforms:value>fr</xforms:value>
-                        </xforms:item>
-                        <xforms:dispatch ev:event="xforms-value-changed" name="orbeon-update-language" target="fr-resources-model"/>
-                    </xforms:select1>
-                </p>
+                <!-- Switch languages -->
+                <!-- TODO: get list of languages through service -->
+                <xforms:select1 model="fr-resources-model" ref="instance('fr-language-instance')">
+                    <xforms:label ref="instance('fr-common-resources')/summary/labels/language-choice"/>
+                    <xforms:item>
+                        <xforms:label>en</xforms:label>
+                        <xforms:value>en</xforms:value>
+                    </xforms:item>
+                    <xforms:item>
+                        <xforms:label>fr</xforms:label>
+                        <xforms:value>fr</xforms:value>
+                    </xforms:item>
+                    <xforms:dispatch ev:event="xforms-value-changed" name="orbeon-update-language" target="fr-resources-model"/>
+                </xforms:select1>
 
                 <xforms:group model="fr-persistence-model" ref="instance('fr-summary-instance')[document]">
-                    <p>
-                        <xforms:output model="fr-resources-model" mediatype="text/html" value="saxon:serialize(instance('fr-common-resources')/summary/messages/intro/node(), 'html')"/>
-                    </p>
+
+                    <!-- Display welcome message -->
+                    <xforms:output model="fr-resources-model" mediatype="text/html"
+                                   value="saxon:serialize(instance('fr-common-resources')/summary/messages/intro/node(), 'html')"
+                                   class="fr-summary-welcome-message"/>
+
                     <table class="fr-tabular fr-summary-table">
                         <tr>
                             <th><xforms:output model="fr-resources-model" value="instance('fr-common-resources')/summary/titles/row-number"/></th>

@@ -167,6 +167,8 @@ h3, h4 {
 .fr-summary-table tr:hover { background: red }
 .fr-summary-table tr:hover { background: red }
 
+.fr-summary-welcome-message { display: block; margin-top: 1em; margin-bottom: 1em }
+
 hr {
     border: 1px solid #eee;
 }
@@ -245,6 +247,7 @@ td { border: 0 }
 h1 { font-size: 197% }
 i { font-style: italic }
 a { color: #3598D4 }
+td {padding: 0 }
 
 /* Not sure why the YUI resets this to center */
 body { text-align: left }

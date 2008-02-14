@@ -88,18 +88,16 @@
                     <!-- Trigger shown to go back if the data is dirty -->
                     <xforms:trigger ref="instance('fr-persistence-instance')[data-status = 'dirty']">
                         <xforms:label><xhtml:img src="/apps/fr/style/previous.gif" alt=""/> <xhtml:span>Discard</xhtml:span></xforms:label>
-                        <!-- TODO -->
-                        <!--<xforms:action ev:event="DOMActivate">-->
-                            <!--<xforms:dispatch target="fr-persistence-model" name="orbeon-save"/>-->
-                        <!--</xforms:action>-->
+                        <xforms:action ev:event="DOMActivate">
+                            <xforms:dispatch target="fr-persistence-model" name="orbeon-summary"/>
+                        </xforms:action>
                     </xforms:trigger>
                     <!-- Trigger shown to go back if the data is clean -->
                     <xforms:trigger ref="instance('fr-persistence-instance')[data-status = 'clean']">
                         <xforms:label><xhtml:img src="/apps/fr/style/previous.gif" alt=""/> <xhtml:span>Back</xhtml:span></xforms:label>
-                        <!-- TODO -->
-                        <!--<xforms:action ev:event="DOMActivate">-->
-                            <!--<xforms:dispatch target="fr-persistence-model" name="orbeon-save"/>-->
-                        <!--</xforms:action>-->
+                        <xforms:action ev:event="DOMActivate">
+                            <xforms:dispatch target="fr-persistence-model" name="orbeon-summary"/>
+                        </xforms:action>
                     </xforms:trigger>
                     <xforms:trigger ref="instance('fr-triggers-instance')/save">
                         <xforms:label><xhtml:img src="/apps/fr/style/run.gif" alt=""/> <xhtml:span>Save Form</xhtml:span></xforms:label>

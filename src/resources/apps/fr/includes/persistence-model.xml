@@ -95,6 +95,10 @@
         <!--<xforms:load resource="xxx" f:url-type="resource" xxforms:show-progress="false"/>-->
     </xforms:action>
 
+    <xforms:action ev:event="orbeon-summary">
+        <xforms:load resource="/fr/{instance('fr-parameters-instance')/app}/{instance('fr-parameters-instance')/form}"/>
+    </xforms:action>
+
     <!-- Parameters passed to this page -->
     <xforms:instance id="fr-parameters-instance" src="input:instance"/>
 

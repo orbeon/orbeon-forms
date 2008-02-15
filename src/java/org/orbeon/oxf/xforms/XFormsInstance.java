@@ -554,10 +554,10 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventHandlerCont
         return getModel(containingDocument).getEventHandlersForInstance(instanceId);
     }
 
-    public void logIfNeeded(String message) {
+    public void logIfNeeded(XFormsContainingDocument containingDocument, String message) {
         if (logger.isDebugEnabled()) {
-            logger.debug("XForms - " + message + ": model id='" + getModelId() +  "', instance id= '" + getEffectiveId() + "'\n"
-                    + TransformerUtils.tinyTreeToString(getInstanceRootElementInfo()));
+            containingDocument.logDebug("instance", message, new String[] { "model id", getModelId(), "isntance id", getEffectiveId(),
+                    "instance", TransformerUtils.tinyTreeToString(getInstanceRootElementInfo()) } );
         }
     }
 

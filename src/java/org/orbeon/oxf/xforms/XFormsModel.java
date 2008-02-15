@@ -879,17 +879,19 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                                                 (LocationData) instanceContainerElement.getData());
 
                                     if (XFormsServer.logger.isDebugEnabled())
-                                        XFormsServer.logger.debug("XForms - using instance from application shared instance cache (instance from static state was not initialized): " + staticStateInstance.getEffectiveId());
+                                        containingDocument.logDebug("model", "using instance from application shared instance cache (instance from static state was not initialized)",
+                                                new String[] { "id", staticStateInstance.getEffectiveId() });
 
                                     final SharedXFormsInstance sharedInstance
-                                            = XFormsServerSharedInstancesCache.instance().find(pipelineContext, staticStateInstance.getEffectiveId(), staticStateInstance.getModelId(), staticStateInstance.getSourceURI(), staticStateInstance.getTimeToLive(), staticStateInstance.getValidation());
+                                            = XFormsServerSharedInstancesCache.instance().find(pipelineContext, containingDocument, staticStateInstance.getEffectiveId(), staticStateInstance.getModelId(), staticStateInstance.getSourceURI(), staticStateInstance.getTimeToLive(), staticStateInstance.getValidation());
                                     setInstance(sharedInstance, false);
 
                                 } else {
                                     // Instance is initialized, just use it
 
                                     if (XFormsServer.logger.isDebugEnabled())
-                                        XFormsServer.logger.debug("XForms - using initialized instance from static state: " + staticStateInstance.getEffectiveId());
+                                        containingDocument.logDebug("model", "using initialized instance from static state",
+                                                new String[] { "id", staticStateInstance.getEffectiveId() });
 
                                     setInstance(staticStateInstance, false);
                                 }
@@ -958,7 +960,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                                 final URI resolvedURI = XFormsUtils.resolveXMLBase(instanceContainerElement, instanceResource);
 
                                 if (XFormsServer.logger.isDebugEnabled())
-                                    XFormsServer.logger.debug("XForms - getting document from optimized URI for: " + resolvedURI.toString());
+                                    containingDocument.logDebug("model", "getting document from optimized URI",
+                                                new String[] { "URI", resolvedURI.toString() });
 
                                 connectionResult = XFormsSubmissionUtils.doOptimized(pipelineContext, externalContext, null, "get", resolvedURI.toString(), null, false, null, null);
 
@@ -1019,7 +1022,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
                                 // Get instance from shared cache if possible
                                 if (isApplicationSharedHint) {
-                                    final SharedXFormsInstance sharedXFormsInstance = XFormsServerSharedInstancesCache.instance().find(pipelineContext, instanceId, modelId, absoluteResolvedURLString, xxformsTimeToLive, xxformsValidation);
+                                    final SharedXFormsInstance sharedXFormsInstance = XFormsServerSharedInstancesCache.instance().find(pipelineContext, containingDocument, instanceId, modelId, absoluteResolvedURLString, xxformsTimeToLive, xxformsValidation);
                                     setInstance(sharedXFormsInstance, false);
                                     continue;
                                 }
@@ -1028,9 +1031,10 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                                     // Connect directly if there is no resolver or if the instance is globally shared
 
                                     if (XFormsServer.logger.isDebugEnabled())
-                                        XFormsServer.logger.debug("XForms - getting document from URI for: " + absoluteResolvedURLString);
+                                        containingDocument.logDebug("model", "getting document from URI",
+                                                new String[] { "URI", absoluteResolvedURLString });
 
-                                    connectionResult = XFormsSubmissionUtils.doRegular(externalContext,
+                                    connectionResult = XFormsSubmissionUtils.doRegular(externalContext, containingDocument,
                                             "get", absoluteResolvedURL, xxformsUsername, xxformsPassword, null, null, null, null);
 
                                     try {
@@ -1062,7 +1066,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                                 } else {
                                     // Optimized case that uses the provided resolver
                                     if (XFormsServer.logger.isDebugEnabled())
-                                        XFormsServer.logger.debug("XForms - getting document from resolver for: " + absoluteResolvedURLString);
+                                        containingDocument.logDebug("model", "getting document from resolver",
+                                                new String[] { "URI", absoluteResolvedURLString });
 
                                     try {
                                         // TODO: Handle validating and handleXInclude!
@@ -1091,7 +1096,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
                         if (XFormsServer.logger.isDebugEnabled()) {
                             final long submissionTime = System.currentTimeMillis() - startTime;
-                            XFormsServer.logger.debug("XForms - instance loading time for instance '" + instanceId + "' (including handling returned body): " + submissionTime);
+                            containingDocument.logDebug("model", "done loading instance (including handling returned body)",
+                                    new String[] { "instance", instanceId, "time", Long.toString(submissionTime) });
                         }
 
                         // Set instance and associated information if everything went well
@@ -1147,11 +1153,13 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                             // NOTE: We add all shared instances, even the globally shared ones, and the static state
                             // decides of the amount of information to actually store
                             if (XFormsServer.logger.isDebugEnabled())
-                                XFormsServer.logger.debug("XForms - adding read-only instance to static state: " + currentInstance.getEffectiveId());
+                                containingDocument.logDebug("model", "adding read-only instance to static state",
+                                    new String[] { "instance", currentInstance.getEffectiveId() });
                             staticState.addInstance((SharedXFormsInstance) currentInstance);
                         } else if (modelHasReset) {
                             if (XFormsServer.logger.isDebugEnabled())
-                                XFormsServer.logger.debug("XForms - adding reset instance to static state: " + currentInstance.getEffectiveId());
+                                containingDocument.logDebug("model", "adding reset instance to static state",
+                                    new String[] { "instance", currentInstance.getEffectiveId() });
                             staticState.addInstance(currentInstance.createSharedInstance());
                         }
                     }
@@ -1303,7 +1311,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         // TODO: rebuild computational dependency data structures
 
         if (XFormsServer.logger.isDebugEnabled())
-            XFormsServer.logger.debug("XForms - performing rebuild for model: " + getEffectiveId());
+            containingDocument.logDebug("model", "performing rebuild", new String[] { "model id", getEffectiveId() });
 
         // "Actions that directly invoke rebuild, recalculate, revalidate, or refresh always
         // have an immediate effect, and clear the corresponding flag."
@@ -1314,7 +1322,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
     public void doRecalculate(PipelineContext pipelineContext) {
 
         if (XFormsServer.logger.isDebugEnabled())
-            XFormsServer.logger.debug("XForms - performing recalculate for model: " + getEffectiveId());
+            containingDocument.logDebug("model", "performing recalculate", new String[] { "model id", getEffectiveId() });
 
         if (instances != null) {
             // NOTE: we do not correctly handle computational dependencies, but it doesn't hurt
@@ -1338,8 +1346,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
             applyComputedExpressionBinds(pipelineContext);
 
             if (XFormsServer.logger.isDebugEnabled()) {
-                final long submissionTime = System.currentTimeMillis() - recalculateStartTime;
-                XFormsServer.logger.debug("XForms - recalculate time: " + submissionTime);
+                final long recalculateTime = System.currentTimeMillis() - recalculateStartTime;
+                containingDocument.logDebug("model", "done recalculating", new String[] { "time", Long.toString(recalculateTime) });
             }
         }
 
@@ -1353,7 +1361,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
     public void doRevalidate(final PipelineContext pipelineContext) {
 
         if (XFormsServer.logger.isDebugEnabled())
-            XFormsServer.logger.debug("XForms - performing revalidate for model: " + getEffectiveId());
+            containingDocument.logDebug("model", "performing revalidate", new String[] { "model id", getEffectiveId() });
 
         if (instances != null) {
             final long revalidateStartTime = XFormsServer.logger.isDebugEnabled() ? System.currentTimeMillis() : 0;
@@ -1376,8 +1384,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
             });
 
             if (XFormsServer.logger.isDebugEnabled()) {
-                final long submissionTime = System.currentTimeMillis() - revalidateStartTime;
-                XFormsServer.logger.debug("XForms - revalidate time: " + submissionTime);
+                final long revalidateTime = System.currentTimeMillis() - revalidateStartTime;
+                containingDocument.logDebug("model", "done rebuilding", new String[] { "model id", getEffectiveId(), "time", Long.toString(revalidateTime) });
             }
         }
 
@@ -1413,7 +1421,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
             return;
 
         if (XFormsServer.logger.isDebugEnabled())
-            XFormsServer.logger.debug("XForms - performing refresh for model: " + getEffectiveId());
+            containingDocument.logDebug("model", "performing refresh", new String[] { "model id", getEffectiveId() });
 
         // If this is the first refresh we mark nodes to dispatch MIP events
         final boolean isMustMarkMIPEvents = containingDocument.isInitializationFirstRefreshClear();
@@ -1727,7 +1735,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
             }
         } else {
             // No UI events to send because there is no event handlers for any of them
-            XFormsServer.logger.debug("XForms - skipping sending of UI events because no listener was found.");
+            containingDocument.logDebug("model", "refresh skipping sending of UI events because no listener was found", new String[] { "model id", getEffectiveId() });
 
             // NOTE: We clear for all models, as we are processing refresh events for all models here. This may have to be changed in the future.
             containingDocument.synchronizeInstanceDataEventState();
@@ -1786,7 +1794,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
             if (xformsControls != null && xformsControls.getCurrentControlsState() != null) {// this just handles the legacy XForms engine which doesn't use the controls
 
                 if (XFormsServer.logger.isDebugEnabled())
-                    XFormsServer.logger.debug("XForms - marking nodes for value change following instance replacement: " + newInstance.getEffectiveId());
+                    containingDocument.logDebug("model", "marking nodes for value change following instance replacement",
+                            new String[] { "isntance id", newInstance.getEffectiveId() });
 
                 // Rebuild controls if needed
                 // NOTE: This requires recalculate and revalidate to take place for 1) relevance handling and 2) type handling

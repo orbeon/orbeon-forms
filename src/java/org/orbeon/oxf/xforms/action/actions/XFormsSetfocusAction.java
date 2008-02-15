@@ -67,7 +67,8 @@ public class XFormsSetfocusAction extends XFormsAction {
             // "If there is a null search result for the target object and the source object is an XForms action such as
             // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."
             if (XFormsServer.logger.isInfoEnabled())
-                XFormsServer.logger.info("XForms - xforms:setfocus does not refer to an existing control: " + resolvedControlId + ". Ignoring action.");
+                containingDocument.logDebug("xforms:setfocus", "control does not refer to an existing control element, ignoring action",
+                        new String[] { "control id", resolvedControlId } );
         }
     }
 }

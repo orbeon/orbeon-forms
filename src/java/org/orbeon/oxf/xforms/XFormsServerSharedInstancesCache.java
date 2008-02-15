@@ -24,7 +24,6 @@ import org.orbeon.saxon.om.DocumentInfo;
 
 import java.net.URL;
 import java.net.MalformedURLException;
-import java.util.Iterator;
 
 /**
  * Cache for shared and immutable XForms instances.
@@ -50,10 +49,10 @@ public class XFormsServerSharedInstancesCache {
         return instance;
     }
 
-    private void add(PipelineContext pipelineContext, String instanceSourceURI, SharedXFormsInstance sharedXFormsInstance) {
+    private void add(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, String instanceSourceURI, SharedXFormsInstance sharedXFormsInstance) {
 
         if (XFormsServer.logger.isDebugEnabled())
-            XFormsServer.logger.debug("XForms - adding application shared instance with id '" + sharedXFormsInstance.getEffectiveId() + "' to cache for URI: " + instanceSourceURI);
+            containingDocument.logDebug("shared instance cache", "adding instance", new String[] { "id", sharedXFormsInstance.getEffectiveId(), "URI", instanceSourceURI });
 
         final Cache cache = ObjectCache.instance(XFORMS_SHARED_INSTANCES_CACHE_NAME, XFORMS_SHARED_INSTANCES_CACHE_DEFAULT_SIZE);
         final InternalCacheKey cacheKey = new InternalCacheKey(SHARED_INSTANCE_KEY_TYPE, instanceSourceURI);
@@ -61,9 +60,9 @@ public class XFormsServerSharedInstancesCache {
         cache.add(pipelineContext, cacheKey, CONSTANT_VALIDITY, new SharedInstanceCacheEntry(sharedXFormsInstance, System.currentTimeMillis()));
     }
 
-    public SharedXFormsInstance find(PipelineContext pipelineContext, String instanceId, String modelId, String sourceURI, long timeToLive, String validation) {
+    public SharedXFormsInstance find(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, String instanceId, String modelId, String sourceURI, long timeToLive, String validation) {
         // Try to find in cache
-        final SharedXFormsInstance existingInstance = findInCache(pipelineContext, instanceId, modelId, sourceURI);
+        final SharedXFormsInstance existingInstance = findInCache(pipelineContext, containingDocument, instanceId, modelId, sourceURI);
         if (existingInstance != null) {
             // Found from the cache
             return existingInstance;
@@ -85,11 +84,12 @@ public class XFormsServerSharedInstancesCache {
             }
 
             if (XFormsServer.logger.isDebugEnabled())
-                XFormsServer.logger.debug("XForms - loading application shared instance from URI for: " + sourceURI);
+                containingDocument.logDebug("shared instance cache", "loading instance",
+                        new String[] { "id", instanceId, "URI", sourceURI });
 
             final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
             final XFormsModelSubmission.ConnectionResult connectionResult = XFormsSubmissionUtils.doRegular(externalContext,
-                    "get", sourceURL, null, null, null, null, null, null);
+                    null, "get", sourceURL, null, null, null, null, null, null);
 
             // Handle connection errors
             if (connectionResult.resultCode != 200) {
@@ -104,7 +104,7 @@ public class XFormsServerSharedInstancesCache {
                 final SharedXFormsInstance newInstance = new SharedXFormsInstance(modelId, instanceId, documentInfo, sourceURI, null, null, true, timeToLive, validation);
 
                 // Add result to cache
-                add(pipelineContext, sourceURI, newInstance);
+                add(pipelineContext, containingDocument, sourceURI, newInstance);
 
                 return newInstance;
             } catch (Exception e) {
@@ -116,7 +116,7 @@ public class XFormsServerSharedInstancesCache {
         }
     }
 
-    private synchronized SharedXFormsInstance findInCache(PipelineContext pipelineContext, String instanceId, String modelId, String sourceURI) {
+    private synchronized SharedXFormsInstance findInCache(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, String instanceId, String modelId, String sourceURI) {
         final Cache cache = ObjectCache.instance(XFORMS_SHARED_INSTANCES_CACHE_NAME, XFORMS_SHARED_INSTANCES_CACHE_DEFAULT_SIZE);
         final InternalCacheKey cacheKey = new InternalCacheKey(SHARED_INSTANCE_KEY_TYPE, sourceURI);
         final SharedInstanceCacheEntry sharedInstanceCacheEntry = (SharedInstanceCacheEntry) cache.findValid(pipelineContext, cacheKey, CONSTANT_VALIDITY);
@@ -128,14 +128,14 @@ public class XFormsServerSharedInstancesCache {
         // Remove expired entry if any
         if (isExpired) {
             if (XFormsServer.logger.isDebugEnabled())
-                XFormsServer.logger.debug("XForms - expiring application shared instance: " + sourceURI);
+                containingDocument.logDebug("shared instance cache", "expiring instance", new String[] { "id", instanceId, "URI", sourceURI });
             cache.remove(pipelineContext, cacheKey);
         }
 
         if (sharedInstanceCacheEntry != null && !isExpired) {
             // Instance was found
             if (XFormsServer.logger.isDebugEnabled())
-                XFormsServer.logger.debug("XForms - application shared instance with id '" + instanceId + "' found in cache for URI: " + sourceURI);
+                containingDocument.logDebug("shared instance cache", "found instance", new String[] { "id", instanceId, "URI", sourceURI });
 
             final SharedXFormsInstance sharedInstance = sharedInstanceCacheEntry.sharedInstance;
 
@@ -151,7 +151,7 @@ public class XFormsServerSharedInstancesCache {
     public synchronized void remove(PipelineContext pipelineContext, String instanceSourceURI) {
 
         if (XFormsServer.logger.isDebugEnabled())
-            XFormsServer.logger.debug("XForms - removing application shared instance with URI '" + instanceSourceURI);
+            XFormsContainingDocument.logDebugStatic("shared instance cache", "removing instance", new String[] { "URI", instanceSourceURI });
 
         final Cache cache = ObjectCache.instance(XFORMS_SHARED_INSTANCES_CACHE_NAME, XFORMS_SHARED_INSTANCES_CACHE_DEFAULT_SIZE);
         final InternalCacheKey cacheKey = new InternalCacheKey(SHARED_INSTANCE_KEY_TYPE, instanceSourceURI);
@@ -164,7 +164,7 @@ public class XFormsServerSharedInstancesCache {
         final int count = cache.removeAll(pipelineContext);
 
         if (XFormsServer.logger.isDebugEnabled())
-            XFormsServer.logger.debug("XForms - removed " + count + "application shared instances");
+            XFormsContainingDocument.logDebugStatic("shared instance cache", "removed all instances", new String[] { "count", Integer.toString(count) });
     }
 
     private static class SharedInstanceCacheEntry {

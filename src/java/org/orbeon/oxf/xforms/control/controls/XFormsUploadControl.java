@@ -90,10 +90,8 @@ public class XFormsUploadControl extends XFormsValueControl {
                     if (file.exists()) {
                         final boolean success = file.delete();
                         try {
-                            if (!success)
-                                XFormsServer.logger.debug("XForms - cannot delete temporary file upon upload: " + file.getCanonicalPath());
-                            else
-                                XFormsServer.logger.debug("XForms - deleted temporary file upon upload: " + file.getCanonicalPath());
+                            final String message = success ? "deleted temporary file upon upload" : "could not delete temporary file upon upload";
+                            containingDocument.logDebug("upload", message, new String[] { "path", file.getCanonicalPath() });
                         } catch (IOException e) {
                         }
                     }
@@ -111,10 +109,8 @@ public class XFormsUploadControl extends XFormsValueControl {
                     final File newFile = new File(newPath);
                     final boolean success = oldFile.renameTo(newFile);
                     try {
-                        if (!success)
-                            XFormsServer.logger.debug("XForms - cannot rename temporary file upon upload: " + oldFile.getCanonicalPath() + " to " + newFile.getCanonicalPath());
-                        else
-                            XFormsServer.logger.debug("XForms - renamed temporary file upon upload: " + oldFile.getCanonicalPath() + " to " + newFile.getCanonicalPath());
+                        final String message = success ? "renamed temporary file upon upload" : "could not rename temporary file upon upload";
+                        containingDocument.logDebug("upload", message, new String[] { "from", oldFile.getCanonicalPath(), "to", newFile.getCanonicalPath() });
                     } catch (IOException e) {
                     }
                     // Try to delete the file on exit and on session termination
@@ -127,16 +123,15 @@ public class XFormsUploadControl extends XFormsValueControl {
                                 public void sessionDestroyed() {
                                     final boolean success = newFile.delete();
                                     try {
-                                        if (!success)
-                                            XFormsServer.logger.debug("XForms - cannot delete temporary file upon session destruction: " + newFile.getCanonicalPath());
-                                        else
-                                            XFormsServer.logger.debug("XForms - deleted temporary file upon session destruction: " + newFile.getCanonicalPath());
+                                        final String message = success ? "deleted temporary file upon session destruction" : "could not delete temporary file upon session destruction";
+                                        containingDocument.logDebug("upload", message, new String[] { "file", newFile.getCanonicalPath() });
                                     } catch (IOException e) {
                                     }
                                 }
                             });
                         } else {
-                            XFormsServer.logger.debug("XForms - no existing session found so cannot register temporary file deletion upon session destruction: " + newFile.getCanonicalPath());
+                            containingDocument.logDebug("upload", "no existing session found so cannot register temporary file deletion upon session destruction",
+                                    new String[] { "file", newFile.getCanonicalPath() });
                         }
                     }
                     newValue = newFile.toURI().toString();

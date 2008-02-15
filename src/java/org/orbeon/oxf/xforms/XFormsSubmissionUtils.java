@@ -46,6 +46,8 @@ public class XFormsSubmissionUtils {
     public static XFormsModelSubmission.ConnectionResult doOptimized(PipelineContext pipelineContext, ExternalContext externalContext,
                                                                      XFormsModelSubmission xformsModelSubmission, String method, final String action, String mediatype, boolean doReplace,
                                                                      byte[] messageBody, String queryString) {
+
+        final XFormsContainingDocument containingDocument = xformsModelSubmission.getContainingDocument();
         try {
             if (isPost(method) || isPut(method) || isGet(method) || isDelete(method)) {
 
@@ -62,7 +64,8 @@ public class XFormsSubmissionUtils {
                         effectiveResourceURI = action;
 
                         if (XFormsServer.logger.isDebugEnabled())
-                            XFormsServer.logger.debug("XForms - setting request body: " + new String(messageBody, "UTF-8"));
+                            containingDocument.logDebug("submission", "setting request body",
+                                new String[] { "body", new String(messageBody, "UTF-8") });
 
                         requestAdapter = new ForwardExternalContextRequestWrapper(externalContext.getRequest(),
                                 effectiveResourceURI, method.toUpperCase(), (mediatype != null) ? mediatype : "application/xml", messageBody);
@@ -85,7 +88,8 @@ public class XFormsSubmissionUtils {
                 }
 
                 if (XFormsServer.logger.isDebugEnabled())
-                    XFormsServer.logger.debug("XForms - dispatching to effective resource URI: " + effectiveResourceURI);
+                    containingDocument.logDebug("submission", "dispatching request",
+                                new String[] { "effective resource URI", effectiveResourceURI });
 
                 final ExternalContext.RequestDispatcher requestDispatcher = externalContext.getRequestDispatcher(action);
                 final XFormsModelSubmission.ConnectionResult connectionResult = new XFormsModelSubmission.ConnectionResult(effectiveResourceURI) {
@@ -144,16 +148,16 @@ public class XFormsSubmissionUtils {
      *
      * @param action absolute URL or absolute path (which must include the context path)
      */
-    public static XFormsModelSubmission.ConnectionResult doRegular(ExternalContext externalContext,
+    public static XFormsModelSubmission.ConnectionResult doRegular(ExternalContext externalContext, XFormsContainingDocument containingDocument,
                                                                    String method, final String action, String username, String password, String mediatype,
                                                                    byte[] messageBody, String queryString, List headerNames, Map headerNameValues) {
 
         // Compute absolute submission URL
         final URL submissionURL = createAbsoluteURL(action, queryString, externalContext);
-        return doRegular(externalContext, method, submissionURL, username, password, mediatype, messageBody, headerNames, headerNameValues);
+        return doRegular(externalContext, containingDocument, method, submissionURL, username, password, mediatype, messageBody, headerNames, headerNameValues);
     }
 
-    public static XFormsModelSubmission.ConnectionResult doRegular(ExternalContext externalContext,
+    public static XFormsModelSubmission.ConnectionResult doRegular(ExternalContext externalContext, XFormsContainingDocument containingDocument,
                                                                    String method, final URL submissionURL, String username, String password, String mediatype,
                                                                    byte[] messageBody, List headerNames, Map headerNameValues) {
 
@@ -178,7 +182,8 @@ public class XFormsSubmissionUtils {
                     } catch (URISyntaxException e) {
                         throw new OXFException(e);
                     }
-                    XFormsServer.logger.debug("XForms - opening URL connection for: " + submissionURI.toString());
+                    XFormsContainingDocument.logDebugStatic(containingDocument, "submission", "opening URL connection",
+                        new String[] { "URL", submissionURI.toString() });
                 }
 
                 final URLConnection urlConnection = submissionURL.openConnection();
@@ -205,7 +210,8 @@ public class XFormsSubmissionUtils {
                     if (hasRequestBody) {
                         if (isPost(method) && "application/soap+xml".equals(contentTypeMediaType)) {
                             // SOAP POST
-                            XFormsServer.logger.debug("XForms - found SOAP POST.");
+
+                            XFormsContainingDocument.logDebugStatic(containingDocument, "submission", "found SOAP POST");
 
                             final Map parameters = NetUtils.getContentTypeParameters(mediatype);
                             final FastStringBuffer sb = new FastStringBuffer("text/xml");
@@ -230,7 +236,8 @@ public class XFormsSubmissionUtils {
                                 if (actionParameter != null) {
                                     // Set SOAPAction header
                                     urlConnection.setRequestProperty("SOAPAction", actionParameter);
-                                    XFormsServer.logger.debug("XForms - setting SOAPAction header: " + actionParameter);
+                                    XFormsContainingDocument.logDebugStatic(containingDocument, "submission", "setting header",
+                                        new String[] { "SOAPAction", actionParameter });
                                 }
                             }
                         } else {
@@ -239,7 +246,7 @@ public class XFormsSubmissionUtils {
                     } else {
                         if (isGet(method) && "application/soap+xml".equals(contentTypeMediaType)) {
                             // SOAP GET
-                            XFormsServer.logger.debug("XForms - found SOAP GET.");
+                            XFormsContainingDocument.logDebugStatic(containingDocument, "submission", "found SOAP GET");
 
                             final Map parameters = NetUtils.getContentTypeParameters(mediatype);
                             final FastStringBuffer sb = new FastStringBuffer("application/soap+xml");
@@ -275,7 +282,9 @@ public class XFormsSubmissionUtils {
 
                         final ExternalContext.Session session = externalContext.getSession(false);
                         if (session != null) {
-                            XFormsServer.logger.debug("XForms - setting JSESSIONID cookie: " + session.getId());
+                            XFormsContainingDocument.logDebugStatic(containingDocument, "submission", "setting cookie",
+                                new String[] { "JSESSIONID", session.getId() });
+
                             urlConnection.setRequestProperty("Cookie", "JSESSIONID=" + session.getId());
                         }
 
@@ -294,7 +303,8 @@ public class XFormsSubmissionUtils {
                     if (username == null) {
                         final String authorizationHeader = (String) externalContext.getRequest().getHeaderMap().get("authorization");
                         if (authorizationHeader != null) {
-                            XFormsServer.logger.debug("XForms - forwarding authorization header: " + authorizationHeader);
+                            XFormsContainingDocument.logDebugStatic(containingDocument, "submission", "forwarding header",
+                                new String[] { "Authorization ", authorizationHeader });
                             urlConnection.setRequestProperty("Authorization", authorizationHeader);
                         }
                     }
@@ -302,8 +312,8 @@ public class XFormsSubmissionUtils {
                     // Write request body if needed
                     if (hasRequestBody) {
                         if (XFormsServer.logger.isDebugEnabled())
-                            XFormsServer.logger.debug("XForms - setting request body: " + new String(messageBody, "UTF-8"));
-                        httpURLConnection.setRequestBody(messageBody);
+                            containingDocument.logDebug("submission", "setting request body",
+                                new String[] { "body", new String(messageBody, "UTF-8") });
                     }
 
                     urlConnection.connect();

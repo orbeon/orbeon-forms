@@ -35,6 +35,7 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.saxon.om.FastStringBuffer;
 
 import java.io.IOException;
 import java.util.*;
@@ -144,7 +145,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     public XFormsContainingDocument(PipelineContext pipelineContext, XFormsStaticState xformsStaticState,
                                     XFormsURIResolver uriResolver) {
 
-        XFormsServer.logger.debug("XForms - creating new ContainingDocument (static state object provided).");
+        logDebug("containing document", "creating new ContainingDocument (static state object provided).");
 
         // Remember static state
         this.xformsStaticState = xformsStaticState;
@@ -173,7 +174,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
      */
     public XFormsContainingDocument(PipelineContext pipelineContext, XFormsState xformsState) {
 
-        XFormsServer.logger.debug("XForms - creating new ContainingDocument (static state object not provided).");
+        logDebug("containing document", "creating new ContainingDocument (static state object not provided).");
 
         // Create static state object
         // TODO: Handle caching of XFormsStaticState object
@@ -661,7 +662,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                     throw new ValidationException("Event target id '" + controlId + "' is not an XFormsEventTarget.", getLocationData());
                 } else {
                     if (XFormsServer.logger.isDebugEnabled()) {
-                        XFormsServer.logger.debug("XForms - ignoring client event with invalid control id: " + controlId);
+                        logDebug("containing document", "ignoring client event with invalid control id", new String[] { "control id", controlId, "event name", eventName });
                     }
                     return;
                 }
@@ -682,7 +683,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                 // Check for implicitly allowed events
                 if (allowedXXFormsDialogExternalEvents.get(eventName) == null) {
                     if (XFormsServer.logger.isDebugEnabled()) {
-                        XFormsServer.logger.debug("XForms - ignoring invalid client event on xxforms:dialog: " + eventName);
+                        logDebug("containing document", "ignoring invalid client event on xxforms:dialog", new String[] { "control id", controlId, "event name", eventName });
                     }
                     return;
                 }
@@ -692,7 +693,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                 // Only single-node controls accept events from the client
                 if (!(eventTarget instanceof XFormsSingleNodeControl)) {
                     if (XFormsServer.logger.isDebugEnabled()) {
-                        XFormsServer.logger.debug("XForms - ignoring client event on non-single-node control: " + eventName);
+                        logDebug("containing document", "ignoring invalid client event on non-single-node control", new String[] { "control id", controlId, "event name", eventName });
                     }
                     return;
                 }
@@ -702,7 +703,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                 if (!xformsControl.isRelevant() || (xformsControl.isReadonly() && !(xformsControl instanceof XFormsOutputControl))) {
                     // Controls accept event only if they are relevant and not readonly, except for xforms:output which may be readonly
                     if (XFormsServer.logger.isDebugEnabled()) {
-                        XFormsServer.logger.debug("XForms - ignoring client event on non-relevant or read-only control: " + eventName);
+                        logDebug("containing document", "ignoring invalid client event on non-relevant or read-only control", new String[] { "control id", controlId, "event name", eventName });
                     }
                     return;
                 }
@@ -712,21 +713,21 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                     if (xformsControl instanceof XFormsOutputControl) {
                         if (allowedXFormsOutputExternalEvents.get(eventName) == null) {
                             if (XFormsServer.logger.isDebugEnabled()) {
-                                XFormsServer.logger.debug("XForms - ignoring invalid client event on xforms:output: " + eventName);
+                                logDebug("containing document", "ignoring invalid client event on xforms:output", new String[] { "control id", controlId, "event name", eventName });
                             }
                             return;
                         }
                     } else if (xformsControl instanceof XFormsUploadControl) {
                         if (allowedXFormsUploadExternalEvents.get(eventName) == null) {
                             if (XFormsServer.logger.isDebugEnabled()) {
-                                XFormsServer.logger.debug("XForms - ignoring invalid client event on xforms:upload: " + eventName);
+                                logDebug("containing document", "ignoring invalid client event on xforms:upload", new String[] { "control id", controlId, "event name", eventName });
                             }
                             return;
                         }
                     } else {
                         if (allowedExternalEvents.get(eventName) == null) {
                             if (XFormsServer.logger.isDebugEnabled()) {
-                                XFormsServer.logger.debug("XForms - ignoring invalid client event: " + eventName);
+                                logDebug("containing document", "ignoring invalid client event", new String[] { "control id", controlId, "event name", eventName });
                             }
                             return;
                         }
@@ -739,7 +740,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                 // The event is not explicitly allowed: check for implicitly allowed events
                 if (allowedXFormsSubmissionExternalEvents.get(eventName) == null) {
                     if (XFormsServer.logger.isDebugEnabled()) {
-                        XFormsServer.logger.debug("XForms - ignoring invalid client event on xforms:submission: " + eventName);
+                        logDebug("containing document", "ignoring invalid client event on xforms:submission", new String[] { "control id", controlId, "event name", eventName });
                     }
                     return;
                 }
@@ -749,7 +750,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
             // Check for implicitly allowed events
             if (allowedXFormsContainingDocumentExternalEvents.get(eventName) == null) {
                 if (XFormsServer.logger.isDebugEnabled()) {
-                    XFormsServer.logger.debug("XForms - ignoring invalid client event on containing document: " + eventName);
+                    logDebug("containing document", "ignoring invalid client event on containing document", new String[] { "control id", controlId, "event name", eventName });
                 }
                 return;
             }
@@ -758,7 +759,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
             if (!isExplicitlyAllowedExternalEvent(eventName)) {
                 // The event is not explicitly allowed
                 if (XFormsServer.logger.isDebugEnabled()) {
-                    XFormsServer.logger.debug("XForms - ignoring invalid client event: " + eventName);
+                    logDebug("containing document", "ignoring invalid client event", new String[] { "control id", controlId, "event name", eventName });
                 }
                 return;
             }
@@ -775,7 +776,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                     throw new ValidationException("Other event target id '" + otherControlId + "' is not an XFormsEventTarget.", getLocationData());
                 } else {
                     if (XFormsServer.logger.isDebugEnabled()) {
-                        XFormsServer.logger.debug("XForms - ignoring client event with invalid second control id: " + otherControlId);
+                        logDebug("containing document", "ignoring invalid client event with invalid second control id", new String[] { "control id", controlId, "event name", eventName, "second control id", otherControlId });
                     }
                     return;
                 }
@@ -960,7 +961,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     public void dispatchEvent(PipelineContext pipelineContext, XFormsEvent event) {
 
         if (XFormsServer.logger.isDebugEnabled()) {
-            XFormsServer.logger.debug("XForms - dispatching event: " + getEventLogSpaces() + event.getEventName() + " - " + event.getTargetObject().getEffectiveId() + " - at " + event.getLocationData());
+            logDebug("event", "dispatching", new String[] { "name", event.getEventName(), "id", event.getTargetObject().getEffectiveId(), "location", event.getLocationData().toString() });
         }
 
         final XFormsEventTarget targetObject = event.getTargetObject();
@@ -1070,21 +1071,84 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         }
     }
 
+    private int logIndentLevel = 0;
     private Stack eventStack = new Stack();
 
     private void startHandleEvent(XFormsEvent event) {
         eventStack.push(event);
+        logIndentLevel++;
     }
 
     private void endHandleEvent() {
         eventStack.pop();
+        logIndentLevel--;
     }
 
-    private String getEventLogSpaces() {
+    public void startHandleAction() {
+        logIndentLevel++;
+    }
+
+    public void endHandleAction() {
+        logIndentLevel--;
+    }
+
+    private static String getLogIndentSpaces(int level) {
         final StringBuffer sb = new StringBuffer();
-        for (int i = 0; i < eventStack.size(); i++)
+        for (int i = 0; i < level; i++)
             sb.append("  ");
         return sb.toString();
+    }
+
+    public void logDebug(String type, String message) {
+        logDebug(logIndentLevel, type, message, null);
+    }
+
+    public void logDebug(String type, String message, String[] parameters) {
+        logDebug(logIndentLevel, type, message, parameters);
+    }
+
+    public static void logDebugStatic(String type, String message, String[] parameters) {
+        logDebugStatic(null, type, message, parameters);
+    }
+
+    public static void logDebugStatic(XFormsContainingDocument containingDocument, String type, String message) {
+        logDebug((containingDocument != null) ? containingDocument.logIndentLevel : 0, type, message, null);
+    }
+
+    public static void logDebugStatic(XFormsContainingDocument containingDocument, String type, String message, String[] parameters) {
+        logDebug((containingDocument != null) ? containingDocument.logIndentLevel : 0, type, message, parameters);
+    }
+
+    private static void logDebug(int indentLevel, String type, String message, String[] parameters) {
+        final String parametersString;
+        if (parameters != null) {
+            final FastStringBuffer sb = new FastStringBuffer(" (");
+            if (parameters != null) {
+                boolean first = true;
+                for (int i = 0; i < parameters.length; i += 2) {
+                    final String paramName = parameters[i];
+                    final String paramValue = parameters[i + 1];
+
+                    if (paramValue != null) {
+                        if (!first)
+                            sb.append(", ");
+
+                        sb.append(paramName);
+                        sb.append("='");
+                        sb.append(paramValue);
+                        sb.append('\'');
+
+                        first = false;
+                    }
+                }
+            }
+            sb.append(')');
+            parametersString = sb.toString();
+        } else {
+            parametersString = "";
+        }
+
+        XFormsServer.logger.debug("XForms - " + getLogIndentSpaces(indentLevel) + type + " - " + message + parametersString);
     }
 
     /**
@@ -1128,7 +1192,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                             instancesElement.add(currentInstance.createContainerElement(!currentInstance.isApplicationShared()));
 
                             // Log instance if needed
-                            currentInstance.logIfNeeded("storing instance to dynamic state");
+                            currentInstance.logIfNeeded(this, "storing instance to dynamic state");
                         }
                     }
                 }
@@ -1258,7 +1322,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                             throw new ValidationException("Non-initialized instance has to be application shared for id: " + newInstance.getEffectiveId(), getLocationData());
 
                         final SharedXFormsInstance sharedInstance
-                                = XFormsServerSharedInstancesCache.instance().find(pipelineContext, newInstance.getEffectiveId(), newInstance.getModelId(), newInstance.getSourceURI(), newInstance.getTimeToLive(), newInstance.getValidation());
+                                = XFormsServerSharedInstancesCache.instance().find(pipelineContext, this, newInstance.getEffectiveId(), newInstance.getModelId(), newInstance.getSourceURI(), newInstance.getTimeToLive(), newInstance.getValidation());
                         getModel(sharedInstance.getModelId()).setInstance(sharedInstance, false);
 
                     } else {
@@ -1267,7 +1331,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                     }
 
                     // Log instance if needed
-                    newInstance.logIfNeeded("restoring instance from dynamic state");
+                    newInstance.logIfNeeded(this, "restoring instance from dynamic state");
                 }
             }
 
@@ -1288,7 +1352,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                                 throw new ValidationException("Non-initialized instance has to be application shared for id: " + currentInstance.getEffectiveId(), getLocationData());
 
                             final SharedXFormsInstance sharedInstance
-                                    = XFormsServerSharedInstancesCache.instance().find(pipelineContext, currentInstance.getEffectiveId(), currentInstance.getModelId(), currentInstance.getSourceURI(), currentInstance.getTimeToLive(), currentInstance.getValidation());
+                                    = XFormsServerSharedInstancesCache.instance().find(pipelineContext, this, currentInstance.getEffectiveId(), currentInstance.getModelId(), currentInstance.getSourceURI(), currentInstance.getTimeToLive(), currentInstance.getValidation());
                             getModel(sharedInstance.getModelId()).setInstance(sharedInstance, false);
 
                         } else {

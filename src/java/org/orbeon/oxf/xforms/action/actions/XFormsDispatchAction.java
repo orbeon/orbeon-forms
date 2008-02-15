@@ -114,8 +114,8 @@ public class XFormsDispatchAction extends XFormsAction {
             // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."
 
             if (XFormsServer.logger.isInfoEnabled())
-                XFormsServer.logger.info("XForms - xforms:dispatch cannot find target: " + resolvedNewEventTargetId + ". Ignoring action.");
+                containingDocument.logDebug("xforms:dispatch", "cannot find target, ignoring action",
+                        new String[] { "target id", resolvedNewEventTargetId } );
         }
     }
 }
-    

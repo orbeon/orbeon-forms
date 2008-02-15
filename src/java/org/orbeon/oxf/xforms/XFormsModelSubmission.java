@@ -407,7 +407,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                 currentInstance.read(identity);
                                 final String documentString = Dom4jUtils.domToString(documentResult.getDocument());
 
-                                logger.debug("XForms - submission - instance document or subset thereof cannot be submitted:\n" + documentString);
+                                containingDocument.logDebug("submission", "instance document or subset thereof cannot be submitted",
+                                        new String[] { "document", documentString });
                             }
                             throw new XFormsSubmissionException("xforms:submission: instance to submit does not satisfy valid and/or required model item properties.",
                                     "checking instance validity", XFormsSubmitErrorEvent.ErrorType.VALIDATION_ERROR);
@@ -540,7 +541,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                 currentInstance.read(identity);
                                 final String documentString = Dom4jUtils.domToString(documentResult.getDocument());
 
-                                logger.debug("XForms - submission - instance document or subset thereof cannot be submitted:\n" + documentString);
+                                containingDocument.logDebug("submission", "instance document or subset thereof cannot be submitted",
+                                        new String[] { "document", documentString });
                             }
                             throw new XFormsSubmissionException("xforms:submission: instance to submit does not satisfy valid and/or required model item properties.",
                                     "checking instance validity", XFormsSubmitErrorEvent.ErrorType.VALIDATION_ERROR);
@@ -725,16 +727,18 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                             // This can only happen is method="get" and replace="instance" and xxforms:readonly="true" and xxforms:shared="application"
 
                             if (XFormsServer.logger.isDebugEnabled())
-                                XFormsServer.logger.debug("XForms - submission - using instance from application shared instance cache: " + replaceInstance.getEffectiveId());
+                                containingDocument.logDebug("submission", "using instance from application shared instance cache",
+                                        new String[] { "instance", replaceInstance.getEffectiveId() });
 
                             final URL absoluteResolvedURL = XFormsSubmissionUtils.createAbsoluteURL(resolvedURL, queryString, externalContext);
                             final String absoluteResolvedURLString = absoluteResolvedURL.toExternalForm();
 
                             final SharedXFormsInstance sharedInstance
-                                    = XFormsServerSharedInstancesCache.instance().find(pipelineContext, replaceInstance.getEffectiveId(), replaceInstance.getModelId(), absoluteResolvedURLString, timeToLive, replaceInstance.getValidation());
+                                    = XFormsServerSharedInstancesCache.instance().find(pipelineContext, containingDocument, replaceInstance.getEffectiveId(), replaceInstance.getModelId(), absoluteResolvedURLString, timeToLive, replaceInstance.getValidation());
 
                             if (XFormsServer.logger.isDebugEnabled())
-                                XFormsServer.logger.debug("XForms - submission - replacing instance with read-only instance: " + sharedInstance.getEffectiveId());
+                                containingDocument.logDebug("submission", "replacing instance with read-only instance",
+                                        new String[] { "instance", sharedInstance.getEffectiveId() });
 
                             // Handle new instance and associated events
                             final XFormsModel replaceModel = sharedInstance.getModel(containingDocument);
@@ -744,7 +748,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                             submitDoneEvent = new XFormsSubmitDoneEvent(XFormsModelSubmission.this, absoluteResolvedURLString);
                         } else {
                             // Perform actual submission
-                            connectionResult = XFormsSubmissionUtils.doRegular(externalContext,
+                            connectionResult = XFormsSubmissionUtils.doRegular(externalContext, containingDocument,
                                     method, resolvedURL, resolvedXXFormsUsername, resolvedXXFormsPassword, (mediatype == null) ? defaultMediatype : mediatype,
                                     messageBody, queryString, headerNames, headerNameValues);
                         }
@@ -801,7 +805,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                                     // Resulting instance is not read-only
 
                                                     if (XFormsServer.logger.isDebugEnabled())
-                                                        XFormsServer.logger.debug("XForms - submission - replacing instance with mutable instance: " + replaceInstance.getEffectiveId());
+                                                        containingDocument.logDebug("submission", "replacing instance with mutable instance",
+                                                            new String[] { "instance", replaceInstance.getEffectiveId() });
 
                                                     // TODO: Sure what default we want. In most cases, we don't use DTDs. Will XML Schema validate as well?
                                                     final boolean validating = false;
@@ -818,7 +823,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                                     // Resulting instance is read-only
 
                                                     if (XFormsServer.logger.isDebugEnabled())
-                                                        XFormsServer.logger.debug("XForms - submission - replacing instance with read-only instance: " + replaceInstance.getEffectiveId());
+                                                        containingDocument.logDebug("submission", "replacing instance with read-only instance",
+                                                            new String[] { "instance", replaceInstance.getEffectiveId() });
 
                                                     // TODO: Handle validating and handleXInclude!
 
@@ -889,7 +895,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                     // Log time spent in submission if needed
                     if (XFormsServer.logger.isDebugEnabled()) {
                         final long submissionTime = System.currentTimeMillis() - externalSubmissionStartTime;
-                        XFormsServer.logger.debug("XForms - submission - external submission time (including handling returned body): " + submissionTime);
+                        containingDocument.logDebug("submission", "external submission time including handling returned body",
+                            new String[] { "time", Long.toString(submissionTime) });
                     }
                 }
             } catch (Throwable e) {
@@ -915,7 +922,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 // Log total time spent in submission if needed
                 if (XFormsServer.logger.isDebugEnabled()) {
                     final long submissionTime = System.currentTimeMillis() - submissionStartTime;
-                    XFormsServer.logger.debug("XForms - submission - total submission time: " + Long.toString(submissionTime));
+                    containingDocument.logDebug("submission", "total submission time",
+                        new String[] { "time", Long.toString(submissionTime) });
                 }
             }
 
@@ -1032,7 +1040,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                     instanceSatisfiesValidRequired[0] &= valid;
 
                     if (!valid && XFormsServer.logger.isDebugEnabled()) {
-                        XFormsServer.logger.debug("XForms - submission - found invalid element: " + elementToString(element));
+                        containingDocument.logDebug("submission", "found invalid element",
+                            new String[] { "element name", elementToString(element) });
                     }
                 }
 
@@ -1042,8 +1051,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                     instanceSatisfiesValidRequired[0] &= valid;
 
                     if (!valid && XFormsServer.logger.isDebugEnabled()) {
-                        XFormsServer.logger.debug("XForms - submission - found invalid attribute: " + attributeToString(attribute)
-                                + " (parent element: " + elementToString(attribute.getParent()) + ")");
+                        containingDocument.logDebug("submission", "found invalid attribute",
+                            new String[] { "attribute name", attributeToString(attribute), "parent element", elementToString(attribute.getParent()) });
                     }
                 }
 

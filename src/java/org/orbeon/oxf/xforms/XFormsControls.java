@@ -376,7 +376,7 @@ public class XFormsControls {
 
         final long startTime;
         if (XFormsServer.logger.isDebugEnabled()) {
-            XFormsServer.logger.debug("XForms - building controls state start.");
+            containingDocument.logDebug("controls", "start building");
             startTime = System.currentTimeMillis();
         } else {
             startTime = 0;
@@ -531,7 +531,7 @@ public class XFormsControls {
         result.setDialogIdToVisibleMap(dialogIdToVisibleMap);
 
         if (XFormsServer.logger.isDebugEnabled()) {
-            XFormsServer.logger.debug("XForms - building controls state end: " + (System.currentTimeMillis() - startTime) + " ms.");
+            containingDocument.logDebug("controls", "end building", new String[] { "time (ms)", Long.toString((System.currentTimeMillis() - startTime)) });
         }
 
         return result;
@@ -547,7 +547,7 @@ public class XFormsControls {
 
         final long startTime;
         if (XFormsServer.logger.isDebugEnabled()) {
-            XFormsServer.logger.debug("XForms - evaluating controls start.");
+            containingDocument.logDebug("controls", "evaluating controls");
             startTime = System.currentTimeMillis();
         } else {
             startTime = 0;
@@ -562,7 +562,8 @@ public class XFormsControls {
         }
 
         if (XFormsServer.logger.isDebugEnabled()) {
-            XFormsServer.logger.debug("XForms - evaluating controls end: " + (System.currentTimeMillis() - startTime) + " ms.");
+            containingDocument.logDebug("controls", "done evaluating controls",
+                    new String[] { "time (ms)", Long.toString(System.currentTimeMillis() - startTime)});
         }
     }
 

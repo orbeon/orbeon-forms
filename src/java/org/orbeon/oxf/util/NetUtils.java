@@ -30,12 +30,10 @@ public class NetUtils {
     private static Logger logger = LoggerFactory.createLogger(NetUtils.class);
 
     /**
-     * <!-- PATTERN_NO_AMP -->
      * @see #decodeQueryString(CharSequence, boolean)
      */
     private static final Pattern PATTERN_NO_AMP;
     /**
-     * <!-- PATTERN_AMP -->
      * @see #decodeQueryString(CharSequence, boolean)
      */
     private static final Pattern PATTERN_AMP;

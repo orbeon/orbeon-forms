@@ -51,7 +51,8 @@ public class XFormsSendAction extends XFormsAction {
             // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."
 
             if (XFormsServer.logger.isInfoEnabled())
-                XFormsServer.logger.info("XForms - xforms:send submission does not refer to an existing xforms:submission element: " + submissionId + ". Ignoring action.");
+                containingDocument.logDebug("xforms:send", "submission does not refer to an existing xforms:submission element, ignoring action",
+                        new String[] { "submission id", submissionId } );
         }
     }
 }

@@ -97,7 +97,7 @@ public class XFormsSetvalueAction extends XFormsAction {
         if (!currentValue.equals(valueToSet)) {// TODO: Check if we are allowed to do this optimization
 
             if (XFormsServer.logger.isDebugEnabled())
-                XFormsServer.logger.debug("XForms - setting instance value to: " + valueToSet);
+                containingDocument.logDebug("setvalue", "setting instance value", new String[] { "value", valueToSet });
 
             XFormsInstance.setValueForNodeInfo(pipelineContext, currentNode, valueToSet, type);
 

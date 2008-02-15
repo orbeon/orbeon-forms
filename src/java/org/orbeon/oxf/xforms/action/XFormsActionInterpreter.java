@@ -187,14 +187,16 @@ public class XFormsActionInterpreter {
             // We are executing the action
             if (XFormsServer.logger.isDebugEnabled()) {
                 if (whileIterationAttribute == null)
-                    XFormsServer.logger.debug("XForms - executing action: " + actionName);
+                    containingDocument.logDebug("action", "executing", new String[] { "action name", actionName });
                 else
-                    XFormsServer.logger.debug("XForms - executing action (while iteration " + whileIteration +"): " + actionName);
+                    containingDocument.logDebug("action", "executing", new String[] { "action name", actionName, "while iteration", Integer.toString(whileIteration) });
             }
 
             // Get action and execute it
             final XFormsAction xformsAction = XFormsActions.getAction(actionNamespaceURI, actionName);
+            containingDocument.startHandleAction();
             xformsAction.execute(this, pipelineContext, targetId, eventHandlerContainer, actionElement, hasOverriddenContext, overriddenContextItem);
+            containingDocument.endHandleAction();
 
             // Stop if there is no iteration
             if (whileIterationAttribute == null)
@@ -245,7 +247,7 @@ public class XFormsActionInterpreter {
         {
             if (contextNodeset.size() == 0 || containingDocument.getInstanceForNode((NodeInfo) contextNodeset.get(contextPosition - 1)) == null) {
                 if (XFormsServer.logger.isDebugEnabled())
-                    XFormsServer.logger.debug("XForms - not executing \"" + conditionType + "\" conditional action (missing context): " + actionName);
+                    containingDocument.logDebug("action", "not executing", new String[] { "action name", actionName, "condition type", conditionType, "reason", "missing context" });
                 return false;
             }
         }
@@ -259,7 +261,7 @@ public class XFormsActionInterpreter {
             // Don't execute action
 
             if (XFormsServer.logger.isDebugEnabled())
-                XFormsServer.logger.debug("XForms - not executing \"" + conditionType + "\" conditional action (condition evaluated to 'false'). Action name: " + actionName + ", condition: " + conditionAttribute);
+                containingDocument.logDebug("action", "not executing", new String[] { "action name", actionName, "condition type", conditionType, "reason", "condition evaluated to 'false'", "condition", conditionAttribute });
 
             return false;
         } else {

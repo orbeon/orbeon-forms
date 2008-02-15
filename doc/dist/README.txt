@@ -4,7 +4,7 @@
 
 =====================================================
 
-Last updated for Orbeon Forms 3.6, December 2007
+Last updated for Orbeon Forms 3.6.1, February 2008
 
 This README.TXT file covers the following topics:
 
@@ -186,8 +186,7 @@ In addition, this product includes the following software:
     * JUnit (http://www.junit.org/)
     * Saxon (http://saxon.sourceforge.net/)
     * SAXPath (http://sourceforge.net/projects/saxpath/)
-    * Sun Multi-Schema XML Validator
-      (http://wwws.sun.com/software/xml/developers/multischema/)
+    * Sun Multi-Schema XML Validator (https://msv.dev.java.net/)
 
 This software makes use of a schema for XSLT 2.0 provided under W3C
 Software License. The schema is available at the following location:
@@ -197,6 +196,6 @@ Software License. The schema is available at the following location:
 Please consult the third-party-licenses directory for more information
 about individual licenses.
 
-Copyright 1999-2007 (C) Orbeon, Inc. All rights reserved.
+Copyright 1999-2008 (C) Orbeon, Inc. All rights reserved.
 
 --

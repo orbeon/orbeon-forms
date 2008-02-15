@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    Copyright (C) 2006 Orbeon, Inc.
+    Copyright (C) 2006-2008 Orbeon, Inc.
 
     This program is free software; you can redistribute it and/or modify it under the terms of the
     GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -13,34 +13,66 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
-    xmlns:f="http://orbeon.org/oxf/xml/formatting"
     xmlns:xhtml="http://www.w3.org/1999/xhtml"
     xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
-    xmlns:xi="http://www.w3.org/2001/XInclude"
-    xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
-    xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
-    xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    xmlns:xdt="http://www.w3.org/2005/xpath-datatypes">
+    xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
     <xhtml:head>
-        <xhtml:title>Custom EVents</xhtml:title>
-        <xforms:model id="main-model" xxforms:external-events="acme-super-event erik-test">
-            <xforms:message ev:event="acme-super-event" level="modal">Hi there!</xforms:message>
+        <xhtml:title>Custom Events</xhtml:title>
+        <xforms:model id="acme-model" xxforms:external-events="acme-super-event">
 
+            <!-- This runs on XForms initialization -->
             <xforms:action ev:event="xforms-ready">
-                <xforms:setfocus control="my-input"/>
+                <!-- The script then dispatches an event back to the model -->
                 <xxforms:script>
-                    ORBEON.xforms.Document.dispatchEvent("main-model", "acme-super-event");
+                    ORBEON.xforms.Document.dispatchEvent("acme-model", "acme-super-event");
                 </xxforms:script>
             </xforms:action>
 
-            <xforms:instance id="instance">
-                <instance>abc</instance>
-            </xforms:instance>
+            <!-- Display a message -->
+            <xforms:message ev:event="acme-super-event" level="modal">Hi there!</xforms:message>
+
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
-        <xforms:input ref="." id="my-input"/>
+        <xhtml:p>
+            This example shows how you can send a custom event from JavaScript back to the XForms model. You should see
+            an alert message come up right after you have loaded this page. Here is how it works:
+        </xhtml:p>
+        <xhtml:ul>
+            <xhtml:li>
+                <xhtml:p>
+                    Upon XForms initialization, the XForms model receives the event <code>xforms-ready</code>. This
+                    happens before the page is sent to the web browser.
+                </xhtml:p>
+            </xhtml:li>
+            <xhtml:li>
+                <xhtml:p>
+                    The event handler for <code>xforms-ready</code> executes the extension <code>xxforms:script</code>
+                    action which allows running JavaScript code on the client.
+                </xhtml:p>
+            </xhtml:li>
+            <xhtml:li>
+                <xhtml:p>
+                    Just after the page is loaded in the browser, the <code>xxforms:script</code> action runs in the web
+                    browser and executes its JavaScript content.
+                </xhtml:p>
+            </xhtml:li>
+            <xhtml:li>
+                <xhtml:p>
+                    The JavaScript dispatches a custom XForms event to the XForms model. The event is sent from the web
+                    browser to the XForms engine on the server. The event here is called <code>acme-super-event</code>
+                    and must be explicitly allowed on the model using the <code>xxforms:external-events</code> property,
+                    for security reasons.
+                </xhtml:p>
+            </xhtml:li>
+            <xhtml:li>
+                <xhtml:p>
+                    The event reaches the XForms model on the server. An event handler for
+                    <code>xxforms:external-events</code> causes a message to be displayed on the client.
+                </xhtml:p>
+            </xhtml:li>
+        </xhtml:ul>
     </xhtml:body>
 </xhtml:html>

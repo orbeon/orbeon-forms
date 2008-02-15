@@ -153,7 +153,7 @@ public class XFormsActionInterpreter {
                 contextStack.popBinding();
                 contextStack.restoreBinding(actionBindingContext);
             } else {
-                // Do a single run
+                // Do a single iteration run (but this may repeat over the @while condition!)
 
                 runSingleIteration(pipelineContext, targetId, eventHandlerContainer, actionElement, actionNamespaceURI,
                         actionName, ifConditionAttribute, whileIterationAttribute, contextStack.hasOverriddenContext(), contextStack.getContextItem());
@@ -199,6 +199,14 @@ public class XFormsActionInterpreter {
             // Stop if there is no iteration
             if (whileIterationAttribute == null)
                 break;
+
+            // If we repeat, we must re-evaluate the action binding.
+            // For example:
+            //   <xforms:delete nodeset="/*/foo[1]" while="/*/foo"/>
+            // In that case, in the second iteration, xforms:repeat must find an up-to-date nodeset
+            // NOTE: There is still the possibility that parent bindings will be out of date. What should be done there?
+            contextStack.popBinding();
+            contextStack.pushBinding(pipelineContext, actionElement);
 
             whileIteration++;
         }

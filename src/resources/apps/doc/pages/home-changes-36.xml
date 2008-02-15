@@ -19,7 +19,8 @@
         xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
         xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:xs="http://www.w3.org/2001/XMLSchema"
-        xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+        xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+        xmlns:ev="http://www.w3.org/2001/xml-events">
     <header>
         <title>Changes in Version 3.6</title>
     </header>
@@ -70,6 +71,30 @@
                             iterate over nodes within actions. See the <a
                             href="reference-xforms-2#exforms-iterate">Iteration of XForms Actions over Nodesets</a> for
                             a complete example.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Support for outputting log messages with <code>xforms:message</code>.</b>
+                            <code>xforms:message</code> supports new level values: <code>xxforms:log-debug</code>,
+                            <code>xxforms:log-info</code>, <code>xxforms:log-warn</code> and
+                            <code>xxforms:log-error</code>. These cause the message to be logged on the server using
+                            the levels "debug", "info", "warn" and "error" as per the log4j terminology. Messages output
+                            with these levels appear in the Orbeon Forms logs depending on the configuration of
+                            <code>log4j.xml</code>. For example:
+                        </p>
+                        <xml-source show-namespaces="false">
+                            <xforms:submission>
+                                ...
+                                <xforms:message ev:event="xforms-submit-error" level="xxforms:log-error">
+                                    A submission error occurred:
+                                    <xforms:output value="event('error-type')"/>
+                                </xforms:message>
+                            </xforms:submission>
+                        </xml-source>
+                        <p>
+                            See also <a href="reference-xforms-ng#xforms-message">Displaying Messages with the
+                            <code>xforms:message</code> Action</a>.
                         </p>
                     </li>
                     <li>

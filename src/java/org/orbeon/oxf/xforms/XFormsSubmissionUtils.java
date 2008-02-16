@@ -314,6 +314,8 @@ public class XFormsSubmissionUtils {
                         if (XFormsServer.logger.isDebugEnabled())
                             containingDocument.logDebug("submission", "setting request body",
                                 new String[] { "body", new String(messageBody, "UTF-8") });
+
+                        httpURLConnection.setRequestBody(messageBody);
                     }
 
                     urlConnection.connect();

@@ -47,7 +47,7 @@ public class XFormsSubmissionUtils {
                                                                      XFormsModelSubmission xformsModelSubmission, String method, final String action, String mediatype, boolean doReplace,
                                                                      byte[] messageBody, String queryString) {
 
-        final XFormsContainingDocument containingDocument = xformsModelSubmission.getContainingDocument();
+        final XFormsContainingDocument containingDocument = (xformsModelSubmission != null) ? xformsModelSubmission.getContainingDocument() : null;
         try {
             if (isPost(method) || isPut(method) || isGet(method) || isDelete(method)) {
 
@@ -64,7 +64,7 @@ public class XFormsSubmissionUtils {
                         effectiveResourceURI = action;
 
                         if (XFormsServer.logger.isDebugEnabled())
-                            containingDocument.logDebug("submission", "setting request body",
+                            XFormsContainingDocument.logDebugStatic(containingDocument, "submission", "setting request body",
                                 new String[] { "body", new String(messageBody, "UTF-8") });
 
                         requestAdapter = new ForwardExternalContextRequestWrapper(externalContext.getRequest(),
@@ -88,7 +88,7 @@ public class XFormsSubmissionUtils {
                 }
 
                 if (XFormsServer.logger.isDebugEnabled())
-                    containingDocument.logDebug("submission", "dispatching request",
+                    XFormsContainingDocument.logDebugStatic(containingDocument, "submission", "dispatching request",
                                 new String[] { "effective resource URI", effectiveResourceURI });
 
                 final ExternalContext.RequestDispatcher requestDispatcher = externalContext.getRequestDispatcher(action);

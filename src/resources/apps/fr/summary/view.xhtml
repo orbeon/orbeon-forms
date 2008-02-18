@@ -31,9 +31,9 @@
         <xhtml:link rel="stylesheet" href="/ops/css/yui/base-min.css" type="text/css"/>
         <xhtml:link rel="stylesheet" href="/apps/fr/style/form-runner.css" type="text/css"/>
         <!-- Summary page XForms model -->
-        <xforms:model id="fr-summary-page-model">
+        <xforms:model id="fr-form-model">
 
-            <xforms:instance id="fr-dummy-instance">
+            <xforms:instance id="fr-form-instance">
                 <dummy/>
             </xforms:instance>
 
@@ -93,45 +93,49 @@
             <xhtml:img src="/apps/fr/style/orbeon-logo-trimmed-transparent-42.png"/> 
             <fr:body>
                 <h2>
-                    Summary for form:
                     <xforms:output model="fr-persistence-model" value="instance('fr-source-form-instance')/xhtml:head/xhtml:title"/>
                 </h2>
-                <!-- Free-text search -->
-                <xforms:input model="fr-persistence-model" ref="instance('fr-search-instance')/query" incremental="true" class="fr-search-input">
-                    <xforms:label model="fr-resources-model" ref="instance('fr-common-resources')/summary/labels/search"/>
-                    <xforms:send ev:event="xforms-value-changed" submission="search-submission"/>
-                </xforms:input>
 
-                <!-- Structured search -->
-                <table>
-                    <tr>
-                        <xforms:repeat model="fr-persistence-model" nodeset="instance('fr-search-instance')/query[@path]" id="search-repeat">
-                            <td>
-                                <!-- input field -->
-                                <xforms:input ref=".[@control = 'input']">
-                                    <xforms:label>
-                                        <xforms:output model="fr-resources-model" value="instance('fr-form-resources')/summary/titles/*[local-name() = context()/@name]"/>
-                                    </xforms:label>
-                                </xforms:input>
-                                <!-- select1 field -->
-                                <xforms:select1 ref=".[@control = 'select1']">
-                                    <xforms:label>
-                                        <xforms:output model="fr-resources-model" value="instance('fr-form-resources')/summary/titles/*[local-name() = context()/@name]"/>
-                                    </xforms:label>
-                                    <xforms:item>
-                                        <xforms:label>[Any]</xforms:label>
-                                        <xforms:value/>
-                                    </xforms:item>
-                                    <xforms:itemset nodeset="instance('fr-source-form-instance')/xhtml:head/xforms:model/xforms:instance[@id = concat(context()/@name, 's-itemset')]/*/*">
-                                        <xforms:label ref="name"/>
-                                        <xforms:value ref="value"/>
-                                    </xforms:itemset>
-                                </xforms:select1>
-                                <xforms:send ev:event="xforms-value-changed" submission="search-submission"/>
-                            </td>
-                        </xforms:repeat>
-                    </tr>
-                </table>
+                <xforms:group appearance="xxforms:internal">
+
+                    <!-- Free-text search -->
+                    <xforms:input model="fr-persistence-model" ref="instance('fr-search-instance')/query" incremental="true" class="fr-search-input">
+                        <xforms:label model="fr-resources-model" ref="instance('fr-common-resources')/summary/labels/search"/>
+                    </xforms:input>
+
+                    <!-- Structured search -->
+                    <table>
+                        <tr>
+                            <xforms:repeat model="fr-persistence-model" nodeset="instance('fr-search-instance')/query[@path]" id="search-repeat">
+                                <td>
+                                    <!-- input field -->
+                                    <xforms:input ref=".[@control = 'input']" incremental="true" >
+                                        <xforms:label>
+                                            <xforms:output model="fr-resources-model" value="instance('fr-form-resources')/summary/titles/*[local-name() = context()/@name]"/>
+                                        </xforms:label>
+                                    </xforms:input>
+                                    <!-- select1 field -->
+                                    <xforms:select1 ref=".[@control = 'select1']">
+                                        <xforms:label>
+                                            <xforms:output model="fr-resources-model" value="instance('fr-form-resources')/summary/titles/*[local-name() = context()/@name]"/>
+                                        </xforms:label>
+                                        <xforms:item>
+                                            <xforms:label>[Any]</xforms:label>
+                                            <xforms:value/>
+                                        </xforms:item>
+                                        <xforms:itemset nodeset="instance('fr-source-form-instance')/xhtml:head/xforms:model/xforms:instance[@id = concat(context()/@name, 's-itemset')]/*/*">
+                                            <xforms:label ref="name"/>
+                                            <xforms:value ref="value"/>
+                                        </xforms:itemset>
+                                    </xforms:select1>
+                                </td>
+                            </xforms:repeat>
+                        </tr>
+                    </table>
+                    
+                    <!-- Send search when values change -->
+                    <xforms:send ev:event="xforms-value-changed" submission="search-submission"/>
+                </xforms:group>
 
                 <!-- Switch languages -->
                 <!-- TODO: get list of languages through service -->
@@ -156,73 +160,89 @@
                                    class="fr-summary-welcome-message"/>
 
                     <table class="fr-tabular fr-summary-table">
-                        <tr>
-                            <th><xforms:output model="fr-resources-model" value="instance('fr-common-resources')/summary/titles/row-number"/></th>
-                            <th><xforms:output model="fr-resources-model" value="instance('fr-common-resources')/summary/titles/created"/></th>
-                            <th><xforms:output model="fr-resources-model" value="instance('fr-common-resources')/summary/titles/last-modified"/></th>
-                            <xforms:repeat nodeset="instance('fr-configuration-instance')/xforms:*[tokenize(@class, ' ') = 'fr-summary']">
-                                <th>
-                                    <!-- Iterate through specially marked controls and derive resource id then resource -->
-                                    <xforms:output model="fr-resources-model"
-                                                   value="for $id in substring-before(context()/@id, '-control')
-                                                          return for $resource in (instance('fr-form-resources')/summary/titles/*[local-name() = $id], '')
-                                                                 return if ($resource != '') then $resource else concat('[', $id, ']')"/>
-                                </th>
-                            </xforms:repeat>
-                        </tr>
-                        <xforms:repeat nodeset="document" id="documents-repeat">
+                        <thead>
                             <tr>
-                                <td>
-                                    <xforms:output value="count(preceding-sibling::document) + 1"/>
-                                </td>
-                                <td>
-                                    <xforms:group ref="@created">
-                                        <xforms:output value="if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), xxforms:instance('fr-common-resources')/summary/formats/save-datetime, xxforms:instance('fr-language-instance'), (), ()) else ."/>
-                                    </xforms:group>
-                                </td>
-                                <td>
-                                    <xforms:group ref="@last-modified">
-                                        <xforms:output value="if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), xxforms:instance('fr-common-resources')/summary/formats/save-datetime, xxforms:instance('fr-language-instance'), (), ()) else ."/>
-                                    </xforms:group>
-                                </td>
-                                <xforms:repeat nodeset="details/detail">
-                                <!--<xforms:repeat nodeset="instance('fr-source-form-instance')/xforms:*">-->
-                                    <td>
-                                        <xforms:group ref=".">
-                                            <xforms:output value="if (. castable as xs:date) then format-date(xs:date(.), xxforms:instance('fr-common-resources')/summary/formats/date, xxforms:instance('fr-language-instance'), (), ()) else ."/>
-                                        </xforms:group>
-                                    </td>
+                                <th><xforms:output model="fr-resources-model" value="instance('fr-common-resources')/summary/titles/row-number"/></th>
+                                <th><xforms:output model="fr-resources-model" value="instance('fr-common-resources')/summary/titles/created"/></th>
+                                <th><xforms:output model="fr-resources-model" value="instance('fr-common-resources')/summary/titles/last-modified"/></th>
+                                <xforms:repeat nodeset="instance('fr-configuration-instance')/xforms:*[tokenize(@class, ' ') = 'fr-summary']">
+                                    <th>
+                                        <!-- Iterate through specially marked controls and derive resource id then resource -->
+                                        <xforms:output model="fr-resources-model"
+                                                       value="for $id in substring-before(context()/@id, '-control')
+                                                              return for $resource in (instance('fr-form-resources')/summary/titles/*[local-name() = $id], '')
+                                                                     return if ($resource != '') then $resource else concat('[', $id, ']')"/>
+                                    </th>
                                 </xforms:repeat>
                             </tr>
-                        </xforms:repeat>
-                        <tr/><!-- This is to work around a bug in IE -->
+                        </thead>
+                        <tbody>
+                            <xforms:repeat nodeset="document" id="documents-repeat">
+                                <tr>
+                                    <td>
+                                        <xforms:output value="instance('fr-paging-instance')/from + count(preceding-sibling::document)"/>
+                                    </td>
+                                    <td>
+                                        <xforms:group ref="@created">
+                                            <xforms:output value="if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), xxforms:instance('fr-common-resources')/summary/formats/save-datetime, xxforms:instance('fr-language-instance'), (), ()) else ."/>
+                                        </xforms:group>
+                                    </td>
+                                    <td>
+                                        <xforms:group ref="@last-modified">
+                                            <xforms:output value="if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), xxforms:instance('fr-common-resources')/summary/formats/save-datetime, xxforms:instance('fr-language-instance'), (), ()) else ."/>
+                                        </xforms:group>
+                                    </td>
+                                    <xforms:repeat nodeset="details/detail">
+                                        <td>
+                                            <!-- Input control -->
+                                            <xforms:group ref=".[instance('fr-search-instance')/query[count(context()/preceding-sibling::detail) + 2]/@control = 'input']">
+                                                <xforms:output value="if (. castable as xs:date) then format-date(xs:date(.), xxforms:instance('fr-common-resources')/summary/formats/date, xxforms:instance('fr-language-instance'), (), ()) else ."/>
+                                            </xforms:group>
+
+                                            <!-- Selection control -->
+                                            <xforms:group ref=".[instance('fr-search-instance')/query[count(context()/preceding-sibling::detail) + 2]/@control = 'select1']">
+                                                <xforms:output value="."/>
+                                                <!-- TODO: Obtain value from itemset -->
+                                                <!--instance('fr-source-form-instance')/xhtml:head/xforms:model/xforms:instance[@id = concat(xxforms:context('documents-repeat')/@name, 's-itemset')]/*/*-->
+                                            </xforms:group>
+                                        </td>
+                                    </xforms:repeat>
+                                </tr>
+                            </xforms:repeat>
+                            <tr/><!-- This is to work around a bug in IE -->
+                        </tbody>
                     </table>
 
                     <p>
                         <xforms:output model="fr-resources-model" value="instance('fr-common-resources')/summary/titles/selected"/>:
-                        <xforms:output value="index('documents-repeat')"/>
+                        <xforms:output value="instance('fr-paging-instance')/from + index('documents-repeat') - 1"/>
                         <xforms:output model="fr-resources-model" value="instance('fr-common-resources')/summary/titles/of"/>
-                        <xforms:output value="count(instance('fr-summary-instance')/document)"/>
-                        <!-- TODO: i18n -->
-                        (total
-                        <xforms:output value="instance('fr-summary-instance')/@total"/>)
+                        <xforms:output value="instance('fr-paging-instance')/total"/>
                     </p>
 
-                    <xforms:trigger>
-                        <xforms:label>Previous</xforms:label>
-                        <xforms:action ev:event="DOMActivate">
-                            <xforms:setvalue ref="instance('fr-search-instance')/page-number" value=". - 1"/>
-                            <xforms:send submission="search-submission"/>
-                        </xforms:action>
-                    </xforms:trigger>
+                    <div class="fr-paging-buttons">
+                        <xforms:trigger ref="instance('fr-paging-instance')/prev-trigger" class="xxx">
+                            <xforms:label>
+                                <xhtml:img src="/apps/fr/style/previous.gif" alt="Previous" title="Previous"/>
+                                <xhtml:span>Previous</xhtml:span>
+                            </xforms:label>
+                            <xforms:action ev:event="DOMActivate">
+                                <xforms:setvalue ref="instance('fr-search-instance')/page-number" value=". - 1"/>
+                                <xforms:send submission="search-submission"/>
+                            </xforms:action>
+                        </xforms:trigger>
 
-                    <xforms:trigger>
-                        <xforms:label>Next</xforms:label>
-                        <xforms:action ev:event="DOMActivate">
-                            <xforms:setvalue ref="instance('fr-search-instance')/page-number" value=". + 1"/>
-                            <xforms:send submission="search-submission"/>
-                        </xforms:action>
-                    </xforms:trigger>
+                        <xforms:trigger ref="instance('fr-paging-instance')/next-trigger">
+                            <xforms:label>
+                                <xhtml:span>Next</xhtml:span>
+                                <xhtml:img src="/apps/fr/style/next.gif" alt="Next" title="Next"/>
+                            </xforms:label>
+                            <xforms:action ev:event="DOMActivate">
+                                <xforms:setvalue ref="instance('fr-search-instance')/page-number" value=". + 1"/>
+                                <xforms:send submission="search-submission"/>
+                            </xforms:action>
+                        </xforms:trigger>
+                    </div>
 
                 </xforms:group>
 
@@ -231,7 +251,7 @@
                     <xforms:output model="fr-resources-model" mediatype="text/html" value="saxon:serialize(instance('fr-common-resources')/summary/messages/no-form-found/node(), 'html')"/>
                 </xforms:group>
 
-                <widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>
+                <!--<widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>-->
 
             </fr:body>
             <fr:buttons>

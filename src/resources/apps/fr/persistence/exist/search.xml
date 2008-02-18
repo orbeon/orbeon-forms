@@ -39,10 +39,12 @@
         let $path := request:get-parameter('path', '')
         let $value := request:get-parameter('value', '')
 
+        (: Count total number of results, independently from paging :)
         let $total := count(for $resource in collection()
                             where ]]><where/><![CDATA[
                             return 1)
 
+        (: Return actual results :)
         return
             <documents total="{$total}" page-size="{$page-size}"
                        page-number="{$page-number}" query="{$query}">

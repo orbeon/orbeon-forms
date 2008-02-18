@@ -175,13 +175,15 @@ h3, h4 {
 .xforms-repeat-selected-item-1 { background: transparent }
 .xforms-repeat-selected-item-2 { background: transparent }
 
-.fr-summary-table .xforms-repeat-selected-item-1 { background: #3598D4 }
-.fr-summary-table .xforms-repeat-selected-item-2 { background: #3598D4 }
+.fr-summary-table tbody .xforms-repeat-selected-item-1 { background: #3598D4 }
+/*.fr-summary-table .xforms-repeat-selected-item-2 { background: #3598D4 }*/
 
-.fr-summary-table tr:hover { background: red }
-.fr-summary-table tr:hover { background: red }
+.fr-summary-table tbody tr:hover { background: red }
+.fr-summary-table tbody tr:hover { background: red }
 
 .fr-summary-welcome-message { display: block; margin-top: 1em; margin-bottom: 1em }
+
+.fr-paging-buttons button { width: 12em }
 
 hr {
     border: 1px solid #eee;

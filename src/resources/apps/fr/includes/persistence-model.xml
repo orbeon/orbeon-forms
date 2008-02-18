@@ -160,15 +160,30 @@
 
     <xforms:instance id="fr-search-template" xxforms:readonly="true">
         <query xmlns="" name="" path="" type="" control=""/>
-    </xforms:instance>
+    </xforms:instance>7
 
     <xforms:instance id="fr-paging-instance">
         <search xmlns="">
-            <total>0</total>
+            <total/>
+            <page-size/>
+            <page-number/>
             <from>0</from>
             <to>0</to>
+            <prev-trigger/>
+            <next-trigger/>
         </search>
     </xforms:instance>
+
+    <!-- Calculations for page navigation -->
+    <xforms:bind nodeset="instance('fr-paging-instance')">
+        <xforms:bind nodeset="total" calculate="(instance('fr-summary-instance')/@total, 0)[1]"/>
+        <xforms:bind nodeset="page-size" calculate="instance('fr-search-instance')/page-size"/>
+        <xforms:bind nodeset="page-number" calculate="instance('fr-search-instance')/page-number"/>
+        <xforms:bind nodeset="from" calculate="if (../total = 0) then 0 else (../page-number - 1)* ../page-size + 1"/>
+        <xforms:bind nodeset="to" calculate="min((../page-number * ../page-size, ../total))"/>
+        <xforms:bind nodeset="prev-trigger" readonly="../total = 0 or xs:integer(../page-number) le 1"/>
+        <xforms:bind nodeset="next-trigger" readonly="../total = 0 or ../total le ../to"/>
+    </xforms:bind>
 
     <xforms:instance id="fr-source-form-instance">
         <dummy xmlns=""/>
@@ -216,14 +231,6 @@
 
         </xforms:action>
     </xforms:submission>
-
-    <!-- Calculations for page navigation -->
-    <xforms:bind nodeset="instance('fr-paging-instance')">
-        <xforms:bind nodeset="total" calculate="(instance('fr-summary-instance')/@total, 0)[1]"/>
-        <xforms:bind nodeset="page" calculate="if ((. - 1) * ../page-size + 1 gt number(../total)) then 1 else ."/>
-        <xforms:bind nodeset="from" calculate="if (../total = 0) then 0 else (../page-number - 1)*../page-size + 1"/>
-        <xforms:bind nodeset="to" calculate="min((../page-number *../page-size, ../total))"/>
-    </xforms:bind>
 
     <!-- Summary data -->
     <xforms:instance id="fr-summary-instance">

@@ -45,7 +45,7 @@
                         <xhtml:div class="yui-g fr-separator">
                         </xhtml:div>
                         <xhtml:div class="yui-g fr-body">
-                            <xforms:group ref="/*">
+                            <xforms:group model="fr-form-model" ref="instance('fr-form-instance')">
                                 <!-- Error summary: handle xforms-invalid event -->
                                 <xforms:action ev:event="xforms-invalid" if="normalize-space(event('label')) != ''">
                                     <xforms:action if="not(xxforms:instance('fr-errors-instance')/error[@id = event('target') and @indexes = string-join(event('repeat-indexes'), '-')])">
@@ -236,7 +236,7 @@
     <xsl:template match="xforms:model[1]">
 
         <!-- This model handles form sections -->
-        <xforms:model id="fr-sections-model">
+        <xforms:model id="fr-sections-model" xxforms:external-events="fr-after-collapse">
             <!-- Contain section being currently expanded/collapsed -->
             <!-- TODO: This probably doesn't quite work for sections within repeats -->
             <xforms:instance id="fr-current-section-instance">
@@ -276,7 +276,6 @@
 
         <!-- Copy existing model -->
         <xsl:copy>
-            <xsl:attribute name="xxforms:external-events" select="'fr-after-collapse'"/>
             <xsl:apply-templates select="@*|node()"/>
 
             <!-- Mark status as dirty if data changes -->

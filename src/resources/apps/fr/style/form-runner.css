@@ -15,6 +15,8 @@ body, body table, textarea.xforms-textarea {
 
 #doc4 .fr-top {
     background-image: url(top-974.png);
+    background-repeat: no-repeat;
+    background-position: bottom center
 }
 
 .fr-bottom {
@@ -24,6 +26,8 @@ body, body table, textarea.xforms-textarea {
 
 #doc4 .fr-bottom {
     background-image: url(bottom-974.png);
+    background-repeat: no-repeat;
+    background-position: top center
 }
 
 .fr-bottom .fr-orbeon-version {

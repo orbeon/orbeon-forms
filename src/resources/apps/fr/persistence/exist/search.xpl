@@ -34,11 +34,14 @@
         <p:input name="data" href="#instance"/>
         <p:input name="config">
             <xforms:submission xsl:version="2.0" method="post"
-                               action="{{xxforms:property('oxf.fr.persistence.exist.uri')}}/db/{/*/app
+                               action="{{xxforms:property('oxf.fr.persistence.exist.uri')}}/{/*/app
                                             }/{/*/form
                                             }/?page-size={/*/page-size
                                             }&amp;page-number={/*/page-number
-                                            }&amp;query={/*/query[1]
+                                            }&amp;query={
+                                                concat(/*/query[1],
+                                                       string-join(for $query in /*/query[position() gt 1]
+                                                         return concat('&amp;path=', $query/@path, '&amp;value=', $query), ''))
                                             }&amp;sort-key={/*/sort-key}" replace="instance">
                 <!-- Move resulting <document> element as root element -->
                 <xforms:insert ev:event="xforms-submit-done" nodeset="/*" origin="/*/*[1]"/>
@@ -59,20 +62,32 @@
     <!-- Prepare query -->
     <p:processor name="oxf:xslt">
         <p:input name="data" href="#instance"/>
+        <p:input name="query" href="search.xml"/>
         <p:input name="config">
             <xsl:stylesheet version="2.0">
                 <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
                 <!-- Get query and apply templates -->
-                <xsl:variable name="query" select="doc(concat('oxf:/forms/', /*/app, '/', /*/form, '/search-query.xml'))"/>
-                <xsl:variable name="instance" select="/"/>
+                <xsl:variable name="query" select="doc('input:query')"/>
+                <xsl:variable name="instance" select="/*" as="element(search)"/>
                 <xsl:template match="/">
                     <xsl:apply-templates select="$query/*"/>
                 </xsl:template>
                 <!-- Dynamically build where clause -->
                 <xsl:template match="where">
                     <xsl:text>($query = '' or text:match-any($resource, $query))</xsl:text>
-                    <xsl:for-each select="$instance/*/search[normalize-space(@value) != '']">
-                        and $resource<xsl:value-of select="@path"/>[contains(., '<xsl:value-of select="normalize-space(@value)"/>')]
+                    <xsl:for-each select="$instance/query[@path]">
+                        <xsl:variable name="position" select="position()" as="xs:integer"/>
+                        <xsl:if test="normalize-space(.) != ''">
+                            and $resource/*/<xsl:value-of select="@path"/>[contains(., $value[<xsl:value-of select="$position"/>])]
+                        </xsl:if>
+                    </xsl:for-each>
+                </xsl:template>
+                <!-- Dynamically build detail result -->
+                <xsl:template match="details">
+                    <xsl:for-each select="$instance/query[@path]">
+                        &lt;detail>
+                            {string-join($resource/*/<xsl:value-of select="@path"/>, ', ')}
+                        &lt;/detail>
                     </xsl:for-each>
                 </xsl:template>
             </xsl:stylesheet>

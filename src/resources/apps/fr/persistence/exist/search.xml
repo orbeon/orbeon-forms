@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Copyright (C) 2008 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<!--
+    Generic XQuery handling full-text search, structured search, paging, and sorting.
+-->
+<exist:query xmlns:exist="http://exist.sourceforge.net/NS/exist">
+    <exist:text>
+        <![CDATA[
+        xquery version "1.0";
+        declare namespace xmldb="http://exist-db.org/xquery/xmldb";
+        declare namespace request="http://exist-db.org/xquery/request";
+        declare namespace text="http://exist-db.org/xquery/text";
+        declare namespace util="http://exist-db.org/xquery/util";
+
+        ]]>
+        <!--let $log1 := util:log('error', ('xxxxxxxxxx', document-uri(collection()[1])))-->
+        <![CDATA[
+        (: Collection name as the name of the first element of the collection :)
+        (: TODO: Handle case of empty collection :)
+        let $collection-name := util:collection-name(collection()[1])
+
+        (: Get URL parameters :)
+        let $page-size := request:get-parameter('page-size', '')
+        let $page-number := request:get-parameter('page-number', '')
+        let $query := request:get-parameter('query', '')
+        let $decision := request:get-parameter('decision', '')
+        let $path := request:get-parameter('path', '')
+        let $value := request:get-parameter('value', '')
+
+        let $total := count(for $resource in collection()
+                            where ]]><where/><![CDATA[
+                            return 1)
+
+        return
+            <documents total="{$total}" page-size="{$page-size}"
+                       page-number="{$page-number}" query="{$query}">
+                {
+                    subsequence(for $resource in collection()
+                        let $resource-uri := document-uri($resource)
+                        let $resource-name := substring-after($resource-uri, concat($collection-name, '/'))
+                        let $last-modified := xmldb:last-modified($collection-name, $resource-name)
+                        where ]]><where/><![CDATA[
+                        order by $last-modified descending
+                        return
+                        <document name="{$resource-name}" created="{xmldb:created($collection-name, $resource-name)}" last-modified="{$last-modified}">
+                            <details>
+                                ]]><details/><![CDATA[
+                            </details>
+                        </document>, (xs:integer($page-number) - 1) * xs:integer($page-size) + 1, xs:integer($page-size))
+                }
+            </documents>
+        ]]>
+    </exist:text>
+</exist:query>

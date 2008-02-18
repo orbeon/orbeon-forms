@@ -235,32 +235,6 @@
     <!-- This not a component really, but  -->
     <xsl:template match="xforms:model[1]">
 
-        <!-- Add script to check dirty status -->
-        <xhtml:script type="text/javascript">
-            <![CDATA[
-            function unload_handler(){
-                try{
-                    if (!ORBEON.xforms.Document.isReloading() && ORBEON.xforms.Document.getValue('fr-data-status-input') == 'dirty'){
-                      return "You may lose some unsaved changes.";
-                    }
-                } catch (ex) {
-                }
-            }
-
-            window.onbeforeunload = unload_handler;
-            ]]>
-        </xhtml:script>
-
-        <xsl:copy>
-            <xsl:attribute name="xxforms:external-events" select="'fr-after-collapse'"/>
-            <xsl:apply-templates select="@*|node()"/>
-
-            <!-- Mark status as dirty if data changes -->
-            <xforms:setvalue ev:observer="fr-form-instance" ev:event="xforms-insert" ref="xxforms:instance('fr-persistence-instance')/data-status">dirty</xforms:setvalue>
-            <xforms:setvalue ev:observer="fr-form-instance" ev:event="xforms-delete" ref="xxforms:instance('fr-persistence-instance')/data-status">dirty</xforms:setvalue>
-
-        </xsl:copy>
-
         <!-- This model handles form sections -->
         <xforms:model id="fr-sections-model">
             <!-- Contain section being currently expanded/collapsed -->
@@ -296,11 +270,25 @@
         </xforms:model>
 
         <!-- Handle document persistence -->
-        <xi:include href="oxf:/apps/fr/includes/persistence-model.xml" xxi:omit-xml-base="true"/>
+        <xi:include href="includes/persistence-model.xml" xxi:omit-xml-base="true"/>
         <!-- Handle error summary -->
-        <xi:include href="oxf:/apps/fr/includes/error-summary-model.xml" xxi:omit-xml-base="true"/>
+        <xi:include href="includes/error-summary-model.xml" xxi:omit-xml-base="true"/>
+
+        <!-- Copy existing model -->
+        <xsl:copy>
+            <xsl:attribute name="xxforms:external-events" select="'fr-after-collapse'"/>
+            <xsl:apply-templates select="@*|node()"/>
+
+            <!-- Mark status as dirty if data changes -->
+            <xforms:setvalue ev:observer="fr-form-instance" ev:event="xforms-insert" ref="xxforms:instance('fr-persistence-instance')/data-status">dirty</xforms:setvalue>
+            <xforms:setvalue ev:observer="fr-form-instance" ev:event="xforms-delete" ref="xxforms:instance('fr-persistence-instance')/data-status">dirty</xforms:setvalue>
+
+        </xsl:copy>
+
         <!-- Handle collapsible sections -->
-        <xi:include href="oxf:/apps/fr/includes/collapse-script.xhtml" xxi:omit-xml-base="true"/>
+        <xi:include href="includes/collapse-script.xhtml" xxi:omit-xml-base="true"/>
+        <!-- Handle checking dirty status -->
+        <xi:include href="includes/check-dirty-script.xhtml" xxi:omit-xml-base="true"/>
 
     </xsl:template>
 

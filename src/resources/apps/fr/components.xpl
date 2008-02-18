@@ -23,7 +23,7 @@
     <p:param type="input" name="data"/>
     <p:param type="output" name="data"/>
 
-	<p:processor name="oxf:xslt">
+	<p:processor name="oxf:unsafe-xslt">
         <p:input name="data" href="#data"/>
         <p:input name="config" href="oxf:/apps/fr/components.xsl"/>
         <p:output name="data" id="after-components"/>

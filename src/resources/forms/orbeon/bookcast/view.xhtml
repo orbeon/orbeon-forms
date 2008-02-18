@@ -34,7 +34,7 @@
                 <dummy/>
             </xforms:instance>
 
-            <xforms:bind nodeset="instance('fr-form-instance')/book">
+            <xforms:bind nodeset="book">
                 <xforms:bind id="title-bind" nodeset="title" required="true()"/>
                 <xforms:bind id="author-bind" nodeset="author" required="true()"/>
                 <xforms:bind id="language-bind" nodeset="language"/>
@@ -114,6 +114,7 @@
     <body>
         <fr:view>
             <xforms:label>XForms Bookcast</xforms:label>
+            <xhtml:img src="/apps/fr/style/orbeon-logo-trimmed-transparent-42.png"/>
             <fr:body>
                 <p>
                     <i>This example is described in details in the <a href="/doc/intro-tutorial">Orbeon Forms Tutorial</a>.</i>

@@ -108,7 +108,10 @@
                     <!--</xhtml:div>-->
                 </xhtml:div>
             </xhtml:div>
-            <xhtml:div id="ft" class="fr-bottom"/>
+            <xhtml:div id="ft" class="fr-bottom">
+                <xsl:variable xmlns:version="java:org.orbeon.oxf.common.Version" name="orbeon-forms-version" select="version:getVersion()" as="xs:string"/>
+                <xhtml:div class="fr-orbeon-version">Orbeon Forms <xsl:value-of select="$orbeon-forms-version"/></xhtml:div>
+            </xhtml:div>
 
         </xhtml:div>
     </xsl:template>

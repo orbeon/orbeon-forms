@@ -9,16 +9,30 @@ body, body table, textarea.xforms-textarea {
 }
 
 .fr-top {
-    background-image: url(top.png);
     height: 10px !important;
     display: block !important;
 }
 
+#doc4 .fr-top {
+    background-image: url(top-974.png);
+}
+
 .fr-bottom {
-    background-image: url(bottom.png);
     height: 10px !important;
     display: block !important;
 }
+
+#doc4 .fr-bottom {
+    background-image: url(bottom-974.png);
+}
+
+.fr-bottom .fr-orbeon-version {
+    text-align: center;
+    font-size: smaller;
+    padding: 10px;
+    color: gray;
+}
+
 .fr-container {
     background-color: white;
     border: 1px solid #cccccc
@@ -66,8 +80,8 @@ h1 { margin-top: 0 }
     height: 75px;
 }
 
-.fr-logo img { margin: .5em 1em .5em 1em; float: left }
-.fr-logo h1 { margin-right: 1em; margin-top: 1em; padding-bottom: 0; margin-bottom: 0; float: right }
+.fr-logo img { margin: 1em 1em .5em 1em; float: left }
+.fr-logo h1 { margin-right: 1em; margin-top: 1.5em; padding-bottom: 0; margin-bottom: 0; float: right; font-weight: normal }
 
 .fr-separator {
     background-color: #3598d4;

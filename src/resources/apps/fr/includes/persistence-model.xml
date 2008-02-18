@@ -158,7 +158,7 @@
         </search>
     </xforms:instance>
 
-    <xforms:instance id="fr-search-template">
+    <xforms:instance id="fr-search-template" xxforms:readonly="true">
         <query xmlns="" name="" path="" type="" control=""/>
     </xforms:instance>
 

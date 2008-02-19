@@ -162,7 +162,8 @@ ORBEON.xforms.Globals = ORBEON.xforms.Globals || {
     formStaticState: {},                 // State that does not change for the life of the page
     formDynamicState: {},                // State that changes at every request
     formServerEvents: {},                // Server events information
-    formClientState: {}                  // Store for information we want to keep when the page is reloaded
+    formClientState: {},                  // Store for information we want to keep when the page is reloaded
+    modalProgressPanel: null			//Overlay modal panel for displaying progress bar
 };
 
 /**
@@ -552,6 +553,30 @@ ORBEON.util.Utils = {
         }
     	// Neither the property's value was supplied, nor a default value exists for the property
         return null;
+    },
+
+    hideModalProgressPanel:function(){
+        if(ORBEON.xforms.Globals.modalProgressPanel){
+            ORBEON.xforms.Globals.modalProgressPanel.hide();
+        }
+    },
+
+    displayModalProgressPanel:function(){
+        if(!ORBEON.xforms.Globals.modalProgressPanel){
+            ORBEON.xforms.Globals.modalProgressPanel =
+            new YAHOO.widget.Panel("wait", {
+                width:"50px",
+                fixedcenter:true,
+                close:false,
+                draggable:false,
+                zindex:4,
+                modal:true,
+                visible:true
+            });
+            ORBEON.xforms.Globals.modalProgressPanel.setBody('<img src="' + BASE_URL + '/ops/images/xforms/processing.gif"/>');
+            ORBEON.xforms.Globals.modalProgressPanel.render(document.body);
+        }
+        ORBEON.xforms.Globals.modalProgressPanel.show();
     }
 }
 
@@ -2461,7 +2486,12 @@ ORBEON.xforms.Server = {
                     // Figure out whether we need to send the initial dynamic state
                     if (event.eventName == "xxforms-all-events-required") {
                         sendInitialDynamicState = true;
-                }
+                    }
+                    // Display progress panel if trigger with "xforms-trigger-appearance-modal" class was activated
+                    var eventElement =  ORBEON.util.Dom.getElementById(event.targetId);
+                    if (event.eventName == 'DOMActivate' && ORBEON.util.Dom.hasClass(eventElement, "xforms-trigger-appearance-modal")) {
+						ORBEON.util.Utils.displayModalProgressPanel();
+                    }
                 }
 
                 // Build request
@@ -3678,6 +3708,7 @@ ORBEON.xforms.Server = {
         ORBEON.xforms.Globals.requestInProgress = false;
         ORBEON.xforms.Globals.requestDocument = "";
         ORBEON.xforms.Globals.executeEventFunctionQueued++;
+        ORBEON.util.Utils.hideModalProgressPanel();
         ORBEON.xforms.Server.executeNextRequest(false);
     },
 

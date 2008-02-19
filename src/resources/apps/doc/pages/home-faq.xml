@@ -151,6 +151,19 @@
                     Saxon).
                 </p>
             </section>
+            <a name="source-code-version"/>
+            <section added="2007-02-19">
+                <title>Where do I find the source code for a particular release of Orbeon Forms?</title>
+                <p>
+                    It's easy: each Orbeon Forms release is tagged with a version number including a time stamp. Say
+                    you downloaded the binary release <code>orbeon-3.6.0.200712061930.zip</code>. From there, you infer
+                    the following CVS tag number: <code>TAG_OPS_3_6_0_200712061930</code>. You then get the source code
+                    from CVS using:
+                </p>
+                <xml-source>
+                    cvs -z3 -d:pserver:anonymous@cvs.forge.objectweb.org:/cvsroot/ops co -r TAG_OPS_3_6_0_200712061930 orbeon  
+                </xml-source>
+            </section>
             <a name="issue-tracker"/>
             <section added="2007-06-06">
                 <title>Is there a list of known issues?</title>

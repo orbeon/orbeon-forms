@@ -162,7 +162,7 @@ public class XFormsContextStack {
             final String bindId = XFormsUtils.namespaceId(containingDocument, bindingElement.attributeValue("bind"));
 
             final Map bindingElementNamespaceContext =
-                    (ref != null || nodeset != null) ? Dom4jUtils.getNamespaceContextNoDefault(bindingElement) : null;
+                    (ref != null || nodeset != null || context != null) ? Dom4jUtils.getNamespaceContextNoDefault(bindingElement) : null;
 
             pushBinding(pipelineContext, ref, context, nodeset, modelId, bindId, bindingElement, bindingElementNamespaceContext);
         } else {

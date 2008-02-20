@@ -87,7 +87,7 @@
 
     <!-- Read, Update and Delete operations -->
     <page path-info="/fr/service/crud/([^/]+)/([^/]+)/([^/]+)/([^/]+)" matcher="oxf:perl5-matcher"
-          view="persistence/${1}/read-update-delete.xpl"/>
+          model="persistence/${1}/read-update-delete.xpl"/>
 
     <!-- Search -->
     <page path-info="/fr/service/search/([^/]+)/([^/]+)/([^/]+)" matcher="oxf:perl5-matcher"

@@ -131,6 +131,13 @@ div.fr-body {
 label.xforms-disabled, span.xforms-disabled, div.xforms-disabled  { display: none; }
 label.xforms-repeat-template { display: none; }
 
+/* Make sure non-relevant labels don't appear */
+label.xforms-disabled { display: none; }
+label.xforms-alert-inactive { display: none; }
+img.xforms-disabled { display: none; }
+/*.xforms-disabled .xforms-label { display: none }*/
+/*.xforms-case-deselected .xforms-label { display: none }*/
+
 .xforms-trigger img { padding-right: 5px; }
 
 .fr-layout-table tr td { width: auto }
@@ -200,10 +207,6 @@ hr {
 /* Make sure xforms-disabled takes precendence over display: block on other classes */
 label.xforms-disabled, span.xforms-disabled, div.xforms-disabled  {
     display: none;
-}
-
-textarea {
-    width: 23em;
 }
 
 .fr-buttons {
@@ -303,3 +306,17 @@ div.fr-collapsible { overflow: hidden }
 .fr-error-label { font-weight: bold }
 .fr-error-row { font-weight: bold }
 .fr-error-alert {}
+
+/* Style common controls*/
+.xforms-select1-appearance-full label { margin-left: .5em; margin-right: 1em }
+
+/* Size form controls depending on layout */
+.fr-grid-1-columns input { width: 65em }
+.fr-grid-1-columns textarea { width: 65em }
+.fr-grid-1-columns .xforms-textarea-appearance-xxforms-autosize { width: 65em }
+.fr-grid-1-columns .xforms-select1-appearance-minimal { width: 65em }
+
+.fr-grid-2-columns input { width: 32em }
+.fr-grid-2-columns textarea { width: 32em }
+.fr-grid-2-columns .xforms-textarea-appearance-xxforms-autosize { width: 32em }
+.fr-grid-2-columns .xforms-select1-appearance-minimal { width: 32em }

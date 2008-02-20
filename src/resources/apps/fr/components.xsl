@@ -25,7 +25,7 @@
 
     <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
 
-    <xsl:template match="fr:view">
+    <xsl:template match="xhtml:body//fr:view">
         <!--  Hidden field to communicate to the client the current section to collapse or expand -->
         <xforms:input model="fr-sections-model" ref="instance('fr-current-section-instance')" id="fr-current-section-input" class="xforms-disabled"/>
         <!-- Hidden field to communicate to the client whether the data is clean or dirty -->
@@ -127,40 +127,152 @@
         </xhtml:div>
     </xsl:template>
 
-    <xsl:template match="fr:section">
+    <xsl:template match="xhtml:body//xforms:input[@appearance='fr:in-place']">
+        <xforms:switch>
+            <xsl:if test="@class">
+                <xsl:attribute name="class" select="@class"/>
+            </xsl:if>
+            <xforms:case id="fr-inplace-{@id}-view">
+                <xhtml:div>
+                    <xhtml:span class="fr-inplace-content">
+                        <xforms:output value="{@ref}" class="fr-inplace-value">
+                            <xsl:copy-of select="xforms:label"/>
+                        </xforms:output>
+                        <xhtml:span class="fr-inplace-buttons">
+                            <xforms:trigger appearance="minimal" class="fr-inplace-delete">
+                                <xforms:label><xhtml:img src="../../../../apps/fr/style/trash.gif" alt="Delete" title="Delete Section"/></xforms:label>
+                            </xforms:trigger>
+                            <xforms:trigger appearance="minimal" class="fr-inplace-edit">
+                                <xforms:label>Change</xforms:label>
+                                <xforms:action ev:event="DOMActivate">
+                                    <xforms:toggle case="fr-inplace-{@id}-edit"/>
+                                    <xforms:setfocus control="fr-inplace-{@id}-input"/>
+                                </xforms:action>
+                            </xforms:trigger>
+                        </xhtml:span>
+                    </xhtml:span>
+                </xhtml:div>
+            </xforms:case>
+            <xforms:case id="fr-inplace-{@id}-edit">
+                <xhtml:div>
+                    <xhtml:span class="fr-inplace-content">
+                        <xforms:input id="fr-inplace-{@id}-input" ref="{@ref}" class="fr-inplace-value">
+                            <xsl:copy-of select="xforms:label"/>
+                            <xforms:toggle ev:event="DOMActivate" case="fr-inplace-{@id}-view"/>
+                        </xforms:input>
+                        <xhtml:span class="fr-inplace-buttons">
+                            <xforms:trigger class="fr-inplace-rename">
+                                <xforms:label>Change <xsl:value-of select="lower-case(xforms:label)"/></xforms:label>
+                                <xforms:toggle ev:event="DOMActivate" case="fr-inplace-{@id}-view"/>
+                            </xforms:trigger>
+                            or
+                            <xforms:trigger appearance="minimal" class="fr-inplace-cancel">
+                                <xforms:label>Cancel</xforms:label>
+                                <xforms:toggle ev:event="DOMActivate" case="fr-inplace-{@id}-view"/>
+                            </xforms:trigger>
+                        </xhtml:span>
+                    </xhtml:span>
+                </xhtml:div>
+            </xforms:case>
+        </xforms:switch>
+    </xsl:template>
+
+    <xsl:template match="xhtml:body//xforms:textarea[@appearance='fr:in-place']">
+        <xforms:switch>
+            <xsl:if test="@class">
+                <xsl:attribute name="class" select="@class"/>
+            </xsl:if>
+            <xforms:case id="fr-inplace-{@id}-view">
+                <xhtml:div>
+                    <xhtml:span class="fr-inplace-content">
+                        <xforms:output value="{@ref}" class="fr-inplace-value">
+                            <xsl:copy-of select="xforms:label"/>
+                        </xforms:output>
+                        <xhtml:span class="fr-inplace-buttons">
+                            <xforms:trigger appearance="minimal" class="fr-inplace-delete">
+                                <xforms:label><xhtml:img src="../../../../apps/fr/style/trash.gif" alt="Delete" title="Delete Section"/></xforms:label>
+                            </xforms:trigger>
+                            <xforms:trigger appearance="minimal" class="fr-inplace-edit">
+                                <xforms:label>Change</xforms:label>
+                                <xforms:action ev:event="DOMActivate">
+                                    <xforms:toggle case="fr-inplace-{@id}-edit"/>
+                                    <xforms:setfocus control="fr-inplace-{@id}-input"/>
+                                </xforms:action>
+                            </xforms:trigger>
+                        </xhtml:span>
+                    </xhtml:span>
+                </xhtml:div>
+            </xforms:case>
+            <xforms:case id="fr-inplace-{@id}-edit">
+                <xhtml:div>
+                    <xhtml:span class="fr-inplace-content">
+                        <xforms:textarea id="fr-inplace-{@id}-input" ref="{@ref}" class="fr-inplace-value" appearance="xxforms:autosize">
+                            <xsl:copy-of select="xforms:label"/>
+                            <xforms:toggle ev:event="DOMActivate" case="fr-inplace-{@id}-view"/>
+                        </xforms:textarea>
+                        <xhtml:span class="fr-inplace-buttons">
+                            <xforms:trigger class="fr-inplace-rename">
+                                <xforms:label>Change <xsl:value-of select="lower-case(xforms:label)"/></xforms:label>
+                                <xforms:toggle ev:event="DOMActivate" case="fr-inplace-{@id}-view"/>
+                            </xforms:trigger>
+                            or
+                            <xforms:trigger appearance="minimal" class="fr-inplace-cancel">
+                                <xforms:label>Cancel</xforms:label>
+                                <xforms:toggle ev:event="DOMActivate" case="fr-inplace-{@id}-view"/>
+                            </xforms:trigger>
+                        </xhtml:span>
+                    </xhtml:span>
+                </xhtml:div>
+            </xforms:case>
+        </xforms:switch>
+    </xsl:template>
+
+    <xsl:template match="xhtml:body//fr:section">
         <xhtml:div class="section-container">
-            <xforms:switch id="switch-{@id}" context="{if (@ref) then @ref else '.'}" xxforms:readonly-appearance="dynamic">
+            <xforms:switch id="switch-{@id}" context="{if (@context) then @context else '.'}" xxforms:readonly-appearance="dynamic">
                 <xforms:case id="case-{@id}-closed" selected="{if (@open = 'false') then 'true' else 'false'}">
                     <xhtml:div>
                         <xhtml:h2>
-                            <xforms:trigger appearance="minimal">
-                                <xforms:label>
-                                    <xhtml:img src="../../../../apps/fr/style/plus.png" alt="Open section" title="Open section"/>
-                                    <xsl:apply-templates select="xforms:label"/>
-                                </xforms:label>
+                            <xforms:group appearance="xxforms:internal">
+                                <xforms:trigger appearance="minimal">
+                                    <xforms:label>
+                                        <xhtml:img src="../../../../apps/fr/style/plus.png" alt="Open section" title="Open section"/>
+                                    </xforms:label>
+                                </xforms:trigger>
+                                <xforms:trigger appearance="minimal">
+                                    <xforms:label>
+                                        <xsl:apply-templates select="xforms:label"/>
+                                    </xforms:label>
+                                </xforms:trigger>
                                 <xforms:action ev:event="DOMActivate">
                                     <xforms:setvalue model="fr-sections-model" ref="instance('fr-current-section-instance')"
                                                      value="concat('{@id}', if (empty(event('repeat-indexes'))) then '' else concat('·', string-join(event('repeat-indexes'), '-')))"/>
                                     <xforms:dispatch target="fr-sections-model" name="fr-expand"/>
                                 </xforms:action>
-                            </xforms:trigger>
+                            </xforms:group>
                         </xhtml:h2>
                     </xhtml:div>
                 </xforms:case>
                 <xforms:case id="case-{@id}-open" selected="{if (not(@open = 'false')) then 'true' else 'false'}">
                     <xhtml:div>
                         <xhtml:h2>
-                            <xforms:trigger appearance="minimal">
-                                <xforms:label>
-                                    <xhtml:img src="../../../../apps/fr/style/minus.png" alt="Close section" title="Close section"/>
-                                    <xsl:apply-templates select="xforms:label"/>
-                                </xforms:label>
+                            <xforms:group appearance="xxforms:internal">
+                                <xforms:trigger appearance="minimal">
+                                    <xforms:label>
+                                        <xhtml:img src="../../../../apps/fr/style/minus.png" alt="Close section" title="Close section"/>
+                                    </xforms:label>
+                                </xforms:trigger>
+                                <xforms:trigger appearance="minimal">
+                                    <xforms:label>
+                                        <xsl:apply-templates select="xforms:label"/>
+                                    </xforms:label>
+                                </xforms:trigger>
                                 <xforms:action ev:event="DOMActivate">
                                     <xforms:setvalue model="fr-sections-model" ref="instance('fr-current-section-instance')"
                                                      value="concat('{@id}', if (empty(event('repeat-indexes'))) then '' else concat('·', string-join(event('repeat-indexes'), '-')))"/>
                                     <xforms:dispatch target="fr-sections-model" name="fr-collapse" />
                                 </xforms:action>
-                            </xforms:trigger>
+                            </xforms:group>
                         </xhtml:h2>
                         <xhtml:div class="fr-collapsible">
                             <!-- Section content -->
@@ -172,7 +284,7 @@
         </xhtml:div>
     </xsl:template>
 
-    <xsl:template match="fr:grid">
+    <xsl:template match="xhtml:body//fr:grid">
         <xhtml:table class="fr-grid fr-grid-{@columns}-columns">
             <!-- Grid content -->
             <xsl:apply-templates select="* except xforms:label"/>
@@ -198,7 +310,7 @@
     </xsl:template>
 
     <!-- Helper for repeats -->
-    <xsl:template match="fr:repeat">
+    <xsl:template match="xhtml:body//fr:repeat">
         <xsl:variable name="tokenized-path" select="tokenize(@nodeset, '/')"/>
         <xsl:variable name="min-occurs" select="if (@minOccurs) then @minOccurs else 0"/>
         <xsl:variable name="max-occurs" select="if (@maxOccurs) then @maxOccurs else 'unbounded'"/>
@@ -249,7 +361,7 @@
     </xsl:template>
 
     <!-- This not a component really, but  -->
-    <xsl:template match="xforms:model[1]">
+    <xsl:template match="/xhtml:html/xhtml:head/xforms:model[1]">
 
         <!-- This model handles form sections -->
         <xforms:model id="fr-sections-model" xxforms:external-events="fr-after-collapse" xxforms:readonly-appearance="{if (doc('input:instance')/*/mode = 'view') then 'static' else 'dynamic'}">

@@ -57,7 +57,7 @@
             </xforms:submission>
         </p:input>
         <p:input name="request" href="aggregate('id', #instance, #matcher-groups#xpointer(/*/group))"/>
-        <p:output name="response" ref="data" debug="xxxxid"/>
+        <p:output name="response" ref="data"/>
     </p:processor>
 
 </p:config>

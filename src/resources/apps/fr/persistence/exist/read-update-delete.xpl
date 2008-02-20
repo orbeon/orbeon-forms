@@ -23,7 +23,6 @@
         xmlns:ev="http://www.w3.org/2001/xml-events">
 
     <p:param type="input" name="instance"/>
-    <p:param type="output" name="data"/>
 
     <!-- NOTE: It's disappointing that we have to use oxf:request/oxf:perl5-matcher rather than using the page flow
          directly, but because we want to support the PUT and POST methods, this is currently the only solution. -->
@@ -55,7 +54,7 @@
                     </xforms:submission>
                 </p:input>
                 <p:input name="request" href="#matcher-groups"/>
-                <p:output name="response" ref="data"/>
+                <p:output name="response" id="response"/>
             </p:processor>
 
         </p:when>
@@ -69,7 +68,7 @@
                     </xforms:submission>
                 </p:input>
                 <p:input name="request" href="#matcher-groups"/>
-                <p:output name="response" ref="data"/>
+                <p:output name="response" id="response"/>
             </p:processor>
 
         </p:when>
@@ -87,9 +86,32 @@
                     </xforms:submission>
                 </p:input>
                 <p:input name="request" href="aggregate('root', #instance, #matcher-groups#xpointer(/*/group))"/>
-                <p:output name="response" ref="data"/>
+                <p:output name="response" id="response"/>
             </p:processor>
         </p:when>
     </p:choose>
+
+    <!-- Convert and serialize to XML -->
+    <p:processor name="oxf:xml-converter">
+        <p:input name="config">
+            <config>
+                <indent>false</indent>
+                <encoding>utf-8</encoding>
+            </config>
+        </p:input>
+        <p:input name="data" href="#response"/>
+        <p:output name="data" id="converted"/>
+    </p:processor>
+
+    <p:processor name="oxf:http-serializer">
+        <p:input name="config">
+            <config>
+                <cache-control>
+                    <use-local-cache>false</use-local-cache>
+                </cache-control>
+            </config>
+        </p:input>
+        <p:input name="data" href="#converted"/>
+    </p:processor>
 
 </p:config>

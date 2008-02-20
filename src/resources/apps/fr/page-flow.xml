@@ -36,7 +36,7 @@
 
     <!-- New document -->
     <page path-info="/fr/([^/]+)/([^/]+)/(new)(/)?" matcher="oxf:perl5-matcher"
-          default-submission="submission-page-info.xml"
+          default-submission="submission-page-detail.xml"
           model="/forms/${1}/${2}/view.xhtml"
           view="components.xpl">
         <setvalue ref="/*/app" matcher-group="1"/>
@@ -46,7 +46,7 @@
 
     <!-- Edit document -->
     <page path-info="/fr/([^/]+)/([^/]+)/([^/]+)/(edit)" matcher="oxf:perl5-matcher"
-          default-submission="submission-page-info.xml"
+          default-submission="submission-page-detail.xml"
           model="/forms/${1}/${2}/view.xhtml"
           view="components.xpl">
         <setvalue ref="/*/app" matcher-group="1"/>
@@ -57,7 +57,7 @@
 
     <!-- View document -->
     <page path-info="/fr/([^/]+)/([^/]+)/([^/]+)/(view)" matcher="oxf:perl5-matcher"
-          default-submission="submission-page-info.xml"
+          default-submission="submission-page-detail.xml"
           model="/forms/${1}/${2}/view.xhtml"
           view="components.xpl">
         <setvalue ref="/*/app" matcher-group="1"/>

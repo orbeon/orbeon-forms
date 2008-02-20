@@ -24,13 +24,28 @@
     <p:param type="input" name="data"/>
     <p:param type="output" name="data"/>
 
-    <p:processor name="oxf:unsafe-xslt">
+    <!-- Apply project-specific theme -->
+    <p:processor name="oxf:url-generator">
+        <p:input name="config" href="aggregate('config', aggregate('url', #instance#xpointer(concat(
+                                        'oxf:/forms/', /*/app, '/theme.xsl'))))"/>
+        <p:output name="data" id="theme"/>
+    </p:processor>
+
+    <p:processor name="oxf:xslt">
         <p:input name="data" href="#data"/>
+        <p:input name="config" href="#theme"/>
+        <p:output name="data" id="themed-data"/>
+    </p:processor>
+
+    <!-- Apply generic components -->
+    <p:processor name="oxf:unsafe-xslt">
+        <p:input name="data" href="#themed-data"/>
         <p:input name="instance" href="#instance"/>
         <p:input name="config" href="oxf:/apps/fr/components.xsl"/>
         <p:output name="data" id="after-components"/>
     </p:processor>
 
+    <!-- Handle XInclude -->
     <p:processor name="oxf:xinclude">
         <p:input name="config" href="#after-components"/>
         <p:output name="data" ref="data"/>

@@ -17,6 +17,7 @@ import org.dom4j.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
@@ -78,18 +79,24 @@ public class XFormsInsertAction extends XFormsAction {
         final NodeInfo insertContextNodeInfo;
         if (hasOverriddenContext) {
             // "If the result is an empty nodeset or not a nodeset, then the insert action is terminated with no effect. "
-            if (overriddenContext == null || !(overriddenContext instanceof NodeInfo))
+            if (overriddenContext == null || !(overriddenContext instanceof NodeInfo)) {
+                if (XFormsServer.logger.isDebugEnabled())
+                    containingDocument.logDebug("insert", "overridden context is an empty nodeset or not a nodeset, terminating");
                 return;
-            else
+            } else {
                 insertContextNodeInfo = (NodeInfo) overriddenContext;
+            }
         } else {
             insertContextNodeInfo = contextStack.getCurrentSingleNode();
         }
 
         // "The insert action is terminated with no effect if [...] b. The context attribute is given, the insert
         // context does not evaluate to an element node and the Node Set Binding node-set is the empty node-set."
-        if (contextAttribute != null && insertContextNodeInfo.getNodeKind() != org.w3c.dom.Document.ELEMENT_NODE && isEmptyNodesetBinding)
+        if (contextAttribute != null && insertContextNodeInfo.getNodeKind() != org.w3c.dom.Document.ELEMENT_NODE && isEmptyNodesetBinding) {
+            if (XFormsServer.logger.isDebugEnabled())
+                containingDocument.logDebug("insert", "insert context is not an element node and binding node-set is empty, terminating");
             return;
+        }
 
         final List originObjects;
         {
@@ -106,8 +113,11 @@ public class XFormsInsertAction extends XFormsAction {
                     // node-set is the empty node-set. [...] The insert action is terminated with no effect if the
                     // origin node-set is the empty node-set."
 
-                    if (isEmptyNodesetBinding)
+                    if (isEmptyNodesetBinding) {
+                        if (XFormsServer.logger.isDebugEnabled())
+                            containingDocument.logDebug("insert", "origin node-set from node-set binding is empty, terminating");
                         return;
+                    }
 
                     // "Otherwise, if the origin attribute is not given, then the origin node-set consists of the last
                     // node of the Node Set Binding node-set."
@@ -132,8 +142,11 @@ public class XFormsInsertAction extends XFormsAction {
                     //XFormsUtils.resolveXMLBase(actionElement, ".").toString()
 
                     // "The insert action is terminated with no effect if the origin node-set is the empty node-set."
-                    if (originObjects.size() == 0)
+                    if (originObjects.size() == 0) {
+                        if (XFormsServer.logger.isDebugEnabled())
+                            containingDocument.logDebug("insert", "origin node-set is empty, terminating");
                         return;
+                    }
 
                     // "Each node in the origin node-set is cloned in the order it appears in the origin node-set."
 
@@ -336,6 +349,13 @@ public class XFormsInsertAction extends XFormsAction {
                         }
                     }
 //                }
+            }
+
+            if (XFormsServer.logger.isDebugEnabled()) {
+                if (insertedNodes.size() == 0)
+                    containingDocument.logDebug("insert", "no node inserted");
+                else
+                    containingDocument.logDebug("insert", "inserted nodes", new String[] { "count", Integer.toString(insertedNodes.size())});
             }
 
             // Rebuild ControlsState

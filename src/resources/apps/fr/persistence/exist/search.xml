@@ -24,10 +24,7 @@
         declare namespace text="http://exist-db.org/xquery/text";
         declare namespace util="http://exist-db.org/xquery/util";
 
-        ]]>
-        <!--let $log1 := util:log('error', ('xxxxxxxxxx', document-uri(collection()[1])))-->
-        <![CDATA[
-        (: Collection name as the name of the first element of the collection :)
+        (: Collection name as the name of the first element of the default collection :)
         (: TODO: Handle case of empty collection :)
         let $collection-name := util:collection-name(collection()[1])
 

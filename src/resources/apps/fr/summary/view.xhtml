@@ -100,7 +100,7 @@
 
                     <!-- Free-text search -->
                     <xforms:input model="fr-persistence-model" ref="instance('fr-search-instance')/query" incremental="true" class="fr-search-input">
-                        <xforms:label model="fr-resources-model" ref="instance('fr-common-resources')/summary/labels/search"/>
+                        <xforms:label model="fr-resources-model" ref="instance('fr-common-resources')/summary/labels/free-search"/>
                     </xforms:input>
 
                     <!-- Structured search -->
@@ -136,21 +136,6 @@
                     <!-- Send search when values change -->
                     <xforms:send ev:event="xforms-value-changed" submission="search-submission"/>
                 </xforms:group>
-
-                <!-- Switch languages -->
-                <!-- TODO: get list of languages through service -->
-                <xforms:select1 model="fr-resources-model" ref="instance('fr-language-instance')">
-                    <xforms:label ref="instance('fr-common-resources')/summary/labels/language-choice"/>
-                    <xforms:item>
-                        <xforms:label>en</xforms:label>
-                        <xforms:value>en</xforms:value>
-                    </xforms:item>
-                    <xforms:item>
-                        <xforms:label>fr</xforms:label>
-                        <xforms:value>fr</xforms:value>
-                    </xforms:item>
-                    <xforms:dispatch ev:event="xforms-value-changed" name="orbeon-update-language" target="fr-resources-model"/>
-                </xforms:select1>
 
                 <xforms:group model="fr-persistence-model" ref="instance('fr-summary-instance')[document]">
 
@@ -212,18 +197,18 @@
                         </tbody>
                     </table>
 
-                    <p>
-                        <xforms:output model="fr-resources-model" value="instance('fr-common-resources')/summary/titles/selected"/>:
-                        <xforms:output value="instance('fr-paging-instance')/from + index('documents-repeat') - 1"/>
-                        <xforms:output model="fr-resources-model" value="instance('fr-common-resources')/summary/titles/of"/>
-                        <xforms:output value="instance('fr-paging-instance')/total"/>
-                    </p>
+                    <!--<p>-->
+                        <!--<xforms:output model="fr-resources-model" value="instance('fr-common-resources')/summary/titles/selected"/>:-->
+                        <!--<xforms:output value="instance('fr-paging-instance')/from + index('documents-repeat') - 1"/>-->
+                        <!--<xforms:output model="fr-resources-model" value="instance('fr-common-resources')/summary/titles/of"/>-->
+                        <!--<xforms:output value="instance('fr-paging-instance')/total"/>-->
+                    <!--</p>-->
 
                     <div class="fr-paging-buttons">
                         <xforms:trigger ref="instance('fr-paging-instance')/prev-trigger" class="xxx">
                             <xforms:label>
-                                <xhtml:img src="/apps/fr/style/previous.gif" alt="Previous" title="Previous"/>
-                                <xhtml:span>Previous</xhtml:span>
+                                <xhtml:img src="../../apps/fr/style/previous.gif" alt="Previous" title="Previous"/>
+                                <xhtml:span><xforms:output model="fr-resources-model" value="instance('fr-common-resources')/summary/labels/previous"/></xhtml:span>
                             </xforms:label>
                             <xforms:action ev:event="DOMActivate">
                                 <xforms:setvalue ref="instance('fr-search-instance')/page-number" value=". - 1"/>
@@ -231,10 +216,16 @@
                             </xforms:action>
                         </xforms:trigger>
 
+                        <span class="fr-paging-numbers">
+                            <xforms:output value="instance('fr-paging-instance')/from + index('documents-repeat') - 1"/>
+                            <xforms:output model="fr-resources-model" value="instance('fr-common-resources')/summary/titles/of"/>
+                            <xforms:output value="instance('fr-paging-instance')/total"/>
+                        </span>
+
                         <xforms:trigger ref="instance('fr-paging-instance')/next-trigger">
                             <xforms:label>
-                                <xhtml:span>Next</xhtml:span>
-                                <xhtml:img src="/apps/fr/style/next.gif" alt="Next" title="Next"/>
+                                <xhtml:span><xforms:output model="fr-resources-model" value="instance('fr-common-resources')/summary/labels/next"/></xhtml:span>
+                                <xhtml:img src="../../apps/fr/style/next.gif" alt="Next" title="Next"/>
                             </xforms:label>
                             <xforms:action ev:event="DOMActivate">
                                 <xforms:setvalue ref="instance('fr-search-instance')/page-number" value=". + 1"/>
@@ -254,59 +245,76 @@
 
             </fr:body>
             <fr:buttons>
-                <xhtml:table>
-                    <xhtml:tr>
-                        <xhtml:td>
-                            <xhtml:div class="fr-buttons">
-                                <xforms:trigger>
-                                    <xforms:label>
-                                        <xhtml:img src="/apps/fr/style/add.gif" alt="Create"/>
-                                        <xhtml:span><xforms:output model="fr-resources-model" ref="instance('fr-common-resources')/summary/labels/new-form"/></xhtml:span>
-                                    </xforms:label>
-                                    <xforms:dispatch ev:event="DOMActivate" target="fr-persistence-model" name="orbeon-create"/>
-                                </xforms:trigger>
-                                <xforms:trigger>
-                                    <xforms:label>
-                                        <xhtml:img src="/apps/fr/style/run.gif" alt="Edit"/>
-                                        <xhtml:span><xforms:output model="fr-resources-model" ref="instance('fr-common-resources')/summary/labels/edit-form"/></xhtml:span>
-                                    </xforms:label>
-                                    <xforms:dispatch ev:event="DOMActivate" target="fr-persistence-model" name="orbeon-edit"/>
-                                </xforms:trigger>
-                                <xforms:trigger>
-                                    <xforms:label>
-                                        <xhtml:img src="/apps/fr/style/delete.gif" alt="Delete"/>
-                                        <xhtml:span><xforms:output model="fr-resources-model" ref="instance('fr-common-resources')/summary/labels/delete-form"/></xhtml:span>
-                                    </xforms:label>
-                                    <xforms:dispatch ev:event="DOMActivate" target="fr-persistence-model" name="orbeon-delete"/>
-                                </xforms:trigger>
+                <xhtml:div class="fr-buttons fr-summary-buttons">
+                    <xforms:trigger>
+                        <xforms:label>
+                            <xhtml:img src="../../apps/fr/style/add.gif" alt="Create"/>
+                            <xhtml:span><xforms:output model="fr-resources-model" ref="instance('fr-common-resources')/summary/labels/new-form"/></xhtml:span>
+                        </xforms:label>
+                        <xforms:dispatch ev:event="DOMActivate" target="fr-persistence-model" name="orbeon-create"/>
+                    </xforms:trigger>
+                    <xforms:trigger>
+                        <xforms:label>
+                            <xhtml:img src="../../apps/fr/style/run.gif" alt="Edit"/>
+                            <xhtml:span><xforms:output model="fr-resources-model" ref="instance('fr-common-resources')/summary/labels/edit-form"/></xhtml:span>
+                        </xforms:label>
+                        <xforms:dispatch ev:event="DOMActivate" target="fr-persistence-model" name="orbeon-edit"/>
+                    </xforms:trigger>
+                    <xforms:trigger>
+                        <xforms:label>
+                            <xhtml:img src="../../apps/fr/style/lockedstate.gif" alt="Delete"/>
+                            <xhtml:span><xforms:output model="fr-resources-model" ref="instance('fr-common-resources')/summary/labels/view-readonly"/></xhtml:span>
+                        </xforms:label>
+                        <xforms:dispatch ev:event="DOMActivate" target="fr-persistence-model" name="orbeon-view"/>
+                    </xforms:trigger>
+                    <xforms:trigger>
+                        <xforms:label>
+                            <xhtml:img src="../../apps/fr/style/delete.gif" alt="Delete"/>
+                            <xhtml:span><xforms:output model="fr-resources-model" ref="instance('fr-common-resources')/summary/labels/delete-form"/></xhtml:span>
+                        </xforms:label>
+                        <xforms:dispatch ev:event="DOMActivate" target="fr-persistence-model" name="orbeon-delete"/>
+                    </xforms:trigger>
 
-                                <!--
-                                <xforms:trigger>
-                                    <xforms:label>
-                                        <xhtml:img src="/apps/fr/style/lockedstate.gif" alt="View"/>
-                                        <xforms:output model="fr-resources-model" ref="instance('fr-common-resources')/summary/labels/view-readonly"/>
-                                    </xforms:label>
-                                    <xforms:dispatch ev:event="DOMActivate" target="fr-persistence-model" name="orbeon-view"/>
-                                </xforms:trigger>
-                                <xforms:trigger>
-                                    <xforms:label>
-                                        <xhtml:img src="/apps/fr/style/view-xml.gif" alt="XML"/>
-                                        <xforms:output model="fr-resources-model" ref="instance('fr-common-resources')/summary/labels/view-xml"/>
-                                    </xforms:label>
-                                    <xforms:dispatch ev:event="DOMActivate" target="fr-persistence-model" name="orbeon-xml"/>
-                                </xforms:trigger>
-                                <xforms:trigger>
-                                    <xforms:label>
-                                        <xhtml:img src="/apps/fr/style/pdf.png" alt="PDF"/>
-                                        <xforms:output model="fr-resources-model" ref="instance('fr-common-resources')/summary/labels/view-pdf"/>
-                                    </xforms:label>
-                                    <xforms:dispatch ev:event="DOMActivate" target="fr-persistence-model" name="orbeon-pdf"/>
-                                </xforms:trigger>
-                                -->
-                            </xhtml:div>
-                        </xhtml:td>
-                    </xhtml:tr>
-                </xhtml:table>
+                    <!--
+                    <xforms:trigger>
+                        <xforms:label>
+                            <xhtml:img src="../../apps/fr/style/lockedstate.gif" alt="View"/>
+                            <xforms:output model="fr-resources-model" ref="instance('fr-common-resources')/summary/labels/view-readonly"/>
+                        </xforms:label>
+                        <xforms:dispatch ev:event="DOMActivate" target="fr-persistence-model" name="orbeon-view"/>
+                    </xforms:trigger>
+                    <xforms:trigger>
+                        <xforms:label>
+                            <xhtml:img src="../../apps/fr/style/view-xml.gif" alt="XML"/>
+                            <xforms:output model="fr-resources-model" ref="instance('fr-common-resources')/summary/labels/view-xml"/>
+                        </xforms:label>
+                        <xforms:dispatch ev:event="DOMActivate" target="fr-persistence-model" name="orbeon-xml"/>
+                    </xforms:trigger>
+                    <xforms:trigger>
+                        <xforms:label>
+                            <xhtml:img src="../../apps/fr/style/pdf.png" alt="PDF"/>
+                            <xforms:output model="fr-resources-model" ref="instance('fr-common-resources')/summary/labels/view-pdf"/>
+                        </xforms:label>
+                        <xforms:dispatch ev:event="DOMActivate" target="fr-persistence-model" name="orbeon-pdf"/>
+                    </xforms:trigger>
+                    -->
+                </xhtml:div>
+                <xhtml:div class="fr-summary-language-choice">
+                    <!-- Switch languages -->
+                    <!-- TODO: get list of languages through service -->
+                    <xforms:select1 model="fr-resources-model" ref="instance('fr-language-instance')">
+                        <xforms:label ref="instance('fr-common-resources')/summary/labels/language-choice"/>
+                        <xforms:item>
+                            <xforms:label>en</xforms:label>
+                            <xforms:value>en</xforms:value>
+                        </xforms:item>
+                        <xforms:item>
+                            <xforms:label>fr</xforms:label>
+                            <xforms:value>fr</xforms:value>
+                        </xforms:item>
+                        <xforms:dispatch ev:event="xforms-value-changed" name="orbeon-update-language" target="fr-resources-model"/>
+                    </xforms:select1>
+                </xhtml:div>
             </fr:buttons>
 
         </fr:view>

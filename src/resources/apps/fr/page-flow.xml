@@ -35,22 +35,35 @@
     </page>
 
     <!-- New document -->
-    <page path-info="/fr/([^/]+)/([^/]+)/new(/)?" matcher="oxf:perl5-matcher"
-          default-submission="submission-page-edit.xml"
+    <page path-info="/fr/([^/]+)/([^/]+)/(new)(/)?" matcher="oxf:perl5-matcher"
+          default-submission="submission-page-info.xml"
           model="/forms/${1}/${2}/view.xhtml"
-          view="/forms/${1}/components.xpl">
+          view="components.xpl">
         <setvalue ref="/*/app" matcher-group="1"/>
         <setvalue ref="/*/form" matcher-group="2"/>
+        <setvalue ref="/*/mode" matcher-group="3"/>
     </page>
 
     <!-- Edit document -->
-    <page path-info="/fr/([^/]+)/([^/]+)/([^/]+)/edit" matcher="oxf:perl5-matcher"
-          default-submission="submission-page-edit.xml"
+    <page path-info="/fr/([^/]+)/([^/]+)/([^/]+)/(edit)" matcher="oxf:perl5-matcher"
+          default-submission="submission-page-info.xml"
           model="/forms/${1}/${2}/view.xhtml"
-          view="/forms/${1}/components.xpl">
+          view="components.xpl">
         <setvalue ref="/*/app" matcher-group="1"/>
         <setvalue ref="/*/form" matcher-group="2"/>
         <setvalue ref="/*/document" matcher-group="3"/>
+        <setvalue ref="/*/mode" matcher-group="4"/>
+    </page>
+
+    <!-- View document -->
+    <page path-info="/fr/([^/]+)/([^/]+)/([^/]+)/(view)" matcher="oxf:perl5-matcher"
+          default-submission="submission-page-info.xml"
+          model="/forms/${1}/${2}/view.xhtml"
+          view="components.xpl">
+        <setvalue ref="/*/app" matcher-group="1"/>
+        <setvalue ref="/*/form" matcher-group="2"/>
+        <setvalue ref="/*/document" matcher-group="3"/>
+        <setvalue ref="/*/mode" matcher-group="4"/>
     </page>
 
     <!-- ==== Services ==== -->

@@ -24,31 +24,36 @@
         <link rel="stylesheet" href="/ops/css/yui/reset-fonts-grids.css" type="text/css"/>
         <link rel="stylesheet" href="/ops/css/yui/base-min.css" type="text/css"/>
         <link rel="stylesheet" href="/apps/fr/style/form-runner.css" type="text/css"/>
-        <link rel="alternate" type="application/atom+xml" title="Orbeon XForms Bookcast Tutorial Feed" href="atom"/>
+        <!--<link rel="alternate" type="application/atom+xml" title="Orbeon XForms Bookcast Tutorial Feed" href="atom"/>-->
 
         <xforms:model id="fr-form-model" schema="oxf:/apps/xforms-bookcast/schema.xsd" xxforms:help-tooltip="false">
 
             <!-- Instance that contains all the books -->
             <xforms:instance id="fr-form-instance">
                 <!-- NOTE: The initial data is obtained by the template service -->
-                <dummy/>
+                <book xmlns="">
+                    <details>
+                        <title/>
+                        <author/>
+                        <language/>
+                        <link/>
+                        <rating/>
+                    </details>
+                    <notes>
+                    </notes>
+                </book>
             </xforms:instance>
 
-            <xforms:bind nodeset="book">
-                <xforms:bind id="title-bind" nodeset="title" required="true()"/>
-                <xforms:bind id="author-bind" nodeset="author" required="true()"/>
-                <xforms:bind id="language-bind" nodeset="language"/>
+            <xforms:bind nodeset=".">
+                <xforms:bind nodeset="details">
+                    <xforms:bind id="title-bind" nodeset="title" required="true()"/>
+                    <xforms:bind id="author-bind" nodeset="author" required="true()"/>
+                    <xforms:bind id="language-bind" nodeset="language"/>
+                </xforms:bind>
             </xforms:bind>
 
-            <xforms:instance id="book-template">
-                <book xmlns="">
-                    <title/>
-                    <author/>
-                    <language/>
-                    <link/>
-                    <rating/>
-                    <notes/>
-                </book>
+            <xforms:instance id="note-template">
+                <note xmlns=""/>
             </xforms:instance>
 
             <xforms:instance id="languages-itemset">
@@ -116,97 +121,118 @@
             <xforms:label>XForms Bookcast</xforms:label>
             <xhtml:img src="/apps/fr/style/orbeon-logo-trimmed-transparent-42.png"/>
             <fr:body>
-                <p>
-                    <i>This example is described in details in the <a href="/doc/intro-tutorial">Orbeon Forms Tutorial</a>.</i>
-                </p>
+                <!--<p>-->
+                    <!--<i>This example is described in details in the <a href="/doc/intro-tutorial">Orbeon Forms Tutorial</a>.</i>-->
+                <!--</p>-->
                 <!-- This table contains the main actions for the page  -->
-                <table class="books-action-table">
-                    <tr>
-                        <td>
-                            <xforms:submit submission="sample-data-submission" appearance="minimal">
-                                <xforms:label><img src="/apps/fr/style/add-all.gif" alt="Load Sample Data"/> Load Sample Data</xforms:label>
-                            </xforms:submit>
-                        </td>
-                    </tr>
-                </table>
+                <!--<table class="books-action-table">-->
+                    <!--<tr>-->
+                        <!--<td>-->
+                            <!--<xforms:submit submission="sample-data-submission" appearance="minimal">-->
+                                <!--<xforms:label><img src="/apps/fr/style/add-all.gif" alt="Load Sample Data"/> Load Sample Data</xforms:label>-->
+                            <!--</xforms:submit>-->
+                        <!--</td>-->
+                    <!--</tr>-->
+                <!--</table>-->
 
-                <fr:section id="books-section" columns="2">
-                    <xforms:label>Books</xforms:label>
+                <fr:section id="details-section" context="details">
+                    <xforms:label>Book Details</xforms:label>
+                    <fr:grid columns="2">
+                        <tr>
+                            <td>
+                                <xforms:input id="title-control" bind="title-bind" class="fr-summary fr-search">
+                                    <xforms:label class="books-label">Title</xforms:label>
+                                    <xforms:hint>Book title</xforms:hint>
+                                    <xforms:help>This input contains the book title. For example...</xforms:help>
+                                    <xforms:alert>The book title is incorrect</xforms:alert>
+                                </xforms:input>
+                            </td>
+                            <td>
+                                <xforms:input id="author-control" bind="author-bind" class="fr-summary fr-search">
+                                    <xforms:label class="books-label">Author</xforms:label>
+                                    <xforms:help>This input contains the book's author name.</xforms:help>
+                                    <xforms:hint>Book author</xforms:hint>
+                                    <xforms:alert>The author name is incorrect</xforms:alert>
+                                </xforms:input>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <xforms:select1 id="language-control" bind="language-bind" class="fr-summary fr-search">
+                                    <xforms:label class="books-label">Language</xforms:label>
+                                    <xforms:hint>Book language</xforms:hint>
+                                    <xforms:help>This contains the book language. For example...</xforms:help>
+                                    <xforms:alert>The language selected is invalid</xforms:alert>
+                                    <xforms:item>
+                                        <xforms:label>Choose One...</xforms:label>
+                                        <xforms:value/>
+                                    </xforms:item>
+                                    <xforms:itemset nodeset="instance('languages-itemset')/language">
+                                        <!-- TODO: language selection -->
+                                        <xforms:label ref="name[not(@xml:lang) or @xml:lang = 'en']"/>
+                                        <xforms:value ref="value"/>
+                                    </xforms:itemset>
+                                </xforms:select1>
+                            </td>
+                            <td>
+                                <xforms:input ref="link">
+                                    <xforms:label class="books-label">Link</xforms:label>
+                                    <xforms:hint>Optional link to external resource</xforms:hint>
+                                    <xforms:help>This input contains a link to an external resource. For example...</xforms:help>
+                                    <xforms:alert>The link must be a valid HTTP URL</xforms:alert>
+                                </xforms:input>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <xforms:select1 ref="rating" appearance="full">
+                                    <xforms:label class="books-label">Rating</xforms:label>
+                                    <xforms:hint>Your rating</xforms:hint>
+                                    <xforms:help>This contains your rating about the book. For example...</xforms:help>
+                                    <xforms:alert>The rating selected is invalid</xforms:alert>
+                                    <xforms:item>
+                                        <xforms:label>None</xforms:label>
+                                        <xforms:value/>
+                                    </xforms:item>
+                                    <xforms:itemset nodeset="instance('ratings-itemset')/rating">
+                                        <xforms:label ref="name"/>
+                                        <xforms:value ref="value"/>
+                                    </xforms:itemset>
+                                </xforms:select1>
+                            </td>
+                            <td>
+                                <xforms:textarea ref="notes" appearance="xxforms:autosize">
+                                    <xforms:label class="books-label">Notes</xforms:label>
+                                    <xforms:hint>Notes about this book</xforms:hint>
+                                    <xforms:help>This area contains your own comments about the book. For example...</xforms:help>
+                                    <xforms:alert>The notes are invalid</xforms:alert>
+                                </xforms:textarea>
+                            </td>
+                        </tr>
+                    </fr:grid>
+                </fr:section>
 
-                    <fr:repeat nodeset="book" id="book-repeat" origin="instance('book-template')">
-                        <xforms:label>Book</xforms:label>
-                            <tr>
-                                <td>
-                                    <xforms:input id="title-control" bind="title-bind" class="fr-summary fr-search">
-                                        <xforms:label class="books-label">Title</xforms:label>
-                                        <xforms:hint>Book title</xforms:hint>
-                                        <xforms:help>This input contains the book title. For example...</xforms:help>
-                                        <xforms:alert>The book title is incorrect</xforms:alert>
-                                    </xforms:input>
-                                </td>
-                                <td>
-                                    <xforms:input id="author-control" bind="author-bind" class="fr-summary fr-search">
-                                        <xforms:label class="books-label">Author</xforms:label>
-                                        <xforms:help>This input contains the book's author name.</xforms:help>
-                                        <xforms:hint>Book author</xforms:hint>
-                                        <xforms:alert>The author name is incorrect</xforms:alert>
-                                    </xforms:input>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <xforms:select1 id="language-control" bind="language-bind" class="fr-summary fr-search">
-                                        <xforms:label class="books-label">Language</xforms:label>
-                                        <xforms:hint>Book language</xforms:hint>
-                                        <xforms:help>This contains the book language. For example...</xforms:help>
-                                        <xforms:alert>The language selected is invalid</xforms:alert>
-                                        <xforms:item>
-                                            <xforms:label>Choose One...</xforms:label>
-                                            <xforms:value/>
-                                        </xforms:item>
-                                        <xforms:itemset nodeset="instance('languages-itemset')/language">
-                                            <!-- TODO: language selection -->
-                                            <xforms:label ref="name[not(@xml:lang) or @xml:lang = 'en']"/>
-                                            <xforms:value ref="value"/>
-                                        </xforms:itemset>
-                                    </xforms:select1>
-                                </td>
-                                <td>
-                                    <xforms:input ref="link">
-                                        <xforms:label class="books-label">Link</xforms:label>
-                                        <xforms:hint>Optional link to external resource</xforms:hint>
-                                        <xforms:help>This input contains a link to an external resource. For example...</xforms:help>
-                                        <xforms:alert>The link must be a valid HTTP URL</xforms:alert>
-                                    </xforms:input>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <xforms:select1 ref="rating" appearance="full">
-                                        <xforms:label class="books-label">Rating</xforms:label>
-                                        <xforms:hint>Your rating</xforms:hint>
-                                        <xforms:help>This contains your rating about the book. For example...</xforms:help>
-                                        <xforms:alert>The rating selected is invalid</xforms:alert>
-                                        <xforms:item>
-                                            <xforms:label>None</xforms:label>
-                                            <xforms:value/>
-                                        </xforms:item>
-                                        <xforms:itemset nodeset="instance('ratings-itemset')/rating">
-                                            <xforms:label ref="name"/>
-                                            <xforms:value ref="value"/>
-                                        </xforms:itemset>
-                                    </xforms:select1>
-                                </td>
-                                <td>
-                                    <xforms:textarea ref="notes" appearance="xxforms:autosize">
-                                        <xforms:label class="books-label">Notes</xforms:label>
-                                        <xforms:hint>Notes about this book</xforms:hint>
-                                        <xforms:help>This area contains your own comments about the book. For example...</xforms:help>
-                                        <xforms:alert>The notes are invalid</xforms:alert>
-                                    </xforms:textarea>
-                                </td>
-                            </tr>
-                    </fr:repeat>
+                <fr:section id="notes-section" context="notes">
+                    <xforms:label>Notes</xforms:label>
+                    <fr:grid columns="1">
+                        <tr>
+                            <td>
+                                <fr:repeat nodeset="note" id="book-repeat" origin="instance('note-template')" columns="1">
+                                    <xforms:label>Note</xforms:label>
+                                    <tr>
+                                        <td>
+                                            <xforms:textarea ref="." appearance="xxforms:autosize">
+                                                <xforms:label class="books-label">Notes</xforms:label>
+                                                <xforms:hint>Notes about this book</xforms:hint>
+                                                <xforms:help>This area contains your own comments about the book. For example...</xforms:help>
+                                                <xforms:alert>The notes are invalid</xforms:alert>
+                                            </xforms:textarea>
+                                        </td>
+                                    </tr>
+                                </fr:repeat>
+                            </td>
+                        </tr>
+                    </fr:grid>
                 </fr:section>
 
                 <!--<widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>-->

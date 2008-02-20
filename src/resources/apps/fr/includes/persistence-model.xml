@@ -79,8 +79,7 @@
 
     <xforms:action ev:event="orbeon-view">
         <xforms:recalculate/>
-        <!-- TODO -->
-        <!--<xforms:load resource="xxx" f:url-type="resource"/>-->
+        <xforms:load resource="/fr/{instance('fr-parameters-instance')/app}/{instance('fr-parameters-instance')/form}/{instance('fr-summary-instance')/document[index('documents-repeat')]/@name}/view"/>
     </xforms:action>
 
     <xforms:action ev:event="orbeon-xml">
@@ -101,6 +100,9 @@
 
     <!-- Parameters passed to this page -->
     <xforms:instance id="fr-parameters-instance" src="input:instance"/>
+
+    <!-- Special cross-model bind to set the form instance read-only when necessary -->
+    <xforms:bind nodeset="xxforms:instance('fr-form-instance')" readonly="xxforms:instance('fr-parameters-instance')/mode = 'view'"/>
 
     <!-- Get document template -->
     <xforms:submission id="get-template-submission"

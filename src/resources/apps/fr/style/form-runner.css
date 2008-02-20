@@ -182,12 +182,16 @@ h3, h4 {
 .fr-summary-table tbody .xforms-repeat-selected-item-1 { background: #3598D4 }
 /*.fr-summary-table .xforms-repeat-selected-item-2 { background: #3598D4 }*/
 
-.fr-summary-table tbody tr:hover { background: red }
-.fr-summary-table tbody tr:hover { background: red }
+.fr-summary-table tbody tr:hover { background: #3598D4 }
+/*.fr-summary-table tbody tr:hover.xforms-repeat-selected-item-1  { background: white }*/
 
 .fr-summary-welcome-message { display: block; margin-top: 1em; margin-bottom: 1em }
 
-.fr-paging-buttons button { width: 12em }
+.fr-paging-buttons button { width: 12em; vertical-align: middle }
+.fr-paging-numbers { vertical-align: middle; margin-left: .5em; margin-right: .5em }
+.fr-summary-language-choice { float: left }
+.fr-summary-language-choice .xforms-label { display: inline; margin-right: .5em }
+
 
 hr {
     border: 1px solid #eee;
@@ -203,9 +207,8 @@ textarea {
 }
 
 .fr-buttons {
-    text-align: right;
-    padding-top: 1em;
-    padding-right: 2em;
+    padding-right: 1em;
+    float: right;
 }
 
 .fr-buttons button {
@@ -292,7 +295,7 @@ div.fr-collapsible { overflow: hidden }
 .fr-unsaved-data { color: red }
 
 /* Errors */
-.fr-error-buttons { width: 100% }
+.fr-error-buttons { float: left }
 .fr-error-buttons td { padding: 0.2em }
 .fr-error-title { color: #f90; font-size: 160%; }
 .fr-error-list li { margin-bottom: .5em; }

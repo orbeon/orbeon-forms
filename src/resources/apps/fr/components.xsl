@@ -40,7 +40,18 @@
                             <xsl:if test="xhtml:img">
                                 <xhtml:img src="{xhtml:img/@src}" alt="Logo"/>
                             </xsl:if>
-                            <xhtml:h1><xsl:value-of select="xforms:label"/></xhtml:h1>
+                            <xhtml:h1>
+                                <xsl:choose>
+                                    <xsl:when test="xforms:label">
+                                        <!-- TODO: Create xforms:output instead -->
+                                        <xsl:value-of select="xforms:label"/>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <!-- HTML title is static -->
+                                        <xsl:value-of select="/xhtml:html/xhtml:head/xhtml:title"/>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </xhtml:h1>
                         </xhtml:div>
                         <xhtml:div class="yui-g fr-separator">
                         </xhtml:div>
@@ -118,7 +129,7 @@
 
     <xsl:template match="fr:section">
         <xhtml:div class="section-container">
-            <xforms:switch id="switch-{@id}" ref="{if (@ref) then @ref else '.'}">
+            <xforms:switch id="switch-{@id}" context="{if (@ref) then @ref else '.'}" xxforms:readonly-appearance="dynamic">
                 <xforms:case id="case-{@id}-closed" selected="{if (@open = 'false') then 'true' else 'false'}">
                     <xhtml:div>
                         <xhtml:h2>
@@ -152,15 +163,20 @@
                             </xforms:trigger>
                         </xhtml:h2>
                         <xhtml:div class="fr-collapsible">
-                            <xhtml:table class="fr-grid fr-grid-{@columns}-columns">
-                                <!-- Section content -->
-                                <xsl:apply-templates select="* except xforms:label"/>
-                            </xhtml:table>
+                            <!-- Section content -->
+                            <xsl:apply-templates select="* except xforms:label"/>
                         </xhtml:div>
                     </xhtml:div>
                 </xforms:case>
             </xforms:switch>
         </xhtml:div>
+    </xsl:template>
+
+    <xsl:template match="fr:grid">
+        <xhtml:table class="fr-grid fr-grid-{@columns}-columns">
+            <!-- Grid content -->
+            <xsl:apply-templates select="* except xforms:label"/>
+        </xhtml:table>
     </xsl:template>
 
     <xsl:template match="fr:optional-element">
@@ -236,7 +252,7 @@
     <xsl:template match="xforms:model[1]">
 
         <!-- This model handles form sections -->
-        <xforms:model id="fr-sections-model" xxforms:external-events="fr-after-collapse">
+        <xforms:model id="fr-sections-model" xxforms:external-events="fr-after-collapse" xxforms:readonly-appearance="{if (doc('input:instance')/*/mode = 'view') then 'static' else 'dynamic'}">
             <!-- Contain section being currently expanded/collapsed -->
             <!-- TODO: This probably doesn't quite work for sections within repeats -->
             <xforms:instance id="fr-current-section-instance">

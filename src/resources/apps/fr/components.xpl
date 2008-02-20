@@ -20,11 +20,13 @@
         xmlns:xi="http://www.w3.org/2001/XInclude"
         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude">
 
+    <p:param type="input" name="instance"/>
     <p:param type="input" name="data"/>
     <p:param type="output" name="data"/>
 
-	<p:processor name="oxf:unsafe-xslt">
+    <p:processor name="oxf:unsafe-xslt">
         <p:input name="data" href="#data"/>
+        <p:input name="instance" href="#instance"/>
         <p:input name="config" href="oxf:/apps/fr/components.xsl"/>
         <p:output name="data" id="after-components"/>
     </p:processor>

@@ -56,7 +56,6 @@
             <!-- Pick theme -->
             <p:choose href="#request">
                 <p:when test="starts-with(/request/request-path, '/doc/')
-                              or starts-with(/request/request-path, '/fb/')
                               or starts-with(/request/request-path, '/fr/')
                               or starts-with(/request/request-path, '/xforms-renderer')
                               or /request/parameters/parameter[name = 'orbeon-theme']/value = 'plain'">
@@ -120,7 +119,7 @@
             </p:choose>
 
             <!-- Choose between XHTML output and HTML output -->
-            <p:choose href="#request"><!-- Use dummy input -->
+            <p:choose href="#request">
                 <p:when test="p:property('oxf.epilogue.output-xhtml') = 'true'">
                     <!-- Produce XHTML output -->
                     <p:choose href="#request">
@@ -209,8 +208,9 @@
                     <p:processor name="oxf:html-converter">
                         <p:input name="config">
                             <config>
-                                <public-doctype>-//W3C//DTD HTML 4.01 Transitional//EN</public-doctype>
-                                <!--<public-doctype>-//W3C//DTD HTML 4.01//EN</public-doctype>-->
+                                <!--<public-doctype>-//W3C//DTD HTML 4.01 Transitional//EN</public-doctype>-->
+                                <public-doctype>-//W3C//DTD HTML 4.01//EN</public-doctype>
+                                <system-doctype>http://www.w3.org/TR/html4/strict.dtd</system-doctype>
                                 <version>4.01</version>
                                 <encoding>utf-8</encoding>
                                 <indent>true</indent>

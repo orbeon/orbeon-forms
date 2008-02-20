@@ -58,7 +58,8 @@ public class XXFormsInstance extends XFormsFunction {
             return new ListIterator(Collections.singletonList(instance.getInstanceRootElementInfo()));
         } else {
             // "an empty node-set is returned"
-            XFormsServer.logger.warn("XForms - Instance not found with xxforms:instance() function for id: " + instanceId);
+            getContainingDocument(xpathContext).logWarning("function", "Instance not found with xxforms:instance() function",
+                    new String[] { "instance id", instanceId });
             return new ListIterator(Collections.EMPTY_LIST);
         }
     }

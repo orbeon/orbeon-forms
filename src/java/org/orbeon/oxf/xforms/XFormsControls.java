@@ -382,6 +382,8 @@ public class XFormsControls {
             startTime = 0;
         }
 
+        containingDocument.startHandleOperation();
+
         final ControlsState result = new ControlsState();
 
         final XFormsControl rootXFormsControl = new RootControl(containingDocument);// this is temporary and won't be stored
@@ -529,6 +531,8 @@ public class XFormsControls {
         result.setIdsToXFormsControls(idsToXFormsControls);
         result.setSwitchIdToSelectedCaseIdMap(switchIdToSelectedCaseIdMap);
         result.setDialogIdToVisibleMap(dialogIdToVisibleMap);
+
+        containingDocument.endHandleOperation();
 
         if (XFormsServer.logger.isDebugEnabled()) {
             containingDocument.logDebug("controls", "end building", new String[] { "time (ms)", Long.toString((System.currentTimeMillis() - startTime)) });

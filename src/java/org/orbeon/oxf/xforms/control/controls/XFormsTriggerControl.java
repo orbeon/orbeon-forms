@@ -21,6 +21,8 @@ import org.dom4j.Element;
 
 /**
  * Represents an xforms:trigger control.
+ *
+ * TODO: Use inheritance to make this a single-node control that doesn't hold a value.
  */
 public class XFormsTriggerControl extends XFormsSingleNodeControl {
     public XFormsTriggerControl(XFormsContainingDocument containingDocument, XFormsControl parent, Element element, String name, String id) {

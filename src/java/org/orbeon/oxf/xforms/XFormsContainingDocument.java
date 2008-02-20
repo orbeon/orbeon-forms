@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms;
 
 import org.apache.commons.pool.ObjectPool;
+import org.apache.log4j.Level;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.ValidationException;
@@ -1084,11 +1085,11 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         logIndentLevel--;
     }
 
-    public void startHandleAction() {
+    public void startHandleOperation() {
         logIndentLevel++;
     }
 
-    public void endHandleAction() {
+    public void endHandleOperation() {
         logIndentLevel--;
     }
 
@@ -1100,11 +1101,11 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     }
 
     public void logDebug(String type, String message) {
-        logDebug(logIndentLevel, type, message, null);
+        log(Level.DEBUG, logIndentLevel, type, message, null);
     }
 
     public void logDebug(String type, String message, String[] parameters) {
-        logDebug(logIndentLevel, type, message, parameters);
+        log(Level.DEBUG, logIndentLevel, type, message, parameters);
     }
 
     public static void logDebugStatic(String type, String message, String[] parameters) {
@@ -1112,17 +1113,21 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     }
 
     public static void logDebugStatic(XFormsContainingDocument containingDocument, String type, String message) {
-        logDebug((containingDocument != null) ? containingDocument.logIndentLevel : 0, type, message, null);
+        log(Level.DEBUG, (containingDocument != null) ? containingDocument.logIndentLevel : 0, type, message, null);
     }
 
     public static void logDebugStatic(XFormsContainingDocument containingDocument, String type, String message, String[] parameters) {
-        logDebug((containingDocument != null) ? containingDocument.logIndentLevel : 0, type, message, parameters);
+        log(Level.DEBUG, (containingDocument != null) ? containingDocument.logIndentLevel : 0, type, message, parameters);
     }
 
-    private static void logDebug(int indentLevel, String type, String message, String[] parameters) {
+    public void logWarning(String type, String message, String[] parameters) {
+        log(Level.WARN, logIndentLevel, type, message, parameters);
+    }
+
+    private static void log(Level level, int indentLevel, String type, String message, String[] parameters) {
         final String parametersString;
         if (parameters != null) {
-            final FastStringBuffer sb = new FastStringBuffer(" (");
+            final FastStringBuffer sb = new FastStringBuffer(" {");
             if (parameters != null) {
                 boolean first = true;
                 for (int i = 0; i < parameters.length; i += 2) {
@@ -1134,21 +1139,21 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                             sb.append(", ");
 
                         sb.append(paramName);
-                        sb.append("='");
+                        sb.append(": \"");
                         sb.append(paramValue);
-                        sb.append('\'');
+                        sb.append('\"');
 
                         first = false;
                     }
                 }
             }
-            sb.append(')');
+            sb.append('}');
             parametersString = sb.toString();
         } else {
             parametersString = "";
         }
 
-        XFormsServer.logger.debug("XForms - " + getLogIndentSpaces(indentLevel) + type + " - " + message + parametersString);
+        XFormsServer.logger.log(level, "XForms - " + getLogIndentSpaces(indentLevel) + type + " - " + message + parametersString);
     }
 
     /**

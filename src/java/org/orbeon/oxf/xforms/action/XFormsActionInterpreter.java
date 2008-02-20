@@ -194,9 +194,9 @@ public class XFormsActionInterpreter {
 
             // Get action and execute it
             final XFormsAction xformsAction = XFormsActions.getAction(actionNamespaceURI, actionName);
-            containingDocument.startHandleAction();
+            containingDocument.startHandleOperation();
             xformsAction.execute(this, pipelineContext, targetId, eventHandlerContainer, actionElement, hasOverriddenContext, overriddenContextItem);
-            containingDocument.endHandleAction();
+            containingDocument.endHandleOperation();
 
             // Stop if there is no iteration
             if (whileIterationAttribute == null)

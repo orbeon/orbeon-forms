@@ -311,12 +311,12 @@ div.fr-collapsible { overflow: hidden }
 .xforms-select1-appearance-full label { margin-left: .5em; margin-right: 1em }
 
 /* Size form controls depending on layout */
-.fr-grid-1-columns input { width: 65em }
-.fr-grid-1-columns textarea { width: 65em }
-.fr-grid-1-columns .xforms-textarea-appearance-xxforms-autosize { width: 65em }
-.fr-grid-1-columns .xforms-select1-appearance-minimal { width: 65em }
+#doc4 .fr-grid-1-columns input { width: 65em }
+#doc4 .fr-grid-1-columns textarea { width: 65em }
+#doc4 .fr-grid-1-columns .xforms-textarea-appearance-xxforms-autosize { width: 65em }
+#doc4 .fr-grid-1-columns .xforms-select1-appearance-minimal { width: 65em }
 
-.fr-grid-2-columns input { width: 32em }
-.fr-grid-2-columns textarea { width: 32em }
-.fr-grid-2-columns .xforms-textarea-appearance-xxforms-autosize { width: 32em }
-.fr-grid-2-columns .xforms-select1-appearance-minimal { width: 32em }
+#doc4 .fr-grid-2-columns input { width: 32em }
+#doc4 .fr-grid-2-columns textarea { width: 32em }
+#doc4 .fr-grid-2-columns .xforms-textarea-appearance-xxforms-autosize { width: 32em }
+#doc4 .fr-grid-2-columns .xforms-select1-appearance-minimal { width: 32em }

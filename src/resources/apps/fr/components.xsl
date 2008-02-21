@@ -139,8 +139,10 @@
                             <xsl:copy-of select="xforms:label"/>
                         </xforms:output>
                         <xhtml:span class="fr-inplace-buttons">
-                            <xforms:trigger appearance="minimal" class="fr-inplace-delete">
+                            <xforms:trigger id="fr-inplace-{@id}-delete" appearance="minimal" class="fr-inplace-delete">
                                 <xforms:label><xhtml:img src="../../../../apps/fr/style/trash.gif" alt="Delete" title="Delete Section"/></xforms:label>
+                                <!-- Dispatch custom event to trigger -->
+                                <xforms:dispatch ev:event="DOMActivate" target="fr-inplace-{@id}-delete" name="fr-delete"/>
                             </xforms:trigger>
                             <xforms:trigger appearance="minimal" class="fr-inplace-edit">
                                 <xforms:label>Change</xforms:label>
@@ -174,6 +176,8 @@
                     </xhtml:span>
                 </xhtml:div>
             </xforms:case>
+            <!-- Copy other children elements, including event handlers -->
+            <xsl:apply-templates select="* except xforms:label"/>
         </xforms:switch>
     </xsl:template>
 
@@ -189,9 +193,9 @@
                             <xsl:copy-of select="xforms:label"/>
                         </xforms:output>
                         <xhtml:span class="fr-inplace-buttons">
-                            <xforms:trigger appearance="minimal" class="fr-inplace-delete">
-                                <xforms:label><xhtml:img src="../../../../apps/fr/style/trash.gif" alt="Delete" title="Delete Section"/></xforms:label>
-                            </xforms:trigger>
+                            <!--<xforms:trigger appearance="minimal" class="fr-inplace-delete">-->
+                                <!--<xforms:label><xhtml:img src="../../../../apps/fr/style/trash.gif" alt="Delete" title="Delete Section"/></xforms:label>-->
+                            <!--</xforms:trigger>-->
                             <xforms:trigger appearance="minimal" class="fr-inplace-edit">
                                 <xforms:label>Change</xforms:label>
                                 <xforms:action ev:event="DOMActivate">

@@ -108,13 +108,19 @@
                         <tr>
                             <xforms:repeat model="fr-persistence-model" nodeset="instance('fr-search-instance')/query[@path]" id="search-repeat">
                                 <td>
-                                    <!-- input field -->
+                                    <!-- input -->
                                     <xforms:input ref=".[@control = 'input']" incremental="true" >
                                         <xforms:label>
                                             <xforms:output model="fr-resources-model" value="instance('fr-form-resources')/summary/titles/*[local-name() = context()/@name]"/>
                                         </xforms:label>
                                     </xforms:input>
-                                    <!-- select1 field -->
+                                    <!-- textarea -->
+                                    <xforms:input ref=".[@control = 'textarea']" incremental="true" >
+                                        <xforms:label>
+                                            <xforms:output model="fr-resources-model" value="instance('fr-form-resources')/summary/titles/*[local-name() = context()/@name]"/>
+                                        </xforms:label>
+                                    </xforms:input>
+                                    <!-- select1 -->
                                     <xforms:select1 ref=".[@control = 'select1']">
                                         <xforms:label>
                                             <xforms:output model="fr-resources-model" value="instance('fr-form-resources')/summary/titles/*[local-name() = context()/@name]"/>
@@ -179,12 +185,17 @@
                                     </td>
                                     <xforms:repeat nodeset="details/detail">
                                         <td>
-                                            <!-- Input control -->
+                                            <!-- input -->
                                             <xforms:group ref=".[instance('fr-search-instance')/query[count(context()/preceding-sibling::detail) + 2]/@control = 'input']">
                                                 <xforms:output value="if (. castable as xs:date) then format-date(xs:date(.), xxforms:instance('fr-common-resources')/summary/formats/date, xxforms:instance('fr-language-instance'), (), ()) else ."/>
                                             </xforms:group>
 
-                                            <!-- Selection control -->
+                                            <!-- textarea -->
+                                            <xforms:group ref=".[instance('fr-search-instance')/query[count(context()/preceding-sibling::detail) + 2]/@control = 'textarea']">
+                                                <xforms:output value="for $text in . return if (string-length($text) > 20) then concat(substring($text, 1, 20), '...') else $text"/>
+                                            </xforms:group>
+
+                                            <!-- select1 -->
                                             <xforms:group ref=".[instance('fr-search-instance')/query[count(context()/preceding-sibling::detail) + 2]/@control = 'select1']">
                                                 <xforms:output value="."/>
                                                 <!-- TODO: Obtain value from itemset -->

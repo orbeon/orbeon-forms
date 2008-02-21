@@ -41,7 +41,7 @@
                                             }&amp;query={
                                                 concat(/*/query[1],
                                                        string-join(for $query in /*/query[position() gt 1]
-                                                         return concat('&amp;path=', $query/@path, '&amp;value=', $query), ''))
+                                                         return concat('&amp;path=', encode-for-uri($query/@path), '&amp;value=', $query), ''))
                                             }&amp;sort-key={/*/sort-key}" replace="instance">
                 <!-- Move resulting <document> element as root element -->
                 <xforms:insert ev:event="xforms-submit-done" nodeset="/*" origin="/*/*[1]"/>

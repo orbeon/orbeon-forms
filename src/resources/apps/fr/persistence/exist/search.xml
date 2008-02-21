@@ -24,6 +24,10 @@
         declare namespace text="http://exist-db.org/xquery/text";
         declare namespace util="http://exist-db.org/xquery/util";
 
+        (: This is specific to the Form Builder, but a generic mechanism should be provided :)
+        declare namespace xhtml="http://www.w3.org/1999/xhtml";
+        declare namespace xforms="http://www.w3.org/2002/xforms";
+
         (: Collection name as the name of the first element of the default collection :)
         (: TODO: Handle case of empty collection :)
         let $collection-name := util:collection-name(collection()[1])

@@ -131,11 +131,11 @@ label.xforms-disabled, span.xforms-disabled, div.xforms-disabled  { display: non
 label.xforms-repeat-template { display: none; }
 
 /* Make sure non-relevant labels don't appear */
-label.xforms-disabled { display: none; }
-label.xforms-alert-inactive { display: none; }
-img.xforms-disabled { display: none; }
-/*.xforms-disabled .xforms-label { display: none }*/
-/*.xforms-case-deselected .xforms-label { display: none }*/
+/*label.xforms-disabled { display: none; }*/
+/*label.xforms-alert-inactive { display: none; }*/
+/*img.xforms-disabled { display: none; }*/
+.xforms-disabled .xforms-label { display: none }
+.xforms-case-deselected .xforms-label { display: none }
 
 .xforms-trigger img { padding-right: 10px; }
 

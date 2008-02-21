@@ -222,10 +222,16 @@
                 <!-- Add control information to template -->
                 <xforms:setvalue ref="instance('fr-search-instance')/query[last()]/@control" value="context()/local-name()"/>
                 <!-- Add meta-information to template -->
-                <xforms:action context="instance('fr-source-form-instance')/xhtml:head/xforms:model//xforms:bind[@id = context()/@bind]">
-                    <xforms:setvalue ref="instance('fr-search-instance')/query[last()]/@name" value="substring-before(context()/@id, '-bind')"/>
-                    <xforms:setvalue ref="instance('fr-search-instance')/query[last()]/@path" value="string-join(context()/ancestor-or-self::xforms:bind/@nodeset, '/')"/>
-                    <xforms:setvalue ref="instance('fr-search-instance')/query[last()]/@type" value="if (context()/@type) then context()/@type else 'xs:string'"/>
+                <xforms:action if="context()/@bind">
+                    <xforms:action context="instance('fr-source-form-instance')/xhtml:head/xforms:model//xforms:bind[@id = context()/@bind]">
+                        <xforms:setvalue ref="instance('fr-search-instance')/query[last()]/@name" value="substring-before(context()/@id, '-bind')"/>
+                        <xforms:setvalue ref="instance('fr-search-instance')/query[last()]/@path" value="string-join(context()/ancestor-or-self::xforms:bind/@nodeset, '/')"/>
+                        <xforms:setvalue ref="instance('fr-search-instance')/query[last()]/@type" value="if (context()/@type) then context()/@type else 'xs:string'"/>
+                    </xforms:action>
+                </xforms:action>
+                <xforms:action if="context()/@ref">
+                    <xforms:setvalue ref="instance('fr-search-instance')/query[last()]/@name" value="context()/@ref"/>
+                    <xforms:setvalue ref="instance('fr-search-instance')/query[last()]/@path" value="string-join((context()/ancestor-or-self::*/(@ref | @context))[position() gt 1], '/')"/>
                 </xforms:action>
             </xforms:action>
 

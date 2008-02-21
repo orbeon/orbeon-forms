@@ -184,6 +184,8 @@ h3, h4 {
 
 .xforms-repeat-selected-item-1 { background: transparent }
 .xforms-repeat-selected-item-2 { background: transparent }
+.xforms-repeat-selected-item-3 { background: transparent }
+.xforms-repeat-selected-item-4 { background: transparent }
 
 .fr-summary-table tbody .xforms-repeat-selected-item-1 { background: #3598D4 }
 /*.fr-summary-table .xforms-repeat-selected-item-2 { background: #3598D4 }*/
@@ -313,12 +315,17 @@ div.fr-collapsible {
 .xforms-select1-appearance-full label { margin-left: .5em; margin-right: 1em }
 
 /* Size form controls depending on layout */
-#doc4 .fr-grid-1-columns input { width: 65em }
-#doc4 .fr-grid-1-columns textarea { width: 65em }
-#doc4 .fr-grid-1-columns .xforms-textarea-appearance-xxforms-autosize { width: 65em }
-#doc4 .fr-grid-1-columns .xforms-select1-appearance-minimal { width: 65em }
+.fr-section-container input { width: 63em }
+.fr-section-container textarea { width: 63em }
+.fr-section-container .xforms-textarea-appearance-xxforms-autosize { width: 63em }
+.fr-section-container .xforms-select1-appearance-minimal { width: 63em }
 
-#doc4 .fr-grid-2-columns input { width: 32em }
-#doc4 .fr-grid-2-columns textarea { width: 32em }
-#doc4 .fr-grid-2-columns .xforms-textarea-appearance-xxforms-autosize { width: 32em }
-#doc4 .fr-grid-2-columns .xforms-select1-appearance-minimal { width: 32em }
+#doc4 .fr-grid-1-columns input { width: 63em }
+#doc4 .fr-grid-1-columns textarea { width: 63em }
+#doc4 .fr-grid-1-columns .xforms-textarea-appearance-xxforms-autosize { width: 63em }
+#doc4 .fr-grid-1-columns .xforms-select1-appearance-minimal { width: 63em }
+
+#doc4 .fr-grid-2-columns input { width: 31em }
+#doc4 .fr-grid-2-columns textarea { width: 31em }
+#doc4 .fr-grid-2-columns .xforms-textarea-appearance-xxforms-autosize { width: 31em }
+#doc4 .fr-grid-2-columns .xforms-select1-appearance-minimal { width: 31em }

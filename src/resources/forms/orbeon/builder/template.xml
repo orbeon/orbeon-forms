@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml"
+      xmlns:xforms="http://www.w3.org/2002/xforms"
+      xmlns:xs="http://www.w3.org/2001/XMLSchema"
+      xmlns:ev="http://www.w3.org/2001/xml-events"
+      xmlns:xi="http://www.w3.org/2001/XInclude"
+      xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+      xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+      xmlns:saxon="http://saxon.sf.net/" >
+    <xhtml:head>
+        <xhtml:title>Empty Form</xhtml:title>
+        <xforms:model>
+
+            <!-- Main instance -->
+            <xforms:instance id="fr-form-instance">
+                <form>
+                    <main>
+                        <input/>
+                    </main>
+                </form>
+            </xforms:instance>
+
+            <!-- Metadata -->
+            <xforms:instance id="fr-form-metadata" xxforms:readonly="true">
+                <metadata>
+                    <title>[Name this form]</title>
+                    <description>[Describe this form]</description>
+                    <author/>
+                </metadata>
+            </xforms:instance>
+
+        </xforms:model>
+
+    </xhtml:head>
+    <xhtml:body>
+        <fr:view>
+            <xforms:label ref="instance('fr-form-metadata')/title"/>
+
+            <fr:section id="section1-section" context="main">
+                <xforms:label>Section 1</xforms:label>
+                <fr:grid columns="1">
+                    <xhtml:tr>
+                        <xhtml:td>
+                            <xforms:input id="input-control" ref="input">
+                                <xforms:label>[Change the label]</xforms:label>
+                                <xforms:hint>[Change the hint]</xforms:hint>
+                                <xforms:help>[Change the help]</xforms:help>
+                                <xforms:alert>[Change the alert]</xforms:alert>
+                            </xforms:input>
+                        </xhtml:td>
+                    </xhtml:tr>
+                </fr:grid>
+            </fr:section>
+
+        </fr:view>
+    </xhtml:body>
+</xhtml:html>

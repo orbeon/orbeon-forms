@@ -128,29 +128,31 @@
     </xsl:template>
 
     <xsl:template match="xhtml:body//xforms:input[@appearance='fr:in-place']">
-        <xforms:switch>
-            <xsl:if test="@class">
-                <xsl:attribute name="class" select="@class"/>
-            </xsl:if>
+        <xforms:switch id="{@id}">
+            <xsl:attribute name="class" select="string-join(('fr-inplace-input', @class), ' ')"/>
             <xforms:case id="fr-inplace-{@id}-view">
                 <xhtml:div>
                     <xhtml:span class="fr-inplace-content">
                         <xforms:output value="{@ref}" class="fr-inplace-value">
                             <xsl:copy-of select="xforms:label"/>
+                            <xforms:action ev:event="DOMActivate">
+                                <xforms:toggle case="fr-inplace-{@id}-edit"/>
+                                <xforms:setfocus control="fr-inplace-{@id}-input"/>
+                            </xforms:action>
                         </xforms:output>
                         <xhtml:span class="fr-inplace-buttons">
                             <xforms:trigger id="fr-inplace-{@id}-delete" appearance="minimal" class="fr-inplace-delete">
-                                <xforms:label><xhtml:img src="../../../../apps/fr/style/trash.gif" alt="Delete" title="Delete Section"/></xforms:label>
+                                <xforms:label><xhtml:img src="../../../../apps/fr/style/trash.gif" alt="Delete" title="Delete {lower-case(xforms:label)}"/></xforms:label>
                                 <!-- Dispatch custom event to trigger -->
                                 <xforms:dispatch ev:event="DOMActivate" target="fr-inplace-{@id}-delete" name="fr-delete"/>
                             </xforms:trigger>
-                            <xforms:trigger appearance="minimal" class="fr-inplace-edit">
-                                <xforms:label>Change</xforms:label>
-                                <xforms:action ev:event="DOMActivate">
-                                    <xforms:toggle case="fr-inplace-{@id}-edit"/>
-                                    <xforms:setfocus control="fr-inplace-{@id}-input"/>
-                                </xforms:action>
-                            </xforms:trigger>
+                            <!--<xforms:trigger appearance="minimal" class="fr-inplace-edit">-->
+                                <!--<xforms:label>Change</xforms:label>-->
+                                <!--<xforms:action ev:event="DOMActivate">-->
+                                    <!--<xforms:toggle case="fr-inplace-{@id}-edit"/>-->
+                                    <!--<xforms:setfocus control="fr-inplace-{@id}-input"/>-->
+                                <!--</xforms:action>-->
+                            <!--</xforms:trigger>-->
                         </xhtml:span>
                     </xhtml:span>
                 </xhtml:div>
@@ -182,28 +184,30 @@
     </xsl:template>
 
     <xsl:template match="xhtml:body//xforms:textarea[@appearance='fr:in-place']">
-        <xforms:switch>
-            <xsl:if test="@class">
-                <xsl:attribute name="class" select="@class"/>
-            </xsl:if>
+        <xforms:switch id="{@id}">
+            <xsl:attribute name="class" select="string-join(('fr-inplace-input', @class), ' ')"/>
             <xforms:case id="fr-inplace-{@id}-view">
                 <xhtml:div>
                     <xhtml:span class="fr-inplace-content">
                         <xforms:output value="{@ref}" class="fr-inplace-value">
                             <xsl:copy-of select="xforms:label"/>
+                            <xforms:action ev:event="DOMActivate">
+                                <xforms:toggle case="fr-inplace-{@id}-edit"/>
+                                <xforms:setfocus control="fr-inplace-{@id}-input"/>
+                            </xforms:action>
                         </xforms:output>
-                        <xhtml:span class="fr-inplace-buttons">
+                        <!--<xhtml:span class="fr-inplace-buttons">-->
                             <!--<xforms:trigger appearance="minimal" class="fr-inplace-delete">-->
                                 <!--<xforms:label><xhtml:img src="../../../../apps/fr/style/trash.gif" alt="Delete" title="Delete Section"/></xforms:label>-->
                             <!--</xforms:trigger>-->
-                            <xforms:trigger appearance="minimal" class="fr-inplace-edit">
-                                <xforms:label>Change</xforms:label>
-                                <xforms:action ev:event="DOMActivate">
-                                    <xforms:toggle case="fr-inplace-{@id}-edit"/>
-                                    <xforms:setfocus control="fr-inplace-{@id}-input"/>
-                                </xforms:action>
-                            </xforms:trigger>
-                        </xhtml:span>
+                            <!--<xforms:trigger appearance="minimal" class="fr-inplace-edit">-->
+                                <!--<xforms:label>Change</xforms:label>-->
+                                <!--<xforms:action ev:event="DOMActivate">-->
+                                    <!--<xforms:toggle case="fr-inplace-{@id}-edit"/>-->
+                                    <!--<xforms:setfocus control="fr-inplace-{@id}-input"/>-->
+                                <!--</xforms:action>-->
+                            <!--</xforms:trigger>-->
+                        <!--</xhtml:span>-->
                     </xhtml:span>
                 </xhtml:div>
             </xforms:case>
@@ -232,7 +236,8 @@
     </xsl:template>
 
     <xsl:template match="xhtml:body//fr:section">
-        <xhtml:div class="section-container">
+        <xhtml:div id="{@id}">
+            <xsl:attribute name="class" select="string-join(('fr-section-container', @class), ' ')"/>
             <xforms:switch id="switch-{@id}" context="{if (@context) then @context else '.'}" xxforms:readonly-appearance="dynamic">
                 <xforms:case id="case-{@id}-closed" selected="{if (@open = 'false') then 'true' else 'false'}">
                     <xhtml:div>

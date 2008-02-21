@@ -75,7 +75,7 @@
     <!-- Template instance -->
     <page path-info="/fr/service/template/([^/]+)/([^/]+)(/([^/]+))?" matcher="oxf:perl5-matcher"
           default-submission="submission-service-empty.xml"
-          view="/forms/${1}/service/template.xpl">
+          model="/forms/${1}/service/template.xpl">
         <setvalue ref="/*/app" matcher-group="1"/>
         <setvalue ref="/*/form" matcher-group="2"/>
         <setvalue ref="/*/template" matcher-group="4"/>

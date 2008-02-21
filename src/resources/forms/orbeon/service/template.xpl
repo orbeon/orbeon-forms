@@ -21,12 +21,34 @@
         xmlns:xi="http://www.w3.org/2001/XInclude">
 
     <p:param type="input" name="instance"/>
-    <p:param type="output" name="data"/>
 
     <p:processor name="oxf:url-generator">
         <p:input name="config" href="aggregate('config', aggregate('url', #instance#xpointer(concat(
                                         'oxf:/forms/', /*/app, '/', /*/form, '/template.xml'))))"/>
-        <p:output name="data" ref="data"/>
+        <p:output name="data" id="template"/>
+    </p:processor>
+
+    <!-- Convert and serialize to XML -->
+    <p:processor name="oxf:xml-converter">
+        <p:input name="config">
+            <config>
+                <indent>false</indent>
+                <encoding>utf-8</encoding>
+            </config>
+        </p:input>
+        <p:input name="data" href="#template"/>
+        <p:output name="data" id="converted"/>
+    </p:processor>
+
+    <p:processor name="oxf:http-serializer">
+        <p:input name="config">
+            <config>
+                <cache-control>
+                    <use-local-cache>false</use-local-cache>
+                </cache-control>
+            </config>
+        </p:input>
+        <p:input name="data" href="#converted"/>
     </p:processor>
 
 </p:config>

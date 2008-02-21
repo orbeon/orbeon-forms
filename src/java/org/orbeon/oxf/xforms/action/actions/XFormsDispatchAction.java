@@ -113,7 +113,7 @@ public class XFormsDispatchAction extends XFormsAction {
             // "If there is a null search result for the target object and the source object is an XForms action such as
             // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."
 
-            if (XFormsServer.logger.isInfoEnabled())
+            if (XFormsServer.logger.isDebugEnabled())
                 containingDocument.logDebug("xforms:dispatch", "cannot find target, ignoring action",
                         new String[] { "target id", resolvedNewEventTargetId } );
         }

@@ -126,7 +126,7 @@ public class XFormsSetindexAction extends XFormsAction {
         } else {
             // "If there is a null search result for the target object and the source object is an XForms action such as
             // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."
-            if (XFormsServer.logger.isInfoEnabled())
+            if (XFormsServer.logger.isDebugEnabled())
                 containingDocument.logDebug("xforms:setindex", "index does not refer to an existing xforms:repeat element, ignoring action",
                         new String[] { "repeat id", repeatId } );
         }

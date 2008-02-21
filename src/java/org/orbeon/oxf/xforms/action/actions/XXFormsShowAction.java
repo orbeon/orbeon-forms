@@ -18,6 +18,8 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsControls;
 import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.processor.XFormsServer;
+import org.orbeon.oxf.xforms.control.controls.XXFormsDialogControl;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
@@ -42,7 +44,14 @@ public class XXFormsShowAction extends XFormsAction {
 
         if (dialogId != null) {
             // Dispatch xxforms-dialog-open event to dialog
-            containingDocument.dispatchEvent(pipelineContext, new XXFormsDialogOpenEvent((XFormsEventTarget) xformsControls.getObjectById(dialogId), neighbor, constrainToViewport));
+            final Object controlObject = (dialogId != null) ? xformsControls.getObjectById(dialogId) : null;
+            if (controlObject instanceof XXFormsDialogControl) {
+                containingDocument.dispatchEvent(pipelineContext, new XXFormsDialogOpenEvent((XFormsEventTarget) controlObject, neighbor, constrainToViewport));
+            } else {
+                if (XFormsServer.logger.isDebugEnabled())
+                containingDocument.logDebug("xxforms:show", "dialog does not refer to an existing xxforms:dialog element, ignoring action",
+                        new String[] { "dialog id", dialogId } );
+            }
         }
     }
 }

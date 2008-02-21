@@ -50,7 +50,7 @@ public class XFormsSendAction extends XFormsAction {
             // "If there is a null search result for the target object and the source object is an XForms action such as
             // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."
 
-            if (XFormsServer.logger.isInfoEnabled())
+            if (XFormsServer.logger.isDebugEnabled())
                 containingDocument.logDebug("xforms:send", "submission does not refer to an existing xforms:submission element, ignoring action",
                         new String[] { "submission id", submissionId } );
         }

@@ -8,27 +8,26 @@ body, body table, textarea.xforms-textarea {
     font-family: "Lucida Grande", Tahoma, Arial, Verdana, sans-serif;
 }
 
+#doc { margin-top: 1em; }
+
 .fr-top {
     height: 10px !important;
     display: block !important;
-}
-
-#doc4 .fr-top {
-    background-image: url(top-974.png);
     background-repeat: no-repeat;
-    background-position: bottom center
+    background-position: bottom center;
 }
+#doc .fr-top { background-image: url(top-750-ee.png); }
+#doc4 .fr-top { background-image: url(top-974.png); }
+
 
 .fr-bottom {
     height: 10px !important;
     display: block !important;
-}
-
-#doc4 .fr-bottom {
-    background-image: url(bottom-974.png);
     background-repeat: no-repeat;
     background-position: top center
 }
+#doc .fr-bottom { background-image: url(bottom-750-ee.png); }
+#doc4 .fr-bottom { background-image: url(bottom-974.png); }
 
 .fr-bottom .fr-orbeon-version {
     text-align: center;
@@ -138,7 +137,7 @@ img.xforms-disabled { display: none; }
 /*.xforms-disabled .xforms-label { display: none }*/
 /*.xforms-case-deselected .xforms-label { display: none }*/
 
-.xforms-trigger img { padding-right: 5px; }
+.xforms-trigger img { padding-right: 10px; }
 
 .fr-layout-table tr td { width: auto }
 .fr-grid .fr-layout-table tr td { width: auto }
@@ -289,7 +288,10 @@ body { text-align: left }
 }
 
 /* Do this for collapsible sections so that YUI animations work */
-div.fr-collapsible { overflow: hidden }
+div.fr-collapsible {
+    overflow: hidden;
+    margin-left: 22px;
+}
 
 /* Messages */
 .fr-message-success { color: green  }

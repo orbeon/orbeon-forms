@@ -76,11 +76,15 @@
     <property as="xs:boolean" name="oxf.xforms.ajax.show-loading-icon"               value="true"/>
     <property as="xs:boolean" name="oxf.xforms.ajax.show-errors"                     value="true"/>
     <property as="xs:boolean" name="oxf.xforms.gzip-state"                           value="true"/>
-    <property as="xs:boolean" name="oxf.xforms.minimal-resources"                    value="true"/>
+    <property as="xs:boolean" name="oxf.xforms.minimal-resources"                    value="false"/>
     <property as="xs:boolean" name="oxf.xforms.combine-resources"                    value="true"/>
     <property as="xs:boolean" name="oxf.xforms.cache-combined-resources"             value="false"/>
     <property as="xs:boolean" name="oxf.xforms.optimize-relevance"                   value="false"/>
     <property as="xs:boolean" name="oxf.xforms.session-heartbeat"                    value="true"/>
+
+    <!-- Form runner properties -->
+    <property as="xs:anyURI"  name="oxf.fr.persistence"             value="exist"/>
+    <property as="xs:string"  name="oxf.fr.persistence.exist.uri"   value="/exist/rest/db"/>
 
     <!-- Rarely used global properties -->
     <property as="xs:string"  name="oxf.servlet.externalize-form-values-prefix"      value="$extnode^"/>

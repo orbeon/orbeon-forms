@@ -31,7 +31,11 @@
         <!-- Hidden field to communicate to the client whether the data is clean or dirty -->
         <xforms:input model="fr-persistence-model" ref="instance('fr-persistence-instance')/data-status" id="fr-data-status-input" class="xforms-disabled"/>
 
-        <xhtml:div id="doc4" class="yui-t5xxx">
+
+        <xsl:if test="@width and not(@width = ('750px', '950px', '974px'))">
+            <xsl:message terminate="yes">Value of fr:view/@view is not valid</xsl:message>
+        </xsl:if>
+        <xhtml:div id="{if (@width = '750px') then 'doc' else if (@width = '950px') then 'doc2' else 'doc4'}" class="yui-t5xxx">
             <xhtml:div id="hd" class="fr-top"/>
             <xhtml:div id="bd" class="fr-container">
                 <xhtml:div id="yui-main">
@@ -96,15 +100,96 @@
                         <xhtml:div class="yui-g fr-separator">
                         </xhtml:div>
                         <xhtml:div class="yui-g fr-buttons-block">
-                            <xsl:choose>
-                                <xsl:when test="fr:buttons">
-                                    <xsl:apply-templates select="fr:buttons/node()"/>
-                                </xsl:when>
-                                <xsl:otherwise>
-                                    <!-- Display the toolbar and errors -->
-                                    <xi:include href="oxf:/apps/fr/includes/toolbar-and-errors-view.xml" xxi:omit-xml-base="true"/>
-                                </xsl:otherwise>
-                            </xsl:choose>
+                            <!-- Display the toolbar and errors -->
+                            <xforms:group model="fr-persistence-model" appearance="xxforms:internal">
+                                <xhtml:table class="fr-error-buttons">
+                                    <xhtml:tr>
+                                        <xhtml:td>
+                                            <!-- Display clean/dirty status -->
+                                            <xforms:group ref="instance('fr-persistence-instance')[data-status = 'dirty']">
+                                                <!-- TODO: i18n or use icon instead -->
+                                                <xhtml:p class="fr-unsaved-data">Your document contains unsaved changes.</xhtml:p>
+                                            </xforms:group>
+                                            <xforms:group ref="instance('fr-persistence-instance')[data-status = 'clean']"/>
+                                            <!-- Display messages -->
+                                            <xforms:switch>
+                                                <xforms:case id="orbeon-message-none">
+                                                    <xhtml:p/>
+                                                </xforms:case>
+                                                <xforms:case id="fr-message-success">
+                                                    <xhtml:p class="fr-message-success">
+                                                        <xforms:output value="instance('fr-persistence-instance')/message"/>
+                                                    </xhtml:p>
+                                                </xforms:case>
+                                                <xforms:case id="fr-message-validation-error">
+                                                    <xhtml:p class="fr-message-validation-error">
+                                                        <xforms:output value="instance('fr-persistence-instance')/message"/>
+                                                    </xhtml:p>
+                                                </xforms:case>
+                                                <xforms:case id="fr-message-fatal-error">
+                                                    <xhtml:p class="fr-message-fatal-error">
+                                                        <xforms:output value="instance('fr-persistence-instance')/message"/>
+                                                    </xhtml:p>
+                                                </xforms:case>
+                                            </xforms:switch>
+                                        </xhtml:td>
+                                    </xhtml:tr>
+                                    <xhtml:tr>
+                                        <xhtml:td>
+                                            <xforms:group ref=".[instance('fr-persistence-instance')/save-attempted = 'true']">
+                                                <xforms:group model="fr-error-summary-model" ref="instance('fr-errors-instance')[error]">
+                                                    <!-- TODO: i18n -->
+                                                    <xhtml:span class="fr-error-title">Your document has the following issues:</xhtml:span>
+                                                    <xhtml:ol class="fr-error-list">
+                                                        <xforms:repeat nodeset="error" id="fr-errors-repeat">
+                                                            <xhtml:li>
+                                                                <xforms:output value="@label" class="fr-error-label"/>
+                                                                <xforms:group ref=".[string-length(@indexes) > 0]" class="fr-error-row">
+                                                                    <xforms:output value="concat('(row ', @indexes, ')')"/>
+                                                                </xforms:group>
+                                                                <xforms:group ref=".[normalize-space(@alert) != '']" class="fr-error-alert">
+                                                                    - <xforms:output value="@alert"/>
+                                                                </xforms:group>
+                                                            </xhtml:li>
+                                                        </xforms:repeat>
+                                                    </xhtml:ol>
+                                                </xforms:group>
+                                                <xforms:group model="fr-error-summary-model" ref="instance('fr-errors-instance')[not(error)]">
+                                                </xforms:group>
+                                            </xforms:group>
+                                        </xhtml:td>
+                                    </xhtml:tr>
+                                </xhtml:table>
+                                <xsl:choose>
+                                    <xsl:when test="fr:buttons">
+                                        <xsl:apply-templates select="fr:buttons/node()"/>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xhtml:div class="fr-buttons">
+                                            <!-- Trigger shown to go back if the data is dirty -->
+                                            <xforms:trigger ref="instance('fr-persistence-instance')[data-status = 'dirty']">
+                                                <xforms:label><xhtml:img src="/apps/fr/style/previous.gif" alt=""/> <xhtml:span>Discard</xhtml:span></xforms:label>
+                                                <xforms:action ev:event="DOMActivate">
+                                                    <xforms:dispatch target="fr-persistence-model" name="orbeon-summary"/>
+                                                </xforms:action>
+                                            </xforms:trigger>
+                                            <!-- Trigger shown to go back if the data is clean -->
+                                            <xforms:trigger ref="instance('fr-persistence-instance')[data-status = 'clean']">
+                                                <xforms:label><xhtml:img src="/apps/fr/style/previous.gif" alt=""/> <xhtml:span>Back</xhtml:span></xforms:label>
+                                                <xforms:action ev:event="DOMActivate">
+                                                    <xforms:dispatch target="fr-persistence-model" name="orbeon-summary"/>
+                                                </xforms:action>
+                                            </xforms:trigger>
+                                            <xforms:trigger ref="instance('fr-triggers-instance')/save">
+                                                <xforms:label><xhtml:img src="/apps/fr/style/run.gif" alt=""/> <xhtml:span>Save Form</xhtml:span></xforms:label>
+                                                <xforms:action ev:event="DOMActivate">
+                                                    <xforms:dispatch target="fr-persistence-model" name="orbeon-save"/>
+                                                </xforms:action>
+                                            </xforms:trigger>
+                                        </xhtml:div>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </xforms:group>
                         </xhtml:div>
                     </xhtml:div>
                 </xhtml:div>
@@ -120,8 +205,15 @@
                 </xhtml:div>
             </xhtml:div>
             <xhtml:div id="ft" class="fr-bottom">
-                <xsl:variable xmlns:version="java:org.orbeon.oxf.common.Version" name="orbeon-forms-version" select="version:getVersion()" as="xs:string"/>
-                <xhtml:div class="fr-orbeon-version">Orbeon Forms <xsl:value-of select="$orbeon-forms-version"/></xhtml:div>
+                <xsl:choose>
+                    <xsl:when test="fr:footer">
+                        <xsl:apply-templates select="fr:footer/node()"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:variable xmlns:version="java:org.orbeon.oxf.common.Version" name="orbeon-forms-version" select="version:getVersion()" as="xs:string"/>
+                        <xhtml:div class="fr-orbeon-version">Orbeon Forms <xsl:value-of select="$orbeon-forms-version"/></xhtml:div>
+                    </xsl:otherwise>
+                </xsl:choose>
             </xhtml:div>
 
         </xhtml:div>
@@ -236,61 +328,74 @@
     </xsl:template>
 
     <xsl:template match="xhtml:body//fr:section">
-        <xhtml:div id="{@id}">
-            <xsl:attribute name="class" select="string-join(('fr-section-container', @class), ' ')"/>
-            <xforms:switch id="switch-{@id}" context="{if (@context) then @context else '.'}" xxforms:readonly-appearance="dynamic">
-                <xforms:case id="case-{@id}-closed" selected="{if (@open = 'false') then 'true' else 'false'}">
-                    <xhtml:div>
-                        <xhtml:h2>
-                            <xforms:group appearance="xxforms:internal">
-                                <xforms:trigger appearance="minimal">
-                                    <xforms:label>
-                                        <xhtml:img src="../../../../apps/fr/style/plus.png" alt="Open section" title="Open section"/>
-                                    </xforms:label>
-                                </xforms:trigger>
-                                <xforms:trigger appearance="minimal">
-                                    <xforms:label>
-                                        <xsl:apply-templates select="xforms:label"/>
-                                    </xforms:label>
-                                </xforms:trigger>
-                                <xforms:action ev:event="DOMActivate">
-                                    <xforms:setvalue model="fr-sections-model" ref="instance('fr-current-section-instance')"
-                                                     value="concat('{@id}', if (empty(event('repeat-indexes'))) then '' else concat('·', string-join(event('repeat-indexes'), '-')))"/>
-                                    <xforms:dispatch target="fr-sections-model" name="fr-expand"/>
-                                </xforms:action>
-                            </xforms:group>
-                        </xhtml:h2>
-                    </xhtml:div>
-                </xforms:case>
-                <xforms:case id="case-{@id}-open" selected="{if (not(@open = 'false')) then 'true' else 'false'}">
-                    <xhtml:div>
-                        <xhtml:h2>
-                            <xforms:group appearance="xxforms:internal">
-                                <xforms:trigger appearance="minimal">
-                                    <xforms:label>
-                                        <xhtml:img src="../../../../apps/fr/style/minus.png" alt="Close section" title="Close section"/>
-                                    </xforms:label>
-                                </xforms:trigger>
-                                <xforms:trigger appearance="minimal">
-                                    <xforms:label>
-                                        <xsl:apply-templates select="xforms:label"/>
-                                    </xforms:label>
-                                </xforms:trigger>
-                                <xforms:action ev:event="DOMActivate">
-                                    <xforms:setvalue model="fr-sections-model" ref="instance('fr-current-section-instance')"
-                                                     value="concat('{@id}', if (empty(event('repeat-indexes'))) then '' else concat('·', string-join(event('repeat-indexes'), '-')))"/>
-                                    <xforms:dispatch target="fr-sections-model" name="fr-collapse" />
-                                </xforms:action>
-                            </xforms:group>
-                        </xhtml:h2>
-                        <xhtml:div class="fr-collapsible">
-                            <!-- Section content -->
-                            <xsl:apply-templates select="* except xforms:label"/>
+        <xsl:variable name="content">
+            <xsl:variable name="ancestor-sections" as="xs:integer" select="count(ancestor::fr:section)"/>
+            <xhtml:div id="{@id}">
+                <xsl:attribute name="class" select="string-join(('fr-section-container', @class), ' ')"/>
+                <xforms:switch id="switch-{@id}" context="{if (@context) then @context else '.'}" xxforms:readonly-appearance="dynamic">
+                    <xforms:case id="case-{@id}-closed" selected="{if (@open = 'false') then 'true' else 'false'}">
+                        <xhtml:div>
+                            <xsl:element name="{if ($ancestor-sections = 0) then 'h2' else 'h3'}">
+                                <xforms:group appearance="xxforms:internal">
+                                    <xforms:trigger appearance="minimal">
+                                        <xforms:label>
+                                            <xhtml:img src="../../../../apps/fr/style/plus.png" alt="Open section" title="Open section"/>
+                                        </xforms:label>
+                                    </xforms:trigger>
+                                    <xforms:trigger appearance="minimal">
+                                        <xforms:label>
+                                            <xsl:apply-templates select="xforms:label"/>
+                                        </xforms:label>
+                                    </xforms:trigger>
+                                    <xforms:action ev:event="DOMActivate">
+                                        <xforms:setvalue model="fr-sections-model" ref="instance('fr-current-section-instance')"
+                                                         value="concat('{@id}', if (empty(event('repeat-indexes'))) then '' else concat('·', string-join(event('repeat-indexes'), '-')))"/>
+                                        <xforms:dispatch target="fr-sections-model" name="fr-expand"/>
+                                    </xforms:action>
+                                </xforms:group>
+                            </xsl:element>
                         </xhtml:div>
-                    </xhtml:div>
-                </xforms:case>
-            </xforms:switch>
-        </xhtml:div>
+                    </xforms:case>
+                    <xforms:case id="case-{@id}-open" selected="{if (not(@open = 'false')) then 'true' else 'false'}">
+                        <xhtml:div>
+                            <xsl:element name="{if ($ancestor-sections = 0) then 'h2' else 'h3'}">
+                                <xforms:group appearance="xxforms:internal">
+                                    <xforms:trigger appearance="minimal">
+                                        <xforms:label>
+                                            <xhtml:img src="../../../../apps/fr/style/minus.png" alt="Close section" title="Close section"/>
+                                        </xforms:label>
+                                    </xforms:trigger>
+                                    <xforms:trigger appearance="minimal">
+                                        <xforms:label>
+                                            <xsl:apply-templates select="xforms:label"/>
+                                        </xforms:label>
+                                    </xforms:trigger>
+                                    <xforms:action ev:event="DOMActivate">
+                                        <xforms:setvalue model="fr-sections-model" ref="instance('fr-current-section-instance')"
+                                                         value="concat('{@id}', if (empty(event('repeat-indexes'))) then '' else concat('·', string-join(event('repeat-indexes'), '-')))"/>
+                                        <xforms:dispatch target="fr-sections-model" name="fr-collapse" />
+                                    </xforms:action>
+                                </xforms:group>
+                            </xsl:element>
+                            <xhtml:div class="fr-collapsible">
+                                <!-- Section content -->
+                                <xsl:apply-templates select="* except xforms:label"/>
+                            </xhtml:div>
+                        </xhtml:div>
+                    </xforms:case>
+                </xforms:switch>
+            </xhtml:div>
+        </xsl:variable>
+        <xsl:choose>
+            <xsl:when test="@ref">
+                <xforms:group ref="{@ref}">
+                    <xsl:copy-of select="$content"/>
+                </xforms:group>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:copy-of select="$content"/>
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:template>
 
     <xsl:template match="xhtml:body//fr:grid">
@@ -323,13 +428,15 @@
         <xsl:variable name="tokenized-path" select="tokenize(@nodeset, '/')"/>
         <xsl:variable name="min-occurs" select="if (@minOccurs) then @minOccurs else 0"/>
         <xsl:variable name="max-occurs" select="if (@maxOccurs) then @maxOccurs else 'unbounded'"/>
-        <xhtml:table class="fr-repeat-table">
+        <xsl:variable name="first-mandatory" as="xs:boolean" select="if (@first-mandatory) then @first-mandatory = 'true' else false()"/>
+        <xsl:variable name="is-table-appearance" as="xs:boolean" select="@appearance = 'xxforms:table'"/>
+        <xhtml:table class="fr-repeat {if ($is-table-appearance) then 'fr-repeat-table' else 'fr-repeat-sections'} {if (@columns) then concat('fr-grid-', @columns, '-columns') else ()}">
             <xforms:group appearance="xxforms:internal">
                 <xhtml:tr>
-                    <xhtml:td/>
-                    <xhtml:td>
+                    <xhtml:td class="fr-repeat-column"/>
+                    <xhtml:td class="fr-repeat-column">
                         <xforms:trigger appearance="minimal" ref=".[{if ($max-occurs = 'unbounded') then 'true()' else concat('count(', @nodeset, ') lt ', $max-occurs)}]">
-                            <xforms:label><xhtml:img src="../../../../apps/fr/style/add.gif"/></xforms:label>
+                            <xforms:label><xhtml:img src="../../../../apps/fr/style/add.gif" alt="Add" title="Add"/></xforms:label>
                         </xforms:trigger>
                     </xhtml:td>
                     <xhtml:td style="width: 100%" colspan="{max(for $tr in xhtml:tr return count($tr/xhtml:td))}">
@@ -345,16 +452,27 @@
                 <!-- TODO: handle @at -->
                 <!-- at="index('{@id}')" position="after" -->
             </xforms:group>
+            <xhtml:tr>
+                <xhtml:td class="fr-repeat-column"/>
+                <xhtml:td class="fr-repeat-column"/>
+                <xsl:for-each select="xhtml:tr[1]/xhtml:td/xforms:*[1]/xforms:label">
+                    <xhtml:th>
+                        <xsl:value-of select="."/>
+                    </xhtml:th>
+                </xsl:for-each>
+            </xhtml:tr>
             <xforms:repeat nodeset="{@nodeset}" id="{@id}">
                 <xhtml:tbody>
                     <xhtml:tr>
-                        <xhtml:td>
-                            <xforms:output value="count(preceding-sibling::{$tokenized-path[last()]}) + 1"/>
+                        <xhtml:td class="fr-repeat-column">
+                            <xforms:output value="position()"/>
                         </xhtml:td>
-                        <xhtml:td>
+                        <xhtml:td class="fr-repeat-column">
                             <xforms:group>
-                                <xforms:trigger appearance="minimal" ref=".[count(../{@nodeset}) gt {$min-occurs}]">
-                                    <xforms:label><xhtml:img src="../../../../apps/fr/style/remove.gif"/></xforms:label>
+                                <xforms:trigger appearance="minimal" ref="if (
+                                        {if ($first-mandatory) then 'position() != 1 and ' else ''}
+                                        count(xxforms:context('{@id}')) gt {$min-occurs}) then . else ()">
+                                    <xforms:label><xhtml:img src="../../../../apps/fr/style/remove.gif" alt="Remove" title="Remove"/></xforms:label>
                                 </xforms:trigger>
                                 <xforms:delete ev:event="DOMActivate" nodeset="."/>
                             </xforms:group>

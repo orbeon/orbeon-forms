@@ -248,6 +248,7 @@
     <xsd:attributeGroup name="Single.Node.Binding.Attributes">
         <xsd:attribute name="model" type="xsd:IDREF" use="optional"/>
         <xsd:attribute name="ref" type="xforms:XPathExpression" use="optional"/>
+        <xsd:attribute name="context" type="xforms:XPathExpression" use="optional"/>
         <xsd:attribute name="bind" type="xsd:IDREF" use="optional"/>
     </xsd:attributeGroup>
     <xsd:attributeGroup name="Nodeset.Binding.Attributes">

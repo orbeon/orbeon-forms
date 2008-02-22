@@ -35,7 +35,7 @@
         <xsl:if test="@width and not(@width = ('750px', '950px', '974px'))">
             <xsl:message terminate="yes">Value of fr:view/@view is not valid</xsl:message>
         </xsl:if>
-        <xhtml:div id="{if (@width = '750px') then 'doc' else if (@width = '950px') then 'doc2' else 'doc4'}" class="yui-t5xxx">
+        <xhtml:div id="{if (@width = '750px') then 'doc' else if (@width = '950px') then 'doc2' else 'doc4'}" class="yui-t5xxx{if (doc('input:instance')/*/mode = 'print') then ' fr-print-mode' else ''}">
             <xhtml:div id="hd" class="fr-top"/>
             <xhtml:div id="bd" class="fr-container">
                 <xhtml:div id="yui-main">
@@ -160,35 +160,32 @@
                                         </xhtml:td>
                                     </xhtml:tr>
                                 </xhtml:table>
-                                <xsl:choose>
-                                    <xsl:when test="fr:buttons">
-                                        <xsl:apply-templates select="fr:buttons/node()"/>
-                                    </xsl:when>
-                                    <xsl:otherwise>
-                                        <xhtml:div class="fr-buttons">
-                                            <!-- Trigger shown to go back if the data is dirty -->
-                                            <xforms:trigger ref="instance('fr-persistence-instance')[data-status = 'dirty']">
-                                                <xforms:label><xhtml:img src="/apps/fr/style/previous.gif" alt=""/> <xhtml:span>Discard</xhtml:span></xforms:label>
-                                                <xforms:action ev:event="DOMActivate">
-                                                    <xforms:dispatch target="fr-persistence-model" name="orbeon-summary"/>
-                                                </xforms:action>
-                                            </xforms:trigger>
-                                            <!-- Trigger shown to go back if the data is clean -->
-                                            <xforms:trigger ref="instance('fr-persistence-instance')[data-status = 'clean']">
-                                                <xforms:label><xhtml:img src="/apps/fr/style/previous.gif" alt=""/> <xhtml:span>Back</xhtml:span></xforms:label>
-                                                <xforms:action ev:event="DOMActivate">
-                                                    <xforms:dispatch target="fr-persistence-model" name="orbeon-summary"/>
-                                                </xforms:action>
-                                            </xforms:trigger>
-                                            <xforms:trigger ref="instance('fr-triggers-instance')/save">
-                                                <xforms:label><xhtml:img src="/apps/fr/style/run.gif" alt=""/> <xhtml:span>Save Form</xhtml:span></xforms:label>
-                                                <xforms:action ev:event="DOMActivate">
-                                                    <xforms:dispatch target="fr-persistence-model" name="orbeon-save"/>
-                                                </xforms:action>
-                                            </xforms:trigger>
-                                        </xhtml:div>
-                                    </xsl:otherwise>
-                                </xsl:choose>
+                                <xhtml:div class="fr-buttons">
+                                    <xsl:choose>
+                                        <!-- In print mode, only include a close button -->
+                                        <xsl:when test="doc('input:instance')/*/mode = 'print'">
+                                            <xsl:variable name="default-buttons" as="element(fr:buttons)">
+                                                <fr:buttons>
+                                                    <fr:close-button/>
+                                                </fr:buttons>
+                                            </xsl:variable>
+                                            <xsl:apply-templates select="$default-buttons/*"/>
+                                        </xsl:when>
+                                        <xsl:when test="fr:buttons">
+                                            <xsl:apply-templates select="fr:buttons/node()"/>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:variable name="default-buttons" as="element(fr:buttons)">
+                                                <fr:buttons>
+                                                    <fr:back-button/>
+                                                    <fr:print-button/>
+                                                    <fr:save-button/>
+                                                </fr:buttons>
+                                            </xsl:variable>
+                                            <xsl:apply-templates select="$default-buttons/*"/>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
+                                </xhtml:div>
                             </xforms:group>
                         </xhtml:div>
                     </xhtml:div>
@@ -217,6 +214,50 @@
             </xhtml:div>
 
         </xhtml:div>
+    </xsl:template>
+
+    <xsl:template match="fr:back-button">
+        <!-- Trigger shown to go back if the data is dirty -->
+        <xforms:trigger ref="instance('fr-persistence-instance')[data-status = 'dirty']">
+            <xforms:label><xhtml:img src="/apps/fr/style/previous.gif" alt=""/> <xhtml:span>Discard</xhtml:span></xforms:label>
+            <xforms:action ev:event="DOMActivate">
+                <xforms:dispatch target="fr-persistence-model" name="orbeon-summary"/>
+            </xforms:action>
+        </xforms:trigger>
+        <!-- Trigger shown to go back if the data is clean -->
+        <xforms:trigger ref="instance('fr-persistence-instance')[data-status = 'clean']">
+            <xforms:label><xhtml:img src="/apps/fr/style/previous.gif" alt=""/> <xhtml:span>Back</xhtml:span></xforms:label>
+            <xforms:action ev:event="DOMActivate">
+                <xforms:dispatch target="fr-persistence-model" name="orbeon-summary"/>
+            </xforms:action>
+        </xforms:trigger>
+    </xsl:template>
+
+    <xsl:template match="fr:save-button">
+        <xforms:trigger ref="instance('fr-triggers-instance')/save">
+            <xforms:label><xhtml:img src="/apps/fr/style/run.gif" alt=""/> <xhtml:span>Save Form</xhtml:span></xforms:label>
+            <xforms:action ev:event="DOMActivate">
+                <xforms:dispatch target="fr-persistence-model" name="orbeon-save"/>
+            </xforms:action>
+        </xforms:trigger>
+    </xsl:template>
+
+    <xsl:template match="fr:print-button">
+        <xforms:trigger>
+            <xforms:label><xhtml:img src="/apps/fr/style/report.gif" alt=""/> <xhtml:span>Print</xhtml:span></xforms:label>
+            <xforms:action ev:event="DOMActivate">
+                <xforms:send submission="fr-print-submission"/>
+            </xforms:action>
+        </xforms:trigger>
+    </xsl:template>
+
+    <xsl:template match="fr:close-button">
+        <xforms:trigger>
+            <xforms:label><xhtml:img src="/apps/fr/style/close.gif" alt=""/> <xhtml:span>Close</xhtml:span></xforms:label>
+            <xforms:action ev:event="DOMActivate">
+                <xxforms:script>window.close();</xxforms:script>
+            </xforms:action>
+        </xforms:trigger>
     </xsl:template>
 
     <xsl:template match="xhtml:body//xforms:input[@appearance='fr:in-place']">
@@ -328,12 +369,13 @@
     </xsl:template>
 
     <xsl:template match="xhtml:body//fr:section">
+        <xsl:variable name="open" as="xs:boolean" select="if (doc('input:instance')/*/mode = 'print') then true() else if (@open = 'false') then false() else true()"/>
         <xsl:variable name="content">
             <xsl:variable name="ancestor-sections" as="xs:integer" select="count(ancestor::fr:section)"/>
             <xhtml:div id="{@id}">
                 <xsl:attribute name="class" select="string-join(('fr-section-container', @class), ' ')"/>
                 <xforms:switch id="switch-{@id}" context="{if (@context) then @context else '.'}" xxforms:readonly-appearance="dynamic">
-                    <xforms:case id="case-{@id}-closed" selected="{if (@open = 'false') then 'true' else 'false'}">
+                    <xforms:case id="case-{@id}-closed" selected="{if (not($open)) then 'true' else 'false'}">
                         <xhtml:div>
                             <xsl:element name="{if ($ancestor-sections = 0) then 'h2' else 'h3'}">
                                 <xforms:group appearance="xxforms:internal">
@@ -356,9 +398,10 @@
                             </xsl:element>
                         </xhtml:div>
                     </xforms:case>
-                    <xforms:case id="case-{@id}-open" selected="{if (not(@open = 'false')) then 'true' else 'false'}">
+                    <xforms:case id="case-{@id}-open" selected="{if ($open) then 'true' else 'false'}">
                         <xhtml:div>
                             <xsl:element name="{if ($ancestor-sections = 0) then 'h2' else 'h3'}">
+                                <xsl:attribute name="class" select="'fr-section-title'"/>
                                 <xforms:group appearance="xxforms:internal">
                                     <xforms:trigger appearance="minimal">
                                         <xforms:label>
@@ -491,7 +534,7 @@
     <xsl:template match="/xhtml:html/xhtml:head/xforms:model[1]">
 
         <!-- This model handles form sections -->
-        <xforms:model id="fr-sections-model" xxforms:external-events="fr-after-collapse {@xxforms:external-events}" xxforms:readonly-appearance="{if (doc('input:instance')/*/mode = 'view') then 'static' else 'dynamic'}">
+        <xforms:model id="fr-sections-model" xxforms:external-events="fr-after-collapse {@xxforms:external-events}" xxforms:readonly-appearance="{if (doc('input:instance')/*/mode = ('view', 'print')) then 'static' else 'dynamic'}">
             <!-- Contain section being currently expanded/collapsed -->
             <!-- TODO: This probably doesn't quite work for sections within repeats -->
             <xforms:instance id="fr-current-section-instance">
@@ -522,6 +565,12 @@
                     <help/>
                 </help>
             </xforms:instance>
+        </xforms:model>
+
+        <xforms:model id="fr-print-model">
+            <xforms:instance id="fr-print-instance"><dummy/></xforms:instance>
+            <xforms:submission id="fr-print-submission" action="/fr/{{xxforms:instance('fr-parameters-instance')/app}}/{{xxforms:instance('fr-parameters-instance')/form}}/print/"
+                    method="post" ref="xxforms:instance('fr-form-instance')" replace="all" validate="false" xxforms:target="_blank" xxforms:show-progress="false"/>
         </xforms:model>
 
         <!-- Handle document persistence -->

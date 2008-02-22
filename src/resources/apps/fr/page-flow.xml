@@ -44,6 +44,11 @@
         <setvalue ref="/*/mode" matcher-group="3"/>
     </page>
 
+    <!-- Print document -->
+    <page path-info="/fr/([^/]+)/([^/]+)/(print)(/)?" matcher="oxf:perl5-matcher"
+          model="/forms/${1}/${2}/view.xhtml"
+          view="print.xpl"/>
+
     <!-- Edit document -->
     <page path-info="/fr/([^/]+)/([^/]+)/([^/]+)/(edit)" matcher="oxf:perl5-matcher"
           default-submission="submission-page-detail.xml"

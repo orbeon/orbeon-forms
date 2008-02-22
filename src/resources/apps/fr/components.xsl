@@ -491,7 +491,7 @@
     <xsl:template match="/xhtml:html/xhtml:head/xforms:model[1]">
 
         <!-- This model handles form sections -->
-        <xforms:model id="fr-sections-model" xxforms:external-events="fr-after-collapse" xxforms:readonly-appearance="{if (doc('input:instance')/*/mode = 'view') then 'static' else 'dynamic'}">
+        <xforms:model id="fr-sections-model" xxforms:external-events="fr-after-collapse {@xxforms:external-events}" xxforms:readonly-appearance="{if (doc('input:instance')/*/mode = 'view') then 'static' else 'dynamic'}">
             <!-- Contain section being currently expanded/collapsed -->
             <!-- TODO: This probably doesn't quite work for sections within repeats -->
             <xforms:instance id="fr-current-section-instance">

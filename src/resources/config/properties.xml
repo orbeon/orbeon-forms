@@ -66,25 +66,25 @@
     <property as="xs:integer" name="oxf.xforms.cache.documents.size"                 value="10"/>
     <property as="xs:integer" name="oxf.xforms.cache.shared-instances.size"          value="40"/>
 
-    <!-- Deprecated XForms cache configuration -->
-    <property as="xs:integer" name="oxf.xforms.cache.session.size"                   value="500000"/>
-    <property as="xs:integer" name="oxf.xforms.cache.application.size"               value="2000000"/>
-
     <!-- Other XForms options -->
     <property as="xs:boolean" name="oxf.xforms.optimize-get-all"                     value="true"/>
     <property as="xs:boolean" name="oxf.xforms.optimize-local-submission"            value="true"/>
     <property as="xs:boolean" name="oxf.xforms.ajax.show-loading-icon"               value="true"/>
     <property as="xs:boolean" name="oxf.xforms.ajax.show-errors"                     value="true"/>
     <property as="xs:boolean" name="oxf.xforms.gzip-state"                           value="true"/>
-    <property as="xs:boolean" name="oxf.xforms.minimal-resources"                    value="false"/>
+    <property as="xs:boolean" name="oxf.xforms.minimal-resources"                    value="true"/>
     <property as="xs:boolean" name="oxf.xforms.combine-resources"                    value="true"/>
     <property as="xs:boolean" name="oxf.xforms.cache-combined-resources"             value="false"/>
     <property as="xs:boolean" name="oxf.xforms.optimize-relevance"                   value="false"/>
     <property as="xs:boolean" name="oxf.xforms.session-heartbeat"                    value="true"/>
 
     <!-- Form runner properties -->
-    <property as="xs:anyURI"  name="oxf.fr.persistence"             value="exist"/>
-    <property as="xs:string"  name="oxf.fr.persistence.exist.uri"   value="/exist/rest/db"/>
+    <property as="xs:anyURI"  name="oxf.fr.persistence"                              value="exist"/>
+    <property as="xs:string"  name="oxf.fr.persistence.exist.uri"                    value="/exist/rest/db"/>
+
+    <!-- Deprecated XForms cache configuration -->
+    <property as="xs:integer" name="oxf.xforms.cache.session.size"                   value="500000"/>
+    <property as="xs:integer" name="oxf.xforms.cache.application.size"               value="2000000"/>
 
     <!-- Rarely used global properties -->
     <property as="xs:string"  name="oxf.servlet.externalize-form-values-prefix"      value="$extnode^"/>

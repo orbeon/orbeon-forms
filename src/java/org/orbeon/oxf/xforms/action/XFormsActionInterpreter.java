@@ -166,20 +166,20 @@ public class XFormsActionInterpreter {
 
     private void runSingleIteration(PipelineContext pipelineContext, String targetId, XFormsEventHandlerContainer eventHandlerContainer,
                                     Element actionElement, String actionNamespaceURI, String actionName, String ifConditionAttribute,
-                                    String whileIterationAttribute, boolean hasOverriddenContext, Item overriddenContextItem) {
+                                    String whileIterationAttribute, boolean hasOverriddenContext, Item contextItem) {
 
         // The context is now the overridden context
         int whileIteration = 1;
         while (true) {
             // Check if the conditionAttribute attribute exists and stop if false
             if (ifConditionAttribute != null) {
-                boolean result = evaluateCondition(pipelineContext, actionElement, actionName, ifConditionAttribute, "if", hasOverriddenContext, overriddenContextItem);
+                boolean result = evaluateCondition(pipelineContext, actionElement, actionName, ifConditionAttribute, "if", contextItem);
                 if (!result)
                     break;
             }
             // Check if the iterationAttribute attribute exists and stop if false
             if (whileIterationAttribute != null) {
-                boolean result = evaluateCondition(pipelineContext, actionElement, actionName, whileIterationAttribute, "while", hasOverriddenContext, overriddenContextItem);
+                boolean result = evaluateCondition(pipelineContext, actionElement, actionName, whileIterationAttribute, "while", contextItem);
                 if (!result)
                     break;
             }
@@ -195,7 +195,7 @@ public class XFormsActionInterpreter {
             // Get action and execute it
             final XFormsAction xformsAction = XFormsActions.getAction(actionNamespaceURI, actionName);
             containingDocument.startHandleOperation();
-            xformsAction.execute(this, pipelineContext, targetId, eventHandlerContainer, actionElement, hasOverriddenContext, overriddenContextItem);
+            xformsAction.execute(this, pipelineContext, targetId, eventHandlerContainer, actionElement, hasOverriddenContext, contextItem);
             containingDocument.endHandleOperation();
 
             // Stop if there is no iteration
@@ -222,24 +222,20 @@ public class XFormsActionInterpreter {
 
     private boolean evaluateCondition(PipelineContext pipelineContext, Element actionElement,
                                       String actionName, String conditionAttribute, String conditionType,
-                                      boolean hasOverriddenContext, Item overriddenContextItem) {
+                                      Item contextItem) {
 
         // Execute condition relative to the overridden context if it exists, or the in-scope context if not
         final List contextNodeset;
         final int contextPosition;
         {
-            if (hasOverriddenContext && overriddenContextItem != null) {
+            if (contextItem != null) {
                 // Use provided context item
-                contextNodeset = Collections.singletonList(overriddenContextItem);
+                contextNodeset = Collections.singletonList(contextItem);
                 contextPosition = 1;
-            } else if (hasOverriddenContext && overriddenContextItem == null) {
+            } else {
                 // Use empty context
                 contextNodeset = Collections.EMPTY_LIST;
                 contextPosition = 0;
-            } else {
-                // Use regular context
-                contextNodeset = contextStack.getCurrentNodeset();
-                contextPosition = contextStack.getCurrentPosition();
             }
         }
 

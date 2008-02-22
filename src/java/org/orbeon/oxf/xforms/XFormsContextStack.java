@@ -66,8 +66,9 @@ public class XFormsContextStack {
 
         // Push the default context
         if (xformsModel.getInstanceCount() > 0) {
-            final List defaultNodeset = Arrays.asList(new Object[]{xformsModel.getDefaultInstance().getInstanceRootElementInfo()});
-            contextStack.push(new BindingContext(null, xformsModel, defaultNodeset, 1, null, true, null, xformsModel.getDefaultInstance().getLocationData(), false, null));
+            final NodeInfo defaultNode = xformsModel.getDefaultInstance().getInstanceRootElementInfo();
+            final List defaultNodeset = Arrays.asList(new Object[]{ defaultNode });
+            contextStack.push(new BindingContext(null, xformsModel, defaultNodeset, 1, null, true, null, xformsModel.getDefaultInstance().getLocationData(), false, defaultNode));
         } else {
             contextStack.push(new BindingContext(null, xformsModel, Collections.EMPTY_LIST, 0, null, true, null, xformsModel.getLocationData(), false, null));
         }
@@ -82,7 +83,7 @@ public class XFormsContextStack {
 
         // Create ancestors-or-self list
         final List ancestorsOrSelf = new ArrayList();
-        XFormsContextStack.BindingContext controlBindingContext = xformsControl.getBindingContext();
+        BindingContext controlBindingContext = xformsControl.getBindingContext();
         while (controlBindingContext != null) {
             ancestorsOrSelf.add(controlBindingContext);
             controlBindingContext = controlBindingContext.getParent();
@@ -170,7 +171,7 @@ public class XFormsContextStack {
 
             final XFormsControl repeatXFormsControl = xformsControl.getParent();
             final List repeatChildren = repeatXFormsControl.getChildren();
-            final XFormsContextStack.BindingContext currentBindingContext = getCurrentBindingContext();
+            final BindingContext currentBindingContext = getCurrentBindingContext();
             final List currentNodeset = currentBindingContext.getNodeset();
 
             final int repeatChildrenSize = (repeatChildren == null) ? 0 : repeatChildren.size();
@@ -272,7 +273,7 @@ public class XFormsContextStack {
         }
 
         // Determine current context
-        final XFormsContextStack.BindingContext currentBindingContext = getCurrentBindingContext();
+        final BindingContext currentBindingContext = getCurrentBindingContext();
 
         // Handle model
         final XFormsModel newModel;
@@ -325,7 +326,7 @@ public class XFormsContextStack {
                 }
 
                 // Evaluate new XPath in context
-                final XFormsContextStack.BindingContext contextBindingContext = getCurrentBindingContext();
+                final BindingContext contextBindingContext = getCurrentBindingContext();
 
                 if (contextBindingContext != null && contextBindingContext.getNodeset().size() > 0) {
                     pushTemporaryContext(contextBindingContext.getSingleItem());// provide context information for the current() function
@@ -348,7 +349,7 @@ public class XFormsContextStack {
             } else if (isNewModel && context == null) {
                 // Only the model has changed
 
-                final XFormsContextStack.BindingContext modelBindingContext = getCurrentBindingContextForModel(newModel.getEffectiveId());
+                final BindingContext modelBindingContext = getCurrentBindingContextForModel(newModel.getEffectiveId());
                 if (modelBindingContext != null) {
                     newNodeset = modelBindingContext.getNodeset();
                     newPosition = modelBindingContext.getPosition();
@@ -385,12 +386,12 @@ public class XFormsContextStack {
 
         // Push new context
         final String id = (bindingElement == null) ? null : bindingElement.attributeValue("id");
-        contextStack.push(new XFormsContextStack.BindingContext(currentBindingContext, newModel, newNodeset, newPosition, id, isNewBind, bindingElement, locationData, hasOverriddenContext, contextItem));
+        contextStack.push(new BindingContext(currentBindingContext, newModel, newNodeset, newPosition, id, isNewBind, bindingElement, locationData, hasOverriddenContext, contextItem));
     }
 
     private void pushTemporaryContext(Item contextItem) {
         final BindingContext currentBindingContext = getCurrentBindingContext();
-        contextStack.push(new XFormsContextStack.BindingContext(currentBindingContext, currentBindingContext.getModel(),
+        contextStack.push(new BindingContext(currentBindingContext, currentBindingContext.getModel(),
                 currentBindingContext.getNodeset(), currentBindingContext.getPosition(), currentBindingContext.getIdForContext(),
                 false, currentBindingContext.getControlElement(), currentBindingContext.getLocationData(),
                 false, contextItem));
@@ -403,28 +404,28 @@ public class XFormsContextStack {
      */
     public void pushIteration(int currentPosition) {
         final BindingContext currentBindingContext = getCurrentBindingContext();
-        contextStack.push(new XFormsContextStack.BindingContext(currentBindingContext, currentBindingContext.getModel(),
+        contextStack.push(new BindingContext(currentBindingContext, currentBindingContext.getModel(),
                 currentBindingContext.getNodeset(), currentPosition, currentBindingContext.getIdForContext(), true, null, currentBindingContext.getLocationData(),
                 false, currentBindingContext.getSingleItem()));
     }
 
-    public XFormsContextStack.BindingContext getCurrentBindingContext() {
-        return (XFormsContextStack.BindingContext) contextStack.peek();
+    public BindingContext getCurrentBindingContext() {
+        return (BindingContext) contextStack.peek();
     }
 
-    public XFormsContextStack.BindingContext popBinding() {
+    public BindingContext popBinding() {
         if (contextStack.size() == 1)
             throw new OXFException("Attempt to clear context stack.");
-        return (XFormsContextStack.BindingContext) contextStack.pop();
+        return (BindingContext) contextStack.pop();
     }
 
     /**
      * Get the current node-set binding for the given model id.
      */
-    public XFormsContextStack.BindingContext getCurrentBindingContextForModel(String modelId) {
+    public BindingContext getCurrentBindingContextForModel(String modelId) {
 
         for (int i = contextStack.size() - 1; i >= 0; i--) {
-            final XFormsContextStack.BindingContext currentBindingContext = (XFormsContextStack.BindingContext) contextStack.get(i);
+            final BindingContext currentBindingContext = (BindingContext) contextStack.get(i);
 
             final String currentModelId = currentBindingContext.getModel().getEffectiveId();
             if ((currentModelId == null && modelId == null) || (modelId != null && modelId.equals(currentModelId)))
@@ -439,7 +440,7 @@ public class XFormsContextStack {
      */
     public List getCurrentNodeset(String modelId) {
 
-        final XFormsContextStack.BindingContext bindingContext = getCurrentBindingContextForModel(modelId);
+        final BindingContext bindingContext = getCurrentBindingContextForModel(modelId);
 
         // If a context exists, return its node-set
         if (bindingContext != null)
@@ -464,7 +465,7 @@ public class XFormsContextStack {
      */
     public NodeInfo getCurrentSingleNode(String modelId) {
 
-        final XFormsContextStack.BindingContext bindingContext = getCurrentBindingContextForModel(modelId);
+        final BindingContext bindingContext = getCurrentBindingContextForModel(modelId);
 
         // If a context exists, use it
         if (bindingContext != null)
@@ -534,12 +535,14 @@ public class XFormsContextStack {
      * repeat id is passed, return the single node associated with the closest enclosing repeat
      * iteration.
      *
+     * NOTE: Use getContextForId() instead.
+     *
      * @param repeatId  enclosing repeat id, or null
      * @return          the single node
      */
     public NodeInfo getRepeatCurrentSingleNode(String repeatId) {
         for (int i = contextStack.size() - 1; i >= 0; i--) {
-            final XFormsContextStack.BindingContext currentBindingContext = (XFormsContextStack.BindingContext) contextStack.get(i);
+            final BindingContext currentBindingContext = (BindingContext) contextStack.get(i);
 
             final Element bindingElement = currentBindingContext.getControlElement();
             final String repeatIdForIteration = currentBindingContext.getIdForContext();
@@ -564,7 +567,7 @@ public class XFormsContextStack {
      */
     public String getEnclosingRepeatId() {
         for (int i = contextStack.size() - 1; i >= 0; i--) {
-            final XFormsContextStack.BindingContext currentBindingContext = (XFormsContextStack.BindingContext) contextStack.get(i);
+            final BindingContext currentBindingContext = (BindingContext) contextStack.get(i);
 
             final Element bindingElement = currentBindingContext.getControlElement();
             final String repeatIdForIteration = currentBindingContext.getIdForContext();
@@ -578,35 +581,54 @@ public class XFormsContextStack {
     }
 
     /**
-     * Return the context node-set based on the enclosing xforms:repeat, xforms:group or xforms:switch, either the
-     * closest one if no argument is passed, or context at the level of the element with the given id passed.
+     * Obtain the single-node binding for an enclosing xforms:group, xforms:repeat, or xforms:switch. It takes one
+     * mandatory string parameter containing the id of an enclosing grouping XForms control. For xforms:repeat, the
+     * context returned is the context of the current iteration.
      *
-     * @param contextId  enclosing context id, or null
-     * @return           the node-set
+     * @param contextId  enclosing context id
+     * @return           the item
      */
-    public List getContextForId(String contextId) {
+    public Item getContextForId(String contextId) {
+        for (int i = contextStack.size() - 1; i >= 0; i--) {
+            final BindingContext currentBindingContext = (BindingContext) contextStack.get(i);
 
-        if (contextId == null) {
-            // Return the context item like the XForms 1.1 context() function
-            return new ArrayList(Collections.singleton(getContextItem()));
-        } else {
-            for (int i = contextStack.size() - 1; i >= 0; i--) {
-                final XFormsContextStack.BindingContext currentBindingContext = (XFormsContextStack.BindingContext) contextStack.get(i);
-
-                final Element bindingElement = currentBindingContext.getControlElement();
-                final String idForContext = currentBindingContext.getIdForContext();
-                if (bindingElement != null && idForContext != null && XFormsControls.groupingControls.get(bindingElement.getName()) != null) {
-                    if (contextId == null || contextId.equals(idForContext)) {
-                        // Found matching binding context
-                        return currentBindingContext.getNodeset();
+            final Element bindingElement = currentBindingContext.getControlElement();
+            final String idForContext = currentBindingContext.getIdForContext();
+            if (contextId.equals(idForContext)) {
+                if (bindingElement != null && XFormsControls.groupingControls.get(bindingElement.getName()) != null) {
+                    // Found matching binding context for regular grouping control
+                    return currentBindingContext.getSingleItem();
+                } else if (bindingElement == null) {
+                    final BindingContext parentBindingContext = currentBindingContext.getParent();
+                    if (parentBindingContext != null && parentBindingContext.getControlElement() != null
+                            && contextId.equals(parentBindingContext.getIdForContext()) && parentBindingContext.getControlElement().getName().equals("repeat")) {
+                        // Found matching repeat iteration
+                        return currentBindingContext.getSingleItem();
                     }
                 }
-                // TODO: What should the context of a repeat be? Currently, it returns a node-set, not the repeat
-                // iteration. This is probably not very reasonable, and also incompatible with the case where contextId
-                // == null.
             }
-            throw new ValidationException("No enclosing container XForms control found for id: " + contextId, getCurrentBindingContext().getLocationData());
         }
+        throw new ValidationException("No enclosing container XForms control found for id: " + contextId, getCurrentBindingContext().getLocationData());
+    }
+
+    /**
+     * Get the current node-set for the given repeat id.
+     *
+     * @param repeatId  existing repeat id
+     * @return          node-set
+     */
+    public List getRepeatNodeset(String repeatId) {
+        for (int i = contextStack.size() - 1; i >= 0; i--) {
+            final BindingContext currentBindingContext = (BindingContext) contextStack.get(i);
+
+            final Element bindingElement = currentBindingContext.getControlElement();
+            final String idForContext = currentBindingContext.getIdForContext();
+            if (repeatId.equals(idForContext) && bindingElement != null && bindingElement.getName().equals("repeat")) {
+                // Found repeat, return associated node-set
+                return currentBindingContext.getNodeset();
+            }
+        }
+        throw new ValidationException("No enclosing xforms:repeat found for id: " + repeatId, getCurrentBindingContext().getLocationData());
     }
 
     /**
@@ -623,7 +645,7 @@ public class XFormsContextStack {
      */
     public XFormsInstance getCurrentInstance() {
         for (int i = contextStack.size() - 1; i >= 0; i--) {
-            final XFormsContextStack.BindingContext currentBindingContext = (XFormsContextStack.BindingContext) contextStack.get(i);
+            final BindingContext currentBindingContext = (BindingContext) contextStack.get(i);
             final NodeInfo currentSingleNode = currentBindingContext.getSingleNode();
 
             if (currentSingleNode != null)

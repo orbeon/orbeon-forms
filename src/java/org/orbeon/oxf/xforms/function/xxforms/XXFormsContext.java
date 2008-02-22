@@ -14,22 +14,23 @@
 package org.orbeon.oxf.xforms.function.xxforms;
 
 import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.StaticContext;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.ListIterator;
 import org.orbeon.saxon.om.SequenceIterator;
+import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.trans.XPathException;
 
-import java.util.List;
+import java.util.ArrayList;
+import java.util.Collections;
 
 /**
- * Return the context node-set based on the enclosing xforms:repeat, xforms:group or xforms:switch,
- * either the closest one if no argument is passed, or context at the level of the element with the
- * given id passed.
- *
- * This function must be called from within an xforms:repeat, xforms:group or xforms:switch.
+ * The xxforms:context() function allows you to obtain the single-node binding for an enclosing xforms:group,
+ * xforms:repeat, or xforms:switch. It takes one mandatory string parameter containing the id of an enclosing grouping
+ * XForms control. For xforms:repeat, the context returned is the context of the current iteration.
  */
 public class XXFormsContext extends XFormsFunction {
 
@@ -43,13 +44,16 @@ public class XXFormsContext extends XFormsFunction {
 
     public SequenceIterator iterate(XPathContext xpathContext) throws XPathException {
 
-        // Get instance id
+        // Get context id
         final Expression contextIdExpression = (argument == null || argument.length == 0) ? null : argument[0];
         final String contextId = (contextIdExpression == null) ? null : XFormsUtils.namespaceId(getContainingDocument(xpathContext), contextIdExpression.evaluateAsString(xpathContext));
 
-        // Get context for id
-        final List currentNodeset = getContextStack(xpathContext).getContextForId(contextId);
-
-        return new ListIterator(currentNodeset);
+        // Get context item for id
+        final XFormsContextStack contextStack = getContextStack(xpathContext);
+        final Item contextItem = contextStack.getContextForId(contextId);
+        if (contextItem != null)
+            return new ListIterator(new ArrayList(Collections.singleton(contextItem)));
+        else
+            return new ListIterator(Collections.EMPTY_LIST);
     }
 }

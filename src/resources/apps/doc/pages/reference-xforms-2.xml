@@ -597,47 +597,16 @@
                             </xml-source>
                         </li>
                         <li>
-                            <a name="xxforms-repeat-current"/>
-                            <p>
-                                <code>xxforms:repeat-current($repeat-id as xs:string?) as node()</code>.
-                            </p>
-                            <p>
-                                The <code>xxforms:repeat-current()</code> function allows you to obtain a reference to
-                                an enclosing <code>xforms:repeat</code>'s current iteration node. It takes one optional
-                                string parameter. If present, the id of the enclosing <code>xforms:repeat</code> is
-                                searched. If absent, the function looks for the closest enclosing
-                                <code>xforms:repeat</code>.
-                            </p>
-                            <xml-source show-namespaces="false">
-                                <xforms:repeat nodeset="employee" id="employee-repeat">
-                                    <tr>
-                                        <td>
-                                            <comment> The context is being set to another instance that controls the visibility of the group. </comment>
-                                            <xforms:group ref="instance('control-instance')/input">
-                                                <comment> Using xxforms:repeat-current() allows reclaiming the context of the repeat iteration. </comment>
-                                                <xforms:input ref="xxforms:repeat-current('employee-repeat')/name">
-                                                    <xforms:label>Employee Name</xforms:label>
-                                                </xforms:input>
-                                            </xforms:group>
-                                        </td>
-                                    </tr>
-                                </xforms:repeat>
-                            </xml-source>
-                            <p>
-                                The <code>xxforms:repeat-current()</code> function must be called from within an
-                                <code>xforms:repeat</code> element.
-                            </p>
-                        </li>
-                        <li>
                             <a name="xxforms-context"/>
                             <p>
-                                <code>xxforms:context($element-id as xs:string?) as node()</code>.
+                                <code>xxforms:context($element-id as xs:string) as node()</code>.
                             </p>
                             <p>
-                                The <code>xxforms:context()</code> function allows you to obtain the evaluation context
+                                The <code>xxforms:context()</code> function allows you to obtain the single-node binding
                                 for an enclosing <code>xforms:group</code>, <code>xforms:repeat</code>, or
-                                <code>xforms:switch</code>. It takes one optional string parameter containing the id of
-                                an enclosing XForms element.
+                                <code>xforms:switch</code>. It takes one mandatory string parameter containing the id of
+                                an enclosing grouping XForms control. For xforms:repeat, the context returned is the
+                                context of the current iteration.
                             </p>
                             <xml-source show-namespaces="false">
                                 <xforms:group ref="employee" id="employee-group">
@@ -652,9 +621,8 @@
                             </xml-source>
                             <note>
                                 <p>
-                                    When referring to an immediate parent context (therefore when an enclosing XForms
-                                    element id is not required), prefer the XForms 1.1 <code>context()</code> function
-                                    instead:
+                                    See also the XForms 1.1 <code>context()</code> function, which returns the current
+                                    evaluation context:
                                 </p>
                                 <xml-source show-namespaces="false">
                                     <xforms:group ref="employee">
@@ -662,6 +630,24 @@
                                     </xforms:group>
                                 </xml-source>
                             </note>
+                        </li>
+                        <li>
+                            <a name="xxforms-repeat-nodeset"/>
+                            <p>
+                                <code>xxforms:repeat-nodeset($repeat-id as xs:string) as node()*</code>.
+                            </p>
+                            <p>
+                                The <code>xxforms:repeat-nodeset()</code> function allows you to obtain the node-set of
+                                an enclosing <code>xforms:repeat</code>. It takes one mandatory string parameter
+                                containing the id of an enclosing repeat XForms control.
+                            </p>
+                            <xml-source show-namespaces="false">
+                                <xforms:repeat id="employee-repeat" nodeset="employee">
+                                    <xhtml:div>
+                                        <xforms:output value="count(xxforms:repeat-nodeset('book-repeat'))"/>
+                                    </xhtml:div>
+                                </xforms:repeat>
+                            </xml-source>
                         </li>
                         <li>
                             <a name="xxforms-instance"/>
@@ -734,6 +720,45 @@
                                     </div>
                                 </xforms:repeat>
                             </xml-source>
+                        </li>
+                        <li>
+                            <a name="xxforms-repeat-current"/>
+                            <p>
+                                <code>xxforms:repeat-current($repeat-id as xs:string?) as node()</code>.
+                            </p>
+                            <note>
+                                <p>
+                                    This function is deprecated. Use <a
+                                    href="#xxforms-context"><code>xxforms:context()</code></a> or the XForms 1.1
+                                    <code>context()</code> function instead.
+                                </p>
+                            </note>
+                            <p>
+                                The <code>xxforms:repeat-current()</code> function allows you to obtain a reference to
+                                an enclosing <code>xforms:repeat</code>'s current iteration node. It takes one optional
+                                string parameter. If present, the id of the enclosing <code>xforms:repeat</code> is
+                                searched. If absent, the function looks for the closest enclosing
+                                <code>xforms:repeat</code>.
+                            </p>
+                            <xml-source show-namespaces="false">
+                                <xforms:repeat nodeset="employee" id="employee-repeat">
+                                    <tr>
+                                        <td>
+                                            <comment> The context is being set to another instance that controls the visibility of the group. </comment>
+                                            <xforms:group ref="instance('control-instance')/input">
+                                                <comment> Using xxforms:repeat-current() allows reclaiming the context of the repeat iteration. </comment>
+                                                <xforms:input ref="xxforms:repeat-current('employee-repeat')/name">
+                                                    <xforms:label>Employee Name</xforms:label>
+                                                </xforms:input>
+                                            </xforms:group>
+                                        </td>
+                                    </tr>
+                                </xforms:repeat>
+                            </xml-source>
+                            <p>
+                                The <code>xxforms:repeat-current()</code> function must be called from within an
+                                <code>xforms:repeat</code> element.
+                            </p>
                         </li>
                     </ul>
                 </section>

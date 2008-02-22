@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2006 Orbeon, Inc.
+ *  Copyright (C) 2008 Orbeon, Inc.
  *
  *  This program is free software; you can redistribute it and/or modify it under the terms of the
  *  GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -13,23 +13,22 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms;
 
+import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.xforms.XFormsUtils;
-import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.StaticContext;
 import org.orbeon.saxon.expr.XPathContext;
-import org.orbeon.saxon.om.Item;
+import org.orbeon.saxon.om.ListIterator;
+import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.trans.XPathException;
 
-/**
- * Return the current node of one of the enclosing xforms:repeat iteration, either the closest
- * iteration if no argument is passed, or the iteration for the repeat id passed.
- *
- * This function must be called from within an xforms:repeat.
- */
-public class XXFormsRepeatCurrent extends XFormsFunction {
+import java.util.List;
 
+/**
+ * The xxforms:repeat-nodeset() function returns the current node-set for a given enclosing repeat.
+ */
+public class XXFormsRepeatNodeset extends XFormsFunction {
     /**
      * preEvaluate: this method suppresses compile-time evaluation by doing nothing
      * (because the value of the expression depends on the runtime context)
@@ -38,17 +37,15 @@ public class XXFormsRepeatCurrent extends XFormsFunction {
         return this;
     }
 
-    public Item evaluateItem(XPathContext xpathContext) throws XPathException {
+    public SequenceIterator iterate(XPathContext xpathContext) throws XPathException {
 
-        // Get instance id
-        final Expression repeatIdExpression = (argument == null || argument.length == 0) ? null : argument[0];
-        final String repeatId = (repeatIdExpression == null) ? null : XFormsUtils.namespaceId(getContainingDocument(xpathContext), repeatIdExpression.evaluateAsString(xpathContext));
+        // Get repeat id
+        final Expression contextIdExpression = (argument == null || argument.length == 0) ? null : argument[0];
+        final String repeatId = (contextIdExpression == null) ? null : XFormsUtils.namespaceId(getContainingDocument(xpathContext), contextIdExpression.evaluateAsString(xpathContext));
 
-        // Note that this is deprecated. Move to warning later?
-        if (XFormsServer.logger.isDebugEnabled())
-            getContainingDocument(xpathContext).logDebug("function", "xxforms:repeat-curent() is deprecated, use context() or xxforms:context() instead");
-
-        // Get current single node
-        return getContextStack(xpathContext).getRepeatCurrentSingleNode(repeatId);
+        // Get repeat node-set for given id
+        final XFormsContextStack contextStack = getContextStack(xpathContext);
+        final List repeatNodeset = contextStack.getRepeatNodeset(repeatId);
+        return new ListIterator(repeatNodeset);
     }
 }

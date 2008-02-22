@@ -220,20 +220,16 @@ label.xforms-disabled, span.xforms-disabled, div.xforms-disabled  {
 }
 
 .fr-repeat-table .xforms-label { margin-top: 0 }
-
-.fr-repeat-table {
-    background-color:#DDDDEE;
-    border:1px solid #3598D4;
-    margin:0 0 1em;
+.fr-repeat-table .xforms-label { display: none; }
+.fr-repeat-sections th { display: none; }
+.fr-repeat-sections .xforms-label { margin-top: 0; }
+.fr-repeat td { vertical-align: top; padding: 0.2em }
+.fr-repeat .fr-repeat-column { width: auto; }
+.fr-repeat {
+    background-color: #EEEEEE;
+    margin: 1em 0 1em 0;
     width: 100%;
 }
-.fr-repeat-table .fr-repeat-table {
-    background-color:#DDDDEE;
-    border:1px solid #3598D4;
-    margin:0 0 1em;
-    width: 100%;
-}
-.fr-repeat-table td { vertical-align: top; padding: 0.2em }
 
 .fr-tabular, .fr-tabular tr td, .fr-tabular tr th {
     border-color: #600;
@@ -270,11 +266,10 @@ label.xforms-disabled, span.xforms-disabled, div.xforms-disabled  {
 /*.xforms-group { display: inline }*/
 /*.xforms-help-image { display: inline }*/
 
-td { border: 0 }
 h1 { font-size: 197% }
 i { font-style: italic }
 a { color: #3598D4 }
-td {padding: 0 }
+th, td {border: 0; padding: 0 }
 
 /* Not sure why the YUI resets this to center */
 body { text-align: left }
@@ -283,7 +278,6 @@ body { text-align: left }
 .xforms-hint {
     display: block;
     font-size: smaller;
-    font-style: italic;
     margin-left: .5em;
     width: 22em;
     color: gray
@@ -311,21 +305,35 @@ div.fr-collapsible {
 .fr-error-row { font-weight: bold }
 .fr-error-alert {}
 
-/* Style common controls*/
-.xforms-select1-appearance-full label { margin-left: .5em; margin-right: 1em }
+/* Check boxes on separate line */
+.xforms-select-appearance-full span { display: block; clear: both; }
+.xforms-select-appearance-full input { float: left; }
 
 /* Size form controls depending on layout */
-.fr-section-container input { width: 63em }
+.fr-section-container .xforms-input input { width: 63em }
 .fr-section-container textarea { width: 63em }
 .fr-section-container .xforms-textarea-appearance-xxforms-autosize { width: 63em }
 .fr-section-container .xforms-select1-appearance-minimal { width: 63em }
 
-#doc4 .fr-grid-1-columns input { width: 63em }
+#doc .fr-grid-1-columns .xforms-input input { width: 46em }
+#doc .fr-grid-1-columns textarea { width: 46em }
+#doc .fr-grid-1-columns .xforms-textarea-appearance-xxforms-autosize { width: 46em; }
+#doc .fr-grid-1-columns .xforms-select1-appearance-minimal { width: 46em; }
+#doc .fr-grid-1-columns .xforms-select-appearance-full label { float: right; width: 47em; *width: 45.86em; padding-right: 5em; }
+
+#doc .fr-grid-2-columns .xforms-input input { width: 22em }
+#doc .fr-grid-2-columns textarea { width: 22em }
+#doc .fr-grid-2-columns .xforms-textarea-appearance-xxforms-autosize { width: 22em; }
+#doc .fr-grid-2-columns .xforms-select1-appearance-minimal { width: 22em; }
+#doc .fr-grid-2-columns .xforms-select-appearance-full label { float: right; width: 90%; }
+
+
+#doc4 .fr-grid-1-columns .xforms-input input { width: 63em }
 #doc4 .fr-grid-1-columns textarea { width: 63em }
-#doc4 .fr-grid-1-columns .xforms-textarea-appearance-xxforms-autosize { width: 63em }
+#doc4 .fr-grid-1-columns .xforms-textarea-appearance-xxforms-autosize { width: 63em; }
 #doc4 .fr-grid-1-columns .xforms-select1-appearance-minimal { width: 63em }
 
-#doc4 .fr-grid-2-columns input { width: 31em }
+#doc4 .fr-grid-2-columns .xforms-input input { width: 31em }
 #doc4 .fr-grid-2-columns textarea { width: 31em }
 #doc4 .fr-grid-2-columns .xforms-textarea-appearance-xxforms-autosize { width: 31em }
 #doc4 .fr-grid-2-columns .xforms-select1-appearance-minimal { width: 31em }

@@ -309,6 +309,9 @@ div.fr-collapsible {
 .xforms-select-appearance-full span { display: block; clear: both; }
 .xforms-select-appearance-full input { float: left; }
 
+/* Space before paragrah in sections */
+.fr-section-container p { margin-top: 1em; }
+
 /* Size form controls depending on layout */
 .fr-section-container .xforms-input input { width: 63em }
 .fr-section-container textarea { width: 63em }

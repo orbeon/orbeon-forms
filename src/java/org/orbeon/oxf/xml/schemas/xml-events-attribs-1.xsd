@@ -28,7 +28,7 @@
       This is the XML Schema for XML Events global attributes
 
       URI: http://www.w3.org/MarkUp/SCHEMA/xml-events-attribs-1.xsd
-      $Id: xml-events-attribs-1.xsd,v 1.1 2004/08/21 20:06:31 ebruchez Exp $
+      $Id: xml-events-attribs-1.xsd,v 1.2 2008/02/22 23:32:55 avernet Exp $
     </xs:documentation>
     <xs:documentation source="xml-events-copyright-1.xsd"/>
   </xs:annotation>
@@ -44,8 +44,8 @@
   </xs:annotation>
 
   <xs:attribute name="event" type="xs:NMTOKEN"/>
-  <xs:attribute name="observer" type="xs:IDREF"/>
-  <xs:attribute name="target" type="xs:IDREF"/>
+  <xs:attribute name="observer" type="xs:NMTOKEN"/>
+  <xs:attribute name="target" type="xs:NMTOKEN"/>
   <xs:attribute name="handler" type="xs:anyURI"/>
   <xs:attribute name="phase" default="default">
     <xs:simpleType>

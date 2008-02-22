@@ -246,10 +246,10 @@
         </xsd:choice>
     </xsd:group>
     <xsd:attributeGroup name="Single.Node.Binding.Attributes">
-        <xsd:attribute name="model" type="xsd:IDREF" use="optional"/>
+        <xsd:attribute name="model" type="xsd:NMTOKEN" use="optional"/>
         <xsd:attribute name="ref" type="xforms:XPathExpression" use="optional"/>
         <xsd:attribute name="context" type="xforms:XPathExpression" use="optional"/>
-        <xsd:attribute name="bind" type="xsd:IDREF" use="optional"/>
+        <xsd:attribute name="bind" type="xsd:NMTOKEN" use="optional"/>
     </xsd:attributeGroup>
     <xsd:attributeGroup name="Nodeset.Binding.Attributes">
         <xsd:attribute name="model" type="xsd:IDREF" use="optional"/>
@@ -621,7 +621,7 @@
         <xsd:complexType>
             <xsd:attributeGroup ref="xforms:Common.Attributes"/>
             <xsd:attribute name="name" type="xsd:NMTOKEN" use="required"/>
-            <xsd:attribute name="target" type="xsd:IDREF" use="required"/>
+            <xsd:attribute name="target" type="xsd:NMTOKEN" use="required"/>
             <xsd:attribute name="bubbles" type="xsd:boolean" use="optional" default="true"/>
             <xsd:attribute name="cancelable" type="xsd:boolean" use="optional" default="true"/>
             <xsd:attributeGroup ref="xforms:XML.Events"/>
@@ -630,7 +630,7 @@
     <xsd:element name="rebuild">
         <xsd:complexType>
             <xsd:attributeGroup ref="xforms:Common.Attributes"/>
-            <xsd:attribute name="model" type="xsd:IDREF" use="required"/>
+            <xsd:attribute name="model" type="xsd:NMTOKEN" use="required"/>
             <xsd:attributeGroup ref="xforms:XML.Events"/>
         </xsd:complexType>
     </xsd:element>
@@ -638,7 +638,7 @@
     <xsd:element name="revalidate">
         <xsd:complexType>
             <xsd:attributeGroup ref="xforms:Common.Attributes"/>
-            <xsd:attribute name="model" type="xsd:IDREF" use="optional"/>
+            <xsd:attribute name="model" type="xsd:NMTOKEN" use="optional"/>
             <xsd:attributeGroup ref="xforms:XML.Events"/>
         </xsd:complexType>
     </xsd:element>
@@ -646,21 +646,21 @@
         <xsd:complexType>
 
             <xsd:attributeGroup ref="xforms:Common.Attributes"/>
-            <xsd:attribute name="model" type="xsd:IDREF" use="optional"/>
+            <xsd:attribute name="model" type="xsd:NMTOKEN" use="optional"/>
             <xsd:attributeGroup ref="xforms:XML.Events"/>
         </xsd:complexType>
     </xsd:element>
     <xsd:element name="refresh">
         <xsd:complexType>
             <xsd:attributeGroup ref="xforms:Common.Attributes"/>
-            <xsd:attribute name="model" type="xsd:IDREF" use="optional"/>
+            <xsd:attribute name="model" type="xsd:NMTOKEN" use="optional"/>
             <xsd:attributeGroup ref="xforms:XML.Events"/>
         </xsd:complexType>
     </xsd:element>
     <xsd:element name="setfocus">
         <xsd:complexType>
             <xsd:attributeGroup ref="xforms:Common.Attributes"/>
-            <xsd:attribute name="control" type="xsd:IDREF" use="required"/>
+            <xsd:attribute name="control" type="xsd:NMTOKEN" use="required"/>
             <xsd:attributeGroup ref="xforms:XML.Events"/>
         </xsd:complexType>
 
@@ -700,7 +700,7 @@
     <xsd:element name="send">
         <xsd:complexType>
             <xsd:attributeGroup ref="xforms:Common.Attributes"/>
-            <xsd:attribute name="submission" type="xsd:IDREF" use="required"/>
+            <xsd:attribute name="submission" type="xsd:NMTOKEN" use="required"/>
             <xsd:attributeGroup ref="xforms:XML.Events"/>
         </xsd:complexType>
     </xsd:element>
@@ -709,7 +709,7 @@
         <xsd:complexType>
             <xsd:attributeGroup ref="xforms:Common.Attributes"/>
             <xsd:attributeGroup ref="xforms:XML.Events"/>
-            <xsd:attribute name="model" type="xsd:IDREF" use="required"/>
+            <xsd:attribute name="model" type="xsd:NMTOKEN" use="required"/>
         </xsd:complexType>
     </xsd:element>
     <xsd:element name="insert">
@@ -744,7 +744,7 @@
     <xsd:element name="setindex">
         <xsd:complexType>
             <xsd:attributeGroup ref="xforms:Common.Attributes"/>
-            <xsd:attribute name="repeat" type="xsd:IDREF" use="required"/>
+            <xsd:attribute name="repeat" type="xsd:NMTOKEN" use="required"/>
             <xsd:attribute name="index" type="xforms:XPathExpression" use="required"/>
 
             <xsd:attributeGroup ref="xforms:XML.Events"/>
@@ -753,7 +753,7 @@
     <xsd:element name="toggle">
         <xsd:complexType>
             <xsd:attributeGroup ref="xforms:Common.Attributes"/>
-            <xsd:attribute name="case" type="xsd:IDREF" use="required"/>
+            <xsd:attribute name="case" type="xsd:NMTOKEN" use="required"/>
             <xsd:attributeGroup ref="xforms:XML.Events"/>
         </xsd:complexType>
 
@@ -786,8 +786,8 @@
     Advanced User Interface
     -->
     <xsd:attribute name="repeat-nodeset" type="xforms:XPathExpression"/>
-    <xsd:attribute name="repeat-model" type="xsd:IDREF"/>
-    <xsd:attribute name="repeat-bind" type="xsd:IDREF"/>
+    <xsd:attribute name="repeat-model" type="xsd:NMTOKEN"/>
+    <xsd:attribute name="repeat-bind" type="xsd:NMTOKEN"/>
 
     <xsd:attribute name="repeat-startindex" type="xsd:positiveInteger"/>
     <xsd:attribute name="repeat-number" type="xsd:nonNegativeInteger"/>

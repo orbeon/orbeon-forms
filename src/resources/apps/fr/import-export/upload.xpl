@@ -42,7 +42,7 @@
     <!-- Save form-data in session -->
     <p:processor name="oxf:scope-serializer">
         <p:input name="data" href="#form-data"/>
-        <p:input name="config" debug="xxx">
+        <p:input name="config">
             <config>
                 <key>fr-upload-form-data</key>
                 <scope>session</scope>

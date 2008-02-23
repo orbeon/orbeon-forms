@@ -23,7 +23,7 @@
                 <include>/request/parameters</include>
             </config>
         </p:input>
-        <p:output name="data" id="request" debug="request"/>
+        <p:output name="data" id="request"/>
     </p:processor>
 
     <p:processor name="oxf:unsafe-xslt">

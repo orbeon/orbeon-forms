@@ -22,6 +22,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
+import org.dom4j.Element;
 
 import java.util.Stack;
 import java.util.Map;
@@ -97,7 +98,28 @@ public class XFormsGroupHandler extends HandlerBase {
         if (!isGroupInTable) {
 
             final ContentHandler contentHandler = controller.getOutput();
-            final String labelValue = (handlerContext.isGenerateTemplate() || groupXFormsControl == null) ? null : groupXFormsControl.getLabel(pipelineContext);
+
+            final boolean hasLabel;
+            final String labelValue;
+            final String labelClassAttribute;
+            if (handlerContext.isGenerateTemplate() || groupXFormsControl == null) {
+                // Determine information statically
+
+                final Element groupElement = (Element) containingDocument.getStaticState().getControlElementsMap().get(handlerContext.getId(attributes));
+                final Element labelElement = groupElement.element(XFormsConstants.XFORMS_LABEL_QNAME);
+                hasLabel = labelElement != null;
+
+                labelValue = null;
+                labelClassAttribute = hasLabel ? labelElement.attributeValue("class") : null;
+
+            } else {
+                // Determine information dynamically
+
+                labelValue = groupXFormsControl.getLabel(pipelineContext);
+                hasLabel = groupXFormsControl.hasLabel();
+                labelClassAttribute = groupXFormsControl.getControlElement().attributeValue("class");
+            }
+
             if (isFieldsetAppearance) {
                 // Fieldset appearance
 
@@ -114,20 +136,22 @@ public class XFormsGroupHandler extends HandlerBase {
             } else {
                 // Default appearance
 
-                // TODO: Should find a way to find xforms:alert/@class
-
-                // Output an xhtml:label element if and only if there is an xforms:label element
-
-                // TODO: Label element detection should be based on static control info so we don't needlessly generate
-                // a label in the template. Maybe XFormsControls should just support a method to obtain a control
-                // element by id.
-                if (handlerContext.isGenerateTemplate() || groupXFormsControl == null || groupXFormsControl.hasLabel()) {
+                // Output an xhtml:label element if and only if there is an xforms:label element. This help with
+                // styling in particular.
+                if (hasLabel) {
                     reusableAttributes.clear();
 
-                    // Handle relevance
                     final FastStringBuffer labelClasses = new FastStringBuffer("xforms-label");
-                    if (groupXFormsControl != null && !groupXFormsControl.isRelevant())
+
+                    // Handle relevance
+                    if (handlerContext.isGenerateTemplate() || groupXFormsControl != null && !groupXFormsControl.isRelevant())
                         labelClasses.append(" xforms-disabled");
+
+                    // Copy over existing classes if any
+                    if (labelClassAttribute != null) {
+                        labelClasses.append(' ');
+                        labelClasses.append(labelClassAttribute);
+                    }
 
                     reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, labelClasses.toString());
                     outputLabelFor(handlerContext, reusableAttributes, effectiveGroupId, labelValue, groupXFormsControl != null && groupXFormsControl.isHTMLLabel(pipelineContext));
@@ -160,7 +184,7 @@ public class XFormsGroupHandler extends HandlerBase {
             // Set control classes
             outputInterceptor.setAddedClasses(classes);
 
-            // Don't support label and other appearances, only the content!
+            // Don't support label, help, alert, or hint and other appearances, only the content!
         }
     }
 

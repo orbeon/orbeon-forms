@@ -342,13 +342,6 @@ public class XFormsStaticState {
             return ((Boolean) (XFormsProperties.getPropertyDefinition(propertyName)).getDefaultValue()).booleanValue();
     }
 
-    /**
-     * Returns whether static analysis information has taken place.
-     */
-    public boolean isAnalyzed() {
-        return isAnalyzed;
-    }
-
     public Map getEventNamesMap() {
         return eventNamesMap;
     }

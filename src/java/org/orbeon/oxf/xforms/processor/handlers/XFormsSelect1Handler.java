@@ -78,7 +78,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
     public void end(String uri, String localname, String qName) throws SAXException {
 
         final XFormsSelect1Control xformsSelect1Control = (XFormsSelect1Control) (handlerContext.isGenerateTemplate()
-                ? null : (XFormsControl) containingDocument.getObjectById(pipelineContext, effectiveId));
+                ? null : (XFormsControl) containingDocument.getObjectById(effectiveId));
 
         final boolean isMany = localname.equals("select");
         final QName appearance;

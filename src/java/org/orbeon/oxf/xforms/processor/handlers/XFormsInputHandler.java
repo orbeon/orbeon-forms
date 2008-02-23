@@ -52,7 +52,7 @@ public class XFormsInputHandler extends XFormsValueControlHandler {
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
         final String effectiveId = handlerContext.getEffectiveId(elementAttributes);
         final XFormsValueControl xformsControl = handlerContext.isGenerateTemplate()
-                ? null : (XFormsValueControl) containingDocument.getObjectById(pipelineContext, effectiveId);
+                ? null : (XFormsValueControl) containingDocument.getObjectById(effectiveId);
         final boolean isConcreteControl = xformsControl != null;
 
         // xforms:label

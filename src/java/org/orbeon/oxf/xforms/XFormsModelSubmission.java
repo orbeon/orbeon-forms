@@ -25,11 +25,14 @@ import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.action.actions.XFormsLoadAction;
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
-import org.orbeon.oxf.xforms.event.*;
+import org.orbeon.oxf.xforms.event.XFormsEvent;
+import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
+import org.orbeon.oxf.xforms.event.XFormsEventTarget;
+import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitErrorEvent.ErrorType;
-import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
+import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -68,9 +71,6 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
     private final XFormsModel model;
     private final Element submissionElement;
     private boolean submissionElementExtracted = false;
-
-    // Event handlers
-    private final List eventHandlers;
 
     private String avtActionOrResource; // required unless there is a nested xforms:resource element
     private String resolvedActionOrResource;
@@ -119,9 +119,6 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
         this.id = id;
         this.submissionElement = submissionElement;
         this.model = model;
-
-        // Extract event handlers
-        eventHandlers = XFormsEventHandlerImpl.extractEventHandlers(containingDocument, this, submissionElement);
     }
 
     public XFormsContainingDocument getContainingDocument() {
@@ -253,6 +250,10 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 && (XFormsSubmissionUtils.isGet(method) || XFormsSubmissionUtils.isPost(method) || XFormsSubmissionUtils.isPut(method));
     }
 
+    public String getId() {
+        return id;
+    }
+
     public String getEffectiveId() {
         return id;
     }
@@ -266,7 +267,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
     }
 
     public List getEventHandlers(XFormsContainingDocument containingDocument) {
-        return eventHandlers;
+        return containingDocument.getStaticState().getEventHandlers(getEffectiveId());
     }
 
     public void performDefaultAction(PipelineContext pipelineContext, XFormsEvent event) {
@@ -474,7 +475,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                             final String name = parameterElement.element("name").getTextTrim();
 
                             final XFormsUploadControl uploadControl
-                                        = (XFormsUploadControl) containingDocument.getObjectById(pipelineContext, name);
+                                        = (XFormsUploadControl) containingDocument.getObjectById(name);
 
                             // In case of xforms:repeat, the name of the template will not match an existing control
                             if (uploadControl == null)

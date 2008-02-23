@@ -73,7 +73,7 @@ public abstract class XFormsEvent {
     public SequenceIterator getAttribute(String name) {
         if ("target".equals(name)) {
             // Return the id of the target of the event
-            final String originalId = (targetObject instanceof XFormsControl) ? ((XFormsControl) targetObject).getOriginalId() : targetObject.getEffectiveId();
+            final String originalId = (targetObject instanceof XFormsControl) ? ((XFormsControl) targetObject).getId() : targetObject.getEffectiveId();
             return new ListIterator(Collections.singletonList(new StringValue(originalId)));
         } else if ("event".equals(name)) {
             // Return the name of the event

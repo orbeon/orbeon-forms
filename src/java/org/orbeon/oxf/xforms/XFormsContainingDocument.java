@@ -326,7 +326,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     /**
      * Get object with the id specified.
      */
-    public Object getObjectById(PipelineContext pipelineContext, String id) {
+    public Object getObjectById(String id) {
 
         // Search in models
         for (Iterator i = models.iterator(); i.hasNext();) {
@@ -595,12 +595,12 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     /**
      * Return the effective control id of the control to set the focus to, or null.
      */
-    public String getClientFocusEffectiveControlId(PipelineContext pipelineContext) {
+    public String getClientFocusEffectiveControlId() {
 
         if (focusEffectiveControlId == null)
             return null;
 
-        final XFormsControl xformsControl = (XFormsControl) getObjectById(pipelineContext, focusEffectiveControlId);
+        final XFormsControl xformsControl = (XFormsControl) getObjectById(focusEffectiveControlId);
         // It doesn't make sense to tell the client to set the focus to an element that is non-relevant or readonly
         if (xformsControl != null && xformsControl instanceof XFormsSingleNodeControl) {
             final XFormsSingleNodeControl xformsSingleNodeControl = (XFormsSingleNodeControl) xformsControl;
@@ -631,12 +631,12 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     /**
      * Return the effective control id of the control to help for, or null.
      */
-    public String getClientHelpEffectiveControlId(PipelineContext pipelineContext) {
+    public String getClientHelpEffectiveControlId() {
 
         if (helpEffectiveControlId == null)
             return null;
 
-        final XFormsControl xformsControl = (XFormsControl) getObjectById(pipelineContext, helpEffectiveControlId);
+        final XFormsControl xformsControl = (XFormsControl) getObjectById(helpEffectiveControlId);
         // It doesn't make sense to tell the client to show help for an element that is non-relevant, but we allow readonly
         if (xformsControl != null && xformsControl instanceof XFormsSingleNodeControl) {
             final XFormsSingleNodeControl xformsSingleNodeControl = (XFormsSingleNodeControl) xformsControl;
@@ -657,7 +657,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         // Get event target object
         final XFormsEventTarget eventTarget;
         {
-            final Object eventTargetObject = getObjectById(pipelineContext, controlId);
+            final Object eventTargetObject = getObjectById(controlId);
             if (!(eventTargetObject instanceof XFormsEventTarget)) {
                 if (XFormsProperties.isExceptionOnInvalidClientControlId(this)) {
                     throw new ValidationException("Event target id '" + controlId + "' is not an XFormsEventTarget.", getLocationData());
@@ -769,7 +769,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         // Get other event target
         final XFormsEventTarget otherEventTarget;
         {
-            final Object otherEventTargetObject = (otherControlId == null) ? null : getObjectById(pipelineContext, otherControlId);
+            final Object otherEventTargetObject = (otherControlId == null) ? null : getObjectById(otherControlId);
             if (otherEventTargetObject == null) {
                 otherEventTarget = null;
             } else if (!(otherEventTargetObject instanceof XFormsEventTarget)) {
@@ -865,11 +865,10 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                 // Handle focus change DOMFocusOut / DOMFocusIn
                 if (concreteEvent.getOtherTargetObject() != null) {
 
-                    final XFormsControl sourceXFormsControl = (XFormsControl) getObjectById(pipelineContext, targetControlEffectiveId);
+                    final XFormsControl sourceXFormsControl = (XFormsControl) getObjectById(targetControlEffectiveId);
 
                     final XFormsControl otherTargetXFormsControl
-                        = (XFormsControl) getObjectById(pipelineContext,
-                                ((XFormsControl) concreteEvent.getOtherTargetObject()).getEffectiveId());
+                        = (XFormsControl) getObjectById(((XFormsControl) concreteEvent.getOtherTargetObject()).getEffectiveId());
 
                     // We have a focus change (otherwise, the focus is assumed to remain the same)
                     if (sourceXFormsControl != null)
@@ -927,8 +926,12 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         return null;
     }
 
-    public String getEffectiveId() {
+    public String getId() {
         return CONTAINING_DOCUMENT_PSEUDO_ID;
+    }
+
+    public String getEffectiveId() {
+        return getId();
     }
 
     public LocationData getLocationData() {
@@ -1004,18 +1007,19 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                         // Event listeners on the target which are in capture mode are not called
 
                         for (Iterator j = eventHandlers.iterator(); j.hasNext();) {
-                            final XFormsEventHandler eventHandlerImpl = (XFormsEventHandler) j.next();
+                            final XFormsEventHandler eventHandler = (XFormsEventHandler) j.next();
 
-                            if (!eventHandlerImpl.isPhase() && eventHandlerImpl.getEventName().equals(event.getEventName())) {
-                                // Capture phase match
+                            if (!eventHandler.isPhase() && eventHandler.getEventName().equals(event.getEventName())
+                                    && (eventHandler.getTargetId() == null || eventHandler.getTargetId().equals(event.getTargetObject().getId()))) {
+                                // Capture phase match on event name and target is specified
                                 startHandleEvent(event);
                                 try {
-                                    eventHandlerImpl.handleEvent(pipelineContext, event);
+                                    eventHandler.handleEvent(pipelineContext, XFormsContainingDocument.this, container, event);
                                 } finally {
                                     endHandleEvent();
                                 }
-                                propagate &= eventHandlerImpl.isPropagate();
-                                performDefaultAction &= eventHandlerImpl.isDefaultAction();
+                                propagate &= eventHandler.isPropagate();
+                                performDefaultAction &= eventHandler.isDefaultAction();
                             }
                         }
                         // Cancel propagation if requested and if authorized by event
@@ -1036,18 +1040,19 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
 
                     if (eventHandlers != null) {
                         for (Iterator j = eventHandlers.iterator(); j.hasNext();) {
-                            final XFormsEventHandler eventHandlerImpl = (XFormsEventHandler) j.next();
+                            final XFormsEventHandler eventHandler = (XFormsEventHandler) j.next();
 
-                            if (eventHandlerImpl.isPhase() && eventHandlerImpl.getEventName().equals(event.getEventName())) {
-                                // Bubbling phase match
+                            if (eventHandler.isPhase() && eventHandler.getEventName().equals(event.getEventName())
+                                    && (eventHandler.getTargetId() == null || eventHandler.getTargetId().equals(event.getTargetObject().getId()))) {
+                                // Bubbling phase match on event name and target is specified
                                 startHandleEvent(event);
                                 try {
-                                    eventHandlerImpl.handleEvent(pipelineContext, event);
+                                    eventHandler.handleEvent(pipelineContext, XFormsContainingDocument.this, container, event);
                                 } finally {
                                     endHandleEvent();
                                 }
-                                propagate &= eventHandlerImpl.isPropagate();
-                                performDefaultAction &= eventHandlerImpl.isDefaultAction();
+                                propagate &= eventHandler.isPropagate();
+                                performDefaultAction &= eventHandler.isDefaultAction();
                             }
                         }
                         // Cancel propagation if requested and if authorized by event
@@ -1459,7 +1464,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
 
         if (xformsStaticState != null) {
             // Create XForms controls
-            xformsControls = new XFormsControls(this, xformsStaticState.getControlsDocument(), repeatIndexesElement);
+            xformsControls = new XFormsControls(this, xformsStaticState, repeatIndexesElement);
 
             // Create and index models
             for (Iterator i = xformsStaticState.getModelDocuments().iterator(); i.hasNext();) {

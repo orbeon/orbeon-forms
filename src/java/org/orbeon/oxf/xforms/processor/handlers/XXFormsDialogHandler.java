@@ -36,7 +36,7 @@ public class XXFormsDialogHandler extends HandlerBase {
     public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
 
         final String effectiveDialogId = handlerContext.getEffectiveId(attributes);
-        final XXFormsDialogControl dialogXFormsControl = ((XXFormsDialogControl) containingDocument.getObjectById(handlerContext.getPipelineContext(), effectiveDialogId));
+        final XXFormsDialogControl dialogXFormsControl = ((XXFormsDialogControl) containingDocument.getObjectById(effectiveDialogId));
         isMinimalAppearance = XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME.equals(getAppearance(attributes));
 
         // Find classes to add

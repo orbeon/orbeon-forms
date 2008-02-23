@@ -57,7 +57,7 @@ public class XFormsIndexUtils {
                 if (XFormsControl instanceof XFormsRepeatControl) {
                     // Found an xforms:repeat
                     final XFormsRepeatControl repeatControlInfo = (XFormsRepeatControl) XFormsControl;
-                    final String repeatId = repeatControlInfo.getOriginalId();
+                    final String repeatId = repeatControlInfo.getId();
                     final List repeatNodeSet = xformsControls.getContextStack().getCurrentNodeset();
 
                     // Make sure the bounds of this xforms:repeat are correct
@@ -116,6 +116,8 @@ public class XFormsIndexUtils {
                                                final XFormsControls.ControlsState currentControlsState, final List clonedNodes) {
 
         // NOTE: The code below assumes that there are no nested repeats bound to node-sets that intersect
+
+        final XFormsStaticState staticState = xformsControls.getContainingDocument().getStaticState();
         currentControlsState.visitControlsFollowRepeats(pipelineContext, xformsControls, new XFormsControls.XFormsControlVisitorListener() {
 
             private XFormsControl foundXFormsControl;
@@ -124,7 +126,7 @@ public class XFormsIndexUtils {
                 if (XFormsControl instanceof XFormsRepeatControl) {
                     // Found an xforms:repeat
                     final XFormsRepeatControl repeatControlInfo = (XFormsRepeatControl) XFormsControl;
-                    final String repeatId = repeatControlInfo.getOriginalId();
+                    final String repeatId = repeatControlInfo.getId();
                     final List repeatNodeSet = xformsControls.getContextStack().getCurrentNodeset();
 
                     if (foundXFormsControl == null) {
@@ -169,7 +171,7 @@ public class XFormsIndexUtils {
                                 currentControlsState.updateRepeatIndex(repeatId, newRepeatIndex);
 
                                 // First step: set all children indexes to 0
-                                final List nestedRepeatIds = currentControlsState.getNestedRepeatIds(xformsControls, repeatId);
+                                final List nestedRepeatIds = staticState.getNestedRepeatIds(repeatId);
                                 if (nestedRepeatIds != null) {
                                     for (Iterator j = nestedRepeatIds.iterator(); j.hasNext();) {
                                         final String nestedRepeatId = (String) j.next();
@@ -260,6 +262,7 @@ public class XFormsIndexUtils {
                                               final Map nestedRepeatIndexUpdates, final Node nodeToRemove) {
 
         // NOTE: The code below assumes that there are no nested repeats bound to node-sets that intersect
+        final XFormsStaticState staticState = xformsControls.getContainingDocument().getStaticState();
         xformsControls.getCurrentControlsState().visitControlsFollowRepeats(pipelineContext, xformsControls, new XFormsControls.XFormsControlVisitorListener() {
 
             private XFormsControl foundXFormsControl;
@@ -269,7 +272,7 @@ public class XFormsIndexUtils {
                 if (XFormsControl instanceof XFormsRepeatControl) {
                     // Found an xforms:repeat
                     final XFormsRepeatControl repeatControlInfo = (XFormsRepeatControl) XFormsControl;
-                    final String repeatId = repeatControlInfo.getOriginalId();
+                    final String repeatId = repeatControlInfo.getId();
 
                     final List repeatNodeSet = xformsControls.getContextStack().getCurrentNodeset();
                     if (foundXFormsControl == null) {
@@ -334,7 +337,7 @@ public class XFormsIndexUtils {
                                     // Handle children
                                     if (reinitializeInner) {
                                         // First step: set all children indexes to 0
-                                        final List nestedRepeatIds = xformsControls.getCurrentControlsState().getNestedRepeatIds(xformsControls, repeatId);
+                                        final List nestedRepeatIds = staticState.getNestedRepeatIds(repeatId);
                                         if (nestedRepeatIds != null) {
                                             for (Iterator j = nestedRepeatIds.iterator(); j.hasNext();) {
                                                 final String nestedRepeatId = (String) j.next();
@@ -378,7 +381,7 @@ public class XFormsIndexUtils {
                 if (XFormsControl instanceof XFormsRepeatControl) {
                     // Found an xforms:repeat
                     final XFormsRepeatControl repeatControlInfo = (XFormsRepeatControl) XFormsControl;
-                    final String repeatId = repeatControlInfo.getOriginalId();
+                    final String repeatId = repeatControlInfo.getId();
 
                     final List repeatNodeSet = xformsControls.getContextStack().getCurrentNodeset();
 

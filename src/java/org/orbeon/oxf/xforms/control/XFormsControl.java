@@ -36,7 +36,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
     // Static information (never changes for the lifetime of the containing document)
     private Element controlElement;
     //private NodeInfo controlNodeInfo; TODO
-    private String originalId;
+    private String id;
     private String name;
     private String appearance;// could become more dynamic in the future
     private String mediatype;// could become more dynamic in the future
@@ -46,7 +46,6 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
 
     // Dynamic information (changes depending on the content of XForms instances)
     private String effectiveId;
-    private List eventHandlers;// this needs to be split into static info and non-static
     protected XFormsContextStack.BindingContext bindingContext;
     private NodeInfo boundNode;
 
@@ -71,10 +70,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
         this.effectiveId = effectiveId;
 
         if (element != null) {
-            originalId = element.attributeValue("id");
-
-            // Extract event handlers
-            eventHandlers = XFormsEventHandlerImpl.extractEventHandlers(containingDocument, this, element);
+            id = element.attributeValue("id");
         }
     }
 
@@ -107,8 +103,8 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
         children.add(XFormsControl);
     }
 
-    public String getOriginalId() {
-        return originalId;
+    public String getId() {
+        return id;
     }
 
     public String getEffectiveId() {
@@ -357,7 +353,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
     }
 
     public List getEventHandlers(XFormsContainingDocument containingDocument) {
-        return eventHandlers;
+        return containingDocument.getStaticState().getEventHandlers(getId());
     }
 
     public void performDefaultAction(PipelineContext pipelineContext, XFormsEvent event) {

@@ -19,7 +19,7 @@ import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.dom4j.Element;
 
 /**
- * Represents an xforms:switch pseudo-control.
+ * Represents an xforms:switch container control.
  *
  * TODO: Use inheritance to make this a single-node control that doesn't hold a value.
  */

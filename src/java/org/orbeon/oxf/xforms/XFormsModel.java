@@ -66,9 +66,6 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
     private List instances;
     private Map instancesMap;
 
-    // Event handlers
-    private Map eventHandlers;
-
     // Submission information
     private Map submissions;
 
@@ -128,7 +125,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
             for (Iterator i = modelElement.elements(new QName("submission", XFormsConstants.XFORMS_NAMESPACE)).iterator(); i.hasNext();) {
                 final Element submissionElement = (Element) i.next();
                 String submissionId = submissionElement.attributeValue("id");
-                if (submissionId == null)
+                if (submissionId == null)// Can this happen? Maybe with the legacy engine?
                     submissionId = "";
 
                 if (this.submissions == null)
@@ -136,9 +133,6 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                 this.submissions.put(submissionId, new XFormsModelSubmission(this.containingDocument, submissionId, submissionElement, this));
             }
         }
-
-        // Extract event handlers
-        eventHandlers = XFormsEventHandlerImpl.extractEventHandlersObserver(this.containingDocument, this, modelElement);
     }
 
     public XFormsContainingDocument getContainingDocument() {
@@ -664,8 +658,12 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         void handleNode(NodeInfo node);
     }
 
-    public String getEffectiveId() {
+    public String getId() {
         return modelId;
+    }
+
+    public String getEffectiveId() {
+        return getId();
     }
 
     public LocationData getLocationData() {
@@ -1927,16 +1925,6 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
      * Return the List of XFormsEventHandler objects within this object.
      */
     public List getEventHandlers(XFormsContainingDocument containingDocument) {
-        return (eventHandlers == null) ? null : (List) eventHandlers.get(getEffectiveId());
-    }
-
-    /**
-     * Return the List of XFormsEventHandler objects for the given child instance.
-     *
-     * @param instanceId    event handlers for instance
-     * @return              List of XFormsEventHandler, null if not found
-     */
-    public List getEventHandlersForInstance(String instanceId) {
-        return (eventHandlers == null) ? null : (List) eventHandlers.get(instanceId);
+        return containingDocument.getStaticState().getEventHandlers(getEffectiveId());
     }
 }

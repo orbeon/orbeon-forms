@@ -41,19 +41,32 @@ public class XFormsActionInterpreter {
     private XFormsControls xformsControls;
     private XFormsContextStack contextStack;
 
-    public XFormsActionInterpreter(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, XFormsEventHandlerContainer eventHandlerContainer, Element actionElement) {
+    public XFormsActionInterpreter(PipelineContext pipelineContext, XFormsContainingDocument containingDocument,
+                                   XFormsEventHandlerContainer eventHandlerContainer, Element actionElement, String containerId) {
         this.containingDocument = containingDocument;
 
         this.xformsControls = containingDocument.getXFormsControls();
         this.contextStack = new XFormsContextStack(containingDocument);
 
         // Set context on top-level action
-        setActionBindingContext(pipelineContext, containingDocument, eventHandlerContainer.getEffectiveId(), actionElement);
+        final String effectiveEventContainerId;
+        if (eventHandlerContainer.getId().equals(containerId)) {
+            // We have access to the effective context
+            effectiveEventContainerId = eventHandlerContainer.getEffectiveId();
+        } else {
+            // We don't really know, and this won't work for handlers nested within repeats but will work for outer
+            // controls and, models, instances and submissions
+            effectiveEventContainerId = containerId;
+        }
+
+        setActionBindingContext(pipelineContext, containingDocument, actionElement, effectiveEventContainerId);
     }
 
-    private void setActionBindingContext(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, String eventHandlerContainerId, Element actionElement) {
-        // Get "fresh" event handler container
-        final XFormsEventHandlerContainer eventHandlerContainer = (XFormsEventHandlerContainer) containingDocument.getObjectById(pipelineContext, eventHandlerContainerId);
+    private void setActionBindingContext(PipelineContext pipelineContext, XFormsContainingDocument containingDocument,
+                                         Element actionElement, String effectiveEventContainerId) {
+
+        // Get "fresh" container
+        final XFormsEventHandlerContainer eventHandlerContainer = (XFormsEventHandlerContainer) containingDocument.getObjectById(effectiveEventContainerId);
 
         // Set context on container element
         contextStack.setBinding(pipelineContext, eventHandlerContainer);

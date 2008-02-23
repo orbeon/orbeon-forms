@@ -101,7 +101,7 @@ public class XFormsSetindexAction extends XFormsAction {
             // "The indexes for inner nested repeat collections are re-initialized to startindex."
             {
                 // First step: set all children indexes to 0
-                final List nestedRepeatIds = currentControlsState.getNestedRepeatIds(xformsControls, repeatId);
+                final List nestedRepeatIds = containingDocument.getStaticState().getNestedRepeatIds(repeatId);
                 final Map nestedRepeatIdsMap = new HashMap();
                 if (nestedRepeatIds != null) {
                     for (Iterator i = nestedRepeatIds.iterator(); i.hasNext();) {

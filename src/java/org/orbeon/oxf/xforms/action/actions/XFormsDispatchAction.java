@@ -91,7 +91,7 @@ public class XFormsDispatchAction extends XFormsAction {
         // Find actual target
         final Object xformsEventTarget;
         {
-            final Object tempXFormsEventTarget = (XFormsEventTarget) containingDocument.getObjectById(pipelineContext, resolvedNewEventTargetId);
+            final Object tempXFormsEventTarget = (XFormsEventTarget) containingDocument.getObjectById(resolvedNewEventTargetId);
             if (tempXFormsEventTarget != null) {
                 // Object with this id exists
                 xformsEventTarget = tempXFormsEventTarget;
@@ -99,7 +99,7 @@ public class XFormsDispatchAction extends XFormsAction {
                 // Otherwise, try effective id
                 final String newEventTargetEffectiveId = xformsControls.getCurrentControlsState().findEffectiveControlId(resolvedNewEventTargetId);
                 if (newEventTargetEffectiveId != null) {
-                    xformsEventTarget = (XFormsEventTarget) containingDocument.getObjectById(pipelineContext, newEventTargetEffectiveId);
+                    xformsEventTarget = (XFormsEventTarget) containingDocument.getObjectById(newEventTargetEffectiveId);
                 } else {
                     xformsEventTarget = null;
                 }

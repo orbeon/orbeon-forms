@@ -22,7 +22,6 @@ import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsControlFactory;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.controls.*;
-import org.orbeon.oxf.xforms.event.XFormsEventHandlerImpl;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.events.XFormsDeselectEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsSelectEvent;
@@ -58,7 +57,7 @@ public class XFormsControls {
 
     private XFormsContextStack contextStack;
 
-    private Map eventsMap;// TODO: this must go into XFormsStaticState
+    //private Map eventsMap;// TODO: this must go into XFormsStaticState
     
     private Map constantItems;
 //    private Map
@@ -136,29 +135,26 @@ public class XFormsControls {
         noNodesetControls.putAll(noSingleNodeControls);
     }
 
-    public XFormsControls(XFormsContainingDocument containingDocument, Document controlsDocument, Element repeatIndexesElement) {
+    public XFormsControls(XFormsContainingDocument containingDocument, XFormsStaticState xformsStaticState, Element repeatIndexesElement) {
         this.containingDocument = containingDocument;
-        this.controlsDocument = controlsDocument;
+        this.controlsDocument = xformsStaticState.getControlsDocument();
 
         this.contextStack = new XFormsContextStack(containingDocument);
 
-        // Build minimal state with repeat indexes so that index() function works in XForms models
-        // initialization
-        initializeMinimal(repeatIndexesElement);
-    }
-
-    private void initializeMinimal(Element repeatIndexesElement) {
-        // Set initial repeat indexes
+        // Get and/or compute static information and perform minimal initialization
         if (controlsDocument != null) {
+            // Gather static analysis information
+            xformsStaticState.analyzeIfNecessary();
+
+            // Set default repeat index information only
             final ControlsState result = new ControlsState();
-            eventsMap = new HashMap();
-            getDefaultRepeatIndexesEventNames(result, eventsMap);
+            result.setDefaultRepeatIdToIndex(xformsStaticState.getDefaultRepeatIdToIndex());
             initialControlsState = result;
             currentControlsState = initialControlsState;
+            
+            // Set incoming repeat index state if any
+            setRepeatIndexState(repeatIndexesElement);
         }
-
-        // Set repeat index state if any
-        setRepeatIndexState(repeatIndexesElement);
     }
 
     public boolean isDirtySinceLastRequest() {
@@ -171,53 +167,6 @@ public class XFormsControls {
             this.currentControlsState.markDirty();
     }
 
-    /**
-     * Iterate statically through controls and set the default repeat index for xforms:repeat.
-     *
-     * @param controlsState    ControlsState to update with setDefaultRepeatIndex()
-     * @param eventNames       Map to gather event names, null if not necessary
-     */
-    private void getDefaultRepeatIndexesEventNames(final ControlsState controlsState, final Map eventNames) {
-        visitAllControlStatic(new ControlElementVisitorListener() {
-
-            private Stack repeatStack = new Stack();
-
-            public boolean startVisitControl(Element controlElement, String controlId) {
-                if (controlElement.getName().equals("repeat")) {
-                    // Create control without parent, just to hold iterations
-                    final XFormsRepeatControl repeatControl
-                            = new XFormsRepeatControl(containingDocument, null, controlElement, controlElement.getName(), controlId);
-
-                    // Set initial index
-                    controlsState.setDefaultRepeatIndex(repeatControl.getRepeatId(), repeatControl.getStartIndex());
-
-                    // Keep control on stack
-                    repeatStack.push(repeatControl);
-                }
-
-                // Gather event names if required
-                if (eventNames != null) {
-                    XFormsEventHandlerImpl.gatherEventHandlerNames(eventNames, controlElement);
-                }
-
-                return true;
-            }
-
-            public boolean endVisitControl(Element controlElement, String controlId) {
-                return true;
-            }
-
-            public void startRepeatIteration(int iteration) {
-                // One more iteration in current repeat
-                final XFormsRepeatControl repeatControl = (XFormsRepeatControl) repeatStack.peek();
-                repeatControl.addChild(new RepeatIterationControl(containingDocument, repeatControl, iteration));
-            }
-
-            public void endRepeatIteration(int iteration) {
-            }
-        });
-    }
-
 
     /**
      * Returns whether there is any event handler registered anywhere in the controls for the given event name.
@@ -226,7 +175,7 @@ public class XFormsControls {
      * @return          true if there is a handler, false otherwise
      */
     public boolean hasHandlerForEvent(String eventName) {
-        return eventsMap.get(eventName) != null;
+        return containingDocument.getStaticState().getEventNamesMap().get(eventName) != null;
     }
 
     /**
@@ -293,7 +242,7 @@ public class XFormsControls {
                             // xforms:switch/xforms:case
                             final String switchId = divElement.attributeValue("switch-id");
                             final String caseId = divElement.attributeValue("case-id");
-                            currentSwitchState.initializeState(switchId, caseId, initialControlsState, isShow);
+                            currentSwitchState.initializeState(switchId, caseId, isShow);
                         }
                     }
                 }
@@ -301,7 +250,11 @@ public class XFormsControls {
                 // Handle repeat indexes if needed
                 if (initialControlsState.isHasRepeat()) {
                     // Get default xforms:repeat indexes beforehand
-                    getDefaultRepeatIndexesEventNames(initialControlsState, null);// TODO: redundant since we called this in initializeMinimal()? If so, migrate initial indexes?
+
+                    containingDocument.getStaticState().analyzeIfNecessary(); // Is this ever necessary since initializeMinimal() was likely called before?
+
+                    // Set default repeat index information
+                    initialControlsState.setDefaultRepeatIdToIndex(containingDocument.getStaticState().getDefaultRepeatIdToIndex());
 
                     // Set external updates
                     setRepeatIndexState(repeatIndexesElement);
@@ -881,38 +834,6 @@ public class XFormsControls {
 //    }
 
     /**
-     * Visit all the control elements without handling repeats or looking at the binding contexts.
-     */
-    public void visitAllControlStatic(ControlElementVisitorListener controlElementVisitorListener) {
-        handleControlsStatic(controlElementVisitorListener, controlsDocument.getRootElement());
-    }
-
-    private boolean handleControlsStatic(ControlElementVisitorListener controlElementVisitorListener, Element container) {
-        boolean doContinue = true;
-        for (Iterator i = container.elements().iterator(); i.hasNext();) {
-            final Element controlElement = (Element) i.next();
-            final String controlName = controlElement.getName();
-
-            final String controlId = controlElement.attributeValue("id");
-
-            if (isGroupingControl(controlName)) {
-                // Handle XForms grouping controls
-                doContinue = controlElementVisitorListener.startVisitControl(controlElement, controlId);
-                if (doContinue)
-                    doContinue = handleControlsStatic(controlElementVisitorListener, controlElement);
-                doContinue = doContinue && controlElementVisitorListener.endVisitControl(controlElement, controlId);
-            } else if (isLeafControl(controlName)) {
-                // Handle leaf control
-                doContinue = controlElementVisitorListener.startVisitControl(controlElement, controlId);
-                doContinue = doContinue && controlElementVisitorListener.endVisitControl(controlElement, controlId);
-            }
-            if (!doContinue)
-                break;
-        }
-        return doContinue;
-    }
-
-    /**
      * Visit all the current XFormsControls.
      */
     public void visitAllControls(XFormsControlVisitorListener xformsControlVisitorListener) {
@@ -1006,7 +927,7 @@ public class XFormsControls {
         /**
          * Update switch info state for the given case id.
          */
-        public void initializeState(String switchId, String caseId, ControlsState controlsState, boolean visible) {
+        public void initializeState(String switchId, String caseId, boolean visible) {
             // Update currently selected case id
             if (visible) {
                 getSwitchIdToSelectedCaseIdMap().put(switchId, caseId);
@@ -1108,10 +1029,8 @@ public class XFormsControls {
             return defaultRepeatIdToIndex;
         }
 
-        public void setDefaultRepeatIndex(String controlId, int index) {
-            if (defaultRepeatIdToIndex == null)
-                defaultRepeatIdToIndex = new HashMap();
-            defaultRepeatIdToIndex.put(controlId, new Integer(index));
+        public void setDefaultRepeatIdToIndex(Map defaultRepeatIdToIndex) {
+            this.defaultRepeatIdToIndex = defaultRepeatIdToIndex;
         }
 
         public void updateRepeatIndex(String controlId, int index) {
@@ -1187,54 +1106,6 @@ public class XFormsControls {
 
         public List getUploadControls() {
             return uploadControlsList;
-        }
-
-        public boolean isHasUpload() {
-            return uploadControlsList != null && uploadControlsList.size() > 0;
-        }
-
-        /**
-         * Return the list of repeat ids descendent of a given repeat id, null if none.
-         */
-        public List getNestedRepeatIds(XFormsControls xformsControls, final String repeatId) {
-
-            final List result = new ArrayList();
-
-            xformsControls.visitAllControlStatic(new ControlElementVisitorListener() {
-
-                private boolean found;
-
-                public boolean startVisitControl(Element controlElement, String controlId) {
-                    if (controlElement.getName().equals("repeat")) {
-
-                        if (!found) {
-                            // Not found yet
-                            if (repeatId.equals(controlId))
-                                found = true;
-                        } else {
-                            // We are within the searched repeat id
-                            result.add(controlId);
-                        }
-                    }
-                    return true;
-                }
-
-                public boolean endVisitControl(Element controlElement, String controlId) {
-                    if (found) {
-                        if (repeatId.equals(controlId))
-                            found = false;
-                    }
-                    return true;
-                }
-
-                public void startRepeatIteration(int iteration) {
-                }
-
-                public void endRepeatIteration(int iteration) {
-                }
-            });
-
-            return result;
         }
 
         /**
@@ -1336,7 +1207,7 @@ public class XFormsControls {
         private String findEffectiveControlId(String controlId, List children) {
             for (Iterator i = children.iterator(); i.hasNext();) {
                 final XFormsControl currentXFormsControl = (XFormsControl) i.next();
-                final String originalControlId = currentXFormsControl.getOriginalId();
+                final String originalControlId = currentXFormsControl.getId();
 
                 if (controlId.equals(originalControlId)) {
                     return currentXFormsControl.getEffectiveId();

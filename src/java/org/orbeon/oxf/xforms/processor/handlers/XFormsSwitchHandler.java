@@ -35,7 +35,7 @@ public class XFormsSwitchHandler extends HandlerBase {
 
         // Find classes to add
         final StringBuffer classes = getInitialClasses(localname, attributes, null);
-        final XFormsSwitchControl switchXFormsControl = ((XFormsSwitchControl) containingDocument.getObjectById(handlerContext.getPipelineContext(), effectiveSwitchId));
+        final XFormsSwitchControl switchXFormsControl = ((XFormsSwitchControl) containingDocument.getObjectById(effectiveSwitchId));
         HandlerBase.handleMIPClasses(classes, switchXFormsControl);
 
         // Start xhtml:span

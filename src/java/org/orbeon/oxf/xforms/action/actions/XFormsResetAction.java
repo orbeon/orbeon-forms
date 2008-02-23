@@ -37,7 +37,7 @@ public class XFormsResetAction extends XFormsAction {
 
         final String modelId = XFormsUtils.namespaceId(containingDocument, actionElement.attributeValue("model"));
 
-        final Object modelObject = containingDocument.getObjectById(pipelineContext, modelId);
+        final Object modelObject = containingDocument.getObjectById(modelId);
         if (modelObject instanceof XFormsModel) {
             final XFormsModel model = (XFormsModel) modelObject;
             containingDocument.dispatchEvent(pipelineContext, new XFormsResetEvent(model));

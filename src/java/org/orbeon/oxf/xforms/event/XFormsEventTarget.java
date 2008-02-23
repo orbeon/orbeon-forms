@@ -18,9 +18,10 @@ import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 
 /**
- * XFormsEventTarget is implemented by classes that support dispatch of XForms events.
+ * XFormsEventTarget is implemented by classes that support dispatching of events.
  */
 public interface XFormsEventTarget {
+    public String getId();
     public String getEffectiveId();
     public LocationData getLocationData();
     public XFormsEventHandlerContainer getParentContainer(XFormsContainingDocument containingDocument);

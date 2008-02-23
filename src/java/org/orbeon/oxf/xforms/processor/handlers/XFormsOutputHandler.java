@@ -46,7 +46,7 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
         final String effectiveId = handlerContext.getEffectiveId(elementAttributes);
         final XFormsOutputControl xformsOutputControl = handlerContext.isGenerateTemplate()
-                ? null : (XFormsOutputControl) containingDocument.getObjectById(pipelineContext, effectiveId);
+                ? null : (XFormsOutputControl) containingDocument.getObjectById(effectiveId);
         final boolean isConcreteControl = xformsOutputControl != null;
 
         // Don't do anything when xforms:output is used as a "pseudo-control", that is when it is within a leaf control,

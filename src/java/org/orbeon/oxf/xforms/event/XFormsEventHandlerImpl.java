@@ -27,26 +27,25 @@ import java.util.*;
  */
 public class XFormsEventHandlerImpl implements XFormsEventHandler {
 
-    private XFormsContainingDocument containingDocument;
     private Element eventHandlerElement;
-    private XFormsEventHandlerContainer eventHandlerContainer;
+    private String containerId;
 
     private String eventName;
-//    private String observer;
-//    private String target;
+    private String observerId;
+    private String targetId;
     //private String handler;
     private boolean phase;          // "true" means "default" (bubbling), "false" means "capture"
     private boolean propagate;      // "true" means "continue", "false" means "stop"
     private boolean defaultAction;  // "true" means "perform", "false" means "cancel"
 
-    public XFormsEventHandlerImpl(XFormsContainingDocument containingDocument, XFormsEventHandlerContainer eventHandlerContainer, Element eventHandlerElement) {
-        this.containingDocument = containingDocument;
-        this.eventHandlerContainer = eventHandlerContainer;
+    public XFormsEventHandlerImpl(Element eventHandlerElement, String containerId, String observerId) {
         this.eventHandlerElement = eventHandlerElement;
+        this.containerId = containerId;
 
-        {
-            this.eventName = eventHandlerElement.attributeValue(XFormsConstants.XML_EVENTS_EVENT_ATTRIBUTE_QNAME);
-        }
+        this.observerId = observerId;
+        this.eventName = eventHandlerElement.attributeValue(XFormsConstants.XML_EVENTS_EVENT_ATTRIBUTE_QNAME);
+        this.targetId = eventHandlerElement.attributeValue(XFormsConstants.XML_EVENTS_TARGET_ATTRIBUTE_QNAME);
+
         {
             final String captureString = eventHandlerElement.attributeValue(XFormsConstants.XML_EVENTS_PHASE_ATTRIBUTE_QNAME);
             this.phase = !"capture".equals(captureString);
@@ -64,100 +63,77 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
     /**
      * Utility method to extract event handlers.
      *
-     * @param containingDocument        current XFormsContainingDocument
-     * @param eventHandlerContainer     control, submission, etc. containing the event handlers
      * @param containingElement         element possibly containing event handlers
-     * @return                          List of XFormsEventHandler
+     * @param eventNames                Map<String, String> of event name to ""
+     * @return                          Map<String, List<XFormsEventHandler>> of observer id to List of XFormsEventHandler
      */
-    public static List extractEventHandlers(XFormsContainingDocument containingDocument, XFormsEventHandlerContainer eventHandlerContainer, Element containingElement) {
+    public static Map extractEventHandlers(Element containingElement, Map eventNames) {
+
+        // Nothing to do if there are no children elements
         final List children = containingElement.elements();
         if (children == null)
             return null;
 
-        List eventHandlers = null;
+        Map eventHandlersMap = null;
+        final String containerId = containingElement.attributeValue("id");
         for (Iterator i = children.iterator(); i.hasNext();) {
             final Element currentElement = (Element) i.next();
-            if (XFormsActions.isActionName(currentElement.getNamespaceURI(), currentElement.getName())
-                    && currentElement.attributeValue(XFormsConstants.XML_EVENTS_EVENT_ATTRIBUTE_QNAME) != null) {
-                // Found an action
-                if (eventHandlers == null)
-                    eventHandlers = new ArrayList();
-                eventHandlers.add(new XFormsEventHandlerImpl(containingDocument, eventHandlerContainer, currentElement));
-            }
-        }
-        return eventHandlers;
-    }
 
-    /**
-     * Utility method to statically gather a event handlers' event names.
-     *
-     * @param eventNames            Map into which event names are stored
-     * @param containingElement     element possibly containing event handlers
-     */
-    public static void gatherEventHandlerNames(Map eventNames, Element containingElement) {
-        final List children = containingElement.elements();
-        if (children == null)
-            return;
-
-        for (Iterator i = children.iterator(); i.hasNext();) {
-            final Element currentElement = (Element) i.next();
             if (XFormsActions.isActionName(currentElement.getNamespaceURI(), currentElement.getName())) {
                 final String eventName = currentElement.attributeValue(XFormsConstants.XML_EVENTS_EVENT_ATTRIBUTE_QNAME);
                 if (eventName != null) {
-                    // Found an action
+
+                    // Found an action with ev:event attribute
+                    if (eventHandlersMap == null)
+                        eventHandlersMap = new HashMap();
+
+                    // Get observer
+                    final String observerId;
+                    {
+                        final String observerIdAttribute = currentElement.attributeValue(XFormsConstants.XML_EVENTS_OBSERVER_ATTRIBUTE_QNAME);
+                        observerId = (observerIdAttribute == null) ? containerId : observerIdAttribute;
+                    }
+
+                    // Get handlers for observer
+                    final List eventHandlersForObserver;
+                    {
+                        final Object currentList = eventHandlersMap.get(observerId);
+                        if (currentList == null) {
+                            eventHandlersForObserver = new ArrayList();
+                            eventHandlersMap.put(observerId, eventHandlersForObserver);
+                        } else {
+                            eventHandlersForObserver = (List) currentList;
+                        }
+                    }
+
+                    // Add event handler
+                    eventHandlersForObserver.add(new XFormsEventHandlerImpl(currentElement, containerId, observerId));
+                    
+                    // Remember that there is an event
                     eventNames.put(eventName, "");
                 }
-            }
-        }
-    }
-
-    public static Map extractEventHandlersObserver(XFormsContainingDocument containingDocument, XFormsEventHandlerContainer eventHandlerContainer, Element containingElement) {
-        final List children = containingElement.elements();
-        if (children == null)
-            return null;
-
-        final Map eventHandlersMap = new HashMap();
-        for (Iterator i = children.iterator(); i.hasNext();) {
-            final Element currentElement = (Element) i.next();
-
-            // Check if this is an action and a handler
-            if (XFormsActions.isActionName(currentElement.getNamespaceURI(), currentElement.getName())
-                    && currentElement.attributeValue(XFormsConstants.XML_EVENTS_EVENT_ATTRIBUTE_QNAME) != null) {
-
-                // Get observer
-                final String observerId;
-                {
-                    final String observerIdAttribute = currentElement.attributeValue(XFormsConstants.XML_EVENTS_OBSERVER_ATTRIBUTE_QNAME);
-                    observerId = (observerIdAttribute == null) ? eventHandlerContainer.getEffectiveId() : observerIdAttribute;
-                }
-
-                // Get handlers for observer
-                final List eventHandlersForObserver;
-                {
-                    final Object currentList = eventHandlersMap.get(observerId);
-                    if (currentList == null) {
-                        eventHandlersForObserver = new ArrayList();
-                        eventHandlersMap.put(observerId, eventHandlersForObserver);
-                    } else {
-                        eventHandlersForObserver = (List) currentList;
-                    }
-                }
-
-                // TODO: FIXME: eventHandlerContainer may not be the actual container when using @ev:observer
-                eventHandlersForObserver.add(new XFormsEventHandlerImpl(containingDocument, eventHandlerContainer, currentElement));
             }
         }
         return eventHandlersMap;
     }
 
-    public void handleEvent(PipelineContext pipelineContext, XFormsEvent event) {
+    public void handleEvent(PipelineContext pipelineContext, XFormsContainingDocument containingDocument,
+                            XFormsEventHandlerContainer eventHandlerContainer, XFormsEvent event) {
         // Create a new top-level action interpreter to handle this event
-        new XFormsActionInterpreter(pipelineContext, containingDocument, eventHandlerContainer, eventHandlerElement)
+        new XFormsActionInterpreter(pipelineContext, containingDocument, eventHandlerContainer, eventHandlerElement, containerId)
                 .runAction(pipelineContext, event.getTargetObject().getEffectiveId(), eventHandlerContainer, eventHandlerElement);
     }
 
     public String getEventName() {
         return eventName;
+    }
+
+    public String getObserverId() {
+        return observerId;
+    }
+
+    public String getTargetId() {
+        return targetId;
     }
 
     public boolean isPhase() {

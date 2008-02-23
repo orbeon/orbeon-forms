@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.Attribute;
+import org.dom4j.QName;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.UUIDUtils;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -23,6 +24,9 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.resources.OXFProperties;
+import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
+import org.orbeon.oxf.xforms.event.XFormsEventHandlerImpl;
+import org.orbeon.saxon.om.FastStringBuffer;
 
 import java.util.*;
 
@@ -64,6 +68,17 @@ public class XFormsStaticState {
     private String containerType;
     private String containerNamespace;
     private LocationData locationData;
+
+    // Static analysis
+    private boolean isAnalyzed;
+    private Map controlNamesMap;            // Map<String, String> of event name to ""
+    private Map eventNamesMap;              // Map<String, String> of event name to ""
+    private Map eventHandlersMap;           // Map<String, List<XFormsEventHandler>> of control id to event handlers
+    private Map controlElementsMap;         // Map<String, Element> of control id to control Element
+    private Map defaultRepeatIdToIndex;     // Map<String, Integer> of repeat id to default repeat index
+    private Map repeatChildrenMap;          // Map<String, List> of repeat id to List of children
+    private Map repeatDescendantsMap;       // Map<String, List> of repeat id to List of descendants (computed on demand)
+    private String repeatHierarchyString;   // contains comma-separated list of space-separated repeat id and ancestor if any
 
     /**
      * Create static state object from an encoded version.
@@ -325,5 +340,231 @@ public class XFormsStaticState {
             return documentProperty.booleanValue();
         else
             return ((Boolean) (XFormsProperties.getPropertyDefinition(propertyName)).getDefaultValue()).booleanValue();
+    }
+
+    /**
+     * Returns whether static analysis information has taken place.
+     */
+    public boolean isAnalyzed() {
+        return isAnalyzed;
+    }
+
+    public Map getEventNamesMap() {
+        return eventNamesMap;
+    }
+
+    public List getEventHandlers(String id) {
+        return (List) eventHandlersMap.get(id);
+    }
+
+    public Map getControlElementsMap() {
+        return controlElementsMap;
+    }
+
+    public Map getDefaultRepeatIdToIndex() {
+        return defaultRepeatIdToIndex;
+    }
+
+    public String getRepeatHierarchyString() {
+        return repeatHierarchyString;
+    }
+
+    public boolean hasControlByName(String controlName) {
+        return controlNamesMap.get(controlName) != null;
+    }
+
+    /**
+     * Return the list of repeat ids descendant of a given repeat id.
+     */
+    public List getNestedRepeatIds(final String repeatId) {
+        // Check if the result is already computed
+        {
+            final List cachedResult = (List) repeatDescendantsMap.get(repeatId);
+            if (cachedResult != null)
+                return cachedResult;
+        }
+
+        // Compute and cache for further requests
+        synchronized (this) {
+            final List newResult = new ArrayList();
+            addRepeatChildren(newResult, repeatId);
+            repeatDescendantsMap.put(repeatId, newResult);
+            return newResult;
+        }
+    }
+
+    private void addRepeatChildren(List result, String repeatId) {
+        final List children = (List) repeatChildrenMap.get(repeatId);
+        if (children != null) {
+            for (Iterator i = children.iterator(); i.hasNext();) {
+                final String currentChild = (String) i.next();
+                result.add(currentChild);
+                addRepeatChildren(result, currentChild);
+            }
+        }
+    }
+
+    public synchronized void analyzeIfNecessary() {
+        if (!isAnalyzed) {
+            controlNamesMap = new HashMap();
+            eventNamesMap = new HashMap();
+            eventHandlersMap = new HashMap();
+            controlElementsMap = new HashMap();
+            defaultRepeatIdToIndex = new HashMap();
+            repeatChildrenMap = new HashMap();
+            repeatDescendantsMap = new HashMap();
+
+            // Iterate over static controls tree
+            final FastStringBuffer repeatHierarchyStringBuffer = new FastStringBuffer(1024);
+            visitAllControlStatic(new XFormsControls.ControlElementVisitorListener() {
+
+                private Stack repeatAncestorsStack = new Stack();
+
+                public boolean startVisitControl(Element controlElement, String controlId) {
+
+                    final String controlName = controlElement.getName();
+                    controlNamesMap.put(controlName, "");
+
+                    // Gather event handlers
+                    // Map<String, List<XFormsEventHandler>> of observer id to List of XFormsEventHandler
+                    final Map controlEventHandlersMap = XFormsEventHandlerImpl.extractEventHandlers(controlElement, eventNamesMap);
+                    mergeEventHandlers(eventHandlersMap, controlEventHandlersMap);
+
+                    // Gather static control
+                    controlElementsMap.put(controlId, controlElement);
+
+                    // Gather xforms:repeat information
+                    if (controlName.equals("repeat")) {
+                        // Find initial indexes
+                        {
+                            // Create control without parent, just to hold iterations
+                            final XFormsRepeatControl repeatControl
+                                    = new XFormsRepeatControl(null, null, controlElement, controlElement.getName(), controlId);
+
+                            // Remember initial index
+                            defaultRepeatIdToIndex.put(repeatControl.getRepeatId(), new Integer(repeatControl.getStartIndex()));
+                        }
+                        // Find repeat parents
+                        {
+                            // Create repeat hierarchy string
+                            if (repeatHierarchyStringBuffer.length() > 0)
+                                repeatHierarchyStringBuffer.append(',');
+
+                            repeatHierarchyStringBuffer.append(controlId);
+
+                            if (repeatAncestorsStack.size() > 0) {
+                                // If we have a parent, append it
+                                final String parentRepeatId = (String) repeatAncestorsStack.peek();
+                                repeatHierarchyStringBuffer.append(' ');
+                                repeatHierarchyStringBuffer.append(parentRepeatId);
+                            }
+                        }
+                        // Find repeat children
+                        {
+                            if (repeatAncestorsStack.size() > 0) {
+                                // If we have a parent, tell the parent that it has a child
+                                final String parentRepeatId = (String) repeatAncestorsStack.peek();
+                                List parentRepeatList = (List) repeatChildrenMap.get(parentRepeatId);
+                                if (parentRepeatList == null) {
+                                    parentRepeatList = new ArrayList();
+                                    repeatChildrenMap.put(parentRepeatId, parentRepeatList);
+                                }
+                                parentRepeatList.add(controlId);
+                            }
+
+                        }
+
+                        repeatAncestorsStack.push(controlId);
+                    }
+
+                    return true;
+                }
+
+                public boolean endVisitControl(Element controlElement, String controlId) {
+                    final String controlName = controlElement.getName();
+                    if (controlName.equals("repeat")) {
+                        repeatAncestorsStack.pop();
+                    }
+                    return true;
+                }
+
+                public void startRepeatIteration(int iteration) {
+                }
+
+                public void endRepeatIteration(int iteration) {
+                }
+            });
+
+            repeatHierarchyString = repeatHierarchyStringBuffer.toString();
+
+            // Iterate over models
+            for (Iterator i = getModelDocuments().iterator(); i.hasNext();) {
+                final Document modelDocument = (Document) i.next();
+                final Element modelElement = modelDocument.getRootElement();
+
+                final Map modelEventHandlers = XFormsEventHandlerImpl.extractEventHandlers(modelElement, eventNamesMap);
+                mergeEventHandlers(eventHandlersMap, modelEventHandlers);
+
+                // Iterate over model submissions
+                for (Iterator j = modelElement.elements(new QName("submission", XFormsConstants.XFORMS_NAMESPACE)).iterator(); j.hasNext();) {
+                    final Element currentSubmissionElement = (Element) j.next();
+
+                    final Map submissionEventHandlers = XFormsEventHandlerImpl.extractEventHandlers(currentSubmissionElement, eventNamesMap);
+                    mergeEventHandlers(eventHandlersMap, submissionEventHandlers);
+                }
+            }
+            isAnalyzed = true;
+        }
+    }
+
+    private static void mergeEventHandlers(Map destination, Map source) {
+        if (source != null) {
+            for (Iterator i = source.entrySet().iterator(); i.hasNext();) {
+                final Map.Entry currentEntry = (Map.Entry) i.next();
+
+                final String currentObserverid = (String) currentEntry.getKey();
+                final List currentEventHandlers = (List) currentEntry.getValue();
+
+                List existingEventHandlers = (List) destination.get(currentObserverid);
+                if (existingEventHandlers == null) {
+                    existingEventHandlers = new ArrayList();
+                    destination.put(currentObserverid, existingEventHandlers);
+                }
+
+                existingEventHandlers.addAll(currentEventHandlers);
+            }
+        }
+    }
+
+    /**
+     * Visit all the control elements without handling repeats or looking at the binding contexts.
+     */
+    public void visitAllControlStatic(XFormsControls.ControlElementVisitorListener controlElementVisitorListener) {
+        handleControlsStatic(controlElementVisitorListener, controlsDocument.getRootElement());
+    }
+
+    private boolean handleControlsStatic(XFormsControls.ControlElementVisitorListener controlElementVisitorListener, Element container) {
+        boolean doContinue = true;
+        for (Iterator i = container.elements().iterator(); i.hasNext();) {
+            final Element currentControlElement = (Element) i.next();
+
+            final String controlName = currentControlElement.getName();
+            final String controlId = currentControlElement.attributeValue("id");
+
+            if (XFormsControls.isGroupingControl(controlName)) {
+                // Handle XForms grouping controls
+                doContinue = controlElementVisitorListener.startVisitControl(currentControlElement, controlId);
+                if (doContinue)
+                    doContinue = handleControlsStatic(controlElementVisitorListener, currentControlElement);
+                doContinue = doContinue && controlElementVisitorListener.endVisitControl(currentControlElement, controlId);
+            } else if (XFormsControls.isLeafControl(controlName)) {
+                // Handle leaf control
+                doContinue = controlElementVisitorListener.startVisitControl(currentControlElement, controlId);
+                doContinue = doContinue && controlElementVisitorListener.endVisitControl(currentControlElement, controlId);
+            }
+            if (!doContinue)
+                break;
+        }
+        return doContinue;
     }
 }

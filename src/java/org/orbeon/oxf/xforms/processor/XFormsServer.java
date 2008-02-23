@@ -530,7 +530,7 @@ public class XFormsServer extends ProcessorImpl {
 
                 // Output focus instruction
                 {
-                    final String focusEffectiveControlId = containingDocument.getClientFocusEffectiveControlId(pipelineContext);
+                    final String focusEffectiveControlId = containingDocument.getClientFocusEffectiveControlId();
                     if (focusEffectiveControlId != null) {
                         outputFocusInfo(ch, focusEffectiveControlId);
                     }
@@ -538,7 +538,7 @@ public class XFormsServer extends ProcessorImpl {
 
                 // Output help instruction
                 {
-                    final String helpEffectiveControlId = containingDocument.getClientHelpEffectiveControlId(pipelineContext);
+                    final String helpEffectiveControlId = containingDocument.getClientHelpEffectiveControlId();
                     if (helpEffectiveControlId != null) {
                         outputHelpInfo(ch, helpEffectiveControlId);
                     }

@@ -22,10 +22,12 @@ import java.util.List;
 import java.util.Iterator;
 
 /**
- * Represents an xforms:repeat pseudo-control.
+ * Represents an xforms:repeat container control.
  */
 public class XFormsRepeatControl extends XFormsControl {
+
     private int startIndex;
+
     public XFormsRepeatControl(XFormsContainingDocument containingDocument, XFormsControl parent, Element element, String name, String id) {
         super(containingDocument, parent, element, name, id);
 
@@ -39,7 +41,7 @@ public class XFormsRepeatControl extends XFormsControl {
     }
 
     public String getRepeatId() {
-        return getOriginalId();
+        return getId();
     }
 
     protected void evaluate(PipelineContext pipelineContext) {
@@ -58,8 +60,13 @@ public class XFormsRepeatControl extends XFormsControl {
     }
 
     public boolean equals(Object obj) {
+
+        if (!(obj instanceof XFormsRepeatControl))
+            return false;
+
         if (!super.equals(obj))
             return false;
+
         final XFormsRepeatControl other = (XFormsRepeatControl) obj;
         return this.startIndex == other.startIndex;
     }

@@ -51,7 +51,7 @@ public class XFormsRepeatHandler extends HandlerBase {
         final Map effectiveRepeatIdToIterations = currentControlState.getEffectiveRepeatIdToIterations();
         final Map repeatIdToIndex = currentControlState.getRepeatIdToIndex();
 
-        final XFormsRepeatControl repeatControl = handlerContext.isGenerateTemplate() ? null : (XFormsRepeatControl) containingDocument.getObjectById(pipelineContext, effectiveId);
+        final XFormsRepeatControl repeatControl = handlerContext.isGenerateTemplate() ? null : (XFormsRepeatControl) containingDocument.getObjectById(effectiveId);
         final boolean isConcreteControl = repeatControl != null;
 
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();

@@ -64,7 +64,7 @@ public class XFormsTriggerHandler extends HandlerBase {
         // xforms:trigger and xforms:submit
 
         final String effectiveId = handlerContext.getEffectiveId(elementAttributes);
-        final XFormsTriggerControl xformsControl = handlerContext.isGenerateTemplate() ? null : ((XFormsTriggerControl) containingDocument.getObjectById(pipelineContext, effectiveId));
+        final XFormsTriggerControl xformsControl = handlerContext.isGenerateTemplate() ? null : ((XFormsTriggerControl) containingDocument.getObjectById(effectiveId));
 
         if (isStaticReadonly(xformsControl))
             return;

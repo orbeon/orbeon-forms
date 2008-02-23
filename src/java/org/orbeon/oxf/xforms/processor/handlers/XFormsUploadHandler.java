@@ -46,7 +46,7 @@ public class XFormsUploadHandler extends XFormsValueControlHandler {
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
         final String effectiveId = handlerContext.getEffectiveId(elementAttributes);
         final XFormsUploadControl xformsControl = handlerContext.isGenerateTemplate()
-                ? null : (XFormsUploadControl) containingDocument.getObjectById(pipelineContext, effectiveId);
+                ? null : (XFormsUploadControl) containingDocument.getObjectById(effectiveId);
 
         // xforms:label
         handleLabelHintHelpAlert(effectiveId, "label", xformsControl);

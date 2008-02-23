@@ -70,7 +70,7 @@ public class XFormsGroupHandler extends HandlerBase {
         // Find classes to add
         final StringBuffer classes = getInitialClasses(localname, attributes, null);
         if (!handlerContext.isGenerateTemplate()) {
-            groupXFormsControl = ((XFormsGroupControl) containingDocument.getObjectById(handlerContext.getPipelineContext(), effectiveGroupId));
+            groupXFormsControl = ((XFormsGroupControl) containingDocument.getObjectById(effectiveGroupId));
         }
         HandlerBase.handleMIPClasses(classes, groupXFormsControl);
 

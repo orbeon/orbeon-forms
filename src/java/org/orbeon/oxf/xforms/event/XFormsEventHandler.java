@@ -14,15 +14,19 @@
 package org.orbeon.oxf.xforms.event;
 
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
 
 /**
  * Represent an XForms event handler.
  */
 public interface XFormsEventHandler {
     public String getEventName();
+    public String getObserverId();
+    public String getTargetId();
     public boolean isPhase();
     public boolean isPropagate();
     public boolean isDefaultAction();
 
-    public void handleEvent(PipelineContext pipelineContext, XFormsEvent event);
+    public void handleEvent(PipelineContext pipelineContext, XFormsContainingDocument containingDocument,
+                            XFormsEventHandlerContainer eventHandlerContainer, XFormsEvent event);
 }

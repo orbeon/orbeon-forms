@@ -21,6 +21,7 @@ import java.util.List;
  * Represents a container of XFormsEventHandler.
  */
 public interface XFormsEventHandlerContainer {
+    public String getId();
     public String getEffectiveId();
     public List getEventHandlers(XFormsContainingDocument containingDocument);
     public XFormsEventHandlerContainer getParentContainer(XFormsContainingDocument containingDocument);

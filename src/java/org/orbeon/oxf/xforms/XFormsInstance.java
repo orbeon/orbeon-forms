@@ -219,8 +219,12 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventHandlerCont
     /**
      * Return the id of this instance.
      */
-    public String getEffectiveId() {
+    public String getId() {
         return instanceId;
+    }
+
+    public String getEffectiveId() {
+        return getId();
     }
 
     public String getModelId() {
@@ -551,7 +555,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventHandlerCont
     }
 
     public List getEventHandlers(XFormsContainingDocument containingDocument) {
-        return getModel(containingDocument).getEventHandlersForInstance(instanceId);
+        return containingDocument.getStaticState().getEventHandlers(instanceId);
     }
 
     public void logIfNeeded(XFormsContainingDocument containingDocument, String message) {

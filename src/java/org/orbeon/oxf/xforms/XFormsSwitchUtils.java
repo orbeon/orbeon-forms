@@ -62,7 +62,7 @@ public class XFormsSwitchUtils {
 
                             // Store an original case id instead of an effective case id
                             final String caseId = (String) entry.getValue();
-                            InstanceData.addSwitchIdToCaseId(nodeInfo, switchXFormsControl.getOriginalId(), caseId.substring(0, caseId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1)));
+                            InstanceData.addSwitchIdToCaseId(nodeInfo, switchXFormsControl.getId(), caseId.substring(0, caseId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1)));
 
     //                        System.out.println("xxx 1: adding case id " + switchControlInfo.getOriginalId() + " " + entry.getValue());
 
@@ -155,7 +155,7 @@ public class XFormsSwitchUtils {
 
                             final NodeInfo nodeInfo = (NodeInfo) currentNodeset.get(repeatIterationInfo.getIteration() - 1);
 
-                            final String caseId = InstanceData.getCaseIdForSwitchId(nodeInfo, switchXFormsControl.getOriginalId());
+                            final String caseId = InstanceData.getCaseIdForSwitchId(nodeInfo, switchXFormsControl.getId());
 
     //                        System.out.println("xxx 2: found case id " + caseId);
 

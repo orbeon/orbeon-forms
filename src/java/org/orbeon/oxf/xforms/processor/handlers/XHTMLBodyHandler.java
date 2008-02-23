@@ -13,12 +13,15 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
-import org.dom4j.Element;
 import org.dom4j.QName;
 import org.orbeon.oxf.processor.PageFlowControllerProcessor;
 import org.orbeon.oxf.resources.OXFProperties;
-import org.orbeon.oxf.xforms.*;
-import org.orbeon.oxf.xforms.state.*;
+import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsControls;
+import org.orbeon.oxf.xforms.XFormsProperties;
+import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.state.XFormsState;
+import org.orbeon.oxf.xforms.state.XFormsStateManager;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.ElementHandlerController;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -29,7 +32,6 @@ import org.xml.sax.SAXException;
 
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Stack;
 
 /**
  * Handle xhtml:body.
@@ -77,8 +79,6 @@ public class XHTMLBodyHandler extends HandlerBase {
 
         final String htmlPrefix = XMLUtils.prefixFromQName(qName);
 
-        final boolean hasUpload = xformsControls.getCurrentControlsState().isHasUpload();
-
         // Get formatting prefix and declare it if needed
         // TODO: would be nice to do this here, but then we need to make sure this prefix is available to other handlers
 //        formattingPrefix = handlerContext.findFormattingPrefixDeclare();
@@ -89,6 +89,7 @@ public class XHTMLBodyHandler extends HandlerBase {
                 PageFlowControllerProcessor.XFORMS_SUBMISSION_PATH_PROPERTY_NAME,
                 PageFlowControllerProcessor.XFORMS_SUBMISSION_PATH_DEFAULT_VALUE);
 
+        final boolean hasUpload = containingDocument.getStaticState().hasControlByName("upload");
         helper.startElement(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "form", new String[] {
                 "id", XFormsUtils.namespaceId(containingDocument, "xforms-form"), // add id so that things work in portals
                 "class", "xforms-form", "action", xformsSubmissionPath, "method", "POST", "onsubmit", "return false",
@@ -118,48 +119,8 @@ public class XHTMLBodyHandler extends HandlerBase {
 
         // Store information about nested repeats hierarchy
         {
-            final StringBuffer repeatHierarchyStringBuffer = new StringBuffer();
-            xformsControls.visitAllControlStatic(new XFormsControls.ControlElementVisitorListener() {
-
-                private Stack ancestorRepeatIds;
-
-                public boolean startVisitControl(Element controlElement, String controlId) {
-                    if (controlElement.getName().equals("repeat")) {
-
-                        if (repeatHierarchyStringBuffer.length() > 0)
-                            repeatHierarchyStringBuffer.append(',');
-
-                        repeatHierarchyStringBuffer.append(controlId);
-
-                        if (ancestorRepeatIds != null && ancestorRepeatIds.size() > 0) {
-                            repeatHierarchyStringBuffer.append(' ');
-                            repeatHierarchyStringBuffer.append(ancestorRepeatIds.peek());
-                        }
-
-                        if (ancestorRepeatIds == null)
-                            ancestorRepeatIds = new Stack();
-
-                        ancestorRepeatIds.push(controlId);
-                    }
-                    return true;
-                }
-
-                public boolean endVisitControl(Element controlElement, String controlId) {
-                    if (controlElement.getName().equals("repeat")) {
-                        ancestorRepeatIds.pop();
-                    }
-                    return true;
-                }
-
-                public void startRepeatIteration(int iteration) {
-                }
-
-                public void endRepeatIteration(int iteration) {
-                }
-            });
-
             helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[]{
-                    "type", "hidden", "name", "$repeat-tree", "value", repeatHierarchyStringBuffer.toString()
+                    "type", "hidden", "name", "$repeat-tree", "value", containingDocument.getStaticState().getRepeatHierarchyString()
             });
         }
 

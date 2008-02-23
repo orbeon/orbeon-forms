@@ -272,7 +272,7 @@ public class XHTMLHeadHandler extends HandlerBase {
 
             // User-defined scripts (with xxforms:script)
             final Map scriptsToDeclare = containingDocument.getScripts();
-            final String focusElementId = containingDocument.getClientFocusEffectiveControlId(pipelineContext);
+            final String focusElementId = containingDocument.getClientFocusEffectiveControlId();
             if (scriptsToDeclare != null || focusElementId != null) {
                 helper.startElement(prefix, XMLConstants.XHTML_NAMESPACE_URI, "script", new String[] {
                     "type", "text/javascript"});

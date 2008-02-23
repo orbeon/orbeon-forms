@@ -390,6 +390,7 @@
                     <xforms:case id="case-{@id}-closed" selected="{if (not($open)) then 'true' else 'false'}">
                         <xhtml:div>
                             <xsl:element name="{if ($ancestor-sections = 0) then 'h2' else 'h3'}">
+                                <xsl:attribute name="class" select="'fr-section-title'"/>
                                 <xforms:group appearance="xxforms:internal">
                                     <xforms:trigger appearance="minimal">
                                         <xforms:label>

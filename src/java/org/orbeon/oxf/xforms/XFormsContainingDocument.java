@@ -1463,6 +1463,14 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     private void createControlAndModel(Element repeatIndexesElement) {
 
         if (xformsStaticState != null) {
+
+            // Gather static analysis information
+            final boolean analyzed = xformsStaticState.analyzeIfNecessary();
+            if (analyzed)
+                logDebug("containing document", "performed static analysis");
+            else
+                logDebug("containing document", "static analysis already available");
+
             // Create XForms controls
             xformsControls = new XFormsControls(this, xformsStaticState, repeatIndexesElement);
 

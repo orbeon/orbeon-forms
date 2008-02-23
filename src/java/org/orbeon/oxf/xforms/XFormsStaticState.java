@@ -397,7 +397,7 @@ public class XFormsStaticState {
         }
     }
 
-    public synchronized void analyzeIfNecessary() {
+    public synchronized boolean analyzeIfNecessary() {
         if (!isAnalyzed) {
             controlNamesMap = new HashMap();
             eventNamesMap = new HashMap();
@@ -507,6 +507,9 @@ public class XFormsStaticState {
                 }
             }
             isAnalyzed = true;
+            return true;
+        } else {
+            return false;
         }
     }
 

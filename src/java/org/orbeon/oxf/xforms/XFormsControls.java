@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms;
 
-import org.dom4j.Document;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
@@ -53,7 +52,6 @@ public class XFormsControls {
     private boolean dirtySinceLastRequest;
 
     private XFormsContainingDocument containingDocument;
-    private Document controlsDocument;
 
     private XFormsContextStack contextStack;
 
@@ -140,10 +138,8 @@ public class XFormsControls {
         this.containingDocument = containingDocument;
         this.contextStack = new XFormsContextStack(containingDocument);
 
-        // Get and/or compute static information and perform minimal initialization
+        // Perform minimal initialization
         if (xformsStaticState != null) {
-            // Gather static analysis information
-            xformsStaticState.analyzeIfNecessary();
 
             // Set default repeat index information only
             final ControlsState result = new ControlsState();
@@ -153,8 +149,6 @@ public class XFormsControls {
             
             // Set incoming repeat index state if any
             setRepeatIndexState(repeatIndexesElement);
-
-            this.controlsDocument = xformsStaticState.getControlsDocument();
         }
     }
 
@@ -202,7 +196,7 @@ public class XFormsControls {
      */
     public void initializeState(PipelineContext pipelineContext, Element divsElement, Element repeatIndexesElement, boolean evaluateItemsets) {
 
-        if (controlsDocument != null) {
+        if (containingDocument.getStaticState().getControlsDocument() != null) {
 
             if (initialized) {
                 // Use existing controls state
@@ -250,9 +244,6 @@ public class XFormsControls {
 
                 // Handle repeat indexes if needed
                 if (initialControlsState.isHasRepeat()) {
-                    // Get default xforms:repeat indexes beforehand
-
-                    containingDocument.getStaticState().analyzeIfNecessary(); // Is this ever necessary since initializeMinimal() was likely called before?
 
                     // Set default repeat index information
                     initialControlsState.setDefaultRepeatIdToIndex(containingDocument.getStaticState().getDefaultRepeatIdToIndex());
@@ -728,7 +719,7 @@ public class XFormsControls {
     public void visitAllControlsHandleRepeat(PipelineContext pipelineContext, ControlElementVisitorListener controlElementVisitorListener) {
         contextStack.resetBindingContext();
         final boolean isOptimizeRelevance = XFormsProperties.isOptimizeRelevance(containingDocument);
-        handleControls(pipelineContext, controlElementVisitorListener, isOptimizeRelevance, controlsDocument.getRootElement(), "");
+        handleControls(pipelineContext, controlElementVisitorListener, isOptimizeRelevance, containingDocument.getStaticState().getControlsDocument().getRootElement(), "");
     }
 
     private boolean handleControls(PipelineContext pipelineContext, ControlElementVisitorListener controlElementVisitorListener,

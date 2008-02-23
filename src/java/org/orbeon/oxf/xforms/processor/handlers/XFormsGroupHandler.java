@@ -21,7 +21,6 @@ import org.orbeon.saxon.om.FastStringBuffer;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
-import org.xml.sax.helpers.AttributesImpl;
 import org.dom4j.Element;
 
 import java.util.Stack;
@@ -120,40 +119,45 @@ public class XFormsGroupHandler extends HandlerBase {
                 labelClassAttribute = groupXFormsControl.getControlElement().attributeValue("class");
             }
 
+            if (hasLabel) {
+                reusableAttributes.clear();
+
+                final FastStringBuffer labelClasses = new FastStringBuffer("xforms-label");
+
+                // Handle relevance
+                if (handlerContext.isGenerateTemplate() || groupXFormsControl != null && !groupXFormsControl.isRelevant())
+                    labelClasses.append(" xforms-disabled");
+
+                // Copy over existing classes if any
+                if (labelClassAttribute != null) {
+                    labelClasses.append(' ');
+                    labelClasses.append(labelClassAttribute);
+                }
+
+                reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, labelClasses.toString());
+            }
+
             if (isFieldsetAppearance) {
                 // Fieldset appearance
 
                 // Start xhtml:fieldset element
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, groupElementName, groupElementQName, getAttributes(attributes, classes.toString(), effectiveGroupId));
 
-                // Output an xhtml:legend element
-                final AttributesImpl labelAttributes = getAttributes(attributes, null, null);
-                final String legendQName = XMLUtils.buildQName(xhtmlPrefix, "legend");
-                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "legend", legendQName, labelAttributes);
-                if (labelValue != null && !labelValue.equals(""))
-                    contentHandler.characters(labelValue.toCharArray(), 0, labelValue.length());
-                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "legend", legendQName);
+                // Output an xhtml:legend element if and only if there is an xforms:label element. This help with
+                // styling in particular.
+                if (hasLabel) {
+                    final String legendQName = XMLUtils.buildQName(xhtmlPrefix, "legend");
+                    contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "legend", legendQName, reusableAttributes);
+                    if (labelValue != null && !labelValue.equals(""))
+                        contentHandler.characters(labelValue.toCharArray(), 0, labelValue.length());
+                    contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "legend", legendQName);
+                }
             } else {
                 // Default appearance
 
                 // Output an xhtml:label element if and only if there is an xforms:label element. This help with
                 // styling in particular.
                 if (hasLabel) {
-                    reusableAttributes.clear();
-
-                    final FastStringBuffer labelClasses = new FastStringBuffer("xforms-label");
-
-                    // Handle relevance
-                    if (handlerContext.isGenerateTemplate() || groupXFormsControl != null && !groupXFormsControl.isRelevant())
-                        labelClasses.append(" xforms-disabled");
-
-                    // Copy over existing classes if any
-                    if (labelClassAttribute != null) {
-                        labelClasses.append(' ');
-                        labelClasses.append(labelClassAttribute);
-                    }
-
-                    reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, labelClasses.toString());
                     outputLabelFor(handlerContext, reusableAttributes, effectiveGroupId, labelValue, groupXFormsControl != null && groupXFormsControl.isHTMLLabel(pipelineContext));
                 }
 

@@ -1925,6 +1925,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
      * Return the List of XFormsEventHandler objects within this object.
      */
     public List getEventHandlers(XFormsContainingDocument containingDocument) {
-        return containingDocument.getStaticState().getEventHandlers(getEffectiveId());
+        // Do test on null for legacy XForm (no event handlers in the model are supported with the legacy engine)
+        final XFormsStaticState staticState = containingDocument.getStaticState();
+        return (staticState != null) ? staticState.getEventHandlers(getEffectiveId()) : null;
     }
 }

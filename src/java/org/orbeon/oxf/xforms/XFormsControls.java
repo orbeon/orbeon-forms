@@ -136,13 +136,12 @@ public class XFormsControls {
     }
 
     public XFormsControls(XFormsContainingDocument containingDocument, XFormsStaticState xformsStaticState, Element repeatIndexesElement) {
-        this.containingDocument = containingDocument;
-        this.controlsDocument = xformsStaticState.getControlsDocument();
 
+        this.containingDocument = containingDocument;
         this.contextStack = new XFormsContextStack(containingDocument);
 
         // Get and/or compute static information and perform minimal initialization
-        if (controlsDocument != null) {
+        if (xformsStaticState != null) {
             // Gather static analysis information
             xformsStaticState.analyzeIfNecessary();
 
@@ -154,6 +153,8 @@ public class XFormsControls {
             
             // Set incoming repeat index state if any
             setRepeatIndexState(repeatIndexesElement);
+
+            this.controlsDocument = xformsStaticState.getControlsDocument();
         }
     }
 

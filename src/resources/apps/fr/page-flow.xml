@@ -71,6 +71,15 @@
         <setvalue ref="/*/mode" matcher-group="4"/>
     </page>
 
+    <!-- Test form with new empty document -->
+    <page path-info="/fr/([^/]+)/([^/]+)/(test)(/)?" matcher="oxf:perl5-matcher"
+          model="test-model.xpl"
+          view="components.xpl">
+        <setvalue ref="/*/app" matcher-group="1"/>
+        <setvalue ref="/*/form" matcher-group="2"/>
+        <setvalue ref="/*/mode" matcher-group="3"/>
+    </page>
+
     <!-- Upload document and start from there -->
     <page path-info="/fr/upload" model="import-export/upload.xpl"/>
 
@@ -127,7 +136,7 @@
     </page>
 
     <!-- Generate HTML to be saved -->
-    <page path-info="/fr/service/import-export/save-generate" view="import-export/save-generate.xpl"/>    
+    <page path-info="/fr/service/import-export/save-generate" view="import-export/save-generate.xpl"/>
 
     <!-- Custom services provided by the project -->
     <page path-info="/fr/service/custom/([^/]+)/.*" matcher="oxf:perl5-matcher"

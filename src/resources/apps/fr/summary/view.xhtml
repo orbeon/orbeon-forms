@@ -223,6 +223,7 @@
                             </xforms:label>
                             <xforms:action ev:event="DOMActivate">
                                 <xforms:setvalue ref="instance('fr-search-instance')/page-number" value=". - 1"/>
+                                <xforms:setindex repeat="documents-repeat" index="1"/>
                                 <xforms:send submission="search-submission"/>
                             </xforms:action>
                         </xforms:trigger>
@@ -240,6 +241,7 @@
                             </xforms:label>
                             <xforms:action ev:event="DOMActivate">
                                 <xforms:setvalue ref="instance('fr-search-instance')/page-number" value=". + 1"/>
+                                <xforms:setindex repeat="documents-repeat" index="1"/>
                                 <xforms:send submission="search-submission"/>
                             </xforms:action>
                         </xforms:trigger>

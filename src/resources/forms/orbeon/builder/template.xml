@@ -10,20 +10,25 @@
       xmlns:saxon="http://saxon.sf.net/" >
     <xhtml:head>
         <xhtml:title>Empty Form</xhtml:title>
-        <xforms:model>
+        <xhtml:link rel="stylesheet" href="/ops/css/yui/reset-fonts-grids.css" type="text/css"/>
+        <xhtml:link rel="stylesheet" href="/ops/css/yui/base-min.css" type="text/css"/>
+        <xhtml:link rel="stylesheet" href="/apps/fr/style/form-runner.css" type="text/css"/>
+        
+        <xforms:model id="fr-form-model">
 
             <!-- Main instance -->
             <xforms:instance id="fr-form-instance">
                 <form>
-                    <main>
-                        <input/>
-                    </main>
+                    <section>
+                        <value/>
+                    </section>
                 </form>
             </xforms:instance>
 
             <!-- Metadata -->
             <xforms:instance id="fr-form-metadata" xxforms:readonly="true">
                 <metadata>
+                    <id/>
                     <title>[Name this form]</title>
                     <description>[Describe this form]</description>
                     <author/>
@@ -36,23 +41,24 @@
     <xhtml:body>
         <fr:view>
             <xforms:label ref="instance('fr-form-metadata')/title"/>
-
-            <fr:section id="section1-section" context="main">
-                <xforms:label>Section 1</xforms:label>
-                <fr:grid columns="1">
-                    <xhtml:tr>
-                        <xhtml:td>
-                            <xforms:input id="input-control" ref="input">
-                                <xforms:label>[Change the label]</xforms:label>
-                                <xforms:hint>[Change the hint]</xforms:hint>
-                                <xforms:help>[Change the help]</xforms:help>
-                                <xforms:alert>[Change the alert]</xforms:alert>
-                            </xforms:input>
-                        </xhtml:td>
-                    </xhtml:tr>
-                </fr:grid>
-            </fr:section>
-
+            <xhtml:img src="/apps/fr/style/orbeon-logo-trimmed-transparent-42.png"/>
+            <fr:body>
+                <fr:section id="section-1" context="section[1]">
+                    <xforms:label>Section 1</xforms:label>
+                    <fr:grid columns="1">
+                        <xhtml:tr>
+                            <xhtml:td>
+                                <xforms:input id="input-control" ref="value[1]">
+                                    <xforms:label>[Change the label]</xforms:label>
+                                    <xforms:hint>[Change the hint]</xforms:hint>
+                                    <xforms:help>[Change the help]</xforms:help>
+                                    <xforms:alert>[Change the alert]</xforms:alert>
+                                </xforms:input>
+                            </xhtml:td>
+                        </xhtml:tr>
+                    </fr:grid>
+                </fr:section>
+            </fr:body>
         </fr:view>
     </xhtml:body>
 </xhtml:html>

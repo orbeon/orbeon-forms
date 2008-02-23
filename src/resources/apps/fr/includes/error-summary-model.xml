@@ -28,13 +28,33 @@
         xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
 
     <!-- XForms instance for error information -->
-    <xforms:instance id="fr-errors-instance" xxforms:validation="skip">
+    <xforms:instance id="fr-errors-instance">
         <errors xmlns=""/>
     </xforms:instance>
 
     <!-- Template for error information -->
-    <xforms:instance id="fr-error-template" xxforms:validation="skip" xxforms:readonly="true">
+    <xforms:instance id="fr-error-template" xxforms:readonly="true">
         <error xmlns="" id="" indexes="" label="" alert=""/>
     </xforms:instance>
+
+    <!-- Handle xforms-invalid event on #fr-form-group -->
+    <xforms:action ev:observer="fr-form-group" ev:event="xforms-invalid"
+                   if="normalize-space(event('label')) != ''"
+                   context="instance('fr-errors-instance')">
+        <xforms:action if="not(error[@id = event('target') and @indexes = string-join(event('repeat-indexes'), '-')])">
+            <xforms:insert context="." nodeset="error" origin="instance('fr-error-template')"/>
+            <xforms:setvalue ref="error[index('fr-errors-repeat')]/@id" value="event('target')"/>
+            <xforms:setvalue ref="error[index('fr-errors-repeat')]/@indexes" value="string-join(event('repeat-indexes'), '-')"/>
+        </xforms:action>
+        <xforms:setvalue ref="error[@id = event('target') and @indexes = string-join(event('repeat-indexes'), '-')]/@alert" value="event('alert')"/>
+        <xforms:setvalue ref="error[@id = event('target') and @indexes = string-join(event('repeat-indexes'), '-')]/@label" value="event('label')"/>
+    </xforms:action>
+
+    <!-- Handle xforms-valid event on #fr-form-group -->
+    <xforms:action ev:observer="fr-form-group" ev:event="xforms-valid"
+                   if="instance('fr-errors-instance')/error[@id = event('target') and @indexes = string-join(event('repeat-indexes'), '-')]"
+                   context="instance('fr-errors-instance')">
+        <xforms:delete nodeset="error[@id = event('target') and @indexes = string-join(event('repeat-indexes'), '-')]"/>
+    </xforms:action>
 
 </xforms:model>

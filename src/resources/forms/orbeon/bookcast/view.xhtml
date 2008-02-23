@@ -26,10 +26,10 @@
         <link rel="stylesheet" href="/apps/fr/style/form-runner.css" type="text/css"/>
         <!--<link rel="alternate" type="application/atom+xml" title="Orbeon XForms Bookcast Tutorial Feed" href="atom"/>-->
 
-        <xforms:model id="fr-form-model" schema="oxf:/apps/xforms-bookcast/schema.xsd" xxforms:help-tooltip="false">
+        <xforms:model id="fr-form-model" schema="oxf:/forms/orbeon/bookcast/schema.xsd" xxforms:help-tooltip="false">
 
             <!-- Instance that contains all the books -->
-            <xforms:instance id="fr-form-instance">
+            <xforms:instance id="fr-form-instance" xxforms:validation="strict">
                 <!-- NOTE: The initial data is obtained by the template service -->
                 <book xmlns="">
                     <details>

@@ -60,41 +60,12 @@
                         <xhtml:div class="yui-g fr-separator">
                         </xhtml:div>
                         <xhtml:div class="yui-g fr-body">
-                            <xforms:group model="fr-form-model" ref="instance('fr-form-instance')">
-                                <!-- Error summary: handle xforms-invalid event -->
-                                <xforms:action ev:event="xforms-invalid" if="normalize-space(event('label')) != ''">
-                                    <xforms:action if="not(xxforms:instance('fr-errors-instance')/error[@id = event('target') and @indexes = string-join(event('repeat-indexes'), '-')])">
-                                        <xforms:insert context="xxforms:instance('fr-errors-instance')" nodeset="error" origin="xxforms:instance('fr-error-template')"/>
-                                        <xforms:setvalue ref="xxforms:instance('fr-errors-instance')/error[index('fr-errors-repeat')]/@id" value="event('target')"/>
-                                        <xforms:setvalue ref="xxforms:instance('fr-errors-instance')/error[index('fr-errors-repeat')]/@indexes" value="string-join(event('repeat-indexes'), '-')"/>
-                                    </xforms:action>
-                                    <xforms:setvalue ref="xxforms:instance('fr-errors-instance')/error[@id = event('target') and @indexes = string-join(event('repeat-indexes'), '-')]/@alert" value="event('alert')"/>
-                                    <xforms:setvalue ref="xxforms:instance('fr-errors-instance')/error[@id = event('target') and @indexes = string-join(event('repeat-indexes'), '-')]/@label" value="event('label')"/>
-                                </xforms:action>
-                                <!-- Error summary: handle xforms-valid -->
-                                <xforms:action ev:event="xforms-valid" if="xxforms:instance('fr-errors-instance')/error[@id = event('target') and @indexes = string-join(event('repeat-indexes'), '-')]">
-                                    <xforms:delete nodeset="xxforms:instance('fr-errors-instance')/error[@id = event('target') and @indexes = string-join(event('repeat-indexes'), '-')]"/>
-                                </xforms:action>
+                            <!-- Set context on form instance and define this group as #fr-form-group as observers will refer to it -->
+                            <xforms:group id="fr-form-group" model="fr-form-model" ref="instance('fr-form-instance')">
 
-                                <xforms:group appearance="xxforms:internal">
-                                    <!-- Clear message upon user interaction -->
-                                    <xforms:setvalue ev:event="DOMFocusIn" model="fr-persistence-model" ref="instance('fr-persistence-instance')/message"/>
-                                    
-                                    <!-- Mark status as dirty if data changes in fr-form-instance instance only -->
-                                    <xforms:setvalue ev:event="xforms-value-changed"
-                                                     if="event('target-ref')/ancestor::*[last()] is xxforms:instance('fr-form-instance')"
-                                                     model="fr-persistence-model"
-                                                     ref="instance('fr-persistence-instance')/data-status">dirty</xforms:setvalue>
+                                <!-- Main form content -->
+                                <xsl:apply-templates select="fr:body/node()"/>
 
-                                    <!-- Take action upon xforms-help -->
-                                    <!--<xforms:action ev:event="xforms-help" ev:defaultAction="cancel">-->
-                                        <!--<xforms:setvalue model="fr-help-model" ref="instance('fr-help-instance')/label" value="event('label')"/>-->
-                                        <!--<xforms:setvalue model="fr-help-model" ref="instance('fr-help-instance')/help" value="event('help')"/>-->
-                                    <!--</xforms:action>-->
-
-                                    <!-- Main form content -->
-                                    <xsl:apply-templates select="fr:body/node()"/>
-                                </xforms:group>
                             </xforms:group>
                         </xhtml:div>
                         <xhtml:div class="yui-g fr-separator">
@@ -276,7 +247,7 @@
         <xforms:switch id="{@id}">
             <xsl:attribute name="class" select="string-join(('fr-inplace-input', @class), ' ')"/>
             <xforms:case id="fr-inplace-{@id}-view">
-                <xhtml:div>
+                <xhtml:div class="fr-inplace-view">
                     <xhtml:span class="fr-inplace-content">
                         <xforms:output value="{@ref}" class="fr-inplace-value">
                             <xsl:copy-of select="xforms:label"/>
@@ -297,13 +268,13 @@
                                     <!--<xforms:toggle case="fr-inplace-{@id}-edit"/>-->
                                     <!--<xforms:setfocus control="fr-inplace-{@id}-input"/>-->
                                 <!--</xforms:action>-->
-                            <!--</xforms:trigger>-->
+                            <!--</xforms:trigger>-->    
                         </xhtml:span>
                     </xhtml:span>
                 </xhtml:div>
             </xforms:case>
             <xforms:case id="fr-inplace-{@id}-edit">
-                <xhtml:div>
+                <xhtml:div class="fr-inplace-edit">
                     <xhtml:span class="fr-inplace-content">
                         <xforms:input id="fr-inplace-{@id}-input" ref="{@ref}" class="fr-inplace-value">
                             <xsl:copy-of select="xforms:label"/>
@@ -330,15 +301,15 @@
 
     <xsl:template match="xhtml:body//xforms:textarea[@appearance='fr:in-place']">
         <xforms:switch id="{@id}">
-            <xsl:attribute name="class" select="string-join(('fr-inplace-input', @class), ' ')"/>
+            <xsl:attribute name="class" select="string-join(('fr-inplace-textarea', @class), ' ')"/>
             <xforms:case id="fr-inplace-{@id}-view">
-                <xhtml:div>
+                <xhtml:div class="fr-inplace-view">
                     <xhtml:span class="fr-inplace-content">
                         <xforms:output value="{@ref}" class="fr-inplace-value">
                             <xsl:copy-of select="xforms:label"/>
                             <xforms:action ev:event="DOMActivate">
                                 <xforms:toggle case="fr-inplace-{@id}-edit"/>
-                                <xforms:setfocus control="fr-inplace-{@id}-input"/>
+                                <xforms:setfocus control="fr-inplace-{@id}-textarea"/>
                             </xforms:action>
                         </xforms:output>
                         <!--<xhtml:span class="fr-inplace-buttons">-->
@@ -349,7 +320,7 @@
                                 <!--<xforms:label>Change</xforms:label>-->
                                 <!--<xforms:action ev:event="DOMActivate">-->
                                     <!--<xforms:toggle case="fr-inplace-{@id}-edit"/>-->
-                                    <!--<xforms:setfocus control="fr-inplace-{@id}-input"/>-->
+                                    <!--<xforms:setfocus control="fr-inplace-{@id}-textarea"/>-->
                                 <!--</xforms:action>-->
                             <!--</xforms:trigger>-->
                         <!--</xhtml:span>-->
@@ -357,9 +328,9 @@
                 </xhtml:div>
             </xforms:case>
             <xforms:case id="fr-inplace-{@id}-edit">
-                <xhtml:div>
+                <xhtml:div class="fr-inplace-edit">
                     <xhtml:span class="fr-inplace-content">
-                        <xforms:textarea id="fr-inplace-{@id}-input" ref="{@ref}" class="fr-inplace-value" appearance="xxforms:autosize">
+                        <xforms:textarea id="fr-inplace-{@id}-textarea" ref="{@ref}" class="fr-inplace-value" appearance="xxforms:autosize">
                             <xsl:copy-of select="xforms:label"/>
                             <xforms:toggle ev:event="DOMActivate" case="fr-inplace-{@id}-view"/>
                         </xforms:textarea>
@@ -562,7 +533,7 @@
             <xforms:action ev:event="fr-collapse">
                 <xxforms:script>document.body.blur(); frCollapse();</xxforms:script>
             </xforms:action>
-            
+
             <!-- Open section -->
             <xforms:action ev:event="fr-expand">
                 <xforms:toggle case="case-{{instance('fr-current-section-instance')}}-open"/>
@@ -570,6 +541,7 @@
             </xforms:action>
         </xforms:model>
 
+        <!-- This model handles help -->
         <xforms:model id="fr-help-model">
             <xforms:instance id="fr-help-instance">
                 <help xmlns="">
@@ -577,8 +549,16 @@
                     <help/>
                 </help>
             </xforms:instance>
+
+            <!-- Take action upon xforms-help on #fr-form-group -->
+            <!--<xforms:action ev:observer="fr-form-group" ev:event="xforms-help" ev:defaultAction="cancel">-->
+                <!--<xforms:setvalue ref="instance('fr-help-instance')/label" value="event('label')"/>-->
+                <!--<xforms:setvalue ref="instance('fr-help-instance')/help" value="event('help')"/>-->
+            <!--</xforms:action>-->
+
         </xforms:model>
 
+        <!-- This model handles print functionality -->
         <xforms:model id="fr-print-model">
             <xforms:instance id="fr-print-instance"><dummy/></xforms:instance>
             <xforms:submission id="fr-print-submission" action="/fr/{{xxforms:instance('fr-parameters-instance')/app}}/{{xxforms:instance('fr-parameters-instance')/form}}/print/"
@@ -595,11 +575,6 @@
         <!-- Copy existing model -->
         <xsl:copy>
             <xsl:apply-templates select="@*|node()"/>
-
-            <!-- Mark status as dirty if data changes -->
-            <xforms:setvalue ev:observer="fr-form-instance" ev:event="xforms-insert" ref="xxforms:instance('fr-persistence-instance')/data-status">dirty</xforms:setvalue>
-            <xforms:setvalue ev:observer="fr-form-instance" ev:event="xforms-delete" ref="xxforms:instance('fr-persistence-instance')/data-status">dirty</xforms:setvalue>
-
         </xsl:copy>
 
         <!-- Handle collapsible sections -->

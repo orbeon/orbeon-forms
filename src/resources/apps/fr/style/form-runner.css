@@ -230,6 +230,13 @@ label.xforms-disabled, span.xforms-disabled, div.xforms-disabled  {
     margin: 1em 0 1em 0;
     width: 100%;
 }
+.fr-repeat-table .fr-repeat-table {
+    background-color:#DDDDEE;
+    border:1px solid #3598D4;
+    margin:0 0 1em;
+    width: 100%;
+}
+.fr-repeat-table td { vertical-align: top; padding: 0.2em }
 
 .fr-tabular, .fr-tabular tr td, .fr-tabular tr th {
     border-color: #600;
@@ -266,6 +273,7 @@ label.xforms-disabled, span.xforms-disabled, div.xforms-disabled  {
 /*.xforms-group { display: inline }*/
 /*.xforms-help-image { display: inline }*/
 
+td { border: 0 }
 h1 { font-size: 197% }
 i { font-style: italic }
 a { color: #3598D4 }
@@ -324,34 +332,37 @@ div.fr-collapsible {
 .xforms-select-appearance-full span { display: block; clear: both; }
 .xforms-select-appearance-full input { float: left; }
 
-/* Space before paragrah in sections */
+/* Radio buttons spacing */
+.xforms-select1-appearance-full label { margin-left: .5em; margin-right: 1em }
+
+/* Space before paragraph in sections */
 .fr-section-container p { margin-top: 1em; }
 
 /* Size form controls depending on layout */
-.fr-section-container .xforms-input input { width: 63em }
-.fr-section-container textarea { width: 63em }
-.fr-section-container .xforms-textarea-appearance-xxforms-autosize { width: 63em }
-.fr-section-container .xforms-select1-appearance-minimal { width: 63em }
+#doc4 .fr-section-container .xforms-input input { width: 63em }
+#doc4 .fr-section-container textarea.xforms-textarea { width: 63em }
+#doc4 .fr-section-container .xforms-textarea-appearance-xxforms-autosize { width: 63em }
+#doc4 .fr-section-container .xforms-select1-appearance-minimal { width: 63em }
 
 #doc .fr-grid-1-columns .xforms-input input { width: 46em }
-#doc .fr-grid-1-columns textarea { width: 46em }
+#doc .fr-grid-1-columns textarea.xforms-textarea { width: 46em }
 #doc .fr-grid-1-columns .xforms-textarea-appearance-xxforms-autosize { width: 46em; }
 #doc .fr-grid-1-columns .xforms-select1-appearance-minimal { width: 46em; }
 #doc .fr-grid-1-columns .xforms-select-appearance-full label { float: right; width: 47em; *width: 45.86em; padding-right: 5em; }
 
 #doc .fr-grid-2-columns .xforms-input input { width: 22em }
-#doc .fr-grid-2-columns textarea { width: 22em }
+#doc .fr-grid-2-columns textarea.xforms-textarea { width: 22em }
 #doc .fr-grid-2-columns .xforms-textarea-appearance-xxforms-autosize { width: 22em; }
 #doc .fr-grid-2-columns .xforms-select1-appearance-minimal { width: 22em; }
 #doc .fr-grid-2-columns .xforms-select-appearance-full label { float: right; width: 90%; }
 
 
 #doc4 .fr-grid-1-columns .xforms-input input { width: 63em }
-#doc4 .fr-grid-1-columns textarea { width: 63em }
+#doc4 .fr-grid-1-columns textarea.xforms-textarea { width: 63em }
 #doc4 .fr-grid-1-columns .xforms-textarea-appearance-xxforms-autosize { width: 63em; }
 #doc4 .fr-grid-1-columns .xforms-select1-appearance-minimal { width: 63em }
 
 #doc4 .fr-grid-2-columns .xforms-input input { width: 31em }
-#doc4 .fr-grid-2-columns textarea { width: 31em }
+#doc4 .fr-grid-2-columns textarea.xforms-textarea { width: 31em }
 #doc4 .fr-grid-2-columns .xforms-textarea-appearance-xxforms-autosize { width: 31em }
 #doc4 .fr-grid-2-columns .xforms-select1-appearance-minimal { width: 31em }

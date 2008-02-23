@@ -15,10 +15,10 @@
             <!-- Main instance -->
             <xforms:instance id="fr-form-instance">
                 <form>
-                    <main>
-                        <input/>
-                        <textarea/>
-                    </main>
+                    <section>
+                        <value/>
+                        <value/>
+                    </section>
                 </form>
             </xforms:instance>
 

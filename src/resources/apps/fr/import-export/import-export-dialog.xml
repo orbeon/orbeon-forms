@@ -1,0 +1,41 @@
+<xxforms:dialog id="fr-download-save-dialog" level="modal" close="true" draggable="false" class="fr-dialog"
+        xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:xforms="http://www.w3.org/2002/xforms"
+        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+        xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:xi="http://www.w3.org/2001/XInclude"
+        xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+        xmlns:ev="http://www.w3.org/2001/xml-events">
+    <xforms:label>Save</xforms:label>
+    <xhtml:p>
+        To save the data you entered:
+    </xhtml:p>
+    <xhtml:ol>
+        <xhtml:li>Click on the link below.</xhtml:li>
+        <xhtml:li>
+            Then choose where you want the file to be saved on you machine. Note that the file is saved on your
+            machine. No data is kept on the server and if you delete the file you saved your data will be lost.
+        </xhtml:li>
+    </xhtml:ol>
+    <xhtml:p>
+        Then to reopen the data:
+    </xhtml:p>
+    <xhtml:ol>
+        <xhtml:li>Double click on the file you saved to open it.</xhtml:li>
+        <xhtml:li>This will take you back to this site with the data and all the fields will be prepopulatd with the data you saved.</xhtml:li>
+    </xhtml:ol>
+    <xhtml:p>
+        <xforms:output mediatype="text/html" value="concat('&lt;a href=&quot;../../../serve?uuid=',
+            xxforms:instance('fr-uuid'), '&amp;filename=',
+            encode-for-uri(concat(xxforms:instance('fr-save-locally-file-name'), '.html')),
+            '&quot;&gt;Download project file&lt;a&gt;')"/>
+    </xhtml:p>
+    <xhtml:div class="fr-dialog-buttons">
+        <xforms:trigger>
+            <xforms:label><xhtml:img src="/apps/fr/style/close.gif" alt=""/> <xhtml:span>Close</xhtml:span></xforms:label>
+            <xxforms:hide ev:event="DOMActivate" dialog="fr-download-save-dialog"/>
+        </xforms:trigger>
+    </xhtml:div>
+</xxforms:dialog>

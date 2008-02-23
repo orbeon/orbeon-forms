@@ -179,6 +179,7 @@
                                                 <fr:buttons>
                                                     <fr:back-button/>
                                                     <fr:print-button/>
+                                                    <fr:save-locally-button/>
                                                     <fr:save-button/>
                                                 </fr:buttons>
                                             </xsl:variable>
@@ -214,6 +215,8 @@
             </xhtml:div>
 
         </xhtml:div>
+        <xi:include href="import-export/import-export-dialog.xml" xxi:omit-xml-base="true"/>
+
     </xsl:template>
 
     <xsl:template match="fr:back-button">
@@ -247,6 +250,15 @@
             <xforms:label><xhtml:img src="/apps/fr/style/report.gif" alt=""/> <xhtml:span>Print</xhtml:span></xforms:label>
             <xforms:action ev:event="DOMActivate">
                 <xforms:send submission="fr-print-submission"/>
+            </xforms:action>
+        </xforms:trigger>
+    </xsl:template>
+
+    <xsl:template match="fr:save-locally-button">
+        <xforms:trigger>
+            <xforms:label><xhtml:img src="/apps/fr/style/save.gif" alt=""/> <xhtml:span>Save locally</xhtml:span></xforms:label>
+            <xforms:action ev:event="DOMActivate">
+                <xforms:send submission="save-locally-submission"/>
             </xforms:action>
         </xforms:trigger>
     </xsl:template>
@@ -454,14 +466,13 @@
         </xforms:input>
         <xforms:trigger ref=".[not({@ref})]" appearance="minimal">
             <xforms:label>
-                <xhtml:img src="../../../../apps/fr/style/add.gif"/>
+                <xhtml:img src="../../../../apps/fr/style/add.gif" alt=""/>
                 Add <xsl:value-of select="lower-case(xforms:label)"/>
             </xforms:label>
             <xforms:insert ev:event="DOMActivate" origin="instance('templates')/{@ref}" nodeset="{@after}"/>
         </xforms:trigger>
         <xforms:trigger ref=".[{@ref}]" appearance="minimal">
-            <xforms:label><xhtml:img src="../../../../apps/fr/style/remove.gif"/></xforms:label>
-            <!--<xforms:label>Remove <xsl:value-of select="lower-case(xforms:label)"/></xforms:label>-->
+            <xforms:label><xhtml:img src="../../../../apps/fr/style/remove.gif" alt="Remove" title="Remove"/></xforms:label>
             <xforms:delete ev:event="DOMActivate" nodeset="{@ref}"/>
         </xforms:trigger>
     </xsl:template>
@@ -575,6 +586,8 @@
 
         <!-- Handle document persistence -->
         <xi:include href="includes/persistence-model.xml" xxi:omit-xml-base="true"/>
+        <!-- Handle import/export -->
+        <xi:include href="import-export/import-export-model.xml" xxi:omit-xml-base="true"/>
         <!-- Handle error summary -->
         <xi:include href="includes/error-summary-model.xml" xxi:omit-xml-base="true"/>
 

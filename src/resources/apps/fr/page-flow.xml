@@ -71,6 +71,19 @@
         <setvalue ref="/*/mode" matcher-group="4"/>
     </page>
 
+    <!-- Upload document and start from there -->
+    <page path-info="/fr/upload" model="import-export/upload.xpl"/>
+
+    <!-- Serve document previously produced -->
+    <page path-info="/fr/serve" model="import-export/serve.xpl" default-submission="import-export/serve-instance.xml">
+        <setvalue ref="/instance/uuid" parameter="uuid"/>
+        <setvalue ref="/instance/filename" parameter="filename"/>
+    </page>
+
+    <!-- Custom pages provided by the project -->
+    <page path-info="/fr/page/custom/([^/]+)/.*" matcher="oxf:perl5-matcher"
+          model="/forms/${1}/page/page-flow.xml"/>
+
     <!-- ==== Services ==== -->
 
     <!-- i18n resources -->
@@ -113,18 +126,12 @@
         <setvalue ref="/*/form" matcher-group="2"/>
     </page>
 
-    <!--<service path-info="/fr/service/configuration/([^/]+)/([^/]+)" matcher="oxf:perl5-matcher"-->
-             <!--implementation="/forms/${1}/${2}/view.xhtml"/>-->
-
-    <!-- ==== Custom services ==== -->
+    <!-- Generate HTML to be saved -->
+    <page path-info="/fr/service/import-export/save-generate" view="import-export/save-generate.xpl"/>    
 
     <!-- Custom services provided by the project -->
     <page path-info="/fr/service/custom/([^/]+)/.*" matcher="oxf:perl5-matcher"
           model="/forms/${1}/service/page-flow.xml"/>
-
-    <!-- Custom pages provided by the project -->
-    <page path-info="/fr/page/custom/([^/]+)/.*" matcher="oxf:perl5-matcher"
-          model="/forms/${1}/page/page-flow.xml"/>
 
     <epilogue url="oxf:/config/epilogue.xpl"/>
 

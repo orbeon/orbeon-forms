@@ -19,7 +19,6 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.action.actions.XFormsSetvalueAction;
 import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.saxon.om.NodeInfo;
 
@@ -149,7 +148,7 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
 
         } else {
             // Format value according to format attribute
-            final Map prefixToURIMap = Dom4jUtils.getNamespaceContextNoDefault(getControlElement());
+            final Map prefixToURIMap = containingDocument.getStaticState().getNamespaceMappings(getControlElement());
 
             final NodeInfo boundNode = getBoundNode();
             if (boundNode == null) {

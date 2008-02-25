@@ -24,7 +24,6 @@ import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
 import org.orbeon.oxf.xforms.event.events.XFormsDeleteEvent;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.saxon.om.NodeInfo;
@@ -93,7 +92,7 @@ public class XFormsDeleteAction extends XFormsAction {
                         final String insertionIndexString = XPathCache.evaluateAsString(pipelineContext,
                                 collectionToUpdate, 1,
                                 "round(" + atAttribute + ")",
-                                Dom4jUtils.getNamespaceContextNoDefault(actionElement), null,
+                                containingDocument.getStaticState().getNamespaceMappings(actionElement), null,
                                 XFormsContainingDocument.getFunctionLibrary(), actionInterpreter.getFunctionContext(), null,
                                 (LocationData) actionElement.getData());
 

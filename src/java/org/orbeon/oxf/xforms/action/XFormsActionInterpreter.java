@@ -21,7 +21,6 @@ import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.util.XPathCache;
@@ -230,7 +229,7 @@ public class XFormsActionInterpreter {
     public void pushIterateAttribute(PipelineContext pipelineContext, Element actionElement, String iterateAttribute) {
         final String contextAttribute = actionElement.attributeValue("context");
         final String modelAttribute = actionElement.attributeValue("model");
-        contextStack.pushBinding(pipelineContext, null, contextAttribute, iterateAttribute, modelAttribute, null, actionElement,Dom4jUtils.getNamespaceContextNoDefault(actionElement));
+        contextStack.pushBinding(pipelineContext, null, contextAttribute, iterateAttribute, modelAttribute, null, actionElement, containingDocument.getStaticState().getNamespaceMappings(actionElement));
     }
 
     private boolean evaluateCondition(PipelineContext pipelineContext, Element actionElement,
@@ -263,7 +262,7 @@ public class XFormsActionInterpreter {
 
         final List conditionResult = XPathCache.evaluate(pipelineContext,
                 contextNodeset, contextPosition, "boolean(" + conditionAttribute + ")",
-            Dom4jUtils.getNamespaceContextNoDefault(actionElement), null, XFormsContainingDocument.getFunctionLibrary(),
+            containingDocument.getStaticState().getNamespaceMappings(actionElement), null, XFormsContainingDocument.getFunctionLibrary(),
             contextStack.getFunctionContext(), null, (LocationData) actionElement.getData());
 
         if (!((Boolean) conditionResult.get(0)).booleanValue()) {

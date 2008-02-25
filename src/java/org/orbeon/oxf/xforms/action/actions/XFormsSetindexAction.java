@@ -23,7 +23,6 @@ import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
 import org.orbeon.oxf.xforms.event.events.XFormsScrollFirstEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsScrollLastEvent;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.saxon.om.NodeInfo;
@@ -53,7 +52,7 @@ public class XFormsSetindexAction extends XFormsAction {
 
         final String indexString = XPathCache.evaluateAsString(pipelineContext,
                 actionInterpreter.getContextStack().getCurrentNodeset(), actionInterpreter.getContextStack().getCurrentPosition(),
-                "number(" + indexXPath + ")", Dom4jUtils.getNamespaceContextNoDefault(actionElement), null, XFormsContainingDocument.getFunctionLibrary(),
+                "number(" + indexXPath + ")", containingDocument.getStaticState().getNamespaceMappings(actionElement), null, XFormsContainingDocument.getFunctionLibrary(),
                 actionInterpreter.getContextStack().getFunctionContext(), null,
                 (LocationData) actionElement.getData());
 

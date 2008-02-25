@@ -20,7 +20,6 @@ import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.saxon.om.NodeInfo;
@@ -47,7 +46,7 @@ public class XFormsSetvalueAction extends XFormsAction {
         final String valueToSet;
         if (value != null) {
             // Value to set is computed with an XPath expression
-            final Map namespaceContext = Dom4jUtils.getNamespaceContextNoDefault(actionElement);
+            final Map namespaceContext = containingDocument.getStaticState().getNamespaceMappings(actionElement);
 
             final List currentNodeset;
             {

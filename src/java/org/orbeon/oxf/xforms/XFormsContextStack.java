@@ -165,8 +165,9 @@ public class XFormsContextStack {
             final String modelId = XFormsUtils.namespaceId(containingDocument, bindingElement.attributeValue("model"));
             final String bindId = XFormsUtils.namespaceId(containingDocument, bindingElement.attributeValue("bind"));
 
+            // Get mappings only if an XPath expression must be computed
             final Map bindingElementNamespaceContext =
-                    (ref != null || nodeset != null || context != null) ? Dom4jUtils.getNamespaceContextNoDefault(bindingElement) : null;
+                    (ref != null || nodeset != null || context != null) ? containingDocument.getStaticState().getNamespaceMappings(bindingElement) : null;
 
             pushBinding(pipelineContext, ref, context, nodeset, modelId, bindId, bindingElement, bindingElementNamespaceContext);
         } else {
@@ -211,33 +212,7 @@ public class XFormsContextStack {
             model = XFormsUtils.namespaceId(containingDocument, bindingElement.attributeValue("model"));
         final String bind = XFormsUtils.namespaceId(containingDocument, bindingElement.attributeValue("bind"));
 
-        // TODO: PERF: Dom4jUtils.getNamespaceContextNoDefault() takes time. We should maybe cache those?
-        final Map bindingElementNamespaceContext;
-        bindingElementNamespaceContext = Dom4jUtils.getNamespaceContextNoDefault(bindingElement);
-//        if (ref != null || nodeset != null) {
-//            if (bindingElement instanceof NonLazyUserDataElement) {
-//                final NonLazyUserDataElement dataElement = (NonLazyUserDataElement) bindingElement;
-//                final Object data = dataElement.getData();
-//
-//                if (data == null) {
-//                    // Get data and cache it
-//                    bindingElementNamespaceContext = Dom4jUtils.getNamespaceContextNoDefault(bindingElement);
-//                    dataElement.setData(bindingElementNamespaceContext);
-//                } else if (data instanceof TreeMap) {
-//                    // Use cached data
-//                    bindingElementNamespaceContext = (Map) data;
-//                } else {
-//                    // Just compute the data
-//                    bindingElementNamespaceContext = Dom4jUtils.getNamespaceContextNoDefault(bindingElement);
-//                }
-//            } else {
-//                // Just compute the data
-//                bindingElementNamespaceContext = Dom4jUtils.getNamespaceContextNoDefault(bindingElement);
-//            }
-//        } else {
-//            // No need for the data
-//            bindingElementNamespaceContext = null;
-//        }
+        final Map bindingElementNamespaceContext = containingDocument.getStaticState().getNamespaceMappings(bindingElement);
         pushBinding(pipelineContext, ref, context, nodeset, model, bind, bindingElement, bindingElementNamespaceContext);
     }
 
@@ -395,7 +370,7 @@ public class XFormsContextStack {
     private void pushTemporaryContext(Item contextItem) {
         final BindingContext currentBindingContext = getCurrentBindingContext();
         contextStack.push(new BindingContext(currentBindingContext, currentBindingContext.getModel(),
-                currentBindingContext.getNodeset(), currentBindingContext.getPosition(), currentBindingContext.getIdForContext(),
+                currentBindingContext.getNodeset(), currentBindingContext.getPosition(), currentBindingContext.getElementId(),
                 false, currentBindingContext.getControlElement(), currentBindingContext.getLocationData(),
                 false, contextItem));
     }
@@ -408,7 +383,7 @@ public class XFormsContextStack {
     public void pushIteration(int currentPosition) {
         final BindingContext currentBindingContext = getCurrentBindingContext();
         contextStack.push(new BindingContext(currentBindingContext, currentBindingContext.getModel(),
-                currentBindingContext.getNodeset(), currentPosition, currentBindingContext.getIdForContext(), true, null, currentBindingContext.getLocationData(),
+                currentBindingContext.getNodeset(), currentPosition, currentBindingContext.getElementId(), true, null, currentBindingContext.getLocationData(),
                 false, currentBindingContext.getSingleItem()));
     }
 
@@ -548,7 +523,7 @@ public class XFormsContextStack {
             final BindingContext currentBindingContext = (BindingContext) contextStack.get(i);
 
             final Element bindingElement = currentBindingContext.getControlElement();
-            final String repeatIdForIteration = currentBindingContext.getIdForContext();
+            final String repeatIdForIteration = currentBindingContext.getElementId();
             if (bindingElement == null && repeatIdForIteration != null) {// NOTE: test on bindingElement == null is just to detect whether this is a repeat iteration
                 if (repeatId == null || repeatId.equals(repeatIdForIteration)) {
                     // Found binding context for relevant repeat iteration
@@ -573,7 +548,7 @@ public class XFormsContextStack {
             final BindingContext currentBindingContext = (BindingContext) contextStack.get(i);
 
             final Element bindingElement = currentBindingContext.getControlElement();
-            final String repeatIdForIteration = currentBindingContext.getIdForContext();
+            final String repeatIdForIteration = currentBindingContext.getElementId();
             if (bindingElement == null && repeatIdForIteration != null) {// NOTE: test on bindingElement == null is just to detect whether this is a repeat iteration
                 // Found binding context for relevant repeat iteration
                 return repeatIdForIteration;
@@ -596,7 +571,7 @@ public class XFormsContextStack {
             final BindingContext currentBindingContext = (BindingContext) contextStack.get(i);
 
             final Element bindingElement = currentBindingContext.getControlElement();
-            final String idForContext = currentBindingContext.getIdForContext();
+            final String idForContext = currentBindingContext.getElementId();
             if (contextId.equals(idForContext)) {
                 if (bindingElement != null && XFormsControls.groupingControls.get(bindingElement.getName()) != null) {
                     // Found matching binding context for regular grouping control
@@ -604,7 +579,7 @@ public class XFormsContextStack {
                 } else if (bindingElement == null) {
                     final BindingContext parentBindingContext = currentBindingContext.getParent();
                     if (parentBindingContext != null && parentBindingContext.getControlElement() != null
-                            && contextId.equals(parentBindingContext.getIdForContext()) && parentBindingContext.getControlElement().getName().equals("repeat")) {
+                            && contextId.equals(parentBindingContext.getElementId()) && parentBindingContext.getControlElement().getName().equals("repeat")) {
                         // Found matching repeat iteration
                         return currentBindingContext.getSingleItem();
                     }
@@ -625,8 +600,8 @@ public class XFormsContextStack {
             final BindingContext currentBindingContext = (BindingContext) contextStack.get(i);
 
             final Element bindingElement = currentBindingContext.getControlElement();
-            final String idForContext = currentBindingContext.getIdForContext();
-            if (repeatId.equals(idForContext) && bindingElement != null && bindingElement.getName().equals("repeat")) {
+            final String elementId = currentBindingContext.getElementId();
+            if (repeatId.equals(elementId) && bindingElement != null && bindingElement.getName().equals("repeat")) {
                 // Found repeat, return associated node-set
                 return currentBindingContext.getNodeset();
             }
@@ -669,19 +644,19 @@ public class XFormsContextStack {
         private XFormsModel model;
         private List nodeset;
         private int position = 1;
-        private String idForContext;
+        private String elementId;
         private boolean newBind;
         private Element controlElement;
         private LocationData locationData;
         private boolean hasOverriddenContext;
         private Item contextItem;
 
-        public BindingContext(BindingContext parent, XFormsModel model, List nodeSet, int position, String idForContext, boolean newBind, Element controlElement, LocationData locationData, boolean hasOverriddenContext, Item contextItem) {
+        public BindingContext(BindingContext parent, XFormsModel model, List nodeSet, int position, String elementId, boolean newBind, Element controlElement, LocationData locationData, boolean hasOverriddenContext, Item contextItem) {
             this.parent = parent;
             this.model = model;
             this.nodeset = nodeSet;
             this.position = position;
-            this.idForContext = idForContext;
+            this.elementId = elementId;
             this.newBind = newBind;
             this.controlElement = controlElement;
             this.locationData = (locationData != null) ? locationData : (controlElement != null) ? (LocationData) controlElement.getData() : null;
@@ -715,8 +690,8 @@ public class XFormsContextStack {
             return position;
         }
 
-        public String getIdForContext() {
-            return idForContext;
+        public String getElementId() {
+            return elementId;
         }
 
         public boolean isNewBind() {

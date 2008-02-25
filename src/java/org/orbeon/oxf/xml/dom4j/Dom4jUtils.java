@@ -39,8 +39,6 @@ import java.util.*;
  */
 public class Dom4jUtils {
 
-    public static final Namespace XSI_NAMESPACE = new Namespace
-            (XMLConstants.XSI_PREFIX, XMLConstants.XSI_URI);
 
     /**
      * 03/30/2005 d : Currently DOM4J doesn't really support read only documents.  ( No real
@@ -51,12 +49,9 @@ public class Dom4jUtils {
 
     static {
         NULL_DOCUMENT = new NonLazyUserDataDocument();
-        final NonLazyUserDataDocumentFactory fctry
-                = NonLazyUserDataDocumentFactory.getInstance(null);
-        Element nullElement = fctry.createElement("null");
-        final QName attNm = new QName
-                (XMLConstants.XSI_NIL_ATTRIBUTE, XSI_NAMESPACE);
-        nullElement.addAttribute(attNm, "true");
+        final NonLazyUserDataDocumentFactory factory = NonLazyUserDataDocumentFactory.getInstance14();
+        Element nullElement = factory.createElement("null");
+        nullElement.addAttribute(XMLConstants.XSI_NIL_QNAME, "true");
         NULL_DOCUMENT.setRootElement(nullElement);
     }
 
@@ -64,7 +59,7 @@ public class Dom4jUtils {
         final SAXParser sxPrs = XMLUtils.newSAXParser(validating, handleXInclude);
         final XMLReader xr = sxPrs.getXMLReader();
         final SAXReader sxRdr = new SAXReader(xr);
-        final NonLazyUserDataDocumentFactory fctry = NonLazyUserDataDocumentFactory.getInstance(null);
+        final NonLazyUserDataDocumentFactory fctry = NonLazyUserDataDocumentFactory.getInstance14();
         sxRdr.setDocumentFactory(fctry);
         return sxRdr;
     }
@@ -73,7 +68,7 @@ public class Dom4jUtils {
         final SAXParser sxPrs = XMLUtils.newSAXParser();
         final XMLReader xr = sxPrs.getXMLReader();
         final SAXReader sxRdr = new SAXReader(xr);
-        final NonLazyUserDataDocumentFactory fctry = NonLazyUserDataDocumentFactory.getInstance(null);
+        final NonLazyUserDataDocumentFactory fctry = NonLazyUserDataDocumentFactory.getInstance14();
         sxRdr.setDocumentFactory(fctry);
         return sxRdr;
     }
@@ -479,49 +474,43 @@ public class Dom4jUtils {
         return (qName == null) ? null : XMLUtils.buildExplodedQName(qName.getNamespaceURI(), qName.getName());
     }
 
-    public static XPath createXPath(final String exprsn) throws InvalidXPathException {
-        final NonLazyUserDataDocumentFactory fctry
-                = NonLazyUserDataDocumentFactory.getInstance(null);
-        return fctry.createXPath(exprsn);
+    public static XPath createXPath(final String expression) throws InvalidXPathException {
+        final NonLazyUserDataDocumentFactory factory = NonLazyUserDataDocumentFactory.getInstance14();
+        return factory.createXPath(expression);
     }
 
-    public static Text createText(final String txt) {
-        final NonLazyUserDataDocumentFactory fctry
-                = NonLazyUserDataDocumentFactory.getInstance(null);
-        return fctry.createText(txt);
+    public static Text createText(final String text) {
+        final NonLazyUserDataDocumentFactory factory = NonLazyUserDataDocumentFactory.getInstance14();
+        return factory.createText(text);
     }
 
     public static Element createElement(final String name) {
-        final NonLazyUserDataDocumentFactory fctry
-                = NonLazyUserDataDocumentFactory.getInstance(null);
-        return fctry.createElement(name);
+        final NonLazyUserDataDocumentFactory factory = NonLazyUserDataDocumentFactory.getInstance14();
+        return factory.createElement(name);
     }
 
     public static Element createElement(final String qualifiedName, final String namespaceURI) {
-        final NonLazyUserDataDocumentFactory fctry
-                = NonLazyUserDataDocumentFactory.getInstance(null);
-        return fctry.createElement(qualifiedName, namespaceURI);
+        final NonLazyUserDataDocumentFactory factory = NonLazyUserDataDocumentFactory.getInstance14();
+        return factory.createElement(qualifiedName, namespaceURI);
     }
 
-    public static Attribute createAttribute(final Element elt, final QName nm, final String val) {
-        final NonLazyUserDataDocumentFactory fctry
-                = NonLazyUserDataDocumentFactory.getInstance(null);
-        return fctry.createAttribute(elt, nm, val);
+    public static Attribute createAttribute(final QName qName, final String value) {
+        final NonLazyUserDataDocumentFactory factory = NonLazyUserDataDocumentFactory.getInstance14();
+        return factory.createAttribute(null, qName, value);
     }
 
-    public static Namespace createNamespace(final String pfx, final String uri) {
-        final NonLazyUserDataDocumentFactory fctry
-                = NonLazyUserDataDocumentFactory.getInstance(null);
-        return fctry.createNamespace(pfx, uri);
+    public static Namespace createNamespace(final String prefix, final String uri) {
+        final NonLazyUserDataDocumentFactory factory = NonLazyUserDataDocumentFactory.getInstance14();
+        return factory.createNamespace(prefix, uri);
     }
 
     /**
      * Return a new document with a copy of newRoot as its root.
      */
     public static Document createDocument(final Element newRoot) {
-        final Element cpy = newRoot.createCopy();
-        final NonLazyUserDataDocumentFactory fctry = NonLazyUserDataDocumentFactory.getInstance(null);
-        return fctry.createDocument(cpy);
+        final Element copy = newRoot.createCopy();
+        final NonLazyUserDataDocumentFactory factory = NonLazyUserDataDocumentFactory.getInstance14();
+        return factory.createDocument(copy);
     }
 
     /**
@@ -552,7 +541,7 @@ public class Dom4jUtils {
 
     public static Document createDocument() {
         final NonLazyUserDataDocumentFactory fctry
-                = NonLazyUserDataDocumentFactory.getInstance(null);
+                = NonLazyUserDataDocumentFactory.getInstance14();
         return fctry.createDocument();
     }
 

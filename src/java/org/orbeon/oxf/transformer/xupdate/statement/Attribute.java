@@ -34,7 +34,7 @@ public class Attribute extends Statement {
     }
 
     public Object execute(URIResolver uriResolver, Object context, VariableContextImpl variableContext, DocumentContext documentContext) {
-        org.dom4j.Attribute attribute = Dom4jUtils.createAttribute(null, qname, "");
+        org.dom4j.Attribute attribute = Dom4jUtils.createAttribute(qname, "");
         Utils.insert(getLocationData(), attribute, 0,
                 Utils.execute(uriResolver, context, variableContext, documentContext, statements));
         return Arrays.asList(new Object[] {attribute});

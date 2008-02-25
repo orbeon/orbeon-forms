@@ -21,6 +21,6 @@ import org.dom4j.io.SAXContentHandler;
 public class NonLazySAXContentHandler extends SAXContentHandler {
 
     public NonLazySAXContentHandler() {
-        super(NonLazyUserDataDocumentFactory.getInstance(null));
+        super(NonLazyUserDataDocumentFactory.getInstance14());
     }
 }

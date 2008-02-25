@@ -72,7 +72,7 @@ public class SQLProcessor extends ProcessorImpl {
     static {
         NULL_DOCUMENT = new NonLazyUserDataDocument();
         final NonLazyUserDataDocumentFactory fctry
-                = NonLazyUserDataDocumentFactory.getInstance(null);
+                = NonLazyUserDataDocumentFactory.getInstance14();
         Element nullElement = fctry.createElement("null");
         final QName attNm = new QName
                 (XMLConstants.XSI_NIL_ATTRIBUTE, XSI_NAMESPACE);

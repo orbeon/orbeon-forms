@@ -98,7 +98,7 @@ public class XFormsDocumentAnnotator extends ProcessorImpl {
                             }
 
                             // Check for duplicate ids
-                            if (ids.get(newIdAttribute) != null) // TODO: create Element to provide more info?
+                            if (ids.get(newIdAttribute) != null) // TODO: create Element to provide more location info?
                                 throw new ValidationException("Duplicate id for XForms element: " + newIdAttributeUnprefixed,
                                         new ExtendedLocationData(new LocationData(getDocumentLocator()), "analyzing control element", new String[] { "id", newIdAttributeUnprefixed }, false));
 

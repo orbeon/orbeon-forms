@@ -19,6 +19,7 @@ import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.action.XFormsActions;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
 import java.util.*;
 
@@ -65,9 +66,10 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
      *
      * @param containingElement         element possibly containing event handlers
      * @param eventNames                Map<String, String> of event name to ""
+     * @param namespacesMap             Map<String, Element> of control id to Map of namespace mappings to which to add mappings
      * @return                          Map<String, List<XFormsEventHandler>> of observer id to List of XFormsEventHandler
      */
-    public static Map extractEventHandlers(Element containingElement, Map eventNames) {
+    public static Map extractEventHandlers(Element containingElement, Map eventNames, Map namespacesMap) {
 
         // Nothing to do if there are no children elements
         final List children = containingElement.elements();
@@ -86,6 +88,13 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
                     // Found an action with ev:event attribute
                     if (eventHandlersMap == null)
                         eventHandlersMap = new HashMap();
+
+                    // Gather namespace information
+                    {
+                        final String actionId = currentElement.attributeValue("id");
+                        final Map namespaceMappings = Dom4jUtils.getNamespaceContextNoDefault(currentElement);
+                        namespacesMap.put(actionId, namespaceMappings);
+                    }
 
                     // Get observer
                     final String observerId;

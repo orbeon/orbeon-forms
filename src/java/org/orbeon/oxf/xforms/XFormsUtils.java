@@ -365,7 +365,7 @@ public class XFormsUtils {
                 if (currentNodeset != null && currentNodeset.size() > 0) {
                     final String tempResult = XPathCache.evaluateAsString(pipelineContext,
                             currentNodeset, currentBindingContext.getPosition(),
-                            valueAttribute, Dom4jUtils.getNamespaceContextNoDefault(childElement),
+                            valueAttribute, containingDocument.getStaticState().getNamespaceMappings(childElement),
                             null, XFormsContainingDocument.getFunctionLibrary(),
                             contextStack.getFunctionContext(), null,
                             (LocationData) childElement.getData());
@@ -790,6 +790,7 @@ public class XFormsUtils {
         if (attributeValue == null)
             return null;
 
+        // TODO: containingDocument.getStaticState().getNamespaceMappings(element)
         return XPathCache.evaluateAsAvt(pipelineContext, contextNode, attributeValue, Dom4jUtils.getNamespaceContextNoDefault(element),
                 variableToValueMap, functionLibrary, functionContext, null, (LocationData) element.getData());
     }

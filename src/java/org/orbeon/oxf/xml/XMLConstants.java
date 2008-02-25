@@ -104,7 +104,9 @@ public class XMLConstants {
     public static final String OPS_TYPES_URI = "http://orbeon.org/oxf/xml/datatypes";
     public static final QName OPS_XMLFRAGMENT_QNAME = new QName("xmlFragment", new Namespace("ops", OPS_TYPES_URI));
 
+    public static final Namespace XSI_NAMESPACE = new Namespace(XSI_PREFIX, XSI_URI);
     public static final String XSI_NIL_ATTRIBUTE = "nil";
+    public static final QName XSI_NIL_QNAME = new QName(XSI_NIL_ATTRIBUTE, XSI_NAMESPACE);
 
     public static final String XSLT_PREFIX = "xsl";
     public static final String XSLT_NAMESPACE = "http://www.w3.org/1999/XSL/Transform";

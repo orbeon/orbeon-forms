@@ -722,6 +722,36 @@
                             </xml-source>
                         </li>
                         <li>
+                            <a name="xxforms-element"/>
+                            <p>
+                                <code>xxforms:element($element-name as xs:string) as element()</code>.
+                            </p>
+                            <p>
+                                The <code>xxforms:element()</code> function returns a new XML element with the qualified
+                                name provided. If the name has a prefix, it is resolved using in-scope namespaces.
+                            </p>
+                            <xml-source show-namespaces="false">
+                                <comment> Insert an element called "value" as a child of element "section" </comment>
+                                <xforms:insert context="section" origin="xxforms:element('value')"/>
+                            </xml-source>
+                        </li>
+                        <li>
+                            <a name="xxforms-attribute"/>
+                            <p>
+                                <code>xxforms:attribute($element-name as xs:string) as attribute()</code>.
+                            </p>
+                            <p>
+                                The <code>xxforms:attribute()</code> function returns a new XML attribute with the
+                                qualified name provided. If the name has a prefix, it is resolved using in-scope
+                                namespaces.
+                            </p>
+                            <xml-source show-namespaces="false">
+                                <comment> Add an attribute called "id" to element "section" </comment>
+                                <xforms:insert context="section" origin="xxforms:attribute('id')"/>
+                            </xml-source>
+                        </li>
+
+                        <li>
                             <a name="xxforms-repeat-current"/>
                             <p>
                                 <code>xxforms:repeat-current($repeat-id as xs:string?) as node()</code>.

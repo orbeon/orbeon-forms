@@ -694,7 +694,7 @@ public class InstanceData {
             }
             // Add attribute
             if (attribute == null) {
-                attribute = Dom4jUtils.createAttribute(element, qName, currentValue);
+                attribute = Dom4jUtils.createAttribute(qName, currentValue);
                 element.add(attribute);
             } else {
                 attribute.setValue(currentValue);

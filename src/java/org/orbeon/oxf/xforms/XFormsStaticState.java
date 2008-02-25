@@ -75,6 +75,7 @@ public class XFormsStaticState {
     private Map eventNamesMap;              // Map<String, String> of event name to ""
     private Map eventHandlersMap;           // Map<String, List<XFormsEventHandler>> of control id to event handlers
     private Map controlElementsMap;         // Map<String, Element> of control id to control Element
+    private Map namespacesMap;              // Map<String, Map<String, String>> of control id to Map of namespace mappings
     private Map defaultRepeatIdToIndex;     // Map<String, Integer> of repeat id to default repeat index
     private Map repeatChildrenMap;          // Map<String, List> of repeat id to List of children
     private Map repeatDescendantsMap;       // Map<String, List> of repeat id to List of descendants (computed on demand)
@@ -354,6 +355,39 @@ public class XFormsStaticState {
         return controlElementsMap;
     }
 
+    /**
+     * Return the namespace mappings for a given XForms element (xforms:* or xxforms:*).
+     *
+     * @param elementId     XForms element id
+     * @return              Map<String, String> or null (should not be null for an existing XForms element)
+     */
+    public Map getNamespaceMappings(String elementId) {
+        return (Map) namespacesMap.get(elementId);
+    }
+
+    /**
+     * Return the namespace mappings for a given element. If the element does not have an id, or if the mapping is not
+     * cached, compute the mapping on the fly. Note that in this case, the resulting mapping is not added to the cache
+     * as the mapping is considered transient and not sharable among pages.
+     *
+     * @param element       Element to get namsepace mapping for
+     * @return              Map<String, String>
+     */
+    public Map getNamespaceMappings(Element element) {
+        final String id = element.attributeValue("id");
+        if (id != null) {
+            // There is an id attribute
+            final Map cachedMap = getNamespaceMappings(id);
+            if (cachedMap != null)
+                return cachedMap;
+            else
+                return Dom4jUtils.getNamespaceContextNoDefault(element);
+        } else {
+            // No id attribute
+            return Dom4jUtils.getNamespaceContextNoDefault(element);
+        }
+    }
+
     public Map getDefaultRepeatIdToIndex() {
         return defaultRepeatIdToIndex;
     }
@@ -403,6 +437,7 @@ public class XFormsStaticState {
             eventNamesMap = new HashMap();
             eventHandlersMap = new HashMap();
             controlElementsMap = new HashMap();
+            namespacesMap = new HashMap();
             defaultRepeatIdToIndex = new HashMap();
             repeatChildrenMap = new HashMap();
             repeatDescendantsMap = new HashMap();
@@ -420,11 +455,15 @@ public class XFormsStaticState {
 
                     // Gather event handlers
                     // Map<String, List<XFormsEventHandler>> of observer id to List of XFormsEventHandler
-                    final Map controlEventHandlersMap = XFormsEventHandlerImpl.extractEventHandlers(controlElement, eventNamesMap);
+                    final Map controlEventHandlersMap = XFormsEventHandlerImpl.extractEventHandlers(controlElement, eventNamesMap, namespacesMap);
                     mergeEventHandlers(eventHandlersMap, controlEventHandlersMap);
 
                     // Gather static control
                     controlElementsMap.put(controlId, controlElement);
+
+                    // Gather namespace information
+                    final Map namespaceMappings = Dom4jUtils.getNamespaceContextNoDefault(controlElement);
+                    namespacesMap.put(controlId, namespaceMappings);
 
                     // Gather xforms:repeat information
                     if (controlName.equals("repeat")) {
@@ -492,19 +531,39 @@ public class XFormsStaticState {
 
             // Iterate over models
             for (Iterator i = getModelDocuments().iterator(); i.hasNext();) {
-                final Document modelDocument = (Document) i.next();
-                final Element modelElement = modelDocument.getRootElement();
 
-                final Map modelEventHandlers = XFormsEventHandlerImpl.extractEventHandlers(modelElement, eventNamesMap);
+                final Element modelElement; {
+                    final Document modelDocument = (Document) i.next();
+                    modelElement = modelDocument.getRootElement();
+                }
+
+                // Gather model namespace mappings
+                {
+                    final String modelId = modelElement.attributeValue("id");
+                    final Map modelNamespaceMappings = Dom4jUtils.getNamespaceContextNoDefault(modelElement);
+                    namespacesMap.put(modelId, modelNamespaceMappings);
+                }
+
+                final Map modelEventHandlers = XFormsEventHandlerImpl.extractEventHandlers(modelElement, eventNamesMap, namespacesMap);
                 mergeEventHandlers(eventHandlersMap, modelEventHandlers);
 
                 // Iterate over model submissions
                 for (Iterator j = modelElement.elements(new QName("submission", XFormsConstants.XFORMS_NAMESPACE)).iterator(); j.hasNext();) {
                     final Element currentSubmissionElement = (Element) j.next();
 
-                    final Map submissionEventHandlers = XFormsEventHandlerImpl.extractEventHandlers(currentSubmissionElement, eventNamesMap);
+                    // Gather submission namespace mappings
+                    {
+                        final String submissionId = currentSubmissionElement.attributeValue("id");
+                        final Map submissionNamespaceMappings = Dom4jUtils.getNamespaceContextNoDefault(currentSubmissionElement);
+                        namespacesMap.put(submissionId, submissionNamespaceMappings);
+                    }
+
+                    final Map submissionEventHandlers = XFormsEventHandlerImpl.extractEventHandlers(currentSubmissionElement, eventNamesMap, namespacesMap);
                     mergeEventHandlers(eventHandlersMap, submissionEventHandlers);
                 }
+
+                // Iterate over binds to gather namespace mappings
+                // TODO
             }
             isAnalyzed = true;
             return true;

@@ -82,8 +82,7 @@ public class TDOM4JInputStreamInterpreter extends TInputStreamInterpreter {
             
 			// Make sure the document and its children are thread safe by using our
                         // document factory.
-			final NonLazyUserDataDocumentFactory fctry 
-                            = NonLazyUserDataDocumentFactory.getInstance( null );
+			final NonLazyUserDataDocumentFactory fctry = NonLazyUserDataDocumentFactory.getInstance14();
 			saxReader.setDocumentFactory( fctry );
  
 			// Invoke the parsing and obtain the Document instance

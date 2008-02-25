@@ -18,14 +18,16 @@ import org.dom4j.tree.DefaultDocument;
 /**
  * @see NonLazyUserDataElement
  */
-public class NonLazyUserDataDocument extends DefaultDocument { 
-    
+public class NonLazyUserDataDocument extends DefaultDocument {
+
     public NonLazyUserDataDocument() {
     }
-    public NonLazyUserDataDocument( final NonLazyUserDataElement root ) {    
-        super( root );
+
+    public NonLazyUserDataDocument(final NonLazyUserDataElement root) {
+        super(root);
     }
+
     protected org.dom4j.DocumentFactory getDocumentFactory() {
-        return NonLazyUserDataDocumentFactory.getInstance( null );
+        return NonLazyUserDataDocumentFactory.getInstance14();
     }
 }

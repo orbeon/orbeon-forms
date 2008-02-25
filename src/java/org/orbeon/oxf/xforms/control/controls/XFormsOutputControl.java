@@ -25,7 +25,6 @@ import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xml.ForwardingContentHandler;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.saxon.om.NodeInfo;
 import org.xml.sax.Attributes;
@@ -33,7 +32,7 @@ import org.xml.sax.SAXException;
 
 import java.util.List;
 
-/**
+    /**
  * Represents an xforms:output control.
  */
 public class XFormsOutputControl extends XFormsValueControl {
@@ -79,7 +78,7 @@ public class XFormsOutputControl extends XFormsValueControl {
                 
                 rawValue = XPathCache.evaluateAsString(pipelineContext,
                         currentNodeset, bindingContext.getPosition(),
-                        valueAttribute, Dom4jUtils.getNamespaceContextNoDefault(getControlElement()), null,
+                        valueAttribute, containingDocument.getStaticState().getNamespaceMappings(getControlElement()), null,
                         XFormsContainingDocument.getFunctionLibrary(), getContextStack().getFunctionContext(), null, getLocationData());
 
 //                if (isTest) {

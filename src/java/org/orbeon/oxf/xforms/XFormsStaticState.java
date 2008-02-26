@@ -13,21 +13,28 @@
  */
 package org.orbeon.oxf.xforms;
 
+import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.Element;
-import org.dom4j.Attribute;
 import org.dom4j.QName;
+import org.dom4j.io.DocumentSource;
+import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.oxf.util.UUIDUtils;
+import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
+import org.orbeon.oxf.xforms.event.XFormsEventHandlerImpl;
+import org.orbeon.oxf.xforms.processor.XFormsNamespaceExtractorContentHandler;
+import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.resources.OXFProperties;
-import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
-import org.orbeon.oxf.xforms.event.XFormsEventHandlerImpl;
 import org.orbeon.saxon.om.FastStringBuffer;
 
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.sax.SAXResult;
 import java.util.*;
 
 /**
@@ -88,7 +95,21 @@ public class XFormsStaticState {
      * @param encodedStaticState    encoded static state
      */
     public XFormsStaticState(PipelineContext pipelineContext, String encodedStaticState) {
-        this(XFormsUtils.decodeXML(pipelineContext, encodedStaticState), encodedStaticState);
+
+        // Parse document
+        final Document staticStateDocument = XFormsUtils.decodeXML(pipelineContext, encodedStaticState);
+
+        // Compute namespace mappings
+        final Map namespacesMap = new HashMap();
+        try {
+            final Transformer identity = TransformerUtils.getIdentityTransformer();
+            identity.transform(new DocumentSource(staticStateDocument), new SAXResult(new XFormsNamespaceExtractorContentHandler(namespacesMap)));
+        } catch (TransformerException e) {
+            throw new OXFException(e);
+        }
+
+        // Initialize
+        initialize(staticStateDocument, encodedStaticState, namespacesMap);
     }
     
 
@@ -96,15 +117,19 @@ public class XFormsStaticState {
      * Create static state object from a Document.
      *
      * @param staticStateDocument   Document containing the static state
+     * @param namespacesMap         Map<String, Map<String, String>> of control id to Map of namespace mappings
      */
-    public XFormsStaticState(Document staticStateDocument) {
-        this(staticStateDocument, null);
+    public XFormsStaticState(Document staticStateDocument, Map namespacesMap) {
+        initialize(staticStateDocument, null, namespacesMap);
     }
 
 //    public XFormsEngineStaticState(PipelineContext pipelineContext, Document staticStateDocument, String uuid) {
 //        this.uuid = uuid;
 
-    private XFormsStaticState(Document staticStateDocument, String encodedStaticState) {
+    private void initialize(Document staticStateDocument, String encodedStaticState, Map namespacesMap) {
+
+        // Namespace mappings
+        this.namespacesMap = namespacesMap;
 
         final Element rootElement = staticStateDocument.getRootElement();
 
@@ -361,7 +386,7 @@ public class XFormsStaticState {
      * @param elementId     XForms element id
      * @return              Map<String, String> or null (should not be null for an existing XForms element)
      */
-    public Map getNamespaceMappings(String elementId) {
+    private Map getNamespaceMappings(String elementId) {
         return (Map) namespacesMap.get(elementId);
     }
 
@@ -378,12 +403,15 @@ public class XFormsStaticState {
         if (id != null) {
             // There is an id attribute
             final Map cachedMap = getNamespaceMappings(id);
-            if (cachedMap != null)
+            if (cachedMap != null) {
                 return cachedMap;
-            else
+            } else {
+//                XFormsContainingDocument.logDebugStatic("static state", "namespace mappings not cached", new String[] { "element", Dom4jUtils.elementToString(element) });
                 return Dom4jUtils.getNamespaceContextNoDefault(element);
+            }
         } else {
             // No id attribute
+//            XFormsContainingDocument.logDebugStatic("static state", "namespace mappings not cached", new String[] { "element", Dom4jUtils.elementToString(element) });
             return Dom4jUtils.getNamespaceContextNoDefault(element);
         }
     }
@@ -437,7 +465,6 @@ public class XFormsStaticState {
             eventNamesMap = new HashMap();
             eventHandlersMap = new HashMap();
             controlElementsMap = new HashMap();
-            namespacesMap = new HashMap();
             defaultRepeatIdToIndex = new HashMap();
             repeatChildrenMap = new HashMap();
             repeatDescendantsMap = new HashMap();
@@ -455,15 +482,11 @@ public class XFormsStaticState {
 
                     // Gather event handlers
                     // Map<String, List<XFormsEventHandler>> of observer id to List of XFormsEventHandler
-                    final Map controlEventHandlersMap = XFormsEventHandlerImpl.extractEventHandlers(controlElement, eventNamesMap, namespacesMap);
+                    final Map controlEventHandlersMap = XFormsEventHandlerImpl.extractEventHandlers(controlElement, eventNamesMap);
                     mergeEventHandlers(eventHandlersMap, controlEventHandlersMap);
 
                     // Gather static control
                     controlElementsMap.put(controlId, controlElement);
-
-                    // Gather namespace information
-                    final Map namespaceMappings = Dom4jUtils.getNamespaceContextNoDefault(controlElement);
-                    namespacesMap.put(controlId, namespaceMappings);
 
                     // Gather xforms:repeat information
                     if (controlName.equals("repeat")) {
@@ -537,33 +560,16 @@ public class XFormsStaticState {
                     modelElement = modelDocument.getRootElement();
                 }
 
-                // Gather model namespace mappings
-                {
-                    final String modelId = modelElement.attributeValue("id");
-                    final Map modelNamespaceMappings = Dom4jUtils.getNamespaceContextNoDefault(modelElement);
-                    namespacesMap.put(modelId, modelNamespaceMappings);
-                }
-
-                final Map modelEventHandlers = XFormsEventHandlerImpl.extractEventHandlers(modelElement, eventNamesMap, namespacesMap);
+                final Map modelEventHandlers = XFormsEventHandlerImpl.extractEventHandlers(modelElement, eventNamesMap);
                 mergeEventHandlers(eventHandlersMap, modelEventHandlers);
 
                 // Iterate over model submissions
                 for (Iterator j = modelElement.elements(new QName("submission", XFormsConstants.XFORMS_NAMESPACE)).iterator(); j.hasNext();) {
                     final Element currentSubmissionElement = (Element) j.next();
 
-                    // Gather submission namespace mappings
-                    {
-                        final String submissionId = currentSubmissionElement.attributeValue("id");
-                        final Map submissionNamespaceMappings = Dom4jUtils.getNamespaceContextNoDefault(currentSubmissionElement);
-                        namespacesMap.put(submissionId, submissionNamespaceMappings);
-                    }
-
-                    final Map submissionEventHandlers = XFormsEventHandlerImpl.extractEventHandlers(currentSubmissionElement, eventNamesMap, namespacesMap);
+                    final Map submissionEventHandlers = XFormsEventHandlerImpl.extractEventHandlers(currentSubmissionElement, eventNamesMap);
                     mergeEventHandlers(eventHandlersMap, submissionEventHandlers);
                 }
-
-                // Iterate over binds to gather namespace mappings
-                // TODO
             }
             isAnalyzed = true;
             return true;

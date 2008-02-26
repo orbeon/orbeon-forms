@@ -24,6 +24,7 @@ import org.orbeon.oxf.xml.NamespaceCleanupContentHandler;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.resources.OXFProperties;
+import org.orbeon.saxon.om.FastStringBuffer;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
@@ -594,6 +595,53 @@ public class Dom4jUtils {
                 // Ignore as we don't need other node types for now
             }
         }
+    }
+
+    public static String elementToString(Element element) {
+        // Open start tag
+        final FastStringBuffer sb = new FastStringBuffer("<");
+        sb.append(element.getQualifiedName());
+
+        // Attributes if any
+        for (Iterator i = element.attributeIterator(); i.hasNext();) {
+            final Attribute currentAttribute = (Attribute) i.next();
+
+            sb.append(' ');
+            sb.append(currentAttribute.getQualifiedName());
+            sb.append("=\"");
+            sb.append(currentAttribute.getValue());
+            sb.append('\"');
+        }
+
+        // Close start tag
+        sb.append('>');
+
+        if (!element.elements().isEmpty()) {
+            // Mixed content
+            final Object firstChild = element.content().get(0);
+            if (firstChild instanceof Text) {
+                sb.append(((Text) firstChild).getText());
+            }
+            sb.append("[...]");
+        } else {
+            // Not mixed content
+            sb.append(element.getText());
+        }
+
+        // Close element with end tag
+        sb.append("</");
+        sb.append(element.getQualifiedName());
+        sb.append('>');
+
+        return sb.toString();
+    }
+
+    public static String attributeToString(Attribute attribute) {
+        final FastStringBuffer sb = new FastStringBuffer(attribute.getQualifiedName());
+        sb.append("=\"");
+        sb.append(attribute.getValue());
+        sb.append('\"');
+        return sb.toString();
     }
 
     public static interface VisitorListener {

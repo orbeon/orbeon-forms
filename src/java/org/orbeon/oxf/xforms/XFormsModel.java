@@ -368,8 +368,10 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                 public void handleNode(NodeInfo nodeInfo) {
                     // Compute calculated value
                     try {
-                        final String stringResult = XPathCache.evaluateAsString(pipelineContext, nodeInfo, modelBind.getCalculate(), modelBind.getNamespaceMap(), null,
-                            XFormsContainingDocument.getFunctionLibrary(), contextStack.getFunctionContext(), modelBind.getLocationData().getSystemID(), modelBind.getLocationData());
+                        final String stringResult = XPathCache.evaluateAsString(pipelineContext, nodeInfo, modelBind.getCalculate(),
+                                containingDocument.getNamespaceMappings(modelBind.getBindElement()), null,
+                                XFormsContainingDocument.getFunctionLibrary(), contextStack.getFunctionContext(),
+                                modelBind.getLocationData().getSystemID(), modelBind.getLocationData());
 
                         // TODO: Detect if we have already handled this node and dispatch xforms-binding-exception
                         XFormsSetvalueAction.doSetValue(pipelineContext, containingDocument, nodeInfo, stringResult, null, true);
@@ -396,7 +398,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                         // Get MIP value
                         final String xpath = "boolean(" + modelBind.getRequired() + ")";
                         final boolean required = ((Boolean) XPathCache.evaluateSingle(pipelineContext,
-                            nodeInfo, xpath, modelBind.getNamespaceMap(), null,
+                            nodeInfo, xpath, containingDocument.getNamespaceMappings(modelBind.getBindElement()), null,
                             XFormsContainingDocument.getFunctionLibrary(), contextStack.getFunctionContext(), modelBind.getLocationData().getSystemID(), modelBind.getLocationData())).booleanValue();
 
                         // Update node with MIP value
@@ -417,7 +419,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                     try {
                         final String xpath = "boolean(" + modelBind.getRelevant() + ")";
                         boolean relevant = ((Boolean) XPathCache.evaluateSingle(pipelineContext,
-                            nodeInfo, xpath, modelBind.getNamespaceMap(), null,
+                            nodeInfo, xpath, containingDocument.getNamespaceMappings(modelBind.getBindElement()), null,
                             XFormsContainingDocument.getFunctionLibrary(), contextStack.getFunctionContext(), modelBind.getLocationData().getSystemID(), modelBind.getLocationData())).booleanValue();
                         // Mark node
                         InstanceData.setRelevant(nodeInfo, relevant);
@@ -438,7 +440,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                     try {
                         final String xpath = "boolean(" + modelBind.getReadonly() + ")";
                         boolean readonly = ((Boolean) XPathCache.evaluateSingle(pipelineContext,
-                            nodeInfo, xpath, modelBind.getNamespaceMap(), null,
+                            nodeInfo, xpath, containingDocument.getNamespaceMappings(modelBind.getBindElement()), null,
                             XFormsContainingDocument.getFunctionLibrary(), contextStack.getFunctionContext(), modelBind.getLocationData().getSystemID(), modelBind.getLocationData())).booleanValue();
 
                         // Mark node
@@ -468,7 +470,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                     try {
                         final String xpath = "boolean(" + modelBind.getXXFormsExternalize() + ")";
                         boolean xxformsExternalize = ((Boolean) XPathCache.evaluateSingle(pipelineContext,
-                            nodeInfo, xpath, modelBind.getNamespaceMap(), null,
+                            nodeInfo, xpath, containingDocument.getNamespaceMappings(modelBind.getBindElement()), null,
                             XFormsContainingDocument.getFunctionLibrary(), contextStack.getFunctionContext(), modelBind.getLocationData().getSystemID(), modelBind.getLocationData())).booleanValue();
 
                         // Mark node
@@ -495,7 +497,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                         // Get MIP value
                         final String xpath = "boolean(" + modelBind.getConstraint() + ")";
                         final Boolean valid = (Boolean) XPathCache.evaluateSingle(pipelineContext,
-                            nodeInfo, xpath, modelBind.getNamespaceMap(), null,
+                            nodeInfo, xpath, containingDocument.getNamespaceMappings(modelBind.getBindElement()), null,
                             XFormsContainingDocument.getFunctionLibrary(), contextStack.getFunctionContext(), modelBind.getLocationData().getSystemID(), modelBind.getLocationData());
 
                         // Update node with MIP value
@@ -517,9 +519,10 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                 xpathEvaluator = new XPathEvaluator();
                 // NOTE: Not sure declaring namespaces here is necessary just to perform the cast
                 final IndependentContext context = xpathEvaluator.getStaticContext();
-                for (Iterator j = modelBind.getNamespaceMap().keySet().iterator(); j.hasNext();) {
+                final Map namespaceMap = containingDocument.getNamespaceMappings(modelBind.getBindElement());
+                for (Iterator j = namespaceMap.keySet().iterator(); j.hasNext();) {
                     final String prefix = (String) j.next();
-                    context.declareNamespace(prefix, (String) modelBind.getNamespaceMap().get(prefix));
+                    context.declareNamespace(prefix, (String) namespaceMap.get(prefix));
                 }
             } catch (Exception e) {
                 throw ValidationException.wrapException(e, modelBind.getLocationData());
@@ -537,7 +540,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                             final int prefixPosition = typeQName.indexOf(':');
                             if (prefixPosition > 0) {
                                 final String prefix = typeQName.substring(0, prefixPosition);
-                                typeNamespaceURI = (String) modelBind.getNamespaceMap().get(prefix);
+                                typeNamespaceURI = (String) containingDocument.getNamespaceMappings(modelBind.getBindElement()).get(prefix);
                                 if (typeNamespaceURI == null)
                                     throw new ValidationException("Namespace not declared for prefix '" + prefix + "'",
                                             modelBind.getLocationData());
@@ -713,7 +716,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                         if (o2.isSameNodeInfo(contextNode)) {
                             // Found one
                             return XPathCache.evaluate(pipelineContext, contextNode, currentModelBind.getNodeset(),
-                                    currentModelBind.getNamespaceMap(), null, XFormsContainingDocument.getFunctionLibrary(),
+                                    containingDocument.getNamespaceMappings(currentModelBind.getBindElement()), null, XFormsContainingDocument.getFunctionLibrary(),
                                     contextStack.getFunctionContext(), currentModelBind.getLocationData().getSystemID(), currentModelBind.getLocationData());
                         }
                     }
@@ -734,7 +737,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                     final NodeInfo currentNode = (NodeInfo) j.next();
                     // Execute XPath expresssion
                     currentModelBindResults.addAll(XPathCache.evaluate(pipelineContext, currentNode, currentModelBind.getNodeset(),
-                            currentModelBind.getNamespaceMap(), null, XFormsContainingDocument.getFunctionLibrary(),
+                            containingDocument.getNamespaceMappings(currentModelBind.getBindElement()), null, XFormsContainingDocument.getFunctionLibrary(),
                             contextStack.getFunctionContext(), currentModelBind.getLocationData().getSystemID(), currentModelBind.getLocationData()));
                 }
 

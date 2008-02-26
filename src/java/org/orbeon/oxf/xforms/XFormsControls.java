@@ -196,7 +196,8 @@ public class XFormsControls {
      */
     public void initializeState(PipelineContext pipelineContext, Element divsElement, Element repeatIndexesElement, boolean evaluateItemsets) {
 
-        if (containingDocument.getStaticState().getControlsDocument() != null) {
+        final XFormsStaticState staticState = containingDocument.getStaticState();
+        if (staticState != null && staticState.getControlsDocument() != null) {
 
             if (initialized) {
                 // Use existing controls state

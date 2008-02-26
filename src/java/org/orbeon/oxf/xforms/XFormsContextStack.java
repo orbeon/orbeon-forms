@@ -14,19 +14,18 @@
 package org.orbeon.oxf.xforms;
 
 import org.dom4j.Element;
-import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
-import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.RepeatIterationControl;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
-import org.orbeon.oxf.util.XPathCache;
-import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
+import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.Item;
+import org.orbeon.saxon.om.NodeInfo;
 
 import java.util.*;
 
@@ -167,7 +166,7 @@ public class XFormsContextStack {
 
             // Get mappings only if an XPath expression must be computed
             final Map bindingElementNamespaceContext =
-                    (ref != null || nodeset != null || context != null) ? containingDocument.getStaticState().getNamespaceMappings(bindingElement) : null;
+                    (ref != null || nodeset != null || context != null) ? containingDocument.getNamespaceMappings(bindingElement) : null;
 
             pushBinding(pipelineContext, ref, context, nodeset, modelId, bindId, bindingElement, bindingElementNamespaceContext);
         } else {
@@ -212,7 +211,7 @@ public class XFormsContextStack {
             model = XFormsUtils.namespaceId(containingDocument, bindingElement.attributeValue("model"));
         final String bind = XFormsUtils.namespaceId(containingDocument, bindingElement.attributeValue("bind"));
 
-        final Map bindingElementNamespaceContext = containingDocument.getStaticState().getNamespaceMappings(bindingElement);
+        final Map bindingElementNamespaceContext = containingDocument.getNamespaceMappings(bindingElement);
         pushBinding(pipelineContext, ref, context, nodeset, model, bind, bindingElement, bindingElementNamespaceContext);
     }
 

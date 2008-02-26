@@ -148,7 +148,7 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
 
         } else {
             // Format value according to format attribute
-            final Map prefixToURIMap = containingDocument.getStaticState().getNamespaceMappings(getControlElement());
+            final Map prefixToURIMap = containingDocument.getNamespaceMappings(getControlElement());
 
             final NodeInfo boundNode = getBoundNode();
             if (boundNode == null) {

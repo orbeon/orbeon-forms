@@ -43,7 +43,6 @@ import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
 import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.functions.FunctionLibrary;
 import org.orbeon.saxon.om.DocumentInfo;
-import org.orbeon.saxon.om.FastStringBuffer;
 import org.orbeon.saxon.om.NodeInfo;
 
 import javax.xml.transform.Transformer;
@@ -1042,7 +1041,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                     if (!valid && XFormsServer.logger.isDebugEnabled()) {
                         containingDocument.logDebug("submission", "found invalid element",
-                            new String[] { "element name", elementToString(element) });
+                            new String[] { "element name", Dom4jUtils.elementToString(element) });
                     }
                 }
 
@@ -1053,7 +1052,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                     if (!valid && XFormsServer.logger.isDebugEnabled()) {
                         containingDocument.logDebug("submission", "found invalid attribute",
-                            new String[] { "attribute name", attributeToString(attribute), "parent element", elementToString(attribute.getParent()) });
+                            new String[] { "attribute name", Dom4jUtils.attributeToString(attribute), "parent element", Dom4jUtils.elementToString(attribute.getParent()) });
                     }
                 }
 
@@ -1076,53 +1075,6 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
             });
         }
         return instanceSatisfiesValidRequired[0];
-    }
-
-    private static String elementToString(Element element) {
-        // Open start tag
-        final FastStringBuffer sb = new FastStringBuffer("<");
-        sb.append(element.getQualifiedName());
-
-        // Attributes if any
-        for (Iterator i = element.attributeIterator(); i.hasNext();) {
-            final Attribute currentAttribute = (Attribute) i.next();
-
-            sb.append(' ');
-            sb.append(currentAttribute.getQualifiedName());
-            sb.append("=\"");
-            sb.append(currentAttribute.getValue());
-            sb.append('\"');
-        }
-
-        // Close start tag
-        sb.append('>');
-
-        if (!element.elements().isEmpty()) {
-            // Mixed content
-            final Object firstChild = element.content().get(0);
-            if (firstChild instanceof Text) {
-                sb.append(((Text) firstChild).getText());
-            }
-            sb.append("[...]");
-        } else {
-            // Not mixed content
-            sb.append(element.getText());
-        }
-
-        // Close element with end tag
-        sb.append("</");
-        sb.append(element.getQualifiedName());
-        sb.append('>');
-
-        return sb.toString();
-    }
-
-    private static String attributeToString(Attribute attribute) {
-        final FastStringBuffer sb = new FastStringBuffer(attribute.getQualifiedName());
-        sb.append("=\"");
-        sb.append(attribute.getValue());
-        sb.append('\"');
-        return sb.toString();
     }
 
     private XFormsSubmitErrorEvent createErrorEvent(ConnectionResult connectionResult, ErrorType errorType) throws IOException {

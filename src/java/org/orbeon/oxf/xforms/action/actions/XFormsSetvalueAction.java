@@ -46,7 +46,7 @@ public class XFormsSetvalueAction extends XFormsAction {
         final String valueToSet;
         if (value != null) {
             // Value to set is computed with an XPath expression
-            final Map namespaceContext = containingDocument.getStaticState().getNamespaceMappings(actionElement);
+            final Map namespaceContext = containingDocument.getNamespaceMappings(actionElement);
 
             final List currentNodeset;
             {

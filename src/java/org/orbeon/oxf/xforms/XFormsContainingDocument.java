@@ -306,6 +306,13 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         return (xformsStaticState == null) ? legacyContainerNamespace : xformsStaticState.getContainerNamespace();
     }
 
+    public Map getNamespaceMappings(Element element) {
+        if (xformsStaticState != null)
+            return xformsStaticState.getNamespaceMappings(element);
+        else // should happen only with the legacy XForms engine
+            return Dom4jUtils.getNamespaceContextNoDefault(element);
+    }
+
     /**
      * Return external-events configuration attribute.
      */
@@ -1118,6 +1125,10 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
 
     public void logDebug(String type, String message, String[] parameters) {
         log(Level.DEBUG, logIndentLevel, type, message, parameters);
+    }
+
+    public static void logDebugStatic(String type, String message) {
+        logDebugStatic(null, type, message);
     }
 
     public static void logDebugStatic(String type, String message, String[] parameters) {

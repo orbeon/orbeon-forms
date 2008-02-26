@@ -229,7 +229,7 @@ public class XFormsActionInterpreter {
     public void pushIterateAttribute(PipelineContext pipelineContext, Element actionElement, String iterateAttribute) {
         final String contextAttribute = actionElement.attributeValue("context");
         final String modelAttribute = actionElement.attributeValue("model");
-        contextStack.pushBinding(pipelineContext, null, contextAttribute, iterateAttribute, modelAttribute, null, actionElement, containingDocument.getStaticState().getNamespaceMappings(actionElement));
+        contextStack.pushBinding(pipelineContext, null, contextAttribute, iterateAttribute, modelAttribute, null, actionElement, containingDocument.getNamespaceMappings(actionElement));
     }
 
     private boolean evaluateCondition(PipelineContext pipelineContext, Element actionElement,
@@ -262,7 +262,7 @@ public class XFormsActionInterpreter {
 
         final List conditionResult = XPathCache.evaluate(pipelineContext,
                 contextNodeset, contextPosition, "boolean(" + conditionAttribute + ")",
-            containingDocument.getStaticState().getNamespaceMappings(actionElement), null, XFormsContainingDocument.getFunctionLibrary(),
+            containingDocument.getNamespaceMappings(actionElement), null, XFormsContainingDocument.getFunctionLibrary(),
             contextStack.getFunctionContext(), null, (LocationData) actionElement.getData());
 
         if (!((Boolean) conditionResult.get(0)).booleanValue()) {

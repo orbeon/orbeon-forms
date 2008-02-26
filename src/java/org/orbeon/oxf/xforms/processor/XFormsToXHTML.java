@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2005 Orbeon, Inc.
+ *  Copyright (C) 2005-2008 Orbeon, Inc.
  *
  *  This program is free software; you can redistribute it and/or modify it under the terms of the
  *  GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -68,6 +68,7 @@ public class XFormsToXHTML extends ProcessorImpl {
 
     public XFormsToXHTML() {
         addInputInfo(new ProcessorInputOutputInfo(INPUT_ANNOTATED_DOCUMENT));
+        addInputInfo(new ProcessorInputOutputInfo("namespace")); // This input ensures that we depend on a portlet namespace
         addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DOCUMENT));
     }
 
@@ -142,18 +143,22 @@ public class XFormsToXHTML extends ProcessorImpl {
     //                            ,new SAXLoggerProcessor.DebugContentHandler()
                         }));
 
-                        // Read the input
-                        readInputAsSAX(pipelineContext, processorInput, annotatedSAXStore);
+                        // Read the input through the annotator and gather namespace mappings
+                        final Map namespaceMappings = new HashMap();
+                        readInputAsSAX(pipelineContext, processorInput, new XFormsDocumentAnnotatorContentHandler(annotatedSAXStore, externalContext, namespaceMappings));
 
                         // Get the results
                         final Document staticStateDocument = documentResult.getDocument();
+
+//                        XFormsContainingDocument.logDebugStatic("XForms to XHTML", "static state", new String[] { "document", Dom4jUtils.domToString(staticStateDocument) });
+
                         // TODO: Digest not used at this point
     //                    final String digest = Base64.encode(digestContentHandler.getResult());
     //                    if (XFormsServer.logger.isDebugEnabled())
     //                        XFormsServer.logger.debug("XForms - created digest for static state: " + digest);
     //                    xformsEngineStaticState = new XFormsStaticState(pipelineContext, staticStateDocument, digest);
 
-                        xformsStaticState = new XFormsStaticState(staticStateDocument);
+                        xformsStaticState = new XFormsStaticState(staticStateDocument, namespaceMappings);
                     }
 
                     // Create document here so we can do appropriate analysis of caching dependencies

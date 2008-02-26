@@ -75,6 +75,18 @@
                     </li>
                     <li>
                         <p>
+                            <b>Support for <code>exforms:variable</code> and <code>xxforms:variable</code> within
+                            controls.</b> [TODO: document + example]
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Support for generalized <code>context</code> attribute on XForms elements.</b> [TODO:
+                            document + example, mention XForms 1.2]
+                        </p>
+                    </li>
+                    <li>
+                        <p>
                             <b>Support for outputting log messages with <code>xforms:message</code>.</b>
                             <code>xforms:message</code> supports new level values: <code>xxforms:log-debug</code>,
                             <code>xxforms:log-info</code>, <code>xxforms:log-warn</code> and
@@ -147,6 +159,16 @@ http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=2
 </ul>
 -->
                 <ul>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=305571&amp;group_id=168&amp;atid=350207">
+                            #305571: RFE: Implement exforms:variable and xxforms:variable in controls
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306972&amp;group_id=168&amp;atid=350207">
+                            #306972: RFE: Generalized support for @context attribute on controls, actions and bindings
+                        </a>
+                    </li>
                     <li>
                         <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308660&amp;group_id=168&amp;atid=350207">
                             #308660: RFE: Extension functions to create elements and attributes by name

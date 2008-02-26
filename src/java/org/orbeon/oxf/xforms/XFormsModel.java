@@ -1448,15 +1448,15 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
             // Iterate through controls and check the nodes they are bound to
             xformsControls.visitAllControls(new XFormsControls.XFormsControlVisitorListener() {
-                public void startVisitControl(XFormsControl xformsControl) {
+                public void startVisitControl(XFormsControl control) {
 
                     // If control is not bound (e.g. xforms:group[not(@ref) and not(@bind)]) no events are sent
-                    final boolean isControlBound = xformsControl.getBindingContext().isNewBind();
+                    final boolean isControlBound = control.getBindingContext().isNewBind();
                     if (!isControlBound)
                         return;
 
                     // This can happen if control is not bound to anything
-                    final NodeInfo currentNodeInfo = xformsControl.getBoundNode();
+                    final NodeInfo currentNodeInfo = control.getBoundNode();
                     if (currentNodeInfo == null)
                         return;
 
@@ -1465,10 +1465,10 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                         return;
 
                     // Check if value has changed
-                    final boolean isValueControl = XFormsControls.isValueControl(xformsControl.getName());
+                    final boolean isValueControl = XFormsControls.isValueControl(control.getName());
                     final boolean valueChanged = isValueControl && InstanceData.isValueChanged(currentNodeInfo);
 
-                    final String effectiveId = xformsControl.getEffectiveId();
+                    final String effectiveId = control.getEffectiveId();
                     final EventSchedule existingEventSchedule = (relevantBindingEvents == null) ? null : (EventSchedule) relevantBindingEvents.get(effectiveId);
 
                     if (valueChanged && isMustSendValueChangedEvents) {
@@ -1750,9 +1750,9 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
         // "5. The user interface reflects the state of the model, which means that all forms
         // controls reflect for their corresponding bound instance data:"
-        if (xformsControls != null) {
-            xformsControls.refreshForModel(pipelineContext, this);
-        }
+//        if (xformsControls != null) {
+//            xformsControls.refreshForModel(pipelineContext, this);
+//        }
     }
 
     private void sendDefaultEventsForDisabledControl(PipelineContext pipelineContext, XFormsControl xformsControl, boolean isValueControl,
@@ -1807,20 +1807,20 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
                 // Mark all nodes to which value controls are bound
                 xformsControls.visitAllControls(new XFormsControls.XFormsControlVisitorListener() {
-                    public void startVisitControl(XFormsControl xformsControl) {
+                    public void startVisitControl(XFormsControl control) {
 
                         // Don't do anything if it's not a value control
-                        final boolean isValueControl = XFormsControls.isValueControl(xformsControl.getName());
+                        final boolean isValueControl = XFormsControls.isValueControl(control.getName());
                         if (!isValueControl)
                             return;
 
                         // If control is not bound (e.g. xforms:group[not(@ref) and not(@bind)]) no events are sent
-                        final boolean isControlBound = xformsControl.getBindingContext().isNewBind();
+                        final boolean isControlBound = control.getBindingContext().isNewBind();
                         if (!isControlBound)
                             return;
 
                         // This can happen if control is not bound to anything
-                        final NodeInfo currentNodeInfo = xformsControl.getBoundNode();
+                        final NodeInfo currentNodeInfo = control.getBoundNode();
                         if (currentNodeInfo == null)
                             return;
 

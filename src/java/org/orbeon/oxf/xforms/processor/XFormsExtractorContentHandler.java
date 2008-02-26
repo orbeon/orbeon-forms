@@ -24,9 +24,34 @@ import java.util.*;
  */
 public class XFormsExtractorContentHandler extends ForwardingContentHandler {
 
-    private final String HTML_QNAME = XMLUtils.buildExplodedQName(XMLConstants.XHTML_NAMESPACE_URI, "html");
-    private final String HEAD_QNAME = XMLUtils.buildExplodedQName(XMLConstants.XHTML_NAMESPACE_URI, "head");
-    private final String BODY_QNAME = XMLUtils.buildExplodedQName(XMLConstants.XHTML_NAMESPACE_URI, "body");
+    private static final String HTML_QNAME = XMLUtils.buildExplodedQName(XMLConstants.XHTML_NAMESPACE_URI, "html");
+    private static final String HEAD_QNAME = XMLUtils.buildExplodedQName(XMLConstants.XHTML_NAMESPACE_URI, "head");
+    private static final String BODY_QNAME = XMLUtils.buildExplodedQName(XMLConstants.XHTML_NAMESPACE_URI, "body");
+
+    private static final Map ALLOWED_XXFORMS_ELEMENTS = new HashMap();
+    static {
+        ALLOWED_XXFORMS_ELEMENTS.put("size", "");
+        ALLOWED_XXFORMS_ELEMENTS.put("script", "");
+        ALLOWED_XXFORMS_ELEMENTS.put("show", "");
+        ALLOWED_XXFORMS_ELEMENTS.put("hide", "");
+        ALLOWED_XXFORMS_ELEMENTS.put("dialog", "");
+        ALLOWED_XXFORMS_ELEMENTS.put("variable", "");
+
+        ALLOWED_XXFORMS_ELEMENTS.put("img", "");// deprecated
+    }
+
+    private static final Map ALLOWED_EXFORMS_ELEMENTS = new HashMap();
+    static {
+        ALLOWED_EXFORMS_ELEMENTS.put("variable", "");
+    }
+
+    private static final Map LABEL_HINT_HELP_ALERT_ELEMENT = new HashMap();
+    static {
+        LABEL_HINT_HELP_ALERT_ELEMENT.put("label", "");
+        LABEL_HINT_HELP_ALERT_ELEMENT.put("hint", "");
+        LABEL_HINT_HELP_ALERT_ELEMENT.put("help", "");
+        LABEL_HINT_HELP_ALERT_ELEMENT.put("alert", "");
+    }
 
     private Locator locator;
     private LocationData locationData;
@@ -212,13 +237,21 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
             // We are under /xhtml:html
             final boolean isXForms = XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri);
             final boolean isXXForms = XFormsConstants.XXFORMS_NAMESPACE_URI.equals(uri);
-            if (isXForms || isXXForms) {
+            final boolean isEXForms = XFormsConstants.EXFORMS_NAMESPACE_URI.equals(uri);
+            if (isXForms || isXXForms || isEXForms) {
                 // This is an XForms element or an extension element
 
-                if (BODY_QNAME.equals(element1) && isXXForms) {
-                    // Check that we are getting a valid xxforms:* element if used in body
-                    if (!("img".equals(localname) || "size".equals(localname) || "script".equals(localname) || "dialog".equals(localname) || "show".equals(localname) || "hide".equals(localname)))
-                        throw new ValidationException("Invalid element in XForms document: xxforms:" + localname, new LocationData(locator));
+                if (BODY_QNAME.equals(element1)) {
+                    // TODO: Move this check to XFormsDocumentAnnotator so we can make sure we check head AND body correctly?
+                    if (isXXForms) {
+                        // Check that we are getting a valid xxforms:* element if used in body
+                        if (ALLOWED_XXFORMS_ELEMENTS.get(localname) == null)
+                            throw new ValidationException("Invalid element in XForms document: xxforms:" + localname, new LocationData(locator));
+                    } else if (isEXForms) {
+                        // Check that we are getting a valid exforms:* element if used in body
+                        if (ALLOWED_EXFORMS_ELEMENTS.get(localname) == null)
+                            throw new ValidationException("Invalid element in XForms document: exforms:" + localname, new LocationData(locator));
+                    }
                 }
 
                 if (!inModel && !inControl && localname.equals("model") && HEAD_QNAME.equals(element1)) {
@@ -280,7 +313,7 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
                 }
 
                 if (inControl) {
-                    if (localname.equals("label") || localname.equals("alert") || localname.equals("hint") || localname.equals("help")) {
+                    if (LABEL_HINT_HELP_ALERT_ELEMENT.get(localname) != null) {
                         inLabelHintHelpAlert = true;
                     }
 
@@ -361,7 +394,7 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
         if (inModel) {
             super.endElement(uri, localname, qName);
         } else if (inControl && isXForms) {
-            if (localname.equals("label") || localname.equals("alert") || localname.equals("hint") || localname.equals("help")) {
+            if (LABEL_HINT_HELP_ALERT_ELEMENT.get(localname) != null) {
                 inLabelHintHelpAlert = false;
             }
             super.endElement(uri, localname, qName);

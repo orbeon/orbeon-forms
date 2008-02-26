@@ -471,11 +471,11 @@ public class XFormsStaticState {
 
             // Iterate over static controls tree
             final FastStringBuffer repeatHierarchyStringBuffer = new FastStringBuffer(1024);
-            visitAllControlStatic(new XFormsControls.ControlElementVisitorListener() {
+            visitAllControlStatic(new ControlElementVisitorListener() {
 
                 private Stack repeatAncestorsStack = new Stack();
 
-                public boolean startVisitControl(Element controlElement, String controlId) {
+                public void startVisitControl(Element controlElement, String controlId) {
 
                     final String controlName = controlElement.getName();
                     controlNamesMap.put(controlName, "");
@@ -531,22 +531,13 @@ public class XFormsStaticState {
 
                         repeatAncestorsStack.push(controlId);
                     }
-
-                    return true;
                 }
 
-                public boolean endVisitControl(Element controlElement, String controlId) {
+                public void endVisitControl(Element controlElement, String controlId) {
                     final String controlName = controlElement.getName();
                     if (controlName.equals("repeat")) {
                         repeatAncestorsStack.pop();
                     }
-                    return true;
-                }
-
-                public void startRepeatIteration(int iteration) {
-                }
-
-                public void endRepeatIteration(int iteration) {
                 }
             });
 
@@ -600,12 +591,11 @@ public class XFormsStaticState {
     /**
      * Visit all the control elements without handling repeats or looking at the binding contexts.
      */
-    public void visitAllControlStatic(XFormsControls.ControlElementVisitorListener controlElementVisitorListener) {
+    public void visitAllControlStatic(ControlElementVisitorListener controlElementVisitorListener) {
         handleControlsStatic(controlElementVisitorListener, controlsDocument.getRootElement());
     }
 
-    private boolean handleControlsStatic(XFormsControls.ControlElementVisitorListener controlElementVisitorListener, Element container) {
-        boolean doContinue = true;
+    private void handleControlsStatic(ControlElementVisitorListener controlElementVisitorListener, Element container) {
         for (Iterator i = container.elements().iterator(); i.hasNext();) {
             final Element currentControlElement = (Element) i.next();
 
@@ -614,18 +604,19 @@ public class XFormsStaticState {
 
             if (XFormsControls.isGroupingControl(controlName)) {
                 // Handle XForms grouping controls
-                doContinue = controlElementVisitorListener.startVisitControl(currentControlElement, controlId);
-                if (doContinue)
-                    doContinue = handleControlsStatic(controlElementVisitorListener, currentControlElement);
-                doContinue = doContinue && controlElementVisitorListener.endVisitControl(currentControlElement, controlId);
+                controlElementVisitorListener.startVisitControl(currentControlElement, controlId);
+                handleControlsStatic(controlElementVisitorListener, currentControlElement);
+                controlElementVisitorListener.endVisitControl(currentControlElement, controlId);
             } else if (XFormsControls.isLeafControl(controlName)) {
                 // Handle leaf control
-                doContinue = controlElementVisitorListener.startVisitControl(currentControlElement, controlId);
-                doContinue = doContinue && controlElementVisitorListener.endVisitControl(currentControlElement, controlId);
+                controlElementVisitorListener.startVisitControl(currentControlElement, controlId);
+                controlElementVisitorListener.endVisitControl(currentControlElement, controlId);
             }
-            if (!doContinue)
-                break;
         }
-        return doContinue;
+    }
+
+    private static interface ControlElementVisitorListener {
+        public void startVisitControl(Element controlElement, String controlId);
+        public void endVisitControl(Element controlElement, String controlId);
     }
 }

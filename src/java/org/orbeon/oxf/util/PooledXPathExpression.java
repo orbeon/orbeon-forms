@@ -23,6 +23,7 @@ import org.orbeon.saxon.instruct.SlotManager;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.om.SequenceIterator;
+import org.orbeon.saxon.om.ValueRepresentation;
 import org.orbeon.saxon.trans.IndependentContext;
 import org.orbeon.saxon.trans.Variable;
 import org.orbeon.saxon.trans.XPathException;
@@ -112,6 +113,17 @@ public class PooledXPathExpression {
         return result;
     }
 
+    /**
+     * Evaluate the expression as a variable value usable by Saxon in further XPath expressions.
+     */
+    public ValueRepresentation evaluateAsVariable(Object functionContext) throws XPathException {
+        final Item contextItem = (contextItems.size() > contextPosition - 1) ? (Item) contextItems.get(contextPosition - 1) : null;
+        final XPathContextMajor xpathContext = new XPathContextMajor(contextItem, this.configuration);
+        final SequenceIterator iter = evaluate(xpathContext, functionContext);
+
+        return new SequenceExtent(iter);
+    }
+
     private List convertToJavaKeepNodeInfo(SequenceExtent extent, XPathContext context) throws XPathException {
         final List result = new ArrayList(extent.getLength());
         final SequenceIterator iter = extent.iterate(null);
@@ -193,20 +205,25 @@ public class PooledXPathExpression {
                 final Variable variable = (Variable) entry.getValue();
 
                 final Object object = variableToValueMap.get(name);
-                final AtomicValue atomicValue;
-                if (object instanceof String) {
-                    atomicValue = new StringValue((String) object);
-                } else if (object instanceof Integer) {
-                    atomicValue = new IntegerValue(((Integer) object).intValue());
-                } else if (object instanceof Float) {
-                    atomicValue = new FloatValue(((Float) object).floatValue());
-                } else if (object instanceof Double) {
-                    atomicValue = new DoubleValue(((Double) object).doubleValue());
-                } else {
-                    throw new OXFException("Invalid variable type: " + object.getClass());
-                }
+                if (object != null) {
+                    final ValueRepresentation valueRepresentation;
+                    if (object instanceof ValueRepresentation) {
+                        // Native Saxon variable value
+                        valueRepresentation = (ValueRepresentation) object;
+                    } else if (object instanceof String) {
+                        valueRepresentation = new StringValue((String) object);
+                    } else if (object instanceof Integer) {
+                        valueRepresentation = new IntegerValue(((Integer) object).intValue());
+                    } else if (object instanceof Float) {
+                        valueRepresentation = new FloatValue(((Float) object).floatValue());
+                    } else if (object instanceof Double) {
+                        valueRepresentation = new DoubleValue(((Double) object).doubleValue());
+                    } else {
+                        throw new OXFException("Invalid variable type: " + object.getClass());
+                    }
 
-                xpathContext.setLocalVariable(variable.getLocalSlotNumber(), atomicValue);
+                    xpathContext.setLocalVariable(variable.getLocalSlotNumber(), valueRepresentation);
+                }
             }
         }
 
@@ -264,13 +281,10 @@ public class PooledXPathExpression {
     }
 
     public void setVariables(Map variableToValueMap) {
+        // NOTE: We used to attempt to decect whether the expression required variables or not and throw an exception,
+        // but we can't really detect this because there may be variables in scope even if the expression does not use
+        // them. Conversely, if there are undeclared variables, we let the XPath engine complain about that.
         this.variableToValueMap = variableToValueMap;
-
-        if ((variables != null && variables.size() > 0) && (variableToValueMap == null || variableToValueMap.size() == 0))
-            throw new OXFException("Expression requires variables.");
-
-        if ((variables == null || variables.size() == 0) && (variableToValueMap != null && variableToValueMap.size() > 0))
-            throw new OXFException("Expression does not require variables.");
     }
 
     public void destroy() {

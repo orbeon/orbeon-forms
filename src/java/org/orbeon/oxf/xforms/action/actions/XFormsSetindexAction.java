@@ -42,6 +42,7 @@ public class XFormsSetindexAction extends XFormsAction {
                         boolean hasOverriddenContext, Item overriddenContext) {
 
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
+        final XFormsContextStack contextStack = actionInterpreter.getContextStack();
 
         final String repeatId = XFormsUtils.namespaceId(containingDocument, actionElement.attributeValue("repeat"));
         final String indexXPath = actionElement.attributeValue("index");
@@ -52,8 +53,9 @@ public class XFormsSetindexAction extends XFormsAction {
 
         final String indexString = XPathCache.evaluateAsString(pipelineContext,
                 actionInterpreter.getContextStack().getCurrentNodeset(), actionInterpreter.getContextStack().getCurrentPosition(),
-                "number(" + indexXPath + ")", containingDocument.getNamespaceMappings(actionElement), null, XFormsContainingDocument.getFunctionLibrary(),
-                actionInterpreter.getContextStack().getFunctionContext(), null,
+                "number(" + indexXPath + ")", containingDocument.getNamespaceMappings(actionElement),
+                contextStack.getCurrentVariables(), XFormsContainingDocument.getFunctionLibrary(),
+                contextStack.getFunctionContext(), null,
                 (LocationData) actionElement.getData());
 
         executeSetindexAction(pipelineContext, containingDocument, repeatId, indexString);
@@ -111,7 +113,7 @@ public class XFormsSetindexAction extends XFormsAction {
                 }
 
                 // Adjust controls ids that could have gone out of bounds
-                XFormsIndexUtils.adjustRepeatIndexes(pipelineContext, xformsControls, nestedRepeatIdsMap);
+                XFormsIndexUtils.adjustRepeatIndexes(xformsControls, nestedRepeatIdsMap);
             }
 
             // TODO: "The implementation data structures for tracking computational dependencies are

@@ -92,8 +92,8 @@ public class XFormsDeleteAction extends XFormsAction {
                         final String insertionIndexString = XPathCache.evaluateAsString(pipelineContext,
                                 collectionToUpdate, 1,
                                 "round(" + atAttribute + ")",
-                                containingDocument.getNamespaceMappings(actionElement), null,
-                                XFormsContainingDocument.getFunctionLibrary(), actionInterpreter.getFunctionContext(), null,
+                                containingDocument.getNamespaceMappings(actionElement), contextStack.getCurrentVariables(),
+                                XFormsContainingDocument.getFunctionLibrary(), contextStack.getFunctionContext(), null,
                                 (LocationData) actionElement.getData());
 
                         // "3. If the result is in the range 1 to the Node Set Binding node-set size, then the insert
@@ -155,7 +155,7 @@ public class XFormsDeleteAction extends XFormsAction {
             // Find updates to repeat indexes
             final Map repeatIndexUpdates = new HashMap();
             final Map nestedRepeatIndexUpdates = new HashMap();
-            XFormsIndexUtils.adjustIndexesForDelete(pipelineContext, xformsControls, previousRepeatIdToIndex,
+            XFormsIndexUtils.adjustIndexesForDelete(xformsControls, previousRepeatIdToIndex,
                     repeatIndexUpdates, nestedRepeatIndexUpdates, nodeToRemove);
 
             // Prepare switches
@@ -180,7 +180,7 @@ public class XFormsDeleteAction extends XFormsAction {
             }
 
             // Adjust indexes that could have gone out of bounds
-            XFormsIndexUtils.adjustRepeatIndexes(pipelineContext, xformsControls, nestedRepeatIndexUpdates);
+            XFormsIndexUtils.adjustRepeatIndexes(xformsControls, nestedRepeatIndexUpdates);
 
             // "4. If the delete is successful, the event xforms-delete is dispatched."
             {

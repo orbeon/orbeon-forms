@@ -78,7 +78,7 @@ public class XFormsOutputControl extends XFormsValueControl {
                 
                 rawValue = XPathCache.evaluateAsString(pipelineContext,
                         currentNodeset, bindingContext.getPosition(),
-                        valueAttribute, containingDocument.getNamespaceMappings(getControlElement()), null,
+                        valueAttribute, containingDocument.getNamespaceMappings(getControlElement()), bindingContext.getVariables(),
                         XFormsContainingDocument.getFunctionLibrary(), getContextStack().getFunctionContext(), null, getLocationData());
 
 //                if (isTest) {

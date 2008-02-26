@@ -36,6 +36,8 @@ import java.util.Enumeration;
 /**
  * ContentHandler that adds ids on all the XForms elements which don't have any, and gathers namespace information on
  * XForms elements (xforms:* and xxforms:*).
+ *
+ * TODO: Should probably combine this with XFormsExtractorContentHandler.
  */
 public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHandler {
 
@@ -132,7 +134,7 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
 
             final int attributesCount = attributes.getLength();
             if (attributesCount > 0) {
-                for (int i = 0; i <attributesCount; i++) {
+                for (int i = 0; i < attributesCount; i++) {
                     final String attributeValue = attributes.getValue(i);
                     if (attributeValue.indexOf('{') != -1) {
                         // This is an AVT

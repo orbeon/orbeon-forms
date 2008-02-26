@@ -68,22 +68,22 @@ public class XHTMLHeadHandler extends HandlerBase {
         {
             final XFormsControls xformsControls = containingDocument.getXFormsControls();
             xformsControls.visitAllControls(new XFormsControls.XFormsControlVisitorListener() {
-                public void startVisitControl(XFormsControl xformsControl) {
-                    final String controlName = xformsControl.getName();
+                public void startVisitControl(XFormsControl control) {
+                    final String controlName = control.getName();
 
                     // Don't run JavaScript initialization if the control is static readonly (could change in the
                     // future if some static readonly controls require JS initialization)
-                    final boolean hasJavaScriptInitialization = xformsControl.hasJavaScriptInitialization() && !xformsControl.isStaticReadonly();
+                    final boolean hasJavaScriptInitialization = control.hasJavaScriptInitialization() && !control.isStaticReadonly();
                     if (hasJavaScriptInitialization) {
                         Map listForControlNameMap = (Map) appearancesMap.get(controlName);
                         if (listForControlNameMap == null) {
                             listForControlNameMap = new HashMap();
-                            appearancesMap.put(xformsControl.getName(), listForControlNameMap);
+                            appearancesMap.put(control.getName(), listForControlNameMap);
                         }
                         final String controlAppearanceOrMediatype;
                         {
-                            final String controlAppearance = xformsControl.getAppearance();
-                            controlAppearanceOrMediatype = (controlAppearance != null) ? controlAppearance : xformsControl.getMediatype();
+                            final String controlAppearance = control.getAppearance();
+                            controlAppearanceOrMediatype = (controlAppearance != null) ? controlAppearance : control.getMediatype();
                         }
 
                         List idsForAppearanceOrMediatypeList = (List) listForControlNameMap.get(controlAppearanceOrMediatype);
@@ -91,7 +91,7 @@ public class XHTMLHeadHandler extends HandlerBase {
                             idsForAppearanceOrMediatypeList = new ArrayList();
                             listForControlNameMap.put(controlAppearanceOrMediatype, idsForAppearanceOrMediatypeList);
                         }
-                        idsForAppearanceOrMediatypeList.add(xformsControl.getEffectiveId());
+                        idsForAppearanceOrMediatypeList.add(control.getEffectiveId());
                     }
                 }
 

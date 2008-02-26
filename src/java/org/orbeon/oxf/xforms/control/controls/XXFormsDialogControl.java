@@ -24,7 +24,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.dom4j.Element;
 
 /**
- * Represents an extension xxforms:dialog control
+ * Represents an extension xxforms:dialog control.
  */
 public class XXFormsDialogControl extends XFormsControl {
 

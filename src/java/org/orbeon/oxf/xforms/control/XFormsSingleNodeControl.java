@@ -104,7 +104,7 @@ public class XFormsSingleNodeControl extends XFormsControl {
                     this.type = null;
                 }
             } else {
-                // Control is not bound to a node because it doesn't have a binding (group, trigger, etc. without @ref)
+                // Control is not bound to a node because it doesn't have a binding (group, trigger, dialog, etc. without @ref)
                 this.readonly = false;
                 this.required = false;
                 this.relevant = (currentNodeInfo != null) ? InstanceData.getInheritedRelevant(currentNodeInfo) : false; // inherit relevance anyway

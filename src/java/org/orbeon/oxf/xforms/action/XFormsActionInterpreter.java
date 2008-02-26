@@ -262,7 +262,7 @@ public class XFormsActionInterpreter {
 
         final List conditionResult = XPathCache.evaluate(pipelineContext,
                 contextNodeset, contextPosition, "boolean(" + conditionAttribute + ")",
-            containingDocument.getNamespaceMappings(actionElement), null, XFormsContainingDocument.getFunctionLibrary(),
+            containingDocument.getNamespaceMappings(actionElement), contextStack.getCurrentVariables(), XFormsContainingDocument.getFunctionLibrary(),
             contextStack.getFunctionContext(), null, (LocationData) actionElement.getData());
 
         if (!((Boolean) conditionResult.get(0)).booleanValue()) {

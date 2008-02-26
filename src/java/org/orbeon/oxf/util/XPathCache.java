@@ -34,6 +34,7 @@ import org.orbeon.saxon.functions.FunctionLibraryList;
 import org.orbeon.saxon.functions.Doc;
 import org.orbeon.saxon.om.FastStringBuffer;
 import org.orbeon.saxon.om.Item;
+import org.orbeon.saxon.om.ValueRepresentation;
 import org.orbeon.saxon.sxpath.XPathEvaluator;
 import org.orbeon.saxon.sxpath.XPathExpression;
 import org.orbeon.saxon.trans.IndependentContext;
@@ -98,6 +99,24 @@ public class XPathCache {
                 xpathString, prefixToURIMap, variableToValueMap, functionLibrary, baseURI, false, false, locationData);
         try {
             return xpathExpression.evaluateKeepItems(functionContext);
+        } catch (Exception e) {
+            throw handleXPathException(e, xpathString, "evaluating XPath expression", locationData);
+        } finally {
+            if (xpathExpression != null)
+                xpathExpression.returnToPool();
+        }
+    }
+
+    /**
+     * Evaluate the expression as a variable value usable by Saxon in further XPath expressions.
+     */
+    public static ValueRepresentation evaluateAsVariable(PipelineContext pipelineContext, List contextItems, int contextPosition, String xpathString,
+                         Map prefixToURIMap, Map variableToValueMap, FunctionLibrary functionLibrary, FunctionContext functionContext, String baseURI, LocationData locationData) {
+
+        final PooledXPathExpression xpathExpression = XPathCache.getXPathExpression(pipelineContext, contextItems, contextPosition,
+                xpathString, prefixToURIMap, variableToValueMap, functionLibrary, baseURI, false, false, locationData);
+        try {
+            return xpathExpression.evaluateAsVariable(functionContext);
         } catch (Exception e) {
             throw handleXPathException(e, xpathString, "evaluating XPath expression", locationData);
         } finally {
@@ -229,7 +248,7 @@ public class XPathCache {
                 // NOTE: Mike Kay confirms on 2007-07-04 that compilation depends on the namespace context, so we need
                 // to use it as part of the cache key.
 
-                // TODO: PERF: It turns out that this takes a lot of time.
+                // TODO: PERF: It turns out that this takes a lot of time. Now that the namespace information is computed statically, we can do better.
                 if (prefixToURIMap != null) {
                     final Map sortedMap = (prefixToURIMap instanceof TreeMap) ? prefixToURIMap : new TreeMap(prefixToURIMap);// this should make sure we always get the keys in the same order
                     for (Iterator i = sortedMap.entrySet().iterator(); i.hasNext();) {
@@ -249,17 +268,18 @@ public class XPathCache {
 
             // TODO: Add baseURI to cache key
 
+            final Set variableNames = (variableToValueMap != null) ? variableToValueMap.keySet() : null;
             final PooledXPathExpression expr;
             if (testNoCache) {
                 // For testing only: don't get expression from cache
-                final Object o = new XFormsCachePoolableObjetFactory(null, xpathString, prefixToURIMap, variableToValueMap, functionLibrary, baseURI, isAvt).makeObject();
+                final Object o = new XFormsCachePoolableObjetFactory(null, xpathString, prefixToURIMap, variableNames, functionLibrary, baseURI, isAvt).makeObject();
                 expr = (PooledXPathExpression) o;
             } else {
                 // Get or create pool
                 final InternalCacheKey cacheKey = new InternalCacheKey("XPath Expression2", cacheKeyString.toString());
                 ObjectPool pool = (ObjectPool) cache.findValid(pipelineContext, cacheKey, validity);
                 if (pool == null) {
-                    pool = createXPathPool(xpathString, prefixToURIMap, variableToValueMap, functionLibrary, baseURI, isAvt);
+                    pool = createXPathPool(xpathString, prefixToURIMap, variableNames, functionLibrary, baseURI, isAvt);
                     cache.add(pipelineContext, cacheKey, validity, pool);
                 }
 
@@ -294,7 +314,7 @@ public class XPathCache {
 
     private static ObjectPool createXPathPool(String xpathString,
                                               Map prefixToURIMap,
-                                              Map variableToValueMap,
+                                              Set variableNames,
                                               FunctionLibrary functionLibrary,
                                               String baseURI,
                                               boolean isAvt) {
@@ -302,7 +322,7 @@ public class XPathCache {
             // TODO: pool should have at least one hard reference
             final SoftReferenceObjectPool pool = new SoftReferenceObjectPool();
             pool.setFactory(new XFormsCachePoolableObjetFactory(pool, xpathString,
-                    prefixToURIMap, variableToValueMap, functionLibrary, baseURI, isAvt));
+                    prefixToURIMap, variableNames, functionLibrary, baseURI, isAvt));
 
             return pool;
         } catch (Exception e) {
@@ -313,7 +333,7 @@ public class XPathCache {
     private static class  XFormsCachePoolableObjetFactory implements PoolableObjectFactory {
         private final String xpathString;
         private final Map prefixToURIMap;
-        private final Map variableToValueMap;// TODO: should not store values in cache
+        private final Set variableNames;
         // NOTE: storing the FunctionLibrary in cache is ok if it doesn't hold dynamic references (case of global XFormsFunctionLibrary)
         private final FunctionLibrary functionLibrary;
         private final ObjectPool pool;
@@ -323,14 +343,14 @@ public class XPathCache {
         public XFormsCachePoolableObjetFactory(ObjectPool pool,
                                           String xpathString,
                                           Map prefixToURIMap,
-                                          Map variableToValueMap,
+                                          Set variableNames,
                                           FunctionLibrary functionLibrary,
                                           String baseURI,
                                           boolean isAvt) {
             this.pool = pool;
             this.xpathString = xpathString;
             this.prefixToURIMap = prefixToURIMap;
-            this.variableToValueMap = variableToValueMap;
+            this.variableNames = variableNames;
             this.functionLibrary = functionLibrary;
             this.baseURI = baseURI;
             this.isAvt = isAvt;
@@ -371,12 +391,12 @@ public class XPathCache {
 
             // Declare variables (we don't use the values here, just the names)
             final Map variables = new HashMap();
-            if (variableToValueMap != null) {
-                for (Iterator i = variableToValueMap.keySet().iterator(); i.hasNext();) {
+            if (variableNames != null) {
+                for (Iterator i = variableNames.iterator(); i.hasNext();) {
                     final String name = (String) i.next();
-                    final Variable var = independentContext.declareVariable(name);
-                    var.setUseStack(true);// "Indicate that values of variables are to be found on the stack, not in the Variable object itself"
-                    variables.put(name, var);
+                    final Variable variable = independentContext.declareVariable(name);
+                    variable.setUseStack(true);// "Indicate that values of variables are to be found on the stack, not in the Variable object itself"
+                    variables.put(name, variable);
                 }
             }
 

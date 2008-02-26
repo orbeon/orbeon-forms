@@ -148,6 +148,131 @@ http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=2
 -->
                 <ul>
                     <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308660&amp;group_id=168&amp;atid=350207">
+                            #308660: RFE: Extension functions to create elements and attributes by name
+                            (xxforms:element() and xxforms:attribute())
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=307876&amp;group_id=168&amp;atid=350207">
+                            #307876: xforms:group without nested xforms:label element may generate xhtml:label element
+                            in output
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=303954&amp;group_id=168&amp;atid=350207">
+                            #303954: XML Events: support ev:observer and ev:target attributes
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308634&amp;group_id=168&amp;atid=350207">
+                            #308634: RFE: Support DOMActivate on xforms:output
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308608&amp;group_id=168&amp;atid=350207">
+                            #308608: RFE: New modal trigger
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308569&amp;group_id=168&amp;atid=350207">
+                            #308569: RFE: Use indentation for XForms event and action logging
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308544&amp;group_id=168&amp;atid=350207">
+                            #308544: Default log file is orbeon.log instead of ops.log
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308545&amp;group_id=168&amp;atid=350207">
+                            #308545: Can't deploy Orbeon Forms in Liferay 4.3.3 because of descriptors incompatibility
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308546&amp;group_id=168&amp;atid=350207">
+                            #308546: RFE: Reorganize WEB-INF descriptors
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308527&amp;group_id=168&amp;atid=350207">
+                            #308527: RFE: Add more context information to DOM* events
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308525&amp;group_id=168&amp;atid=350207">
+                            #308525: RFE: Implement XForms 1.1 context() function
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308526&amp;group_id=168&amp;atid=350207">
+                            #308526: RFE: Implement eXorms @exforms:iterate attribute on actions
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308524&amp;group_id=168&amp;atid=350207">
+                            #308524: XForms schema: allow "style" attribute on xforms:output
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308494&amp;group_id=168&amp;atid=350207">
+                            #308494: Handle reference to nested xforms:bind from xforms:repeat as per XForms 1.1
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308486&amp;group_id=168&amp;atid=350207">
+                            #308486: RFE: xforms:toggle/@case should support AVTs
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308391&amp;group_id=168&amp;atid=350207">
+                            #308391: RFE: Support xforms-help event
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308461&amp;group_id=168&amp;atid=350207">
+                            #308461: RFE: Help displayed as a tooltip
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308419&amp;group_id=168&amp;atid=350207">
+                            #308419: JavaScript error in IE when clicking around in the tab with the slider in the
+                            XForms controls example
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308446&amp;group_id=168&amp;atid=350207">
+                            #308446: RFE: Action to output log messages
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308444&amp;group_id=168&amp;atid=350207">
+                            #308444: Integrate patch for error-type context information on xforms-submit-error
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308443&amp;group_id=168&amp;atid=350207">
+                            #308443: URL generator's &lt;url&gt; element shouldn't be forced to appear first in the
+                            configuration
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308410&amp;group_id=168&amp;atid=350207">
+                            #308410: When the session expires on IE, a JavaScript exception occurs
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308406&amp;group_id=168&amp;atid=350207">
+                            #308406: oxf:scope-generator produces incorrect null document
+                        </a>
+                    </li>
+                    <li>
                         <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308404&amp;group_id=168&amp;atid=350207">
                             #308404: Increase default session duration
                         </a>

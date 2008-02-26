@@ -135,9 +135,9 @@ public class XFormsInsertAction extends XFormsAction {
                     // origin attribute in the insert context."
 
                     originObjects = XPathCache.evaluate(pipelineContext, insertContextNodeInfo,
-                            originAttribute, containingDocument.getNamespaceMappings(actionElement), null,
+                            originAttribute, containingDocument.getNamespaceMappings(actionElement), contextStack.getCurrentVariables(),
                             XFormsContainingDocument.getFunctionLibrary(),
-                            actionInterpreter.getFunctionContext(),
+                            contextStack.getFunctionContext(),
                             null, (LocationData) actionElement.getData());
                     //XFormsUtils.resolveXMLBase(actionElement, ".").toString()
 
@@ -213,8 +213,8 @@ public class XFormsInsertAction extends XFormsAction {
                     // "b. The return value is processed according to the rules of the XPath function round()"
                     final String insertionIndexString = XPathCache.evaluateAsString(pipelineContext,
                             collectionToBeUpdated, 1,
-                            "round(" + atAttribute + ")", containingDocument.getNamespaceMappings(actionElement), null,
-                            XFormsContainingDocument.getFunctionLibrary(), actionInterpreter.getFunctionContext(), null,
+                            "round(" + atAttribute + ")", containingDocument.getNamespaceMappings(actionElement), contextStack.getCurrentVariables(),
+                            XFormsContainingDocument.getFunctionLibrary(), contextStack.getFunctionContext(), null,
                             (LocationData) actionElement.getData());
 
                     // "c. If the result is in the range 1 to the Node Set Binding node-set size, then the insert
@@ -363,7 +363,7 @@ public class XFormsInsertAction extends XFormsAction {
             final XFormsControls.ControlsState currentControlsState = xformsControls.getCurrentControlsState();
 
             // Update repeat indexes
-            XFormsIndexUtils.adjustIndexesAfterInsert(pipelineContext, xformsControls, currentControlsState, clonedNodes);
+            XFormsIndexUtils.adjustIndexesAfterInsert(xformsControls, currentControlsState, clonedNodes);
 
             // Update switches
             XFormsSwitchUtils.updateSwitches(xformsControls);

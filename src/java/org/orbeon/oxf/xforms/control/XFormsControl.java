@@ -423,10 +423,10 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
 
                         // Update children xforms:repeat indexes if any
                         xformsControls.visitAllControls(new XFormsControls.XFormsControlVisitorListener() {
-                            public void startVisitControl(XFormsControl XFormsControl) {
-                                if (XFormsControl instanceof XFormsRepeatControl) {
+                            public void startVisitControl(XFormsControl control) {
+                                if (control instanceof XFormsRepeatControl) {
                                     // Found child repeat
-                                    xformsControls.getCurrentControlsState().updateRepeatIndex(((XFormsRepeatControl) XFormsControl).getRepeatId(), 1);
+                                    xformsControls.getCurrentControlsState().updateRepeatIndex(((XFormsRepeatControl) control).getRepeatId(), 1);
                                 }
                             }
 
@@ -435,7 +435,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
                         }, firstAncestorRepeatControlInfo);
 
                         // Adjust controls ids that could have gone out of bounds
-                        XFormsIndexUtils.adjustRepeatIndexes(pipelineContext, xformsControls, null);
+                        XFormsIndexUtils.adjustRepeatIndexes(xformsControls, null);
 
                         // After changing indexes, must recalculate
                         // NOTE: The <setindex> action is supposed to "The implementation data

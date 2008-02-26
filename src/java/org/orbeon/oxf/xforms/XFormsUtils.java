@@ -804,7 +804,7 @@ public class XFormsUtils {
      */
     public static String encodeHRRI(String uriString, boolean processSpace) {
 
-        // Note that the XML Schema spec says "Spaces are, in principle, allowed in the �lexical space� of anyURI,
+        // Note that the XML Schema spec says "Spaces are, in principle, allowed in the ·lexical space· of anyURI,
         // however, their use is highly discouraged (unless they are encoded by %20).".
 
         // We assume that we never want leading or trailing spaces. You can use %20 if you realy want this.

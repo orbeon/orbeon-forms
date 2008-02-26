@@ -36,6 +36,13 @@
             <xsl:message terminate="yes">Value of fr:view/@view is not valid</xsl:message>
         </xsl:if>
         <xhtml:div id="{if (@width = '750px') then 'doc' else if (@width = '950px') then 'doc2' else 'doc4'}" class="yui-t5xxx{if (doc('input:instance')/*/mode = 'print') then ' fr-print-mode' else ''}">
+            <xsl:if test="fr:header">
+                <xforms:group model="fr-form-model" context="instance('fr-form-instance')">
+                    <xhtml:div class="fr-header">
+                        <xsl:apply-templates select="fr:header/node()"/>
+                    </xhtml:div>
+                </xforms:group>
+            </xsl:if>
             <xhtml:div id="hd" class="fr-top"/>
             <xhtml:div id="bd" class="fr-container">
                 <xhtml:div id="yui-main">
@@ -268,7 +275,7 @@
                                     <!--<xforms:toggle case="fr-inplace-{@id}-edit"/>-->
                                     <!--<xforms:setfocus control="fr-inplace-{@id}-input"/>-->
                                 <!--</xforms:action>-->
-                            <!--</xforms:trigger>-->    
+                            <!--</xforms:trigger>-->
                         </xhtml:span>
                     </xhtml:span>
                 </xhtml:div>
@@ -369,9 +376,7 @@
                                         </xforms:label>
                                     </xforms:trigger>
                                     <xforms:trigger appearance="minimal">
-                                        <xforms:label>
-                                            <xsl:apply-templates select="xforms:label"/>
-                                        </xforms:label>
+                                        <xsl:apply-templates select="xforms:label"/>
                                     </xforms:trigger>
                                     <xforms:action ev:event="DOMActivate">
                                         <xforms:setvalue model="fr-sections-model" ref="instance('fr-current-section-instance')"
@@ -393,9 +398,7 @@
                                         </xforms:label>
                                     </xforms:trigger>
                                     <xforms:trigger appearance="minimal">
-                                        <xforms:label>
-                                            <xsl:apply-templates select="xforms:label"/>
-                                        </xforms:label>
+                                        <xsl:apply-templates select="xforms:label"/>
                                     </xforms:trigger>
                                     <xforms:action ev:event="DOMActivate">
                                         <xforms:setvalue model="fr-sections-model" ref="instance('fr-current-section-instance')"

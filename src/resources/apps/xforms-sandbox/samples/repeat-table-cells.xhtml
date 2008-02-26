@@ -93,7 +93,7 @@
                 <tr>
                     <xforms:repeat nodeset="td" id="cell-repeat">
                         <td>
-                            (<xforms:output value="count(xxforms:repeat-current('row-repeat')/preceding-sibling::*) + 1"/>,
+                            (<xforms:output value="count(xxforms:context('row-repeat')/preceding-sibling::*) + 1"/>,
                             <xforms:output value="position()"/>)
                         </td>
                     </xforms:repeat>
@@ -101,7 +101,7 @@
             </xforms:repeat>
         </table>
 
-        <!--<widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>-->
+        <widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>
 
     </xhtml:body>
 </xhtml:html>

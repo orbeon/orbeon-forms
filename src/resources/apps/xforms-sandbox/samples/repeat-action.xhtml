@@ -41,7 +41,7 @@
             <xforms:label>New value:</xforms:label>
         </xforms:input>
 
-        <xforms:repeat nodeset="orange">
+        <xforms:repeat nodeset="orange" id="orange-repeat">
             <div>
                 <xforms:group ref="instance('other')">
 
@@ -49,7 +49,7 @@
                         <xforms:label>Set</xforms:label>
 
                         <xforms:action ev:event="DOMActivate">
-                            <xforms:setvalue ref="xxforms:repeat-current()" value="instance('other')"/>
+                            <xforms:setvalue ref="xxforms:context('orange-repeat')" value="instance('other')"/>
                         </xforms:action>
 
                     </xforms:trigger>

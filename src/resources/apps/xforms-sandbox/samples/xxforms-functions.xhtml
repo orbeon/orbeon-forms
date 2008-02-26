@@ -44,10 +44,6 @@
                     <xforms:setvalue ev:event="DOMActivate" ref="value" value="name(context())"/>
                 </xforms:trigger>
                 <xforms:trigger>
-                    <xforms:label>Set value of xxforms:context()</xforms:label>
-                    <xforms:setvalue ev:event="DOMActivate" ref="value" value="name(xxforms:context())"/>
-                </xforms:trigger>
-                <xforms:trigger>
                     <xforms:label>Set value of xxforms:context('group2')</xforms:label>
                     <xforms:setvalue ev:event="DOMActivate" ref="value" value="name(xxforms:context('group2'))"/>
                 </xforms:trigger>
@@ -55,9 +51,6 @@
                     <xforms:label>Set value of xxforms:context('group1')</xforms:label>
                     <xforms:setvalue ev:event="DOMActivate" ref="value" value="name(xxforms:context('group1'))"/>
                 </xforms:trigger>
-                <!--<xhtml:p>-->
-                    <!--Result of xxforms:repeat-current() function: <xforms:output value="name(xxforms:repeat-current())"/>-->
-                <!--</xhtml:p>-->
             </xforms:group>
         </xforms:group>
     </xhtml:body>

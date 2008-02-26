@@ -2088,4 +2088,64 @@
         </output>
     </test>
 
+    <test description="ev:observer and ev:target" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-server-init.xpl"/>
+                    <p:input name="document">
+                        <xhtml:html>
+                            <xhtml:head>
+                                <xforms:model id="my-model" xxforms:state-handling="client">
+                                    <xforms:instance id="my-instance">
+                                        <instance>initial</instance>
+                                    </xforms:instance>
+
+                                    <xforms:action ev:observer="my-group" ev:target="my-input" ev:event="DOMFocusIn">
+                                        <xforms:setvalue ref=".">new</xforms:setvalue>
+                                    </xforms:action>
+                                </xforms:model>
+                            </xhtml:head>
+                            <xhtml:body>
+                                <xforms:group id="my-group">
+                                    <xforms:input id="my-input" ref=".">
+                                        <xforms:label>My Data</xforms:label>
+                                    </xforms:input>
+
+                                    <xforms:action ev:observer="my-model" ev:event="xforms-ready">
+                                        <xforms:dispatch name="DOMFocusIn" target="my-input"/>
+                                    </xforms:action>
+
+                                </xforms:group>
+                            </xhtml:body>
+                        </xhtml:html>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+
+            </p:config>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="my-instance" model-id="my-model">
+                                <instance>new</instance>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="my-group" relevant="true"/>
+                        <xxf:control id="my-input" relevant="true" label="My Data">new</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>

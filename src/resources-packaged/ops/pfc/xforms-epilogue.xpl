@@ -1,4 +1,4 @@
-<!-- Copyright (C) 2005-2007 Orbeon, Inc.
+<!-- Copyright (C) 2005-2008 Orbeon, Inc.
 
     This program is free software; you can redistribute it and/or modify it under the terms of the
     GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -107,7 +107,7 @@
                         <!--<p:output name="data" id="widgeted-view2"/>-->
                     <!--</p:processor>-->
 
-                    <!-- Get current namespace to enable caching per portlet only -->
+                    <!-- Get current namespace to enable caching per portlet -->
                     <p:processor name="oxf:request">
                         <p:input name="config">
                             <config>
@@ -117,19 +117,12 @@
                         <p:output name="data" id="namespace"/>
                     </p:processor>
 
-                    <!-- Annotate elements in view with ids -->
-                    <p:processor name="oxf:xforms-document-annotator">
-                        <p:input name="data" href="#widgeted-view"/>
-                        <!--<p:input name="data" href="#widgeted-view2"/>-->
-                        <!--<p:input name="data" href="#data"/>-->
-                        <p:input name="namespace" href="#namespace"/>
-                        <p:output name="data" id="annotated-view"/>
-                    </p:processor>
-
                     <!-- Native XForms Initialization -->
                     <p:processor name="oxf:xforms-to-xhtml">
-                        <p:input name="annotated-document" href="#annotated-view"/>
+                        <p:input name="annotated-document" href="#widgeted-view"/>
                         <p:input name="data" href="#model-data"/>
+                        <!-- This input adds a dependency on the container namespace. Keep it for portlets. -->
+                        <p:input name="namespace" href="#namespace"/>
                         <p:input name="instance" href="#instance"/>
                         <p:output name="document" id="xhtml-data"/>
                     </p:processor>

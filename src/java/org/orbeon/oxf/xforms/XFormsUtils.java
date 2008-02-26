@@ -366,7 +366,7 @@ public class XFormsUtils {
                     final String tempResult = XPathCache.evaluateAsString(pipelineContext,
                             currentNodeset, currentBindingContext.getPosition(),
                             valueAttribute, containingDocument.getStaticState().getNamespaceMappings(childElement),
-                            null, XFormsContainingDocument.getFunctionLibrary(),
+                            contextStack.getCurrentVariables(), XFormsContainingDocument.getFunctionLibrary(),
                             contextStack.getFunctionContext(), null,
                             (LocationData) childElement.getData());
 

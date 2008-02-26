@@ -58,6 +58,8 @@ public class XFormsSetindexAction extends XFormsAction {
                 contextStack.getFunctionContext(), null,
                 (LocationData) actionElement.getData());
 
+        containingDocument.logDebug("xforms:setindex", "setting index", new String[] { "index", indexString });
+
         executeSetindexAction(pipelineContext, containingDocument, repeatId, indexString);
     }
 

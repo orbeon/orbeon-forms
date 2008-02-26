@@ -390,6 +390,7 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
 
         final boolean isXForms = XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri);
         final boolean isXXForms = XFormsConstants.XXFORMS_NAMESPACE_URI.equals(uri);
+        final boolean isEXForms = XFormsConstants.EXFORMS_NAMESPACE_URI.equals(uri);
 
         if (inModel) {
             super.endElement(uri, localname, qName);
@@ -398,7 +399,7 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
                 inLabelHintHelpAlert = false;
             }
             super.endElement(uri, localname, qName);
-        } else if (inControl && isXXForms) {
+        } else if (inControl && (isXXForms || isEXForms)) {
             super.endElement(uri, localname, qName);
         } else if (inLabelHintHelpAlert && (XMLConstants.XHTML_NAMESPACE_URI.equals(uri) || "".equals(uri))) {
             // Preserve content

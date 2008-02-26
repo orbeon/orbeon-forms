@@ -1076,35 +1076,31 @@ public class XFormsControls {
          */
         public Map getRepeatIdToRepeatXFormsControl() {
             final Map result = new HashMap();
-            visitRepeatHierarchy(result);
+            visitRepeatHierarchy(result, this.children);
             return result;
         }
 
-        private void visitRepeatHierarchy(Map result) {
-            visitRepeatHierarchy(result, this.children);
-        }
-
         private void visitRepeatHierarchy(Map result, List children) {
-            for (Iterator i = children.iterator(); i.hasNext();) {
-                final XFormsControl currentXFormsControl = (XFormsControl) i.next();
+            if (children != null) {
+                for (Iterator i = children.iterator(); i.hasNext();) {
+                    final XFormsControl currentXFormsControl = (XFormsControl) i.next();
 
-                if (currentXFormsControl instanceof XFormsRepeatControl) {
-                    final XFormsRepeatControl currentRepeatXFormsControl = (XFormsRepeatControl) currentXFormsControl;
-                    final String repeatId = currentRepeatXFormsControl.getRepeatId();
-                    final int index = ((Integer) getRepeatIdToIndex().get(repeatId)).intValue();
+                    if (currentXFormsControl instanceof XFormsRepeatControl) {
+                        final XFormsRepeatControl currentRepeatXFormsControl = (XFormsRepeatControl) currentXFormsControl;
+                        final String repeatId = currentRepeatXFormsControl.getRepeatId();
+                        final int index = ((Integer) getRepeatIdToIndex().get(repeatId)).intValue();
 
-                    result.put(repeatId, currentXFormsControl);
+                        result.put(repeatId, currentXFormsControl);
 
-                    if (index > 0) {
-                        final List newChildren = currentXFormsControl.getChildren();
-                        if (newChildren != null && newChildren.size() > 0)
-                            visitRepeatHierarchy(result, Collections.singletonList(newChildren.get(index - 1)));
+                        if (index > 0) {
+                            final List newChildren = currentXFormsControl.getChildren();
+                            if (newChildren != null && newChildren.size() > 0)
+                                visitRepeatHierarchy(result, Collections.singletonList(newChildren.get(index - 1)));
+                        }
+
+                    } else {
+                        visitRepeatHierarchy(result, currentXFormsControl.getChildren());
                     }
-
-                } else {
-                    final List newChildren = currentXFormsControl.getChildren();
-                    if (newChildren != null)
-                        visitRepeatHierarchy(result, newChildren);
                 }
             }
         }

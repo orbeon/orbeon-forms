@@ -1,0 +1,51 @@
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:f="http://orbeon.org/oxf/xml/formatting"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:widget="http://orbeon.org/oxf/xml/widget"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:exforms="http://www.exforms.org/exf/1-0">
+
+    <xhtml:head>
+        <xhtml:title>Iterating with xforms:setindex and variables</xhtml:title>
+        <xforms:model id="my-model" xxforms:state-handling="client">
+            <xforms:instance id="my-instance">
+                <items>
+                    <item>
+                        <label>One</label>
+                        <value/>
+                    </item>
+                    <item>
+                        <label>Two</label>
+                        <value/>
+                    </item>
+                    <item>
+                        <label>Three</label>
+                        <value/>
+                    </item>
+                </items>
+            </xforms:instance>
+
+            <xforms:action ev:event="xforms-ready" xxforms:iterate="item">
+                <xforms:setindex repeat="items-repeat" index="position()"/>
+                <xforms:dispatch name="my-event" target="my-count"/>
+            </xforms:action>
+
+        </xforms:model>
+    </xhtml:head>
+    <xhtml:body>
+
+        <xxforms:variable name="instance" select="."/>
+        <exforms:variable name="items" select="$instance/item"/>
+
+        <xforms:repeat nodeset="$items" id="items-repeat">
+            <exforms:variable name="current-item" select="."/>
+            <xxforms:variable name="current-position" select="position()"/>
+            <xforms:output id="my-count" ref="$current-item/value">
+                <xforms:label value="concat($current-item/label, ':')"/>
+                <xforms:setvalue ev:event="my-event" ref="$current-item/value" value="count($items) + $current-position"/>
+            </xforms:output>
+        </xforms:repeat>
+    </xhtml:body>
+</xhtml:html>

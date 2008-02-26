@@ -81,7 +81,7 @@ public class XFormsInsertAction extends XFormsAction {
             // "If the result is an empty nodeset or not a nodeset, then the insert action is terminated with no effect. "
             if (overriddenContext == null || !(overriddenContext instanceof NodeInfo)) {
                 if (XFormsServer.logger.isDebugEnabled())
-                    containingDocument.logDebug("insert", "overridden context is an empty nodeset or not a nodeset, terminating");
+                    containingDocument.logDebug("xforms:insert", "overridden context is an empty nodeset or not a nodeset, terminating");
                 return;
             } else {
                 insertContextNodeInfo = (NodeInfo) overriddenContext;
@@ -94,7 +94,7 @@ public class XFormsInsertAction extends XFormsAction {
         // context does not evaluate to an element node and the Node Set Binding node-set is the empty node-set."
         if (contextAttribute != null && insertContextNodeInfo.getNodeKind() != org.w3c.dom.Document.ELEMENT_NODE && isEmptyNodesetBinding) {
             if (XFormsServer.logger.isDebugEnabled())
-                containingDocument.logDebug("insert", "insert context is not an element node and binding node-set is empty, terminating");
+                containingDocument.logDebug("xforms:insert", "insert context is not an element node and binding node-set is empty, terminating");
             return;
         }
 
@@ -115,7 +115,7 @@ public class XFormsInsertAction extends XFormsAction {
 
                     if (isEmptyNodesetBinding) {
                         if (XFormsServer.logger.isDebugEnabled())
-                            containingDocument.logDebug("insert", "origin node-set from node-set binding is empty, terminating");
+                            containingDocument.logDebug("xforms:insert", "origin node-set from node-set binding is empty, terminating");
                         return;
                     }
 
@@ -144,7 +144,7 @@ public class XFormsInsertAction extends XFormsAction {
                     // "The insert action is terminated with no effect if the origin node-set is the empty node-set."
                     if (originObjects.size() == 0) {
                         if (XFormsServer.logger.isDebugEnabled())
-                            containingDocument.logDebug("insert", "origin node-set is empty, terminating");
+                            containingDocument.logDebug("xforms:insert", "origin node-set is empty, terminating");
                         return;
                     }
 
@@ -353,9 +353,9 @@ public class XFormsInsertAction extends XFormsAction {
 
             if (XFormsServer.logger.isDebugEnabled()) {
                 if (insertedNodes.size() == 0)
-                    containingDocument.logDebug("insert", "no node inserted");
+                    containingDocument.logDebug("xforms:insert", "no node inserted");
                 else
-                    containingDocument.logDebug("insert", "inserted nodes", new String[] { "count", Integer.toString(insertedNodes.size())});
+                    containingDocument.logDebug("xforms:insert", "inserted nodes", new String[] { "count", Integer.toString(insertedNodes.size())});
             }
 
             // Rebuild ControlsState

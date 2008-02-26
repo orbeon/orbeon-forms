@@ -2148,4 +2148,105 @@
         </output>
     </test>
 
+    <test description="xxforms:variable" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-server-init.xpl"/>
+                    <p:input name="document">
+                        <xhtml:html xmlns:exforms="http://www.exforms.org/exf/1-0">
+                            <xhtml:head>
+                                <xhtml:title>Iterating with xforms:setindex and variables</xhtml:title>
+                                <xforms:model id="my-model" xxforms:state-handling="client">
+                                    <xforms:instance id="my-instance">
+                                        <items>
+                                            <item>
+                                                <label>One</label>
+                                                <value/>
+                                            </item>
+                                            <item>
+                                                <label>Two</label>
+                                                <value/>
+                                            </item>
+                                            <item>
+                                                <label>Three</label>
+                                                <value/>
+                                            </item>
+                                        </items>
+                                    </xforms:instance>
+
+                                    <xforms:action ev:event="xforms-ready" xxforms:iterate="item">
+                                        <xforms:setindex repeat="items-repeat" index="position()"/>
+                                        <xforms:dispatch name="my-event" target="my-count"/>
+                                    </xforms:action>
+
+                                </xforms:model>
+                            </xhtml:head>
+                            <xhtml:body>
+
+                                <xxforms:variable name="instance" select="."/>
+                                <exforms:variable name="items" select="$instance/item"/>
+
+                                <xforms:repeat nodeset="$items" id="items-repeat">
+                                    <exforms:variable name="current-item" select="."/>
+                                    <xxforms:variable name="current-position" select="position()"/>
+                                    <xforms:output id="my-count" ref="$current-item/value">
+                                        <xforms:label value="concat($current-item/label, ':')"/>
+                                        <xforms:setvalue ev:event="my-event" ref="$current-item/value" value="count($items) + $current-position"/>
+                                    </xforms:output>
+                                </xforms:repeat>
+                            </xhtml:body>
+                        </xhtml:html>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+
+            </p:config>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="my-instance" model-id="my-model">
+                                <items>
+                                    <item>
+                                        <label>One</label>
+                                        <value>4</value>
+                                    </item>
+                                    <item>
+                                        <label>Two</label>
+                                        <value>5</value>
+                                    </item>
+                                    <item>
+                                        <label>Three</label>
+                                        <value>6</value>
+                                    </item>
+                                </items>
+                            </instance>
+                        </instances>
+                        <repeat-indexes>
+                            <repeat-index id="items-repeat" index="3"/>
+                        </repeat-indexes>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:copy-repeat-template id="items-repeat" parent-indexes="" id-suffix="2"/>
+                        <xxf:copy-repeat-template id="items-repeat" parent-indexes="" id-suffix="3"/>
+                        <xxf:control id="my-count·1" relevant="true" label="One:">4</xxf:control>
+                        <xxf:control id="my-count·2" relevant="true" label="Two:">5</xxf:control>
+                        <xxf:control id="my-count·3" relevant="true" label="Three:">6</xxf:control>
+                    </xxf:control-values>
+                    <xxf:repeats>
+                        <xxf:repeat-index id="items-repeat" index="3"/>
+                        <xxf:repeat-iteration id="items-repeat" occurs="3"/>
+                    </xxf:repeats>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>

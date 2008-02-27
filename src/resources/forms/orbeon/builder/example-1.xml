@@ -23,7 +23,11 @@
       xmlns:saxon="http://saxon.sf.net/" >
     <xhtml:head>
         <xhtml:title>Empty Form</xhtml:title>
-        <xforms:model>
+        <xhtml:link rel="stylesheet" href="/ops/css/yui/reset-fonts-grids.css" type="text/css"/>
+        <xhtml:link rel="stylesheet" href="/ops/css/yui/base-min.css" type="text/css"/>
+        <xhtml:link rel="stylesheet" href="/apps/fr/style/form-runner.css" type="text/css"/>
+        
+        <xforms:model id="fr-form-model">
 
             <!-- Main instance -->
             <xforms:instance id="fr-form-instance">
@@ -38,6 +42,7 @@
             <!-- Metadata -->
             <xforms:instance id="fr-form-metadata" xxforms:readonly="true">
                 <metadata>
+                    <id/>
                     <title>Basic form</title>
                     <description>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Mauris eget tortor quis neque vestibulum eleifend. Donec nisl. Donec lorem. Mauris non ligula. Aenean at lacus. Vivamus sagittis odio eu elit porttitor pretium. Sed dignissim elit et pede. Aenean justo nunc, scelerisque et, eleifend nec, vestibulum a, eros. Integer pretium velit ac justo. Nulla sodales libero id nisi. Vivamus a arcu in leo fringilla bibendum.</description>
                     <author>Erik Bruchez</author>

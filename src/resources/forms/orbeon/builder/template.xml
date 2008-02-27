@@ -32,20 +32,42 @@
             <!-- Main instance -->
             <xforms:instance id="fr-form-instance">
                 <form>
-                    <section>
-                        <value/>
-                    </section>
+                    <section-1>
+                        <control-1/>
+                    </section-1>
                 </form>
             </xforms:instance>
 
             <!-- Metadata -->
             <xforms:instance id="fr-form-metadata" xxforms:readonly="true">
                 <metadata>
-                    <id/>
+                    <id>[Choose an identifier for this form]</id>
                     <title>[Name this form]</title>
                     <description>[Describe this form]</description>
                     <author/>
                 </metadata>
+            </xforms:instance>
+
+            <!-- Current form resources -->
+            <xforms:instance id="fr-form-resource">
+                <dummy/>
+            </xforms:instance>
+
+            <!-- All form resources -->
+            <xforms:instance id="fr-form-resources" xxforms:readonly="true">
+                <resources>
+                    <resource xml:lang="en">
+                        <section-1>
+                            <label>Section 1</label>
+                        </section-1>
+                        <control-1>
+                            <label>Input 1</label>
+                            <hint>[Please modify the hint]</hint>
+                            <help>[Please modify the help]</help>
+                            <alert>[Please modify the alert]</alert>
+                        </control-1>
+                    </resource>
+                </resources>
             </xforms:instance>
 
         </xforms:model>
@@ -56,16 +78,16 @@
             <xforms:label ref="instance('fr-form-metadata')/title"/>
             <xhtml:img src="/apps/fr/style/orbeon-logo-trimmed-transparent-42.png"/>
             <fr:body>
-                <fr:section id="section-1" context="section[1]">
-                    <xforms:label>Section 1</xforms:label>
+                <fr:section id="section-1-section" context="section-1">
+                    <xforms:label ref="instance('fr-form-resource')/section-1/label"/>
                     <fr:grid columns="1">
                         <xhtml:tr>
                             <xhtml:td>
-                                <xforms:input id="input-control" ref="value[1]">
-                                    <xforms:label>[Change the label]</xforms:label>
-                                    <xforms:hint>[Change the hint]</xforms:hint>
-                                    <xforms:help>[Change the help]</xforms:help>
-                                    <xforms:alert>[Change the alert]</xforms:alert>
+                                <xforms:input id="control-1-control" ref="control-1">
+                                    <xforms:label ref="instance('fr-form-resource')/control-1/label"/>
+                                    <xforms:label ref="instance('fr-form-resource')/control-1/help"/>
+                                    <xforms:label ref="instance('fr-form-resource')/control-1/hint"/>
+                                    <xforms:label ref="instance('fr-form-resource')/control-1/alert"/>
                                 </xforms:input>
                             </xhtml:td>
                         </xhtml:tr>

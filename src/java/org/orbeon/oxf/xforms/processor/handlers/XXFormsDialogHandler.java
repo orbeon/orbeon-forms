@@ -48,6 +48,8 @@ public class XXFormsDialogHandler extends HandlerBase {
         classes.append(Boolean.toString(dialogXFormsControl.isClose()));
         classes.append(" xforms-dialog-draggable-");
         classes.append(Boolean.toString(dialogXFormsControl.isDraggable()));
+        classes.append(" xforms-dialog-visible-");
+        classes.append(Boolean.toString(dialogXFormsControl.isInitiallyVisible()));
 
         // Start main xhtml:div
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();

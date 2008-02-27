@@ -78,7 +78,16 @@ public class XFormsResourceServer extends ProcessorImpl {
         // If conditional get and date ok, send not modified
 
         // Set Last-Modified, required for caching and conditional get
-        response.setCaching(combinedLastModified, false, false);
+        if (URLRewriter.isResourcesVersioned()) {
+
+            // Set old last modified date so that Expires header is set as far in the future as possible
+            // NOTE: the setCaching() implementation will specially handle values <= 0 as being not cacheable
+            // TODO: Need better API, right?
+            response.setCaching(1, false, false);
+
+        } else {
+            response.setCaching(combinedLastModified, false, false);
+        }
 
         // Check If-Modified-Since and don't return content if condition is met
         if (!response.checkIfModifiedSince(combinedLastModified, false)) {

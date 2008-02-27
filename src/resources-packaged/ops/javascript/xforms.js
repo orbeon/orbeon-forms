@@ -1697,6 +1697,7 @@ ORBEON.xforms.Events = {
     errorReloadClicked: function(event, errorPanel) {
         ORBEON.xforms.Globals.isReloading = true;
         window.location.reload(true);// force reload
+        //NOTE: You would think that if reload is canceled, you would reset this to false, but somehow this fails with IE
     },
 
     /**
@@ -2047,7 +2048,8 @@ ORBEON.xforms.Init = {
                 } else {
                     if (ORBEON.util.Utils.getProperty(REVISIT_HANDLING_PROPERTY) == "reload") {
                         ORBEON.xforms.Globals.isReloading = true;
-                        window.location.reload(true)
+                        window.location.reload(true);
+                        //NOTE: You would think that if reload is canceled, you would reset this to false, but somehow this fails with IE
                     } else {
                         xformsFireEvents(new Array(xformsCreateEventArray(form, "xxforms-all-events-required", null, null)), false);
                     }
@@ -2308,9 +2310,10 @@ ORBEON.xforms.Init = {
     _dialog: function(dialog) {
         var isModal = ORBEON.util.Dom.hasClass(dialog, "xforms-dialog-modal");
         var hasClose = ORBEON.util.Dom.hasClass(dialog, "xforms-dialog-close-true");
-        var draggable = ORBEON.util.Dom.hasClass(dialog, "xforms-dialog-draggable-true");
+        var isDraggable = ORBEON.util.Dom.hasClass(dialog, "xforms-dialog-draggable-true");
+        var isVisible = ORBEON.util.Dom.hasClass(dialog, "xforms-dialog-visible-true");
         var isMinimal = ORBEON.util.Dom.hasClass(dialog, "xforms-dialog-appearance-minimal");
-        ORBEON.util.Dom.removeClass(dialog, "xforms-initially-hidden");
+        ORBEON.util.Dom.removeClass(dialog, "xforms-initially-hidden"); // mmh, should we move this further down after render()?
 
         // Create dialog object
         if (isMinimal) {
@@ -2327,8 +2330,8 @@ ORBEON.xforms.Init = {
             yuiDialog = new YAHOO.widget.Dialog(dialog.id, {
                 modal: isModal,
                 close: hasClose,
-                visible: false,
-                draggable: draggable,
+                visible: isVisible,
+                draggable: isDraggable,
                 fixedcenter: false,
                 constraintoviewport: true,
                 underlay: "shadow"
@@ -2340,7 +2343,8 @@ ORBEON.xforms.Init = {
 
         // We hide the dialog as it otherwise interfers with other dialogs, preventing
         // the cursor from showing in input fields of other dialogs
-        yuiDialog.element.style.display = "none";
+        if (!isVisible)
+            yuiDialog.element.style.display = "none";
         ORBEON.xforms.Globals.dialogs[dialog.id] = yuiDialog;
     }
 };

@@ -27,10 +27,7 @@ import org.orbeon.oxf.xforms.event.events.XFormsSelectEvent;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.saxon.om.NodeInfo;
-import org.orbeon.saxon.om.ValueRepresentation;
-import org.orbeon.saxon.value.EmptySequence;
 import org.xml.sax.Locator;
 
 import java.util.*;
@@ -267,7 +264,7 @@ public class XFormsControls {
             initialControlsState.dirty = false;
         }
 
-        contextStack.resetBindingContext();// not sure we actually need to do this
+        contextStack.resetBindingContext(pipelineContext);// not sure we actually need to do this
 
         initialized = true;
     }
@@ -703,7 +700,7 @@ public class XFormsControls {
      * Visit all the effective controls elements.
      */
     public void visitAllControlsHandleRepeat(PipelineContext pipelineContext, ControlElementVisitorListener controlElementVisitorListener) {
-        contextStack.resetBindingContext();
+        contextStack.resetBindingContext(pipelineContext);
         final boolean isOptimizeRelevance = XFormsProperties.isOptimizeRelevance(containingDocument);
         handleControls(pipelineContext, controlElementVisitorListener, isOptimizeRelevance, containingDocument.getStaticState().getControlsDocument().getRootElement(), "");
     }
@@ -788,7 +785,7 @@ public class XFormsControls {
 
                 // Push the variable on the context stack. Note that we do as if each variable was a "parent" of the following controls and variables.
                 // NOTE: The value is computed immediately. We should use Expression objects and do lazy evaluation in the future.
-                contextStack.pushVariable(currentControlElement, variable.getVariableName(), variable.getVariableValue(pipelineContext));
+                contextStack.pushVariable(currentControlElement, variable.getVariableName(), variable.getVariableValue(pipelineContext, true));
 
                 variablesCount++;
             }
@@ -1335,62 +1332,5 @@ public class XFormsControls {
         if (constantItems == null)
             constantItems = new HashMap();
         constantItems.put(controlId, items);
-    }
-
-    /**
-     * Represents an exforms:variable / xxforms:variable element.
-     */
-    public static class Variable {
-
-        private XFormsContainingDocument containingDocument;
-        private XFormsContextStack contextStack;
-        private Element element;
-
-        private String variableName;
-        private String selectAttribute;
-
-        private boolean evaluated;
-        private ValueRepresentation variableValue;
-
-        public Variable(XFormsContainingDocument containingDocument, XFormsContextStack contextStack, Element element) {
-            this.containingDocument = containingDocument;
-            this.contextStack = contextStack;
-            this.element = element;
-
-            this.variableName = element.attributeValue("name");
-            this.selectAttribute = element.attributeValue("select");
-        }
-
-        private void evaluate(PipelineContext pipelineContext) {
-
-            final XFormsContextStack.BindingContext bindingContext = contextStack.getCurrentBindingContext();
-
-            final List currentNodeset = bindingContext.getNodeset();
-            if (currentNodeset != null && currentNodeset.size() > 0) {
-                variableValue = XPathCache.evaluateAsVariable(pipelineContext,
-                        currentNodeset, bindingContext.getPosition(),
-                        selectAttribute, containingDocument.getNamespaceMappings(element), bindingContext.getVariables(),
-                        XFormsContainingDocument.getFunctionLibrary(), contextStack.getFunctionContext(), null, getLocationData());
-
-            } else {
-                variableValue = EmptySequence.getInstance();
-            }
-        }
-
-        public String getVariableName() {
-            return variableName;
-        }
-
-        public ValueRepresentation getVariableValue(PipelineContext pipelineContext) {
-            if (!evaluated) {
-                evaluated = true;
-                evaluate(pipelineContext);
-            }
-            return variableValue;
-        }
-
-        public LocationData getLocationData() {
-            return (element != null) ? (LocationData) element.getData() : null;
-        }
     }
 }

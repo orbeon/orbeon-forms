@@ -15,6 +15,9 @@ package org.orbeon.oxf.xml;
 
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.saxon.trans.IndependentContext;
+import org.orbeon.saxon.trans.StaticError;
+import org.orbeon.saxon.value.QNameValue;
+import org.orbeon.saxon.expr.VariableReference;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -34,12 +37,6 @@ public class XPathCacheStandaloneContext extends IndependentContext {
         getConfiguration().setURIResolver(URI_RESOLVER);
     }
 
-    // This is not used
-//    public XPathCacheStandaloneContext(Configuration configuration) {
-//        super(configuration);
-//        getConfiguration().setURIResolver(URI_RESOLVER);
-//    }
-
     private static class XPathCacheURIResolver implements URIResolver {
         public Source resolve(String href, String base) throws TransformerException {
             try {
@@ -53,6 +50,16 @@ public class XPathCacheStandaloneContext extends IndependentContext {
             } catch (IOException e) {
                 throw new TransformerException(e);
             }
+        }
+    }
+
+    public VariableReference bindVariable(int fingerprint) throws StaticError {
+        try {
+            return super.bindVariable(fingerprint);
+        } catch (StaticError e) {
+            // Be a little more friendly in the error message
+            final QNameValue qname = new QNameValue(getNamePool(), fingerprint);
+            throw new StaticError("Undeclared variable in a standalone expression: $" + qname.getStringValue());
         }
     }
 }

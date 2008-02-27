@@ -339,7 +339,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         if (allBinds == null)
             resetBinds();
 
-        contextStack.resetBindingContext(this);
+        // Reset context and variables
+        contextStack.resetBindingContext(pipelineContext, this);
 
         // Iterate over all binds
         for (Iterator i = allBinds.iterator(); i.hasNext();) {

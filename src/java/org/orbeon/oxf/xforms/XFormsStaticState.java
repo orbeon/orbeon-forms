@@ -30,6 +30,7 @@ import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.saxon.om.FastStringBuffer;
 
 import javax.xml.transform.Transformer;
@@ -477,8 +478,35 @@ public class XFormsStaticState {
 
                 public void startVisitControl(Element controlElement, String controlId) {
 
+                    // Gather control name
                     final String controlName = controlElement.getName();
                     controlNamesMap.put(controlName, "");
+
+                    final LocationData locationData = new ExtendedLocationData((LocationData) controlElement.getData(), "gathering static control information", controlElement);
+
+                    // Check for mandatory and optional bindings
+                    if (controlElement != null && XFormsConstants.XFORMS_NAMESPACE_URI.equals(controlElement.getNamespaceURI())) {
+                        if (XFormsControls.mandatorySingleNodeControls.get(controlName) != null
+                                && !(controlElement.attribute("ref") != null || controlElement.attribute("bind") != null)) {
+                            throw new ValidationException("Missing mandatory single node binding for element: " + controlElement.getQualifiedName(), locationData);
+                        }
+                        if (XFormsControls.noSingleNodeControls.get(controlName) != null
+                                && (controlElement.attribute("ref") != null || controlElement.attribute("bind") != null)) {
+                            throw new ValidationException("Single node binding is prohibited for element: " + controlElement.getQualifiedName(), locationData);
+                        }
+                        if (XFormsControls.mandatoryNodesetControls.get(controlName) != null
+                                && !(controlElement.attribute("nodeset") != null || controlElement.attribute("bind") != null)) {
+                            throw new ValidationException("Missing mandatory nodeset binding for element: " + controlElement.getQualifiedName(), locationData);
+                        }
+                        if (XFormsControls.noNodesetControls.get(controlName) != null
+                                && controlElement.attribute("nodeset") != null) {
+                            throw new ValidationException("Node-set binding is prohibited for element: " + controlElement.getQualifiedName(), locationData);
+                        }
+                        if (XFormsControls.singleNodeOrValueControls.get(controlName) != null
+                                && !(controlElement.attribute("ref") != null || controlElement.attribute("bind") != null || controlElement.attribute("value") != null)) {
+                            throw new ValidationException("Missing mandatory single node binding or value attribute for element: " + controlElement.getQualifiedName(), locationData);
+                        }
+                    }
 
                     // Gather event handlers
                     // Map<String, List<XFormsEventHandler>> of observer id to List of XFormsEventHandler

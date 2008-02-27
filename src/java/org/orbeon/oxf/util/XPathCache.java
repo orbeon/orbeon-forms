@@ -260,13 +260,22 @@ public class XPathCache {
                     }
                 }
             }
+            if (variableToValueMap != null && variableToValueMap.size() > 0) {
+                // There are some variables in scope. They must be part of the key
+                // TODO: Put this in static state as this can be determined statically once and for all 
+                for (Iterator i = variableToValueMap.keySet().iterator(); i.hasNext();) {
+                    final String variableName = (String) i.next();
+                    cacheKeyString.append('|');
+                    cacheKeyString.append(variableName);
+                }
+            }
             {
                 // Add this to the key as evaluating "name" as XPath or as AVT is very different!
                 cacheKeyString.append('|');
                 cacheKeyString.append(Boolean.toString(isAvt));
             }
 
-            // TODO: Add baseURI to cache key
+            // TODO: Add baseURI to cache key (currently, baseURI is pretty much unused)
 
             final Set variableNames = (variableToValueMap != null) ? variableToValueMap.keySet() : null;
             final PooledXPathExpression expr;

@@ -21,6 +21,7 @@ import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
+import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.Item;
@@ -53,13 +54,16 @@ public class XFormsContextStack {
     }
 
     /**
-     * Reset the binding context to the root of the containing document.
+     * Reset the binding context to the root of the first model's first instance.
      */
-    public void resetBindingContext() {
-        resetBindingContext(containingDocument.getModel(""));
+    public void resetBindingContext(PipelineContext pipelineContext) {
+        resetBindingContext(pipelineContext, containingDocument.getModel(""));
     }
 
-    public void resetBindingContext(XFormsModel xformsModel) {
+    /**
+     * Reset the binding context to the root of the given model's first instance.
+     */
+    public void resetBindingContext(PipelineContext pipelineContext, XFormsModel xformsModel) {
         // Clear existing stack
         contextStack.clear();
 
@@ -71,6 +75,26 @@ public class XFormsContextStack {
         } else {
             contextStack.push(new BindingContext(null, xformsModel, Collections.EMPTY_LIST, 0, null, true, null, xformsModel.getLocationData(), false, null));
         }
+
+        // Add model variables for default model
+        addVariables(pipelineContext, getCurrentBindingContext(), xformsModel);
+    }
+
+    private void addVariables(PipelineContext pipelineContext, BindingContext bindingContext, XFormsModel xformsModel) {
+        int variablesCount = 0;
+        // TODO: Check dirty flag to prevent needless re-evaluation
+        for (Iterator i = xformsModel.getModelDocument().getRootElement().elements("variable").iterator(); i.hasNext(); variablesCount++) {
+            final Element currentVariableElement = (Element) i.next();
+
+            // All variables in the model are in scope for the nested binds and actions.
+            // NOTE: The value is computed immediately. We should use Expression objects and do lazy evaluation in the future.
+            final Variable variable = new Variable(containingDocument, this, currentVariableElement);
+            bindingContext.addVariable(variable.getVariableName(), variable.getVariableValue(pipelineContext, false));
+        }
+
+        if (variablesCount > 0 && XFormsServer.logger.isDebugEnabled())
+            containingDocument.logDebug("model", "evaluated variables",
+                    new String[] { "count", Integer.toString(variablesCount) });
     }
 
     /**
@@ -106,14 +130,14 @@ public class XFormsContextStack {
             setBinding((XFormsControl) eventHandlerContainer);
         } else if (eventHandlerContainer instanceof XFormsModel) {
             final XFormsModel xformsModel = (XFormsModel) eventHandlerContainer;
-            resetBindingContext(xformsModel);
+            resetBindingContext(pipelineContext, xformsModel);
         } else if (eventHandlerContainer instanceof XFormsInstance) {
             final XFormsInstance xformsInstance = (XFormsInstance) eventHandlerContainer;
-            resetBindingContext(xformsInstance.getModel(containingDocument));
+            resetBindingContext(pipelineContext, xformsInstance.getModel(containingDocument));
         } else if (eventHandlerContainer instanceof XFormsModelSubmission) {
             final XFormsModelSubmission submission = (XFormsModelSubmission) eventHandlerContainer;
             final XFormsModel xformsModel = (XFormsModel) submission.getParentContainer(containingDocument);
-            resetBindingContext(xformsModel);
+            resetBindingContext(pipelineContext, xformsModel);
             pushBinding(pipelineContext, submission.getSubmissionElement());
         } else {
             // Should not happen
@@ -152,43 +176,6 @@ public class XFormsContextStack {
         contextStack.push(bindingContext);
     }
 
-//    public void pushBinding(PipelineContext pipelineContext, XFormsControl xformsControl) {
-//
-//        final Element bindingElement = xformsControl.getControlElement();
-//        if (!(xformsControl instanceof RepeatIterationControl)) {
-//            // Regular XFormsControl backed by an element
-//
-//            final String ref = bindingElement.attributeValue("ref");
-//            final String context = bindingElement.attributeValue("context");
-//            final String nodeset = bindingElement.attributeValue("nodeset");
-//            final String modelId = XFormsUtils.namespaceId(containingDocument, bindingElement.attributeValue("model"));
-//            final String bindId = XFormsUtils.namespaceId(containingDocument, bindingElement.attributeValue("bind"));
-//
-//            // Get mappings only if an XPath expression must be computed
-//            final Map bindingElementNamespaceContext =
-//                    (ref != null || nodeset != null || context != null) ? containingDocument.getNamespaceMappings(bindingElement) : null;
-//
-//            pushBinding(pipelineContext, ref, context, nodeset, modelId, bindId, bindingElement, bindingElementNamespaceContext);
-//        } else {
-//            // RepeatIterationInfo
-//
-//            final XFormsControl repeatXFormsControl = xformsControl.getParent();
-//            final List repeatChildren = repeatXFormsControl.getChildren();
-//            final BindingContext currentBindingContext = getCurrentBindingContext();
-//            final List currentNodeset = currentBindingContext.getNodeset();
-//
-//            final int repeatChildrenSize = (repeatChildren == null) ? 0 : repeatChildren.size();
-//            final int currentNodesetSize = (currentNodeset == null) ? 0 : currentNodeset.size();
-//
-//            if (repeatChildrenSize != currentNodesetSize)
-//                throw new ValidationException("repeatChildren and newNodeset have different sizes.", xformsControl.getLocationData());
-//
-//            // Push iteration
-//            final int position = ((RepeatIterationControl) xformsControl).getIteration();
-//            pushIteration(position);
-//        }
-//    }
-
     /**
      * Push an element containing either single-node or nodeset binding attributes.
      */
@@ -223,32 +210,6 @@ public class XFormsContextStack {
                 ? containingDocument.getLocationData()
                 : new ExtendedLocationData((LocationData) bindingElement.getData(), "pushing XForms control binding", bindingElement);
 
-        // Check for mandatory and optional bindings
-        // TODO: This is static analysis to do only once and should be moved somewhere else
-        if (bindingElement != null && XFormsConstants.XFORMS_NAMESPACE_URI.equals(bindingElement.getNamespaceURI())) {
-            final String controlName = bindingElement.getName();
-            if (XFormsControls.mandatorySingleNodeControls.get(controlName) != null
-                    && !(bindingElement.attribute("ref") != null || bindingElement.attribute("bind") != null)) {
-                throw new ValidationException("Missing mandatory single node binding for element: " + bindingElement.getQualifiedName(), locationData);
-            }
-            if (XFormsControls.noSingleNodeControls.get(controlName) != null
-                    && (bindingElement.attribute("ref") != null || bindingElement.attribute("bind") != null)) {
-                throw new ValidationException("Single node binding is prohibited for element: " + bindingElement.getQualifiedName(), locationData);
-            }
-            if (XFormsControls.mandatoryNodesetControls.get(controlName) != null
-                    && !(bindingElement.attribute("nodeset") != null || bindingElement.attribute("bind") != null)) {
-                throw new ValidationException("Missing mandatory nodeset binding for element: " + bindingElement.getQualifiedName(), locationData);
-            }
-            if (XFormsControls.noNodesetControls.get(controlName) != null
-                    && bindingElement.attribute("nodeset") != null) {
-                throw new ValidationException("Node-set binding is prohibited for element: " + bindingElement.getQualifiedName(), locationData);
-            }
-            if (XFormsControls.singleNodeOrValueControls.get(controlName) != null
-                    && !(bindingElement.attribute("ref") != null || bindingElement.attribute("bind") != null || bindingElement.attribute("value") != null)) {
-                throw new ValidationException("Missing mandatory single node binding or value attribute for element: " + bindingElement.getQualifiedName(), locationData);
-            }
-        }
-
         // Determine current context
         final BindingContext currentBindingContext = getCurrentBindingContext();
 
@@ -271,6 +232,8 @@ public class XFormsContextStack {
         final List newNodeset;
         final boolean hasOverriddenContext;
         final Item contextItem;
+        final boolean isPushModelVariables;
+        final List variableInfo;
         {
             if (bindId != null) {
                 // Resolve the bind id to a nodeset
@@ -282,33 +245,37 @@ public class XFormsContextStack {
                 contextItem = currentBindingContext.getSingleItem();
                 isNewBind = true;
                 newPosition = 1;
+                isPushModelVariables = false;
+                variableInfo = null;
             } else if (ref != null || nodeset != null) {
 
                 // Check whether there is an optional context (XForms 1.1, likely generalized in XForms 1.2)
                 if (context != null) {
                     // Push model and context
-
-                    pushTemporaryContext(currentBindingContext.getSingleItem());// provide context information for the current() function
+                    pushTemporaryContext(currentBindingContext.getSingleItem());// provide context information for the context() function
                     pushBinding(pipelineContext, null, null, context, modelId, null, null, bindingElementNamespaceContext);
                     hasOverriddenContext = true;
                     contextItem = getCurrentSingleNode();
+                    variableInfo = getCurrentBindingContext().getVariableInfo();
                 } else if (isNewModel) {
                     // Push model only
                     pushBinding(pipelineContext, null, null, null, modelId, null, null, bindingElementNamespaceContext);
                     hasOverriddenContext = false;
                     contextItem = currentBindingContext.getSingleItem();
+                    variableInfo = getCurrentBindingContext().getVariableInfo();
                 } else {
                     hasOverriddenContext = false;
                     contextItem = currentBindingContext.getSingleItem();
+                    variableInfo = null;
                 }
 
                 // Evaluate new XPath in context
                 final BindingContext contextBindingContext = getCurrentBindingContext();
 
                 if (contextBindingContext != null && contextBindingContext.getNodeset().size() > 0) {
-                    pushTemporaryContext(contextBindingContext.getSingleItem());// provide context information for the current() function
+                    pushTemporaryContext(contextBindingContext.getSingleItem());// provide context information for the context() function
                     newNodeset = XPathCache.evaluateKeepItems(pipelineContext, contextBindingContext.getNodeset(), contextBindingContext.getPosition(),
-                            ref != null ? ref : nodeset, bindingElementNamespaceContext, contextBindingContext.getVariables(), XFormsContainingDocument.getFunctionLibrary(),
+                            ref != null ? ref : nodeset, bindingElementNamespaceContext, contextBindingContext.getInScopeVariables(), XFormsContainingDocument.getFunctionLibrary(),
                             functionContext, null, locationData);
                     popBinding();
                 } else {
@@ -323,6 +290,7 @@ public class XFormsContextStack {
                 }
                 isNewBind = true;
                 newPosition = 1;
+                isPushModelVariables = false;
             } else if (isNewModel && context == null) {
                 // Only the model has changed
 
@@ -330,14 +298,18 @@ public class XFormsContextStack {
                 if (modelBindingContext != null) {
                     newNodeset = modelBindingContext.getNodeset();
                     newPosition = modelBindingContext.getPosition();
+                    isPushModelVariables = false;
                 } else {
                     newNodeset = getCurrentNodeset(newModel.getEffectiveId());
                     newPosition = 1;
+                    // Variables for this model are not yet on the stack
+                    isPushModelVariables = true;
                 }
 
                 hasOverriddenContext = false;
                 contextItem = currentBindingContext.getSingleItem();
                 isNewBind = false;
+                variableInfo = null;
 
             } else if (context != null) {
                 // Only the context has changed, and possibly the model
@@ -348,6 +320,8 @@ public class XFormsContextStack {
                     isNewBind = false;
                     hasOverriddenContext = true;
                     contextItem = getCurrentSingleNode();
+                    isPushModelVariables = false;
+                    variableInfo = null;
                 }
                 popBinding();
 
@@ -358,12 +332,24 @@ public class XFormsContextStack {
                 contextItem = currentBindingContext.getContextItem();
                 isNewBind = false;
                 newPosition = currentBindingContext.getPosition();
+                isPushModelVariables = false;
+                variableInfo = null;
             }
         }
 
         // Push new context
         final String id = (bindingElement == null) ? null : bindingElement.attributeValue("id");
         contextStack.push(new BindingContext(currentBindingContext, newModel, newNodeset, newPosition, id, isNewBind, bindingElement, locationData, hasOverriddenContext, contextItem));
+
+        // Add new model variables if needed
+        if (variableInfo != null) {
+            // In this case, we did a temporary context push with the new model, and we already gathered the new
+            // variables in scope. We have to set them to the newly pushed BindingContext.
+            getCurrentBindingContext().setVariableInfo(variableInfo);
+        } else if (isPushModelVariables) {
+            // In this case, the model just changed and so we gathered the variables in scope for this model.
+            addVariables(pipelineContext, getCurrentBindingContext(), newModel);
+        }
     }
 
     private void pushTemporaryContext(Item contextItem) {
@@ -525,7 +511,7 @@ public class XFormsContextStack {
      * @return  Map<String, List> of variable name to value
      */
     public Map getCurrentVariables() {
-        return getCurrentBindingContext().getVariables();
+        return getCurrentBindingContext().getInScopeVariables();
     }
 
     /**
@@ -671,8 +657,8 @@ public class XFormsContextStack {
         private boolean hasOverriddenContext;
         private Item contextItem;
 
-        private String variableName;
-        private ValueRepresentation variableValue;
+        private List variableInfo;
+
         private Map variablesMap; // cached varaiable map
 
         public BindingContext(BindingContext parent, XFormsModel model, List nodeSet, int position, String elementId, boolean newBind, Element controlElement, LocationData locationData, boolean hasOverriddenContext, Item contextItem) {
@@ -700,8 +686,8 @@ public class XFormsContextStack {
 
         public BindingContext(BindingContext parent, Element controlElement, LocationData locationData, String variableName, ValueRepresentation variableValue) {
             this(parent, parent.getModel(), parent.getNodeset(), parent.getPosition(), parent.getElementId(), false, controlElement, locationData, false, parent.getContextItem());
-            this.variableName = variableName;
-            this.variableValue = variableValue;
+            variableInfo = new ArrayList();
+            variableInfo.add(new VariableInfo(variableName, variableValue));
         }
 
         public BindingContext getParent() {
@@ -768,27 +754,67 @@ public class XFormsContextStack {
             return (Item) nodeset.get(position - 1);
         }
 
+        public void addVariable(String variableName, ValueRepresentation variableValue) {
+            if (variableInfo == null)
+                variableInfo = new ArrayList();
+            variableInfo.add(new VariableInfo(variableName, variableValue));
+        }
+
+        public void setVariableInfo(List variableInfo) {
+            this.variableInfo = variableInfo;
+        }
+
+        public List getVariableInfo() {
+            return variableInfo;
+        }
+
         /**
          * Return a Map of the variables in scope.
          *
          * @return  Map<String, List> of variable name to value
          */
-        public Map getVariables() {
-            if (variablesMap == null) {
-                variablesMap = new HashMap();
+        public Map getInScopeVariables() {
+            return getInScopeVariables(true);
+        }
+
+        public Map getInScopeVariables(boolean useCache) {
+            // TODO: Variables in scope in the view must not include the variables defined in another model, but must include all view variables.
+            if (variablesMap == null || !useCache) {
+                final Map tempVariablesMap = new HashMap();
 
                 BindingContext currentBindingContext = this;
                 do {
-                    final String currentName = currentBindingContext.variableName;
-                    if (currentName != null && variablesMap.get(currentName) == null) {
-                        // The binding defines a variable and there is not already a variable with that name
-                        variablesMap.put(currentBindingContext.variableName, currentBindingContext.variableValue);
+                    final List currentInfo = currentBindingContext.variableInfo;
+                    if (currentInfo != null) {
+                        for (Iterator i = currentInfo.iterator(); i.hasNext();) {
+                            final VariableInfo variableInfo = (VariableInfo) i.next();
+                            final String currentName = variableInfo.variableName;
+                            if (currentName != null && tempVariablesMap.get(currentName) == null) {
+                                // The binding defines a variable and there is not already a variable with that name
+                                tempVariablesMap.put(variableInfo.variableName, variableInfo.variableValue);
+                            }
+                        }
                     }
 
                     currentBindingContext = currentBindingContext.getParent();
                 } while (currentBindingContext != null);
+
+                if (!useCache)
+                    return tempVariablesMap;
+
+                variablesMap = tempVariablesMap;
             }
             return variablesMap;
+        }
+
+        private static class VariableInfo {
+            private String variableName;
+            private ValueRepresentation variableValue;
+
+            private VariableInfo(String variableName, ValueRepresentation variableValue) {
+                this.variableName = variableName;
+                this.variableValue = variableValue;
+            }
         }
     }
 }

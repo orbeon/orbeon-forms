@@ -76,7 +76,8 @@
                     <li>
                         <p>
                             <b>Support for <code>exforms:variable</code> and <code>xxforms:variable</code> within
-                            controls.</b> [TODO: document + example]
+                            controls.</b> [TODO: document + example, also mention view vs. models + currently no
+                            actions; document scoping rules]
                         </p>
                     </li>
                     <li>

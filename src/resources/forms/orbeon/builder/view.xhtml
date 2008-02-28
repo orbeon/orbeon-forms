@@ -48,6 +48,8 @@
             #fb-delete-confirm-dialog { width: 400px; }
             #fb-toolbox-dialog { width: 180px; }
             #fb-xml-dialog .fb-xml-dialog-view { width: 57.69em; *width:56.301em; min-width:750px; height: 400px; overflow: scroll }
+            #fb-edit-source-dialog .fb-xml-dialog-view { width: 57.69em; *width:56.301em; min-width:750px; height: 400px }
+            #fb-edit-source-dialog .fb-xml-dialog-view textarea.xforms-textarea { width: 99%; height: 29em }
 
             .dialog-icon { float: left; margin-right: 2em; margin-left: 1em; padding-bottom: 1em; }
             .dialog-message { margin-top: 1em; padding-top: 0.5em; }
@@ -130,14 +132,19 @@
                 <language>en</language>
             </xforms:instance>
 
-            <!-- Useful variables -->
+            <!-- Variable pointing to the current language -->
             <xxforms:variable name="lang" select="instance('fb-language-instance')"/>
 
+            <!-- Other variables -->
             <xxforms:variable name="form-instance" select="xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-instance']/*"/>
             <xxforms:variable name="metadata-instance" select="xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-metadata']/*"/>
             <xxforms:variable name="resources" select="xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-resources']/*"/>
             <xxforms:variable name="current-resources" select="$resources/resource[@xml:lang = $lang]"/>
             <xxforms:variable name="body" select="xhtml:body/fr:view/fr:body"/>
+
+            <xforms:instance id="fb-xsl-output-instance">
+                <xsl:output xmlns:xsl="http://www.w3.org/1999/XSL/Transform" method="xml" omit-xml-declaration="yes" indent="yes" saxon:indent-spaces="4"/>
+            </xforms:instance>
 
             <!-- Submission to test the form -->
             <xforms:submission id="fb-test-form-submission"
@@ -161,6 +168,9 @@
                     <new-language-trigger/>
 
                     <new-help/>
+
+                    <new-source/>
+                    <new-source-trigger/>
                 </variables>
             </xforms:instance>
 
@@ -811,11 +821,10 @@
                 <!-- Edit Source -->
                 <xforms:trigger>
                     <xforms:label>
-                        <xhtml:img src="../../../../apps/fr/style/view-xml.gif" alt="Edit Source" title="Edit Source"/>
+                        <xhtml:img src="../../../../apps/fr/style/edit.gif" alt="Edit Source" title="Edit Source"/>
                         <xhtml:span>Edit Source</xhtml:span>
                     </xforms:label>
-                    <!-- TODO -->
-                    <!--<xxforms:show ev:event="DOMActivate" dialog="fb-xml-dialog"/>-->
+                    <xxforms:show ev:event="DOMActivate" dialog="fb-edit-source-dialog"/>
                 </xforms:trigger>
 
                 <!-- Upload XML Schema -->
@@ -1018,9 +1027,9 @@
                                 <xforms:label><xhtml:img src="/apps/fr/style/close.gif" alt=""/> <xhtml:span>Cancel</xhtml:span></xforms:label>
                             </xforms:trigger>
                         </xforms:group>
-                        <!-- Hide dialog -->
-                        <xxforms:hide ev:event="DOMActivate" dialog="fb-delete-confirm-dialog"/>
                     </xhtml:div>
+                    <!-- Hide dialog -->
+                    <xxforms:hide ev:event="DOMActivate" dialog="fb-delete-confirm-dialog"/>
                 </xxforms:dialog>
 
                 <!-- Dialog to show the XML -->
@@ -1035,9 +1044,48 @@
                         <xforms:trigger>
                             <xforms:label><xhtml:img src="/apps/fr/style/close.gif" alt=""/> <xhtml:span>Close</xhtml:span></xforms:label>
                         </xforms:trigger>
-                        <!-- Hide dialog -->
-                        <xxforms:hide ev:event="DOMActivate" dialog="fb-xml-dialog"/>
                     </xhtml:div>
+                    <!-- Hide dialog -->
+                    <xxforms:hide ev:event="DOMActivate" dialog="fb-xml-dialog"/>
+                </xxforms:dialog>
+
+                <!-- Dialog to edit the source -->
+                <xxforms:dialog id="fb-edit-source-dialog" level="modeless" close="true" draggable="true">
+                    <xforms:label>Edit source</xforms:label>
+                    <xhtml:div class="fb-xml-dialog-view">
+                        <xforms:textarea ref="$variables/new-source"/>
+                    </xhtml:div>
+                    <xhtml:div class="dialog-button">
+                        <xhtml:span class="fr-inplace-buttons">
+                            <xforms:trigger class="fr-inplace-rename" ref="$variables/new-source-trigger">
+                                <xforms:label>Save</xforms:label>
+                                <!-- TODO: At the very least, should make sure the XML is well-formed. Even better would be to validate it. -->
+                                <xforms:action ev:event="DOMActivate">
+
+                                    <!-- Parse the XML and insert it -->
+
+                                    <!-- TODO: extra line breaks are added as you edit and save the XML -->
+                                    <xforms:message level="xxforms:log-debug">
+                                        <xforms:output value="replace($variables/new-source, '&#x0d;', '&#x0d;xxx')"/>
+                                    </xforms:message>
+
+                                    <xforms:insert nodeset="instance('fr-form-instance')" origin="saxon:parse($variables/new-source)"/>
+                                    <!-- Saxon serialization adds an extra meta element -->
+                                    <xforms:delete nodeset="instance('fr-form-instance')/xhtml:head/meta[@http-equiv = 'Content-Type']"/>
+
+                                </xforms:action>
+                            </xforms:trigger>
+                            or
+                            <xforms:trigger appearance="minimal" class="fr-inplace-cancel">
+                                <xforms:label>Cancel</xforms:label>
+                            </xforms:trigger>
+                        </xhtml:span>
+                    </xhtml:div>
+                    <!-- Hide dialog -->
+                    <xxforms:hide ev:event="DOMActivate" dialog="fb-edit-source-dialog"/>
+                    <!-- Serialize XML when the dialog opens -->
+                    <xforms:setvalue ev:event="xxforms-dialog-open" ref="$variables/new-source"
+                                     value="saxon:serialize(instance('fr-form-instance'), xxforms:instance('fb-xsl-output-instance'))"/>
                 </xxforms:dialog>
 
                 <!-- Add language dialog -->
@@ -1074,9 +1122,9 @@
                                 </xforms:trigger>
                             </xhtml:span>
                         </xforms:group>
-                        <!-- Hide dialog -->
-                        <xxforms:hide ev:event="DOMActivate" dialog="fb-add-language-dialog"/>
                     </xhtml:div>
+                    <!-- Hide dialog -->
+                    <xxforms:hide ev:event="DOMActivate" dialog="fb-add-language-dialog"/>
                     <!-- Clear selection list when the dialog opens -->
                     <xforms:setvalue ev:event="xxforms-dialog-open" ref="$variables/new-language"/>
                 </xxforms:dialog>

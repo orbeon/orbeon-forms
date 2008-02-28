@@ -242,7 +242,7 @@ public class PooledXPathExpression {
 
         public Item current() {
             if (currentPosition != -1 && contextNodeset.size() > currentPosition - 1)
-                return (NodeInfo) contextNodeset.get(currentPosition - 1);
+                return (Item) contextNodeset.get(currentPosition - 1);
             else
                 return null;
         }

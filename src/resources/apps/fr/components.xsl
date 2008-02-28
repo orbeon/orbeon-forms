@@ -268,6 +268,7 @@
         <xforms:trigger>
             <xforms:label><xhtml:img src="/apps/fr/style/save.gif" alt=""/> <xhtml:span>Save locally</xhtml:span></xforms:label>
             <xforms:action ev:event="DOMActivate">
+                <xforms:setvalue ref="xxforms:instance('fr-persistence-instance')/save-attempted">true</xforms:setvalue>
                 <xforms:send submission="save-locally-submission"/>
             </xforms:action>
         </xforms:trigger>
@@ -497,11 +498,13 @@
             <xforms:group appearance="xxforms:internal">
                 <xhtml:tr>
                     <xhtml:td class="fr-repeat-column"/>
+                    <!-- Add trigger (image) -->
                     <xhtml:td class="fr-repeat-column">
                         <xforms:trigger appearance="minimal" ref=".[{if ($max-occurs = 'unbounded') then 'true()' else concat('count(', @nodeset, ') lt ', $max-occurs)}]">
                             <xforms:label><xhtml:img src="../../../../apps/fr/style/add.gif" alt="Add" title="Add"/></xforms:label>
                         </xforms:trigger>
                     </xhtml:td>
+                    <!-- Add trigger (text) -->
                     <xhtml:td style="width: 100%" colspan="{max(for $tr in xhtml:tr return count($tr/xhtml:td))}">
                         <xforms:trigger appearance="minimal" ref=".[{if ($max-occurs = 'unbounded') then 'true()' else concat('count(', @nodeset, ') lt ', $max-occurs)}]">
                             <xforms:label>Add <xsl:value-of select="lower-case(xforms:label)"/></xforms:label>
@@ -518,6 +521,7 @@
             <xhtml:tr>
                 <xhtml:td class="fr-repeat-column"/>
                 <xhtml:td class="fr-repeat-column"/>
+                <!-- Line with column headers -->
                 <xsl:for-each select="xhtml:tr[1]/xhtml:td/xforms:*[1]/xforms:label">
                     <xhtml:th>
                         <xsl:value-of select="."/>
@@ -532,9 +536,10 @@
                         </xhtml:td>
                         <xhtml:td class="fr-repeat-column">
                             <xforms:group>
+                                <!-- Remove trigger -->
                                 <xforms:trigger appearance="minimal" ref="if (
                                         {if ($first-mandatory) then 'position() != 1 and ' else ''}
-                                        count(xxforms:context('{@id}')) gt {$min-occurs}) then . else ()">
+                                        count(xxforms:repeat-nodeset('{@id}')) gt {$min-occurs}) then . else ()">
                                     <xforms:label><xhtml:img src="../../../../apps/fr/style/remove.gif" alt="Remove" title="Remove"/></xforms:label>
                                 </xforms:trigger>
                                 <xforms:delete ev:event="DOMActivate" nodeset="."/>

@@ -45,8 +45,9 @@
             .fb-new-grid { margin-top: .5em }
 
             <!-- Set width of dialog (otherwise becomes too wide) -->
-            .fb-delete-confirm-dialog { width: 400px; }
-            .fb-toolbox-dialog { width: 320px; }
+            #fb-delete-confirm-dialog { width: 400px; }
+            #fb-toolbox-dialog { width: 180px; }
+            #fb-xml-dialog .fb-xml-dialog-view { width: 57.69em; *width:56.301em; min-width:750px; height: 400px; overflow: scroll }
 
             .dialog-icon { float: left; margin-right: 2em; margin-left: 1em; padding-bottom: 1em; }
             .dialog-message { margin-top: 1em; padding-top: 0.5em; }
@@ -109,6 +110,7 @@
                 background: white;
             }
 
+            .fb-hide-alert .xforms-alert { display: none }
 
             <!--.fb-section-title-content { background: #eee }-->
         </xhtml:style>
@@ -123,15 +125,19 @@
                 <xforms:bind nodeset="xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-metadata']/*/id" type="xs:NCName"/>
             </xforms:bind>
 
+            <!-- Instance containing the current language -->
+            <xforms:instance id="fb-language-instance">
+                <language>en</language>
+            </xforms:instance>
+
             <!-- Useful variables -->
-            <xxforms:variable name="lang" select="'en'"/><!-- TEMP -->
+            <xxforms:variable name="lang" select="instance('fb-language-instance')"/>
 
             <xxforms:variable name="form-instance" select="xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-instance']/*"/>
             <xxforms:variable name="metadata-instance" select="xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-metadata']/*"/>
             <xxforms:variable name="resources" select="xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-resources']/*"/>
             <xxforms:variable name="current-resources" select="$resources/resource[@xml:lang = $lang]"/>
             <xxforms:variable name="body" select="xhtml:body/fr:view/fr:body"/>
-            <xxforms:variable name="variables" select="instance('fb-variables')"/>
 
             <!-- Submission to test the form -->
             <xforms:submission id="fb-test-form-submission"
@@ -145,16 +151,25 @@
                 <variables>
                     <delete-node/>
                     <help-node/>
+
                     <blank-readonly-value/>
+
                     <next-section-id/>
                     <next-control-id/>
+
+                    <new-language/>
+                    <new-language-trigger/>
+
+                    <new-help/>
                 </variables>
             </xforms:instance>
 
             <xforms:bind nodeset="instance('fb-variables')">
                 <xforms:bind nodeset="blank-readonly-value" readonly="true()"/>
+                <xforms:bind nodeset="new-language-trigger" readonly="normalize-space(../new-language) = ''"/>
             </xforms:bind>
 
+            <xxforms:variable name="variables" select="instance('fb-variables')"/>
             <xxforms:variable name="next-section-id" select="$variables/next-section-id"/>
             <xxforms:variable name="next-control-id" select="$variables/next-control-id"/>
 
@@ -288,6 +303,36 @@
                 <templates xmlns="">
                     <template label="Text Line">
                         <xhtml:div class="input">
+                            <xforms:input id="" ref="">
+                                <xforms:label ref=""/>
+                                <xforms:hint ref=""/>
+                                <xforms:help ref=""/>
+                                <xforms:alert ref=""/>
+                            </xforms:input>
+                        </xhtml:div>
+                    </template>
+                    <template label="Date Picker" image="/ops/images/xforms/calendar.gif">
+                        <xhtml:div class="date-input">
+                            <xforms:input id="" ref="">
+                                <xforms:label ref=""/>
+                                <xforms:hint ref=""/>
+                                <xforms:help ref=""/>
+                                <xforms:alert ref=""/>
+                            </xforms:input>
+                        </xhtml:div>
+                    </template>
+                    <template label="Time" image="/forms/orbeon/builder/images/clock.png">
+                        <xhtml:div class="time-input">
+                            <xforms:input id="" ref="">
+                                <xforms:label ref=""/>
+                                <xforms:hint ref=""/>
+                                <xforms:help ref=""/>
+                                <xforms:alert ref=""/>
+                            </xforms:input>
+                        </xhtml:div>
+                    </template>
+                    <template label="Date and Time" image="/ops/images/xforms/calendar.gif">
+                        <xhtml:div class="dateTime-input">
                             <xforms:input id="" ref="">
                                 <xforms:label ref=""/>
                                 <xforms:hint ref=""/>
@@ -437,6 +482,20 @@
 
                 -->
 
+                <xforms:group class="fr-summary-language-choice fb-hide-alert">
+                    <xforms:select1 appearance="minimal" ref="$lang" id="fb-resources-language-select">
+                        <xforms:label>Resources Language</xforms:label>
+                        <xforms:itemset nodeset="$resources/resource">
+                            <xforms:label value="xxforms:instance('fr-languages-instance')/language[@code = context()/@xml:lang]/(if (@native-name != @english-name) then concat(@native-name, ' (', @english-name, ')') else @native-name)"/>
+                            <xforms:value ref="@xml:lang"/>
+                        </xforms:itemset>
+                    </xforms:select1>
+                    <xforms:trigger appearance="minimal">
+                        <xforms:label>Add</xforms:label>
+                        <xxforms:show ev:event="DOMActivate" dialog="fb-add-language-dialog" neighbor="fb-resources-language-select"/>
+                    </xforms:trigger>
+                </xforms:group>
+
                 <!-- Section about form metadata -->
                 <fr:section id="fb-metadata-section" context="$metadata-instance" class="fb-metadata-section">
                     <xforms:label>Form Metadata</xforms:label>
@@ -457,13 +516,6 @@
                 <fr:section id="fb-details-section" context="$body">
                     <xforms:label>Form Details</xforms:label>
 
-                    <!--<xforms:trigger>-->
-                        <!--<xforms:label>-->
-                            <!--<xhtml:span>Show Toolbox</xhtml:span>-->
-                        <!--</xforms:label>-->
-                        <!--<xxforms:show ev:event="DOMActivate" dialog="fb-toolbox-dialog"/>-->
-                    <!--</xforms:trigger>-->
-
                     <xhtml:div style="clear: both">
 
                         <!-- Handle top-level blocks -->
@@ -473,6 +525,8 @@
                             <xforms:group ref=".[local-name() = 'section']">
 
                                 <xxforms:variable name="section-id" select="substring-before(@id, '-section')"/>
+
+                                <!--<xhtml:img src="/apps/fr/style/minus.png" alt="Close section" title="Close section"/>-->
 
                                 <!-- Editable section title -->
                                 <xforms:input id="fb-section-title-input"
@@ -557,7 +611,7 @@
                                                                         <xforms:trigger appearance="minimal">
                                                                             <xforms:label><xhtml:img src="../../../../apps/fr/style/trash.gif" alt="Delete" title="Delete"/></xforms:label>
                                                                             <xforms:action ev:event="DOMActivate">
-                                                                                <xforms:delete nodeset="."/>
+                                                                                <xforms:delete nodeset=".."/>
                                                                             </xforms:action>
                                                                         </xforms:trigger>
                                                                     </xhtml:td>
@@ -571,6 +625,17 @@
                                                                             </xforms:input>
                                                                         </xhtml:span>
 
+                                                                        <!-- Edit control type -->
+                                                                        <!--zzzz-->
+                                                                        <!--<xhtml:span>-->
+                                                                            <!--<xforms:input id="fb-control-label-control"-->
+                                                                                          <!--ref="$current-resources/*[name() = $control-id]/label"-->
+                                                                                          <!--appearance="fr:in-place" class="fb-control-label">-->
+                                                                                <!--<xforms:label class="fb-xforms-disabled"/>-->
+                                                                            <!--</xforms:input>-->
+                                                                        <!--</xhtml:span>-->
+
+                                                                        <!-- Display representation of the control -->
                                                                         <xhtml:span class="fb-control-control">
                                                                             <xforms:group ref="xforms:input">
                                                                                 <!--instance('fr-form-instance')/xhtml:head/xforms:model/xforms:instance/*/*[xxx section]/*[count(context()/preceding-sibling::*) + 1]-->
@@ -731,11 +796,46 @@
                         <xhtml:img src="../../../../forms/orbeon/builder/images/play.png" alt="Test Form" title="Test Form"/>
                         <xhtml:span>Test Form</xhtml:span>
                     </xforms:label>
-                    <xforms:action ev:event="DOMActivate">
+                    <xforms:send ev:event="DOMActivate" submission="fb-test-form-submission"/>
+                </xforms:trigger>
 
-                        <xforms:send submission="fb-test-form-submission"/>
+                <!-- Show XML -->
+                <xforms:trigger>
+                    <xforms:label>
+                        <xhtml:img src="../../../../apps/fr/style/view-xml.gif" alt="Show XML" title="Show XML"/>
+                        <xhtml:span>Show XML</xhtml:span>
+                    </xforms:label>
+                    <xxforms:show ev:event="DOMActivate" dialog="fb-xml-dialog"/>
+                </xforms:trigger>
 
-                    </xforms:action>
+                <!-- Edit Source -->
+                <xforms:trigger>
+                    <xforms:label>
+                        <xhtml:img src="../../../../apps/fr/style/view-xml.gif" alt="Edit Source" title="Edit Source"/>
+                        <xhtml:span>Edit Source</xhtml:span>
+                    </xforms:label>
+                    <!-- TODO -->
+                    <!--<xxforms:show ev:event="DOMActivate" dialog="fb-xml-dialog"/>-->
+                </xforms:trigger>
+
+                <!-- Upload XML Schema -->
+                <xforms:trigger>
+                    <xforms:label>
+                        <xhtml:img src="../../../../forms/orbeon/builder/images/upload.png" alt="Upload XML Schema" title="Upload XML Schema"/>
+                        <xhtml:span>Upload XML Schema</xhtml:span>
+                    </xforms:label>
+                    <!-- TODO -->
+                    <!--<xxforms:show ev:event="DOMActivate" dialog="fb-xml-dialog"/>-->
+                </xforms:trigger>
+
+                <!-- Upload PDF Template -->
+                <xforms:trigger>
+                    <xforms:label>
+                        <xhtml:img src="../../../../apps/fr/style/pdf.png" alt="Upload PDF" title="Upload PDF"/>
+                        <xhtml:span>Upload PDF</xhtml:span>
+                    </xforms:label>
+                    <!-- TODO -->
+                    <!--<xxforms:show ev:event="DOMActivate" dialog="fb-xml-dialog"/>-->
                 </xforms:trigger>
 
                 <!-- Toolbox -->
@@ -778,11 +878,13 @@
 
                                         </xforms:action>
 
-                                        <!-- Insert resources -->
-                                        <xforms:insert context="$current-resources" nodeset="*"
-                                                       origin="xxforms:element(concat('section-', $next-section-id))"/>
+                                        <!-- Insert resources placeholders for all languages -->
+                                        <xforms:action xxforms:iterate="$resources/resource">
+                                            <xforms:insert context="." nodeset="*"
+                                                           origin="xxforms:element(concat('section-', $next-section-id))"/>
 
-                                        <xforms:insert context="$current-resources/*[last()]" origin="instance('fb-resource-template')/*"/>
+                                            <xforms:insert context="*[last()]" origin="instance('fb-resource-template')/*"/>
+                                        </xforms:action>
 
                                         <!-- Insert a first component into the section -->
                                         <xforms:setindex repeat="fb-controls-template-repeat" index="1"/>
@@ -798,7 +900,7 @@
                                 <xhtml:div class="fb-tool">
                                     <xforms:trigger id="fb-add-control-trigger" xmlns:f="http://orbeon.org/oxf/xml/formatting">
                                         <xforms:label>
-                                            <xforms:output value="concat('&lt;img src=''../../../../forms/orbeon/builder/images/', xhtml:div/@class, '.png''/>')" mediatype="text/html" f:url-norewrite="true"/>
+                                            <xforms:output value="concat('&lt;img width=''16'' height=''16'' src=''', if (@image) then @image else concat('../../../../forms/orbeon/builder/images/', xhtml:div/@class, '.png'), '''/>')" mediatype="text/html" f:url-norewrite="true"/>
                                             <xforms:output ref="@label"/>
                                         </xforms:label>
                                         <xforms:action ev:event="DOMActivate">
@@ -855,11 +957,13 @@
 
                                             </xforms:action>
 
-                                            <!-- Insert resources -->
-                                            <xforms:insert context="$current-resources" nodeset="*"
-                                                           origin="xxforms:element(concat('control-', $next-control-id))"/>
+                                            <!-- Insert resources placeholders for all languages -->
+                                            <xforms:action xxforms:iterate="$resources/resource">
+                                                <xforms:insert context="." nodeset="*"
+                                                               origin="xxforms:element(concat('control-', $next-control-id))"/>
 
-                                            <xforms:insert context="$current-resources/*[last()]" origin="instance('fb-resource-template')/*"/>
+                                                <xforms:insert context="*[last()]" origin="instance('fb-resource-template')/*"/>
+                                            </xforms:action>
 
                                         </xforms:action>
                                     </xforms:trigger>
@@ -869,29 +973,30 @@
                     </xhtml:div>
                 </xxforms:dialog>
 
-                <!-- Help edit -->
-                <xxforms:dialog id="fb-edit-help-dialog" level="modal" draggable="true" appearance="minimal">
+                <!-- Edit help -->
+                <xxforms:dialog id="fb-edit-help-dialog" appearance="minimal">
                     <xforms:label>Edit Help</xforms:label>
                     <xhtml:div>
-                        <xforms:group>
-                            <xforms:textarea ref="if ($variables/help-node = '') then () else $form-instance/root()/saxon:evaluate($variables/help-node)">
-                                <xforms:label>Help</xforms:label>
+                        <xforms:group class="fb-hide-alert">
+                            <xforms:textarea ref="$variables/new-help">
+                                <xforms:label>Help Message:</xforms:label>
                             </xforms:textarea>
-                            <xhtml:span class="fr-inplace-buttons">
+                            <xhtml:div>
                                 <xforms:trigger class="fr-inplace-rename">
                                     <xforms:label>Change</xforms:label>
-                                    <xforms:toggle ev:event="DOMActivate" case="fr-inplace-{@id}-view"/>
+                                    <xforms:setvalue ev:event="DOMActivate" ref="$form-instance/root()/saxon:evaluate($variables/help-node)" value="$variables/new-help"/>
                                 </xforms:trigger>
                                 or
                                 <xforms:trigger appearance="minimal" class="fr-inplace-cancel">
                                     <xforms:label>Cancel</xforms:label>
-                                    <xforms:toggle ev:event="DOMActivate" case="fr-inplace-{@id}-view"/>
                                 </xforms:trigger>
-                            </xhtml:span>
+                            </xhtml:div>
                         </xforms:group>
                         <!-- Hide dialog -->
                         <xxforms:hide ev:event="DOMActivate" dialog="fb-edit-help-dialog"/>
                     </xhtml:div>
+                    <!-- Copy help value when the dialog opens -->
+                    <xforms:setvalue ev:event="xxforms-dialog-open" ref="$variables/new-help" value="$form-instance/root()/saxon:evaluate($variables/help-node)"/>
                 </xxforms:dialog>
 
                 <!-- Section delete confirmation -->
@@ -917,6 +1022,65 @@
                         <xxforms:hide ev:event="DOMActivate" dialog="fb-delete-confirm-dialog"/>
                     </xhtml:div>
                 </xxforms:dialog>
+
+                <!-- Dialog to show the XML -->
+                <xxforms:dialog id="fb-xml-dialog" level="modeless" close="true" draggable="true">
+                    <xforms:label>View XML</xforms:label>
+                    <xhtml:div class="fb-xml-dialog-view">
+                        <xforms:output mediatype="text/html"
+                                value="xxforms:serialize(xxforms:call-xpl(
+                                        'oxf:/ops/utils/formatting/format.xpl', 'data', instance('fr-form-instance'), 'data')/*, 'html')"/>
+                    </xhtml:div>
+                    <xhtml:div class="dialog-button">
+                        <xforms:trigger>
+                            <xforms:label><xhtml:img src="/apps/fr/style/close.gif" alt=""/> <xhtml:span>Close</xhtml:span></xforms:label>
+                        </xforms:trigger>
+                        <!-- Hide dialog -->
+                        <xxforms:hide ev:event="DOMActivate" dialog="fb-xml-dialog"/>
+                    </xhtml:div>
+                </xxforms:dialog>
+
+                <!-- Add language dialog -->
+                <xxforms:dialog id="fb-add-language-dialog" appearance="minimal">
+                    <xforms:label>Add Language</xforms:label>
+                    <xhtml:div>
+                        <xforms:group>
+                            <xforms:group class="fb-hide-alert">
+                                <xforms:select1 ref="$variables/new-language" xxforms:refresh-items="false">
+                                    <xforms:label>Add the following language:</xforms:label>
+                                    <xforms:item>
+                                        <xforms:label>[Select...]</xforms:label>
+                                        <xforms:value/>
+                                    </xforms:item>
+                                    <xforms:itemset model="fr-resources-model"
+                                                    nodeset="instance('fr-languages-instance')/language[not(@exclude = 'true') and not(@code = $lang)]">
+                                        <xforms:label value="if (@native-name != @english-name) then concat(@native-name, ' (', @english-name, ')') else @native-name"/>
+                                        <xforms:value ref="@code"/>
+                                    </xforms:itemset>
+                                </xforms:select1>
+                            </xforms:group>
+                            <xhtml:span class="fr-inplace-buttons">
+                                <xforms:trigger class="fr-inplace-rename" ref="$variables/new-language-trigger">
+                                    <xforms:label>Add</xforms:label>
+                                    <xforms:action ev:event="DOMActivate">
+                                        <xforms:insert context="$resources" nodeset="resource" origin="resource[1]"/>
+                                        <xforms:setvalue ref="$resources/resource[last()]/@xml:lang" value="$variables/new-language"/>
+                                        <xforms:setvalue ref="$lang" value="$variables/new-language"/>
+                                    </xforms:action>
+                                </xforms:trigger>
+                                or
+                                <xforms:trigger appearance="minimal" class="fr-inplace-cancel">
+                                    <xforms:label>Cancel</xforms:label>
+                                </xforms:trigger>
+                            </xhtml:span>
+                        </xforms:group>
+                        <!-- Hide dialog -->
+                        <xxforms:hide ev:event="DOMActivate" dialog="fb-add-language-dialog"/>
+                    </xhtml:div>
+                    <!-- Clear selection list when the dialog opens -->
+                    <xforms:setvalue ev:event="xxforms-dialog-open" ref="$variables/new-language"/>
+                </xxforms:dialog>
+
             </fr:body>
         </fr:view>
 

@@ -67,7 +67,7 @@
                                     <xforms:repeat model="fr-resources-model" nodeset="$available-languages">
 
                                         <xxforms:variable name="position" select="position()"/>
-                                        <xxforms:variable name="label" select="($fr-resources/languages/item[value = context()]/label[normalize-space() != ''], context())[1]"/>
+                                        <xxforms:variable name="label" select="(instance('fr-languages-instance')/language[@code = context()]/@native-name, context())[1]"/>
                                         
                                         <xforms:group ref=".[$position > 1]"> | </xforms:group>
                                         <xforms:trigger ref=".[context() != instance('fr-language-instance')]" appearance="minimal">
@@ -404,7 +404,8 @@
                                 <xforms:group appearance="xxforms:internal">
                                     <xforms:trigger appearance="minimal">
                                         <xforms:label>
-                                            <xhtml:img src="../../../../apps/fr/style/plus.png" alt="Open section" title="Open section"/>
+                                            <!--  xxx temp links -->
+                                            <xhtml:img src="/apps/fr/style/plus.png" alt="Open section" title="Open section"/>
                                         </xforms:label>
                                     </xforms:trigger>
                                     <xforms:trigger appearance="minimal">
@@ -426,7 +427,8 @@
                                 <xforms:group appearance="xxforms:internal">
                                     <xforms:trigger appearance="minimal">
                                         <xforms:label>
-                                            <xhtml:img src="../../../../apps/fr/style/minus.png" alt="Close section" title="Close section"/>
+                                            <!--  xxx temp links -->
+                                            <xhtml:img src="/apps/fr/style/minus.png" alt="Close section" title="Close section"/>
                                         </xforms:label>
                                     </xforms:trigger>
                                     <xforms:trigger appearance="minimal">
@@ -619,6 +621,9 @@
             <xforms:instance id="fr-current-resources">
                 <resource xmlns=""/>
             </xforms:instance>
+
+            <!-- Instance containing all the ISO 639-1 languages -->
+            <xforms:instance id="fr-languages-instance" src="oxf:/apps/fr/includes/languages.xml" xxforms:readonly="true"/>
 
             <!-- Respond to language change in the UI -->
             <xforms:action ev:observer="fr-language-selector" ev:event="xforms-value-changed">

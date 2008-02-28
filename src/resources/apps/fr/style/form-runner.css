@@ -85,10 +85,8 @@ h1 { margin-top: 0 }
 
 .fr-logo img { margin: 1em 1em .5em 1em; float: left }
 .fr-logo h1 { clear: right; margin-right: 1em; margin-top: .5em; padding-bottom: 0; margin-bottom: 0; float: right; font-weight: normal }
-.fr-logo .fr-summary-language-choice { float: right; margin-right: 1em }
-
-/*.fr-summary-language-choice { float: left }*/
-/*.fr-summary-language-choice .xforms-label { display: inline; margin-right: .5em }*/
+.fr-summary-language-choice { float: right; margin-right: 1em; margin-top: .2em }
+.fr-summary-language-choice .xforms-label { display: inline; margin-right: .5em }
 
 .fr-separator {
     background-color: #3598d4;

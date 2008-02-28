@@ -24,7 +24,6 @@
         <link rel="stylesheet" href="/ops/css/yui/reset-fonts-grids.css" type="text/css"/>
         <link rel="stylesheet" href="/ops/css/yui/base-min.css" type="text/css"/>
         <link rel="stylesheet" href="/apps/fr/style/form-runner.css" type="text/css"/>
-        <!--<link rel="alternate" type="application/atom+xml" title="Orbeon XForms Bookcast Tutorial Feed" href="atom"/>-->
 
         <xforms:model id="fr-form-model" schema="oxf:/forms/orbeon/bookcast/schema.xsd" xxforms:help-tooltip="false">
 
@@ -51,6 +50,30 @@
                     <xforms:bind id="language-bind" nodeset="language"/>
                 </xforms:bind>
             </xforms:bind>
+
+            <!-- XForms instance containing all the resources -->
+            <xforms:instance id="fr-form-resources">
+                <resources xmlns="">
+                    <resource xml:lang="en">
+                        <summary>
+                            <titles>
+                                <title>Title</title>
+                                <author>Author</author>
+                                <language>Language</language>
+                            </titles>
+                        </summary>
+                    </resource>
+                    <resource xml:lang="fr">
+                        <summary>
+                            <titles>
+                                <title>Titre</title>
+                                <author>Auteur</author>
+                                <language>Langue</language>
+                            </titles>
+                        </summary>
+                    </resource>
+                </resources>
+            </xforms:instance>
 
             <xforms:instance id="note-template">
                 <note xmlns=""/>

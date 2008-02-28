@@ -84,7 +84,11 @@ h1 { margin-top: 0 }
 }
 
 .fr-logo img { margin: 1em 1em .5em 1em; float: left }
-.fr-logo h1 { margin-right: 1em; margin-top: 1.5em; padding-bottom: 0; margin-bottom: 0; float: right; font-weight: normal }
+.fr-logo h1 { clear: right; margin-right: 1em; margin-top: .5em; padding-bottom: 0; margin-bottom: 0; float: right; font-weight: normal }
+.fr-logo .fr-summary-language-choice { float: right; margin-right: 1em }
+
+/*.fr-summary-language-choice { float: left }*/
+/*.fr-summary-language-choice .xforms-label { display: inline; margin-right: .5em }*/
 
 .fr-separator {
     background-color: #3598d4;
@@ -197,8 +201,6 @@ h3, h4 {
 
 .fr-paging-buttons button { width: 12em; vertical-align: middle }
 .fr-paging-numbers { vertical-align: middle; margin-left: .5em; margin-right: .5em }
-.fr-summary-language-choice { float: left }
-.fr-summary-language-choice .xforms-label { display: inline; margin-right: .5em }
 
 
 hr {

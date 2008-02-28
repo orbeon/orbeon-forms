@@ -50,7 +50,12 @@
                 <p:input name="submission">
                     <xforms:submission method="get" replace="instance" serialization="none"
                             action="{xxforms:property('oxf.fr.persistence.exist.uri')}/{/*/group[2]}/{/*/group[3]}/{/*/group[4]}">
-                        <!-- TODO: Propagate error to caller -->
+                        <xforms:action ev:event="xforms-submit-error">
+                            <!-- TODO: Propagate error to caller -->
+                            <xforms:delete while="/*/*" nodeset="/*/*"/>
+                            <xforms:setvalue ref="/*" value="event('response-body')"/>
+                            <xforms:message level="xxforms:log-error"><xforms:output value="event('response-body')"/></xforms:message>
+                        </xforms:action>
                     </xforms:submission>
                 </p:input>
                 <p:input name="request" href="#matcher-groups"/>
@@ -64,7 +69,12 @@
                 <p:input name="submission">
                     <xforms:submission method="delete" replace="none" serialization="none"
                             action="{xxforms:property('oxf.fr.persistence.exist.uri')}/{/*/group[2]}/{/*/group[3]}/{/*/group[4]}">
-                        <!-- TODO: Propagate error to caller -->
+                        <xforms:action ev:event="xforms-submit-error">
+                            <!-- TODO: Propagate error to caller -->
+                            <xforms:delete while="/*/*" nodeset="/*/*"/>
+                            <xforms:setvalue ref="/*" value="event('response-body')"/>
+                            <xforms:message level="xxforms:log-error"><xforms:output value="event('response-body')"/></xforms:message>
+                        </xforms:action>
                     </xforms:submission>
                 </p:input>
                 <p:input name="request" href="#matcher-groups"/>
@@ -79,10 +89,11 @@
                     <xforms:submission ref="/*/*[1]" method="put" replace="none"
                             action="{xxforms:property('oxf.fr.persistence.exist.uri')}/{/*/group[2]}/{/*/group[3]}/{/*/group[4]}">
                         <xforms:action ev:event="xforms-submit-error">
-                            <xforms:setvalue ref="." value="event('response-body')"/>
+                            <!-- TODO: Propagate error to caller -->
+                            <xforms:delete while="/*/*" nodeset="/*/*"/>
+                            <xforms:setvalue ref="/*" value="event('response-body')"/>
                             <xforms:message level="xxforms:log-error"><xforms:output value="event('response-body')"/></xforms:message>
                         </xforms:action>
-                        <!-- TODO: Propagate error to caller -->
                     </xforms:submission>
                 </p:input>
                 <p:input name="request" href="aggregate('root', #instance, #matcher-groups#xpointer(/*/group))"/>

@@ -48,11 +48,6 @@
                 </metadata>
             </xforms:instance>
 
-            <!-- Current form resources -->
-            <xforms:instance id="fr-form-resource">
-                <dummy/>
-            </xforms:instance>
-
             <!-- All form resources -->
             <xforms:instance id="fr-form-resources" xxforms:readonly="true">
                 <resources>
@@ -79,15 +74,15 @@
             <xhtml:img src="/apps/fr/style/orbeon-logo-trimmed-transparent-42.png"/>
             <fr:body>
                 <fr:section id="section-1-section" context="section-1">
-                    <xforms:label ref="instance('fr-form-resource')/section-1/label"/>
+                    <xforms:label ref="$form-resources/section-1/label"/>
                     <fr:grid columns="1">
                         <xhtml:tr>
                             <xhtml:td>
                                 <xforms:input id="control-1-control" ref="control-1">
-                                    <xforms:label ref="instance('fr-form-resource')/control-1/label"/>
-                                    <xforms:label ref="instance('fr-form-resource')/control-1/help"/>
-                                    <xforms:label ref="instance('fr-form-resource')/control-1/hint"/>
-                                    <xforms:label ref="instance('fr-form-resource')/control-1/alert"/>
+                                    <xforms:label ref="$form-resources/control-1/label"/>
+                                    <xforms:hint ref="$form-resources/control-1/hint"/>
+                                    <xforms:help ref="$form-resources/control-1/help"/>
+                                    <xforms:alert ref="$form-resources/control-1/alert"/>
                                 </xforms:input>
                             </xhtml:td>
                         </xhtml:tr>

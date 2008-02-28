@@ -131,6 +131,7 @@
             <xxforms:variable name="resources" select="xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-resources']/*"/>
             <xxforms:variable name="current-resources" select="$resources/resource[@xml:lang = $lang]"/>
             <xxforms:variable name="body" select="xhtml:body/fr:view/fr:body"/>
+            <xxforms:variable name="variables" select="instance('fb-variables')"/>
 
             <!-- Submission to test the form -->
             <xforms:submission id="fb-test-form-submission"
@@ -143,6 +144,7 @@
             <xforms:instance id="fb-variables">
                 <variables>
                     <delete-node/>
+                    <help-node/>
                     <blank-readonly-value/>
                     <next-section-id/>
                     <next-control-id/>
@@ -153,8 +155,8 @@
                 <xforms:bind nodeset="blank-readonly-value" readonly="true()"/>
             </xforms:bind>
 
-            <xxforms:variable name="next-section-id" select="instance('fb-variables')/next-section-id"/>
-            <xxforms:variable name="next-control-id" select="instance('fb-variables')/next-control-id"/>
+            <xxforms:variable name="next-section-id" select="$variables/next-section-id"/>
+            <xxforms:variable name="next-control-id" select="$variables/next-control-id"/>
 
             <!-- Compute the next section id -->
             <xforms:action ev:event="fb-compute-section-id">
@@ -455,28 +457,12 @@
                 <fr:section id="fb-details-section" context="$body">
                     <xforms:label>Form Details</xforms:label>
 
-                    <!--<xhtml:div style="float:right">-->
-                        <!--<xforms:trigger>-->
-                            <!--<xforms:label>-->
-                                <!--<xhtml:img src="../../../../apps/fr/style/plus.png" alt="Open section" title="Open section"/>-->
-                                <!--<xhtml:span>New Section</xhtml:span>-->
-                            <!--</xforms:label>-->
-                            <!--<xforms:action ev:event="DOMActivate">-->
-                                <!--<xforms:insert context="." nodeset="fr:section | fr:repeat | fr:grid"-->
-                                               <!--at="index('fb-top-level-repeat')" position="after"-->
-                                               <!--origin="instance('fb-section-template')"/>-->
-                            <!--</xforms:action>-->
-                        <!--</xforms:trigger>-->
-                    <!--</xhtml:div>-->
-
                     <!--<xforms:trigger>-->
                         <!--<xforms:label>-->
                             <!--<xhtml:span>Show Toolbox</xhtml:span>-->
                         <!--</xforms:label>-->
                         <!--<xxforms:show ev:event="DOMActivate" dialog="fb-toolbox-dialog"/>-->
                     <!--</xforms:trigger>-->
-
-
 
                     <xhtml:div style="clear: both">
 
@@ -496,7 +482,7 @@
 
                                     <!-- Respond to fr-delete event to delete the current section -->
                                     <xforms:action ev:event="fr-delete">
-                                        <xforms:setvalue ref="instance('fb-variables')/delete-node" value="context()/saxon:path()"/>
+                                        <xforms:setvalue ref="$variables/delete-node" value="context()/saxon:path()"/>
                                         <xxforms:show dialog="fb-delete-confirm-dialog"/>
 
                                         <!-- TODO: react to dialog close -->
@@ -588,17 +574,17 @@
                                                                         <xhtml:span class="fb-control-control">
                                                                             <xforms:group ref="xforms:input">
                                                                                 <!--instance('fr-form-instance')/xhtml:head/xforms:model/xforms:instance/*/*[xxx section]/*[count(context()/preceding-sibling::*) + 1]-->
-                                                                                <xforms:input ref="instance('fb-variables')/blank-readonly-value">
+                                                                                <xforms:input ref="$variables/blank-readonly-value">
                                                                                     <xforms:label class="fb-xforms-disabled"/>
                                                                                 </xforms:input>
                                                                             </xforms:group>
                                                                             <xforms:group ref="xforms:textarea">
-                                                                                <xforms:textarea ref="instance('fb-variables')/blank-readonly-value">
+                                                                                <xforms:textarea ref="$variables/blank-readonly-value">
                                                                                     <xforms:label class="fb-xforms-disabled"/>
                                                                                 </xforms:textarea>
                                                                             </xforms:group>
                                                                             <xforms:group ref="xforms:select1[@appearance = 'minimal']">
-                                                                                <xforms:select1 appearance="minimal" ref="instance('fb-variables')/blank-readonly-value">
+                                                                                <xforms:select1 appearance="minimal" ref="$variables/blank-readonly-value">
                                                                                     <xforms:label class="fb-xforms-disabled"/>
                                                                                     <xforms:item>
                                                                                         <xforms:label>[Choose...]</xforms:label>
@@ -625,8 +611,10 @@
                                                                         <!-- Edit help for any control -->
                                                                         <xforms:trigger appearance="minimal" id="fb-edit-help-trigger">
                                                                             <xforms:label><xhtml:img class="fb-control-help" alt="Help" title="" src="../../../../ops/images/xforms/help.gif"/></xforms:label>
-                                                                            <!-- TODO -->
-                                                                            <xxforms:show ev:event="DOMActivate" dialog="fb-edit-help-dialog" neighbor="fb-edit-help-trigger"/>
+                                                                            <xforms:action ev:event="DOMActivate">
+                                                                                <xforms:setvalue ref="$variables/help-node" value="$current-resources/*[name() = $control-id]/help/saxon:path()"/>
+                                                                                <xxforms:show  dialog="fb-edit-help-dialog" neighbor="fb-edit-help-trigger"/>
+                                                                            </xforms:action>
                                                                         </xforms:trigger>
 
                                                                         <!-- Edit hint for any control -->
@@ -769,8 +757,13 @@
                                                        at="index('fb-top-level-repeat')" position="after"
                                                        origin="instance('fb-section-template')"/>
 
-                                        <!-- Set @id value -->
+                                        <!-- Compute next section id -->
                                         <xforms:dispatch target="fr-form-model" name="fb-compute-section-id"/>
+
+                                        <!-- Set xforms:label @ref value -->
+                                        <xforms:setvalue ref="*[index('fb-top-level-repeat')]/xforms:label/@ref" value="concat('$form-resources/section-', $next-section-id, '/label')"/>
+
+                                        <!-- Set @id value -->
                                         <xforms:setvalue ref="*[index('fb-top-level-repeat')]/@id" value="concat('section-', $next-section-id, '-section')"/>
 
                                         <!-- Set @context value -->
@@ -852,11 +845,11 @@
                                                         <!-- Set @ref value -->
                                                         <xforms:setvalue ref="@ref" value="concat('control-', $next-control-id)"/>
 
-                                                        <!-- Set xforms:label @ref -->
-                                                        <xforms:setvalue ref="xforms:label/@ref" value="concat('instance(''fr-form-resource'')/control-', $next-control-id, '/label')"/>
-                                                        <xforms:setvalue ref="xforms:hint/@ref" value="concat('instance(''fr-form-resource'')/control-', $next-control-id, '/hint')"/>
-                                                        <xforms:setvalue ref="xforms:help/@ref" value="concat('instance(''fr-form-resource'')/control-', $next-control-id, '/help')"/>
-                                                        <xforms:setvalue ref="xforms:alert/@ref" value="concat('instance(''fr-form-resource'')/control-', $next-control-id, '/alert')"/>
+                                                        <!-- Set xforms:label, xforms:hint, xforms:help and xforms:alert @ref -->
+                                                        <xforms:setvalue ref="xforms:label/@ref" value="concat('$form-resources/control-', $next-control-id, '/label')"/>
+                                                        <xforms:setvalue ref="xforms:hint/@ref" value="concat('$form-resources/control-', $next-control-id, '/hint')"/>
+                                                        <xforms:setvalue ref="xforms:help/@ref" value="concat('$form-resources/control-', $next-control-id, '/help')"/>
+                                                        <xforms:setvalue ref="xforms:alert/@ref" value="concat('$form-resources/control-', $next-control-id, '/alert')"/>
                                                     </xforms:action>
                                                 </xforms:action>
 
@@ -880,19 +873,21 @@
                 <xxforms:dialog id="fb-edit-help-dialog" level="modal" draggable="true" appearance="minimal">
                     <xforms:label>Edit Help</xforms:label>
                     <xhtml:div>
-                        <xhtml:img src="/apps/fr/style/question-large.gif" alt="Question" class="dialog-icon"/>
-                        <xhtml:div class="dialog-message">Are you sure you want to delete the current section?</xhtml:div>
-                    </xhtml:div>
-                    <xhtml:div class="dialog-button">
                         <xforms:group>
-                            <xforms:trigger>
-                                <xforms:label><xhtml:img src="/apps/fr/style/clear.gif" alt=""/> <xhtml:span>Delete</xhtml:span></xforms:label>
-                                <!-- Delete node -->
-                                <xforms:delete ev:event="DOMActivate" model="fr-form-model" nodeset="saxon:evaluate(instance('fb-variables')/delete-node)"/>
-                            </xforms:trigger>
-                            <xforms:trigger>
-                                <xforms:label><xhtml:img src="/apps/fr/style/close.gif" alt=""/> <xhtml:span>Cancel</xhtml:span></xforms:label>
-                            </xforms:trigger>
+                            <xforms:textarea ref="if ($variables/help-node = '') then () else $form-instance/root()/saxon:evaluate($variables/help-node)">
+                                <xforms:label>Help</xforms:label>
+                            </xforms:textarea>
+                            <xhtml:span class="fr-inplace-buttons">
+                                <xforms:trigger class="fr-inplace-rename">
+                                    <xforms:label>Change</xforms:label>
+                                    <xforms:toggle ev:event="DOMActivate" case="fr-inplace-{@id}-view"/>
+                                </xforms:trigger>
+                                or
+                                <xforms:trigger appearance="minimal" class="fr-inplace-cancel">
+                                    <xforms:label>Cancel</xforms:label>
+                                    <xforms:toggle ev:event="DOMActivate" case="fr-inplace-{@id}-view"/>
+                                </xforms:trigger>
+                            </xhtml:span>
                         </xforms:group>
                         <!-- Hide dialog -->
                         <xxforms:hide ev:event="DOMActivate" dialog="fb-edit-help-dialog"/>
@@ -900,6 +895,7 @@
                 </xxforms:dialog>
 
                 <!-- Section delete confirmation -->
+                <!-- TODO: Generic dialog in components.xsl -->
                 <xxforms:dialog id="fb-delete-confirm-dialog" level="modal" close="false" draggable="true">
                     <xforms:label>Confirm</xforms:label>
                     <xhtml:div>
@@ -911,7 +907,7 @@
                             <xforms:trigger>
                                 <xforms:label><xhtml:img src="/apps/fr/style/clear.gif" alt=""/> <xhtml:span>Delete</xhtml:span></xforms:label>
                                 <!-- Delete node -->
-                                <xforms:delete ev:event="DOMActivate" model="fr-form-model" nodeset="saxon:evaluate(instance('fb-variables')/delete-node)"/>
+                                <xforms:delete ev:event="DOMActivate" model="fr-form-model" nodeset="saxon:evaluate($variables/delete-node)"/>
                             </xforms:trigger>
                             <xforms:trigger>
                                 <xforms:label><xhtml:img src="/apps/fr/style/close.gif" alt=""/> <xhtml:span>Cancel</xhtml:span></xforms:label>

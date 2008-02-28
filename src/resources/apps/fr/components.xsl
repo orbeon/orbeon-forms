@@ -26,11 +26,13 @@
     <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
 
     <xsl:template match="xhtml:body//fr:view">
-        <!--  Hidden field to communicate to the client the current section to collapse or expand -->
+        <!-- Hidden field to communicate to the client the current section to collapse or expand -->
         <xforms:input model="fr-sections-model" ref="instance('fr-current-section-instance')" id="fr-current-section-input" class="xforms-disabled"/>
         <!-- Hidden field to communicate to the client whether the data is clean or dirty -->
         <xforms:input model="fr-persistence-model" ref="instance('fr-persistence-instance')/data-status" id="fr-data-status-input" class="xforms-disabled"/>
 
+        <!-- Scope variable with Form Runner resources -->
+        <xxforms:variable name="fr-resources" select="xxforms:instance('fr-current-resources')"/>
 
         <xsl:if test="@width and not(@width = ('750px', '950px', '974px'))">
             <xsl:message terminate="yes">Value of fr:view/@view is not valid</xsl:message>
@@ -51,6 +53,33 @@
                             <xsl:if test="xhtml:img">
                                 <xhtml:img src="{xhtml:img/@src}" alt="Logo"/>
                             </xsl:if>
+                            <xhtml:div class="fr-summary-language-choice">
+                                <!-- Switch language -->
+
+                                <xxforms:variable name="available-languages-1"
+                                                  select="xxforms:instance('fr-form-resources')/resource/@xml:lang"/>
+
+                                <xxforms:variable name="available-languages" select="$available-languages-1"/>
+
+                                <!-- This implements a sort of xforms:select1[@appearance = 'xxforms:full']. Should be componentized. -->
+                                <xforms:group id="fr-language-selector">
+                                    <!--<xforms:label ref="$fr-resources/summary/labels/language-choice"/>-->
+                                    <xforms:repeat model="fr-resources-model" nodeset="$available-languages">
+
+                                        <xxforms:variable name="position" select="position()"/>
+                                        <xxforms:variable name="label" select="($fr-resources/languages/item[value = context()]/label[normalize-space() != ''], context())[1]"/>
+                                        
+                                        <xforms:group ref=".[$position > 1]"> | </xforms:group>
+                                        <xforms:trigger ref=".[context() != instance('fr-language-instance')]" appearance="minimal">
+                                            <xforms:label value="$label"/>
+                                            <xforms:action ev:event="DOMActivate">
+                                                <xforms:setvalue ref="instance('fr-language-instance')" value="context()"/>
+                                            </xforms:action>
+                                        </xforms:trigger>
+                                        <xforms:output ref=".[context() = instance('fr-language-instance')]" value="$label"/>
+                                    </xforms:repeat>
+                                </xforms:group>
+                            </xhtml:div>
                             <xhtml:h1>
                                 <xsl:choose>
                                     <xsl:when test="xforms:label">
@@ -69,6 +98,9 @@
                         <xhtml:div class="yui-g fr-body">
                             <!-- Set context on form instance and define this group as #fr-form-group as observers will refer to it -->
                             <xforms:group id="fr-form-group" model="fr-form-model" ref="instance('fr-form-instance')">
+
+                                <!-- Scope form resources -->
+                                <xxforms:variable name="form-resources" select="xxforms:instance('fr-current-form-resources')"/>
 
                                 <!-- Main form content -->
                                 <xsl:apply-templates select="fr:body/node()"/>
@@ -419,11 +451,11 @@
         <xsl:choose>
             <xsl:when test="@ref">
                 <xforms:group ref="{@ref}">
-                    <xsl:copy-of select="$content"/>
+                    <xsl:apply-templates select="$content"/>
                 </xforms:group>
             </xsl:when>
             <xsl:otherwise>
-                <xsl:copy-of select="$content"/>
+                <xsl:apply-templates select="$content"/>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
@@ -558,6 +590,52 @@
                 <!--<xforms:setvalue ref="instance('fr-help-instance')/label" value="event('label')"/>-->
                 <!--<xforms:setvalue ref="instance('fr-help-instance')/help" value="event('help')"/>-->
             <!--</xforms:action>-->
+
+        </xforms:model>
+
+        <!-- This model handles i18n resources -->
+        <xforms:model id="fr-resources-model">
+
+            <xforms:action ev:event="xforms-ready">
+                <xforms:dispatch name="fr-update-language" target="fr-resources-model"/>
+            </xforms:action>
+
+            <!-- Instance containing the current language -->
+            <xforms:instance id="fr-language-instance">
+                <language xmlns="">en</language>
+            </xforms:instance>
+
+            <xxforms:variable name="lang" select="instance('fr-language-instance')"/>
+
+            <!-- XForms instance containing the current form resources -->
+            <xforms:instance id="fr-current-form-resources">
+                <resource xmlns=""/>
+            </xforms:instance>
+
+            <!-- Instance containing the Form Runner resources -->
+            <xforms:instance id="fr-resources" src="oxf:/apps/fr/includes/resources.xml" xxforms:readonly="true"/>
+
+            <!-- Instance containing the current Form Runner resources -->
+            <xforms:instance id="fr-current-resources">
+                <resource xmlns=""/>
+            </xforms:instance>
+
+            <!-- Respond to language change in the UI -->
+            <xforms:action ev:observer="fr-language-selector" ev:event="xforms-value-changed">
+                <xforms:dispatch name="fr-update-language" target="fr-resources-model"/>
+            </xforms:action>
+
+            <xforms:action ev:observer="fr-language-selector" ev:event="DOMActivate">
+                <xforms:dispatch name="fr-update-language" target="fr-resources-model"/>
+            </xforms:action>
+
+            <!-- Copy resources of the selected language, using the first language declared if the no matching language is found -->
+            <xforms:action ev:event="fr-update-language">
+                <xforms:insert nodeset="instance('fr-current-form-resources')"
+                               origin="xxforms:instance('fr-form-resources')/(resource[@xml:lang = $lang], resource[1])[1]"/>
+                <xforms:insert nodeset="instance('fr-current-resources')"
+                               origin="instance('fr-resources')/(resource[@xml:lang = $lang], resource[1])[1]"/>
+            </xforms:action>
 
         </xforms:model>
 

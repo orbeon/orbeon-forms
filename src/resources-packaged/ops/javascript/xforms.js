@@ -1096,7 +1096,7 @@ ORBEON.xforms.Controls = {
         ORBEON.xforms.Globals.formHelpPanelCloseButton[form.id].focus();
     },
 
-    showDialog: function(controlId) {
+    showDialog: function(controlId, neighbor) {
         var divElement = ORBEON.util.Dom.getElementById(controlId);
         var yuiDialog = ORBEON.xforms.Globals.dialogs[controlId];
         // Fixes cursor Firefox issue; more on this in dialog init code
@@ -1107,7 +1107,8 @@ ORBEON.xforms.Controls = {
         var constrain = ORBEON.util.Dom.getAttribute(divElement, "constrain") == "false" ? false : true;
         yuiDialog.cfg.setProperty("constraintoviewport", constrain);
         // Position the dialog either at the center of the viewport or relative of a neighbor
-        var neighbor = ORBEON.util.Dom.getAttribute(divElement, "neighbor");
+        if (neighbor == null)
+            neighbor = ORBEON.util.Dom.getAttribute(divElement, "neighbor");
         if (neighbor == null) {
             // Center dialog in page, if not positined relative to other element
             yuiDialog.center();
@@ -2376,7 +2377,7 @@ ORBEON.xforms.Init = {
         ORBEON.xforms.Globals.dialogs[dialog.id] = yuiDialog;
 
         if (isVisible)
-            ORBEON.xforms.Controls.showDialog(dialog.id);
+            ORBEON.xforms.Controls.showDialog(dialog.id, null);
     }
 };
 
@@ -3446,6 +3447,7 @@ ORBEON.xforms.Server = {
                                             var divElement = divsElement.childNodes[j];
                                             var controlId = ORBEON.util.Dom.getAttribute(divElement, "id");
                                             var visible = ORBEON.util.Dom.getAttribute(divElement, "visibility") == "visible";
+                                            var neighbor = ORBEON.util.Dom.getAttribute(divElement, "neighbor");
 
                                             var yuiDialog = ORBEON.xforms.Globals.dialogs[controlId];
                                             if (yuiDialog == null) {
@@ -3469,7 +3471,7 @@ ORBEON.xforms.Server = {
                                             } else {
                                                 // This is a dialog
                                                 if (visible)  {
-                                                    ORBEON.xforms.Controls.showDialog(controlId);
+                                                    ORBEON.xforms.Controls.showDialog(controlId, neighbor);
                                                 } else {
                                                     yuiDialog.hide();
                                                     // Fixes cursor Firefox issue; more on this in dialog init code

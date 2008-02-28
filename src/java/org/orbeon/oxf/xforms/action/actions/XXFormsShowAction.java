@@ -42,11 +42,14 @@ public class XXFormsShowAction extends XFormsAction {
         final String neighbor = XFormsUtils.namespaceId(containingDocument, actionElement.attributeValue("neighbor"));
         final boolean constrainToViewport = !"false".equals(actionElement.attributeValue("constrain"));
 
+        final String effectiveNeighbor
+                = (neighbor != null) ? xformsControls.getCurrentControlsState().findEffectiveControlId(neighbor) : null;
+
         if (dialogId != null) {
             // Dispatch xxforms-dialog-open event to dialog
             final Object controlObject = (dialogId != null) ? xformsControls.getObjectById(dialogId) : null;
             if (controlObject instanceof XXFormsDialogControl) {
-                containingDocument.dispatchEvent(pipelineContext, new XXFormsDialogOpenEvent((XFormsEventTarget) controlObject, neighbor, constrainToViewport));
+                containingDocument.dispatchEvent(pipelineContext, new XXFormsDialogOpenEvent((XFormsEventTarget) controlObject, effectiveNeighbor, constrainToViewport));
             } else {
                 if (XFormsServer.logger.isDebugEnabled())
                 containingDocument.logDebug("xxforms:show", "dialog does not refer to an existing xxforms:dialog element, ignoring action",

@@ -371,6 +371,8 @@ public class XFormsControls {
                         }
                     } else if (controlName.equals("dialog")) {
                         // Handle xxforms:dialog
+                        // TODO: Handle initial visibility. Do this here?
+//                        final XXFormsDialogControl dialogControl = (XXFormsDialogControl) xformsControl;
                         dialogIdToVisibleMap.put(effectiveControlId, new DialogState.DialogInfo(false, null, false));
                     } else if (xformsControl instanceof XFormsSelectControl || xformsControl instanceof XFormsSelect1Control) {
                         // Handle xforms:itemset

@@ -1100,7 +1100,7 @@
                         You declare dialogs directly under the <code>&lt;xhtml:body></code> element with:
                     </p>
                     <xml-source>
-                        <xxforms:dialog id="my-dialog-id" appearance="full | minimal" level="modeless" close="true" draggable="true">
+                        <xxforms:dialog id="my-dialog-id" appearance="full | minimal" level="modeless" close="true" draggable="true" visible="false">
                             <xforms:label>Dialog title</xforms:label>
                             Content of the dialog (XHTML + XForms)
                         </xxforms:dialog>
@@ -1205,6 +1205,20 @@
                             <td>
                                 When set to <code>false</code>, you won't be able to move dialog on the page by using
                                 drag and drop in the dialog title bar.
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>visible</th>
+                            <td>
+                                Optional. Whether the dialog is initially visible when the page loads. Possible values
+                                are:
+                                <ul>
+                                    <li><code>true</code></li>
+                                    <li><code>false</code> (default)</li>
+                                </ul>
+                            </td>
+                            <td>
+                                When set to <code>true</code>, the dialog appears immediately when the page loads.
                             </td>
                         </tr>
                     </table>

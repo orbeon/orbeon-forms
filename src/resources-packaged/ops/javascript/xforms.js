@@ -1094,6 +1094,35 @@ ORBEON.xforms.Controls = {
         var bdDiv = ORBEON.xforms.Globals.formHelpPanelMessageDiv[form.id].parentNode;
         if (bdDiv.scrollHeight <= bdDiv.clientHeight)
         ORBEON.xforms.Globals.formHelpPanelCloseButton[form.id].focus();
+    },
+
+    showDialog: function(controlId) {
+        var divElement = ORBEON.util.Dom.getElementById(controlId);
+        var yuiDialog = ORBEON.xforms.Globals.dialogs[controlId];
+        // Fixes cursor Firefox issue; more on this in dialog init code
+        yuiDialog.element.style.display = "block";
+        // Show the dialog
+        yuiDialog.show();
+        // By default try to display the dialog inside the viewport, but this can be overridden with consrain="false"
+        var constrain = ORBEON.util.Dom.getAttribute(divElement, "constrain") == "false" ? false : true;
+        yuiDialog.cfg.setProperty("constraintoviewport", constrain);
+        // Position the dialog either at the center of the viewport or relative of a neighbor
+        var neighbor = ORBEON.util.Dom.getAttribute(divElement, "neighbor");
+        if (neighbor == null) {
+            // Center dialog in page, if not positined relative to other element
+            yuiDialog.center();
+        } else {
+            // Align dialog relative to neighbor
+            yuiDialog.cfg.setProperty("context", [neighbor, "tl", "bl"]);
+            yuiDialog.align();
+            ORBEON.xforms.Globals.dialogMinimalVisible[controlId] = true;
+        }
+        // Take out the focus from the current control. This is particulary important with non-modal dialogs
+        // opened with a minimal trigger, otherwise we have a dotted line around the link after it opens.
+        if (ORBEON.xforms.Globals.lastFocusControlId) {
+            var focusedElement = ORBEON.util.Dom.getElementById(ORBEON.xforms.Globals.lastFocusControlId);
+            if (focusedElement) focusedElement.blur();
+        }
     }
 };
 
@@ -2330,7 +2359,7 @@ ORBEON.xforms.Init = {
             yuiDialog = new YAHOO.widget.Dialog(dialog.id, {
                 modal: isModal,
                 close: hasClose,
-                visible: isVisible,
+                visible: false,
                 draggable: isDraggable,
                 fixedcenter: false,
                 constraintoviewport: true,
@@ -2343,9 +2372,11 @@ ORBEON.xforms.Init = {
 
         // We hide the dialog as it otherwise interfers with other dialogs, preventing
         // the cursor from showing in input fields of other dialogs
-        if (!isVisible)
-            yuiDialog.element.style.display = "none";
+        yuiDialog.element.style.display = "none";
         ORBEON.xforms.Globals.dialogs[dialog.id] = yuiDialog;
+
+        if (isVisible)
+            ORBEON.xforms.Controls.showDialog(dialog.id);
     }
 };
 
@@ -3414,7 +3445,7 @@ ORBEON.xforms.Server = {
                                         if (xformsGetLocalName(divsElement.childNodes[j]) == "div") {
                                             var divElement = divsElement.childNodes[j];
                                             var controlId = ORBEON.util.Dom.getAttribute(divElement, "id");
-                                            var visibile = ORBEON.util.Dom.getAttribute(divElement, "visibility") == "visible";
+                                            var visible = ORBEON.util.Dom.getAttribute(divElement, "visibility") == "visible";
 
                                             var yuiDialog = ORBEON.xforms.Globals.dialogs[controlId];
                                             if (yuiDialog == null) {
@@ -3431,37 +3462,14 @@ ORBEON.xforms.Server = {
                                                     }
                                                     if (cursor.nodeType == ELEMENT_TYPE) {
                                                         if (cursor.id == "xforms-case-end-" + controlId) break;
-                                                        ORBEON.util.Dom.addClass(cursor, visibile ? "xforms-case-selected" : "xforms-case-deselected");
-                                                        ORBEON.util.Dom.removeClass(cursor, visibile ? "xforms-case-deselected" : "xforms-case-selected");
+                                                        ORBEON.util.Dom.addClass(cursor, visible ? "xforms-case-selected" : "xforms-case-deselected");
+                                                        ORBEON.util.Dom.removeClass(cursor, visible ? "xforms-case-deselected" : "xforms-case-selected");
                                                     }
                                                 }
                                             } else {
                                                 // This is a dialog
-                                                if (visibile)  {
-                                                    // Fixes cursor Firefox issue; more on this in dialog init code
-                                                    yuiDialog.element.style.display = "block";
-                                                    // Show the dialog
-                                                    yuiDialog.show();
-                                                    // By default try to display the dialog inside the viewport, but this can be overridden with consrain="false"
-                                                    var constrain = ORBEON.util.Dom.getAttribute(divElement, "constrain") == "false" ? false : true;
-                                                    yuiDialog.cfg.setProperty("constraintoviewport", constrain);
-                                                    // Position the dialog either at the center of the viewport or relative of a neighbor
-                                                    var neighbor = ORBEON.util.Dom.getAttribute(divElement, "neighbor");
-                                                    if (neighbor == null) {
-                                                        // Center dialog in page, if not positined relative to other element
-                                                        yuiDialog.center();
-                                                    } else {
-                                                        // Align dialog relative to neighbor
-                                                        yuiDialog.cfg.setProperty("context", [neighbor, "tl", "bl"]);
-                                                        yuiDialog.align();
-                                                        ORBEON.xforms.Globals.dialogMinimalVisible[controlId] = true;
-                                                    }
-                                                    // Take out the focus from the current control. This is particulary important with non-modal dialogs
-                                                    // opened with a minimal trigger, otherwise we have a dotted line around the link after it opens.
-                                                    if (ORBEON.xforms.Globals.lastFocusControlId) {
-                                                        var focusedElement = ORBEON.util.Dom.getElementById(ORBEON.xforms.Globals.lastFocusControlId);
-                                                        if (focusedElement) focusedElement.blur();
-                                                    }
+                                                if (visible)  {
+                                                    ORBEON.xforms.Controls.showDialog(controlId);
                                                 } else {
                                                     yuiDialog.hide();
                                                     // Fixes cursor Firefox issue; more on this in dialog init code

@@ -1341,13 +1341,19 @@ ORBEON.xforms.Events = {
     _showToolTip: function(tooltipForControl, controlId, targetId, toolTipSuffix, message, delay, event) {
         if (message != "") {
             // We have a hint, initialize YUI tooltip
-            tooltipForControl[controlId] =
+            var yuiTooltip =
                 new YAHOO.widget.Tooltip(controlId + toolTipSuffix, {
                     context: targetId,
                     text: message,
                     showDelay: delay,
                     effect: {effect: YAHOO.widget.ContainerEffect.FADE, duration: 0.2}
                 });
+            // Send the mouse over event to the tooltip, since the YUI tooltip didn't receive it as it didn't
+            // exist yet when the event was dispatched by the browser
+            var context = ORBEON.util.Dom.getElementById(targetId);
+            yuiTooltip.onContextMouseOver.call(context, event, yuiTooltip);
+            // Save reference to YUI tooltip
+            tooltipForControl[controlId] = yuiTooltip;
         } else {
             // Remember we looked at this control already
             tooltipForControl[controlId] = true;

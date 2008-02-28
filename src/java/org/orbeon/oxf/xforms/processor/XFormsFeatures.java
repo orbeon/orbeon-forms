@@ -143,8 +143,8 @@ public class XFormsFeatures {
             new ResourceConfig("/ops/javascript/yui/dom.js", "/ops/javascript/yui/dom-min.js"),
             new ResourceConfig("/ops/javascript/yui/connection.js", "/ops/javascript/yui/connection-min.js"),
             new ResourceConfig("/ops/javascript/yui/animation.js", "/ops/javascript/yui/animation-min.js"),
-            new ResourceConfig("/ops/javascript/yui/container.js", "/ops/javascript/yui/container-min.js"),
             new ResourceConfig("/ops/javascript/yui/dragdrop.js", "/ops/javascript/yui/dragdrop-min.js"),
+            new ResourceConfig("/ops/javascript/yui/container.js", "/ops/javascript/yui/container-min.js"),
             new ResourceConfig("/ops/javascript/yui/slider.js", "/ops/javascript/yui/slider-min.js") {
                 public boolean isInUse(Map appearancesMap) {
                     return isRangeInUse(appearancesMap);

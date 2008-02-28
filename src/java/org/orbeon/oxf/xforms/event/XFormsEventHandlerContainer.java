@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * Represents a container of XFormsEventHandler.
  */
-public interface XFormsEventHandlerContainer {
+public interface XFormsEventHandlerContainer extends XFormsEventTarget {
     public String getId();
     public String getEffectiveId();
     public List getEventHandlers(XFormsContainingDocument containingDocument);

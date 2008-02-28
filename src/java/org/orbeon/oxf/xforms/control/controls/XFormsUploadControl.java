@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms.control.controls;
 import org.dom4j.Element;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.action.actions.XFormsSetvalueAction;
-import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -228,7 +227,7 @@ public class XFormsUploadControl extends XFormsValueControl {
         contextStack.pushBinding(pipelineContext, element);
         final NodeInfo currentSingleNode = contextStack.getCurrentSingleNode();
         if (currentSingleNode != null) {
-            XFormsSetvalueAction.doSetValue(pipelineContext, containingDocument, currentSingleNode, value, null, false);
+            XFormsSetvalueAction.doSetValue(pipelineContext, containingDocument, this, currentSingleNode, value, null, false);
             contextStack.popBinding();
         }
     }

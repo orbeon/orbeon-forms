@@ -20,6 +20,7 @@ import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
+import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.saxon.om.NodeInfo;
@@ -85,21 +86,25 @@ public class XFormsSetvalueAction extends XFormsAction {
             // have either a single non-empty text node child, or no children string was empty.
 
             // Node exists, we can try to set the value
-            doSetValue(pipelineContext, containingDocument, currentNode, valueToSet, null, false);
+            doSetValue(pipelineContext, containingDocument, eventHandlerContainer, currentNode, valueToSet, null, false);
         } else {
             // Node doesn't exist, don't do anything
             // NOP
         }
     }
 
-    public static boolean doSetValue(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, NodeInfo currentNode, String valueToSet, String type, boolean isCalculate) {
+    public static boolean doSetValue(PipelineContext pipelineContext, XFormsContainingDocument containingDocument,
+                                     XFormsEventTarget eventTarget, NodeInfo currentNode,
+                                     String valueToSet, String type, boolean isCalculate) {
         final String currentValue = XFormsInstance.getValueForNodeInfo(currentNode);
         if (!currentValue.equals(valueToSet)) {// TODO: Check if we are allowed to do this optimization
 
-            if (XFormsServer.logger.isDebugEnabled())
-                containingDocument.logDebug("setvalue", "setting instance value", new String[] { "value", valueToSet });
+            if (XFormsServer.logger.isDebugEnabled()) {
+                final XFormsInstance modifiedInstance = containingDocument.getInstanceForNode(currentNode);
+                containingDocument.logDebug("setvalue", "setting instance value", new String[] { "value", valueToSet, "instance", modifiedInstance.getEffectiveId() });
+            }
 
-            XFormsInstance.setValueForNodeInfo(pipelineContext, currentNode, valueToSet, type);
+            XFormsInstance.setValueForNodeInfo(pipelineContext, containingDocument, eventTarget, currentNode, valueToSet, type);
 
             if (!isCalculate) {
                 // When this is called from a calculate, we don't set the flags as revalidate and refresh will have been set already

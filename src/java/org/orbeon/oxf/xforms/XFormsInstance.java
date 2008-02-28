@@ -21,6 +21,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
+import org.orbeon.oxf.xforms.event.events.XFormsBindingExceptionEvent;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -42,6 +43,7 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.StringReader;
 import java.util.List;
+import java.util.Iterator;
 
 /**
  * Represent an XForms instance.
@@ -288,16 +290,35 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventHandlerCont
     /**
      * Set a value on the instance using a NodeInfo and a value.
      *
-     * @param pipelineContext   current PipelineContext
-     * @param nodeInfo          element or attribute NodeInfo to update
-     * @param newValue          value to set
-     * @param type              type of the value to set (xs:anyURI or xs:base64Binary), null if none
+     * @param pipelineContext       current PipelineContext
+     * @param containingDocument    containing document (for event dispatch), null if no events requested
+     * @paran eventTarget           event target (for event dispatch), null if no events requested
+     * @param nodeInfo              element or attribute NodeInfo to update
+     * @param newValue              value to set
+     * @param type                  type of the value to set (xs:anyURI or xs:base64Binary), null if none
      */
-    public static void setValueForNodeInfo(PipelineContext pipelineContext, NodeInfo nodeInfo, String newValue, String type) {
+    public static void setValueForNodeInfo(PipelineContext pipelineContext, XFormsContainingDocument containingDocument,
+                                     XFormsEventTarget eventTarget, NodeInfo nodeInfo, String newValue, String type) {
         if (!(nodeInfo instanceof NodeWrapper))
             throw new OXFException("Unable to set value of read-only instance.");
 
         final Node node = (Node) ((NodeWrapper) nodeInfo).getUnderlyingNode();
+        if (containingDocument != null && eventTarget != null && node instanceof Element) {
+
+            // "10.2 The setvalue Element [...] An xforms-binding-exception occurs if the Single Node Binding
+            // indicates a node whose content is not simpleContent (i.e., a node that has element children)."
+
+            final Element element = (Element) node;
+
+            final List content = element.content();
+            for (Iterator i = content.iterator(); i.hasNext();) {
+                final Object currentContent = i.next();
+                if (currentContent instanceof Element || currentContent instanceof ProcessingInstruction) {
+                    containingDocument.dispatchEvent(pipelineContext, new XFormsBindingExceptionEvent(eventTarget));
+                    return;
+                }
+            }
+        }
         setValueForNode(pipelineContext, node, newValue, type);
     }
 

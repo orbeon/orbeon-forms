@@ -375,7 +375,9 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                                 modelBind.getLocationData().getSystemID(), modelBind.getLocationData());
 
                         // TODO: Detect if we have already handled this node and dispatch xforms-binding-exception
-                        XFormsSetvalueAction.doSetValue(pipelineContext, containingDocument, nodeInfo, stringResult, null, true);
+                        // TODO: doSetValue may dispatch an xforms-binding-exception. It should reach the bind, but we don't support that yet so pass the model.
+                        final XFormsEventTarget eventTarget = XFormsModel.this;
+                        XFormsSetvalueAction.doSetValue(pipelineContext, containingDocument, eventTarget, nodeInfo, stringResult, null, true);
 
                     } catch (Exception e) {
                         throw ValidationException.wrapException(e, new ExtendedLocationData(modelBind.getLocationData(), "evaluating XForms calculate bind",

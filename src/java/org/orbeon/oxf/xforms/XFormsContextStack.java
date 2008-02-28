@@ -329,11 +329,11 @@ public class XFormsContextStack {
                 // No change to anything
                 newNodeset = currentBindingContext.getNodeset();
                 hasOverriddenContext = false;
-                contextItem = currentBindingContext.getContextItem();
                 isNewBind = false;
                 newPosition = currentBindingContext.getPosition();
                 isPushModelVariables = false;
                 variableInfo = null;
+                contextItem = currentBindingContext.getContextItem();
             }
         }
 
@@ -367,9 +367,18 @@ public class XFormsContextStack {
      */
     public void pushIteration(int currentPosition) {
         final BindingContext currentBindingContext = getCurrentBindingContext();
+        final List currentNodeset = currentBindingContext.getNodeset();
+
+        // Set a new context item so that nested context gets the current iteration node as context
+        final Item newContextItem;
+        if (currentNodeset == null || currentNodeset.size() == 0)
+            newContextItem = null;
+        else
+            newContextItem = (Item) currentNodeset.get(currentPosition - 1);
+
         contextStack.push(new BindingContext(currentBindingContext, currentBindingContext.getModel(),
-                currentBindingContext.getNodeset(), currentPosition, currentBindingContext.getElementId(), true, null, currentBindingContext.getLocationData(),
-                false, currentBindingContext.getSingleItem()));
+                currentNodeset, currentPosition, currentBindingContext.getElementId(), true, null, currentBindingContext.getLocationData(),
+                false, newContextItem));
     }
 
     /**

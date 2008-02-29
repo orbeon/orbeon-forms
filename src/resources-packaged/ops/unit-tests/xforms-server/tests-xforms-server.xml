@@ -1873,7 +1873,7 @@
         </output>
     </test>
 
-    <test description="xxforms:iterate attribute on action and current() function" name="oxf:pipeline">
+    <test description="xxforms:iterate attribute on action and context() function" name="oxf:pipeline">
         <input name="config">
             <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <p:param name="response" type="output"/>
@@ -1958,7 +1958,7 @@
         </output>
     </test>
 
-    <test description="xxforms:iterate and current() function on strings" name="oxf:pipeline">
+    <test description="xxforms:iterate and context() function on strings" name="oxf:pipeline">
         <input name="config">
             <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <p:param name="response" type="output"/>
@@ -2244,6 +2244,121 @@
                         <xxf:repeat-index id="items-repeat" index="3"/>
                         <xxf:repeat-iteration id="items-repeat" occurs="3"/>
                     </xxf:repeats>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="simple use of context()" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-server-init.xpl"/>
+                    <p:input name="document">
+                        <xhtml:html xmlns:exforms="http://www.exforms.org/exf/1-0">
+                            <xhtml:head>
+                                <xhtml:title>Iterating with xforms:setindex and variables</xhtml:title>
+                                <xforms:model id="my-model" xxforms:state-handling="client">
+                                    <xforms:instance id="value">
+                                        <value/>
+                                    </xforms:instance>
+                                    <xforms:instance id="items" xxforms:readonly="true">
+                                        <items>
+                                            <item>
+                                                <label>One</label>
+                                                <value>1</value>
+                                            </item>
+                                            <item>
+                                                <label>Two</label>
+                                                <value>2</value>
+                                            </item>
+                                            <item>
+                                                <label>Three</label>
+                                                <value>3</value>
+                                            </item>
+                                        </items>
+                                    </xforms:instance>
+
+                                    <xforms:instance id="results">
+                                        <results>
+                                            <result1/>
+                                            <result2/>
+                                            <result3/>
+                                            <result4/>
+                                            <result5/>
+                                        </results>
+                                    </xforms:instance>
+
+                                    <xforms:action ev:event="xforms-ready">
+                                        <xforms:setvalue ref="." value="2"/>
+                                    </xforms:action>
+
+                                </xforms:model>
+                            </xhtml:head>
+                            <xhtml:body>
+
+                                <xforms:select1 ref=".">
+                                    <xforms:item>
+                                        <xforms:label>Select...</xforms:label>
+                                        <xforms:value/>
+                                    </xforms:item>
+                                    <xforms:itemset nodeset="instance('items')/item">
+                                        <xforms:label ref="label"/>
+                                        <xforms:value ref="value"/>
+                                    </xforms:itemset>
+                                    <xforms:action ev:event="xforms-value-changed">
+                                        <!-- Save value of current context -->
+                                        <xforms:setvalue ref="instance('results')/result1" value="context()"/>
+                                        <!-- Save value of current context relative to ref -->
+                                        <xforms:setvalue ref="instance('results')/result2" value="."/>
+                                        <!-- Check with if on outer action -->
+                                        <xforms:action if="context() = 2">
+                                            <xforms:setvalue ref="instance('results')/result3">got 2</xforms:setvalue>
+                                        </xforms:action>
+                                        <!-- Check with if directly on action  -->
+                                        <xforms:setvalue if="context() = 2" ref="instance('results')/result4">got 2</xforms:setvalue>
+                                        <!-- Check with explicit context if directly on action  -->
+                                        <xforms:setvalue context="." if="context() = 2" ref="instance('results')/result5">got 2</xforms:setvalue>
+                                    </xforms:action>
+                                </xforms:select1>
+
+                            </xhtml:body>
+                        </xhtml:html>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+
+            </p:config>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="value" model-id="my-model">
+                                <value>2</value>
+                            </instance>
+                            <instance id="results" model-id="my-model">
+                                <results>
+                                    <result1>2</result1>
+                                    <result2/>
+                                    <result3>got 2</result3>
+                                    <result4>got 2</result4>
+                                    <result5>got 2</result5>
+                                </results>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="xforms-element-7" relevant="true">2</xxf:control>
+                    </xxf:control-values>
+                    <xxf:itemsets>
+                        <xxf:itemset id="xforms-element-7">[["Select...",""],["One","1"],["Two","2"],["Three","3"]]</xxf:itemset>
+                    </xxf:itemsets>
                 </xxf:action>
             </xxf:event-response>
         </output>

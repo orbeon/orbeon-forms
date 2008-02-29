@@ -149,4 +149,72 @@
             </item>
         </languages>
     </resource>
+    <resource xml:lang="es">
+        <summary>
+            <titles>
+                <summary-title>Síntesis</summary-title>
+                <row-number>Número</row-number>
+                <created>Creado</created>
+                <last-modified>Fecha de modificación</last-modified>
+                <selected>Seleccionado</selected>
+                <of> de </of>
+            </titles>
+            <messages>
+                <intro><i>Por favor, seleccione una forma para llevar a cabo una operación, o seleccione "Nueva Forma" para crear un nuevo formulario en blanco.</i></intro>
+                <no-form-found><i>No se encontró el formulario de datos.</i></no-form-found>
+            </messages>
+            <labels>
+                <new-form>Nueva Forma</new-form>
+                <import-forms>Formas de importación</import-forms>
+                <edit-form>Editar seleccionados</edit-form>
+                <delete-form>Eliminar seleccionados</delete-form>
+                <view-readonly>Ver HTML</view-readonly>
+                <view-xml>Ver XML</view-xml>
+                <view-pdf>Ver PDF</view-pdf>
+                <language-choice>Elegir idioma</language-choice>
+                <form-choice>Elige una Forma</form-choice>
+                <free-search>Búsqueda Libre</free-search>
+                <previous>Anterior</previous>
+                <next>Siguiente</next>
+            </labels>
+            <formats>
+                <date>[MNn] [D], [Y]</date>
+                <save-datetime>[MNn] [D], [Y] [H01]:[m01]:[s01]</save-datetime>
+            </formats>
+        </summary>
+        <detail>
+            <messages>
+                <save-success>Documento guardado correctamente!</save-success>
+                <save-error-form>Documento no guardado: por favor, compruebe si existen errores en su formulario antes de grabar de nuevo.</save-error-form>
+                <save-error-submission>Documento no guardado: por favor, póngase en contacto con el administrador del sistema.</save-error-submission>
+            </messages>
+            <labels>
+                <save-document>Guardar Documento</save-document>
+                <save-locally>Guardar Localmente</save-locally>
+                <return>Volver a las formas</return>
+                <discard>Olvídese de los cambios</discard>
+                <language-choice>Idioma</language-choice>
+                <errors>Resumen de errores</errors>
+                <check-errors-in-form>Este formulario contiene errores</check-errors-in-form>
+                <error-details>Ver detalles de error</error-details>
+                <language-choice>Idioma</language-choice>
+                <close>Cerrar</close>
+                <print>Imprimir</print>
+            </labels>
+        </detail>
+        <languages>
+            <item>
+                <label>English</label>
+                <value>en</value>
+            </item>
+            <item>
+                <label>Français</label>
+                <value>fr</value>
+            </item>
+            <item>
+                <label>Español</label>
+                <value>es</value>
+            </item>
+        </languages>
+    </resource>
 </resources>

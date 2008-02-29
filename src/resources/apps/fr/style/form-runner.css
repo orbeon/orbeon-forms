@@ -83,10 +83,12 @@ h1 { margin-top: 0 }
     height: 75px;
 }
 
-.fr-logo img { margin: 1em 1em .5em 1em; float: left }
-.fr-logo h1 { clear: right; margin-right: 1em; margin-top: .5em; padding-bottom: 0; margin-bottom: 0; float: right; font-weight: normal }
-.fr-summary-language-choice { float: right; margin-right: 1em; margin-top: .2em }
+.fr-header { overflow: hidden;  }
+.fr-summary-language-choice { float: right; margin-right: 1em; margin-top: .2em; color: gray; font-size: 85%; text-align: right; }
+.fr-summary-language-choice a { color: gray; }
 .fr-summary-language-choice .xforms-label { display: inline; margin-right: .5em }
+.fr-logo img { margin: 1em 1em .5em 1em; float: left }
+.fr-logo h1 { clear: right; margin-right: 1em; margin-top: 1em; padding-bottom: 0; margin-bottom: 0; float: right; font-weight: normal }
 
 .fr-separator {
     background-color: #3598d4;
@@ -216,7 +218,7 @@ label.xforms-disabled, span.xforms-disabled, div.xforms-disabled  {
 }
 
 .fr-buttons button {
-    width: 12em
+    width: 14em
 }
 
 .fr-repeat-table .xforms-label { margin-top: 0 }

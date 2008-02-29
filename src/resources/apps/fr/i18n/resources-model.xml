@@ -1,0 +1,56 @@
+<xforms:model xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:xforms="http://www.w3.org/2002/xforms"
+        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+        xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:xi="http://www.w3.org/2001/XInclude"
+        xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+        xmlns:ev="http://www.w3.org/2001/xml-events"
+        id="fr-resources-model">
+
+    <xforms:action ev:event="xforms-ready">
+        <xforms:dispatch name="fr-update-language" target="fr-resources-model"/>
+    </xforms:action>
+
+    <!-- Instance containing the current language -->
+    <xforms:instance id="fr-language-instance">
+        <language xmlns="">en</language>
+    </xforms:instance>
+
+    <xxforms:variable name="lang" select="instance('fr-language-instance')"/>
+
+    <!-- XForms instance containing the current form resources -->
+    <xforms:instance id="fr-current-form-resources">
+        <resource xmlns=""/>
+    </xforms:instance>
+
+    <!-- Instance containing the Form Runner resources -->
+    <xforms:instance id="fr-fr-resources" src="oxf:/apps/fr/i18n/resources.xml" xxforms:readonly="true"/>
+
+    <!-- Instance containing the current Form Runner resources -->
+    <xforms:instance id="fr-fr-current-resources">
+        <resource xmlns=""/> 
+    </xforms:instance>
+
+    <!-- Instance containing all the ISO 639-1 languages -->
+    <xforms:instance id="fr-languages-instance" src="oxf:/apps/fr/i18n/languages.xml" xxforms:readonly="true"/>
+
+    <!-- Respond to language change in the UI -->
+    <xforms:action ev:observer="fr-language-selector" ev:event="xforms-value-changed">
+        <xforms:dispatch name="fr-update-language" target="fr-resources-model"/>
+    </xforms:action>
+
+    <xforms:action ev:observer="fr-language-selector" ev:event="DOMActivate">
+        <xforms:dispatch name="fr-update-language" target="fr-resources-model"/>
+    </xforms:action>
+
+    <!-- Copy resources of the selected language, using the first language declared if the no matching language is found -->
+    <xforms:action ev:event="fr-update-language">
+        <xforms:insert nodeset="instance('fr-current-form-resources')"
+                       origin="xxforms:instance('fr-form-resources')/(resource[@xml:lang = $lang], resource[1])[1]"/>
+        <xforms:insert nodeset="instance('fr-fr-current-resources')"
+                       origin="instance('fr-fr-resources')/(resource[@xml:lang = $lang], resource[1])[1]"/>
+    </xforms:action>
+
+</xforms:model>

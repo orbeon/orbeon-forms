@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Copyright (C) 2008 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<resources>
+    <resource xml:lang="en">
+        <summary>
+            <titles>
+                <summary-title>Summary</summary-title>
+                <row-number>No.</row-number>
+                <created>Created</created>
+                <last-modified>Last Modified</last-modified>
+                <selected>Selected</selected>
+                <of> of </of>
+            </titles>
+            <messages>
+                <intro><i>Please select a form in order to perform an operation, or select "New Form" to create a new blank form.</i></intro>
+                <no-form-found><i>No form data was found.</i></no-form-found>
+            </messages>
+            <labels>
+                <new-form>New Form</new-form>
+                <import-forms>Import Forms</import-forms>
+                <edit-form>Edit Selected</edit-form>
+                <delete-form>Delete Selected</delete-form>
+                <view-readonly>View HTML</view-readonly>
+                <view-xml>View XML</view-xml>
+                <view-pdf>View PDF</view-pdf>
+                <language-choice>Choose language</language-choice>
+                <form-choice>Choose a Form</form-choice>
+                <free-search>Free Search</free-search>
+                <previous>Previous</previous>
+                <next>Next</next>
+            </labels>
+            <formats>
+                <date>[MNn] [D], [Y]</date>
+                <save-datetime>[MNn] [D], [Y] [H01]:[m01]:[s01]</save-datetime>
+            </formats>
+        </summary>
+        <detail>
+            <messages>
+                <save-success>Document saved successfully!</save-success>
+                <save-error-form>Document not saved: please check for errors in your form before saving again.</save-error-form>
+                <save-error-submission>Document not saved: please contact your system administrator.</save-error-submission>
+            </messages>
+            <labels>
+                <save-document>Save Document</save-document>
+                <save-locally>Save Locally</save-locally>
+                <return>Back to Forms</return>
+                <discard>Forget Changes</discard>
+                <language-choice>Language</language-choice>
+                <errors>Summary of errors</errors>
+                <check-errors-in-form>This form contains errors</check-errors-in-form>
+                <error-details>View error details</error-details>
+                <language-choice>Language</language-choice>
+                <close>Close</close>
+                <print>Print</print>
+            </labels>
+        </detail>
+        <languages>
+            <item>
+                <label>English</label>
+                <value>en</value>
+            </item>
+            <item>
+                <label>Français</label>
+                <value>fr</value>
+            </item>
+            <item>
+                <label>Español</label>
+                <value>es</value>
+            </item>
+        </languages>
+    </resource>
+    <resource xml:lang="fr">
+        <summary>
+            <titles>
+                <summary-title>Sommaire</summary-title>
+                <row-number>No.</row-number>
+                <created>Création</created>
+                <last-modified>Dernière modification</last-modified>
+                <selected>Sélection</selected>
+                <of> sur </of>
+            </titles>
+            <messages>
+                <intro><i>Veuillez sélectionner un document avant d'effectuer une opération, ou sélectionnez "Nouveau" pour créer un nouveau formulaire.</i></intro>
+                <no-form-found><i>Aucun formulaire trouvé.</i></no-form-found>
+            </messages>
+            <labels>
+                <new-form>Nouveau</new-form>
+                <import-forms>Importer</import-forms>
+                <edit-form>Editer</edit-form>
+                <delete-form>Supprimer</delete-form>
+                <view-readonly>Vue HTML</view-readonly>
+                <view-xml>Vue XML</view-xml>
+                <view-pdf>Vue PDF</view-pdf>
+                <language-choice>Choix de la langue</language-choice>
+                <form-choice>Choisisez un formulaire</form-choice>
+                <free-search>Recherche libre</free-search>
+                <previous>Précédent</previous>
+                <next>Suivant</next>
+            </labels>
+            <formats>
+                <date>Le [D] [Mn] [Y]</date>
+                <save-datetime>[D] [Mn] [Y] à [H01]:[m01]:[s01]</save-datetime>
+            </formats>
+        </summary>
+        <detail>
+            <messages>
+                <save-success>Document sauvegardé avec succès!</save-success>
+                <save-error-form>Document non sauvegardé: veuillez vérifier que le formulaire ne contienne pas d'erreurs.</save-error-form>
+                <save-error-submission>Document non sauvegardé: veuillez contacter votre administrateur système.</save-error-submission>
+            </messages>
+            <labels>
+                <save-document>Sauvegarder</save-document>
+                <save-locally>Sauvegarde Locale</save-locally>
+                <return>Retour</return>
+                <discard>Ignore les Changements</discard>
+                <language-choice>Langue</language-choice>
+                <errors>Résumé des erreurs</errors>
+                <check-errors-in-form>Ce formulaire contient des erreurs</check-errors-in-form>
+                <error-details>Détail des erreurs</error-details>
+                <language-choice>Langue</language-choice>
+                <close>Fermer</close>
+                <print>Imprimer</print>
+            </labels>
+        </detail>
+        <languages>
+            <item>
+                <label>English</label>
+                <value>en</value>
+            </item>
+            <item>
+                <label>Français</label>
+                <value>fr</value>
+            </item>
+            <item>
+                <label>Español</label>
+                <value>es</value>
+            </item>
+        </languages>
+    </resource>
+</resources>

@@ -32,19 +32,40 @@
         <xforms:input model="fr-persistence-model" ref="instance('fr-persistence-instance')/data-status" id="fr-data-status-input" class="xforms-disabled"/>
 
         <!-- Scope variable with Form Runner resources -->
-        <xxforms:variable name="fr-resources" select="xxforms:instance('fr-current-resources')"/>
+        <xxforms:variable name="fr-resources" select="xxforms:instance('fr-fr-current-resources')"/>
 
         <xsl:if test="@width and not(@width = ('750px', '950px', '974px'))">
             <xsl:message terminate="yes">Value of fr:view/@view is not valid</xsl:message>
         </xsl:if>
         <xhtml:div id="{if (@width = '750px') then 'doc' else if (@width = '950px') then 'doc2' else 'doc4'}" class="yui-t5xxx{if (doc('input:instance')/*/mode = 'print') then ' fr-print-mode' else ''}">
-            <xsl:if test="fr:header">
-                <xforms:group model="fr-form-model" context="instance('fr-form-instance')">
-                    <xhtml:div class="fr-header">
+            <xhtml:div class="fr-header">
+                <!-- Switch language -->
+                <xhtml:div class="fr-summary-language-choice">
+                    <xxforms:variable name="available-languages"
+                                      select="xxforms:instance('fr-form-resources')/resource/@xml:lang"/>
+                    <!-- This implements a sort of xforms:select1[@appearance = 'xxforms:full']. Should be componentized. -->
+                    <xforms:group id="fr-language-selector">
+                        <xforms:repeat model="fr-resources-model" nodeset="$available-languages">
+                            <xxforms:variable name="position" select="position()"/>
+                            <xxforms:variable name="label" select="(instance('fr-languages-instance')/language[@code = context()]/@native-name, context())[1]"/>
+                            <xforms:group ref=".[$position > 1]"> | </xforms:group>
+                            <xforms:trigger ref=".[context() != instance('fr-language-instance')]" appearance="minimal">
+                                <xforms:label value="$label"/>
+                                <xforms:action ev:event="DOMActivate">
+                                    <xforms:setvalue ref="instance('fr-language-instance')" value="context()"/>
+                                </xforms:action>
+                            </xforms:trigger>
+                            <xforms:output ref=".[context() = instance('fr-language-instance')]" value="$label"/>
+                        </xforms:repeat>
+                    </xforms:group>
+                </xhtml:div>
+                <!-- Custom content added to the header -->
+                <xsl:if test="fr:header">
+                    <xforms:group model="fr-form-model" context="instance('fr-form-instance')">
                         <xsl:apply-templates select="fr:header/node()"/>
-                    </xhtml:div>
-                </xforms:group>
-            </xsl:if>
+                    </xforms:group>
+                </xsl:if>
+            </xhtml:div>
             <xhtml:div id="hd" class="fr-top"/>
             <xhtml:div id="bd" class="fr-container">
                 <xhtml:div id="yui-main">
@@ -53,33 +74,6 @@
                             <xsl:if test="xhtml:img">
                                 <xhtml:img src="{xhtml:img/@src}" alt="Logo"/>
                             </xsl:if>
-                            <xhtml:div class="fr-summary-language-choice">
-                                <!-- Switch language -->
-
-                                <xxforms:variable name="available-languages-1"
-                                                  select="xxforms:instance('fr-form-resources')/resource/@xml:lang"/>
-
-                                <xxforms:variable name="available-languages" select="$available-languages-1"/>
-
-                                <!-- This implements a sort of xforms:select1[@appearance = 'xxforms:full']. Should be componentized. -->
-                                <xforms:group id="fr-language-selector">
-                                    <!--<xforms:label ref="$fr-resources/summary/labels/language-choice"/>-->
-                                    <xforms:repeat model="fr-resources-model" nodeset="$available-languages">
-
-                                        <xxforms:variable name="position" select="position()"/>
-                                        <xxforms:variable name="label" select="(instance('fr-languages-instance')/language[@code = context()]/@native-name, context())[1]"/>
-                                        
-                                        <xforms:group ref=".[$position > 1]"> | </xforms:group>
-                                        <xforms:trigger ref=".[context() != instance('fr-language-instance')]" appearance="minimal">
-                                            <xforms:label value="$label"/>
-                                            <xforms:action ev:event="DOMActivate">
-                                                <xforms:setvalue ref="instance('fr-language-instance')" value="context()"/>
-                                            </xforms:action>
-                                        </xforms:trigger>
-                                        <xforms:output ref=".[context() = instance('fr-language-instance')]" value="$label"/>
-                                    </xforms:repeat>
-                                </xforms:group>
-                            </xhtml:div>
                             <xhtml:h1>
                                 <xsl:choose>
                                     <xsl:when test="xforms:label">
@@ -232,14 +226,20 @@
     <xsl:template match="fr:back-button">
         <!-- Trigger shown to go back if the data is dirty -->
         <xforms:trigger ref="instance('fr-persistence-instance')[data-status = 'dirty']">
-            <xforms:label><xhtml:img src="/apps/fr/style/previous.gif" alt=""/> <xhtml:span>Discard</xhtml:span></xforms:label>
+            <xforms:label>
+                <xhtml:img src="../../../../apps/fr/style/previous.gif" alt=""/>
+                <xhtml:span><xforms:output value="$fr-resources/detail/labels/discard"/></xhtml:span>
+            </xforms:label>
             <xforms:action ev:event="DOMActivate">
                 <xforms:dispatch target="fr-persistence-model" name="orbeon-summary"/>
             </xforms:action>
         </xforms:trigger>
         <!-- Trigger shown to go back if the data is clean -->
         <xforms:trigger ref="instance('fr-persistence-instance')[data-status = 'clean']">
-            <xforms:label><xhtml:img src="/apps/fr/style/previous.gif" alt=""/> <xhtml:span>Back</xhtml:span></xforms:label>
+            <xforms:label>
+                <xhtml:img src="../../../../apps/fr/style/previous.gif" alt=""/>
+                <xhtml:span><xforms:output value="$fr-resources/detail/labels/return"/></xhtml:span>
+            </xforms:label>
             <xforms:action ev:event="DOMActivate">
                 <xforms:dispatch target="fr-persistence-model" name="orbeon-summary"/>
             </xforms:action>
@@ -248,7 +248,10 @@
 
     <xsl:template match="fr:save-button">
         <xforms:trigger ref="instance('fr-triggers-instance')/save">
-            <xforms:label><xhtml:img src="/apps/fr/style/run.gif" alt=""/> <xhtml:span>Save Form</xhtml:span></xforms:label>
+            <xforms:label>
+                <xhtml:img src="../../../../apps/fr/style/run.gif" alt=""/>
+                <xhtml:span><xforms:output value="$fr-resources/detail/labels/save-document"/></xhtml:span>
+            </xforms:label>
             <xforms:action ev:event="DOMActivate">
                 <xforms:dispatch target="fr-persistence-model" name="orbeon-save"/>
             </xforms:action>
@@ -257,7 +260,10 @@
 
     <xsl:template match="fr:print-button">
         <xforms:trigger>
-            <xforms:label><xhtml:img src="/apps/fr/style/report.gif" alt=""/> <xhtml:span>Print</xhtml:span></xforms:label>
+            <xforms:label>
+                <xhtml:img src="../../../../apps/fr/style/report.gif" alt=""/>
+                <xhtml:span><xforms:output value="$fr-resources/detail/labels/print"/></xhtml:span>
+            </xforms:label>
             <xforms:action ev:event="DOMActivate">
                 <xforms:send submission="fr-print-submission"/>
             </xforms:action>
@@ -266,13 +272,19 @@
 
     <xsl:template match="fr:save-locally-button">
         <xforms:trigger id="save-locally-button">
-            <xforms:label><xhtml:img src="/apps/fr/style/save.gif" alt=""/> <xhtml:span>Save locally</xhtml:span></xforms:label>
+            <xforms:label>
+                <xhtml:img src="../../../../apps/fr/style/save.gif" alt=""/>
+                <xforms:output value="$fr-resources/detail/labels/save-locally"/>
+            </xforms:label>
         </xforms:trigger>
     </xsl:template>
 
     <xsl:template match="fr:close-button">
         <xforms:trigger>
-            <xforms:label><xhtml:img src="/apps/fr/style/close.gif" alt=""/> <xhtml:span>Close</xhtml:span></xforms:label>
+            <xforms:label>
+                <xhtml:img src="../../../../apps/fr/style/close.gif" alt=""/>
+                <xforms:output value="$fr-resources/detail/labels/discard"/>
+            </xforms:label>
             <xforms:action ev:event="DOMActivate">
                 <xxforms:script>window.close();</xxforms:script>
             </xforms:action>
@@ -598,53 +610,7 @@
         </xforms:model>
 
         <!-- This model handles i18n resources -->
-        <xforms:model id="fr-resources-model">
-
-            <xforms:action ev:event="xforms-ready">
-                <xforms:dispatch name="fr-update-language" target="fr-resources-model"/>
-            </xforms:action>
-
-            <!-- Instance containing the current language -->
-            <xforms:instance id="fr-language-instance">
-                <language xmlns="">en</language>
-            </xforms:instance>
-
-            <xxforms:variable name="lang" select="instance('fr-language-instance')"/>
-
-            <!-- XForms instance containing the current form resources -->
-            <xforms:instance id="fr-current-form-resources">
-                <resource xmlns=""/>
-            </xforms:instance>
-
-            <!-- Instance containing the Form Runner resources -->
-            <xforms:instance id="fr-resources" src="oxf:/apps/fr/includes/resources.xml" xxforms:readonly="true"/>
-
-            <!-- Instance containing the current Form Runner resources -->
-            <xforms:instance id="fr-current-resources">
-                <resource xmlns=""/>
-            </xforms:instance>
-
-            <!-- Instance containing all the ISO 639-1 languages -->
-            <xforms:instance id="fr-languages-instance" src="oxf:/apps/fr/includes/languages.xml" xxforms:readonly="true"/>
-
-            <!-- Respond to language change in the UI -->
-            <xforms:action ev:observer="fr-language-selector" ev:event="xforms-value-changed">
-                <xforms:dispatch name="fr-update-language" target="fr-resources-model"/>
-            </xforms:action>
-
-            <xforms:action ev:observer="fr-language-selector" ev:event="DOMActivate">
-                <xforms:dispatch name="fr-update-language" target="fr-resources-model"/>
-            </xforms:action>
-
-            <!-- Copy resources of the selected language, using the first language declared if the no matching language is found -->
-            <xforms:action ev:event="fr-update-language">
-                <xforms:insert nodeset="instance('fr-current-form-resources')"
-                               origin="xxforms:instance('fr-form-resources')/(resource[@xml:lang = $lang], resource[1])[1]"/>
-                <xforms:insert nodeset="instance('fr-current-resources')"
-                               origin="instance('fr-resources')/(resource[@xml:lang = $lang], resource[1])[1]"/>
-            </xforms:action>
-
-        </xforms:model>
+        <xi:include href="i18n/resources-model.xml" xxi:omit-xml-base="true"/>
 
         <!-- This model handles print functionality -->
         <xforms:model id="fr-print-model">

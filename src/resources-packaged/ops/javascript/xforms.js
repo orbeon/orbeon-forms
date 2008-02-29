@@ -2312,7 +2312,7 @@ ORBEON.xforms.Init = {
         // Change the path to a custom configuration, based on the FCK_CUSTOM_CONFIG variable
     	type_check = typeof FCK_CUSTOM_CONFIG;
     	if (type_check != 'undefined')
-    		fckEditor.Config["CustomConfigurationsPath"] = FCK_CUSTOM_CONFIG;
+    		fckEditor.Config["CustomConfigurationsPath"] = fckEditor.BasePath + FCK_CUSTOM_CONFIG;
 
         if (ORBEON.xforms.Globals.fckEditorLoading) {
             ORBEON.xforms.Globals.fckEditorsToLoad.push(fckEditor);

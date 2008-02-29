@@ -110,7 +110,7 @@ public class XFormsActionInterpreter {
         }
 
         try {
-            // Handle conditional action (@if / @exf:if)
+            // Extract conditional action (@if / @exf:if)
             final String ifConditionAttribute;
             {
                 final String ifAttribute = actionElement.attributeValue("if");
@@ -120,7 +120,7 @@ public class XFormsActionInterpreter {
                     ifConditionAttribute = actionElement.attributeValue(XFormsConstants.EXFORMS_IF_ATTRIBUTE_QNAME);
             }
 
-            // Handle iterated action (@while / @exf:while)
+            // Extract iterated action (@while / @exf:while)
             final String whileIterationAttribute;
             {
                 final String whileAttribute = actionElement.attributeValue("while");
@@ -130,7 +130,7 @@ public class XFormsActionInterpreter {
                     whileIterationAttribute = actionElement.attributeValue(XFormsConstants.EXFORMS_WHILE_ATTRIBUTE_QNAME);
             }
 
-            // Handle iterated action (@xxforms:iterate / @exf:iterate)
+            // Extract iterated action (@xxforms:iterate / @exf:iterate)
             final String iterateIterationAttribute;
             {
                 final String xxformsIterateAttribute = actionElement.attributeValue(XFormsConstants.XXFORMS_ITERATE_ATTRIBUTE_QNAME);

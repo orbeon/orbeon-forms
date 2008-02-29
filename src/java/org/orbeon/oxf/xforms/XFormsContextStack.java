@@ -327,13 +327,21 @@ public class XFormsContextStack {
 
             } else {
                 // No change to anything
-                newNodeset = currentBindingContext.getNodeset();
-                hasOverriddenContext = false;
                 isNewBind = false;
+                newNodeset = currentBindingContext.getNodeset();
                 newPosition = currentBindingContext.getPosition();
                 isPushModelVariables = false;
                 variableInfo = null;
-                contextItem = currentBindingContext.getContextItem();
+
+                // We set a new context item as the context into which other attributes must be evaluated. E.g.:
+                //
+                // <xforms:select1 ref="type">
+                //   <xforms:action ev:event="xforms-value-changed" if="context() = 'foobar'">
+                //
+                // In this case, you expect context() to be updated as follows.
+                //
+                hasOverriddenContext = false;
+                contextItem = currentBindingContext.getSingleItem();
             }
         }
 
@@ -369,7 +377,7 @@ public class XFormsContextStack {
         final BindingContext currentBindingContext = getCurrentBindingContext();
         final List currentNodeset = currentBindingContext.getNodeset();
 
-        // Set a new context item so that nested context gets the current iteration node as context
+        // Set a new context item, although the context() function is never called on the iteration itself
         final Item newContextItem;
         if (currentNodeset == null || currentNodeset.size() == 0)
             newContextItem = null;

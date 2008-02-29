@@ -32,6 +32,11 @@
         <file-name>data</file-name>
     </xforms:instance>
 
+    <xforms:action ev:observer="save-locally-button" ev:event="DOMActivate">
+        <xforms:setvalue ref="xxforms:instance('fr-persistence-instance')/save-attempted">true</xforms:setvalue>
+        <xforms:send submission="save-locally-submission"/>
+    </xforms:action>
+
     <xforms:submission id="save-locally-submission" method="post" ref="xxforms:instance('fr-form-instance')" replace="instance" instance="fr-uuid"
             action="/fr/service/import-export/save-generate?app={xxforms:instance('fr-parameters-instance')/app}&amp;form={xxforms:instance('fr-parameters-instance')/form}" validate="false">
         <xforms:action ev:event="xforms-submit-done">

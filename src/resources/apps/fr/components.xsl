@@ -265,12 +265,8 @@
     </xsl:template>
 
     <xsl:template match="fr:save-locally-button">
-        <xforms:trigger>
+        <xforms:trigger id="save-locally-button">
             <xforms:label><xhtml:img src="/apps/fr/style/save.gif" alt=""/> <xhtml:span>Save locally</xhtml:span></xforms:label>
-            <xforms:action ev:event="DOMActivate">
-                <xforms:setvalue ref="xxforms:instance('fr-persistence-instance')/save-attempted">true</xforms:setvalue>
-                <xforms:send submission="save-locally-submission"/>
-            </xforms:action>
         </xforms:trigger>
     </xsl:template>
 

@@ -51,6 +51,7 @@
                 <save-success>Document saved successfully!</save-success>
                 <save-error-form>Document not saved: please check for errors in your form before saving again.</save-error-form>
                 <save-error-submission>Document not saved: please contact your system administrator.</save-error-submission>
+                <clear-confirm-message>Are you sure you want to clear all the fields on this page? Your data will be lost if you haven't saved it.</clear-confirm-message>
             </messages>
             <labels>
                 <save-document>Save Document</save-document>
@@ -64,6 +65,9 @@
                 <language-choice>Language</language-choice>
                 <close>Close</close>
                 <print>Print</print>
+                <clear>Clear</clear>
+                <confirm>Confirm</confirm>
+                <cancel>Cancel</cancel>
             </labels>
         </detail>
         <languages>
@@ -119,6 +123,7 @@
                 <save-success>Document sauvegardé avec succès!</save-success>
                 <save-error-form>Document non sauvegardé: veuillez vérifier que le formulaire ne contienne pas d'erreurs.</save-error-form>
                 <save-error-submission>Document non sauvegardé: veuillez contacter votre administrateur système.</save-error-submission>
+                <clear-confirm-message>Êtes-vous sûr de vouloir effacer tous les champs de cette page? Vos données seront perdues si vous ne les avez pas sauvegardées.</clear-confirm-message>
             </messages>
             <labels>
                 <save-document>Sauvegarder</save-document>
@@ -132,6 +137,9 @@
                 <language-choice>Langue</language-choice>
                 <close>Fermer</close>
                 <print>Imprimer</print>
+                <clear>Effacer</clear>
+                <confirm>Confirmer</confirm>
+                <cancel>Annuler</cancel>
             </labels>
         </detail>
         <languages>
@@ -187,6 +195,7 @@
                 <save-success>Documento guardado correctamente!</save-success>
                 <save-error-form>Documento no guardado: por favor, compruebe si existen errores en su formulario antes de grabar de nuevo.</save-error-form>
                 <save-error-submission>Documento no guardado: por favor, póngase en contacto con el administrador del sistema.</save-error-submission>
+                <clear-confirm-message>¿Está seguro de que desea borrar todos los campos de esta página? Sus datos se perderán si no ha guardado.</clear-confirm-message>
             </messages>
             <labels>
                 <save-document>Guardar Documento</save-document>
@@ -200,6 +209,9 @@
                 <language-choice>Idioma</language-choice>
                 <close>Cerrar</close>
                 <print>Imprimir</print>
+                <clear>Borrar</clear>
+                <confirm>Confirme</confirm>
+                <cancel>Cancelar</cancel>
             </labels>
         </detail>
         <languages>

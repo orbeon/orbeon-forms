@@ -180,6 +180,7 @@
                                                 <xsl:variable name="default-buttons" as="element(fr:buttons)">
                                                     <fr:buttons>
                                                         <fr:back-button/>
+                                                        <fr:clear-button/>
                                                         <fr:print-button/>
                                                         <fr:save-locally-button/>
                                                         <fr:save-button/>
@@ -218,6 +219,7 @@
             </xforms:group>
         </xhtml:div>
         <xi:include href="import-export/import-export-dialog.xml" xxi:omit-xml-base="true"/>
+        <xi:include href="includes/clear-dialog.xhtml" xxi:omit-xml-base="true"/>
 
     </xsl:template>
 
@@ -244,14 +246,14 @@
         </xforms:trigger>
     </xsl:template>
 
-    <xsl:template match="fr:save-button">
-        <xforms:trigger ref="instance('fr-triggers-instance')/save">
-            <xforms:label>
-                <xhtml:img src="../../../../apps/fr/style/run.gif" alt=""/>
-                <xhtml:span><xforms:output value="$fr-resources/detail/labels/save-document"/></xhtml:span>
+    <xsl:template match="fr:clear-button">
+        <xforms:trigger>
+            <xforms:label><xhtml:img src="../../../../apps/fr/style/clear.gif" alt=""/>
+                <xhtml:span><xforms:output value="$fr-resources/detail/labels/clear"/></xhtml:span>
             </xforms:label>
             <xforms:action ev:event="DOMActivate">
-                <xforms:dispatch target="fr-persistence-model" name="orbeon-save"/>
+                <xforms:setvalue ref="xxforms:instance('errors-state')/submitted">true</xforms:setvalue>
+                <xxforms:show dialog="fr-clear-confirm-dialog"/>
             </xforms:action>
         </xforms:trigger>
     </xsl:template>
@@ -274,6 +276,18 @@
                 <xhtml:img src="../../../../apps/fr/style/save.gif" alt=""/>
                 <xforms:output value="$fr-resources/detail/labels/save-locally"/>
             </xforms:label>
+        </xforms:trigger>
+    </xsl:template>
+
+    <xsl:template match="fr:save-button">
+        <xforms:trigger ref="instance('fr-triggers-instance')/save">
+            <xforms:label>
+                <xhtml:img src="../../../../apps/fr/style/run.gif" alt=""/>
+                <xhtml:span><xforms:output value="$fr-resources/detail/labels/save-document"/></xhtml:span>
+            </xforms:label>
+            <xforms:action ev:event="DOMActivate">
+                <xforms:dispatch target="fr-persistence-model" name="orbeon-save"/>
+            </xforms:action>
         </xforms:trigger>
     </xsl:template>
 

@@ -1121,7 +1121,7 @@
                     </ul>
                     <table>
                         <tr>
-                            <th>id</th>
+                            <th><code>id</code></th>
                             <td>Mandatory</td>
                             <td>
                                 The ID of the dialog. You reference this ID when opening the dialog with
@@ -1161,7 +1161,7 @@
                             </td>
                         </tr>
                         <tr>
-                            <th>level</th>
+                            <th><code>level</code></th>
                             <td>
                                 Optional. Can only be used appearance is set to <code>full</code>. Possible values are:
                                 <ul>
@@ -1176,7 +1176,7 @@
                             </td>
                         </tr>
                         <tr>
-                            <th>close</th>
+                            <th><code>close</code></th>
                             <td>
                                 Optional. Can only be used appearance is set to <code>full</code>. Possible values are:
                                 <ul>
@@ -1194,7 +1194,7 @@
                             </td>
                         </tr>
                         <tr>
-                            <th>draggable</th>
+                            <th><code>draggable</code></th>
                             <td>
                                 Optional. Can only be used appearance is set to <code>full</code>. Possible values are:
                                 <ul>
@@ -1208,7 +1208,7 @@
                             </td>
                         </tr>
                         <tr>
-                            <th>visible</th>
+                            <th><code>visible</code></th>
                             <td>
                                 Optional. Whether the dialog is initially visible when the page loads. Possible values
                                 are:
@@ -1221,17 +1221,143 @@
                                 When set to <code>true</code>, the dialog appears immediately when the page loads.
                             </td>
                         </tr>
+                        <tr>
+                            <th><code>neighbor</code></th>
+                            <td>Optional</td>
+                            <td>
+                                Optional. Use only with <code>minimal</code> appearance. The id of the control next to
+                                which the dialog should display when opening.
+                            </td>
+                        </tr>
                     </table>
                 </section>
                 <a name="dialog-show-hide"/>
                 <section>
                     <title>The <code>xxforms:show</code> and <code>xxforms:hide</code> Actions</title>
-                    <p>[To be completed]</p>
+                    <p>
+                        You open a dialog by using the <code>xxforms:show</code> action:
+                    </p>
+                    <xml-source>
+                        <xforms:trigger>
+                            <xforms:label>Show Dialog</xforms:label>
+                            <xxforms:show ev:event="DOMActivate" dialog="hello-dialog"/>
+                        </xforms:trigger>
+                    </xml-source>
+                    <p>
+                        If the dialog is already open, no action takes place.
+                    </p>
+                    <p>
+                        <code>xxforms:show</code> supports the following attributes:
+                    </p>
+                    <table>
+                        <tr>
+                            <th><code>dialog</code></th>
+                            <td>Mandatory</td>
+                            <td>
+                                The id of an existing dialog to open.
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><code>neighbor</code></th>
+                            <td>Optional</td>
+                            <td>
+                                Optional. Use only with <code>minimal</code> appearance. The id of the control next to
+                                which the dialog should display when opening.
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><code>constrain</code></th>
+                            <td>Optional</td>
+                            <td>
+                                Whether to constrain the dialog to the viewport. Possible values
+                                are:
+                                <ul>
+                                    <li><code>true</code> (default)</li>
+                                    <li><code>false</code></li>
+                                </ul>
+                            </td>
+                        </tr>
+                    </table>
+                    <p>
+                        You close a dialog by using the <code>xxforms:hide</code> action:
+                    </p>
+                    <xml-source>
+                        <xforms:trigger>
+                            <xforms:label>Hide Dialog</xforms:label>
+                            <xxforms:hide ev:event="DOMActivate" dialog="hello-dialog"/>
+                        </xforms:trigger>
+                    </xml-source>
+                    <p>
+                        If the dialog is already closed, no action takes place.
+                    </p>
+                    <p>
+                        <code>xxforms:hide</code> supports the following attributes:
+                    </p>
+                    <table>
+                        <tr>
+                            <th><code>dialog</code></th>
+                            <td>Mandatory</td>
+                            <td>
+                                The id of an existing dialog to close.
+                            </td>
+                        </tr>
+                    </table>
                 </section>
-                <a name="dialog-dialog-open-close"/>
+                <a name="xxforms-dialog-open"/>
                 <section>
-                    <title>The <code>xxforms-dialog-open</code> and <code>xxforms-dialog-close</code> Events</title>
-                    <p>[To be completed]</p>
+                    <title>The <code>xxforms-dialog-open</code> Event</title>
+                    <p>
+                        Dispatched in response to: <code>xxforms:show</code> action executed with an existing dialog id.
+                    </p>
+                    <p>
+                        Target: <code>dialog</code>
+                    </p>
+                    <p>
+                        Bubbles: Yes
+                    </p>
+                    <p>
+                        Cancelable: Yes
+                    </p>
+                    <p>
+                        Context Info: none
+                    </p>
+                    <p>
+                        Default Action: Open the dialog.
+                    </p>
+                    <p>
+                        You can respond to this event before the dialog opens, for example to perform initialization of
+                        data:
+                    </p>
+                    <xml-source>
+                        <xxforms:dialog id="hello-dialog">
+                            <xhtml:div>
+                                Hello!
+                            </xhtml:div>
+                            <xxforms:setvalue ev:event="xxforms-dialog-open" ref="..." value="..."/>
+                        </xxforms:dialog>
+                    </xml-source>
+                </section>
+                <a name="xxforms-dialog-close"/>
+                <section>
+                    <title>The <code>xxforms-dialog-close</code> Event</title>
+                    <p>
+                        Dispatched in response to: <code>xxforms:hide</code> action executed with an existing dialog id.
+                    </p>
+                    <p>
+                        Target: <code>dialog</code>
+                    </p>
+                    <p>
+                        Bubbles: Yes
+                    </p>
+                    <p>
+                        Cancelable: Yes
+                    </p>
+                    <p>
+                        Context Info: none
+                    </p>
+                    <p>
+                        Default Action: Close the dialog.
+                    </p>
                 </section>
             </section>
             <a name="other-extensions"/>

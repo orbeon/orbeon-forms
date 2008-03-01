@@ -20,13 +20,6 @@
         <title>Orbeon Forms FAQ</title>
     </header>
     <body>
-        <a name="introduction"/>
-        <section>
-            <title>Introduction</title>
-            <p>
-                This FAQ answsers technical questions about Orbeon Forms.
-            </p>
-        </section>
         <a name="general"/>
         <section>
             <title>General Orbeon Forms FAQ</title>
@@ -87,157 +80,7 @@
                     Orbeon does offer commercial support for Orbeon Forms. See the information about our <a
                     href="#getting-support">support plans</a>. </p>
             </section>
-            <a name="name-change"/>
-            <section>
-                <title>Why did we rename Orbeon PresentationServer to Orbeon Forms?</title>
-                <p>
-                    Renaming a product is not something to be taken lightly. However we felt that:
-                </p>
-                <ul>
-                    <li>
-                        <p>
-                            <i>Orbeon Forms</i> better reflects the fact that forms have been the main focus of our
-                            development efforts since 2004.
-                        </p>
-                    </li>
-                    <li>
-                        <p>
-                            This new face will help potential users understand more easily what the platform can do for
-                            them.
-                        </p>
-                    </li>
-                    <li>
-                        <p><i>Orbeon Forms</i> is just an easier name to remember!</p>
-                    </li>
-                </ul>
-                <p>
-                    We were encouraged in this decision by the fact that almost all current users build complex web forms
-                    using our Ajax-based XForms engine. The name change also conveys that we plan to keep focusing on
-                    form-related capabilities in the future.
-                </p>
-                <p>
-                    It is important to precise the following:
-                </p>
-                <ul>
-                    <li>
-                        <p>
-                            <i>Orbeon Forms</i> is simply the new name of Orbeon PresentationServer, not a different
-                            product.
-                        </p>
-                    </li>
-                    <li>
-                        <p>
-                            Other XML technologies like XSLT and XML pipelines remain an important part of the
-                            platform.
-                        </p>
-                    </li>
-                    <li>
-                        <p>And of course, <i>Orbeon Forms</i> remains an open source solution!</p>
-                    </li>
-                </ul>
-            </section>
             <a name="source-code"/>
-            <section added="2007-01-06">
-                <title>Where do I find the source code?</title>
-                <p>
-                    In the OW2 CVS repository. <a href="http://forge.objectweb.org/scm/?group_id=168">This
-                    page</a> provides the instructions to retrieve it. You can also <a
-                    href="http://cvs.forge.objectweb.org/cgi-bin/viewcvs.cgi/ops/">browse the repository</a> with your
-                    web browser.
-                </p>
-                <p>
-                    Use the <code>orbeon</code> CVS module for Orbeon Forms proper, and the <code>saxon</code> CVS
-                    module for the Saxon source code (which sometimes contains fixes against the latest released
-                    Saxon).
-                </p>
-            </section>
-            <a name="source-code-version"/>
-            <section added="2007-02-19">
-                <title>Where do I find the source code for a particular release of Orbeon Forms?</title>
-                <p>
-                    It's easy: each Orbeon Forms release is tagged with a version number including a time stamp. Say
-                    you downloaded the binary release <code>orbeon-3.6.0.200712061930.zip</code>. From there, you infer
-                    the following CVS tag number: <code>TAG_OPS_3_6_0_200712061930</code>. You then get the source code
-                    from CVS using:
-                </p>
-                <xml-source>
-                    cvs -z3 -d:pserver:anonymous@cvs.forge.objectweb.org:/cvsroot/ops co -r TAG_OPS_3_6_0_200712061930 orbeon  
-                </xml-source>
-            </section>
-            <a name="issue-tracker"/>
-            <section added="2007-06-06">
-                <title>Is there a list of known issues?</title>
-                <p>
-                    Yes. You find it on the OW2 site, <a
-                    href="http://forge.objectweb.org/tracker/index.php?set=custom&amp;_assigned_to=0&amp;_status=1&amp;_category=100&amp;_group=100&amp;_sort_col=priority&amp;_sort_ord=DESC&amp;submit=Browse&amp;atid=350207&amp;group_id=168&amp;func=browse">here
-                    ordered by descending priority</a> and
-                    <a
-                    href="http://forge.objectweb.org/tracker/index.php?set=custom&amp;_assigned_to=0&amp;_status=1&amp;_category=100&amp;_group=100&amp;_sort_col=open_date&amp;_sort_ord=DESC&amp;submit=Browse&amp;atid=350207&amp;group_id=168&amp;func=browse">here
-                    by opening date</a> (both these links are better than the default order provided by the tracker).
-                </p>
-                <p>
-                    Note that we put bugs and requests for enhancement (RFEs) in the same tracker category, and just
-                    prefix RFE descriptions with the string "RFE:".
-                </p>
-                <p>
-                    In general, we recommend you do not add bugs or RFEs in the tracker yourself, as we may miss them,
-                    and you may introduce duplicates. Please discuss bugs or issues on the Orbeon Forms <a
-                    href="http://www.orbeon.com/forms/mailing-list">mailing-list</a> first.
-                </p>
-            </section>
-            <a name="wiki"/>
-            <section added="2008-01-30">
-                <title>Is there a wiki?</title>
-                <p>
-                    Yes. You find it <a href="https://wiki.objectweb.org/ops/Wiki.jsp?page=Main">here on the OW2 site</a>.
-                </p>
-                <p>
-                    Feel free to add or make changes to the contents there. You can do so after creating a user
-                    (anonymous changes are not allowed). But please be considerate. You may want to discuss changes
-                    there on the mailing-list first.
-                </p>
-            </section>
-            <a name="oxf"/>
-            <section added="2007-01-15">
-                <title>What is OXF?</title>
-                <p>
-                    OXF was the name of Orbeon Forms before it was open sourced in 2004. For backward compatibility, the
-                    string "oxf" still persists in a few places, including:
-                </p>
-                <ul>
-                    <li>
-                        <p>As XML namespace prefix for built-in XPL processors.</p>
-                    </li>
-                    <li>
-                        <p>As part of built-in XML namespace URIs.</p>
-                    </li>
-                    <li>
-                        <p>As a URL scheme for accessing Orbeon Forms resources.</p>
-                    </li>
-                    <li>
-                        <p>As a prefix for property names in <code>properties.xml</code>.</p>
-                    </li>
-                    <li>
-                        <p>As a prefix for parameter names in <code>web.xml</code>.</p>
-                    </li>
-                    <li>
-                        <p>As a package name in the Java source code.</p>
-                    </li>
-                </ul>
-                <p>
-                    See also <a href="#xpl-oxf-prefix">I am confused by all those oxf: prefixes. What do they mean?</a>.
-                </p>
-            </section>
-            <a name="ops"/>
-            <section added="2007-01-15">
-                <title>What is OPS?</title>
-                <p>
-                    OPS stands for Orbeon PresentationServer and was the name of the platform before it was renamed to
-                    Orbeon Forms in November 2006. The string "ops" still persists in a few places, including some
-                    resource paths, and the name of the Orbeon Forms <a
-                    href="http://www.orbeon.com/forms/mailing-list">mailing-list</a>.
-                </p>
-            </section>
         </section>
         <a name="support"/>
         <section>
@@ -310,6 +153,33 @@
                     href="mailto:info@orbeon.com">info@orbeon.com</a>.
                 </p>
             </section>
+            <section added="2007-01-06">
+                <title>Where do I find the source code?</title>
+                <p>
+                    In the OW2 CVS repository. <a href="http://forge.objectweb.org/scm/?group_id=168">This
+                    page</a> provides the instructions to retrieve it. You can also <a
+                    href="http://cvs.forge.objectweb.org/cgi-bin/viewcvs.cgi/ops/">browse the repository</a> with your
+                    web browser.
+                </p>
+                <p>
+                    Use the <code>orbeon</code> CVS module for Orbeon Forms proper, and the <code>saxon</code> CVS
+                    module for the Saxon source code (which sometimes contains fixes against the latest released
+                    Saxon).
+                </p>
+            </section>
+            <a name="source-code-version"/>
+            <section added="2007-02-19">
+                <title>Where do I find the source code for a particular release of Orbeon Forms?</title>
+                <p>
+                    It's easy: each Orbeon Forms release is tagged with a version number including a time stamp. Say
+                    you downloaded the binary release <code>orbeon-3.6.0.200712061930.zip</code>. From there, you infer
+                    the following CVS tag number: <code>TAG_OPS_3_6_0_200712061930</code>. You then get the source code
+                    from CVS using:
+                </p>
+                <xml-source>
+                    cvs -z3 -d:pserver:anonymous@cvs.forge.objectweb.org:/cvsroot/ops co -r TAG_OPS_3_6_0_200712061930 orbeon
+                </xml-source>
+            </section>
             <a name="issue-fixing"/>
             <section added="2007-06-22">
                 <title>When are you going to fix/implement feature foobar?</title>
@@ -341,7 +211,7 @@
             </section>
             <a name="reporting-issues"/>
             <section>
-                <title>How to report an issue in the Orbeon Forms mailing list?</title>
+                <title>How do I report an issue in the Orbeon Forms mailing list?</title>
                 <p>
                     The key to effectively reporting an issue is to post in the ops-users mailing list a message with:
                 </p>
@@ -453,6 +323,52 @@
                     </li>
                 </ul>
                 <p>Your support is greatly appreciated!</p>
+            </section>
+            <a name="issue-tracker"/>
+            <section added="2007-06-06">
+                <title>Is there a list of known issues?</title>
+                <p>
+                    Yes. You find it on the OW2 site, <a
+                    href="http://forge.objectweb.org/tracker/index.php?set=custom&amp;_assigned_to=0&amp;_status=1&amp;_category=100&amp;_group=100&amp;_sort_col=priority&amp;_sort_ord=DESC&amp;submit=Browse&amp;atid=350207&amp;group_id=168&amp;func=browse">here
+                    ordered by descending priority</a> and
+                    <a
+                    href="http://forge.objectweb.org/tracker/index.php?set=custom&amp;_assigned_to=0&amp;_status=1&amp;_category=100&amp;_group=100&amp;_sort_col=open_date&amp;_sort_ord=DESC&amp;submit=Browse&amp;atid=350207&amp;group_id=168&amp;func=browse">here
+                    by opening date</a> (both these links are better than the default order provided by the tracker).
+                </p>
+                <p>
+                    Note that we put bugs and requests for enhancement (RFEs) in the same tracker category, and just
+                    prefix RFE descriptions with the string "RFE:".
+                </p>
+                <p>
+                    In general, we recommend you do not add bugs or RFEs in the tracker yourself, as we may miss them,
+                    and you may introduce duplicates. Please discuss bugs or issues on the Orbeon Forms <a
+                    href="http://www.orbeon.com/forms/mailing-list">mailing-list</a> first.
+                </p>
+            </section>
+            <a name="wiki"/>
+            <section added="2008-01-30">
+                <title>Is there a wiki?</title>
+                <p>
+                    Yes. You find it <a href="https://wiki.objectweb.org/ops/Wiki.jsp?page=Main">here on the OW2 site</a>.
+                </p>
+                <p>
+                    Feel free to add or make changes to the contents there. You can do so after creating a user
+                    (anonymous changes are not allowed). But please be considerate. You may want to discuss changes
+                    there on the mailing-list first.
+                </p>
+            </section>
+            <a name="development"/>
+            <section added="2008-03-01">
+                <title>What's going on with development?</title>
+                <p>
+                    Orbeon developers often talk about Orbeon Forms development in the <a
+                    href="#mailing-list">mailing-list</a> and on the <a href="http://www.orbeon.com/blog/">XForms
+                    Everywhere blog</a>.
+                </p>
+                <p>
+                    There is also an <a href="http://mailbucket.org/ops-commits.xml">RSS feed of the commits</a>, and
+                    you can see the last commits <a href="http://mailbucket.org/simple/ops-commits">on this page</a>.
+                </p>
             </section>
         </section>
         <a name="xforms"/>
@@ -1921,130 +1837,99 @@
                 </p>
             </section>
         </section>
-        <!--<section>-->
-            <!--<title>Studio FAQ</title>-->
-            <!--<a name="studio-xpl-trace"/>-->
-            <!--<section>-->
-                <!--<title>In Studio, why nothing shows up in the XPL Trace Views?</title>-->
-                <!--<p>-->
-                    <!--The XPL Trace facility provides information for a given page served by Orbeon Forms. For that page,-->
-                    <!--it shows a tree of processor calls and indicates on that tree how much time has been spent on each-->
-                    <!--node. This information collected by XPL Trace can be either sent to the standard output, or to-->
-                    <!--Studio. When sent to Studio, it will be shown in the XPL Trace Table and XPL Trace Tree views. For-->
-                    <!--this to work as expected:-->
-                <!--</p>-->
-                <!--<ul>-->
-                    <!--<li>-->
-                        <!--You need to setup the port Studio listens to, from Preferences / Orbeon. That port must match-->
-                        <!--the one you have setup in Orbeon Forms <a href="reference-properties#trace">properties</a>.-->
-                    <!--</li>-->
-                    <!--<li>-->
-                        <!--After changing the port number in Studio, you might have to restart-->
-                        <!--Eclipse.-->
-                    <!--</li>-->
-                    <!--<li>-->
-                        <!--For Studio to listen on the specified port, you need to have two views (XPL-->
-                        <!--Trace Table and XPL Trace Tree) open. You might also need to at least make-->
-                        <!--one of the views active before Studio starts listening on the specified-->
-                        <!--port. On Windows, you can check if Studio is listening on the port you-->
-                        <!--specified using <a-->
-                        <!--href="http://www.sysinternals.com/Utilities/TcpView.html">TCPView</a>.-->
-                    <!--</li>-->
-                <!--</ul>-->
-            <!--</section>-->
-            <!--<a name="studio-vm-args"/>-->
-            <!--<section>-->
-                <!--<title>-->
-                    <!--In Studio, how can I add my own VM arguments (e.g. heap size, debugging)-->
-                <!--</title>-->
-                <!--<ul>-->
-                    <!--<li>For version 1.0.3 or higher :-->
-                        <!--<ol>-->
-                            <!--<li>Select the menu item-->
-                                <!--<code>Run | Run...</code>-->
-                            <!--</li>-->
-                            <!--<li>-->
-                                <!--Either create a new J2EE Container Container for Orbeon Forms launch configuration-->
-                                <!--or select an existing one.-->
-                            <!--</li>-->
-                            <!--<li>Select the Argguments tab.</li>-->
-                            <!--<li>In the VM arguments field add your VM arguments.</li>-->
-                            <!--<li>Click the Apply button to save the change.</li>-->
-                        <!--</ol>-->
-                    <!--</li>-->
-                    <!--<li>For versions lower than 1.0.3 :-->
-                        <!--<ol>-->
-                            <!--<li>Open the-->
-                                <!--<i>Window | Preferences</i> dialog.-->
-                            <!--</li>-->
-                            <!--<li>Under-->
-                                <!--<i>Java | Installed JRE</i>, select the "Standard VM".-->
-                            <!--</li>-->
-                            <!--<li>Click on the-->
-                                <!--<i>Edit</i> button.-->
-                            <!--</li>-->
-                            <!--<li>Enter your own VM arguments in the-->
-                                <!--<i>Default VM Arguments</i> text field.-->
-                            <!--</li>-->
-                        <!--</ol>-->
-                        <!--<p>-->
-                            <!--Note that this sets the VM arguments for all the applications you run-->
-                            <!--from Eclipse. At this point there is no way to set VM arguments that-->
-                            <!--are only used when starting the J2EE container.-->
-                        <!--</p>-->
-                    <!--</li>-->
-                <!--</ul>-->
-            <!--</section>-->
-            <!--<a name="studio-empty-events"/>-->
-            <!--<section>-->
-                <!--<title>-->
-                    <!--In Studio, why is the Logging Events view always empty?-->
-                <!--</title>-->
-                <!--<p>Check the following:</p>-->
-                <!--<ol>-->
-                    <!--<li>-->
-                        <!--<p>-->
-                            <!--Make you don't have any "Address already in use" error in the Console-->
-                            <!--view when you start the application server. If you do, it means that you-->
-                            <!--already have another application (other program, or other Orbeon Forms-->
-                            <!--application maybe deployed in the same application server) using the-->
-                            <!--same port. On Windows, you can use <a-->
-                            <!--href="http://www.sysinternals.com/ntw2k/source/tcpview.shtml">TCPView</a>-->
-                            <!--to determine what application is using the port you mention in the-->
-                            <!--<code>log4j.xml</code>.-->
-                        <!--</p>-->
-                    <!--</li>-->
-                    <!--<li>-->
-                        <!--<p>-->
-                            <!--Make sure you don't have any filter setup in Logging Events view by-->
-                            <!--right-clicking on the "down arrow" icon and selecting "Filters".-->
-                        <!--</p>-->
-                    <!--</li>-->
-                    <!--<li>-->
-                        <!--<p>-->
-                            <!--To populate the Logging Events view, Studio connects to log4j, and-->
-                            <!--log4j listens on the port specified in the log4j.xml file.-->
-                        <!--</p>-->
-                        <!--<p>-->
-                            <!--There is nothing in the Studio preferences to tell Studio to which port-->
-                            <!--it should connect. Instead, Studio finds the port by looking at all the-->
-                            <!--log4j.xml files you have in all the open projects. It will then try to-->
-                            <!--connect to all the ports specified those files.-->
-                        <!--</p>-->
-                        <!--<p>-->
-                            <!--If log4j was able to listen on the port specified in your log4j.xml (see-->
-                            <!--point 1 above) and still no messages appear in the Logging Events view,-->
-                            <!--that might be because Studio cannot find your log4j.xml. So make sure-->
-                            <!--that this file is in an open project defined in the Studio. Also note-->
-                            <!--that if you modify this file outside of Eclipse with an external-->
-                            <!--program, Studio won't pick up that modification. In that case, in the-->
-                            <!--Navigator view, right click on the project that contains your log4j.xml-->
-                            <!--and choose Refresh. Right after this, events should start to appear in-->
-                            <!--the Logging Event view as you load pages in the browser.-->
-                        <!--</p>-->
-                    <!--</li>-->
-                <!--</ol>-->
-            <!--</section>-->
-        <!--</section>-->
+        <a name="general"/>
+        <section>
+            <title>Historical FAQ</title>
+            <a name="name-change"/>
+            <section>
+                <title>Why did we rename Orbeon PresentationServer to Orbeon Forms?</title>
+                <p>
+                    Renaming a product is not something to be taken lightly. However we felt that:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            <i>Orbeon Forms</i> better reflects the fact that forms have been the main focus of our
+                            development efforts since 2004.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            This new face will help potential users understand more easily what the platform can do for
+                            them.
+                        </p>
+                    </li>
+                    <li>
+                        <p><i>Orbeon Forms</i> is just an easier name to remember!</p>
+                    </li>
+                </ul>
+                <p>
+                    We were encouraged in this decision by the fact that almost all current users build complex web forms
+                    using our Ajax-based XForms engine. The name change also conveys that we plan to keep focusing on
+                    form-related capabilities in the future.
+                </p>
+                <p>
+                    It is important to precise the following:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            <i>Orbeon Forms</i> is simply the new name of Orbeon PresentationServer, not a different
+                            product.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Other XML technologies like XSLT and XML pipelines remain an important part of the
+                            platform.
+                        </p>
+                    </li>
+                    <li>
+                        <p>And of course, <i>Orbeon Forms</i> remains an open source solution!</p>
+                    </li>
+                </ul>
+            </section>
+            <a name="oxf"/>
+            <section added="2007-01-15">
+                <title>What is OXF?</title>
+                <p>
+                    OXF was the name of Orbeon Forms before it was open sourced in 2004. For backward compatibility, the
+                    string "oxf" still persists in a few places, including:
+                </p>
+                <ul>
+                    <li>
+                        <p>As XML namespace prefix for built-in XPL processors.</p>
+                    </li>
+                    <li>
+                        <p>As part of built-in XML namespace URIs.</p>
+                    </li>
+                    <li>
+                        <p>As a URL scheme for accessing Orbeon Forms resources.</p>
+                    </li>
+                    <li>
+                        <p>As a prefix for property names in <code>properties.xml</code>.</p>
+                    </li>
+                    <li>
+                        <p>As a prefix for parameter names in <code>web.xml</code>.</p>
+                    </li>
+                    <li>
+                        <p>As a package name in the Java source code.</p>
+                    </li>
+                </ul>
+                <p>
+                    See also <a href="#xpl-oxf-prefix">I am confused by all those oxf: prefixes. What do they mean?</a>.
+                </p>
+            </section>
+            <a name="ops"/>
+            <section added="2007-01-15">
+                <title>What is OPS?</title>
+                <p>
+                    OPS stands for Orbeon PresentationServer and was the name of the platform before it was renamed to
+                    Orbeon Forms in November 2006. The string "ops" still persists in a few places, including some
+                    resource paths, and the name of the Orbeon Forms <a
+                    href="http://www.orbeon.com/forms/mailing-list">mailing-list</a>.
+                </p>
+            </section>
+        </section>
     </body>
 </document>

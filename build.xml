@@ -89,19 +89,18 @@
         <include name="antlr-2_7_4_orbeon.jar"/>
         <include name="jakarta-slide-webdavlib-2.0rc1.jar"/>
 
-        <include name="exist_20071218.jar"/>
-        <include name="exist-modules_20071218.jar"/>
-        <include name="exist-optional_20071218.jar"/>
-        <include name="exist-ngram-module_20071218.jar"/>
+        <include name="exist_1_2.jar"/>
+        <include name="exist-modules_1_2.jar"/>
+        <include name="exist-optional_1_2.jar"/>
+        <include name="exist-ngram-module_1_2.jar"/>
 
-        <include name="exist-xmlrpc-1_2-patched.jar"/>
-        <include name="exist-xmldb.jar"/>
-        <include name="exist-jgroups-all.jar"/>
         <include name="exist-antlr-2_7_6.jar"/>
-        <include name="exist-jug-lgpl-2_0_0.jar"/>
+        <include name="exist-jgroups-all-exist.jar"/>
         <include name="exist-jta.jar"/>
         <include name="exist-quartz-1_6_0.jar"/>
         <include name="exist-stax-api-1_0_1.jar"/>
+        <include name="exist-xmldb.jar"/>
+        <include name="exist-xmlrpc-1_2-patched.jar"/>
 
         <include name="jms-api-1_1.jar"/>
         <include name="mail-1_3_2.jar"/>

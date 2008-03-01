@@ -18,11 +18,11 @@ done
 ant clean
 ant
 rm $ORBEON_HOME/lib/*exist*
-DATE=$(date +%Y%m%d)
-cp exist.jar $ORBEON_HOME/lib/exist_$DATE.jar
-cp exist-optional.jar $ORBEON_HOME/lib/exist-optional_$DATE.jar
-cp lib/extensions/exist-modules.jar $ORBEON_HOME/lib/exist-modules_$DATE.jar
-cp lib/extensions/exist-ngram-module.jar $ORBEON_HOME/lib/exist-ngram-module_$DATE.jar
+VERSION=1_2
+cp exist.jar $ORBEON_HOME/lib/exist_$VERSION.jar
+cp exist-optional.jar $ORBEON_HOME/lib/exist-optional_$VERSION.jar
+cp lib/extensions/exist-modules.jar $ORBEON_HOME/lib/exist-modules_$VERSION.jar
+cp lib/extensions/exist-ngram-module.jar $ORBEON_HOME/lib/exist-ngram-module_$VERSION.jar
 
 cp lib/core/antlr-2.7.6.jar $ORBEON_HOME/lib/exist-antlr-2_7_6.jar
 cp lib/core/jgroups-all.jar $ORBEON_HOME/lib/exist-jgroups-all-exist.jar

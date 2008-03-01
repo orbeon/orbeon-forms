@@ -594,13 +594,13 @@
 
             <!-- Close section -->
             <xforms:action ev:event="fr-collapse">
-                <xxforms:script>document.body.blur(); frCollapse();</xxforms:script>
+                <xxforms:script>frCollapse();</xxforms:script>
             </xforms:action>
 
             <!-- Open section -->
             <xforms:action ev:event="fr-expand">
                 <xforms:toggle case="case-{{instance('fr-current-section-instance')}}-open"/>
-                <xxforms:script>document.body.blur(); frExpand();</xxforms:script>
+                <xxforms:script>frExpand();</xxforms:script>
             </xforms:action>
         </xforms:model>
 

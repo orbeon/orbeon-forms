@@ -29,6 +29,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.*;
 import org.xml.sax.helpers.AttributesImpl;
+import org.dom4j.Element;
 
 import javax.xml.parsers.*;
 import javax.xml.transform.Source;
@@ -205,6 +206,23 @@ public class XMLUtils {
             sb.append(localname);
             return sb.toString();
         }
+    }
+
+    /**
+     * Convert dom4j attributes to SAX attributes.
+     *
+     * @param element   dom4j Element
+     * @return          SAX Attributes
+     */
+    public static Attributes convertAttributes(Element element) {
+        final AttributesImpl result = new AttributesImpl();
+        for (Iterator i = element.attributeIterator(); i.hasNext();) {
+            final org.dom4j.Attribute attribute = (org.dom4j.Attribute) i.next();
+
+            result.addAttribute(attribute.getNamespaceURI(), attribute.getName(), attribute.getQualifiedName(),
+                    ContentHandlerHelper.CDATA, attribute.getValue());
+        }
+        return result;
     }
 
     public static class EntityResolver implements org.xml.sax.EntityResolver {
@@ -1058,7 +1076,7 @@ public class XMLUtils {
      * @return new AttributesImpl containing  all attribs that were in src attribs and that were
      *         in the default name space.
      */
-    public static AttributesImpl getAttribsFromDefaultNamespace(final Attributes atts) {
+    public static AttributesImpl getAttributesFromDefaultNamespace(final Attributes atts) {
         final AttributesImpl ret = new AttributesImpl();
         final int size = atts.getLength();
         for (int i = 0; i < size; i++) {

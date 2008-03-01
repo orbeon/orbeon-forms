@@ -89,6 +89,8 @@ public class XFormsControls {
         valueControls.put("select", "");
         valueControls.put("select1", "");
 
+        valueControls.put("attribute", "");
+
         noValueControls.put("submit", "");
         noValueControls.put("trigger", "");
 
@@ -383,6 +385,9 @@ public class XFormsControls {
                     } else if (xformsControl instanceof XFormsUploadControl) {
                         // Handle xforms:upload
                         result.addUploadControl((XFormsUploadControl) xformsControl);
+                    } else if (xformsControl instanceof XXFormsAttributeControl) {
+                        // Handle xxforms:attribute
+                        result.addAttributeControl((XXFormsAttributeControl) xformsControl);
                     }
                 }
 
@@ -1067,6 +1072,34 @@ public class XFormsControls {
 
         public List getUploadControls() {
             return uploadControlsList;
+        }
+
+        private Map attributeControls;
+
+        public void addAttributeControl(XXFormsAttributeControl attributeControl) {
+            final String effectiveForAttribute = attributeControl.getEffectiveForAttribute();
+            if (attributeControls == null) {
+                attributeControls = new HashMap();
+                final Map mapForId = new HashMap();
+                attributeControls.put(effectiveForAttribute, mapForId);
+                mapForId.put(attributeControl.getNameAttribute(), attributeControl);
+            } else {
+                Map mapForId = (Map) attributeControls.get(effectiveForAttribute);
+                if (mapForId == null) {
+                    mapForId = new HashMap();
+                    attributeControls.put(effectiveForAttribute, mapForId);
+                }
+                mapForId.put(attributeControl.getNameAttribute(), attributeControl);
+            }
+        }
+
+        public boolean hasAttributeControl(String effectiveForAttribute) {
+            return attributeControls != null && attributeControls.get(effectiveForAttribute) != null;
+        }
+
+        public XXFormsAttributeControl getAttributeControl(String effectiveForAttribute, String attributeName) {
+            final Map mapForId = (Map) attributeControls.get(effectiveForAttribute);
+            return (mapForId != null) ? (XXFormsAttributeControl) mapForId.get(attributeName) : null;
         }
 
         /**

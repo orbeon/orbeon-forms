@@ -3048,10 +3048,10 @@ ORBEON.xforms.Server = {
                                 // Update controls
                                 case "control-values": {
                                     var controlValuesElement = actionElement.childNodes[actionIndex];
-                                    var controlElements = ORBEON.util.Dom.getElementsByName(controlValuesElement,"control",xmlNamespace);
+                                    var controlElements = ORBEON.util.Dom.getElementsByName(controlValuesElement, "control", xmlNamespace);
                                     var controlElementslength = controlElements.length;
                                     // Update control value and MIPs
-				                    for(var j = 0 ; j < controlElementslength; j++){
+				                    for(var j = 0 ; j < controlElementslength; j++) {
                                         var controlElement = controlElements[j];
                                         var newControlValue = ORBEON.util.Dom.getStringValue(controlElement);
                                         var controlId = ORBEON.util.Dom.getAttribute(controlElement, "id");
@@ -3060,6 +3060,7 @@ ORBEON.xforms.Server = {
                                         var readonly = ORBEON.util.Dom.getAttribute(controlElement, "readonly");
                                         var required = ORBEON.util.Dom.getAttribute(controlElement, "required");
                                         var displayValue = ORBEON.util.Dom.getAttribute(controlElement, "display-value");
+
                                         var type = ORBEON.util.Dom.getAttribute(controlElement, "type");
                                         var documentElement = ORBEON.util.Dom.getElementById(controlId);
                                         if (documentElement == null) {
@@ -3419,30 +3420,42 @@ ORBEON.xforms.Server = {
                                                 }
                                             }
 
-                                            // Model item properties on a repeat item
-                                        var repeatIterationElements = ORBEON.util.Dom.getElementsByName(controlValuesElement,"repeat-iteration",xmlNamespace);
-                                            var repeatIterationElementslength = repeatIterationElements.length;
-                                            // Extract data from server response
-                                            for(var j = 0 ; j < repeatIterationElementslength; j++) {
-                                                var repeatIterationElement = repeatIterationElements[j];
-                                                var repeatId = ORBEON.util.Dom.getAttribute(repeatIterationElement, "id");
-                                                var iteration = ORBEON.util.Dom.getAttribute(repeatIterationElement, "iteration");
-                                                var relevant = ORBEON.util.Dom.getAttribute(repeatIterationElement, "relevant");
-                                                // Remove or add xforms-disabled on elements after this delimiter
-                                                var cursor = xformsFindRepeatDelimiter(repeatId, iteration).nextSibling;
-                                                while (!(cursor.nodeType == ELEMENT_TYPE &&
-                                                         (ORBEON.util.Dom.hasClass(cursor, "xforms-repeat-delimiter")
-                                                            || ORBEON.util.Dom.hasClass(cursor, "xforms-repeat-begin-end")))) {
-                                                    if (cursor.nodeType == ELEMENT_TYPE) {
-                                                        if (relevant) {
-                                                            if (relevant == "true") ORBEON.util.Dom.removeClass(cursor, "xforms-disabled");
-                                                            else ORBEON.util.Dom.addClass(cursor, "xforms-disabled");
-                                                        }
-                                                    }
-                                                    cursor = cursor.nextSibling;
+                                    // Handle updates to HTML attributes
+                                    var attributeElements = ORBEON.util.Dom.getElementsByName(controlValuesElement, "attribute", xmlNamespace);
+                                    var attributeElementslength = attributeElements.length;
+				                    for(var j = 0 ; j < attributeElementslength; j++) {
+                                        var attributeElement = attributeElements[j];
+                                        var newAttributeValue = ORBEON.util.Dom.getStringValue(attributeElement);
+                                        var forAttribute = ORBEON.util.Dom.getAttribute(attributeElement, "for");
+                                        var nameAttribute = ORBEON.util.Dom.getAttribute(attributeElement, "name");
+                                        var htmlElement = ORBEON.util.Dom.getElementById(forAttribute);
+                                        htmlElement.setAttribute(nameAttribute, newAttributeValue);
+                                    }
+
+                                    // Model item properties on a repeat item
+                                    var repeatIterationElements = ORBEON.util.Dom.getElementsByName(controlValuesElement,"repeat-iteration",xmlNamespace);
+                                    var repeatIterationElementslength = repeatIterationElements.length;
+                                    // Extract data from server response
+                                    for(var j = 0 ; j < repeatIterationElementslength; j++) {
+                                        var repeatIterationElement = repeatIterationElements[j];
+                                        var repeatId = ORBEON.util.Dom.getAttribute(repeatIterationElement, "id");
+                                        var iteration = ORBEON.util.Dom.getAttribute(repeatIterationElement, "iteration");
+                                        var relevant = ORBEON.util.Dom.getAttribute(repeatIterationElement, "relevant");
+                                        // Remove or add xforms-disabled on elements after this delimiter
+                                        var cursor = xformsFindRepeatDelimiter(repeatId, iteration).nextSibling;
+                                        while (!(cursor.nodeType == ELEMENT_TYPE &&
+                                                 (ORBEON.util.Dom.hasClass(cursor, "xforms-repeat-delimiter")
+                                                    || ORBEON.util.Dom.hasClass(cursor, "xforms-repeat-begin-end")))) {
+                                            if (cursor.nodeType == ELEMENT_TYPE) {
+                                                if (relevant) {
+                                                    if (relevant == "true") ORBEON.util.Dom.removeClass(cursor, "xforms-disabled");
+                                                    else ORBEON.util.Dom.addClass(cursor, "xforms-disabled");
                                                 }
                                             }
-                                        break;
+                                            cursor = cursor.nextSibling;
+                                        }
+                                    }
+                                    break;
                                 }
 
                                 // Display or hide divs

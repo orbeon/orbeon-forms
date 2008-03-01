@@ -34,10 +34,12 @@ import java.util.HashMap;
 import java.util.Enumeration;
 
 /**
- * ContentHandler that adds ids on all the XForms elements which don't have any, and gathers namespace information on
- * XForms elements (xforms:* and xxforms:*).
+ * ContentHandler that adds ids on all the XForms elements which don't have any, and gathers:
  *
- * TODO: Should probably combine this with XFormsExtractorContentHandler.
+ * o namespace information on XForms elements (xforms:* and xxforms:*).
+ * o ids of XHTML elements with AVTs
+ *
+ * TODO: Should combine this with XFormsExtractorContentHandler?
  */
 public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHandler {
 
@@ -51,15 +53,39 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
     private final boolean portlet;
 
     private final Map namespaceMappings;
+
     private NamespaceSupport3 namespaceSupport = new NamespaceSupport3();
 
     private final Map ids = new HashMap();
-    private final boolean hostLanguageAVTs = XFormsProperties.isHostLanguageAVTs();
+    private final boolean hostLanguageAVTs = XFormsProperties.isHostLanguageAVTs(); // TODO: this should be obtained per document, but we only know about this in the extractor
     private final AttributesImpl reusableAttributes = new AttributesImpl();
+    private final String[] reusableStringArray = new String[1];
 
+    /**
+     * This constructor just computes the namespace mappings and AVT elements
+     *
+     * @param namespaceMappings     Map<String, Map<String, String>> of control id to Map of namespace mappings
+     */
+    public XFormsDocumentAnnotatorContentHandler(Map namespaceMappings) {
+
+        // In this mode, all elements that need to have ids already have them, so set safe defaults
+        this.containerNamespace = "";
+        this.portlet = false;
+
+        this.namespaceMappings = namespaceMappings;
+    }
+
+    /**
+     * This constructor just computes the namespace mappings and AVT elements
+     *
+     * @param contentHandler        ContentHandler
+     * @param externalContext       ExternalContext
+     * @param namespaceMappings     Map<String, Map<String, String>> of control id to Map of namespace mappings
+     */
     public XFormsDocumentAnnotatorContentHandler(ContentHandler contentHandler, ExternalContext externalContext, Map namespaceMappings) {
-        super(contentHandler);
+        super(contentHandler, contentHandler != null);
 
+        // In this mode, elements may not yet have ids, and existing ids may have to get prefixed
         this.containerNamespace = externalContext.getRequest().getContainerNamespace();
         this.portlet = "portlet".equals(externalContext.getRequest().getContainerType());
 
@@ -78,49 +104,8 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
         } else if (XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri) || XFormsConstants.XXFORMS_NAMESPACE_URI.equals(uri)) {
             // This is an XForms element
 
-            final int idIndex = attributes.getIndex("id");
-            final String newIdAttributeUnprefixed;
-            final String newIdAttribute;
-            if (idIndex == -1) {
-                // Create a new "id" attribute, prefixing if needed
-                final AttributesImpl newAttributes = new AttributesImpl(attributes);
-                newIdAttributeUnprefixed = "xforms-element-" + currentId;
-                newIdAttribute = containerNamespace + newIdAttributeUnprefixed;
-                newAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, newIdAttribute);
-                attributes = newAttributes;
-            } else if (portlet) {
-                // Then we must prefix the existing id
-                final AttributesImpl newAttributes = new AttributesImpl(attributes);
-                newIdAttributeUnprefixed = newAttributes.getValue(idIndex);
-                newIdAttribute = containerNamespace + newIdAttributeUnprefixed;
-                newAttributes.setValue(idIndex, newIdAttribute);
-                attributes = newAttributes;
-            } else {
-                // Keep existing id
-                newIdAttributeUnprefixed = newIdAttribute = attributes.getValue(idIndex);
-            }
-
-            // Check for duplicate ids
-            if (ids.get(newIdAttribute) != null) // TODO: create Element to provide more location info?
-                throw new ValidationException("Duplicate id for XForms element: " + newIdAttributeUnprefixed,
-                        new ExtendedLocationData(new LocationData(getDocumentLocator()), "analyzing control element", new String[] { "id", newIdAttributeUnprefixed }, false));
-
-            // Remember that this id was used
-            ids.put(newIdAttribute, "");
-
-            // Gather namespace information
-            if (namespaceMappings != null) {
-                final Map namespaces = new HashMap();
-                for (Enumeration e = namespaceSupport.getPrefixes(); e.hasMoreElements();) {
-                    final String namespacePrefix = (String) e.nextElement();
-                    if (!namespacePrefix.startsWith("xml") && !namespacePrefix.equals(""))
-                        namespaces.put(namespacePrefix, namespaceSupport.getURI(namespacePrefix));
-                }
-
-                namespaceMappings.put(newIdAttribute, namespaces);
-            }
-
-            currentId++;
+            // Create a new id and update the attributes if needed
+            attributes = getAttribute(attributes, reusableStringArray);
 
             super.startElement(uri, localname, qName, attributes);
 
@@ -130,31 +115,53 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
             }
 
         } else if (XMLConstants.XHTML_NAMESPACE_URI.equals(uri) && hostLanguageAVTs) {
-            // This is an XHTML element
+            // This is an XHTML element and we allow AVTs
 
             final int attributesCount = attributes.getLength();
             if (attributesCount > 0) {
+                String htmlElementId = null;
                 for (int i = 0; i < attributesCount; i++) {
-                    final String attributeValue = attributes.getValue(i);
-                    if (attributeValue.indexOf('{') != -1) {
-                        // This is an AVT
-                        final String attributeName = attributes.getLocalName(i);
+                    if ("".equals(attributes.getURI(i))) {
+                        // For now we only support AVTs on attributes in no namespace
+                        final String attributeValue = attributes.getValue(i);
+                        if (attributeValue.indexOf('{') != -1) {
+                            // This is an AVT
+                            final String attributeName = attributes.getLocalName(i);
 
-                        final String id = attributes.getValue("id");// TODO: create / update id if needed
+                            // Create a new id and update the attributes if needed
+                            if (htmlElementId == null) {
+                                attributes = getAttribute(attributes, reusableStringArray);
+                                htmlElementId = reusableStringArray[0];
 
-                        reusableAttributes.clear();
-                        reusableAttributes.addAttribute("", "for", "for", ContentHandlerHelper.CDATA, id);
-                        reusableAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, attributeName);
+                                // TODO: Clear all attributes having AVTs or XPath expressions will end up in repeat templates.
 
-                        super.startPrefixMapping("xxforms", XFormsConstants.XXFORMS_NAMESPACE_URI);
-                        super.startElement(XFormsConstants.XXFORMS_NAMESPACE_URI, "attribute", "xxforms:attribute", reusableAttributes);
-                        super.endElement(XFormsConstants.XXFORMS_NAMESPACE_URI, "attribute", "xxforms:attribute");
-                        super.endPrefixMapping("xxforms");
+                                // Output the element with the new or updated id attribute
+                                super.startElement(uri, localname, qName, attributes);
+                            }
+
+                            // Create a new xxforms:attribute control
+                            reusableAttributes.clear();
+
+                            final AttributesImpl newAttributes = (AttributesImpl) getAttribute(reusableAttributes, reusableStringArray);
+
+                            newAttributes.addAttribute("", "for", "for", ContentHandlerHelper.CDATA, htmlElementId);
+                            newAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, attributeName);
+                            newAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, attributeValue);
+
+                            super.startPrefixMapping("xxforms", XFormsConstants.XXFORMS_NAMESPACE_URI);
+                            super.startElement(XFormsConstants.XXFORMS_NAMESPACE_URI, "attribute", "xxforms:attribute", newAttributes);
+                            super.endElement(XFormsConstants.XXFORMS_NAMESPACE_URI, "attribute", "xxforms:attribute");
+                            super.endPrefixMapping("xxforms");
+                        }
                     }
                 }
-                // TODO: create / update id if needed
-                super.startElement(uri, localname, qName, attributes);
+
+                // Output the element as is if no AVT was found
+                if (htmlElementId == null)
+                    super.startElement(uri, localname, qName, attributes);
+
             } else {
+                // No attributes, just output the element
                 super.startElement(uri, localname, qName, attributes);
             }
         } else {
@@ -187,5 +194,52 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
 
     public Locator getDocumentLocator() {
         return documentLocator;
+    }
+
+    private Attributes getAttribute(Attributes attributes, String[] newIdAttribute) {
+        final int idIndex = attributes.getIndex("id");
+        final String newIdAttributeUnprefixed;
+        if (idIndex == -1) {
+            // Create a new "id" attribute, prefixing if needed
+            final AttributesImpl newAttributes = new AttributesImpl(attributes);
+            newIdAttributeUnprefixed = "xforms-element-" + currentId;
+            newIdAttribute[0] = containerNamespace + newIdAttributeUnprefixed;
+            newAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, newIdAttribute[0]);
+            attributes = newAttributes;
+        } else if (portlet) {
+            // Then we must prefix the existing id
+            final AttributesImpl newAttributes = new AttributesImpl(attributes);
+            newIdAttributeUnprefixed = newAttributes.getValue(idIndex);
+            newIdAttribute[0] = containerNamespace + newIdAttributeUnprefixed;
+            newAttributes.setValue(idIndex, newIdAttribute[0]);
+            attributes = newAttributes;
+        } else {
+            // Keep existing id
+            newIdAttributeUnprefixed = newIdAttribute[0] = attributes.getValue(idIndex);
+        }
+
+        // Check for duplicate ids
+        if (ids.get(newIdAttribute[0]) != null) // TODO: create Element to provide more location info?
+            throw new ValidationException("Duplicate id for XForms element: " + newIdAttributeUnprefixed,
+                    new ExtendedLocationData(new LocationData(getDocumentLocator()), "analyzing control element", new String[] { "id", newIdAttributeUnprefixed }, false));
+
+        // Remember that this id was used
+        ids.put(newIdAttribute[0], "");
+
+        // Gather namespace information
+        if (namespaceMappings != null) {
+            final Map namespaces = new HashMap();
+            for (Enumeration e = namespaceSupport.getPrefixes(); e.hasMoreElements();) {
+                final String namespacePrefix = (String) e.nextElement();
+                if (!namespacePrefix.startsWith("xml") && !namespacePrefix.equals(""))
+                    namespaces.put(namespacePrefix, namespaceSupport.getURI(namespacePrefix));
+            }
+
+            namespaceMappings.put(newIdAttribute[0], namespaces);
+        }
+
+        currentId++;
+
+        return attributes;
     }
 }

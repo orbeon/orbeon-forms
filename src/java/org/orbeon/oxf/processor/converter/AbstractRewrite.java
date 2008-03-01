@@ -223,7 +223,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
                 if (res == null) break done;
 
                 ret = this;
-                final AttributesImpl newAtts = XMLUtils.getAttribsFromDefaultNamespace(atts);
+                final AttributesImpl newAtts = XMLUtils.getAttributesFromDefaultNamespace(atts);
                 final String newRes = URLRewriter.rewriteResourceURL(request, response, res, pathMatchers);
                 final int idx = newAtts.getIndex("", resAtt);
                 newAtts.setValue(idx, newRes);
@@ -252,7 +252,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
                 if (classidAttribute == null && codebaseAttribute == null && dataAttribute == null && usemapAttribute == null) break done;
 
                 ret = this;
-                final AttributesImpl newAtts = XMLUtils.getAttribsFromDefaultNamespace(atts);
+                final AttributesImpl newAtts = XMLUtils.getAttributesFromDefaultNamespace(atts);
                 if (codebaseAttribute != null) {
                     final String newAttribute = URLRewriter.rewriteResourceURL(request, response, codebaseAttribute, pathMatchers);
                     final int idx = newAtts.getIndex("", "codebase");
@@ -315,7 +315,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
                 if (archiveAttribute == null && codebaseAttribute == null) break done;
 
                 ret = this;
-                final AttributesImpl newAtts = XMLUtils.getAttribsFromDefaultNamespace(atts);
+                final AttributesImpl newAtts = XMLUtils.getAttributesFromDefaultNamespace(atts);
                 if (codebaseAttribute != null) {
                     final String newAttribute = URLRewriter.rewriteResourceURL(request, response, codebaseAttribute, pathMatchers);
                     final int idx = newAtts.getIndex("", "codebase");
@@ -386,7 +386,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
                 if (href == null) break done;
 
                 ret = this;
-                final AttributesImpl newAtts = XMLUtils.getAttribsFromDefaultNamespace(atts);
+                final AttributesImpl newAtts = XMLUtils.getAttributesFromDefaultNamespace(atts);
                 final String urlType = atts.getValue(XMLConstants.OPS_FORMATTING_URI, "url-type");
                 final String portletMode = atts.getValue(XMLConstants.OPS_FORMATTING_URI, "portlet-mode");
                 final String windowState = atts.getValue(XMLConstants.OPS_FORMATTING_URI, "window-state");
@@ -443,7 +443,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
                 if (href == null) break done;
 
                 ret = this;
-                final AttributesImpl newAtts = XMLUtils.getAttribsFromDefaultNamespace(atts);
+                final AttributesImpl newAtts = XMLUtils.getAttributesFromDefaultNamespace(atts);
                 final String newHref = response.rewriteActionURL(href);
                 final int idx = newAtts.getIndex("", HREF_ATT);
                 newAtts.setValue(idx, newHref);
@@ -535,7 +535,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
             final State2 ret;
             if ("form".equals(lnam)) {
 
-                final AttributesImpl newAtts = XMLUtils.getAttribsFromDefaultNamespace(atts);
+                final AttributesImpl newAtts = XMLUtils.getAttributesFromDefaultNamespace(atts);
 
                 final String actn = newAtts.getValue("", ACTION_ATT);
                 final String newActn;
@@ -804,7 +804,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
                 ret = stt.startElement(ns, lnam, qnam, atts);
             } else {
                 scriptDepthOnStart(ns, lnam);
-                final Attributes newAtts = XMLUtils.getAttribsFromDefaultNamespace(atts);
+                final Attributes newAtts = XMLUtils.getAttributesFromDefaultNamespace(atts);
                 contentHandler.startElement(ns, lnam, qnam, newAtts);
                 ret = this;
             }

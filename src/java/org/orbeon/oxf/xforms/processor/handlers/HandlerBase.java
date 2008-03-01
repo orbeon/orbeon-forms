@@ -32,24 +32,19 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 import org.dom4j.QName;
 import org.dom4j.Namespace;
+import org.dom4j.Element;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Base class for all XHTML and XForms handlers.
  */
 public abstract class HandlerBase extends ElementHandler {
 
-    private int level = 0;
-
-    private Attributes labelAttributes;
-    private Attributes helpAttributes;
-    private Attributes hintAttributes;
-    private Attributes alertAttributes;
-
     // NOTE: the XForms schema seems to indicates that "style", "onchange", and others
     // cannot be used; those should probably be in the XHTML namespace
-    private static final String[] XHTML_ATTRIBUTES_TO_COPY = {"style", "onchange"};
+    private static final String[] XHTML_ATTRIBUTES_TO_COPY = {"style", "onchange" };
 
     private boolean repeating;
     private boolean forwarding;
@@ -86,37 +81,6 @@ public abstract class HandlerBase extends ElementHandler {
 
     public boolean isForwarding() {
         return forwarding;
-    }
-
-    public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
-        // Reset state, as this handler may be reused
-        level = 0;
-        labelAttributes = null;
-        helpAttributes = null;
-        hintAttributes = null;
-        alertAttributes = null;
-    }
-
-    public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
-        level++;
-        if (level == 1 && XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri)) {
-            // Handle direct children only
-            if ("label".equals(localname)) {
-                labelAttributes = new AttributesImpl(attributes);
-            } else if ("hint".equals(localname)) {
-                hintAttributes = new AttributesImpl(attributes);
-            } else if ("help".equals(localname)) {
-                helpAttributes = new AttributesImpl(attributes);
-            } else if ("alert".equals(localname)) {
-                alertAttributes = new AttributesImpl(attributes);
-            }
-        }
-        super.startElement(uri, localname, qName, attributes);
-    }
-
-    public void endElement(String uri, String localname, String qName) throws SAXException {
-        super.endElement(uri, localname, qName);
-        level--;
     }
 
     public static void handleReadOnlyAttribute(AttributesImpl newAttributes, XFormsContainingDocument containingDocument, XFormsSingleNodeControl xformsControl) {
@@ -353,11 +317,11 @@ public abstract class HandlerBase extends ElementHandler {
         return xformsControl != null && xformsControl.isStaticReadonly();
     }
 
-    protected void handleLabelHintHelpAlert(String parentId, String type, XFormsSingleNodeControl xformsControl) throws SAXException {
-        handleLabelHintHelpAlert(parentId, type, xformsControl, true);
+    protected void handleLabelHintHelpAlert(String forId, String forEffectiveId, String type, XFormsSingleNodeControl xformsControl) throws SAXException {
+        handleLabelHintHelpAlert(forId, forEffectiveId, type, xformsControl, true);
     }
 
-    protected void handleLabelHintHelpAlert(String parentId, String type, XFormsSingleNodeControl xformsControl, boolean placeholder) throws SAXException {
+    protected void handleLabelHintHelpAlert(String forId, String forEffectiveId, String type, XFormsSingleNodeControl xformsControl, boolean placeholder) throws SAXException {
 
         final boolean isHint = type.equals("hint");
         final boolean isAlert = type.equals("alert");
@@ -397,18 +361,25 @@ public abstract class HandlerBase extends ElementHandler {
             mustOutputHTMLFragment = false;
         }
 
-        // Find attributes
         final Attributes labelHintHelpAlertAttributes;
-        if (isLabel) {
-            labelHintHelpAlertAttributes = labelAttributes;
-        } else if (isHelp) {
-            labelHintHelpAlertAttributes = helpAttributes;
-        } else if (isHint) {
-            labelHintHelpAlertAttributes = hintAttributes;
-        } else if (isAlert) {
-            labelHintHelpAlertAttributes = alertAttributes;
-        } else {
-            throw new IllegalStateException("Illegal type requested");
+        {
+            // Statically obtain attributes information
+            final Map controlElementsMap = containingDocument.getStaticState().getControlElementsMap();
+            final Element controlElement = (Element) controlElementsMap.get(forId);
+            final Element nestedElement;
+            if (isLabel) {
+                nestedElement = controlElement.element(XFormsConstants.XFORMS_LABEL_QNAME);
+            } else if (isHelp) {
+                nestedElement = controlElement.element(XFormsConstants.XFORMS_HELP_QNAME);
+            } else if (isHint) {
+                nestedElement = controlElement.element(XFormsConstants.XFORMS_HINT_QNAME);
+            } else if (isAlert) {
+                nestedElement = controlElement.element(XFormsConstants.XFORMS_ALERT_QNAME);
+            } else {
+                throw new IllegalStateException("Illegal type requested");
+            }
+
+            labelHintHelpAlertAttributes = (nestedElement != null) ? XMLUtils.convertAttributes(nestedElement) : null;
         }
 
         if (labelHintHelpAlertAttributes != null || isAlert) {
@@ -478,13 +449,13 @@ public abstract class HandlerBase extends ElementHandler {
             // We handle null attributes as well because we want a placeholder for "alert" even if there is no xforms:alert
             final Attributes newAttributes = (labelHintHelpAlertAttributes != null) ? labelHintHelpAlertAttributes : (placeholder) ? new AttributesImpl() : null;
             if (newAttributes != null) {
-                outputLabelFor(handlerContext, getAttributes(newAttributes, labelClasses, null), parentId, labelHintHelpAlertValue, mustOutputHTMLFragment);
+                outputLabelFor(handlerContext, getAttributes(newAttributes, labelClasses, null), forEffectiveId, labelHintHelpAlertValue, mustOutputHTMLFragment);
             }
         }
     }
 
-    public static void outputLabelFor(HandlerContext handlerContext, AttributesImpl attributes, String forId, String value, boolean mustOutputHTMLFragment) throws SAXException {
-        attributes.addAttribute("", "for", "for", ContentHandlerHelper.CDATA, forId);
+    public static void outputLabelFor(HandlerContext handlerContext, AttributesImpl attributes, String forEffectiveId, String value, boolean mustOutputHTMLFragment) throws SAXException {
+        attributes.addAttribute("", "for", "for", ContentHandlerHelper.CDATA, forEffectiveId);
 
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
         final String labelQName = XMLUtils.buildQName(xhtmlPrefix, "label");

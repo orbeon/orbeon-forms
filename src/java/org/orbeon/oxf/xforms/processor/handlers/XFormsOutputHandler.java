@@ -44,6 +44,7 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
     public void end(String uri, String localname, String qName) throws SAXException {
 
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
+        final String id = handlerContext.getId(elementAttributes);
         final String effectiveId = handlerContext.getEffectiveId(elementAttributes);
         final XFormsOutputControl xformsOutputControl = handlerContext.isGenerateTemplate()
                 ? null : (XFormsOutputControl) containingDocument.getObjectById(effectiveId);
@@ -65,7 +66,7 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
         }
 
         // xforms:label
-        handleLabelHintHelpAlert(effectiveId, "label", xformsOutputControl);
+        handleLabelHintHelpAlert(id, effectiveId, "label", xformsOutputControl);
 
         final AttributesImpl newAttributes;
         final boolean isDateOrTime;
@@ -142,14 +143,14 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
         handlerContext.findFormattingPrefixUndeclare(formattingPrefix);
 
         // xforms:help
-        handleLabelHintHelpAlert(effectiveId, "help", xformsOutputControl);
+        handleLabelHintHelpAlert(id, effectiveId, "help", xformsOutputControl);
 
         // xforms:alert
         if (elementAttributes.getValue("value") == null)
-            handleLabelHintHelpAlert(effectiveId, "alert", xformsOutputControl);
+            handleLabelHintHelpAlert(id, effectiveId, "alert", xformsOutputControl);
 
         // xforms:hint
-        handleLabelHintHelpAlert(effectiveId, "hint", xformsOutputControl);
+        handleLabelHintHelpAlert(id, effectiveId, "hint", xformsOutputControl);
     }
 
 }

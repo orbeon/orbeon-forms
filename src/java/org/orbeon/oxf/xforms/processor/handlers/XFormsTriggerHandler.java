@@ -63,6 +63,7 @@ public class XFormsTriggerHandler extends HandlerBase {
 
         // xforms:trigger and xforms:submit
 
+        final String id = handlerContext.getId(elementAttributes);
         final String effectiveId = handlerContext.getEffectiveId(elementAttributes);
         final XFormsTriggerControl xformsControl = handlerContext.isGenerateTemplate() ? null : ((XFormsTriggerControl) containingDocument.getObjectById(effectiveId));
 
@@ -191,6 +192,6 @@ public class XFormsTriggerHandler extends HandlerBase {
         }
 
         // xforms:help
-        handleLabelHintHelpAlert(effectiveId, "help", xformsControl);
+        handleLabelHintHelpAlert(id, effectiveId, "help", xformsControl);
     }
 }

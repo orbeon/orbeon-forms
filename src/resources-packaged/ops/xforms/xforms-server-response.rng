@@ -94,6 +94,14 @@
                                             <data type="string"/>
                                         </optional>
                                     </element>
+                                    <element name="xxforms:attribute">
+                                        <attribute name="id"/>
+                                        <attribute name="name"/>
+                                        <attribute name="for"/>
+                                        <optional>
+                                            <data type="string"/>
+                                        </optional>
+                                    </element>
                                     <element name="xxforms:copy-repeat-template">
                                         <attribute name="id">
                                             <data type="string"/>

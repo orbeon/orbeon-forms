@@ -547,10 +547,9 @@ public class Dom4jUtils {
     }
 
     /**
-     * <!-- getFileAndLine -->
      * Workaround for Java's lack of an equivalent to C's __FILE__ and __LINE__ macros.  Use
      * carefully as it is not fast.
-     * <p/>
+     *
      * Perhaps in 1.5 we will find a better way.
      *
      * @return LocationData of caller.

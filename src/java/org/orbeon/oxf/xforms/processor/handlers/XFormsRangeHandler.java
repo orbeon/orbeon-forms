@@ -41,12 +41,13 @@ public class XFormsRangeHandler extends XFormsValueControlHandler {
     public void end(String uri, String localname, String qName) throws SAXException {
 
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
+        final String id = handlerContext.getId(elementAttributes);
         final String effectiveId = handlerContext.getEffectiveId(elementAttributes);
         final XFormsRangeControl xformsControl = handlerContext.isGenerateTemplate()
                 ? null : (XFormsRangeControl) containingDocument.getObjectById(effectiveId);
 
         // xforms:label
-        handleLabelHintHelpAlert(effectiveId, "label", xformsControl);
+        handleLabelHintHelpAlert(id, effectiveId, "label", xformsControl);
 
         final AttributesImpl newAttributes;
         {
@@ -74,12 +75,12 @@ public class XFormsRangeHandler extends XFormsValueControlHandler {
         }
 
         // xforms:help
-        handleLabelHintHelpAlert(effectiveId, "help", xformsControl);
+        handleLabelHintHelpAlert(id, effectiveId, "help", xformsControl);
 
         // xforms:alert
-        handleLabelHintHelpAlert(effectiveId, "alert", xformsControl);
+        handleLabelHintHelpAlert(id, effectiveId, "alert", xformsControl);
 
         // xforms:hint
-        handleLabelHintHelpAlert(effectiveId, "hint", xformsControl);
+        handleLabelHintHelpAlert(id, effectiveId, "hint", xformsControl);
     }
 }

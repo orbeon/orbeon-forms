@@ -94,8 +94,10 @@ public class OldControlsComparator extends BaseControlsComparator {
                     boolean doOutputElement = false;
 
                     // Control children values
-                    if (!(xformsSingleNodeControl2 instanceof RepeatIterationControl)) {
-                        // Anything but a repeat iteration
+                    final boolean isRepeatIterationControl = xformsSingleNodeControl2 instanceof RepeatIterationControl;
+                    final boolean isAttributeControl = xformsSingleNodeControl2 instanceof XXFormsAttributeControl;
+                    if (!(isRepeatIterationControl || isAttributeControl)) {
+                        // Anything but a repeat iteration or an attribute
 
                         // Model item properties
                         if (isNewRepeatIteration && xformsSingleNodeControl2.isReadonly()
@@ -268,15 +270,47 @@ public class OldControlsComparator extends BaseControlsComparator {
                                 final String tempValue = xformsValueControl.getExternalValue();
                                 value = (tempValue == null) ? "" : tempValue;
                             }
-                            if (doOutputElement || ! isNewRepeatIteration || (isNewRepeatIteration && !value.equals(""))) {
+                            if (doOutputElement || !isNewRepeatIteration || (isNewRepeatIteration && !value.equals(""))) {
                                 ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control", attributesImpl);
                                 ch.text(value);
                                 ch.endElement();
                             }
                         } else {
-                            // No value, just output element with no content
+                            // No value, just output element with no content (but there may be attributes)
                             if (doOutputElement)
                                 ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control", attributesImpl);
+                        }
+                    } else if (isAttributeControl) {
+                        // Attribute control
+                        final XXFormsAttributeControl attributeControlInfo2 = (XXFormsAttributeControl) xformsSingleNodeControl2;
+
+                        // The client does not store an HTML representation of the xxforms:attribute control, so we
+                        // have to output these attributes.
+                        {
+                            // HTML element id
+                            final String effectiveFor2 = attributeControlInfo2.getEffectiveForAttribute();
+                            doOutputElement |= addAttributeIfNeeded(attributesImpl, "for", effectiveFor2,  isNewRepeatIteration, false);
+                        }
+
+                        {
+                            // Attribute name
+                            final String name2 = attributeControlInfo2.getNameAttribute();
+                            doOutputElement |= addAttributeIfNeeded(attributesImpl, "name", name2,  isNewRepeatIteration, false);
+                        }
+
+                        final XFormsValueControl xformsValueControl = (XFormsValueControl) xformsSingleNodeControl2;
+
+                        // Create element with text value
+                        final String value;
+                        {
+                            // Value may become null when controls are unbound
+                            final String tempValue = xformsValueControl.getExternalValue();
+                            value = (tempValue == null) ? "" : tempValue;
+                        }
+                        if (doOutputElement || !isNewRepeatIteration || (isNewRepeatIteration && !value.equals(""))) {
+                            ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "attribute", attributesImpl);
+                            ch.text(value);
+                            ch.endElement();
                         }
                     } else {
 

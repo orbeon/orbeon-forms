@@ -50,13 +50,14 @@ public class XFormsInputHandler extends XFormsValueControlHandler {
     public void end(String uri, String localname, String qName) throws SAXException {
 
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
+        final String id = handlerContext.getId(elementAttributes);
         final String effectiveId = handlerContext.getEffectiveId(elementAttributes);
         final XFormsValueControl xformsControl = handlerContext.isGenerateTemplate()
                 ? null : (XFormsValueControl) containingDocument.getObjectById(effectiveId);
         final boolean isConcreteControl = xformsControl != null;
 
         // xforms:label
-        handleLabelHintHelpAlert(effectiveId, "label", xformsControl);
+        handleLabelHintHelpAlert(id, effectiveId, "label", xformsControl);
 
         final AttributesImpl newAttributes;
         final boolean isDate;
@@ -203,13 +204,13 @@ public class XFormsInputHandler extends XFormsValueControlHandler {
             contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
 
             // xforms:help
-            handleLabelHintHelpAlert(effectiveId, "help", xformsControl);
+            handleLabelHintHelpAlert(id, effectiveId, "help", xformsControl);
 
             // xforms:alert
-            handleLabelHintHelpAlert(effectiveId, "alert", xformsControl);
+            handleLabelHintHelpAlert(id, effectiveId, "alert", xformsControl);
 
             // xforms:hint
-            handleLabelHintHelpAlert(effectiveId, "hint", xformsControl);
+            handleLabelHintHelpAlert(id, effectiveId, "hint", xformsControl);
         }
     }
 }

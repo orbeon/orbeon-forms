@@ -119,7 +119,8 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
         final boolean isAutocompleteNoFilter = isAutocomplete && "false".equals(elementAttributes.getValue(XFormsConstants.XXFORMS_NAMESPACE_URI, "filter"));
 
         // xforms:label
-        handleLabelHintHelpAlert(effectiveId, "label", xformsValueControl);
+        final String id = handlerContext.getId(elementAttributes);
+        handleLabelHintHelpAlert(id, effectiveId, "label", xformsValueControl);
 
         final AttributesImpl newAttributes;
         {
@@ -428,13 +429,13 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
         }
 
         // xforms:help
-        handleLabelHintHelpAlert(effectiveId, "help", xformsValueControl);
+        handleLabelHintHelpAlert(id, effectiveId, "help", xformsValueControl);
 
         // xforms:alert
-        handleLabelHintHelpAlert(effectiveId, "alert", xformsValueControl);
+        handleLabelHintHelpAlert(id, effectiveId, "alert", xformsValueControl);
 
         // xforms:hint
-        handleLabelHintHelpAlert(effectiveId, "hint", xformsValueControl);
+        handleLabelHintHelpAlert(id, effectiveId, "hint", xformsValueControl);
     }
 
     private void outputJSONTreeInfo(XFormsValueControl xformsControl, List items, boolean many, ContentHandler contentHandler) throws SAXException {

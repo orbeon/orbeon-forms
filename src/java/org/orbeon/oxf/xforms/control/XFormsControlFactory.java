@@ -29,6 +29,7 @@ public class XFormsControlFactory {
     private static Map nameToClassMap = new HashMap();
 
     static {
+        // Built-in controls
         nameToClassMap.put("case", new Factory() {
             public XFormsControl createXFormsControl(XFormsContainingDocument containingDocument, XFormsControl parent, Element element, String name, String effectiveId) {
                 return new XFormsCaseControl(containingDocument, parent, element, name, effectiveId);
@@ -99,9 +100,15 @@ public class XFormsControlFactory {
                 return new XFormsUploadControl(containingDocument, parent, element, name, effectiveId);
             }
         });
+        // Extension controls
         nameToClassMap.put("dialog", new Factory() {
             public XFormsControl createXFormsControl(XFormsContainingDocument containingDocument, XFormsControl parent, Element element, String name, String effectiveId) {
                 return new XXFormsDialogControl(containingDocument, parent, element, name, effectiveId);
+            }
+        });
+        nameToClassMap.put("attribute", new Factory() {
+            public XFormsControl createXFormsControl(XFormsContainingDocument containingDocument, XFormsControl parent, Element element, String name, String effectiveId) {
+                return new XXFormsAttributeControl(containingDocument, parent, element, name, effectiveId);
             }
         });
     }

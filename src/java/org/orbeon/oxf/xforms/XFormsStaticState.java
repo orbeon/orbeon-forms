@@ -25,7 +25,7 @@ import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.oxf.util.UUIDUtils;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerImpl;
-import org.orbeon.oxf.xforms.processor.XFormsNamespaceExtractorContentHandler;
+import org.orbeon.oxf.xforms.processor.XFormsDocumentAnnotatorContentHandler;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -79,7 +79,7 @@ public class XFormsStaticState {
 
     // Static analysis
     private boolean isAnalyzed;
-    private Map controlNamesMap;            // Map<String, String> of event name to ""
+    private Map controlNamesMap;            // Map<String, String> of control name to ""
     private Map eventNamesMap;              // Map<String, String> of event name to ""
     private Map eventHandlersMap;           // Map<String, List<XFormsEventHandler>> of control id to event handlers
     private Map controlElementsMap;         // Map<String, Element> of control id to control Element
@@ -100,11 +100,11 @@ public class XFormsStaticState {
         // Parse document
         final Document staticStateDocument = XFormsUtils.decodeXML(pipelineContext, encodedStaticState);
 
-        // Compute namespace mappings
+        // Recompute namespace mappings
         final Map namespacesMap = new HashMap();
         try {
             final Transformer identity = TransformerUtils.getIdentityTransformer();
-            identity.transform(new DocumentSource(staticStateDocument), new SAXResult(new XFormsNamespaceExtractorContentHandler(namespacesMap)));
+            identity.transform(new DocumentSource(staticStateDocument), new SAXResult(new XFormsDocumentAnnotatorContentHandler(namespacesMap)));
         } catch (TransformerException e) {
             throw new OXFException(e);
         }

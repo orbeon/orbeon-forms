@@ -478,14 +478,9 @@ public class XFormsToXHTML extends ProcessorImpl {
     private static final Map exceptionXFormsElements = new HashMap();
 
     static {
+        // This is still used by XFormsSelect1Handler
         exceptionXFormsElements.put("item", "");
         exceptionXFormsElements.put("itemset", "");
-        exceptionXFormsElements.put("choices", "");
-        exceptionXFormsElements.put("value", "");
-        exceptionXFormsElements.put("label", "");
-        exceptionXFormsElements.put("hint", "");
-        exceptionXFormsElements.put("help", "");
-        exceptionXFormsElements.put("alert", "");
     }
 
     private void testOutputResponseState(final PipelineContext pipelineContext, final XFormsContainingDocument containingDocument,

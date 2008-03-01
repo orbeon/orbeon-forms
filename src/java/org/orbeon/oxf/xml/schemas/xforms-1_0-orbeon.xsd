@@ -252,10 +252,9 @@
         <xsd:attribute name="bind" type="xsd:NMTOKEN" use="optional"/>
     </xsd:attributeGroup>
     <xsd:attributeGroup name="Nodeset.Binding.Attributes">
-        <xsd:attribute name="model" type="xsd:IDREF" use="optional"/>
-
+        <xsd:attribute name="model" type="xsd:NMTOKEN" use="optional"/>
         <xsd:attribute name="nodeset" type="xforms:XPathExpression" use="optional"/>
-        <xsd:attribute name="bind" type="xsd:IDREF" use="optional"/>
+        <xsd:attribute name="bind" type="xsd:NMTOKEN" use="optional"/>
     </xsd:attributeGroup>
     <xsd:attributeGroup name="UI.Common.Attrs">
         <xsd:attribute name="appearance" type="xforms:appearanceType" use="optional"/>

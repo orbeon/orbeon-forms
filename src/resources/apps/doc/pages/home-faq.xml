@@ -366,9 +366,22 @@
                     Everywhere blog</a>.
                 </p>
                 <p>
-                    There is also an <a href="http://mailbucket.org/ops-commits.xml">RSS feed of the commits</a>, and
-                    you can see the last commits <a href="http://mailbucket.org/simple/ops-commits">on this page</a>.
+                    There is also a mailing-list for CVS commits:
                 </p>
+                <ul>
+                    <li>
+                        <a href="http://www.ow2.org/wws/arc/ops-commits">Home of the ops-commits mailing-list</a>
+                    </li>
+                    <li>
+                        <a href="http://mail-archive.ow2.org/ops-commits/index.html">ops-commits mailing-list archive</a>
+                    </li>
+                    <li>
+                        <a href="http://mailbucket.org/ops-commits.xml">RSS feed of ops-commits</a> (at mailbucket)
+                    </li>
+                    <li>
+                        <a href="http://mailbucket.org/simple/ops-commits">Last entries of ops-commits</a> (at mailbucket)
+                    </li>
+                </ul>
             </section>
         </section>
         <a name="xforms"/>

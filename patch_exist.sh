@@ -1,7 +1,12 @@
 #!/bin/sh
 
 # This is a script which you can run under the checked out eXist source code directory to update eXist's references to
-# XML parser and XSLT code. This worked as of 2007-12-18.
+# XML parser and XSLT code. This worked as of 2008-03-01.
+#
+# Before running this script:
+#
+# 1) Set ORBEON_HOME to point to your Orbeon Forms source directory (which contains Orbeon's build.xml).
+# 2) Make sure that you have compile version of Orbeon Forms (will look for $ORBEON_HOME/build/lib/orbeon.jar)
 
 ORBEON_HOME=../orbeon
 rm lib/endorsed/xercesImpl-2.9.1.jar
@@ -9,20 +14,22 @@ rm lib/endorsed/xalan-2.7.0.jar
 cp $ORBEON_HOME/lib/xerces-xercesImpl-2_9_orbeon_20070711.jar lib/endorsed/
 cp $ORBEON_HOME/lib/xalan-2_5_1_orbeon.jar lib/endorsed/
 cp $ORBEON_HOME/lib/saxon-8_8_orbeon_20070817.jar lib/endorsed/
+cp $ORBEON_HOME/build/lib/orbeon.jar lib/endorsed/
 for F in $(find src -name *.java)
 do
     sed -i -e 's/org.apache.xerces/orbeon.apache.xerces/g' $F
     sed -i -e 's/org.apache.xalan/orbeon.apache.xalan/g' $F
     sed -i -e 's/net.sf.saxon/org.orbeon.saxon/g' $F
+    sed -i -e 's/SAXParserFactory.newInstance()/new org.orbeon.oxf.xml.xerces.XercesSAXParserFactoryImpl()/g' $F
 done
 ant clean
 ant
 rm $ORBEON_HOME/lib/*exist*
 VERSION=1_2
-cp exist.jar $ORBEON_HOME/lib/exist_$VERSION.jar
-cp exist-optional.jar $ORBEON_HOME/lib/exist-optional_$VERSION.jar
-cp lib/extensions/exist-modules.jar $ORBEON_HOME/lib/exist-modules_$VERSION.jar
-cp lib/extensions/exist-ngram-module.jar $ORBEON_HOME/lib/exist-ngram-module_$VERSION.jar
+cp exist.jar $ORBEON_HOME/lib/exist-$VERSION.jar
+cp exist-optional.jar $ORBEON_HOME/lib/exist-optional-$VERSION.jar
+cp lib/extensions/exist-modules.jar $ORBEON_HOME/lib/exist-modules-$VERSION.jar
+cp lib/extensions/exist-ngram-module.jar $ORBEON_HOME/lib/exist-ngram-module-$VERSION.jar
 
 cp lib/core/antlr-2.7.6.jar $ORBEON_HOME/lib/exist-antlr-2_7_6.jar
 cp lib/core/jgroups-all.jar $ORBEON_HOME/lib/exist-jgroups-all-exist.jar

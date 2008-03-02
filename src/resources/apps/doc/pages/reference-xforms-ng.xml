@@ -2427,11 +2427,11 @@
             <section>
                 <title>XForms Submisssion</title>
                 <p>
-                    Specifying a submission URL is done with the <code>action</code>
-                    attribute on the <code>xforms:submission</code> element:
+                    Specifying a submission URL is done with the <code>resource</code> attribute (or the deprecated, as
+                    of XForms 1.1, <code>action</code> attribute) on the <code>xforms:submission</code> element:
                 </p>
                 <xml-source show-namespaces="false">
-                    <xforms:submission action="/submission" ref="..."/>
+                    <xforms:submission resource="/submission" ref="..."/>
                 </xml-source>
                 <p>
                     The following assumes that Orbeon Forms runs in the <code>/ops</code> servlet context:

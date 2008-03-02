@@ -84,6 +84,20 @@
                     </li>
                     <li>
                         <p>
+                            <b>Attribute Value Templates (AVTs) on XHTML elements.</b> AVTs were already supported on <a
+                            href="reference-xforms-2#avts-xforms">some XForms elements</a>. You can now use AVTs on
+                            XHTML elements as well. This allows you to use XForms to influence aspects of XHTML such as
+                            <code>class</code>, <code>style</code> or <code>colspan</code> attributes.
+                        </p>
+                        <p>
+                            See <a href="reference-xforms-2#avts-xhtml">AVTs on XHTML Elements</a> for documentation.
+                        </p>
+                        <p>
+                            This feature is kindly sponsored by Teleflex.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
                             <b>Support for the <code>exforms:iterate</code> attribute and the XForms 1.1
                             <code>context()</code> function.</b> In particular, these additions make it much easier to
                             iterate over nodes within actions.
@@ -96,11 +110,14 @@
                     <li>
                         <p>
                             <b>Support for <code>exforms:variable</code> and <code>xxforms:variable</code> within
-                            controls and models.</b>
-                            
-
-                            [TODO: document + example, also mention view vs. models + currently no actions; document
-                            scoping rules]
+                            controls and models.</b> You can now declare XPath variables usable from any XPath
+                            expression in an XForms document. Variables are extremely useful, for example to avoid
+                            repeating long XPath expressions, or to give an XPath expression unambiguous access to data
+                            computed in enclosing <code>&lt;xforms:group></code> or <code>&lt;xforms:repeat></code>
+                            elements.
+                        </p>
+                        <p>
+                            See <a href="reference-xforms-2#variables">Variables</a> for documentation.
                         </p>
                     </li>
                     <li>

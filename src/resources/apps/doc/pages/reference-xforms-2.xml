@@ -228,7 +228,7 @@
                 </p>
                 <xml-source>
                     <xforms:submission id="my-submission" method="post" validate="false" relevant="false"
-                                       action="http://example.org/rest/draft/"
+                                       resource="http://example.org/rest/draft/"
                                        replace="none"/>
                 </xml-source>
                 <p>
@@ -246,7 +246,7 @@
                     method:
                 </p>
                 <xml-source>
-                    <xforms:submission id="my-submission" method="get" serialization="none" action="http://example.org/document.xml"
+                    <xforms:submission id="my-submission" method="get" serialization="none" resource="http://example.org/document.xml"
                                        replace="instance" instance="my-instance"/>
                 </xml-source>
                 <p>
@@ -1077,52 +1077,295 @@
                 </p>
                 <p>
                     To improve this, Orbeon Form supports a notation called <i>Attribute Value Templates</i> (AVTs),
-                    borrowed from XSLT, which allows including XPath expressions within attributes. You include XPath
-                    expressions in attributes by enclosing them within curly brackets (<code>{</code> and
-                    <code>}</code>). Consider this example:
+                    borrowed from <a href="http://www.w3.org/TR/xslt20/">XSLT</a>, which allows including XPath
+                    expressions within attributes. You include XPath expressions in attributes by enclosing them within
+                    curly brackets (<code>{</code> and <code>}</code>).
                 </p>
-                <xml-source>
-                    <xforms:load resource="/forms/detail/{instance('documents-instance')/documents/document[index('documents-repeat')]/id}"/>
+                <a name="avts-xforms"/>
+                <section>
+                    <title>AVTs on XForms Elements</title>
+                    <p>
+                        Consider this example:
+                    </p>
+                    <xml-source>
+                        <xforms:load resource="/forms/detail/{instance('documents-instance')/documents/document[index('documents-repeat')]/id}"/>
+                    </xml-source>
+                    <p>
+                        When <code>&lt;xforms:load></code> is executed, the <code>resource</code> attribute is
+                        evaluated. The results is the concatenation of <code>/forms/detail/</code> and of the result of
+                        the expression within brackets:
+                    </p>
+                    <xml-source>
+                        instance('documents-instance')/documents/document[index('documents-repeat')]/id
+                    </xml-source>
+                    <p>
+                        If the <code>id</code> element pointed to contains the string
+                        <code>C728595E0E43A8BF50D8DED9F196A582</code>, the <code>resource</code> attribute takes the
+                        value:
+                    </p>
+                    <xml-source>
+                        /forms/detail/C728595E0E43A8BF50D8DED9F196A582
+                    </xml-source>
+                    <p>
+                        Note the following:
+                    </p>
+                    <ul>
+                        <li>
+                            <p>
+                                If you need curly brackets as literal values instead of enclosing an XPath expression,
+                                escape them using double brackets (<code>{{</code> and <code>}}</code>).
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                You can use as many XPath expressions as you want within a single attributes, each of
+                                them enclosed by curly brackets.
+                            </p>
+                        </li>
+                    </ul>
+                    <p>
+                        AVTs are currently supported only within certain attributes:
+                    </p>
+                    <ul>
+                        <li>
+                            <p>
+                                <code>&lt;xforms:submission></code> attributes:
+                            </p>
+                            <ul>
+                                <li>
+                                    <code>action</code> and <code>resource</code>
+                                </li>
+                                <li>
+                                    <code>target</code>
+                                </li>
+                                <li>
+                                    <code>xxforms:username</code>
+                                </li>
+                                <li>
+                                    <code>xxforms:password</code>
+                                </li>
+                                <li>
+                                    <code>xxforms:readonly</code>
+                                </li>
+                                <li>
+                                    <code>xxforms:shared</code>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <p>
+                                <code>&lt;xforms:dispatch></code> attributes:
+                            </p>
+                            <ul>
+                                <li>
+                                    <code>name</code>
+                                </li>
+                                <li>
+                                    <code>target</code>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <p>
+                                <code>&lt;xforms:load></code>: <code>resource</code> attribute.
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                <code>&lt;xforms:setfocus></code>: <code>control</code> attribute.
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                <code>&lt;xforms:toggle></code>: <code>case</code> attribute.
+                            </p>
+                        </li>
+                    </ul>
+                    <p>
+                        There are plans to support AVTs in more places in the future. Please send your suggestions!
+                    </p>
+                </section>
+                <a name="avts-xhtml"/>
+                <section>
+                    <title>AVTs on XHTML Elements</title>
+                    <p>
+                        AVTs are also supported on XHTML elements. You must first enable this feature in
+                        <code>properties.xml</code>:
+                    </p>
+                    <xml-source>
+                        <property as="xs:boolean" name="oxf.xforms.host-language-avts" value="true"/>
+                    </xml-source>
+                    <p>
+                        For example:
+                    </p>
+                    <xml-source>
+                        <xhtml:table class="zebra-table">
+                            <xhtml:tbody>
+                                <xforms:repeat nodeset="*">
+                                    <xhtml:tr class="zebra-row-{if (position() mod 2 = 0) then 'even' else 'odd'}">
+                                        <xhtml:td>
+                                            <xforms:output value="."/>
+                                        </xhtml:td>
+                                    </xhtml:tr>
+                                </xforms:repeat>
+                            </xhtml:tbody>
+                        </xhtml:table>
+                    </xml-source>
+                    <p>
+                        In the above example, the value of the <code>class</code> attribute on
+                        <code>&lt;xhtml:tr></code> is determined dynamically through XPath and XForms. Even table rows
+                        get the class <code>zebra-row-even</code> and odd table rows get the class
+                        <code>zebra-row-odd</code>.
+                    </p>
+                    <p>
+                        The values of XHTML attributes built using AVTs update as you interact with the XForms page. In
+                        the example above, inserting or deleting table rows after the page is loaded will still
+                        correctly update the <code>class</code> attribute.
+                    </p>
+                    <note>
+                        <p>
+                            At the moment, AVTs are only supported on XHTML elements within
+                            <code>&lt;xhtml:body></code>.
+                        </p>
+                        <p>
+                            It is not possible to use AVTs on the <code>id</code> attribute of XHTML elements.
+                        </p>
+                    </note>
+                </section>
+            </section>
+            <a name="variables"/>
+            <section>
+                <title>Variables</title>
+                <p>
+                    Orbeon Forms supports declaring variables which look and behave very much like XSLT variables.
+                    Variables are extremely useful, for example to avoid repeating long XPath expressions, or to give an
+                    XPath expression unambiguous access to data computed in enclosing <code>&lt;xforms:group></code> or
+                    <code>&lt;xforms:repeat></code> elements.
+                </p>
+                <p>
+                    You define variables with the extension element <code>&lt;xxforms:variable></code>. You can also use
+                    <code>&lt;exforms:variable></code> in the eXforms namespace. Either element supports the
+                    following attributes:
+                </p>
+                <table>
+                    <tr>
+                        <th><code>name</code></th>
+                        <td>Mandatory</td>
+                        <td>
+                            Name of the variable.
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><code>select</code></th>
+                        <td>Mandatory</td>
+                        <td>
+                            XPath 2.0 expression determining the value of the variable.
+                        </td>
+                    </tr>
+                </table>
+                <p>
+                    Once a variable is declared, you can use it from XPath expressions for which the variable is
+                    visible:
+                </p>
+                <xml-source  xmlns:exforms="http://www.exforms.org/exf/1-0">
+                    <xhtml:body>
+                        <comment> Variable pointing to the default instance's root element </comment>
+                        <xxforms:variable name="instance" select="."/>
+                        <comment> variable pointing to all the item children (using the "exforms" prefix this time) </comment>
+                        <comment> It uses the variable declared above </comment>
+                        <exforms:variable name="items" select="$instance/item"/>
+
+                        <comment> The code below uses the variables in scope </comment>
+                        <xforms:repeat nodeset="$items" id="items-repeat">
+                            <exforms:variable name="current-item" select="."/>
+                            <xxforms:variable name="current-position" select="position()"/>
+                            <xforms:output id="my-count" ref="$current-item/value">
+                                <xforms:label value="concat($current-item/label, ':')"/>
+                                <xforms:setvalue ev:event="my-event" ref="$current-item/value" value="count($items) + $current-position"/>
+                            </xforms:output>
+                        </xforms:repeat>
+                    </xhtml:body>
                 </xml-source>
                 <p>
-                    When <code>&lt;xforms:load></code> is executed, the <code>resource</code> attribute is evaluated.
-                    The results is the concatenation of <code>/forms/detail/</code> and of the result of the expression
-                    within brackets
-                    <code>instance('documents-instance')/documents/document[index('documents-repeat')]/id</code>. If the
-                    <code>id</code> element pointed to contains the string
-                    <code>C728595E0E43A8BF50D8DED9F196A582</code>, the <code>resource</code> attribute takes the
-                    value <code>/forms/detail/C728595E0E43A8BF50D8DED9F196A582</code>.
-                </p>
-                <p>
-                    AVTs are currently supported only within certain attributes:
+                    Under the <code>&lt;xhtml:body></code> element, the following rules apply:
                 </p>
                 <ul>
                     <li>
                         <p>
-                            <code>&lt;xforms:submission></code>: <code>action</code>, <code>xxforms:username</code>,
-                            <code>xxforms:password</code>, <code>xxforms:readonly</code> and
-                            <code>xxforms:shared</code> attributes.
+                            You can declare XPath variables anywhere an XForms control can be declared.
                         </p>
                     </li>
                     <li>
                         <p>
-                            <code>&lt;xforms:dispatch></code>: <code>name</code> attribute.
-                        </p>
-                    </li>
-                    <li>
-                        <p>
-                            <code>&lt;xforms:load></code>: <code>resource</code> attribute.
-                        </p>
-                    </li>
-                    <li>
-                        <p>
-                            <code>&lt;xforms:setfocus></code>: <code>control</code> attribute.
+                            A variable is visible to any XPath expression on a following sibling element or on a
+                            following sibling element's descendant element.
                         </p>
                     </li>
                 </ul>
                 <p>
-                    There are plans to support AVTs in more places in the future.
+                    In addition, variables are supported within <code>&lt;xforms:model></code>. Under the
+                    <code>&lt;xforms:model></code> element, the following rules apply:
                 </p>
+                <ul>
+                    <li>
+                        <p>
+                            Variables have to be declared as direct children of an <code>&lt;xforms:model></code>
+                            element.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Variables defined within a given model are also visible from XPath expression under the
+                            <code>&lt;xhtml:body></code> element whenever that model is in scope:
+                        </p>
+                    </li>
+                </ul>
+                <xml-source  xmlns:exforms="http://www.exforms.org/exf/1-0">
+                    <xhtml:head>
+                        <xforms:model id="my-model">
+                            <xforms:instance id="my-instance">...</xforms:instance>
+                            <xxforms:variable name="my" select="."/>
+                        </xforms:model>
+                        <xforms:model id="her-model">
+                            <xforms:instance id="her-instance">...</xforms:instance>
+                            <xxforms:variable name="her" select="instance('her-instance')"/>
+                        </xforms:model>
+                    </xhtml:head>
+                    <xhtml:body>
+                        <comment> $my is visible from here, but not $her </comment>
+                        <xforms:output value="$my">
+                            <xforms:label>My stuff:</xforms:label>
+                        </xforms:output>
+                        <xforms:group model="her-model">
+                            <comment> $her is visible from here, but not $my </comment>
+                            <xforms:output value="$her">
+                            <xforms:label>Her stuff:</xforms:label>
+                        </xforms:output>
+                        </xforms:group>
+                    </xhtml:body>
+                </xml-source>
+                <p>
+                    Currently you cannot declare variables in these locations:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            Within action handlers.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Within XForms core controls such as <code>&lt;xforms:input></code>, including within
+                            nested items or itemsets.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Within nested model elements, including <code>&lt;xforms:bind></code> or
+                            <code>&lt;xforms:submission></code>.
+                        </p>
+                    </li>
+                </ul>
             </section>
             <a name="dialog"/>
             <section>
@@ -1409,7 +1652,7 @@
                     </p>
                     <xml-source show-namespaces="false">
                         <xforms:submission id="save-submission" ref="instance('my-instance')"
-                                   method="put" action="/exist/rest/ops/my-file.xml" replace="none" xxforms:username="admin" xxforms:password=""/>
+                                   method="put" resource="/exist/rest/ops/my-file.xml" replace="none" xxforms:username="admin" xxforms:password=""/>
                     </xml-source>
                 </section>
                 <a name="submission-show-progress"/>
@@ -1562,7 +1805,7 @@
                         <code>method="get"</code> method and <code>replace="instance"</code>:
                     </p>
                     <xml-source>
-                        <xforms:submission serialization="none" action="/forms/resources/fr" method="get"
+                        <xforms:submission serialization="none" resource="/forms/resources/fr" method="get"
                                            replace="instance" instance="resources-instance" xxforms:readonly="true" xxforms:shared="application"/>
                     </xml-source>
                     <p>

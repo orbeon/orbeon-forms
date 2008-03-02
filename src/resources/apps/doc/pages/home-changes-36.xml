@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="windows-1252"?>
 <!--
-    Copyright (C) 2007 Orbeon, Inc.
+    Copyright (C) 2007-2008 Orbeon, Inc.
 
     The Orbeon documentation is not distributed under the LGPL license. Use of the documentation is
     subject to the following terms:
@@ -40,44 +40,79 @@
                 This document describes changes made between Orbeon Forms 3.5.1 and Orbeon Forms 3.6.1.
             </p>
             <p>
-                <b style="color: red">NOTE: Orbeon Forms 3.6.1 is still UNDER DEVELOPMENT as of February 2008. The
+                <b style="color: red">NOTE: Orbeon Forms 3.6.1 is still UNDER DEVELOPMENT as of March 2008. The
                 latest stable release of Orbeon Forms is 3.6.</b>
             </p>
         </section>
         <a name="changes-361"/>
         <section>
             <title>Changes in Version 3.6.1</title>
-            <a name="changes-361-full"/>
             <p>
-                Orbeon Forms 3.6.1 is an update to Orbeon Forms 3.6.
+                Orbeon Forms 3.6.1 is an update to Orbeon Forms 3.6. It features over <a href="#changes-361-full">60
+                improvements</a> since version 3.6.
             </p>
             <section>
                 <title>Noteworthy Changes</title>
                 <ul>
                     <li>
                         <p>
-                            <b>Session heartbeat feature for XForms pages.</b> [TODO]
+                            <b>Session heartbeat feature for XForms pages.</b> Orbeon Forms now enables by default the
+                            <a href="reference-xforms-2#session-heartbeat">Session Heartbeat</a> feature. This allows
+                            sessions associated with live pages in a user's browser to stay active, therefore
+                            preventing situations where the user gets back to a form and gets session expiration errors.
+                        </p>
+                        <p>
+                            See also <a href="reference-xforms-2#session-heartbeat">Session Heartbeat</a>.
+                        </p>
+                        <p>
+                            This feature is kindly sponsored by Teleflex.
                         </p>
                     </li>
                     <li>
                         <p>
-                            <b>Versioned resources.</b> [TODO]
+                            <b>Versioned resources.</b> Orbeon Forms now supports versioning of resources such as CSS,
+                            JavaScript, and images. This allows more aggressive client-side caching, thereby reducing
+                            page loading times as well as server load.
+                        </p>
+                        <p>
+                            See <a href="reference-xforms-2#versioned-resources">Versioned Resources</a> for the full
+                            documentation.
+                        </p>
+                        <p>
+                            This feature is kindly sponsored by Teleflex.
                         </p>
                     </li>
                     <li>
                         <p>
                             <b>Support for the <code>exforms:iterate</code> attribute and the XForms 1.1
                             <code>context()</code> function.</b> In particular, these additions make it much easier to
-                            iterate over nodes within actions. See the <a
-                            href="reference-xforms-2#exforms-iterate">Iteration of XForms Actions over Nodesets</a> for
-                            a complete example.
+                            iterate over nodes within actions.
+                        </p>
+                        <p>
+                            See <a href="reference-xforms-2#exforms-iterate">Iteration of XForms Actions over
+                            Nodesets</a> for documentation and a complete example.
                         </p>
                     </li>
                     <li>
                         <p>
                             <b>Support for <code>exforms:variable</code> and <code>xxforms:variable</code> within
-                            controls.</b> [TODO: document + example, also mention view vs. models + currently no
-                            actions; document scoping rules]
+                            controls and models.</b>
+                            
+
+                            [TODO: document + example, also mention view vs. models + currently no actions; document
+                            scoping rules]
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Support for <code>ev:observer</code> and <code>ev:target</code> attributes on action
+                            handlers.</b> The <code>ev:observer</code> attribute is now globally supported (it used to
+                            be only supported within a model to refer to a nested instance). Support for the more rarely
+                            needed <code>ev:target</code> attribute has been added as well.
+                        </p>
+                        <p>
+                            See also <a href="reference-xforms-ng#events-observer-target">Using the
+                            <code>ev:observer</code> and <code>ev:target</code> Attributes</a>.
                         </p>
                     </li>
                     <li>
@@ -121,9 +156,9 @@
                     </li>
                     <li>
                         <p>
-                            <b>The epilogue pipeline is configurable with properties.</b> The epilogue pipeline is now
-                            configurable with <a href="reference-properties#epilogue">properties</a>. Those in
-                            particular allow you to pick the theme stylesheet, enable XHTML output, etc.
+                            <b>The epilogue pipeline is configurable with properties.</b> These <a
+                            href="reference-properties#epilogue">properties</a> in particular allow you to pick the
+                            theme stylesheet, enable XHTML output, etc.
                         </p>
                     </li>
                     <li>
@@ -136,6 +171,7 @@
                     </li>
                 </ul>
             </section>
+            <a name="changes-361-full"/>
             <section>
                 <title>Complete List of Issues Addressed in this Release</title>
                 <p>

@@ -409,7 +409,7 @@
                 <table>
                     <tr>
                         <th>Name</th>
-                        <td><code>oxf.epilogue.theme</code></td>
+                        <td><code>oxf.epilogue.use-theme</code></td>
                     </tr>
                     <tr>
                         <th>Purpose</th>

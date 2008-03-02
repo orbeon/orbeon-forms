@@ -33,8 +33,9 @@
                 Web applications use forms to collect data from users. Orbeon Forms's form handling capabilities are
                 based on <link href="http://www.w3.org/MarkUp/Forms/">XForms</link>, namely the <a
                 href="http://www.w3.org/TR/xforms/">XForms 1.0 (Second Edition) W3C Recommendation</a> and the <a
-                href="http://www.w3.org/TR/xforms11/">XForms 1.1 W3C Working Draft</a>. This section provides an
-                introduction to XForms concepts and explains how to use XForms in your Orbeon Forms application.
+                href="http://www.w3.org/TR/xforms11/">XForms 1.1 W3C Candidate Recommendation</a>. This section
+                provides an introduction to XForms concepts and explains how to use XForms in your Orbeon Forms
+                application.
             </p>
             <note>
                 <p>
@@ -48,7 +49,7 @@
                         March 2006</a>
                     </li>
                     <li>
-                        <a href="http://www.w3.org/TR/xforms11/">XForms 1.1 W3C Working Draft</a>
+                        <a href="http://www.w3.org/TR/xforms11/">XForms 1.1 W3C Candidate Recommendation</a>
                     </li>
                     <li>
                         <a href="http://xformsinstitute.com/essentials/">XForms Essentials</a>, by
@@ -69,7 +70,8 @@
                 Orbeon Forms.
             </p>
             <p>
-                Please be sure to visit <a href="reference-xforms-2">Part 2</a> as well.
+                Please be sure to visit <a href="reference-xforms-2">Part 2</a> as well, and <a
+                href="reference-xforms-migration">Migrating from XForms Classic to XForms NG</a> if relevant.
             </p>
         </section>
         <a name="introduction"/>
@@ -82,8 +84,8 @@
                     rank of W3C Recommendation in October 2003, and a <a
                     href="http://www.w3.org/TR/2005/PER-xforms-20051006/">second edition</a> of the specification was
                     released in March 2006. The <a href="http://www.w3.org/MarkUp/Forms/">XForms Working Group at
-                    W3C</a>is as of July 2006 working on XForms 1.1, before embarking on XForms 1.2 or XForms 2.0. For
-                    more information about XForms, please refer to the <a href="home-faq#xforms">FAQ</a>.
+                    W3C</a>is as of March 2008 working on XForms 1.2 or XForms 2.0. For more information about XForms,
+                    please refer to the <a href="home-faq#xforms">FAQ</a>.
                 </p>
                 <p>
                     As of July 2006, mainstream browsers (Internet Explorer, Mozilla / Firefox, Opera, Safari) do not
@@ -1805,16 +1807,16 @@
                     </p>
                 </section>
                 <a name="events-observer"/>
+                <a name="events-observer-target"/>
                 <section>
-                    <title>Using the <code>ev:observer</code> Attribute</title>
+                    <title>Using the <code>ev:observer</code> and <code>ev:target</code> Attributes</title>
                     <p>
-                        The <code>ev:observer</code> attribute, defined by the XML Events specification, allows you to
-                        register event handlers by specifying an element identifier, instead of embedding the event
-                        handler within that element. This is particularly useful to register event handlers on
+                        The <code>ev:observer</code> attribute, defined by the <a
+                        href="http://www.w3.org/TR/xml-events/">XML Events specification</a>, allows you to register
+                        event handlers by specifying an element identifier, instead of embedding the event handler
+                        within that element. This is particularly useful to register event handlers on
                         <code>&lt;xforms:instance></code> elements, which do not allow you to directly embed XML event
-                        handlers. The current support is limited to adding the <code>ev:observer</code> attribute on
-                        XForms actions under <code>&lt;xforms:model></code> with the <code>ev:observer</code> attribute
-                        referring to a child <code>&lt;xforms:instance></code>.
+                        handlers.
                     </p>
                     <xml-source>
                         <xforms:model id="main-model">
@@ -1825,8 +1827,43 @@
                         </xforms:model>
                     </xml-source>
                     <p>
-                        Note that you still need to use the <code>ev:event</code> attribute to specify to what
-                        event the handler responds.
+                        Note that you still need to use the <code>ev:event</code> attribute to specify to what event the
+                        handler responds. The following example shows how you can define event handlers for XForms
+                        elements anywhere in an XForms document:
+                    </p>
+                    <xml-source>
+                        <xhtml:html>
+                            <xhtml:head>
+                                <xforms:model id="my-model">
+                                    <comment> A small instance </comment>
+                                    <xforms:instance id="my-instance">
+                                        <instance>initial</instance>
+                                    </xforms:instance>
+                                    <comment> Event handler located in the model but observing an element in the view </comment>
+                                    <xforms:action ev:observer="my-group" ev:target="my-input" ev:event="DOMFocusIn">
+                                        <xforms:setvalue ref=".">new</xforms:setvalue>
+                                    </xforms:action>
+                                </xforms:model>
+                            </xhtml:head>
+                            <xhtml:body>
+                                <xforms:group id="my-group">
+                                    <comment> A simple XForms input control </comment>
+                                    <xforms:input id="my-input" ref=".">
+                                        <xforms:label>My Data</xforms:label>
+                                    </xforms:input>
+                                    <comment> Event handler located in the view but observing an element in the model </comment>
+                                    <xforms:action ev:observer="my-model" ev:event="xforms-ready">
+                                        <xforms:dispatch name="DOMFocusIn" target="my-input"/>
+                                    </xforms:action>
+                                </xforms:group>
+                            </xhtml:body>
+                        </xhtml:html>
+                    </xml-source>
+                    <p>
+                        The above example also shows how you can constrain an event handler to respond to an event
+                        dispatched to a particular target element using the <code>ev:target</code> attribute. here, the
+                        event handler responds to <code>DOMFocusIn</code> events, but only those dispatched to the
+                        <code>my-input</code> control.
                     </p>
                 </section>
             </section>
@@ -1900,12 +1937,18 @@
                         starting with <code>oxf:</code>, <code>http:</code> or other supported protocols. It is not
                         recommended to use the <code>src</code> attribute to specify the content of the message.</p>
                     </note>
+                    <p>
+                        Simple message:
+                    </p>
                     <xml-source show-namespaces="false">
                         <xforms:trigger>
                             <xforms:label>Test</xforms:label>
                             <xforms:message ev:event="DOMActivate" ref="taste"/>
                         </xforms:trigger>
                     </xml-source>
+                    <p>
+                        Message with nested <code>xforms:output</code>:
+                    </p>
                     <xml-source show-namespaces="false">
                         <xforms:trigger>
                             <xforms:label>Test</xforms:label>
@@ -1915,6 +1958,9 @@
                             </xforms:message>
                         </xforms:trigger>
                     </xml-source>
+                    <p>
+                        Server-side log message:
+                    </p>
                     <xml-source show-namespaces="false">
                         <xforms:submission>
                             ...

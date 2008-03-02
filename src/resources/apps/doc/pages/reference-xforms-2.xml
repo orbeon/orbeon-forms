@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="windows-1252"?>
 <!--
-    Copyright (C) 2004-2007 Orbeon, Inc.
+    Copyright (C) 2004-2008 Orbeon, Inc.
 
     The Orbeon documentation is not distributed under the LGPL license. Use of the documentation is
     subject to the following terms:
@@ -30,12 +30,239 @@
         <section>
             <title>Introduction</title>
             <p>
-                This is Part 2 of a two-part document. This part focuses on extensions over XForms provided by Orbeon
-                Forms, as well as XForms engine configuration.
+                This is Part 2 of a two-part documentation. This part focuses on extensions over XForms provided by
+                Orbeon Forms, as well as XForms engine configuration.
             </p>
             <p>
                 Please be sure to visit <a href="reference-xforms-ng">Part 1</a> as well.
             </p>
+        </section>
+        <a name="xforms11-extensions"/>
+        <a name="xforms11"/>
+        <section>
+            <title>XForms 1.1 Support</title>
+            <a name="output-mediatype"/>
+            <section>
+                <title>Media Type for <code>xforms:output</code></title>
+                <p>
+                    In XForms 1.0, <code>xforms:output</code> is only used to display text. However, XForms 1.1 supports
+                    a <code>mediatype</code> attribute on that element allowing display of other media types.
+                </p>
+                <a name="xforms-image-mediatype"/>
+                <section>
+                    <title>Image Types</title>
+                    <p>
+                         For the <code>&lt;xforms:output></code> control to display an image, you
+                         need to:
+                    </p>
+                    <ul>
+                        <li>
+                            <p>
+                                Have a <code>mediatype</code> attribute on the
+                                <code>&lt;xforms:output></code>. That attribute must refer to an
+                                image, such as <code>image/*</code> or <code>image/jpeg</code>.
+                            </p>
+                        </li>
+                       <li>
+                            <p>
+                                Use the <code>value</code> attribute on
+                                <code>&lt;xforms:output></code> or bind to the control to a node
+                                without type or with an <code>xs:anyURI</code> type.
+                            </p>
+                        </li>
+                   </ul>
+                    <p>
+                        The resulting value is interpreted a URI pointing to an image. The image
+                        will display in place of the <code>xforms:output</code>. When a single-node
+                        binding is used, it is possible to dynamically change the image pointed to.
+                        For example:
+                    </p>
+                    <xml-source show-namespaces="false">
+                        <xforms:output mediatype="image/*" value="'/images/moon.jpg'"/>
+                    </xml-source>
+                    <xml-source show-namespaces="false">
+                        <xforms:model>
+                            <xforms:instance>
+                                <image-uri/>
+                            </xforms:instance>
+                            <xforms:bind nodeset="image-uri" type="xs:anyURI"/>
+                        </xforms:model>
+                        ...
+                        <xforms:output mediatype="image/*" ref="image-uri"/>
+                    </xml-source>
+                    <note>
+                        It is not yet possible to directly embed image data in an XForms instance
+                        using the <code>xs:base64Binary</code> type.
+                    </note>
+                </section>
+                <section>
+                    <title>HTML Type</title>
+                    <p>
+                        When an <code>xforms:output</code> control has a <code>mediatype</code>
+                        attribute with value <code>text/html</code>, the value of the node to which
+                        the control is bound is interpreted as HTML content. Consider the following
+                        XForms instance:
+                    </p>
+                    <xml-source show-namespaces="false">
+                        <xforms:instance id="my-instance">
+                            <form>
+                                <html-content>
+                                    This is in &amp;lt;b&amp;gt;bold&amp;lt;/b&amp;gt;!
+                                </html-content>
+                            </form>
+                        </xforms:instance>
+                    </xml-source>
+                    <p>
+                        You bind an <code>xforms:output</code> control to the
+                        <code>html-content</code> node as follows:
+                    </p>
+                    <xml-source show-namespaces="false">
+                        <xforms:output ref="instance('my-instance')/html-content" mediatype="text/html"/>
+                    </xml-source>
+                    <p>
+                        This will display the result as HTML, as expected: "This is in <b>bold</b>!". If the
+                        <code>mediatype</code> is not specified, the result would be instead: "This is in
+                        &lt;b>bold&lt;/b>!". In the XForms instance, the HTML content must be escaped as text. On
+                        the other hand, the following content will not work as expected:
+                    </p>
+                    <xml-source show-namespaces="false">
+                        <xforms:instance>
+                            <form>
+                                <html-content>
+                                    This is in in <b>bold</b>!
+                                </html-content>
+                            </form>
+                        </xforms:instance>
+                    </xml-source>
+                    <note>
+                        When using a <code>mediatype="text/html"</code>, an HTML
+                        <code>&lt;div></code> element will be generated by the XForms engine to hold
+                        the HTML data. As in HTML a <code>&lt;div></code> cannot
+                        be embedded into a <code>&lt;p></code>, if you have a
+                        <code>&lt;xforms:output mediatype="text/html"></code> control, you should
+                        not put that control into a <code>&lt;xhtml:p></code>.
+                    </note>
+                </section>
+            </section>
+            <a name="origin-attribute"/>
+            <section>
+                <title><code>origin</code> Attribute on <code>xforms:insert</code> Action</title>
+                <p>
+                    Orbeon Forms supports the XForms 1.1 <code>origin</code> attribute on the
+                    <code>xforms:insert</code> action. This attribute allows specifying the source node to use as
+                    template. This allows storing templates separately from the node-set specified by the
+                    <code>nodeset</code> attribute. For example:
+                </p>
+                <xml-source show-namespaces="false">
+                    <xforms:insert nodeset="address" at="last()" position="after" origin="instance('template-instance')"/>
+                </xml-source>
+                <p>
+                    The template copied in this case comes from an XForms instance:
+                </p>
+                <xml-source show-namespaces="false">
+                    <xforms:instance id="template-instance">
+                        <address>
+                            <street>
+                                <number/>
+                                <name-1/>
+                                <name-2/>
+                            </street>
+                            <apt/>
+                            <city/>
+                            <state/>
+                            <zip/>
+                        </address>
+                    </xforms:instance>
+                </xml-source>
+            </section>
+            <a name="context-attribute"/>
+            <section>
+                <title><code>context</code> Attribute on <code>xforms:insert</code> Action</title>
+                <p>
+                    Orbeon Forms supports the XForms 1.1 <code>context</code> attribute on the
+                    <code>xforms:insert</code> action. This attribute allows specifying a context for insertion,
+                    which along with the <code>origin</code> attribute allows inserting content into elements:
+                </p>
+                <xml-source show-namespaces="false">
+                    <xforms:insert context="instance('main-instance')/books" nodeset="book" origin="instance('book-instance')"/>
+                </xml-source>
+                <p>
+                    With original instances as follows:
+                </p>
+                <xml-source show-namespaces="false">
+                    <xforms:instance id="main-instance">
+                        <instance xmlns="">
+                            <books/>
+                        </instance>
+                    </xforms:instance>
+                    <xforms:instance id="book-instance">
+                        <book xmlns="">
+                            <title>Cosmos</title>
+                            <author>Carl Sagan</author>
+                        </book>
+                    </xforms:instance>
+                </xml-source>
+                <p>
+                    The result of a first insertion is:
+                </p>
+                <xml-source show-namespaces="false">
+                    <xforms:instance id="main-instance">
+                        <instance xmlns="">
+                            <books>
+                                <book>
+                                    <title>Cosmos</title>
+                                    <author>Carl Sagan</author>
+                                </book>
+                            </books>
+                        </instance>
+                    </xforms:instance>
+                </xml-source>
+            </section>
+            <a name="validate-relevant-attributes"/>
+            <section>
+                <title><code>validate</code> and <code>relevant</code> Attributes on <code>xforms:submission</code></title>
+                <p>
+                    Orbeon Forms supports the XForms 1.1 <code>validate</code> and <code>relevant</code> attributes
+                    on <code>xforms:submission</code>. These boolean attributes disable processing of validation
+                    and relevance respectively for a given submission:
+                </p>
+                <xml-source>
+                    <xforms:submission id="my-submission" method="post" validate="false" relevant="false"
+                                       action="http://example.org/rest/draft/"
+                                       replace="none"/>
+                </xml-source>
+                <p>
+                    For more information, please visit the <a
+                    href="http://www.w3.org/TR/xforms11/#submit-submission-element">XForms 1.1 specification</a>.
+                </p>
+            </section>
+            <a name="serialization-attribute"/>
+            <section>
+                <title><code>serialization</code> Attribute on <code>xforms:submission</code></title>
+                <p>
+                    Orbeon Forms partially supports the XForms 1.1 <code>serialization</code> on
+                    <code>xforms:submission</code>: when the value of this attribute is set to <code>none</code>, no
+                    serialization of the data takes place. This is particularly useful for the <code>get</code>
+                    method:
+                </p>
+                <xml-source>
+                    <xforms:submission id="my-submission" method="get" serialization="none" action="http://example.org/document.xml"
+                                       replace="instance" instance="my-instance"/>
+                </xml-source>
+                <p>
+                    For more information, please visit the <a
+                    href="http://www.w3.org/TR/xforms11/#submit-submission-element">XForms 1.1 specification</a>.
+                </p>
+            </section>
+            <a name="xforms11-if-while"/>
+            <section>
+                <title>Conditional Execution and Iteration of XForms Actions</title>
+                <p>
+                    Orbeon Forms supports the XForms 1.1 <code>if</code> and <code>while</code> attributes on XForms
+                    action elements. For more information, please visit the <a
+                    href="http://www.w3.org/TR/xforms11/#action-conditional">XForms 1.1 specification</a>.
+                </p>
+            </section>
         </section>
         <a name="extensions"/>
         <section>
@@ -135,6 +362,13 @@
                     <xml-source show-namespaces="false">
                         <xforms:input ref="date" xxforms:format="format-date(xs:date(.), '[MNn] [D], [Y]', 'en', (), ())"/>
                     </xml-source>
+                    <note>
+                        <p>
+                            This only controls the appearance of the date as shown to the user. It does not control the
+                            format of the date captured in the XML document, or determines the format into which the
+                            user can type the date.
+                        </p>
+                    </note>
                 </section>
                 <section>
                     <title>xforms:output</title>
@@ -214,206 +448,6 @@
                             <tt>UTC</tt> by <tt>[ZN]</tt>.
                         </li>
                     </ul>
-                </section>
-            </section>
-            <a name="xforms11-extensions"/>
-            <section>
-                <title>XForms 1.1 Support</title>
-                <a name="output-mediatype"/>
-                <section>
-                    <title>Media Type for <code>xforms:output</code></title>
-                    <p>
-                        In XForms 1.0, <code>xforms:output</code> is used to display text. However, based on a proposal
-                        in a draft version of XForms 1.1, Orbeon Forms supports a <code>mediatype</code> attribute on
-                        that element.
-                    </p>
-                    <a name="xforms-image-mediatype"/>
-                    <section>
-                        <title>Image Types</title>
-                        <p>
-                             For the <code>&lt;xforms:output></code> control to display an image, you
-                             need to:
-                        </p>
-                        <ul>
-                            <li>
-                                <p>
-                                    Have a <code>mediatype</code> attribute on the
-                                    <code>&lt;xforms:output></code>. That attribute must refer to an
-                                    image, such as <code>image/*</code> or <code>image/jpeg</code>.
-                                </p>
-                            </li>
-                           <li>
-                                <p>
-                                    Use the <code>value</code> attribute on
-                                    <code>&lt;xforms:output></code> or bind to the control to a node
-                                    without type or with an <code>xs:anyURI</code> type.
-                                </p>
-                            </li>
-                       </ul>
-                        <p>
-                            The resulting value is interpreted a URI pointing to an image. The image
-                            will display in place of the <code>xforms:output</code>. When a single-node
-                            binding is used, it is possible to dynamically change the image pointed to.
-                            For example:
-                        </p>
-                        <xml-source show-namespaces="false">
-                            <xforms:output mediatype="image/*" value="'/images/moon.jpg'"/>
-                        </xml-source>
-                        <xml-source show-namespaces="false">
-                            <xforms:model>
-                                <xforms:instance>
-                                    <image-uri/>
-                                </xforms:instance>
-                                <xforms:bind nodeset="image-uri" type="xs:anyURI"/>
-                            </xforms:model>
-                            ...
-                            <xforms:output mediatype="image/*" ref="image-uri"/>
-                        </xml-source>
-                        <note>
-                            It is not yet possible to directly embed image data in an XForms instance
-                            using the <code>xs:base64Binary</code> type.
-                        </note>
-                    </section>
-                    <section>
-                        <title>HTML Type</title>
-                        <p>
-                            When an <code>xforms:output</code> control has a <code>mediatype</code>
-                            attribute with value <code>text/html</code>, the value of the node to which
-                            the control is bound is interpreted as HTML content. Consider the following
-                            XForms instance:
-                        </p>
-                        <xml-source show-namespaces="false">
-                            <xforms:instance id="my-instance">
-                                <form>
-                                    <html-content>
-                                        This is in &amp;lt;b&amp;gt;bold&amp;lt;/b&amp;gt;!
-                                    </html-content>
-                                </form>
-                            </xforms:instance>
-                        </xml-source>
-                        <p>
-                            You bind an <code>xforms:output</code> control to the
-                            <code>html-content</code> node as follows:
-                        </p>
-                        <xml-source show-namespaces="false">
-                            <xforms:output ref="instance('my-instance')/html-content" mediatype="text/html"/>
-                        </xml-source>
-                        <p>
-                            This will display the result as HTML, as expected: "This is in <b>bold</b>!". If the
-                            <code>mediatype</code> is not specified, the result would be instead: "This is in
-                            &lt;b>bold&lt;/b>!". In the XForms instance, the HTML content must be escaped as text. On
-                            the other hand, the following content will not work as expected:
-                        </p>
-                        <xml-source show-namespaces="false">
-                            <xforms:instance>
-                                <form>
-                                    <html-content>
-                                        This is in in <b>bold</b>!
-                                    </html-content>
-                                </form>
-                            </xforms:instance>
-                        </xml-source>
-                        <note>
-                            When using a <code>mediatype="text/html"</code>, an HTML
-                            <code>&lt;div></code> element will be generated by the XForms engine to hold
-                            the HTML data. As in HTML a <code>&lt;div></code> cannot
-                            be embedded into a <code>&lt;p></code>, if you have a
-                            <code>&lt;xforms:output mediatype="text/html"></code> control, you should
-                            not put that control into a <code>&lt;xhtml:p></code>.
-                        </note>
-                    </section>
-                </section>
-                <a name="origin-attribute"/>
-                <section>
-                    <title><code>origin</code> Attribute on <code>xforms:insert</code> Action</title>
-                    <p>
-                        Orbeon Forms supports the XForms 1.1 <code>origin</code> attribute on the
-                        <code>xforms:insert</code> action. This attribute allows specifying the source node to use as
-                        template. This allows storing templates separately from the node-set specified by the
-                        <code>nodeset</code> attribute. For example:
-                    </p>
-                    <xml-source show-namespaces="false">
-                        <xforms:insert nodeset="address" at="last()" position="after" origin="instance('template-instance')"/>
-                    </xml-source>
-                    <p>
-                        The template copied in this case comes from an XForms instance:
-                    </p>
-                    <xml-source show-namespaces="false">
-                        <xforms:instance id="template-instance">
-                            <address>
-                                <street>
-                                    <number/>
-                                    <name-1/>
-                                    <name-2/>
-                                </street>
-                                <apt/>
-                                <city/>
-                                <state/>
-                                <zip/>
-                            </address>
-                        </xforms:instance>
-                    </xml-source>
-                </section>
-                <a name="context-attribute"/>
-                <section>
-                    <title><code>context</code> Attribute on <code>xforms:insert</code> Action</title>
-                    <p>
-                        Orbeon Forms supports the XForms 1.1 <code>context</code> attribute on the
-                        <code>xforms:insert</code> action. This attribute allows specifying a context for insertion,
-                        which along with the <code>origin</code> attribute allows inserting content into elements:
-                    </p>
-                    <xml-source show-namespaces="false">
-                        <xforms:insert context="instance('main-instance')/books" nodeset="book" origin="instance('book-instance')"/>
-                    </xml-source>
-                    <p>
-                        With original instances as follows:
-                    </p>
-                    <xml-source show-namespaces="false">
-                        <xforms:instance id="main-instance">
-                            <instance xmlns="">
-                                <books/>
-                            </instance>
-                        </xforms:instance>
-                        <xforms:instance id="book-instance">
-                            <book xmlns="">
-                                <title>Cosmos</title>
-                                <author>Carl Sagan</author>
-                            </book>
-                        </xforms:instance>
-                    </xml-source>
-                    <p>
-                        The result of a first insertion is:
-                    </p>
-                    <xml-source show-namespaces="false">
-                        <xforms:instance id="main-instance">
-                            <instance xmlns="">
-                                <books>
-                                    <book>
-                                        <title>Cosmos</title>
-                                        <author>Carl Sagan</author>
-                                    </book>
-                                </books>
-                            </instance>
-                        </xforms:instance>
-                    </xml-source>
-                </section>
-                <a name="validate-relevant-attributes"/>
-                <section>
-                    <title><code>validate</code> and <code>relevant</code> Attributes on <code>xforms:submission</code></title>
-                    <p>
-                        Orbeon Forms supports the XForms 1.1 <code>validate</code> and <code>relevant</code> attributes
-                        on <code>xforms:submission</code>. For more information, please visit the <a
-                        href="http://www.w3.org/TR/xforms11/#submit-submission-element">XForms 1.1 specification</a>.
-                    </p>
-                </section>
-                <a name="xforms11-if-while"/>
-                <section>
-                    <title>Conditional Execution and Iteration of XForms Actions</title>
-                    <p>
-                        Orbeon Forms supports the XForms 1.1 <code>if</code> and <code>while</code> attributes on XForms
-                        action elements. For more information, please visit the <a
-                        href="http://www.w3.org/TR/xforms11/#action-conditional">XForms 1.1 specification</a>.
-                    </p>
                 </section>
             </section>
             <a name="exforms-iterate"/>
@@ -1232,7 +1266,7 @@
                     </table>
                 </section>
                 <a name="dialog-show-hide"/>
-                <section>
+                <section added="2008-03-01">
                     <title>The <code>xxforms:show</code> and <code>xxforms:hide</code> Actions</title>
                     <p>
                         You open a dialog by using the <code>xxforms:show</code> action:
@@ -1304,7 +1338,7 @@
                     </table>
                 </section>
                 <a name="xxforms-dialog-open"/>
-                <section>
+                <section added="2008-03-01">
                     <title>The <code>xxforms-dialog-open</code> Event</title>
                     <p>
                         Dispatched in response to: <code>xxforms:show</code> action executed with an existing dialog id.
@@ -1338,7 +1372,7 @@
                     </xml-source>
                 </section>
                 <a name="xxforms-dialog-close"/>
-                <section>
+                <section added="2008-03-01">
                     <title>The <code>xxforms-dialog-close</code> Event</title>
                     <p>
                         Dispatched in response to: <code>xxforms:hide</code> action executed with an existing dialog id.
@@ -1632,6 +1666,7 @@
             <a name="xforms-state-handling"/>
             <section>
                 <title>State Handling</title>
+                <a name="state-handling-rationale"/>
                 <section>
                     <title>Rationale</title>
                     <p>
@@ -1747,6 +1782,7 @@
                         default to client-side only if you have well understood the tradeoffs explained above.
                     </p>
                 </section>
+                <a name="state-handling-configuration"/>
                 <section>
                     <title>Configuring State Handling</title>
                     <p>
@@ -1814,32 +1850,93 @@
                         which means that if to users load the same XForms page two entries will be needed in the cache.
                     </p>
                 </section>
-                <!--
-                <section>
-                    <title>Handling the Browser's Back Button</title>
+                <a name="session-heartbeat"/>
+                <section added="2008-03-01">
+                    <title>Session Heartbeat</title>
                     <p>
-                        TODO: Explain what Orbeon Forms does and how different browsers behave.
+                        If you happen to leave a browser window open on your computer, chances are that you will get
+                        back to that window and keep using the application. The last thing you want to happen when you
+                        come back is lose your session and therefore your data.
                     </p>
+                    <p>
+                        This is not always a correct guess of course: you may just happen to leave a window or tab open
+                        without planning to use it again. Conversely you may have a page which is not actually visible,
+                        for example in your browser history, yet you will come back to it. This approach wouldn’t be
+                        good for banking applications either. Still, in many situations, such as filling-out large
+                        forms, it sounds like a good idea to keep your session alive for open pages.
+                    </p>
+                    <p>
+                        To achieve this goal you could make all server sessions longer. However this is harder to
+                        configure for the application developer, and this won’t discriminate between pages that are
+                        actually open on a client and the ones that are not. And while it may be ideal to have
+                        infinitely long sessions, unfortunately many applications are not ready for this kind of
+                        approach.
+                    </p>
+                    <p>
+                        So Orbeon Forms supports a "session heartbeat" feature. Here is how this works:
+                    </p>
+                    <ul>
+                        <li>
+                            <p>
+                                When this feature is enabled (the default), an open XForms page in a client browser
+                                regularly pings the server through Ajax to keep the current server session alive.
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                The ping delay is automatically computed based on the server’s session timeout. The
+                                client pings the server at 80% of the session expiration time after the last interaction
+                                with the server.
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                We are careful not to hit the XForms engine too much, in fact we do a very limited
+                                amount of work on the server for each ping, so they should run fast.
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                XForms state information for pages hit with the heartbeat just migrates to the <a
+                                href="#state-handling-configuration">disk store</a> over time if RAM is used by other
+                                pages, so keeping even large numbers of pages open should not have any negative impact
+                                on server RAM.
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                When a user gets back to using the page, state information migrates back from disk to
+                                RAM, and the page will be live again.
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                Sessions do eventually expire as nobody keeps a browser open forever.
+                            </p>
+                        </li>
+                    </ul>
+                    <p>
+                        Note that whenever an application keeps sessions alive for a long time, it is a good idea to
+                        keep as little data as possible in the session. The Orbeon Forms XForms engine itself uses a <a
+                        href="#state-handling-configuration">global state store</a> and does not use session objects
+                        for storage, but do remember to keep your sessions small!
+                    </p>
+                    <p>
+                        The session heartbeat should help prevent many occurrences of "session expired" error messages.
+                        As an Orbeon Forms application developer you don’t have to worry about anything: the session
+                        heartbeat is enabled by default. You can configure it globally in <code>properties.xml</code>:
+                    </p>
+                    <xml-source>
+                        <property as="xs:boolean" name="oxf.xforms.session-heartbeat" value="true"/>
+                    </xml-source>
+                    <p>
+                        You can also override the global default by specifying a property on the first XForms model of a
+                        page:
+                    </p>
+                    <xml-source>
+                        <xforms:model id="my-model" xxforms:session-heartbeat="false"/>
+                    </xml-source>
                 </section>
-                -->
-                <!--
-                <section>
-                    <title>Configuring Session Handling</title>
-                    <p>
-                        This section is relevant when XForm state is stored into a session.
-                    </p>
-                    <p>
-                        TODO: Configuration tips: expiration (web.xml), passivation? (Tomcat).
-                    </p>
-                    <p>
-                        Session passivation can be tightly controlled with Tomcat 5.5. Please refer to
-                        the <a
-                        href="http://tomcat.apache.org/tomcat-5.5-doc/config/manager.html">relevant
-                        Tomcat documentation</a> for more information. Other servlet containers may have
-                        similar relevant documentation.
-                    </p>
-                </section>
-                -->
             </section>
             <a name="xforms-resources"/>
             <section>
@@ -1925,6 +2022,210 @@
                         front-end.
                     </p>
                 </section>
+                <a name="versioned-resources"/>
+                <section added="2008-03-01">
+                    <title>Versioned Resources</title>
+                    <p>
+                        To further improve caching efficiency, Orbeon Forms supports enabling <i>versioned
+                        resources</i>. Usually, a resource such as a CSS, JavaScript or image file, is served through
+                        URLs like this one:
+                    </p>
+                    <xml-source>
+                        http://localhost:8080/orbeon/xforms-server/xforms-dialog-min.js
+                    </xml-source>
+                    <p>
+                        When configuring caching on the server, for example by using an Apache front-end, you may face
+                        a dilemma:
+                    </p>
+                    <ul>
+                        <li>
+                            <p>
+                                Caching aggressively (with an expiration date far in the future and no revalidation) so
+                                that the client asks for the resource as rarely as possible. Doing so may cause
+                                resources on the client to be out of date.
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                Caching for a shorter period of time or by forcing revalidation so that your client
+                                always has a fresh version of the resources. Doing so may cause longer page loads and
+                                more load on the server.
+                            </p>
+                        </li>
+                    </ul>
+                    <p>
+                        Orbeon Forms solves this by providing the option of using versioned resources, that is inserting
+                        automatically a version number within resource URLs. You enable versioned resources in
+                        <code>properties.xml</code>:
+                    </p>
+                    <xml-source>
+                        <property as="xs:boolean" name="oxf.resources.versioned" value="true"/>
+                    </xml-source>
+                    <p>
+                        With this, the resource above is served as follows:
+                    </p>
+                    <xml-source>
+                        http://localhost:8080/orbeon/xforms-server/3.6.0.200803010236/xforms-dialog-min.js
+                    </xml-source>
+                    <p>
+                        The XForms Server component, which serves the resource in this case, sets an expiration date far
+                        in the future. For example, this is the description of the cache entry in the Firefox
+                        <code>about:cache</code> page:
+                    </p>
+                    <pre class="ops-doc-code">
+          Key: http://localhost:8080/orbeon/xforms-server/3.6.0.200803010236/xforms-dialog-min.css
+    Data size: 22524 bytes
+  Fetch count: 2
+Last modified: 2008-03-01 17:04:25
+      Expires: 2011-12-25 17:10:42</pre>
+                    <p>
+                        This means that the resource can effectively be cached "for ever" by a client. In case the
+                        client visits Orbeon Forms pages often, the resources will be availabe from cache, therefore
+                        reducing page loading times and server load as well.
+                    </p>
+                    <p>
+                        When Orbeon Forms is upgraded on the server, the version number changes as well. An XForms page
+                        will refer to resources with the new version number, so the cached resource is not used by the
+                        browser and a new resource is loaded from the server, before being cached. This "magic" is
+                        enabled simply with the inclusion of the Orbeon Forms version number in the URL.
+                    </p>
+                    <p>
+                        Only CSS and JavaScript resources used by the XForms engine are loaded through the XForms
+                        Server component. Other resources like images referred by XForms stylesheets are served by the
+                        Page Flow Controller, through URLs like this one:
+                    </p>
+                    <xml-source>
+                        http://localhost:8080/orbeon/ops/images/xforms/error.gif
+                    </xml-source>
+                    <p>
+                        With resource versioning enabled, the URL becomes:
+                    </p>
+                    <xml-source>
+                        http://localhost:8080/orbeon/3.6.0.200803010236/ops/images/xforms/error.gif
+                    </xml-source>
+                    <p>
+                        When resource versioning is enabled, the Page Flow Controller by default serves all the
+                        resources defined in <code>&lt;files></code> elements by first checking the
+                        <code>oxf.resources.versioned</code> property. If versioning is enabled, the PFC removes the
+                        version number from the URL before searching for the resource on disk. It is possible to turn
+                        this behavior on and off selectively with the <code>versioned</code> attribute. Here is how to
+                        turn off versioning for PDF files in <code>page-flow.xml</code>:
+                    </p>
+                    <xml-source>
+                        <config xmlns="http://www.orbeon.com/oxf/controller" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                            <comment xmlns=""> GIF images are loaded following oxf.resources.versioned </comment>
+                            <files path-info="*.gif"/>
+                            <comment xmlns=""> More file definitions here </comment>
+                            ...
+                            <comment xmlns=""> PDF files are not versioned </comment>
+                            <files path-info="*.pdf" versioned="false"/>
+                            <comment xmlns=""> More file definitions here </comment>
+                            ...
+                            <comment xmlns=""> More page definitions here </comment>
+                            ...
+                        </config>
+                    </xml-source>
+                    <p>
+                        Conversely, resource URLs produced by an XForms page are automatically rewritten following the
+                        Page Flow's <code>&lt;files></code> definitions.
+                    </p>
+                    <p>
+                        The versioning mechanism is made available to your own application resources as well. Any
+                        resource whose path doesn't start with <code>/ops/</code> or <code>/config/</code> is considered
+                        part of your application, not of Orbeon Forms. In that case, the Orbeon Forms version number is
+                        not used, but you specify instead an application version number in <code>properties.xml</code>:
+                    </p>
+                    <xml-source>
+                        <property as="xs:string"  name="oxf.resources.version-number" value="1.6.3"/>
+                    </xml-source>
+                    <p>
+                        Note that if this property is commented out or missing, no versioning takes place for your
+                        application resources even if <code>oxf.resources.versioned</code> is set to <code>true</code>.
+                    </p>
+                    <p>
+                        For deployed application, you should upgrade the application version number whenever you modify
+                        application resources so that clients retrieve the proper resources.
+                    </p>
+                    <p>
+                        The following scenario shows the entire lifecycle for application resources:
+                    </p>
+                    <ul>
+                        <li>
+                            <p>
+                                You an image as <code>RESOURCES/apps/foo/bar.png</code>
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                You refer to it as:
+                            </p>
+                            <xml-source>
+                                <xhtml:body>
+                                    <xhtml:img src="/apps/foo/bar.png" alt="My Image"/>
+                                </xhtml:body>
+                            </xml-source>
+                        </li>
+                        <li>
+                            <p>
+                                With versioning enabled, the image path is rewritten automatically as follows:
+                            </p>
+                            <xml-source>
+                                /1.6.3/apps/foo/bar.png
+                            </xml-source>
+                            <p>
+                                Note that the application resource number is used because the resource is not part of
+                                Orbeon Forms.
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                Your browser sees a URL like:
+                            </p>
+                            <xml-source>
+                                http://localhost:8080/orbeon/1.6.3/apps/foo/bar.png
+                            </xml-source>
+                        </li>
+                        <li>
+                            <p>
+                                When the browser loads the image, the PFC receives back:
+                            </p>
+                            <xml-source>
+                                /1.6.3/apps/foo/bar.png
+                            </xml-source>
+                        </li>
+                        <li>
+                            <p>
+                                The PFC knows that PNG files are versioned, so removes the version number and sends
+                                this resource to the browser:
+                            </p>
+                            <xml-source>
+                                RESOURCES/apps/foo/bar.png
+                            </xml-source>
+                        </li>
+                    </ul>
+                    <p>
+                       At the moment, the resources served by the PFC (that is all the resources except the XForms
+                       engine's CSS and JavaScript resources) do not automatically get a special expiration date. If
+                       you want to fully leverage client-side caching capabilities, you may want to use an Apache
+                       front-end or a Servlet filter to modify the Expires header of those resources. With Apache, you
+                       can use <a href="http://httpd.apache.org/docs/2.2/mod/mod_expires.html">mod_expires</a>.
+                    </p>
+                    <p>
+                        In case you use Apache, you can in addition configure a rewriting rule with <a
+                        href="http://httpd.apache.org/docs/2.2/mod/mod_rewrite.html">mod_rewrite</a> to allow Apache to
+                        load resources containing a version number.
+                    </p>
+                    <!--<xml-source>-->
+                        <!---->
+                    <!--</xml-source>-->
+                    <note>
+                        <p>
+                            We recommend restarting Orbeon Forms after changing the <code>oxf.resources.versioned</code>
+                            property, as data in Orbeon Forms caches may not be made aware of the change until the next
+                            restart.
+                        </p>
+                    </note>
+                </section>
             </section>
             <a name="xforms-back-forward"/>
             <section>
@@ -1959,10 +2260,12 @@
                         When a fatal error occurs, the XForms engine throws a Java exception which either results in an error
                         page in your web browser (when the error occurrs during page initialization) or in an error message at
                         the top of the displayed XForms page (when the error occurs during an Ajax request after the page is
-                        loaded). The main Java exception is also logged on the server. Often, this provides enough information
-                        to the developer to figure out what went wrong. When this is not sufficient, the best tool available is
-                        the XForms engine logging facility. To enable it, make sure you uncomment the following lines in
-                        <code>config/log4j.xml</code>:
+                        loaded). The main Java exception is also logged on the server.
+                    </p>
+                    <p>
+                        Sometimes, this provides enough information to the developer to figure out what went wrong. But
+                        often this is not sufficient. The best tool available is the XForms engine logging facility. To
+                        enable it, make sure you uncomment the following lines in <code>config/log4j.xml</code>:
                     </p>
                     <xml-source>
                         <category name="org.orbeon.oxf.xforms.processor.XFormsServer">
@@ -1978,7 +2281,7 @@
                         </p>
                     </note>
                     <p>
-                        This setting enables verbose logging of the XForms engine's operations, in particular:
+                        These settings enable verbose logging of the XForms engine's operations, in particular:
                     </p>
                     <ul>
                         <li>
@@ -2013,19 +2316,56 @@
                         </li>
                     </ul>
                     <p>
-                        The following figure shows a sample XForms logging session in Orbeon Studio:
+                        The following shows a sample XForms logging session:
                     </p>
-                    <img src="../apps/doc/images/reference-xforms-logging.png" style="clear: both; margin-left: 1em; border: 1px solid black"/>
+                    <pre class="ops-doc-code">
+event - dispatching {name: "DOMFocusIn", id: "xforms-element-222", location: "line 28 of XFormsDOMFocusInEvent.java"}
+  action - executing {action name: "setvalue"}
+setvalue - setting instance value {value: "4", instance: "fr-form-instance"}
+event - dispatching {name: "xforms-recalculate", id: "fr-form-model", location: "line 1895 of XFormsModel.java"}
+  model - performing recalculate {model id: "fr-form-model"}
+  model - done recalculating {time: "4"}
+event - dispatching {name: "xforms-revalidate", id: "fr-form-model", location: "line 1900 of XFormsModel.java"}
+  model - performing revalidate {model id: "fr-form-model"}
+  model - done rebuilding {model id: "fr-form-model", time: "1"}
+event - dispatching {name: "xforms-refresh", id: "fr-form-model", location: "line 1905 of XFormsModel.java"}
+  model - performing refresh {model id: "fr-form-model"}
+  controls - start building
+    model - evaluated variables {count: "1"}
+  controls - end building {time (ms): "22"}
+  event - dispatching {name: "xforms-value-changed", id: "xforms-element-222", location: "line 27 of XFormsValueChangeEvent.java"}
+    action - executing {action name: "setvalue"}
+      setvalue - setting instance value {value: "dirty", instance: "fr-persistence-instance"}
+  event - dispatching {name: "xforms-valid", id: "xforms-element-222", location: "line 27 of XFormsValidEvent.java"}
+event - dispatching {name: "xforms-recalculate", id: "fr-persistence-model", location: "line 1895 of XFormsModel.java"}
+  model - performing recalculate {model id: "fr-persistence-model"}
+  model - done recalculating {time: "5"}
+event - dispatching {name: "xforms-revalidate", id: "fr-persistence-model", location: "line 1900 of XFormsModel.java"}
+  model - performing revalidate {model id: "fr-persistence-model"}
+  model - done rebuilding {model id: "fr-persistence-model", time: "5"}
+event - dispatching {name: "xforms-refresh", id: "fr-persistence-model", location: "line 1905 of XFormsModel.java"}
+  model - performing refresh {model id: "fr-persistence-model"}
+  controls - start building
+    model - evaluated variables {count: "1"}
+  controls - end building {time (ms): "9"}
+  event - dispatching {name: "xforms-value-changed", id: "fr-data-status-input", location: "line 27 of XFormsValueChangeEvent.java"}
+  event - dispatching {name: "xforms-valid", id: "fr-data-status-input", location: "line 27 of XFormsValidEvent.java"}
+controls - evaluating controls
+controls - done evaluating controls {time (ms): "4"}</pre>
                 </section>
                 <a name="xforms-instance-inspector"/>
                 <section>
                     <title>The Instance Inspector</title>
                     <p>
-                        The Instance Inspector allows you to visualize all the instances of your XForms page. You enable it
-                        by adding the following within your XForms page:
+                        The Instance Inspector allows you to visualize all the instances of your XForms page. You enable
+                        it by adding the following within your XForms page's <code>xhtml:body</code> element, typically
+                        just before closing that element:
                     </p>
                     <xml-source>
-                        <widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>
+                        <xhtml:body>
+                            ...
+                            <widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>
+                        </xhtml:body>
                     </xml-source>
                     <p>
                         This is an example of how the Instance Inspector looks like in  your page:
@@ -2037,212 +2377,6 @@
                     </p>
                 </section>
             </section>
-        </section>
-        <a name="xforms-classic-migration"/>
-        <section added="2006-09-18">
-            <title>Migrating from XForms Classic to XForms NG</title>
-            <p>
-                Migrating from XForms Classic to XForms NG consists in telling Orbeon Forms to use XForms NG, in
-                making the necessary changes to adjust your XForms model and controls (this is necessary as XForms
-                Classic was lacking in terms of compatibility with the XForms specification, and XForms NG on the
-                contrary aims at implementing XForms 1.0 and XForms 1.1 fully), and (sometimes optionally) in making
-                some architectural changes to your application:
-            </p>
-            <ol>
-                <li>
-                    <p>
-                        <b>Configuring Orbeon Forms to use XForms NG.</b>
-                    </p>
-                    <ol>
-                        <li>
-                            <p>
-                                Identify in your page flow the pages that use XForms Classic. Those are defined by
-                                <code>&lt;page></code> elements with the <code>xforms</code> attribute, for example:
-                            </p>
-                            <xml-source>
-                                <page id="my-page" path-info="/my/page" xforms="/my-page/xforms-model.xml" view="/my-page/view.xhtml"/>
-                            </xml-source>
-                        </li>
-                        <li>
-                            <p>
-                                For each page identified in the previous step, locate the XForms model file referred by the
-                                <code>xforms</code> attribute. In most cases, this is a static XML file with a root element
-                                called <code>&lt;xforms:model></code>, for example:
-                            </p>
-                            <xml-source>
-                                <xforms:model>
-                                    <xforms:instance>
-                                        ...
-                                    </xforms:instance>
-                                    ...
-                                </xforms:model>
-                            </xml-source>
-                            <p>
-                                You must now insert the content of that file into your XHTML page view. In most cases, the
-                                page view is a static XHTML file or a dynamic XSLT file that produces XHTML. Locate the
-                                <code>&lt;xhtml:head></code> element and insert the XForms model as a child of that element:
-                            </p>
-                            <xml-source>
-                                <xhtml:html>
-                                    <xhtml:head>
-                                        <xhtml:title>My Page</xhtml:title>
-                                        <xforms:model>
-                                            <xforms:instance>
-                                                ...
-                                            </xforms:instance>
-                                            ...
-                                        </xforms:model>
-                                    </xhtml:head>
-                                    <xhtml:body>
-                                        ...
-                                    </xhtml:body>
-                                </xhtml:html>
-                            </xml-source>
-                            <p>
-                                Alternatively, you can use XInclude to keep the XForms model external:
-                            </p>
-                            <xml-source>
-                                <xhtml:html>
-                                    <xhtml:head>
-                                        <xhtml:title>My Page</xhtml:title>
-                                        <xi:include href="oxf:/my-page/xforms-model.xml"/>
-                                    </xhtml:head>
-                                    <xhtml:body>
-                                        ...
-                                    </xhtml:body>
-                                </xhtml:html>
-                            </xml-source>
-                        </li>
-                        <li>
-                            <p>
-                                In the page flow, remove the <code>xforms</code> attribute on the <code>&lt;page></code>
-                                element:
-                            </p>
-                            <xml-source>
-                                <page id="my-page" path-info="/my/page" view="/my-page/view.xhtml"/>
-                            </xml-source>
-                            <p>
-                                What you have achieved at this point is migrating from XForms Classic's external
-                                XForms model specification to the up-to-date way of including XForms directly within XHTML.
-                                Note that this also allows you to use multiple XForms models simply by adding them as
-                                children of the <code>&lt;xhtml:head></code> element:
-                            </p>
-                            <xml-source show-namespaces="false">
-                                <xhtml:html>
-                                    <xhtml:head>
-                                        <xhtml:title>My Page</xhtml:title>
-                                        <xforms:model id="main-model">
-                                            ...
-                                        </xforms:model>
-                                        <xforms:model id="resources-model">
-                                            ...
-                                        </xforms:model>
-                                    </xhtml:head>
-                                    <xhtml:body>
-                                        ...
-                                    </xhtml:body>
-                                </xhtml:html>
-                            </xml-source>
-                        </li>
-                    </ol>
-                </li>
-                <li>
-                    <p>
-                        <b>Updating XForms model and controls.</b>
-                    </p>
-                    <p>
-                        You are very likely to have to make further adjustments to your XForms controls and model. The
-                        following are possible things to look at:
-                    </p>
-                    <ul>
-                        <li>
-                            <p>
-                                The <code>&lt;xforms:submit></code> control requires a <code>submission</code>
-                                attribute referring to an existing <code>&lt;xforms:submission></code> element
-                                within an XForms model. Start creating an <code>&lt;xforms:submission></code>
-                                element, assign it an id, and then set the <code>submission</code> attribute on
-                                <code>&lt;xforms:submit></code>. For example:
-                            </p>
-                            <xml-source show-namespaces="false">
-                                <xforms:submission id="default-submission" method="post" action="/services/save" replace="none"/>
-                                ...
-                                <xforms:submit submission="default-submission">
-                                    <xforms:label>Save</xforms:label>
-                                </xforms:submit>
-                            </xml-source>
-                        </li>
-                        <li>
-                            <p>
-                                The <code>&lt;xxforms:if></code> and <code>&lt;xxforms:choose></code> extensions no
-                                longer work with XForms NG. Use <code>&lt;xforms:switch></code> or
-                                <code>&lt;xforms:group></code> with relevance instead. Note that you can often
-                                convert simply from:
-                            </p>
-                            <xml-source show-namespaces="false">
-                                <xxforms:if test="/form/first-name = 'Joe'">
-                                    ...
-                                </xxforms:if>
-                            </xml-source>
-                            <p>
-                                to:
-                            </p>
-                            <xml-source show-namespaces="false">
-                                <xforms:group ref=".[/form/first-name = 'Joe']">
-                                    ...
-                                </xforms:group>
-                            </xml-source>
-                        </li>
-                        <li>
-                            <p>
-                                With XForms Classic, activacting a trigger would make the unique XForms instance of the
-                                unique XForms model available to Page Flow Controller processing (i.e. a PFC action,
-                                model and view could be activated). With NG, this is no longer the case and processing
-                                follows the XForms specification. This means in particular that if a submission fails
-                                because the submitted instance is invalid, that instance will never be sent by the
-                                XForms engine and will not, in particular, reach a page or service declared in the page
-                                flow (unless the XForms 1.1 <code>validate="false"</code> attribute on
-                                <code>&lt;xforms:submission></code> is set).
-                            </p>
-                            <p>
-                                Similarly, using triggers to perform insertions or deletions into XForms instances does
-                                not cause a submission to happen with XForms NG.
-                            </p>
-                        </li>
-                        <li>
-                            <p>
-                                With XForms Classic, a submission would annotate an XForms instance with attributes
-                                such as <code>xxforms:valid="true"</code>, etc. This is no longer the case with XForms
-                                NG.
-                            </p>
-                        </li>
-                    </ul>
-                </li>
-                <li>
-                    <p>
-                        <b>Architectural considerations.</b>
-                    </p>
-                    <ul>
-                        <li>
-                            <p>
-                                Much of the work that was performed with page flow actions with XForms Classic can be
-                                implemented with XForms events and XForms actions. This means that you will tend to
-                                migrate functionality away from the PFC and towards XForms. This also means that you
-                                will use less XSLT to produce your pages, or even none at all, which is ideal as that is
-                                one less technology tha developers have to learn.
-                            </p>
-                        </li>
-                        <li>
-                            <p>
-                                Because of the power of the <code>&lt;xforms:submission></code> element (which, with
-                                XForms 1.1, allows you to call any REST service), you are likely to move towards a
-                                service-oriented approach where your XForms page uses submissions that communicate with
-                                services. Such services may be external, or they may be implemented in Orbeon Forms and
-                                mapped in your page flow.
-                            </p>
-                        </li>
-                    </ul>
-                </li>
-            </ol>
         </section>
     </body>
 </document>

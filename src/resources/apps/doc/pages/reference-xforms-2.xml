@@ -1695,10 +1695,10 @@
                 </section>
                 <a name="xxforms-script-extension"/>
                 <section>
-                    <title><code>xxforms:script</code> Action</title>
+                    <title><code>&lt;xxforms:script></code> Action</title>
                     <p>
-                        The <code>xxforms:script</code> action allows you to call client-side JavaScript as a result of
-                        XForms events:
+                        The <code>&lt;xxforms:script></code> action allows you to call client-side JavaScript as a
+                        result of XForms events:
                     </p>
                     <xml-source show-namespaces="false">
                         <xforms:action ev:event="xforms-value-changed">
@@ -1709,10 +1709,29 @@
                             </xxforms:script>
                         </xforms:action>
                     </xml-source>
+                    <p>
+                        Scripts run with <code>&lt;xxforms:script></code> have access to the following JavaScript
+                        variables:
+                    </p>
+                    <ul>
+                        <li>
+                            <p>
+                                <b>this</b>. The element observing the event causing <code>&lt;xxforms:script></code>
+                                to run.
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                <b>event</b>. Object containing a "target" propeterty. <code>event.target</code> returns
+                                the element which is the target of the event causing <code>&lt;xxforms:script></code> to
+                                run.
+                            </p>
+                        </li>
+                    </ul>
                     <note>
                         <p>
-                            <code>xxforms:script</code> actions are currently always executed <i>last</i> in a sequence
-                            of XForms actions, even if they appear before other XForms actions.
+                            <code>&lt;xxforms:script></code> actions are currently always executed <i>last</i> in a
+                            sequence of XForms actions, even if they appear before other XForms actions.
                         </p>
                     </note>
                 </section>

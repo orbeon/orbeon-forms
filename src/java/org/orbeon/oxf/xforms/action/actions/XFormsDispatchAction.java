@@ -26,7 +26,10 @@ import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEventFactory;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
+import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.Item;
+
+import java.util.Map;
 
 /**
  * 10.1.2 The dispatch Element
@@ -49,6 +52,10 @@ public class XFormsDispatchAction extends XFormsAction {
 
         final XFormsContextStack.BindingContext bindingContext = actionInterpreter.getContextStack().getCurrentBindingContext();
 
+        final Map prefixToURIMap = containingDocument.getStaticState().getNamespaceMappings(actionElement.attributeValue("id"));
+        final LocationData locationData = (LocationData) actionElement.getData();
+        final XFormsContextStack contextStack = actionInterpreter.getContextStack();
+
         final String resolvedNewEventName;
         {
             // NOP if there is an AVT but no context node
@@ -57,7 +64,7 @@ public class XFormsDispatchAction extends XFormsAction {
 
             // Resolve AVT
             resolvedNewEventName = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, bindingContext.getSingleNode(),
-                    null, XFormsContainingDocument.getFunctionLibrary(), actionInterpreter.getFunctionContext(), actionElement, newEventNameAttributeValue);
+                    contextStack.getCurrentVariables(), XFormsContainingDocument.getFunctionLibrary(), actionInterpreter.getFunctionContext(), prefixToURIMap, locationData, newEventNameAttributeValue);
         }
 
         final String resolvedNewEventTargetId;
@@ -69,7 +76,7 @@ public class XFormsDispatchAction extends XFormsAction {
             // Resolve AVT
             resolvedNewEventTargetId = XFormsUtils.namespaceId(containingDocument,
                     XFormsUtils.resolveAttributeValueTemplates(pipelineContext, bindingContext.getSingleNode(),
-                    null, XFormsContainingDocument.getFunctionLibrary(), actionInterpreter.getFunctionContext(), actionElement, newEventTargetIdValue));
+                    contextStack.getCurrentVariables(), XFormsContainingDocument.getFunctionLibrary(), actionInterpreter.getFunctionContext(), prefixToURIMap, locationData, newEventTargetIdValue));
         }
 
         // Optional attributes

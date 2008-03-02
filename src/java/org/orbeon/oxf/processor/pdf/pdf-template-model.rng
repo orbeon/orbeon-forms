@@ -85,7 +85,7 @@
 		                </attribute>
 		            </optional>
 				</group>
-			</choice>		        
+			</choice>
             <choice>
                 <attribute name="value">
                     <data type="string"/>

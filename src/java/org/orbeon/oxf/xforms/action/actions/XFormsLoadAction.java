@@ -21,8 +21,11 @@ import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
 import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.om.Item;
+
+import java.util.Map;
 
 /**
  * 10.1.8 The load Element
@@ -74,8 +77,11 @@ public class XFormsLoadAction extends XFormsAction {
                 return;
 
             // Resolve AVT
+            final Map prefixToURIMap = containingDocument.getStaticState().getNamespaceMappings(actionElement.attributeValue("id"));
+            final LocationData locationData = (LocationData) actionElement.getData();
+            final XFormsContextStack contextStack = actionInterpreter.getContextStack();
             final String resolvedResource = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, bindingContext.getSingleNode(),
-                    null, XFormsContainingDocument.getFunctionLibrary(), actionInterpreter.getFunctionContext(), actionElement, resourceAttributeValue);
+                    contextStack.getCurrentVariables(), XFormsContainingDocument.getFunctionLibrary(), actionInterpreter.getFunctionContext(), prefixToURIMap, locationData, resourceAttributeValue);
             final String encodedResource = XFormsUtils.encodeHRRI(resolvedResource, true);
             resolveLoadValue(containingDocument, pipelineContext, actionElement, doReplace, encodedResource, target, urlType, urlNorewrite, isShowProgress);
             // NOTE: We are supposed to throw an xforms-link-error in case of failure. Can we do it?

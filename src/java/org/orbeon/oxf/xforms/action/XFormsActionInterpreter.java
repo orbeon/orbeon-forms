@@ -94,11 +94,11 @@ public class XFormsActionInterpreter {
      * Execute an XForms action.
      *
      * @param pipelineContext       current PipelineContext
-     * @param targetId              id of the target control
+     * @param targetEffectiveId     effective id of the target control
      * @param eventHandlerContainer event handler containe this action is running in
      * @param actionElement         Element specifying the action to execute
      */
-    public void runAction(final PipelineContext pipelineContext, String targetId, XFormsEventHandlerContainer eventHandlerContainer, Element actionElement) {
+    public void runAction(final PipelineContext pipelineContext, String targetEffectiveId, XFormsEventHandlerContainer eventHandlerContainer, Element actionElement) {
 
         // Check that we understand the action element
         final String actionNamespaceURI = actionElement.getNamespaceURI();
@@ -154,7 +154,7 @@ public class XFormsActionInterpreter {
                         contextStack.pushIteration(index);
 
                         final Item overriddenContextNodeInfo = contextStack.getCurrentSingleItem();
-                        runSingleIteration(pipelineContext, targetId, eventHandlerContainer, actionElement, actionNamespaceURI,
+                        runSingleIteration(pipelineContext, targetEffectiveId, eventHandlerContainer, actionElement, actionNamespaceURI,
                                 actionName, ifConditionAttribute, whileIterationAttribute, true, overriddenContextNodeInfo);
 
                         contextStack.popBinding();
@@ -167,7 +167,7 @@ public class XFormsActionInterpreter {
             } else {
                 // Do a single iteration run (but this may repeat over the @while condition!)
 
-                runSingleIteration(pipelineContext, targetId, eventHandlerContainer, actionElement, actionNamespaceURI,
+                runSingleIteration(pipelineContext, targetEffectiveId, eventHandlerContainer, actionElement, actionNamespaceURI,
                         actionName, ifConditionAttribute, whileIterationAttribute, contextStack.hasOverriddenContext(), contextStack.getContextItem());
             }
         } catch (Exception e) {

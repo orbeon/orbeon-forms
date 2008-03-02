@@ -27,7 +27,10 @@ import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.events.XFormsFocusEvent;
+import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.Item;
+
+import java.util.Map;
 
 /**
  * 10.1.7 The setfocus Element
@@ -53,8 +56,11 @@ public class XFormsSetfocusAction extends XFormsAction {
                 return;
 
             // Resolve AVT
+            final Map prefixToURIMap = containingDocument.getStaticState().getNamespaceMappings(actionElement.attributeValue("id"));
+            final LocationData locationData = (LocationData) actionElement.getData();
+            final XFormsContextStack contextStack = actionInterpreter.getContextStack();
             resolvedControlId = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, bindingContext.getSingleNode(),
-                    null, XFormsContainingDocument.getFunctionLibrary(), actionInterpreter.getFunctionContext(), actionElement, controlIdAttributeValue);
+                    contextStack.getCurrentVariables(), XFormsContainingDocument.getFunctionLibrary(), actionInterpreter.getFunctionContext(), prefixToURIMap, locationData, controlIdAttributeValue);
         }
 
         final String effectiveControlId = xformsControls.getCurrentControlsState().findEffectiveControlId(resolvedControlId);

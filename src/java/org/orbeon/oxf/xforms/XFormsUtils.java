@@ -785,18 +785,20 @@ public class XFormsUtils {
      * @param variableToValueMap variables
      * @param functionLibrary    XPath function libary to use
      * @param functionContext    context object to pass to the XForms function
-     * @param element            element on which the AVT attribute is present
+     * @param prefixToURIMap     namespace mappings
+     * @param locationData       LocationData for error reporting
      * @param attributeValue     attribute value
      * @return                   resolved attribute value
      */
-    public static String resolveAttributeValueTemplates(PipelineContext pipelineContext, NodeInfo contextNode, Map variableToValueMap, FunctionLibrary functionLibrary, XPathCache.FunctionContext functionContext, Element element, String attributeValue) {
+    public static String resolveAttributeValueTemplates(PipelineContext pipelineContext, NodeInfo contextNode, Map variableToValueMap,
+                                                        FunctionLibrary functionLibrary, XPathCache.FunctionContext functionContext,
+                                                        Map prefixToURIMap, LocationData locationData, String attributeValue) {
 
         if (attributeValue == null)
             return null;
 
-        // TODO: containingDocument.getStaticState().getNamespaceMappings(element)
-        return XPathCache.evaluateAsAvt(pipelineContext, contextNode, attributeValue, Dom4jUtils.getNamespaceContextNoDefault(element),
-                variableToValueMap, functionLibrary, functionContext, null, (LocationData) element.getData());
+        return XPathCache.evaluateAsAvt(pipelineContext, contextNode, attributeValue, prefixToURIMap,
+                variableToValueMap, functionLibrary, functionContext, null, locationData);
     }
 
     /**

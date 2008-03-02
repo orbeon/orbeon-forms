@@ -297,10 +297,10 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 // Get current node for xforms:submission and instance containing the node to submit
                 final NodeInfo currentNodeInfo;
                 final XFormsInstance currentInstance;
+                // Create context (should we simply reuse that of the model?)
+                final XFormsContextStack contextStack = new XFormsContextStack(model);
                 final XFormsFunction.Context functionContext;
                 {
-                    // Create context (should we simply reuse that of the model?)
-                    final XFormsContextStack contextStack = new XFormsContextStack(model);
                     contextStack.setBinding(pipelineContext, XFormsModelSubmission.this);
 
                     currentNodeInfo = contextStack.getCurrentSingleNode();
@@ -421,12 +421,14 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                     initialDocumentToSubmit = null;
                 }
 
+                final Map prefixToURIMap = containingDocument.getStaticState().getNamespaceMappings(getEffectiveId());
+
                 // Deferred submission: end of the first pass
                 if (isDeferredSubmissionFirstPass) {
 
                     // Resolve the target AVT if needed
                     final FunctionLibrary functionLibrary = XFormsContainingDocument.getFunctionLibrary();
-                    resolvedXXFormsTarget = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, currentNodeInfo, null, functionLibrary, functionContext, submissionElement, avtXXFormsTarget);
+                    resolvedXXFormsTarget = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, currentNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtXXFormsTarget);
 
                     // When replace="all", we wait for the submission of an XXFormsSubmissionEvent from the client
                     containingDocument.setClientActiveSubmission(this);
@@ -437,13 +439,13 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 {
                     final FunctionLibrary functionLibrary = XFormsContainingDocument.getFunctionLibrary();
 
-                    final String tempActionOrResource = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, currentNodeInfo, null, functionLibrary, functionContext, submissionElement, avtActionOrResource);
+                    final String tempActionOrResource = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, currentNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtActionOrResource);
                     resolvedActionOrResource = XFormsUtils.encodeHRRI(tempActionOrResource, true);
 
-                    resolvedXXFormsUsername = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, currentNodeInfo, null, functionLibrary, functionContext, submissionElement, avtXXFormsUsername);
-                    resolvedXXFormsPassword = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, currentNodeInfo, null, functionLibrary, functionContext, submissionElement, avtXXFormsPassword);
-                    resolvedXXFormsReadonly = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, currentNodeInfo, null, functionLibrary, functionContext, submissionElement, avtXXFormsReadonly);
-                    resolvedXXFormsShared = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, currentNodeInfo, null, functionLibrary, functionContext, submissionElement, avtXXFormsShared);
+                    resolvedXXFormsUsername = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, currentNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtXXFormsUsername);
+                    resolvedXXFormsPassword = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, currentNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtXXFormsPassword);
+                    resolvedXXFormsReadonly = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, currentNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtXXFormsReadonly);
+                    resolvedXXFormsShared = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, currentNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtXXFormsShared);
                 }
 
                 // Check read-only and shared hints

@@ -387,7 +387,7 @@ public class XFormsStaticState {
      * @param elementId     XForms element id
      * @return              Map<String, String> or null (should not be null for an existing XForms element)
      */
-    private Map getNamespaceMappings(String elementId) {
+    public Map getNamespaceMappings(String elementId) {
         return (Map) namespacesMap.get(elementId);
     }
 

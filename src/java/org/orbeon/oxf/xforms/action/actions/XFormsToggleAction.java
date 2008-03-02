@@ -24,7 +24,10 @@ import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.Item;
+
+import java.util.Map;
 
 /**
  * 9.2.3 The toggle Element
@@ -45,8 +48,10 @@ public class XFormsToggleAction extends XFormsAction {
 
         final String caseId;
         if (bindingContext.getSingleNode() != null) {
+            final Map prefixToURIMap = containingDocument.getStaticState().getNamespaceMappings(actionElement.attributeValue("id"));
+            final LocationData locationData = (LocationData) actionElement.getData();
             final String resolvedCaseId = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, bindingContext.getSingleNode(),
-                    null, XFormsContainingDocument.getFunctionLibrary(), actionInterpreter.getFunctionContext(), actionElement, caseAttribute);
+                    contextStack.getCurrentVariables(), XFormsContainingDocument.getFunctionLibrary(), actionInterpreter.getFunctionContext(), prefixToURIMap, locationData, caseAttribute);
             caseId = XFormsUtils.namespaceId(containingDocument, resolvedCaseId);
         } else {
             // TODO: Presence of context is not the right way to decide whether to evaluate AVTs or not

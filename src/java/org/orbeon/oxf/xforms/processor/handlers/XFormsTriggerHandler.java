@@ -27,6 +27,8 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
+import java.util.Map;
+
 /**
  * Handle xforms:trigger.
  */
@@ -119,9 +121,12 @@ public class XFormsTriggerHandler extends HandlerBase {
                                 // Computed resource URL
                                 final XFormsContextStack.BindingContext currentBindingContext = xformsControl.getBindingContext();
                                 if (currentBindingContext != null && currentBindingContext.getSingleNode() != null) {
+
+                                    final Map prefixToURIMap = containingDocument.getStaticState().getNamespaceMappings(id);
+                                    final XFormsContextStack contextStack = containingDocument.getXFormsControls().getContextStack();
                                     hrefValue = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, currentBindingContext.getSingleNode(),
-                                            null, XFormsContainingDocument.getFunctionLibrary(),
-                                            containingDocument.getXFormsControls().getContextStack().getFunctionContext(), loadElement, resource);
+                                            contextStack.getCurrentVariables(), XFormsContainingDocument.getFunctionLibrary(),
+                                            contextStack.getFunctionContext(), prefixToURIMap, xformsControl.getLocationData(), resource);
                                 }
                             } else {
                                 // Assume single-node binding

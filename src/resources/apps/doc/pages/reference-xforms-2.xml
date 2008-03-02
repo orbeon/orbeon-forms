@@ -175,7 +175,7 @@
                     </xforms:instance>
                 </xml-source>
             </section>
-            <a name="context-attribute"/>
+            <a name="insert-context-attribute"/>
             <section>
                 <title><code>context</code> Attribute on <code>xforms:insert</code> Action</title>
                 <p>
@@ -452,7 +452,7 @@
             </section>
             <a name="exforms-iterate"/>
             <section>
-                <title>Iteration of XForms Actions over Nodesets</title>
+                <title>Iteration of XForms Actions over Sequences</title>
                 <p>
                     Orbeon Forms supports the <code>exforms:iterate</code> attribute, also available as
                     <code>xxforms:iterate</code> attribute, on XForms action elements. Consider the following
@@ -516,8 +516,39 @@
                     </instance>
                 </xml-source>
                 <p>
+                    Note that because Orbeon Forms uses XPath 2.0, <code>xxforms:iterate</code> is not limited to
+                    returning node-sets, but can return sequences of items such as strings.
+                </p>
+                <p>
                     For more information about eXforms extensions, please visit the <a
                     href="http://www.exforms.org/conditionals.html#id4484032">eXforms site</a>.
+                </p>
+            </section>
+            <a name="context-attribute"/>
+            <section>
+                <title>Generalized <code>context</code> attribute</title>
+                <p>
+                    XForms 1.1 introduces the <code>context</code> attribute on <code>&lt;xforms:insert></code> and
+                    <code>&lt;xforms:delete></code>. Orbeon Forms supports this convenient attribute on all XForms
+                    elements changing the XPath evaluation context, including controls, actions, binds, and
+                    submissions.
+                </p>
+                <p>
+                    The <code>context</code> attribute overrides the in-scope XPath evaluation context for an action. It
+                    applies before the <code>ref</code> and <code>context</code> attributes, but after the
+                    <code>model</code> attribute.
+                </p>
+                <p>
+                    One convenient use is to just change the context within a group:
+                </p>
+                <xml-source>
+                    <xforms:group context="personal-information">
+                        ...
+                    </xforms:group>
+                </xml-source>
+                <p>
+                    Note that it is also possible to use <code>ref</code> in this case, but doing so has the side effect
+                    of binding the group to an instance data node, which may affect group relevance, for example.
                 </p>
             </section>
             <a name="xpath-extensions"/>

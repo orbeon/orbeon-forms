@@ -98,12 +98,12 @@
                     </li>
                     <li>
                         <p>
-                            <b>Support for variables within controls and models.</b> You can now declare variables
-                            usable from any XPath expression in an XForms document, using the
-                            <code>xxforms:variable</code> (or <code>exforms:variable</code>) element. Variables are
-                            extremely useful, for example to avoid repeating long XPath expressions, or to give an XPath
-                            expression unambiguous access to data computed in enclosing <code>&lt;xforms:group></code>
-                            or <code>&lt;xforms:repeat></code> elements.
+                            <b>Variables within controls and models.</b> You can now declare variables usable from any
+                            XPath expression in an XForms document, using the <code>xxforms:variable</code> (or
+                            <code>exforms:variable</code>) element. Variables are extremely useful, for example to avoid
+                            repeating long XPath expressions, or to give an XPath expression unambiguous access to data
+                            computed in enclosing <code>&lt;xforms:group></code> or <code>&lt;xforms:repeat></code>
+                            elements.
                         </p>
                         <p>
                             See <a href="reference-xforms-2#variables">Variables</a> for documentation.
@@ -111,9 +111,9 @@
                     </li>
                     <li>
                         <p>
-                            <b>Support for the <code>exforms:iterate</code> attribute and the XForms 1.1
-                            <code>context()</code> function.</b> In particular, these additions make it much easier to
-                            iterate over nodes within actions.
+                            <b><code>exforms:iterate</code> attribute and XForms 1.1 <code>context()</code>
+                            function.</b> In particular, these additions make it much easier to iterate over nodes
+                            within actions.
                         </p>
                         <p>
                             See <a href="reference-xforms-2#exforms-iterate">Iteration of XForms Actions over
@@ -122,10 +122,10 @@
                     </li>
                     <li>
                         <p>
-                            <b>Support for <code>ev:observer</code> and <code>ev:target</code> attributes on action
-                            handlers.</b> The <code>ev:observer</code> attribute is now globally supported (it used to
-                            be only supported within a model to refer to a nested instance). Support for the more rarely
-                            needed <code>ev:target</code> attribute has been added as well.
+                            <b><code>ev:observer</code> and <code>ev:target</code> attributes on action handlers.</b>
+                            The <code>ev:observer</code> attribute used to be only supported within a model to refer to
+                            a nested instance. It is now globally supported. Support for the more rarely needed
+                            <code>ev:target</code> attribute has been added as well.
                         </p>
                         <p>
                             See also <a href="reference-xforms-ng#events-observer-target">Using the
@@ -147,17 +147,24 @@
                     </li>
                     <li>
                         <p>
-                            <b>Support for generalized <code>context</code> attribute on XForms elements.</b> [TODO:
-                            document + example, mention XForms 1.2]
+                            <b>Generalized <code>context</code> attribute on XForms elements.</b> XForms 1.1 introduces
+                            the <code>context</code> attribute on <code>&lt;xforms:insert></code> and
+                            <code>&lt;xforms:delete></code>. Orbeon Forms now supports this convenient attribute on all
+                            elements changing the XPath evaluation context, including controls, actions, binds, and
+                            submissions. Further versions of XForms are likely to extend support this way.
+                        </p>
+                        <p>
+                            See <a href="reference-xforms-ng#context-attribute">Generalized <code>context</code>
+                            attribute</a> for the documentation.
                         </p>
                     </li>
                     <li>
                         <p>
-                            <b>Support for outputting log messages with <code>xforms:message</code>.</b>
+                            <b>Outputting server log messages with <code>xforms:message</code>.</b>
                             <code>xforms:message</code> supports new level values: <code>xxforms:log-debug</code>,
                             <code>xxforms:log-info</code>, <code>xxforms:log-warn</code> and
-                            <code>xxforms:log-error</code>. These cause the message to be logged on the server using
-                            the levels "debug", "info", "warn" and "error" as per the log4j terminology. Messages output
+                            <code>xxforms:log-error</code>. These cause the message to be logged on the server using the
+                            levels "debug", "info", "warn" and "error" as per the log4j terminology. Messages output
                             with these levels appear in the Orbeon Forms logs depending on the configuration of
                             <code>log4j.xml</code>. For example:
                         </p>
@@ -177,16 +184,16 @@
                     </li>
                     <li>
                         <p>
-                            <b>Support for temporary files in the file serializer.</b> The file serializer can now
-                            automatically create temporary files and write to those temporary files. It will also delete
-                            temporary files, based on a "scope" parameter you specify in the configuration. As with the
-                            Scope generator and Scope serializer, you can set the scope to either "request", "session",
-                            or "application".
+                            <b>Temporary files in the file serializer.</b> The file serializer can now automatically
+                            create temporary files and write to those temporary files. It will also delete temporary
+                            files, based on a "scope" parameter you specify in the configuration. As with the Scope
+                            generator and Scope serializer, you can set the scope to either "request", "session", or
+                            "application".
                         </p>
                     </li>
                     <li>
                         <p>
-                            <b>The epilogue pipeline is configurable with properties.</b> These <a
+                            <b>Epilogue pipeline configurable with properties.</b> These <a
                             href="reference-properties#epilogue">properties</a> in particular allow you to pick the
                             theme stylesheet, enable XHTML output, etc.
                         </p>

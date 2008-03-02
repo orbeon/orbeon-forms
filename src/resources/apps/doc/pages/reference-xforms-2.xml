@@ -1954,9 +1954,6 @@
                         Usually, activating a trigger on the client doesn't prevent further actions in the user
                         interface. Sometimes, it is however useful to block such further actions until some processing
                         is complete, for example calling a submission that saves a document.
-
-                        [TODO: describe the Orbeon Forms <code>xxforms:autocomplete</code> appearance on
-                        <code>xforms:select</code> and <code>xforms:select1</code>]
                     </p>
                     <p>
                         You can obtain this behavior by using the <code>xforms-trigger-appearance-modal</code> class on

@@ -133,7 +133,8 @@ public class URLRewriter {
             // 2. Determine if URL is a platform or application URL based on reserved paths
             final boolean isPlatformURL = absolutePathNoContext.startsWith("/ops/") || absolutePathNoContext.startsWith("/config/");
 
-            final String applicationVersion = OXFProperties.instance().getPropertySet().getString(RESOURCES_VERSION_NUMBER_PROPERTY);
+            // TODO: get version only once for a run
+            final String applicationVersion = getApplicationResourceVersion();
             if (!isPlatformURL && (applicationVersion == null || applicationVersion.length() == 0)) {
                 // There is no application version so do usual rewrite
                 return response.rewriteResourceURL(urlString, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
@@ -198,6 +199,10 @@ public class URLRewriter {
 
     public static boolean isResourcesVersioned() {
         return OXFProperties.instance().getPropertySet().getBoolean(RESOURCES_VERSIONED_PROPERTY, RESOURCES_VERSIONED_DEFAULT).booleanValue();
+    }
+
+    public static String getApplicationResourceVersion() {
+        return OXFProperties.instance().getPropertySet().getString(RESOURCES_VERSION_NUMBER_PROPERTY);
     }
 
     public static class PathMatcher {

@@ -2474,6 +2474,12 @@ Last modified: 2008-03-01 17:04:25
                         </li>
                     </ul>
                     <p>
+                        From client-side JavaScript, you can access the application version number as follow:
+                    </p>
+                    <xml-source>
+                        var version = ORBEON.util.Utils.getProperty(APPLICATION_RESOURCES_VERSION_PROPERTY);
+                    </xml-source>
+                    <p>
                        At the moment, the resources served by the PFC (that is all the resources except the XForms
                        engine's CSS and JavaScript resources) do not automatically get a special expiration date. If
                        you want to fully leverage client-side caching capabilities, you may want to use an Apache

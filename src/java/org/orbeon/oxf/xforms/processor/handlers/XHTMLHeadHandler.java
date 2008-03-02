@@ -219,6 +219,16 @@ public class XHTMLHeadHandler extends HandlerBase {
                                 dynamicProperties.put(XFormsProperties.HELP_HANDLER_PROPERTY, Boolean.TRUE);
                             }
                         }
+                        // Application version
+                        {
+                            if (isVersionedResources) {
+                                final String applicationVersion = URLRewriter.getApplicationResourceVersion();
+                                if (applicationVersion != null) {
+                                    // This is not an XForms property but we want to expose it on the client 
+                                    dynamicProperties.put(URLRewriter.RESOURCES_VERSION_NUMBER_PROPERTY, "1.0");
+                                }
+                            }
+                        }
                     }
 
                     final Map nonDefaultProperties = containingDocument.getStaticState().getNonDefaultProperties();
@@ -234,7 +244,7 @@ public class XHTMLHeadHandler extends HandlerBase {
                         final Object propertyValue = currentEntry.getValue();
 
                         final XFormsProperties.PropertyDefinition propertyDefinition = XFormsProperties.getPropertyDefinition(propertyName);
-                        if (propertyDefinition.isPropagateToClient()) {
+                        if (propertyDefinition != null && propertyDefinition.isPropagateToClient() || URLRewriter.RESOURCES_VERSION_NUMBER_PROPERTY.equals(propertyName)) {
 
                             if (sb == null) {
                                 // First property found

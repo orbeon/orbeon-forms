@@ -98,12 +98,12 @@
                     </li>
                     <li>
                         <p>
-                            <b>Support for <code>exforms:variable</code> and <code>xxforms:variable</code> within
-                            controls and models.</b> You can now declare XPath variables usable from any XPath
-                            expression in an XForms document. Variables are extremely useful, for example to avoid
-                            repeating long XPath expressions, or to give an XPath expression unambiguous access to data
-                            computed in enclosing <code>&lt;xforms:group></code> or <code>&lt;xforms:repeat></code>
-                            elements.
+                            <b>Support for variables within controls and models.</b> You can now declare variables
+                            usable from any XPath expression in an XForms document, using the
+                            <code>xxforms:variable</code> (or <code>exforms:variable</code>) element. Variables are
+                            extremely useful, for example to avoid repeating long XPath expressions, or to give an XPath
+                            expression unambiguous access to data computed in enclosing <code>&lt;xforms:group></code>
+                            or <code>&lt;xforms:repeat></code> elements.
                         </p>
                         <p>
                             See <a href="reference-xforms-2#variables">Variables</a> for documentation.

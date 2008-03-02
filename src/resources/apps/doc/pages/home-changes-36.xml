@@ -98,17 +98,6 @@
                     </li>
                     <li>
                         <p>
-                            <b>Support for the <code>exforms:iterate</code> attribute and the XForms 1.1
-                            <code>context()</code> function.</b> In particular, these additions make it much easier to
-                            iterate over nodes within actions.
-                        </p>
-                        <p>
-                            See <a href="reference-xforms-2#exforms-iterate">Iteration of XForms Actions over
-                            Nodesets</a> for documentation and a complete example.
-                        </p>
-                    </li>
-                    <li>
-                        <p>
                             <b>Support for <code>exforms:variable</code> and <code>xxforms:variable</code> within
                             controls and models.</b> You can now declare XPath variables usable from any XPath
                             expression in an XForms document. Variables are extremely useful, for example to avoid
@@ -118,6 +107,17 @@
                         </p>
                         <p>
                             See <a href="reference-xforms-2#variables">Variables</a> for documentation.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Support for the <code>exforms:iterate</code> attribute and the XForms 1.1
+                            <code>context()</code> function.</b> In particular, these additions make it much easier to
+                            iterate over nodes within actions.
+                        </p>
+                        <p>
+                            See <a href="reference-xforms-2#exforms-iterate">Iteration of XForms Actions over
+                            Nodesets</a> for documentation and a complete example.
                         </p>
                     </li>
                     <li>
@@ -202,7 +202,7 @@ http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=2
 <ul>
     {
         for $table in //table[tr/td/span/strong[. = 'ID']]
-            let $latest-id := '307983'
+            let $latest-id := '308227'
             let $latest-position := count(($table//tr)[td[normalize-space(.) = $latest-id]]/preceding-sibling::tr) + 1
             return
                 for $row in ($table//tr)[position() ge 2 and position() lt $latest-position and normalize-space(td[7]) = 'Fixed'] return
@@ -213,6 +213,70 @@ http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=2
 </ul>
 -->
                 <ul>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308227&amp;group_id=168&amp;atid=350207">
+                            #308227: RFE: Support versioned resources to improve caching
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308087&amp;group_id=168&amp;atid=350207">
+                            #308087: RFE: Implement session heartbeat feature to keep open pages alive
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=305753&amp;group_id=168&amp;atid=350207">
+                            #305753: Document xxforms:script's support for this and event
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306666&amp;group_id=168&amp;atid=350207">
+                            #306666: Add documentation for dialog actions and events
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308708&amp;group_id=168&amp;atid=350207">
+                            #308708: RFE: Upgrade to eXist 1.2
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308462&amp;group_id=168&amp;atid=350207">
+                            #308462: Tooltips on mouse over only show only show the second and subsequent times the mouse
+                            goes over the icon or control
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308694&amp;group_id=168&amp;atid=350207">
+                            #308694: xxforms:show/@neighbor doesn't work
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308695&amp;group_id=168&amp;atid=350207">
+                            #308695: xxforms:show/@neighbor doesn't work correctly when the neighbor is within a repeat
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306407&amp;group_id=168&amp;atid=350207">
+                            #306407: Needs ability to show dialog when page loads
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308039&amp;group_id=168&amp;atid=350207">
+                            #308039: Upgrade setvalue and related to the XForms 1.1 semantics
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308447&amp;group_id=168&amp;atid=350207">
+                            #308447: Dialogs are no longer draggable
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308674&amp;group_id=168&amp;atid=350207">
+                            #308674: RFE: Implement exforms:variable and xxforms:variable in models
+                        </a>
+                    </li>
                     <li>
                         <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=305571&amp;group_id=168&amp;atid=350207">
                             #305571: RFE: Implement exforms:variable and xxforms:variable in controls

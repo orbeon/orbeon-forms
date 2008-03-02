@@ -1875,7 +1875,7 @@
                         <xforms:select1 ref="state" xxforms:refresh-items="false">
                             <xforms:label>State</xforms:label>
                             <xforms:item>
-                                <xforms:label></xforms:label>
+                                <xforms:label>[Select...]</xforms:label>
                                 <xforms:value/>
                             </xforms:item>
                             <xforms:itemset nodeset="instance('schema-instance')/xs:simpleType[@name = 'state']//xs:enumeration">
@@ -1884,6 +1884,25 @@
                             </xforms:itemset>
                         </xforms:select1>
                     </xml-source>
+                </section>
+                <a name="internal-group"/>
+                <section>
+                    <title>Special <code>xxforms:internal</code> Appearance on <code>&lt;xforms:group></code></title>
+                    <p>
+                        <code>&lt;xforms:group></code> supports a special appearance, <code>xxforms:internal</code>,
+                        which causes the group to have no representation at all on the client:
+                    </p>
+                    <xml-source>
+                        <xforms:group model="my-model" appearance="xxforms:internal">
+                            <comment> More XForms controls </comment>
+                        </xforms:group>
+                    </xml-source>
+                    <p>
+                        In general you won't have a need for this appearance, but it is useful as an optimization, as it
+                        leads to less HTML sent to the client. You may use it when a group is used only to change the
+                        in-scope evaluation context for nested controls and when you don't need changes to relevance
+                        which apply directly to the group to be reflected in the client.
+                    </p>
                 </section>
                 <a name="tree"/>
                 <section>
@@ -1899,6 +1918,14 @@
                     <p>
                         [TODO: describe the Orbeon Forms <code>xxforms:tree</code> appearance on
                         <code>xforms:select1</code>]
+                    </p>
+                </section>
+                <a name="autocomplete"/>
+                <section>
+                    <title>Autocomplete box <code>xxforms:tree</code> Appearance</title>
+                    <p>
+                        [TODO: describe the Orbeon Forms <code>xxforms:autocomplete</code> appearance on
+                        <code>xforms:select</code> and <code>xforms:select1</code>]
                     </p>
                 </section>
             </section>

@@ -2213,11 +2213,8 @@ Last modified: 2008-03-01 17:04:25
                     <p>
                         In case you use Apache, you can in addition configure a rewriting rule with <a
                         href="http://httpd.apache.org/docs/2.2/mod/mod_rewrite.html">mod_rewrite</a> to allow Apache to
-                        load resources containing a version number.
+                        directly load resources containing a version number, as <a href="#apache">shown below</a>.
                     </p>
-                    <!--<xml-source>-->
-                        <!---->
-                    <!--</xml-source>-->
                     <note>
                         <p>
                             We recommend restarting Orbeon Forms after changing the <code>oxf.resources.versioned</code>
@@ -2225,6 +2222,68 @@ Last modified: 2008-03-01 17:04:25
                             restart.
                         </p>
                     </note>
+                </section>
+                <a name="apache"/>
+                <section added="2008-03-01">
+                    <title>Examples of Apache Configurations</title>
+                    <p>
+                        Here is how you can configure Apache to serve Orbeon Forms resources. This assumes the
+                        following:
+                    </p>
+                    <ul>
+                        <li>
+                            <p>
+                                Orbeon Forms deployed under the <code>/orbeon</code> context
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                Orbeon Forms exploded WAR file under <code>/home/orbeon/war/</code>
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                <code>orbeon-resources-public.jar</code> unziped under <code>/home/orbeon/war/WEB-INF/orbeon-resources-public/</code>
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                <code>oxf.xforms.cache-combined-resources</code> set to <code>true</code> in <code>properties.xml</code>
+                            </p>
+                        </li>
+                    </ul>
+                    <p>
+                        Without <a href="#versioned-resources">resources versioning</a>:
+                    </p>
+                    <pre class="ops-doc-code">
+RewriteEngine on
+# Rewrite CSS and JavaScript resources served by the XForms Server
+# -> make sure "oxf.xforms.cache-combined-resources" is set to "true" in properties.xml
+RewriteRule ^/orbeon/(xforms-server/.*\.(css|js))$ /home/orbeon/war/WEB-INF/resources/$1 [L]
+# Serve /config/theme resources
+# -> make sure orbeon-resources-public.jar is unzipped under "orbeon-resources-public"
+RewriteRule ^/orbeon/(config/theme/.*\.(css|png|gif))$ /home/orbeon/war/WEB-INF/orbeon-resources-public/$1 [L]
+# Serve /ops resources
+# -> make sure orbeon-resources-public.jar is unzipped under "orbeon-resources-public"
+RewriteRule ^/orbeon/(ops/.*\.(css|js|gif|png|jpg|html|htc))$ /home/orbeon/war/WEB-INF/orbeon-resources-public/$1 [L]
+# Serve remaining resources
+RewriteRule ^/orbeon/(.*\.(css|js|gif|png|jpg|html|htc))$ /home/orbeon/war/WEB-INF/resources/$1 [L]</pre>
+                    <p>
+                        With <a href="#versioned-resources">resources versioning</a>:
+                    </p>
+                    <pre class="ops-doc-code">
+RewriteEngine on
+# Rewrite CSS and JavaScript resources served by the XForms Server
+# -> make sure "oxf.xforms.cache-combined-resources" is set to "true" in properties.xml
+RewriteRule ^/orbeon/xforms-server/[^/]+/(.*\.(css|js))$ /home/orbeon/war/WEB-INF/resources/xforms-server/$1 [L]
+# Serve /config/theme resources
+# -> make sure orbeon-resources-public.jar is unzipped under "orbeon-resources-public"
+RewriteRule ^/orbeon/[^/]+/(config/theme/.*\.(css|png|gif))$ /home/orbeon/war/WEB-INF/orbeon-resources-public/$1 [L]
+# Serve /ops resources
+# -> make sure orbeon-resources-public.jar is unzipped under "orbeon-resources-public"
+RewriteRule ^/orbeon/[^/]+/(ops/.*\.(css|js|gif|png|jpg|html|htc))$ /home/orbeon/war/WEB-INF/orbeon-resources-public/$1 [L]
+# Serve remaining resources
+RewriteRule ^/orbeon/[^/]+/(.*\.(css|js|gif|png|jpg|html|htc))$ /home/orbeon/war/WEB-INF/resources/$1 [L]</pre>
                 </section>
             </section>
             <a name="xforms-back-forward"/>

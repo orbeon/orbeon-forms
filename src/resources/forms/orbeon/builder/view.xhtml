@@ -28,6 +28,9 @@
         <xhtml:link rel="stylesheet" href="/apps/fr/style/form-runner.css" type="text/css"/>
         
         <xhtml:style type="text/css">
+
+            #doc4 { margin-left: 15.5em }
+
             .fb-section-title div {
                 background: white url(../../../../apps/fr/style/separator.gif) repeat-x scroll left center
             }
@@ -46,7 +49,7 @@
             .fb-section-toolbar { margin-top: .5em }
 
             <!-- Set width of dialog (otherwise becomes too wide) -->
-            #fb-delete-confirm-dialog { width: 400px; }
+            #fb-confirmation-dialog { width: 400px; }
             #fb-toolbox-dialog { width: 180px; }
             #fb-xml-dialog .fb-xml-dialog-view { width: 57.69em; *width:56.301em; min-width:750px; height: 400px; overflow: scroll }
             #fb-edit-source-dialog .fb-xml-dialog-view { width: 57.69em; *width:56.301em; min-width:750px; height: 400px }
@@ -85,6 +88,16 @@
             #fb-details-section .fb-section-title .fr-inplace-delete { display: inline }
             #fb-details-section .fb-section-title .xforms-input input { width: 20em }
 
+            <!-- Highlighting of top-level blocks (sections, ...) -->
+            .fb-top-level-content { display: block; padding-left: .5em; margin-bottom: .5em; border-left: 4px solid transparent }
+            .fb-top-level-content:hover { border-left: 4px solid gray}
+            .fr-section-container .xforms-repeat-selected-item-1 { border-left: 4px solid #3598D4}
+
+            <!-- Highlighting of section content (grids, ...) -->
+            .fb-section-content { display: block; padding-left: .5em; margin-bottom: .5em; border-left: 4px solid transparent }
+            .fb-section-content:hover { border-left: 4px solid gray}
+            .fr-section-container .xforms-repeat-selected-item-2 { border-left: 4px solid #3598D4}
+
             <!-- Control editor -->
             .fb-control-label .xforms-label { display: none }
             .fb-control-label .fr-inplace-value { font-weight: bold }
@@ -110,7 +123,7 @@
             <!-- Grid -->
 
             <!-- Set min height of table using CSS hack for IE -->
-            .fb-grid-cell-icons { min-height: 4em; height: auto !important; height: 4em  }
+            .fb-grid-cell-icons { min-height: 4em; height: auto !important; height: 4em; text-align: center }
 
             .fb-grid-control-icons { display: block; text-align: center; float: right }
             .fb-grid-control-icons .xforms-trigger { display: block }
@@ -134,15 +147,18 @@
 
             .fb-grid-cell-icons { width: 1em; text-align: center; margin-right: .2em; float: left }
             .fb-grid-cell-icons img { margin-bottom: .5em; padding: 0 }
-            <!--.xforms-repeat-selected-item-1 .xforms-repeat-selected-item-2 .xforms-repeat-selected-item-3 .fb-grid-row { background: #3598D4 }-->
-            <!--.fb-grid-row:hover, .xforms-repeat-selected-item-1 .xforms-repeat-selected-item-2 .xforms-repeat-selected-item-3 .fb-grid-row:hover {-->
-                <!--background: white;-->
-            <!--}-->
+
             .fb-grid-content { float: left }
 
-            .xforms-repeat-selected-item-1 .xforms-repeat-selected-item-2 .xforms-repeat-selected-item-3 .xforms-repeat-selected-item-4 {
+            .xforms-repeat-selected-item-4 {
                 background-image: url(../../../../apps/fr/style/logo-bg.gif) 
             }
+
+            .fb-grid td .fb-grid-cell-icons img { display: none }
+            .fb-grid td:hover .fb-grid-cell-icons img { display: block }
+
+            .fb-grid td .fb-grid-control-icons img { display: none }
+            .fb-grid td:hover .fb-grid-control-icons img { display: block }
 
             .fb-hide-alert .xforms-alert { display: none }
 
@@ -190,9 +206,12 @@
 
             <xforms:instance id="fb-variables">
                 <variables>
-                    <blank-readonly-value/>
                     <done/>
                     <column-number/>
+
+                    <!-- Confirmation dialog -->
+                    <confirmation-message/>
+                    <confirmation-target/>
 
                     <result-node/>
 
@@ -212,7 +231,6 @@
             </xforms:instance>
 
             <xforms:bind nodeset="instance('fb-variables')">
-                <xforms:bind nodeset="blank-readonly-value" readonly="false()"/>
                 <xforms:bind nodeset="new-language-trigger" readonly="normalize-space(../new-language) = ''"/>
             </xforms:bind>
 
@@ -498,6 +516,22 @@
                         <xforms:label>Add</xforms:label>
                         <xxforms:show ev:event="DOMActivate" dialog="fb-add-language-dialog" neighbor="fb-resources-language-select"/>
                     </xforms:trigger>
+                    <xforms:trigger appearance="minimal" id="fb-language-remove" ref=".[count($resources/resource) gt 1]">
+                        <xforms:label>Remove</xforms:label>
+                        <xforms:action ev:event="DOMActivate">
+                            <!-- Ask confirmation -->
+                            <xforms:setvalue ref="$variables/confirmation-message"
+                                             value="concat('Are you sure you want to delete all resources for language ''',
+                                             xxforms:instance('fr-languages-instance')/language[@code = $lang]/(if (@native-name != @english-name) then concat(@native-name, ' (', @english-name, ')') else @native-name),
+                                             '''?')"/>
+                            <xforms:setvalue ref="$variables/confirmation-target">fb-language-remove</xforms:setvalue>
+                            <xxforms:show dialog="fb-confirmation-dialog"/>
+                        </xforms:action>
+                        <xforms:action ev:event="fb-confirmation-yes">
+                            <!-- Delete resources for this language -->
+                            <xforms:delete nodeset="$resources/resource[@xml:lang = $lang]"/>
+                        </xforms:action>
+                    </xforms:trigger>
                 </xforms:group>
 
                 <!-- Section about form metadata -->
@@ -525,406 +559,446 @@
                         <!-- Handle top-level blocks -->
                         <xforms:repeat nodeset="fr:section | fr:repeat | fr:grid" id="fb-top-level-repeat">
 
-                            <!-- Top-level section -->
-                            <xforms:group ref=".[local-name() = 'section']">
+                            <xhtml:div class="fb-top-level-content">
+                                <!-- Top-level section -->
+                                <xforms:group ref=".[local-name() = 'section']">
 
-                                <xxforms:variable name="section-id" select="substring-before(@id, '-section')"/>
+                                    <!-- Section id -->
+                                    <xxforms:variable name="section-id" select="substring-before(@id, '-section')"/>
+                                    <!-- Holder element for the section -->
+                                    <xxforms:variable name="section-holder" select="$form-instance/*[name() = $section-id]"/>
 
-                                <!--<xhtml:img src="/apps/fr/style/minus.png" alt="Close section" title="Close section"/>-->
+                                    <!--<xhtml:img src="/apps/fr/style/minus.png" alt="Close section" title="Close section"/>-->
 
-                                <!-- Editable section title -->
-                                <xforms:input id="fb-section-title-input"
-                                              ref="$current-resources/*[name() = $section-id]/label"
-                                              appearance="fr:in-place" class="fb-section-title">
-                                    <xforms:label>Section</xforms:label>
+                                    <!-- Editable section title -->
+                                    <xforms:group appearance="xxforms:internal" id="fb-section-title-input-container">
+                                        <xforms:input id="fb-section-title-input"
+                                                      ref="$current-resources/*[name() = $section-id]/label"
+                                                      appearance="fr:in-place" class="fb-section-title">
+                                            <xforms:label>Section</xforms:label>
+                                        </xforms:input>
 
-                                    <!-- Respond to fr-delete event to delete the current section -->
-                                    <xforms:action ev:event="fr-delete">
-                                        <xforms:setvalue ref="$variables/result-node" value="context()/saxon:path()"/>
-                                        <xxforms:show dialog="fb-delete-confirm-dialog"/>
-
-                                        <!-- TODO: react to dialog close and put action handler here -->
-
-                                    </xforms:action>
-                                </xforms:input>
-
-                                <!-- Insert section children -->
-                                <xhtml:div class="fb-section-toolbar fb-toolbar">
-                                    <xforms:trigger appearance="full">
-                                        <xforms:label>
-                                            <xhtml:img src="../../../../forms/orbeon/builder/images/action1.gif" alt="New 1-Column Grid" title="New 1-Column Grid"/>
-                                            <xhtml:span>New 1-Column Grid</xhtml:span>
-                                        </xforms:label>
-                                        <xforms:action ev:event="DOMActivate">
-                                            <xforms:insert context="." nodeset="fr:section | fr:repeat | fr:grid"
-                                                           at="index('fb-section-content-repeat')" position="after"
-                                                           origin="instance('fb-grid-1-template')"/>
-                                            <!--<xforms:setvalue ref="(fr:section | fr:repeat | fr:grid)[index('fb-section-content-repeat')]/@columns" value="1"/>-->
+                                        <!-- Respond to fr-delete event to delete the current section -->
+                                        <xforms:action ev:event="fr-delete">
+                                            <xforms:setvalue ref="$variables/confirmation-message" value="'Are you sure you want to delete the current section?'"/>
+                                            <xforms:setvalue ref="$variables/confirmation-target">fb-section-title-input-container</xforms:setvalue>
+                                            <xxforms:show dialog="fb-confirmation-dialog"/>
                                         </xforms:action>
-                                    </xforms:trigger>
+                                        <!-- Respond to confirmation -->
+                                        <xforms:action ev:event="fb-confirmation-yes">
+                                            <!-- Delete holder element for section -->
+                                            <xforms:delete nodeset="$form-instance/*[name() = context()/@context]"/>
+                                            <!-- Delete resources for section -->
+                                            <xforms:delete xxforms:iterate="$resources/resource/*[name() = context()/@context]" nodeset="."/>
 
-                                    <xforms:trigger appearance="full">
-                                        <xforms:label>
-                                            <xhtml:img src="../../../../forms/orbeon/builder/images/action2.gif" alt="New 2-Column Grid" title="New 2-Column Grid"/>
-                                            <xhtml:span>New 2-Column Grid</xhtml:span>
-                                        </xforms:label>
-                                        <xforms:action ev:event="DOMActivate">
-                                            <xforms:insert context="." nodeset="fr:section | fr:repeat | fr:grid"
-                                                           at="index('fb-section-content-repeat')" position="after"
-                                                           origin="instance('fb-grid-2-template')"/>
+                                            <xforms:action xxforms:iterate="*/xhtml:tr/xhtml:td">
+                                                <!-- Delete holder element and resources for control -->
+                                                <xforms:action if="exists(xforms:*)">
+                                                    <xforms:delete nodeset="$form-instance/*[index('fb-top-level-repeat')]/*[name() = context()/xforms:*/@ref]"/>
+                                                    <xforms:delete xxforms:iterate="$resources/resource/*[name() = context()/xforms:*/@ref]" nodeset="."/>
+                                                </xforms:action>
+                                            </xforms:action>
+
+                                            <!-- Delete section including all controls -->
+                                            <xforms:delete nodeset="."/>
                                         </xforms:action>
-                                    </xforms:trigger>
 
-                                    <xforms:trigger appearance="full">
-                                        <xforms:label>
-                                            <xhtml:img src="../../../../forms/orbeon/builder/images/action3.gif" alt="New 3-Column Grid" title="New 3-Column Grid"/>
-                                            <xhtml:span>New 3-Column Grid</xhtml:span>
-                                        </xforms:label>
-                                        <xforms:action ev:event="DOMActivate">
-                                            <xforms:insert context="." nodeset="fr:section | fr:repeat | fr:grid"
-                                                           at="index('fb-section-content-repeat')" position="after"
-                                                           origin="instance('fb-grid-3-template')"/>
-                                        </xforms:action>
-                                    </xforms:trigger>
+                                    </xforms:group>
 
-                                    <xforms:trigger appearance="full">
-                                        <xforms:label>
-                                            <xhtml:img src="../../../../forms/orbeon/builder/images/action3.gif" alt="New 4-Column Grid" title="New 4-Column Grid"/>
-                                            <xhtml:span>New 4-Column Grid</xhtml:span>
-                                        </xforms:label>
-                                        <xforms:action ev:event="DOMActivate">
-                                            <xforms:insert context="." nodeset="fr:section | fr:repeat | fr:grid"
-                                                           at="index('fb-section-content-repeat')" position="after"
-                                                           origin="instance('fb-grid-4-template')"/>
-                                        </xforms:action>
-                                    </xforms:trigger>
-                                </xhtml:div>
+                                    <!-- Insert section children -->
+                                    <xhtml:div class="fb-section-toolbar fb-toolbar">
+                                        <xforms:trigger appearance="full">
+                                            <xforms:label>
+                                                <xhtml:img src="../../../../forms/orbeon/builder/images/action1.gif" alt="New 1-Column Grid" title="New 1-Column Grid"/>
+                                                <xhtml:span>New 1-Column Grid</xhtml:span>
+                                            </xforms:label>
+                                            <xforms:action ev:event="DOMActivate">
+                                                <xforms:insert context="." nodeset="fr:section | fr:repeat | fr:grid"
+                                                               at="index('fb-section-content-repeat')" position="after"
+                                                               origin="instance('fb-grid-1-template')"/>
+                                                <!--<xforms:setvalue ref="(fr:section | fr:repeat | fr:grid)[index('fb-section-content-repeat')]/@columns" value="1"/>-->
+                                            </xforms:action>
+                                        </xforms:trigger>
 
-                                <!-- Section content -->
-                                <xforms:repeat nodeset="fr:section | fr:repeat | fr:grid" id="fb-section-content-repeat">
+                                        <xforms:trigger appearance="full">
+                                            <xforms:label>
+                                                <xhtml:img src="../../../../forms/orbeon/builder/images/action2.gif" alt="New 2-Column Grid" title="New 2-Column Grid"/>
+                                                <xhtml:span>New 2-Column Grid</xhtml:span>
+                                            </xforms:label>
+                                            <xforms:action ev:event="DOMActivate">
+                                                <xforms:insert context="." nodeset="fr:section | fr:repeat | fr:grid"
+                                                               at="index('fb-section-content-repeat')" position="after"
+                                                               origin="instance('fb-grid-2-template')"/>
+                                            </xforms:action>
+                                        </xforms:trigger>
 
-                                    <xhtml:div>
-                                        <!-- Grid within top-level section -->
-                                        <xforms:group ref=".[local-name() = 'grid']">
+                                        <xforms:trigger appearance="full">
+                                            <xforms:label>
+                                                <xhtml:img src="../../../../forms/orbeon/builder/images/action3.gif" alt="New 3-Column Grid" title="New 3-Column Grid"/>
+                                                <xhtml:span>New 3-Column Grid</xhtml:span>
+                                            </xforms:label>
+                                            <xforms:action ev:event="DOMActivate">
+                                                <xforms:insert context="." nodeset="fr:section | fr:repeat | fr:grid"
+                                                               at="index('fb-section-content-repeat')" position="after"
+                                                               origin="instance('fb-grid-3-template')"/>
+                                            </xforms:action>
+                                        </xforms:trigger>
 
-                                            <xhtml:div class="fb-grid-toolbar fb-toolbar">
-                                                <xforms:trigger appearance="full">
-                                                    <xforms:label>
-                                                        <xhtml:span>Add Row</xhtml:span>
-                                                    </xforms:label>
-                                                    <xforms:action ev:event="DOMActivate">
-                                                        <xforms:action context="$body/fr:*[index('fb-top-level-repeat')]/fr:*[index('fb-section-content-repeat')]">
-                                                            <!-- Pointing to current grid element -->
-                                                            <xforms:insert context="." nodeset="xhtml:tr"
-                                                                           at="index('fb-section-content-grid-tr-repeat')"
-                                                                           origin="instance(concat('fb-grid-', context()/@columns, '-template'))/xhtml:tr"/>
+                                        <xforms:trigger appearance="full">
+                                            <xforms:label>
+                                                <xhtml:img src="../../../../forms/orbeon/builder/images/action3.gif" alt="New 4-Column Grid" title="New 4-Column Grid"/>
+                                                <xhtml:span>New 4-Column Grid</xhtml:span>
+                                            </xforms:label>
+                                            <xforms:action ev:event="DOMActivate">
+                                                <xforms:insert context="." nodeset="fr:section | fr:repeat | fr:grid"
+                                                               at="index('fb-section-content-repeat')" position="after"
+                                                               origin="instance('fb-grid-4-template')"/>
+                                            </xforms:action>
+                                        </xforms:trigger>
+                                    </xhtml:div>
 
-                                                        </xforms:action>
-                                                    </xforms:action>
-                                                </xforms:trigger>
-                                                <xforms:trigger appearance="full" ref=".[xs:integer(@columns) lt 4]">
-                                                    <xforms:label>
-                                                        <xhtml:span>Add Column</xhtml:span>
-                                                    </xforms:label>
-                                                    <xforms:action ev:event="DOMActivate">
-                                                        <!-- Context is on current grid -->
-                                                        <xforms:setvalue ref="@columns" value=". + 1"/>
+                                    <!-- Section content -->
+                                    <xforms:repeat nodeset="fr:section | fr:repeat | fr:grid" id="fb-section-content-repeat">
 
-                                                        <!-- Save column index -->
-                                                        <xforms:setvalue ref="$variables/column-number" value="index('fb-section-content-grid-td-repeat')"/>
+                                        <xhtml:div class="fb-section-content">
+                                            <!-- Grid within top-level section -->
+                                            <xforms:group ref=".[local-name() = 'grid']">
 
-                                                        <xforms:action xxforms:iterate="xhtml:tr">
-                                                            <xforms:insert nodeset="xhtml:td" origin="xxforms:element('xhtml:td')" at="$variables/column-number"/>
-                                                        </xforms:action>
-                                                    </xforms:action>
-                                                </xforms:trigger>
-                                                <xforms:trigger appearance="full" ref=".[count(xhtml:tr) gt 1]">
-                                                    <xforms:label>
-                                                        <xhtml:span>Delete Row</xhtml:span>
-                                                    </xforms:label>
-                                                    <!-- TODO: Confirmation -->
-                                                    <xforms:action ev:event="DOMActivate">
-                                                        <!-- Context is on current grid -->
+                                                <xhtml:div class="fb-grid-toolbar fb-toolbar">
+                                                    <xforms:trigger appearance="full">
+                                                        <xforms:label>
+                                                            <xhtml:span>Add Row</xhtml:span>
+                                                        </xforms:label>
+                                                        <xforms:action ev:event="DOMActivate">
+                                                            <xforms:action context="$body/fr:*[index('fb-top-level-repeat')]/fr:*[index('fb-section-content-repeat')]">
+                                                                <!-- Pointing to current grid element -->
+                                                                <xforms:insert context="." nodeset="xhtml:tr"
+                                                                               at="index('fb-section-content-grid-tr-repeat')"
+                                                                               origin="instance(concat('fb-grid-', context()/@columns, '-template'))/xhtml:tr"/>
 
-                                                        <xforms:action xxforms:iterate="xhtml:tr[index('fb-section-content-grid-tr-repeat')]/xhtml:td">
-                                                            <!-- Delete holder element and resources -->
-                                                            <xforms:action if="exists(xforms:*)">
-                                                                <xforms:delete nodeset="$form-instance/*[index('fb-top-level-repeat')]/*[name() = context()/xforms:*/@ref]"/>
-                                                                <xforms:delete xxforms:iterate="$resources/resource/*[name() = context()/xforms:*/@ref]" nodeset="."/>
                                                             </xforms:action>
                                                         </xforms:action>
+                                                    </xforms:trigger>
+                                                    <xforms:trigger appearance="full" ref=".[xs:integer(@columns) lt 4]">
+                                                        <xforms:label>
+                                                            <xhtml:span>Add Column</xhtml:span>
+                                                        </xforms:label>
+                                                        <xforms:action ev:event="DOMActivate">
+                                                            <!-- Context is on current grid -->
+                                                            <xforms:setvalue ref="@columns" value=". + 1"/>
 
-                                                        <!-- Delete whole row including nested controls -->
-                                                        <xforms:delete nodeset="xhtml:tr" at="index('fb-section-content-grid-tr-repeat')"/>
-                                                    </xforms:action>
-                                                </xforms:trigger>
-                                                <xforms:trigger appearance="full" ref=".[xs:integer(@columns) gt 1]">
-                                                    <xforms:label>
-                                                        <xhtml:span>Delete Column</xhtml:span>
-                                                    </xforms:label>
-                                                    <!-- TODO: Confirmation -->
-                                                    <xforms:action ev:event="DOMActivate">
-                                                        <!-- Context is on current grid -->
-                                                        <xforms:setvalue ref="@columns" value=". - 1"/>
+                                                            <!-- Save column index -->
+                                                            <xforms:setvalue ref="$variables/column-number" value="index('fb-section-content-grid-td-repeat')"/>
 
-                                                        <!-- Save column index -->
-                                                        <xforms:setvalue ref="$variables/column-number" value="index('fb-section-content-grid-td-repeat')"/>
+                                                            <xforms:action xxforms:iterate="xhtml:tr">
+                                                                <xforms:insert nodeset="xhtml:td" origin="xxforms:element('xhtml:td')" at="$variables/column-number"/>
+                                                            </xforms:action>
+                                                        </xforms:action>
+                                                    </xforms:trigger>
+                                                    <xforms:trigger appearance="full" ref=".[count(xhtml:tr) gt 1]" id="fb-delete-row-trigger">
+                                                        <xforms:label>
+                                                            <xhtml:span>Delete Row</xhtml:span>
+                                                        </xforms:label>
+                                                        <xforms:action ev:event="DOMActivate">
+                                                            <!-- Ask confirmation -->
+                                                            <xforms:setvalue ref="$variables/confirmation-message">Are you sure you want to delete the current row?</xforms:setvalue>
+                                                            <xforms:setvalue ref="$variables/confirmation-target">fb-delete-row-trigger</xforms:setvalue>
+                                                            <xxforms:show dialog="fb-confirmation-dialog"/>
+                                                        </xforms:action>
+                                                        <xforms:action ev:event="fb-confirmation-yes">
+                                                            <!-- Context is on current grid -->
 
-                                                        <!-- Iterate over rows and in each delete the appropriate column -->
-                                                        <xforms:action xxforms:iterate="xhtml:tr">
-                                                            <xforms:action context="xhtml:td[xs:integer($variables/column-number)]">
-                                                                <!-- Delete holder element, resources, and control -->
+                                                            <!-- Delete holder elements and resources -->
+                                                            <xforms:action xxforms:iterate="xhtml:tr[index('fb-section-content-grid-tr-repeat')]/xhtml:td">
                                                                 <xforms:action if="exists(xforms:*)">
                                                                     <xforms:delete nodeset="$form-instance/*[index('fb-top-level-repeat')]/*[name() = context()/xforms:*/@ref]"/>
                                                                     <xforms:delete xxforms:iterate="$resources/resource/*[name() = context()/xforms:*/@ref]" nodeset="."/>
                                                                 </xforms:action>
-                                                                <xforms:delete nodeset="."/>
+                                                            </xforms:action>
+
+                                                            <!-- Delete whole row including nested controls -->
+                                                            <xforms:delete nodeset="xhtml:tr" at="index('fb-section-content-grid-tr-repeat')"/>
+                                                        </xforms:action>
+                                                    </xforms:trigger>
+                                                    <xforms:trigger appearance="full" ref=".[xs:integer(@columns) gt 1]" id="fb-delete-column-trigger">
+                                                        <xforms:label>
+                                                            <xhtml:span>Delete Column</xhtml:span>
+                                                        </xforms:label>
+                                                        <xforms:action ev:event="DOMActivate">
+                                                            <!-- Ask confirmation -->
+                                                            <xforms:setvalue ref="$variables/confirmation-message">Are you sure you want to delete the current column?</xforms:setvalue>
+                                                            <xforms:setvalue ref="$variables/confirmation-target">fb-delete-column-trigger</xforms:setvalue>
+                                                            <xxforms:show dialog="fb-confirmation-dialog"/>
+                                                        </xforms:action>
+                                                        <xforms:action ev:event="fb-confirmation-yes">
+                                                            <!-- Context is on current grid -->
+                                                            <xforms:setvalue ref="@columns" value=". - 1"/>
+
+                                                            <!-- Save column index -->
+                                                            <xforms:setvalue ref="$variables/column-number" value="index('fb-section-content-grid-td-repeat')"/>
+
+                                                            <!-- Iterate over rows and in each delete the appropriate column -->
+                                                            <xforms:action xxforms:iterate="xhtml:tr">
+                                                                <xforms:action context="xhtml:td[xs:integer($variables/column-number)]">
+                                                                    <!-- Delete holder element, resources, and control -->
+                                                                    <xforms:action if="exists(xforms:*)">
+                                                                        <xforms:delete nodeset="$form-instance/*[index('fb-top-level-repeat')]/*[name() = context()/xforms:*/@ref]"/>
+                                                                        <xforms:delete xxforms:iterate="$resources/resource/*[name() = context()/xforms:*/@ref]" nodeset="."/>
+                                                                    </xforms:action>
+                                                                    <xforms:delete nodeset="."/>
+                                                                </xforms:action>
                                                             </xforms:action>
                                                         </xforms:action>
-                                                    </xforms:action>
-                                                </xforms:trigger>
-                                                <xforms:trigger appearance="full">
-                                                    <xforms:label>
-                                                        <xhtml:span>Delete Grid</xhtml:span>
-                                                    </xforms:label>
-                                                    <!-- TODO: Confirmation -->
-                                                    <xforms:action ev:event="DOMActivate">
-                                                        <!-- Context is on current grid -->
-
-                                                        <xforms:action xxforms:iterate="xhtml:tr/xhtml:td">
-                                                            <!-- Delete holder element and resources -->
-                                                            <xforms:action if="exists(xforms:*)">
-                                                                <xforms:delete nodeset="$form-instance/*[index('fb-top-level-repeat')]/*[name() = context()/xforms:*/@ref]"/>
-                                                                <xforms:delete xxforms:iterate="$resources/resource/*[name() = context()/xforms:*/@ref]" nodeset="."/>
-                                                            </xforms:action>
+                                                    </xforms:trigger>
+                                                    <xforms:trigger appearance="full" id="fb-delete-grid-trigger">
+                                                        <xforms:label>
+                                                            <xhtml:span>Delete Grid</xhtml:span>
+                                                        </xforms:label>
+                                                        <xforms:action ev:event="DOMActivate">
+                                                            <!-- Ask confirmation -->
+                                                            <xforms:setvalue ref="$variables/confirmation-message">Are you sure you want to delete the current grid?</xforms:setvalue>
+                                                            <xforms:setvalue ref="$variables/confirmation-target">fb-delete-grid-trigger</xforms:setvalue>
+                                                            <xxforms:show dialog="fb-confirmation-dialog"/>
                                                         </xforms:action>
+                                                        <xforms:action ev:event="fb-confirmation-yes">
+                                                            <!-- Context is on current grid -->
 
-                                                        <!-- Delete whole grid element -->
-                                                        <xforms:delete nodeset="."/>
+                                                            <xforms:action xxforms:iterate="xhtml:tr/xhtml:td">
+                                                                <!-- Delete holder element and resources -->
+                                                                <xforms:action if="exists(xforms:*)">
+                                                                    <xforms:delete nodeset="$form-instance/*[index('fb-top-level-repeat')]/*[name() = context()/xforms:*/@ref]"/>
+                                                                    <xforms:delete xxforms:iterate="$resources/resource/*[name() = context()/xforms:*/@ref]" nodeset="."/>
+                                                                </xforms:action>
+                                                            </xforms:action>
 
-                                                    </xforms:action>
-                                                </xforms:trigger>
-                                            </xhtml:div>
+                                                            <!-- Delete whole grid element -->
+                                                            <xforms:delete nodeset="."/>
+                                                        </xforms:action>
+                                                    </xforms:trigger>
+                                                </xhtml:div>
 
-                                            <!-- Use AVTs to set the style on the div depending on the number of columns -->
-                                            <xhtml:div class="fb-grid fb-grid-{count(xhtml:tr[1]/xhtml:td)}-columns">
-                                                <!-- Grid table -->
-                                                <xhtml:table>
-                                                    <xhtml:tbody>
-                                                        <!-- Repeat over table rows -->
-                                                        <xforms:repeat nodeset="xhtml:tr" id="fb-section-content-grid-tr-repeat">
-                                                            <xhtml:tr>
-                                                                <!-- Repeat over table columns -->
-                                                                <xforms:repeat nodeset="xhtml:td" id="fb-section-content-grid-td-repeat">
+                                                <!-- Use AVTs to set the style on the div depending on the number of columns -->
+                                                <xhtml:div class="fb-grid fb-grid-{count(xhtml:tr[1]/xhtml:td)}-columns">
+                                                    <!-- Grid table -->
+                                                    <xhtml:table>
+                                                        <xhtml:tbody>
+                                                            <!-- Repeat over table rows -->
+                                                            <xforms:repeat nodeset="xhtml:tr" id="fb-section-content-grid-tr-repeat" xxforms:dnd="true">
+                                                                <xhtml:tr>
+                                                                    <!-- Repeat over table columns -->
+                                                                    <xforms:repeat nodeset="xhtml:td" id="fb-section-content-grid-td-repeat" xxforms:dnd="true">
 
-                                                                    <xxforms:variable name="control-id" select="substring-before(xforms:*[1]/@id, '-control')"/>
-                                                                    <xhtml:td>
-                                                                        <xhtml:div class="fb-grid-cell-icons">
-                                                                            <!-- TODO: For now put here, but move once dnd is there and clicking on cell is enough -->
-                                                                            <xforms:trigger appearance="minimal">
-                                                                                <xforms:label><xhtml:img src="../../../../apps/fr/style/drag_handle.gif" alt="Drag" title="Drag"/></xforms:label>
-                                                                            </xforms:trigger>
-                                                                            <xforms:group ref=".[xforms:*]">
-
+                                                                        <xxforms:variable name="control-id" select="substring-before(xforms:*[1]/@id, '-control')"/>
+                                                                        <xhtml:td>
+                                                                            <xhtml:div class="fb-grid-cell-icons">
+                                                                                <!-- TODO: For now put here, but move once dnd is there and clicking on cell is enough -->
                                                                                 <xforms:trigger appearance="minimal">
-                                                                                    <xforms:label><xhtml:img src="../../../../apps/fr/style/trash.gif" alt="Delete Control" title="Delete Control"/></xforms:label>
+                                                                                    <xforms:label><xhtml:img src="../../../../apps/fr/style/drag_handle.gif" alt="Drag" title="Drag"/></xforms:label>
+                                                                                </xforms:trigger>
+                                                                                <xforms:group ref=".[xforms:*]">
+
+                                                                                    <xforms:trigger appearance="minimal">
+                                                                                        <xforms:label><xhtml:img src="../../../../apps/fr/style/trash.gif" alt="Delete Control" title="Delete Control"/></xforms:label>
+                                                                                        <xforms:action ev:event="DOMActivate">
+                                                                                            <!-- Delete holder element, resources, and control -->
+                                                                                            <xforms:delete nodeset="$form-instance/*[index('fb-top-level-repeat')]/*[name() = $control-id]"/>
+                                                                                            <xforms:delete xxforms:iterate="$resources/resource/*[name() = $control-id]" nodeset="."/>
+                                                                                            <xforms:delete nodeset="xforms:*"/>
+                                                                                        </xforms:action>
+                                                                                    </xforms:trigger>
+                                                                                </xforms:group>
+                                                                            </xhtml:div>
+                                                                            <xforms:group ref=".[xforms:*]" class="fb-grid-control-icons">
+                                                                                <!-- Edit details for any control -->
+                                                                                <xforms:trigger appearance="minimal" id="fb-edit-details-trigger">
+                                                                                    <xforms:label><xhtml:img class="fb-control-help" alt="Details" title="" src="../../../../apps/fr/style/edit.gif"/></xforms:label>
                                                                                     <xforms:action ev:event="DOMActivate">
-                                                                                        <!-- Delete holder element, resources, and control -->
-                                                                                        <xforms:delete nodeset="$form-instance/*[index('fb-top-level-repeat')]/*[name() = $control-id]"/>
-                                                                                        <xforms:delete xxforms:iterate="$resources/resource/*[name() = $control-id]" nodeset="."/>
-                                                                                        <xforms:delete nodeset="xforms:*"/>
+                                                                                        <!-- TODO zzz edit control id -->
+                                                                                    </xforms:action>
+                                                                                </xforms:trigger>
+
+                                                                                <!-- Edit help for any control -->
+                                                                                <xforms:trigger appearance="minimal" id="fb-edit-help-trigger">
+                                                                                    <xforms:label><xhtml:img class="fb-control-help" alt="Help" title="" src="../../../../ops/images/xforms/help.gif"/></xforms:label>
+                                                                                    <xforms:action ev:event="DOMActivate">
+                                                                                        <xforms:setvalue ref="$variables/result-node" value="$current-resources/*[name() = $control-id]/help/saxon:path()"/>
+                                                                                        <xxforms:show dialog="fb-edit-help-dialog" neighbor="fb-edit-help-trigger"/>
+                                                                                    </xforms:action>
+                                                                                </xforms:trigger>
+
+                                                                                <!-- Edit Alert for any control -->
+                                                                                <xforms:trigger appearance="minimal" id="fb-edit-alert-trigger">
+                                                                                    <xforms:label><xhtml:img class="fb-control-alert" alt="Alert" title="" src="../../../../ops/images/xforms/error.gif"/></xforms:label>
+                                                                                    <xforms:action ev:event="DOMActivate">
+                                                                                        <xforms:setvalue ref="$variables/result-node" value="$current-resources/*[name() = $control-id]/alert/saxon:path()"/>
+                                                                                        <xxforms:show dialog="fb-edit-alert-dialog" neighbor="fb-edit-alert-trigger"/>
                                                                                     </xforms:action>
                                                                                 </xforms:trigger>
                                                                             </xforms:group>
-                                                                        </xhtml:div>
-                                                                        <xforms:group ref=".[xforms:*]" class="fb-grid-control-icons">
-                                                                            <!-- Edit details for any control -->
-                                                                            <xforms:trigger appearance="minimal" id="fb-edit-details-trigger">
-                                                                                <xforms:label><xhtml:img class="fb-control-help" alt="Details" title="" src="../../../../apps/fr/style/edit.gif"/></xforms:label>
-                                                                                <xforms:action ev:event="DOMActivate">
-                                                                                    <!-- TODO zzz edit control id -->
-                                                                                </xforms:action>
-                                                                            </xforms:trigger>
-
-                                                                            <!-- Edit help for any control -->
-                                                                            <xforms:trigger appearance="minimal" id="fb-edit-help-trigger">
-                                                                                <xforms:label><xhtml:img class="fb-control-help" alt="Help" title="" src="../../../../ops/images/xforms/help.gif"/></xforms:label>
-                                                                                <xforms:action ev:event="DOMActivate">
-                                                                                    <xforms:setvalue ref="$variables/result-node" value="$current-resources/*[name() = $control-id]/help/saxon:path()"/>
-                                                                                    <xxforms:show dialog="fb-edit-help-dialog" neighbor="fb-edit-help-trigger"/>
-                                                                                </xforms:action>
-                                                                            </xforms:trigger>
-
-                                                                            <!-- Edit Alert for any control -->
-                                                                            <xforms:trigger appearance="minimal" id="fb-edit-alert-trigger">
-                                                                                <xforms:label><xhtml:img class="fb-control-alert" alt="Alert" title="" src="../../../../ops/images/xforms/error.gif"/></xforms:label>
-                                                                                <xforms:action ev:event="DOMActivate">
-                                                                                    <xforms:setvalue ref="$variables/result-node" value="$current-resources/*[name() = $control-id]/alert/saxon:path()"/>
-                                                                                    <xxforms:show dialog="fb-edit-alert-dialog" neighbor="fb-edit-alert-trigger"/>
-                                                                                </xforms:action>
-                                                                            </xforms:trigger>
-                                                                        </xforms:group>
 
 
-                                                                        <xhtml:div class="fb-grid-content">
+                                                                            <xhtml:div class="fb-grid-content">
 
-                                                                            <xforms:group ref=".[xforms:*]">
+                                                                                <xforms:group ref=".[xforms:*]">
 
-                                                                                <!-- Set label for any control -->
-                                                                                <xhtml:span>
-                                                                                    <xforms:input id="fb-control-label-control"
-                                                                                                  ref="$current-resources/*[name() = $control-id]/label"
-                                                                                                  appearance="fr:in-place" class="fb-control-label">
-                                                                                        <xforms:label class="fb-xforms-disabled"/>
-                                                                                    </xforms:input>
-                                                                                </xhtml:span>
+                                                                                    <xxforms:variable name="instance-holder" select="$section-holder/*[name() = $control-id]"/>
 
-                                                                                <!-- Edit control type -->
-                                                                                <!--zzzz-->
-                                                                                <!--<xhtml:span>-->
-                                                                                    <!--<xforms:input id="fb-control-label-control"-->
-                                                                                                  <!--ref="$current-resources/*[name() = $control-id]/label"-->
-                                                                                                  <!--appearance="fr:in-place" class="fb-control-label">-->
-                                                                                        <!--<xforms:label class="fb-xforms-disabled"/>-->
-                                                                                    <!--</xforms:input>-->
-                                                                                <!--</xhtml:span>-->
-
-                                                                                <!-- Display representation of the control -->
-                                                                                <xhtml:div class="fb-control-control">
-
-                                                                                    <xforms:group ref="xforms:input">
-                                                                                        <!--instance('fr-form-instance')/xhtml:head/xforms:model/xforms:instance/*/*[xxx section]/*[count(context()/preceding-sibling::*) + 1]-->
-                                                                                        <xforms:input ref="$variables/blank-readonly-value">
+                                                                                    <!-- Set label for any control -->
+                                                                                    <xhtml:span>
+                                                                                        <xforms:input id="fb-control-label-control"
+                                                                                                      ref="$current-resources/*[name() = $control-id]/label"
+                                                                                                      appearance="fr:in-place" class="fb-control-label">
                                                                                             <xforms:label class="fb-xforms-disabled"/>
                                                                                         </xforms:input>
-                                                                                    </xforms:group>
-                                                                                    <xforms:group ref="xforms:textarea">
-                                                                                        <xforms:textarea ref="$variables/blank-readonly-value">
+                                                                                    </xhtml:span>
+
+                                                                                    <!-- Edit control type -->
+                                                                                    <!--zzzz-->
+                                                                                    <!--<xhtml:span>-->
+                                                                                        <!--<xforms:input id="fb-control-label-control"-->
+                                                                                                      <!--ref="$current-resources/*[name() = $control-id]/label"-->
+                                                                                                      <!--appearance="fr:in-place" class="fb-control-label">-->
+                                                                                            <!--<xforms:label class="fb-xforms-disabled"/>-->
+                                                                                        <!--</xforms:input>-->
+                                                                                    <!--</xhtml:span>-->
+
+                                                                                    <!-- Display representation of the control -->
+                                                                                    <xhtml:div class="fb-control-control">
+
+                                                                                        <xforms:group ref="xforms:input">
+                                                                                            <!--instance('fr-form-instance')/xhtml:head/xforms:model/xforms:instance/*/*[xxx section]/*[count(context()/preceding-sibling::*) + 1]-->
+                                                                                            <xforms:input ref="$instance-holder">
+                                                                                                <xforms:label class="fb-xforms-disabled"/>
+                                                                                            </xforms:input>
+                                                                                        </xforms:group>
+                                                                                        <xforms:group ref="xforms:textarea">
+                                                                                            <xforms:textarea ref="$instance-holder">
+                                                                                                <xforms:label class="fb-xforms-disabled"/>
+                                                                                            </xforms:textarea>
+                                                                                        </xforms:group>
+                                                                                        <xforms:group ref="xforms:select1[@appearance = 'minimal']">
+                                                                                            <xforms:select1 appearance="minimal" ref="$instance-holder">
+                                                                                                <xforms:label class="fb-xforms-disabled"/>
+                                                                                                <xforms:item>
+                                                                                                    <xforms:label>[Choose...]</xforms:label>
+                                                                                                    <xforms:value/>
+                                                                                                </xforms:item>
+                                                                                            </xforms:select1>
+
+                                                                                            <fr:repeat nodeset="xforms:item" id="book-repeat" origin="instance('note-template')" columns="1">
+                                                                                                <xhtml:tr>
+                                                                                                    <xhtml:td>
+                                                                                                        xxxx
+                                                                                                    </xhtml:td>
+                                                                                                </xhtml:tr>
+                                                                                            </fr:repeat>
+
+                                                                                            <!-- TODO: edit items -->
+
+                                                                                            zzz
+
+                                                                                        </xforms:group>
+                                                                                        <!-- TODO -->
+                                                                                    </xhtml:div>
+
+                                                                                    <!-- Edit hint for any control -->
+                                                                                    <xhtml:span>
+                                                                                        <xforms:input id="fb-control-hint-control"
+                                                                                                      ref="$current-resources/*[name() = $control-id]/hint"
+                                                                                                      appearance="fr:in-place" class="fb-control-hint">
                                                                                             <xforms:label class="fb-xforms-disabled"/>
-                                                                                        </xforms:textarea>
-                                                                                    </xforms:group>
-                                                                                    <xforms:group ref="xforms:select1[@appearance = 'minimal']">
-                                                                                        <xforms:select1 appearance="minimal" ref="$variables/blank-readonly-value">
-                                                                                            <xforms:label class="fb-xforms-disabled"/>
-                                                                                            <xforms:item>
-                                                                                                <xforms:label>[Choose...]</xforms:label>
-                                                                                                <xforms:value/>
-                                                                                            </xforms:item>
-                                                                                        </xforms:select1>
+                                                                                        </xforms:input>
+                                                                                    </xhtml:span>
+                                                                                </xforms:group>
 
-                                                                                        <fr:repeat nodeset="xforms:item" id="book-repeat" origin="instance('note-template')" columns="1">
-                                                                                            <xhtml:tr>
-                                                                                                <xhtml:td>
-                                                                                                    xxxx
-                                                                                                </xhtml:td>
-                                                                                            </xhtml:tr>
-                                                                                        </fr:repeat>
-
-                                                                                        <!-- TODO: edit items -->
-
-                                                                                        zzz
-
-                                                                                    </xforms:group>
-                                                                                    <!-- TODO -->
-                                                                                </xhtml:div>
-
-                                                                                <!-- Edit hint for any control -->
-                                                                                <xhtml:span>
-                                                                                    <xforms:input id="fb-control-hint-control"
-                                                                                                  ref="$current-resources/*[name() = $control-id]/hint"
-                                                                                                  appearance="fr:in-place" class="fb-control-hint">
-                                                                                        <xforms:label class="fb-xforms-disabled"/>
-                                                                                    </xforms:input>
+                                                                                <xhtml:span class="fb-control-control">
+                                                                                <xforms:group ref=".[@class = ('radio')]/xforms:*">
+                                                                                    <xforms:select1 ref="instance('form-instance')/xhtml:head/xforms:model/xforms:instance/instance/*[count(xxforms:repeat-current()/preceding-sibling::*) + 1]"
+                                                                                            appearance="full">
+                                                                                        <xforms:label ref="xxforms:repeat-current('form-repeat')/xforms:*/xforms:label"/>
+                                                                                        <xforms:help ref="xxforms:repeat-current('form-repeat')/xforms:*/xforms:help"/>
+                                                                                        <xforms:hint ref="xxforms:repeat-current('form-repeat')/xforms:*/xforms:hint"/>
+                                                                                        <xforms:alert ref="xxforms:repeat-current('form-repeat')/xforms:*/xforms:alert"/>
+                                                                                        <xforms:itemset nodeset="xxforms:repeat-current('form-repeat')/xforms:*/xforms:item">
+                                                                                            <xforms:label ref="xforms:label"/>
+                                                                                            <xforms:value ref="xforms:value"/>
+                                                                                        </xforms:itemset>
+                                                                                    </xforms:select1>
+                                                                                </xforms:group>
+                                                                                <xforms:group ref=".[@class = 'dropdown']/xforms:*">
+                                                                                    <xforms:select1 ref="instance('form-instance')/xhtml:head/xforms:model/xforms:instance/instance/*[count(xxforms:repeat-current()/preceding-sibling::*) + 1]"
+                                                                                            appearance="minimal">
+                                                                                        <xforms:label ref="xxforms:repeat-current('form-repeat')/xforms:*/xforms:label"/>
+                                                                                        <xforms:help ref="xxforms:repeat-current('form-repeat')/xforms:*/xforms:help"/>
+                                                                                        <xforms:hint ref="xxforms:repeat-current('form-repeat')/xforms:*/xforms:hint"/>
+                                                                                        <xforms:alert ref="xxforms:repeat-current('form-repeat')/xforms:*/xforms:alert"/>
+                                                                                        <xforms:itemset nodeset="xxforms:repeat-current('form-repeat')/xforms:*/xforms:item">
+                                                                                            <xforms:label ref="xforms:label"/>
+                                                                                            <xforms:value ref="xforms:value"/>
+                                                                                        </xforms:itemset>
+                                                                                    </xforms:select1>
+                                                                                </xforms:group>
+                                                                                <xforms:group ref=".[@class = ('checkbox')]/xforms:*">
+                                                                                    <xforms:select ref="instance('form-instance')/xhtml:head/xforms:model/xforms:instance/instance/*[count(xxforms:repeat-current()/preceding-sibling::*) + 1]"
+                                                                                            appearance="full">
+                                                                                        <xforms:label ref="xxforms:repeat-current('form-repeat')/xforms:*/xforms:label"/>
+                                                                                        <xforms:help ref="xxforms:repeat-current('form-repeat')/xforms:*/xforms:help"/>
+                                                                                        <xforms:hint ref="xxforms:repeat-current('form-repeat')/xforms:*/xforms:hint"/>
+                                                                                        <xforms:alert ref="xxforms:repeat-current('form-repeat')/xforms:*/xforms:alert"/>
+                                                                                        <xforms:itemset nodeset="xxforms:repeat-current('form-repeat')/xforms:*/xforms:item">
+                                                                                            <xforms:label ref="xforms:label"/>
+                                                                                            <xforms:value ref="xforms:value"/>
+                                                                                        </xforms:itemset>
+                                                                                    </xforms:select>
+                                                                                </xforms:group>
+                                                                                <xforms:group ref=".[@class = 'output']/xforms:*">
+                                                                                    <xforms:output ref="instance('form-instance')/xhtml:head/xforms:model/xforms:instance/instance/*[count(xxforms:repeat-current()/preceding-sibling::*) + 1]">
+                                                                                        <xforms:label ref="xxforms:repeat-current('form-repeat')/xforms:*/xforms:label"/>
+                                                                                        <xforms:help ref="xxforms:repeat-current('form-repeat')/xforms:*/xforms:help"/>
+                                                                                    </xforms:output>
+                                                                                </xforms:group>
                                                                                 </xhtml:span>
-                                                                            </xforms:group>
+                                                                            </xhtml:div>
+                                                                        </xhtml:td>
+                                                                    </xforms:repeat>
+                                                                </xhtml:tr>
+                                                            </xforms:repeat>
+                                                        </xhtml:tbody>
+                                                    </xhtml:table>
+                                                </xhtml:div>
+                                            </xforms:group>
+                                            <!-- Repeat within top-level section -->
+                                            <xforms:group ref=".[local-name() = 'repeat']">
 
-                                                                            <xhtml:span class="fb-control-control">
-                                                                            <xforms:group ref=".[@class = ('radio')]/xforms:*">
-                                                                                <xforms:select1 ref="instance('form-instance')/xhtml:head/xforms:model/xforms:instance/instance/*[count(xxforms:repeat-current()/preceding-sibling::*) + 1]"
-                                                                                        appearance="full">
-                                                                                    <xforms:label ref="xxforms:repeat-current('form-repeat')/xforms:*/xforms:label"/>
-                                                                                    <xforms:help ref="xxforms:repeat-current('form-repeat')/xforms:*/xforms:help"/>
-                                                                                    <xforms:hint ref="xxforms:repeat-current('form-repeat')/xforms:*/xforms:hint"/>
-                                                                                    <xforms:alert ref="xxforms:repeat-current('form-repeat')/xforms:*/xforms:alert"/>
-                                                                                    <xforms:itemset nodeset="xxforms:repeat-current('form-repeat')/xforms:*/xforms:item">
-                                                                                        <xforms:label ref="xforms:label"/>
-                                                                                        <xforms:value ref="xforms:value"/>
-                                                                                    </xforms:itemset>
-                                                                                </xforms:select1>
-                                                                            </xforms:group>
-                                                                            <xforms:group ref=".[@class = 'dropdown']/xforms:*">
-                                                                                <xforms:select1 ref="instance('form-instance')/xhtml:head/xforms:model/xforms:instance/instance/*[count(xxforms:repeat-current()/preceding-sibling::*) + 1]"
-                                                                                        appearance="minimal">
-                                                                                    <xforms:label ref="xxforms:repeat-current('form-repeat')/xforms:*/xforms:label"/>
-                                                                                    <xforms:help ref="xxforms:repeat-current('form-repeat')/xforms:*/xforms:help"/>
-                                                                                    <xforms:hint ref="xxforms:repeat-current('form-repeat')/xforms:*/xforms:hint"/>
-                                                                                    <xforms:alert ref="xxforms:repeat-current('form-repeat')/xforms:*/xforms:alert"/>
-                                                                                    <xforms:itemset nodeset="xxforms:repeat-current('form-repeat')/xforms:*/xforms:item">
-                                                                                        <xforms:label ref="xforms:label"/>
-                                                                                        <xforms:value ref="xforms:value"/>
-                                                                                    </xforms:itemset>
-                                                                                </xforms:select1>
-                                                                            </xforms:group>
-                                                                            <xforms:group ref=".[@class = ('checkbox')]/xforms:*">
-                                                                                <xforms:select ref="instance('form-instance')/xhtml:head/xforms:model/xforms:instance/instance/*[count(xxforms:repeat-current()/preceding-sibling::*) + 1]"
-                                                                                        appearance="full">
-                                                                                    <xforms:label ref="xxforms:repeat-current('form-repeat')/xforms:*/xforms:label"/>
-                                                                                    <xforms:help ref="xxforms:repeat-current('form-repeat')/xforms:*/xforms:help"/>
-                                                                                    <xforms:hint ref="xxforms:repeat-current('form-repeat')/xforms:*/xforms:hint"/>
-                                                                                    <xforms:alert ref="xxforms:repeat-current('form-repeat')/xforms:*/xforms:alert"/>
-                                                                                    <xforms:itemset nodeset="xxforms:repeat-current('form-repeat')/xforms:*/xforms:item">
-                                                                                        <xforms:label ref="xforms:label"/>
-                                                                                        <xforms:value ref="xforms:value"/>
-                                                                                    </xforms:itemset>
-                                                                                </xforms:select>
-                                                                            </xforms:group>
-                                                                            <xforms:group ref=".[@class = 'output']/xforms:*">
-                                                                                <xforms:output ref="instance('form-instance')/xhtml:head/xforms:model/xforms:instance/instance/*[count(xxforms:repeat-current()/preceding-sibling::*) + 1]">
-                                                                                    <xforms:label ref="xxforms:repeat-current('form-repeat')/xforms:*/xforms:label"/>
-                                                                                    <xforms:help ref="xxforms:repeat-current('form-repeat')/xforms:*/xforms:help"/>
-                                                                                </xforms:output>
-                                                                            </xforms:group>
-                                                                            </xhtml:span>
-                                                                        </xhtml:div>
-                                                                    </xhtml:td>
-                                                                </xforms:repeat>
-                                                            </xhtml:tr>
-                                                        </xforms:repeat>
-                                                    </xhtml:tbody>
-                                                </xhtml:table>
-                                            </xhtml:div>
-                                        </xforms:group>
-                                        <!-- Repeat within top-level section -->
-                                        <xforms:group ref=".[local-name() = 'repeat']">
+                                                <!-- TODO: Handle nested repeat -->
 
-                                            <!-- TODO: Handle nested repeat -->
+                                            </xforms:group>
+                                            <!-- Section within top-level section -->
+                                            <xforms:group ref=".[local-name() = 'section']">
 
-                                        </xforms:group>
-                                        <!-- Section within top-level section -->
-                                        <xforms:group ref=".[local-name() = 'section']">
+                                                <!-- TODO: Handle nested section-->
 
-                                            <!-- TODO: Handle nested section-->
+                                            </xforms:group>
+                                        </xhtml:div>
+                                    </xforms:repeat>
 
-                                        </xforms:group>
-                                    </xhtml:div>
-                                </xforms:repeat>
+                                </xforms:group>
 
-                            </xforms:group>
+                                <!-- Top-level grid -->
+                                <xforms:group ref=".[local-name() = 'grid']">
+                                    <xforms:label ref="."/>
 
-                            <!-- Top-level grid -->
-                            <xforms:group ref=".[local-name() = 'grid']">
-                                <xforms:label ref="."/>
+                                    <!-- TODO: Handle top-level grid -->
 
-                                <!-- TODO: Handle top-level grid -->
+                                </xforms:group>
 
-                            </xforms:group>
+                                <!-- Top-level repeat -->
+                                <xforms:group ref=".[local-name() = 'repeat']">
 
-                            <!-- Top-level repeat -->
-                            <xforms:group ref=".[local-name() = 'repeat']">
+                                    <!-- TODO: Handle top-level repeat -->
 
-                                <!-- TODO: Handle top-level repeat -->
-
-                            </xforms:group>
+                                </xforms:group>
+                            </xhtml:div>
                         </xforms:repeat>
                     </xhtml:div>
                 </fr:section>
@@ -1184,48 +1258,6 @@
                     <xforms:setvalue ev:event="xxforms-dialog-open" ref="$variables/new-text" value="$form-instance/root()/saxon:evaluate($variables/result-node)"/>
                 </xxforms:dialog>
 
-                <!-- Section delete confirmation -->
-                <!-- TODO: Generic dialog in components.xsl -->
-                <xxforms:dialog id="fb-delete-confirm-dialog" level="modal" close="false" draggable="true">
-                    <xforms:label>Confirm</xforms:label>
-                    <xhtml:div>
-                        <xhtml:img src="/apps/fr/style/question-large.gif" alt="Question" class="dialog-icon"/>
-                        <xhtml:div class="dialog-message">Are you sure you want to delete the current section?</xhtml:div>
-                    </xhtml:div>
-                    <xhtml:div class="dialog-button">
-                        <xforms:group>
-                            <xforms:trigger>
-                                <xforms:label><xhtml:img src="/apps/fr/style/clear.gif" alt=""/> <xhtml:span>Delete</xhtml:span></xforms:label>
-                                <xforms:action ev:event="DOMActivate" context="saxon:evaluate($variables/result-node)">
-                                    <!-- Context is on fr:section element to delete -->
-
-                                    <!-- Delete holder element for section -->
-                                    <xforms:delete nodeset="$form-instance/*[name() = context()/@context]"/>
-                                    <!-- Delete resources for section -->
-                                    <xforms:delete xxforms:iterate="$resources/resource/*[name() = context()/@context]" nodeset="."/>
-
-                                    <xforms:action xxforms:iterate="*/xhtml:tr/xhtml:td">
-                                        <!-- Delete holder element and resources for control -->
-                                        <xforms:action if="exists(xforms:*)">
-                                            <xforms:delete nodeset="$form-instance/*[index('fb-top-level-repeat')]/*[name() = context()/xforms:*/@ref]"/>
-                                            <xforms:delete xxforms:iterate="$resources/resource/*[name() = context()/xforms:*/@ref]" nodeset="."/>
-                                        </xforms:action>
-                                    </xforms:action>
-
-                                    <!-- Delete section including all controls -->
-                                    <xforms:delete ev:event="DOMActivate" nodeset="."/>
-                                </xforms:action>
-
-                            </xforms:trigger>
-                            <xforms:trigger>
-                                <xforms:label><xhtml:img src="/apps/fr/style/close.gif" alt=""/> <xhtml:span>Cancel</xhtml:span></xforms:label>
-                            </xforms:trigger>
-                        </xforms:group>
-                    </xhtml:div>
-                    <!-- Hide dialog -->
-                    <xxforms:hide ev:event="DOMActivate" dialog="fb-delete-confirm-dialog"/>
-                </xxforms:dialog>
-
                 <!-- Dialog to show the XML -->
                 <xxforms:dialog id="fb-xml-dialog" level="modeless" close="true" draggable="true">
                     <xforms:label>View XML</xforms:label>
@@ -1325,6 +1357,31 @@
                     <xxforms:hide ev:event="DOMActivate" dialog="fb-add-language-dialog"/>
                     <!-- Clear selection list when the dialog opens -->
                     <xforms:setvalue ev:event="xxforms-dialog-open" ref="$variables/new-language"/>
+                </xxforms:dialog>
+
+                <!-- Generic confirmation dialog -->
+                <xxforms:dialog id="fb-confirmation-dialog" level="modal" close="false" draggable="true">
+                    <xforms:label>Confirm</xforms:label>
+                    <xhtml:div>
+                        <xhtml:img src="/apps/fr/style/question-large.gif" alt="Question" class="dialog-icon"/>
+                        <xhtml:div class="dialog-message">
+                            <xforms:output value="$variables/confirmation-message"/>
+                        </xhtml:div>
+                    </xhtml:div>
+                    <xhtml:div class="dialog-button">
+                        <xforms:group>
+                            <xforms:trigger>
+                                <xforms:label><xhtml:img src="/apps/fr/style/clear.gif" alt=""/> <xhtml:span>Delete</xhtml:span></xforms:label>
+                                <xforms:dispatch ev:event="DOMActivate" name="fb-confirmation-yes" target="{$variables/confirmation-target}"/>
+                            </xforms:trigger>
+                            <xforms:trigger>
+                                <xforms:label><xhtml:img src="/apps/fr/style/close.gif" alt=""/> <xhtml:span>Cancel</xhtml:span></xforms:label>
+                                <xforms:dispatch ev:event="DOMActivate" name="fb-confirmation-no" target="{$variables/confirmation-target}"/>
+                            </xforms:trigger>
+                        </xforms:group>
+                    </xhtml:div>
+                    <!-- Hide dialog -->
+                    <xxforms:hide ev:event="DOMActivate" dialog="fb-confirmation-dialog"/>
                 </xxforms:dialog>
 
             </fr:body>

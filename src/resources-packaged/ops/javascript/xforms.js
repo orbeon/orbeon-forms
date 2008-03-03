@@ -36,6 +36,7 @@ var LOADING_MIN_TOP_PADDING_PROPERTY = "loading-min-top-padding";
 var REVISIT_HANDLING_PROPERTY = "revisit-handling";
 var HELP_HANDLER_PROPERTY = "help-handler";
 var HELP_TOOLTIP_PROPERTY = "help-tooltip";
+var APPLICATION_RESOURCES_VERSION_PROPERTY = "oxf.resources.version-number";
 
 // Parameter defaults
 // NOTE: Default values below MUST match the ones in XFormsProperties
@@ -57,6 +58,7 @@ var XFORMS_LOADING_MIN_TOP_PADDING = 10;
 var XFORMS_REVISIT_HANDLING = "restore";
 var XFORMS_HELP_HANDLER = false;
 var XFORMS_HELP_TOOLTIP = false;
+var APPLICATION_RESOURCES_VERSION = "1.0";
 
 /**
  * Constants

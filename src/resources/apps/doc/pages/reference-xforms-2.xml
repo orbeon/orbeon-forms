@@ -551,6 +551,13 @@
                     of binding the group to an instance data node, which may affect group relevance, for example.
                 </p>
             </section>
+            <a name="event-context"/>
+            <section>
+                <title>Enhanced <code>event()</code> Function Support</title>
+                <p>
+                    [TODO: describe Orbeon Forms support for event() function for each event]
+                </p>
+            </section>
             <a name="xpath-extensions"/>
             <section>
                 <title>XPath Extension Functions</title>

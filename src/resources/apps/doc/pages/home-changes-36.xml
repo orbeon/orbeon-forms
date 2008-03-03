@@ -117,15 +117,15 @@
                         </p>
                         <p>
                             See <a href="reference-xforms-2#exforms-iterate">Iteration of XForms Actions over
-                            Nodesets</a> for documentation and a complete example.
+                            Sequences</a> for documentation and a complete example.
                         </p>
                     </li>
                     <li>
                         <p>
                             <b><code>ev:observer</code> and <code>ev:target</code> attributes on action handlers.</b>
-                            The <code>ev:observer</code> attribute used to be only supported within a model to refer to
-                            a nested instance. It is now globally supported. Support for the more rarely needed
-                            <code>ev:target</code> attribute has been added as well.
+                            The XML Events <code>ev:observer</code> attribute used to be only supported within a model
+                            to refer to a nested instance. It is now globally supported. Support for the more rarely
+                            needed <code>ev:target</code> attribute has been added as well.
                         </p>
                         <p>
                             See also <a href="reference-xforms-ng#events-observer-target">Using the

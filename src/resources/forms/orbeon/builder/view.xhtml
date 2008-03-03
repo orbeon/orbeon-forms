@@ -35,9 +35,15 @@
                 background: white url(../../../../apps/fr/style/separator.gif) repeat-x scroll left center
             }
 
-            .fb-toolbox { margin: 1em; padding: .2em; border: 0px solid black; width: auto; background-color: #3598D4; clear: both }
-            .fb-toolbox .fb-tool { display: block; float: left; margin: .2em }
+            <!-- Language toolbar -->
+            .fb-language-choice { display: block; float: right; }
+            .fb-language-choice .fb-language-triggers { display: block }
+
+            <!-- Toolbox -->
+            .fb-toolbox { margin: .5em; padding: .5em; width: auto; background-color: #3598D4; text-align: center }
+            .fb-toolbox .fb-tool { display: block }
             .fb-toolbox .fb-tool button { width: 12em; text-align: left }
+
             .fb-clear { clear: both }
             .fb-xforms-disabled { display:none }
 
@@ -45,7 +51,7 @@
             .fb-grid table { margin-top: .5em; margin-left: 1px }
             .fb-grid td { border: 1px dotted gray; padding: .2em }
 
-            .fb-toolbar button { width: 15em }
+            .fb-toolbar button { width: 12em }
             .fb-section-toolbar { margin-top: .5em }
 
             <!-- Set width of dialog (otherwise becomes too wide) -->
@@ -132,18 +138,22 @@
             .fb-grid tr td { width: auto; vertical-align: top }
             #fb-details-section .fb-grid tr td .xforms-input input { width: 63.5em }
             #fb-details-section .fb-grid tr td textarea.xforms-textarea { width: 64em }
+            #fb-details-section .fb-grid tr td .xforms-select1-appearance-minimal { width: 64em }
 
             .fb-grid-2-columns tr td { width: 50%; }
             #fb-details-section .fb-grid-2-columns tr td .xforms-input input { width: 30em; }
             #fb-details-section .fb-grid-2-columns tr td textarea.xforms-textarea { width: 30em; }
+            #fb-details-section .fb-grid-2-columns tr td .xforms-select1-appearance-minimal { width: 30em }
 
             .fb-grid-3-columns tr td { width: 33.3%; }
             #fb-details-section .fb-grid-3-columns tr td .xforms-input input { width: 18em; }
             #fb-details-section .fb-grid-3-columns tr td textarea.xforms-textarea { width: 19em; }
+            #fb-details-section .fb-grid-3-columns tr td .xforms-select1-appearance-minimal { width: 19em }
 
             .fb-grid-4-columns tr td { width: 25%; }
             #fb-details-section .fb-grid-4-columns tr td .xforms-input input { width: 13em; }
             #fb-details-section .fb-grid-4-columns tr td textarea.xforms-textarea { width: 13em; }
+            #fb-details-section .fb-grid-4-columns tr td .xforms-select1-appearance-minimal { width: 13em }
 
             .fb-grid-cell-icons { width: 1em; text-align: center; margin-right: .2em; float: left }
             .fb-grid-cell-icons img { margin-bottom: .5em; padding: 0 }
@@ -165,6 +175,13 @@
             <!--.fb-section-title-content { background: #eee }-->
         </xhtml:style>
         <xforms:model id="fr-form-model">
+
+            <xforms:action ev:event="xforms-ready">
+                <xxforms:script>
+                    <!-- Position toolbox to the left -->                    
+                    ORBEON.xforms.Globals.dialogs["fb-toolbox-dialog"].cfg.setProperty("x", 0);
+                </xxforms:script>
+            </xforms:action>
 
             <!-- Main instance -->
             <xforms:instance id="fr-form-instance" src="oxf:/forms/orbeon/builder/example-1.xml"/>
@@ -490,6 +507,9 @@
             <xhtml:img src="/apps/fr/style/orbeon-logo-trimmed-transparent-42.png"/>
             <fr:body>
 
+                <xxforms:variable name="current-top-level-block" select="$body/fr:*[index('fb-top-level-repeat')]"/>
+                <xxforms:variable name="current-section-content-block" select="$current-top-level-block/fr:*[index('fb-section-content-repeat')]"/>
+
                 <!--
 
                     Here is how a page is organized:
@@ -504,7 +524,7 @@
 
                 -->
 
-                <xforms:group class="fr-summary-language-choice fb-hide-alert">
+                <xforms:group class="fb-language-choice fb-hide-alert">
                     <xforms:select1 appearance="minimal" ref="$lang" id="fb-resources-language-select">
                         <xforms:label>Resources Language</xforms:label>
                         <xforms:itemset nodeset="$resources/resource">
@@ -512,26 +532,29 @@
                             <xforms:value ref="@xml:lang"/>
                         </xforms:itemset>
                     </xforms:select1>
-                    <xforms:trigger appearance="minimal">
-                        <xforms:label>Add</xforms:label>
-                        <xxforms:show ev:event="DOMActivate" dialog="fb-add-language-dialog" neighbor="fb-resources-language-select"/>
-                    </xforms:trigger>
-                    <xforms:trigger appearance="minimal" id="fb-language-remove" ref=".[count($resources/resource) gt 1]">
-                        <xforms:label>Remove</xforms:label>
-                        <xforms:action ev:event="DOMActivate">
-                            <!-- Ask confirmation -->
-                            <xforms:setvalue ref="$variables/confirmation-message"
-                                             value="concat('Are you sure you want to delete all resources for language ''',
-                                             xxforms:instance('fr-languages-instance')/language[@code = $lang]/(if (@native-name != @english-name) then concat(@native-name, ' (', @english-name, ')') else @native-name),
-                                             '''?')"/>
-                            <xforms:setvalue ref="$variables/confirmation-target">fb-language-remove</xforms:setvalue>
-                            <xxforms:show dialog="fb-confirmation-dialog"/>
-                        </xforms:action>
-                        <xforms:action ev:event="fb-confirmation-yes">
-                            <!-- Delete resources for this language -->
-                            <xforms:delete nodeset="$resources/resource[@xml:lang = $lang]"/>
-                        </xforms:action>
-                    </xforms:trigger>
+                    <xforms:group class="fb-language-triggers">
+                        <xforms:trigger appearance="minimal">
+                            <xforms:label>Add</xforms:label>
+                            <xxforms:show ev:event="DOMActivate" dialog="fb-add-language-dialog" neighbor="fb-resources-language-select"/>
+                        </xforms:trigger>
+                        <xforms:trigger appearance="minimal" id="fb-language-remove" ref=".[count($resources/resource) gt 1]">
+                            <xforms:label>Remove</xforms:label>
+                            <xforms:action ev:event="DOMActivate">
+                                <!-- Ask confirmation -->
+                                <xforms:setvalue ref="$variables/confirmation-message"
+                                                 value="concat('Are you sure you want to delete all resources for language ''',
+                                                 xxforms:instance('fr-languages-instance')/language[@code = $lang]/(if (@native-name != @english-name) then concat(@native-name, ' (', @english-name, ')') else @native-name),
+                                                 '''?')"/>
+                                <xforms:setvalue ref="$variables/confirmation-target">fb-language-remove</xforms:setvalue>
+                                <xxforms:show dialog="fb-confirmation-dialog"/>
+                            </xforms:action>
+                            <xforms:action ev:event="fb-confirmation-yes">
+                                <!-- Delete resources for this language -->
+                                <xforms:delete nodeset="$resources/resource[@xml:lang = $lang]"/>
+                                <xforms:setvalue ref="$lang" value="$resources/resource[1]/@xml:lang"/>
+                            </xforms:action>
+                        </xforms:trigger>
+                    </xforms:group>
                 </xforms:group>
 
                 <!-- Section about form metadata -->
@@ -551,6 +574,7 @@
                     </xforms:textarea>
                 </fr:section>
 
+                <!-- Form details -->
                 <fr:section id="fb-details-section" context="$body">
                     <xforms:label>Form Details</xforms:label>
 
@@ -605,58 +629,6 @@
 
                                     </xforms:group>
 
-                                    <!-- Insert section children -->
-                                    <xhtml:div class="fb-section-toolbar fb-toolbar">
-                                        <xforms:trigger appearance="full">
-                                            <xforms:label>
-                                                <xhtml:img src="../../../../forms/orbeon/builder/images/action1.gif" alt="New 1-Column Grid" title="New 1-Column Grid"/>
-                                                <xhtml:span>New 1-Column Grid</xhtml:span>
-                                            </xforms:label>
-                                            <xforms:action ev:event="DOMActivate">
-                                                <xforms:insert context="." nodeset="fr:section | fr:repeat | fr:grid"
-                                                               at="index('fb-section-content-repeat')" position="after"
-                                                               origin="instance('fb-grid-1-template')"/>
-                                                <!--<xforms:setvalue ref="(fr:section | fr:repeat | fr:grid)[index('fb-section-content-repeat')]/@columns" value="1"/>-->
-                                            </xforms:action>
-                                        </xforms:trigger>
-
-                                        <xforms:trigger appearance="full">
-                                            <xforms:label>
-                                                <xhtml:img src="../../../../forms/orbeon/builder/images/action2.gif" alt="New 2-Column Grid" title="New 2-Column Grid"/>
-                                                <xhtml:span>New 2-Column Grid</xhtml:span>
-                                            </xforms:label>
-                                            <xforms:action ev:event="DOMActivate">
-                                                <xforms:insert context="." nodeset="fr:section | fr:repeat | fr:grid"
-                                                               at="index('fb-section-content-repeat')" position="after"
-                                                               origin="instance('fb-grid-2-template')"/>
-                                            </xforms:action>
-                                        </xforms:trigger>
-
-                                        <xforms:trigger appearance="full">
-                                            <xforms:label>
-                                                <xhtml:img src="../../../../forms/orbeon/builder/images/action3.gif" alt="New 3-Column Grid" title="New 3-Column Grid"/>
-                                                <xhtml:span>New 3-Column Grid</xhtml:span>
-                                            </xforms:label>
-                                            <xforms:action ev:event="DOMActivate">
-                                                <xforms:insert context="." nodeset="fr:section | fr:repeat | fr:grid"
-                                                               at="index('fb-section-content-repeat')" position="after"
-                                                               origin="instance('fb-grid-3-template')"/>
-                                            </xforms:action>
-                                        </xforms:trigger>
-
-                                        <xforms:trigger appearance="full">
-                                            <xforms:label>
-                                                <xhtml:img src="../../../../forms/orbeon/builder/images/action3.gif" alt="New 4-Column Grid" title="New 4-Column Grid"/>
-                                                <xhtml:span>New 4-Column Grid</xhtml:span>
-                                            </xforms:label>
-                                            <xforms:action ev:event="DOMActivate">
-                                                <xforms:insert context="." nodeset="fr:section | fr:repeat | fr:grid"
-                                                               at="index('fb-section-content-repeat')" position="after"
-                                                               origin="instance('fb-grid-4-template')"/>
-                                            </xforms:action>
-                                        </xforms:trigger>
-                                    </xhtml:div>
-
                                     <!-- Section content -->
                                     <xforms:repeat nodeset="fr:section | fr:repeat | fr:grid" id="fb-section-content-repeat">
 
@@ -667,10 +639,10 @@
                                                 <xhtml:div class="fb-grid-toolbar fb-toolbar">
                                                     <xforms:trigger appearance="full">
                                                         <xforms:label>
-                                                            <xhtml:span>Add Row</xhtml:span>
+                                                            <xhtml:span>Insert Row</xhtml:span>
                                                         </xforms:label>
                                                         <xforms:action ev:event="DOMActivate">
-                                                            <xforms:action context="$body/fr:*[index('fb-top-level-repeat')]/fr:*[index('fb-section-content-repeat')]">
+                                                            <xforms:action context="$current-section-content-block">
                                                                 <!-- Pointing to current grid element -->
                                                                 <xforms:insert context="." nodeset="xhtml:tr"
                                                                                at="index('fb-section-content-grid-tr-repeat')"
@@ -681,7 +653,7 @@
                                                     </xforms:trigger>
                                                     <xforms:trigger appearance="full" ref=".[xs:integer(@columns) lt 4]">
                                                         <xforms:label>
-                                                            <xhtml:span>Add Column</xhtml:span>
+                                                            <xhtml:span>Insert Column</xhtml:span>
                                                         </xforms:label>
                                                         <xforms:action ev:event="DOMActivate">
                                                             <!-- Context is on current grid -->
@@ -1035,7 +1007,7 @@
                     <xforms:trigger>
                         <xforms:label>
                             <xhtml:img src="../../../../forms/orbeon/builder/images/upload.png" alt="Upload XML Schema" title="Upload XML Schema"/>
-                            <xhtml:span>Upload XML Schema</xhtml:span>
+                            <xhtml:span>XML Schema</xhtml:span>
                         </xforms:label>
                         <!-- TODO -->
                         <!--<xxforms:show ev:event="DOMActivate" dialog="fb-xml-dialog"/>-->
@@ -1107,6 +1079,64 @@
                                     </xforms:action>
                                 </xforms:trigger>
                             </xhtml:div>
+                            <!-- Add grids -->
+                            <xforms:group context="$current-top-level-block" appearance="xxforms:internal">
+                                <xhtml:div class="fb-tool">
+                                    <xforms:trigger appearance="full">
+                                        <xforms:label>
+                                            <xhtml:img src="../../../../forms/orbeon/builder/images/action1.gif" alt="New 1-Column Grid" title="New 1-Column Grid"/>
+                                            <xhtml:span>1-Column Grid</xhtml:span>
+                                        </xforms:label>
+                                        <xforms:action ev:event="DOMActivate">
+                                            <xforms:insert context="." nodeset="fr:section | fr:repeat | fr:grid"
+                                                           at="index('fb-section-content-repeat')" position="after"
+                                                           origin="instance('fb-grid-1-template')"/>
+                                            <!--<xforms:setvalue ref="(fr:section | fr:repeat | fr:grid)[index('fb-section-content-repeat')]/@columns" value="1"/>-->
+                                        </xforms:action>
+                                    </xforms:trigger>
+                                </xhtml:div>
+                                <xhtml:div class="fb-tool">
+                                    <xforms:trigger appearance="full">
+                                        <xforms:label>
+                                            <xhtml:img src="../../../../forms/orbeon/builder/images/action2.gif" alt="New 2-Column Grid" title="New 2-Column Grid"/>
+                                            <xhtml:span>2-Column Grid</xhtml:span>
+                                        </xforms:label>
+                                        <xforms:action ev:event="DOMActivate">
+                                            <xforms:insert context="." nodeset="fr:section | fr:repeat | fr:grid"
+                                                           at="index('fb-section-content-repeat')" position="after"
+                                                           origin="instance('fb-grid-2-template')"/>
+                                        </xforms:action>
+                                    </xforms:trigger>
+                                </xhtml:div>
+                                <xhtml:div class="fb-tool">
+                                    <xforms:trigger appearance="full">
+                                        <xforms:label>
+                                            <xhtml:img src="../../../../forms/orbeon/builder/images/action3.gif" alt="New 3-Column Grid" title="New 3-Column Grid"/>
+                                            <xhtml:span>3-Column Grid</xhtml:span>
+                                        </xforms:label>
+                                        <xforms:action ev:event="DOMActivate">
+                                            <xforms:insert context="." nodeset="fr:section | fr:repeat | fr:grid"
+                                                           at="index('fb-section-content-repeat')" position="after"
+                                                           origin="instance('fb-grid-3-template')"/>
+                                        </xforms:action>
+                                    </xforms:trigger>
+                                </xhtml:div>
+                                <xhtml:div class="fb-tool">
+                                    <xforms:trigger appearance="full">
+                                        <xforms:label>
+                                            <xhtml:img src="../../../../forms/orbeon/builder/images/action3.gif" alt="New 4-Column Grid" title="New 4-Column Grid"/>
+                                            <xhtml:span>4-Column Grid</xhtml:span>
+                                        </xforms:label>
+                                        <xforms:action ev:event="DOMActivate">
+                                            <xforms:insert context="." nodeset="fr:section | fr:repeat | fr:grid"
+                                                           at="index('fb-section-content-repeat')" position="after"
+                                                           origin="instance('fb-grid-4-template')"/>
+                                        </xforms:action>
+                                    </xforms:trigger>
+                                </xhtml:div>
+                            </xforms:group>
+                        </xhtml:div>
+                        <xhtml:div class="fb-toolbox">
                             <xforms:repeat nodeset="instance('fb-controls-template')/template" id="fb-controls-template-repeat">
 
                                 <xxforms:variable name="control-template" select="xhtml:div/xforms:*"/>
@@ -1132,7 +1162,7 @@
                                                            origin="xxforms:element(concat('control-', $next-control-id))"/>
 
                                             <!-- Insert new control into the document -->
-                                            <xforms:action context="$body/fr:*[index('fb-top-level-repeat')]/fr:*[index('fb-section-content-repeat')]">
+                                            <xforms:action context="$current-section-content-block">
                                                 <!-- Pointing to current grid element -->
 
                                                 <xforms:action context="xhtml:tr[index('fb-section-content-grid-tr-repeat')]/xhtml:td[index('fb-section-content-grid-td-repeat')]"
@@ -1374,7 +1404,7 @@
                                 <xforms:label><xhtml:img src="/apps/fr/style/clear.gif" alt=""/> <xhtml:span>Delete</xhtml:span></xforms:label>
                                 <xforms:dispatch ev:event="DOMActivate" name="fb-confirmation-yes" target="{$variables/confirmation-target}"/>
                             </xforms:trigger>
-                            <xforms:trigger>
+                            <xforms:trigger id="fb-confirmation-dialog-cancel-trigger">
                                 <xforms:label><xhtml:img src="/apps/fr/style/close.gif" alt=""/> <xhtml:span>Cancel</xhtml:span></xforms:label>
                                 <xforms:dispatch ev:event="DOMActivate" name="fb-confirmation-no" target="{$variables/confirmation-target}"/>
                             </xforms:trigger>
@@ -1382,6 +1412,8 @@
                     </xhtml:div>
                     <!-- Hide dialog -->
                     <xxforms:hide ev:event="DOMActivate" dialog="fb-confirmation-dialog"/>
+                    <!-- Set focus when the dialog open  -->
+                    <xforms:setfocus ev:event="xxforms-dialog-open" control="fb-confirmation-dialog-cancel-trigger"/>
                 </xxforms:dialog>
 
             </fr:body>

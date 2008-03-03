@@ -20,6 +20,7 @@ import org.dom4j.Node;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
@@ -61,13 +62,19 @@ public class XFormsDeleteAction extends XFormsAction {
 
         // "The delete action is terminated with no effect if [...] the context attribute is not given and the Node
         // Set Binding node-set is empty."
-        if (contextAttribute == null && isEmptyNodesetBinding)
+        if (contextAttribute == null && isEmptyNodesetBinding) {
+            if (XFormsServer.logger.isDebugEnabled())
+                containingDocument.logDebug("xforms:delete", "context is empty, terminating");
             return;
+        }
 
         // Handle insert context (with @context attribute)
         // "The delete action is terminated with no effect if the insert context is the empty node-set [...]."
-        if (hasOverriddenContext && (overriddenContext == null || !(overriddenContext instanceof NodeInfo)))
+        if (hasOverriddenContext && (overriddenContext == null || !(overriddenContext instanceof NodeInfo))) {
+            if (XFormsServer.logger.isDebugEnabled())
+                containingDocument.logDebug("xforms:delete", "overridden context is an empty nodeset or not a nodeset, terminating");
             return;
+        }
 
         {
             final NodeInfo nodeInfoToRemove;
@@ -114,7 +121,8 @@ public class XFormsDeleteAction extends XFormsAction {
                 }
 
                 if (isEmptyNodesetBinding) {
-                    // TODO: not specified by spec
+                    if (XFormsServer.logger.isDebugEnabled())
+                        containingDocument.logDebug("xforms:delete", "empty node-set binding, terminating");
                     return;
                 } else {
                     // Find actual deletion point
@@ -139,6 +147,10 @@ public class XFormsDeleteAction extends XFormsAction {
 
                         // "except if the node is the root document element of an instance then the delete action
                         // is terminated with no effect."
+
+                        if (XFormsServer.logger.isDebugEnabled())
+                            containingDocument.logDebug("xforms:delete", "attempt to delete document node, terminating");
+
                         return;
                     } else {
                         throw new OXFException("Node to delete doesn't have a parent.");
@@ -164,6 +176,12 @@ public class XFormsDeleteAction extends XFormsAction {
             // Then only perform the deletion
             // "The node at the delete location in the Node Set Binding node-set is deleted"
             parentContent.remove(actualIndexInParentContentCollection);
+
+            // TODO: Support removing all the nodes in @nodeset, as per XForms 1.1
+            final int removedNodesCount = 1;
+            if (XFormsServer.logger.isDebugEnabled())
+                containingDocument.logDebug("xforms:delete", "removed nodes",
+                        new String[] { "count", Integer.toString(removedNodesCount), "instance", modifiedInstance.getId() });
 
             // Rebuild ControlsState
             xformsControls.rebuildCurrentControlsState(pipelineContext);

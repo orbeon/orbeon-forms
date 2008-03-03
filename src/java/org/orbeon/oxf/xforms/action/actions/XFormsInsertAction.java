@@ -72,8 +72,11 @@ public class XFormsInsertAction extends XFormsAction {
 
         // "The insert action is terminated with no effect if [...] a. The context attribute is not given and the Node
         // Set Binding node-set is the empty node-set."
-        if (contextAttribute == null && isEmptyNodesetBinding)
+        if (contextAttribute == null && isEmptyNodesetBinding) {
+            if (XFormsServer.logger.isDebugEnabled())
+                containingDocument.logDebug("xforms:insert", "context is empty, terminating");
             return;
+        }
 
         // Handle insert context (with @context attribute)
         final NodeInfo insertContextNodeInfo;

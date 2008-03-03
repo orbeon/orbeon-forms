@@ -29,6 +29,7 @@ import org.orbeon.saxon.om.Item;
 
 import java.util.List;
 import java.util.Collections;
+import java.util.Map;
 
 /**
  * Execute a top-level XForms action and the included nested actions if any.
@@ -146,17 +147,34 @@ public class XFormsActionInterpreter {
                 // Gotta iterate
 
                 // We have to restore the context to the in-scope evaluation context, then push @model/@context/@iterate
+                // NOTE: It's not 100% how @context and @xxforms:iterate should interact here
                 final XFormsContextStack.BindingContext actionBindingContext = contextStack.popBinding();
-                pushIterateAttribute(pipelineContext, actionElement, iterateIterationAttribute);
+                final Map namespaceContext = containingDocument.getNamespaceMappings(actionElement);
                 {
+                    final String contextAttribute = actionElement.attributeValue("context");
+                    final String modelAttribute = actionElement.attributeValue("model");
+                    contextStack.pushBinding(pipelineContext, null, contextAttribute, iterateIterationAttribute, modelAttribute, null, actionElement, namespaceContext);
+                }
+                {
+                    final String refAttribute = actionElement.attributeValue("ref");
+                    final String nodesetAttribute = actionElement.attributeValue("nodeset");
+                    final String bindAttribute = actionElement.attributeValue("bind");
+
                     final int iterationCount = contextStack.getCurrentNodeset().size();
                     for (int index = 1; index <= iterationCount; index++) {
+
+                        // Push iteration
                         contextStack.pushIteration(index);
+
+                        // Then we also need to push back binding attributes, excluding @context and @model
+                        contextStack.pushBinding(pipelineContext, refAttribute, null, nodesetAttribute, null, bindAttribute, actionElement, namespaceContext);
 
                         final Item overriddenContextNodeInfo = contextStack.getCurrentSingleItem();
                         runSingleIteration(pipelineContext, targetEffectiveId, eventHandlerContainer, actionElement, actionNamespaceURI,
                                 actionName, ifConditionAttribute, whileIterationAttribute, true, overriddenContextNodeInfo);
 
+                        // Restore context
+                        contextStack.popBinding();
                         contextStack.popBinding();
                     }
 
@@ -224,12 +242,6 @@ public class XFormsActionInterpreter {
 
             whileIteration++;
         }
-    }
-
-    public void pushIterateAttribute(PipelineContext pipelineContext, Element actionElement, String iterateAttribute) {
-        final String contextAttribute = actionElement.attributeValue("context");
-        final String modelAttribute = actionElement.attributeValue("model");
-        contextStack.pushBinding(pipelineContext, null, contextAttribute, iterateAttribute, modelAttribute, null, actionElement, containingDocument.getNamespaceMappings(actionElement));
     }
 
     private boolean evaluateCondition(PipelineContext pipelineContext, Element actionElement,

@@ -1110,9 +1110,9 @@ ORBEON.xforms.Controls = {
         yuiDialog.cfg.setProperty("constraintoviewport", constrain);
         // Position the dialog either at the center of the viewport or relative of a neighbor
         if (neighbor == null)
-            neighbor = ORBEON.util.Dom.getAttribute(divElement, "neighbor");
+            neighbor = ORBEON.util.Dom.getAttribute(divElement, "neighbor");// TODO: there can't be a "neighbor" attribute on the HTML element
         if (neighbor == null) {
-            // Center dialog in page, if not positined relative to other element
+            // Center dialog in page, if not positioned relative to other element
             yuiDialog.center();
         } else {
             // Align dialog relative to neighbor

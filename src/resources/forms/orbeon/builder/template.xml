@@ -22,7 +22,7 @@
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
       xmlns:saxon="http://saxon.sf.net/" >
     <xhtml:head>
-        <xhtml:title>Empty Form</xhtml:title>
+        <xhtml:title>Empty Orbeon Form</xhtml:title>
         <xhtml:link rel="stylesheet" href="/ops/css/yui/reset-fonts-grids.css" type="text/css"/>
         <xhtml:link rel="stylesheet" href="/ops/css/yui/base-min.css" type="text/css"/>
         <xhtml:link rel="stylesheet" href="/apps/fr/style/form-runner.css" type="text/css"/>
@@ -41,9 +41,9 @@
             <!-- Metadata -->
             <xforms:instance id="fr-form-metadata" xxforms:readonly="true">
                 <metadata>
-                    <id>[Choose an identifier for this form]</id>
-                    <title>[Name this form]</title>
-                    <description>[Describe this form]</description>
+                    <id/>
+                    <title>[Please give this form a title]</title>
+                    <description>[Please optionally describe this form]</description>
                     <author/>
                 </metadata>
             </xforms:instance>
@@ -75,7 +75,7 @@
             <fr:body>
                 <fr:section id="section-1-section" context="section-1">
                     <xforms:label ref="$form-resources/section-1/label"/>
-                    <fr:grid columns="1">
+                    <fr:grid columns="2">
                         <xhtml:tr>
                             <xhtml:td>
                                 <xforms:input id="control-1-control" ref="control-1">
@@ -85,6 +85,7 @@
                                     <xforms:alert ref="$form-resources/control-1/alert"/>
                                 </xforms:input>
                             </xhtml:td>
+                            <xhtml:td/>
                         </xhtml:tr>
                     </fr:grid>
                 </fr:section>

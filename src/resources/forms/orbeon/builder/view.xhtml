@@ -108,6 +108,10 @@
 
             <!-- Grid -->
 
+            <!-- Set min height of table using CSS hack for IE -->
+            .fb-grid-cell-icons { min-height: 4em; height: auto !important; height: 4em  }
+
+            .fb-grid table { width: 68em }
             .fb-grid tr td { width: auto }
             #fb-details-section .fb-grid tr td .xforms-input input { width: 63em }
             #fb-details-section .fb-grid tr td textarea.xforms-textarea { width: 63.5em }
@@ -121,8 +125,8 @@
             #fb-details-section .fb-grid-3-columns tr td textarea.xforms-textarea { width: 17.83em; }
 
             .fb-grid-4-columns tr td { width: 25%; }
-            #fb-details-section .fb-grid-4-columns tr td .xforms-input input { width: 12.2em; }
-            #fb-details-section .fb-grid-4-columns tr td textarea.xforms-textarea { width: 12.2em; }
+            #fb-details-section .fb-grid-4-columns tr td .xforms-input input { width: 12em; }
+            #fb-details-section .fb-grid-4-columns tr td textarea.xforms-textarea { width: 12em; }
 
             .fb-grid-cell-icons { width: 1em; text-align: center; margin-right: .2em; float: left }
             .fb-grid-cell-icons img { margin-bottom: .5em; padding: 0 }
@@ -131,6 +135,10 @@
                 <!--background: white;-->
             <!--}-->
             .fb-grid-content { float: left }
+
+            .xforms-repeat-selected-item-1 .xforms-repeat-selected-item-2 .xforms-repeat-selected-item-3 .xforms-repeat-selected-item-4 {
+                background-image: url(../../../../apps/fr/style/logo-bg.gif) 
+            }
 
             .fb-hide-alert .xforms-alert { display: none }
 
@@ -254,25 +262,10 @@
                 </template>
             </xforms:instance>
 
-            <xforms:instance id="fb-grid-tr-template" xxforms:readonly="true">
-                <xhtml:tr/>
-            </xforms:instance>
-
-            <xforms:instance id="fb-grid-td-template" xxforms:readonly="true">
-                <xhtml:td/>
-            </xforms:instance>
-
             <xforms:instance id="fb-grid-1-template" xxforms:readonly="true">
                 <fr:grid columns="1">
                     <xhtml:tr>
-                        <xhtml:td>
-                            <xforms:input ref="input">
-                                <xforms:label ref=""/>
-                                <xforms:hint ref=""/>
-                                <xforms:help ref=""/>
-                                <xforms:alert ref=""/>
-                            </xforms:input>
-                        </xhtml:td>
+                        <xhtml:td/>
                     </xhtml:tr>
                 </fr:grid>
             </xforms:instance>
@@ -280,16 +273,8 @@
             <xforms:instance id="fb-grid-2-template" xxforms:readonly="true">
                 <fr:grid columns="2">
                     <xhtml:tr>
-                        <xhtml:td>
-                            <xforms:input ref="input">
-                                <xforms:label ref=""/>
-                                <xforms:hint ref=""/>
-                                <xforms:help ref=""/>
-                                <xforms:alert ref=""/>
-                            </xforms:input>
-                        </xhtml:td>
-                        <xhtml:td>
-                        </xhtml:td>
+                        <xhtml:td/>
+                        <xhtml:td/>
                     </xhtml:tr>
                 </fr:grid>
             </xforms:instance>
@@ -297,18 +282,9 @@
             <xforms:instance id="fb-grid-3-template" xxforms:readonly="true">
                 <fr:grid columns="2">
                     <xhtml:tr>
-                        <xhtml:td>
-                            <xforms:input id="" ref="input">
-                                <xforms:label ref=""/>
-                                <xforms:hint ref=""/>
-                                <xforms:help ref=""/>
-                                <xforms:alert ref=""/>
-                            </xforms:input>
-                        </xhtml:td>
-                        <xhtml:td>
-                        </xhtml:td>
-                        <xhtml:td>
-                        </xhtml:td>
+                        <xhtml:td/>
+                        <xhtml:td/>
+                        <xhtml:td/>
                     </xhtml:tr>
                 </fr:grid>
             </xforms:instance>
@@ -316,20 +292,10 @@
             <xforms:instance id="fb-grid-4-template" xxforms:readonly="true">
                 <fr:grid columns="2">
                     <xhtml:tr>
-                        <xhtml:td>
-                            <xforms:input id="" ref="input">
-                                <xforms:label ref=""/>
-                                <xforms:hint ref=""/>
-                                <xforms:help ref=""/>
-                                <xforms:alert ref=""/>
-                            </xforms:input>
-                        </xhtml:td>
-                        <xhtml:td>
-                        </xhtml:td>
-                        <xhtml:td>
-                        </xhtml:td>
-                        <xhtml:td>
-                        </xhtml:td>
+                        <xhtml:td/>
+                        <xhtml:td/>
+                        <xhtml:td/>
+                        <xhtml:td/>
                     </xhtml:tr>
                 </fr:grid>
             </xforms:instance>
@@ -642,7 +608,7 @@
                                     <xhtml:div>
                                         <!-- Handle grid -->
                                         <xforms:group ref=".[local-name() = 'grid']">
-                                            <!-- TODO: How do we set the fr-grid-1-columns or fr-grid-2-columns style? Need avts on HTML attributes? -->
+                                            <!-- Use AVTs to set the style on the div depending on the number of columns -->
                                             <xhtml:div class="fb-grid fb-grid-{count(xhtml:tr[1]/xhtml:td)}-columns">
                                                 <!-- Grid table -->
                                                 <xhtml:table>
@@ -653,16 +619,22 @@
                                                                 <!-- Repeat over table columns -->
                                                                 <xforms:repeat nodeset="xhtml:td" id="fb-section-content-grid-td-repeat">
 
-                                                                    <xxforms:variable name="control-id" select="substring-before(xforms:*/@id, '-control')"/>
+                                                                    <xxforms:variable name="control-id" select="substring-before(xforms:*[1]/@id, '-control')"/>
                                                                     <xhtml:td>
                                                                         <xhtml:div class="fb-grid-cell-icons">
+                                                                            <!-- TODO: For now put here, but move once dnd is there and clicking on cell is enough -->
+                                                                            <xforms:trigger appearance="minimal">
+                                                                                <xforms:label><xhtml:img src="../../../../apps/fr/style/drag_handle.gif" alt="Drag" title="Drag"/></xforms:label>
+                                                                            </xforms:trigger>
                                                                             <xforms:group ref=".[xforms:*]">
-                                                                                <xhtml:img src="../../../../apps/fr/style/drag_handle.gif" alt="Drag" title="Drag"/>
 
                                                                                 <xforms:trigger appearance="minimal">
                                                                                     <xforms:label><xhtml:img src="../../../../apps/fr/style/trash.gif" alt="Delete" title="Delete"/></xforms:label>
+                                                                                    <!-- Delete control -->
                                                                                     <xforms:action ev:event="DOMActivate">
-                                                                                        <xforms:delete nodeset=".."/>
+                                                                                        <!-- TODO: delete containing element -->
+                                                                                        <!-- TODO: delete resources -->
+                                                                                        <xforms:delete nodeset="xforms:*"/>
                                                                                     </xforms:action>
                                                                                 </xforms:trigger>
                                                                             </xforms:group>
@@ -961,7 +933,7 @@
                                         <xforms:action ev:event="DOMActivate">
                                             <!-- Insert a new control -->
 
-                                            <!-- TODO: for now assume a top-level section containing a grid -->
+                                            <!-- TODO: for now assume a top-level section containing one or more grids; later add repeats and top-level grids -->
 
                                             <!-- Compute next control id -->
                                             <xforms:dispatch target="fr-form-model" name="fb-compute-control-id"/>
@@ -973,22 +945,26 @@
                                                            origin="xxforms:element(concat('control-', $next-control-id))"/>
 
                                             <!-- Insert new control into the document -->
-                                            <xforms:action context="$body/fr:section[index('fb-top-level-repeat')]/fr:grid">
-                                                <!-- Pointing to section container element -->
-                                                <!-- TODO: here assume 1-column grid -->
+                                            <xforms:action context="$body/fr:*[index('fb-top-level-repeat')]/fr:*[index('fb-section-content-repeat')]">
+                                                <!-- Pointing to current grid element -->
 
-                                                <!-- Insert row container -->
-                                                <xforms:insert context="."
-                                                               nodeset="xhtml:tr"
-                                                               at="index('fb-section-content-grid-tr-repeat')"
-                                                               origin="instance('fb-grid-tr-template')"/>
+                                                <xforms:action context="xhtml:tr[index('fb-section-content-grid-tr-repeat')]/xhtml:td[index('fb-section-content-grid-td-repeat')]"
+                                                               if="exists(xforms:*)">
+                                                    <!-- Current cell is not empty -->
 
-                                                <!-- Insert column container -->
-                                                <xforms:insert context="xhtml:tr[index('fb-section-content-grid-tr-repeat')]"
-                                                               nodeset="xhtml:td"
-                                                               at="index('fb-section-content-grid-td-repeat')"
-                                                               origin="instance('fb-grid-td-template')"/>
+                                                    <xforms:action if="following-sibling::xhtml:td[1][not(xforms:*)]">
+                                                        <!-- Next cell is empty, move to that one -->
+                                                        <xforms:setindex repeat="fb-section-content-grid-td-repeat" index="index('fb-section-content-grid-td-repeat') + 1"/>
+                                                    </xforms:action>
+                                                    <xforms:action if="not(following-sibling::xhtml:td)">
+                                                        <!-- We are the last cell or a row, insert new row after the current one -->
+                                                        <xforms:insert context="self::xhtml:td" nodeset="parent::xhtml:tr"
+                                                                       origin="instance(concat('fb-grid-', count(../xhtml:td), '-template'))/xhtml:tr"/>
+                                                    </xforms:action>
 
+                                                </xforms:action>
+
+                                                <!-- This ensures the context is recomputed -->
                                                 <xforms:action context="xhtml:tr[index('fb-section-content-grid-tr-repeat')]/xhtml:td[index('fb-section-content-grid-td-repeat')]">
                                                     <!-- Context is now on td -->
 
@@ -1182,6 +1158,6 @@
             </fr:body>
         </fr:view>
 
-        <widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>
+        <!--<widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>-->
     </xhtml:body>
 </xhtml:html>

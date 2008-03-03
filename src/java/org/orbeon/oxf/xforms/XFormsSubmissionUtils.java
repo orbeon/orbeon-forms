@@ -89,7 +89,7 @@ public class XFormsSubmissionUtils {
 
                 if (XFormsServer.logger.isDebugEnabled())
                     XFormsContainingDocument.logDebugStatic(containingDocument, "submission", "dispatching request",
-                                new String[] { "effective resource URI", effectiveResourceURI });
+                                new String[] { "effective resource URI (relative to servlet context)", effectiveResourceURI });
 
                 final ExternalContext.RequestDispatcher requestDispatcher = externalContext.getRequestDispatcher(action);
                 final XFormsModelSubmission.ConnectionResult connectionResult = new XFormsModelSubmission.ConnectionResult(effectiveResourceURI) {

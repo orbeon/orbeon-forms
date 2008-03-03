@@ -647,10 +647,10 @@
                                                         <!-- Context is on current grid -->
 
                                                         <xforms:action xxforms:iterate="xhtml:tr[index('fb-section-content-grid-tr-repeat')]/xhtml:td">
-                                                            <!-- Delete holder element and resource -->
+                                                            <!-- Delete holder element and resources -->
                                                             <xforms:action if="exists(xforms:*)">
                                                                 <xforms:delete nodeset="$form-instance/*[index('fb-top-level-repeat')]/*[name() = context()/xforms:*/@ref]"/>
-                                                                <xforms:delete nodeset="$current-resources/*[name() = context()/xforms:*/@ref]"/>
+                                                                <xforms:delete xxforms:iterate="$resources/resource/*[name() = context()/xforms:*/@ref]" nodeset="."/>
                                                             </xforms:action>
                                                         </xforms:action>
 
@@ -673,10 +673,10 @@
                                                         <!-- Iterate over rows and in each delete the appropriate column -->
                                                         <xforms:action xxforms:iterate="xhtml:tr">
                                                             <xforms:action context="xhtml:td[xs:integer($variables/column-number)]">
-                                                                <!-- Delete holder element, resource, and control -->
+                                                                <!-- Delete holder element, resources, and control -->
                                                                 <xforms:action if="exists(xforms:*)">
                                                                     <xforms:delete nodeset="$form-instance/*[index('fb-top-level-repeat')]/*[name() = context()/xforms:*/@ref]"/>
-                                                                    <xforms:delete nodeset="$current-resources/*[name() = context()/xforms:*/@ref]"/>
+                                                                    <xforms:delete xxforms:iterate="$resources/resource/*[name() = context()/xforms:*/@ref]" nodeset="."/>
                                                                 </xforms:action>
                                                                 <xforms:delete nodeset="."/>
                                                             </xforms:action>
@@ -692,10 +692,10 @@
                                                         <!-- Context is on current grid -->
 
                                                         <xforms:action xxforms:iterate="xhtml:tr/xhtml:td">
-                                                            <!-- Delete holder element and resource -->
+                                                            <!-- Delete holder element and resources -->
                                                             <xforms:action if="exists(xforms:*)">
                                                                 <xforms:delete nodeset="$form-instance/*[index('fb-top-level-repeat')]/*[name() = context()/xforms:*/@ref]"/>
-                                                                <xforms:delete nodeset="$current-resources/*[name() = context()/xforms:*/@ref]"/>
+                                                                <xforms:delete xxforms:iterate="$resources/resource/*[name() = context()/xforms:*/@ref]" nodeset="."/>
                                                             </xforms:action>
                                                         </xforms:action>
 
@@ -729,9 +729,9 @@
                                                                                 <xforms:trigger appearance="minimal">
                                                                                     <xforms:label><xhtml:img src="../../../../apps/fr/style/trash.gif" alt="Delete Control" title="Delete Control"/></xforms:label>
                                                                                     <xforms:action ev:event="DOMActivate">
-                                                                                        <!-- Delete holder element, resource, and control -->
+                                                                                        <!-- Delete holder element, resources, and control -->
                                                                                         <xforms:delete nodeset="$form-instance/*[index('fb-top-level-repeat')]/*[name() = $control-id]"/>
-                                                                                        <xforms:delete nodeset="$current-resources/*[name() = $control-id]"/>
+                                                                                        <xforms:delete xxforms:iterate="$resources/resource/*[name() = $control-id]" nodeset="."/>
                                                                                         <xforms:delete nodeset="xforms:*"/>
                                                                                     </xforms:action>
                                                                                 </xforms:trigger>
@@ -1201,14 +1201,14 @@
 
                                     <!-- Delete holder element for section -->
                                     <xforms:delete nodeset="$form-instance/*[name() = context()/@context]"/>
-                                    <!-- Delete resource for section -->
-                                    <xforms:delete nodeset="$current-resources/*[name() = context()/@context]"/>
+                                    <!-- Delete resources for section -->
+                                    <xforms:delete xxforms:iterate="$resources/resource/*[name() = context()/@context]" nodeset="."/>
 
                                     <xforms:action xxforms:iterate="*/xhtml:tr/xhtml:td">
-                                        <!-- Delete holder element and resource for control -->
+                                        <!-- Delete holder element and resources for control -->
                                         <xforms:action if="exists(xforms:*)">
                                             <xforms:delete nodeset="$form-instance/*[index('fb-top-level-repeat')]/*[name() = context()/xforms:*/@ref]"/>
-                                            <xforms:delete nodeset="$current-resources/*[name() = context()/xforms:*/@ref]"/>
+                                            <xforms:delete xxforms:iterate="$resources/resource/*[name() = context()/xforms:*/@ref]" nodeset="."/>
                                         </xforms:action>
                                     </xforms:action>
 

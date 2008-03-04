@@ -31,18 +31,26 @@
 
             #doc4 { margin-left: 15.5em }
 
+            .fb-section-title { display: block; margin-bottom: .5em}
+
             .fb-section-title div {
                 background: white url(../../../../apps/fr/style/separator.gif) repeat-x scroll left center
             }
 
+            <!-- Itemset editor -->
+            #fb-itemset-editor-dialog { width: 35em }
+            #fb-itemset-editor-dialog .fr-grid-2-columns .xforms-input input { width: 11em }
+            #fb-itemset-editor-dialog .fr-repeat { margin: 0; background-color: transparent }
+            #fb-itemset-editor-dialog .fb-dialog-body { }
+
             <!-- Language toolbar -->
             .fb-language-choice { display: block; float: right; }
-            .fb-language-choice .fb-language-triggers { display: block }
+            .fb-language-choice .fb-language-triggers { display: block; witdh: 100%; text-align: right }
 
             <!-- Toolbox -->
             .fb-toolbox { margin: .5em; padding: .5em; width: auto; background-color: #3598D4; text-align: center }
             .fb-toolbox .fb-tool { display: block }
-            .fb-toolbox .fb-tool button { width: 12em; text-align: left }
+            .fb-toolbox .fb-tool button { width: 100%; text-align: left }
 
             .fb-clear { clear: both }
             .fb-xforms-disabled { display:none }
@@ -96,12 +104,12 @@
 
             <!-- Highlighting of top-level blocks (sections, ...) -->
             .fb-top-level-content { display: block; padding-left: .5em; margin-bottom: .5em; border-left: 4px solid transparent }
-            .fb-top-level-content:hover { border-left: 4px solid gray}
+            .fb-top-level-content:hover { border-left: 4px solid #ccc }
             .fr-section-container .xforms-repeat-selected-item-1 { border-left: 4px solid #3598D4}
 
             <!-- Highlighting of section content (grids, ...) -->
             .fb-section-content { display: block; padding-left: .5em; margin-bottom: .5em; border-left: 4px solid transparent }
-            .fb-section-content:hover { border-left: 4px solid gray}
+            .fb-section-content:hover { border-left: 4px solid #ccc}
             .fr-section-container .xforms-repeat-selected-item-2 { border-left: 4px solid #3598D4}
 
             <!-- Control editor -->
@@ -138,22 +146,35 @@
             .fb-grid tr td { width: auto; vertical-align: top }
             #fb-details-section .fb-grid tr td .xforms-input input { width: 63.5em }
             #fb-details-section .fb-grid tr td textarea.xforms-textarea { width: 64em }
-            #fb-details-section .fb-grid tr td .xforms-select1-appearance-minimal { width: 64em }
+            #fb-details-section .fb-grid tr td .xforms-select1-appearance-minimal { width: 62em }
+            #fb-details-section .fb-grid tr td .xforms-select1-appearance-full { width: 62em; display: block }
+            #fb-details-section .fb-grid tr td .xforms-select1-appearance-full span { white-space: nowrap; display: block }
+            #fb-details-section .fb-grid tr td .xforms-select1-appearance-compact { width: 62em; height: 6em }
+            #fb-details-section .fb-grid tr td .xforms-select-appearance-compact { width: 62em; height: 6em }
 
             .fb-grid-2-columns tr td { width: 50%; }
             #fb-details-section .fb-grid-2-columns tr td .xforms-input input { width: 30em; }
             #fb-details-section .fb-grid-2-columns tr td textarea.xforms-textarea { width: 30em; }
-            #fb-details-section .fb-grid-2-columns tr td .xforms-select1-appearance-minimal { width: 30em }
+            #fb-details-section .fb-grid-2-columns tr td .xforms-select1-appearance-minimal { width: 28em }
+            #fb-details-section .fb-grid-2-columns tr td .xforms-select1-appearance-full { width: 28em; display: block }
+            #fb-details-section .fb-grid-2-columns tr td .xforms-select1-appearance-compact { width: 28em; height: 6em }
+            #fb-details-section .fb-grid-2-columns tr td .xforms-select-appearance-compact { width: 28em; height: 6em }
 
             .fb-grid-3-columns tr td { width: 33.3%; }
             #fb-details-section .fb-grid-3-columns tr td .xforms-input input { width: 18em; }
             #fb-details-section .fb-grid-3-columns tr td textarea.xforms-textarea { width: 19em; }
-            #fb-details-section .fb-grid-3-columns tr td .xforms-select1-appearance-minimal { width: 19em }
+            #fb-details-section .fb-grid-3-columns tr td .xforms-select1-appearance-minimal { width: 17em }
+            #fb-details-section .fb-grid-3-columns tr td .xforms-select1-appearance-full { width: 17em; display: block }
+            #fb-details-section .fb-grid-3-columns tr td .xforms-select1-appearance-compact { width: 17em; height: 6em }
+            #fb-details-section .fb-grid-3-columns tr td .xforms-select-appearance-compact { width: 17em; height: 6em }
 
             .fb-grid-4-columns tr td { width: 25%; }
             #fb-details-section .fb-grid-4-columns tr td .xforms-input input { width: 13em; }
             #fb-details-section .fb-grid-4-columns tr td textarea.xforms-textarea { width: 13em; }
-            #fb-details-section .fb-grid-4-columns tr td .xforms-select1-appearance-minimal { width: 13em }
+            #fb-details-section .fb-grid-4-columns tr td .xforms-select1-appearance-minimal { width: 11em }
+            #fb-details-section .fb-grid-4-columns tr td .xforms-select1-appearance-full { width: 11em; display: block }
+            #fb-details-section .fb-grid-4-columns tr td .xforms-select1-appearance-compact { width: 11em; height: 6em }
+            #fb-details-section .fb-grid-4-columns tr td .xforms-select-appearance-compact { width: 11em; height: 6em }
 
             .fb-grid-cell-icons { width: 1em; text-align: center; margin-right: .2em; float: left }
             .fb-grid-cell-icons img { margin-bottom: .5em; padding: 0 }
@@ -178,7 +199,7 @@
 
             <xforms:action ev:event="xforms-ready">
                 <xxforms:script>
-                    <!-- Position toolbox to the left -->                    
+                    <!-- Position toolbox to the left upon loading -->
                     ORBEON.xforms.Globals.dialogs["fb-toolbox-dialog"].cfg.setProperty("x", 0);
                 </xxforms:script>
             </xforms:action>
@@ -209,6 +230,7 @@
             <xxforms:variable name="current-resources" select="$resources/resource[@xml:lang = $lang]"/>
             <xxforms:variable name="body" select="xhtml:body/fr:view/fr:body"/>
 
+            <!-- Configuration for Saxon serialization -->
             <xforms:instance id="fb-xsl-output-instance">
                 <xsl:output xmlns:xsl="http://www.w3.org/1999/XSL/Transform" method="xml" omit-xml-declaration="yes" indent="yes" saxon:indent-spaces="4"/>
             </xforms:instance>
@@ -229,6 +251,9 @@
                     <!-- Confirmation dialog -->
                     <confirmation-message/>
                     <confirmation-target/>
+
+                    <!-- Itemset editor dialog -->
+                    <itemset-resource/>
 
                     <result-node/>
 
@@ -295,6 +320,13 @@
                     <help>[Please modify the help]</help>
                     <alert>[Please modify the alert]</alert>
                 </template>
+            </xforms:instance>
+
+            <xforms:instance id="fb-item-template" xxforms:readonly="true">
+                <item>
+                    <label/>
+                    <value/>
+                </item>
             </xforms:instance>
 
             <xforms:instance id="fb-grid-1-template" xxforms:readonly="true">
@@ -394,78 +426,52 @@
                                 <xforms:hint ref=""/>
                                 <xforms:help ref=""/>
                                 <xforms:alert ref=""/>
-
-
-                                zzz
-                                
-                                <xforms:item>
-                                    <xforms:label>Choice #1</xforms:label>
-                                    <xforms:value>1</xforms:value>
-                                </xforms:item>
-                                <xforms:item>
-                                    <xforms:label>Choice #2</xforms:label>
-                                    <xforms:value>2</xforms:value>
-                                </xforms:item>
                             </xforms:select1>
                         </xhtml:div>
                     </template>
                     <template label="Radio Buttons">
                         <xhtml:div class="radio">
-                            <xforms:select1 appearance="full" ref="">
-                                <xforms:label>[Choose a label]</xforms:label>
-                                <xforms:help/>
-                                <xforms:hint/>
-                                <xforms:alert/>
-                                <xforms:item>
-                                    <xforms:label>Choice #1</xforms:label>
-                                    <xforms:value>1</xforms:value>
-                                </xforms:item>
-                                <xforms:item>
-                                    <xforms:label>Choice #2</xforms:label>
-                                    <xforms:value>2</xforms:value>
-                                </xforms:item>
+                            <xforms:select1 id="" appearance="full" ref="">
+                                <xforms:label ref=""/>
+                                <xforms:hint ref=""/>
+                                <xforms:help ref=""/>
+                                <xforms:alert ref=""/>
                             </xforms:select1>
                         </xhtml:div>
                     </template>
-                    <template label="List box">
+                    <template label="List box (1)">
                         <xhtml:div class="listbox">
-                            <xforms:select1 appearance="compact" ref="">
-                                <xforms:label>[Choose a label]</xforms:label>
-                                <xforms:help/>
-                                <xforms:hint/>
-                                <xforms:alert/>
-                                <xforms:item>
-                                    <xforms:label>Choice #1</xforms:label>
-                                    <xforms:value>1</xforms:value>
-                                </xforms:item>
-                                <xforms:item>
-                                    <xforms:label>Choice #2</xforms:label>
-                                    <xforms:value>2</xforms:value>
-                                </xforms:item>
+                            <xforms:select1 id="" appearance="compact" ref="">
+                                <xforms:label ref=""/>
+                                <xforms:hint ref=""/>
+                                <xforms:help ref=""/>
+                                <xforms:alert ref=""/>
                             </xforms:select1>
                         </xhtml:div>
                     </template>
                     <template label="Checkboxes">
                         <xhtml:div class="checkbox">
-                            <xforms:select appearance="full" ref="">
-                                <xforms:label>[Choose a label]</xforms:label>
-                                <xforms:help/>
-                                <xforms:hint/>
-                                <xforms:alert/>
-                                <xforms:item>
-                                    <xforms:label>Choice #1</xforms:label>
-                                    <xforms:value>1</xforms:value>
-                                </xforms:item>
-                                <xforms:item>
-                                    <xforms:label>Choice #2</xforms:label>
-                                    <xforms:value>2</xforms:value>
-                                </xforms:item>
+                            <xforms:select id="" appearance="full" ref="">
+                                <xforms:label ref=""/>
+                                <xforms:hint ref=""/>
+                                <xforms:help ref=""/>
+                                <xforms:alert ref=""/>
+                            </xforms:select>
+                        </xhtml:div>
+                    </template>
+                    <template label="List box (2)">
+                        <xhtml:div class="listbox-multiple">
+                            <xforms:select id="" appearance="compact" ref="">
+                                <xforms:label ref=""/>
+                                <xforms:hint ref=""/>
+                                <xforms:help ref=""/>
+                                <xforms:alert ref=""/>
                             </xforms:select>
                         </xhtml:div>
                     </template>
                     <template label="Output">
                         <xhtml:div class="output">
-                            <xforms:output ref="">
+                            <xforms:output id="" ref="">
                                 <xforms:label>[Choose a label]</xforms:label>
                                 <xforms:help/>
                             </xforms:output>
@@ -487,7 +493,7 @@
                     </template>
                     <template label="Upload">
                         <xhtml:div class="upload">
-                            <xforms:upload ref="">
+                            <xforms:upload id="" ref="">
                                 <xforms:label>[Choose a label]</xforms:label>
                                 <xforms:help/>
                                 <xforms:hint/>
@@ -806,6 +812,57 @@
                                                                                         <xxforms:show dialog="fb-edit-alert-dialog" neighbor="fb-edit-alert-trigger"/>
                                                                                     </xforms:action>
                                                                                 </xforms:trigger>
+
+                                                                                <!-- Change appearance for selection controls -->
+                                                                                <xforms:group ref=".[xforms:select1 | xforms:select]">
+                                                                                    <xforms:trigger appearance="minimal">
+                                                                                        <xforms:label>
+                                                                                            <xhtml:img src="../../../../apps/fr/style/update.gif" alt="Switch Appearance" title="Switch Appearance"/>
+                                                                                        </xforms:label>
+                                                                                        <xforms:action ev:event="DOMActivate">
+
+                                                                                            <!-- select1 minimal -> compact -> full -> select compact -> full -->
+
+                                                                                            <xforms:setvalue ref="$variables/done">false</xforms:setvalue>
+                                                                                            <xforms:action if="xforms:select1 and xforms:select1/@appearance = 'full'">
+                                                                                                <!-- Switch to xforms:select -->
+
+                                                                                                <!-- Create xforms:select, copy all attributes and children elements, and delete xforms:select1 -->
+                                                                                                <xforms:insert nodeset="xforms:select1" origin="xxforms:element('xforms:select')"/>
+                                                                                                <xforms:insert context="xforms:select" origin="../xforms:select1/@*"/>
+                                                                                                <xforms:insert context="xforms:select" origin="../xforms:select1/*"/>
+                                                                                                <xforms:delete nodeset="xforms:select1"/>
+                                                                                                <xforms:setvalue ref="xforms:select/@appearance" value="'compact'"/>
+
+                                                                                                <xforms:setvalue ref="$variables/done">true</xforms:setvalue>
+                                                                                            </xforms:action>
+                                                                                            <xforms:action if="$variables/done != 'true' and xforms:select and xforms:select/@appearance = 'full'">
+                                                                                                <!-- Switch to xforms:select1 -->
+
+                                                                                                <!-- Create xforms:select1, copy all attributes and children elements, and delete xforms:select -->
+                                                                                                <xforms:insert nodeset="xforms:select" origin="xxforms:element('xforms:select1')"/>
+                                                                                                <xforms:insert context="xforms:select1" origin="../xforms:select/@*"/>
+                                                                                                <xforms:insert context="xforms:select1" origin="../xforms:select/*"/>
+                                                                                                <xforms:delete nodeset="xforms:select"/>
+                                                                                                <xforms:setvalue ref="xforms:select1/@appearance" value="'minimal'"/>
+
+                                                                                                <xforms:setvalue ref="$variables/done">true</xforms:setvalue>
+                                                                                            </xforms:action>
+                                                                                            <xforms:action if="$variables/done != 'true' and xforms:select1">
+                                                                                                <!-- Simply update the appearance of xforms:select1 -->
+                                                                                                <xforms:setvalue ref="xforms:select1/@appearance"
+                                                                                                                 value="if (. = 'minimal') then 'compact' else if (. = 'compact') then 'full' else ."/>
+                                                                                            </xforms:action>
+                                                                                            <xforms:action if="$variables/done != 'true' and xforms:select">
+                                                                                                <!-- Simply update the appearance of xforms:select -->
+                                                                                                <xforms:setvalue ref="xforms:select/@appearance"
+                                                                                                                 value="if (. = 'compact') then 'full' else ."/>
+                                                                                            </xforms:action>
+
+                                                                                        </xforms:action>
+                                                                                    </xforms:trigger>
+                                                                                </xforms:group>
+
                                                                             </xforms:group>
 
 
@@ -814,11 +871,11 @@
                                                                                 <xforms:group ref=".[xforms:*]">
 
                                                                                     <xxforms:variable name="instance-holder" select="$section-holder/*[name() = $control-id]"/>
+                                                                                    <xxforms:variable name="resource-holder" select="$current-resources/*[name() = $control-id]"/>
 
                                                                                     <!-- Set label for any control -->
                                                                                     <xhtml:span>
-                                                                                        <xforms:input id="fb-control-label-control"
-                                                                                                      ref="$current-resources/*[name() = $control-id]/label"
+                                                                                        <xforms:input id="fb-control-label-control" ref="$resource-holder/label"
                                                                                                       appearance="fr:in-place" class="fb-control-label">
                                                                                             <xforms:label class="fb-xforms-disabled"/>
                                                                                         </xforms:input>
@@ -849,34 +906,95 @@
                                                                                             </xforms:textarea>
                                                                                         </xforms:group>
                                                                                         <xforms:group ref="xforms:select1[@appearance = 'minimal']">
-                                                                                            <xforms:select1 appearance="minimal" ref="$instance-holder">
+                                                                                            <xforms:select1 appearance="minimal" ref="$instance-holder" id="fb-edit-select1-minimal-control">
                                                                                                 <xforms:label class="fb-xforms-disabled"/>
                                                                                                 <xforms:item>
                                                                                                     <xforms:label>[Choose...]</xforms:label>
                                                                                                     <xforms:value/>
                                                                                                 </xforms:item>
+                                                                                                <xforms:itemset nodeset="$resource-holder/item">
+                                                                                                    <xforms:label ref="label"/>
+                                                                                                    <xforms:value ref="value"/>
+                                                                                                </xforms:itemset>
                                                                                             </xforms:select1>
-
-                                                                                            <fr:repeat nodeset="xforms:item" id="book-repeat" origin="instance('note-template')" columns="1">
-                                                                                                <xhtml:tr>
-                                                                                                    <xhtml:td>
-                                                                                                        xxxx
-                                                                                                    </xhtml:td>
-                                                                                                </xhtml:tr>
-                                                                                            </fr:repeat>
-
-                                                                                            <!-- TODO: edit items -->
-
-                                                                                            zzz
-
+                                                                                            <xforms:trigger appearance="minimal">
+                                                                                                <xforms:label>Edit</xforms:label>
+                                                                                                <xforms:action ev:event="DOMActivate">
+                                                                                                    <xforms:setvalue ref="$variables/itemset-resource" value="$resource-holder/saxon:path()"/>
+                                                                                                    <xxforms:show dialog="fb-itemset-editor-dialog" neighbor="fb-edit-select1-minimal-control"/>
+                                                                                                </xforms:action>
+                                                                                            </xforms:trigger>
+                                                                                        </xforms:group>
+                                                                                        <xforms:group ref="xforms:select1[@appearance = 'full']">
+                                                                                            <xforms:select1 appearance="full" ref="$instance-holder" id="fb-edit-select1-full-control">
+                                                                                                <xforms:label class="fb-xforms-disabled"/>
+                                                                                                <xforms:itemset nodeset="$resource-holder/item">
+                                                                                                    <xforms:label ref="label"/>
+                                                                                                    <xforms:value ref="value"/>
+                                                                                                </xforms:itemset>
+                                                                                            </xforms:select1>
+                                                                                            <xforms:trigger appearance="minimal">
+                                                                                                <xforms:label>Edit</xforms:label>
+                                                                                                <xforms:action ev:event="DOMActivate">
+                                                                                                    <xforms:setvalue ref="$variables/itemset-resource" value="$resource-holder/saxon:path()"/>
+                                                                                                    <xxforms:show dialog="fb-itemset-editor-dialog" neighbor="fb-edit-select1-full-control"/>
+                                                                                                </xforms:action>
+                                                                                            </xforms:trigger>
+                                                                                        </xforms:group>
+                                                                                        <xforms:group ref="xforms:select1[@appearance = 'compact']">
+                                                                                            <xforms:select1 appearance="compact" ref="$instance-holder" id="fb-edit-select1-compact-control">
+                                                                                                <xforms:label class="fb-xforms-disabled"/>
+                                                                                                <xforms:itemset nodeset="$resource-holder/item">
+                                                                                                    <xforms:label ref="label"/>
+                                                                                                    <xforms:value ref="value"/>
+                                                                                                </xforms:itemset>
+                                                                                            </xforms:select1>
+                                                                                            <xforms:trigger appearance="minimal">
+                                                                                                <xforms:label>Edit</xforms:label>
+                                                                                                <xforms:action ev:event="DOMActivate">
+                                                                                                    <xforms:setvalue ref="$variables/itemset-resource" value="$resource-holder/saxon:path()"/>
+                                                                                                    <xxforms:show dialog="fb-itemset-editor-dialog" neighbor="fb-edit-select1-compact-control"/>
+                                                                                                </xforms:action>
+                                                                                            </xforms:trigger>
+                                                                                        </xforms:group>
+                                                                                        <xforms:group ref="xforms:select[@appearance = 'full']">
+                                                                                            <xforms:select appearance="full" ref="$instance-holder" id="fb-edit-select-full-control">
+                                                                                                <xforms:label class="fb-xforms-disabled"/>
+                                                                                                <xforms:itemset nodeset="$resource-holder/item">
+                                                                                                    <xforms:label ref="label"/>
+                                                                                                    <xforms:value ref="value"/>
+                                                                                                </xforms:itemset>
+                                                                                            </xforms:select>
+                                                                                            <xforms:trigger appearance="minimal">
+                                                                                                <xforms:label>Edit</xforms:label>
+                                                                                                <xforms:action ev:event="DOMActivate">
+                                                                                                    <xforms:setvalue ref="$variables/itemset-resource" value="$resource-holder/saxon:path()"/>
+                                                                                                    <xxforms:show dialog="fb-itemset-editor-dialog" neighbor="fb-edit-select-full-control"/>
+                                                                                                </xforms:action>
+                                                                                            </xforms:trigger>
+                                                                                        </xforms:group>
+                                                                                        <xforms:group ref="xforms:select[@appearance = 'compact']">
+                                                                                            <xforms:select appearance="compact" ref="$instance-holder" id="fb-edit-select-compact-control">
+                                                                                                <xforms:label class="fb-xforms-disabled"/>
+                                                                                                <xforms:itemset nodeset="$resource-holder/item">
+                                                                                                    <xforms:label ref="label"/>
+                                                                                                    <xforms:value ref="value"/>
+                                                                                                </xforms:itemset>
+                                                                                            </xforms:select>
+                                                                                            <xforms:trigger appearance="minimal">
+                                                                                                <xforms:label>Edit</xforms:label>
+                                                                                                <xforms:action ev:event="DOMActivate">
+                                                                                                    <xforms:setvalue ref="$variables/itemset-resource" value="$resource-holder/saxon:path()"/>
+                                                                                                    <xxforms:show dialog="fb-itemset-editor-dialog" neighbor="fb-edit-select-compact-control"/>
+                                                                                                </xforms:action>
+                                                                                            </xforms:trigger>
                                                                                         </xforms:group>
                                                                                         <!-- TODO -->
                                                                                     </xhtml:div>
 
                                                                                     <!-- Edit hint for any control -->
                                                                                     <xhtml:span>
-                                                                                        <xforms:input id="fb-control-hint-control"
-                                                                                                      ref="$current-resources/*[name() = $control-id]/hint"
+                                                                                        <xforms:input id="fb-control-hint-control" ref="$resource-holder/hint"
                                                                                                       appearance="fr:in-place" class="fb-control-hint">
                                                                                             <xforms:label class="fb-xforms-disabled"/>
                                                                                         </xforms:input>
@@ -884,32 +1002,7 @@
                                                                                 </xforms:group>
 
                                                                                 <xhtml:span class="fb-control-control">
-                                                                                <xforms:group ref=".[@class = ('radio')]/xforms:*">
-                                                                                    <xforms:select1 ref="instance('form-instance')/xhtml:head/xforms:model/xforms:instance/instance/*[count(xxforms:repeat-current()/preceding-sibling::*) + 1]"
-                                                                                            appearance="full">
-                                                                                        <xforms:label ref="xxforms:repeat-current('form-repeat')/xforms:*/xforms:label"/>
-                                                                                        <xforms:help ref="xxforms:repeat-current('form-repeat')/xforms:*/xforms:help"/>
-                                                                                        <xforms:hint ref="xxforms:repeat-current('form-repeat')/xforms:*/xforms:hint"/>
-                                                                                        <xforms:alert ref="xxforms:repeat-current('form-repeat')/xforms:*/xforms:alert"/>
-                                                                                        <xforms:itemset nodeset="xxforms:repeat-current('form-repeat')/xforms:*/xforms:item">
-                                                                                            <xforms:label ref="xforms:label"/>
-                                                                                            <xforms:value ref="xforms:value"/>
-                                                                                        </xforms:itemset>
-                                                                                    </xforms:select1>
-                                                                                </xforms:group>
-                                                                                <xforms:group ref=".[@class = 'dropdown']/xforms:*">
-                                                                                    <xforms:select1 ref="instance('form-instance')/xhtml:head/xforms:model/xforms:instance/instance/*[count(xxforms:repeat-current()/preceding-sibling::*) + 1]"
-                                                                                            appearance="minimal">
-                                                                                        <xforms:label ref="xxforms:repeat-current('form-repeat')/xforms:*/xforms:label"/>
-                                                                                        <xforms:help ref="xxforms:repeat-current('form-repeat')/xforms:*/xforms:help"/>
-                                                                                        <xforms:hint ref="xxforms:repeat-current('form-repeat')/xforms:*/xforms:hint"/>
-                                                                                        <xforms:alert ref="xxforms:repeat-current('form-repeat')/xforms:*/xforms:alert"/>
-                                                                                        <xforms:itemset nodeset="xxforms:repeat-current('form-repeat')/xforms:*/xforms:item">
-                                                                                            <xforms:label ref="xforms:label"/>
-                                                                                            <xforms:value ref="xforms:value"/>
-                                                                                        </xforms:itemset>
-                                                                                    </xforms:select1>
-                                                                                </xforms:group>
+                                                                                
                                                                                 <xforms:group ref=".[@class = ('checkbox')]/xforms:*">
                                                                                     <xforms:select ref="instance('form-instance')/xhtml:head/xforms:model/xforms:instance/instance/*[count(xxforms:repeat-current()/preceding-sibling::*) + 1]"
                                                                                             appearance="full">
@@ -1197,7 +1290,7 @@
                                                 </xforms:action>
 
                                                 <!-- This ensures the context is recomputed -->
-                                                <xforms:action context="xhtml:tr[index('fb-section-content-grid-tr-repeat')]/xhtml:td[index('fb-section-content-grid-td-repeat')]">
+                                                <xforms:action if="$variables/done = 'true'" context="xhtml:tr[index('fb-section-content-grid-tr-repeat')]/xhtml:td[index('fb-section-content-grid-td-repeat')]">
                                                     <!-- Context is now on td -->
 
                                                     <!-- Insert control into td -->
@@ -1416,9 +1509,47 @@
                     <xforms:setfocus ev:event="xxforms-dialog-open" control="fb-confirmation-dialog-cancel-trigger"/>
                 </xxforms:dialog>
 
+                <!-- Dialog to edit itemsets -->
+                <xxforms:dialog id="fb-itemset-editor-dialog" appearance="minimal">
+                    <xforms:label>Itemset Editor</xforms:label>
+                    <xhtml:div class="fb-dialog-body">
+                        <xforms:group context="if ($variables/itemset-resource != '') then saxon:evaluate($variables/itemset-resource) else ()">
+                            <fr:repeat nodeset="item" id="fb-itemset-repeat" origin="instance('fb-item-template')" columns="2">
+                                <xhtml:tr>
+                                    <xhtml:td>
+                                        <xforms:input ref="label"/>
+                                    </xhtml:td>
+                                    <xhtml:td>
+                                        <xforms:input ref="value">
+                                            <!-- TODO: Insert on DOMActivate -->
+                                            <!--<xxforms:hide ev:event="DOMActivate" dialog="fb-itemset-editor-dialog"/>-->
+                                        </xforms:input>
+                                    </xhtml:td>
+                                </xhtml:tr>
+                            </fr:repeat>
+                        </xforms:group>
+                    </xhtml:div>
+                    <xhtml:div class="dialog-button">
+                        <xforms:group>
+                            <!--<xforms:trigger>-->
+                                <!--<xforms:label><xhtml:img src="/apps/fr/style/clear.gif" alt=""/> <xhtml:span>Delete</xhtml:span></xforms:label>-->
+                                <!--<xforms:dispatch ev:event="DOMActivate" name="fb-confirmation-yes" target="{$variables/confirmation-target}"/>-->
+                            <!--</xforms:trigger>-->
+                            <!--<xforms:trigger id="fb-confirmation-dialog-cancel-trigger">-->
+                                <!--<xforms:label><xhtml:img src="/apps/fr/style/close.gif" alt=""/> <xhtml:span>Cancel</xhtml:span></xforms:label>-->
+                                <!--<xforms:dispatch ev:event="DOMActivate" name="fb-confirmation-no" target="{$variables/confirmation-target}"/>-->
+                            <!--</xforms:trigger>-->
+                            <!-- Hide dialog -->
+                            <xxforms:hide ev:event="DOMActivate" dialog="fb-itemset-editor-dialog"/>
+                        </xforms:group>
+                    </xhtml:div>
+                    <!-- Set focus when the dialog open  -->
+                    <xforms:setfocus ev:event="xxforms-dialog-open" control="fb-confirmation-dialog-cancel-trigger"/>
+                </xxforms:dialog>
+
             </fr:body>
         </fr:view>
 
-        <!--<widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>-->
+        <widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>    
     </xhtml:body>
 </xhtml:html>

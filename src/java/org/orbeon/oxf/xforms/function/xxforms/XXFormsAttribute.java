@@ -29,10 +29,11 @@ import org.orbeon.saxon.trans.XPathException;
 import java.util.Map;
 
 /**
- * xxforms:attribute(xs:string) as attribute()
+ * xxforms:attribute(xs:string, xs:string?) as attribute()
  *
- * Creates a new XML attribute. The argument is a string representing a QName. If a prefix is present, it is resolved
- * with the namespace mappings in scope where the expression is evaluated.
+ * Creates a new XML attribute. The first argument is a string representing a QName representing the name of the
+ * attribute to create. If a prefix is present, it is resolved with the namespace mappings in scope where the expression
+ * is evaluated. The second attribute is an optional attribute value. The default is the empty string.
  */
 public class XXFormsAttribute extends XFormsFunction {
 
@@ -46,14 +47,17 @@ public class XXFormsAttribute extends XFormsFunction {
 
     public Item evaluateItem(XPathContext xpathContext) throws XPathException {
 
-        final Expression qNameExpression = (argument == null || argument.length == 0) ? null : argument[0];
+        final Expression qNameExpression = (argument == null || argument.length < 1) ? null : argument[0];
         final String qName = (qNameExpression == null) ? null : qNameExpression.evaluateAsString(xpathContext);
+
+        final Expression valueExpression = (argument == null || argument.length < 2) ? null : argument[1];
+        final String value = (valueExpression == null) ? "" : valueExpression.evaluateAsString(xpathContext);
 
         final int colonIndex = qName.indexOf(':');
         final Attribute attribute;
         if (colonIndex == -1) {
             // NCName
-            attribute = Dom4jUtils.createAttribute(new QName(qName), "");
+            attribute = Dom4jUtils.createAttribute(new QName(qName), value);
         } else {
             // QName-but-not-NCName
             final String prefix = qName.substring(0, colonIndex);
@@ -65,7 +69,7 @@ public class XXFormsAttribute extends XFormsFunction {
             if (uri == null)
                 throw new OXFException("Namespace prefix not in space for QName: " + qName);
 
-            attribute = Dom4jUtils.createAttribute(new QName(qName.substring(colonIndex + 1), new Namespace(prefix, uri)), "");
+            attribute = Dom4jUtils.createAttribute(new QName(qName.substring(colonIndex + 1), new Namespace(prefix, uri)), value);
         }
 
         return XXFormsElement.documentWrapper.wrap(attribute);

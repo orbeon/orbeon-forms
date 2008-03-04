@@ -810,16 +810,17 @@
                         <li>
                             <a name="xxforms-attribute"/>
                             <p>
-                                <code>xxforms:attribute($attribute-name as xs:string) as attribute()</code>.
+                                <code>xxforms:attribute($qname as xs:string, $value as xs:string?) as attribute()</code>.
                             </p>
                             <p>
                                 The <code>xxforms:attribute()</code> function returns a new XML attribute with the
-                                qualified name provided. If the name has a prefix, it is resolved using in-scope
-                                namespaces.
+                                qualified name provided as first argument. If the name has a prefix, it is resolved
+                                using in-scope namespaces. The second argument is an optional value for the attribute.
+                                It default to the empty string.
                             </p>
                             <xml-source show-namespaces="false">
-                                <comment> Add an attribute called "id" to element "section" </comment>
-                                <xforms:insert context="section" origin="xxforms:attribute('id')"/>
+                                <comment> Add an attribute called "id" with a value of "first-name" to element "section" </comment>
+                                <xforms:insert context="section" origin="xxforms:attribute('id', 'first-name')"/>
                             </xml-source>
                         </li>
 
@@ -1811,10 +1812,10 @@
                         <xforms:instance id="resources-instance" src="/forms/resources/en" xxforms:readonly="true"/>
                     </xml-source>
                     <p>
-                        The <code>xxforms:readonly</code> attribute on <code>&lt;xxforms:instance></code> determines if
+                        The <code>xxforms:readonly</code> attribute on <code>&lt;xforms:instance></code> determines if
                         the instance is read-only until that instance is being replaced. After an instance is replaced,
                         it can be read-only or not irrelevant of the of <code>xxforms:readonly</code> on
-                        <code>&lt;xxforms:instance></code>. When the instance is replaced, the replaced instance is
+                        <code>&lt;xforms:instance></code>. When the instance is replaced, the replaced instance is
                         read-only if and only if the <code>&lt;xforms:submission></code> that does the replacement has a
                         attribute <code>xxforms:readonly="true"</code>.
                     </p>
@@ -1944,10 +1945,10 @@
                 </section>
                 <a name="internal-group"/>
                 <section>
-                    <title>Special <code>xxforms:internal</code> Appearance on <code>&lt;xforms:group></code></title>
+                    <title><code>xxforms:internal</code> Appearance on <code>&lt;xforms:group></code></title>
                     <p>
-                        <code>&lt;xforms:group></code> supports a special appearance, <code>xxforms:internal</code>,
-                        which causes the group to have no representation at all on the client:
+                        <code>&lt;xforms:group></code> supports the <code>xxforms:internal</code> appearance, which
+                        causes the group to have no representation at all on the client:
                     </p>
                     <xml-source>
                         <xforms:group model="my-model" appearance="xxforms:internal">
@@ -1984,6 +1985,28 @@
                         [TODO: describe the Orbeon Forms <code>xxforms:autocomplete</code> appearance on
                         <code>xforms:select</code> and <code>xforms:select1</code>]
                     </p>
+                </section>
+                <a name="submission-xxforms-instance"/>
+                <section>
+                    <title><code>xxforms:instance</code> attribute on <code>&lt;xforms:submission></code></title>
+                    <p>
+                        On an <code>&lt;xforms:submission></code> element with <code>replace="instance"</code>, the
+                        optional <code>instance</code> attribute specifies a destination instance for the result. That
+                        attribute is processed like the <code>instance()</code> function, which means that the instance
+                        specified must be in the current model.
+                    </p>
+                    <p>
+                        The <code>xxforms:instance</code> extension attribute can be use instead of the standard
+                        <code>instance</code> attribute. It works like <code>instance</code>, except that the instance
+                        is searched globally among all models. <code>xxforms:instance</code> is to the
+                        <code>instance</code> attribute what the <a
+                        href="xxforms-instance"><code>xxforms:instance()</code></a> function is to the standard
+                        <code>instance()</code> function.
+                    </p>
+                    <xml-source>
+                        <xforms:submission id="my-submission" method="post" resource="http://example.org/"
+                                           replace="instance" xxforms:instance="my-instance"/>
+                    </xml-source>
                 </section>
                 <a name="modal-trigger"/>
                 <section>

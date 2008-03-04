@@ -19,6 +19,8 @@ import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
 import org.orbeon.oxf.xforms.XFormsContextStack;
+import org.orbeon.oxf.xforms.Variable;
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.saxon.om.Item;
 
 import java.util.Iterator;
@@ -30,19 +32,40 @@ public class XFormsActionAction extends XFormsAction {
     public void execute(XFormsActionInterpreter actionInterpreter, PipelineContext pipelineContext, String targetId,
                         XFormsEventHandlerContainer eventHandlerContainer, Element actionElement,
                         boolean hasOverriddenContext, Item overriddenContext) {
-        // Iterate over child actions
+
+        final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
         final XFormsContextStack contextStack = actionInterpreter.getContextStack();
+
+        // Iterate over child actions
+        int variablesCount = 0;
         for (Iterator i = actionElement.elementIterator(); i.hasNext();) {
             final Element currentActionElement = (Element) i.next();
+            final String currentActionName = currentActionElement.getName();
 
-            // Set context on action element
-            contextStack.pushBinding(pipelineContext, currentActionElement);
+            if (currentActionName.equals("variable")) {
+                // Create variable object
+                final Variable variable = new Variable(containingDocument, contextStack, currentActionElement);
 
-            // Run action
-            actionInterpreter.runAction(pipelineContext, targetId, eventHandlerContainer, currentActionElement);
+                // Push the variable on the context stack. Note that we do as if each variable was a "parent" of the following controls and variables.
+                // NOTE: The value is computed immediately. We should use Expression objects and do lazy evaluation in the future.
+                contextStack.pushVariable(currentActionElement, variable.getVariableName(), variable.getVariableValue(pipelineContext, true));
 
-            // Restore context
-            contextStack.popBinding();
+                variablesCount++;
+            } else {
+
+                // Set context on action element
+                contextStack.pushBinding(pipelineContext, currentActionElement);
+
+                // Run action
+                actionInterpreter.runAction(pipelineContext, targetId, eventHandlerContainer, currentActionElement);
+
+                // Restore context
+                contextStack.popBinding();
+            }
         }
+
+        // Unscope all variables
+        for (int i = 0; i < variablesCount; i++)
+            contextStack.popBinding();
     }
 }

@@ -719,12 +719,12 @@ public class XFormsControls {
         int variablesCount = 0;
         for (Iterator i = containerElement.elements().iterator(); i.hasNext();) {
             final Element currentControlElement = (Element) i.next();
-            final String controlName = currentControlElement.getName();
+            final String currentControlName = currentControlElement.getName();
 
             final String controlId = currentControlElement.attributeValue("id");
             final String effectiveControlId = controlId + (idPostfix.equals("") ? "" : XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1 + idPostfix);
 
-            if (controlName.equals("repeat")) {
+            if (currentControlName.equals("repeat")) {
                 // Handle xforms:repeat
                 contextStack.pushBinding(pipelineContext, currentControlElement);
 
@@ -755,7 +755,7 @@ public class XFormsControls {
 
                 doContinue = doContinue && controlElementVisitorListener.endVisitControl(currentControlElement, effectiveControlId);
                 contextStack.popBinding();
-            } else if (isGroupingControl(controlName)) {
+            } else if (isGroupingControl(currentControlName)) {
                 // Handle XForms grouping controls
                 contextStack.pushBinding(pipelineContext, currentControlElement);
                 doContinue = controlElementVisitorListener.startVisitControl(currentControlElement, effectiveControlId);
@@ -778,13 +778,13 @@ public class XFormsControls {
                 }
                 doContinue = doContinue && controlElementVisitorListener.endVisitControl(currentControlElement, effectiveControlId);
                 contextStack.popBinding();
-            } else if (isLeafControl(controlName)) {
+            } else if (isLeafControl(currentControlName)) {
                 // Handle leaf control
                 contextStack.pushBinding(pipelineContext, currentControlElement);
                 doContinue = controlElementVisitorListener.startVisitControl(currentControlElement, effectiveControlId);
                 doContinue = doContinue && controlElementVisitorListener.endVisitControl(currentControlElement, effectiveControlId);
                 contextStack.popBinding();
-            } else if (controlName.equals("variable")) {
+            } else if (currentControlName.equals("variable")) {
                 // Handle xxforms:variable specifically
 
                 // Create variable object

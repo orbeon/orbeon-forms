@@ -1331,7 +1331,8 @@
                 <ul>
                     <li>
                         <p>
-                            You can declare XPath variables anywhere an XForms control can be declared.
+                            You can declare XPath variables anywhere an XForms control can be declared, as well as
+                            within <code>&lt;xforms:action></code>.
                         </p>
                     </li>
                     <li>
@@ -1342,8 +1343,9 @@
                     </li>
                 </ul>
                 <p>
-                    In addition, variables are supported within <code>&lt;xforms:model></code>. Under the
-                    <code>&lt;xforms:model></code> element, the following rules apply:
+                    In addition, variables are supported within <code>&lt;xforms:model></code>, as well as within
+                    <code>&lt;xforms:action></code> in a model. Under the <code>&lt;xforms:model></code> element, the
+                    following rules apply:
                 </p>
                 <ul>
                     <li>
@@ -1389,19 +1391,16 @@
                 <ul>
                     <li>
                         <p>
-                            Within action handlers.
-                        </p>
-                    </li>
-                    <li>
-                        <p>
-                            Within XForms core controls such as <code>&lt;xforms:input></code>, including within
-                            nested items or itemsets.
+                            Within XForms core controls such as <code>&lt;xforms:input></code>, including within nested
+                            items or itemsets (except within <code>&lt;xforms:action></code> elements, where they are
+                            allowed).
                         </p>
                     </li>
                     <li>
                         <p>
                             Within nested model elements, including <code>&lt;xforms:bind></code> or
-                            <code>&lt;xforms:submission></code>.
+                            <code>&lt;xforms:submission></code> (except within <code>&lt;xforms:action></code>
+                            elements, where they are allowed).
                         </p>
                     </li>
                 </ul>

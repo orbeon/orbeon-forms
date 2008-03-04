@@ -37,7 +37,8 @@
     overflow: hidden;
     /* This is needed to hide the text of the alert! */
     text-indent: 16px;
-    padding-left: 16px;
+    /* text-indent doesn't work on Firefox 2 (but does in 3), but the following does the trick */
+    font-size: 0;
     /* Not sure why we would need this  */
     /*line-height: 10px;*/
     margin-left: .25em;

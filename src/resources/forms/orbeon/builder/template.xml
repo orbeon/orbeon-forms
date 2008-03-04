@@ -53,10 +53,10 @@
                 <resources>
                     <resource xml:lang="en">
                         <section-1>
-                            <label>Section 1</label>
+                            <label>[Please give this section a title]</label>
                         </section-1>
                         <control-1>
-                            <label>Input 1</label>
+                            <label>[Please give this control a title]</label>
                             <hint>[Please modify the hint]</hint>
                             <help>[Please modify the help]</help>
                             <alert>[Please modify the alert]</alert>

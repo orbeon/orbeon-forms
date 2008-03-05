@@ -1108,6 +1108,11 @@ ORBEON.xforms.Controls = {
         // By default try to display the dialog inside the viewport, but this can be overridden with consrain="false"
         var constrain = ORBEON.util.Dom.getAttribute(divElement, "constrain") == "false" ? false : true;
         yuiDialog.cfg.setProperty("constraintoviewport", constrain);
+
+        // xxx
+        //if (window.zIndex == null) window.zIndex = 5;
+        //console.log(window.zIndex);
+        //yuiDialog.cfg.setProperty("zIndex", window.zIndex++);
         // Position the dialog either at the center of the viewport or relative of a neighbor
         if (neighbor == null)
             neighbor = ORBEON.util.Dom.getAttribute(divElement, "neighbor");// TODO: there can't be a "neighbor" attribute on the HTML element
@@ -1544,6 +1549,39 @@ ORBEON.xforms.Events = {
                     // we can avoid a round trip and show the help right away
                     ORBEON.xforms.Controls.showHelp(control);
                 }
+            }
+        } else {
+            // Click on something that is not an XForms element, but which might still be in an repeat iteration,
+            // in which case we want to let the server know about where in the iteration the click was.
+
+            var node = originalTarget;
+
+            // Iterate on ancestors, stop when we don't find ancestors anymore or we arrive at the form element
+            while (node != null && ! (ORBEON.util.Dom.isElement(node) && node.tagName.toLowerCase() == "form")) {
+                // Iterate on previous siblings
+                var delimiterCount = 0;
+                var foundRepeatBegin = false;
+                var sibling = node;
+                while (sibling != null) {
+                    if (ORBEON.util.Dom.isElement(sibling)) {
+                        if (sibling.id.indexOf("repeat-begin-") == 0) {
+                            // Found beginning of current iteration, tell server
+                            var form = ORBEON.xforms.Controls.getForm(sibling);
+                            var targetId = sibling.id.substring("repeat-begin-".length) + "-" + delimiterCount;
+                            var event = new ORBEON.xforms.Server.Event(form, targetId, null, null, "DOMFocusIn");
+                            ORBEON.xforms.Server.fireEvents([event]);
+                            foundRepeatBegin = true;
+                            break;
+                        } else if (ORBEON.util.Dom.hasClass(sibling, "xforms-repeat-delimiter")) {
+                            delimiterCount++;
+                        }
+                    }
+                    sibling = sibling.previousSibling;
+                }
+                // We found what we were looking for, no need to go to parents
+                if (foundRepeatBegin) break;
+                // Explore parent
+                node = node.parentNode;
             }
         }
     },

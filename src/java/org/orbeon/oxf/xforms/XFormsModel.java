@@ -550,7 +550,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
                                 typeLocalname = typeQName.substring(prefixPosition + 1);
                             } else {
-                                typeNamespaceURI = null;
+                                typeNamespaceURI = "";
                                 typeLocalname = typeQName;
                             }
                         }

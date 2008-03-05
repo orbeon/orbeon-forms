@@ -56,6 +56,34 @@
                 <ul>
                     <li>
                         <p>
+                            <b>Inline XML Schema support.</b> XForms supports using XML Schemas which are embedded
+                            within the <code>&lt;xforms:model></code> element. Orbeon Forms now supports this feature.
+                            This is particularly useful when you create a new schema which is just used within an XForms
+                            document, or to define a series of simple types used for validation.
+                        </p>
+                        <xml-source>
+                            <xforms:model>
+                                <comment> A simple inline XML Schema </comment>
+                                <xs:schema elementFormDefault="qualified" attributeFormDefault="unqualified">
+                                    <xs:simpleType name="link">
+                                        <xs:restriction base="xs:string">
+                                            <xs:pattern value="(https?\://([^/?#]+)/([^?#]*)(\?([^?#]+))?(#(.*))?)?"/>
+                                        </xs:restriction>
+                                    </xs:simpleType>
+                                </xs:schema>
+                                <comment> More XForms model constructs below </comment>
+                                ...
+                            </xforms:model>
+                        </xml-source>
+                        <p>
+                            The XML Schema definitions are directly available to the model, in particular to binds:
+                        </p>
+                        <xml-source>
+                            <xforms:bind nodeset="my-link" type="link"/>
+                        </xml-source>
+                    </li>
+                    <li>
+                        <p>
                             <b>Session heartbeat feature for XForms pages.</b> Orbeon Forms now enables by default the
                             <a href="reference-xforms-2#session-heartbeat">Session Heartbeat</a> feature. This allows
                             sessions associated with live pages in a user's browser to stay active, therefore

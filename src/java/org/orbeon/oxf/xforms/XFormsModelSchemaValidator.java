@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2004 - 2005 Orbeon, Inc.
+ *  Copyright (C) 2004 - 2008 Orbeon, Inc.
  *
  *  This program is free software; you can redistribute it and/or modify it under the terms of the
  *  GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -21,6 +21,7 @@ import com.sun.msv.grammar.IDContextProvider2;
 import com.sun.msv.grammar.xmlschema.*;
 import com.sun.msv.reader.GrammarReaderController;
 import com.sun.msv.reader.util.GrammarLoader;
+import com.sun.msv.reader.xmlschema.XMLSchemaReader;
 import com.sun.msv.util.DatatypeRef;
 import com.sun.msv.util.StartTagInfo;
 import com.sun.msv.util.StringRef;
@@ -31,6 +32,7 @@ import com.sun.msv.verifier.regexp.SimpleAcceptor;
 import com.sun.msv.verifier.regexp.StringToken;
 import com.sun.msv.verifier.regexp.xmlschema.XSAcceptor;
 import com.sun.msv.verifier.regexp.xmlschema.XSREDocDecl;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dom4j.Attribute;
 import org.dom4j.Element;
@@ -47,6 +49,7 @@ import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.msv.IDConstraintChecker;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
+import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -67,22 +70,43 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * Provides XML Schema validation services for the XForms model. 
+ * Provides XML Schema validation services for the XForms model.
+ *
+ * TODO: support multiple schemas
+ *
+ * TODO: "3.3.1 The model Element [...] The schema list may include URI fragments referring to elements located
+ * outside the current model elsewhere in the containing document; e.g. "#myschema"."
  */
 public class XFormsModelSchemaValidator {
 
     private static final ValidationContext validationContext = new ValidationContext();
 
     private Element modelElement;
-    private String schemaURIs;
     private Grammar schemaGrammar;
+    private String[] schemaURIs;
+    private List schemaElements;
 
     // REDocumentDeclaration is not reentrant, but the validator is used by a single thread
     private REDocumentDeclaration documentDeclaration;
 
     public XFormsModelSchemaValidator(Element modelElement) {
         this.modelElement = modelElement;
-        this.schemaURIs = XFormsUtils.encodeHRRI(modelElement.attributeValue("schema"), false);
+
+        // Check for external schemas
+        final String schemaAttribute = modelElement.attributeValue("schema");
+        if (schemaAttribute != null)
+            this.schemaURIs = StringUtils.split(XFormsUtils.encodeHRRI(schemaAttribute, false));
+
+        // Check for inline schemas
+        // "3.3.1 The model Element [...] xs:schema elements located inside the current model need not be listed."
+        for (Iterator i = modelElement.elements(XMLConstants.XML_SCHEMA_QNAME).iterator(); i.hasNext(); ) {
+            final Element currentSchemaElement = (Element) i.next();
+
+            if (schemaElements == null)
+                schemaElements = new ArrayList();
+
+            schemaElements.add(currentSchemaElement);
+        }
     }
 
     private static class MSVGrammarReaderController implements GrammarReaderController {
@@ -97,36 +121,35 @@ public class XFormsModelSchemaValidator {
             this.schemaInfo = schemaInfo;
         }
 
-        public void warning(final Locator[] locs, final String msg) {
-            if (locs == null && locs.length == 0) {
-                logger.warn(msg);
+        public void warning(final Locator[] locators, final String message) {
+            if (locators == null && locators.length == 0) {
+                logger.warn(message);
             } else {
-                final String frst = XMLUtils.toString(locs[0]);
-                final StringBuffer sb = new StringBuffer(frst);
-                for (int i = 1; i < locs.length; i++) {
+                final String first = XMLUtils.toString(locators[0]);
+                final StringBuffer sb = new StringBuffer(first);
+                for (int i = 1; i < locators.length; i++) {
                     sb.append(',');
-                    final String locMsg = XMLUtils.toString(locs[i]);
+                    final String locMsg = XMLUtils.toString(locators[i]);
                     sb.append(locMsg);
                 }
                 sb.append(':');
-                sb.append(msg);
-                final String logMsg = sb.toString();
-                logger.warn(logMsg);
+                sb.append(message);
+                final String logMessage = sb.toString();
+                logger.warn(logMessage);
             }
         }
 
-        public void error(final Locator[] locs, final String msg, final Exception ex) {
-            final LocationData ld = locs.length > 0 ? new LocationData(locs[0]) : null;
-            throw new ValidationException(msg, ex, ld);
+        public void error(final Locator[] locators, final String message, final Exception exception) {
+            final LocationData locationData = locators.length > 0 ? new LocationData(locators[0]) : null;
+            throw new ValidationException(message, exception, locationData);
         }
 
-        public InputSource resolveEntity(final String pid, final String sid)
-                throws SAXException, IOException {
-            final java.net.URL u = URLFactory.createURL(baseURI, sid);
-            schemaInfo.addInclude(u);
+        public InputSource resolveEntity(final String pid, final String sid) throws SAXException, IOException {
+            final URL url = URLFactory.createURL(baseURI, sid);
+            schemaInfo.addInclude(url);
 
-            final String surl = u.toString();
-            return XMLUtils.ENTITY_RESOLVER.resolveEntity("", surl);
+            final String urlString = url.toString();
+            return XMLUtils.ENTITY_RESOLVER.resolveEntity("", urlString);
         }
     }
 
@@ -162,36 +185,34 @@ public class XFormsModelSchemaValidator {
         private final ArrayList modTimes = new ArrayList(0);
         private Grammar grammar;
 
-        void addInclude(final URL u) throws java.io.IOException {
-            // Get the time first.  This way if there's a problem the array lengths will remain
-            // the same.
-            final Long modTim = NetUtils.getLastModifiedAsLong(u);
-            includes.add(u);
-            modTimes.add(modTim);
+        void addInclude(final URL url) throws IOException {
+            // Get the time first. This way if there's a problem the array lengths will remain the same.
+            final Long lastModified = NetUtils.getLastModifiedAsLong(url);
+            includes.add(url);
+            modTimes.add(lastModified);
         }
 
         boolean includesUpToDate() {
             boolean ret = true;
             final int size = includes.size();
             for (int i = 0; ret && i < size; i++) {
-                final URL u = (URL) includes.get(i);
+                final URL url = (URL) includes.get(i);
                 try {
-                    final Long crntTim = NetUtils.getLastModifiedAsLong(u);
-                    final Long lstTim = (Long) modTimes.get(i);
-                    ret = crntTim.equals(lstTim);
-                } catch (final java.io.IOException e) {
-                    // We won't propagate here.  Reason is that while an include may be missing
-                    // it may just be the case that it isn't included anymore _and_ it has been
-                    // removed.  So, we return false and then on a reparse we will find out the
-                    // truth.
+                    final Long lastModified = NetUtils.getLastModifiedAsLong(url);
+                    final Long lastTime = (Long) modTimes.get(i);
+                    ret = lastModified.equals(lastTime);
+                } catch (final IOException e) {
+                    // We won't propagate here. Reason is that while an include may be missing it may just be the case
+                    // that it isn't included anymore _and_ it has been removed. So, we return false and then on a
+                    // reparse we will find out the truth.
                     ret = false;
                 }
             }
             return ret;
         }
 
-        void setGrammar(final Grammar g) {
-            grammar = g;
+        void setGrammar(final Grammar grammar) {
+            this.grammar = grammar;
         }
 
         Grammar getGrammar() {
@@ -583,18 +604,24 @@ public class XFormsModelSchemaValidator {
      */
     public void loadSchemas(final PipelineContext pipelineContext) {
 
-        final String schemaURI = schemaURIs;// TODO: check for multiple schemas
+        // Check for external schemas
+        if (schemaURIs != null && schemaURIs.length > 0) {
+            // External context
+            final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
 
-        // External instance
-        final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+            // Resolve URL
+            // NOTE: We do not support "optimized" access here, we always use an URL, because loadGrammar() wants a URL
+            final String resolvedURLString = XFormsUtils.resolveResourceURL(pipelineContext, modelElement, schemaURIs[0]);
+            final URL resolvedURL = XFormsSubmissionUtils.createAbsoluteURL(resolvedURLString, null, externalContext);
 
-        // Resolve URL
-        // TODO: We do not support "optimized" access here, we always use an URL, because loadGrammar() wants a URL
-        final String resolvedURLString = XFormsUtils.resolveResourceURL(pipelineContext, modelElement, schemaURI);
-        final URL resolvedURL = XFormsSubmissionUtils.createAbsoluteURL(resolvedURLString, null, externalContext);
+            // Load associated grammar
+            schemaGrammar = loadCacheGrammar(pipelineContext, resolvedURL.toExternalForm());
+        }
 
-        // Load associated grammar
-        schemaGrammar = loadCacheGrammar(pipelineContext, resolvedURL.toExternalForm());
+        // Check for inline schemas
+        if (schemaElements != null && schemaElements.size() > 0) {
+            schemaGrammar = loadInlineGrammar(null, (Element) schemaElements.get(0)); // TODO: specify baseURI
+        }
     }
 
     /**
@@ -636,17 +663,27 @@ public class XFormsModelSchemaValidator {
         }
     }
 
-    // TODO: Work in progress for loading inline schemas (probably)
-//    private Grammar loadGrammar(final String baseURI, final NodeInfo schemaElementInfo) {
-//        final SchemaInfo newSchemaInfo = new SchemaInfo();
-//        final MSVGrammarReaderController controller = new MSVGrammarReaderController(baseURI, newSchemaInfo);
-//        final SAXParserFactory saxParserFactory = XMLUtils.getSAXParserFactory(false, false);
-//        final XMLSchemaReader reader = new XMLSchemaReader(controller, saxParserFactory);
-//
+    /**
+     * Load an inline schema.
+     *
+     * @param baseURI               URI to resolve external dependencies
+     * @param schemaElement         root element of the schema
+     * @return
+     */
+//    private Grammar loadInlineGrammar(final String baseURI, final NodeInfo schemaElementInfo) {
+    private Grammar loadInlineGrammar(final String baseURI, final Element schemaElement) {
+        final SchemaInfo newSchemaInfo = new SchemaInfo(); // used for resolving external dependencies
+        // TODO: Use SchemaInfo to cache depdencies if any
+        final MSVGrammarReaderController controller = new MSVGrammarReaderController(baseURI, newSchemaInfo);
+        final SAXParserFactory saxParserFactory = XMLUtils.getSAXParserFactory(false, false);
+        final XMLSchemaReader reader = new XMLSchemaReader(controller, saxParserFactory);
+
 //        TransformerUtils.writeTinyTree(schemaElementInfo, reader);
-//
-//        return reader.getResult();
-//    }
+        // TODO: We create an entirely new dom4j document here because otherwise the transformation picks the whole document
+        TransformerUtils.writeDom4j(Dom4jUtils.createDocument(schemaElement), reader);
+
+        return reader.getResult();
+    }
 
     /**
      * Apply schema validation to an instance. The instance may content a hint specifying whether to perform "lax",
@@ -802,11 +839,11 @@ public class XFormsModelSchemaValidator {
     }
 
     /**
-     * Return the value of the @schema attribute on the model.
+     * Return the schema URIs specified on the model.
      *
-     * @return  value of the @schema attribute on the model
+     * @return  array of schema URIs specified on the model, or null if none
      */
-    public String getSchemaURIs() {
+    public String[] getSchemaURIs() {
         return schemaURIs;
     }
 }

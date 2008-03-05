@@ -779,8 +779,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
     private void loadSchemasIfNeeded(PipelineContext pipelineContext) {
         final Element modelElement = modelDocument.getRootElement();
-        // Create Schema validator only if we have schemas specified
-        if (modelElement.attributeValue("schema") != null && schemaValidator == null) {
+        if (schemaValidator == null) {
             if (!XFormsProperties.isSkipSchemaValidation(containingDocument)) {
                 schemaValidator = new XFormsModelSchemaValidator(modelElement);
                 schemaValidator.loadSchemas(pipelineContext);
@@ -803,7 +802,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         }
     }
 
-    public String getSchemaURI() {
+    public String[] getSchemaURIs() {
         if (schemaValidator != null) {
             return schemaValidator.getSchemaURIs();
         } else {
@@ -831,9 +830,6 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
             // 1. All XML Schemas loaded (throws xforms-link-exception)
 
-            // TODO: support multiple schemas
-            // TODO: support inline schemas
-            // Get schema URI
             loadSchemasIfNeeded(pipelineContext);
             // TODO: throw exception event
 

@@ -286,11 +286,15 @@ public class XFormsToXHTML extends ProcessorImpl {
             final XFormsModel currentModel = (XFormsModel) i.next();
 
             // Add schema dependencies
-            final String schemaURI = currentModel.getSchemaURI();
-            if (schemaURI != null) {
-                if (logger.isDebugEnabled())
-                    logger.debug("XForms - adding document cache dependency for schema: " + schemaURI);
-                inputDependencies.addReference(null, schemaURI, null, null);// TODO: support username / password on schema refs
+            final String[] schemaURIs = currentModel.getSchemaURIs();
+            // TODO: We should also use dependencies computed in XFormsModelSchemaValidator.SchemaInfo
+            if (schemaURIs != null) {
+                for (int j = 0; j < schemaURIs.length; j++) {
+                    final String currentSchemaURI = schemaURIs[j];
+                    if (logger.isDebugEnabled())
+                        logger.debug("XForms - adding document cache dependency for schema: " + currentSchemaURI);
+                    inputDependencies.addReference(null, currentSchemaURI, null, null);// TODO: support username / password on schema refs
+                }
             }
 
             // Add instance source dependencies

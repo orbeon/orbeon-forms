@@ -32,6 +32,8 @@ public class XMLConstants {
     public static final String XSD_URI = "http://www.w3.org/2001/XMLSchema";
     public static final Namespace XSD_NAMESPACE = new Namespace(XSD_PREFIX, XSD_URI);
 
+    public final static QName XML_SCHEMA_QNAME = new QName("schema", XSD_NAMESPACE);
+
     public static final String XINCLUDE_PREFIX = "xi";
     // NOTE: "2003" was used at some point; the correct value for XInclude 1.0 is "2001"
     public static final String XINCLUDE_URI = "http://www.w3.org/2001/XInclude";

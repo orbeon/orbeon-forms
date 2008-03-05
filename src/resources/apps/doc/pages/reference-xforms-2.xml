@@ -263,6 +263,13 @@
                     href="http://www.w3.org/TR/xforms11/#action-conditional">XForms 1.1 specification</a>.
                 </p>
             </section>
+            <a name="xforms11-function"/>
+            <section>
+                <title>XForms 1.1 Functions</title>
+                <p>
+                    [TODO: List all XForms 1.1 functions implemented]
+                </p>
+            </section>
         </section>
         <a name="extensions"/>
         <section>
@@ -2006,6 +2013,27 @@
                         <xforms:submission id="my-submission" method="post" resource="http://example.org/"
                                            replace="instance" xxforms:instance="my-instance"/>
                     </xml-source>
+                </section>
+                <a name="events-multiple-observers"/>
+                <section>
+                    <title>Multiple Observers on Event Handlers</title>
+                    <p>
+                        The <code>ev:observer</code> attribute, defined by the <a
+                        href="http://www.w3.org/TR/xml-events/">XML Events specification</a>, only supports one
+                        observer. Orbeon Forms supports as an extension a list of space-separated observer identifiers.
+                        The behavior is that the event handler is attached to all the observers specified:
+                    </p>
+                    <xml-source>
+                        <xforms:action ev:event="DOMActivate" ev:observer="my-input my-trigger">
+                            <comment> Observing both the "my-input" and "my-trigger" controls </comment>
+                            ...
+                        </xforms:action>
+                    </xml-source>
+                    <p>
+                        This feature has been <a
+                        href="http://lists.w3.org/Archives/Public/www-html-editor/2008JanMar/0012.html">requested</a>
+                        for inclusion in XML Events 2.
+                    </p>
                 </section>
                 <a name="modal-trigger"/>
                 <section>

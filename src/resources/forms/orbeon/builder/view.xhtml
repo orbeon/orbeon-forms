@@ -248,8 +248,8 @@
 
             <xforms:instance id="fb-variables">
                 <variables>
+                    <!-- TODO: check where local variable can be used instead -->
                     <done/>
-                    <column-number/>
 
                     <!-- Confirmation dialog -->
                     <confirmation-message/>
@@ -741,10 +741,10 @@
                                                             <xforms:setvalue ref="@columns" value=". + 1"/>
 
                                                             <!-- Save column index -->
-                                                            <xforms:setvalue ref="$variables/column-number" value="index('fb-section-content-grid-td-repeat')"/>
+                                                            <xxforms:variable name="column-number" select="index('fb-section-content-grid-td-repeat')"/>
 
                                                             <xforms:action xxforms:iterate="xhtml:tr">
-                                                                <xforms:insert nodeset="xhtml:td" origin="xxforms:element('xhtml:td')" at="$variables/column-number"/>
+                                                                <xforms:insert nodeset="xhtml:td" origin="xxforms:element('xhtml:td')" at="$column-number"/>
                                                             </xforms:action>
                                                         </xforms:action>
                                                     </xforms:trigger>
@@ -753,13 +753,22 @@
                                                             <xhtml:span>Delete Row</xhtml:span>
                                                         </xforms:label>
                                                         <xforms:action ev:event="DOMActivate">
-                                                            <!-- Ask confirmation -->
-                                                            <xforms:setvalue ref="$variables/confirmation-message"
-                                                                             value="concat('Are you sure you want to delete the current row? ',
-                                                                                    count(context()/xhtml:tr[index('fb-section-content-grid-tr-repeat')]/xhtml:td[xforms:*]),
-                                                                                    ' controls will be deleted.')"/>
-                                                            <xforms:setvalue ref="$variables/confirmation-target">fb-delete-row-trigger</xforms:setvalue>
-                                                            <xxforms:show dialog="fb-confirmation-dialog"/>
+
+                                                            <xxforms:variable name="count" select="count(xhtml:tr[index('fb-section-content-grid-tr-repeat')]/xhtml:td[xforms:*])"/>
+
+                                                            <xforms:action if="$count > 0">
+                                                                <!-- Ask confirmation -->
+                                                                <xforms:setvalue ref="$variables/confirmation-message"
+                                                                                 value="concat('Are you sure you want to delete the current row? ',
+                                                                                        $count, ' controls will be deleted.')"/>
+                                                                <xforms:setvalue ref="$variables/confirmation-target">fb-delete-row-trigger</xforms:setvalue>
+                                                                <xxforms:show dialog="fb-confirmation-dialog"/>
+                                                            </xforms:action>
+                                                            <xforms:action if="$count = 0">
+                                                                <!-- We are automatically confirmed-->
+                                                                <xforms:dispatch name="fb-confirmation-yes" target="fb-delete-row-trigger"/>
+                                                            </xforms:action>
+
                                                         </xforms:action>
                                                         <xforms:action ev:event="fb-confirmation-yes">
                                                             <!-- Context is on current grid -->
@@ -781,25 +790,33 @@
                                                             <xhtml:span>Delete Column</xhtml:span>
                                                         </xforms:label>
                                                         <xforms:action ev:event="DOMActivate">
-                                                            <!-- Ask confirmation -->
-                                                            <xforms:setvalue ref="$variables/column-number" value="index('fb-section-content-grid-td-repeat')"/>
-                                                            <xforms:setvalue ref="$variables/confirmation-message"
-                                                                             value="concat('Are you sure you want to delete the current column? ',
-                                                                                    count(context()/xhtml:tr/xhtml:td[xs:integer($variables/column-number)][xforms:*]),
-                                                                                    ' controls will be deleted.')"/>
-                                                            <xforms:setvalue ref="$variables/confirmation-target">fb-delete-column-trigger</xforms:setvalue>
-                                                            <xxforms:show dialog="fb-confirmation-dialog"/>
+
+                                                            <xxforms:variable name="column-number" select="index('fb-section-content-grid-td-repeat')"/>
+                                                            <xxforms:variable name="count" select="count(xhtml:tr/xhtml:td[xs:integer($column-number)][xforms:*])"/>
+
+                                                            <xforms:action if="$count > 0">
+                                                                <!-- Ask confirmation -->
+                                                                <xforms:setvalue ref="$variables/confirmation-message"
+                                                                                 value="concat('Are you sure you want to delete the current column? ',
+                                                                                        $count,
+                                                                                        ' controls will be deleted.')"/>
+                                                                <xforms:setvalue ref="$variables/confirmation-target">fb-delete-column-trigger</xforms:setvalue>
+                                                                <xxforms:show dialog="fb-confirmation-dialog"/>
+                                                            </xforms:action>
+                                                            <xforms:action if="$count = 0">
+                                                                <!-- We are automatically confirmed-->
+                                                                <xforms:dispatch name="fb-confirmation-yes" target="fb-delete-column-trigger"/>
+                                                            </xforms:action>
                                                         </xforms:action>
                                                         <xforms:action ev:event="fb-confirmation-yes">
                                                             <!-- Context is on current grid -->
                                                             <xforms:setvalue ref="@columns" value=". - 1"/>
 
-                                                            <!-- Save column index -->
-                                                            <xforms:setvalue ref="$variables/column-number" value="index('fb-section-content-grid-td-repeat')"/>
+                                                            <xxforms:variable name="column-number" select="index('fb-section-content-grid-td-repeat')"/>
 
                                                             <!-- Iterate over rows and in each delete the appropriate column -->
                                                             <xforms:action xxforms:iterate="xhtml:tr">
-                                                                <xforms:action context="xhtml:td[xs:integer($variables/column-number)]">
+                                                                <xforms:action context="xhtml:td[xs:integer($column-number)]">
                                                                     <!-- Delete holder element, resources, and control -->
                                                                     <xforms:action if="exists(xforms:*)">
                                                                         <xforms:delete nodeset="$form-instance/*[index('fb-top-level-repeat')]/*[name() = context()/xforms:*/@ref]"/>
@@ -954,7 +971,6 @@
                                                                                     <xhtml:div class="fb-control-control">
 
                                                                                         <xforms:group ref="xforms:input">
-                                                                                            <!--instance('fr-form-instance')/xhtml:head/xforms:model/xforms:instance/*/*[xxx section]/*[count(context()/preceding-sibling::*) + 1]-->
                                                                                             <xforms:input ref="$instance-holder">
                                                                                                 <xforms:label class="fb-xforms-disabled"/>
                                                                                                 <!--<xforms:hint value="$control-id"/>-->
@@ -1235,7 +1251,6 @@
                                             <xforms:insert context="." nodeset="fr:section | fr:repeat | fr:grid"
                                                            at="index('fb-section-content-repeat')" position="after"
                                                            origin="instance('fb-grid-1-template')"/>
-                                            <!--<xforms:setvalue ref="(fr:section | fr:repeat | fr:grid)[index('fb-section-content-repeat')]/@columns" value="1"/>-->
                                         </xforms:action>
                                     </xforms:trigger>
                                 </xhtml:div>
@@ -1298,18 +1313,33 @@
 
                                             <!-- Compute next control id -->
                                             <xforms:dispatch target="fr-form-model" name="fb-compute-control-id"/>
+                                            <xxforms:variable name="new-control-id" select="concat('control-', $next-control-id)"/>
 
-                                            <!-- Insert new holder element into the instance -->
+                                            <!-- Pointing to the current xhtml:td -->
+                                            <xxforms:variable name="current-td"
+                                                              select="$current-section-content-block/xhtml:tr[index('fb-section-content-grid-tr-repeat')]
+                                                                        /xhtml:td[index('fb-section-content-grid-td-repeat')]"/>
+
+                                            <!-- All the xhtml:td elements up to and including the current one -->
+                                            <xxforms:variable name="tds" select="($current-td/../preceding-sibling::xhtml:tr/xhtml:td, $current-td/preceding-sibling::xhtml:td, $current-td)"/>
+
+                                            <!-- Name of the preceding control id -->
+                                            <xxforms:variable name="preceding-control-id" select="($tds/xforms:*)[last()]/@ref"/>
+
+                                            <!--<xforms:message>-->
+                                                <!--<xforms:output value="$preceding-control-id"/>-->
+                                            <!--</xforms:message>-->
+
+                                            <!-- Insert new holder element into the instance just after the previous control -->
                                             <xforms:insert context="$form-instance/*[index('fb-top-level-repeat')]"
-                                                           nodeset="*"
-                                                           at="index('fb-section-content-grid-tr-repeat') * 1 + index('fb-section-content-grid-td-repeat') - 1"
-                                                           origin="xxforms:element(concat('control-', $next-control-id))"/>
+                                                           nodeset="*[name() = $preceding-control-id]"
+                                                           origin="xxforms:element($new-control-id)"/>
 
-                                            <!-- Insert new control into the document -->
+                                            <!-- Insert new control into the grid -->
                                             <xforms:action context="$current-section-content-block">
                                                 <!-- Pointing to current grid element -->
 
-                                                <xforms:action context="xhtml:tr[index('fb-section-content-grid-tr-repeat')]/xhtml:td[index('fb-section-content-grid-td-repeat')]">
+                                                <xforms:action context="$current-td">
                                                     <!-- Context is now on td, and it is not empty -->
 
                                                     <!-- Hack: use the "done" variable to simulate if/else -->
@@ -1356,16 +1386,16 @@
 
                                                     <xforms:action context="xforms:*">
                                                         <!-- Set @id value -->
-                                                        <xforms:setvalue ref="@id" value="concat('control-', $next-control-id, '-control')"/>
+                                                        <xforms:setvalue ref="@id" value="concat($new-control-id, '-control')"/>
 
                                                         <!-- Set @ref value -->
-                                                        <xforms:setvalue ref="@ref" value="concat('control-', $next-control-id)"/>
+                                                        <xforms:setvalue ref="@ref" value="$new-control-id"/>
 
                                                         <!-- Set xforms:label, xforms:hint, xforms:help and xforms:alert @ref -->
-                                                        <xforms:setvalue ref="xforms:label/@ref" value="concat('$form-resources/control-', $next-control-id, '/label')"/>
-                                                        <xforms:setvalue ref="xforms:hint/@ref" value="concat('$form-resources/control-', $next-control-id, '/hint')"/>
-                                                        <xforms:setvalue ref="xforms:help/@ref" value="concat('$form-resources/control-', $next-control-id, '/help')"/>
-                                                        <xforms:setvalue ref="xforms:alert/@ref" value="concat('$form-resources/control-', $next-control-id, '/alert')"/>
+                                                        <xforms:setvalue ref="xforms:label/@ref" value="concat('$form-resources/', $new-control-id, '/label')"/>
+                                                        <xforms:setvalue ref="xforms:hint/@ref" value="concat('$form-resources/', $new-control-id, '/hint')"/>
+                                                        <xforms:setvalue ref="xforms:help/@ref" value="concat('$form-resources/', $new-control-id, '/help')"/>
+                                                        <xforms:setvalue ref="xforms:alert/@ref" value="concat('$form-resources/', $new-control-id, '/alert')"/>
                                                     </xforms:action>
                                                 </xforms:action>
 
@@ -1373,10 +1403,10 @@
 
                                             <!-- Insert resources placeholders for all languages -->
                                             <xforms:action xxforms:iterate="$resources/resource">
-                                                <xforms:insert context="." nodeset="*"
-                                                               origin="xxforms:element(concat('control-', $next-control-id))"/>
+                                                <xforms:insert context="." nodeset="*[name() = $preceding-control-id]"
+                                                               origin="xxforms:element($new-control-id)"/>
 
-                                                <xforms:insert context="*[last()]" origin="instance('fb-resource-template')/*"/>
+                                                <xforms:insert context="*[name() = $new-control-id]" origin="instance('fb-resource-template')/*"/>
                                             </xforms:action>
 
                                         </xforms:action>

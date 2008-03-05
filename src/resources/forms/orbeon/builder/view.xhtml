@@ -151,7 +151,7 @@
             #fb-details-section .fb-grid-td .xforms-select1-appearance-full { width: 62em; display: block }
             #fb-details-section .fb-grid-td .xforms-select1-appearance-full span { white-space: nowrap; display: block }
             #fb-details-section .fb-grid-td .xforms-select1-appearance-compact { width: 62em; height: 6em }
-            #fb-details-section .fb-grid-td .xforms-select-appearance-compact { width: 62em; height: 6em }
+            .xforms-select-appearance-compact { width: 62em; height: 6em }
 
             .fb-grid-2-columns .fb-grid-td { width: 50%; }
             #fb-details-section .fb-grid-2-columns .fb-grid-td .xforms-input input { width: 30em; }
@@ -259,6 +259,7 @@
                     <itemset-resource-id/>
                     <itemset-lang/>
 
+
                     <result-node/>
 
                     <next-section-id/>
@@ -275,6 +276,21 @@
                     <xml-view/>
                 </variables>
             </xforms:instance>
+
+            <!-- Details dialog -->
+            <xforms:instance id="fb-details-editor-instance">
+                <details>
+                    <control-id/>
+                    <control/>
+                    <instance-holder/>
+                    <change-trigger/>
+                </details>
+            </xforms:instance>
+
+            <xforms:bind nodeset="instance('fb-details-editor-instance')">
+                <xforms:bind nodeset="control-id" constraint="not(concat(normalize-space(), '-control') = $body//xforms:*/@id)"/>
+                <xforms:bind nodeset="change-trigger" readonly="concat(normalize-space(../control-id), '-control') = $body//xforms:*/@id"/>
+            </xforms:bind>
 
             <!-- Instance for the itemset editor -->
             <xforms:instance id="fb-itemset-instance">
@@ -807,14 +823,18 @@
                                                                     <!-- Repeat over table columns -->
                                                                     <xforms:repeat nodeset="xhtml:td" id="fb-section-content-grid-td-repeat" xxforms:dnd="true">
 
-                                                                        <xxforms:variable name="control-id" select="substring-before(xforms:*[1]/@id, '-control')"/>
+                                                                        <xxforms:variable name="control" select="xforms:*[1]"/>
+                                                                        <xxforms:variable name="control-id" select="substring-before($control/@id, '-control')"/>
+                                                                        <xxforms:variable name="instance-holder" select="$section-holder/*[name() = $control-id]"/>
+                                                                        <xxforms:variable name="resource-holder" select="$current-resources/*[name() = $control-id]"/>
+
                                                                         <xhtml:td class="fb-grid-td">
                                                                             <xhtml:div class="fb-grid-cell-icons">
                                                                                 <!-- TODO: For now put here, but move once dnd is there and clicking on cell is enough -->
                                                                                 <xforms:trigger appearance="minimal">
                                                                                     <xforms:label><xhtml:img src="../../../../apps/fr/style/drag_handle.gif" alt="Drag" title="Drag"/></xforms:label>
                                                                                 </xforms:trigger>
-                                                                                <xforms:group ref=".[xforms:*]">
+                                                                                <xforms:group ref=".[$control]">
 
                                                                                     <xforms:trigger appearance="minimal">
                                                                                         <xforms:label><xhtml:img src="../../../../apps/fr/style/trash.gif" alt="Delete Control" title="Delete Control"/></xforms:label>
@@ -822,17 +842,20 @@
                                                                                             <!-- Delete holder element, resources, and control -->
                                                                                             <xforms:delete nodeset="$form-instance/*[index('fb-top-level-repeat')]/*[name() = $control-id]"/>
                                                                                             <xforms:delete xxforms:iterate="$resources/resource/*[name() = $control-id]" nodeset="."/>
-                                                                                            <xforms:delete nodeset="xforms:*"/>
+                                                                                            <xforms:delete nodeset="$control"/>
                                                                                         </xforms:action>
                                                                                     </xforms:trigger>
                                                                                 </xforms:group>
                                                                             </xhtml:div>
-                                                                            <xforms:group ref=".[xforms:*]" class="fb-grid-control-icons">
+                                                                            <xforms:group ref=".[$control]" class="fb-grid-control-icons">
                                                                                 <!-- Edit details for any control -->
                                                                                 <xforms:trigger appearance="minimal" id="fb-edit-details-trigger">
                                                                                     <xforms:label><xhtml:img class="fb-control-help" alt="Details" title="" src="../../../../apps/fr/style/edit.gif"/></xforms:label>
-                                                                                    <xforms:action ev:event="DOMActivate">
-                                                                                        <!-- TODO zzz edit control id -->
+                                                                                    <xforms:action ev:event="DOMActivate" context="instance('fb-details-editor-instance')">
+                                                                                        <xforms:setvalue ref="control-id" value="$control-id"/>
+                                                                                        <xforms:setvalue ref="control" value="$control/saxon:path()"/>
+                                                                                        <xforms:setvalue ref="instance-holder" value="$instance-holder/saxon:path()"/>
+                                                                                        <xxforms:show dialog="fb-edit-details-dialog" neighbor="fb-edit-details-trigger"/>
                                                                                     </xforms:action>
                                                                                 </xforms:trigger>
 
@@ -840,7 +863,7 @@
                                                                                 <xforms:trigger appearance="minimal" id="fb-edit-help-trigger">
                                                                                     <xforms:label><xhtml:img class="fb-control-help" alt="Help" title="" src="../../../../ops/images/xforms/help.gif"/></xforms:label>
                                                                                     <xforms:action ev:event="DOMActivate">
-                                                                                        <xforms:setvalue ref="$variables/result-node" value="$current-resources/*[name() = $control-id]/help/saxon:path()"/>
+                                                                                        <xforms:setvalue ref="$variables/result-node" value="$resource-holder/help/saxon:path()"/>
                                                                                         <xxforms:show dialog="fb-edit-help-dialog" neighbor="fb-edit-help-trigger"/>
                                                                                     </xforms:action>
                                                                                 </xforms:trigger>
@@ -849,7 +872,7 @@
                                                                                 <xforms:trigger appearance="minimal" id="fb-edit-alert-trigger">
                                                                                     <xforms:label><xhtml:img class="fb-control-alert" alt="Alert" title="" src="../../../../ops/images/xforms/error.gif"/></xforms:label>
                                                                                     <xforms:action ev:event="DOMActivate">
-                                                                                        <xforms:setvalue ref="$variables/result-node" value="$current-resources/*[name() = $control-id]/alert/saxon:path()"/>
+                                                                                        <xforms:setvalue ref="$variables/result-node" value="$resource-holder/alert/saxon:path()"/>
                                                                                         <xxforms:show dialog="fb-edit-alert-dialog" neighbor="fb-edit-alert-trigger"/>
                                                                                     </xforms:action>
                                                                                 </xforms:trigger>
@@ -907,10 +930,7 @@
 
                                                                             <xhtml:div class="fb-grid-content">
 
-                                                                                <xforms:group ref=".[xforms:*]">
-
-                                                                                    <xxforms:variable name="instance-holder" select="$section-holder/*[name() = $control-id]"/>
-                                                                                    <xxforms:variable name="resource-holder" select="$current-resources/*[name() = $control-id]"/>
+                                                                                <xforms:group ref=".[$control]">
 
                                                                                     <!-- Set label for any control -->
                                                                                     <xhtml:span>
@@ -924,7 +944,7 @@
                                                                                     <!--zzzz-->
                                                                                     <!--<xhtml:span>-->
                                                                                         <!--<xforms:input id="fb-control-label-control"-->
-                                                                                                      <!--ref="$current-resources/*[name() = $control-id]/label"-->
+                                                                                                      <!--ref="$resource-holder/label"-->
                                                                                                       <!--appearance="fr:in-place" class="fb-control-label">-->
                                                                                             <!--<xforms:label class="fb-xforms-disabled"/>-->
                                                                                         <!--</xforms:input>-->
@@ -937,6 +957,7 @@
                                                                                             <!--instance('fr-form-instance')/xhtml:head/xforms:model/xforms:instance/*/*[xxx section]/*[count(context()/preceding-sibling::*) + 1]-->
                                                                                             <xforms:input ref="$instance-holder">
                                                                                                 <xforms:label class="fb-xforms-disabled"/>
+                                                                                                <!--<xforms:hint value="$control-id"/>-->
                                                                                             </xforms:input>
                                                                                         </xforms:group>
                                                                                         <xforms:group ref="xforms:textarea">
@@ -1043,7 +1064,6 @@
                                                                                                 <xforms:label class="fb-xforms-disabled"/>
                                                                                             </xforms:upload>
                                                                                         </xforms:group>
-                                                                                        <!-- TODO -->
                                                                                     </xhtml:div>
 
                                                                                     <!-- Edit hint for any control -->
@@ -1054,29 +1074,6 @@
                                                                                         </xforms:input>
                                                                                     </xhtml:span>
                                                                                 </xforms:group>
-
-                                                                                <xhtml:span class="fb-control-control">
-                                                                                
-                                                                                <xforms:group ref=".[@class = ('checkbox')]/xforms:*">
-                                                                                    <xforms:select ref="instance('form-instance')/xhtml:head/xforms:model/xforms:instance/instance/*[count(xxforms:repeat-current()/preceding-sibling::*) + 1]"
-                                                                                            appearance="full">
-                                                                                        <xforms:label ref="xxforms:repeat-current('form-repeat')/xforms:*/xforms:label"/>
-                                                                                        <xforms:help ref="xxforms:repeat-current('form-repeat')/xforms:*/xforms:help"/>
-                                                                                        <xforms:hint ref="xxforms:repeat-current('form-repeat')/xforms:*/xforms:hint"/>
-                                                                                        <xforms:alert ref="xxforms:repeat-current('form-repeat')/xforms:*/xforms:alert"/>
-                                                                                        <xforms:itemset nodeset="xxforms:repeat-current('form-repeat')/xforms:*/xforms:item">
-                                                                                            <xforms:label ref="xforms:label"/>
-                                                                                            <xforms:value ref="xforms:value"/>
-                                                                                        </xforms:itemset>
-                                                                                    </xforms:select>
-                                                                                </xforms:group>
-                                                                                <xforms:group ref=".[@class = 'output']/xforms:*">
-                                                                                    <xforms:output ref="instance('form-instance')/xhtml:head/xforms:model/xforms:instance/instance/*[count(xxforms:repeat-current()/preceding-sibling::*) + 1]">
-                                                                                        <xforms:label ref="xxforms:repeat-current('form-repeat')/xforms:*/xforms:label"/>
-                                                                                        <xforms:help ref="xxforms:repeat-current('form-repeat')/xforms:*/xforms:help"/>
-                                                                                    </xforms:output>
-                                                                                </xforms:group>
-                                                                                </xhtml:span>
                                                                             </xhtml:div>
                                                                         </xhtml:td>
                                                                     </xforms:repeat>
@@ -1409,9 +1406,9 @@
                                 </xforms:trigger>
                             </xhtml:div>
                         </xforms:group>
-                        <!-- Hide dialog -->
-                        <xxforms:hide ev:event="DOMActivate" dialog="fb-edit-help-dialog"/>
                     </xhtml:div>
+                    <!-- Hide dialog -->
+                    <xxforms:hide ev:event="DOMActivate" dialog="fb-edit-help-dialog"/>
                     <!-- Copy help value when the dialog opens -->
                     <xforms:setvalue ev:event="xxforms-dialog-open" ref="$variables/new-text" value="$form-instance/root()/saxon:evaluate($variables/result-node)"/>
                 </xxforms:dialog>
@@ -1435,9 +1432,9 @@
                                 </xforms:trigger>
                             </xhtml:div>
                         </xforms:group>
-                        <!-- Hide dialog -->
-                        <xxforms:hide ev:event="DOMActivate" dialog="fb-edit-alert-dialog"/>
                     </xhtml:div>
+                    <!-- Hide dialog -->
+                    <xxforms:hide ev:event="DOMActivate" dialog="fb-edit-alert-dialog"/>
                     <!-- Copy help value when the dialog opens -->
                     <xforms:setvalue ev:event="xxforms-dialog-open" ref="$variables/new-text" value="$form-instance/root()/saxon:evaluate($variables/result-node)"/>
                 </xxforms:dialog>
@@ -1656,39 +1653,101 @@
                         <xforms:setfocus control="fb-itemset-label-input"/>
                     </xforms:action>
 
+                    <xforms:action ev:event="xxforms-dialog-close">
+
+                        <!-- Copy back the items to all languages -->
+
+                        <xxforms:variable name="resource-id" select="$variables/itemset-resource-id"/>
+                        <xforms:action xxforms:iterate="$resources/resource">
+                            <xxforms:variable name="current-lang" select="@xml:lang"/>
+                            <xxforms:variable name="current-resource" select="*[name() = $resource-id]"/>
+
+                            <xforms:action context="$current-resource">
+                                <!-- Delete all the existing items -->
+                                <xforms:delete while="item" nodeset="item"/>
+
+                                <!-- Copy all the new items (after existing elements if any) -->
+                                <xforms:insert context="." nodeset="*" origin="instance('fb-itemset-instance')/item"/>
+
+                                <!-- Delete all labels with a different language -->
+                                <xforms:delete xxforms:iterate="item/label[@xml:lang != $current-lang]" nodeset="."/>
+
+                                <!-- Delete all xml:lang attributes -->
+                                <xforms:delete xxforms:iterate="item/label/@xml:lang" nodeset="."/>
+                            </xforms:action>
+
+                        </xforms:action>
+
+                        <!-- Clear itemset instance -->
+                        <xforms:delete context="instance('fb-itemset-instance')" while="*" nodeset="*"/>
+                    </xforms:action>
+
                 </xxforms:dialog>
 
-                <xforms:action ev:event="xxforms-dialog-close">
+                <!-- Edit details -->
+                <xxforms:dialog id="fb-edit-details-dialog" appearance="minimal">
+                    <xforms:label>Edit Control Details</xforms:label>
+                    
+                    <xhtml:div>
+                        <xxforms:variable name="instance" select="instance('fb-details-editor-instance')"/>
+                        <xforms:group context="$instance">
+                            <xforms:input ref="control-id" incremental="true" id="fb-edit-details-control-id-input">
+                                <xforms:label>Control Id:</xforms:label>
+                            </xforms:input>
+                            <xhtml:div>
+                                <xforms:trigger class="fr-inplace-rename" ref="change-trigger" id="fb-edit-details-control-id-trigger">
+                                    <xforms:label>Change</xforms:label>
+                                </xforms:trigger>
+                                or
+                                <xforms:trigger appearance="minimal" class="fr-inplace-cancel">
+                                    <xforms:label>Cancel</xforms:label>
+                                </xforms:trigger>
+                            </xhtml:div>
+                        </xforms:group>
+                    </xhtml:div>
 
-                    <!-- Copy back the items to all languages -->
-                    <xxforms:variable name="resource-id" select="$variables/itemset-resource-id"/>
-                    <xforms:action xxforms:iterate="$resources/resource">
-                        <xxforms:variable name="current-lang" select="@xml:lang"/>
-                        <xxforms:variable name="current-resource" select="*[name() = $resource-id]"/>
+                    <!-- Rename the control instance holder and resource holder -->
+                    <xforms:action ev:event="DOMActivate" ev:observer="fb-edit-details-control-id-input fb-edit-details-control-id-trigger">
 
-                        <xforms:action context="$current-resource">
-                            <!-- Delete all the existing items -->
-                            <xforms:delete while="item" nodeset="item"/>
+                        <xxforms:variable name="instance" select="instance('fb-details-editor-instance')"/>
 
-                            <!-- Copy all the new items (after existing elements if any) -->
-                            <xforms:insert context="." nodeset="*" origin="instance('fb-itemset-instance')/item"/>
+                        <xxforms:variable name="control" select="$form-instance/root()/saxon:evaluate($instance/control)"/>
+                        <xxforms:variable name="instance-holder" select="$form-instance/root()/saxon:evaluate($instance/instance-holder)"/>
 
-                            <!-- Delete all labels with a different language -->
-                            <xforms:delete xxforms:iterate="item/label[@xml:lang != $current-lang]" nodeset="."/>
+                        <xxforms:variable name="old-name" select="name($instance-holder)"/>
+                        <xxforms:variable name="new-name" select="$instance/control-id"/>
 
-                            <!-- Delete all xml:lang attributes -->
-                            <xforms:delete xxforms:iterate="item/label/@xml:lang" nodeset="."/>
+                        <!-- Iterate through instance holder and all resources -->
+                        <xforms:action xxforms:iterate="($instance-holder, $resources/resource/*[name() = $old-name])">
+                            <xxforms:variable name="current-holder" select="."/>
+
+                            <!-- Insert new placeholder after existing one -->
+                            <xforms:insert nodeset="$current-holder" origin="xxforms:element($new-name)"/>
+                            <!-- Copy existing content into new element -->
+                            <xforms:insert context="$current-holder/../*[name() = $new-name]" origin="$current-holder/node()"/>
+                            <!-- Delete old element -->
+                            <xforms:delete nodeset="$current-holder"/>
+                        </xforms:action>
+
+                        <!-- Update control id and bindings -->
+                        <xforms:setvalue ref="$control/@id" value="concat($new-name, '-control')"/>
+                        <xforms:setvalue ref="$control/@ref" value="$new-name"/>
+                        <xforms:action xxforms:iterate="$control/(xforms:label, xforms:hint, xforms:help, xforms:alert)">
+                            <xxforms:variable name="local-name" select="local-name()"/>
+                            <xforms:setvalue ref="@ref" value="concat('$form-resources/', $new-name, '/', $local-name)"/>
                         </xforms:action>
 
                     </xforms:action>
 
-                    <!-- Clear itemset instance -->
-                    <xforms:delete context="instance('fb-itemset-instance')" while="*" nodeset="*"/>
-                </xforms:action>
+                    <!-- Hide dialog -->
+                    <xxforms:hide ev:event="DOMActivate" dialog="fb-edit-details-dialog"/>
+                    <!-- Set focus when the dialog open  -->
+                    <xforms:setfocus ev:event="xxforms-dialog-open" control="fb-edit-details-control-id-input"/>
+                </xxforms:dialog>
 
             </fr:body>
         </fr:view>
 
-        <!--<widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>    -->
+        <!--<widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>-->
     </xhtml:body>
 </xhtml:html>

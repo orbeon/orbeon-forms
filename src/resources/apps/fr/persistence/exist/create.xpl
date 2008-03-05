@@ -43,7 +43,7 @@
     <p:processor name="oxf:xforms-submission">
         <p:input name="submission">
             <xforms:submission ref="/*/*[1]" method="put" replace="none"
-                    action="{xxforms:property('oxf.fr.persistence.exist.uri')}/{/*/group[2]}/{/*/group[3]}/{digest(string(random(true)), 'MD5', 'hex')}">
+                    resource="{xxforms:property('oxf.fr.persistence.exist.uri')}/{/*/group[2]}/{/*/group[3]}/{digest(string(random(true)), 'MD5', 'hex')}">
                 <xforms:action ev:event="xforms-submit-error">
                     <!-- TODO: Propagate error to caller -->
                     <xforms:delete while="/*/*" nodeset="/*/*"/>

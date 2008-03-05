@@ -107,7 +107,7 @@
     <!-- Get document template -->
     <xforms:submission id="get-template-submission"
             method="get" serialization="none"
-            action="/fr/service/template/{instance('fr-parameters-instance')/app}/{instance('fr-parameters-instance')/form}"
+            resource="/fr/service/template/{instance('fr-parameters-instance')/app}/{instance('fr-parameters-instance')/form}"
             replace="instance" xxforms:instance="fr-form-instance">
         <xforms:message ev:event="xforms-submit-error" level="xxforms:log-error"><xforms:output value="event('error-type')"/></xforms:message>
     </xforms:submission>
@@ -115,7 +115,7 @@
     <!-- Get document -->
     <xforms:submission id="get-document-submission"
             method="get" serialization="none"
-            action="/fr/service/crud/exist/{instance('fr-parameters-instance')/app}/{instance('fr-parameters-instance')/form}/{instance('fr-parameters-instance')/document}"
+            resource="/fr/service/crud/exist/{instance('fr-parameters-instance')/app}/{instance('fr-parameters-instance')/form}/{instance('fr-parameters-instance')/document}"
             replace="instance" xxforms:instance="fr-form-instance"/>
 
     <!-- Create document -->
@@ -126,7 +126,7 @@
     <xforms:submission id="create-submission"
             validate="true"
             method="put" ref="xxforms:instance('fr-form-instance')"
-            action="/fr/service/crud/exist/{instance('fr-parameters-instance')/app}/{instance('fr-parameters-instance')/form}"
+            resource="/fr/service/crud/exist/{instance('fr-parameters-instance')/app}/{instance('fr-parameters-instance')/form}"
             replace="instance" instance="fr-create-instance">
         <xforms:setvalue ev:event="xforms-submit-done" ref="instance('fr-parameters-instance')/document" value="instance('fr-create-instance')"/>
     </xforms:submission>
@@ -135,14 +135,14 @@
     <xforms:submission id="update-submission"
             validate="true"
             method="put" ref="xxforms:instance('fr-form-instance')"
-            action="/fr/service/crud/exist/{instance('fr-parameters-instance')/app}/{instance('fr-parameters-instance')/form}/{instance('fr-parameters-instance')/document}"
+            resource="/fr/service/crud/exist/{instance('fr-parameters-instance')/app}/{instance('fr-parameters-instance')/form}/{instance('fr-parameters-instance')/document}"
             replace="none">
     </xforms:submission>
 
     <!-- Delete document -->
     <xforms:submission id="delete-document-submission"
             method="delete" serialization="none"
-            action="/fr/service/crud/exist/{instance('fr-parameters-instance')/app}/{instance('fr-parameters-instance')/form}/{instance('fr-summary-instance')/document[index('documents-repeat')]/@name}"
+            resource="/fr/service/crud/exist/{instance('fr-parameters-instance')/app}/{instance('fr-parameters-instance')/form}/{instance('fr-summary-instance')/document[index('documents-repeat')]/@name}"
             replace="none"/>
 
     <!-- Instance to track search results and paging -->
@@ -201,7 +201,7 @@
 
     <xforms:submission id="get-configuration-submission"
             method="get" serialization="none"
-            action="/fr/service/configuration/{
+            resource="/fr/service/configuration/{
                 instance('fr-parameters-instance')/app}/{
                 instance('fr-parameters-instance')/form}"
             replace="instance" instance="fr-source-form-instance" xxforms:readonly="true">
@@ -256,7 +256,7 @@
     <xforms:submission id="search-submission"
             ref="instance('fr-search-instance')"
             method="post"
-            action="/fr/service/search/exist/{
+            resource="/fr/service/search/exist/{
                 instance('fr-parameters-instance')/app}/{
                 instance('fr-parameters-instance')/form}"
             replace="instance" instance="fr-summary-instance"/>
@@ -312,8 +312,9 @@
     <xforms:setvalue ev:observer="fr-form-instance" ev:event="xforms-delete" ref="instance('fr-persistence-instance')/data-status">dirty</xforms:setvalue>
 
     <!-- Mark status as dirty if data changes in fr-form-instance instance only -->
+    <!-- NOTE: Only handle events coming from controls bound to "fr-form-instance" instance -->
     <xforms:setvalue ev:observer="fr-form-group" ev:event="xforms-value-changed"
-                     if="event('target-ref')/ancestor::*[last()] is xxforms:instance('fr-form-instance')"
+                     if="event('target-ref')/root()/* is xxforms:instance('fr-form-instance')"
                      ref="instance('fr-persistence-instance')/data-status">dirty</xforms:setvalue>
 
     <!-- Clear message upon DOMFocusIn on #fr-form-group -->

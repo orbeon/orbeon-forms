@@ -38,8 +38,9 @@
     </xforms:instance>
 
     <!-- Handle xforms-invalid event on #fr-form-group -->
+    <!-- NOTE: Only handle events coming from controls bound to "fr-form-instance" instance -->
     <xforms:action ev:observer="fr-form-group" ev:event="xforms-invalid"
-                   if="normalize-space(event('label')) != ''"
+                   if="event('target-ref')/root()/* is xxforms:instance('fr-form-instance') and normalize-space(event('label')) != ''"
                    context="instance('fr-errors-instance')">
         <xforms:action if="not(error[@id = event('target') and @indexes = string-join(event('repeat-indexes'), '-')])">
             <xforms:insert context="." nodeset="error" origin="instance('fr-error-template')"/>
@@ -51,8 +52,9 @@
     </xforms:action>
 
     <!-- Handle xforms-valid event on #fr-form-group -->
+    <!-- NOTE: Only handle events coming from controls bound to "fr-form-instance" instance -->
     <xforms:action ev:observer="fr-form-group" ev:event="xforms-valid"
-                   if="instance('fr-errors-instance')/error[@id = event('target') and @indexes = string-join(event('repeat-indexes'), '-')]"
+                   if="event('target-ref')/root()/* is xxforms:instance('fr-form-instance') and instance('fr-errors-instance')/error[@id = event('target') and @indexes = string-join(event('repeat-indexes'), '-')]"
                    context="instance('fr-errors-instance')">
         <xforms:delete nodeset="error[@id = event('target') and @indexes = string-join(event('repeat-indexes'), '-')]"/>
     </xforms:action>

@@ -26,10 +26,6 @@
     <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
 
     <xsl:template match="xhtml:body//fr:view">
-        <!-- Hidden field to communicate to the client the current section to collapse or expand -->
-        <xforms:input model="fr-sections-model" ref="instance('fr-current-section-instance')" id="fr-current-section-input" class="xforms-disabled"/>
-        <!-- Hidden field to communicate to the client whether the data is clean or dirty -->
-        <xforms:input model="fr-persistence-model" ref="instance('fr-persistence-instance')/data-status" id="fr-data-status-input" class="xforms-disabled"/>
 
         <!-- Scope variable with Form Runner resources -->
         <xxforms:variable name="fr-resources" select="xxforms:instance('fr-fr-current-resources')"/>
@@ -221,6 +217,13 @@
         <xi:include href="import-export/import-export-dialog.xml" xxi:omit-xml-base="true"/>
         <xi:include href="includes/clear-dialog.xhtml" xxi:omit-xml-base="true"/>
 
+        <xhtml:span class="fr-hidden-controls">
+            <!-- Hidden field to communicate to the client the current section to collapse or expand -->
+            <xforms:input model="fr-sections-model" ref="instance('fr-current-section-instance')" id="fr-current-section-input" class="xforms-disabled"/>
+            <!-- Hidden field to communicate to the client whether the data is clean or dirty -->
+            <xforms:input model="fr-persistence-model" ref="instance('fr-persistence-instance')/data-status" id="fr-data-status-input" class="xforms-disabled"/>
+        </xhtml:span>
+
     </xsl:template>
 
     <xsl:template match="fr:back-button">
@@ -280,7 +283,7 @@
     </xsl:template>
 
     <xsl:template match="fr:save-button">
-        <xforms:trigger ref="instance('fr-triggers-instance')/save">
+        <xforms:trigger ref="instance('fr-triggers-instance')/save" class="xforms-trigger-appearance-modal">
             <xforms:label>
                 <xhtml:img src="../../../../apps/fr/style/run.gif" alt=""/>
                 <xhtml:span><xforms:output value="$fr-resources/detail/labels/save-document"/></xhtml:span>
@@ -533,8 +536,7 @@
                 </xhtml:tr>
                 <xforms:insert ev:event="DOMActivate"
                                origin="{if (@origin) then @origin else concat('instance(''templates'')/', $tokenized-path[last()])}"
-                               context="."
-                               nodeset="{if (@after) then @after else @nodeset}"/>
+                               context="." nodeset="{if (@after) then @after else @nodeset}"/>
                 <!-- TODO: handle @at -->
                 <!-- at="index('{@id}')" position="after" -->
             </xforms:group>
@@ -627,7 +629,7 @@
         <!-- This model handles print functionality -->
         <xforms:model id="fr-print-model">
             <xforms:instance id="fr-print-instance"><dummy/></xforms:instance>
-            <xforms:submission id="fr-print-submission" action="/fr/{{xxforms:instance('fr-parameters-instance')/app}}/{{xxforms:instance('fr-parameters-instance')/form}}/print/"
+            <xforms:submission id="fr-print-submission" resource="/fr/{{xxforms:instance('fr-parameters-instance')/app}}/{{xxforms:instance('fr-parameters-instance')/form}}/print/"
                     method="post" ref="xxforms:instance('fr-form-instance')" replace="all" validate="false" xxforms:target="_blank" xxforms:show-progress="false"/>
         </xforms:model>
 

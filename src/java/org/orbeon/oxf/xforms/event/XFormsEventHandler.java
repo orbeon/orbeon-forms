@@ -21,7 +21,7 @@ import org.orbeon.oxf.xforms.XFormsContainingDocument;
  */
 public interface XFormsEventHandler {
     public String getEventName();
-    public String getObserverId();
+    public String[] getObserverIds();
     public String getTargetId();
     public boolean isPhase();
     public boolean isPropagate();

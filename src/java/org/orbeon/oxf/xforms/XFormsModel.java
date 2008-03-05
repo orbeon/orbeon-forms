@@ -401,7 +401,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                         // Get MIP value
                         final String xpath = "boolean(" + modelBind.getRequired() + ")";
                         final boolean required = ((Boolean) XPathCache.evaluateSingle(pipelineContext,
-                            nodeInfo, xpath, containingDocument.getNamespaceMappings(modelBind.getBindElement()), null,
+                            nodeInfo, xpath, containingDocument.getNamespaceMappings(modelBind.getBindElement()), contextStack.getCurrentVariables(),
                             XFormsContainingDocument.getFunctionLibrary(), contextStack.getFunctionContext(), modelBind.getLocationData().getSystemID(), modelBind.getLocationData())).booleanValue();
 
                         // Update node with MIP value
@@ -422,7 +422,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                     try {
                         final String xpath = "boolean(" + modelBind.getRelevant() + ")";
                         boolean relevant = ((Boolean) XPathCache.evaluateSingle(pipelineContext,
-                            nodeInfo, xpath, containingDocument.getNamespaceMappings(modelBind.getBindElement()), null,
+                            nodeInfo, xpath, containingDocument.getNamespaceMappings(modelBind.getBindElement()), contextStack.getCurrentVariables(),
                             XFormsContainingDocument.getFunctionLibrary(), contextStack.getFunctionContext(), modelBind.getLocationData().getSystemID(), modelBind.getLocationData())).booleanValue();
                         // Mark node
                         InstanceData.setRelevant(nodeInfo, relevant);
@@ -443,7 +443,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                     try {
                         final String xpath = "boolean(" + modelBind.getReadonly() + ")";
                         boolean readonly = ((Boolean) XPathCache.evaluateSingle(pipelineContext,
-                            nodeInfo, xpath, containingDocument.getNamespaceMappings(modelBind.getBindElement()), null,
+                            nodeInfo, xpath, containingDocument.getNamespaceMappings(modelBind.getBindElement()), contextStack.getCurrentVariables(),
                             XFormsContainingDocument.getFunctionLibrary(), contextStack.getFunctionContext(), modelBind.getLocationData().getSystemID(), modelBind.getLocationData())).booleanValue();
 
                         // Mark node
@@ -473,7 +473,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                     try {
                         final String xpath = "boolean(" + modelBind.getXXFormsExternalize() + ")";
                         boolean xxformsExternalize = ((Boolean) XPathCache.evaluateSingle(pipelineContext,
-                            nodeInfo, xpath, containingDocument.getNamespaceMappings(modelBind.getBindElement()), null,
+                            nodeInfo, xpath, containingDocument.getNamespaceMappings(modelBind.getBindElement()), contextStack.getCurrentVariables(),
                             XFormsContainingDocument.getFunctionLibrary(), contextStack.getFunctionContext(), modelBind.getLocationData().getSystemID(), modelBind.getLocationData())).booleanValue();
 
                         // Mark node
@@ -500,7 +500,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                         // Get MIP value
                         final String xpath = "boolean(" + modelBind.getConstraint() + ")";
                         final Boolean valid = (Boolean) XPathCache.evaluateSingle(pipelineContext,
-                            nodeInfo, xpath, containingDocument.getNamespaceMappings(modelBind.getBindElement()), null,
+                            nodeInfo, xpath, containingDocument.getNamespaceMappings(modelBind.getBindElement()), contextStack.getCurrentVariables(),
                             XFormsContainingDocument.getFunctionLibrary(), contextStack.getFunctionContext(), modelBind.getLocationData().getSystemID(), modelBind.getLocationData());
 
                         // Update node with MIP value

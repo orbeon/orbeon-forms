@@ -153,6 +153,7 @@ ORBEON.xforms.Globals = ORBEON.xforms.Globals || {
     treeYui: {},                         // Maps tree id to the YUI object for that tree
     idToElement: {},                     // Maintain mapping from ID to element, so we don't lookup the sme ID more than once
     isReloading: false,                  // Whether the form is being reloaded from the server
+    lastDialogZIndex: 5,                 // zIndex of the last dialog displayed. Gets incremented so the last dialog is always on top of everything else
     // Data relative to a form is stored in an array indexed by form id.
     formLoadingLoadingOverlay: {},       // Overlay for the loading indicator
     formLoadingLoadingInitialRightTop:{},// Initial number of pixel between the loading indicator and the top of the page
@@ -164,8 +165,8 @@ ORBEON.xforms.Globals = ORBEON.xforms.Globals || {
     formStaticState: {},                 // State that does not change for the life of the page
     formDynamicState: {},                // State that changes at every request
     formServerEvents: {},                // Server events information
-    formClientState: {},                  // Store for information we want to keep when the page is reloaded
-    modalProgressPanel: null			//Overlay modal panel for displaying progress bar
+    formClientState: {},                 // Store for information we want to keep when the page is reloaded
+    modalProgressPanel: null		  	 //Overlay modal panel for displaying progress bar
 };
 
 /**
@@ -1108,11 +1109,8 @@ ORBEON.xforms.Controls = {
         // By default try to display the dialog inside the viewport, but this can be overridden with consrain="false"
         var constrain = ORBEON.util.Dom.getAttribute(divElement, "constrain") == "false" ? false : true;
         yuiDialog.cfg.setProperty("constraintoviewport", constrain);
-
-        // xxx
-        //if (window.zIndex == null) window.zIndex = 5;
-        //console.log(window.zIndex);
-        //yuiDialog.cfg.setProperty("zIndex", window.zIndex++);
+        // Make sure that this dialog is on top of everything else
+        yuiDialog.cfg.setProperty("zIndex", ORBEON.xforms.Globals.lastDialogZIndex++);
         // Position the dialog either at the center of the viewport or relative of a neighbor
         if (neighbor == null)
             neighbor = ORBEON.util.Dom.getAttribute(divElement, "neighbor");// TODO: there can't be a "neighbor" attribute on the HTML element
@@ -1353,7 +1351,10 @@ ORBEON.xforms.Events = {
                     context: targetId,
                     text: message,
                     showDelay: delay,
-                    effect: {effect: YAHOO.widget.ContainerEffect.FADE, duration: 0.2}
+                    effect: {effect: YAHOO.widget.ContainerEffect.FADE, duration: 0.2},
+                    // We provide here a "high" zIndex value so the tooltip is "always" displayed on top over everything else.
+                    // Otherwise, with dialogs, the tooltip might end up being below the dialog and be invisible.
+                    zIndex: 1000
                 });
             // Send the mouse over event to the tooltip, since the YUI tooltip didn't receive it as it didn't
             // exist yet when the event was dispatched by the browser

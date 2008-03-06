@@ -289,6 +289,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
             try {
                 final boolean isReplaceAll = replace.equals(XFormsConstants.XFORMS_SUBMIT_REPLACE_ALL);
                 final boolean isReplaceInstance = replace.equals(XFormsConstants.XFORMS_SUBMIT_REPLACE_INSTANCE);
+                final boolean isReplaceNone = replace.equals(XFormsConstants.XFORMS_SUBMIT_REPLACE_NONE);
 
                 final boolean isHandlingOptimizedGet = XFormsProperties.isOptimizeGetAllSubmission(containingDocument) && XFormsSubmissionUtils.isGet(method)
                         && isReplaceAll
@@ -652,7 +653,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 ConnectionResult connectionResult = null;
                 final long externalSubmissionStartTime = XFormsServer.logger.isDebugEnabled() ? System.currentTimeMillis() : 0;
                 try {
-                    if (isReplaceInstance && resolvedActionOrResource.startsWith("test:")) {
+                    if ((isReplaceInstance || isReplaceNone) && resolvedActionOrResource.startsWith("test:")) {
                         // Test action
 
                         if (messageBody == null)

@@ -46,6 +46,7 @@
 
             <!-- Language toolbar -->
             .fb-language-choice { display: block; float: right; }
+            .fb-language-choice .xforms-select1 { width: 100% }
             .fb-language-choice .fb-language-triggers { display: block; witdh: 100%; text-align: right }
 
             <!-- Toolbox -->
@@ -65,6 +66,11 @@
 
             <!-- Set width of dialog (otherwise becomes too wide) -->
             #fb-confirmation-dialog { width: 400px; }
+            #fb-schema-upload-dialog { width: 400px; }
+            #fb-schema-upload-dialog .xforms-hint { width: 100% }
+            #fb-schema-upload-dialog .xforms-select1 { height: 10em; width: 100% }
+            #fb-schema-upload-dialog .fb-dialog-h2 { font-size: larger }
+            #fb-schema-upload-dialog .fb-dialog-section { display: block; margin-left: 1em }
             #fb-toolbox-dialog { width: 180px; }
             #fb-xml-dialog .fb-xml-dialog-view { width: 57.69em; *width:56.301em; min-width:750px; height: 400px; overflow: scroll }
             #fb-edit-source-dialog .fb-xml-dialog-view { width: 57.69em; *width:56.301em; min-width:750px; height: 400px }
@@ -77,7 +83,7 @@
 
             <!-- In-place editing for regular fields -->
 
-            .fr-section-container .fr-inplace-buttons { display: block; margin-top: .5em }
+            .fr-section-container .fr-inplace-buttons { display: block; margin-top: .5em; margin-bottom: .5em }
             .fr-section-container .fr-inplace-input input {
                 border: 1px inset rgb(233, 233, 174); padding: 0; background-color: rgb(255, 255, 211)
             }
@@ -94,11 +100,13 @@
             #fb-metadata-section .fr-inplace-view .fr-inplace-buttons { display: none }
 
             <!-- In-place editing for section titles -->
-            #fb-details-section .fb-section-title .fr-inplace-buttons { display:inline; padding-left: .5em; padding-right: .5em; margin-left: .5em; background: white }
+            #fb-details-section .fb-section-title .fr-inplace-buttons { display:inline; padding-left: .5em; padding-right: .5em; margin-left: .5em; margin-right: .5em; background: white }
+            #fb-details-section .fb-section-title .fr-inplace-buttons button { vertical-align: middle  }
             <!--#fb-details-section .fb-section-title .fr-inplace-value:hover { background-color: rgb(255, 255, 211) }-->
+            #fb-details-section .fb-section-title .fr-inplace-content { font-size: 160%; vertical-align: middle }
             #fb-details-section .fb-section-title .fr-inplace-value { margin-left: 1em; padding-left: .5em; padding-right: .5em; background: white }
             #fb-details-section .fb-section-title .fr-inplace-content .xforms-label { display: none }
-            #fb-details-section .fb-section-title .fr-inplace-delete { margin-right: .5em }
+            <!--#fb-details-section .fb-section-title .fr-inplace-delete { margin-right: .5em }-->
             #fb-details-section .fb-section-title .fr-inplace-delete img { padding: 0 }
             #fb-details-section .fb-section-title .fr-inplace-delete { display: inline }
             #fb-details-section .fb-section-title .xforms-input input { width: 20em }
@@ -116,6 +124,7 @@
             <!-- Control editor -->
             .fb-control-label .xforms-label { display: none }
             .fb-control-label .fr-inplace-value { font-weight: bold }
+            .fb-control-label .fr-inplace-edit .xforms-alert { display: none }
             .fb-control-label .fr-inplace-view .fr-inplace-buttons { display: none }
             .fb-control-control .xforms-label { display: none }
             .fb-control-control .xforms-alert { display: none }
@@ -151,6 +160,7 @@
             #fb-details-section .fb-grid-td .xforms-select1-appearance-full { width: 62em; display: block }
             #fb-details-section .fb-grid-td .xforms-select1-appearance-full span { white-space: nowrap; display: block }
             #fb-details-section .fb-grid-td .xforms-select1-appearance-compact { width: 62em; height: 6em }
+            <!--#fb-details-section .fb-grid-td .fr-inplace-edit .xforms-input input { width: 63em; }-->
             .xforms-select-appearance-compact { width: 62em; height: 6em }
 
             .fb-grid-2-columns .fb-grid-td { width: 50%; }
@@ -160,6 +170,7 @@
             #fb-details-section .fb-grid-2-columns .fb-grid-td .xforms-select1-appearance-full { width: 28em; display: block }
             #fb-details-section .fb-grid-2-columns .fb-grid-td .xforms-select1-appearance-compact { width: 28em; height: 6em }
             #fb-details-section .fb-grid-2-columns .fb-grid-td .xforms-select-appearance-compact { width: 28em; height: 6em }
+            <!--#fb-details-section .fb-grid-2-columns .fb-grid-td .fr-inplace-edit .xforms-input input { width: 29em; }-->
 
             .fb-grid-3-columns .fb-grid-td { width: 33.3%; }
             #fb-details-section .fb-grid-3-columns .fb-grid-td .xforms-input input { width: 18em; }
@@ -168,6 +179,7 @@
             #fb-details-section .fb-grid-3-columns .fb-grid-td .xforms-select1-appearance-full { width: 17em; display: block }
             #fb-details-section .fb-grid-3-columns .fb-grid-td .xforms-select1-appearance-compact { width: 17em; height: 6em }
             #fb-details-section .fb-grid-3-columns .fb-grid-td .xforms-select-appearance-compact { width: 17em; height: 6em }
+            <!--#fb-details-section .fb-grid-3-columns .fb-grid-td .fr-inplace-edit .xforms-input input { width: 18em; }-->
 
             .fb-grid-4-columns .fb-grid-td { width: 25%; }
             #fb-details-section .fb-grid-4-columns .fb-grid-td .xforms-input input { width: 13em; }
@@ -176,6 +188,7 @@
             #fb-details-section .fb-grid-4-columns .fb-grid-td .xforms-select1-appearance-full { width: 11em; display: block }
             #fb-details-section .fb-grid-4-columns .fb-grid-td .xforms-select1-appearance-compact { width: 11em; height: 6em }
             #fb-details-section .fb-grid-4-columns .fb-grid-td .xforms-select-appearance-compact { width: 11em; height: 6em }
+            <!--#fb-details-section .fb-grid-4-columns .fb-grid-td .fr-inplace-edit .xforms-input input { width: 12em; }-->
 
             .fb-grid-cell-icons { width: 1em; text-align: center; margin-right: .2em; float: left }
             .fb-grid-cell-icons img { margin-bottom: .5em; padding: 0 }
@@ -227,9 +240,10 @@
             <xxforms:variable name="lang" select="instance('fb-language-instance')"/>
 
             <!-- Other variables -->
-            <xxforms:variable name="form-instance" select="xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-instance']/*"/>
-            <xxforms:variable name="metadata-instance" select="xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-metadata']/*"/>
-            <xxforms:variable name="resources" select="xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-resources']/*"/>
+            <xxforms:variable name="model" select="xhtml:head/xforms:model[@id = 'fr-form-model']"/>
+            <xxforms:variable name="form-instance" select="$model/xforms:instance[@id = 'fr-form-instance']/*"/>
+            <xxforms:variable name="metadata-instance" select="$model/xforms:instance[@id = 'fr-form-metadata']/*"/>
+            <xxforms:variable name="resources" select="$model/xforms:instance[@id = 'fr-form-resources']/*"/>
             <xxforms:variable name="current-resources" select="$resources/resource[@xml:lang = $lang]"/>
             <xxforms:variable name="body" select="xhtml:body/fr:view/fr:body"/>
 
@@ -242,9 +256,7 @@
             <xforms:submission id="fb-test-form-submission"
                     ref="instance('fr-form-instance')"
                     method="post" replace="all"
-                    resource="/fr/orbeon/test/test/">
-
-            </xforms:submission>
+                    resource="/fr/orbeon/test/test/"/>
 
             <xforms:instance id="fb-variables">
                 <variables>
@@ -292,6 +304,99 @@
                 <xforms:bind nodeset="change-trigger" readonly="concat(normalize-space(../control-id), '-control') = $body//xforms:*/@id"/>
             </xforms:bind>
 
+            <!-- Validation dialog -->
+            <xforms:instance id="fb-validation-editor-instance">
+                <validation>
+                    <resource/>
+                    <builtin-type/>
+                    <schema-type/>
+                    <alert/>
+                </validation>
+            </xforms:instance>
+
+            <xforms:instance id="fb-validation-types-instance" xxforms:readonly="true">
+                <choices>
+                    <choices>
+                        <label>String Types</label>
+                        <type>string</type>
+                        <type>normalizedString</type>
+                        <type>token</type>
+                        <type>language</type>
+                        <type>Name</type>
+                        <type>NCName</type>
+                        <type>ID</type>
+                        <type>IDREF</type>
+                        <type>IDREFS</type>
+                        <type>ENTITY</type>
+                        <type>ENTITIES</type>
+                        <type>NMTOKEN</type>
+                        <type>NMTOKENS</type>
+                    </choices>
+                    <choices>
+                        <label>Number Types</label>
+                        <type>float</type>
+                        <type>double</type>
+                        <type>decimal</type>
+                        <type>integer</type>
+                        <type>long</type>
+                        <type>int</type>
+                        <type>short</type>
+                        <type>byte</type>
+                        <type>positiveInteger</type>
+                        <type>nonPositiveInteger</type>
+                        <type>negativeInteger</type>
+                        <type>nonNegativeInteger</type>
+                        <type>unsignedLong</type>
+                        <type>unsignedInt</type>
+                        <type>unsignedShort</type>
+                        <type>unsignedByte</type>
+                    </choices>
+                    <choices>
+                        <label>Time Types</label>
+                        <type>duration</type>
+                        <type>dateTime</type>
+                        <type>time</type>
+                        <type>date</type>
+                        <type>gYearMonth</type>
+                        <type>gYear</type>
+                        <type>gMonthDay</type>
+                        <type>gDay</type>
+                        <type>gMonth</type>
+                    </choices>
+                    <choices>
+                        <label>Other Types</label>
+                        <type>boolean</type>
+                        <type>hexBinary</type>
+                        <type>base64Binary</type>
+                        <type>anyURI</type>
+                        <type>QName</type>
+                        <type>NOTATION</type>
+                    </choices>
+                </choices>
+            </xforms:instance>
+
+            <!-- Schema upload dialog -->
+            <xforms:instance id="fb-schema-upload-instance">
+                <validation>
+                    <schema-uri filename="" mediatype="" size=""/>
+                    <schema>
+                        <!-- Content will be like this -->
+                        <!--<xs:schema>-->
+                            <!--...-->
+                        <!--</xs:schema>-->
+                    </schema>
+                    <temp-type/>
+                </validation>
+            </xforms:instance>
+
+            <xforms:bind nodeset="instance('fb-schema-upload-instance')">
+                <xforms:bind nodeset="temp-type" readonly="true()"/>
+            </xforms:bind>
+
+            <!-- Submission to upload the schema -->
+            <xforms:submission id="fb-schema-upload-submission" ref="instance('fb-schema-upload-instance')"
+                               method="post" replace="none" resource="test:"/>
+
             <!-- Instance for the itemset editor -->
             <xforms:instance id="fb-itemset-instance">
                 <itemset>
@@ -307,6 +412,7 @@
             <!-- Item template for the itemset editor -->
             <xforms:instance id="fb-item-template">
                 <item>
+                    <!-- Content will be like this -->
                     <!--<label xml:lang="en"/>-->
                     <!--<label xml:lang="fr"/>-->
                     <!--<value/>-->
@@ -889,8 +995,8 @@
                                                                                 <xforms:trigger appearance="minimal" id="fb-edit-alert-trigger">
                                                                                     <xforms:label><xhtml:img class="fb-control-alert" alt="Alert" title="" src="../../../../ops/images/xforms/error.gif"/></xforms:label>
                                                                                     <xforms:action ev:event="DOMActivate">
-                                                                                        <xforms:setvalue ref="$variables/result-node" value="$resource-holder/alert/saxon:path()"/>
-                                                                                        <xxforms:show dialog="fb-edit-alert-dialog" neighbor="fb-edit-alert-trigger"/>
+                                                                                        <xforms:setvalue ref="instance('fb-validation-editor-instance')/resource" value="$resource-holder/saxon:path()"/>
+                                                                                        <xxforms:show dialog="fb-edit-validation-dialog" neighbor="fb-edit-alert-trigger"/>
                                                                                     </xforms:action>
                                                                                 </xforms:trigger>
 
@@ -1169,8 +1275,7 @@
                             <xhtml:img src="../../../../forms/orbeon/builder/images/upload.png" alt="Upload XML Schema" title="Upload XML Schema"/>
                             <xhtml:span>XML Schema</xhtml:span>
                         </xforms:label>
-                        <!-- TODO -->
-                        <!--<xxforms:show ev:event="DOMActivate" dialog="fb-xml-dialog"/>-->
+                        <xxforms:show ev:event="DOMActivate" dialog="fb-schema-upload-dialog"/>
                     </xforms:trigger>
 
                     <!-- Upload PDF Template -->
@@ -1439,32 +1544,6 @@
                     </xhtml:div>
                     <!-- Hide dialog -->
                     <xxforms:hide ev:event="DOMActivate" dialog="fb-edit-help-dialog"/>
-                    <!-- Copy help value when the dialog opens -->
-                    <xforms:setvalue ev:event="xxforms-dialog-open" ref="$variables/new-text" value="$form-instance/root()/saxon:evaluate($variables/result-node)"/>
-                </xxforms:dialog>
-
-                <!-- Edit alert -->
-                <xxforms:dialog id="fb-edit-alert-dialog" appearance="minimal">
-                    <xforms:label>Edit Alert</xforms:label>
-                    <xhtml:div>
-                        <xforms:group class="fb-hide-alert">
-                            <xforms:textarea ref="$variables/new-text">
-                                <xforms:label>Alert Message:</xforms:label>
-                            </xforms:textarea>
-                            <xhtml:div>
-                                <xforms:trigger class="fr-inplace-rename">
-                                    <xforms:label>Change</xforms:label>
-                                    <xforms:setvalue ev:event="DOMActivate" ref="$form-instance/root()/saxon:evaluate($variables/result-node)" value="$variables/new-text"/>
-                                </xforms:trigger>
-                                or
-                                <xforms:trigger appearance="minimal" class="fr-inplace-cancel">
-                                    <xforms:label>Cancel</xforms:label>
-                                </xforms:trigger>
-                            </xhtml:div>
-                        </xforms:group>
-                    </xhtml:div>
-                    <!-- Hide dialog -->
-                    <xxforms:hide ev:event="DOMActivate" dialog="fb-edit-alert-dialog"/>
                     <!-- Copy help value when the dialog opens -->
                     <xforms:setvalue ev:event="xxforms-dialog-open" ref="$variables/new-text" value="$form-instance/root()/saxon:evaluate($variables/result-node)"/>
                 </xxforms:dialog>
@@ -1775,9 +1854,217 @@
                     <xforms:setfocus ev:event="xxforms-dialog-open" control="fb-edit-details-control-id-input"/>
                 </xxforms:dialog>
 
+                <!-- Edit validation -->
+                <xxforms:dialog id="fb-edit-validation-dialog" appearance="minimal">
+                    <xforms:label>Edit Validation Properties</xforms:label>
+                    <xxforms:variable name="instance" select="instance('fb-validation-editor-instance')"/>
+                    <xhtml:div>
+                        <xforms:group class="fb-hide-alert">
+                            <!-- Built-in type selection -->
+                            <xforms:select1 ref="$instance/builtin-type">
+                                <xforms:label>Built-in Type</xforms:label>
+                                <xforms:item>
+                                    <xforms:label>[Select...]</xforms:label>
+                                    <xforms:value/>
+                                </xforms:item>
+                                <xforms:itemset nodeset="instance('fb-validation-types-instance')/root()//(choices | type)">
+                                    <xforms:label ref="if (self::choices) then label else ."/>
+                                    <xforms:value ref="if (self::choices) then () else ."/>
+                                </xforms:itemset>
+                            </xforms:select1>
+
+                            <!-- Schema type selection if applicable -->
+                            <xforms:select1 ref="$instance/schema-type[$model/xs:schema]">
+                                <xforms:label>Schema Type</xforms:label>
+                                <xforms:item>
+                                    <xforms:label>[Select...]</xforms:label>
+                                    <xforms:value/>
+                                </xforms:item>
+                                <xforms:itemset nodeset="$model/xs:schema/xs:simpleType">
+                                    <xforms:label ref="@name"/>
+                                    <xforms:value ref="@name"/>
+                                </xforms:itemset>
+                            </xforms:select1>
+
+                            <!-- Alert message -->
+                            <xforms:textarea ref="$instance/alert">
+                                <xforms:label>Alert Message</xforms:label>
+                            </xforms:textarea>
+
+                            <xhtml:div class="dialog-button">
+                                <xforms:trigger class="fr-inplace-rename" id="fb-edit-validation-trigger">
+                                    <xforms:label>Change</xforms:label>
+                                </xforms:trigger>
+                                or
+                                <xforms:trigger appearance="minimal" class="fr-inplace-cancel">
+                                    <xforms:label>Cancel</xforms:label>
+                                </xforms:trigger>
+                            </xhtml:div>
+                        </xforms:group>
+                    </xhtml:div>
+
+                    <!-- Copy back information -->
+                    <xforms:action ev:event="DOMActivate" ev:observer="fb-edit-validation-trigger">
+                        <xxforms:variable name="instance" select="instance('fb-validation-editor-instance')"/>
+                        <xforms:setvalue ref="$form-instance/root()/saxon:evaluate($instance/resource)/alert" value="$instance/alert"/>
+                    </xforms:action>
+
+                    <!-- Hide dialog -->
+                    <xxforms:hide ev:event="DOMActivate" dialog="fb-edit-validation-dialog"/>
+
+                    <!-- Copy help value when the dialog opens -->
+                    <xforms:action ev:event="xxforms-dialog-open">
+                        <xxforms:variable name="instance" select="instance('fb-validation-editor-instance')"/>
+                        <xforms:setvalue ref="$instance/alert" value="$form-instance/root()/saxon:evaluate($instance/resource)/alert"/>
+                    </xforms:action>
+                </xxforms:dialog>
+
+                <!-- Schema upload -->
+                <xxforms:dialog id="fb-schema-upload-dialog" level="modeless">
+                    <xforms:label>XML Schema Upload</xforms:label>
+
+                    <xxforms:variable name="instance" select="instance('fb-schema-upload-instance')"/>
+                    <xhtml:div>
+                        <xforms:group>
+
+                            <!-- Schema information -->
+                            <xxforms:variable name="schema-element" select="($instance/schema/xs:schema, $model/xs:schema)[1]"/>
+                            <xxforms:variable name="is-new-schema" select="$instance/schema/xs:schema"/>
+
+                            <xforms:group ref="$schema-element" class="fb-hide-alert">
+                                <xforms:label class="fb-dialog-h2" value="if ($is-new-schema) then 'New Schema Information' else 'Existing Schema Information'"/>
+
+                                <xhtml:div class="fb-dialog-section">
+                                    <xforms:group ref=".[xs:simpleType]">
+                                        <!-- Schema types -->
+                                        <xforms:select1 ref="$instance/temp-type" appearance="compact">
+                                            <xforms:label>Available Schema Types</xforms:label>
+                                            <xforms:hint>This lists the simple types available in the uploaded schema</xforms:hint>
+                                            <!--<xforms:item>-->
+                                                <!--<xforms:label>[Select...]</xforms:label>-->
+                                                <!--<xforms:value/>-->
+                                            <!--</xforms:item>-->
+                                            <xforms:itemset nodeset="$schema-element/xs:simpleType">
+                                                <xforms:label ref="@name"/>
+                                                <xforms:value ref="@name"/>
+                                            </xforms:itemset>
+                                        </xforms:select1>
+                                    </xforms:group>
+                                    <xforms:group ref=".[not(xs:simpleType)]">
+                                        <xforms:label>Available Schema Types</xforms:label>
+                                        Your schema does not seem to contain simple types. You won't be able to select types
+                                        from this schema for validation.
+                                    </xforms:group>
+                                    <xforms:group ref=".[@targetNamespace]">
+                                        <xforms:output value="@targetNamespace">
+                                            <xforms:label>Schema Namespace URI</xforms:label>
+                                            <xforms:hint>This is the namespace URI of the uploaded schema</xforms:hint>
+                                        </xforms:output>
+                                    </xforms:group>
+                                </xhtml:div>
+
+                            </xforms:group>
+                            <xforms:group class="fb-hide-alert">
+                                <xforms:label class="fb-dialog-h2">Operations</xforms:label>
+
+                                <xhtml:div class="fb-dialog-section">
+                                    <xforms:trigger ref=".[not($is-new-schema) and $model/xs:schema]">
+                                        <xforms:label>Delete Existing XML Schema</xforms:label>
+
+                                        <xforms:action ev:event="DOMActivate">
+                                            <!-- Delete XML Schema -->
+                                            <xforms:delete nodeset="$model/xs:schema"/>
+                                            <!-- TODO: Ask for confirmation, esp. if some types are in use -->
+                                            <!-- TODO: Check and adjust types that could be in use -->
+                                        </xforms:action>
+
+                                    </xforms:trigger>
+
+                                    <!-- Upload a schema-->
+                                    <xforms:upload ref="$instance/schema-uri">
+                                        <xforms:label value="if ($is-new-schema) then 'Change XML Schema' else 'Upload XML Schema'"/>
+                                        <xforms:filename ref="@filename"/>
+                                        <xforms:mediatype ref="@mediatype"/>
+                                        <xxforms:size ref="@size"/>
+
+                                        <!-- Upload file when selected -->
+                                        <xforms:action ev:event="xforms-select">
+                                            <xforms:send submission="fb-schema-upload-submission"/>
+                                        </xforms:action>
+
+                                        <!-- Handle a successful submission -->
+                                        <xforms:action ev:event="xforms-submit-done" ev:observer="fb-schema-upload-submission" context="$instance">
+                                            <!-- Read the schema and store it -->
+                                            <!-- TODO: support catching dynamic XPath error in case doc() fails -->
+                                            <xforms:insert context="schema" origin="doc(../schema-uri)"/>
+                                            <xxforms:variable name="schema-element" select="schema/*"/>
+                                            <xforms:action if="$schema-element/self::xs:schema">
+                                                <!-- We got something that looks like a schema -->
+
+                                                <!-- Check for inclusions -->
+                                                <xforms:action if="$schema-element/(xs:import | xs:include)">
+                                                    <xforms:message>Your schema contains imports or includes. These will be disabled.</xforms:message>
+                                                    <!-- Delete inclusions -->
+                                                    <xforms:delete xxforms:iterate="$schema-element/(xs:import | xs:include)" nodeset="."/>
+                                                </xforms:action>
+
+                                            </xforms:action>
+                                            <xforms:action if="not($schema-element/self::xs:schema)">
+                                                <!-- Oops, this is definitely not a schema -->
+                                                <xforms:message>The uploaded file is not a valid schema.</xforms:message>
+                                                <!-- Clear uploaded content -->
+                                                <xforms:setvalue ref="schema-uri"/>
+                                                <xforms:delete nodeset="$schema-element"/>
+                                            </xforms:action>
+                                        </xforms:action>
+
+                                        <!-- Clear information when deselected -->
+                                        <xforms:action ev:event="xforms-deselect">
+                                            <!-- Clear uploaded content -->
+                                            <xforms:setvalue ref="$instance/schema-uri"/>
+                                            <xforms:delete nodeset="$instance/schema/*"/>
+                                        </xforms:action>
+                                    </xforms:upload>
+                                </xhtml:div>
+                            </xforms:group>
+
+                        </xforms:group>
+                    </xhtml:div>
+                    <xhtml:div class="dialog-button">
+                        <xforms:group appearance="xxforms:internal">
+                            <xforms:trigger class="fr-inplace-rename" id="fb-edit-schema-trigger">
+                                <xforms:label>Change</xforms:label>
+
+                                <xforms:action ev:event="DOMActivate">
+                                    <!-- Insert schema into the model -->
+
+                                    <!-- Delete existing XML Schema if any -->
+                                    <!-- TODO: What we want in fact is to disable this button if there is an existing schema, and the user will explicitly remove the previous schema -->
+                                    <xforms:delete nodeset="$model/xs:schema"/>
+
+                                    <xforms:insert context="$model" origin="$instance/schema/*"/>
+                                </xforms:action>
+
+                            </xforms:trigger>
+                            or
+                            <xforms:trigger appearance="minimal" class="fr-inplace-cancel">
+                                <xforms:label>Cancel</xforms:label>
+                            </xforms:trigger>
+
+                            <xforms:action ev:event="DOMActivate">
+                                <!-- Hide dialog -->
+                                <xxforms:hide dialog="fb-schema-upload-dialog"/>
+                                <!-- Clear uploaded content -->
+                                <xforms:setvalue ref="$instance/schema-uri"/>
+                                <xforms:delete nodeset="$instance/schema/*"/>
+                            </xforms:action>
+                        </xforms:group>
+                    </xhtml:div>
+                </xxforms:dialog>
+
             </fr:body>
         </fr:view>
 
-        <!--<widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>-->
+        <widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>
     </xhtml:body>
 </xhtml:html>

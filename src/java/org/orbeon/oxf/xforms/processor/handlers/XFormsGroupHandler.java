@@ -118,7 +118,15 @@ public class XFormsGroupHandler extends HandlerBase {
 
                 labelValue = groupXFormsControl.getLabel(pipelineContext);
                 hasLabel = groupXFormsControl.hasLabel();
-                labelClassAttribute = groupXFormsControl.getControlElement().attributeValue("class");
+
+                if (hasLabel) {
+                    final Element groupElement = groupXFormsControl.getControlElement();
+                    final Element labelElement = groupElement.element(XFormsConstants.XFORMS_LABEL_QNAME);
+
+                    labelClassAttribute = labelElement.attributeValue("class");
+                } else {
+                    labelClassAttribute = null;
+                }
             }
 
             if (hasLabel) {

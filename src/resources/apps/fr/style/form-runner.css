@@ -10,6 +10,8 @@ body, body table, textarea.xforms-textarea {
 
 #doc { margin-top: 1em; }
 
+.fr-hidden-controls { display: none }
+
 .fr-top {
     height: 10px !important;
     display: block !important;
@@ -141,9 +143,10 @@ label.xforms-repeat-template { display: none; }
 .xforms-disabled .xforms-label { display: none }
 .xforms-case-deselected .xforms-label { display: none }
 
-.xforms-trigger img { padding-right: 10px; }
+button.xforms-trigger img { padding-right: 10px; }
 
 .fr-layout-table tr td { width: auto }
+
 .fr-grid .fr-layout-table tr td { width: auto }
 
 .fr-grid-2-columns tr td {
@@ -333,6 +336,7 @@ div.fr-collapsible {
 /* Check boxes on separate line */
 .xforms-select-appearance-full span { display: block; clear: both; }
 .xforms-select-appearance-full input { float: left; }
+.xforms-select-appearance-full label { margin-left: .5em; margin-right: 1em }
 
 /* Radio buttons spacing */
 .xforms-select1-appearance-full label { margin-left: .5em; margin-right: 1em }

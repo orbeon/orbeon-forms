@@ -78,19 +78,19 @@
                                     <!-- input -->
                                     <xforms:input ref=".[@control = 'input']" incremental="true" >
                                         <xforms:label>
-                                            <xforms:output value="$form-resources/summary/titles/*[local-name() = context()/@name]"/>
+                                            <xforms:output value="$form-resources/*[local-name() = context()/@name]"/>
                                         </xforms:label>
                                     </xforms:input>
                                     <!-- textarea -->
                                     <xforms:input ref=".[@control = 'textarea']" incremental="true" >
                                         <xforms:label>
-                                            <xforms:output value="$form-resources/summary/titles/*[local-name() = context()/@name]"/>
+                                            <xforms:output value="$form-resources/*[local-name() = context()/@name]"/>
                                         </xforms:label>
                                     </xforms:input>
                                     <!-- select1 -->
                                     <xforms:select1 ref=".[@control = 'select1']">
                                         <xforms:label>
-                                            <xforms:output value="$form-resources/summary/titles/*[local-name() = context()/@name]"/>
+                                            <xforms:output value="$form-resources/*[local-name() = context()/@name]"/>
                                         </xforms:label>
                                         <xforms:item>
                                             <xforms:label>[Any]</xforms:label>
@@ -128,13 +128,15 @@
                                     <th>
                                         <!-- NOTE: We used to use a for $resource in ... construct, but this broke, maybe due to an XPath-related bug -->
                                         <xxforms:variable name="id" select="substring-before(@id, '-control')"/>
-                                        <xxforms:variable name="resource" select="$form-resources/summary/titles/*[local-name() = $id]"/>
+                                        <xxforms:variable name="resource" select="$form-resources/*[local-name() = $id]"/>
 
                                         <xforms:output value="if ($resource != '') then $resource else concat('[', $id, ']')"/>
 
 <!--<xforms:output value="for $id in substring-before(context()/@id, '-control')-->
                       <!--return for $resource in ($form-resources/summary/titles/*[local-name() = $id], '')-->
                              <!--return if ($resource != '') then $resource else concat('[', $id, ']')"/>-->
+
+                                        <!--<xforms:output value="for $foo in context() return name($foo)"/>-->
 
                                     </th>
                                 </xforms:repeat>
@@ -165,7 +167,7 @@
 
                                             <!-- textarea -->
                                             <xforms:group ref=".[instance('fr-search-instance')/query[count(context()/preceding-sibling::detail) + 2]/@control = 'textarea']">
-                                                <xforms:output value="for $text in . return if (string-length($text) > 20) then concat(substring($text, 1, 20), '...') else $text"/>
+                                                <xforms:output value="if (string-length(context()) > 20) then concat(substring(context(), 1, 20), '...') else context()"/>
                                             </xforms:group>
 
                                             <!-- select1 -->

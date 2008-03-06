@@ -244,7 +244,7 @@
                     the startup script again). Then open up with a web browser the following URL:
                 </p>
                 <xml-source>
-                    http://localhost:8080/ops/
+                    http://localhost:8080/orbeon/
                 </xml-source>
                 <p>
                     You should see the Orbeon Forms welcome page:
@@ -495,7 +495,7 @@
                     If you look at your browser's URL bar when showing the example, you notice that it looks like this:
                 </p>
                 <xml-source>
-                    http://localhost:8080/ops/xforms-hello/
+                    http://localhost:8080/orbeon/xforms-hello/
                 </xml-source>
                 <ul>
                     <li>
@@ -506,10 +506,10 @@
                     </li>
                     <li>
                         <p>
-                            The next part, <code>ops</code>, depends on what context you install Orbeon Forms into. By
-                            default, because the WAR file is called <code>orbeon.war</code>, the context is
-                            <code>ops</code>. (You could as well configure your container to use a different context, or
-                            an empty (default) context.)
+                            The next part, <code>orbeon</code>, depends on what context you install Orbeon Forms into.
+                            By default, because the WAR file is called <code>orbeon.war</code>, the context is
+                            <code>orbeon</code>. (You could as well configure your container to use a different context,
+                            or an empty (default) context.)
                         </p>
                     </li>
                     <li>
@@ -541,7 +541,7 @@
                     check this by entering the following path in your browser:
                 </p>
                 <xml-source>
-                    http://localhost:8080/ops/xforms-hello/my-page
+                    http://localhost:8080/orbeon/xforms-hello/my-page
                 </xml-source>
                 <p>
                     The exact same result shows! Of course, page flows make the most sense when you have more than one
@@ -552,7 +552,7 @@
             <section>
                 <title>Orbeon Forms Resources</title>
                 <p>
-                    Under <code>TOMCAT_HOME/webapps/ops</code>, you find a <code>WEB-INF</code> directory. That
+                    Under <code>TOMCAT_HOME/webapps/orbeon</code>, you find a <code>WEB-INF</code> directory. That
                     directory, in turn, contains a <code>resources</code> directory. We refer to that
                     <code>resources</code> directory as <code>RESOURCES</code> below.
                 </p>
@@ -610,7 +610,7 @@
                     You find the application under <code>RESOURCES/apps/xforms-hello</code>. That directory contains
                     the two files that you have seen earlier through the Source Code Viewer in your web browser. Again,
                     the name <code>xforms-hello</code> is important and matches the <code>xforms-hello</code> part of
-                    the URL in your web browser: <code>http://localhost:8080/ops/xforms-hello/</code>.
+                    the URL in your web browser: <code>http://localhost:8080/orbeon/xforms-hello/</code>.
                 </p>
                 <note>
                     <p>
@@ -736,8 +736,9 @@
                         </xml-source>
                         <p>
                             This page flow is automatically called for any path that starts with
-                            <code>/ops/my-bookcast/</code>. Here, it matches on the exact path
-                            <code>/ops/my-bookcast/</code> and calls up the page view called <code>view.xhtml</code>.
+                            <code>/orbeon/my-bookcast/</code>. Here, it matches on the exact path
+                            <code>/orbeon/my-bookcast/</code> and calls up the page view called
+                            <code>view.xhtml</code>.
                         </p>
                     </li>
                     <li>
@@ -770,7 +771,7 @@
                     Now go to:
                 </p>
                 <xml-source>
-                    http://localhost:8080/ops/my-bookcast/
+                    http://localhost:8080/orbeon/my-bookcast/
                 </xml-source>
                 <p>
                     You should something like this:
@@ -1336,12 +1337,12 @@
                             This path is equivalent to  using the absolute URL:
                         </p>
                         <xml-source>
-                            http://localhost:8080/ops/exist/rest/db/orbeon/my-bookcast/books.xml
+                            http://localhost:8080/orbeon/exist/rest/db/orbeon/my-bookcast/books.xml
                         </xml-source>
                         <p>
                             (Because it is inconvenient for you to always write absolute URLs when you want to address
                             an URL handle by Orbeon Forms, Orbeon Forms automatically resolves absolute paths against
-                            the base <code>http://localhost:8080/ops/</code>.)
+                            the base <code>http://localhost:8080/orbeon/</code>.)
                         </p>
                         <p>
                             The paths starts with <code>/exist/rest/</code>, which maps to the built-in eXist database.
@@ -1413,7 +1414,7 @@
                              and enter the following URL:
                         </p>
                         <xml-source>
-                            http://localhost:8080/ops/exist/rest/db/orbeon/my-bookcast/books.xml
+                            http://localhost:8080/orbeon/exist/rest/db/orbeon/my-bookcast/books.xml
                         </xml-source>
                         <p>
                             This is the exact same URL to which your submission has done an HTTP PUT. By entering it in
@@ -2229,7 +2230,7 @@
                         external URL of the Bookcast page, so the schema is actually loaded though:
                     </p>
                     <xml-source>
-                        http://localhost:8080/ops/apps/xforms-bookcast/schema.xsd
+                        http://localhost:8080/orbeon/apps/xforms-bookcast/schema.xsd
                     </xml-source>
                     <p>
                         Because retrieving documents through HTTP takes some time, you can also use the Orbeon Forms
@@ -2505,7 +2506,7 @@
                 <code>atom.xpl</code> and <code>atom.xsl</code>, and point your browser to:
             </p>
             <xml-source>
-                http://localhost:8080/ops/my-bookcast/atom
+                http://localhost:8080/orbeon/my-bookcast/atom
             </xml-source>
             <p>
                 You should see something similar to this, depending on your browser:

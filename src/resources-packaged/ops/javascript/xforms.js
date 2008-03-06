@@ -4274,7 +4274,7 @@ function xformsDisplayLoading() {
 if (!ORBEON.xforms.Globals.pageLoadedRegistered) {
     ORBEON.xforms.Globals.pageLoadedRegistered = true;
     // If the browser does not provide a console object, create one which delegates log() to xformsLog()
-    YAHOO.util.Event.addListener(window, "load", ORBEON.xforms.Init.document);
+    YAHOO.util.Event.onDOMReady(ORBEON.xforms.Init.document);
     ORBEON.xforms.Globals.debugLastTime = new Date().getTime();
     ORBEON.xforms.Globals.lastEventSentTime = new Date().getTime();
 }

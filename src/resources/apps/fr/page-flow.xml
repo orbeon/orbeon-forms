@@ -96,10 +96,12 @@
     <!-- ==== Services ==== -->
 
     <!-- i18n resources -->
+    <!-- TODO: This is mostly obsolete w/ the form builder -->
     <page path-info="/fr/service/resources/([^/]+)/([^/]+)/([^/]+)" matcher="oxf:perl5-matcher"
           view="/forms/${1}/${2}/resources_${3}.xml"/>
 
     <!-- Template instance -->
+    <!-- TODO: This is mostly obsolete w/ the form builder -->
     <page path-info="/fr/service/template/([^/]+)/([^/]+)(/([^/]+))?" matcher="oxf:perl5-matcher"
           default-submission="submission-service-empty.xml"
           model="/forms/${1}/service/template.xpl">

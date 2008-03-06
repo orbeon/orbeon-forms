@@ -16,7 +16,7 @@
 
     <!-- Global properties -->
     <property as="xs:anyURI"  name="oxf.log4j-config"                                value="oxf:/config/log4j.xml"/>
-    <property as="xs:integer" name="oxf.cache.size"                                  value="300"/>
+    <property as="xs:integer" name="oxf.cache.size"                                  value="500"/>
     <property as="xs:integer" name="oxf.cache.xpath.size"                            value="600"/>
     <property as="xs:boolean" name="oxf.sax.inspection"                              value="false"/>
     <property as="xs:boolean" name="oxf.resources.versioned"                         value="false"/>
@@ -77,10 +77,13 @@
     <property as="xs:boolean" name="oxf.xforms.cache-combined-resources"             value="false"/>
     <property as="xs:boolean" name="oxf.xforms.optimize-relevance"                   value="false"/>
     <property as="xs:boolean" name="oxf.xforms.session-heartbeat"                    value="true"/>
+    <property as="xs:boolean" name="oxf.xforms.host-language-avts"                   value="true"/>
 
     <!-- Form runner properties -->
-    <property as="xs:anyURI"  name="oxf.fr.persistence"                              value="exist"/>
-    <property as="xs:string"  name="oxf.fr.persistence.exist.uri"                    value="/exist/rest/db"/>
+    <property as="xs:string"  name="oxf.fr.persistence"                              value="exist"/>
+    <property as="xs:anyURI"  name="oxf.fr.persistence.exist.uri"                    value="/exist/rest/db"/>
+    <property as="xs:string"  name="oxf.fr.persistence.orbeon.builder"               value="resources"/>
+    <property as="xs:string"  name="oxf.fr.persistence.orbeon.bookcast"              value="resources"/>
 
     <!-- Deprecated XForms cache configuration -->
     <property as="xs:integer" name="oxf.xforms.cache.session.size"                   value="500000"/>

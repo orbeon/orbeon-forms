@@ -141,10 +141,10 @@ public class TransformerUtils {
             transformer.setOutputProperty(OutputKeys.ENCODING, DEFAULT_OUTPUT_ENCODING);
             transformer.setOutputProperty(OutputKeys.METHOD, "xml");
             transformer.setOutputProperty(OutputKeys.VERSION, "1.0");
-            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-            transformer.setOutputProperty(INDENT_AMOUNT_PROPERTY, "1");
+            transformer.setOutputProperty(OutputKeys.INDENT, "no");
+            transformer.setOutputProperty(INDENT_AMOUNT_PROPERTY, "0");
             return transformer;
-        } catch (Exception e) {
+        } catch (TransformerException e) {
             throw new OXFException(e);
         }
     }
@@ -198,7 +198,7 @@ public class TransformerUtils {
      * @throws TransformerConfigurationException
      */
     public static Transformer getIdentityTransformer() throws TransformerConfigurationException {
-        Transformer transformer = getFactory(IDENTITY_TYPE).newTransformer();
+        final Transformer transformer = getFactory(IDENTITY_TYPE).newTransformer();
         // Wrap Transformer for properties
         return new TransformerWrapper(transformer, INDENT_AMOUNT_PROPERTY, SAXON_INDENT_AMOUNT_PROPERTY);
     }
@@ -442,7 +442,7 @@ public class TransformerUtils {
      */
     public static String tinyTreeToString(NodeInfo nodeInfo) {
         try {
-            final Transformer identity = getIdentityTransformer();
+            final Transformer identity = getXMLIdentityTransformer();
             final StringWriter writer = new StringWriter();
             identity.transform(nodeInfo, new StreamResult(writer));
             return writer.toString();

@@ -1568,7 +1568,9 @@ ORBEON.xforms.Events = {
                         if (sibling.id.indexOf("repeat-begin-") == 0) {
                             // Found beginning of current iteration, tell server
                             var form = ORBEON.xforms.Controls.getForm(sibling);
-                            var targetId = sibling.id.substring("repeat-begin-".length) + "-" + delimiterCount;
+                            var targetId = sibling.id.substring("repeat-begin-".length);
+                            targetId += targetId.indexOf(XFORMS_SEPARATOR_1) == -1 ? XFORMS_SEPARATOR_1 : XFORMS_SEPARATOR_2;
+                            targetId += delimiterCount;
                             var event = new ORBEON.xforms.Server.Event(form, targetId, null, null, "DOMFocusIn");
                             ORBEON.xforms.Server.fireEvents([event]);
                             foundRepeatBegin = true;

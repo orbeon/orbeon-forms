@@ -224,12 +224,48 @@
             <xforms:instance id="fr-form-instance" src="oxf:/forms/orbeon/builder/example-1.xml"/>
 
             <!-- Binds on main instance -->
-            <xforms:bind nodeset="instance('fr-form-instance')">
+            <xforms:bind nodeset=".">
                 <!-- Constrain form ids -->
                 <xforms:bind nodeset="xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-metadata']/*/id"
                              type="xs:NCName" readonly="false()"
                              calculate="if (normalize-space() = '') then concat('ID', digest(string(random(true)), 'MD5', 'hex')) else ."/>
+
+                <!-- Metadata information -->
+                <xforms:bind nodeset="xhtml:head/xforms:model[@id = 'fr-form-model']/xforms:instance[@id = 'fr-form-metadata']/*">
+                    <xforms:bind id="form-id-bind" nodeset="id" required="true()"/>
+                    <xforms:bind id="title-bind" nodeset="title" required="true()"/>
+                    <xforms:bind id="description-bind" nodeset="description"/>
+                </xforms:bind>
             </xforms:bind>
+
+            <!-- All form resources -->
+            <xforms:instance id="fr-form-resources" xxforms:readonly="true">
+                <resources>
+                    <resource xml:lang="en">
+                        <form-id>
+                            <label>Form Identifier</label>
+                        </form-id>
+                        <title>
+                            <label>Form Title</label>
+                        </title>
+                        <description>
+                            <label>Form Description</label>
+                        </description>
+                        <!-- TODO: i18n whole Form Builder -->
+                    </resource>
+                    <resource xml:lang="fr">
+                        <form-id>
+                            <label>Identifiant du formulaire</label>
+                        </form-id>
+                        <title>
+                            <label>Titre du formulaire</label>
+                        </title>
+                        <description>
+                            <label>Description du formulaire</label>
+                        </description>
+                    </resource>
+                </resources>
+            </xforms:instance>
 
             <!-- Instance containing the current language -->
             <xforms:instance id="fb-language-instance">
@@ -309,10 +345,15 @@
                 <validation>
                     <resource/>
                     <builtin-type/>
+                    <allow-empty>false</allow-empty>
                     <schema-type/>
                     <alert/>
                 </validation>
             </xforms:instance>
+
+            <xforms:bind nodeset="instance('fb-validation-editor-instance')">
+                <xforms:bind nodeset="allow-empty" readonly="../schema-type != ''"/>
+            </xforms:bind>
 
             <xforms:instance id="fb-validation-types-instance" xxforms:readonly="true">
                 <choices>
@@ -566,6 +607,14 @@
                                 <xforms:hint ref=""/>
                                 <xforms:help ref=""/>
                                 <xforms:alert ref=""/>
+                                <xforms:item>
+                                    <xforms:label>[Select...]</xforms:label>
+                                    <xforms:value/>
+                                </xforms:item>
+                                <xforms:itemset nodeset="">
+                                    <xforms:label ref="label"/>
+                                    <xforms:value ref="value"/>
+                                </xforms:itemset>
                             </xforms:select1>
                         </xhtml:div>
                     </template>
@@ -576,6 +625,10 @@
                                 <xforms:hint ref=""/>
                                 <xforms:help ref=""/>
                                 <xforms:alert ref=""/>
+                                <xforms:itemset nodeset="">
+                                    <xforms:label ref="label"/>
+                                    <xforms:value ref="value"/>
+                                </xforms:itemset>
                             </xforms:select1>
                         </xhtml:div>
                     </template>
@@ -586,6 +639,10 @@
                                 <xforms:hint ref=""/>
                                 <xforms:help ref=""/>
                                 <xforms:alert ref=""/>
+                                <xforms:itemset nodeset="">
+                                    <xforms:label ref="label"/>
+                                    <xforms:value ref="value"/>
+                                </xforms:itemset>
                             </xforms:select1>
                         </xhtml:div>
                     </template>
@@ -596,6 +653,10 @@
                                 <xforms:hint ref=""/>
                                 <xforms:help ref=""/>
                                 <xforms:alert ref=""/>
+                                <xforms:itemset nodeset="">
+                                    <xforms:label ref="label"/>
+                                    <xforms:value ref="value"/>
+                                </xforms:itemset>
                             </xforms:select>
                         </xhtml:div>
                     </template>
@@ -606,6 +667,10 @@
                                 <xforms:hint ref=""/>
                                 <xforms:help ref=""/>
                                 <xforms:alert ref=""/>
+                                <xforms:itemset nodeset="">
+                                    <xforms:label ref="label"/>
+                                    <xforms:value ref="value"/>
+                                </xforms:itemset>
                             </xforms:select>
                         </xhtml:div>
                     </template>
@@ -705,19 +770,19 @@
                 </xforms:group>
 
                 <!-- Section about form metadata -->
-                <fr:section id="fb-metadata-section" context="$metadata-instance" class="fb-metadata-section">
+                <fr:section id="fb-metadata-section" class="fb-metadata-section">
                     <xforms:label>Form Metadata</xforms:label>
 
-                    <xforms:input id="form-id-control" ref="id" appearance="fr:in-place" class="fr-summary fr-search">
-                        <xforms:label>Form Identifier</xforms:label>
+                    <xforms:input id="form-id-control" bind="form-id-bind" appearance="fr:in-place" class="fr-summary fr-search">
+                        <xforms:label ref="$form-resources/form-id"/>
                     </xforms:input>
 
-                    <xforms:input id="title-control" ref="title" appearance="fr:in-place" class="fr-summary fr-search">
-                        <xforms:label>Form Title</xforms:label>
+                    <xforms:input id="title-control" bind="title-bind" appearance="fr:in-place" class="fr-summary fr-search">
+                        <xforms:label ref="$form-resources/title"/>
                     </xforms:input>
 
-                    <xforms:textarea id="description-control" ref="description" appearance="fr:in-place" class="fr-summary fr-search">
-                        <xforms:label>Form Description</xforms:label>
+                    <xforms:textarea id="description-control" bind="description-bind" appearance="fr:in-place" class="fr-summary fr-search">
+                        <xforms:label ref="$form-resources/description"/>
                     </xforms:textarea>
                 </fr:section>
 
@@ -1501,6 +1566,9 @@
                                                         <xforms:setvalue ref="xforms:hint/@ref" value="concat('$form-resources/', $new-control-id, '/hint')"/>
                                                         <xforms:setvalue ref="xforms:help/@ref" value="concat('$form-resources/', $new-control-id, '/help')"/>
                                                         <xforms:setvalue ref="xforms:alert/@ref" value="concat('$form-resources/', $new-control-id, '/alert')"/>
+
+                                                        <!-- Set xforms:itemset/@nodeset value -->
+                                                        <xforms:setvalue ref="xforms:itemset/@nodeset" value="concat('$form-resources/', $new-control-id, '/item')"/>
                                                     </xforms:action>
                                                 </xforms:action>
 
@@ -1860,18 +1928,38 @@
                     <xxforms:variable name="instance" select="instance('fb-validation-editor-instance')"/>
                     <xhtml:div>
                         <xforms:group class="fb-hide-alert">
-                            <!-- Built-in type selection -->
-                            <xforms:select1 ref="$instance/builtin-type">
-                                <xforms:label>Built-in Type</xforms:label>
-                                <xforms:item>
-                                    <xforms:label>[Select...]</xforms:label>
-                                    <xforms:value/>
-                                </xforms:item>
-                                <xforms:itemset nodeset="instance('fb-validation-types-instance')/root()//(choices | type)">
-                                    <xforms:label ref="if (self::choices) then label else ."/>
-                                    <xforms:value ref="if (self::choices) then () else ."/>
-                                </xforms:itemset>
-                            </xforms:select1>
+                            <!--<xhtml:table>-->
+                                <!--<xhtml:tr>-->
+                                    <!--<xhtml:td>-->
+                                        <!-- Built-in type selection -->
+                                        <xforms:select1 ref="$instance/builtin-type">
+                                            <xforms:label>Built-in Type</xforms:label>
+                                            <xforms:item>
+                                                <xforms:label>[Select...]</xforms:label>
+                                                <xforms:value/>
+                                            </xforms:item>
+                                            <xforms:itemset nodeset="instance('fb-validation-types-instance')/root()//(choices | type)">
+                                                <xforms:label ref="if (self::choices) then label else ."/>
+                                                <xforms:value ref="if (self::choices) then () else ."/>
+                                            </xforms:itemset>
+                                            <xforms:setvalue ev:event="xforms-value-changed" if=". != ''" ref="../schema-type"/>
+                                        </xforms:select1>
+                                    <!--</xhtml:td>-->
+                                    <!--<xhtml:td>-->
+                                        <xforms:select1 ref="$instance/allow-empty" appearance="full">
+                                            <xforms:label>Allow Empty Content</xforms:label>
+                                            <xforms:item>
+                                                <xforms:label>Yes</xforms:label>
+                                                <xforms:value>true</xforms:value>
+                                            </xforms:item>
+                                            <xforms:item>
+                                                <xforms:label>No</xforms:label>
+                                                <xforms:value>false</xforms:value>
+                                            </xforms:item>
+                                        </xforms:select1>
+                                    <!--</xhtml:td>-->
+                                <!--</xhtml:tr>-->
+                            <!--</xhtml:table>-->
 
                             <!-- Schema type selection if applicable -->
                             <xforms:select1 ref="$instance/schema-type[$model/xs:schema]">
@@ -1884,6 +1972,7 @@
                                     <xforms:label ref="@name"/>
                                     <xforms:value ref="@name"/>
                                 </xforms:itemset>
+                                <xforms:setvalue ev:event="xforms-value-changed" if=". != ''" ref="../builtin-type"/>
                             </xforms:select1>
 
                             <!-- Alert message -->
@@ -1920,7 +2009,7 @@
                 </xxforms:dialog>
 
                 <!-- Schema upload -->
-                <xxforms:dialog id="fb-schema-upload-dialog" level="modeless">
+                <xxforms:dialog id="fb-schema-upload-dialog" level="modal">
                     <xforms:label>XML Schema Upload</xforms:label>
 
                     <xxforms:variable name="instance" select="instance('fb-schema-upload-instance')"/>
@@ -1929,7 +2018,8 @@
 
                             <!-- Schema information -->
                             <xxforms:variable name="schema-element" select="($instance/schema/xs:schema, $model/xs:schema)[1]"/>
-                            <xxforms:variable name="is-new-schema" select="$instance/schema/xs:schema"/>
+                            <xxforms:variable name="is-existing-schema" select="exists($model/xs:schema)"/>
+                            <xxforms:variable name="is-new-schema" select="exists($instance/schema/xs:schema)"/>
 
                             <xforms:group ref="$schema-element" class="fb-hide-alert">
                                 <xforms:label class="fb-dialog-h2" value="if ($is-new-schema) then 'New Schema Information' else 'Existing Schema Information'"/>
@@ -1982,7 +2072,7 @@
 
                                     <!-- Upload a schema-->
                                     <xforms:upload ref="$instance/schema-uri">
-                                        <xforms:label value="if ($is-new-schema) then 'Change XML Schema' else 'Upload XML Schema'"/>
+                                        <xforms:label value="if ($is-new-schema) then 'Change XML Schema' else if ($is-existing-schema) then 'Replace XML Schema' else 'Upload XML Schema'"/>
                                         <xforms:filename ref="@filename"/>
                                         <xforms:mediatype ref="@mediatype"/>
                                         <xxforms:size ref="@size"/>

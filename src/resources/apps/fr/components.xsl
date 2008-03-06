@@ -312,8 +312,8 @@
             <xforms:case id="fr-inplace-{@id}-view">
                 <xhtml:div class="fr-inplace-view">
                     <xhtml:span class="fr-inplace-content">
-                        <xforms:output value="{@ref}" class="fr-inplace-value">
-                            <xsl:copy-of select="xforms:label"/>
+                        <xforms:output class="fr-inplace-value">
+                            <xsl:copy-of select="@ref | @bind | xforms:label"/>
                             <xforms:action ev:event="DOMActivate">
                                 <xforms:toggle case="fr-inplace-{@id}-edit"/>
                                 <xforms:setfocus control="fr-inplace-{@id}-input"/>
@@ -339,8 +339,8 @@
             <xforms:case id="fr-inplace-{@id}-edit">
                 <xhtml:div class="fr-inplace-edit">
                     <xhtml:span class="fr-inplace-content">
-                        <xforms:input id="fr-inplace-{@id}-input" ref="{@ref}" class="fr-inplace-value">
-                            <xsl:copy-of select="xforms:label"/>
+                        <xforms:input id="fr-inplace-{@id}-input" class="fr-inplace-value">
+                            <xsl:copy-of select="@ref | @bind | xforms:label"/>
                             <xforms:toggle ev:event="DOMActivate" case="fr-inplace-{@id}-view"/>
                         </xforms:input>
                         <xhtml:span class="fr-inplace-buttons">
@@ -368,8 +368,8 @@
             <xforms:case id="fr-inplace-{@id}-view">
                 <xhtml:div class="fr-inplace-view">
                     <xhtml:span class="fr-inplace-content">
-                        <xforms:output value="{@ref}" class="fr-inplace-value">
-                            <xsl:copy-of select="xforms:label"/>
+                        <xforms:output class="fr-inplace-value">
+                            <xsl:copy-of select="@ref | @bind | xforms:label"/>
                             <xforms:action ev:event="DOMActivate">
                                 <xforms:toggle case="fr-inplace-{@id}-edit"/>
                                 <xforms:setfocus control="fr-inplace-{@id}-textarea"/>
@@ -393,8 +393,8 @@
             <xforms:case id="fr-inplace-{@id}-edit">
                 <xhtml:div class="fr-inplace-edit">
                     <xhtml:span class="fr-inplace-content">
-                        <xforms:textarea id="fr-inplace-{@id}-textarea" ref="{@ref}" class="fr-inplace-value" appearance="xxforms:autosize">
-                            <xsl:copy-of select="xforms:label"/>
+                        <xforms:textarea id="fr-inplace-{@id}-textarea" class="fr-inplace-value" appearance="xxforms:autosize">
+                            <xsl:copy-of select="@ref | @bind | xforms:label"/>
                             <xforms:toggle ev:event="DOMActivate" case="fr-inplace-{@id}-view"/>
                         </xforms:textarea>
                         <xhtml:span class="fr-inplace-buttons">

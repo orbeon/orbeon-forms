@@ -55,22 +55,14 @@
             <xforms:instance id="fr-form-resources">
                 <resources xmlns="">
                     <resource xml:lang="en">
-                        <summary>
-                            <titles>
-                                <title>Title</title>
-                                <author>Author</author>
-                                <language>Language</language>
-                            </titles>
-                        </summary>
+                        <title>Title</title>
+                        <author>Author</author>
+                        <language>Language</language>
                     </resource>
                     <resource xml:lang="fr">
-                        <summary>
-                            <titles>
-                                <title>Titre</title>
-                                <author>Auteur</author>
-                                <language>Langue</language>
-                            </titles>
-                        </summary>
+                        <title>Titre</title>
+                        <author>Auteur</author>
+                        <language>Langue</language>
                     </resource>
                 </resources>
             </xforms:instance>
@@ -156,7 +148,7 @@
                         <tr>
                             <td>
                                 <xforms:input id="title-control" bind="title-bind" class="fr-summary fr-search">
-                                    <xforms:label class="books-label">Title</xforms:label>
+                                    <xforms:label ref="$form-resources/title"/>
                                     <xforms:hint>Book title</xforms:hint>
                                     <xforms:help>This input contains the book title. For example...</xforms:help>
                                     <xforms:alert>The book title is incorrect</xforms:alert>
@@ -164,7 +156,7 @@
                             </td>
                             <td>
                                 <xforms:input id="author-control" bind="author-bind" class="fr-summary fr-search">
-                                    <xforms:label class="books-label">Author</xforms:label>
+                                    <xforms:label ref="$form-resources/author"/>
                                     <xforms:help>This input contains the book's author name.</xforms:help>
                                     <xforms:hint>Book author</xforms:hint>
                                     <xforms:alert>The author name is incorrect</xforms:alert>
@@ -174,7 +166,7 @@
                         <tr>
                             <td>
                                 <xforms:select1 id="language-control" bind="language-bind" class="fr-summary fr-search">
-                                    <xforms:label class="books-label">Language</xforms:label>
+                                    <xforms:label ref="$form-resources/author"/>
                                     <xforms:hint>Book language</xforms:hint>
                                     <xforms:help>This contains the book language. For example...</xforms:help>
                                     <xforms:alert>The language selected is invalid</xforms:alert>
@@ -191,7 +183,7 @@
                             </td>
                             <td>
                                 <xforms:input ref="link">
-                                    <xforms:label class="books-label">Link</xforms:label>
+                                    <xforms:label>Link</xforms:label>
                                     <xforms:hint>Optional link to external resource</xforms:hint>
                                     <xforms:help>This input contains a link to an external resource. For example...</xforms:help>
                                     <xforms:alert>The link must be a valid HTTP URL</xforms:alert>
@@ -201,7 +193,7 @@
                         <tr>
                             <td>
                                 <xforms:select1 ref="rating" appearance="full">
-                                    <xforms:label class="books-label">Rating</xforms:label>
+                                    <xforms:label>Rating</xforms:label>
                                     <xforms:hint>Your rating</xforms:hint>
                                     <xforms:help>This contains your rating about the book. For example...</xforms:help>
                                     <xforms:alert>The rating selected is invalid</xforms:alert>
@@ -217,7 +209,7 @@
                             </td>
                             <td>
                                 <xforms:textarea ref="notes" appearance="xxforms:autosize">
-                                    <xforms:label class="books-label">Notes</xforms:label>
+                                    <xforms:label>Notes</xforms:label>
                                     <xforms:hint>Notes about this book</xforms:hint>
                                     <xforms:help>This area contains your own comments about the book. For example...</xforms:help>
                                     <xforms:alert>The notes are invalid</xforms:alert>
@@ -237,7 +229,7 @@
                                     <tr>
                                         <td>
                                             <xforms:textarea ref="." appearance="xxforms:autosize">
-                                                <xforms:label class="books-label">Note</xforms:label>
+                                                <xforms:label>Note</xforms:label>
                                                 <xforms:hint>Notes about this book</xforms:hint>
                                                 <xforms:help>This area contains your own comments about the book. For example...</xforms:help>
                                                 <xforms:alert>The notes are invalid</xforms:alert>

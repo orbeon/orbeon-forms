@@ -367,7 +367,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
 
                 // Find current path through ancestor xforms:repeat elements, if any
                 {
-                    XFormsControl currentXFormsControl = getParent();
+                    XFormsControl currentXFormsControl = XFormsControl.this; // start with this, as we can be a RepeatIteration
                     while (currentXFormsControl != null) {
 
                         if (currentXFormsControl instanceof RepeatIterationControl) {

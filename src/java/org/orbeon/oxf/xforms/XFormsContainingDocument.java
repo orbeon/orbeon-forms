@@ -678,7 +678,6 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
             eventTarget = (XFormsEventTarget) eventTargetObject;
         }
 
-
         // Don't allow for events on non-relevant, readonly or xforms:output controls (we accept focus events on
         // xforms:output though).
         // This is also a security measures that also ensures that somebody is not able to change values in an instance

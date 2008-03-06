@@ -27,8 +27,8 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
  */
 public class RepeatIterationControl extends XFormsSingleNodeControl {
     private int iteration;
-    public RepeatIterationControl(XFormsContainingDocument containingDocument, XFormsControl parent, int iteration) {
-        super(containingDocument, parent, null, "xxforms-repeat-iteration", parent.getEffectiveId());
+    public RepeatIterationControl(XFormsContainingDocument containingDocument, XFormsControl parent, int iteration, String effectiveIterationId) {
+        super(containingDocument, parent, null, "xxforms-repeat-iteration", effectiveIterationId);
         this.iteration = iteration;
     }
 

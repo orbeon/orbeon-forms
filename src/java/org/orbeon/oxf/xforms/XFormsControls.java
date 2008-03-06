@@ -443,9 +443,11 @@ public class XFormsControls {
                 return true;
             }
 
-            public void startRepeatIteration(int iteration) {
+            public void startRepeatIteration(int iteration, String effectiveIterationId) {
 
-                final XFormsControl repeatIterationControl = new RepeatIterationControl(containingDocument, currentControlsContainer, iteration);
+                final XFormsControl repeatIterationControl = new RepeatIterationControl(containingDocument, currentControlsContainer, iteration, effectiveIterationId);
+                idsToXFormsControls.put(effectiveIterationId, repeatIterationControl);
+
                 currentControlsContainer.addChild(repeatIterationControl);
                 currentControlsContainer = repeatIterationControl;
 
@@ -741,7 +743,13 @@ public class XFormsControls {
                             // Handle children of xforms:repeat
                             if (doContinue) {
                                 // TODO: handle isOptimizeRelevance()
-                                controlElementVisitorListener.startRepeatIteration(currentPosition);
+
+                                // Compute repeat iteration id
+                                final String iterationEffectiveId = effectiveControlId
+                                        + (idPostfix.equals("") ? XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1 : XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_2)
+                                        + currentPosition;
+
+                                controlElementVisitorListener.startRepeatIteration(currentPosition, iterationEffectiveId);
                                 final String newIdPostfix = idPostfix.equals("") ? Integer.toString(currentPosition) : (idPostfix + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_2 + currentPosition);
                                 doContinue = handleControls(pipelineContext, controlElementVisitorListener, isOptimizeRelevance, currentControlElement, newIdPostfix);
                                 controlElementVisitorListener.endRepeatIteration(currentPosition);
@@ -836,7 +844,7 @@ public class XFormsControls {
     private static interface ControlElementVisitorListener {
         public boolean startVisitControl(Element controlElement, String effectiveControlId);
         public boolean endVisitControl(Element controlElement, String effectiveControlId);
-        public void startRepeatIteration(int iteration);
+        public void startRepeatIteration(int iteration, String effectiveIterationId);
         public void endRepeatIteration(int iteration);
     }
 

@@ -41,7 +41,8 @@
             <!-- Metadata -->
             <xforms:instance id="fr-form-metadata" xxforms:readonly="true">
                 <metadata>
-                    <id/>
+                    <project-id/>
+                    <form-id/>
                     <title>[Please give this form a title]</title>
                     <description>[Please optionally describe this form]</description>
                     <author/>

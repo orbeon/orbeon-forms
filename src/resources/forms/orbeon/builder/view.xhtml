@@ -226,13 +226,14 @@
             <!-- Binds on main instance -->
             <xforms:bind nodeset=".">
                 <!-- Constrain form ids -->
-                <xforms:bind nodeset="xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-metadata']/*/id"
+                <xforms:bind nodeset="xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-metadata']/*/(form-id, project-id)"
                              type="xs:NCName" readonly="false()"
                              calculate="if (normalize-space() = '') then concat('ID', digest(string(random(true)), 'MD5', 'hex')) else ."/>
 
                 <!-- Metadata information -->
                 <xforms:bind nodeset="xhtml:head/xforms:model[@id = 'fr-form-model']/xforms:instance[@id = 'fr-form-metadata']/*">
-                    <xforms:bind id="form-id-bind" nodeset="id" required="true()"/>
+                    <xforms:bind id="project-id-bind" nodeset="project-id" required="true()"/>
+                    <xforms:bind id="form-id-bind" nodeset="form-id" required="true()"/>
                     <xforms:bind id="title-bind" nodeset="title" required="true()"/>
                     <xforms:bind id="description-bind" nodeset="description"/>
                 </xforms:bind>
@@ -242,6 +243,9 @@
             <xforms:instance id="fr-form-resources" xxforms:readonly="true">
                 <resources>
                     <resource xml:lang="en">
+                        <project-id>
+                            <label>Project Identifier</label>
+                        </project-id>
                         <form-id>
                             <label>Form Identifier</label>
                         </form-id>
@@ -254,6 +258,9 @@
                         <!-- TODO: i18n whole Form Builder -->
                     </resource>
                     <resource xml:lang="fr">
+                        <project-id>
+                            <label>Identifiant du Projet</label>
+                        </project-id>
                         <form-id>
                             <label>Identifiant du formulaire</label>
                         </form-id>
@@ -772,6 +779,10 @@
                 <!-- Section about form metadata -->
                 <fr:section id="fb-metadata-section" class="fb-metadata-section">
                     <xforms:label>Form Metadata</xforms:label>
+
+                    <xforms:input id="project-id-control" bind="project-id-bind" appearance="fr:in-place" class="fr-summary fr-search">
+                        <xforms:label ref="$form-resources/project-id"/>
+                    </xforms:input>
 
                     <xforms:input id="form-id-control" bind="form-id-bind" appearance="fr:in-place" class="fr-summary fr-search">
                         <xforms:label ref="$form-resources/form-id"/>

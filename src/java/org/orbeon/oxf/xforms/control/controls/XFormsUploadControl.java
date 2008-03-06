@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.control.controls;
 
 import org.dom4j.Element;
 import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.event.events.XFormsDeselectEvent;
 import org.orbeon.oxf.xforms.action.actions.XFormsSetvalueAction;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
@@ -79,10 +80,16 @@ public class XFormsUploadControl extends XFormsValueControl {
 
     public void setExternalValue(PipelineContext pipelineContext, String value, String type, boolean handleTemporaryFiles){
 
+        final String oldValue = getValue();
+
+        if ((value == null || value.trim().equals("")) && !(oldValue == null || oldValue.trim().equals(""))) {
+            // Consider that file got "deselected" in the UI
+            containingDocument.dispatchEvent(pipelineContext, new XFormsDeselectEvent(this));
+        }
+
         try {
             final String newValue;
             if (handleTemporaryFiles) {
-                final String oldValue = getValue();
                 // Try to delete temporary file if old value was temp URI and new value is different
                 if (oldValue != null && NetUtils.urlHasProtocol(oldValue) && !oldValue.equals(value)) {
                     final File file = new File(new URI(oldValue));

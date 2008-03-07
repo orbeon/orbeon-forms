@@ -421,39 +421,14 @@ public class XPathCache {
                     final Expression tempExpression = AttributeValueTemplate.make(xpathString, -1, independentContext);
                     // Running typeCheck() is mandatory otherwise things break! This is also done when using evaluator.createExpression()
                     expression = tempExpression.typeCheck(independentContext, Type.ITEM_TYPE);
-
-                    // Allocate variable slots in all cases
-                    ExpressionTool.allocateSlots(expression, independentContext.getStackFrameMap().getNumberOfVariables(), independentContext.getStackFrameMap());
                 } else {
-
-                    // We used to use XPathEvaluator.createExpression(), but there is a but in it related to slots allocation, so we do the work ourselves instead.
-                    Expression exp = ExpressionTool.make(xpathString, independentContext,0,-1,1);
-                    exp = exp.typeCheck(independentContext, Type.ITEM_TYPE);
-                    final SlotManager map = independentContext.getStackFrameMap();
-                    ExpressionTool.allocateSlots(exp, independentContext.getStackFrameMap().getNumberOfVariables(), map); // this is what's missing from XPathEvaluator.createExpression()
-                    expression = exp;
-
-//                    // Create Saxon XPath Evaluator
-//                    final XPathEvaluator evaluator = new XPathEvaluator(independentContext.getConfiguration()) {
-//
-//                        // NOTE: What we do here is patch Saxon's createExpression(), which does not correctly call allocateSlots()
-//                        public XPathExpression createExpression(String expression) throws XPathException {
-//                            Expression exp = ExpressionTool.make(expression, independentContext,0,-1,1);
-//                            exp = exp.typeCheck(independentContext, Type.ITEM_TYPE);
-//                            final SlotManager map = independentContext.getStackFrameMap();
-//                            ExpressionTool.allocateSlots(exp, independentContext.getStackFrameMap().getNumberOfVariables(), map); // this is our patch
-//                            return new XPathExpression(this, exp) { // do this because of protected access
-//                                {
-//                                    setStackFrameMap(map);
-//                                }
-//                            };
-//                        }
-//                    };
-//                    evaluator.setStaticContext(independentContext);
-//
-//                    final XPathExpression exp = evaluator.createExpression(xpathString);
-//                    expression = exp.getInternalExpression();
+                    // We used to use XPathEvaluator.createExpression(), but there is a bug in it related to slots allocation, so we do the work ourselves instead.
+                    final Expression tempExpression = ExpressionTool.make(xpathString, independentContext, 0, -1, 1);
+                    expression = tempExpression.typeCheck(independentContext, Type.ITEM_TYPE);
                 }
+
+                // Allocate variable slots in all cases
+                ExpressionTool.allocateSlots(expression, independentContext.getStackFrameMap().getNumberOfVariables(), independentContext.getStackFrameMap());
 
                 {
                     // Provide an Executable with the only purpose of allowing the evaluate() function find the right

@@ -343,6 +343,7 @@ div.fr-collapsible {
 
 /* Space before paragraph in sections */
 .fr-section-container p { margin-top: 1em; }
+.fr-section-container img.fr-open-close { margin-right: .5em }
 
 /* Size form controls depending on layout */
 #doc4 .fr-section-container .xforms-input input { width: 63em }

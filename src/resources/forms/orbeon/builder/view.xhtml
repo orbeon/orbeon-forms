@@ -297,9 +297,8 @@
 
             <!-- Submission to test the form -->
             <xforms:submission id="fb-test-form-submission"
-                    ref="instance('fr-form-instance')"
-                    method="post" replace="all"
-                    resource="/fr/orbeon/test/test/"/>
+                    ref="instance('fr-form-instance')" method="post" replace="all"
+                    resource="/fr/orbeon/test/test/" xxforms:target="_blank" xxforms:show-progress="false"/>
 
             <xforms:instance id="fb-variables">
                 <variables>
@@ -1924,6 +1923,7 @@
                             <xxforms:variable name="local-name" select="local-name()"/>
                             <xforms:setvalue ref="@ref" value="concat('$form-resources/', $new-name, '/', $local-name)"/>
                         </xforms:action>
+                        <xforms:setvalue ref="$control/xforms:itemset/@nodeset" value="concat('$form-resources/', $new-name, '/item')"/>
 
                     </xforms:action>
 

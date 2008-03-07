@@ -141,7 +141,8 @@
 
     <!-- React to successful submission when saving/updating -->
     <xforms:action ev:event="xforms-submit-done" ev:target="fr-create-submission fr-update-submission">
-        <xforms:setvalue ref="instance('fr-persistence-instance')/message">Document saved.</xforms:setvalue><!-- TODO: i18n -->
+        <xforms:setvalue ref="instance('fr-persistence-instance')/message"
+                         value="xxforms:instance('fr-fr-current-resources')/detail/messages/save-success"/>
         <xforms:setvalue ref="instance('fr-persistence-instance')/data-status">clean</xforms:setvalue>
         <xforms:toggle case="fr-message-success"/>
     </xforms:action>
@@ -151,11 +152,13 @@
         <xforms:setvalue ref="instance('fr-persistence-instance')/error" value="event('response-body')"/>
         <xforms:message level="xxforms:log-error"><xforms:output value="event('response-body')"/></xforms:message>
         <xforms:action if="event('error-type') = 'validation-error'">
-            <xforms:setvalue ref="instance('fr-persistence-instance')/message">Your document could not be saved because errors were found.</xforms:setvalue><!-- TODO: i18n -->
+            <xforms:setvalue ref="instance('fr-persistence-instance')/message"
+                             value="xxforms:instance('fr-fr-current-resources')/detail/messages/save-error-form"/>
             <xforms:toggle case="fr-message-validation-error"/>
         </xforms:action>
         <xforms:action if="event('error-type') != 'validation-error'">
-            <xforms:setvalue ref="instance('fr-persistence-instance')/message">Unable to save document. Please contact your system administrator.</xforms:setvalue><!-- TODO: i18n -->
+            <xforms:setvalue ref="instance('fr-persistence-instance')/message"
+                    value="xxforms:instance('fr-fr-current-resources')/detail/messages/save-error-form"/>
             <xforms:toggle case="fr-message-fatal-error"/>
         </xforms:action>
     </xforms:action>

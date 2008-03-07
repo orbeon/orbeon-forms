@@ -426,7 +426,7 @@
                                     <xforms:trigger appearance="minimal">
                                         <xforms:label>
                                             <!--  xxx temp links -->
-                                            <xhtml:img src="/apps/fr/style/plus.png" alt="Open section" title="Open section"/>
+                                            <xhtml:img src="/apps/fr/style/plus.png" alt="Open section" title="Open section" class="fr-open-close"/>
                                         </xforms:label>
                                     </xforms:trigger>
                                     <xforms:trigger appearance="minimal">
@@ -449,7 +449,7 @@
                                     <xforms:trigger appearance="minimal">
                                         <xforms:label>
                                             <!--  xxx temp links -->
-                                            <xhtml:img src="/apps/fr/style/minus.png" alt="Close section" title="Close section"/>
+                                            <xhtml:img src="/apps/fr/style/minus.png" alt="Close section" title="Close section" class="fr-open-close"/>
                                         </xforms:label>
                                     </xforms:trigger>
                                     <xforms:trigger appearance="minimal">

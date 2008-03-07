@@ -203,6 +203,7 @@
             <!-- Summary data -->
             <xforms:instance id="fr-summary-instance">
                 <documents xmlns="" total="0">
+                    <!-- Content will be like this -->
                     <!--<document name="" created="" last-modified="">-->
                         <!--<id/>-->
                         <!--<details>-->
@@ -292,17 +293,9 @@
                                 <!-- Iterate through specially marked controls and derive resource id then resource -->
                                 <xforms:repeat nodeset="instance('fr-configuration-instance')/xforms:*[tokenize(@class, ' ') = 'fr-summary']">
                                     <th>
-                                        <!-- NOTE: We used to use a for $resource in ... construct, but this broke, maybe due to an XPath-related bug -->
-                                        <xxforms:variable name="id" select="substring-before(@id, '-control')"/>
-                                        <xxforms:variable name="resource" select="$form-resources/*[local-name() = $id]"/>
-
-                                        <xforms:output value="if ($resource != '') then $resource else concat('[', $id, ']')"/>
-
-<!--<xforms:output value="for $id in substring-before(context()/@id, '-control')-->
-                      <!--return for $resource in ($form-resources/summary/titles/*[local-name() = $id], '')-->
-                             <!--return if ($resource != '') then $resource else concat('[', $id, ']')"/>-->
-
-                                        <!--<xforms:output value="for $foo in context() return name($foo)"/>-->
+                                        <xforms:output value="for $id in substring-before(context()/@id, '-control')
+                                                              return for $resource in ($form-resources/*[local-name() = $id], '')
+                                                                     return if ($resource != '') then $resource else concat('[', $id, ']')"/>
 
                                     </th>
                                 </xforms:repeat>

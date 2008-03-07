@@ -2418,4 +2418,139 @@
         </output>
     </test>
 
+    <test description="custom context functions" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-server-init.xpl"/>
+                    <p:input name="document">
+                        <xhtml:html>
+                            <xhtml:head>
+                                <xhtml:title>Bug</xhtml:title>
+                                <xforms:model xxforms:state-handling="client">
+                                    <xforms:instance xxforms:readonly="true">
+                                        <fruits>
+                                            <orange>bloody</orange>
+                                            <orange>valencia</orange>
+                                            <apple>green</apple>
+                                            <apple>red</apple>
+                                            <apple>iPod</apple>
+                                            <pear>green</pear>
+                                            <pear>williams</pear>
+                                            <pear>yellow</pear>
+                                        </fruits>
+                                    </xforms:instance>
+                                    <xforms:action ev:event="xforms-ready">
+                                        <xforms:setindex repeat="my-repeat" index="5"/>
+                                    </xforms:action>
+                                </xforms:model>
+                            </xhtml:head>
+                            <xhtml:body>
+
+                                <xforms:repeat id="my-repeat" nodeset="*">
+                                    <xforms:group id="my-group" ref="..">
+                                        <xforms:output id="repeat-current-output-1" value="xxforms:repeat-current()"/>
+                                        <xforms:output id="repeat-current-output-2" value="xxforms:repeat-current('my-repeat')"/>
+                                        <xforms:output id="repeat-index-1" value="index('my-repeat')"/>
+                                        <xforms:output id="repeat-index-2" value="xxforms:index()"/>
+                                        <xforms:output id="repeat-context-1" value="name(xxforms:context('my-group'))"/>
+                                        <xforms:output id="repeat-context-2" value="xxforms:context('my-repeat')"/>
+                                    </xforms:group>
+                                </xforms:repeat>
+
+                            </xhtml:body>
+                        </xhtml:html>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+
+            </p:config>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances/>
+                        <repeat-indexes>
+                            <repeat-index id="my-repeat" index="5"/>
+                        </repeat-indexes>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:copy-repeat-template id="my-repeat" parent-indexes="" id-suffix="2"/>
+                        <xxf:copy-repeat-template id="my-repeat" parent-indexes="" id-suffix="3"/>
+                        <xxf:copy-repeat-template id="my-repeat" parent-indexes="" id-suffix="4"/>
+                        <xxf:copy-repeat-template id="my-repeat" parent-indexes="" id-suffix="5"/>
+                        <xxf:copy-repeat-template id="my-repeat" parent-indexes="" id-suffix="6"/>
+                        <xxf:copy-repeat-template id="my-repeat" parent-indexes="" id-suffix="7"/>
+                        <xxf:copy-repeat-template id="my-repeat" parent-indexes="" id-suffix="8"/>
+                        <xxf:control id="my-group·1" relevant="true"/>
+                        <xxf:control id="repeat-current-output-1·1" relevant="true">bloody</xxf:control>
+                        <xxf:control id="repeat-current-output-2·1" relevant="true">bloody</xxf:control>
+                        <xxf:control id="repeat-index-1·1" relevant="true">5</xxf:control>
+                        <xxf:control id="repeat-index-2·1" relevant="true">5</xxf:control>
+                        <xxf:control id="repeat-context-1·1" relevant="true">fruits</xxf:control>
+                        <xxf:control id="repeat-context-2·1" relevant="true">bloody</xxf:control>
+                        <xxf:control id="my-group·2" relevant="true"/>
+                        <xxf:control id="repeat-current-output-1·2" relevant="true">valencia</xxf:control>
+                        <xxf:control id="repeat-current-output-2·2" relevant="true">valencia</xxf:control>
+                        <xxf:control id="repeat-index-1·2" relevant="true">5</xxf:control>
+                        <xxf:control id="repeat-index-2·2" relevant="true">5</xxf:control>
+                        <xxf:control id="repeat-context-1·2" relevant="true">fruits</xxf:control>
+                        <xxf:control id="repeat-context-2·2" relevant="true">valencia</xxf:control>
+                        <xxf:control id="my-group·3" relevant="true"/>
+                        <xxf:control id="repeat-current-output-1·3" relevant="true">green</xxf:control>
+                        <xxf:control id="repeat-current-output-2·3" relevant="true">green</xxf:control>
+                        <xxf:control id="repeat-index-1·3" relevant="true">5</xxf:control>
+                        <xxf:control id="repeat-index-2·3" relevant="true">5</xxf:control>
+                        <xxf:control id="repeat-context-1·3" relevant="true">fruits</xxf:control>
+                        <xxf:control id="repeat-context-2·3" relevant="true">green</xxf:control>
+                        <xxf:control id="my-group·4" relevant="true"/>
+                        <xxf:control id="repeat-current-output-1·4" relevant="true">red</xxf:control>
+                        <xxf:control id="repeat-current-output-2·4" relevant="true">red</xxf:control>
+                        <xxf:control id="repeat-index-1·4" relevant="true">5</xxf:control>
+                        <xxf:control id="repeat-index-2·4" relevant="true">5</xxf:control>
+                        <xxf:control id="repeat-context-1·4" relevant="true">fruits</xxf:control>
+                        <xxf:control id="repeat-context-2·4" relevant="true">red</xxf:control>
+                        <xxf:control id="my-group·5" relevant="true"/>
+                        <xxf:control id="repeat-current-output-1·5" relevant="true">iPod</xxf:control>
+                        <xxf:control id="repeat-current-output-2·5" relevant="true">iPod</xxf:control>
+                        <xxf:control id="repeat-index-1·5" relevant="true">5</xxf:control>
+                        <xxf:control id="repeat-index-2·5" relevant="true">5</xxf:control>
+                        <xxf:control id="repeat-context-1·5" relevant="true">fruits</xxf:control>
+                        <xxf:control id="repeat-context-2·5" relevant="true">iPod</xxf:control>
+                        <xxf:control id="my-group·6" relevant="true"/>
+                        <xxf:control id="repeat-current-output-1·6" relevant="true">green</xxf:control>
+                        <xxf:control id="repeat-current-output-2·6" relevant="true">green</xxf:control>
+                        <xxf:control id="repeat-index-1·6" relevant="true">5</xxf:control>
+                        <xxf:control id="repeat-index-2·6" relevant="true">5</xxf:control>
+                        <xxf:control id="repeat-context-1·6" relevant="true">fruits</xxf:control>
+                        <xxf:control id="repeat-context-2·6" relevant="true">green</xxf:control>
+                        <xxf:control id="my-group·7" relevant="true"/>
+                        <xxf:control id="repeat-current-output-1·7" relevant="true">williams</xxf:control>
+                        <xxf:control id="repeat-current-output-2·7" relevant="true">williams</xxf:control>
+                        <xxf:control id="repeat-index-1·7" relevant="true">5</xxf:control>
+                        <xxf:control id="repeat-index-2·7" relevant="true">5</xxf:control>
+                        <xxf:control id="repeat-context-1·7" relevant="true">fruits</xxf:control>
+                        <xxf:control id="repeat-context-2·7" relevant="true">williams</xxf:control>
+                        <xxf:control id="my-group·8" relevant="true"/>
+                        <xxf:control id="repeat-current-output-1·8" relevant="true">yellow</xxf:control>
+                        <xxf:control id="repeat-current-output-2·8" relevant="true">yellow</xxf:control>
+                        <xxf:control id="repeat-index-1·8" relevant="true">5</xxf:control>
+                        <xxf:control id="repeat-index-2·8" relevant="true">5</xxf:control>
+                        <xxf:control id="repeat-context-1·8" relevant="true">fruits</xxf:control>
+                        <xxf:control id="repeat-context-2·8" relevant="true">yellow</xxf:control>
+                    </xxf:control-values>
+                    <xxf:repeats>
+                        <xxf:repeat-index id="my-repeat" index="5"/>
+                        <xxf:repeat-iteration id="my-repeat" occurs="8"/>
+                    </xxf:repeats>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>

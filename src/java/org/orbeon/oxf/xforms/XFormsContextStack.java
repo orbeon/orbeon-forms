@@ -544,14 +544,9 @@ public class XFormsContextStack {
     public NodeInfo getRepeatCurrentSingleNode(String repeatId) {
         for (int i = contextStack.size() - 1; i >= 0; i--) {
             final BindingContext currentBindingContext = (BindingContext) contextStack.get(i);
-
-            final Element bindingElement = currentBindingContext.getControlElement();
-            final String repeatIdForIteration = currentBindingContext.getElementId();
-            if (bindingElement == null && repeatIdForIteration != null) {// NOTE: test on bindingElement == null is just to detect whether this is a repeat iteration
-                if (repeatId == null || repeatId.equals(repeatIdForIteration)) {
-                    // Found binding context for relevant repeat iteration
-                    return currentBindingContext.getSingleNode();
-                }
+            if (isRepeatIterationBindingContext(currentBindingContext) && (repeatId == null || currentBindingContext.getParent().getElementId().equals(repeatId))) {
+                // Found binding context for relevant repeat iteration
+                return currentBindingContext.getSingleNode();
             }
         }
         // It is required that there is a relevant enclosing xforms:repeat
@@ -559,6 +554,17 @@ public class XFormsContextStack {
             throw new ValidationException("No enclosing xforms:repeat found.", getCurrentBindingContext().getLocationData());
         else
             throw new ValidationException("No enclosing xforms:repeat found for repeat id: " + repeatId, getCurrentBindingContext().getLocationData());
+    }
+
+    private boolean isRepeatIterationBindingContext(BindingContext bindingContext) {
+        // First, we need a parent
+        final BindingContext parent = bindingContext.getParent();
+        if (parent == null)
+            return false;
+        // We don't have a bound element, but the parent is bound to xforms:repeat
+        final Element bindingElement = bindingContext.getControlElement();
+        final Element parentBindingElement = parent.getControlElement();
+        return (bindingElement == null) && (parentBindingElement != null) && parentBindingElement.getName().equals("repeat");
     }
 
     /**
@@ -570,11 +576,9 @@ public class XFormsContextStack {
         for (int i = contextStack.size() - 1; i >= 0; i--) {
             final BindingContext currentBindingContext = (BindingContext) contextStack.get(i);
 
-            final Element bindingElement = currentBindingContext.getControlElement();
-            final String repeatIdForIteration = currentBindingContext.getElementId();
-            if (bindingElement == null && repeatIdForIteration != null) {// NOTE: test on bindingElement == null is just to detect whether this is a repeat iteration
+            if (isRepeatIterationBindingContext(currentBindingContext)) {
                 // Found binding context for relevant repeat iteration
-                return repeatIdForIteration;
+                return currentBindingContext.getParent().getElementId();
             }
         }
         // It is required that there is a relevant enclosing xforms:repeat
@@ -594,18 +598,18 @@ public class XFormsContextStack {
             final BindingContext currentBindingContext = (BindingContext) contextStack.get(i);
 
             final Element bindingElement = currentBindingContext.getControlElement();
-            final String idForContext = currentBindingContext.getElementId();
-            if (contextId.equals(idForContext)) {
-                if (bindingElement != null && XFormsControls.groupingControls.get(bindingElement.getName()) != null) {
+            if (bindingElement != null && XFormsControls.groupingControls.get(bindingElement.getName()) != null) {
+                // We are a grouping control
+                final String elementId = currentBindingContext.getElementId();
+                if (contextId.equals(elementId)) {
                     // Found matching binding context for regular grouping control
                     return currentBindingContext.getSingleItem();
-                } else if (bindingElement == null) {
-                    final BindingContext parentBindingContext = currentBindingContext.getParent();
-                    if (parentBindingContext != null && parentBindingContext.getControlElement() != null
-                            && contextId.equals(parentBindingContext.getElementId()) && parentBindingContext.getControlElement().getName().equals("repeat")) {
-                        // Found matching repeat iteration
-                        return currentBindingContext.getSingleItem();
-                    }
+                }
+            } else if (bindingElement == null) {
+                // We a likely repeat iteration
+                if (isRepeatIterationBindingContext(currentBindingContext) && currentBindingContext.getParent().getElementId().equals(contextId)) {
+                    // Found matching repeat iteration
+                    return currentBindingContext.getSingleItem();
                 }
             }
         }

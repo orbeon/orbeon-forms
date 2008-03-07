@@ -40,7 +40,7 @@ public class XXFormsRepeatCurrent extends XFormsFunction {
 
     public Item evaluateItem(XPathContext xpathContext) throws XPathException {
 
-        // Get instance id
+        // Get repeat id
         final Expression repeatIdExpression = (argument == null || argument.length == 0) ? null : argument[0];
         final String repeatId = (repeatIdExpression == null) ? null : XFormsUtils.namespaceId(getContainingDocument(xpathContext), repeatIdExpression.evaluateAsString(xpathContext));
 

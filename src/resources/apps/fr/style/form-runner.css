@@ -8,7 +8,7 @@ body, body table, textarea.xforms-textarea {
     font-family: "Lucida Grande", Tahoma, Arial, Verdana, sans-serif;
 }
 
-#doc { margin-top: 1em; }
+#doc { margin-top: 1em; }   
 
 .fr-hidden-controls { display: none }
 
@@ -273,6 +273,11 @@ label.xforms-disabled, span.xforms-disabled, div.xforms-disabled  {
     background-image: url(search.gif);
     background-position: right center;
     background-repeat: no-repeat;
+}
+
+.xforms-input input, textarea.xforms-textarea {
+    background-image: url(field.png);
+    background-repeat: repeat-x
 }
 
 /*.xforms-group { display: inline }*/

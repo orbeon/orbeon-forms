@@ -112,18 +112,19 @@
 }
 
 .xforms-input input {
-    border: 1px solid #7f9db9;
+    /*border: 1px solid #7f9db9;*/
     padding-bottom: 2px;
     padding-left: 1px;
     padding-right: 1px;
 }
 
 .xforms-textarea {
-    border: 1px solid #7f9db9; font-family: Arial,Helvetica,Geneva,sans-serif
+    /*border: 1px solid #7f9db9;*/
+    font-family: Arial,Helvetica,Geneva,sans-serif
 }
 
 .xforms-secret {
-    border: 1px solid #7f9db9
+    /*border: 1px solid #7f9db9*/
 }
 
 .xforms-textarea-appearance-xxforms-autosize {
@@ -131,7 +132,10 @@
     overflow: hidden;
 }
 
-.xforms-select1-appearance-minimal { border: 1px solid #7f9db9; font-family: Arial,Helvetica,Geneva,sans-serif }
+.xforms-select1-appearance-minimal {
+    /*border: 1px solid #7f9db9;*/
+    font-family: Arial,Helvetica,Geneva,sans-serif
+}
 
 /* Prevent display of border when static read-only */
 .xforms-static { border: none }

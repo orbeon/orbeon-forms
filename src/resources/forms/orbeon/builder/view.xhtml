@@ -85,14 +85,19 @@
 
             .fr-section-container .fr-inplace-buttons { display: block; margin-top: .5em; margin-bottom: .5em }
             .fr-section-container .fr-inplace-input input {
-                border: 1px inset rgb(233, 233, 174); padding: 0; background-color: rgb(255, 255, 211)
+                border: 1px inset rgb(233, 233, 174); padding: 0; background-color: #FFFF88; background-image: none
             }
 
             .fr-section-container .fr-inplace-textarea textarea.xforms-textarea {
-                border: 1px inset rgb(233, 233, 174); padding: 0; background-color: rgb(255, 255, 211)
+                border: 1px inset rgb(233, 233, 174); padding: 0; background-color: #FFFF88; background-image: none
             }
 
-            .fr-section-container .fr-inplace-value:hover { background-color: rgb(255, 255, 211) }
+            <!-- Highlighting of in-place outputs depending on hovering -->
+            <!--.fr-inplace-content .xforms-output { background-color: #FFFFDD }-->
+            .fr-section-container .fr-inplace-content .xforms-output:hover { background-color: #FFFF88 }
+            #fb-metadata-section:hover .fr-inplace-content .xforms-output { background-color: #FFFFDD }
+            #fb-details-section .fb-top-level-content:hover .fb-section-title .fr-inplace-content .xforms-output { background-color: #FFFFDD }
+            #fb-details-section .fb-grid-td:hover .fr-inplace-content .xforms-output { background-color: #FFFFDD }
 
             <!-- In-place editing for metadata section -->
             #fb-metadata-section .fr-inplace-input .xforms-input input { width: 68em }
@@ -100,13 +105,13 @@
             #fb-metadata-section .fr-inplace-view .fr-inplace-buttons { display: none }
 
             <!-- In-place editing for section titles -->
+            .fb-section-title .fr-inplace-content .xforms-output { background: white }
             #fb-details-section .fb-section-title .fr-inplace-buttons { display:inline; padding-left: .5em; padding-right: .5em; margin-left: .5em; margin-right: .5em; background: white }
             #fb-details-section .fb-section-title .fr-inplace-buttons button { vertical-align: middle  }
-            <!--#fb-details-section .fb-section-title .fr-inplace-value:hover { background-color: rgb(255, 255, 211) }-->
             #fb-details-section .fb-section-title .fr-inplace-content { font-size: 160%; vertical-align: middle }
-            #fb-details-section .fb-section-title .fr-inplace-value { margin-left: 1em; padding-left: .5em; padding-right: .5em; background: white }
+            #fb-details-section .fb-section-title .fr-inplace-content .xforms-output { margin-left: 1em; padding-left: .5em; padding-right: .5em }
+            #fb-details-section .fb-section-title .fr-inplace-content .xforms-input input { margin-left: 1em; padding-left: .5em; padding-right: .5em }
             #fb-details-section .fb-section-title .fr-inplace-content .xforms-label { display: none }
-            <!--#fb-details-section .fb-section-title .fr-inplace-delete { margin-right: .5em }-->
             #fb-details-section .fb-section-title .fr-inplace-delete img { padding: 0 }
             #fb-details-section .fb-section-title .fr-inplace-delete { display: inline }
             #fb-details-section .fb-section-title .xforms-input input { width: 20em }
@@ -123,7 +128,7 @@
 
             <!-- Control editor -->
             .fb-control-label .xforms-label { display: none }
-            .fb-control-label .fr-inplace-value { font-weight: bold }
+            .fb-control-label .fr-inplace-content { font-weight: bold }
             .fb-control-label .fr-inplace-edit .xforms-alert { display: none }
             .fb-control-label .fr-inplace-view .fr-inplace-buttons { display: none }
             .fb-control-control .xforms-label { display: none }
@@ -135,7 +140,7 @@
                 vertical-align: middle;
             }
 
-            .fb-control-hint .fr-inplace-value {
+            .fb-control-hint .fr-inplace-content {
                 font-size: smaller;
                 font-style: italic;
                 margin-left: .5em;
@@ -1699,7 +1704,7 @@
                                         <xforms:value/>
                                     </xforms:item>
                                     <xforms:itemset model="fr-resources-model"
-                                                    nodeset="instance('fr-languages-instance')/language[not(@exclude = 'true') and not(@code = $lang)]">
+                                                    nodeset="instance('fr-languages-instance')/language[not(@exclude = 'true') and not(@code = $resources/resource/@xml:lang)]">
                                         <xforms:label value="if (@native-name != @english-name) then concat(@native-name, ' (', @english-name, ')') else @native-name"/>
                                         <xforms:value ref="@code"/>
                                     </xforms:itemset>

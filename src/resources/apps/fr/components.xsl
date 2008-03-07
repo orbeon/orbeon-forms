@@ -234,7 +234,7 @@
                 <xhtml:span><xforms:output value="$fr-resources/detail/labels/discard"/></xhtml:span>
             </xforms:label>
             <xforms:action ev:event="DOMActivate">
-                <xforms:dispatch target="fr-persistence-model" name="orbeon-summary"/>
+                <xforms:dispatch target="fr-persistence-model" name="fr-goto-summary"/>
             </xforms:action>
         </xforms:trigger>
         <!-- Trigger shown to go back if the data is clean -->
@@ -244,7 +244,7 @@
                 <xhtml:span><xforms:output value="$fr-resources/detail/labels/return"/></xhtml:span>
             </xforms:label>
             <xforms:action ev:event="DOMActivate">
-                <xforms:dispatch target="fr-persistence-model" name="orbeon-summary"/>
+                <xforms:dispatch target="fr-persistence-model" name="fr-goto-summary"/>
             </xforms:action>
         </xforms:trigger>
     </xsl:template>
@@ -283,14 +283,11 @@
     </xsl:template>
 
     <xsl:template match="fr:save-button">
-        <xforms:trigger ref="instance('fr-triggers-instance')/save" class="xforms-trigger-appearance-modal">
+        <xforms:trigger ref="instance('fr-triggers-instance')/save" class="xforms-trigger-appearance-modal" id="fr-save-button">
             <xforms:label>
                 <xhtml:img src="../../../../apps/fr/style/run.gif" alt=""/>
                 <xhtml:span><xforms:output value="$fr-resources/detail/labels/save-document"/></xhtml:span>
             </xforms:label>
-            <xforms:action ev:event="DOMActivate">
-                <xforms:dispatch target="fr-persistence-model" name="orbeon-save"/>
-            </xforms:action>
         </xforms:trigger>
     </xsl:template>
 
@@ -629,7 +626,7 @@
         <!-- This model handles print functionality -->
         <xforms:model id="fr-print-model">
             <xforms:instance id="fr-print-instance"><dummy/></xforms:instance>
-            <xforms:submission id="fr-print-submission" resource="/fr/{{xxforms:instance('fr-parameters-instance')/app}}/{{xxforms:instance('fr-parameters-instance')/form}}/print/"
+            <xforms:submission id="fr-print-submission" resource="/fr/{{$parameters/app}}/{{$parameters/form}}/print/"
                     method="post" ref="xxforms:instance('fr-form-instance')" replace="all" validate="false" xxforms:target="_blank" xxforms:show-progress="false"/>
         </xforms:model>
 

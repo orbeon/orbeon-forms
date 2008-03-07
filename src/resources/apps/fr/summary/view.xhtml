@@ -33,24 +33,190 @@
         <!-- Summary page XForms model -->
         <xforms:model id="fr-form-model">
 
-            <xforms:instance id="fr-form-instance">
-                <dummy/>
-            </xforms:instance>
-
-            <!-- XForms instance containing all the resources -->
-            <xforms:instance id="fr-form-resources">
-                <resources xmlns=""/>
-            </xforms:instance>
-
+            <!-- Model initialization -->
             <xforms:action ev:event="xforms-ready">
+                <!-- Get configuration for the current form -->
+                <xforms:send submission="get-configuration-submission"/>
+
                 <!-- Query list of documents -->
                 <xforms:send submission="search-submission"/>
                 <!-- Store resources from configuration instance -->
                 <xforms:insert nodeset="instance('fr-form-resources')"
-                               origin="xxforms:instance('fr-source-form-instance')/xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-resources']/*"/>
+                               origin="instance('fr-source-form-instance')/xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-resources']/*"/>
                 <!-- Update to current language -->
                 <xforms:dispatch name="fr-update-language" target="fr-resources-model"/>
             </xforms:action>
+
+            <!-- Standard Form Runner data instance -->
+            <xforms:instance id="fr-form-instance">
+                <dummy/>
+            </xforms:instance>
+
+            <!-- Standard Form Runner resources instance -->
+            <xforms:instance id="fr-form-resources">
+                <resources xmlns=""/>
+            </xforms:instance>
+
+            <!-- Instance to control the triggers' appearance -->
+            <xforms:instance id="fr-summary-triggers-instance">
+                <triggers xmlns="">
+                    <new/>
+                    <edit/>
+                    <view/>
+                    <delete/>
+                </triggers>
+            </xforms:instance>
+
+            <xforms:bind nodeset="instance('fr-summary-triggers-instance')">
+                <!-- Operations on a given entry are disabled if there are no entries -->
+                <xforms:bind nodeset="edit | view| delete" readonly="count(instance('fr-summary-instance')/document) = 0"/>
+            </xforms:bind>
+
+            <xxforms:variable name="parameters" select="xxforms:instance('fr-parameters-instance')"/>
+
+            <xforms:action ev:event="orbeon-create">
+                <xforms:recalculate/>
+                <xforms:load resource="/fr/{$parameters/app}/{$parameters/form}/new/"/>
+            </xforms:action>
+
+            <xforms:action ev:event="orbeon-edit">
+                <xforms:recalculate/>
+                <xforms:load resource="/fr/{$parameters/app}/{$parameters/form}/{instance('fr-summary-instance')/document[index('documents-repeat')]/@name}/edit"/>
+            </xforms:action>
+
+            <xforms:action ev:event="orbeon-delete">
+                <xforms:send submission="fr-delete-document-submission"/>
+                <xforms:send submission="search-submission"/>
+            </xforms:action>
+
+            <xforms:action ev:event="orbeon-view">
+                <xforms:recalculate/>
+                <xforms:load resource="/fr/{$parameters/app}/{$parameters/form}/{instance('fr-summary-instance')/document[index('documents-repeat')]/@name}/view"/>
+            </xforms:action>
+
+            <xforms:action ev:event="orbeon-xml">
+                <xforms:recalculate/>
+                <!-- TODO -->
+                <!--<xforms:load resource="xxx" f:url-type="resource"/>-->
+            </xforms:action>
+
+            <xforms:action ev:event="orbeon-pdf">
+                <xforms:recalculate/>
+                <!-- TODO -->
+                <!--<xforms:load resource="xxx" f:url-type="resource" xxforms:show-progress="false"/>-->
+            </xforms:action>
+
+            <!-- Instance to track search results and paging -->
+            <xforms:instance id="fr-search-instance">
+                <search xmlns="">
+                    <app/>
+                    <form/>
+                    <!-- Search query to execute -->
+                    <query/>
+                    <!-- Paging -->
+                    <page-size>10</page-size>
+                    <page-number>1</page-number>
+                    <!-- Sorting -->
+                    <sort-key/>
+                </search>
+            </xforms:instance>
+
+            <xforms:instance id="fr-search-template" xxforms:readonly="true">
+                <query xmlns="" name="" path="" type="" control=""/>
+            </xforms:instance>
+
+            <!-- Paging information -->
+            <xforms:instance id="fr-paging-instance">
+                <search xmlns="">
+                    <total/>
+                    <page-size/>
+                    <page-number/>
+                    <from>0</from>
+                    <to>0</to>
+                    <prev-trigger/>
+                    <next-trigger/>
+                </search>
+            </xforms:instance>
+
+            <!-- Calculations for page navigation -->
+            <xforms:bind nodeset="instance('fr-paging-instance')">
+                <xforms:bind nodeset="total" calculate="(instance('fr-summary-instance')/@total, 0)[1]"/>
+                <xforms:bind nodeset="page-size" calculate="instance('fr-search-instance')/page-size"/>
+                <xforms:bind nodeset="page-number" calculate="instance('fr-search-instance')/page-number"/>
+                <xforms:bind nodeset="from" calculate="if (../total = 0) then 0 else (../page-number - 1)* ../page-size + 1"/>
+                <xforms:bind nodeset="to" calculate="min((../page-number * ../page-size, ../total))"/>
+                <xforms:bind nodeset="prev-trigger" readonly="../total = 0 or xs:integer(../page-number) le 1"/>
+                <xforms:bind nodeset="next-trigger" readonly="../total = 0 or ../total le ../to"/>
+            </xforms:bind>
+
+            <xforms:instance id="fr-source-form-instance">
+                <dummy xmlns=""/>
+            </xforms:instance>
+
+            <xforms:instance id="fr-summary-headers-instance">
+                <dummy xmlns=""/>
+            </xforms:instance>
+
+            <xforms:instance id="fr-configuration-instance">
+                <configuration xmlns=""/>
+            </xforms:instance>
+
+            <xforms:submission id="get-configuration-submission"
+                    method="get" serialization="none"
+                    resource="/fr/service/configuration/{$parameters/app}/{$parameters/form}"
+                    replace="instance" instance="fr-source-form-instance" xxforms:readonly="true">
+
+                <!-- Extract summary configuration information from the XHTML document -->
+                <xforms:action ev:event="xforms-submit-done">
+                    <!--<xforms:insert context="instance('fr-search-instance')" nodeset="query"-->
+                        <!--origin="instance('fr-source-form-instance')/search"/>-->
+
+                    <!-- Extract fields which must appear in the summary -->
+                    <xforms:insert context="instance('fr-configuration-instance')" nodeset="*"
+                        origin="instance('fr-source-form-instance')/xhtml:body//xforms:*[@class and tokenize(@class, ' ') = ('fr-summary', 'fr-search')]"/>
+
+                    <!-- Create elements holding structured search data -->
+                    <xforms:action xxforms:iterate="instance('fr-source-form-instance')/xhtml:body//xforms:*[@class and tokenize(@class, ' ') = ('fr-search')]">
+                        <!-- Insert empty template -->
+                        <xforms:insert context="instance('fr-search-instance')" nodeset="query" origin="instance('fr-search-template')"/>
+                        <!-- Add control information to template -->
+                        <xforms:setvalue ref="instance('fr-search-instance')/query[last()]/@control" value="context()/local-name()"/>
+                        <!-- Add meta-information to template -->
+                        <xforms:action if="context()/@bind">
+                            <xforms:action context="instance('fr-source-form-instance')/xhtml:head/xforms:model//xforms:bind[@id = context()/@bind]">
+                                <xforms:setvalue ref="instance('fr-search-instance')/query[last()]/@name" value="substring-before(context()/@id, '-bind')"/>
+                                <xforms:setvalue ref="instance('fr-search-instance')/query[last()]/@path" value="string-join(context()/ancestor-or-self::xforms:bind/@nodeset, '/')"/>
+                                <xforms:setvalue ref="instance('fr-search-instance')/query[last()]/@type" value="if (context()/@type) then context()/@type else 'xs:string'"/>
+                            </xforms:action>
+                        </xforms:action>
+                        <xforms:action if="context()/@ref">
+                            <xforms:setvalue ref="instance('fr-search-instance')/query[last()]/@name" value="context()/@ref"/>
+                            <xforms:setvalue ref="instance('fr-search-instance')/query[last()]/@path" value="string-join((context()/ancestor-or-self::*/(@ref | @context))[position() gt 1], '/')"/>
+                        </xforms:action>
+                    </xforms:action>
+
+                    <!-- xxx TODO extract other information -->
+
+                </xforms:action>
+            </xforms:submission>
+
+            <!-- Summary data -->
+            <xforms:instance id="fr-summary-instance">
+                <documents xmlns="" total="0">
+                    <!--<document name="" created="" last-modified="">-->
+                        <!--<id/>-->
+                        <!--<details>-->
+                            <!--<detail/>-->
+                            <!--<detail/>-->
+                        <!--</details>-->
+                    <!--</document>-->
+                </documents>
+            </xforms:instance>
+
+            <xforms:submission id="search-submission"
+                    ref="instance('fr-search-instance')" method="post"
+                    resource="/fr/service/search/exist/{$parameters/app}/{$parameters/form}"
+                    replace="instance" instance="fr-summary-instance"/>
 
         </xforms:model>
     </head>
@@ -60,20 +226,20 @@
             <xhtml:img src="/apps/fr/style/orbeon-logo-trimmed-transparent-42.png"/> 
             <fr:body>
                 <h2>
-                    <xforms:output model="fr-persistence-model" value="instance('fr-source-form-instance')/xhtml:head/xhtml:title"/>
+                    <xforms:output value="instance('fr-source-form-instance')/xhtml:head/xhtml:title"/>
                 </h2>
 
                 <xforms:group appearance="xxforms:internal">
 
                     <!-- Free-text search -->
-                    <xforms:input model="fr-persistence-model" ref="instance('fr-search-instance')/query" incremental="true" class="fr-search-input">
+                    <xforms:input ref="instance('fr-search-instance')/query" incremental="true" class="fr-search-input">
                         <xforms:label ref="$fr-resources/summary/labels/free-search"/>
                     </xforms:input>
 
                     <!-- Structured search -->
                     <table>
                         <tr>
-                            <xforms:repeat model="fr-persistence-model" nodeset="instance('fr-search-instance')/query[@path]" id="search-repeat">
+                            <xforms:repeat nodeset="instance('fr-search-instance')/query[@path]" id="search-repeat">
                                 <td>
                                     <!-- input -->
                                     <xforms:input ref=".[@control = 'input']" incremental="true" >
@@ -110,10 +276,10 @@
                     <xforms:send ev:event="xforms-value-changed" submission="search-submission"/>
                 </xforms:group>
 
-                <xforms:group model="fr-persistence-model" ref="instance('fr-summary-instance')[document]">
+                <xforms:group ref="instance('fr-summary-instance')[document]">
 
                     <!-- Display welcome message -->
-                    <xforms:output model="fr-resources-model" mediatype="text/html"
+                    <xforms:output mediatype="text/html"
                                    value="saxon:serialize($fr-resources/summary/messages/intro/node(), 'html')"
                                    class="fr-summary-welcome-message"/>
 
@@ -191,7 +357,7 @@
                     <!--</p>-->
 
                     <div class="fr-paging-buttons">
-                        <xforms:trigger ref="instance('fr-paging-instance')/prev-trigger" class="xxx">
+                        <xforms:trigger ref="instance('fr-paging-instance')/prev-trigger" class="fr-form-model">
                             <xforms:label>
                                 <xhtml:img src="../../apps/fr/style/previous.gif" alt="Previous" title="Previous"/>
                                 <xhtml:span><xforms:output value="$fr-resources/summary/labels/previous"/></xhtml:span>
@@ -225,52 +391,49 @@
                 </xforms:group>
 
                 <!-- Display this when no form is found -->
-                <xforms:group model="fr-persistence-model" ref="instance('fr-summary-instance')[not(document)]">
-                    <xforms:output model="fr-resources-model" mediatype="text/html" value="saxon:serialize($fr-resources/summary/messages/no-form-found/node(), 'html')"/>
+                <xforms:group ref="instance('fr-summary-instance')[not(document)]">
+                    <xforms:output mediatype="text/html" value="saxon:serialize($fr-resources/summary/messages/no-form-found/node(), 'html')"/>
                 </xforms:group>
 
                 <!--<widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>-->
 
             </fr:body>
             <fr:buttons>
-                <xhtml:div class="fr-buttons fr-summary-buttons">
-                    <xforms:trigger>
-                        <xforms:label>
-                            <xhtml:img src="../../apps/fr/style/add.gif" alt="Create"/>
-                            <xhtml:span><xforms:output ref="$fr-resources/summary/labels/new-form"/></xhtml:span>
-                        </xforms:label>
-                        <xforms:dispatch ev:event="DOMActivate" target="fr-persistence-model" name="orbeon-create"/>
-                    </xforms:trigger>
-                    <xforms:trigger>
-                        <xforms:label>
-                            <xhtml:img src="../../apps/fr/style/run.gif" alt="Edit"/>
-                            <xhtml:span><xforms:output ref="$fr-resources/summary/labels/edit-form"/></xhtml:span>
-                        </xforms:label>
-                        <xforms:dispatch ev:event="DOMActivate" target="fr-persistence-model" name="orbeon-edit"/>
-                    </xforms:trigger>
-                    <xforms:trigger>
-                        <xforms:label>
-                            <xhtml:img src="../../apps/fr/style/lockedstate.gif" alt="Delete"/>
-                            <xhtml:span><xforms:output ref="$fr-resources/summary/labels/view-readonly"/></xhtml:span>
-                        </xforms:label>
-                        <xforms:dispatch ev:event="DOMActivate" target="fr-persistence-model" name="orbeon-view"/>
-                    </xforms:trigger>
-                    <xforms:trigger>
-                        <xforms:label>
-                            <xhtml:img src="../../apps/fr/style/delete.gif" alt="Delete"/>
-                            <xhtml:span><xforms:output ref="$fr-resources/summary/labels/delete-form"/></xhtml:span>
-                        </xforms:label>
-                        <xforms:dispatch ev:event="DOMActivate" target="fr-persistence-model" name="orbeon-delete"/>
-                    </xforms:trigger>
+                <!-- Custom buttons for the summary page -->
 
-                    <!--
-                    <xforms:trigger>
-                        <xforms:label>
-                            <xhtml:img src="../../apps/fr/style/lockedstate.gif" alt="View"/>
-                            <xforms:output ref="$fr-resources/summary/labels/view-readonly"/>
-                        </xforms:label>
-                        <xforms:dispatch ev:event="DOMActivate" target="fr-persistence-model" name="orbeon-view"/>
-                    </xforms:trigger>
+                <xhtml:div class="fr-buttons fr-summary-buttons">
+                    <xforms:group model="fr-form-model" appearance="xxforms:internal">
+                        <xforms:trigger ref="instance('fr-summary-triggers-instance')/new">
+                            <xforms:label>
+                                <xhtml:img src="../../apps/fr/style/add.gif" alt="Create"/>
+                                <xhtml:span><xforms:output ref="$fr-resources/summary/labels/new-form"/></xhtml:span>
+                            </xforms:label>
+                            <xforms:dispatch ev:event="DOMActivate" target="fr-form-model" name="orbeon-create"/>
+                        </xforms:trigger>
+                        <xforms:trigger ref="instance('fr-summary-triggers-instance')/edit">
+                            <xforms:label>
+                                <xhtml:img src="../../apps/fr/style/run.gif" alt="Edit"/>
+                                <xhtml:span><xforms:output ref="$fr-resources/summary/labels/edit-form"/></xhtml:span>
+                            </xforms:label>
+                            <xforms:dispatch ev:event="DOMActivate" target="fr-form-model" name="orbeon-edit"/>
+                        </xforms:trigger>
+                        <xforms:trigger ref="instance('fr-summary-triggers-instance')/edit">
+                            <xforms:label>
+                                <xhtml:img src="../../apps/fr/style/lockedstate.gif" alt="Delete"/>
+                                <xhtml:span><xforms:output ref="$fr-resources/summary/labels/view-readonly"/></xhtml:span>
+                            </xforms:label>
+                            <xforms:dispatch ev:event="DOMActivate" target="fr-form-model" name="orbeon-view"/>
+                        </xforms:trigger>
+                        <xforms:trigger ref="instance('fr-summary-triggers-instance')/delete">
+                            <xforms:label>
+                                <xhtml:img src="../../apps/fr/style/delete.gif" alt="Delete"/>
+                                <xhtml:span><xforms:output ref="$fr-resources/summary/labels/delete-form"/></xhtml:span>
+                            </xforms:label>
+                            <xforms:dispatch ev:event="DOMActivate" target="fr-form-model" name="orbeon-delete"/>
+                        </xforms:trigger>
+                    </xforms:group>
+
+                    <!-- TODO
                     <xforms:trigger>
                         <xforms:label>
                             <xhtml:img src="../../apps/fr/style/view-xml.gif" alt="XML"/>
@@ -290,25 +453,5 @@
             </fr:buttons>
 
         </fr:view>
-
-        <!--<table class="forms-action-table">-->
-            <!--<tr>-->
-                <!--<td>-->
-                    <!--<xforms:group ref="instance('control-instance')/empty-triggers">-->
-                        <!--<xforms:action ev:event="DOMActivate">-->
-                            <!--<xforms:send submission="import-documents-submission"/>-->
-                            <!--<xforms:send submission="list-documents-submission"/>-->
-                        <!--</xforms:action>-->
-                        <!--<xforms:trigger appearance="minimal" ref=".">-->
-                            <!--<xforms:label>-->
-                                <!--<xhtml:img src="../apps/forms/images/add-all.gif" alt="Import Forms"/>-->
-                                <!--<xforms:output ref="$fr-resources/summary/labels/import-forms"/>-->
-                            <!--</xforms:label>-->
-                        <!--</xforms:trigger>-->
-                    <!--</xforms:group>-->
-                <!--</td>-->
-            <!--</tr>-->
-        <!--</table>-->
-
     </body>
 </html>

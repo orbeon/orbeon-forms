@@ -1015,8 +1015,9 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                         for (Iterator j = eventHandlers.iterator(); j.hasNext();) {
                             final XFormsEventHandler eventHandler = (XFormsEventHandler) j.next();
 
-                            if (!eventHandler.isPhase() && eventHandler.getEventName().equals(event.getEventName())
-                                    && (eventHandler.getTargetId() == null || eventHandler.getTargetId().equals(event.getTargetObject().getId()))) {
+                            if (!eventHandler.isBubblingPhase()
+                                    && eventHandler.isMatchEventName(event.getEventName())
+                                    && eventHandler.isMatchTarget(event.getTargetObject().getId())) {
                                 // Capture phase match on event name and target is specified
                                 startHandleEvent(event);
                                 try {
@@ -1025,7 +1026,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                                     endHandleEvent();
                                 }
                                 propagate &= eventHandler.isPropagate();
-                                performDefaultAction &= eventHandler.isDefaultAction();
+                                performDefaultAction &= eventHandler.isPerformDefaultAction();
                             }
                         }
                         // Cancel propagation if requested and if authorized by event
@@ -1048,8 +1049,9 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                         for (Iterator j = eventHandlers.iterator(); j.hasNext();) {
                             final XFormsEventHandler eventHandler = (XFormsEventHandler) j.next();
 
-                            if (eventHandler.isPhase() && eventHandler.getEventName().equals(event.getEventName())
-                                    && (eventHandler.getTargetId() == null || eventHandler.getTargetId().equals(event.getTargetObject().getId()))) {
+                            if (eventHandler.isBubblingPhase()
+                                    && eventHandler.isMatchEventName(event.getEventName())
+                                    && eventHandler.isMatchTarget(event.getTargetObject().getId())) {
                                 // Bubbling phase match on event name and target is specified
                                 startHandleEvent(event);
                                 try {
@@ -1058,7 +1060,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                                     endHandleEvent();
                                 }
                                 propagate &= eventHandler.isPropagate();
-                                performDefaultAction &= eventHandler.isDefaultAction();
+                                performDefaultAction &= eventHandler.isPerformDefaultAction();
                             }
                         }
                         // Cancel propagation if requested and if authorized by event

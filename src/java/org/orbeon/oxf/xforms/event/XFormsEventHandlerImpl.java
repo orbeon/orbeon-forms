@@ -31,33 +31,67 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
     private Element eventHandlerElement;
     private String containerId;
 
-    private String eventName;
+    private Map eventNames;
     private String[] observerIds;
-    private String targetId;
+    private Map targetIds;
     //private String handler;
-    private boolean phase;          // "true" means "default" (bubbling), "false" means "capture"
-    private boolean propagate;      // "true" means "continue", "false" means "stop"
-    private boolean defaultAction;  // "true" means "perform", "false" means "cancel"
+    private boolean isBubblingPhase;        // "true" means "default" (bubbling), "false" means "capture"
+    private boolean isPropagate;            // "true" means "continue", "false" means "stop"
+    private boolean isPerformDefaultAction; // "true" means "perform", "false" means "cancel"
 
-    public XFormsEventHandlerImpl(Element eventHandlerElement, String containerId, String[] observerIds) {
+    public XFormsEventHandlerImpl(Element eventHandlerElement, String containerId) {
+
         this.eventHandlerElement = eventHandlerElement;
         this.containerId = containerId;
 
-        this.observerIds = observerIds;
-        this.eventName = eventHandlerElement.attributeValue(XFormsConstants.XML_EVENTS_EVENT_ATTRIBUTE_QNAME);
-        this.targetId = eventHandlerElement.attributeValue(XFormsConstants.XML_EVENTS_TARGET_ATTRIBUTE_QNAME);
+        // Gather observers
+        // NOTE: Supporting space-separated handlers is an extension
+        {
+            final String observerAttribute = eventHandlerElement.attributeValue(XFormsConstants.XML_EVENTS_OBSERVER_ATTRIBUTE_QNAME);
+            if (observerAttribute == null) {
+                observerIds = new String[] { containerId };
+            } else {
+                observerIds = StringUtils.split(observerAttribute);
+            }
+        }
+
+        // Gather event names
+        // NOTE: Supporting space-separated event names is an extension
+        {
+            final String eventAttribute = eventHandlerElement.attributeValue(XFormsConstants.XML_EVENTS_EVENT_ATTRIBUTE_QNAME);
+            eventNames = new HashMap();
+            final String[] eventNamesArray = StringUtils.split(eventAttribute);
+            for (int i = 0; i < eventNamesArray.length; i++) {
+                eventNames.put(eventNamesArray[i], "");
+            }
+        }
+
+        // Gather target ids
+        // NOTE: Supporting space-separated target ids is an extension
+        {
+            final String targetAttribute = eventHandlerElement.attributeValue(XFormsConstants.XML_EVENTS_TARGET_ATTRIBUTE_QNAME);
+            if (targetAttribute == null) {
+                targetIds = null;
+            } else {
+                targetIds = new HashMap();
+                final String[] targetIdsArray = StringUtils.split(targetAttribute);
+                for (int i = 0; i < targetIdsArray.length; i++) {
+                    targetIds.put(targetIdsArray[i], "");
+                }
+            }
+        }
 
         {
             final String captureString = eventHandlerElement.attributeValue(XFormsConstants.XML_EVENTS_PHASE_ATTRIBUTE_QNAME);
-            this.phase = !"capture".equals(captureString);
+            this.isBubblingPhase = !"capture".equals(captureString);
         }
         {
             final String propagateString = eventHandlerElement.attributeValue(XFormsConstants.XML_EVENTS_PROPAGATE_ATTRIBUTE_QNAME);
-            this.propagate = !"stop".equals(propagateString);
+            this.isPropagate = !"stop".equals(propagateString);
         }
         {
             final String defaultActionString = eventHandlerElement.attributeValue(XFormsConstants.XML_EVENTS_DEFAULT_ACTION_ATTRIBUTE_QNAME);
-            this.defaultAction = !"cancel".equals(defaultActionString);
+            this.isPerformDefaultAction = !"cancel".equals(defaultActionString);
         }
     }
 
@@ -88,19 +122,8 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
                     if (eventHandlersMap == null)
                         eventHandlersMap = new HashMap();
 
-                    // Get observers
-                    // NOTE: Supporting space-separated handlers is an extension of XML Events
-                    final String[] observerIds;
-                    {
-                        final String observerIdAttribute = currentElement.attributeValue(XFormsConstants.XML_EVENTS_OBSERVER_ATTRIBUTE_QNAME);
-                        if (observerIdAttribute == null) {
-                            observerIds = new String[] { containerIdAttribute };
-                        } else {
-                            observerIds = StringUtils.split(observerIdAttribute);
-                        }
-                    }
-
-                    final XFormsEventHandlerImpl newEventHandlerImpl = new XFormsEventHandlerImpl(currentElement, containerIdAttribute, observerIds);
+                    final XFormsEventHandlerImpl newEventHandlerImpl = new XFormsEventHandlerImpl(currentElement, containerIdAttribute);
+                    final String[] observerIds = newEventHandlerImpl.getObserverIds();
                     for (int j = 0; j < observerIds.length; j++) {
                         final String currentObserverId = observerIds[j];
                         // Get handlers for observer
@@ -134,27 +157,28 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
                 .runAction(pipelineContext, event.getTargetObject().getEffectiveId(), eventHandlerContainer, eventHandlerElement);
     }
 
-    public String getEventName() {
-        return eventName;
-    }
-
     public String[] getObserverIds() {
         return observerIds;
     }
 
-    public String getTargetId() {
-        return targetId;
-    }
-
-    public boolean isPhase() {
-        return phase;
+    public boolean isBubblingPhase() {
+        return isBubblingPhase;
     }
 
     public boolean isPropagate() {
-        return propagate;
+        return isPropagate;
     }
 
-    public boolean isDefaultAction() {
-        return defaultAction;
+    public boolean isPerformDefaultAction() {
+        return isPerformDefaultAction;
+    }
+
+    public boolean isMatchEventName(String eventName) {
+        return eventNames.get(eventName) != null;
+    }
+
+    public boolean isMatchTarget(String targetId) {
+        // Match if no target id is specified, or if any specifed target matches
+        return targetIds == null || targetIds.get(targetId) != null;
     }
 }

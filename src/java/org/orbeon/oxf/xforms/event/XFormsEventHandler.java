@@ -20,12 +20,14 @@ import org.orbeon.oxf.xforms.XFormsContainingDocument;
  * Represent an XForms event handler.
  */
 public interface XFormsEventHandler {
-    public String getEventName();
-    public String[] getObserverIds();
-    public String getTargetId();
-    public boolean isPhase();
+
+    public boolean isBubblingPhase();
     public boolean isPropagate();
-    public boolean isDefaultAction();
+    public boolean isPerformDefaultAction();
+
+    public String[] getObserverIds();
+    public boolean isMatchEventName(String eventName);
+    public boolean isMatchTarget(String targetId);
 
     public void handleEvent(PipelineContext pipelineContext, XFormsContainingDocument containingDocument,
                             XFormsEventHandlerContainer eventHandlerContainer, XFormsEvent event);

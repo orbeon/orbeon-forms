@@ -565,6 +565,13 @@
                     [TODO: describe Orbeon Forms support for event() function for each event]
                 </p>
             </section>
+            <a name="xforms-select-deselect"/>
+            <section>
+                <title>Enhanced Support for <code>xforms-select</code> and <code>xforms-deselect</code></title>
+                <p>
+                    [TODO: describe support for these events on xforms:upload]
+                </p>
+            </section>
             <a name="xpath-extensions"/>
             <section>
                 <title>XPath Extension Functions</title>
@@ -2014,21 +2021,52 @@
                                            replace="instance" xxforms:instance="my-instance"/>
                     </xml-source>
                 </section>
-                <a name="events-multiple-observers"/>
+                <a name="events-multiple"/>
                 <section>
-                    <title>Multiple Observers on Event Handlers</title>
+                    <title>Multiple Event Names, Observers and Targets on Event Handlers</title>
                     <p>
-                        The <code>ev:observer</code> attribute, defined by the <a
-                        href="http://www.w3.org/TR/xml-events/">XML Events specification</a>, only supports one
-                        observer. Orbeon Forms supports as an extension a list of space-separated observer identifiers.
-                        The behavior is that the event handler is attached to all the observers specified:
+                        The <code>ev:event</code>, <code>ev:observer</code> and <code>ev:target</code> attributes,
+                        defined by the <a href="http://www.w3.org/TR/xml-events/">XML Events specification</a>, only
+                        support one event name, observer, or target respectively. Orbeon Forms supports as an extension
+                        a list of space-separated values. The behavior is as follows:
                     </p>
-                    <xml-source>
-                        <xforms:action ev:event="DOMActivate" ev:observer="my-input my-trigger">
-                            <comment> Observing both the "my-input" and "my-trigger" controls </comment>
-                            ...
-                        </xforms:action>
-                    </xml-source>
+                    <ul>
+                        <li>
+                            <p>
+                                For <code>ev:event</code>: the handler is called if any of the specified events matches.
+                            </p>
+                            <xml-source>
+                                <xforms:action ev:event="DOMFocusIn DOMFocusOut">
+                                    <comment> Reacting to either the "DOMFocusIn" and "DOMFocusOut" events </comment>
+                                    ...
+                                </xforms:action>
+                            </xml-source>
+                        </li>
+                        <li>
+                            <p>
+                                For <code>ev:observer</code>: the event handler is attached to all the observers
+                                specified.
+                            </p>
+                            <xml-source>
+                                <xforms:action ev:event="DOMActivate" ev:observer="my-input my-trigger">
+                                    <comment> Observing both the "my-input" and "my-trigger" controls </comment>
+                                    ...
+                                </xforms:action>
+                            </xml-source>
+                        </li>
+                        <li>
+                            <p>
+                                For <code>ev:target</code>: the handler is called if any of the specified targets
+                                matches.
+                            </p>
+                            <xml-source>
+                                <xforms:action ev:event="xforms-submit-done" ev:target="create-submission update-submission">
+                                    <comment> Checking that either the "create-submission" and "update-submission" controls is a target </comment>
+                                    ...
+                                </xforms:action>
+                            </xml-source>
+                        </li>
+                    </ul>
                     <p>
                         This feature has been <a
                         href="http://lists.w3.org/Archives/Public/www-html-editor/2008JanMar/0012.html">requested</a>

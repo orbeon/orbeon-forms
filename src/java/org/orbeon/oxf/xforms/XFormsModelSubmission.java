@@ -79,7 +79,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
     private boolean relevant = true;
 
     private String serialization;
-    private boolean serialize = true;// for backward compability only
+    private boolean serialize = true;// for backward compability only (was in XForms 1.1 draft)
 
     private String version;
     private boolean indent;

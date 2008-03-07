@@ -2364,4 +2364,58 @@
         </output>
     </test>
 
+    <test description="variable slot allocation bug" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-server-init.xpl"/>
+                    <p:input name="document">
+                        <xhtml:html>
+                            <xhtml:head>
+                                <xhtml:title>Bug</xhtml:title>
+                                <xforms:model xxforms:state-handling="client">
+                                    <xforms:instance xxforms:readonly="true">
+                                        <fruits>
+                                            <orange>bloody</orange>
+                                            <orange>valencia</orange>
+                                            <apple>green</apple>
+                                            <apple>red</apple>
+                                            <apple>iPod</apple>
+                                            <pear>green</pear>
+                                            <pear>williams</pear>
+                                            <pear>yellow</pear>
+                                        </fruits>
+                                    </xforms:instance>
+                                </xforms:model>
+                            </xhtml:head>
+                            <xhtml:body>
+                                <!-- This test ensures we do not regress with a bug in local variable allocation in XPathCache -->
+                                <xxforms:variable name="my-variable" select="orange"/>
+                                <xforms:output value="string-join(for $foo in pear return concat($foo, '-', $my-variable[1]), ', ') "/>
+                            </xhtml:body>
+                        </xhtml:html>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+
+            </p:config>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances/>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="xforms-element-4" relevant="true">green-bloody, williams-bloody, yellow-bloody</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>

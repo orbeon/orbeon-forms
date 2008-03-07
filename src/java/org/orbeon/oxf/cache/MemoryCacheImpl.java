@@ -71,7 +71,7 @@ public class MemoryCacheImpl implements Cache {
     };
 
     public synchronized void add(PipelineContext pipelineContext, CacheKey key, Object validity, Object object) {
-        if (key == null || validity == null) return;
+        if (key == null || validity == null || maxSize == 0) return;
         final MemoryCacheStatistics statistics = (pipelineContext != null) ? (MemoryCacheStatistics) getStatistics(pipelineContext) : null;
         if (statistics != null)
             statistics.incrementAddCount();

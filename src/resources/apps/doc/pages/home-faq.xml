@@ -328,13 +328,32 @@
             <section added="2007-06-06">
                 <title>Is there a list of known issues?</title>
                 <p>
-                    Yes. You find it on the OW2 site, <a
-                    href="http://forge.objectweb.org/tracker/index.php?set=custom&amp;_assigned_to=0&amp;_status=1&amp;_category=100&amp;_group=100&amp;_sort_col=priority&amp;_sort_ord=DESC&amp;submit=Browse&amp;atid=350207&amp;group_id=168&amp;func=browse">here
-                    ordered by descending priority</a> and
-                    <a
-                    href="http://forge.objectweb.org/tracker/index.php?set=custom&amp;_assigned_to=0&amp;_status=1&amp;_category=100&amp;_group=100&amp;_sort_col=open_date&amp;_sort_ord=DESC&amp;submit=Browse&amp;atid=350207&amp;group_id=168&amp;func=browse">here
-                    by opening date</a> (both these links are better than the default order provided by the tracker).
+                    Yes. You find it on the OW2 site:
                 </p>
+                <ul>
+                    <li>
+                        <p>
+                            All <b>open</b> issues <a
+                            href="http://forge.objectweb.org/tracker/index.php?set=custom&amp;_assigned_to=0&amp;_status=1&amp;_category=100&amp;_group=100&amp;_sort_col=open_date&amp;_sort_ord=DESC&amp;submit=Browse&amp;atid=350207&amp;group_id=168&amp;func=browse">
+                            ordered by descending opening date</a>
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            All <b>open</b> issues <a
+                            href="http://forge.objectweb.org/tracker/index.php?set=custom&amp;_assigned_to=0&amp;_status=1&amp;_category=100&amp;_group=100&amp;_sort_col=priority&amp;_sort_ord=DESC&amp;submit=Browse&amp;atid=350207&amp;group_id=168&amp;func=browse">
+                            ordered by descending priority</a>
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            All <b>closed</b> issues
+                            <a
+                            href="http://forge.objectweb.org/tracker/index.php?set=custom&amp;_assigned_to=0&amp;_status=2&amp;_category=100&amp;_group=100&amp;_sort_col=close_date&amp;_sort_ord=DESC&amp;submit=Browse&amp;atid=350207&amp;group_id=168&amp;func=browse">
+                            ordered by descending closing date</a>
+                        </p>
+                    </li>
+                </ul>
                 <p>
                     Note that we put bugs and requests for enhancement (RFEs) in the same tracker category, and just
                     prefix RFE descriptions with the string "RFE:".

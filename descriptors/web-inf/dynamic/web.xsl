@@ -183,10 +183,10 @@
                 <xsl:with-param name="commented" select="$target = 'war'"/>
                 <xsl:with-param name="content">
                     <listener>
-                        <listener-class>org.orbeon.oxf.webapp.OPSServletContextListener</listener-class>
+                        <listener-class>org.orbeon.oxf.webapp.OPSServletContextListenerDelegate</listener-class>
                     </listener>
                     <listener>
-                        <listener-class>org.orbeon.oxf.webapp.OPSSessionListener</listener-class>
+                        <listener-class>org.orbeon.oxf.webapp.OPSSessionListenerDelegate</listener-class>
                     </listener>
                 </xsl:with-param>
             </xsl:call-template>
@@ -194,7 +194,7 @@
             <!--
             <servlet>
                 <servlet-name>ops-xhtml-xforms-servlet</servlet-name>
-                <servlet-class>org.orbeon.oxf.servlet.OPSServlet</servlet-class>
+                <servlet-class>org.orbeon.oxf.servlet.OPSServletDelegate</servlet-class>
                 <init-param>
                     <param-name>oxf.main-processor.name</param-name>
                     <param-value>{http://www.orbeon.com/oxf/processors}pipeline</param-value>
@@ -223,7 +223,7 @@
             <xsl:comment> This is the main Orbeon Forms servlet </xsl:comment>
             <servlet>
                 <servlet-name>ops-main-servlet</servlet-name>
-                <servlet-class>org.orbeon.oxf.servlet.OPSServlet</servlet-class>
+                <servlet-class>org.orbeon.oxf.servlet.OPSServletDelegate</servlet-class>
                 <xsl:comment> Set main processor </xsl:comment>
                 <init-param>
                     <param-name>oxf.main-processor.name</param-name>
@@ -276,7 +276,7 @@
             <xsl:comment> This is the XForms Server servlet </xsl:comment>
             <servlet>
                 <servlet-name>ops-xforms-server-servlet</servlet-name>
-                <servlet-class>org.orbeon.oxf.servlet.OPSServlet</servlet-class>
+                <servlet-class>org.orbeon.oxf.servlet.OPSServletDelegate</servlet-class>
                 <xsl:comment> Set main processor </xsl:comment>
                 <init-param>
                     <param-name>oxf.main-processor.name</param-name>
@@ -301,7 +301,7 @@
             <xsl:comment> This is the XForms Renderer servlet, used to deploy Orbeon Forms as a separate WAR </xsl:comment>
             <servlet>
                 <servlet-name>ops-renderer-servlet</servlet-name>
-                <servlet-class>org.orbeon.oxf.servlet.OPSServlet</servlet-class>
+                <servlet-class>org.orbeon.oxf.servlet.OPSServletDelegate</servlet-class>
                 <xsl:comment> Set main processor </xsl:comment>
                 <init-param>
                     <param-name>oxf.main-processor.name</param-name>
@@ -476,7 +476,8 @@
             </xsl:call-template>
 
             <session-config>
-                <session-timeout>30</session-timeout>
+                <!-- 12 * 60 = 12 hours -->
+                <session-timeout>720</session-timeout>
             </session-config>
 
         </web-app>

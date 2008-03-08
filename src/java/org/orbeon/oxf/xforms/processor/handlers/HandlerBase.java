@@ -113,7 +113,7 @@ public abstract class HandlerBase extends ElementHandler {
                     sb.append(' ');
                 sb.append("xforms-required");
                 if (xformsControl instanceof XFormsValueControl) {
-                    if ("".equals(((XFormsValueControl) xformsControl).getValue()))
+                    if (isEmpty(xformsControl))
                         sb.append(" xforms-required-empty");
                     else
                         sb.append(" xforms-required-filled");
@@ -135,6 +135,11 @@ public abstract class HandlerBase extends ElementHandler {
                 sb.append(' ');
             sb.append("xforms-disabled");
         }
+    }
+
+    private static boolean isEmpty(XFormsControl xformsControl) {
+        // TODO: Configure meaning of "empty" through property (trimming vs. no strict) 
+        return xformsControl instanceof XFormsValueControl && "".equals(((XFormsValueControl) xformsControl).getValue());
     }
 
     public static boolean isDateOrTime(String type) {
@@ -389,7 +394,7 @@ public abstract class HandlerBase extends ElementHandler {
 
             // Handle alert state
             if (isAlert) {
-                if (!handlerContext.isGenerateTemplate() && xformsControl != null && !xformsControl.isValid())
+                if (!handlerContext.isGenerateTemplate() && xformsControl != null && (!xformsControl.isValid() || xformsControl.isRequired() && isEmpty(xformsControl)))
                     classes.append(" xforms-alert-active");
                 else
                     classes.append(" xforms-alert-inactive");

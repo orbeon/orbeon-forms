@@ -140,6 +140,7 @@
 /* Prevent display of border when static read-only */
 .xforms-static { border: none }
 
+/*
 .xforms-required-empty input, textarea.xforms-required-empty, input.xforms-required-empty {
     border: 1px solid #f99;
     background-color: #fcc;
@@ -155,6 +156,11 @@ span.xforms-select-appearance-full.xforms-required-empty, span.xforms-select1-ap
 span.xforms-select-appearance-full.xforms-required-empty input, span.xforms-select1-appearance-full.xforms-required-empty input {
     border: none
 }
+
+select.xforms-required-empty {
+    background-color: #fcc;
+}
+*/
 
 .xforms-select1-appearance-full input { vertical-align: middle }
 .xforms-select1-appearance-full label { vertical-align: middle; margin-right: .5em }
@@ -261,10 +267,6 @@ span.xforms-select-appearance-full.xforms-required-empty input, span.xforms-sele
 .xforms-dialog-appearance-minimal { visibility:hidden; border: 1px outset #eef; }
 .xforms-dialog-appearance-minimal div { border: 0; padding: 5px; background-color: #dde; margin: 0; }
 .xforms-dialog-appearance-minimal div div { padding: 3px; background-color: #fff }
-
-select.xforms-required-empty {
-    background-color: #fcc;
-}
 
 /* Reasonable defaults for alignment of button content */
 button.xforms-trigger img { vertical-align: middle }

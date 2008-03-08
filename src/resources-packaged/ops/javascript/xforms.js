@@ -776,15 +776,21 @@ ORBEON.xforms.Controls = {
         ORBEON.xforms.Controls._setTooltipMessage(control, message, ORBEON.xforms.Globals.helpTooltipForControl);
     },
 
-    setValid: function(control, isValid) {
+    setValid: function(control, newValid, isRequiredEmpty) {
         // Update class xforms-invalid on the control
-        if (isValid) ORBEON.util.Dom.removeClass(control, "xforms-invalid");
-        else ORBEON.util.Dom.addClass(control, "xforms-invalid");
+        var isValid;
+        if (newValid != null) {
+            isValid = newValid != "false";
+            if (isValid) ORBEON.util.Dom.removeClass(control, "xforms-invalid");
+            else ORBEON.util.Dom.addClass(control, "xforms-invalid");
+        } else {
+            isValid = ORBEON.xforms.Controls.isValid(control);
+        }
 
         // Update class on alert label
         var alertElement = ORBEON.xforms.Controls._getControlLabel(control, "xforms-alert");
         if (alertElement != null) { // Some controls don't have validity indicator
-            if (isValid) {
+            if (isValid && !isRequiredEmpty) {
                 ORBEON.util.Dom.removeClass(alertElement, "xforms-alert-active");
                 ORBEON.util.Dom.addClass(alertElement, "xforms-alert-inactive");
             } else {
@@ -940,13 +946,16 @@ ORBEON.xforms.Controls = {
             if (ORBEON.xforms.Controls.getCurrentValue(control) == "") {
                 ORBEON.util.Dom.addClass(control, "xforms-required-empty");
                 ORBEON.util.Dom.removeClass(control, "xforms-required-filled");
+                return true;
             } else {
                 ORBEON.util.Dom.addClass(control, "xforms-required-filled");
                 ORBEON.util.Dom.removeClass(control, "xforms-required-empty");
+                return false;
             }
         } else {
             ORBEON.util.Dom.removeClass(control, "xforms-required-filled");
             ORBEON.util.Dom.removeClass(control, "xforms-required-empty");
+            return false;
         }
     },
 
@@ -1325,7 +1334,8 @@ ORBEON.xforms.Events = {
             }
 
             // If value is required, add/remove xforms-required-empty appropriately
-            ORBEON.xforms.Controls.updateRequiredEmpty(target);
+            // NOTE: Don't do this anymore, as this can now show an alert, which may be outdated before the next Ajax response 
+            //ORBEON.xforms.Controls.updateRequiredEmpty(target);
 
             // Resize wide text area
             if (ORBEON.util.Dom.hasClass(target, "xforms-textarea-appearance-xxforms-autosize")) {
@@ -1378,7 +1388,8 @@ ORBEON.xforms.Events = {
             }
 
             // Alert tooltip
-            if (ORBEON.util.Dom.hasClass(target, "xforms-alert-active")) {
+            if (ORBEON.util.Dom.hasClass(target, "xforms-alert-active")
+                    && ! ORBEON.util.Dom.hasClass(document.body, "xforms-disable-alert-as-tooltip")) {
                 var control = ORBEON.util.Dom.getElementById(target.htmlFor);
                 if (ORBEON.xforms.Globals.alertTooltipForControl[control.id] == null) {
                     var message = ORBEON.xforms.Controls.getAlertMessage(control);
@@ -3427,8 +3438,11 @@ ORBEON.xforms.Server = {
 
                                                 // Update the required-empty/required-full even if the required has not changed or
                                                 // is not specified as the value may have changed
+                                                var isRequiredEmpty;
                                                 if (!isStaticReadonly) {
-                                                    ORBEON.xforms.Controls.updateRequiredEmpty(documentElement);
+                                                    isRequiredEmpty = ORBEON.xforms.Controls.updateRequiredEmpty(documentElement);
+                                                } else {
+                                                    isRequiredEmpty = false;
                                                 }
 
                                                 // Store new label message in control attribute
@@ -3449,10 +3463,7 @@ ORBEON.xforms.Server = {
                                                     ORBEON.xforms.Controls.setAlertMessage(documentElement, newAlert);
                                                 // Store validity, label, hint, help in element
                                                 var newValid = ORBEON.util.Dom.getAttribute(controlElement, "valid");
-                                                if (newValid != null) {
-                                                    var newIsValid = newValid != "false";
-                                                    ORBEON.xforms.Controls.setValid(documentElement, newIsValid);
-                                                }
+                                                ORBEON.xforms.Controls.setValid(documentElement, newValid, isRequiredEmpty);
 
                                                 // After we update classes on textarea, copy those classes on the FCKeditor iframe
                                                 if (ORBEON.util.Dom.hasClass(documentElement, "xforms-textarea")

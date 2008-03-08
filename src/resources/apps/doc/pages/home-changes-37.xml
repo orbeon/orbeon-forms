@@ -188,6 +188,19 @@
                     </li>
                     <li>
                         <p>
+                            <b>Change to handling of alerts.</b> In XForms the behavior of <code>xforms:alert</code>
+                            is not built-in. Instead, the behavior was initially planned to be controlled through CSS.
+                            Previous versions of Orbeon Forms displayed an alert icon and message (if provided) only if
+                            the value associated with the control was invalid. Orbeon Forms now by default shows the
+                            control in alert state when the value is invalid, but also when it is required but empty.
+                        </p>
+                        <p>
+                            See <a href="reference-xforms-ng#context-attribute">Generalized <code>context</code>
+                            attribute</a> for the documentation.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
                             <b>Outputting server log messages with <code>xforms:message</code>.</b>
                             <code>xforms:message</code> supports new level values: <code>xxforms:log-debug</code>,
                             <code>xxforms:log-info</code>, <code>xxforms:log-warn</code> and

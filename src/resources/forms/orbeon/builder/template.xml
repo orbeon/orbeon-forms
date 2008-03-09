@@ -59,8 +59,8 @@
                         <control-1>
                             <label>[Please give this control a title]</label>
                             <hint>[Please modify the hint]</hint>
-                            <help>[Please modify the help]</help>
-                            <alert>[Please modify the alert]</alert>
+                            <help/>
+                            <alert>The value of this field is incorrect</alert>
                         </control-1>
                     </resource>
                 </resources>

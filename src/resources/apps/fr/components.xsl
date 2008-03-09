@@ -25,6 +25,14 @@
 
     <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
 
+    <xsl:template match="xhtml:body">
+        <xsl:copy>
+            <xsl:attribute name="class" select="string-join(('xforms-disable-hint-as-tooltip', 'xforms-disable-alert-as-tooltip', @class), ' ')"/>
+            <xsl:apply-templates select="@* except @class | node()"/>
+            <widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>
+        </xsl:copy>
+    </xsl:template>
+
     <xsl:template match="xhtml:body//fr:view">
 
         <!-- Scope variable with Form Runner resources -->
@@ -134,8 +142,8 @@
                                         </xhtml:tr>
                                         <xhtml:tr>
                                             <xhtml:td>
-                                                <xforms:group ref=".[instance('fr-persistence-instance')/save-attempted = 'true']">
-                                                    <xforms:group model="fr-error-summary-model" ref="instance('fr-errors-instance')[error]">
+                                                <xforms:group ref=".">
+                                                    <xforms:group model="fr-error-summary-model" ref="instance('fr-errors-instance')[error[@id = instance('fr-visited-instance')/control/@id]]">
                                                         <!-- TODO: i18n -->
                                                         <xhtml:span class="fr-error-title">Your document has the following issues:</xhtml:span>
                                                         <xhtml:ol class="fr-error-list">

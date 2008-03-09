@@ -295,6 +295,18 @@ th, td {border: 0; padding: 0 }
 /* Not sure why the YUI resets this to center */
 body { text-align: left }
 
+/* Display alerts under each control */
+.xforms-alert-active {
+    display: block;
+    font-size: smaller;
+    font-weight: bold;
+    margin-left: .5em;
+    width: 22em;
+    color: red;
+    text-indent: 0;
+    background-image: none
+}
+
 /* Display hints under each control */
 .xforms-hint {
     display: block;

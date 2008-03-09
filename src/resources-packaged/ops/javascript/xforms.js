@@ -3309,16 +3309,18 @@ ORBEON.xforms.Server = {
                                                     if (type == "{http://www.w3.org/2001/XMLSchema}date" || type == "{http://www.w3.org/2002/xforms}date") {
 //                                                         for (var childIndex = 0; childIndex < documentElement.childNodes.length; childIndex++) {
 //                                                             var child = documentElement.childNodes[childIndex];
-                                                              ORBEON.util.Dom.addClass(documentElement, "xforms-type-date");
-                                                              ORBEON.util.Dom.removeClass(documentElement, "xforms-type-string");
+                                                        ORBEON.util.Dom.addClass(documentElement, "xforms-type-date");
+                                                        ORBEON.util.Dom.removeClass(documentElement, "xforms-type-string");
 //                                                            }
                                                     } else if (type != null && type != "{http://www.w3.org/2001/XMLSchema}date" && type != "{http://www.w3.org/2002/xforms}date") {
 //                                                            for (var childIndex = 0; childIndex < documentElement.childNodes.length; childIndex++) {
 //                                                                var child = documentElement.childNodes[childIndex];
 //                                                                ORBEON.util.Dom.addClass(documentElement, "xforms-type-string");
-                                                                ORBEON.util.Dom.removeClass(documentElement, "xforms-type-date");
+                                                        ORBEON.util.Dom.removeClass(documentElement, "xforms-type-date");
 //                                                            }
-                                                        }
+                                                        var dateDisplayElement = ORBEON.util.Dom.getChildElementByClass(documentElement, "xforms-date-display");
+                                                        ORBEON.util.Dom.setStringValue(dateDisplayElement, "");
+                                                    }
 
                                                         // Populate values
                                                         if (ORBEON.util.Dom.hasClass(documentElement, "xforms-type-date")) {

@@ -29,7 +29,7 @@
         <xsl:copy>
             <xsl:attribute name="class" select="string-join(('xforms-disable-hint-as-tooltip', 'xforms-disable-alert-as-tooltip', @class), ' ')"/>
             <xsl:apply-templates select="@* except @class | node()"/>
-            <widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>
+            <!--<widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>-->
         </xsl:copy>
     </xsl:template>
 

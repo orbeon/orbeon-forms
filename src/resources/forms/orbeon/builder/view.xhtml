@@ -131,7 +131,12 @@
 
             <!-- Control editor -->
             .fb-control-label .xforms-label { display: none }
-            .fb-control-label .fr-inplace-content { font-weight: bold }
+            .fb-control-label .fr-inplace-content {
+                font-weight: bold;
+                display: block;
+                margin-bottom: .2em;
+            }
+            
             .fb-control-label .fr-inplace-edit .xforms-alert { display: none }
             .fb-control-label .fr-inplace-view .fr-inplace-buttons { display: none }
             .fb-control-control .xforms-label { display: none }
@@ -146,8 +151,9 @@
             .fb-control-hint .fr-inplace-content {
                 font-size: smaller;
                 font-style: italic;
+                display: block;
                 margin-left: .5em;
-                width: 22em;
+                margin-top: .2em;
                 color: gray
             }
             .fb-control-hint .fr-inplace-view .fr-inplace-buttons { display: none }
@@ -162,46 +168,30 @@
 
             .fb-grid-table { width: 68em }
             .fb-grid-td { width: auto; vertical-align: top }
-            #fb-details-section .fb-grid-td .xforms-input input { width: 63.5em }
-            #fb-details-section .fb-grid-td textarea.xforms-textarea { width: 64em }
-            #fb-details-section .fb-grid-td .xforms-select1-appearance-minimal { width: 62em }
-            #fb-details-section .fb-grid-td .xforms-select1-appearance-full { width: 62em; display: block }
+            .fb-grid-td .xforms-alert { display: none }
+            .fb-grid-content { float: left }
+
+            .fb-grid-td .fb-grid-content { width: 64em }
+            #fb-details-section .fb-grid-td .xforms-input input { width: 100% }
+            #fb-details-section .fb-grid-td .fr-inplace-value { width: 100% }
+            #fb-details-section .fb-grid-td textarea.xforms-textarea { width: 100% }
+            #fb-details-section .fb-grid-td .xforms-select1-appearance-minimal { width: 100% }
+            #fb-details-section .fb-grid-td .xforms-select1-appearance-full { width: 100%; display: block }
             #fb-details-section .fb-grid-td .xforms-select1-appearance-full span { white-space: nowrap; display: block }
-            #fb-details-section .fb-grid-td .xforms-select1-appearance-compact { width: 62em; height: 6em }
-            <!--#fb-details-section .fb-grid-td .fr-inplace-edit .xforms-input input { width: 63em; }-->
-            .xforms-select-appearance-compact { width: 62em; height: 6em }
+            #fb-details-section .fb-grid-td .xforms-select1-appearance-compact { width: 100%; height: 6em }
+            #fb-details-section .fb-grid-td .xforms-select-appearance-compact { width: 100%; height: 6em }
 
             .fb-grid-2-columns .fb-grid-td { width: 50%; }
-            #fb-details-section .fb-grid-2-columns .fb-grid-td .xforms-input input { width: 30em; }
-            #fb-details-section .fb-grid-2-columns .fb-grid-td textarea.xforms-textarea { width: 30em; }
-            #fb-details-section .fb-grid-2-columns .fb-grid-td .xforms-select1-appearance-minimal { width: 28em }
-            #fb-details-section .fb-grid-2-columns .fb-grid-td .xforms-select1-appearance-full { width: 28em; display: block }
-            #fb-details-section .fb-grid-2-columns .fb-grid-td .xforms-select1-appearance-compact { width: 28em; height: 6em }
-            #fb-details-section .fb-grid-2-columns .fb-grid-td .xforms-select-appearance-compact { width: 28em; height: 6em }
-            <!--#fb-details-section .fb-grid-2-columns .fb-grid-td .fr-inplace-edit .xforms-input input { width: 29em; }-->
+            .fb-grid-2-columns .fb-grid-td .fb-grid-content { width: 30em }
 
             .fb-grid-3-columns .fb-grid-td { width: 33.3%; }
-            #fb-details-section .fb-grid-3-columns .fb-grid-td .xforms-input input { width: 18em; }
-            #fb-details-section .fb-grid-3-columns .fb-grid-td textarea.xforms-textarea { width: 19em; }
-            #fb-details-section .fb-grid-3-columns .fb-grid-td .xforms-select1-appearance-minimal { width: 17em }
-            #fb-details-section .fb-grid-3-columns .fb-grid-td .xforms-select1-appearance-full { width: 17em; display: block }
-            #fb-details-section .fb-grid-3-columns .fb-grid-td .xforms-select1-appearance-compact { width: 17em; height: 6em }
-            #fb-details-section .fb-grid-3-columns .fb-grid-td .xforms-select-appearance-compact { width: 17em; height: 6em }
-            <!--#fb-details-section .fb-grid-3-columns .fb-grid-td .fr-inplace-edit .xforms-input input { width: 18em; }-->
+            .fb-grid-3-columns .fb-grid-td .fb-grid-content { width: 18.6em }
 
             .fb-grid-4-columns .fb-grid-td { width: 25%; }
-            #fb-details-section .fb-grid-4-columns .fb-grid-td .xforms-input input { width: 13em; }
-            #fb-details-section .fb-grid-4-columns .fb-grid-td textarea.xforms-textarea { width: 13em; }
-            #fb-details-section .fb-grid-4-columns .fb-grid-td .xforms-select1-appearance-minimal { width: 11em }
-            #fb-details-section .fb-grid-4-columns .fb-grid-td .xforms-select1-appearance-full { width: 11em; display: block }
-            #fb-details-section .fb-grid-4-columns .fb-grid-td .xforms-select1-appearance-compact { width: 11em; height: 6em }
-            #fb-details-section .fb-grid-4-columns .fb-grid-td .xforms-select-appearance-compact { width: 11em; height: 6em }
-            <!--#fb-details-section .fb-grid-4-columns .fb-grid-td .fr-inplace-edit .xforms-input input { width: 12em; }-->
+            .fb-grid-4-columns .fb-grid-td .fb-grid-content { width: 13em }
 
             .fb-grid-cell-icons { width: 1em; text-align: center; margin-right: .2em; float: left }
             .fb-grid-cell-icons img { margin-bottom: .5em; padding: 0 }
-
-            .fb-grid-content { float: left }
 
             .xforms-repeat-selected-item-4 {
                 background-color: #F8F8F8;
@@ -217,7 +207,6 @@
 
             .fb-hide-alert .xforms-alert { display: none }
 
-            <!--.fb-section-title-content { background: #eee }-->
         </xhtml:style>
         <xforms:model id="fr-form-model">
 
@@ -247,6 +236,7 @@
                 <!-- Types -->
                 <xforms:bind nodeset="$form-instance">
                     <xforms:bind nodeset="*/*[name() = $model/xforms:bind/xforms:bind/xforms:bind[substring-after(@type, ':') = 'date']/@nodeset]" type="xs:date"/>
+                    <!--<xforms:bind nodeset="*/*[name() = $model/xforms:bind/xforms:bind/xforms:bind[substring-after(@type, ':') = 'boolean']/@nodeset]" type="xs:boolean"/>-->
                 </xforms:bind>
                 <!-- Metadata information -->
                 <xforms:bind nodeset="xhtml:head/xforms:model[@id = 'fr-form-model']/xforms:instance[@id = 'fr-form-metadata']/*">

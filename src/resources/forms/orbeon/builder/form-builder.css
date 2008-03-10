@@ -16,7 +16,7 @@
 /* Language toolbar */
 .fb-language-choice { display: block; float: right; }
 .fb-language-choice .xforms-select1 { width: 100% }
-.fb-language-choice .fb-language-triggers { display: block; witdh: 100%; text-align: right }
+.fb-language-choice .fb-language-triggers { display: block; width: 100%; text-align: right }
 
 /* Toolbox */
 .fb-toolbox { margin: .5em; padding: .5em; width: auto; background-color: #3598D4; text-align: center }
@@ -62,7 +62,7 @@
 }
 
 /* Highlighting of in-place outputs depending on hovering */
-/*.fr-inplace-content .xforms-output { background-color: #FFFFDD }-->
+/*.fr-inplace-content .xforms-output { background-color: #FFFFDD }*/
 .fr-inplace-content .xforms-output:hover { background-color: #FFFF88 }
 #fb-metadata-section:hover .fr-inplace-content .xforms-output { background-color: #FFFFDD }
 #fb-metadata-section:hover .fr-inplace-content .xforms-output:hover { background-color: #FFFF88 }

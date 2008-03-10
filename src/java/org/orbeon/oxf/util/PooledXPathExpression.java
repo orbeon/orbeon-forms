@@ -21,7 +21,6 @@ import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.expr.XPathContextMajor;
 import org.orbeon.saxon.instruct.SlotManager;
 import org.orbeon.saxon.om.Item;
-import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.om.ValueRepresentation;
 import org.orbeon.saxon.trans.IndependentContext;
@@ -116,7 +115,7 @@ public class PooledXPathExpression {
     /**
      * Evaluate the expression as a variable value usable by Saxon in further XPath expressions.
      */
-    public ValueRepresentation evaluateAsVariable(Object functionContext) throws XPathException {
+    public SequenceExtent evaluateAsExtent(Object functionContext) throws XPathException {
         final Item contextItem = (contextItems.size() > contextPosition - 1) ? (Item) contextItems.get(contextPosition - 1) : null;
         final XPathContextMajor xpathContext = new XPathContextMajor(contextItem, this.configuration);
         final SequenceIterator iter = evaluate(xpathContext, functionContext);

@@ -37,6 +37,7 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
         ALLOWED_XXFORMS_ELEMENTS.put("dialog", "");
         ALLOWED_XXFORMS_ELEMENTS.put("variable", "");
         ALLOWED_XXFORMS_ELEMENTS.put("attribute", "");
+        ALLOWED_XXFORMS_ELEMENTS.put("context", "");
 
         ALLOWED_XXFORMS_ELEMENTS.put("img", "");// deprecated
     }

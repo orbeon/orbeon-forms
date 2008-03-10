@@ -45,7 +45,7 @@ public class Variable {
 
         final List currentNodeset = bindingContext.getNodeset();
         if (currentNodeset != null && currentNodeset.size() > 0) {
-            variableValue = XPathCache.evaluateAsVariable(pipelineContext,
+            variableValue = XPathCache.evaluateAsExtent(pipelineContext,
                     currentNodeset, bindingContext.getPosition(),
                     selectAttribute, containingDocument.getNamespaceMappings(element), bindingContext.getInScopeVariables(useCache),
                     XFormsContainingDocument.getFunctionLibrary(), contextStack.getFunctionContext(), null, getLocationData());

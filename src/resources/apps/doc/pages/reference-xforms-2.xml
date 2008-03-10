@@ -565,6 +565,47 @@
                     [TODO: describe Orbeon Forms support for event() function for each event]
                 </p>
             </section>
+            <a name="dispatch-context"/>
+            <section>
+                <title>Enhanced <code>xforms:dispatch</code> Support</title>
+                <p>
+                    Orbeon Forms extends <code>xforms:dispatch</code> to support passing event context information to
+                    custom events, with the <code>xxforms:context</code> child element:
+                </p>
+                <xml-source>
+                    <xforms:dispatch name="rename-control" target="my-model">
+                        <xxforms:context name="control" select="my/control"/>
+                        <xxforms:context name="control-name" select="'beverage-selection'"/>
+                    </xforms:dispatch>
+                </xml-source>
+                <p>
+                    <code>xxforms:context</code> supports the following two attributes:
+                </p>
+                <table>
+                    <tr>
+                        <th><code>name</code></th>
+                        <td>Mandatory</td>
+                        <td>
+                            Name of the context attribute.
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><code>select</code></th>
+                        <td>Mandatory</td>
+                        <td>
+                            XPath 2.0 expression determining the value of the context attribute.
+                        </td>
+                    </tr>
+                </table>
+                <p>
+                    Context attribute passed this way can be retrieved using the <code>event()</code> function:
+                </p>
+                <xml-source>
+                    <xforms:action ev:event="rename-control">
+                        <xforms:setvalue ref="event('control')/@name" value="event('control-name')"/>
+                    </xforms:action>
+                </xml-source>
+            </section>
             <a name="xforms-select-deselect"/>
             <section>
                 <title>Enhanced Support for <code>xforms-select</code> and <code>xforms-deselect</code></title>

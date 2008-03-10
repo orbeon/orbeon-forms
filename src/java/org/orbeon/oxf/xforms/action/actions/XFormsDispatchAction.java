@@ -16,20 +16,22 @@ package org.orbeon.oxf.xforms.action.actions;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsControls;
-import org.orbeon.oxf.xforms.XFormsUtils;
-import org.orbeon.oxf.xforms.XFormsContextStack;
+import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEventFactory;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
+import org.orbeon.oxf.xforms.event.XFormsEvent;
+import org.orbeon.oxf.xforms.event.events.XFormsCustomEvent;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.saxon.om.Item;
+import org.orbeon.saxon.value.SequenceExtent;
 
 import java.util.Map;
+import java.util.Iterator;
 
 /**
  * 10.1.2 The dispatch Element
@@ -115,7 +117,36 @@ public class XFormsDispatchAction extends XFormsAction {
 
         if (xformsEventTarget instanceof XFormsEventTarget) {
             // Dispatch the event
-            containingDocument.dispatchEvent(pipelineContext, XFormsEventFactory.createEvent(resolvedNewEventName, (XFormsEventTarget) xformsEventTarget, newEventBubbles, newEventCancelable));
+            final XFormsEvent newEvent = XFormsEventFactory.createEvent(resolvedNewEventName, (XFormsEventTarget) xformsEventTarget, newEventBubbles, newEventCancelable);
+
+            if (newEvent instanceof XFormsCustomEvent) {
+                final XFormsCustomEvent customEvent = (XFormsCustomEvent) newEvent;
+                // Check if there are parameters specified
+
+                for (Iterator i = actionElement.elements(XFormsConstants.XXFORMS_CONTEXT_QNAME).iterator(); i.hasNext();) {
+                    final Element currentContextInfo = (Element) i.next();
+
+                    final String name = currentContextInfo.attributeValue("name");
+                    if (name == null)
+                        throw new OXFException(XFormsConstants.XXFORMS_CONTEXT_QNAME + " element must have a \"name\" attribute.");
+
+                    final String select = currentContextInfo.attributeValue("select");
+                    if (select == null)
+                        throw new OXFException(XFormsConstants.XXFORMS_CONTEXT_QNAME + " element must have a \"select\" attribute.");
+
+                    // Evaluate context parameter
+                    final SequenceExtent value = XPathCache.evaluateAsExtent(pipelineContext,
+                        actionInterpreter.getContextStack().getCurrentNodeset(), actionInterpreter.getContextStack().getCurrentPosition(),
+                        select, containingDocument.getNamespaceMappings(actionElement),
+                        contextStack.getCurrentVariables(), XFormsContainingDocument.getFunctionLibrary(),
+                        contextStack.getFunctionContext(), null,
+                        (LocationData) actionElement.getData());
+
+                    customEvent.setAttribute(name, value);
+                }
+            }
+
+            containingDocument.dispatchEvent(pipelineContext, newEvent);
         } else {
             // "If there is a null search result for the target object and the source object is an XForms action such as
             // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."

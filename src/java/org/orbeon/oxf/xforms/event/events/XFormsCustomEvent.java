@@ -15,6 +15,11 @@ package org.orbeon.oxf.xforms.event.events;
 
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
+import org.orbeon.saxon.om.SequenceIterator;
+import org.orbeon.saxon.value.SequenceExtent;
+
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  * Custom (i.e. non-XForms) event.
@@ -22,5 +27,19 @@ import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 public class XFormsCustomEvent extends XFormsEvent {
     public XFormsCustomEvent(String eventName, XFormsEventTarget targetObject, boolean bubbles, boolean cancelable) {
         super(eventName, targetObject, bubbles, cancelable);
+    }
+
+    private Map customAttributes;
+
+    public void setAttribute(String name, SequenceExtent value) {
+        if (customAttributes == null)
+            customAttributes = new HashMap();
+        customAttributes.put(name, value.iterate(null)); // NOTE: With Saxon 8, the param is not used, and Saxon 9 has value.iterate()
+    }
+
+    public SequenceIterator getAttribute(String name) {
+        // Get custom attribute if available, or call superclass
+        final Object customAttribute = (customAttributes != null) ? customAttributes.get(name) : null;
+        return (SequenceIterator) ((customAttribute != null) ? customAttribute : super.getAttribute(name));
     }
 }

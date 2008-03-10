@@ -149,6 +149,8 @@ public class XFormsConstants {
 
     public static final QName XXFORMS_REFRESH_ITEMS_QNAME = new QName("refresh-items", XFormsConstants.XXFORMS_NAMESPACE);
 
+    public static final QName XXFORMS_CONTEXT_QNAME = new QName("context", XFormsConstants.XXFORMS_NAMESPACE);
+
     public static final String XFORMS_BOOLEAN_EXPLODED_QNAME = XMLUtils.buildExplodedQName(XFORMS_NAMESPACE_URI, "boolean");
     public static final String XFORMS_INTEGER_EXPLODED_QNAME = XMLUtils.buildExplodedQName(XFORMS_NAMESPACE_URI, "integer");
     public static final String XFORMS_DATE_EXPLODED_QNAME = XMLUtils.buildExplodedQName(XFORMS_NAMESPACE_URI, "date");

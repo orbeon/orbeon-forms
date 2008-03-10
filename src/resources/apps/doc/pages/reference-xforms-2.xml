@@ -567,10 +567,10 @@
             </section>
             <a name="dispatch-context"/>
             <section>
-                <title>Enhanced <code>xforms:dispatch</code> Support</title>
+                <title>Enhanced <code>&lt;xforms:dispatch></code> Support</title>
                 <p>
-                    Orbeon Forms extends <code>xforms:dispatch</code> to support passing event context information to
-                    custom events, with the <code>xxforms:context</code> child element:
+                    Orbeon Forms extends <code>&lt;xforms:dispatch></code> to support passing event context information to
+                    custom events, with the <code>&lt;xxforms:context></code> child element:
                 </p>
                 <xml-source>
                     <xforms:dispatch name="rename-control" target="my-model">
@@ -579,7 +579,7 @@
                     </xforms:dispatch>
                 </xml-source>
                 <p>
-                    <code>xxforms:context</code> supports the following two attributes:
+                    <code>&lt;xxforms:context></code> supports the following two attributes:
                 </p>
                 <table>
                     <tr>
@@ -605,6 +605,13 @@
                         <xforms:setvalue ref="event('control')/@name" value="event('control-name')"/>
                     </xforms:action>
                 </xml-source>
+                <note>
+                    <p>
+                        At the moment, only custom events support passing context attributes this way. Built-in events,
+                        such as <code>xforms-value-changed</code>, or <code>DOMActivate</code>, ignore nested
+                        <code>&lt;xxforms:context></code> elements.
+                    </p>
+                </note>
             </section>
             <a name="xforms-select-deselect"/>
             <section>

@@ -38,6 +38,7 @@ import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.XPathContext;
+import org.orbeon.saxon.expr.StaticContext;
 import org.orbeon.saxon.om.*;
 import org.orbeon.saxon.trans.XPathException;
 
@@ -53,6 +54,14 @@ import java.util.List;
 public class XXFormsCallXPL extends XFormsFunction {
 
     private static Logger logger = LoggerFactory.createLogger(XXFormsCallXPL.class);
+
+    /**
+     * preEvaluate: this method suppresses compile-time evaluation by doing nothing
+     * (because the value of the expression depends on the runtime context)
+     */
+    public Expression preEvaluate(StaticContext env) {
+        return this;
+    }
 
     public SequenceIterator iterate(XPathContext xpathContext) throws XPathException {
 

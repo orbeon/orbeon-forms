@@ -129,7 +129,7 @@
                 <save-document>Sauvegarder</save-document>
                 <save-locally>Sauvegarde Locale</save-locally>
                 <return>Retour</return>
-                <discard>Ignore les Changements</discard>
+                <discard>Ignorer Changements</discard>
                 <language-choice>Langue</language-choice>
                 <errors>Résumé des erreurs</errors>
                 <check-errors-in-form>Ce formulaire contient des erreurs</check-errors-in-form>

@@ -21,15 +21,13 @@
     <!-- Summary -->
     <page path-info="/fr/([^/]+)/" matcher="oxf:perl5-matcher"
           default-submission="summary/submission-page-summary.xml"
-          model="summary/view.xhtml"
-          view="components.xpl">
+          model="summary/view.xhtml" view="components.xpl">
         <setvalue ref="/*/app" matcher-group="1"/>
     </page>
 
     <page path-info="/fr/([^/]+)/([^/]+)" matcher="oxf:perl5-matcher"
           default-submission="summary/submission-page-summary.xml"
-          model="summary/view.xhtml"
-          view="components.xpl">
+          model="summary/view.xhtml" view="components.xpl">
         <setvalue ref="/*/app" matcher-group="1"/>
         <setvalue ref="/*/form" matcher-group="2"/>
     </page>
@@ -37,8 +35,7 @@
     <!-- New document -->
     <page path-info="/fr/([^/]+)/([^/]+)/(new)(/)?" matcher="oxf:perl5-matcher"
           default-submission="submission-page-detail.xml"
-          model="/forms/${1}/${2}/view.xhtml"
-          view="components.xpl">
+          model="detail/read-form.xpl" view="components.xpl">
         <setvalue ref="/*/app" matcher-group="1"/>
         <setvalue ref="/*/form" matcher-group="2"/>
         <setvalue ref="/*/mode" matcher-group="3"/>
@@ -46,14 +43,13 @@
 
     <!-- Print document -->
     <page path-info="/fr/([^/]+)/([^/]+)/(print)(/)?" matcher="oxf:perl5-matcher"
-          model="/forms/${1}/${2}/view.xhtml"
-          view="print.xpl"/>
+          default-submission="submission-page-detail.xml"
+          model="detail/read-form.xpl" view="print.xpl"/>
 
     <!-- Edit document -->
     <page path-info="/fr/([^/]+)/([^/]+)/([^/]+)/(edit)" matcher="oxf:perl5-matcher"
           default-submission="submission-page-detail.xml"
-          model="/forms/${1}/${2}/view.xhtml"
-          view="components.xpl">
+          model="detail/read-form.xpl" view="components.xpl">
         <setvalue ref="/*/app" matcher-group="1"/>
         <setvalue ref="/*/form" matcher-group="2"/>
         <setvalue ref="/*/document" matcher-group="3"/>
@@ -63,8 +59,7 @@
     <!-- View document -->
     <page path-info="/fr/([^/]+)/([^/]+)/([^/]+)/(view)" matcher="oxf:perl5-matcher"
           default-submission="submission-page-detail.xml"
-          model="/forms/${1}/${2}/view.xhtml"
-          view="components.xpl">
+          model="detail/read-form.xpl" view="components.xpl">
         <setvalue ref="/*/app" matcher-group="1"/>
         <setvalue ref="/*/form" matcher-group="2"/>
         <setvalue ref="/*/document" matcher-group="3"/>
@@ -73,8 +68,7 @@
 
     <!-- Test form with new empty document -->
     <page path-info="/fr/([^/]+)/([^/]+)/(test)(/)?" matcher="oxf:perl5-matcher"
-          model="test-model.xpl"
-          view="components.xpl">
+          model="test-model.xpl" view="components.xpl">
         <setvalue ref="/*/app" matcher-group="1"/>
         <setvalue ref="/*/form" matcher-group="2"/>
         <setvalue ref="/*/mode" matcher-group="3"/>
@@ -93,49 +87,29 @@
     <page path-info="/fr/page/custom/([^/]+)/.*" matcher="oxf:perl5-matcher"
           model="/forms/${1}/page/page-flow.xml"/>
 
-    <!-- ==== Services ==== -->
+    <!-- ==== Built-in eXist-based Persistence Services ==== -->
 
-    <!-- i18n resources -->
-    <!-- TODO: This is mostly obsolete w/ the form builder -->
-    <page path-info="/fr/service/resources/([^/]+)/([^/]+)/([^/]+)" matcher="oxf:perl5-matcher"
-          view="/forms/${1}/${2}/resources_${3}.xml"/>
-
-    <!-- Template instance -->
-    <!-- TODO: This is mostly obsolete w/ the form builder -->
-    <page path-info="/fr/service/template/([^/]+)/([^/]+)(/([^/]+))?" matcher="oxf:perl5-matcher"
-          default-submission="submission-service-empty.xml"
-          model="/forms/${1}/service/template.xpl">
-        <setvalue ref="/*/app" matcher-group="1"/>
-        <setvalue ref="/*/form" matcher-group="2"/>
-        <setvalue ref="/*/template" matcher-group="4"/>
-    </page>
-
-    <!-- Create operation -->
-    <page path-info="/fr/service/crud/([^/]+)/([^/]+)/([^/]+)" matcher="oxf:perl5-matcher"
-          view="persistence/${1}/create.xpl"/>
-
-    <!-- Read, Update and Delete operations -->
-    <page path-info="/fr/service/crud/([^/]+)/([^/]+)/([^/]+)/([^/]+)" matcher="oxf:perl5-matcher"
-          model="persistence/${1}/read-update-delete.xpl"/>
+    <!-- Create, Read, Update and Delete operations (id provided) -->
+    <page path-info="/fr/service/exist/crud/([^/]+/[^/]+/(form/[^/]+|data/[^/]+/[^/]+))" matcher="oxf:perl5-matcher"
+          model="persistence/exist/crud.xpl"/>
 
     <!-- Search -->
-    <page path-info="/fr/service/search/([^/]+)/([^/]+)/([^/]+)" matcher="oxf:perl5-matcher"
-          view="persistence/${1}/search.xpl">
-        <setvalue ref="/*/app" matcher-group="2"/>
-        <setvalue ref="/*/form" matcher-group="3"/>
-        <!--<setvalue ref="/*/query" parameter="query"/>-->
-        <!--<setvalue ref="/*/page-size" parameter="page-size"/>-->
-        <!--<setvalue ref="/*/page-number" parameter="page-number"/>-->
-        <!--<setvalue ref="/*/sort-key" parameter="sort-key"/>-->
-    </page>
-
-    <!-- Configuration -->
-    <page path-info="/fr/service/configuration/([^/]+)/([^/]+)" matcher="oxf:perl5-matcher"
-          default-submission="submission-service-empty.xml"
-          model="summary/load-form.xpl">
+    <page path-info="/fr/service/exist/search/([^/]+)/([^/]+)" matcher="oxf:perl5-matcher"
+          view="persistence/exist/search.xpl">
         <setvalue ref="/*/app" matcher-group="1"/>
         <setvalue ref="/*/form" matcher-group="2"/>
     </page>
+
+    <!-- ==== Built-in Resource Manager-Based Persistence Services ==== -->
+
+    <!-- Create, Read, Update and Delete operations (id provided) -->
+    <page path-info="/fr/service/resource/crud/([^/]+/[^/]+/(form/[^/]+|data/[^/]+/[^/]+))" matcher="oxf:perl5-matcher"
+          default-submission="submission-service-resource.xml"
+          model="persistence/resource/crud.xpl">
+        <setvalue ref="/*/resource" matcher-group="1"/>
+    </page>
+
+    <!-- ==== Other Services ==== -->
 
     <!-- Generate HTML to be saved -->
     <page path-info="/fr/service/import-export/save-generate" view="import-export/save-generate.xpl"/>

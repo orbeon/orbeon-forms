@@ -84,11 +84,6 @@
                 <xforms:load resource="/fr/{$parameters/app}/{$parameters/form}/{instance('fr-summary-instance')/document[index('documents-repeat')]/@name}/edit"/>
             </xforms:action>
 
-            <xforms:action ev:event="orbeon-delete">
-                <xforms:send submission="fr-delete-document-submission"/>
-                <xforms:send submission="search-submission"/>
-            </xforms:action>
-
             <xforms:action ev:event="orbeon-view">
                 <xforms:recalculate/>
                 <xforms:load resource="/fr/{$parameters/app}/{$parameters/form}/{instance('fr-summary-instance')/document[index('documents-repeat')]/@name}/view"/>
@@ -161,9 +156,10 @@
                 <configuration xmlns=""/>
             </xforms:instance>
 
+            <!-- TODO: Refactor this to persistence model -->
             <xforms:submission id="get-configuration-submission"
                     method="get" serialization="none"
-                    resource="/fr/service/configuration/{$parameters/app}/{$parameters/form}"
+                    resource="{xxforms:instance('fr-uris-instance')/form-collection}/crud/{$parameters/app}/{$parameters/form}/form/form.xhtml"
                     replace="instance" instance="fr-source-form-instance" xxforms:readonly="true">
 
                 <!-- Extract summary configuration information from the XHTML document -->
@@ -216,7 +212,7 @@
 
             <xforms:submission id="search-submission"
                     ref="instance('fr-search-instance')" method="post"
-                    resource="/fr/service/search/exist/{$parameters/app}/{$parameters/form}"
+                    resource="{xxforms:instance('fr-uris-instance')/data-collection}/search/{$parameters/app}/{$parameters/form}"
                     replace="instance" instance="fr-summary-instance"/>
 
         </xforms:model>
@@ -422,7 +418,12 @@
                                 <xhtml:img src="../../apps/fr/style/delete.gif" alt="Delete"/>
                                 <xhtml:span><xforms:output ref="$fr-resources/summary/labels/delete-form"/></xhtml:span>
                             </xforms:label>
-                            <xforms:dispatch ev:event="DOMActivate" target="fr-form-model" name="orbeon-delete"/>
+                            <xforms:action ev:event="DOMActivate">
+                                <xforms:dispatch name="fr-delete-data" target="fr-persistence-model">
+                                    <xxforms:context name="document-id" select="instance('fr-summary-instance')/document[index('documents-repeat')]/@name"/>
+                                </xforms:dispatch>
+                                <xforms:send submission="search-submission"/>
+                            </xforms:action>
                         </xforms:trigger>
                     </xforms:group>
 

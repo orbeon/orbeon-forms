@@ -26,6 +26,33 @@
     <!-- Model initialization -->
     <!-- TODO: Should not do this on summary page, for example -->
     <xforms:action ev:event="xforms-ready">
+
+        <!-- Initialize URIs based on hierarchy of properties -->
+
+        <!-- TODO: This code must be moved to a function -->
+        <xxforms:variable name="prefix" select="'oxf.fr.persistence.app'"/>
+        <xxforms:variable name="suffix" select="'uri'"/>
+        
+        <xxforms:variable name="properties"
+                          select="(string-join(($prefix, $app, $form, $suffix), '.'),
+                                   string-join(($prefix, $app, $suffix), '.'),
+                                   string-join(($prefix, '*', $suffix), '.'))"/>
+
+        <xxforms:variable name="form-properties" select="(string-join(($prefix, $app, $form, 'form', $suffix), '.'), $properties)"/>
+
+        <xforms:action xxforms:iterate="$form-properties">
+            <xforms:action if="not(empty(xxforms:property(context()))) and instance('fr-uris-instance')/form-collection = ''">
+                <xforms:setvalue ref="instance('fr-uris-instance')/form-collection" value="xxforms:property(context())"/>
+            </xforms:action>
+        </xforms:action>
+
+        <xxforms:variable name="data-properties" select="(string-join(($prefix, $app, $form, 'data', $suffix), '.'), $properties)"/>
+
+        <xforms:action xxforms:iterate="$data-properties">
+            <xforms:action if="not(empty(xxforms:property(context()))) and instance('fr-uris-instance')/data-collection = ''">
+                <xforms:setvalue ref="instance('fr-uris-instance')/data-collection" value="xxforms:property(context())"/>
+            </xforms:action>
+        </xforms:action>
         
         <!-- A document id is provided -->
         <xforms:action if="$parameters/document != ''">
@@ -34,8 +61,8 @@
         </xforms:action>
         <!-- No document id is provided and we are not in print view -->
         <xforms:action if="$parameters/document = '' and $parameters/mode != 'print'">
-            <!-- Create new empty document -->
-            <xforms:send submission="fr-get-template-submission"/>
+            <!-- Create random document id -->
+            <xforms:setvalue ref="$parameters/document" value="digest(string(random(true)), 'MD5', 'hex')"/>
         </xforms:action>
 
         <!-- Force all this so we can safely mark the data status as clean -->
@@ -48,17 +75,74 @@
         <xforms:setvalue ref="instance('fr-persistence-instance')/data-status">clean</xforms:setvalue>
     </xforms:action>
 
+    <!-- Delete operation -->
+    <xforms:action ev:event="fr-delete-data">
+        <xforms:send submission="fr-delete-document-submission">
+            <xxforms:context name="document-id" select="event('document-id')"/>
+        </xforms:send>
+    </xforms:action>
+
+    <xforms:submission id="fr-delete-document-submission"
+            method="delete" serialization="none"
+            resource="{instance('fr-uris-instance')/data-collection}/crud/{$parameters/app}/{$parameters/form}/data/{event('document-id')}/data"
+            replace="none"/>
+
+    <!-- Publish form operation -->
+    <xforms:action ev:event="fr-publish-form">
+
+        <!-- TODO: This code must be moved to a function -->
+        <xxforms:variable name="prefix" select="'oxf.fr.persistence.app'"/>
+        <xxforms:variable name="app" select="event('application')"/>
+        <xxforms:variable name="form" select="event('form')"/>
+        <xxforms:variable name="suffix" select="'uri'"/>
+
+        <!-- List of properties from specific to generic -->
+        <xxforms:variable name="form-properties"
+                          select="(string-join(($prefix, $app, $form, 'form', $suffix), '.'),
+                                   string-join(($prefix, $app, $form, $suffix), '.'),
+                                   string-join(($prefix, $app, $suffix), '.'),
+                                   string-join(($prefix, '*', $suffix), '.'))"/>
+
+        <!-- Iterate to find property -->
+        <xforms:action xxforms:iterate="$form-properties">
+            <xforms:action if="not(empty(xxforms:property(context()))) and instance('fr-uris-instance')/temp-collection = ''">
+                <xforms:setvalue ref="instance('fr-uris-instance')/temp-collection" value="xxforms:property(context())"/>
+            </xforms:action>
+        </xforms:action>
+
+
+
+        <xforms:send submission="fr-publish-form-submission">
+            <xxforms:context name="collection" select="instance('fr-uris-instance')/temp-collection"/>
+            <xxforms:context name="application" select="$app"/>
+            <xxforms:context name="form" select="$form"/>
+        </xforms:send>
+    </xforms:action>
+
+    <xforms:submission id="fr-publish-form-submission"
+            ref="xxforms:instance('fr-form-instance')" method="put"
+            resource="{event('collection')}/crud/{event('application')}/{event('form')}/form/form.xhtml"
+            replace="none">
+
+        <!--<xforms:message ev:event="xforms-submit">-->
+            <!--zzz-->
+            <!--<xforms:output value="event('application')"/>-->
+            <!--xxx-->
+            <!--<xforms:output value="event('form')"/>-->
+        <!--</xforms:message>-->
+
+    </xforms:submission>
+
     <!-- Respond to save button activation -->
-    <!-- QUESTION: Do we need a custom fr-save event? -->
     <xforms:action ev:event="DOMActivate" ev:observer="fr-save-button">
         <xforms:setvalue ref="instance('fr-persistence-instance')/save-attempted">true</xforms:setvalue>
         <xforms:action if="$parameters/document != ''">
-            <!-- Update -->
-            <xforms:send submission="fr-update-submission"/>
+            <!-- Create or update -->
+            <xforms:send submission="fr-create-update-submission"/>
         </xforms:action>
         <xforms:action if="$parameters/document = ''">
             <!-- Create -->
-            <xforms:send submission="fr-create-submission"/>
+            <!--<xforms:send submission="fr-create-submission"/>-->
         </xforms:action>
     </xforms:action>
 
@@ -68,51 +152,36 @@
     </xforms:action>
 
     <!-- Parameters passed to this page -->
+    <!-- NOTE: the <document> element may be modified, so we don't set this as read-only -->
     <xforms:instance id="fr-parameters-instance" src="input:instance"/>
     <xxforms:variable name="parameters" select="instance('fr-parameters-instance')"/>
+    <xxforms:variable name="app" select="$parameters/app"/>
+    <xxforms:variable name="form" select="$parameters/form"/>
+    <xxforms:variable name="document" select="$parameters/document"/>
+
+    <!-- Persistence URIs -->
+    <xforms:instance id="fr-uris-instance">
+        <uris xmlns="">
+            <form-collection/>
+            <data-collection/>
+            <temp-collection/>
+        </uris>
+    </xforms:instance>
 
     <!-- Special cross-model bind to set the form instance read-only when necessary -->
     <xforms:bind nodeset="xxforms:instance('fr-form-instance')" readonly="$parameters/mode = ('view', 'print')"/>
 
-    <!-- Create document -->
-    <xforms:instance id="fr-create-instance">
-        <dummy xmlns=""/>
-    </xforms:instance>
-
-    <xforms:submission id="fr-create-submission"
+    <xforms:submission id="fr-create-update-submission"
             validate="true"
             method="put" ref="xxforms:instance('fr-form-instance')"
-            resource="/fr/service/crud/exist/{$parameters/app}/{$parameters/form}"
-            replace="instance" instance="fr-create-instance">
-        <xforms:setvalue ev:event="xforms-submit-done" ref="$parameters/document" value="instance('fr-create-instance')"/>
-    </xforms:submission>
-
-    <!-- Update document -->
-    <xforms:submission id="fr-update-submission"
-            validate="true"
-            method="put" ref="xxforms:instance('fr-form-instance')"
-            resource="/fr/service/crud/exist/{$parameters/app}/{$parameters/form}/{$parameters/document}"
+            resource="{instance('fr-uris-instance')/data-collection}/crud/{$parameters/app}/{$parameters/form}/data/{$parameters/document}/data"
             replace="none">
-    </xforms:submission>
-
-    <!-- Delete document -->
-    <xforms:submission id="fr-delete-document-submission"
-            method="delete" serialization="none"
-            resource="/fr/service/crud/exist/{$parameters/app}/{$parameters/form}/{instance('fr-summary-instance')/document[index('documents-repeat')]/@name}"
-            replace="none"/>
-
-    <!-- Get document template -->
-    <xforms:submission id="fr-get-template-submission"
-            method="get" serialization="none"
-            resource="/fr/service/template/{$parameters/app}/{$parameters/form}"
-            replace="instance" xxforms:instance="fr-form-instance">
-        <xforms:message ev:event="xforms-submit-error" level="xxforms:log-error"><xforms:output value="event('error-type')"/></xforms:message>
     </xforms:submission>
 
     <!-- Get document -->
     <xforms:submission id="get-document-submission"
             method="get" serialization="none"
-            resource="/fr/service/crud/exist/{$parameters/app}/{$parameters/form}/{$parameters/document}"
+            resource="{instance('fr-uris-instance')/data-collection}/crud/{$parameters/app}/{$parameters/form}/data/{$parameters/document}/data"
             replace="instance" xxforms:instance="fr-form-instance"/>
 
     <xforms:instance id="fr-persistence-instance">
@@ -140,7 +209,7 @@
     </xforms:bind>
 
     <!-- React to successful submission when saving/updating -->
-    <xforms:action ev:event="xforms-submit-done" ev:target="fr-create-submission fr-update-submission">
+    <xforms:action ev:event="xforms-submit-done" ev:target="fr-create-submission fr-create-update-submission">
         <xforms:setvalue ref="instance('fr-persistence-instance')/message"
                          value="xxforms:instance('fr-fr-current-resources')/detail/messages/save-success"/>
         <xforms:setvalue ref="instance('fr-persistence-instance')/data-status">clean</xforms:setvalue>
@@ -148,7 +217,7 @@
     </xforms:action>
 
     <!-- React to failed submission when saving/updating -->
-    <xforms:action ev:event="xforms-submit-error" ev:target="fr-create-submission fr-update-submission">
+    <xforms:action ev:event="xforms-submit-error" ev:target="fr-create-submission fr-create-update-submission">
         <xforms:setvalue ref="instance('fr-persistence-instance')/error" value="event('response-body')"/>
         <xforms:message level="xxforms:log-error"><xforms:output value="event('response-body')"/></xforms:message>
         <xforms:action if="event('error-type') = 'validation-error'">

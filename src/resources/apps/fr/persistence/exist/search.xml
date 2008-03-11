@@ -28,10 +28,6 @@
         declare namespace xhtml="http://www.w3.org/1999/xhtml";
         declare namespace xforms="http://www.w3.org/2002/xforms";
 
-        (: Collection name as the name of the first element of the default collection :)
-        (: TODO: Handle case of empty collection :)
-        let $collection-name := util:collection-name(collection()[1])
-
         (: Get URL parameters :)
         let $page-size := request:get-parameter('page-size', '')
         let $page-number := request:get-parameter('page-number', '')
@@ -52,12 +48,14 @@
                 {
                     subsequence(for $resource in collection()
                         let $resource-uri := document-uri($resource)
-                        let $resource-name := substring-after($resource-uri, concat($collection-name, '/'))
+                        let $collection-name := string-join(tokenize($resource-uri, '/')[position() lt last()], '/')
+                        let $resource-name := tokenize($resource-uri, '/')[last()]
+                        let $resource-id := tokenize($resource-uri, '/')[last() - 1]
                         let $last-modified := xmldb:last-modified($collection-name, $resource-name)
                         where ]]><where/><![CDATA[
                         order by $last-modified descending
                         return
-                        <document name="{$resource-name}" created="{xmldb:created($collection-name, $resource-name)}" last-modified="{$last-modified}">
+                        <document created="{xmldb:created($collection-name, $resource-name)}" last-modified="{$last-modified}" name="{$resource-id}">
                             <details>
                                 ]]><details/><![CDATA[
                             </details>

@@ -34,9 +34,9 @@
         <p:input name="data" href="#instance"/>
         <p:input name="config">
             <xforms:submission xsl:version="2.0" method="post"
-                               resource="{{xxforms:property('oxf.fr.persistence.exist.uri')}}/{/*/app
+                               resource="{{xxforms:property('oxf.fr.persistence.service.exist.uri')}}/{/*/app
                                             }/{/*/form
-                                            }/?page-size={/*/page-size
+                                            }/data?page-size={/*/page-size
                                             }&amp;page-number={/*/page-number
                                             }&amp;query={
                                                 concat(/*/query[1],

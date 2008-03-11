@@ -22,6 +22,8 @@
 .fb-toolbox { margin: .5em; padding: .5em; width: auto; background-color: #3598D4; text-align: center }
 .fb-toolbox .fb-tool { display: block }
 .fb-toolbox .fb-tool button { width: 100%; text-align: left }
+.fb-xvc { text-align: center }
+.fb-xvc a { text-decoration: none }
 
 .fb-clear { clear: both }
 .fb-xforms-disabled { display:none }

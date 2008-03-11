@@ -124,7 +124,8 @@ public class XFormsTriggerHandler extends HandlerBase {
 
                                     final Map prefixToURIMap = containingDocument.getStaticState().getNamespaceMappings(id);
                                     final XFormsContextStack contextStack = containingDocument.getXFormsControls().getContextStack();
-                                    hrefValue = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, currentBindingContext.getSingleNode(),
+                                    hrefValue = XFormsUtils.resolveAttributeValueTemplates(pipelineContext,
+                                            currentBindingContext.getNodeset(), currentBindingContext.getPosition(),
                                             contextStack.getCurrentVariables(), XFormsContainingDocument.getFunctionLibrary(),
                                             contextStack.getFunctionContext(), prefixToURIMap, xformsControl.getLocationData(), resource);
                                 }

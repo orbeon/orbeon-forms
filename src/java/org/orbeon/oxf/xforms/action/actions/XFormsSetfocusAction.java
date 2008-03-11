@@ -59,7 +59,7 @@ public class XFormsSetfocusAction extends XFormsAction {
             final Map prefixToURIMap = containingDocument.getStaticState().getNamespaceMappings(actionElement.attributeValue("id"));
             final LocationData locationData = (LocationData) actionElement.getData();
             final XFormsContextStack contextStack = actionInterpreter.getContextStack();
-            resolvedControlId = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, bindingContext.getSingleNode(),
+            resolvedControlId = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, bindingContext.getNodeset(), bindingContext.getPosition(),
                     contextStack.getCurrentVariables(), XFormsContainingDocument.getFunctionLibrary(), actionInterpreter.getFunctionContext(), prefixToURIMap, locationData, controlIdAttributeValue);
         }
 

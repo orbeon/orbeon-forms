@@ -80,7 +80,7 @@ public class XFormsLoadAction extends XFormsAction {
             final Map prefixToURIMap = containingDocument.getStaticState().getNamespaceMappings(actionElement.attributeValue("id"));
             final LocationData locationData = (LocationData) actionElement.getData();
             final XFormsContextStack contextStack = actionInterpreter.getContextStack();
-            final String resolvedResource = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, bindingContext.getSingleNode(),
+            final String resolvedResource = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, bindingContext.getNodeset(), bindingContext.getPosition(),
                     contextStack.getCurrentVariables(), XFormsContainingDocument.getFunctionLibrary(), actionInterpreter.getFunctionContext(), prefixToURIMap, locationData, resourceAttributeValue);
             final String encodedResource = XFormsUtils.encodeHRRI(resolvedResource, true);
             resolveLoadValue(containingDocument, pipelineContext, actionElement, doReplace, encodedResource, target, urlType, urlNorewrite, isShowProgress);
@@ -94,16 +94,19 @@ public class XFormsLoadAction extends XFormsAction {
 
     public static String resolveLoadValue(XFormsContainingDocument containingDocument, PipelineContext pipelineContext,
                                           Element currentElement, boolean doReplace, String value, String target, String urlType, boolean urlNorewrite, boolean isShowProgress) {
+
         final boolean isPortletLoad = "portlet".equals(containingDocument.getContainerType());
         final String externalURL;
-        if (!urlNorewrite) {
+        if (value.startsWith("#") || urlNorewrite) {
+            // Keep value unchanged if it's just a fragment or if we are explicitly disabling rewriting
+            externalURL = value;
+        } else {
             if ((!isPortletLoad) ? doReplace : (doReplace && !"resource".equals(urlType))) {
                 externalURL = XFormsUtils.resolveURLDoReplace(containingDocument, pipelineContext, currentElement, value);
             } else {
+                // Just a resource URL
                 externalURL = XFormsUtils.resolveResourceURL(pipelineContext, currentElement, value);
             }
-        } else {
-            externalURL = value;
         }
         containingDocument.addLoadToRun(externalURL, target, urlType, doReplace, isPortletLoad, isShowProgress);
         return externalURL;

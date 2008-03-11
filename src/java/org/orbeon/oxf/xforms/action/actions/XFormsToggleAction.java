@@ -50,7 +50,7 @@ public class XFormsToggleAction extends XFormsAction {
         if (bindingContext.getSingleNode() != null) {
             final Map prefixToURIMap = containingDocument.getStaticState().getNamespaceMappings(actionElement.attributeValue("id"));
             final LocationData locationData = (LocationData) actionElement.getData();
-            final String resolvedCaseId = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, bindingContext.getSingleNode(),
+            final String resolvedCaseId = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, bindingContext.getNodeset(), bindingContext.getPosition(),
                     contextStack.getCurrentVariables(), XFormsContainingDocument.getFunctionLibrary(), actionInterpreter.getFunctionContext(), prefixToURIMap, locationData, caseAttribute);
             caseId = XFormsUtils.namespaceId(containingDocument, resolvedCaseId);
         } else {

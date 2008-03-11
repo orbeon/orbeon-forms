@@ -65,7 +65,7 @@ public class XFormsDispatchAction extends XFormsAction {
                 return;
 
             // Resolve AVT
-            resolvedNewEventName = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, bindingContext.getSingleNode(),
+            resolvedNewEventName = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, bindingContext.getNodeset(), bindingContext.getPosition(),
                     contextStack.getCurrentVariables(), XFormsContainingDocument.getFunctionLibrary(), actionInterpreter.getFunctionContext(), prefixToURIMap, locationData, newEventNameAttributeValue);
         }
 
@@ -77,7 +77,7 @@ public class XFormsDispatchAction extends XFormsAction {
 
             // Resolve AVT
             resolvedNewEventTargetId = XFormsUtils.namespaceId(containingDocument,
-                    XFormsUtils.resolveAttributeValueTemplates(pipelineContext, bindingContext.getSingleNode(),
+                    XFormsUtils.resolveAttributeValueTemplates(pipelineContext, bindingContext.getNodeset(), bindingContext.getPosition(),
                     contextStack.getCurrentVariables(), XFormsContainingDocument.getFunctionLibrary(), actionInterpreter.getFunctionContext(), prefixToURIMap, locationData, newEventTargetIdValue));
         }
 

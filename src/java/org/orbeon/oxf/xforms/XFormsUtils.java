@@ -781,6 +781,31 @@ public class XFormsUtils {
      * Resolve attribute value templates (AVTs).
      *
      * @param pipelineContext    current pipeline context
+     * @param contextItems       context items
+     * @param contextPosition    context position
+     * @param variableToValueMap variables
+     * @param functionLibrary    XPath function libary to use
+     * @param functionContext    context object to pass to the XForms function
+     * @param prefixToURIMap     namespace mappings
+     * @param locationData       LocationData for error reporting
+     * @param attributeValue     attribute value
+     * @return                   resolved attribute value
+     */
+    public static String resolveAttributeValueTemplates(PipelineContext pipelineContext, List contextItems, int contextPosition, Map variableToValueMap,
+                                                        FunctionLibrary functionLibrary, XPathCache.FunctionContext functionContext,
+                                                        Map prefixToURIMap, LocationData locationData, String attributeValue) {
+
+        if (attributeValue == null)
+            return null;
+
+        return XPathCache.evaluateAsAvt(pipelineContext, contextItems, contextPosition, attributeValue, prefixToURIMap,
+                variableToValueMap, functionLibrary, functionContext, null, locationData);
+    }
+
+    /**
+     * Resolve attribute value templates (AVTs).
+     *
+     * @param pipelineContext    current pipeline context
      * @param contextNode        context node for evaluation
      * @param variableToValueMap variables
      * @param functionLibrary    XPath function libary to use

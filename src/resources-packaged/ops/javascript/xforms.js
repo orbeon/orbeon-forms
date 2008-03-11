@@ -3714,7 +3714,7 @@ ORBEON.xforms.Server = {
                                     if (show == "replace") {
                                         if (target == null) {
                                             // Display loading indicator unless the server tells us not to display it
-                                            if (showProcess != "false")
+                                            if (resource.charAt(0) != '#' &&  showProcess != "false")
                                                 newDynamicStateTriggersReplace = true;
                                             try {
                                                 window.location.href = resource;

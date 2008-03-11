@@ -569,8 +569,33 @@
             <section>
                 <title>Enhanced <code>&lt;xforms:dispatch></code> Support</title>
                 <p>
-                    Orbeon Forms extends <code>&lt;xforms:dispatch></code> to support passing event context information to
-                    custom events, with the <code>&lt;xxforms:context></code> child element:
+                    Orbeon Forms supports passing event context attributes with the <code>&lt;xxforms:context></code>
+                    child element. The actions supported are actions which directly cause an event to be dispatched:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            <code>&lt;xforms:dispatch></code>
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>&lt;xforms:send></code>
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>&lt;xxforms:show></code>
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>&lt;xxforms:hide></code>
+                        </p>
+                    </li>
+                </ul>
+                <p>
+                    Here is how you pass context attributes when executing an action:
                 </p>
                 <xml-source>
                     <xforms:dispatch name="rename-control" target="my-model">
@@ -607,9 +632,9 @@
                 </xml-source>
                 <note>
                     <p>
-                        At the moment, only custom events support passing context attributes this way. Built-in events,
-                        such as <code>xforms-value-changed</code>, or <code>DOMActivate</code>, ignore nested
-                        <code>&lt;xxforms:context></code> elements.
+                        At the moment, with, <code>&lt;xforms:dispatch></code>, only custom events support passing
+                        context attributes this way. Built-in events, such as <code>xforms-value-changed</code>, or
+                        <code>DOMActivate</code>, ignore nested <code>&lt;xxforms:context></code> elements.
                     </p>
                 </note>
             </section>

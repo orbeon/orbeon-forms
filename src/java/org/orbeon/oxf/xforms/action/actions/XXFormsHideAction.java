@@ -24,7 +24,9 @@ import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
+import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.events.XXFormsDialogCloseEvent;
+import org.orbeon.oxf.xforms.event.events.XXFormsDialogOpenEvent;
 import org.orbeon.saxon.om.Item;
 
 /**
@@ -40,11 +42,17 @@ public class XXFormsHideAction extends XFormsAction {
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
         final String dialogId = XFormsUtils.namespaceId(containingDocument, actionElement.attributeValue("dialog"));
 
+        if (dialogId == null) {
+            // TODO: Should we try to find the dialog containing the action, of the dialog containing the observer or the target causing this event?
+        }
+
         if (dialogId != null) {
             // Dispatch xxforms-dialog-close event to dialog
             final Object controlObject = (dialogId != null) ? xformsControls.getObjectById(dialogId) : null;
             if (controlObject instanceof XXFormsDialogControl) {
-                containingDocument.dispatchEvent(pipelineContext, new XXFormsDialogCloseEvent((XFormsEventTarget) controlObject));
+                final XFormsEvent newEvent = new XXFormsDialogCloseEvent((XFormsEventTarget) controlObject);
+                addContextAttributes(actionInterpreter, pipelineContext, actionElement, newEvent);
+                containingDocument.dispatchEvent(pipelineContext, newEvent);
             } else {
                 if (XFormsServer.logger.isDebugEnabled())
                 containingDocument.logDebug("xxforms:hide", "dialog does not refer to an existing xxforms:dialog element, ignoring action",

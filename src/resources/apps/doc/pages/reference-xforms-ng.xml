@@ -325,6 +325,12 @@
                 </p>
             </section>
             -->
+            <section>
+                <title>Browser Support</title>
+                <p>
+                    [TODO: detail browser support]
+                </p>
+            </section>
         </section>
         <section>
             <title>Programming With XForms 1.0</title>
@@ -2062,6 +2068,13 @@
                     </li>
                 </ul>
             </section>
+        </section>
+        <a name="xforms-schema-validation"/>
+        <section>
+            <title>Validation with XML Schema</title>
+            <p>
+                [TODO: document schema validation including basics, extensions, inline schemas]
+            </p>
         </section>
         <a name="xforms-instance-initialization"/>
         <section>

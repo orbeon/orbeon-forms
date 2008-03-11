@@ -116,36 +116,9 @@ public class XFormsDispatchAction extends XFormsAction {
         }
 
         if (xformsEventTarget instanceof XFormsEventTarget) {
-            // Dispatch the event
+            // Create and dispatch the event
             final XFormsEvent newEvent = XFormsEventFactory.createEvent(resolvedNewEventName, (XFormsEventTarget) xformsEventTarget, newEventBubbles, newEventCancelable);
-
-            if (newEvent instanceof XFormsCustomEvent) {
-                final XFormsCustomEvent customEvent = (XFormsCustomEvent) newEvent;
-                // Check if there are parameters specified
-
-                for (Iterator i = actionElement.elements(XFormsConstants.XXFORMS_CONTEXT_QNAME).iterator(); i.hasNext();) {
-                    final Element currentContextInfo = (Element) i.next();
-
-                    final String name = currentContextInfo.attributeValue("name");
-                    if (name == null)
-                        throw new OXFException(XFormsConstants.XXFORMS_CONTEXT_QNAME + " element must have a \"name\" attribute.");
-
-                    final String select = currentContextInfo.attributeValue("select");
-                    if (select == null)
-                        throw new OXFException(XFormsConstants.XXFORMS_CONTEXT_QNAME + " element must have a \"select\" attribute.");
-
-                    // Evaluate context parameter
-                    final SequenceExtent value = XPathCache.evaluateAsExtent(pipelineContext,
-                        actionInterpreter.getContextStack().getCurrentNodeset(), actionInterpreter.getContextStack().getCurrentPosition(),
-                        select, containingDocument.getNamespaceMappings(actionElement),
-                        contextStack.getCurrentVariables(), XFormsContainingDocument.getFunctionLibrary(),
-                        contextStack.getFunctionContext(), null,
-                        (LocationData) actionElement.getData());
-
-                    customEvent.setAttribute(name, value);
-                }
-            }
-
+            addContextAttributes(actionInterpreter, pipelineContext, actionElement, newEvent);
             containingDocument.dispatchEvent(pipelineContext, newEvent);
         } else {
             // "If there is a null search result for the target object and the source object is an XForms action such as

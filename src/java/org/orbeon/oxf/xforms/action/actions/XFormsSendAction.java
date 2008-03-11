@@ -24,6 +24,7 @@ import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
+import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitEvent;
 import org.orbeon.saxon.om.Item;
 
@@ -45,7 +46,9 @@ public class XFormsSendAction extends XFormsAction {
 
         if (submission instanceof XFormsModelSubmission) {
             // Dispatch event to submission object
-            containingDocument.dispatchEvent(pipelineContext, new XFormsSubmitEvent((XFormsEventTarget) submission));
+            final XFormsEvent newEvent = new XFormsSubmitEvent((XFormsEventTarget) submission);
+            addContextAttributes(actionInterpreter, pipelineContext, actionElement, newEvent);
+            containingDocument.dispatchEvent(pipelineContext, newEvent);
         } else {
             // "If there is a null search result for the target object and the source object is an XForms action such as
             // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."

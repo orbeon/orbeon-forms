@@ -23,8 +23,11 @@ import org.orbeon.saxon.om.ListIterator;
 import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.om.EmptyIterator;
 import org.orbeon.saxon.value.StringValue;
+import org.orbeon.saxon.value.SequenceExtent;
 
 import java.util.Collections;
+import java.util.Map;
+import java.util.HashMap;
 
 
 /**
@@ -36,6 +39,8 @@ public abstract class XFormsEvent {
     private XFormsEventTarget targetObject;
     private boolean bubbles;
     private boolean cancelable;
+
+    private Map customAttributes;
 
     private LocationData locationData;
 
@@ -70,6 +75,12 @@ public abstract class XFormsEvent {
         return locationData;
     }
 
+    public void setAttribute(String name, SequenceExtent value) {
+        if (customAttributes == null)
+            customAttributes = new HashMap();
+        customAttributes.put(name, value.iterate(null)); // NOTE: With Saxon 8, the param is not used, and Saxon 9 has value.iterate()
+    }
+
     public SequenceIterator getAttribute(String name) {
         if ("target".equals(name)) {
             // Return the id of the target of the event
@@ -78,6 +89,9 @@ public abstract class XFormsEvent {
         } else if ("event".equals(name)) {
             // Return the name of the event
             return new ListIterator(Collections.singletonList(new StringValue(eventName)));
+        } else if (customAttributes != null && customAttributes.get(name) != null) {
+            // Return custom attribute if found
+            return (SequenceIterator) customAttributes.get(name);
         } else {
             // "If the event context information does not contain the property indicated by the string argument, then an
             // empty node-set is returned."

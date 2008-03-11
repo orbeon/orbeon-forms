@@ -24,6 +24,7 @@ import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
+import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.events.XXFormsDialogOpenEvent;
 import org.orbeon.saxon.om.Item;
 
@@ -49,7 +50,10 @@ public class XXFormsShowAction extends XFormsAction {
             // Dispatch xxforms-dialog-open event to dialog
             final Object controlObject = (dialogId != null) ? xformsControls.getObjectById(dialogId) : null;
             if (controlObject instanceof XXFormsDialogControl) {
-                containingDocument.dispatchEvent(pipelineContext, new XXFormsDialogOpenEvent((XFormsEventTarget) controlObject, effectiveNeighbor, constrainToViewport));
+
+                final XFormsEvent newEvent = new XXFormsDialogOpenEvent((XFormsEventTarget) controlObject, effectiveNeighbor, constrainToViewport);
+                addContextAttributes(actionInterpreter, pipelineContext, actionElement, newEvent);
+                containingDocument.dispatchEvent(pipelineContext, newEvent);
             } else {
                 if (XFormsServer.logger.isDebugEnabled())
                 containingDocument.logDebug("xxforms:show", "dialog does not refer to an existing xxforms:dialog element, ignoring action",

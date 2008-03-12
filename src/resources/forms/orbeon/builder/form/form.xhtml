@@ -15,6 +15,7 @@
 <xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml"
       xmlns:xforms="http://www.w3.org/2002/xforms"
       xmlns:xs="http://www.w3.org/2001/XMLSchema"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:ev="http://www.w3.org/2001/xml-events"
       xmlns:xi="http://www.w3.org/2001/XInclude"
       xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
@@ -67,22 +68,24 @@
                 </xforms:bind>
                 <!-- Metadata information -->
                 <xforms:bind nodeset="xhtml:head/xforms:model[@id = 'fr-form-model']/xforms:instance[@id = 'fr-form-metadata']/*">
-                    <xforms:bind id="project-id-bind" nodeset="project-id" required="true()" type="xs:NCName" readonly="false()"
+                    <xforms:bind id="application-id-bind" nodeset="application-id" required="true()" type="xs:NCName" readonly="false()"
                                  calculate="if (normalize-space() = '') then concat('ID', digest(string(random(true)), 'MD5', 'hex')) else ."/>
                     <xforms:bind id="form-id-bind" nodeset="form-id" required="true()" type="xs:NCName" readonly="false()"
                                  calculate="if (normalize-space() = '') then concat('ID', digest(string(random(true)), 'MD5', 'hex')) else ."/>
                     <xforms:bind id="title-bind" nodeset="title" required="true()"/>
                     <xforms:bind id="description-bind" nodeset="description"/>
                 </xforms:bind>
+                <!-- Set HTML title -->
+                <xforms:bind nodeset="xhtml:head/xhtml:title" calculate="$metadata-instance/title"/>
             </xforms:bind>
 
             <!-- All form resources -->
             <xforms:instance id="fr-form-resources" xxforms:readonly="true">
                 <resources>
                     <resource xml:lang="en">
-                        <project-id>
+                        <application-id>
                             <label>Application Identifier</label>
-                        </project-id>
+                        </application-id>
                         <form-id>
                             <label>Form Identifier</label>
                         </form-id>
@@ -95,9 +98,9 @@
                         <!-- TODO: i18n whole Form Builder -->
                     </resource>
                     <resource xml:lang="fr">
-                        <project-id>
+                        <application-id>
                             <label>Identifiant du Projet</label>
-                        </project-id>
+                        </application-id>
                         <form-id>
                             <label>Identifiant du formulaire</label>
                         </form-id>
@@ -120,6 +123,17 @@
             <xforms:instance id="fb-xsl-output-instance">
                 <xsl:output xmlns:xsl="http://www.w3.org/1999/XSL/Transform" method="xml" omit-xml-declaration="yes" indent="yes" saxon:indent-spaces="4"/>
             </xforms:instance>
+
+            <!-- Handle attachments -->
+            <xforms:submission id="fb-upload-attachment-submission"
+                               ref="$model/xforms:instance[@id = 'fr-form-attachments']/*"
+                               method="post" replace="none" resource="test:"/>
+
+            <xforms:submission id="fb-save-attachment-submission"
+                    ref="instance('fb-attachment')"
+                    method="put" serialization="application/octet-stream"
+                    replace="none"
+                    resource="/fr/service/exist/crud/orbeon/form1/form/test.bin"/>
 
             <!-- Submission to test the form -->
             <xforms:submission id="fb-test-form-submission"
@@ -897,8 +911,8 @@
                 <fr:section id="fb-metadata-section" class="fb-metadata-section">
                     <xforms:label>Form Metadata</xforms:label>
 
-                    <xforms:input id="project-id-control" bind="project-id-bind" appearance="fr:in-place" class="fr-summary fr-search">
-                        <xforms:label ref="$form-resources/project-id"/>
+                    <xforms:input id="application-id-control" bind="application-id-bind" appearance="fr:in-place" class="fr-summary fr-search">
+                        <xforms:label ref="$form-resources/application-id"/>
                     </xforms:input>
 
                     <xforms:input id="form-id-control" bind="form-id-bind" appearance="fr:in-place" class="fr-summary fr-search">
@@ -1482,6 +1496,15 @@
                         <xxforms:show ev:event="DOMActivate" dialog="fb-schema-upload-dialog"/>
                     </xforms:trigger>
 
+                    <!-- Upload CSS -->
+                    <xforms:trigger>
+                        <xforms:label>
+                            <xhtml:img src="../../../../apps/fr/style/pdf.png" alt="Upload PDF" title="Upload PDF"/>
+                            <xhtml:span>Upload CSS</xhtml:span>
+                        </xforms:label>
+                        <xxforms:show ev:event="DOMActivate" dialog="fb-css-upload-dialog"/>
+                    </xforms:trigger>
+
                     <!-- Upload PDF Template -->
                     <xforms:trigger>
                         <xforms:label>
@@ -1916,498 +1939,148 @@
                     <xforms:setfocus ev:event="xxforms-dialog-open" control="fb-confirmation-dialog-cancel-trigger"/>
                 </xxforms:dialog>
 
-                <!-- Dialog to edit itemsets -->
-                <xxforms:dialog id="fb-itemset-editor-dialog" appearance="minimal">
-                    <xforms:label>Itemset Editor</xforms:label>
-
-                    <xhtml:div class="fb-dialog-body">
-                        
-                        <xforms:group class="fb-language-choice fb-hide-alert">
-                            <xforms:select1 appearance="minimal" ref="$variables/itemset-lang">
-                                <xforms:label class="xforms-disabled">Resources Language</xforms:label>
-                                <xforms:itemset nodeset="$resources/resource">
-                                    <xforms:label value="xxforms:instance('fr-languages-instance')/language[@code = context()/@xml:lang]/(if (@native-name != @english-name) then concat(@native-name, ' (', @english-name, ')') else @native-name)"/>
-                                    <xforms:value ref="@xml:lang"/>
-                                </xforms:itemset>
-                            </xforms:select1>
-                        </xforms:group>
-
-                        <xforms:group context="instance('fb-itemset-instance')" appearance="xxforms:internal">
-                            <fr:repeat nodeset="item" id="fb-itemset-repeat" origin="instance('fb-item-template')" columns="2">
-                                <xhtml:tr>
-                                    <xhtml:td>
-                                        <xforms:input ref="label[@xml:lang = $variables/itemset-lang]" id="fb-itemset-label-input">
-                                            <xforms:action ev:event="DOMActivate">
-                                                <xforms:insert origin="instance('fb-item-template')" nodeset=".."/>
-                                                <xforms:setfocus control="fb-itemset-label-input"/>
-                                            </xforms:action>
-                                        </xforms:input>
-                                    </xhtml:td>
-                                    <xhtml:td>
-                                        <xforms:input ref="value">
-                                            <xforms:action ev:event="DOMActivate">
-                                                <xforms:insert origin="instance('fb-item-template')" nodeset=".."/>
-                                                <xforms:setfocus control="fb-itemset-label-input"/>
-                                            </xforms:action>
-                                        </xforms:input>
-                                    </xhtml:td>
-                                </xhtml:tr>
-                            </fr:repeat>
-                        </xforms:group>
-                    </xhtml:div>
-
-                    <xforms:action ev:event="xxforms-dialog-open">
-
-                        <!-- Build itemset with all languages -->
-
-                        <!-- Clear itemset instance -->
-                        <xforms:delete context="instance('fb-itemset-instance')" while="*" nodeset="*"/>
-
-                        <!-- Iterate over all of the current language's items -->
-                        <xxforms:variable name="resource-id" select="$variables/itemset-resource-id"/>
-                        <xforms:action xxforms:iterate="$current-resources/*[name() = $resource-id]/item">
-                            <xxforms:variable name="item" select="."/>
-                            <!-- Insert the current language's item and add xml:lang attribute on label -->
-                            <xforms:insert context="instance('fb-itemset-instance')" nodeset="item" origin="$item"/>
-                            <xforms:insert context="instance('fb-itemset-instance')/item[last()]/label" origin="$current-resources/@xml:lang"/>
-                            <!-- Iterate over all the other languages  -->
-                            <xforms:action xxforms:iterate="$resources/resource[@xml:lang != $lang]">
-                                <xxforms:variable name="other-resource" select="."/>
-                                <xxforms:variable name="other-item" select="*[name() = $resource-id]/item[value = $item/value]"/>
-
-                                <!-- Insert the label for the other language and add xml:lang attribute -->
-                                <xforms:action if="exists($other-item/label)">
-                                    <xforms:insert nodeset="instance('fb-itemset-instance')/item[last()]/label" origin="$other-item/label"/>
-                                    <xforms:insert context="instance('fb-itemset-instance')/item[last()]/label[last()]" origin="$other-resource/@xml:lang"/>
-                                </xforms:action>
-                            </xforms:action>
-                        </xforms:action>
-
-                        <!-- Prepare insert template -->
-                        <xforms:delete context="instance('fb-item-template')" while="*" nodeset="*"/>
-                        <xforms:action xxforms:iterate="$resources/resource">
-                            <xxforms:variable name="current-lang" select="@xml:lang"/>
-                            <xforms:insert context="instance('fb-item-template')" nodeset="label" origin="xxforms:element('label')"/>
-                            <xforms:insert context="instance('fb-item-template')/label[last()]" origin="$current-lang"/>
-                        </xforms:action>
-                        <xforms:insert context="instance('fb-item-template')" nodeset="label" origin="xxforms:element('value')"/>
-
-                        <!-- Start with current language -->
-                        <xforms:setvalue ref="$variables/itemset-lang" value="$lang"/>
-
-                        <!-- Set focus when the dialog open  -->
-                        <xforms:setfocus control="fb-itemset-label-input"/>
-                    </xforms:action>
-
-                    <xforms:action ev:event="xxforms-dialog-close">
-
-                        <!-- Copy back the items to all languages -->
-
-                        <xxforms:variable name="resource-id" select="$variables/itemset-resource-id"/>
-                        <xforms:action xxforms:iterate="$resources/resource">
-                            <xxforms:variable name="current-lang" select="@xml:lang"/>
-                            <xxforms:variable name="current-resource" select="*[name() = $resource-id]"/>
-
-                            <xforms:action context="$current-resource">
-                                <!-- Delete all the existing items -->
-                                <xforms:delete while="item" nodeset="item"/>
-
-                                <!-- Copy all the new items (after existing elements if any) -->
-                                <xforms:insert context="." nodeset="*" origin="instance('fb-itemset-instance')/item"/>
-
-                                <!-- Delete all labels with a different language -->
-                                <xforms:delete xxforms:iterate="item/label[@xml:lang != $current-lang]" nodeset="."/>
-
-                                <!-- Delete all xml:lang attributes -->
-                                <xforms:delete xxforms:iterate="item/label/@xml:lang" nodeset="."/>
-                            </xforms:action>
-
-                        </xforms:action>
-
-                        <!-- Clear itemset instance -->
-                        <xforms:delete context="instance('fb-itemset-instance')" while="*" nodeset="*"/>
-                    </xforms:action>
-
-                </xxforms:dialog>
-
-                <!-- Edit details -->
-                <xxforms:dialog id="fb-edit-details-dialog" appearance="minimal">
-                    <xforms:label>Edit Control Details</xforms:label>
-                    
+                <!-- Publish dialog -->
+                <xxforms:dialog id="fb-publish-dialog" level="modal" close="true" draggable="true">
+                    <xforms:label>Publish Form</xforms:label>
                     <xhtml:div>
-                        <xxforms:variable name="instance" select="instance('fb-details-editor-instance')"/>
-                        <xforms:group context="$instance">
-                            <xforms:input ref="control-id" incremental="true" id="fb-edit-details-control-id-input">
-                                <xforms:label>Control Id:</xforms:label>
-                            </xforms:input>
-                            <xhtml:div>
-                                <xforms:trigger class="fr-inplace-rename" ref="change-trigger" id="fb-edit-details-control-id-trigger">
-                                    <xforms:label>Change</xforms:label>
-                                </xforms:trigger>
-                                or
-                                <xforms:trigger appearance="minimal" class="fr-inplace-cancel">
-                                    <xforms:label>Cancel</xforms:label>
-                                </xforms:trigger>
-                            </xhtml:div>
-                        </xforms:group>
-                    </xhtml:div>
-
-                    <!-- Rename the control instance holder and resource holder -->
-                    <xforms:action ev:event="DOMActivate" ev:observer="fb-edit-details-control-id-input fb-edit-details-control-id-trigger">
-
-                        <xxforms:variable name="instance" select="instance('fb-details-editor-instance')"/>
-
-                        <xxforms:variable name="control" select="$form-instance/root()/saxon:evaluate($instance/control)"/>
-                        <xxforms:variable name="instance-holder" select="$form-instance/root()/saxon:evaluate($instance/instance-holder)"/>
-
-                        <xxforms:variable name="old-name" select="name($instance-holder)"/>
-                        <xxforms:variable name="new-name" select="$instance/control-id"/>
-
-                        <!-- Rename instance holder and all resources -->
-                        <xforms:dispatch name="fb-rename-holders" target="fr-form-model">
-                            <xxforms:context name="holders" select="($instance-holder, $resources/resource/*[name() = $old-name])"/>
-                            <xxforms:context name="new-name" select="$new-name"/>
-                        </xforms:dispatch>
-
-                        <!-- Update control id and bindings -->
-                        <xforms:dispatch name="fb-rename-control" target="fr-form-model">
-                            <xxforms:context name="control" select="$control"/>
-                            <xxforms:context name="new-name" select="$new-name"/>
-                        </xforms:dispatch>
-
-                        <!-- Update bind if existing -->
-                        <xxforms:variable name="old-bind-id" select="concat($old-name, '-bind')"/>
-                        <xxforms:variable name="bind" select="$model//xforms:bind[@id = $old-bind-id]"/>
-                        <xforms:action context="$bind" if="exists(.)">
-                            <xforms:setvalue ref="@id" value="concat($new-name, '-bind')"/>
-                            <xforms:setvalue ref="@nodeset" value="$new-name"/>
-                        </xforms:action>
-
-                    </xforms:action>
-
-                    <!-- Hide dialog -->
-                    <xxforms:hide ev:event="DOMActivate" dialog="fb-edit-details-dialog"/>
-                    <!-- Set focus when the dialog open  -->
-                    <xforms:setfocus ev:event="xxforms-dialog-open" control="fb-edit-details-control-id-input"/>
-                </xxforms:dialog>
-
-                <!-- Edit validation -->
-                <xxforms:dialog id="fb-edit-validation-dialog" appearance="minimal">
-                    <xforms:label>Edit Validation Properties</xforms:label>
-                    <xxforms:variable name="instance" select="instance('fb-validation-editor-instance')"/>
-                    <xhtml:div>
-                        <xforms:group class="fb-hide-alert">
-                            <!--<xhtml:table>-->
-                                <!--<xhtml:tr>-->
-                                    <!--<xhtml:td>-->
-                                        <!-- Built-in type selection -->
-                                        <xforms:select1 ref="$instance/builtin-type">
-                                            <xforms:label>Built-in Type</xforms:label>
-                                            <!--<xforms:item>-->
-                                                <!--<xforms:label>[Select...]</xforms:label>-->
-                                                <!--<xforms:value/>-->
-                                            <!--</xforms:item>-->
-                                            <xforms:itemset nodeset="instance('fb-validation-types-instance')/root()//(choices | type)">
-                                                <xforms:label ref="if (self::choices) then label else ."/>
-                                                <xforms:value ref="if (self::choices) then () else ."/>
-                                            </xforms:itemset>
-                                            <xforms:setvalue ev:event="xforms-value-changed" if=". != ''" ref="../schema-type"/>
-                                        </xforms:select1>
-                                    <!--</xhtml:td>-->
-                                    <!--<xhtml:td>-->
-                                        <xforms:select1 ref="$instance/required" appearance="full">
-                                            <xforms:label/>
-                                            <xforms:item>
-                                                <xforms:label>Required</xforms:label>
-                                                <xforms:value>true</xforms:value>
-                                            </xforms:item>
-                                            <xforms:item>
-                                                <xforms:label>Optional</xforms:label>
-                                                <xforms:value>false</xforms:value>
-                                            </xforms:item>
-                                        </xforms:select1>
-                                        <!--<xforms:select ref="$instance/mark-required" appearance="full">-->
-                                            <!--<xforms:label/>-->
-                                            <!--<xforms:item>-->
-                                                <!--<xforms:label>Mark as required</xforms:label>-->
-                                                <!--<xforms:value>true</xforms:value>-->
-                                            <!--</xforms:item>-->
-                                        <!--</xforms:select>-->
-                                        <!--<xforms:select ref="$instance/allow-blanks" appearance="full">-->
-                                            <!--<xforms:label/>-->
-                                            <!--<xforms:item>-->
-                                                <!--<xforms:label>Allow blanks</xforms:label>-->
-                                                <!--<xforms:value>true</xforms:value>-->
-                                            <!--</xforms:item>-->
-                                        <!--</xforms:select>-->
-                                    <!--</xhtml:td>-->
-                                <!--</xhtml:tr>-->
-                            <!--</xhtml:table>-->
-
-                            <!-- Schema type selection if applicable -->
-                            <xforms:select1 ref="$instance/schema-type[$model/xs:schema]">
-                                <xforms:label>Schema Type</xforms:label>
-                                <xforms:item>
-                                    <xforms:label>[Select...]</xforms:label>
-                                    <xforms:value/>
-                                </xforms:item>
-                                <xforms:itemset nodeset="$model/xs:schema/xs:simpleType">
-                                    <xforms:label ref="@name"/>
-                                    <xforms:value ref="@name"/>
-                                </xforms:itemset>
-                                <xforms:setvalue ev:event="xforms-value-changed" if=". != ''" ref="../builtin-type"/>
-                            </xforms:select1>
-
-                            <!-- Alert message -->
-                            <xforms:textarea ref="$instance/alert">
-                                <xforms:label>Alert Message</xforms:label>
-                            </xforms:textarea>
-
-                            <xhtml:div class="dialog-button">
-                                <xforms:trigger class="fr-inplace-rename" id="fb-edit-validation-trigger">
-                                    <xforms:label>Change</xforms:label>
-                                </xforms:trigger>
-                                or
-                                <xforms:trigger appearance="minimal" class="fr-inplace-cancel">
-                                    <xforms:label>Cancel</xforms:label>
-                                </xforms:trigger>
-                            </xhtml:div>
-                        </xforms:group>
-                    </xhtml:div>
-
-                    <!-- Set type information into the form -->
-                    <xforms:action ev:event="DOMActivate" ev:observer="fb-edit-validation-trigger">
-                        <xxforms:variable name="instance" select="instance('fb-validation-editor-instance')"/>
-                        <xxforms:variable name="current-control" select="if ($current-control-name != '') then $body//xforms:*[@id = concat($current-control-name, '-control')] else ()"/>
-                        <xxforms:variable name="current-control-resource" select="$current-resources/*[name() = $current-control-name]"/>
-                        <xxforms:variable name="current-bind-id" select="concat($current-control-name, '-bind')"/>
-
-                        <!-- Copy back the alert -->
-                        <xforms:setvalue ref="$current-control-resource/alert" value="$instance/alert"/>\
-
-                        <xxforms:variable name="is-bind" select="$instance/schema-type != '' or $instance/builtin-type != 'string' or $instance/required = 'true'"/>
-                        <xforms:action if="$is-bind">
-
-                            <!-- Insert bind if needed -->
-                            <xforms:dispatch name="fb-ensure-bind" target="fr-form-model">
-                                <xxforms:context name="control-name" select="$current-control-name"/>
-                            </xforms:dispatch>
-
-                            <!-- Make sure the control points to the bind -->
-                            <xforms:action context="$current-control">
-                                <xforms:delete nodeset="@ref"/>
-                                <xforms:insert context="." origin="xxforms:attribute('bind', $current-bind-id)"/>
-                            </xforms:action>
-
-                            <xxforms:variable name="new-bind" select="$model//xforms:bind[@id = $current-bind-id]"/>
-                            <xforms:action context="$new-bind">
-                                <!-- Set built-in type if needed -->
-                                <xforms:insert if="$instance/builtin-type != ''"
-                                               context="." origin="xxforms:attribute('type', concat(if ($instance/required = 'true') then 'xs:' else 'xforms:', $instance/builtin-type))"/>
-                                <xforms:insert if="$instance/required = 'true'"
-                                               context="." origin="xxforms:attribute('required', 'true()')"/>
-                                <xforms:delete if="$instance/required = 'false'"
-                                               context="." nodeset="@required"/>
-
-                                <!-- Set schema type if needed -->
-                                <!-- TODO: Handle namespace and prefix for namespace -->
-                                <xforms:insert if="$instance/schema-type != ''"
-                                               context="." origin="xxforms:attribute('type', $instance/schema-type)"/>
-                            </xforms:action>
-
-                            <!-- TODO: constraints -->
-
-                        </xforms:action>
-                        <xxforms:variable name="bind" select="$model//xforms:bind[@id = $current-bind-id]"/>
-                        <xforms:action if="not($is-bind) and exists($bind)">
-                            <!-- Remove bind and associated data -->
-
-                            <!-- Make sure the control doesn't point to the bind -->
-                            <xforms:delete nodeset="$current-control/@bind"/>
-                            <xforms:insert context="$current-control" origin="xxforms:attribute('ref', $current-control-name)"/>
-
-                            <!-- Delete the bind -->
-                            <xforms:delete nodeset="$bind"/>
-
-                        </xforms:action>
-
-                    </xforms:action>
-
-                    <!-- Hide dialog -->
-                    <xxforms:hide ev:event="DOMActivate" dialog="fb-edit-validation-dialog"/>
-
-                    <!-- When the dialog opens, get type information from the form -->
-                    <xforms:action ev:event="xxforms-dialog-open">
-                        <xxforms:variable name="instance" select="instance('fb-validation-editor-instance')"/>
-                        <xxforms:variable name="current-control-resource" select="$current-resources/*[name() = $current-control-name]"/>
-                        <xxforms:variable name="current-bind-id" select="concat($current-control-name, '-bind')"/>
-                        <xxforms:variable name="current-bind" select="$model//xforms:bind[@id = $current-bind-id]"/>
-
-                        <!-- Copy alert -->
-                        <xforms:setvalue ref="$instance/alert" value="$current-control-resource/alert"/>
-
-                        <!-- Copy bind information -->
-
-                        <!-- Set string type if there is no type specified at all -->
-                        <xforms:setvalue if="not($current-bind/@type)" ref="$instance/builtin-type">string</xforms:setvalue>
-                        <xforms:setvalue ref="$instance/schema-type"/>
-                        <xforms:setvalue ref="$instance/required">false</xforms:setvalue>
-
-                        <!-- Set type information if there is a type specified -->
-                        <xforms:action if="$current-bind/@type">
-                            <xxforms:variable name="is-builtin-type" select="starts-with($current-bind/@type, 'xs:') or starts-with($current-bind/@type, 'xforms:')"/>
-                            <xforms:setvalue if="$is-builtin-type" ref="$instance/builtin-type" value="substring-after($current-bind/@type, ':')"/>
-                            <!-- TODO: Handle namespace and prefix for namespace -->
-                            <xforms:setvalue if="not($is-builtin-type)"
-                                             ref="$instance/schema-type" value="$current-bind/@type"/>
-                            <xforms:setvalue ref="$instance/required" value="starts-with($current-bind/@type, 'xs:')"/>
-                        </xforms:action>
-                    </xforms:action>
-                </xxforms:dialog>
-
-                <!-- Schema upload -->
-                <xxforms:dialog id="fb-schema-upload-dialog" level="modal">
-                    <xforms:label>XML Schema Upload</xforms:label>
-
-                    <xxforms:variable name="instance" select="instance('fb-schema-upload-instance')"/>
-                    <xhtml:div>
-                        <xforms:group>
-
-                            <!-- Schema information -->
-                            <xxforms:variable name="schema-element" select="($instance/schema/xs:schema, $model/xs:schema)[1]"/>
-                            <xxforms:variable name="is-existing-schema" select="exists($model/xs:schema)"/>
-                            <xxforms:variable name="is-new-schema" select="exists($instance/schema/xs:schema)"/>
-
-                            <xforms:group ref="$schema-element" class="fb-hide-alert">
-                                <xforms:label class="fb-dialog-h2" value="if ($is-new-schema) then 'New Schema Information' else 'Existing Schema Information'"/>
-
-                                <xhtml:div class="fb-dialog-section">
-                                    <xforms:group ref=".[xs:simpleType]">
-                                        <!-- Schema types -->
-                                        <xforms:select1 ref="$instance/temp-type" appearance="compact">
-                                            <xforms:label>Available Schema Types</xforms:label>
-                                            <xforms:hint>This lists the simple types available in the uploaded schema</xforms:hint>
-                                            <!--<xforms:item>-->
-                                                <!--<xforms:label>[Select...]</xforms:label>-->
-                                                <!--<xforms:value/>-->
-                                            <!--</xforms:item>-->
-                                            <xforms:itemset nodeset="$schema-element/xs:simpleType">
-                                                <xforms:label ref="@name"/>
-                                                <xforms:value ref="@name"/>
-                                            </xforms:itemset>
-                                        </xforms:select1>
-                                    </xforms:group>
-                                    <xforms:group ref=".[not(xs:simpleType)]">
-                                        <xforms:label>Available Schema Types</xforms:label>
-                                        Your schema does not seem to contain simple types. You won't be able to select types
-                                        from this schema for validation.
-                                    </xforms:group>
-                                    <xforms:group ref=".[@targetNamespace]">
-                                        <xforms:output value="@targetNamespace">
-                                            <xforms:label>Schema Namespace URI</xforms:label>
-                                            <xforms:hint>This is the namespace URI of the uploaded schema</xforms:hint>
-                                        </xforms:output>
-                                    </xforms:group>
-                                </xhtml:div>
-
-                            </xforms:group>
-                            <xforms:group class="fb-hide-alert">
-                                <xforms:label class="fb-dialog-h2">Operations</xforms:label>
-
-                                <xhtml:div class="fb-dialog-section">
-                                    <xforms:trigger ref=".[not($is-new-schema) and $model/xs:schema]">
-                                        <xforms:label>Delete Existing XML Schema</xforms:label>
-
-                                        <xforms:action ev:event="DOMActivate">
-                                            <!-- Delete XML Schema -->
-                                            <xforms:delete nodeset="$model/xs:schema"/>
-                                            <!-- TODO: Ask for confirmation, esp. if some types are in use -->
-                                            <!-- TODO: Check and adjust types that could be in use -->
-                                        </xforms:action>
-
-                                    </xforms:trigger>
-
-                                    <!-- Upload a schema-->
-                                    <xforms:upload ref="$instance/schema-uri">
-                                        <xforms:label value="if ($is-new-schema) then 'Change XML Schema' else if ($is-existing-schema) then 'Replace XML Schema' else 'Upload XML Schema'"/>
-                                        <xforms:filename ref="@filename"/>
-                                        <xforms:mediatype ref="@mediatype"/>
-                                        <xxforms:size ref="@size"/>
-
-                                        <!-- Upload file when selected -->
-                                        <xforms:action ev:event="xforms-select">
-                                            <xforms:send submission="fb-schema-upload-submission"/>
-                                        </xforms:action>
-
-                                        <!-- Handle a successful submission -->
-                                        <xforms:action ev:event="xforms-submit-done" ev:observer="fb-schema-upload-submission" context="$instance">
-                                            <!-- Read the schema and store it -->
-                                            <!-- TODO: support catching dynamic XPath error in case doc() fails -->
-                                            <xforms:insert context="schema" origin="doc(../schema-uri)"/>
-                                            <xxforms:variable name="schema-element" select="schema/*"/>
-                                            <xforms:action if="$schema-element/self::xs:schema">
-                                                <!-- We got something that looks like a schema -->
-
-                                                <!-- Check for inclusions -->
-                                                <xforms:action if="$schema-element/(xs:import | xs:include)">
-                                                    <xforms:message>Your schema contains imports or includes. These will be disabled.</xforms:message>
-                                                    <!-- Delete inclusions -->
-                                                    <xforms:delete xxforms:iterate="$schema-element/(xs:import | xs:include)" nodeset="."/>
-                                                </xforms:action>
-
-                                            </xforms:action>
-                                            <xforms:action if="not($schema-element/self::xs:schema)">
-                                                <!-- Oops, this is definitely not a schema -->
-                                                <xforms:message>The uploaded file is not a valid schema.</xforms:message>
-                                                <!-- Clear uploaded content -->
-                                                <xforms:setvalue ref="schema-uri"/>
-                                                <xforms:delete nodeset="$schema-element"/>
-                                            </xforms:action>
-                                        </xforms:action>
-
-                                        <!-- Clear information when deselected -->
-                                        <xforms:action ev:event="xforms-deselect">
-                                            <!-- Clear uploaded content -->
-                                            <xforms:setvalue ref="$instance/schema-uri"/>
-                                            <xforms:delete nodeset="$instance/schema/*"/>
-                                        </xforms:action>
-                                    </xforms:upload>
-                                </xhtml:div>
-                            </xforms:group>
-
-                        </xforms:group>
+                        <!--<xhtml:img src="/apps/fr/style/question-large.gif" alt="Question" class="dialog-icon"/>-->
+                        <xhtml:div class="dialog-message">
+                            <xhtml:p>
+                                Are you sure you want to publish this form? This will override the existing form with
+                                the following properties:
+                            </xhtml:p>
+                            <xhtml:ul>
+                                <xhtml:li>
+                                    <xhtml:p>
+                                        <xhtml:b>Application Id:</xhtml:b>
+                                        <xforms:output value="$metadata-instance/application-id"/>
+                                    </xhtml:p>
+                                </xhtml:li>
+                                <xhtml:li>
+                                    <xhtml:p>
+                                        <xhtml:b>Form Id:</xhtml:b>
+                                        <xforms:output value="$metadata-instance/form-id"/>
+                                    </xhtml:p>
+                                </xhtml:li>
+                            </xhtml:ul>
+                        </xhtml:div>
                     </xhtml:div>
                     <xhtml:div class="dialog-button">
-                        <xforms:group appearance="xxforms:internal">
-                            <xforms:trigger class="fr-inplace-rename" id="fb-edit-schema-trigger">
-                                <xforms:label>Change</xforms:label>
-
+                        <xforms:group>
+                            <xforms:trigger class="xforms-trigger-appearance-modal">
+                                <xforms:label>
+                                    <xhtml:img src="../../../../forms/orbeon/builder/images/upload.png" alt="Publish" title="Publish"/>
+                                    <xhtml:span>Publish</xhtml:span>
+                                </xforms:label>
                                 <xforms:action ev:event="DOMActivate">
-                                    <!-- Insert schema into the model -->
-
-                                    <!-- Delete existing XML Schema if any -->
-                                    <!-- TODO: What we want in fact is to disable this button if there is an existing schema, and the user will explicitly remove the previous schema -->
-                                    <xforms:delete nodeset="$model/xs:schema"/>
-
-                                    <xforms:insert context="$model" origin="$instance/schema/*"/>
+                                    <xforms:dispatch name="fr-publish-form" target="fr-persistence-model">
+                                        <xxforms:context name="application" select="$metadata-instance/application-id"/>
+                                        <xxforms:context name="form" select="$metadata-instance/form-id"/>
+                                    </xforms:dispatch>
                                 </xforms:action>
-
                             </xforms:trigger>
-                            or
-                            <xforms:trigger appearance="minimal" class="fr-inplace-cancel">
-                                <xforms:label>Cancel</xforms:label>
+                            <xforms:trigger>
+                                <xforms:label><xhtml:img src="/apps/fr/style/close.gif" alt=""/> <xhtml:span>Cancel</xhtml:span></xforms:label>
                             </xforms:trigger>
-
-                            <xforms:action ev:event="DOMActivate">
-                                <!-- Hide dialog -->
-                                <xxforms:hide dialog="fb-schema-upload-dialog"/>
-                                <!-- Clear uploaded content -->
-                                <xforms:setvalue ref="$instance/schema-uri"/>
-                                <xforms:delete nodeset="$instance/schema/*"/>
-                            </xforms:action>
                         </xforms:group>
                     </xhtml:div>
+                    <!-- Hide dialog -->
+                    <xxforms:hide ev:event="DOMActivate" dialog="fb-publish-dialog"/>
+                    <!-- Set focus when the dialog open  -->
+                    <!--<xforms:setfocus ev:event="xxforms-dialog-open" control="fb-confirmation-dialog-cancel-trigger"/>-->
                 </xxforms:dialog>
+
+                <!-- CSS upload dialog -->
+                <xxforms:dialog id="fb-css-upload-dialog" level="modal" close="true" draggable="true">
+                    <xforms:label>Upload CSS</xforms:label>
+                    <xxforms:variable name="attachments-instance" select="$model/xforms:instance[@id = 'fr-form-attachments']/*"/>
+                    <xhtml:div>
+                        <xhtml:div class="dialog-message">
+
+                            <!-- Upload a CSS file -->
+                            <xforms:upload ref="$attachments-instance/attachment[1]">
+                                <xforms:label>CSS File</xforms:label>
+                                <xforms:filename ref="@filename"/>
+                                <xforms:mediatype ref="@mediatype"/>
+                                <xxforms:size ref="@size"/>
+
+                                <!-- Upload file when selected -->
+                                <xforms:action ev:event="xforms-select">
+                                    <xforms:send submission="fb-upload-attachment-submission"/>
+                                </xforms:action>
+
+                                <!-- Clear information when deselected -->
+                                <xforms:action ev:event="xforms-deselect">
+                                    <!-- Clear uploaded content -->
+                                    <xforms:setvalue ref="."/>
+                                    <xforms:setvalue ref="@filename"/>
+                                    <xforms:setvalue ref="@mediatype"/>
+                                    <xforms:setvalue ref="@size"/>
+                                </xforms:action>
+                            </xforms:upload>
+
+                            <!--<xforms:group context="$attachments-instance/attachment[1]" appearance="xxforms:internal">-->
+                                <!--<xhtml:ul>-->
+                                    <!--<xhtml:li>-->
+                                        <!--<xhtml:p>-->
+                                            <!--<xhtml:b>File Name:</xhtml:b>-->
+                                            <!--<xforms:output value="@filename"/>-->
+                                        <!--</xhtml:p>-->
+                                    <!--</xhtml:li>-->
+                                    <!--<xhtml:li>-->
+                                        <!--<xhtml:p>-->
+                                            <!--<xhtml:b>Mediatype:</xhtml:b>-->
+                                            <!--<xforms:output value="@mediatype"/>-->
+                                        <!--</xhtml:p>-->
+                                    <!--</xhtml:li>-->
+                                    <!--<xhtml:li>-->
+                                        <!--<xhtml:p>-->
+                                            <!--<xhtml:b>Size:</xhtml:b>-->
+                                            <!--<xforms:output value="@size"/>-->
+                                        <!--</xhtml:p>-->
+                                    <!--</xhtml:li>-->
+                                <!--</xhtml:ul>-->
+                            <!--</xforms:group>-->
+
+                        </xhtml:div>
+                    </xhtml:div>
+                    <xhtml:div class="dialog-button">
+                        <xforms:group>
+                            <xforms:trigger class="xforms-trigger-appearance-modal">
+                                <xforms:label>
+                                    <xhtml:img src="../../../../forms/orbeon/builder/images/upload.png" alt="Publish" title="Publish"/>
+                                    <xhtml:span>Upload</xhtml:span>
+                                </xforms:label>
+                                <xforms:action ev:event="DOMActivate">
+                                    <xforms:send submission="fb-save-attachment-submission">
+                                        xxx
+                                        <!-- TODO -->
+                                        <xxforms:context name="name" select="$attachments-instance/attachment[1]/@filename"/>
+                                    </xforms:send>
+                                </xforms:action>
+                            </xforms:trigger>
+                            <xforms:trigger>
+                                <xforms:label><xhtml:img src="/apps/fr/style/close.gif" alt=""/> <xhtml:span>Cancel</xhtml:span></xforms:label>
+                            </xforms:trigger>
+                        </xforms:group>
+                    </xhtml:div>
+                    <!-- Hide dialog -->
+                    <xxforms:hide ev:event="DOMActivate" dialog="fb-css-upload-dialog"/>
+                    <!-- Set focus when the dialog open  -->
+                    <!--<xforms:setfocus ev:event="xxforms-dialog-open" control="fb-confirmation-dialog-cancel-trigger"/>-->
+                </xxforms:dialog>
+
+                <!-- Dialog to edit itemsets -->
+                <xi:include href="oxf:/forms/orbeon/builder/form/dialog-itemsets.xml" xxi:omit-xml-base="true"/>
+
+                <!-- Edit details -->
+                <xi:include href="oxf:/forms/orbeon/builder/form/dialog-details.xml" xxi:omit-xml-base="true"/>
+
+                <!-- Validation dialog -->
+                <xi:include href="oxf:/forms/orbeon/builder/form/dialog-validation.xml" xxi:omit-xml-base="true"/>
+
+                <!-- Schema upload -->
+                <xi:include href="oxf:/forms/orbeon/builder/form/dialog-schema.xml" xxi:omit-xml-base="true"/>
 
             </fr:body>
             <fr:buttons>
@@ -2424,16 +2097,13 @@
                 </xforms:trigger>
 
                 <!-- Publish form -->
-                <xforms:trigger id="fb-publish-button" class="xforms-trigger-appearance-modal" >
+                <xforms:trigger id="fb-publish-button">
                     <xforms:label>
                         <xhtml:img src="../../../../forms/orbeon/builder/images/upload.png" alt="Publish" title="Publish"/>
                         <xhtml:span>Publish</xhtml:span>
                     </xforms:label>
                     <xforms:action ev:event="DOMActivate">
-                        <xforms:dispatch name="fr-publish-form" target="fr-persistence-model">
-                            <xxforms:context name="application" select="$metadata-instance/project-id"/>
-                            <xxforms:context name="form" select="$metadata-instance/form-id"/>
-                        </xforms:dispatch>
+                        <xxforms:show dialog="fb-publish-dialog"/>
                     </xforms:action>
                 </xforms:trigger>
 

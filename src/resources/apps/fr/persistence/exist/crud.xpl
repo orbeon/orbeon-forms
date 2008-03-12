@@ -30,7 +30,9 @@
         <p:input name="config">
             <config>
                 <include>/request/request-path</include>
+                <include>/request/content-type</include>
                 <include>/request/method</include>
+                <include>/request/body</include>
             </config>
         </p:input>
         <p:output name="data" id="request"/>
@@ -39,12 +41,34 @@
     <p:processor name="oxf:perl5-matcher">
         <p:input name="config"><config>/fr/service/exist/crud/([^/]+/[^/]+/(form/[^/]+|data/[^/]+/[^/]+))</config></p:input>
         <p:input name="data" href="#request#xpointer(/request/request-path)"/>
-        <p:output name="data" id="matcher-groups" debug="xxxx"/>
+        <p:output name="data" id="matcher-groups"/>
     </p:processor>
 
-    <!-- Discriminate based on the HTTP method -->
+    <!-- Discriminate based on the HTTP method and content type -->
     <p:choose href="#request">
-        <p:when test="/request/method = 'GET'">
+
+        <p:when test="/*/method = 'PUT' and not(/*/content-type = ('application/xml', 'text/xml') or ends-with(/*/content-type, '+xml'))">
+            <!-- Binary put -->
+
+            <p:processor name="oxf:xforms-submission">
+                <p:input name="submission">
+                    <xforms:submission ref="/*/body" method="put" replace="none"
+                            serialization="application/octet-stream"
+                            resource="{xxforms:property('oxf.fr.persistence.service.exist.uri')}/{/*/group[1]}">
+                        <xforms:action ev:event="xforms-submit-error">
+                            <!-- TODO: Propagate error to caller -->
+                            <xforms:delete while="/*/*" nodeset="/*/*"/>
+                            <xforms:setvalue ref="/*" value="event('response-body')"/>
+                            <xforms:message level="xxforms:log-error"><xforms:output value="event('response-body')"/></xforms:message>
+                        </xforms:action>
+                    </xforms:submission>
+                </p:input>
+                <p:input name="request" href="aggregate('root', #request#xpointer(/*/body), #matcher-groups#xpointer(/*/group))"/>
+                <p:output name="response" id="response"/>
+            </p:processor>
+
+        </p:when>
+        <p:when test="/*/method = 'GET'">
 
             <p:processor name="oxf:xforms-submission">
                 <p:input name="submission">
@@ -63,7 +87,7 @@
             </p:processor>
 
         </p:when>
-        <p:when test="/request/method = 'DELETE'">
+        <p:when test="/*/method = 'DELETE'">
 
             <p:processor name="oxf:xforms-submission">
                 <p:input name="submission">
@@ -82,7 +106,7 @@
             </p:processor>
 
         </p:when>
-        <p:when test="/request/method = 'PUT'">
+        <p:when test="/*/method = 'PUT'">
 
             <p:processor name="oxf:xforms-submission">
                 <p:input name="submission">

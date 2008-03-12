@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Copyright (C) 2008 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xxforms:dialog xmlns:xhtml="http://www.w3.org/1999/xhtml"
+      xmlns:xforms="http://www.w3.org/2002/xforms"
+      xmlns:xs="http://www.w3.org/2001/XMLSchema"
+      xmlns:ev="http://www.w3.org/2001/xml-events"
+      xmlns:xi="http://www.w3.org/2001/XInclude"
+      xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+      xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+      xmlns:saxon="http://saxon.sf.net/"
+
+      id="fb-edit-details-dialog" appearance="minimal">
+
+    <xforms:label>Edit Control Details</xforms:label>
+
+    <xhtml:div>
+        <xxforms:variable name="instance" select="instance('fb-details-editor-instance')"/>
+        <xforms:group context="$instance">
+            <xforms:input ref="control-id" incremental="true" id="fb-edit-details-control-id-input">
+                <xforms:label>Control Id:</xforms:label>
+            </xforms:input>
+            <xhtml:div>
+                <xforms:trigger class="fr-inplace-rename" ref="change-trigger" id="fb-edit-details-control-id-trigger">
+                    <xforms:label>Change</xforms:label>
+                </xforms:trigger>
+                or
+                <xforms:trigger appearance="minimal" class="fr-inplace-cancel">
+                    <xforms:label>Cancel</xforms:label>
+                </xforms:trigger>
+            </xhtml:div>
+        </xforms:group>
+    </xhtml:div>
+
+    <!-- Rename the control instance holder and resource holder -->
+    <xforms:action ev:event="DOMActivate" ev:observer="fb-edit-details-control-id-input fb-edit-details-control-id-trigger">
+
+        <xxforms:variable name="instance" select="instance('fb-details-editor-instance')"/>
+
+        <xxforms:variable name="control" select="$form-instance/root()/saxon:evaluate($instance/control)"/>
+        <xxforms:variable name="instance-holder" select="$form-instance/root()/saxon:evaluate($instance/instance-holder)"/>
+
+        <xxforms:variable name="old-name" select="name($instance-holder)"/>
+        <xxforms:variable name="new-name" select="$instance/control-id"/>
+
+        <!-- Rename instance holder and all resources -->
+        <xforms:dispatch name="fb-rename-holders" target="fr-form-model">
+            <xxforms:context name="holders" select="($instance-holder, $resources/resource/*[name() = $old-name])"/>
+            <xxforms:context name="new-name" select="$new-name"/>
+        </xforms:dispatch>
+
+        <!-- Update control id and bindings -->
+        <xforms:dispatch name="fb-rename-control" target="fr-form-model">
+            <xxforms:context name="control" select="$control"/>
+            <xxforms:context name="new-name" select="$new-name"/>
+        </xforms:dispatch>
+
+        <!-- Update bind if existing -->
+        <xxforms:variable name="old-bind-id" select="concat($old-name, '-bind')"/>
+        <xxforms:variable name="bind" select="$model//xforms:bind[@id = $old-bind-id]"/>
+        <xforms:action context="$bind" if="exists(.)">
+            <xforms:setvalue ref="@id" value="concat($new-name, '-bind')"/>
+            <xforms:setvalue ref="@nodeset" value="$new-name"/>
+        </xforms:action>
+
+    </xforms:action>
+
+    <!-- Hide dialog -->
+    <xxforms:hide ev:event="DOMActivate" dialog="fb-edit-details-dialog"/>
+    <!-- Set focus when the dialog open  -->
+    <xforms:setfocus ev:event="xxforms-dialog-open" control="fb-edit-details-control-id-input"/>
+</xxforms:dialog>

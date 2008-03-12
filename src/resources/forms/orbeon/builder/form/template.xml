@@ -15,12 +15,13 @@
 <xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml"
       xmlns:xforms="http://www.w3.org/2002/xforms"
       xmlns:xs="http://www.w3.org/2001/XMLSchema"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:ev="http://www.w3.org/2001/xml-events"
       xmlns:xi="http://www.w3.org/2001/XInclude"
       xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
       xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-      xmlns:saxon="http://saxon.sf.net/" >
+      xmlns:saxon="http://saxon.sf.net/">
     <xhtml:head>
         <xhtml:title>Empty Orbeon Form</xhtml:title>
         <xhtml:link rel="stylesheet" href="/ops/css/yui/reset-fonts-grids.css" type="text/css"/>
@@ -41,12 +42,20 @@
             <!-- Metadata -->
             <xforms:instance id="fr-form-metadata" xxforms:readonly="true">
                 <metadata>
-                    <project-id/>
+                    <application-id/>
                     <form-id/>
                     <title>[Give this form a title]</title>
                     <description>[Optionally describe this form]</description>
                     <author/>
                 </metadata>
+            </xforms:instance>
+
+            <!-- Attachments -->
+            <xforms:instance id="fr-form-attachments" xxforms:readonly="true">
+                <attachments>
+                    <attachment type="xs:anyURI" mediatype="text/css" filename="" size=""/>
+                    <attachment type="xs:anyURI" mediatype="application/pdf" filename="" size=""/>
+                </attachments>
             </xforms:instance>
 
             <!-- All form resources -->

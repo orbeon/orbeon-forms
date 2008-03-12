@@ -25,8 +25,7 @@
 
     <!-- Model initialization -->
     <!-- TODO: Should not do this on summary page, for example -->
-    <xforms:action ev:event="xforms-ready">
-
+    <xforms:action ev:event="xforms-model-construct-done">
         <!-- Initialize URIs based on hierarchy of properties -->
 
         <!-- TODO: This code must be moved to a function -->

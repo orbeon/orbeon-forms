@@ -34,7 +34,7 @@
         <xforms:model id="fr-form-model">
 
             <!-- Model initialization -->
-            <xforms:action ev:event="xforms-ready">
+            <xforms:action ev:event="xforms-model-construct-done">
                 <!-- Get configuration for the current form -->
                 <xforms:send submission="get-configuration-submission"/>
 

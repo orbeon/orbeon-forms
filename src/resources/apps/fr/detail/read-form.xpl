@@ -70,8 +70,8 @@
                 </xforms:action>
             </xforms:submission>
         </p:input>
-        <p:input name="request" href="#instance"/>
-        <p:output name="response" ref="data" debug="xxx"/>
+        <p:input name="request" href="#instance" debug="xxx"/>
+        <p:output name="response" ref="data"/>
     </p:processor>
 
     <!-- TODO: Use digest to allow caching by XForms processor -->

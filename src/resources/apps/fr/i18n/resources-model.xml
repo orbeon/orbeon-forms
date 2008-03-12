@@ -9,7 +9,7 @@
         xmlns:ev="http://www.w3.org/2001/xml-events"
         id="fr-resources-model">
 
-    <xforms:action ev:event="xforms-ready">
+    <xforms:action ev:event="xforms-model-construct-done">
         <xforms:dispatch name="fr-update-language" target="fr-resources-model"/>
     </xforms:action>
 

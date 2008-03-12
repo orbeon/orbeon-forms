@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Copyright (C) 2008 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xxforms:dialog xmlns:xhtml="http://www.w3.org/1999/xhtml"
+      xmlns:xforms="http://www.w3.org/2002/xforms"
+      xmlns:xs="http://www.w3.org/2001/XMLSchema"
+      xmlns:ev="http://www.w3.org/2001/xml-events"
+      xmlns:xi="http://www.w3.org/2001/XInclude"
+      xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+      xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+      xmlns:saxon="http://saxon.sf.net/"
+
+      id="fb-edit-validation-dialog" appearance="minimal">
+
+    <xforms:label>Edit Validation Properties</xforms:label>
+    <xxforms:variable name="instance" select="instance('fb-validation-editor-instance')"/>
+    <xhtml:div>
+        <xforms:group class="fb-hide-alert">
+            <!--<xhtml:table>-->
+                <!--<xhtml:tr>-->
+                    <!--<xhtml:td>-->
+                        <!-- Built-in type selection -->
+                        <xforms:select1 ref="$instance/builtin-type">
+                            <xforms:label>Built-in Type</xforms:label>
+                            <!--<xforms:item>-->
+                                <!--<xforms:label>[Select...]</xforms:label>-->
+                                <!--<xforms:value/>-->
+                            <!--</xforms:item>-->
+                            <xforms:itemset nodeset="instance('fb-validation-types-instance')/root()//(choices | type)">
+                                <xforms:label ref="if (self::choices) then label else ."/>
+                                <xforms:value ref="if (self::choices) then () else ."/>
+                            </xforms:itemset>
+                            <xforms:setvalue ev:event="xforms-value-changed" if=". != ''" ref="../schema-type"/>
+                        </xforms:select1>
+                    <!--</xhtml:td>-->
+                    <!--<xhtml:td>-->
+                        <xforms:select1 ref="$instance/required" appearance="full">
+                            <xforms:label/>
+                            <xforms:item>
+                                <xforms:label>Required</xforms:label>
+                                <xforms:value>true</xforms:value>
+                            </xforms:item>
+                            <xforms:item>
+                                <xforms:label>Optional</xforms:label>
+                                <xforms:value>false</xforms:value>
+                            </xforms:item>
+                        </xforms:select1>
+                        <!--<xforms:select ref="$instance/mark-required" appearance="full">-->
+                            <!--<xforms:label/>-->
+                            <!--<xforms:item>-->
+                                <!--<xforms:label>Mark as required</xforms:label>-->
+                                <!--<xforms:value>true</xforms:value>-->
+                            <!--</xforms:item>-->
+                        <!--</xforms:select>-->
+                        <!--<xforms:select ref="$instance/allow-blanks" appearance="full">-->
+                            <!--<xforms:label/>-->
+                            <!--<xforms:item>-->
+                                <!--<xforms:label>Allow blanks</xforms:label>-->
+                                <!--<xforms:value>true</xforms:value>-->
+                            <!--</xforms:item>-->
+                        <!--</xforms:select>-->
+                    <!--</xhtml:td>-->
+                <!--</xhtml:tr>-->
+            <!--</xhtml:table>-->
+
+            <!-- Schema type selection if applicable -->
+            <xforms:select1 ref="$instance/schema-type[$model/xs:schema]">
+                <xforms:label>Schema Type</xforms:label>
+                <xforms:item>
+                    <xforms:label>[Select...]</xforms:label>
+                    <xforms:value/>
+                </xforms:item>
+                <xforms:itemset nodeset="$model/xs:schema/xs:simpleType">
+                    <xforms:label ref="@name"/>
+                    <xforms:value ref="@name"/>
+                </xforms:itemset>
+                <xforms:setvalue ev:event="xforms-value-changed" if=". != ''" ref="../builtin-type"/>
+            </xforms:select1>
+
+            <!-- Alert message -->
+            <xforms:textarea ref="$instance/alert">
+                <xforms:label>Alert Message</xforms:label>
+            </xforms:textarea>
+
+            <xhtml:div class="dialog-button">
+                <xforms:trigger class="fr-inplace-rename" id="fb-edit-validation-trigger">
+                    <xforms:label>Change</xforms:label>
+                </xforms:trigger>
+                or
+                <xforms:trigger appearance="minimal" class="fr-inplace-cancel">
+                    <xforms:label>Cancel</xforms:label>
+                </xforms:trigger>
+            </xhtml:div>
+        </xforms:group>
+    </xhtml:div>
+
+    <!-- Set type information into the form -->
+    <xforms:action ev:event="DOMActivate" ev:observer="fb-edit-validation-trigger">
+        <xxforms:variable name="instance" select="instance('fb-validation-editor-instance')"/>
+        <xxforms:variable name="current-control" select="if ($current-control-name != '') then $body//xforms:*[@id = concat($current-control-name, '-control')] else ()"/>
+        <xxforms:variable name="current-control-resource" select="$current-resources/*[name() = $current-control-name]"/>
+        <xxforms:variable name="current-bind-id" select="concat($current-control-name, '-bind')"/>
+
+        <!-- Copy back the alert -->
+        <xforms:setvalue ref="$current-control-resource/alert" value="$instance/alert"/>\
+
+        <xxforms:variable name="is-bind" select="$instance/schema-type != '' or $instance/builtin-type != 'string' or $instance/required = 'true'"/>
+        <xforms:action if="$is-bind">
+
+            <!-- Insert bind if needed -->
+            <xforms:dispatch name="fb-ensure-bind" target="fr-form-model">
+                <xxforms:context name="control-name" select="$current-control-name"/>
+            </xforms:dispatch>
+
+            <!-- Make sure the control points to the bind -->
+            <xforms:action context="$current-control">
+                <xforms:delete nodeset="@ref"/>
+                <xforms:insert context="." origin="xxforms:attribute('bind', $current-bind-id)"/>
+            </xforms:action>
+
+            <xxforms:variable name="new-bind" select="$model//xforms:bind[@id = $current-bind-id]"/>
+            <xforms:action context="$new-bind">
+                <!-- Set built-in type if needed -->
+                <xforms:insert if="$instance/builtin-type != ''"
+                               context="." origin="xxforms:attribute('type', concat(if ($instance/required = 'true') then 'xs:' else 'xforms:', $instance/builtin-type))"/>
+                <xforms:insert if="$instance/required = 'true'"
+                               context="." origin="xxforms:attribute('required', 'true()')"/>
+                <xforms:delete if="$instance/required = 'false'"
+                               context="." nodeset="@required"/>
+
+                <!-- Set schema type if needed -->
+                <!-- TODO: Handle namespace and prefix for namespace -->
+                <xforms:insert if="$instance/schema-type != ''"
+                               context="." origin="xxforms:attribute('type', $instance/schema-type)"/>
+            </xforms:action>
+
+            <!-- TODO: constraints -->
+
+        </xforms:action>
+        <xxforms:variable name="bind" select="$model//xforms:bind[@id = $current-bind-id]"/>
+        <xforms:action if="not($is-bind) and exists($bind)">
+            <!-- Remove bind and associated data -->
+
+            <!-- Make sure the control doesn't point to the bind -->
+            <xforms:delete nodeset="$current-control/@bind"/>
+            <xforms:insert context="$current-control" origin="xxforms:attribute('ref', $current-control-name)"/>
+
+            <!-- Delete the bind -->
+            <xforms:delete nodeset="$bind"/>
+
+        </xforms:action>
+
+    </xforms:action>
+
+    <!-- Hide dialog -->
+    <xxforms:hide ev:event="DOMActivate" dialog="fb-edit-validation-dialog"/>
+
+    <!-- When the dialog opens, get type information from the form -->
+    <xforms:action ev:event="xxforms-dialog-open">
+        <xxforms:variable name="instance" select="instance('fb-validation-editor-instance')"/>
+        <xxforms:variable name="current-control-resource" select="$current-resources/*[name() = $current-control-name]"/>
+        <xxforms:variable name="current-bind-id" select="concat($current-control-name, '-bind')"/>
+        <xxforms:variable name="current-bind" select="$model//xforms:bind[@id = $current-bind-id]"/>
+
+        <!-- Copy alert -->
+        <xforms:setvalue ref="$instance/alert" value="$current-control-resource/alert"/>
+
+        <!-- Copy bind information -->
+
+        <!-- Set string type if there is no type specified at all -->
+        <xforms:setvalue if="not($current-bind/@type)" ref="$instance/builtin-type">string</xforms:setvalue>
+        <xforms:setvalue ref="$instance/schema-type"/>
+        <xforms:setvalue ref="$instance/required">false</xforms:setvalue>
+
+        <!-- Set type information if there is a type specified -->
+        <xforms:action if="$current-bind/@type">
+            <xxforms:variable name="is-builtin-type" select="starts-with($current-bind/@type, 'xs:') or starts-with($current-bind/@type, 'xforms:')"/>
+            <xforms:setvalue if="$is-builtin-type" ref="$instance/builtin-type" value="substring-after($current-bind/@type, ':')"/>
+            <!-- TODO: Handle namespace and prefix for namespace -->
+            <xforms:setvalue if="not($is-builtin-type)"
+                             ref="$instance/schema-type" value="$current-bind/@type"/>
+            <xforms:setvalue ref="$instance/required" value="starts-with($current-bind/@type, 'xs:')"/>
+        </xforms:action>
+    </xforms:action>
+</xxforms:dialog>

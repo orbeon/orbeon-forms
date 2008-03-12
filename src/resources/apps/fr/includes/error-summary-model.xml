@@ -27,7 +27,7 @@
         xmlns:xdt="http://www.w3.org/2005/xpath-datatypes"
         xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
 
-    <xforms:action ev:event="xforms-ready">
+    <xforms:action ev:event="xforms-model-construct-done">
         <xforms:delete xxforms:iterate="instance('fr-errors-instance')/*" nodeset="."/>
         <xforms:delete xxforms:iterate="instance('fr-visited-instance')/*" nodeset="."/>
     </xforms:action>

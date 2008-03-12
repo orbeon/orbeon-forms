@@ -17,8 +17,10 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.oxf.xml.*;
+import org.orbeon.saxon.om.*;
 import org.orbeon.saxon.dom4j.NodeWrapper;
+import org.orbeon.saxon.style.StandardNames;
 import org.dom4j.*;
 
 import java.util.*;
@@ -210,8 +212,41 @@ public class InstanceData {
     public static String getType(NodeInfo nodeInfo) {
         final InstanceData existingInstanceData = getLocalInstanceData(nodeInfo, false);
         if (existingInstanceData == null) {
+            // No type was assigned by schema or MIP
+            if (nodeInfo.getNodeKind() == org.w3c.dom.Document.ELEMENT_NODE) {
+                // Check for xsi:type attribute
+                // NOTE: Saxon 9 has new code to resolve such QNames
+                final String typeQName = nodeInfo.getAttributeValue(StandardNames.XSI_TYPE);
+                if (typeQName != null) {
+                    try {
+                        final NameChecker checker = nodeInfo.getConfiguration().getNameChecker();
+                        final String[] parts = checker.getQNameParts(typeQName);
+
+                        // No prefix
+                        if (parts[0].equals("")) {
+                            return parts[1];
+                        }
+
+                        // There is a prefix, resolve it
+                        final SequenceIterator namespaceNodes = nodeInfo.iterateAxis(Axis.NAMESPACE);
+                        while (true) {
+                            final NodeInfo currentNamespaceNode = (NodeInfo) namespaceNodes.next();
+                            if (currentNamespaceNode == null) {
+                                break;
+                            }
+                            final String prefix = currentNamespaceNode.getLocalPart();
+                            if (prefix.equals(parts[0])) {
+                                return XMLUtils.buildExplodedQName(currentNamespaceNode.getStringValue(), parts[1]);
+                            }
+                        }
+                    } catch (Exception e) {
+                        throw new OXFException(e);
+                    }
+                }
+            }
             return null;
         } else {
+            // Return type assigned by schema or MIP
             return existingInstanceData.type;
         }
     }
@@ -219,8 +254,17 @@ public class InstanceData {
     public static String getType(Node node) {
         final InstanceData existingInstanceData = getLocalInstanceData(node);
         if (existingInstanceData == null) {
+            // No type was assigned by schema or MIP
+            if (node instanceof Element) {
+                // Check for xsi:type attribute
+                final Element element = (Element) node;
+                final QName typeQName = Dom4jUtils.extractAttributeValueQName(element, XMLConstants.XSI_TYPE_QNAME);
+                if (typeQName != null)
+                    return Dom4jUtils.qNameToexplodedQName(typeQName);
+            }
             return null;
         } else {
+            // Return type assigned by schema or MIP
             return existingInstanceData.type;
         }
     }

@@ -1881,6 +1881,14 @@
                             resource="http://example.com/foo.bin"/>
                         ...
                     </xml-source>
+                    <p>
+                        Alternatively, you can set the type information using the <code>xsi:type</code> attribute:
+                    </p>
+                    <xml-source>
+                        <xforms:instance id="attachment">
+                            <attachment xsi:type="xs:anyURI">file:/Users/jdoe/Applications/apache-tomcat-5.5.20/temp/xforms_upload_30877.tmp</attachment>
+                        </xforms:instance>
+                    </xml-source>
                 </section>
             </section>
             <a name="other-extensions"/>

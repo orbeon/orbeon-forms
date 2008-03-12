@@ -1434,10 +1434,8 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
 
         final String[] eventsToDispatch = { XFormsEvents.XFORMS_MODEL_CONSTRUCT, XFormsEvents.XFORMS_MODEL_CONSTRUCT_DONE, XFormsEvents.XFORMS_READY, XFormsEvents.XXFORMS_READY };
         for (int i = 0; i < eventsToDispatch.length; i++) {
-            // Initialize controls right at the beginning
-            final boolean isXFormsModelConstructDone = i == 1;
-            if (isXFormsModelConstructDone) {
-                // Initialize controls after all the xforms-model-construct events have been sent
+            if (i == 2) {
+                // Initialize controls after all the xforms-model-construct-done events have been sent
                 xformsControls.initialize(pipelineContext);
             }
 

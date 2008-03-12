@@ -590,9 +590,7 @@ public class XFormsControls {
     public boolean rebuildCurrentControlsStateIfNeeded(PipelineContext pipelineContext) {
 
         if (!initialized) {
-            // This can occur because we lazily initialize controls during initialization
-            initialize(pipelineContext);
-            return true;
+            return false;
         } else {
             // This is the regular case
 

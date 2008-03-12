@@ -303,7 +303,7 @@ public class EmailProcessor extends ProcessorImpl {
             content = handleInlinePartContent(partDocument, contentType);
         }
 
-        if (!(ProcessorUtils.isTextContentType(contentType) || ProcessorUtils.isXMLContentType(contentType))) {
+        if (!(XMLUtils.isTextContentType(contentType) || XMLUtils.isXMLMediatype(contentType))) {
             // This is binary content
             if (content instanceof FileItem) {
                 final FileItem fileItem = (FileItem) content;
@@ -402,7 +402,7 @@ public class EmailProcessor extends ProcessorImpl {
         Writer writer = null;
         OutputStream os = null;
 
-        final boolean useWriter = ProcessorUtils.isTextContentType(contentType) || ProcessorUtils.isXMLContentType(contentType);
+        final boolean useWriter = XMLUtils.isTextContentType(contentType) || XMLUtils.isXMLMediatype(contentType);
 
         try {
             os = fileItem.getOutputStream();

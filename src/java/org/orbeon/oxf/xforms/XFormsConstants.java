@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms;
 
 import org.dom4j.Namespace;
 import org.dom4j.QName;
-import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 
@@ -160,7 +159,7 @@ public class XFormsConstants {
 
     public static final char REPEAT_HIERARCHY_SEPARATOR_1 = 0xB7;
     public static final char REPEAT_HIERARCHY_SEPARATOR_2 = '-';
-    public static final String DEFAULT_UPLOAD_TYPE_EXPLODED_QNAME = ProcessorUtils.XS_ANYURI_EXPLODED_QNAME;
+    public static final String DEFAULT_UPLOAD_TYPE_EXPLODED_QNAME = XMLConstants.XS_ANYURI_EXPLODED_QNAME;
     public static final QName DEFAULT_UPLOAD_TYPE_QNAME = XMLConstants.XS_ANYURI_QNAME;
 
         public static final String DUMMY_IMAGE_URI = "/ops/images/xforms/spacer.gif";

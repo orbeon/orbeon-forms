@@ -1762,12 +1762,12 @@
                     </p>
                 </section>
             </section>
-            <a name="other-extensions"/>
+            <a name="submission-extensions"/>
             <section>
-                <title>Other Extensions</title>
+                <title>Submission Extensions</title>
                 <a name="submission-auth-extension"/>
                 <section>
-                    <title>XForms Submission - HTTP Authentication</title>
+                    <title>HTTP Authentication</title>
                     <p>
                         The <code>xforms:submission</code> element supports optional <code>xxforms:username</code> and
                         <code>xxforms:password</code> attributes that allow specifying HTTP authentication credentials.
@@ -1782,7 +1782,7 @@
                 </section>
                 <a name="submission-show-progress"/>
                 <section>
-                    <title>XForms Submission/Load - Loading Indicator</title>
+                    <title>Loading Indicator</title>
                     <p>
                         When an <code>xforms:submission</code> with <code>replace="all"</code> is executed, in general,
                         the browser will load another page. While this happens, the loading indicator, by default shown
@@ -1808,7 +1808,7 @@
                 </section>
                 <a name="submission-target"/>
                 <section>
-                    <title>XForms Submission/Load - Target</title>
+                    <title>Target</title>
                     <p>
                         You can use the <code>xxforms:target</code> attribute on both <code>xforms:submission</code> and
                         <code>xforms:load</code>. It behaves just like the <a
@@ -1818,6 +1818,74 @@
                         page.
                     </p>
                 </section>
+                <a name="submission-xxforms-instance"/>
+                <section>
+                    <title><code>xxforms:instance</code> Attribute</title>
+                    <p>
+                        On an <code>&lt;xforms:submission></code> element with <code>replace="instance"</code>, the
+                        optional <code>instance</code> attribute specifies a destination instance for the result. That
+                        attribute is processed like the <code>instance()</code> function, which means that the instance
+                        specified must be in the current model.
+                    </p>
+                    <p>
+                        The <code>xxforms:instance</code> extension attribute can be use instead of the standard
+                        <code>instance</code> attribute. It works like <code>instance</code>, except that the instance
+                        is searched globally among all models. <code>xxforms:instance</code> is to the
+                        <code>instance</code> attribute what the <a
+                        href="xxforms-instance"><code>xxforms:instance()</code></a> function is to the standard
+                        <code>instance()</code> function.
+                    </p>
+                    <xml-source>
+                        <xforms:submission id="my-submission" method="post" resource="http://example.org/"
+                                           replace="instance" xxforms:instance="my-instance"/>
+                    </xml-source>
+                </section>
+                <a name="submission-binary"/>
+                <section>
+                    <title>Submitting Binary Content</title>
+                    <p>
+                        XForms 1.1 does not explicitly support submitting binary content, but does not prohibit it
+                        either. Orbeon Forms supports sending the content of a binary resource specified by a URI. Such
+                        resources are easily obtained with <code>&lt;xforms:upload></code>, for example. To perform a
+                        binary submission:
+                    </p>
+                    <ul>
+                        <li>
+                            <p>
+                                The <code>post</code> or <code>put</code> method is required.
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                You must use a binary <code>serialization</code> attribute. This includes all
+                                mediatypes which are not XML or text, including <code>application/octet-stream</code>,
+                                <code>image/*</code>, etc.
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                The node referred to by the submission must be of type <code>xs:anyURI</code>.
+                            </p>
+                        </li>
+                    </ul>
+                    <xml-source>
+                        <xforms:instance id="attachment">
+                            <attachment>file:/Users/jdoe/Applications/apache-tomcat-5.5.20/temp/xforms_upload_30877.tmp</attachment>
+                        </xforms:instance>
+                        <xforms:bind nodeset="instance('attachment')" type="xs:anyURI"/>
+                        ...
+                        <xforms:submission id="save-submission"
+                            ref="instance('attachment')"
+                            method="put" serialization="application/octet-stream"
+                            replace="none"
+                            resource="http://example.com/foo.bin"/>
+                        ...
+                    </xml-source>
+                </section>
+            </section>
+            <a name="other-extensions"/>
+            <section>
+                <title>Other Extensions</title>
                 <a name="xxforms-script-extension"/>
                 <section>
                     <title><code>&lt;xxforms:script></code> Action</title>
@@ -2071,28 +2139,6 @@
                         [TODO: describe the Orbeon Forms <code>xxforms:autocomplete</code> appearance on
                         <code>xforms:select</code> and <code>xforms:select1</code>]
                     </p>
-                </section>
-                <a name="submission-xxforms-instance"/>
-                <section>
-                    <title><code>xxforms:instance</code> attribute on <code>&lt;xforms:submission></code></title>
-                    <p>
-                        On an <code>&lt;xforms:submission></code> element with <code>replace="instance"</code>, the
-                        optional <code>instance</code> attribute specifies a destination instance for the result. That
-                        attribute is processed like the <code>instance()</code> function, which means that the instance
-                        specified must be in the current model.
-                    </p>
-                    <p>
-                        The <code>xxforms:instance</code> extension attribute can be use instead of the standard
-                        <code>instance</code> attribute. It works like <code>instance</code>, except that the instance
-                        is searched globally among all models. <code>xxforms:instance</code> is to the
-                        <code>instance</code> attribute what the <a
-                        href="xxforms-instance"><code>xxforms:instance()</code></a> function is to the standard
-                        <code>instance()</code> function.
-                    </p>
-                    <xml-source>
-                        <xforms:submission id="my-submission" method="post" resource="http://example.org/"
-                                           replace="instance" xxforms:instance="my-instance"/>
-                    </xml-source>
                 </section>
                 <a name="events-multiple"/>
                 <section>

@@ -407,7 +407,7 @@ public class URLGenerator extends ProcessorImpl {
                             if (ProcessorUtils.HTML_CONTENT_TYPE.equals(contentType)) {
                                 handler.readHTML(output);
                                 configURIReferences.uriReferences = null;
-                            } else if (ProcessorUtils.isXMLContentType(contentType)) {
+                            } else if (XMLUtils.isXMLMediatype(contentType)) {
                                 final LocalXIncludeListener localXIncludeListener = new LocalXIncludeListener();
                                 XIncludeHandler.setXIncludeListener(localXIncludeListener);
                                 try {
@@ -416,7 +416,7 @@ public class URLGenerator extends ProcessorImpl {
                                     XIncludeHandler.setXIncludeListener(null);
                                 }
                                 localXIncludeListener.updateCache(pipelineContext, configURIReferences);
-                            } else if (ProcessorUtils.isTextContentType(contentType)) {
+                            } else if (XMLUtils.isTextContentType(contentType)) {
                                 handler.readText(output, contentType);
                                 configURIReferences.uriReferences = null;
                             } else {

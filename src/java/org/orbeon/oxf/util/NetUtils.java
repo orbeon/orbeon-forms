@@ -15,6 +15,8 @@ package org.orbeon.oxf.util;
 
 import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.pipeline.StaticExternalContext;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
@@ -497,4 +499,16 @@ public class NetUtils {
         }
         return sb.toString();
     }
+
+   public static String readURIToLocalURI(String uri) throws URISyntaxException, IOException {
+       final PipelineContext pipelineContext = StaticExternalContext.getStaticContext().getPipelineContext();
+       final URLConnection urlConnection = new URI(uri).toURL().openConnection();
+       InputStream inputStream = null;
+       try {
+           inputStream = urlConnection.getInputStream();
+           return org.orbeon.oxf.xml.XMLUtils.inputStreamToAnyURI(pipelineContext, inputStream);
+       } finally {
+           if (inputStream != null) inputStream.close();
+       }
+   }
 }

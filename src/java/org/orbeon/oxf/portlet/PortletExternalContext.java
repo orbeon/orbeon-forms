@@ -17,13 +17,13 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.externalcontext.PortletToExternalContextRequestDispatcherWrapper;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.processor.serializer.CachedSerializer;
 import org.orbeon.oxf.servlet.ServletExternalContext;
 import org.orbeon.oxf.util.AttributesToMap;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.URLRewriter;
 import org.orbeon.oxf.webapp.ProcessorService;
+import org.orbeon.oxf.xml.*;
 
 import javax.portlet.*;
 import java.io.*;
@@ -558,7 +558,7 @@ public class PortletExternalContext extends PortletWebAppExternalContext impleme
         }
 
         public void write(RenderResponse response) throws IOException {
-            if (ProcessorUtils.isTextContentType(contentType) || ProcessorUtils.isXMLContentType(contentType)) {
+            if (XMLUtils.isTextContentType(contentType) || XMLUtils.isXMLMediatype(contentType)) {
                 // We are dealing with text content that may need rewriting
                 // CHECK: Is this check on the content-type going to cover the relevant cases?
                 if (stringWriter != null) {

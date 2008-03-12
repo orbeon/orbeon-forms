@@ -22,8 +22,8 @@ import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.saxon.om.NodeInfo;
 import org.apache.commons.lang.StringUtils;
 
@@ -103,7 +103,7 @@ public class XFormsUploadControl extends XFormsValueControl {
                     }
                 }
 
-                if (ProcessorUtils.XS_ANYURI_EXPLODED_QNAME.equals(type) && value != null && NetUtils.urlHasProtocol(value)) {
+                if (XMLConstants.XS_ANYURI_EXPLODED_QNAME.equals(type) && value != null && NetUtils.urlHasProtocol(value)) {
                     // If we upload a new URI in the background, then don't delete the temporary file
                     final String newPath;
                     {

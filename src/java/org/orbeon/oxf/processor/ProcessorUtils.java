@@ -39,48 +39,25 @@ import java.io.InputStreamReader;
 import java.io.BufferedInputStream;
 
 public class ProcessorUtils {
-    public static final String XML_CONTENT_TYPE1 = "text/xml";
-    public static final String XML_CONTENT_TYPE2 = "application/xml";
-    public static final String XML_CONTENT_TYPE3_SUFFIX = "+xml";
 
-    public static final String XML_CONTENT_TYPE = XML_CONTENT_TYPE2;
-    public static final String TEXT_CONTENT_TYPE_PREFIX = "text/";
     public static final String HTML_CONTENT_TYPE = "text/html";
-    public static final String DEFAULT_CONTENT_TYPE = XML_CONTENT_TYPE2;
-    public static final String DEFAULT_BINARY_CONTENT_TYPE = "application/octet-stream";
+    public static final String DEFAULT_CONTENT_TYPE = XMLUtils.XML_CONTENT_TYPE2;
+    //public static final String DEFAULT_BINARY_CONTENT_TYPE = "application/octet-stream";
 
     public static final Map SUPPORTED_BINARY_TYPES = new HashMap();
-
-    public static final String XS_BASE64BINARY_EXPLODED_QNAME =
-            XMLUtils.buildExplodedQName(XMLConstants.XS_BASE64BINARY_QNAME.getNamespaceURI(), XMLConstants.XS_BASE64BINARY_QNAME.getName());
-
-    public static final String XS_ANYURI_EXPLODED_QNAME =
-            XMLUtils.buildExplodedQName(XMLConstants.XS_ANYURI_QNAME.getNamespaceURI(), XMLConstants.XS_ANYURI_QNAME.getName());
 
     public static final String DEFAULT_TEXT_READING_ENCODING = "iso-8859-1";
     public static final String DEFAULT_TEXT_DOCUMENT_ELEMENT = "document";
     public static final String DEFAULT_BINARY_DOCUMENT_ELEMENT = "document";
 
     static {
-        SUPPORTED_BINARY_TYPES.put(XS_BASE64BINARY_EXPLODED_QNAME, "");
-        SUPPORTED_BINARY_TYPES.put(XS_ANYURI_EXPLODED_QNAME, "");
+        SUPPORTED_BINARY_TYPES.put(XMLConstants.XS_BASE64BINARY_EXPLODED_QNAME, "");
+        SUPPORTED_BINARY_TYPES.put(XMLConstants.XS_ANYURI_EXPLODED_QNAME, "");
     }
 
     public static LocationData getElementLocationData(Element element) {
         final Object elementData = element.getData();
         return (elementData instanceof LocationData) ? (LocationData) elementData : null;
-    }
-
-    public static boolean isXMLContentType(String contentType) {
-        if (contentType == null)
-            return false;
-        return contentType.equals(XML_CONTENT_TYPE1)
-                || contentType.equals(XML_CONTENT_TYPE2)
-                || contentType.endsWith(XML_CONTENT_TYPE3_SUFFIX);
-    }
-
-    public static boolean isTextContentType(String contentType) {
-        return contentType != null && contentType.startsWith(TEXT_CONTENT_TYPE_PREFIX);
     }
 
     public static boolean selectBooleanValue(Node node, String expr, boolean defaultValue) {

@@ -40,6 +40,7 @@ import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.stream.StreamResult;
 import java.io.*;
 import java.net.URL;
+import java.net.URI;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
@@ -65,6 +66,12 @@ public class XMLUtils {
     private static SAXParserFactory validatingSAXParserFactory;
 
     private static FileItemFactory fileItemFactory;
+
+    public static final String XML_CONTENT_TYPE1 = "text/xml";
+    public static final String XML_CONTENT_TYPE2 = "application/xml";
+    public static final String XML_CONTENT_TYPE3_SUFFIX = "+xml";
+    public static final String XML_CONTENT_TYPE = XML_CONTENT_TYPE2;
+    public static final String TEXT_CONTENT_TYPE_PREFIX = "text/";
 
     static {
         try {
@@ -223,6 +230,24 @@ public class XMLUtils {
                     ContentHandlerHelper.CDATA, attribute.getValue());
         }
         return result;
+    }
+
+    /**
+     * Return whether the given mediatype is considered as XML.
+     *
+     * @param mediatype mediatype or null
+     * @return          true if not null and XML mediatype, false otherwise
+     */
+    public static boolean isXMLMediatype(String mediatype) {
+        if (mediatype == null)
+            return false;
+        return mediatype.equals(XML_CONTENT_TYPE1)
+                || mediatype.equals(XML_CONTENT_TYPE2)
+                || mediatype.endsWith(XML_CONTENT_TYPE3_SUFFIX);
+    }
+
+    public static boolean isTextContentType(String contentType) {
+        return contentType != null && contentType.startsWith(TEXT_CONTENT_TYPE_PREFIX);
     }
 
     public static class EntityResolver implements org.xml.sax.EntityResolver {
@@ -863,8 +888,7 @@ public class XMLUtils {
     public static void inputStreamToBase64Characters(InputStream is, ContentHandler contentHandler) {
 
         try {
-            // NOTE: New implementation based on ContentHandlerOutputStream
-            OutputStream os = new ContentHandlerOutputStream(contentHandler);
+            final OutputStream os = new ContentHandlerOutputStream(contentHandler);
             NetUtils.copyStream(new BufferedInputStream(is), os);
             os.close(); // necessary with ContentHandlerOutputStream to make sure all extra characters are written
         } catch (Exception e) {
@@ -884,9 +908,49 @@ public class XMLUtils {
      */
     public static String base64BinaryToAnyURI(PipelineContext pipelineContext, String value) {
         // Convert Base64 to binary first
-        byte[] bytes = XMLUtils.base64StringToByteArray(value);
+        final byte[] bytes = XMLUtils.base64StringToByteArray(value);
 
         return inputStreamToAnyURI(pipelineContext, new ByteArrayInputStream(bytes));
+    }
+
+    /**
+     * Read an InputStream into a byte array.
+     *
+     * @param is    InputStream
+     * @return      byte array
+     */
+    public static byte[] inputStreamToByteArray(InputStream is) {
+        try {
+            final ByteArrayOutputStream os = new ByteArrayOutputStream();
+            NetUtils.copyStream(new BufferedInputStream(is), os);
+            os.close();
+            return os.toByteArray();
+        } catch (Exception e) {
+            throw new OXFException(e);
+        }
+    }
+
+    /**
+     * Read a URI into a byte array.
+     *
+     * @param uri   URI to read
+     * @return      byte array
+     */
+    public static byte[] uriToByteArray(String uri) {
+        InputStream is = null;
+        try {
+            is = new URI(uri).toURL().openStream();
+            return XMLUtils.inputStreamToByteArray(is);
+        } catch (Exception e) {
+            throw new OXFException(e);
+        } finally {
+            try {
+                if (is != null)
+                    is.close();
+            } catch (IOException e) {
+                throw new OXFException(e);
+            }
+        }
     }
 
     /**

@@ -18,7 +18,6 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.externalcontext.ForwardExternalContextRequestWrapper;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.resources.handler.HTTPURLConnection;
 import org.orbeon.oxf.util.NetUtils;
@@ -122,7 +121,7 @@ public class XFormsSubmissionUtils {
                     // included resource's content type or headers. Because of this we should not
                     // use an optimized submission from within a servlet.
                     connectionResult.resultCode = responseAdapter.getResponseCode();
-                    connectionResult.resultMediaType = ProcessorUtils.XML_CONTENT_TYPE;
+                    connectionResult.resultMediaType = XMLUtils.XML_CONTENT_TYPE;
                     connectionResult.setResultInputStream(responseAdapter.getInputStream());
                     connectionResult.resultHeaders = new HashMap();
                     connectionResult.lastModified = 0;
@@ -311,9 +310,10 @@ public class XFormsSubmissionUtils {
 
                     // Write request body if needed
                     if (hasRequestBody) {
-                        if (XFormsServer.logger.isDebugEnabled())
+                        if (XFormsServer.logger.isDebugEnabled()) {
                             containingDocument.logDebug("submission", "setting request body",
-                                new String[] { "body", new String(messageBody, "UTF-8") });
+                                new String[] { "body", XMLUtils.isXMLMediatype(mediatype) ? new String(messageBody, "UTF-8") : null });
+                        }
 
                         httpURLConnection.setRequestBody(messageBody);
                     }

@@ -729,7 +729,7 @@ public class XFormsUtils {
         if (ProcessorUtils.SUPPORTED_BINARY_TYPES.get(newType) == null)
             throw new UnsupportedOperationException("Unsupported type: " + newType);
 
-        if (currentType.equals(ProcessorUtils.XS_BASE64BINARY_EXPLODED_QNAME)) {
+        if (currentType.equals(XMLConstants.XS_BASE64BINARY_EXPLODED_QNAME)) {
             // Convert from xs:base64Binary to xs:anyURI
             return XMLUtils.base64BinaryToAnyURI(pipelineContext, value);
         } else {

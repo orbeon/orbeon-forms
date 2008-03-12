@@ -12,7 +12,7 @@ import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.URLRewriter;
-import org.orbeon.oxf.xml.XPathUtils;
+import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 
 import javax.xml.transform.sax.SAXSource;
@@ -121,7 +121,7 @@ public class TestExternalContext implements ExternalContext  {
                     SAXSource saxSource = EmailProcessor.getSAXSource(null, pipelineContext, hrefAttribute, systemId, contentType);
                     FileItem content = EmailProcessor.handleStreamedPartContent(pipelineContext, saxSource, contentType, charset);
 
-                    if (!(ProcessorUtils.isTextContentType(contentType) || ProcessorUtils.isXMLContentType(contentType))) {
+                    if (!(XMLUtils.isTextContentType(contentType) || XMLUtils.isXMLMediatype(contentType))) {
                         // This is binary content
                         if (content instanceof FileItem) {
                             final FileItem fileItem = (FileItem) content;

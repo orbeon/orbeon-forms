@@ -102,6 +102,7 @@ public class XMLConstants {
     public static final String XS_DATETIME_EXPLODED_QNAME = XMLUtils.buildExplodedQName(XSD_URI, "dateTime");
     public static final String XS_TIME_EXPLODED_QNAME = XMLUtils.buildExplodedQName(XSD_URI, "time");
     public static final String XS_ANYURI_EXPLODED_QNAME = XMLUtils.buildExplodedQName(XSD_URI, "anyURI");
+    public static final String XS_BASE64BINARY_EXPLODED_QNAME = XMLUtils.buildExplodedQName(XSD_URI, "base64Binary");
 
     public static final String OPS_TYPES_URI = "http://orbeon.org/oxf/xml/datatypes";
     public static final QName OPS_XMLFRAGMENT_QNAME = new QName("xmlFragment", new Namespace("ops", OPS_TYPES_URI));

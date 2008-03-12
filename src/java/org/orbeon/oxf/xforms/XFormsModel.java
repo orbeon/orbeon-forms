@@ -370,7 +370,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                     // Compute calculated value
                     try {
                         final String stringResult = XPathCache.evaluateAsString(pipelineContext, nodeInfo, modelBind.getCalculate(),
-                                containingDocument.getNamespaceMappings(modelBind.getBindElement()), null,
+                                containingDocument.getNamespaceMappings(modelBind.getBindElement()), contextStack.getCurrentVariables(),
                                 XFormsContainingDocument.getFunctionLibrary(), contextStack.getFunctionContext(),
                                 modelBind.getLocationData().getSystemID(), modelBind.getLocationData());
 

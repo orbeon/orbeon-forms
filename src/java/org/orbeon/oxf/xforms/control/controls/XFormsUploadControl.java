@@ -239,7 +239,7 @@ public class XFormsUploadControl extends XFormsValueControl {
         }
     }
 
-    public boolean equals(Object obj) {
+    public boolean equalsExternal(PipelineContext pipelineContext, Object obj) {
 
         if (obj == null || !(obj instanceof XFormsUploadControl))
             return false;
@@ -261,6 +261,6 @@ public class XFormsUploadControl extends XFormsValueControl {
         if (!((filename == null && other.filename == null) || (filename != null && other.filename != null && filename.equals(other.filename))))
             return false;
 
-        return super.equals(obj);
+        return super.equalsExternal(pipelineContext, obj);
     }
 }

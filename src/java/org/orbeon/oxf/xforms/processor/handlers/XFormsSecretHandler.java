@@ -67,7 +67,7 @@ public class XFormsSecretHandler extends XFormsValueControlHandler {
                 newAttributes.addAttribute("", "type", "type", ContentHandlerHelper.CDATA, "password");
                 newAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, effectiveId);
                 newAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA,
-                        handlerContext.isGenerateTemplate() || xformsControl.getValue() == null ? "" : xformsControl.getValue());
+                        handlerContext.isGenerateTemplate() || xformsControl.getExternalValue(pipelineContext) == null ? "" : xformsControl.getExternalValue(pipelineContext));
 
                 // Handle accessibility attributes
                 handleAccessibilityAttributes(elementAttributes, newAttributes);

@@ -75,7 +75,7 @@ public class OldControlsComparator extends BaseControlsComparator {
 
                 // Output diffs between controlInfo1 and controlInfo2
                 final boolean isValueChangeControl = valueChangeControlIds != null && valueChangeControlIds.get(xformsSingleNodeControl2.getEffectiveId()) != null;
-                if ((!xformsSingleNodeControl2.equals(xformsSingleNodeControl1) || isValueChangeControl)
+                if ((!xformsSingleNodeControl2.equalsExternal(pipelineContext, xformsSingleNodeControl1) || isValueChangeControl)
                         && !(isStaticReadonly && xformsSingleNodeControl2.isReadonly() && xformsSingleNodeControl2 instanceof XFormsTriggerControl)
                         && !(xformsSingleNodeControl2 instanceof XFormsGroupControl && XFormsGroupControl.INTERNAL_APPEARANCE.equals(xformsSingleNodeControl2.getAppearance()))) {
                     // Don't send anything if nothing has changed
@@ -267,7 +267,7 @@ public class OldControlsComparator extends BaseControlsComparator {
                             final String value;
                             {
                                 // Value may become null when controls are unbound
-                                final String tempValue = xformsValueControl.getExternalValue();
+                                final String tempValue = xformsValueControl.getExternalValue(pipelineContext);
                                 value = (tempValue == null) ? "" : tempValue;
                             }
                             if (doOutputElement || !isNewRepeatIteration || (isNewRepeatIteration && !value.equals(""))) {
@@ -304,7 +304,7 @@ public class OldControlsComparator extends BaseControlsComparator {
                         final String value;
                         {
                             // Value may become null when controls are unbound
-                            final String tempValue = xformsValueControl.getExternalValue();
+                            final String tempValue = xformsValueControl.getExternalValue(pipelineContext);
                             value = (tempValue == null) ? "" : tempValue;
                         }
                         if (doOutputElement || !isNewRepeatIteration || (isNewRepeatIteration && !value.equals(""))) {

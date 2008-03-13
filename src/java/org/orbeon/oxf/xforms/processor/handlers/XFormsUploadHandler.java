@@ -50,7 +50,7 @@ public class XFormsUploadHandler extends XFormsValueControlHandler {
                 ? null : (XFormsUploadControl) containingDocument.getObjectById(effectiveId);
 
         // Control value
-        final String value = handlerContext.isGenerateTemplate() || xformsControl.getValue() == null ? "" : xformsControl.getValue();
+        final String value = handlerContext.isGenerateTemplate() || xformsControl.getExternalValue(pipelineContext) == null ? "" : xformsControl.getExternalValue(pipelineContext);
 
         // xforms:label
         handleLabelHintHelpAlert(id, effectiveId, "label", xformsControl);
@@ -79,8 +79,7 @@ public class XFormsUploadHandler extends XFormsValueControlHandler {
                 reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-upload-select");
                 reusableAttributes.addAttribute("", "type", "type", ContentHandlerHelper.CDATA, "file");
                 reusableAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, effectiveId);
-                // TODO: Why would we set the value here?
-                reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, value);
+                // NOTE: @value was meant to suggest an initial file name, but this is not supported by browsers
 
                 // Copy special attributes in xxforms namespace
                 copyAttributes(elementAttributes, XFormsConstants.XXFORMS_NAMESPACE_URI, XXFORMS_ATTRIBUTES_TO_COPY, reusableAttributes);

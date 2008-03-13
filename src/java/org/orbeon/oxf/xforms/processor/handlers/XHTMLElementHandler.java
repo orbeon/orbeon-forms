@@ -54,7 +54,7 @@ public class XHTMLElementHandler extends HandlerBase {
                         attributes = XMLUtils.addOrReplaceAttribute(attributes, "", "", "id", effectiveId);
 
                         // Find effective attribute value
-                        final String effectiveAttributeValue = (attributeControl != null) ? attributeControl.getExternalValue() : "";
+                        final String effectiveAttributeValue = (attributeControl != null) ? attributeControl.getExternalValue(pipelineContext) : "";
 
                         // Set the value of the attribute
                         attributes = XMLUtils.addOrReplaceAttribute(attributes, "", "", attributeName, effectiveAttributeValue);

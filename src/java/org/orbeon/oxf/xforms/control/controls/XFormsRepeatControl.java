@@ -59,12 +59,12 @@ public class XFormsRepeatControl extends XFormsControl {
         }
     }
 
-    public boolean equals(Object obj) {
+    public boolean equalsExternal(PipelineContext pipelineContext, Object obj) {
 
         if (!(obj instanceof XFormsRepeatControl))
             return false;
 
-        if (!super.equals(obj))
+        if (!super.equalsExternal(pipelineContext, obj))
             return false;
 
         final XFormsRepeatControl other = (XFormsRepeatControl) obj;

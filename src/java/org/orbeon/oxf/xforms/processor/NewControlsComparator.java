@@ -99,7 +99,7 @@ public class NewControlsComparator extends BaseControlsComparator {
                     final boolean isValueChangeControl = valueChangeControlIds != null && valueChangeControlIds.get(leadingControl.getEffectiveId()) != null;
                     if (xformsSingleNodeControl2 != null) {
 
-                        if ((!xformsSingleNodeControl2.equals(xformsSingleNodeControl1) || isValueChangeControl)
+                        if ((!xformsSingleNodeControl2.equalsExternal(pipelineContext, xformsSingleNodeControl1) || isValueChangeControl)
                                 && !(isStaticReadonly && xformsSingleNodeControl2.isReadonly() && xformsSingleNodeControl2 instanceof XFormsTriggerControl)
                                 && !(xformsSingleNodeControl2 instanceof XFormsGroupControl && XFormsGroupControl.INTERNAL_APPEARANCE.equals(xformsSingleNodeControl2.getAppearance()))) {
                             // Don't send anything if nothing has changed
@@ -286,7 +286,7 @@ public class NewControlsComparator extends BaseControlsComparator {
                                     final String value;
                                     {
                                         // Value may become null when controls are unbound
-                                        final String tempValue = xformsValueControl.getExternalValue();
+                                        final String tempValue = xformsValueControl.getExternalValue(pipelineContext);
                                         value = (tempValue == null) ? "" : tempValue;
                                     }
                                     if (doOutputElement || !isNewRepeatIteration || (isNewRepeatIteration && !value.equals(value))) {

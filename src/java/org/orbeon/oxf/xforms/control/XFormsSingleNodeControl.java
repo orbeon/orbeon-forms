@@ -115,7 +115,7 @@ public class XFormsSingleNodeControl extends XFormsControl {
         }
     }
 
-    public boolean equals(Object obj) {
+    public boolean equalsExternal(PipelineContext pipelineContext, Object obj) {
 
         if (obj == null || !(obj instanceof XFormsSingleNodeControl))
             return false;
@@ -143,7 +143,7 @@ public class XFormsSingleNodeControl extends XFormsControl {
         if (!((type == null && other.type == null) || (type != null && other.type != null && type.equals(other.type))))
             return false;
 
-        return super.equals(obj);
+        return super.equalsExternal(pipelineContext, obj);
     }
 
     public boolean isStaticReadonly() {

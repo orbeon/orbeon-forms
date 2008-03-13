@@ -119,7 +119,7 @@ public class XFormsInputHandler extends XFormsValueControlHandler {
                     reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, spanClasses.toString());// TODO: check whether like in the XSTL version we need to copy other classes as well
                     contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, reusableAttributes);
                     if (isConcreteControl && isDate) {
-                        final String displayValueOrValue = xformsControl.getDisplayValueOrExternalValue();
+                        final String displayValueOrValue = xformsControl.getDisplayValueOrExternalValue(pipelineContext);
                         if (displayValueOrValue != null && !displayValueOrValue.equals("")) {
                             contentHandler.characters(displayValueOrValue.toCharArray(), 0, displayValueOrValue.length());
                         } else {
@@ -145,7 +145,7 @@ public class XFormsInputHandler extends XFormsValueControlHandler {
 
                         if (isConcreteControl) {
                             // Output value only for concrete control
-                            final String value = xformsControl.getValue();
+                            final String value = xformsControl.getExternalValue(pipelineContext);
                             reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, (value == null) ? "" : value);
                         } else {
                             reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, "");
@@ -168,7 +168,7 @@ public class XFormsInputHandler extends XFormsValueControlHandler {
                         // Read-only mode
                         if (isConcreteControl) {
                             // Output value only for concrete control
-                            final String value = xformsControl.getDisplayValueOrExternalValue();
+                            final String value = xformsControl.getDisplayValueOrExternalValue(pipelineContext);
                             if (value != null)
                                 contentHandler.characters(value.toCharArray(), 0, value.length());
                         }

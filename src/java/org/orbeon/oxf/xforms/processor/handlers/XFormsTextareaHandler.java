@@ -76,7 +76,7 @@ public class XFormsTextareaHandler extends XFormsValueControlHandler {
 
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "textarea", textareaQName, newAttributes);
                 if (isConcreteControl) {
-                    final String value = xformsControl.getValue();
+                    final String value = xformsControl.getExternalValue(pipelineContext);
                     if (value != null)
                         contentHandler.characters(value.toCharArray(), 0, value.length());
                 }
@@ -86,7 +86,7 @@ public class XFormsTextareaHandler extends XFormsValueControlHandler {
 
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, newAttributes);
                 if (isConcreteControl) {
-                    final String value = xformsControl.getValue();
+                    final String value = xformsControl.getExternalValue(pipelineContext);
                     if (value != null) {
                         final boolean isHTMLMediaType = "text/html".equals(xformsControl.getMediatype());
                         if (!isHTMLMediaType) {

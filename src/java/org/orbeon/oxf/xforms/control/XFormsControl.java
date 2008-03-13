@@ -223,7 +223,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
         return false;
     }
 
-    public boolean equals(Object obj) {
+    public boolean equalsExternal(PipelineContext pipelineContext, Object obj) {
 
         if (obj == null || !(obj instanceof XFormsControl))
             return false;

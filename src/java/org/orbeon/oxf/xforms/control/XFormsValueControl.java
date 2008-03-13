@@ -182,11 +182,11 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
      *
      * @return                  external value
      */
-    public String getExternalValue() {
+    public String getExternalValue(PipelineContext pipelineContext) {
         if (externalValue == null) {
             // Lazily evaluate the external value
-            evaluateIfNeeded(null);// TODO: Statistics won't be gathered. Any other consequence?
-            externalValue = evaluateExternalValue(null);
+            evaluateIfNeeded(pipelineContext);
+            externalValue = evaluateExternalValue(pipelineContext);
         }
         return externalValue;
     }
@@ -195,8 +195,8 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
      * Return a formatted display value of the control value, or the external control value if there is no such display
      * value.
      */
-    public String getDisplayValueOrExternalValue() {
-        return displayValue != null ? displayValue : getExternalValue();
+    public String getDisplayValueOrExternalValue(PipelineContext pipelineContext) {
+        return displayValue != null ? displayValue : getExternalValue(pipelineContext);
     }
 
     protected void setValue(String value) {
@@ -207,7 +207,7 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
         this.displayValue = displayValue;
     }
 
-    public boolean equals(Object obj) {
+    public boolean equalsExternal(PipelineContext pipelineContext, Object obj) {
 
         if (obj == null || !(obj instanceof XFormsValueControl))
             return false;
@@ -217,14 +217,14 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
 
         final XFormsValueControl other = (XFormsValueControl) obj;
 
-        final String displayValueOrValue = getDisplayValueOrExternalValue();
-        final String otherDisplayValueOrValue = other.getDisplayValueOrExternalValue();
+        final String displayValueOrValue = getDisplayValueOrExternalValue(pipelineContext);
+        final String otherDisplayValueOrValue = other.getDisplayValueOrExternalValue(pipelineContext);
 
         if (!((displayValueOrValue == null && otherDisplayValueOrValue == null)
                 || (displayValueOrValue != null && otherDisplayValueOrValue != null && displayValueOrValue.equals(otherDisplayValueOrValue))))
             return false;
 
-        return super.equals(obj);
+        return super.equalsExternal(pipelineContext, obj);
     }
 
     public boolean isValueControl() {

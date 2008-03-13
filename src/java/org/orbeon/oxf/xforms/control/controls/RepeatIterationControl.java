@@ -49,8 +49,8 @@ public class RepeatIterationControl extends XFormsSingleNodeControl {
         return null;
     }
 
-    public boolean equals(Object obj) {
-        if (!super.equals(obj))
+    public boolean equalsExternal(PipelineContext pipelineContext, Object obj) {
+        if (!super.equalsExternal(pipelineContext, obj))
             return false;
         final RepeatIterationControl other = (RepeatIterationControl) obj;
         return this.iteration == other.iteration;

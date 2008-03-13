@@ -108,7 +108,7 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
                 final AttributesImpl imgAttributes = new AttributesImpl();
                 // @src="..."
                 // NOTE: If producing a template, we must point to an existing image
-                final String srcValue = isConcreteControl ? xformsOutputControl.getValue() : XFormsConstants.DUMMY_IMAGE_URI;
+                final String srcValue = isConcreteControl ? xformsOutputControl.getExternalValue(pipelineContext) : XFormsConstants.DUMMY_IMAGE_URI;
                 imgAttributes.addAttribute("", "src", "src", ContentHandlerHelper.CDATA, srcValue);
 
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "img", imgQName, imgAttributes);
@@ -117,7 +117,7 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
             } else if (isDateOrTime) {
                 // Display formatted value for dates
                 if (isConcreteControl) {
-                    final String displayValue = xformsOutputControl.getDisplayValueOrExternalValue();
+                    final String displayValue = xformsOutputControl.getDisplayValueOrExternalValue(pipelineContext);
                     if (displayValue != null)
                         contentHandler.characters(displayValue.toCharArray(), 0, displayValue.length());
                 }
@@ -125,13 +125,13 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
                 // HTML case
 
                 if (isConcreteControl) {
-                    final String displayValue = xformsOutputControl.getDisplayValueOrExternalValue();
+                    final String displayValue = xformsOutputControl.getDisplayValueOrExternalValue(pipelineContext);
                     XFormsUtils.streamHTMLFragment(contentHandler, displayValue, xformsOutputControl.getLocationData(), xhtmlPrefix);
                 }
             } else {
                 // Regular text case
                 if (isConcreteControl) {
-                    final String displayValue = xformsOutputControl.getDisplayValueOrExternalValue();
+                    final String displayValue = xformsOutputControl.getDisplayValueOrExternalValue(pipelineContext);
                     if (displayValue != null && displayValue.length() > 0)
                         contentHandler.characters(displayValue.toCharArray(), 0, displayValue.length());
                 }

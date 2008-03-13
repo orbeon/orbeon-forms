@@ -1,4 +1,4 @@
-    /**
+/**
  *  Copyright (C) 2006 Orbeon, Inc.
  *
  *  This program is free software; you can redistribute it and/or modify it under the terms of the
@@ -32,7 +32,7 @@ import org.xml.sax.SAXException;
 
 import java.util.List;
 
-    /**
+/**
  * Represents an xforms:output control.
  */
 public class XFormsOutputControl extends XFormsValueControl {
@@ -56,50 +56,44 @@ public class XFormsOutputControl extends XFormsValueControl {
         this.urlNorewrite = XFormsUtils.resolveUrlNorewrite(element);
     }
 
-    protected void evaluateValue(final PipelineContext pipelineContext) {
-        final String rawValue;
+    protected void evaluateValue(PipelineContext pipelineContext) {
+        final String value;
         if (valueAttribute == null) {
             // Get value from single-node binding
             final NodeInfo currentSingleNode = bindingContext.getSingleNode();
             if (currentSingleNode != null)
-                rawValue = XFormsInstance.getValueForNodeInfo(currentSingleNode);
+                value = XFormsInstance.getValueForNodeInfo(currentSingleNode);
             else
-                rawValue = "";
+                value = "";
         } else {
             // Value comes from the XPath expression within the value attribute
             final List currentNodeset = bindingContext.getNodeset();
             if (currentNodeset != null && currentNodeset.size() > 0) {
 
-//                boolean isTest = false;
-//                if (valueAttribute.indexOf("preceding::lom:entity") != -1) {
-//                    isTest = true;
-//                    System.out.print("xxx evaluating preceding::..." + valueAttribute + ", nodeset size " + currentNodeset.size());
-//                }
-                
-                rawValue = XPathCache.evaluateAsString(pipelineContext,
+                value = XPathCache.evaluateAsString(pipelineContext,
                         currentNodeset, bindingContext.getPosition(),
                         valueAttribute, containingDocument.getNamespaceMappings(getControlElement()), bindingContext.getInScopeVariables(),
                         XFormsContainingDocument.getFunctionLibrary(), getContextStack().getFunctionContext(), null, getLocationData());
-
-//                if (isTest) {
-//                    System.out.print("  " + rawValue);
-//                    final String otherAPIResult = XPathUtils.selectStringValue((org.dom4j.Node) ((NodeWrapper) bindingContext.getSingleNode()).getUnderlyingNode(), valueAttribute,
-//                            Dom4jUtils.getNamespaceContextNoDefault(getControlElement()));
-//                    System.out.println(" -> other API result: " + otherAPIResult);
-//                }
             } else {
-                rawValue = "";
+                value = "";
             }
         }
+        setValue(value);
+    }
+
+    protected String evaluateExternalValue(final PipelineContext pipelineContext) {
+
+        final String rawValue = getValue();
 
         // Handle image mediatype if necessary
         final String updatedValue;
         if (mediatypeAttribute != null && mediatypeAttribute.startsWith("image/")) {
             final String type = getType();
             if (!urlNorewrite && (type == null || type.equals(XMLConstants.XS_ANYURI_EXPLODED_QNAME) || type.equals(XFormsConstants.XFORMS_ANYURI_EXPLODED_QNAME))) {
-                // Rewrite image URI
+                // We got a URI and we need to rewrite it
                 updatedValue = XFormsUtils.resolveResourceURL(pipelineContext, getControlElement(), rawValue);
             } else {
+                // Otherwise we leave the value as is
                 updatedValue = rawValue;
             }
         } else if ("text/html".equals(mediatypeAttribute)) {
@@ -164,7 +158,7 @@ public class XFormsOutputControl extends XFormsValueControl {
             updatedValue = rawValue;
         }
 
-        super.setValue(updatedValue);
+        return updatedValue;
     }
 
     public void evaluateDisplayValue(PipelineContext pipelineContext) {

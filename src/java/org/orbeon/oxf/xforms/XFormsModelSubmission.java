@@ -105,6 +105,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
     private String avtXXFormsTarget;
     private String resolvedXXFormsTarget;
 
+    private boolean xxfFormsEnsureUploads;
+
     private List headerNames;
     private Map headerNameValues;
 
@@ -232,6 +234,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
             avtXXFormsTarget = submissionElement.attributeValue(XFormsConstants.XXFORMS_TARGET_QNAME);
 
+            xxfFormsEnsureUploads = !"false".equals(submissionElement.attributeValue(XFormsConstants.XXFORMS_ENSURE_UPLOADS_QNAME));
+
             // Whether we must show progress or not
             xxfShowProgress = !"false".equals(submissionElement.attributeValue(XFormsConstants.XXFORMS_SHOW_PROGRESS_QNAME));
 
@@ -324,7 +328,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 // NOTE: We only check this if we are not currently initializing the document because at that point
                 // the client cannot have any files to upload yet
                 boolean hasBoundRelevantUploadControl = false;
-                if (serialize && !containingDocument.isInitializing()) {
+                if (xxfFormsEnsureUploads && serialize && !containingDocument.isInitializing()) {
                     final XFormsControls xformsControls = containingDocument.getXFormsControls();
                     final List uploadControls = xformsControls.getCurrentControlsState().getUploadControls();
                     if (uploadControls != null) {
@@ -332,8 +336,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                             final XFormsUploadControl currentControl = (XFormsUploadControl) i.next();
                             if (currentControl.isRelevant()) {
                                 final NodeInfo boundNodeInfo = currentControl.getBoundNode();
-                                if (currentInstance ==  model.getInstanceForNode(boundNodeInfo)) {
-                                    // Found one relevant bound control
+                                if (currentInstance == currentInstance.getModel(containingDocument).getInstanceForNode(boundNodeInfo)) {
+                                    // Found one relevant upload control bound to the instance we are submitting
                                     hasBoundRelevantUploadControl = true;
                                     break;
                                 }

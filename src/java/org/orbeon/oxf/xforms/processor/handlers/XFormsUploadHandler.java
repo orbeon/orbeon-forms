@@ -49,13 +49,19 @@ public class XFormsUploadHandler extends XFormsValueControlHandler {
         final XFormsUploadControl xformsControl = handlerContext.isGenerateTemplate()
                 ? null : (XFormsUploadControl) containingDocument.getObjectById(effectiveId);
 
+        // Control value
+        final String value = handlerContext.isGenerateTemplate() || xformsControl.getValue() == null ? "" : xformsControl.getValue();
+
         // xforms:label
         handleLabelHintHelpAlert(id, effectiveId, "label", xformsControl);
 
         final AttributesImpl newAttributes;
         {
             final StringBuffer classes = getInitialClasses(localname, elementAttributes, xformsControl);
-            classes.append(" xforms-upload-state-empty");
+            if (value.equals(""))
+                classes.append(" xforms-upload-state-empty");
+            else
+                classes.append(" xforms-upload-state-file");
             handleMIPClasses(classes, xformsControl);
             newAttributes = getAttributes(elementAttributes, classes.toString(), effectiveId);
         }
@@ -73,8 +79,8 @@ public class XFormsUploadHandler extends XFormsValueControlHandler {
                 reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-upload-select");
                 reusableAttributes.addAttribute("", "type", "type", ContentHandlerHelper.CDATA, "file");
                 reusableAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, effectiveId);
-                reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA,
-                        handlerContext.isGenerateTemplate() || xformsControl.getValue() == null ? "" : xformsControl.getValue());
+                // TODO: Why would we set the value here?
+                reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, value);
 
                 // Copy special attributes in xxforms namespace
                 copyAttributes(elementAttributes, XFormsConstants.XXFORMS_NAMESPACE_URI, XXFORMS_ATTRIBUTES_TO_COPY, reusableAttributes);

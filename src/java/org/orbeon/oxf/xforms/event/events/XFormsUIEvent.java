@@ -44,6 +44,7 @@ public abstract class XFormsUIEvent extends XFormsEvent {
 
     public SequenceIterator getAttribute(String name) {
         if ("target-ref".equals(name)) {
+            // TODO: This is ill-named in case we use @bind
             // Return the node to which the control is bound
             return new ListIterator(Collections.singletonList(targetXFormsControl.getBoundNode()));
         } else if ("alert".equals(name)) {

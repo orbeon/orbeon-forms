@@ -379,44 +379,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                 final Document initialDocumentToSubmit;
                 if (serialize && !isDeferredSubmissionSecondPass) {
-                    // Create document to submit
-                    try {
-                        initialDocumentToSubmit = createDocumentToSubmit(currentNodeInfo, currentInstance);
-
-                        // Temporarily change instance document so that we can run validation again
-                        modelForInstance.setInstanceDocument(initialDocumentToSubmit,
-                                currentInstance.getModelId(), currentInstance.getEffectiveId(), currentInstance.getSourceURI(),
-                                currentInstance.getUsername(), currentInstance.getPassword(),
-                                currentInstance.isApplicationShared(),
-                                currentInstance.getTimeToLive(),
-                                currentInstance.getValidation());
-
-                        // Revalidate instance
-                        modelForInstance.doRevalidate(pipelineContext);
-                        // TODO: Check if the validation state can really change. If so, find a solution.
-                        // "no notification events are marked for dispatching due to this operation"
-
-                        // Check that there are no validation errors
-                        // NOTE: If the instance is read-only, it can't have MIPs, and can't fail validation/requiredness, so we don't go through the process at all.
-                        final boolean instanceSatisfiesValidRequired = currentInstance.isReadOnly() || isDocumentSatisfiesValidRequired(initialDocumentToSubmit);
-                        if (!instanceSatisfiesValidRequired) {
-                            if (logger.isDebugEnabled()) {
-                                final LocationDocumentResult documentResult = new LocationDocumentResult();
-                                final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
-                                identity.setResult(documentResult);
-                                currentInstance.read(identity);
-                                final String documentString = Dom4jUtils.domToString(documentResult.getDocument());
-
-                                containingDocument.logDebug("submission", "instance document or subset thereof cannot be submitted",
-                                        new String[] { "document", documentString });
-                            }
-                            throw new XFormsSubmissionException("xforms:submission: instance to submit does not satisfy valid and/or required model item properties.",
-                                    "checking instance validity", XFormsSubmitErrorEvent.ErrorType.VALIDATION_ERROR);
-                        }
-                    } finally {
-                        // Restore instance document
-                        modelForInstance.setInstance(currentInstance, currentInstance.isReplaced());
-                    }
+                    initialDocumentToSubmit = createDocumentToSubmit(pipelineContext, currentNodeInfo, currentInstance, modelForInstance);
                 } else {
                     initialDocumentToSubmit = null;
                 }
@@ -515,44 +478,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                     }
 
                     // Create document to submit
-                    try {
-                        documentToSubmit = createDocumentToSubmit(currentNodeInfo, currentInstance);
+                    documentToSubmit = createDocumentToSubmit(pipelineContext, currentNodeInfo, currentInstance, modelForInstance);
 
-                        // Temporarily change instance document so that we can run validation again
-                        modelForInstance.setInstanceDocument(documentToSubmit,
-                                currentInstance.getModelId(), currentInstance.getEffectiveId(), currentInstance.getSourceURI(),
-                                currentInstance.getUsername(), currentInstance.getPassword(),
-                                currentInstance.isApplicationShared(),
-                                currentInstance.getTimeToLive(),
-                                currentInstance.getValidation());
-
-                        // Revalidate instance
-                        modelForInstance.doRevalidate(pipelineContext);
-                        // sent out. Check if the validation state can really change. If so, find a
-                        // solution.
-                        // "no notification events are marked for dispatching due to this operation"
-
-                        // Check that there are no validation errors
-                        // NOTE: If the instance is read-only, it can't have MIPs, and can't fail validation/requiredness, so we don't go through the process at all.
-                        final boolean instanceSatisfiesValidRequired = currentInstance.isReadOnly() || isDocumentSatisfiesValidRequired(documentToSubmit);
-                        if (!instanceSatisfiesValidRequired) {
-                            if (logger.isDebugEnabled()) {
-                                final LocationDocumentResult documentResult = new LocationDocumentResult();
-                                final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
-                                identity.setResult(documentResult);
-                                currentInstance.read(identity);
-                                final String documentString = Dom4jUtils.domToString(documentResult.getDocument());
-
-                                containingDocument.logDebug("submission", "instance document or subset thereof cannot be submitted",
-                                        new String[] { "document", documentString });
-                            }
-                            throw new XFormsSubmissionException("xforms:submission: instance to submit does not satisfy valid and/or required model item properties.",
-                                    "checking instance validity", XFormsSubmitErrorEvent.ErrorType.VALIDATION_ERROR);
-                        }
-                    } finally {
-                        // Restore instance document
-                        modelForInstance.setInstance(currentInstance, currentInstance.isReplaced());
-                    }
                 } else {
                     // Don't recreate document
                     documentToSubmit = initialDocumentToSubmit;
@@ -866,9 +793,10 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                                     // We don't want XInclude automatically handled for security reasons
                                                     final boolean handleXInclude = false;
 
-                                                    // TODO: Use TransformerUtils.readDom4j() instead?
+                                                    // TODO: Use TransformerUtils.readDom4j() instead? What about configuring validation and XInclude?
 
-                                                    final Document resultingInstanceDocument = Dom4jUtils.readDom4j(connectionResult.getResultInputStream(), connectionResult.resourceURI, validating, handleXInclude);
+                                                    final Document resultingInstanceDocument
+                                                            = Dom4jUtils.readDom4j(connectionResult.getResultInputStream(), connectionResult.resourceURI, validating, handleXInclude);
                                                     newInstance = new XFormsInstance(replaceInstance.getModelId(), replaceInstance.getEffectiveId(), resultingInstanceDocument,
                                                             connectionResult.resourceURI, resolvedXXFormsUsername, resolvedXXFormsPassword, false, -1, replaceInstance.getValidation());
                                                 } else {
@@ -985,7 +913,55 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
         }
     }
 
-    private Document createDocumentToSubmit(final NodeInfo currentNodeInfo, final XFormsInstance currentInstance) {
+    private Document createDocumentToSubmit(PipelineContext pipelineContext, NodeInfo currentNodeInfo, XFormsInstance currentInstance, XFormsModel modelForInstance) {
+        final Document documentToSubmit;
+
+        // Create document to submit
+        try {
+            // Revalidate instance
+
+            // NOTE: We need to do this here so that bind/@type works correctly. XForms 1.1 seems to say that this
+            // must be done after pruning, but then it is not clear how XML Schema validation would work then.
+
+            modelForInstance.doRevalidate(pipelineContext);
+
+            // Get selected nodes (re-root and prune)
+            documentToSubmit = reRootAndPrune(currentNodeInfo, currentInstance);
+
+            // Temporarily change instance document so that we can run validation again
+            modelForInstance.setInstanceDocument(documentToSubmit,
+                    currentInstance.getModelId(), currentInstance.getEffectiveId(), currentInstance.getSourceURI(),
+                    currentInstance.getUsername(), currentInstance.getPassword(),
+                    currentInstance.isApplicationShared(),
+                    currentInstance.getTimeToLive(),
+                    currentInstance.getValidation());
+
+            // Check that there are no validation errors
+            // NOTE: If the instance is read-only, it can't have MIPs, and can't fail validation/requiredness, so we don't go through the process at all.
+            final boolean instanceSatisfiesValidRequired = currentInstance.isReadOnly() || isDocumentSatisfiesValidRequired(documentToSubmit);
+            if (!instanceSatisfiesValidRequired) {
+                if (logger.isDebugEnabled()) {
+                    final LocationDocumentResult documentResult = new LocationDocumentResult();
+                    final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
+                    identity.setResult(documentResult);
+                    currentInstance.read(identity);
+                    final String documentString = Dom4jUtils.domToString(documentResult.getDocument());
+
+                    containingDocument.logDebug("submission", "instance document or subset thereof cannot be submitted",
+                            new String[] { "document", documentString });
+                }
+                throw new XFormsSubmissionException("xforms:submission: instance to submit does not satisfy valid and/or required model item properties.",
+                        "checking instance validity", XFormsSubmitErrorEvent.ErrorType.VALIDATION_ERROR);
+            }
+        } finally {
+            // Restore instance document
+            modelForInstance.setInstance(currentInstance, currentInstance.isReplaced());
+        }
+
+        return documentToSubmit;
+    }
+
+    private Document reRootAndPrune(final NodeInfo currentNodeInfo, final XFormsInstance currentInstance) {
 
         final Document documentToSubmit;
         if (currentNodeInfo instanceof NodeWrapper) {

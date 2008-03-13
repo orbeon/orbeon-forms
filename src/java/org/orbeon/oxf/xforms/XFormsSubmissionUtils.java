@@ -311,8 +311,12 @@ public class XFormsSubmissionUtils {
                     // Write request body if needed
                     if (hasRequestBody) {
                         if (XFormsServer.logger.isDebugEnabled()) {
-                            containingDocument.logDebug("submission", "setting request body",
-                                new String[] { "body", XMLUtils.isXMLMediatype(mediatype) ? new String(messageBody, "UTF-8") : null });
+                            if (XMLUtils.isXMLMediatype(mediatype)) {
+                                containingDocument.logDebug("submission", "setting XML request body",
+                                    new String[] { "body", new String(messageBody, "UTF-8")});
+                            } else {
+                                containingDocument.logDebug("submission", "setting binary request body");
+                            }
                         }
 
                         httpURLConnection.setRequestBody(messageBody);

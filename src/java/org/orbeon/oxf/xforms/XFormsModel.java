@@ -1385,7 +1385,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
             if (XFormsServer.logger.isDebugEnabled()) {
                 final long revalidateTime = System.currentTimeMillis() - revalidateStartTime;
-                containingDocument.logDebug("model", "done rebuilding", new String[] { "model id", getEffectiveId(), "time", Long.toString(revalidateTime) });
+                containingDocument.logDebug("model", "done revalidating", new String[] { "model id", getEffectiveId(), "time", Long.toString(revalidateTime) });
             }
         }
 

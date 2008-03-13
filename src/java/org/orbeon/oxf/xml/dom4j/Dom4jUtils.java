@@ -110,28 +110,34 @@ public class Dom4jUtils {
      * Replacement for DocumentHelper.parseText. DocumentHelper.parseText is not used since it
      * creates work for GC (because it relies on JAXP).
      */
-    public static Document readDom4j(final String xmlString) throws SAXException, DocumentException {
+    public static Document readDom4j(String xmlString) throws SAXException, DocumentException {
         final StringReader stringReader = new StringReader(xmlString);
         return readDom4j(stringReader);
     }
 
-    public static Document readDom4j(final Reader reader) throws SAXException, DocumentException {
+    public static Document readDom4j(Reader reader) throws SAXException, DocumentException {
         final SAXReader saxReader = createSAXReader();
         return saxReader.read(reader);
     }
 
-    public static Document readDom4j(final Reader reader, final String uri) throws SAXException, DocumentException {
+    public static Document readDom4j(Reader reader, String uri) throws SAXException, DocumentException {
         final SAXReader saxReader = createSAXReader();
         return saxReader.read(reader, uri);
     }
 
-    public static Document readDom4j(final InputStream inputStream) throws SAXException, DocumentException {
+    public static Document readDom4j(InputStream inputStream) throws SAXException, DocumentException {
         // TODO: See TransformerUtils.readDom4j() instead and remove?
         final SAXReader saxReader = createSAXReader();
         return saxReader.read(inputStream);
     }
 
-    public static Document readDom4j(final InputStream inputStream, final String uri, boolean validating, boolean handleXInclude) throws SAXException, DocumentException {
+    public static Document readDom4j(String xmlString, boolean validating, boolean handleXInclude) throws SAXException, DocumentException {
+        final SAXReader saxReader = createSAXReader(validating, handleXInclude);
+        final StringReader stringReader = new StringReader(xmlString);
+        return saxReader.read(stringReader);
+    }
+
+    public static Document readDom4j(InputStream inputStream, String uri, boolean validating, boolean handleXInclude) throws SAXException, DocumentException {
         final SAXReader saxReader = createSAXReader(validating, handleXInclude);
         return saxReader.read(inputStream, uri);
     }

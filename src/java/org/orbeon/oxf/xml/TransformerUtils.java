@@ -399,8 +399,8 @@ public class TransformerUtils {
      */
     public static Document tinyTreeToDom4j2(NodeInfo nodeInfo) {
         try {
-            final String xmlString = TransformerUtils.tinyTreeToString(nodeInfo);
-            return Dom4jUtils.readDom4j(xmlString);
+            final String xmlString = tinyTreeToString(nodeInfo);
+            return Dom4jUtils.readDom4j(xmlString, false, false);
         } catch (Exception e) {
             throw new OXFException(e);
         }

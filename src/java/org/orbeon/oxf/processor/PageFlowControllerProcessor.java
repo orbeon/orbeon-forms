@@ -181,7 +181,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                         Document config = null;
                         try {
                             config = Dom4jUtils.readDom4j
-                                    ( "<config><include>/request/request-path</include></config>" );
+                                    ( "<config><include>/request/request-path</include><include>/request/method</include></config>" );
                         } catch (DocumentException e) {
                             throw new OXFException(e);
                         } catch ( final SAXException e ) {
@@ -356,6 +356,9 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                                 if (currentIsFile) {
                                     previousIsFile = true;
                                     previousFileIsVersioned = currentFileIsVersioned;
+
+                                    // For files, enforce GET method
+                                    when.setTest("/request/method = 'GET' and (" + when.getTest() + ")");
 
                                     handleFile(when, request, mimeType, epilogueData, epilogueModelData, epilogueInstance, epilogueXFormsModel, currentFileIsVersioned);
                                 } else if ("page".equals(element.getName())) {

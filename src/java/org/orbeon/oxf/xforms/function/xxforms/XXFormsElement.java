@@ -14,16 +14,22 @@
 package org.orbeon.oxf.xforms.function.xxforms;
 
 import org.dom4j.Element;
+import org.dom4j.Node;
+import org.dom4j.Attribute;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.Configuration;
+import org.orbeon.saxon.value.AtomicValue;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
+import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.StaticContext;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.Item;
+import org.orbeon.saxon.om.SequenceIterator;
+import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.trans.XPathException;
 
 import java.util.Map;
@@ -50,8 +56,11 @@ public class XXFormsElement extends XFormsFunction {
 
     public Item evaluateItem(XPathContext xpathContext) throws XPathException {
 
-        final Expression qNameExpression = (argument == null || argument.length == 0) ? null : argument[0];
+        final Expression qNameExpression = (argument == null || argument.length < 1) ? null : argument[0];
         final String qName = (qNameExpression == null) ? null : qNameExpression.evaluateAsString(xpathContext);
+
+        final Expression contextExpression = (argument == null || argument.length < 2) ? null : argument[1];
+        final SequenceIterator content = (contextExpression == null) ? null : contextExpression.iterate(xpathContext);
 
         final int colonIndex = qName.indexOf(':');
         final Element element;
@@ -70,6 +79,45 @@ public class XXFormsElement extends XFormsFunction {
                 throw new OXFException("Namespace prefix not in space for QName: " + qName);
 
             element = Dom4jUtils.createElement(qName, uri);
+        }
+
+        // Iterate over content if passed
+        if (content != null) {
+            boolean hasNewText = false;
+            while (true) {
+                final Item currentItem = content.next();
+                if (currentItem == null) {
+                    break;
+                }
+                if (currentItem instanceof AtomicValue) {
+                    // Insert as text
+                    element.addText(currentItem.getStringValue());
+                    hasNewText = true;
+                } else if (currentItem instanceof NodeInfo) {
+                    // Insert nodes
+
+                    if (currentItem instanceof NodeWrapper) {
+                        // dom4j node
+                        final Node currentNode = (Node) ((NodeWrapper) currentItem).getUnderlyingNode();
+
+                        if (currentNode instanceof Attribute) {
+                            // Add attribute
+                            element.add((Attribute) currentNode);
+                        } else {
+                            // Append node
+                            element.content().add(currentNode);
+                        }
+
+                    } else {
+                        // Other type of node
+                        // TODO: read and convert
+                    }
+                }
+            }
+
+            // Make sure we are normalized if we added text 
+            if (hasNewText)
+                Dom4jUtils.normalizeTextNodes(element);
         }
 
         return documentWrapper.wrap(element);

@@ -23,7 +23,7 @@
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
       xmlns:saxon="http://saxon.sf.net/">
     <xhtml:head>
-        <xhtml:title>Empty Orbeon Form</xhtml:title>
+        <xhtml:title>[Give this form a title]</xhtml:title>
         <xhtml:link rel="stylesheet" href="/ops/css/yui/reset-fonts-grids.css" type="text/css"/>
         <xhtml:link rel="stylesheet" href="/ops/css/yui/base-min.css" type="text/css"/>
         <xhtml:link rel="stylesheet" href="/apps/fr/style/form-runner.css" type="text/css"/>
@@ -51,10 +51,10 @@
             </xforms:instance>
 
             <!-- Attachments -->
-            <xforms:instance id="fr-form-attachments" xxforms:readonly="true">
+            <xforms:instance id="fr-form-attachments">
                 <attachments>
-                    <attachment type="xs:anyURI" mediatype="text/css" filename="" size=""/>
-                    <attachment type="xs:anyURI" mediatype="application/pdf" filename="" size=""/>
+                    <css mediatype="text/css" filename="" size=""/>
+                    <pdf mediatype="application/pdf" filename="" size=""/>
                 </attachments>
             </xforms:instance>
 

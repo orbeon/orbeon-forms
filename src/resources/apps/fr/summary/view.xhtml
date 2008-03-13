@@ -35,14 +35,12 @@
 
             <!-- Model initialization -->
             <xforms:action ev:event="xforms-model-construct-done">
-                <!-- Get configuration for the current form -->
-                <xforms:send submission="get-configuration-submission"/>
 
                 <!-- Query list of documents -->
                 <xforms:send submission="search-submission"/>
                 <!-- Store resources from configuration instance -->
                 <xforms:insert nodeset="instance('fr-form-resources')"
-                               origin="instance('fr-source-form-instance')/xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-resources']/*"/>
+                               origin="xxforms:instance('fr-source-form-instance')/xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-resources']/*"/>
                 <!-- Update to current language -->
                 <xforms:dispatch name="fr-update-language" target="fr-resources-model"/>
             </xforms:action>
@@ -144,10 +142,6 @@
                 <xforms:bind nodeset="next-trigger" readonly="../total = 0 or ../total le ../to"/>
             </xforms:bind>
 
-            <xforms:instance id="fr-source-form-instance">
-                <dummy xmlns=""/>
-            </xforms:instance>
-
             <xforms:instance id="fr-summary-headers-instance">
                 <dummy xmlns=""/>
             </xforms:instance>
@@ -156,45 +150,39 @@
                 <configuration xmlns=""/>
             </xforms:instance>
 
-            <!-- TODO: Refactor this to persistence model -->
-            <xforms:submission id="get-configuration-submission"
-                    method="get" serialization="none"
-                    resource="{xxforms:instance('fr-uris-instance')/form-collection}/crud/{$parameters/app}/{$parameters/form}/form/form.xhtml"
-                    replace="instance" instance="fr-source-form-instance" xxforms:readonly="true">
+            <!-- Extract summary configuration information from the XHTML document -->
+            <!-- TODO: Move back to persistence model? -->
+            <xforms:action ev:event="xforms-submit-done" ev:observer="get-configuration-submission">
+                <!--<xforms:insert context="instance('fr-search-instance')" nodeset="query"-->
+                    <!--origin="instance('fr-source-form-instance')/search"/>-->
 
-                <!-- Extract summary configuration information from the XHTML document -->
-                <xforms:action ev:event="xforms-submit-done">
-                    <!--<xforms:insert context="instance('fr-search-instance')" nodeset="query"-->
-                        <!--origin="instance('fr-source-form-instance')/search"/>-->
+                <!-- Extract fields which must appear in the summary -->
+                <xforms:insert context="instance('fr-configuration-instance')" nodeset="*"
+                    origin="xxforms:instance('fr-source-form-instance')/xhtml:body//xforms:*[@class and tokenize(@class, ' ') = ('fr-summary', 'fr-search')]"/>
 
-                    <!-- Extract fields which must appear in the summary -->
-                    <xforms:insert context="instance('fr-configuration-instance')" nodeset="*"
-                        origin="instance('fr-source-form-instance')/xhtml:body//xforms:*[@class and tokenize(@class, ' ') = ('fr-summary', 'fr-search')]"/>
-
-                    <!-- Create elements holding structured search data -->
-                    <xforms:action xxforms:iterate="instance('fr-source-form-instance')/xhtml:body//xforms:*[@class and tokenize(@class, ' ') = ('fr-search')]">
-                        <!-- Insert empty template -->
-                        <xforms:insert context="instance('fr-search-instance')" nodeset="query" origin="instance('fr-search-template')"/>
-                        <!-- Add control information to template -->
-                        <xforms:setvalue ref="instance('fr-search-instance')/query[last()]/@control" value="context()/local-name()"/>
-                        <!-- Add meta-information to template -->
-                        <xforms:action if="context()/@bind">
-                            <xforms:action context="instance('fr-source-form-instance')/xhtml:head/xforms:model//xforms:bind[@id = context()/@bind]">
-                                <xforms:setvalue ref="instance('fr-search-instance')/query[last()]/@name" value="substring-before(context()/@id, '-bind')"/>
-                                <xforms:setvalue ref="instance('fr-search-instance')/query[last()]/@path" value="string-join(context()/ancestor-or-self::xforms:bind/@nodeset, '/')"/>
-                                <xforms:setvalue ref="instance('fr-search-instance')/query[last()]/@type" value="if (context()/@type) then context()/@type else 'xs:string'"/>
-                            </xforms:action>
-                        </xforms:action>
-                        <xforms:action if="context()/@ref">
-                            <xforms:setvalue ref="instance('fr-search-instance')/query[last()]/@name" value="context()/@ref"/>
-                            <xforms:setvalue ref="instance('fr-search-instance')/query[last()]/@path" value="string-join((context()/ancestor-or-self::*/(@ref | @context))[position() gt 1], '/')"/>
+                <!-- Create elements holding structured search data -->
+                <xforms:action xxforms:iterate="xxforms:instance('fr-source-form-instance')/xhtml:body//xforms:*[@class and tokenize(@class, ' ') = ('fr-search')]">
+                    <!-- Insert empty template -->
+                    <xforms:insert context="instance('fr-search-instance')" nodeset="query" origin="instance('fr-search-template')"/>
+                    <!-- Add control information to template -->
+                    <xforms:setvalue ref="instance('fr-search-instance')/query[last()]/@control" value="context()/local-name()"/>
+                    <!-- Add meta-information to template -->
+                    <xforms:action if="context()/@bind">
+                        <xforms:action context="xxforms:instance('fr-source-form-instance')/xhtml:head/xforms:model//xforms:bind[@id = context()/@bind]">
+                            <xforms:setvalue ref="instance('fr-search-instance')/query[last()]/@name" value="substring-before(context()/@id, '-bind')"/>
+                            <xforms:setvalue ref="instance('fr-search-instance')/query[last()]/@path" value="string-join(context()/ancestor-or-self::xforms:bind/@nodeset, '/')"/>
+                            <xforms:setvalue ref="instance('fr-search-instance')/query[last()]/@type" value="if (context()/@type) then context()/@type else 'xs:string'"/>
                         </xforms:action>
                     </xforms:action>
-
-                    <!-- xxx TODO extract other information -->
-
+                    <xforms:action if="context()/@ref">
+                        <xforms:setvalue ref="instance('fr-search-instance')/query[last()]/@name" value="context()/@ref"/>
+                        <xforms:setvalue ref="instance('fr-search-instance')/query[last()]/@path" value="string-join((context()/ancestor-or-self::*/(@ref | @context))[position() gt 1], '/')"/>
+                    </xforms:action>
                 </xforms:action>
-            </xforms:submission>
+
+                <!-- xxx TODO extract other information -->
+
+            </xforms:action>
 
             <!-- Summary data -->
             <xforms:instance id="fr-summary-instance">
@@ -223,7 +211,7 @@
             <xhtml:img src="/apps/fr/style/orbeon-logo-trimmed-transparent-42.png"/> 
             <fr:body>
                 <h2>
-                    <xforms:output value="instance('fr-source-form-instance')/xhtml:head/xhtml:title"/>
+                    <xforms:output model="fr-persistence-model" value="instance('fr-source-form-instance')/xhtml:head/xhtml:title"/>
                 </h2>
 
                 <xforms:group appearance="xxforms:internal">
@@ -259,7 +247,9 @@
                                             <xforms:label>[Any]</xforms:label>
                                             <xforms:value/>
                                         </xforms:item>
-                                        <xforms:itemset nodeset="instance('fr-source-form-instance')/xhtml:head/xforms:model/xforms:instance[@id = concat(context()/@name, 's-itemset')]/*/*">
+                                        <xforms:itemset model="fr-persistence-model"
+                                                        nodeset="instance('fr-source-form-instance')/xhtml:head/xforms:model/xforms:instance[@id = concat(context()/@name, 's-itemset')]/*/*"
+                                                        xxforms:refresh-items="false">
                                             <xforms:label ref="name"/>
                                             <xforms:value ref="value"/>
                                         </xforms:itemset>

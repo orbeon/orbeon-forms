@@ -390,3 +390,8 @@ div.fr-collapsible {
 #doc4 .fr-grid-2-columns textarea.xforms-textarea { width: 31em }
 #doc4 .fr-grid-2-columns .xforms-textarea-appearance-xxforms-autosize { width: 31em }
 #doc4 .fr-grid-2-columns .xforms-select1-appearance-minimal { width: 31em }
+
+/* Upload control information */
+.xforms-upload-info { display: block; width: 100%; background-color: #FFFFDD; padding: 2px }
+.xforms-upload-mediatype, xforms-upload-size { padding-left: 1em }
+.xforms-upload-remove {}

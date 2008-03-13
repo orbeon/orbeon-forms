@@ -59,14 +59,7 @@
 
             <!-- Binds on main instance -->
             <xforms:bind nodeset=".">
-                <!-- Types -->
-                <xforms:bind nodeset="$form-instance">
-                    <!-- Handle "date" type. Note we make it optional with xforms:date so we can save the form -->
-                    <xforms:bind nodeset="*/*[name() = $model/xforms:bind/xforms:bind/xforms:bind[substring-after(@type, ':') = 'date']/@nodeset]" type="xforms:date"/>
-                    <!-- Handle "boolean" type -->
-                    <!--<xforms:bind nodeset="*/*[name() = $model/xforms:bind/xforms:bind/xforms:bind[substring-after(@type, ':') = 'boolean']/@nodeset]" type="xs:boolean"/>-->
-                </xforms:bind>
-                <!-- Metadata information -->
+                <!-- Form metadata (also used by Form Runner) -->
                 <xforms:bind nodeset="xhtml:head/xforms:model[@id = 'fr-form-model']/xforms:instance[@id = 'fr-form-metadata']/*">
                     <xforms:bind id="application-id-bind" nodeset="application-id" required="true()" type="xs:NCName" readonly="false()"
                                  calculate="if (normalize-space() = '') then concat('ID', digest(string(random(true)), 'MD5', 'hex')) else ."/>
@@ -74,6 +67,22 @@
                                  calculate="if (normalize-space() = '') then concat('ID', digest(string(random(true)), 'MD5', 'hex')) else ."/>
                     <xforms:bind id="title-bind" nodeset="title" required="true()"/>
                     <xforms:bind id="description-bind" nodeset="description"/>
+                </xforms:bind>
+                <!-- Global attachments (also used by Form Runner) -->
+                <xforms:bind nodeset="xhtml:head/xforms:model[@id = 'fr-form-model']/xforms:instance[@id = 'fr-form-attachments']/*">
+                    <xforms:bind id="css-attachment-bind" nodeset="css" type="xs:anyURI"/>
+                    <xforms:bind id="pdf-attachment-bind" nodeset="pdf" type="xs:anyURI"/>
+                </xforms:bind>
+                <!-- Form instance -->
+                <xforms:bind nodeset="xhtml:head/xforms:model[@id = 'fr-form-model']/xforms:instance[@id = 'fr-form-instance']/*">
+
+                    <!-- Handle "date" type. Note we make it optional with xforms:date so we can save the form -->
+                    <xforms:bind nodeset="*/*[name() = $model/xforms:bind/xforms:bind/xforms:bind[substring-after(@type, ':') = 'date']/@nodeset]" type="xforms:date"/>
+                    <!-- Handle "boolean" type -->
+                    <!--<xforms:bind nodeset="*/*[name() = $model/xforms:bind/xforms:bind/xforms:bind[substring-after(@type, ':') = 'boolean']/@nodeset]" type="xs:boolean"/>-->
+
+                    <!-- Handle local attachments -->
+                    <xforms:bind nodeset="*/*[@filename and @mediatype and @size]" type="xs:anyURI" class="fr-attachment"/>
                 </xforms:bind>
                 <!-- Set HTML title -->
                 <xforms:bind nodeset="xhtml:head/xhtml:title" calculate="$metadata-instance/title"/>
@@ -123,17 +132,6 @@
             <xforms:instance id="fb-xsl-output-instance">
                 <xsl:output xmlns:xsl="http://www.w3.org/1999/XSL/Transform" method="xml" omit-xml-declaration="yes" indent="yes" saxon:indent-spaces="4"/>
             </xforms:instance>
-
-            <!-- Handle attachments -->
-            <xforms:submission id="fb-upload-attachment-submission"
-                               ref="$model/xforms:instance[@id = 'fr-form-attachments']/*"
-                               method="post" replace="none" resource="test:"/>
-
-            <xforms:submission id="fb-save-attachment-submission"
-                    ref="instance('fb-attachment')"
-                    method="put" serialization="application/octet-stream"
-                    replace="none"
-                    resource="/fr/service/exist/crud/orbeon/form1/form/test.bin"/>
 
             <!-- Submission to test the form -->
             <xforms:submission id="fb-test-form-submission"
@@ -835,16 +833,24 @@
                     </template>
                     <template label="Image">
                         <xhtml:div class="image">
-                            <!-- TODO -->
+                            <xforms:output id="" bind="" mediatype="image/*" class="fr-attachment">
+                                <xforms:label ref=""/>
+                                <xforms:help ref=""/>
+                                <!-- No hint? -->
+                                <xforms:alert ref=""/>
+                            </xforms:output>
                         </xhtml:div>
                     </template>
                     <template label="Upload">
                         <xhtml:div class="upload">
-                            <xforms:upload id="" ref="">
+                            <xforms:upload id="" ref="" class="fr-attachment">
                                 <xforms:label ref=""/>
                                 <xforms:hint ref=""/>
                                 <xforms:help ref=""/>
                                 <xforms:alert ref=""/>
+                                <xforms:filename ref="@filename"/>
+                                <xforms:mediatype ref="@mediatype"/>
+                                <xxforms:size ref="@size"/>
                             </xforms:upload>
                         </xhtml:div>
                     </template>
@@ -1389,7 +1395,7 @@
                                                                                                 </xforms:action>
                                                                                             </xforms:trigger>
                                                                                         </xforms:group>
-                                                                                        <xforms:group ref="xforms:output">
+                                                                                        <xforms:group ref="xforms:output[not(@mediatype)]">
                                                                                             <xforms:output ref="$instance-holder" id="fb-edit-output-control">
                                                                                                 <xforms:label class="fb-xforms-disabled"/>
                                                                                             </xforms:output>
@@ -1407,9 +1413,18 @@
                                                                                                 <xforms:label ref="$resource-holder/label"/>
                                                                                             </xforms:trigger>
                                                                                         </xforms:group>
+                                                                                        <xforms:group ref="xforms:output[mediatype = 'image/*']">
+                                                                                            <!-- TODO: Image upload -->
+                                                                                            <xforms:output ref="$instance-holder" id="fb-edit-output-image-control">
+                                                                                                <xforms:label class="fb-xforms-disabled"/>
+                                                                                            </xforms:output>
+                                                                                        </xforms:group>
                                                                                         <xforms:group ref="xforms:upload">
                                                                                             <xforms:upload ref="$instance-holder" id="fb-edit-upload-control">
                                                                                                 <xforms:label class="fb-xforms-disabled"/>
+                                                                                                <xforms:filename ref="@filename"/>
+                                                                                                <xforms:mediatype ref="@mediatype"/>
+                                                                                                <xxforms:size ref="@size"/>
                                                                                             </xforms:upload>
                                                                                         </xforms:group>
                                                                                     </xhtml:div>
@@ -1515,272 +1530,6 @@
                         <!--<xxforms:show ev:event="DOMActivate" dialog="fb-xml-dialog"/>-->
                     </xforms:trigger>
                 </xhtml:div>
-
-                <!-- Toolbox -->
-                <xxforms:dialog id="fb-toolbox-dialog" level="modeless" draggable="true" visible="true" close="false" class="fb-toolbox-dialog" neighbor="switch-fb-details-section">
-                    <xforms:label>Toolbox</xforms:label>
-
-                    <xhtml:div class="fb-xvc">
-                        <xforms:trigger appearance="minimal" ref="$xcv/cut-trigger">
-                            <xforms:label>
-                                <xhtml:img src="../../../../forms/orbeon/builder/images/cut.gif" alt="Cut" title="Cut"/>
-                                <xhtml:span>Cut</xhtml:span>
-                            </xforms:label>
-                            <xforms:action ev:event="DOMActivate">
-                                <!-- Copy control -->
-                                <xforms:dispatch name="fb-copy-control" target="fr-form-model">
-                                    <xxforms:context name="current-td" select="$current-td"/>
-                                </xforms:dispatch>
-                                <!-- Then delete the source -->
-                                <xforms:dispatch name="fb-delete-control" target="fr-form-model">
-                                    <xxforms:context name="control" select="$current-td/xforms:*"/>
-                                </xforms:dispatch>
-                            </xforms:action>
-                        </xforms:trigger>
-                        <xforms:trigger appearance="minimal" ref="$xcv/copy-trigger">
-                            <xforms:label>
-                                <xhtml:img src="../../../../forms/orbeon/builder/images/copy.gif" alt="Copy" title="Copy"/>
-                                <xhtml:span>Copy</xhtml:span>
-                            </xforms:label>
-                            <xforms:action ev:event="DOMActivate">
-                                <!-- Copy control -->
-                                <xforms:dispatch name="fb-copy-control" target="fr-form-model">
-                                    <xxforms:context name="current-td" select="$current-td"/>
-                                </xforms:dispatch>
-                            </xforms:action>
-                        </xforms:trigger>
-                        <xforms:trigger appearance="minimal" ref="$xcv/paste-trigger">
-                            <xforms:label>
-                                <xhtml:img src="../../../../forms/orbeon/builder/images/paste.gif" alt="Paste" title="Paste"/>
-                                <xhtml:span>Paste</xhtml:span>
-                            </xforms:label>
-                            <xforms:action ev:event="DOMActivate">
-                                <!-- Paste control -->
-                                <xforms:dispatch name="fb-paste-control" target="fr-form-model"/>
-                            </xforms:action>
-                        </xforms:trigger>
-                    </xhtml:div>
-
-                    <!--<xhtml:div class="fb-toolbox">-->
-                        <!-- Cut/copy/paste-->
-                        <!--<xhtml:div class="fb-tool">-->
-                            <!--<xforms:trigger appearance="full" ref="$xcv/cut-trigger">-->
-                                <!--<xforms:label>-->
-                                    <!--<xhtml:img src="../../../../forms/orbeon/builder/images/cut.gif" alt="Cut" title="Cut"/>-->
-                                    <!--<xhtml:span>Cut Control</xhtml:span>-->
-                                <!--</xforms:label>-->
-                                <!--<xforms:action ev:event="DOMActivate">-->
-                                    <!-- Copy control -->
-                                    <!--<xforms:dispatch name="fb-copy-control" target="fr-form-model">-->
-                                        <!--<xxforms:context name="current-td" select="$current-td"/>-->
-                                    <!--</xforms:dispatch>-->
-                                    <!-- Then delete the source -->
-                                    <!--<xforms:dispatch name="fb-delete-control" target="fr-form-model">-->
-                                        <!--<xxforms:context name="control" select="$current-td/xforms:*"/>-->
-                                    <!--</xforms:dispatch>-->
-                                <!--</xforms:action>-->
-                            <!--</xforms:trigger>-->
-                        <!--</xhtml:div>-->
-                        <!--<xhtml:div class="fb-tool">-->
-                            <!--<xforms:trigger appearance="full" ref="$xcv/copy-trigger">-->
-                                <!--<xforms:label>-->
-                                    <!--<xhtml:img src="../../../../forms/orbeon/builder/images/copy.gif" alt="Copy" title="Copy"/>-->
-                                    <!--<xhtml:span>Copy Control</xhtml:span>-->
-                                <!--</xforms:label>-->
-                                <!--<xforms:action ev:event="DOMActivate">-->
-                                    <!-- Copy control -->
-                                    <!--<xforms:dispatch name="fb-copy-control" target="fr-form-model">-->
-                                        <!--<xxforms:context name="current-td" select="$current-td"/>-->
-                                    <!--</xforms:dispatch>-->
-                                <!--</xforms:action>-->
-                            <!--</xforms:trigger>-->
-                        <!--</xhtml:div>-->
-                        <!--<xhtml:div class="fb-tool">-->
-                            <!--<xforms:trigger appearance="full" ref="$xcv/paste-trigger">-->
-                                <!--<xforms:label>-->
-                                    <!--<xhtml:img src="../../../../forms/orbeon/builder/images/paste.gif" alt="Paste" title="Paste"/>-->
-                                    <!--<xhtml:span>Paste Control</xhtml:span>-->
-                                <!--</xforms:label>-->
-                                <!--<xforms:action ev:event="DOMActivate">-->
-                                    <!-- Paste control -->
-                                    <!--<xforms:dispatch name="fb-paste-control" target="fr-form-model"/>-->
-                                <!--</xforms:action>-->
-                            <!--</xforms:trigger>-->
-                        <!--</xhtml:div>-->
-                    <!--</xhtml:div>-->
-
-                        <xhtml:div class="fb-toolbox">
-                            <!-- Add new section -->
-                            <xhtml:div class="fb-tool">
-                                <xforms:trigger>
-                                    <xforms:label>
-                                        <xhtml:img src="../../../../apps/fr/style/plus.png" alt="Open section" title="Open section"/>
-                                        <xhtml:span>Section</xhtml:span>
-                                    </xforms:label>
-                                    <xforms:action ev:event="DOMActivate" context="$body">
-                                        <!-- Insert section -->
-
-                                        <!-- Insert section template in the UI -->
-                                        <xforms:insert context="." nodeset="fr:section | fr:repeat | fr:grid"
-                                                       at="index('fb-top-level-repeat')" position="after"
-                                                       origin="instance('fb-section-template')"/>
-
-                                        <!-- Compute next section id -->
-                                        <xforms:dispatch target="fr-form-model" name="fb-compute-section-id"/>
-
-                                        <!-- Set xforms:label @ref value -->
-                                        <xforms:setvalue ref="*[index('fb-top-level-repeat')]/xforms:label/@ref" value="concat('$form-resources/section-', $next-section-id, '/label')"/>
-
-                                        <!-- Set @id value -->
-                                        <xforms:setvalue ref="*[index('fb-top-level-repeat')]/@id" value="concat('section-', $next-section-id, '-section')"/>
-
-                                        <!-- Set @context value -->
-                                        <xforms:setvalue ref="*[index('fb-top-level-repeat')]/@context" value="concat('section-', $next-section-id)"/>
-
-                                        <!-- Insert container in the instance -->
-                                        <xforms:action context="$form-instance">
-                                            <!-- TODO: for now assume a top-level section containing a grid -->
-                                            <xforms:insert context="." nodeset="*"
-                                                           at="index('fb-top-level-repeat')" position="after"
-                                                           origin="xxforms:element(concat('section-', $next-section-id))"/>
-
-                                        </xforms:action>
-
-                                        <!-- Insert resources placeholders for all languages -->
-                                        <xforms:action xxforms:iterate="$resources/resource">
-                                            <xforms:insert context="." nodeset="*"
-                                                           origin="xxforms:element(concat('section-', $next-section-id))"/>
-
-                                            <xforms:insert context="*[last()]" origin="instance('fb-resource-template')/*"/>
-                                        </xforms:action>
-
-                                        <!-- Insert a first component into the section -->
-                                        <!--<xforms:setindex repeat="fb-controls-template-repeat" index="1"/>-->
-                                        <!--<xforms:dispatch name="DOMActivate" target="fb-add-control-trigger"/>-->
-
-                                    </xforms:action>
-                                </xforms:trigger>
-                            </xhtml:div>
-                            <!-- Add grids -->
-                            <xforms:group context="$current-top-level-block" appearance="xxforms:internal">
-                                <xhtml:div class="fb-tool">
-                                    <xforms:trigger appearance="full">
-                                        <xforms:label>
-                                            <xhtml:img src="../../../../forms/orbeon/builder/images/action1.gif" alt="New 1-Column Grid" title="New 1-Column Grid"/>
-                                            <xhtml:span>1-Column Grid</xhtml:span>
-                                        </xforms:label>
-                                        <xforms:action ev:event="DOMActivate">
-                                            <xforms:insert context="." nodeset="fr:section | fr:repeat | fr:grid"
-                                                           at="index('fb-section-content-repeat')" position="after"
-                                                           origin="instance('fb-grid-1-template')"/>
-                                        </xforms:action>
-                                    </xforms:trigger>
-                                </xhtml:div>
-                                <xhtml:div class="fb-tool">
-                                    <xforms:trigger appearance="full">
-                                        <xforms:label>
-                                            <xhtml:img src="../../../../forms/orbeon/builder/images/action2.gif" alt="New 2-Column Grid" title="New 2-Column Grid"/>
-                                            <xhtml:span>2-Column Grid</xhtml:span>
-                                        </xforms:label>
-                                        <xforms:action ev:event="DOMActivate">
-                                            <xforms:insert context="." nodeset="fr:section | fr:repeat | fr:grid"
-                                                           at="index('fb-section-content-repeat')" position="after"
-                                                           origin="instance('fb-grid-2-template')"/>
-                                        </xforms:action>
-                                    </xforms:trigger>
-                                </xhtml:div>
-                                <xhtml:div class="fb-tool">
-                                    <xforms:trigger appearance="full">
-                                        <xforms:label>
-                                            <xhtml:img src="../../../../forms/orbeon/builder/images/action3.gif" alt="New 3-Column Grid" title="New 3-Column Grid"/>
-                                            <xhtml:span>3-Column Grid</xhtml:span>
-                                        </xforms:label>
-                                        <xforms:action ev:event="DOMActivate">
-                                            <xforms:insert context="." nodeset="fr:section | fr:repeat | fr:grid"
-                                                           at="index('fb-section-content-repeat')" position="after"
-                                                           origin="instance('fb-grid-3-template')"/>
-                                        </xforms:action>
-                                    </xforms:trigger>
-                                </xhtml:div>
-                                <xhtml:div class="fb-tool">
-                                    <xforms:trigger appearance="full">
-                                        <xforms:label>
-                                            <xhtml:img src="../../../../forms/orbeon/builder/images/action3.gif" alt="New 4-Column Grid" title="New 4-Column Grid"/>
-                                            <xhtml:span>4-Column Grid</xhtml:span>
-                                        </xforms:label>
-                                        <xforms:action ev:event="DOMActivate">
-                                            <xforms:insert context="." nodeset="fr:section | fr:repeat | fr:grid"
-                                                           at="index('fb-section-content-repeat')" position="after"
-                                                           origin="instance('fb-grid-4-template')"/>
-                                        </xforms:action>
-                                    </xforms:trigger>
-                                </xhtml:div>
-                            </xforms:group>
-                        </xhtml:div>
-                        <xhtml:div class="fb-toolbox">
-                            <xforms:repeat nodeset="instance('fb-controls-template')/template" id="fb-controls-template-repeat">
-
-                                <xxforms:variable name="control-template" select="xhtml:div/xforms:*"/>
-
-                                <xhtml:div class="fb-tool">
-                                    <xforms:trigger id="fb-add-control-trigger" xmlns:f="http://orbeon.org/oxf/xml/formatting">
-                                        <xforms:label>
-                                            <xforms:output value="concat('&lt;img width=''16'' height=''16'' src=''', if (@image) then @image else concat('../../../../forms/orbeon/builder/images/', xhtml:div/@class, '.png'), '''/>')" mediatype="text/html" f:url-norewrite="true"/>
-                                            <xforms:output ref="@label"/>
-                                        </xforms:label>
-                                        <xforms:action ev:event="DOMActivate">
-                                            <!-- Insert a new control -->
-
-                                            <!-- Compute next control id -->
-                                            <xforms:dispatch target="fr-form-model" name="fb-compute-control-id"/>
-                                            <xxforms:variable name="new-control-name" select="concat('control-', $next-control-id)"/>
-                                            <xxforms:variable name="section-name" select="$current-td/ancestor::fr:section[1]/@context"/>
-
-                                            <!-- Try to find empty td -->
-                                            <xforms:dispatch name="fb-ensure-empty-td" target="fr-form-model"/>
-
-                                            <!-- This ensures the context is recomputed -->
-                                            <xxforms:variable name="new-td" select="$current-section-content-block/
-                                                xhtml:tr[index('fb-section-content-grid-tr-repeat')]/
-                                                xhtml:td[index('fb-section-content-grid-td-repeat')]"/>
-                                            <xforms:action context="$new-td" if="not(exists(xforms:*))">
-                                                <!-- Context is now on td and there is room for insertion -->
-
-                                                <!-- Insert control into td -->
-                                                <xforms:insert context="." origin="$control-template"/>
-
-                                                <!-- Adjust bindings on newly inserted control -->
-                                                <xforms:dispatch name="fb-rename-control" target="fr-form-model">
-                                                    <xxforms:context name="control" select="xforms:*"/>
-                                                    <xxforms:context name="new-name" select="$new-control-name"/>
-                                                </xforms:dispatch>
-
-                                                <!-- Insert instance and resource holders -->
-                                                <xforms:dispatch name="fb-insert-holders" target="fr-form-model">
-                                                    <xxforms:context name="current-td" select="$new-td"/>
-                                                    <xxforms:context name="section-name" select="$section-name"/>
-                                                    <xxforms:context name="instance-holder" select="xxforms:element($new-control-name)"/>
-                                                    <xxforms:context name="resource-holders" select="for $r in $resources/resource return xxforms:element($new-control-name)"/>
-                                                </xforms:dispatch>
-
-                                                <!-- Insert the bind element if needed -->
-                                                <xforms:action if="$control-template/../@class = 'date-input'">
-                                                    <xforms:dispatch name="fb-ensure-bind" target="fr-form-model">
-                                                        <xxforms:context name="control-name" select="$new-control-name"/>
-                                                    </xforms:dispatch>
-
-                                                    <xxforms:variable name="bind" select="$model//xforms:bind[@nodeset = $new-control-name]"/>
-                                                    <xforms:insert context="$bind" origin="xxforms:attribute('type', 'xs:date')"/>
-                                                </xforms:action>
-                                            </xforms:action>
-
-                                        </xforms:action>
-                                    </xforms:trigger>
-                                </xhtml:div>
-                            </xforms:repeat>
-                        <xhtml:div class="fb-clear"/>
-                    </xhtml:div>
-                </xxforms:dialog>
 
                 <!-- Edit help -->
                 <xxforms:dialog id="fb-edit-help-dialog" appearance="minimal">
@@ -1939,75 +1688,22 @@
                     <xforms:setfocus ev:event="xxforms-dialog-open" control="fb-confirmation-dialog-cancel-trigger"/>
                 </xxforms:dialog>
 
-                <!-- Publish dialog -->
-                <xxforms:dialog id="fb-publish-dialog" level="modal" close="true" draggable="true">
-                    <xforms:label>Publish Form</xforms:label>
-                    <xhtml:div>
-                        <!--<xhtml:img src="/apps/fr/style/question-large.gif" alt="Question" class="dialog-icon"/>-->
-                        <xhtml:div class="dialog-message">
-                            <xhtml:p>
-                                Are you sure you want to publish this form? This will override the existing form with
-                                the following properties:
-                            </xhtml:p>
-                            <xhtml:ul>
-                                <xhtml:li>
-                                    <xhtml:p>
-                                        <xhtml:b>Application Id:</xhtml:b>
-                                        <xforms:output value="$metadata-instance/application-id"/>
-                                    </xhtml:p>
-                                </xhtml:li>
-                                <xhtml:li>
-                                    <xhtml:p>
-                                        <xhtml:b>Form Id:</xhtml:b>
-                                        <xforms:output value="$metadata-instance/form-id"/>
-                                    </xhtml:p>
-                                </xhtml:li>
-                            </xhtml:ul>
-                        </xhtml:div>
-                    </xhtml:div>
-                    <xhtml:div class="dialog-button">
-                        <xforms:group>
-                            <xforms:trigger class="xforms-trigger-appearance-modal">
-                                <xforms:label>
-                                    <xhtml:img src="../../../../forms/orbeon/builder/images/upload.png" alt="Publish" title="Publish"/>
-                                    <xhtml:span>Publish</xhtml:span>
-                                </xforms:label>
-                                <xforms:action ev:event="DOMActivate">
-                                    <xforms:dispatch name="fr-publish-form" target="fr-persistence-model">
-                                        <xxforms:context name="application" select="$metadata-instance/application-id"/>
-                                        <xxforms:context name="form" select="$metadata-instance/form-id"/>
-                                    </xforms:dispatch>
-                                </xforms:action>
-                            </xforms:trigger>
-                            <xforms:trigger>
-                                <xforms:label><xhtml:img src="/apps/fr/style/close.gif" alt=""/> <xhtml:span>Cancel</xhtml:span></xforms:label>
-                            </xforms:trigger>
-                        </xforms:group>
-                    </xhtml:div>
-                    <!-- Hide dialog -->
-                    <xxforms:hide ev:event="DOMActivate" dialog="fb-publish-dialog"/>
-                    <!-- Set focus when the dialog open  -->
-                    <!--<xforms:setfocus ev:event="xxforms-dialog-open" control="fb-confirmation-dialog-cancel-trigger"/>-->
-                </xxforms:dialog>
-
                 <!-- CSS upload dialog -->
+                <!--<xi:include href="oxf:/forms/orbeon/builder/form/dialog-css.xml" xxi:omit-xml-base="true"/>-->
+                <!-- NOTE: For now don't XInclude, otherwise the Form Runner can't see the fr-attachment -->
                 <xxforms:dialog id="fb-css-upload-dialog" level="modal" close="true" draggable="true">
+
                     <xforms:label>Upload CSS</xforms:label>
                     <xxforms:variable name="attachments-instance" select="$model/xforms:instance[@id = 'fr-form-attachments']/*"/>
                     <xhtml:div>
                         <xhtml:div class="dialog-message">
 
                             <!-- Upload a CSS file -->
-                            <xforms:upload ref="$attachments-instance/attachment[1]">
+                            <xforms:upload bind="css-attachment-bind" class="fr-attachment">
                                 <xforms:label>CSS File</xforms:label>
                                 <xforms:filename ref="@filename"/>
                                 <xforms:mediatype ref="@mediatype"/>
                                 <xxforms:size ref="@size"/>
-
-                                <!-- Upload file when selected -->
-                                <xforms:action ev:event="xforms-select">
-                                    <xforms:send submission="fb-upload-attachment-submission"/>
-                                </xforms:action>
 
                                 <!-- Clear information when deselected -->
                                 <xforms:action ev:event="xforms-deselect">
@@ -2048,27 +1744,21 @@
                         <xforms:group>
                             <xforms:trigger class="xforms-trigger-appearance-modal">
                                 <xforms:label>
-                                    <xhtml:img src="../../../../forms/orbeon/builder/images/upload.png" alt="Publish" title="Publish"/>
-                                    <xhtml:span>Upload</xhtml:span>
+                                    <!--<xhtml:img src="../../../../forms/orbeon/builder/images/upload.png" alt="Publish" title="Publish"/>-->
+                                    <xhtml:span>Done</xhtml:span>
                                 </xforms:label>
-                                <xforms:action ev:event="DOMActivate">
-                                    <xforms:send submission="fb-save-attachment-submission">
-                                        xxx
-                                        <!-- TODO -->
-                                        <xxforms:context name="name" select="$attachments-instance/attachment[1]/@filename"/>
-                                    </xforms:send>
-                                </xforms:action>
-                            </xforms:trigger>
-                            <xforms:trigger>
-                                <xforms:label><xhtml:img src="/apps/fr/style/close.gif" alt=""/> <xhtml:span>Cancel</xhtml:span></xforms:label>
                             </xforms:trigger>
                         </xforms:group>
                     </xhtml:div>
                     <!-- Hide dialog -->
                     <xxforms:hide ev:event="DOMActivate" dialog="fb-css-upload-dialog"/>
-                    <!-- Set focus when the dialog open  -->
-                    <!--<xforms:setfocus ev:event="xxforms-dialog-open" control="fb-confirmation-dialog-cancel-trigger"/>-->
                 </xxforms:dialog>
+
+                <!-- Publish dialog -->
+                <xi:include href="oxf:/forms/orbeon/builder/form/dialog-publish.xml" xxi:omit-xml-base="true"/>
+
+                <!-- Toolbox dialog -->
+                <xi:include href="oxf:/forms/orbeon/builder/form/dialog-toolbox.xml" xxi:omit-xml-base="true"/>
 
                 <!-- Dialog to edit itemsets -->
                 <xi:include href="oxf:/forms/orbeon/builder/form/dialog-itemsets.xml" xxi:omit-xml-base="true"/>

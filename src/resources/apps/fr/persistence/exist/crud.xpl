@@ -47,9 +47,9 @@
     <!-- Discriminate based on the HTTP method and content type -->
     <p:choose href="#request">
 
+        <!-- Binary put -->
         <p:when test="/*/method = 'PUT' and not(/*/content-type = ('application/xml', 'text/xml') or ends-with(/*/content-type, '+xml'))">
-            <!-- Binary put -->
-
+            
             <p:processor name="oxf:xforms-submission">
                 <p:input name="submission">
                     <xforms:submission ref="/*/body" method="put" replace="none"

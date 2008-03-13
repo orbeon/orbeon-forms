@@ -52,6 +52,9 @@
                 <xforms:setvalue ref="instance('fr-uris-instance')/data-collection" value="xxforms:property(context())"/>
             </xforms:action>
         </xforms:action>
+
+        <!-- Load current form configuration -->
+        <xforms:send submission="get-configuration-submission"/>
         
         <!-- A document id is provided -->
         <xforms:action if="$parameters/document != ''">
@@ -109,8 +112,6 @@
             </xforms:action>
         </xforms:action>
 
-
-
         <xforms:send submission="fr-publish-form-submission">
             <xxforms:context name="collection" select="instance('fr-uris-instance')/temp-collection"/>
             <xxforms:context name="application" select="$app"/>
@@ -118,7 +119,7 @@
         </xforms:send>
     </xforms:action>
 
-    <xforms:submission id="fr-publish-form-submission"
+    <xforms:submission id="fr-publish-form-submission" xxforms:ensure-uploads="false"
             ref="xxforms:instance('fr-form-instance')" method="put"
             resource="{event('collection')}/crud/{event('application')}/{event('form')}/form/form.xhtml"
             replace="none">
@@ -136,12 +137,62 @@
     <xforms:action ev:event="DOMActivate" ev:observer="fr-save-button">
         <xforms:setvalue ref="instance('fr-persistence-instance')/save-attempted">true</xforms:setvalue>
         <xforms:action if="$parameters/document != ''">
-            <!-- Create or update -->
-            <xforms:send submission="fr-create-update-submission"/>
-        </xforms:action>
-        <xforms:action if="$parameters/document = ''">
-            <!-- Create -->
-            <!--<xforms:send submission="fr-create-submission"/>-->
+
+            <!-- Handle attachments -->
+            <xxforms:variable name="attachment-controls"
+                              select="instance('fr-source-form-instance')/xhtml:body//(xforms:* | fr:*)[@bind and @class and tokenize(@class, ' ') = 'fr-attachment']"/>
+
+            <!-- Find all binds with fb-attachment, or to which controls with fb-attachment are bound -->
+            <xxforms:variable name="attachment-binds"
+                              select="instance('fr-source-form-instance')/xhtml:head/xforms:model//xforms:bind[(@class and tokenize(@class, ' ') = 'fr-attachment')
+                                        or @id = $attachment-controls/@bind]"/>
+
+            <!--<xforms:message level="xxforms:log-error">-->
+                <!--xxx 0-->
+                <!--<xforms:output value="count($attachment-controls)"/>-->
+            <!--</xforms:message>-->
+
+            <!-- Use a global variable to determine whether we must continue -->
+            <xforms:setvalue ref="instance('fr-persistence-instance')/is-error">false</xforms:setvalue>
+
+            <!-- Iterate over attachment controls while there is no submission error -->
+            <xforms:action xxforms:iterate="$attachment-binds">
+
+                <xforms:action if="instance('fr-persistence-instance')/is-error = 'false'">
+
+                    <xxforms:variable name="bind" select="."/>
+                    <xxforms:variable name="expression" select="string-join($bind/ancestor-or-self::xforms:bind/@nodeset, '/')"/>
+                    <xxforms:variable name="holder" select="xxforms:instance('fr-form-instance')/saxon:evaluate($expression)"/>
+
+                    <xforms:action if="$holder">
+                        <!-- Found attachment URI location -->
+                        <xxforms:variable name="uri" select="normalize-space($holder)"/>
+                        <xforms:action if="$uri != '' and starts-with($uri, 'file:')">
+                            <!-- There is a URI to process -->
+
+                            <!-- Save attachment -->
+                            <xforms:send submission="fr-create-update-attachment-submission">
+                                <xxforms:context name="holder" select="$holder"/>
+                                <!-- TODO: We should really specify an extension, but when reading back from the Page flow, .png, e.g., will match on the <files> section -->
+                                <!-- For now, use last part as temp file name, which has a .tmp extension -->
+                                <xxforms:context name="resource" select="tokenize($holder, '/')[last()]"/>
+                            </xforms:send>
+
+                            <!-- Only keep the last part of the path -->
+                            <xforms:setvalue ref="$holder" value="tokenize($holder, '/')[last()]"/>
+
+                        </xforms:action>
+                    </xforms:action>
+                </xforms:action>
+                
+            </xforms:action>
+
+            <!-- Handle XML document if there was no submission error -->
+            <xforms:send submission="fr-create-update-submission" if="instance('fr-persistence-instance')/is-error = 'false'">
+                <xxforms:context name="holder" select="xxforms:instance('fr-form-instance')"/>
+                <!-- TODO: We should really specify an extension, but when reading back from the Page flow, .xml will match on the <files> section -->
+                <xxforms:context name="resource" select="'data'"/>
+            </xforms:send>
         </xforms:action>
     </xforms:action>
 
@@ -171,17 +222,33 @@
     <xforms:bind nodeset="xxforms:instance('fr-form-instance')" readonly="$parameters/mode = ('view', 'print')"/>
 
     <xforms:submission id="fr-create-update-submission"
-            validate="true"
-            method="put" ref="xxforms:instance('fr-form-instance')"
-            resource="{instance('fr-uris-instance')/data-collection}/crud/{$parameters/app}/{$parameters/form}/data/{$parameters/document}/data"
-            replace="none">
-    </xforms:submission>
+            validate="true" method="put"
+            ref="event('holder')" xxforms:ensure-uploads="false"
+            resource="{instance('fr-uris-instance')/data-collection}/crud/{$parameters/app}/{$parameters/form}/data/{$parameters/document}/{event('resource')}"
+            replace="none"/>
+
+    <xforms:submission id="fr-create-update-attachment-submission"
+            method="put" serialization="application/octet-stream"
+            ref="event('holder')" xxforms:ensure-uploads="false"
+            resource="{instance('fr-uris-instance')/data-collection}/crud/{$parameters/app}/{$parameters/form}/data/{$parameters/document}/{event('resource')}"
+            replace="none"/>
 
     <!-- Get document -->
     <xforms:submission id="get-document-submission"
             method="get" serialization="none"
             resource="{instance('fr-uris-instance')/data-collection}/crud/{$parameters/app}/{$parameters/form}/data/{$parameters/document}/data"
             replace="instance" xxforms:instance="fr-form-instance"/>
+
+    <!-- Source form with metadata -->
+    <xforms:instance id="fr-source-form-instance" xxforms:readonly="true">
+        <form xmlns=""/>
+    </xforms:instance>
+
+    <xforms:submission id="get-configuration-submission"
+        method="get" serialization="none"
+        resource="{instance('fr-uris-instance')/form-collection}/crud/{$parameters/app}/{$parameters/form}/form/form.xhtml"
+        replace="instance" instance="fr-source-form-instance" xxforms:readonly="true">
+    </xforms:submission>
 
     <xforms:instance id="fr-persistence-instance">
         <save xmlns="">
@@ -193,6 +260,8 @@
             <message/>
             <!-- Error document returned -->
             <error/>
+            <!-- Whether an error was received -->
+            <is-error>false</is-error>
         </save>
     </xforms:instance>
 
@@ -208,16 +277,23 @@
     </xforms:bind>
 
     <!-- React to successful submission when saving/updating -->
-    <xforms:action ev:event="xforms-submit-done" ev:target="fr-create-submission fr-create-update-submission">
+    <xforms:action ev:event="xforms-submit-done" ev:target="fr-create-update-submission">
         <xforms:setvalue ref="instance('fr-persistence-instance')/message"
                          value="xxforms:instance('fr-fr-current-resources')/detail/messages/save-success"/>
-        <xforms:setvalue ref="instance('fr-persistence-instance')/data-status">clean</xforms:setvalue>
         <xforms:toggle case="fr-message-success"/>
+
+        <!-- HACK: Force this before cleaning the status because we do a setvalue just before calling the submission -->
+        <xforms:recalculate/>
+        <xforms:refresh/>
+
+        <xforms:setvalue ref="instance('fr-persistence-instance')/data-status">clean</xforms:setvalue>
+
     </xforms:action>
 
     <!-- React to failed submission when saving/updating -->
-    <xforms:action ev:event="xforms-submit-error" ev:target="fr-create-submission fr-create-update-submission">
+    <xforms:action ev:event="xforms-submit-error" ev:target="fr-create-update-submission fr-create-update-attachment-submission">
         <xforms:setvalue ref="instance('fr-persistence-instance')/error" value="event('response-body')"/>
+        <xforms:setvalue ref="instance('fr-persistence-instance')/is-error">true</xforms:setvalue>
         <xforms:message level="xxforms:log-error"><xforms:output value="event('response-body')"/></xforms:message>
         <xforms:action if="event('error-type') = 'validation-error'">
             <xforms:setvalue ref="instance('fr-persistence-instance')/message"
@@ -243,5 +319,15 @@
 
     <!-- Clear message upon DOMFocusIn on #fr-form-group -->
     <xforms:setvalue ev:observer="fr-form-group" ev:event="DOMFocusIn" ref="instance('fr-persistence-instance')/message"/>
+
+    <!-- Perform background submission upon xforms-sepect #fr-form-group for xforms:upload -->
+    <xforms:action ev:observer="fr-form-group" ev:event="xforms-select"
+            if="event('target-ref')/root()/* is xxforms:instance('fr-form-instance') and event('target-ref')/(@filename and @mediatype and @size)">
+        <xforms:send submission="fr-upload-attachment-submission"/>
+    </xforms:action>
+
+    <xforms:submission id="fr-upload-attachment-submission" xxforms:ensure-uploads="true"
+                       ref="xxforms:instance('fr-form-instance')" validate="false" relevant="false"
+                       method="post" replace="none" resource="test:"/>
 
 </xforms:model>

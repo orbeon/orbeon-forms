@@ -7,11 +7,12 @@
     background: white url(../../../apps/fr/style/separator.gif) repeat-x scroll left center
 }
 
-/* Itemset editor */
-#fb-itemset-editor-dialog { width: 35em }
-#fb-itemset-editor-dialog .fr-grid-2-columns .xforms-input input { width: 13em }
-#fb-itemset-editor-dialog .fr-repeat { margin: 0; background-color: transparent }
-#fb-itemset-editor-dialog .fb-dialog-body { }
+.fb-clear { clear: both }
+.fb-xforms-disabled { display:none }
+
+.section-container { border-top: 1px solid #3598D4; margin-top: .5em }
+.fb-grid-table { margin-top: .5em; margin-left: 1px }
+.fb-grid-td { border: 1px dotted gray; padding: .2em }
 
 /* Language toolbar */
 .fb-language-choice { display: block; float: right; }
@@ -24,30 +25,33 @@
 .fb-toolbox .fb-tool button { width: 100%; text-align: left }
 .fb-xvc { text-align: center }
 .fb-xvc a { text-decoration: none }
-
-.fb-clear { clear: both }
-.fb-xforms-disabled { display:none }
-
-.section-container { border-top: 1px solid #3598D4; margin-top: .5em }
-.fb-grid-table { margin-top: .5em; margin-left: 1px }
-.fb-grid-td { border: 1px dotted gray; padding: .2em }
+#fb-toolbox-dialog { width: 180px; }
+#fb-toolbox-dialog .yui-panel .hd { background-color: #3598d4 }
 
 .fb-toolbar button { width: 12em }
 .fb-section-toolbar { margin-top: .5em }
 
-/* Dialogs */
+/* Itemset editor dialog */
+#fb-itemset-editor-dialog { width: 35em }
+#fb-itemset-editor-dialog .fr-grid-2-columns .xforms-input input { width: 13em }
+#fb-itemset-editor-dialog .fr-repeat { margin: 0; background-color: transparent }
+#fb-itemset-editor-dialog .fb-dialog-body { }
+
+/* Other dialogs */
 .xforms-dialog .bd { padding-left: .5em; padding-right: .5em }
 #fb-publish-dialog { width: 450px; }
+#fb-css-upload-dialog { width: 400px; }
 
 #fb-schema-upload-dialog .xforms-hint { width: 100% }
 #fb-schema-upload-dialog .xforms-select1 { height: 10em; width: 100% }
 #fb-schema-upload-dialog .fb-dialog-h2 { font-size: larger }
 #fb-schema-upload-dialog .fb-dialog-section { display: block; margin-left: 1em }
-#fb-toolbox-dialog { width: 180px; }
+
 #fb-xml-dialog .fb-xml-dialog-view { width: 57.69em; *width:56.301em; min-width:750px; height: 400px; overflow: scroll }
 #fb-edit-source-dialog .fb-xml-dialog-view { width: 57.69em; *width:56.301em; min-width:750px; height: 400px }
 #fb-edit-source-dialog .fb-xml-dialog-view textarea.xforms-textarea { width: 99%; height: 29em }
-#fb-toolbox-dialog .yui-panel .hd { background-color: #3598d4 }
+
+
 
 .dialog-icon { float: left; margin-right: 2em; margin-left: 1em; padding-bottom: 1em; }
 .dialog-message { margin-top: 1em; padding-top: 0.5em; }

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Copyright (C) 2008 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xxforms:dialog xmlns:xhtml="http://www.w3.org/1999/xhtml"
+      xmlns:xforms="http://www.w3.org/2002/xforms"
+      xmlns:xs="http://www.w3.org/2001/XMLSchema"
+      xmlns:ev="http://www.w3.org/2001/xml-events"
+      xmlns:xi="http://www.w3.org/2001/XInclude"
+      xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+      xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+      xmlns:saxon="http://saxon.sf.net/"
+
+      id="fb-publish-dialog" level="modal" close="true" draggable="true">
+
+    <xforms:label>Publish Form</xforms:label>
+    <xhtml:div>
+        <!--<xhtml:img src="/apps/fr/style/question-large.gif" alt="Question" class="dialog-icon"/>-->
+        <xhtml:div class="dialog-message">
+            <xhtml:p>
+                Are you sure you want to publish this form? This will override the existing form with
+                the following properties:
+            </xhtml:p>
+            <xhtml:ul>
+                <xhtml:li>
+                    <xhtml:p>
+                        <xhtml:b>Application Id:</xhtml:b>
+                        <xforms:output value="$metadata-instance/application-id"/>
+                    </xhtml:p>
+                </xhtml:li>
+                <xhtml:li>
+                    <xhtml:p>
+                        <xhtml:b>Form Id:</xhtml:b>
+                        <xforms:output value="$metadata-instance/form-id"/>
+                    </xhtml:p>
+                </xhtml:li>
+            </xhtml:ul>
+        </xhtml:div>
+    </xhtml:div>
+    <xhtml:div class="dialog-button">
+        <xforms:group>
+            <xforms:trigger class="xforms-trigger-appearance-modal">
+                <xforms:label>
+                    <xhtml:img src="../../../../forms/orbeon/builder/images/upload.png" alt="Publish" title="Publish"/>
+                    <xhtml:span>Publish</xhtml:span>
+                </xforms:label>
+                <xforms:action ev:event="DOMActivate">
+                    <xforms:dispatch name="fr-publish-form" target="fr-persistence-model">
+                        <xxforms:context name="application" select="$metadata-instance/application-id"/>
+                        <xxforms:context name="form" select="$metadata-instance/form-id"/>
+                    </xforms:dispatch>
+                </xforms:action>
+            </xforms:trigger>
+            <xforms:trigger>
+                <xforms:label><xhtml:img src="/apps/fr/style/close.gif" alt=""/> <xhtml:span>Cancel</xhtml:span></xforms:label>
+            </xforms:trigger>
+        </xforms:group>
+    </xhtml:div>
+    <!-- Hide dialog -->
+    <xxforms:hide ev:event="DOMActivate" dialog="fb-publish-dialog"/>
+    <!-- Set focus when the dialog open  -->
+    <!--<xforms:setfocus ev:event="xxforms-dialog-open" control="fb-confirmation-dialog-cancel-trigger"/>-->
+</xxforms:dialog>

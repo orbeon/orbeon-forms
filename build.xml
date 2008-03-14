@@ -84,7 +84,6 @@
         <include name="xmlgraphics-commons-1_1.jar"/>
         <include name="jakarta-poi*"/>
         <include name="metadata-extractor-2_1.jar"/>
-        <include name="jdom-b9.jar"/>
         <include name="castor-0_9_4_3-xml.jar"/>
         <include name="antlr-2_7_4_orbeon.jar"/>
         <include name="jakarta-slide-webdavlib-2.0rc1.jar"/>

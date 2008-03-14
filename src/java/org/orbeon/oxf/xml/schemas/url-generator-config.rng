@@ -74,6 +74,11 @@
                             <data type="boolean"/>
                         </element>
                     </optional>
+                    <optional>
+                        <element name="output-binary">
+                            <data type="boolean"/>
+                        </element>
+                    </optional>
                     <zeroOrMore>
                         <element name="header">
                             <element name="name">

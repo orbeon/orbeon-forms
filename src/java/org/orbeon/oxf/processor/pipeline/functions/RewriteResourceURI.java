@@ -11,13 +11,13 @@
  *
  *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.xforms.function.xxforms;
+package org.orbeon.oxf.processor.pipeline.functions;
 
-import org.orbeon.oxf.resources.OXFProperties;
-import org.orbeon.oxf.xforms.function.XFormsFunction;
+import org.orbeon.oxf.pipeline.StaticExternalContext;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.StaticContext;
 import org.orbeon.saxon.expr.XPathContext;
+import org.orbeon.saxon.functions.SystemFunction;
 import org.orbeon.saxon.om.ListIterator;
 import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.trans.XPathException;
@@ -25,7 +25,7 @@ import org.orbeon.saxon.value.StringValue;
 
 import java.util.Collections;
 
-public class XXFormsProperty extends XFormsFunction {
+public class RewriteResourceURI extends SystemFunction {
 
     /**
      * preEvaluate: this method suppresses compile-time evaluation by doing nothing
@@ -37,21 +37,17 @@ public class XXFormsProperty extends XFormsFunction {
 
     public SequenceIterator iterate(XPathContext xpathContext) throws XPathException {
 
-        // Get property name
-        final Expression propertyNameExpression = argument[0];
-        final String propertyName = propertyNameExpression.evaluateAsString(xpathContext);
+        // Get URI
+        final Expression uriExpression = argument[0];
+        final String uri = uriExpression.evaluateAsString(xpathContext);
 
-        // Never return the password property
-        if ("oxf.xforms.password".equals(propertyName.trim())) {
-            return new ListIterator(Collections.EMPTY_LIST);
-        }
+        // Get mode
+        final Expression modeExpression = (argument.length < 2) ? null : argument[1];
+        final boolean mode = (modeExpression == null) ? false : modeExpression.effectiveBooleanValue(xpathContext);
 
         // Get property value
-        final Object propertyValue = OXFProperties.instance().getPropertySet().getObject(propertyName);
+        final String rewrittenURI = StaticExternalContext.rewriteResourceURL(uri, mode);
 
-        if (propertyValue != null)
-            return new ListIterator(Collections.singletonList(new StringValue(propertyValue.toString())));
-        else
-            return new ListIterator(Collections.EMPTY_LIST);
+        return new ListIterator(Collections.singletonList(new StringValue(rewrittenURI)));
     }
 }

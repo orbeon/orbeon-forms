@@ -265,7 +265,7 @@ public class XFormsActionInterpreter {
 
         // Don't evaluate the condition if the context has gone missing
         {
-            if (contextNodeset.size() == 0 || containingDocument.getInstanceForNode((NodeInfo) contextNodeset.get(contextPosition - 1)) == null) {
+            if (contextNodeset.size() == 0) {//  || containingDocument.getInstanceForNode((NodeInfo) contextNodeset.get(contextPosition - 1)) == null
                 if (XFormsServer.logger.isDebugEnabled())
                     containingDocument.logDebug("action", "not executing", new String[] { "action name", actionName, "condition type", conditionType, "reason", "missing context" });
                 return false;

@@ -13,14 +13,16 @@
  */
 package org.orbeon.oxf.xforms.function;
 
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsControls;
-import org.orbeon.oxf.xforms.XFormsModel;
-import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPathCache;
-import org.orbeon.saxon.functions.SystemFunction;
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsContextStack;
+import org.orbeon.oxf.xforms.XFormsControls;
+import org.orbeon.oxf.xforms.XFormsModel;
+import org.orbeon.saxon.expr.Expression;
+import org.orbeon.saxon.expr.StaticContext;
 import org.orbeon.saxon.expr.XPathContext;
+import org.orbeon.saxon.functions.SystemFunction;
 
 /**
  * Base class for all XForms functions.
@@ -28,6 +30,16 @@ import org.orbeon.saxon.expr.XPathContext;
 abstract public class XFormsFunction extends SystemFunction {
 
     protected XFormsFunction() {
+    }
+
+    /**
+     * preEvaluate: this method suppresses compile-time evaluation by doing nothing
+     * (because the value of the expression depends on the runtime context)
+     *
+     * NOTE: A few functions would benefit from not having this, but it is always safe.
+     */
+    public Expression preEvaluate(StaticContext env) {
+        return this;
     }
 
     public XFormsModel getContainingModel(XPathContext xpathContext) {

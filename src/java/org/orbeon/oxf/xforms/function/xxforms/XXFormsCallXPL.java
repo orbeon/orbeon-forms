@@ -14,10 +14,10 @@
 package org.orbeon.oxf.xforms.function.xxforms;
 
 import org.apache.log4j.Logger;
-import org.dom4j.QName;
-import org.dom4j.Node;
-import org.dom4j.Element;
 import org.dom4j.Document;
+import org.dom4j.Element;
+import org.dom4j.Node;
+import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.InitUtils;
 import org.orbeon.oxf.pipeline.StaticExternalContext;
@@ -30,16 +30,18 @@ import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
-import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.TransformerUtils;
+import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.XPathContext;
-import org.orbeon.saxon.expr.StaticContext;
-import org.orbeon.saxon.om.*;
+import org.orbeon.saxon.om.Item;
+import org.orbeon.saxon.om.ListIterator;
+import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.trans.XPathException;
 
 import java.net.URL;
@@ -54,14 +56,6 @@ import java.util.List;
 public class XXFormsCallXPL extends XFormsFunction {
 
     private static Logger logger = LoggerFactory.createLogger(XXFormsCallXPL.class);
-
-    /**
-     * preEvaluate: this method suppresses compile-time evaluation by doing nothing
-     * (because the value of the expression depends on the runtime context)
-     */
-    public Expression preEvaluate(StaticContext env) {
-        return this;
-    }
 
     public SequenceIterator iterate(XPathContext xpathContext) throws XPathException {
 

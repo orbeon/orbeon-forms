@@ -14,22 +14,17 @@
 package org.orbeon.oxf.xforms.function.exforms;
 
 import org.orbeon.oxf.xforms.function.XFormsFunction;
-import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.expr.*;
-import org.orbeon.saxon.trans.XPathException;
-import org.orbeon.saxon.trans.IndependentContext;
+import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.sort.SortExpression;
 import org.orbeon.saxon.sort.SortKeyDefinition;
+import org.orbeon.saxon.trans.IndependentContext;
+import org.orbeon.saxon.trans.XPathException;
 
 /**
  * exforms:sort() function
  */
 public class EXFormsSort extends XFormsFunction {
-
-
-    public Expression preEvaluate(StaticContext staticContext) throws XPathException {
-        return super.preEvaluate(staticContext);
-    }
 
     public SequenceIterator iterate(XPathContext xpathContext) throws XPathException {
 

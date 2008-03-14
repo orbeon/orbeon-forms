@@ -27,7 +27,6 @@ public class Months extends XFormsFunction {
 
     private static final int YEAR_COEF = 12;
 
-
     public Item evaluateItem(XPathContext context) throws XPathException {
         String arg = argument[0].evaluateAsString(context);
         DurationValue value = null;

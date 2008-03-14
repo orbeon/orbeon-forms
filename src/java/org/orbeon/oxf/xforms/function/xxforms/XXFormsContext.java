@@ -13,15 +13,14 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms;
 
-import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.XFormsContextStack;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.saxon.expr.Expression;
-import org.orbeon.saxon.expr.StaticContext;
 import org.orbeon.saxon.expr.XPathContext;
+import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.ListIterator;
 import org.orbeon.saxon.om.SequenceIterator;
-import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.trans.XPathException;
 
 import java.util.ArrayList;
@@ -33,14 +32,6 @@ import java.util.Collections;
  * XForms control. For xforms:repeat, the context returned is the context of the current iteration.
  */
 public class XXFormsContext extends XFormsFunction {
-
-    /**
-     * preEvaluate: this method suppresses compile-time evaluation by doing nothing
-     * (because the value of the expression depends on the runtime context)
-     */
-    public Expression preEvaluate(StaticContext env) {
-        return this;
-    }
 
     public SequenceIterator iterate(XPathContext xpathContext) throws XPathException {
 

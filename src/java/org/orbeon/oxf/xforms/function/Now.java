@@ -13,8 +13,6 @@
  */
 package org.orbeon.oxf.xforms.function;
 
-import org.orbeon.saxon.expr.Expression;
-import org.orbeon.saxon.expr.StaticContext;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.trans.XPathException;
@@ -27,12 +25,6 @@ import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
 public class Now extends XFormsFunction {
-
-
-
-    public Expression preEvaluate(StaticContext env) throws XPathException {
-        return this;
-    }
 
     public Item evaluateItem(XPathContext context) throws XPathException {
         DateTimeValue value;

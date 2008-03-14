@@ -21,7 +21,6 @@ import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.expr.Expression;
-import org.orbeon.saxon.expr.StaticContext;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.trans.XPathException;
@@ -36,14 +35,6 @@ import java.util.Map;
  * is evaluated. The second attribute is an optional attribute value. The default is the empty string.
  */
 public class XXFormsAttribute extends XFormsFunction {
-
-    /**
-    * preEvaluate: this method suppresses compile-time evaluation by doing nothing
-    * (because the value of the expression depends on the runtime context)
-    */
-    public Expression preEvaluate(StaticContext env) {
-        return this;
-    }
 
     public Item evaluateItem(XPathContext xpathContext) throws XPathException {
 

@@ -20,8 +20,6 @@ import org.orbeon.oxf.xforms.XFormsElementContext;
 import org.orbeon.oxf.xforms.XFormsModel;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.event.events.XFormsComputeExceptionEvent;
-import org.orbeon.saxon.expr.Expression;
-import org.orbeon.saxon.expr.StaticContext;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.trans.XPathException;
@@ -33,14 +31,6 @@ import org.orbeon.saxon.value.IntegerValue;
  * 7.8.5 The index() Function
  */
 public class Index extends XFormsFunction {
-
-    /**
-    * preEvaluate: this method suppresses compile-time evaluation by doing nothing
-    * (because the value of the expression depends on the runtime context)
-    */
-    public Expression preEvaluate(StaticContext env) {
-        return this;
-    }
 
     public Item evaluateItem(XPathContext xpathContext) throws XPathException {
 
@@ -68,7 +58,7 @@ public class Index extends XFormsFunction {
             // Obtain PipelineContext - this function is always called from controls so
             // PipelineContext should be present
             final StaticExternalContext.StaticContext staticContext = StaticExternalContext.getStaticContext();
-            PipelineContext pipelineContext = (staticContext != null) ? staticContext.getPipelineContext() : null;
+            final PipelineContext pipelineContext = (staticContext != null) ? staticContext.getPipelineContext() : null;
 
             final XFormsModel currentModel = getContextStack(xpathContext).getCurrentModel();
             currentModel.getContainingDocument().dispatchEvent(pipelineContext,

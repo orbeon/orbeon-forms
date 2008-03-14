@@ -13,14 +13,10 @@
  */
 package org.orbeon.oxf.xforms.function;
 
-import org.orbeon.saxon.expr.Expression;
-import org.orbeon.saxon.expr.StaticContext;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.trans.XPathException;
-import org.orbeon.saxon.value.StringValue;
 import org.orbeon.saxon.value.DoubleValue;
-import org.orbeon.oxf.xml.XMLUtils;
 
 /**
  * XForms random() function (XForms 1.1).
@@ -28,14 +24,6 @@ import org.orbeon.oxf.xml.XMLUtils;
 public class Random extends XFormsFunction {
 
     private static java.util.Random random;
-
-    /**
-    * preEvaluate: this method suppresses compile-time evaluation by doing nothing
-    * (because the value of the expression depends on the runtime context)
-    */
-    public Expression preEvaluate(StaticContext env) {
-        return this;
-    }
 
     public Item evaluateItem(XPathContext c) throws XPathException {
 

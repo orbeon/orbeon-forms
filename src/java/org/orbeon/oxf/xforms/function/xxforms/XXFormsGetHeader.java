@@ -13,7 +13,8 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms;
 
-import org.orbeon.oxf.resources.OXFProperties;
+import org.orbeon.oxf.pipeline.StaticExternalContext;
+import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.XPathContext;
@@ -24,24 +25,26 @@ import org.orbeon.saxon.value.StringValue;
 
 import java.util.Collections;
 
-public class XXFormsProperty extends XFormsFunction {
+public class XXFormsGetHeader extends XFormsFunction {
 
     public SequenceIterator iterate(XPathContext xpathContext) throws XPathException {
 
-        // Get property name
-        final Expression propertyNameExpression = argument[0];
-        final String propertyName = propertyNameExpression.evaluateAsString(xpathContext);
+        // Get header name
+        final Expression headerNameExpression = argument[0];
+        final String headerName = headerNameExpression.evaluateAsString(xpathContext);
 
-        // Never return the password property
-        if ("oxf.xforms.password".equals(propertyName.trim())) {
-            return new ListIterator(Collections.EMPTY_LIST);
-        }
+        // Get header value
 
-        // Get property value
-        final Object propertyValue = OXFProperties.instance().getPropertySet().getObject(propertyName);
+        // Obtain PipelineContext - this function is always called from controls so
+        // PipelineContext should be present
+        final StaticExternalContext.StaticContext staticContext = StaticExternalContext.getStaticContext();
+        final ExternalContext externalContext = staticContext.getExternalContext();
 
-        if (propertyValue != null)
-            return new ListIterator(Collections.singletonList(new StringValue(propertyValue.toString())));
+        // TODO: getHeaderMap() returns a single header, but should really return all occurrences
+        final String headerValue = (String) externalContext.getRequest().getHeaderMap().get(headerName.toLowerCase());
+
+        if (headerValue != null)
+            return new ListIterator(Collections.singletonList(new StringValue(headerValue)));
         else
             return new ListIterator(Collections.EMPTY_LIST);
     }

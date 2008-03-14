@@ -13,8 +13,6 @@
  */
 package org.orbeon.oxf.xforms.function;
 
-import org.orbeon.saxon.expr.Expression;
-import org.orbeon.saxon.expr.StaticContext;
 import org.orbeon.saxon.expr.StaticProperty;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.Item;
@@ -23,11 +21,6 @@ import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.value.IntegerValue;
 
 public class Last extends XFormsFunction {
-
-
-    public Expression preEvaluate(StaticContext env) {
-        return this;
-    }
 
     public Item evaluateItem(XPathContext xpathContext) throws XPathException {
         if (xpathContext.getCurrentIterator() instanceof SingletonIterator) {

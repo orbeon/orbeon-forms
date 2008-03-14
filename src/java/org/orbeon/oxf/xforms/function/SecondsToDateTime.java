@@ -13,11 +13,14 @@
  */
 package org.orbeon.oxf.xforms.function;
 
-import org.orbeon.saxon.value.*;
-import org.orbeon.saxon.trans.XPathException;
-import org.orbeon.saxon.om.Item;
-import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.saxon.expr.XPathContext;
+import org.orbeon.saxon.om.Item;
+import org.orbeon.saxon.trans.XPathException;
+import org.orbeon.saxon.value.AtomicValue;
+import org.orbeon.saxon.value.DateTimeValue;
+import org.orbeon.saxon.value.NumericValue;
+import org.orbeon.saxon.value.SecondsDurationValue;
 
 
 public class SecondsToDateTime extends XFormsFunction {

@@ -13,8 +13,6 @@
  */
 package org.orbeon.oxf.xforms.function;
 
-import org.orbeon.saxon.expr.Expression;
-import org.orbeon.saxon.expr.StaticContext;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.trans.XPathException;
@@ -23,14 +21,6 @@ import org.orbeon.saxon.trans.XPathException;
  * XForms 1.1 context() function.
  */
 public class Context extends XFormsFunction {
-
-    /**
-     * preEvaluate: this method suppresses compile-time evaluation by doing nothing
-     * (because the value of the expression depends on the runtime context)
-     */
-    public Expression preEvaluate(StaticContext env) {
-        return this;
-    }
 
     public Item evaluateItem(XPathContext xpathContext) throws XPathException {
 

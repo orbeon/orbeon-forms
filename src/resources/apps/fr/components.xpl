@@ -25,21 +25,37 @@
     <p:param type="output" name="data"/>
 
     <!-- Apply project-specific theme -->
-    <p:processor name="oxf:url-generator">
-        <p:input name="config" href="aggregate('config', aggregate('url', #instance#xpointer(concat(
-                                        'oxf:/forms/', /*/app, '/theme.xsl'))))"/>
-        <p:output name="data" id="theme"/>
-    </p:processor>
+    <p:choose href="#instance">
+        <p:when test="doc-available(concat('oxf:/forms/', /*/app, '/theme.xsl'))">
+            <!-- TODO: Fetch from persistence layer -->
+            <p:processor name="oxf:url-generator">
+                <p:input name="config" href="aggregate('config', aggregate('url', #instance#xpointer(concat(
+                                                'oxf:/forms/', /*/app, '/theme.xsl'))))"/>
+                <p:output name="data" id="theme"/>
+            </p:processor>
+            <p:processor name="oxf:xslt">
+                <p:input name="data" href="#data"/>
+                <p:input name="config" href="#theme"/>
+                <p:output name="data" id="themed-data"/>
+            </p:processor>
+        </p:when>
+        <p:otherwise>
+            <p:processor name="oxf:identity">
+                <p:input name="data" href="#data"/>
+                <p:output name="data" id="themed-data"/>
+            </p:processor>
+        </p:otherwise>
+    </p:choose>
 
-    <p:processor name="oxf:xslt">
-        <p:input name="data" href="#data"/>
-        <p:input name="config" href="#theme"/>
-        <p:output name="data" id="themed-data"/>
+    <!-- Handle XInclude -->
+    <p:processor name="oxf:xinclude">
+        <p:input name="config" href="#themed-data"/>
+        <p:output name="data" id="after-xinclude"/>
     </p:processor>
 
     <!-- Apply generic components -->
     <p:processor name="oxf:unsafe-xslt">
-        <p:input name="data" href="#themed-data"/>
+        <p:input name="data" href="#after-xinclude"/>
         <p:input name="instance" href="#instance"/>
         <p:input name="config" href="oxf:/apps/fr/components.xsl"/>
         <p:output name="data" id="after-components"/>

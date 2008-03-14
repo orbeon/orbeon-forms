@@ -162,24 +162,30 @@
 
                     <xxforms:variable name="bind" select="."/>
                     <xxforms:variable name="expression" select="string-join($bind/ancestor-or-self::xforms:bind/@nodeset, '/')"/>
-                    <xxforms:variable name="holder" select="xxforms:instance('fr-form-instance')/saxon:evaluate($expression)"/>
+                    <xxforms:variable name="holders" select="xxforms:instance('fr-form-instance')/saxon:evaluate($expression)"/>
 
-                    <xforms:action if="$holder">
+                    <xforms:action xxforms:iterate="$holders">
+                        <xxforms:variable name="holder" select="."/>
                         <!-- Found attachment URI location -->
                         <xxforms:variable name="uri" select="normalize-space($holder)"/>
                         <xforms:action if="$uri != '' and starts-with($uri, 'file:')">
                             <!-- There is a URI to process -->
+
+                            <xxforms:variable name="resource"
+                                              select="concat(instance('fr-uris-instance')/data-collection, '/crud/',
+                                                        $parameters/app, '/', $parameters/form, '/data/',
+                                                        $parameters/document, '/', tokenize($holder, '/')[last()])"/>
 
                             <!-- Save attachment -->
                             <xforms:send submission="fr-create-update-attachment-submission">
                                 <xxforms:context name="holder" select="$holder"/>
                                 <!-- TODO: We should really specify an extension, but when reading back from the Page flow, .png, e.g., will match on the <files> section -->
                                 <!-- For now, use last part as temp file name, which has a .tmp extension -->
-                                <xxforms:context name="resource" select="tokenize($holder, '/')[last()]"/>
+                                <xxforms:context name="resource" select="$resource"/>
                             </xforms:send>
 
                             <!-- Only keep the last part of the path -->
-                            <xforms:setvalue ref="$holder" value="tokenize($holder, '/')[last()]"/>
+                            <xforms:setvalue ref="$holder" value="$resource"/>
 
                         </xforms:action>
                     </xforms:action>
@@ -230,7 +236,7 @@
     <xforms:submission id="fr-create-update-attachment-submission"
             method="put" serialization="application/octet-stream"
             ref="event('holder')" xxforms:ensure-uploads="false"
-            resource="{instance('fr-uris-instance')/data-collection}/crud/{$parameters/app}/{$parameters/form}/data/{$parameters/document}/{event('resource')}"
+            resource="{event('resource')}"
             replace="none"/>
 
     <!-- Get document -->

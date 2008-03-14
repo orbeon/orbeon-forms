@@ -162,21 +162,25 @@
 
                 <!-- Create elements holding structured search data -->
                 <xforms:action xxforms:iterate="xxforms:instance('fr-source-form-instance')/xhtml:body//xforms:*[@class and tokenize(@class, ' ') = ('fr-search')]">
+                    <xxforms:variable name="control" select="."/>
+
                     <!-- Insert empty template -->
                     <xforms:insert context="instance('fr-search-instance')" nodeset="query" origin="instance('fr-search-template')"/>
+                    <xxforms:variable name="query" select="instance('fr-search-instance')/query[last()]"/>
+
                     <!-- Add control information to template -->
-                    <xforms:setvalue ref="instance('fr-search-instance')/query[last()]/@control" value="context()/local-name()"/>
+                    <xforms:setvalue ref="$query/@control" value="$control/local-name()"/>
                     <!-- Add meta-information to template -->
-                    <xforms:action if="context()/@bind">
-                        <xforms:action context="xxforms:instance('fr-source-form-instance')/xhtml:head/xforms:model//xforms:bind[@id = context()/@bind]">
-                            <xforms:setvalue ref="instance('fr-search-instance')/query[last()]/@name" value="substring-before(context()/@id, '-bind')"/>
-                            <xforms:setvalue ref="instance('fr-search-instance')/query[last()]/@path" value="string-join(context()/ancestor-or-self::xforms:bind/@nodeset, '/')"/>
-                            <xforms:setvalue ref="instance('fr-search-instance')/query[last()]/@type" value="if (context()/@type) then context()/@type else 'xs:string'"/>
-                        </xforms:action>
+                    <xforms:action if="$control/@bind">
+                        <xxforms:variable name="bind" select="xxforms:instance('fr-source-form-instance')/xhtml:head/xforms:model//xforms:bind[@id = $control/@bind]"/>
+
+                        <xforms:setvalue ref="$query/@name" value="substring-before($bind/@id, '-bind')"/>
+                        <xforms:setvalue ref="$query/@path" value="string-join(($bind/ancestor-or-self::xforms:bind/@nodeset)[position() gt 1], '/')"/>
+                        <xforms:setvalue ref="$query/@type" value="if ($bind/@type) then $bind/@type else 'xs:string'"/>
                     </xforms:action>
-                    <xforms:action if="context()/@ref">
-                        <xforms:setvalue ref="instance('fr-search-instance')/query[last()]/@name" value="context()/@ref"/>
-                        <xforms:setvalue ref="instance('fr-search-instance')/query[last()]/@path" value="string-join((context()/ancestor-or-self::*/(@ref | @context))[position() gt 1], '/')"/>
+                    <xforms:action if="$control/@ref">
+                        <xforms:setvalue ref="$query/@name" value="$control/@ref"/>
+                        <xforms:setvalue ref="$query/@path" value="string-join(($control/ancestor-or-self::*/(@ref | @context)), '/')"/>
                     </xforms:action>
                 </xforms:action>
 
@@ -226,22 +230,23 @@
                         <tr>
                             <xforms:repeat nodeset="instance('fr-search-instance')/query[@path]" id="search-repeat">
                                 <td>
+                                    <xxforms:variable name="label" select="$form-resources/*[local-name() = context()/@name]/label"/>
                                     <!-- input -->
                                     <xforms:input ref=".[@control = 'input']" incremental="true" >
                                         <xforms:label>
-                                            <xforms:output value="$form-resources/*[local-name() = context()/@name]"/>
+                                            <xforms:output value="$label"/>
                                         </xforms:label>
                                     </xforms:input>
                                     <!-- textarea -->
                                     <xforms:input ref=".[@control = 'textarea']" incremental="true" >
                                         <xforms:label>
-                                            <xforms:output value="$form-resources/*[local-name() = context()/@name]"/>
+                                            <xforms:output value="$label"/>
                                         </xforms:label>
                                     </xforms:input>
                                     <!-- select1 -->
                                     <xforms:select1 ref=".[@control = 'select1']">
                                         <xforms:label>
-                                            <xforms:output value="$form-resources/*[local-name() = context()/@name]"/>
+                                            <xforms:output value="$label"/>
                                         </xforms:label>
                                         <xforms:item>
                                             <xforms:label>[Any]</xforms:label>
@@ -281,7 +286,7 @@
                                     <th>
                                         <xforms:output value="for $id in substring-before(context()/@id, '-control')
                                                               return for $resource in ($form-resources/*[local-name() = $id], '')
-                                                                     return if ($resource != '') then $resource else concat('[', $id, ']')"/>
+                                                                     return if ($resource != '') then $resource/label else concat('[', $id, ']')"/>
 
                                     </th>
                                 </xforms:repeat>
@@ -373,8 +378,6 @@
                 <xforms:group ref="instance('fr-summary-instance')[not(document)]">
                     <xforms:output mediatype="text/html" value="saxon:serialize($fr-resources/summary/messages/no-form-found/node(), 'html')"/>
                 </xforms:group>
-
-                <!--<widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>-->
 
             </fr:body>
             <fr:buttons>

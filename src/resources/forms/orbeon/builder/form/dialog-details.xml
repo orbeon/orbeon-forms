@@ -29,11 +29,23 @@
     <xhtml:div>
         <xxforms:variable name="instance" select="instance('fb-details-editor-instance')"/>
         <xforms:group context="$instance">
-            <xforms:input ref="control-id" incremental="true" id="fb-edit-details-control-id-input">
-                <xforms:label>Control Id:</xforms:label>
+            <xforms:input ref="control-name" incremental="true" id="fb-edit-details-control-name-input">
+                <xforms:label>Control Name</xforms:label>
+                <xforms:alert>Name is already in use or incorrect</xforms:alert>
             </xforms:input>
-            <xhtml:div>
-                <xforms:trigger class="fr-inplace-rename" ref="change-trigger" id="fb-edit-details-control-id-trigger">
+            <xforms:select ref="classes" appearance="full">
+                <xforms:label>Summary Page</xforms:label>
+                <xforms:item>
+                    <xforms:label>Show in Summary</xforms:label>
+                    <xforms:value>fr-summary</xforms:value>
+                </xforms:item>
+                <xforms:item>
+                    <xforms:label>Show in Search</xforms:label>
+                    <xforms:value>fr-search</xforms:value>
+                </xforms:item>
+            </xforms:select>
+            <xhtml:div class="dialog-button">
+                <xforms:trigger class="fr-inplace-rename" ref="change-trigger" id="fb-edit-details-control-name-trigger">
                     <xforms:label>Change</xforms:label>
                 </xforms:trigger>
                 or
@@ -45,7 +57,7 @@
     </xhtml:div>
 
     <!-- Rename the control instance holder and resource holder -->
-    <xforms:action ev:event="DOMActivate" ev:observer="fb-edit-details-control-id-input fb-edit-details-control-id-trigger">
+    <xforms:action ev:event="DOMActivate" ev:observer="fb-edit-details-control-name-input fb-edit-details-control-name-trigger">
 
         <xxforms:variable name="instance" select="instance('fb-details-editor-instance')"/>
 
@@ -53,32 +65,57 @@
         <xxforms:variable name="instance-holder" select="$form-instance/root()/saxon:evaluate($instance/instance-holder)"/>
 
         <xxforms:variable name="old-name" select="name($instance-holder)"/>
-        <xxforms:variable name="new-name" select="$instance/control-id"/>
+        <xxforms:variable name="new-name" select="$instance/control-name"/>
 
-        <!-- Rename instance holder and all resources -->
-        <xforms:dispatch name="fb-rename-holders" target="fr-form-model">
-            <xxforms:context name="holders" select="($instance-holder, $resources/resource/*[name() = $old-name])"/>
-            <xxforms:context name="new-name" select="$new-name"/>
-        </xforms:dispatch>
+        <!-- Rename if needed -->
+        <xforms:action if="$old-name != $new-name">
 
-        <!-- Update control id and bindings -->
-        <xforms:dispatch name="fb-rename-control" target="fr-form-model">
-            <xxforms:context name="control" select="$control"/>
-            <xxforms:context name="new-name" select="$new-name"/>
-        </xforms:dispatch>
+            <!-- Rename instance holder and all resources -->
+            <xforms:dispatch name="fb-rename-holders" target="fr-form-model">
+                <xxforms:context name="holders" select="($instance-holder, $resources/resource/*[name() = $old-name])"/>
+                <xxforms:context name="new-name" select="$new-name"/>
+            </xforms:dispatch>
 
-        <!-- Update bind if existing -->
-        <xxforms:variable name="old-bind-id" select="concat($old-name, '-bind')"/>
-        <xxforms:variable name="bind" select="$model//xforms:bind[@id = $old-bind-id]"/>
-        <xforms:action context="$bind" if="exists(.)">
-            <xforms:setvalue ref="@id" value="concat($new-name, '-bind')"/>
-            <xforms:setvalue ref="@nodeset" value="$new-name"/>
+            <!-- Update control id and bindings -->
+            <xforms:dispatch name="fb-rename-control" target="fr-form-model">
+                <xxforms:context name="control" select="$control"/>
+                <xxforms:context name="new-name" select="$new-name"/>
+            </xforms:dispatch>
+
+            <!-- Update bind if existing -->
+            <xxforms:variable name="old-bind-id" select="concat($old-name, '-bind')"/>
+            <xxforms:variable name="bind" select="$model//xforms:bind[@id = $old-bind-id]"/>
+            <xforms:action context="$bind" if="exists(.)">
+                <xforms:setvalue ref="@id" value="concat($new-name, '-bind')"/>
+                <xforms:setvalue ref="@nodeset" value="$new-name"/>
+            </xforms:action>
         </xforms:action>
+
+        <!-- Set proper classes -->
+        <xxforms:variable name="classes" select="tokenize($instance/classes, ' ')"/>
+        <xforms:delete if="count($classes) = 0" nodeset="$control/@class"/>
+        <xforms:insert if="count($classes) > 0" context="$control" origin="xxforms:attribute('class', $instance/classes)"/>
 
     </xforms:action>
 
     <!-- Hide dialog -->
     <xxforms:hide ev:event="DOMActivate" dialog="fb-edit-details-dialog"/>
-    <!-- Set focus when the dialog open  -->
-    <xforms:setfocus ev:event="xxforms-dialog-open" control="fb-edit-details-control-id-input"/>
+    <!-- Show dialog -->
+    <xforms:action ev:event="xxforms-dialog-open">
+        <!-- Copy over values -->
+        <xxforms:variable name="instance" select="instance('fb-details-editor-instance')"/>
+
+        <xxforms:variable name="control" select="event('control')"/>
+
+        <xforms:setvalue ref="$instance/control-name" value="event('control-name')"/>
+        <xforms:setvalue ref="$instance/original-control-name" value="event('control-name')"/>
+        <xforms:setvalue ref="$instance/control" value="$control/saxon:path()"/>
+        <xforms:setvalue ref="$instance/instance-holder" value="event('instance-holder')/saxon:path()"/>
+
+        <xforms:setvalue ref="$instance/classes" value="$control/@class"/>
+
+        <!-- Set focus when the dialog open  -->
+        <xforms:setfocus control="fb-edit-details-control-name-input"/>
+    </xforms:action>
+
 </xxforms:dialog>

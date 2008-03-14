@@ -46,107 +46,120 @@
 
     <!-- Discriminate based on the HTTP method and content type -->
     <p:choose href="#request">
-
-        <!-- Binary put -->
-        <p:when test="/*/method = 'PUT' and not(/*/content-type = ('application/xml', 'text/xml') or ends-with(/*/content-type, '+xml'))">
-            
-            <p:processor name="oxf:xforms-submission">
-                <p:input name="submission">
-                    <xforms:submission ref="/*/body" method="put" replace="none"
-                            serialization="application/octet-stream"
-                            resource="{xxforms:property('oxf.fr.persistence.service.exist.uri')}/{/*/group[1]}">
-                        <xforms:action ev:event="xforms-submit-error">
-                            <!-- TODO: Propagate error to caller -->
-                            <xforms:delete while="/*/*" nodeset="/*/*"/>
-                            <xforms:setvalue ref="/*" value="event('response-body')"/>
-                            <xforms:message level="xxforms:log-error"><xforms:output value="event('response-body')"/></xforms:message>
-                        </xforms:action>
-                    </xforms:submission>
-                </p:input>
-                <p:input name="request" href="aggregate('root', #request#xpointer(/*/body), #matcher-groups#xpointer(/*/group))"/>
-                <p:output name="response" id="response"/>
-            </p:processor>
-
-        </p:when>
+        <!-- Handle binary and XML GET -->
         <p:when test="/*/method = 'GET'">
 
-            <p:processor name="oxf:xforms-submission">
-                <p:input name="submission">
-                    <xforms:submission method="get" replace="instance" serialization="none"
-                            resource="{xxforms:property('oxf.fr.persistence.service.exist.uri')}/{/*/group[1]}">
-                        <xforms:action ev:event="xforms-submit-error">
-                            <!-- TODO: Propagate error to caller -->
-                            <xforms:delete while="/*/*" nodeset="/*/*"/>
-                            <xforms:setvalue ref="/*" value="event('response-body')"/>
-                            <xforms:message level="xxforms:log-error"><xforms:output value="event('response-body')"/></xforms:message>
-                        </xforms:action>
-                    </xforms:submission>
+            <!-- Read URL -->
+            <p:processor name="oxf:url-generator">
+                <p:input name="config"
+                         href="aggregate('config',
+                                         aggregate('url', #matcher-groups#xpointer(p:rewrite-resource-uri(concat(p:property('oxf.fr.persistence.service.exist.uri'), '/', /*/group[1]), true()))),
+                                         aggregate('output-binary', #matcher-groups#xpointer('true')))"/>
+                <p:output name="data" id="document"/>
+            </p:processor>
+            <!-- Serialize out as is -->
+            <p:processor name="oxf:http-serializer">
+                <p:input name="config">
+                    <config>
+                        <cache-control>
+                            <use-local-cache>false</use-local-cache>
+                        </cache-control>
+                    </config>
                 </p:input>
-                <p:input name="request" href="#matcher-groups"/>
-                <p:output name="response" id="response"/>
+                <p:input name="data" href="#document"/>
             </p:processor>
 
         </p:when>
-        <p:when test="/*/method = 'DELETE'">
+        <p:otherwise>
+            <!-- Discriminate based on the HTTP method and content type -->
+            <p:choose href="#request">
 
-            <p:processor name="oxf:xforms-submission">
-                <p:input name="submission">
-                    <xforms:submission method="delete" replace="none" serialization="none"
-                            resource="{xxforms:property('oxf.fr.persistence.service.exist.uri')}/{/*/group[1]}">
-                        <xforms:action ev:event="xforms-submit-error">
-                            <!-- TODO: Propagate error to caller -->
-                            <xforms:delete while="/*/*" nodeset="/*/*"/>
-                            <xforms:setvalue ref="/*" value="event('response-body')"/>
-                            <xforms:message level="xxforms:log-error"><xforms:output value="event('response-body')"/></xforms:message>
-                        </xforms:action>
-                    </xforms:submission>
+                <!-- Binary PUT -->
+                <p:when test="/*/method = 'PUT' and not(/*/content-type = ('application/xml', 'text/xml') or ends-with(/*/content-type, '+xml'))">
+
+                    <p:processor name="oxf:xforms-submission">
+                        <p:input name="submission">
+                            <xforms:submission ref="/*/body" method="put" replace="none"
+                                    serialization="application/octet-stream"
+                                    resource="{xxforms:property('oxf.fr.persistence.service.exist.uri')}/{/*/group[1]}">
+                                <xforms:action ev:event="xforms-submit-error">
+                                    <!-- TODO: Propagate error to caller -->
+                                    <xforms:delete while="/*/*" nodeset="/*/*"/>
+                                    <xforms:setvalue ref="/*" value="event('response-body')"/>
+                                    <xforms:message level="xxforms:log-error"><xforms:output value="event('response-body')"/></xforms:message>
+                                </xforms:action>
+                            </xforms:submission>
+                        </p:input>
+                        <p:input name="request" href="aggregate('root', #request#xpointer(/*/body), #matcher-groups#xpointer(/*/group))"/>
+                        <p:output name="response" id="response"/>
+                    </p:processor>
+
+                </p:when>
+                <!-- DELETE -->
+                <p:when test="/*/method = 'DELETE'">
+
+                    <p:processor name="oxf:xforms-submission">
+                        <p:input name="submission">
+                            <xforms:submission method="delete" replace="none" serialization="none"
+                                    resource="{xxforms:property('oxf.fr.persistence.service.exist.uri')}/{/*/group[1]}">
+                                <xforms:action ev:event="xforms-submit-error">
+                                    <!-- TODO: Propagate error to caller -->
+                                    <xforms:delete while="/*/*" nodeset="/*/*"/>
+                                    <xforms:setvalue ref="/*" value="event('response-body')"/>
+                                    <xforms:message level="xxforms:log-error"><xforms:output value="event('response-body')"/></xforms:message>
+                                </xforms:action>
+                            </xforms:submission>
+                        </p:input>
+                        <p:input name="request" href="#matcher-groups"/>
+                        <p:output name="response" id="response"/>
+                    </p:processor>
+
+                </p:when>
+                <!-- XML PUT -->
+                <p:when test="/*/method = 'PUT'">
+
+                    <p:processor name="oxf:xforms-submission">
+                        <p:input name="submission">
+                            <xforms:submission ref="/*/*[1]" method="put" replace="none"
+                                    resource="{xxforms:property('oxf.fr.persistence.service.exist.uri')}/{/*/group[1]}">
+                                <xforms:action ev:event="xforms-submit-error">
+                                    <!-- TODO: Propagate error to caller -->
+                                    <xforms:delete while="/*/*" nodeset="/*/*"/>
+                                    <xforms:setvalue ref="/*" value="event('response-body')"/>
+                                    <xforms:message level="xxforms:log-error"><xforms:output value="event('response-body')"/></xforms:message>
+                                </xforms:action>
+                            </xforms:submission>
+                        </p:input>
+                        <p:input name="request" href="aggregate('root', #instance, #matcher-groups#xpointer(/*/group))"/>
+                        <p:output name="response" id="response"/>
+                    </p:processor>
+                </p:when>
+            </p:choose>
+
+            <!-- Convert and serialize to XML -->
+            <p:processor name="oxf:xml-converter">
+                <p:input name="config">
+                    <config>
+                        <indent>false</indent>
+                        <encoding>utf-8</encoding>
+                    </config>
                 </p:input>
-                <p:input name="request" href="#matcher-groups"/>
-                <p:output name="response" id="response"/>
+                <p:input name="data" href="#response"/>
+                <p:output name="data" id="converted"/>
             </p:processor>
 
-        </p:when>
-        <p:when test="/*/method = 'PUT'">
-
-            <p:processor name="oxf:xforms-submission">
-                <p:input name="submission">
-                    <xforms:submission ref="/*/*[1]" method="put" replace="none"
-                            resource="{xxforms:property('oxf.fr.persistence.service.exist.uri')}/{/*/group[1]}">
-                        <xforms:action ev:event="xforms-submit-error">
-                            <!-- TODO: Propagate error to caller -->
-                            <xforms:delete while="/*/*" nodeset="/*/*"/>
-                            <xforms:setvalue ref="/*" value="event('response-body')"/>
-                            <xforms:message level="xxforms:log-error"><xforms:output value="event('response-body')"/></xforms:message>
-                        </xforms:action>
-                    </xforms:submission>
+            <p:processor name="oxf:http-serializer">
+                <p:input name="config">
+                    <config>
+                        <cache-control>
+                            <use-local-cache>false</use-local-cache>
+                        </cache-control>
+                    </config>
                 </p:input>
-                <p:input name="request" href="aggregate('root', #instance, #matcher-groups#xpointer(/*/group))"/>
-                <p:output name="response" id="response"/>
+                <p:input name="data" href="#converted"/>
             </p:processor>
-        </p:when>
+        </p:otherwise>
+
     </p:choose>
-
-    <!-- Convert and serialize to XML -->
-    <p:processor name="oxf:xml-converter">
-        <p:input name="config">
-            <config>
-                <indent>false</indent>
-                <encoding>utf-8</encoding>
-            </config>
-        </p:input>
-        <p:input name="data" href="#response"/>
-        <p:output name="data" id="converted"/>
-    </p:processor>
-
-    <p:processor name="oxf:http-serializer">
-        <p:input name="config">
-            <config>
-                <cache-control>
-                    <use-local-cache>false</use-local-cache>
-                </cache-control>
-            </config>
-        </p:input>
-        <p:input name="data" href="#converted"/>
-    </p:processor>
 
 </p:config>

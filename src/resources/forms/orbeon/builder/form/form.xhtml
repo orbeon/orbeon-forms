@@ -30,6 +30,12 @@
         <xhtml:link rel="stylesheet" href="/forms/orbeon/builder/form-builder.css" type="text/css"/>
         <xforms:model id="fr-form-model">
 
+            <xforms:action ev:event="xforms-model-construct-done">
+                <xxforms:variable name="user-agent" select="xxforms:get-header('user-agent')"/>
+                <xforms:setvalue ref="instance('fb-user-agent-instance')/is-ie"
+                                 value="contains(lower-case($user-agent), 'msie') and not(contains(lower-case($user-agent), 'opera'))"/>
+            </xforms:action>
+
             <xforms:action ev:event="xforms-ready">
                 <xxforms:script>
                     <!-- Position toolbox to the left upon loading -->
@@ -108,7 +114,7 @@
                     </resource>
                     <resource xml:lang="fr">
                         <application-id>
-                            <label>Identifiant du Projet</label>
+                            <label>Identifiant de l'application</label>
                         </application-id>
                         <form-id>
                             <label>Identifiant du formulaire</label>
@@ -133,14 +139,21 @@
                 <xsl:output xmlns:xsl="http://www.w3.org/1999/XSL/Transform" method="xml" omit-xml-declaration="yes" indent="yes" saxon:indent-spaces="4"/>
             </xforms:instance>
 
+            <!-- Store user-agent details -->
+            <xforms:instance id="fb-user-agent-instance">
+                <user-agent>
+                    <is-ie/>
+                </user-agent>
+            </xforms:instance>
+
             <!-- Submission to test the form -->
             <xforms:submission id="fb-test-form-submission"
                     ref="instance('fr-form-instance')" method="post" replace="all"
                     resource="/fr/orbeon/test/test/" xxforms:target="_blank" xxforms:show-progress="false"/>
 
+            <!-- TODO: check where local variable can be used instead -->
             <xforms:instance id="fb-variables">
                 <variables>
-                    <!-- TODO: check where local variable can be used instead -->
                     <done/>
 
                     <!-- Confirmation dialog -->
@@ -150,7 +163,6 @@
                     <!-- Itemset editor dialog -->
                     <itemset-resource-id/>
                     <itemset-lang/>
-
 
                     <result-node/>
 
@@ -344,7 +356,7 @@
                     <!-- Insert new placeholder after existing one -->
                     <xforms:insert nodeset="$current-holder" origin="xxforms:element($new-name)"/>
                     <!-- Copy existing content into new element -->
-                    <xforms:insert context="$current-holder/../*[name() = $new-name]" origin="$current-holder/node()"/>
+                    <xforms:insert context="$current-holder/../*[name() = $new-name]" origin="$current-holder/(@* | node())"/>
                     <!-- Delete old element -->
                     <xforms:delete nodeset="$current-holder"/>
                 </xforms:action>
@@ -460,16 +472,18 @@
             <!-- Details dialog -->
             <xforms:instance id="fb-details-editor-instance">
                 <details>
-                    <control-id/>
+                    <original-control-name/>
+                    <control-name/>
                     <control/>
+                    <classes/>
                     <instance-holder/>
                     <change-trigger/>
                 </details>
             </xforms:instance>
 
             <xforms:bind nodeset="instance('fb-details-editor-instance')">
-                <xforms:bind nodeset="control-id" constraint="not(concat(normalize-space(), '-control') = $body//xforms:*/@id)"/>
-                <xforms:bind nodeset="change-trigger" readonly="concat(normalize-space(../control-id), '-control') = $body//xforms:*/@id"/>
+                <xforms:bind nodeset="control-name" constraint=". = ../original-control-name or not(concat(normalize-space(), '-control') = $body//xforms:*/@id)" type="xs:NCName"/>
+                <xforms:bind nodeset="change-trigger" readonly="../control-name != ../original-control-name and concat(normalize-space(../control-name), '-control') = $body//xforms:*/@id"/>
             </xforms:bind>
 
             <!-- Validation dialog -->
@@ -707,26 +721,27 @@
                             </xforms:input>
                         </xhtml:div>
                     </template>
-                    <template label="Time" image="/forms/orbeon/builder/images/clock.png">
-                        <xhtml:div class="time-input">
-                            <xforms:input id="" ref="">
-                                <xforms:label ref=""/>
-                                <xforms:hint ref=""/>
-                                <xforms:help ref=""/>
-                                <xforms:alert ref=""/>
-                            </xforms:input>
-                        </xhtml:div>
-                    </template>
-                    <template label="Date and Time" image="/ops/images/xforms/calendar.gif">
-                        <xhtml:div class="dateTime-input">
-                            <xforms:input id="" ref="">
-                                <xforms:label ref=""/>
-                                <xforms:hint ref=""/>
-                                <xforms:help ref=""/>
-                                <xforms:alert ref=""/>
-                            </xforms:input>
-                        </xhtml:div>
-                    </template>
+                    <!-- TODO -->
+                    <!--<template label="Time" image="/forms/orbeon/builder/images/clock.png">-->
+                        <!--<xhtml:div class="time-input">-->
+                            <!--<xforms:input id="" ref="">-->
+                                <!--<xforms:label ref=""/>-->
+                                <!--<xforms:hint ref=""/>-->
+                                <!--<xforms:help ref=""/>-->
+                                <!--<xforms:alert ref=""/>-->
+                            <!--</xforms:input>-->
+                        <!--</xhtml:div>-->
+                    <!--</template>-->
+                    <!--<template label="Date and Time" image="/ops/images/xforms/calendar.gif">-->
+                        <!--<xhtml:div class="dateTime-input">-->
+                            <!--<xforms:input id="" ref="">-->
+                                <!--<xforms:label ref=""/>-->
+                                <!--<xforms:hint ref=""/>-->
+                                <!--<xforms:help ref=""/>-->
+                                <!--<xforms:alert ref=""/>-->
+                            <!--</xforms:input>-->
+                        <!--</xhtml:div>-->
+                    <!--</template>-->
                     <template label="Text Area">
                         <xhtml:div id="" class="textarea">
                             <xforms:textarea id="" ref="">
@@ -863,8 +878,15 @@
 
         <fr:view>
             <xforms:label>Orbeon Form Builder</xforms:label>
-            <xhtml:img src="/apps/fr/style/orbeon-logo-trimmed-transparent-42.png"/>
+            <xhtml:img src="/apps/fr/style/orbeon-logo-trimmed-transparent-42.png"/>xxx
             <fr:body>
+
+                <xforms:group ref=".[instance('fb-user-agent-instance')/is-ie = 'true']" class="fb-ie-warning">
+                    Orbeon Form Builder still needs work to provide a satisfactory experience with Internet Explorer.
+                    Please bear with us while we fix this. In the meanwhile, we recommend you use <a
+                    href="http://www.mozilla.com/firefox/">Firefox</a>, <a
+                    href="http://www.apple.com/safari/">Safari</a>, or <a href="http://www.opera.com/">Opera</a>.
+                </xforms:group>
 
                 <!--
 
@@ -1181,9 +1203,9 @@
                                                                     <xforms:repeat nodeset="xhtml:td" id="fb-section-content-grid-td-repeat" xxforms:dnd="true">
 
                                                                         <xxforms:variable name="control" select="xforms:*[1]"/>
-                                                                        <xxforms:variable name="control-id" select="substring-before($control/@id, '-control')"/>
-                                                                        <xxforms:variable name="instance-holder" select="$section-holder/*[name() = $control-id]"/>
-                                                                        <xxforms:variable name="resource-holder" select="$current-resources/*[name() = $control-id]"/>
+                                                                        <xxforms:variable name="control-name" select="substring-before($control/@id, '-control')"/>
+                                                                        <xxforms:variable name="instance-holder" select="$section-holder/*[name() = $control-name]"/>
+                                                                        <xxforms:variable name="resource-holder" select="$current-resources/*[name() = $control-name]"/>
 
                                                                         <xhtml:td class="fb-grid-td">
                                                                             <xhtml:div class="fb-grid-cell-icons">
@@ -1209,10 +1231,11 @@
                                                                                 <xforms:trigger appearance="minimal" id="fb-edit-details-trigger">
                                                                                     <xforms:label><xhtml:img class="fb-control-help" alt="Details" title="" src="../../../../apps/fr/style/edit.gif"/></xforms:label>
                                                                                     <xforms:action ev:event="DOMActivate" context="instance('fb-details-editor-instance')">
-                                                                                        <xforms:setvalue ref="control-id" value="$control-id"/>
-                                                                                        <xforms:setvalue ref="control" value="$control/saxon:path()"/>
-                                                                                        <xforms:setvalue ref="instance-holder" value="$instance-holder/saxon:path()"/>
-                                                                                        <xxforms:show dialog="fb-edit-details-dialog" neighbor="fb-edit-details-trigger"/>
+                                                                                        <xxforms:show dialog="fb-edit-details-dialog" neighbor="fb-edit-details-trigger">
+                                                                                            <xxforms:context name="control" select="$control"/>
+                                                                                            <xxforms:context name="control-name" select="$control-name"/>
+                                                                                            <xxforms:context name="instance-holder" select="$instance-holder"/>
+                                                                                        </xxforms:show>
                                                                                     </xforms:action>
                                                                                 </xforms:trigger>
 
@@ -1229,7 +1252,7 @@
                                                                                 <xforms:trigger appearance="minimal" id="fb-edit-alert-trigger">
                                                                                     <xforms:label><xhtml:img class="fb-control-alert" alt="Alert" title="" src="../../../../ops/images/xforms/error.gif"/></xforms:label>
                                                                                     <xforms:action ev:event="DOMActivate">
-                                                                                        <xforms:setvalue ref="$current-control-name" value="$control-id"/>
+                                                                                        <xforms:setvalue ref="$current-control-name" value="$control-name"/>
                                                                                         <xxforms:show dialog="fb-edit-validation-dialog" neighbor="fb-edit-alert-trigger"/>
                                                                                     </xforms:action>
                                                                                 </xforms:trigger>
@@ -1303,7 +1326,7 @@
                                                                                         <xforms:group ref="xforms:input">
                                                                                             <xforms:input ref="$instance-holder">
                                                                                                 <xforms:label class="fb-xforms-disabled"/>
-                                                                                                <!--<xforms:hint value="$control-id"/>-->
+                                                                                                <!--<xforms:hint value="$control-name"/>-->
                                                                                             </xforms:input>
                                                                                         </xforms:group>
                                                                                         <xforms:group ref="xforms:textarea">
@@ -1413,11 +1436,20 @@
                                                                                                 <xforms:label ref="$resource-holder/label"/>
                                                                                             </xforms:trigger>
                                                                                         </xforms:group>
-                                                                                        <xforms:group ref="xforms:output[mediatype = 'image/*']">
-                                                                                            <!-- TODO: Image upload -->
-                                                                                            <xforms:output ref="$instance-holder" id="fb-edit-output-image-control">
+                                                                                        <xforms:group ref="xforms:output[@mediatype = 'image/*']">
+                                                                                            <!-- Image -->
+                                                                                            <xforms:group ref="$instance-holder[normalize-space() != '']">
+                                                                                                <xforms:output ref="." mediatype="image/*" id="fb-edit-output-image-control">
+                                                                                                    <xforms:label class="fb-xforms-disabled"/>
+                                                                                                </xforms:output>
+                                                                                            </xforms:group>
+                                                                                            <!-- File chooser -->
+                                                                                            <xforms:upload ref="$instance-holder">
                                                                                                 <xforms:label class="fb-xforms-disabled"/>
-                                                                                            </xforms:output>
+                                                                                                <xforms:filename ref="@filename"/>
+                                                                                                <xforms:mediatype ref="@mediatype"/>
+                                                                                                <xxforms:size ref="@size"/>
+                                                                                            </xforms:upload>
                                                                                         </xforms:group>
                                                                                         <xforms:group ref="xforms:upload">
                                                                                             <xforms:upload ref="$instance-holder" id="fb-edit-upload-control">

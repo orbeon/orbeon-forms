@@ -73,17 +73,20 @@
     <property as="xs:boolean" name="oxf.xforms.ajax.show-errors"                     value="true"/>
     <property as="xs:boolean" name="oxf.xforms.gzip-state"                           value="true"/>
     <property as="xs:boolean" name="oxf.xforms.minimal-resources"                    value="true"/>
-    <property as="xs:boolean" name="oxf.xforms.combine-resources"                    value="true"/>
+    <property as="xs:boolean" name="oxf.xforms.combine-resources"                    value="false"/>
     <property as="xs:boolean" name="oxf.xforms.cache-combined-resources"             value="false"/>
     <property as="xs:boolean" name="oxf.xforms.optimize-relevance"                   value="false"/>
     <property as="xs:boolean" name="oxf.xforms.session-heartbeat"                    value="true"/>
     <property as="xs:boolean" name="oxf.xforms.host-language-avts"                   value="true"/>
 
-    <!-- Form runner properties -->
-    <property as="xs:string"  name="oxf.fr.persistence"                              value="exist"/>
-    <property as="xs:anyURI"  name="oxf.fr.persistence.exist.uri"                    value="/exist/rest/db"/>
-    <property as="xs:string"  name="oxf.fr.persistence.orbeon.builder"               value="resources"/>
-    <property as="xs:string"  name="oxf.fr.persistence.orbeon.bookcast"              value="resources"/>
+    <!-- Form Runner / Form Builder properties -->
+    <property as="xs:anyURI"  name="oxf.fr.persistence.app.*.uri"                    value="/fr/service/exist"/>
+    <property as="xs:anyURI"  name="oxf.fr.persistence.app.orbeon.builder.form.uri"  value="/fr/service/resource"/>
+    <property as="xs:anyURI"  name="oxf.fr.persistence.app.orbeon.builder.data.uri"  value="/fr/service/exist"/>
+    <property as="xs:anyURI"  name="oxf.fr.persistence.app.orbeon.bookcast.form.uri" value="/fr/service/resource"/>
+    <property as="xs:anyURI"  name="oxf.fr.persistence.app.orbeon.bookcast.data.uri" value="/fr/service/exist"/>
+
+    <property as="xs:anyURI"  name="oxf.fr.persistence.service.exist.uri"            value="/exist/rest/db"/>
 
     <!-- Deprecated XForms cache configuration -->
     <property as="xs:integer" name="oxf.xforms.cache.session.size"                   value="500000"/>

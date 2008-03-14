@@ -102,7 +102,7 @@ h1 { margin-top: 0 }
     display: block;
     font-weight: bold;
     padding-bottom: .2em;
-    margin-top: .5em;
+    /*margin-top: .5em;*/
     text-align: left;
     margin-bottom: 0;
 }
@@ -119,26 +119,13 @@ div.fr-body {
     padding: 0 0 0 0;
 }
 
-.fr-grid tr th {
-    text-align: left;
-}
-
-.fr-grid {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.fr-grid tr td {
-    vertical-align: top;
-}
-
 /* Make sure xforms-disabled  and xforms-repeat-template takes precendence over display: block on other classes */
 label.xforms-disabled, span.xforms-disabled, div.xforms-disabled  { display: none; }
 label.xforms-repeat-template { display: none; }
 
 /* Make sure non-relevant labels don't appear */
 /*label.xforms-disabled { display: none; }*/
-/*label.xforms-alert-inactive { display: none; }*/
+label.xforms-alert-inactive { display: none; }
 /*img.xforms-disabled { display: none; }*/
 .xforms-disabled .xforms-label { display: none }
 .xforms-case-deselected .xforms-label { display: none }
@@ -148,26 +135,6 @@ button.xforms-trigger img { padding-right: 10px; }
 .fr-layout-table tr td { width: auto }
 
 .fr-grid .fr-layout-table tr td { width: auto }
-
-.fr-grid-2-columns tr td {
-    width: 50%;
-}
-
-.fr-grid-3-columns tr td {
-    width: 33.3%;
-}
-
-.fr-grid-4-columns tr td {
-    width: 25%;
-}
-
-.fr-grid-5-columns tr td {
-    width: 20%;
-}
-
-.fr-grid-6-columns tr td {
-    width: 16.6%;
-}
 
 h2 a, h3 a, h4 a {
     color: black;
@@ -301,7 +268,8 @@ body { text-align: left }
     font-size: smaller;
     font-weight: bold;
     margin-left: .5em;
-    width: 22em;
+    /*width: 22em;*/
+    width: 100%;
     color: red;
     text-indent: 0;
     background-image: none
@@ -312,7 +280,8 @@ body { text-align: left }
     display: block;
     font-size: smaller;
     margin-left: .5em;
-    width: 22em;
+    /*width: 22em;*/
+    width: 100%;
     color: gray
 }
 
@@ -350,48 +319,86 @@ div.fr-collapsible {
 .fr-error-row { font-weight: bold }
 .fr-error-alert {}
 
-/* Check boxes on separate line */
-.xforms-select-appearance-full span { display: block; clear: both; }
-.xforms-select-appearance-full input { float: left; }
-.xforms-select-appearance-full label { margin-left: .5em; margin-right: 1em }
-
 /* Radio buttons spacing */
-.xforms-select1-appearance-full label { margin-left: .5em; margin-right: 1em }
+/*.xforms-select1-appearance-full label { margin-left: .5em; margin-right: 1em }*/
 
 /* Space before paragraph in sections */
 .fr-section-container p { margin-top: 1em; }
 .fr-section-container img.fr-open-close { margin-right: .5em }
 
-/* Size form controls depending on layout */
-#doc4 .fr-section-container .xforms-input input { width: 63em }
-#doc4 .fr-section-container textarea.xforms-textarea { width: 63em }
-#doc4 .fr-section-container .xforms-textarea-appearance-xxforms-autosize { width: 63em }
-#doc4 .fr-section-container .xforms-select1-appearance-minimal { width: 63em }
+/* Grid */
 
-#doc .fr-grid-1-columns .xforms-input input { width: 46em }
-#doc .fr-grid-1-columns textarea.xforms-textarea { width: 46em }
-#doc .fr-grid-1-columns .xforms-textarea-appearance-xxforms-autosize { width: 46em; }
-#doc .fr-grid-1-columns .xforms-select1-appearance-minimal { width: 46em; }
-#doc .fr-grid-1-columns .xforms-select-appearance-full label { float: right; width: 47em; *width: 45.86em; padding-right: 5em; }
+/* Column widths */
 
-#doc .fr-grid-2-columns .xforms-input input { width: 22em }
-#doc .fr-grid-2-columns textarea.xforms-textarea { width: 22em }
-#doc .fr-grid-2-columns .xforms-textarea-appearance-xxforms-autosize { width: 22em; }
-#doc .fr-grid-2-columns .xforms-select1-appearance-minimal { width: 22em; }
-#doc .fr-grid-2-columns .xforms-select-appearance-full label { float: right; width: 90%; }
+.fr-grid { width: 100%}
+/*.fr-grid td { border: 1px solid red  }*/
+/* TODO: Figure out a reliable way to control IE's cell content */
+.fr-grid-1-columns tr td { *width: 68em }
+.fr-grid-2-columns tr td { width: 50%; *width: 33.5em }
+.fr-grid-3-columns tr td { width: 33.3%; *width: 21.5em }
+.fr-grid-4-columns tr td { width: 25%; *width: 14em }
+
+/*.fr-grid-5-columns tr td { width: 20%; *width: 13.6em  }*/
+/*.fr-grid-6-columns tr td { width: 16.6%; *width: 11.33em }*/
+
+/* Cell details */
+.fr-grid tr th { text-align: left }
+.fr-grid { width: 100%; border-collapse: collapse }
+.fr-grid tr td { vertical-align: top }
+.fr-grid td { padding: .5em }
+
+/* Cell content */
+.fr-grid .xforms-input input { width: 100% }
+.fr-grid .fr-inplace-value { width: 100% }
+.fr-grid textarea.xforms-textarea { width: 100% }
+.fr-grid .xforms-select1-appearance-minimal { width: 100% }
+/*.fr-grid .xforms-select1-appearance-full { width: 100%; display: block }*/
+/*.fr-grid .xforms-select1-appearance-full span { white-space: nowrap; display: block }*/
+.fr-grid .xforms-select1-appearance-compact { width: 100%; height: 6em }
+.fr-grid .xforms-select-appearance-compact { width: 100%; height: 6em }
+
+/* Check boxes on separate lines */
+.fr-grid .xforms-select-appearance-full span { display: block; clear: both; }
+.fr-grid .xforms-select-appearance-full input { float: left; }
+.xforms-select-appearance-full label { margin-left: .5em; margin-right: 1em }
+
+/* Radio buttons on separate lines */
+.fr-grid .xforms-select1-appearance-full span { display: block; clear: both; }
+.fr-grid .xforms-select1-appearance-full input { float: left; }
+.xforms-select1-appearance-full label { margin-left: .5em; margin-right: 1em }
+
+/* Image output */
+.fr-grid .xforms-mediatype-image { width: 100%; overflow: auto; display: block }
+
+/*#doc4 .fr-section-container .xforms-input input { width: 63em }*/
+/*#doc4 .fr-section-container textarea.xforms-textarea { width: 63em }*/
+/*#doc4 .fr-section-container .xforms-textarea-appearance-xxforms-autosize { width: 63em }*/
+/*#doc4 .fr-section-container .xforms-select1-appearance-minimal { width: 63em }*/
+
+/*#doc .fr-grid-1-columns .xforms-input input { width: 46em }*/
+/*#doc .fr-grid-1-columns textarea.xforms-textarea { width: 46em }*/
+/*#doc .fr-grid-1-columns .xforms-textarea-appearance-xxforms-autosize { width: 46em; }*/
+/*#doc .fr-grid-1-columns .xforms-select1-appearance-minimal { width: 46em; }*/
+/*#doc .fr-grid-1-columns .xforms-select-appearance-full label { float: right; width: 47em; *width: 45.86em; padding-right: 5em; }*/
+
+/*#doc .fr-grid-2-columns .xforms-input input { width: 22em }*/
+/*#doc .fr-grid-2-columns textarea.xforms-textarea { width: 22em }*/
+/*#doc .fr-grid-2-columns .xforms-textarea-appearance-xxforms-autosize { width: 22em; }*/
+/*#doc .fr-grid-2-columns .xforms-select1-appearance-minimal { width: 22em; }*/
+/*#doc .fr-grid-2-columns .xforms-select-appearance-full label { float: right; width: 90%; }*/
 
 
-#doc4 .fr-grid-1-columns .xforms-input input { width: 63em }
-#doc4 .fr-grid-1-columns textarea.xforms-textarea { width: 63em }
-#doc4 .fr-grid-1-columns .xforms-textarea-appearance-xxforms-autosize { width: 63em; }
-#doc4 .fr-grid-1-columns .xforms-select1-appearance-minimal { width: 63em }
+/*#doc4 .fr-grid-1-columns .xforms-input input { width: 63em }*/
+/*#doc4 .fr-grid-1-columns textarea.xforms-textarea { width: 63em }*/
+/*#doc4 .fr-grid-1-columns .xforms-textarea-appearance-xxforms-autosize { width: 63em; }*/
+/*#doc4 .fr-grid-1-columns .xforms-select1-appearance-minimal { width: 63em }*/
 
-#doc4 .fr-grid-2-columns .xforms-input input { width: 31em }
-#doc4 .fr-grid-2-columns textarea.xforms-textarea { width: 31em }
-#doc4 .fr-grid-2-columns .xforms-textarea-appearance-xxforms-autosize { width: 31em }
-#doc4 .fr-grid-2-columns .xforms-select1-appearance-minimal { width: 31em }
+/*#doc4 .fr-grid-2-columns .xforms-input input { width: 31em }*/
+/*#doc4 .fr-grid-2-columns textarea.xforms-textarea { width: 31em }*/
+/*#doc4 .fr-grid-2-columns .xforms-textarea-appearance-xxforms-autosize { width: 31em }*/
+/*#doc4 .fr-grid-2-columns .xforms-select1-appearance-minimal { width: 31em }*/
 
 /* Upload control information */
 .xforms-upload-info { display: block; width: 100%; background-color: #FFFFDD; padding: 2px }
 .xforms-upload-mediatype, xforms-upload-size { padding-left: 1em }
-.xforms-upload-remove {}
+.xforms-upload-remove { vertical-align: top }

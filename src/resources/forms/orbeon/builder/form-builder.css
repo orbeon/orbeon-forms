@@ -1,6 +1,8 @@
 #doc4 { margin-left: 15.5em; *margin-left: 15.12645em }
 .xforms-select table { margin-bottom: 0 }
 
+.fb-ie-warning { display: block; margin: 2em; padding: 1em; border: 4px solid #D00000; background-color: #FFF0F0 }
+
 .fb-section-title { display: block; margin-bottom: .5em}
 
 .fb-section-title div {
@@ -15,9 +17,10 @@
 .fb-grid-td { border: 1px dotted gray; padding: .2em }
 
 /* Language toolbar */
-.fb-language-choice { display: block; float: right; }
+.fb-language-choice { display: block; float: right; text-align: left; width: 18em }
+/*.fb-language-choice .xforms-label { text-align: right }*/
 .fb-language-choice .xforms-select1 { width: 100% }
-.fb-language-choice .fb-language-triggers { display: block; width: 100%; text-align: right }
+.fb-language-choice .fb-language-triggers { display: block; width: 100% }
 
 /* Toolbox */
 .fb-toolbox { margin: .5em; padding: .5em; width: auto; background-color: #3598D4; text-align: center }
@@ -47,7 +50,7 @@
 #fb-schema-upload-dialog .fb-dialog-h2 { font-size: larger }
 #fb-schema-upload-dialog .fb-dialog-section { display: block; margin-left: 1em }
 
-#fb-xml-dialog .fb-xml-dialog-view { width: 57.69em; *width:56.301em; min-width:750px; height: 400px; overflow: scroll }
+#fb-xml-dialog .fb-xml-dialog-view { width: 57.69em; *width:56.301em; min-width:750px; height: 400px; overflow: auto }
 #fb-edit-source-dialog .fb-xml-dialog-view { width: 57.69em; *width:56.301em; min-width:750px; height: 400px }
 #fb-edit-source-dialog .fb-xml-dialog-view textarea.xforms-textarea { width: 99%; height: 29em }
 
@@ -156,6 +159,8 @@
 #fb-details-section .fb-grid-td .xforms-select1-appearance-full span { white-space: nowrap; display: block }
 #fb-details-section .fb-grid-td .xforms-select1-appearance-compact { width: 100%; height: 6em }
 #fb-details-section .fb-grid-td .xforms-select-appearance-compact { width: 100%; height: 6em }
+
+#fb-details-section .fb-grid-td .xforms-mediatype-image { display: block; width: 100%; border: 2px solid #3598D4; overflow: auto }
 
 .fb-grid-2-columns .fb-grid-td { width: 50%; }
 .fb-grid-2-columns .fb-grid-td .fb-grid-content { width: 30em; *width: 27em }

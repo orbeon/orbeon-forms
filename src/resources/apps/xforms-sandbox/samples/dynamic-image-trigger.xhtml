@@ -36,7 +36,7 @@
     </xhtml:head>
     <xhtml:body>
         <!-- Dynamic image via action support in xforms:output -->
-        <b>Case 1:</b> [won't work because DOMActivate is not fired on xforms:output]
+        <b>Case 1:</b> [works because now, DOMActivate is fired on xforms:output]
         <xhtml:table>
             <xhtml:tr>
                 <xhtml:td>
@@ -78,7 +78,7 @@
                 <xhtml:td>
                     <xforms:repeat nodeset="instance('main-instance')/button">
                         <xhtml:td>
-                            <xforms:trigger appearance="xxforms:link">
+                            <xforms:trigger appearance="minimal">
                                 <xforms:label><xforms:output ref="image" mediatype="image/*"/></xforms:label>
                                 <xforms:message ref="url" ev:event="DOMActivate" level="modal"/>
                             </xforms:trigger>
@@ -88,13 +88,13 @@
             </xhtml:tr>
         </xhtml:table>
         <!-- Dynamic image via text/html mediatype within label -->
-        <b>Case 4:</b> [should work!]
+        <b>Case 4:</b> [works but only with f:url-norewrite="true"]
         <xhtml:table>
             <xhtml:tr>
                 <xforms:repeat nodeset="instance('main-instance')/button">
                     <xhtml:td>
                         <xforms:trigger>
-                            <xforms:label><b>Bold:</b> <xforms:output value="concat('&lt;img src=''../..', image, '''>')" mediatype="text/html"/></xforms:label>
+                            <xforms:label><b>Bold:</b> <xforms:output value="concat('&lt;img src=''../..', image, '''>')" mediatype="text/html" f:url-norewrite="true"/></xforms:label>
                             <xforms:message ref="url" ev:event="DOMActivate" level="modal"/>
                         </xforms:trigger>
                     </xhtml:td>
@@ -104,7 +104,7 @@
                 <xforms:repeat nodeset="instance('main-instance')/button">
                     <xhtml:td>
                         <xforms:trigger appearance="minimal">
-                            <xforms:label><b>Bold:</b> <xforms:output value="concat('&lt;img src=''../..', image, '''>')" mediatype="text/html"/></xforms:label>
+                            <xforms:label><b>Bold:</b> <xforms:output value="concat('&lt;img src=''../..', image, '''>')" mediatype="text/html" f:url-norewrite="true"/></xforms:label>
                             <xforms:message ref="url" ev:event="DOMActivate" level="modal"/>
                         </xforms:trigger>
                     </xhtml:td>

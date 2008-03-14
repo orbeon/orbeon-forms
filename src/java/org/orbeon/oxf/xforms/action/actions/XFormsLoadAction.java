@@ -105,7 +105,7 @@ public class XFormsLoadAction extends XFormsAction {
                 externalURL = XFormsUtils.resolveURLDoReplace(containingDocument, pipelineContext, currentElement, value);
             } else {
                 // Just a resource URL
-                externalURL = XFormsUtils.resolveResourceURL(pipelineContext, currentElement, value);
+                externalURL = XFormsUtils.resolveResourceURL(pipelineContext, currentElement, value, false);
             }
         }
         containingDocument.addLoadToRun(externalURL, target, urlType, doReplace, isPortletLoad, isShowProgress);

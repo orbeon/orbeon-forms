@@ -33,6 +33,39 @@ import java.util.*;
  */
 public class XFormsResourceServer extends ProcessorImpl {
 
+    public static final String DYNAMIC_RESOURCES_PATH = "/xforms-server/dynamic/";
+    public static final String DYNAMIC_RESOURCES_SESSION_KEY = "orbeon.xforms.resources.dynamic.";
+
+    public static class DynamicResource {
+        private String uri;
+        private String mediatype;
+        private long size;
+        private long lastModified;
+
+        public DynamicResource(String uri, String mediatype, long size, long lastModified) {
+            this.uri = uri;
+            this.mediatype = mediatype;
+            this.size = size;
+            this.lastModified = lastModified;
+        }
+
+        public String getURI() {
+            return uri;
+        }
+
+        public String getMediatype() {
+            return mediatype;
+        }
+
+        public long getSize() {
+            return size;
+        }
+
+        public long getLastModified() {
+            return lastModified;
+        }
+    }
+
     public XFormsResourceServer() {
     }
 
@@ -43,91 +76,139 @@ public class XFormsResourceServer extends ProcessorImpl {
 
         final String requestPath = request.getRequestPath();
         final String filename = requestPath.substring(requestPath.lastIndexOf('/') + 1);
-        final boolean isCSS = filename.endsWith(".css");
 
-        // Find what features are requested
-        // Assume a file name of the form: xforms-feature1-feature2-feature3-...[-min].[css|js]
-        boolean isMinimal = false;
-        final Map requestedFeaturesMap = new HashMap();
-        {
-            final StringTokenizer st = new StringTokenizer(filename.substring(0, filename.lastIndexOf(".")), "-");
-            while (st.hasMoreTokens()) {
-                final String currentToken = st.nextToken();
+        if (requestPath.startsWith(DYNAMIC_RESOURCES_PATH)) {
+            // Dynamic resource requested
 
-                if (currentToken.equals("min")) {
-                    isMinimal = true;
-                    continue;
-                }
+            final ExternalContext.Session session = externalContext.getSession(false);
+            if (session != null) {
+                // Store mapping into session
+                final DynamicResource resource = (DynamicResource) session.getAttributesMap().get(DYNAMIC_RESOURCES_SESSION_KEY + filename);
 
-                final XFormsFeatures.FeatureConfig currentFeature = XFormsFeatures.getFeatureById(currentToken);
-                if (currentFeature != null)
-                    requestedFeaturesMap.put(currentFeature.getName(), currentFeature);
-            }
-        }
+                if (resource != null && resource.getURI() != null) {
+                    // Found URI, stream it out
 
-        // Determine list of resources to load
-        final List resources;
-        if (isCSS)
-            resources = XFormsFeatures.getCSSResourcesByFeatureMap(requestedFeaturesMap);
-        else
-            resources = XFormsFeatures.getJavaScriptResourcesByFeatureMap(requestedFeaturesMap);
+                    if (resource.getLastModified() > 0)
+                        response.setCaching(resource.getLastModified(), false, false);
 
-        // Get last modified date
-        final long combinedLastModified = computeCombinedLastModified(resources, isMinimal);
+                    if (resource.getSize() > 0)
+                        response.setContentLength((int) resource.getSize());// NOTE: Why does this API (and Servlet counterpart) take an int?
 
-        // If conditional get and date ok, send not modified
+                    if (resource.getMediatype() != null)
+                        response.setContentType(resource.getMediatype());
+                    else
+                        response.setContentType("application/octet-stream");
 
-        // Set Last-Modified, required for caching and conditional get
-        if (URLRewriter.isResourcesVersioned()) {
-
-            // Set old last modified date so that Expires header is set as far in the future as possible
-            // NOTE: the setCaching() implementation will specially handle values <= 0 as being not cacheable
-            // TODO: Need better API, right?
-            response.setCaching(1, false, false);
-
-        } else {
-            response.setCaching(combinedLastModified, false, false);
-        }
-
-        // Check If-Modified-Since and don't return content if condition is met
-        if (!response.checkIfModifiedSince(combinedLastModified, false)) {
-            response.setStatus(ExternalContext.SC_NOT_MODIFIED);
-            return;
-        }
-
-        try {
-            response.setContentType(isCSS ? "text/css" : "application/javascript");
-            final OutputStream responseOutputStream = response.getOutputStream();
-            {
-                final boolean isDebugEnabled = XFormsServer.logger.isDebugEnabled();
-                if (XFormsProperties.isCacheCombinedResources()) {
-                    // Caching requested
-                    final File resourceFile = cacheResources(resources, pipelineContext, requestPath, combinedLastModified, isCSS, isMinimal);
-                    if (resourceFile != null) {
-                        // Caching could take place, send out cached result
-                        if (isDebugEnabled)
-                            XFormsServer.logger.debug("XForms resources - serving from cache " + requestPath + ".");
-                        final FileInputStream fis = new FileInputStream(resourceFile);
-                        NetUtils.copyStream(fis, responseOutputStream);
-                        fis.close();
-                        responseOutputStream.flush();
-                    } else {
-                        // Was unable to cache, just serve
-                        if (isDebugEnabled)
-                            XFormsServer.logger.debug("XForms resources - caching requested but not possible, serving directly " + requestPath + ".");
-                        generate(resources, pipelineContext, responseOutputStream, isCSS, isMinimal);
+                    // Copy stream out
+                    InputStream is = null;
+                    try {
+                        is = new URI(resource.getURI()).toURL().openStream();
+                        NetUtils.copyStream(is, response.getOutputStream());
+                    } catch (Exception e) {
+                        XFormsServer.logger.error("Exception copying stream", e);
+                    } finally {
+                        if (is != null) {
+                            try {
+                                is.close();
+                            } catch (IOException e) {
+                                XFormsServer.logger.error("Exception closing stream", e);
+                            }
+                        }
                     }
                 } else {
-                    // Should not cache, just serve
-                    if (isDebugEnabled)
-                        XFormsServer.logger.debug("XForms resources - caching not requested, serving directly " + requestPath + ".");
-                    generate(resources, pipelineContext, responseOutputStream, isCSS, isMinimal);
+                    // Not found
+                    response.setStatus(ExternalContext.SC_NOT_FOUND);
                 }
             }
-        } catch (OXFException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new OXFException(e);
+
+        } else {
+            // CSS or JavaScript resource requested
+            final boolean isCSS = filename.endsWith(".css");
+
+            // Find what features are requested
+            // Assume a file name of the form: xforms-feature1-feature2-feature3-...[-min].[css|js]
+            boolean isMinimal = false;
+            final Map requestedFeaturesMap = new HashMap();
+            {
+                final StringTokenizer st = new StringTokenizer(filename.substring(0, filename.lastIndexOf(".")), "-");
+                while (st.hasMoreTokens()) {
+                    final String currentToken = st.nextToken();
+
+                    if (currentToken.equals("min")) {
+                        isMinimal = true;
+                        continue;
+                    }
+
+                    final XFormsFeatures.FeatureConfig currentFeature = XFormsFeatures.getFeatureById(currentToken);
+                    if (currentFeature != null)
+                        requestedFeaturesMap.put(currentFeature.getName(), currentFeature);
+                }
+            }
+
+            // Determine list of resources to load
+            final List resources;
+            if (isCSS)
+                resources = XFormsFeatures.getCSSResourcesByFeatureMap(requestedFeaturesMap);
+            else
+                resources = XFormsFeatures.getJavaScriptResourcesByFeatureMap(requestedFeaturesMap);
+
+            // Get last modified date
+            final long combinedLastModified = computeCombinedLastModified(resources, isMinimal);
+
+            // If conditional get and date ok, send not modified
+
+            // Set Last-Modified, required for caching and conditional get
+            if (URLRewriter.isResourcesVersioned()) {
+
+                // Set old last modified date so that Expires header is set as far in the future as possible
+                // NOTE: the setCaching() implementation will specially handle values <= 0 as being not cacheable
+                // TODO: Need better API, right?
+                response.setCaching(1, false, false);
+
+            } else {
+                response.setCaching(combinedLastModified, false, false);
+            }
+
+            // Check If-Modified-Since and don't return content if condition is met
+            if (!response.checkIfModifiedSince(combinedLastModified, false)) {
+                response.setStatus(ExternalContext.SC_NOT_MODIFIED);
+                return;
+            }
+
+            try {
+                response.setContentType(isCSS ? "text/css" : "application/javascript");
+                final OutputStream responseOutputStream = response.getOutputStream();
+                {
+                    final boolean isDebugEnabled = XFormsServer.logger.isDebugEnabled();
+                    if (XFormsProperties.isCacheCombinedResources()) {
+                        // Caching requested
+                        final File resourceFile = cacheResources(resources, pipelineContext, requestPath, combinedLastModified, isCSS, isMinimal);
+                        if (resourceFile != null) {
+                            // Caching could take place, send out cached result
+                            if (isDebugEnabled)
+                                XFormsServer.logger.debug("XForms resources - serving from cache " + requestPath + ".");
+                            final FileInputStream fis = new FileInputStream(resourceFile);
+                            NetUtils.copyStream(fis, responseOutputStream);
+                            fis.close();
+                            responseOutputStream.flush();
+                        } else {
+                            // Was unable to cache, just serve
+                            if (isDebugEnabled)
+                                XFormsServer.logger.debug("XForms resources - caching requested but not possible, serving directly " + requestPath + ".");
+                            generate(resources, pipelineContext, responseOutputStream, isCSS, isMinimal);
+                        }
+                    } else {
+                        // Should not cache, just serve
+                        if (isDebugEnabled)
+                            XFormsServer.logger.debug("XForms resources - caching not requested, serving directly " + requestPath + ".");
+                        generate(resources, pipelineContext, responseOutputStream, isCSS, isMinimal);
+                    }
+                }
+            } catch (OXFException e) {
+                throw e;
+            } catch (Exception e) {
+                throw new OXFException(e);
+            }
         }
     }
 

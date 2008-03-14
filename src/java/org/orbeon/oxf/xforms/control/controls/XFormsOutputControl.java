@@ -16,16 +16,19 @@ package org.orbeon.oxf.xforms.control.controls;
 import org.dom4j.Element;
 import org.dom4j.QName;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsInstance;
 import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.processor.XFormsResourceServer;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xml.ForwardingContentHandler;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.util.XPathCache;
+import org.orbeon.oxf.util.SecureUtils;
 import org.orbeon.saxon.om.NodeInfo;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -89,9 +92,25 @@ public class XFormsOutputControl extends XFormsValueControl {
         final String updatedValue;
         if (mediatypeAttribute != null && mediatypeAttribute.startsWith("image/")) {
             final String type = getType();
-            if (!urlNorewrite && (type == null || type.equals(XMLConstants.XS_ANYURI_EXPLODED_QNAME) || type.equals(XFormsConstants.XFORMS_ANYURI_EXPLODED_QNAME))) {
-                // We got a URI and we need to rewrite it
-                updatedValue = XFormsUtils.resolveResourceURL(pipelineContext, getControlElement(), rawValue);
+            if (!urlNorewrite && (type == null || type.equals(XMLConstants.XS_ANYURI_EXPLODED_QNAME)
+                    || type.equals(XFormsConstants.XFORMS_ANYURI_EXPLODED_QNAME))) {
+
+                // We got a URI and we need to rewrite it to an absolute URI
+                final String rewrittenURI = XFormsUtils.resolveResourceURL(pipelineContext, getControlElement(), rawValue, true);
+                final String digest = SecureUtils.digestString(rewrittenURI, "MD5", "hex");
+
+                final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+                final ExternalContext.Session session = externalContext.getSession(true);// NOTE: We force session creation here. Should we? What's the alternative?
+                if (session != null) {
+                    // Store mapping into session
+
+                    // Rewrite to an absolute URL, since XFormsResourceServer will have to read it and stream
+                    session.getAttributesMap().put(XFormsResourceServer.DYNAMIC_RESOURCES_SESSION_KEY + digest,
+                            new XFormsResourceServer.DynamicResource(rewrittenURI, mediatypeAttribute, -1, System.currentTimeMillis()));
+                }
+
+                updatedValue = externalContext.getResponse().rewriteResourceURL(XFormsResourceServer.DYNAMIC_RESOURCES_PATH + digest,
+                        ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH);
             } else {
                 // Otherwise we leave the value as is
                 updatedValue = rawValue;
@@ -124,7 +143,7 @@ public class XFormsOutputControl extends XFormsValueControl {
 
                             final String rewrittenValue;
                             if ("src".equals(currentName) || "href".equals(currentName)) {
-                                rewrittenValue = XFormsUtils.resolveResourceURL(pipelineContext, getControlElement(), currentValue);
+                                rewrittenValue = XFormsUtils.resolveResourceURL(pipelineContext, getControlElement(), currentValue, false);
                             } else {
                                 rewrittenValue = currentValue;
                             }

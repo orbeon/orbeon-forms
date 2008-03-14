@@ -430,10 +430,10 @@ public class XFormsUtils {
                             if ("text/html".equals(outputControl.getMediatype())) {
                                 if (containsHTML != null)
                                     containsHTML[0] = true; // this indicates for sure that there is some nested HTML
-                                sb.append(outputControl.getDisplayValueOrExternalValue());
+                                sb.append(outputControl.getDisplayValueOrExternalValue(pipelineContext));
                             } else {
                                 // Mediatype is not HTML so we don't escape
-                                sb.append(XMLUtils.escapeXMLMinimal(outputControl.getDisplayValueOrExternalValue()));
+                                sb.append(XMLUtils.escapeXMLMinimal(outputControl.getDisplayValueOrExternalValue(pipelineContext)));
                             }
                         } else {
                             if ("text/html".equals(outputControl.getMediatype())) {
@@ -441,7 +441,7 @@ public class XFormsUtils {
                                 throw new OXFException("HTML not allowed in element: " + childElement.getName());
                             } else {
                                 // Mediatype is not HTML so we don't escape
-                                sb.append(outputControl.getDisplayValueOrExternalValue());
+                                sb.append(outputControl.getDisplayValueOrExternalValue(pipelineContext));
                             }
                         }
                     } else {
@@ -468,7 +468,7 @@ public class XFormsUtils {
                                 final String rewrittenValue;
                                 final boolean mustRewrite = false;//TODO: issue is that further rewriting will occur (upon initialization only) unless the caller uses f:url-norewrite="true"
                                 if (mustRewrite && ("src".equals(currentName) || "href".equals(currentName))) {
-                                    rewrittenValue = XFormsUtils.resolveResourceURL(pipelineContext, childElement, currentValue);
+                                    rewrittenValue = XFormsUtils.resolveResourceURL(pipelineContext, childElement, currentValue, false);
                                 } else {
                                     rewrittenValue = currentValue;
                                 }
@@ -768,13 +768,13 @@ public class XFormsUtils {
         return externalURL;
     }
 
-    public static String resolveResourceURL(PipelineContext pipelineContext, Element currentElement, String url) {
+    public static String resolveResourceURL(PipelineContext pipelineContext, Element currentElement, String url, boolean absolute) {
 
         final URI resolvedURI = resolveXMLBase(currentElement, url);
         final String resolvedURISTring = resolvedURI.toString();
         final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
 
-        return externalContext.getResponse().rewriteResourceURL(resolvedURISTring, false);
+        return externalContext.getResponse().rewriteResourceURL(resolvedURISTring, absolute);
     }
 
     /**

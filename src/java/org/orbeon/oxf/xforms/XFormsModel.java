@@ -1007,7 +1007,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                                 final URL absoluteResolvedURL;
                                 final String absoluteResolvedURLString;
                                 {
-                                    final String resolvedURL = XFormsUtils.resolveResourceURL(pipelineContext, instanceContainerElement, instanceResource);
+                                    final String resolvedURL = XFormsUtils.resolveResourceURL(pipelineContext, instanceContainerElement, instanceResource, false);
                                     final String inputName = ProcessorImpl.getProcessorInputSchemeInputName(resolvedURL);
                                     if (inputName != null) {
                                         // URL is input:*, keep it as is

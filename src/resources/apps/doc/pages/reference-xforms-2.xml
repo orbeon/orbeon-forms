@@ -698,7 +698,7 @@
                         <li>
                             <a name="xxforms-if"/>
                             <p>
-                                <code>xxforms:if()</code>.
+                                <code>xxforms:if()</code>
                             </p>
                             <p>
                                 This function implements the semantic of the XForms 1.0 <code>if()</code> function.
@@ -709,7 +709,7 @@
                             <a name="xxforms-call-xpl"/>
                             <p>
                                 <code>xxforms:call-xpl($xplURL as xs:string, $inputNames as xs:string*, $inputElements
-                                as element()*, $outputNames as xs:string+) as document-node()*</code>.
+                                as element()*, $outputNames as xs:string+) as document-node()*</code>
                             </p>
                             <p>
                                 This function lets you call an XPL pipeline.
@@ -754,7 +754,7 @@
                         <li>
                             <a name="xxforms-evaluate"/>
                             <p>
-                                <code>xxforms:evaluate($xpath as xs:string) as item()*</code>.
+                                <code>xxforms:evaluate($xpath as xs:string) as item()*</code>
                             </p>
                             <p>
                                 The <code>xxforms:evaluate()</code> function allows you to evaluate XPath expressions
@@ -769,7 +769,7 @@
                         <li>
                             <a name="xxforms-serialize"/>
                             <p>
-                                <code>xxforms:serialize($item as node(), $format as xs:string?) as xs:string</code>.
+                                <code>xxforms:serialize($item as node(), $format as xs:string?) as xs:string</code>
                             </p>
                             <p>
                                 The <code>xxforms:serialize()</code> function allows you to serialize an XML node to
@@ -782,7 +782,7 @@
                         <li>
                             <a name="xxforms-context"/>
                             <p>
-                                <code>xxforms:context($element-id as xs:string) as node()</code>.
+                                <code>xxforms:context($element-id as xs:string) as node()</code>
                             </p>
                             <p>
                                 The <code>xxforms:context()</code> function allows you to obtain the single-node binding
@@ -817,7 +817,7 @@
                         <li>
                             <a name="xxforms-repeat-nodeset"/>
                             <p>
-                                <code>xxforms:repeat-nodeset($repeat-id as xs:string) as node()*</code>.
+                                <code>xxforms:repeat-nodeset($repeat-id as xs:string) as node()*</code>
                             </p>
                             <p>
                                 The <code>xxforms:repeat-nodeset()</code> function allows you to obtain the node-set of
@@ -835,7 +835,7 @@
                         <li>
                             <a name="xxforms-instance"/>
                             <p>
-                                <code>xxforms:instance($instance-id as xs:string) as element()?</code>.
+                                <code>xxforms:instance($instance-id as xs:string) as element()?</code>
                             </p>
                             <p>
                                 The <code>xxforms:instance()</code> function works like the standard
@@ -863,7 +863,7 @@
                         <li>
                             <a name="xxforms-index"/>
                             <p>
-                                <code>xxforms:index($repeat-id as xs:string?) as xs:integer</code>.
+                                <code>xxforms:index($repeat-id as xs:string?) as xs:integer</code>
                             </p>
                             <p>
                                 The <code>xxforms:index()</code> function behaves like the standard XForms
@@ -886,7 +886,7 @@
                         <li>
                             <a name="xxforms-property"/>
                             <p>
-                                <code>xxforms:property($property-name as xs:string) as xs:string?</code>.
+                                <code>xxforms:property($property-name as xs:string) as xs:string?</code>
                             </p>
                             <p>
                                 The <code>xxforms:property()</code> function retrieves the value of a property defined
@@ -907,7 +907,7 @@
                         <li>
                             <a name="xxforms-element"/>
                             <p>
-                                <code>xxforms:element($element-name as xs:string) as element()</code>.
+                                <code>xxforms:element($element-name as xs:string) as element()</code>
                             </p>
                             <p>
                                 <code>xxforms:element($element-name as xs:string, $content as item()*) as element()</code>.
@@ -932,7 +932,7 @@
                         <li>
                             <a name="xxforms-attribute"/>
                             <p>
-                                <code>xxforms:attribute($qname as xs:string, $value as xs:string?) as attribute()</code>.
+                                <code>xxforms:attribute($qname as xs:string, $value as xs:string?) as attribute()</code>
                             </p>
                             <p>
                                 The <code>xxforms:attribute()</code> function returns a new XML attribute with the
@@ -944,6 +944,50 @@
                                 <comment> Add an attribute called "id" with a value of "first-name" to element "section" </comment>
                                 <xforms:insert context="section" origin="xxforms:attribute('id', 'first-name')"/>
                             </xml-source>
+                        </li>
+                        <li>
+                            <a name="xxforms-get-header"/>
+                            <p>
+                                <code>xxforms:get-header($header-name as xs:string) as xs:string*</code>
+                            </p>
+                            <p>
+                                The <code>xxforms:get-header()</code> function returns the value(s) of the given
+                                request HTTP header.
+                            </p>
+                            <xml-source show-namespaces="false">
+                                <comment> Remember the User-Agent header </comment>
+                                <xforms:setvalue ref="user-agent" select="xxforms:get-header('User-Agent')"/>
+                            </xml-source>
+                            <note>
+                                <p>
+                                    This function will return a non-empty result only if call during page
+                                    initialization. We recommend you use it only within event handlers called as a
+                                    result of processing <code>xforms-model-construct-done</code> or
+                                    <code>xforms-ready</code>.
+                                </p>
+                            </note>
+                        </li>
+                        <li>
+                            <a name="xxforms-get-parameter"/>
+                            <p>
+                                <code>xxforms:get-parameter($parameter-name as xs:string) xs:string*</code>
+                            </p>
+                            <p>
+                                The <code>xxforms:get-parameter()</code> function returns the value(s) of the given
+                                request parameter.
+                            </p>
+                            <xml-source show-namespaces="false">
+                                <comment> Remember the "columns" parameter </comment>
+                                <xforms:setvalue ref="columns" select="xxforms:get-parameter('columns')"/>
+                            </xml-source>
+                            <note>
+                                <p>
+                                    This function will return a non-empty result only if call during page
+                                    initialization. We recommend you use it only within event handlers called as a
+                                    result of processing <code>xforms-model-construct-done</code> or
+                                    <code>xforms-ready</code>.
+                                </p>
+                            </note>
                         </li>
 
                         <li>

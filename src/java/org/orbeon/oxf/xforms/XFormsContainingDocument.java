@@ -165,7 +165,8 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
 
         // Clear URI resolver, since it is of no use after initialization, and it may keep dangerous references (PipelineContext)
         this.uriResolver = null;
-        this.isInitializing = false;
+
+        // NOTE: we clear isInitializing when Ajax requests come in
     }
 
     /**
@@ -402,6 +403,8 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
      * Clear current client state.
      */
     private void clearClientState() {
+        this.isInitializing = false;
+
         this.activeSubmission = null;
         this.gotSubmission = false;
         this.gotSubmissionSecondPass = false;

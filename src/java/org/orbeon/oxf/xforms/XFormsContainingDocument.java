@@ -76,6 +76,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     private boolean dirtySinceLastRequest;
     private XFormsModelSubmission activeSubmission;
     private boolean gotSubmission;
+    private boolean gotSubmissionSecondPass;
     private List messagesToRun;
     private List loadsToRun;
     private List scriptsToRun;
@@ -403,6 +404,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     private void clearClientState() {
         this.activeSubmission = null;
         this.gotSubmission = false;
+        this.gotSubmissionSecondPass = false;
 
         this.messagesToRun = null;
         this.loadsToRun = null;
@@ -442,8 +444,16 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         return gotSubmission;
     }
 
-    public void setGotSubmission(boolean gotSubmission) {
-        this.gotSubmission = gotSubmission;
+    public void setGotSubmission() {
+        this.gotSubmission = true;
+    }
+
+    public boolean isGotSubmissionSecondPass() {
+        return gotSubmissionSecondPass;
+    }
+
+    public void setGotSubmissionSecondPass() {
+        this.gotSubmissionSecondPass = true;
     }
 
     /**

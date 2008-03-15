@@ -279,7 +279,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
             // 11.1 The xforms-submit Event
             // Bubbles: Yes / Cancelable: Yes / Context Info: None
 
-            containingDocument.setGotSubmission(true);
+            containingDocument.setGotSubmission();
 
             boolean isDeferredSubmissionSecondPassReplaceAll = false;
             XFormsSubmitErrorEvent submitErrorEvent = null;
@@ -324,11 +324,19 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 }
 
                 // Determine if the instance to submit has one or more bound and relevant upload controls
-                
-                // NOTE: We only check this if we are not currently initializing the document because at that point
-                // the client cannot have any files to upload yet
+                //
+                // o we don't check if we are currently initializing the document because at that point the
+                //   client cannot have any files to upload yet
+                //
+                // o we don't check if we have already processed the second pass of a submission during this
+                //   request, because it means that upload controls have been already committed
+                //
+                // o we don't check if we are requested not to with an attribute
+                //
+                // o we only check for replace="instance|none" and if serialization must take place
+
                 boolean hasBoundRelevantUploadControl = false;
-                if (xxfFormsEnsureUploads && serialize && !containingDocument.isInitializing()) {
+                if (!containingDocument.isInitializing() && !containingDocument.isGotSubmissionSecondPass() && xxfFormsEnsureUploads && !isReplaceAll && serialize) {
                     final XFormsControls xformsControls = containingDocument.getXFormsControls();
                     final List uploadControls = xformsControls.getCurrentControlsState().getUploadControls();
                     if (uploadControls != null) {
@@ -350,6 +358,9 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 final boolean isDeferredSubmissionFirstPass = isDeferredSubmission && XFormsEvents.XFORMS_SUBMIT.equals(eventName);
                 final boolean isDeferredSubmissionSecondPass = isDeferredSubmission && !isDeferredSubmissionFirstPass; // here we get XXFORMS_SUBMIT
                 isDeferredSubmissionSecondPassReplaceAll = isDeferredSubmissionSecondPass && isReplaceAll;
+
+                if (isDeferredSubmissionSecondPass)
+                    containingDocument.setGotSubmissionSecondPass();
 
                 // If a submission requiring a second pass was already set, then we ignore a subsequent submission but
                 // issue a warning

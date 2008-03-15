@@ -102,9 +102,11 @@
             <!-- Instance to track search results and paging -->
             <xforms:instance id="fr-search-instance">
                 <search xmlns="">
+                    <!-- Application name -->
                     <app/>
+                    <!-- Form name -->
                     <form/>
-                    <!-- Search query to execute -->
+                    <!-- Free text search query -->
                     <query/>
                     <!-- Paging -->
                     <page-size>10</page-size>
@@ -268,12 +270,14 @@
                     <xforms:send ev:event="xforms-value-changed" submission="search-submission"/>
                 </xforms:group>
 
-                <xforms:group ref="instance('fr-summary-instance')[document]">
+                <xforms:group ref="instance('fr-summary-instance')">
 
-                    <!-- Display welcome message -->
-                    <xforms:output mediatype="text/html"
-                                   value="saxon:serialize($fr-resources/summary/messages/intro/node(), 'html')"
-                                   class="fr-summary-welcome-message"/>
+                    <xforms:group ref=".[document]">
+                        <!-- Display welcome message -->
+                        <xforms:output mediatype="text/html"
+                                       value="saxon:serialize($fr-resources/summary/messages/intro/node(), 'html')"
+                                       class="fr-summary-welcome-message"/>
+                    </xforms:group>
 
                     <table class="fr-tabular fr-summary-table">
                         <thead>
@@ -330,6 +334,13 @@
                                     </xforms:repeat>
                                 </tr>
                             </xforms:repeat>
+                            <xforms:group ref=".[not(document)]">
+                                <tr>
+                                    <td colspan="{3 + count(instance('fr-configuration-instance')/xforms:*[tokenize(@class, ' ') = 'fr-summary'])}">
+                                        <xforms:output mediatype="text/html" value="saxon:serialize($fr-resources/summary/messages/no-form-found/node(), 'html')"/>
+                                    </td>
+                                </tr>
+                            </xforms:group>
                         </tbody>
                     </table>
 

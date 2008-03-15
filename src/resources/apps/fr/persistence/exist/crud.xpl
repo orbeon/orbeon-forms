@@ -54,7 +54,7 @@
                 <p:input name="config"
                          href="aggregate('config',
                                          aggregate('url', #matcher-groups#xpointer(p:rewrite-resource-uri(concat(p:property('oxf.fr.persistence.service.exist.uri'), '/', /*/group[1]), true()))),
-                                         aggregate('output-binary', #matcher-groups#xpointer('true')))"/>
+                                         aggregate('mode', #matcher-groups#xpointer('binary')))"/>
                 <p:output name="data" id="document"/>
             </p:processor>
             <!-- Serialize out as is -->

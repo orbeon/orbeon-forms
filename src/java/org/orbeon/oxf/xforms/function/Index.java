@@ -55,8 +55,7 @@ public class Index extends XFormsFunction {
             final String message = "Function index uses repeat id '" + repeatId + "' which is not in scope";
             final RuntimeException exception = new ValidationException(message, null);
 
-            // Obtain PipelineContext - this function is always called from controls so
-            // PipelineContext should be present
+            // This function is always called from controls so PipelineContext should be present
             final StaticExternalContext.StaticContext staticContext = StaticExternalContext.getStaticContext();
             final PipelineContext pipelineContext = (staticContext != null) ? staticContext.getPipelineContext() : null;
 

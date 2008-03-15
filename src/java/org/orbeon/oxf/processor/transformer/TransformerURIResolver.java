@@ -83,7 +83,7 @@ public class TransformerURIResolver implements URIResolver {
                     // with HTTP and HTTPS. When would it make sense to use local caching?
                     final String protocol = url.getProtocol();
                     final boolean cacheUseLocalCache = !(protocol.equals("http") || protocol.equals("https"));
-                    final Processor urlGenerator = new URLGenerator(url, null, false, null, false, false, false, handleXInclude, false, null, cacheUseLocalCache);
+                    final Processor urlGenerator = new URLGenerator(url, null, false, null, false, false, false, handleXInclude, null, null, cacheUseLocalCache);
                     xmlReader = new ProcessorOutputXMLReader(pipelineContext, urlGenerator.createOutput(ProcessorImpl.OUTPUT_DATA));
                     systemId = url.toExternalForm();
                 }

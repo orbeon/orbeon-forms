@@ -68,8 +68,6 @@ public class URLGenerator extends ProcessorImpl {
     private static final boolean DEFAULT_FORCE_ENCODING = false;
     private static final boolean DEFAULT_IGNORE_CONNECTION_ENCODING = false;
 
-    private static final boolean DEFAULT_OUTPUT_BINARY = false;
-
     private static final int CACHE_EXPIRATION_NO_CACHE = 0;
     private static final int CACHE_EXPIRATION_NO_EXPIRATION = -1;
     private static final int CACHE_EXPIRATION_LAST_MODIFIED = -2;
@@ -124,10 +122,10 @@ public class URLGenerator extends ProcessorImpl {
     }
 
     public URLGenerator(URL url, String contentType, boolean forceContentType, String encoding, boolean forceEncoding,
-                      boolean ignoreConnectionEncoding, boolean validating, boolean handleXInclude, boolean outputBinary, Map headers,
+                      boolean ignoreConnectionEncoding, boolean validating, boolean handleXInclude, String mode, Map headers,
                       boolean cacheUseLocalCache) {
         this.localConfigURIReferences = new ConfigURIReferences(new Config(url, contentType, forceContentType, encoding,
-                forceEncoding, ignoreConnectionEncoding, validating, handleXInclude, outputBinary, headers, cacheUseLocalCache,
+                forceEncoding, ignoreConnectionEncoding, validating, handleXInclude, mode, headers, cacheUseLocalCache,
                 DEFAULT_CACHE_ALWAYS_REVALIDATE, DEFAULT_CACHE_EXPIRATION, new TidyConfig(null)));
         addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
     }
@@ -143,7 +141,7 @@ public class URLGenerator extends ProcessorImpl {
         private Map headers;
         private boolean handleXInclude = DEFAULT_HANDLE_XINCLUDE;
 
-        private boolean outputBinary = DEFAULT_OUTPUT_BINARY;
+        private String mode;
 
         private boolean cacheUseLocalCache = DEFAULT_CACHE_USE_LOCAL_CACHE;
         private boolean cacheAlwaysRevalidate = DEFAULT_CACHE_ALWAYS_REVALIDATE;
@@ -171,7 +169,7 @@ public class URLGenerator extends ProcessorImpl {
         }
 
         public Config(URL url, String contentType, boolean forceContentType, String encoding, boolean forceEncoding,
-                      boolean ignoreConnectionEncoding, boolean validating, boolean handleXInclude, boolean outputBinary,Map headers,
+                      boolean ignoreConnectionEncoding, boolean validating, boolean handleXInclude, String mode,Map headers,
                       boolean cacheUseLocalCache, boolean cacheAlwaysRevalidate, int cacheExpiration, TidyConfig tidyConfig) {
             this.url = url;
             this.contentType = contentType;
@@ -183,7 +181,7 @@ public class URLGenerator extends ProcessorImpl {
             this.headers = headers;
             this.handleXInclude = handleXInclude;
 
-            this.outputBinary = outputBinary;
+            this.mode = mode;
 
             this.cacheUseLocalCache = cacheUseLocalCache;
             this.cacheAlwaysRevalidate = cacheAlwaysRevalidate;
@@ -228,8 +226,8 @@ public class URLGenerator extends ProcessorImpl {
             return handleXInclude;
         }
 
-        public boolean isOutputBinary() {
-            return outputBinary;
+        public String getMode() {
+            return mode;
         }
 
         public Map getHeaders() {
@@ -327,8 +325,8 @@ public class URLGenerator extends ProcessorImpl {
                                 boolean defaultHandleXInclude = getPropertySet().getBoolean(HANDLE_XINCLUDE_PROPERTY, DEFAULT_HANDLE_XINCLUDE).booleanValue();
                                 boolean handleXInclude = ProcessorUtils.selectBooleanValue(configElement, "/config/handle-xinclude", defaultHandleXInclude);
 
-                                // Binary output
-                                boolean outputBinary = ProcessorUtils.selectBooleanValue(configElement, "/config/output-binary", DEFAULT_OUTPUT_BINARY);
+                                // Output mode
+                                String mode = XPathUtils.selectStringValueNormalize(configElement, "/config/mode");
 
                                 // Cache control
                                 boolean cacheUseLocalCache = ProcessorUtils.selectBooleanValue(configElement, "/config/cache-control/use-local-cache", DEFAULT_CACHE_USE_LOCAL_CACHE);
@@ -350,7 +348,7 @@ public class URLGenerator extends ProcessorImpl {
 
                                     // Create configuration
                                     Config config = new Config(fullURL, contentType, forceContentType, encoding, forceEncoding,
-                                            ignoreConnectionEncoding, validating, handleXInclude, outputBinary, headers,
+                                            ignoreConnectionEncoding, validating, handleXInclude, mode, headers,
                                             cacheUseLocalCache, cacheAlwaysRevalidate, cacheExpiration, tidyConfig);
                                     if (logger.isDebugEnabled())
                                         logger.debug("Read configuration: " + config.toString());
@@ -416,15 +414,26 @@ public class URLGenerator extends ProcessorImpl {
                             // Create store for caching if necessary
                             final ContentHandler output = isUseLocalCache ? new SAXStore(contentHandler) : contentHandler;
 
+                            // Handle mode
+                            String mode = configURIReferences.config.getMode();
+                            if (mode == null) {
+                                // Mode is inferred from content-type
+                                if (ProcessorUtils.HTML_CONTENT_TYPE.equals(contentType))
+                                    mode = "html";
+                                else if (XMLUtils.isXMLMediatype(contentType))
+                                    mode = "xml";
+                                else if (XMLUtils.isTextContentType(contentType))
+                                    mode = "text";
+                                else
+                                    mode = "binary";
+
+                            }
+
                             // Read resource
-                            if (configURIReferences.config.isOutputBinary()) {
-                                // Always output a binary document in this case
-                                handler.readBinary(output, contentType);
-                                configURIReferences.uriReferences = null;
-                            } else if (ProcessorUtils.HTML_CONTENT_TYPE.equals(contentType)) {
+                            if (mode.equals("html")) {
                                 handler.readHTML(output);
                                 configURIReferences.uriReferences = null;
-                            } else if (XMLUtils.isXMLMediatype(contentType)) {
+                            } else if (mode.equals("xml")) {
                                 final LocalXIncludeListener localXIncludeListener = new LocalXIncludeListener();
                                 XIncludeHandler.setXIncludeListener(localXIncludeListener);
                                 try {
@@ -433,7 +442,7 @@ public class URLGenerator extends ProcessorImpl {
                                     XIncludeHandler.setXIncludeListener(null);
                                 }
                                 localXIncludeListener.updateCache(pipelineContext, configURIReferences);
-                            } else if (XMLUtils.isTextContentType(contentType)) {
+                            } else if (mode.equals("text")) {
                                 handler.readText(output, contentType);
                                 configURIReferences.uriReferences = null;
                             } else {

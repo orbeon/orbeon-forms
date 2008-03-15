@@ -75,8 +75,13 @@
                         </element>
                     </optional>
                     <optional>
-                        <element name="output-binary">
-                            <data type="boolean"/>
+                        <element name="mode">
+                            <choice>
+                                <value>html</value>
+                                <value>xml</value>
+                                <value>text</value>
+                                <value>binary</value>
+                            </choice>
                         </element>
                     </optional>
                     <zeroOrMore>

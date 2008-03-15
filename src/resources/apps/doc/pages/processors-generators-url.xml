@@ -64,20 +64,46 @@
                     Use <code>application/xml</code>.
                 </li>
             </ol>
+            <p>
+                In addition, it is possible to force the mode using the <code>&lt;mode></code> configuration element:
+            </p>
+            <xml-source>
+                <p:processor name="oxf:url-generator">
+                    <p:input name="config">
+                        <config>
+                            <url>http://example.org/resource</url>
+                            <mode>binary</mode>
+                        </config>
+                    </p:input>
+                    <p:output name="data" id="binary-document"/>
+                </p:processor>
+            </xml-source>
         </section>
         <a name="xml-mode"/>
         <section>
             <title>XML Mode</title>
             <p>
-                The XML mode is selected when the content type is <code>text/xml</code>,
-                <code>application/xml</code>, or ends with <code>+xml</code> according to the
-                selection algorithm above. The generator fetches the specified URL and parses the
-                XML document. If the <code>validating</code> option is set to <code>true</code>, a
-                validating parser is used, otherwise a non-validating parser is used. Using a
-                validating parser allows to validate a document with a DTD. In addition, the URL
-                generator is able to handle XInclude inclusions during parsing. By default, it does
-                so. This can be disabled by seeting the <code>handle-xinclude</code> option to
-                <code>false</code>.
+                The XML mode is selected when:
+            </p>
+            <ul>
+                <li>
+                    <p>
+                        the content type is <code>text/xml</code>, <code>application/xml</code>, or ends with
+                        <code>+xml</code> according to the selection algorithm above
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        the <code>xml</code> mode is forced using the <code>&lt;mode></code> configuration element
+                    </p>
+                </li>
+            </ul>
+            <p>
+                The generator fetches the specified URL and parses the XML document. If the <code>validating</code>
+                option is set to <code>true</code>, a validating parser is used, otherwise a non-validating parser is
+                used. Using a validating parser allows to validate a document with a DTD. In addition, the URL generator
+                is able to handle XInclude inclusions during parsing. By default, it does so. This can be disabled by
+                seeting the <code>handle-xinclude</code> option to <code>false</code>.
             </p>
             <p>
                 Example:
@@ -106,11 +132,23 @@
         <section>
             <title>HTML Mode</title>
             <p>
-                The HTML mode is selected when the content type is <code>text/html</code>
-                according to the selection algorithm above. In this mode, the URL generator
-                uses <link href="http://tidy.sourceforge.net/">HTML Tidy</link> to transform
-                HTML into XML. This feature is useful to later extract information from HTML
-                using XPath.
+                The HTML mode is selected when:
+            </p>
+            <ul>
+                <li>
+                    <p>
+                        the content type is <code>text/html</code> according to the selection algorithm above
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        the <code>html</code> mode is forced using the <code>&lt;mode></code> configuration element
+                    </p>
+                </li>
+            </ul>
+            <p>
+                In this mode, the URL generator uses <link href="http://tidy.sourceforge.net/">HTML Tidy</link> to
+                transform HTML into XML. This feature is useful to later extract information from HTML using XPath.
             </p>
             <p>
                 Examples:
@@ -161,11 +199,25 @@
         <section>
             <title>Text Mode</title>
             <p>
-                The text mode is selected when the content type according to the selection
-                algorithm above starts with <code>text/</code> and is different from
-                <code>text/html</code> or <code>text/xml</code>, for example
-                <code>text/plain</code>. In this mode, the URL generator reads the input as a
-                text file and produces an XML document containing the text read.
+                The text mode is selected when:
+            </p>
+            <ul>
+                <li>
+                    <p>
+                        the content type according to the selection algorithm above starts with <code>text/</code> and
+                        is different from <code>text/html</code> or <code>text/xml</code>, for example
+                        <code>text/plain</code>
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        the <code>text</code> mode is forced using the <code>&lt;mode></code> configuration element
+                    </p>
+                </li>
+            </ul>
+            <p>
+                In this mode, the URL generator reads the input as a text file and produces an XML document containing
+                the text read.
             </p>
             <p>
                 Example:
@@ -219,11 +271,24 @@ This is line three of the input document!
         <section>
             <title>Binary Mode</title>
             <p>
-                The binary mode is selected when the content type is neither one of the XML
-                content types nor one of the <code>text/*</code> content types. In this mode,
-                the URL generator uses a Base64 encoding to transform binary content into XML
-                according to the <a href="reference-formats#binary-documents">binary document
-                format</a>. For example:
+                The binary mode is selected when:
+            </p>
+            <ul>
+                <li>
+                    <p>
+                        the content type is neither one of the XML content types nor one of the <code>text/*</code>
+                        content types
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        the <code>binary</code> mode is forced using the <code>&lt;mode></code> configuration element
+                    </p>
+                </li>
+            </ul>
+            <p>
+                In this mode, the URL generator uses a Base64 encoding to transform binary content into XML according
+                to the <a href="reference-formats#binary-documents">binary document format</a>. For example:
             </p>
             <xml-source>
                 <p:processor name="oxf:url-generator">

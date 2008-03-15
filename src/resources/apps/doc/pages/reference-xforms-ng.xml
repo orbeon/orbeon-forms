@@ -333,7 +333,7 @@
             </section>
         </section>
         <section>
-            <title>Programming With XForms 1.0</title>
+            <title>Programming With XForms</title>
             <a name="xforms-model"/>
             <section>
                 <title>XForms Model</title>
@@ -1993,7 +1993,7 @@
                     directly to the web browser. This however means that submission errors cannot be caught by XForms
                     event handlers after Orbeon Forms has started connecting to the submission URL, as should be the
                     case following the XForms specification. If set to <code>false</code>, Orbeon Forms buffers the
-                    reply so that errors can be handled as per XForms 1.0. However, this solution is less efficient.
+                    reply so that errors can be handled as per XForms. However, this solution is less efficient.
                 </p>
                 <xml-source>
                     <property as="xs:boolean" name="oxf.xforms.optimize-local-submission" value="true"/>
@@ -2030,15 +2030,15 @@
             <section>
                 <title>Note About XPath 2.0 Expressions</title>
                 <p>
-                    Orbeon Forms uses XPath 2.0 expressions instead of XPath 1.0 expressions as mandated by XForms 1.0
-                    and XForms 1.1. This allows much greater flexibility in the expressions you can use in Orbeon Forms
-                    (and once you have tasted XPath 2.0, you can't go back to XPath 1.0!).
+                    Orbeon Forms uses XPath 2.0 expressions instead of XPath 1.0 expressions as mandated by XForms.
+                    This allows much greater flexibility in the expressions you can use in Orbeon Forms (and once you
+                    have tasted XPath 2.0, you can't go back to XPath 1.0!).
                 </p>
                 <p>
                     In general, this does not cause incompatibilities: most XPath 1.0 expressions work without issues
                     with an XPath 2.0 implementation. But one place where there is an incompatibility is the use of the
                     XPath 1.0 <code>if()</code> function. This function clashes with XPath 2.0's built-in
-                    <code>if()</code> construct. The bottom line is that you cannot directly use the XForms 1.0
+                    <code>if()</code> construct. The bottom line is that you cannot directly use the XForms
                     <code>if()</code> function in Orbeon Forms at the moment. The following, for example, will not work
                     in Orbeon Forms:
                 </p>
@@ -2059,7 +2059,7 @@
                     </li>
                     <li>
                         <p>
-                            Use the Orbeon Forms <code>xxforms:if()</code> extension, which behaves like the XForms 1.0
+                            Use the Orbeon Forms <code>xxforms:if()</code> extension, which behaves like the XForms
                             <code>if()</code> function:
                         </p>
                         <xml-source>
@@ -2075,6 +2075,52 @@
             <p>
                 [TODO: document schema validation including basics, extensions, inline schemas]
             </p>
+        </section>
+        <a name="xforms-initialization"/>
+        <section>
+            <title>XForms Initialization</title>
+            <p>
+                Upon loading, an XForms document goes through a phase of initialization during which models, instances
+                and controls are created and prepared.
+            </p>
+            <p>
+                As a form author, you can hook-up event handlers to perform your own initialization. You usually do this
+                with either the <code>xforms-model-construct-done</code> or <code>xforms-ready</code> events dispatched
+                to each model.
+            </p>
+            <p>
+                In many cases, you can use either event, but there is a significant difference: when
+                <code>xforms-model-construct-done</code> runs, controls are not yet initialized, and you may obtain
+                better performance when using that event, as controls don't have to update as a response to  actions.
+            </p>
+            <p>
+                Here are a few things you can do during initialization:
+            </p>
+            <ul>
+                <li>
+                    <p>
+                        <b>Call submissions to load data.</b> For example, you may want to load initial form data from
+                        a database, or load localization resources.
+                    </p>
+                    <xml-source>
+                        <xforms:model>
+                            <xforms:send ev:event="xforms-model-construct-done" submission="load-submission"/>
+                            ...
+                        </xforms:model>
+                    </xml-source>
+                </li>
+                <li>
+                    <p>
+                        <b>Prepare data.</b> For example, you may want to perform initial calculations.
+                    </p>
+                    <xml-source>
+                        <xforms:model>
+                            <xforms:setvalue ev:event="xforms-model-construct-done" ref="uuid" value="digest(string(random(true)), 'MD5', 'hex')"/>
+                            ...
+                        </xforms:model>
+                    </xml-source>
+                </li>
+            </ul>
         </section>
         <a name="xforms-instance-initialization"/>
         <section>
@@ -2714,21 +2760,18 @@
             <section>
                 <title>Introduction</title>
                 <p>
-                    XForms 1.0 allows an XForms page to perform submissions of XForms instances and
-                    to handle a response. In most cases, both the submitted XForms instance and the
-                    response are XML documents.
+                    XForms allows an XForms page to perform submissions of XForms instances and to handle a response.
+                    In most cases, both the submitted XForms instance and the response are XML documents.
                 </p>
                 <note>
-                    It is possible to submit an XForms instance with the HTTP GET method. In that
-                    case, some information contained in the XML document is lost, as the structure
-                    of the instance, attributes, and namespace prefixes among others, are not passed
-                    to the submission.
+                    It is possible to submit an XForms instance with the HTTP GET method. In that case, some
+                    information contained in the XML document is lost, as the structure of the instance, attributes, and
+                    namespace prefixes among others, are not passed to the submission.
                 </note>
                 <p>
-                    The XForms submission feature practically allows forms to call XML services.
-                    Those services are accessible through an XML API, which means that a request is
-                    performed by sending an XML document to the service, and a response consists of
-                    an XML document as well.
+                    The XForms submission feature practically allows forms to call XML services. Those services are
+                    accessible through an XML API, which means that a request is performed by sending an XML document to
+                    the service, and a response consists of an XML document as well.
                 </p>
             </section>
             <!--

@@ -398,6 +398,15 @@
                     combined resources caching and gzip compression in addition.
                 </p>
             </section>
+            <a name="xforms-versioned-resources"/>
+            <section>
+                <title>Enable versioned resources</title>
+                <p>
+                    Configure versioned resources, to maximize client-side caching of CSS, JavaScript, and other
+                    resources. See the <a href="reference-xforms-2#versioned-resources">XForms reference</a> for
+                    details.
+                </p>
+            </section>
             <a name="xforms-readonly-instances"/>
             <section>
                 <title>Consider using read-only and shared instances</title>
@@ -420,15 +429,13 @@
             </section>
             <a name="xforms-state"/>
             <section>
-                <title>Consider server-side XForms state handling</title>
+                <title>Use server-side XForms state handling</title>
                 <p>
                     The state of the XForms engine can be either stored on the server, or sent to the client and
-                    exchanged with the server with each request. By default, the XForms state is stored on the client.
-                    This option works in most cases and doesn't require any tuning. However, you might want to consider
-                    storing the XForms state on the server if your XForms instances are getting large or if your users
-                    have low bandwidth connection to the server. See the <a
-                    href="reference-xforms-2#xforms-state-handling">XForms reference</a> for the benefits and drawbacks
-                    of each option and for details on how to configure state handling.
+                    exchanged with the server with each request. By default, the XForms state is stored on the server.
+                    Make sure this is enabled. See the <a href="reference-xforms-2#xforms-state-handling">XForms
+                    reference</a> for the benefits and drawbacks of each option and for details on how to configure
+                    state handling.
                 </p>
             </section>
             <a name="xforms-instance-src"/>
@@ -440,6 +447,16 @@
                     the <code>src</code> attribute of the <code>xforms:instance</code> instead of
                     <code>xi:include</code> or XSLT. Alternatively, you can use a submission upon receiving
                     <code>xforms-ready</code>. This helps ensures that the source XForms page is cacheable.
+                </p>
+            </section>
+            <a name="xforms-initialization"/>
+            <section>
+                <title>Perform initialization on <code>xforms-model-construct-done</code></title>
+                <p>
+                    If you have initialization tasks to perform upon page initialization, try using
+                    <code>xforms-model-construct-done</code> instead of <code>xforms-ready</code>. This will cause less
+                    updates to controls and may yield better performance. See also the <a
+                    href="reference-xforms-ng#xforms-initialization">XForms reference</a> for details.
                 </p>
             </section>
             <a name="xforms-cache"/>

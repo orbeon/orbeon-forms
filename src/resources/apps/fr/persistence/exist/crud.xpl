@@ -28,7 +28,7 @@
          directly, but because we want to support the PUT and POST methods, this is currently the only solution. -->
     <p:processor name="oxf:request">
         <p:input name="config">
-            <config>
+            <config stream-type="xs:anyURI">
                 <include>/request/request-path</include>
                 <include>/request/content-type</include>
                 <include>/request/method</include>
@@ -51,6 +51,7 @@
 
             <!-- Read URL -->
             <p:processor name="oxf:url-generator">
+                <!-- Build URL, force binary mode and read URL -->
                 <p:input name="config"
                          href="aggregate('config',
                                          aggregate('url', #matcher-groups#xpointer(p:rewrite-resource-uri(concat(p:property('oxf.fr.persistence.service.exist.uri'), '/', /*/group[1]), true()))),
@@ -79,6 +80,7 @@
 
                     <p:processor name="oxf:xforms-submission">
                         <p:input name="submission">
+                            <!-- NOTE: The <body> element contains the xs:anyURI type -->
                             <xforms:submission ref="/*/body" method="put" replace="none"
                                     serialization="application/octet-stream"
                                     resource="{xxforms:property('oxf.fr.persistence.service.exist.uri')}/{/*/group[1]}">

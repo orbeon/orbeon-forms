@@ -32,6 +32,7 @@
 
             <xforms:action ev:event="xforms-model-construct-done">
                 <xxforms:variable name="user-agent" select="xxforms:get-header('user-agent')"/>
+                <xforms:setvalue ref="instance('fb-user-agent-instance')/value" value="$user-agent"/>
                 <xforms:setvalue ref="instance('fb-user-agent-instance')/is-ie"
                                  value="contains(lower-case($user-agent), 'msie') and not(contains(lower-case($user-agent), 'opera'))"/>
             </xforms:action>
@@ -67,12 +68,13 @@
             <xforms:bind nodeset=".">
                 <!-- Form metadata (also used by Form Runner) -->
                 <xforms:bind nodeset="xhtml:head/xforms:model[@id = 'fr-form-model']/xforms:instance[@id = 'fr-form-metadata']/*">
-                    <xforms:bind id="application-id-bind" nodeset="application-id" required="true()" type="xs:NCName" readonly="false()"
+                    <xforms:bind id="application-name-bind" nodeset="application-name" required="true()" type="xs:NCName" readonly="false()"
                                  calculate="if (normalize-space() = '') then concat('ID', digest(string(random(true)), 'MD5', 'hex')) else ."/>
-                    <xforms:bind id="form-id-bind" nodeset="form-id" required="true()" type="xs:NCName" readonly="false()"
+                    <xforms:bind id="form-name-bind" nodeset="form-name" required="true()" type="xs:NCName" readonly="false()"
                                  calculate="if (normalize-space() = '') then concat('ID', digest(string(random(true)), 'MD5', 'hex')) else ."/>
                     <xforms:bind id="title-bind" nodeset="title" required="true()"/>
                     <xforms:bind id="description-bind" nodeset="description"/>
+                    <xforms:bind id="logo-bind" nodeset="logo" type="xs:anyURI"/>
                 </xforms:bind>
                 <!-- Global attachments (also used by Form Runner) -->
                 <xforms:bind nodeset="xhtml:head/xforms:model[@id = 'fr-form-model']/xforms:instance[@id = 'fr-form-attachments']/*">
@@ -94,37 +96,55 @@
                 <xforms:bind nodeset="xhtml:head/xhtml:title" calculate="$metadata-instance/title"/>
             </xforms:bind>
 
+            <!-- Metadata -->
+            <xforms:instance id="fr-form-metadata" xxforms:readonly="true">
+                <metadata>
+                    <application-name>orbeon</application-name>
+                    <form-name>builder</form-name>
+                    <title>Orbeon Form Builder</title>
+                    <description>Orbeon Form Builder allows you to easily build forms right from your web browser and without programming.</description>
+                    <author>Orbeon, Inc.</author>
+                    <logo mediatype="image/png" filename="orbeon-logo-trimmed-transparent-42.png" size="">/apps/fr/style/orbeon-logo-trimmed-transparent-42.png</logo>
+                </metadata>
+            </xforms:instance>
+
             <!-- All form resources -->
             <xforms:instance id="fr-form-resources" xxforms:readonly="true">
                 <resources>
                     <resource xml:lang="en">
-                        <application-id>
-                            <label>Application Identifier</label>
-                        </application-id>
-                        <form-id>
-                            <label>Form Identifier</label>
-                        </form-id>
+                        <application-name>
+                            <label>Application Name</label>
+                        </application-name>
+                        <form-name>
+                            <label>Form Name</label>
+                        </form-name>
                         <title>
                             <label>Form Title</label>
                         </title>
                         <description>
                             <label>Form Description</label>
                         </description>
+                        <logo>
+                            <label>Logo</label>
+                        </logo>
                         <!-- TODO: i18n whole Form Builder -->
                     </resource>
                     <resource xml:lang="fr">
-                        <application-id>
-                            <label>Identifiant de l'application</label>
-                        </application-id>
-                        <form-id>
-                            <label>Identifiant du formulaire</label>
-                        </form-id>
+                        <application-name>
+                            <label>Nom de l'application</label>
+                        </application-name>
+                        <form-name>
+                            <label>Nom du formulaire</label>
+                        </form-name>
                         <title>
                             <label>Titre du formulaire</label>
                         </title>
                         <description>
                             <label>Description du formulaire</label>
                         </description>
+                        <logo>
+                            <label>Logo</label>
+                        </logo>
                     </resource>
                 </resources>
             </xforms:instance>
@@ -142,6 +162,7 @@
             <!-- Store user-agent details -->
             <xforms:instance id="fb-user-agent-instance">
                 <user-agent>
+                    <value/>
                     <is-ie/>
                 </user-agent>
             </xforms:instance>
@@ -878,8 +899,10 @@
 
         <fr:view>
             <xforms:label>Orbeon Form Builder</xforms:label>
-            <xhtml:img src="/apps/fr/style/orbeon-logo-trimmed-transparent-42.png"/>xxx
+            <!--<xhtml:img src="/apps/fr/style/orbeon-logo-trimmed-transparent-42.png"/>-->
             <fr:body>
+
+                <!--<xforms:output value="instance('fb-user-agent-instance')/value"/>-->
 
                 <xforms:group ref=".[instance('fb-user-agent-instance')/is-ie = 'true']" class="fb-ie-warning">
                     Orbeon Form Builder still needs work to provide a satisfactory experience with Internet Explorer.
@@ -939,12 +962,12 @@
                 <fr:section id="fb-metadata-section" class="fb-metadata-section">
                     <xforms:label>Form Metadata</xforms:label>
 
-                    <xforms:input id="application-id-control" bind="application-id-bind" appearance="fr:in-place" class="fr-summary fr-search">
-                        <xforms:label ref="$form-resources/application-id"/>
+                    <xforms:input id="application-name-control" bind="application-name-bind" appearance="fr:in-place" class="fr-summary fr-search">
+                        <xforms:label ref="$form-resources/application-name"/>
                     </xforms:input>
 
-                    <xforms:input id="form-id-control" bind="form-id-bind" appearance="fr:in-place" class="fr-summary fr-search">
-                        <xforms:label ref="$form-resources/form-id"/>
+                    <xforms:input id="form-name-control" bind="form-name-bind" appearance="fr:in-place" class="fr-summary fr-search">
+                        <xforms:label ref="$form-resources/form-name"/>
                     </xforms:input>
 
                     <xforms:input id="title-control" bind="title-bind" appearance="fr:in-place" class="fr-summary fr-search">
@@ -954,6 +977,24 @@
                     <xforms:textarea id="description-control" bind="description-bind" appearance="fr:in-place" class="fr-summary fr-search">
                         <xforms:label ref="$form-resources/description"/>
                     </xforms:textarea>
+
+                    <!-- Image -->
+                    <xforms:group>
+                        <xforms:label>Logo</xforms:label>
+                        <xforms:group ref="$metadata-instance/logo[normalize-space() != '']">
+                            <xforms:output ref="." mediatype="image/*">
+                                <xforms:label class="fb-xforms-disabled"/>
+                            </xforms:output>
+                        </xforms:group>
+                        <!-- File chooser -->
+                        <xforms:upload id="logo-control" bind="logo-bind" class="fr-attachment">
+                            <xforms:label class="fb-xforms-disabled"/>
+                            <xforms:filename ref="@filename"/>
+                            <xforms:mediatype ref="@mediatype"/>
+                            <xxforms:size ref="@size"/>
+                        </xforms:upload>
+                    </xforms:group>
+
                 </fr:section>
 
                 <!-- Form details -->

@@ -80,17 +80,24 @@ h1 { margin-top: 0 }
 }
 
 .fr-logo {
+    background-color: #F8F8F8;
     background-image: url(logo-bg.gif);
     background-position: top;
-    height: 75px;
+    padding: 1em;
+    min-height: 75px; height: auto !important; height: 75px
 }
+
+.fr-logo table { width: 100% }
+.fr-logo table tr td { vertical-align: middle }
+.fr-logo img { margin-right: 1em }
+.fr-logo h1 { margin: 0 0 .5em 0; padding: 0; font-weight: normal; white-space: nowrap; color: #3598d4 }
+.fr-logo .fr-form-description { margin: 0; padding: .5em; border: 4px solid #3598d4; background-color: white }
 
 .fr-header { overflow: hidden;  }
 .fr-summary-language-choice { float: right; margin-right: 1em; margin-top: .2em; color: gray; font-size: 85%; text-align: right; }
 .fr-summary-language-choice a { color: gray; }
 .fr-summary-language-choice .xforms-label { display: inline; margin-right: .5em }
-.fr-logo img { margin: 1em 1em .5em 1em; float: left }
-.fr-logo h1 { clear: right; margin-right: 1em; margin-top: 1em; padding-bottom: 0; margin-bottom: 0; float: right; font-weight: normal }
+
 
 .fr-separator {
     background-color: #3598d4;
@@ -132,7 +139,8 @@ label.xforms-alert-inactive { display: none; }
 
 button.xforms-trigger img { padding-right: 10px; }
 
-.fr-layout-table tr td { width: auto }
+.fr-layout-table { padding: 0; margin: 0 }
+.fr-layout-table tr td { width: auto; vertical-align: top }
 
 .fr-grid .fr-layout-table tr td { width: auto }
 
@@ -326,6 +334,16 @@ div.fr-collapsible {
 .fr-section-container p { margin-top: 1em; }
 .fr-section-container img.fr-open-close { margin-right: .5em }
 
+/* Radio buttons on separate lines */
+.xforms-select1-appearance-full span { display: block; clear: both; }
+.xforms-select1-appearance-full span input { float: left; }
+.xforms-select1-appearance-full span label { margin-left: .5em; margin-right: 1em }
+
+/* Check boxes on separate lines */
+.xforms-select-appearance-full span { display: block; clear: both; }
+.xforms-select-appearance-full span input { float: left; }
+.xforms-select-appearance-full span label { margin-left: .5em; margin-right: 1em }
+
 /* Grid */
 
 /* Column widths */
@@ -357,18 +375,9 @@ div.fr-collapsible {
 .fr-grid .xforms-select1-appearance-compact { width: 100%; height: 6em }
 .fr-grid .xforms-select-appearance-compact { width: 100%; height: 6em }
 
-/* Check boxes on separate lines */
-.fr-grid .xforms-select-appearance-full span { display: block; clear: both; }
-.fr-grid .xforms-select-appearance-full input { float: left; }
-.xforms-select-appearance-full label { margin-left: .5em; margin-right: 1em }
-
-/* Radio buttons on separate lines */
-.fr-grid .xforms-select1-appearance-full span { display: block; clear: both; }
-.fr-grid .xforms-select1-appearance-full input { float: left; }
-.xforms-select1-appearance-full label { margin-left: .5em; margin-right: 1em }
-
 /* Image output */
 .fr-grid .xforms-mediatype-image { width: 100%; overflow: auto; display: block }
+.fr-grid .xforms-mediatype-image img { display: block }
 
 /*#doc4 .fr-section-container .xforms-input input { width: 63em }*/
 /*#doc4 .fr-section-container textarea.xforms-textarea { width: 63em }*/

@@ -42,11 +42,12 @@
             <!-- Metadata -->
             <xforms:instance id="fr-form-metadata" xxforms:readonly="true">
                 <metadata>
-                    <application-id/>
-                    <form-id/>
+                    <application-name/>
+                    <form-name/>
                     <title>[Give this form a title]</title>
                     <description>[Optionally describe this form]</description>
                     <author/>
+                    <logo mediatype="" filename="" size=""/>
                 </metadata>
             </xforms:instance>
 

@@ -78,21 +78,28 @@
                     <xhtml:div id="yui-main">
                         <xhtml:div class="yui-b">
                             <xhtml:div class="yui-g fr-logo">
-                                <xsl:if test="xhtml:img">
-                                    <xhtml:img src="{xhtml:img/@src}" alt="Logo"/>
-                                </xsl:if>
-                                <xhtml:h1>
-                                    <xsl:choose>
-                                        <xsl:when test="xforms:label">
-                                            <!-- TODO: Create xforms:output instead -->
-                                            <xsl:value-of select="xforms:label"/>
-                                        </xsl:when>
-                                        <xsl:otherwise>
-                                            <!-- HTML title is static -->
-                                            <xsl:value-of select="/xhtml:html/xhtml:head/xhtml:title"/>
-                                        </xsl:otherwise>
-                                    </xsl:choose>
-                                </xhtml:h1>
+                                <xxforms:variable name="label" select="xforms:label"/>
+                                <xforms:group model="fr-form-model" appearance="xxforms:internal">
+                                    <xhtml:table class="fr-layout-table">
+                                        <xhtml:tr>
+                                            <xhtml:td rowspan="2">
+                                                <xforms:output value="((instance('fr-form-metadata')/logo, '/apps/fr/style/orbeon-logo-trimmed-transparent-42.png')[normalize-space() != ''])[1]" mediatype="image/*"/>
+                                            </xhtml:td>
+                                            <xhtml:td>
+                                                <xhtml:h1>
+                                                    <xforms:output value="((instance('fr-form-metadata')/title, $label/@ref, $label, /xhtml:html/xhtml:head/xhtml:title)[normalize-space() != ''])[1]"/>
+                                                </xhtml:h1>
+                                            </xhtml:td>
+                                        </xhtml:tr>
+                                        <xhtml:tr>
+                                            <xhtml:td>
+                                                <xhtml:div class="fr-form-description">
+                                                    <xforms:output value="instance('fr-form-metadata')/description"/>
+                                                </xhtml:div>
+                                            </xhtml:td>
+                                        </xhtml:tr>
+                                    </xhtml:table>
+                                </xforms:group>
                             </xhtml:div>
                             <xhtml:div class="yui-g fr-separator">
                             </xhtml:div>

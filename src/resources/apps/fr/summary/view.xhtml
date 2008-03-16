@@ -50,6 +50,18 @@
                 <dummy/>
             </xforms:instance>
 
+            <!-- Metadata -->
+            <xforms:instance id="fr-form-metadata" xxforms:readonly="true">
+                <metadata xmlns="">
+                    <application-name>orbeon</application-name>
+                    <form-name>runner</form-name>
+                    <title>Orbeon Form Runner</title>
+                    <description>Orbeon Form Runner is the start page for all your forms.</description>
+                    <author>Orbeon, Inc.</author>
+                    <logo mediatype="image/png" filename="orbeon-logo-trimmed-transparent-42.png" size="">/apps/fr/style/orbeon-logo-trimmed-transparent-42.png</logo>
+                </metadata>
+            </xforms:instance>
+
             <!-- Standard Form Runner resources instance -->
             <xforms:instance id="fr-form-resources">
                 <resources xmlns=""/>
@@ -216,10 +228,6 @@
             <xforms:label>Orbeon Form Runner</xforms:label>
             <xhtml:img src="/apps/fr/style/orbeon-logo-trimmed-transparent-42.png"/> 
             <fr:body>
-                <h2>
-                    <xforms:output model="fr-persistence-model" value="instance('fr-source-form-instance')/xhtml:head/xhtml:title"/>
-                </h2>
-
                 <xforms:group appearance="xxforms:internal">
 
                     <!-- Free-text search -->

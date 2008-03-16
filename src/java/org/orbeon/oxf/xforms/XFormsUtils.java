@@ -731,10 +731,10 @@ public class XFormsUtils {
 
         if (currentType.equals(XMLConstants.XS_BASE64BINARY_EXPLODED_QNAME)) {
             // Convert from xs:base64Binary to xs:anyURI
-            return XMLUtils.base64BinaryToAnyURI(pipelineContext, value);
+            return NetUtils.base64BinaryToAnyURI(pipelineContext, value, NetUtils.REQUEST_SCOPE);
         } else {
             // Convert from xs:anyURI to xs:base64Binary
-            return XMLUtils.anyURIToBase64Binary(value);
+            return NetUtils.anyURIToBase64Binary(value);
         }
     }
 

@@ -1,0 +1,76 @@
+<!--
+    Copyright (C) 2008 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:f="http://orbeon.org/oxf/xml/formatting"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <xhtml:head>
+        <xhtml:title>XForms Output with Image Mediatype</xhtml:title>
+        <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms">
+            <xforms:instance id="instance">
+                <instance>
+                    <anyURI xsi:type="xs:anyURI" filename="" mediatype="" size=""/>
+                    <base64Binary xsi:type="xs:base64Binary" filename="" mediatype="" size=""/>
+                </instance>
+            </xforms:instance>
+
+            <xforms:action ev:observer="upload-anyURI upload-base64Binary" ev:event="xforms-select">
+                <xforms:send submission="upload-submission"/>
+            </xforms:action>
+
+            <xforms:submission id="upload-submission" xxforms:ensure-uploads="true"
+                       ref="." method="post" replace="none" resource="test:"/>
+
+        </xforms:model>
+    </xhtml:head>
+    <xhtml:body>
+
+        <h2>Image stored as a URI</h2>
+
+        <xforms:group ref="anyURI[normalize-space() != '']">
+            <xforms:output ref="." mediatype="image/*">
+                <xforms:label>Image:</xforms:label>
+            </xforms:output>
+        </xforms:group>
+        <!-- File chooser -->
+        <xforms:upload ref="anyURI" id="upload-anyURI">
+            <xforms:label>Upload an image:</xforms:label>
+            <xforms:filename ref="@filename"/>
+            <xforms:mediatype ref="@mediatype"/>
+            <xxforms:size ref="@size"/>
+        </xforms:upload>
+
+        <h2>Image stored as a base64-encoded binary</h2>
+
+        <xforms:group ref="base64Binary[normalize-space() != '']">
+            <xforms:output ref="." mediatype="image/*">
+                <xforms:label>Image:</xforms:label>
+            </xforms:output>
+        </xforms:group>
+        <!-- File chooser -->
+        <xforms:upload ref="base64Binary" id="upload-base64Binary">
+            <xforms:label>Upload an image:</xforms:label>
+            <xforms:filename ref="@filename"/>
+            <xforms:mediatype ref="@mediatype"/>
+            <xxforms:size ref="@size"/>
+        </xforms:upload>
+
+        <widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>
+
+    </xhtml:body>
+</xhtml:html>

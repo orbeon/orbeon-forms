@@ -14,10 +14,7 @@
 package org.orbeon.oxf.processor.serializer;
 
 import org.apache.log4j.Logger;
-import org.apache.commons.fileupload.FileItemFactory;
-import org.apache.commons.fileupload.DeferredFileOutputStream;
 import org.apache.commons.fileupload.DefaultFileItem;
-import org.apache.commons.fileupload.DefaultFileItemFactory;
 import org.apache.commons.fileupload.FileItem;
 import org.xml.sax.SAXException;
 import org.dom4j.Document;
@@ -27,18 +24,18 @@ import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.serializer.store.ResultStore;
 import org.orbeon.oxf.processor.serializer.store.ResultStoreOutputStream;
 import org.orbeon.oxf.util.LoggerFactory;
+import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.resources.OXFProperties;
-import org.orbeon.oxf.util.SystemUtils;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.XMLUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+
 import org.xml.sax.ContentHandler;
+
 import javax.xml.parsers.DocumentBuilderFactory;
 
 /**
@@ -61,8 +58,6 @@ public class FileSerializer extends ProcessorImpl {
 
     private static final boolean DEFAULT_APPEND = false;
     private static final boolean DEFAULT_MAKE_DIRECTORIES = false;
-
-    private static FileItemFactory fileItemFactory;
 
     static {
         try {
@@ -289,30 +284,30 @@ public class FileSerializer extends ProcessorImpl {
                     //Get the input and config
                     final Config config = getConfig(pipelineContext);
                     final ProcessorInput dataInput = getInputByName(INPUT_DATA);
-                    final Document configDocument = readInputAsDOM4J(pipelineContext,dataInput);
-                    final String text = XPathUtils.selectStringValueNormalize(configDocument, "/text");
+
+                    // Determine scope
+                    final int scope;
+                    if ("request".equals(config.getScope())) {
+                        scope = NetUtils.REQUEST_SCOPE;
+                    } else if ("session".equals(config.getScope())) {
+                        scope = NetUtils.SESSION_SCOPE;
+                    } else if ("application".equals(config.getScope())) {
+                        scope = NetUtils.APPLICATION_SCOPE;
+                    } else {
+                        throw new OXFException("Invalid context requested: " + config.getScope());
+                    }
+
                     // We use the commons fileupload utilities to write to file
-                    if (fileItemFactory == null)
-                        fileItemFactory = new DefaultFileItemFactory(0,SystemUtils.getTemporaryDirectory());
-                    final FileItem fileItem = fileItemFactory.createItem("dummy", "dummy", false, null);
-
-                    if("request".equals(config.getScope())) {
-                        deleteFileOnRequestEnd(pipelineContext, fileItem);
-                    }
-                    else if("session".equals(config.getScope())) {
-                        deleteFileOnSessionTermination(pipelineContext,fileItem);
-                    }
-                    else if("application".equals(config.getScope())) {
-                        deleteFileOnContextDestroyed(pipelineContext,fileItem);
-                    }
-
+                    final FileItem fileItem = NetUtils.prepareFileItem(pipelineContext, scope);
                     fileOutputStream = fileItem.getOutputStream();
                     writeToFile(pipelineContext, config, dataInput, fileOutputStream);
+
                     // Create file if it doesn't exist
-                    final File storeLocation = ( (DefaultFileItem) fileItem).getStoreLocation();
+                    final File storeLocation = ((DefaultFileItem) fileItem).getStoreLocation();
                     storeLocation.createNewFile();
+
                     // Get the url of the file
-                    final String url = ( (DefaultFileItem) fileItem).getStoreLocation().toURI().toString();
+                    final String url = ((DefaultFileItem) fileItem).getStoreLocation().toURI().toString();
                     contentHandler.startDocument();
                     contentHandler.startElement("", "url", "url", XMLUtils.EMPTY_ATTRIBUTES);
                     contentHandler.characters(url.toCharArray(), 0, url.length());
@@ -348,90 +343,6 @@ public class FileSerializer extends ProcessorImpl {
                 return new Config(readInputAsDOM4J(context, input));
             }
         });
-    }
-
-    /**
-     * Add listener to fileItem which is going to be automatically destroyed at the end of request
-     * @param pipelineContext PipelineContext
-     * @param fileItem FileItem
-     */
-    private void deleteFileOnRequestEnd(PipelineContext pipelineContext, final FileItem fileItem) {
-        // Make sure the file is deleted at the end of request
-        pipelineContext.addContextListener(new PipelineContext.ContextListenerAdapter() {
-            public void contextDestroyed(boolean success) {
-                try {
-                    // Log when we delete files
-                    if (logger.isDebugEnabled()) {
-                        final String temporaryFileName = ((DeferredFileOutputStream) fileItem.getOutputStream()).getFile().getAbsolutePath();
-                        logger.debug("Deleting temporary file: " + temporaryFileName);
-                    }
-                    fileItem.delete();
-                } catch (IOException e) {
-                    throw new OXFException(e);
-                }
-            }
-        });
-    }
-
-    /**
-     * Add listener to fileItem which is going to be automatically destroyed on session destruction
-     * @param pipelineContext PipelineContext
-     * @param fileItem FileItem
-     */
-    private void deleteFileOnSessionTermination(PipelineContext pipelineContext, final FileItem fileItem) {
-        // Try to delete the file on exit and on session termination
-        final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
-        final ExternalContext.Session session = externalContext.getSession(false);
-        if (session != null) {
-            session.addListener(new ExternalContext.Session.SessionListener() {
-                public void sessionDestroyed() {
-                    try {
-                        if (logger.isDebugEnabled()) {
-                            final String temporaryFileName = ((DeferredFileOutputStream) fileItem.getOutputStream()).getFile().getAbsolutePath();
-                            logger.debug("Deleting temporary Session file: " + temporaryFileName);
-                        }
-                        fileItem.delete();
-                    }
-                    catch (IOException e) {
-                        throw new OXFException(e);
-                    }
-                }
-            });
-        }
-        else {
-            XFormsServer.logger.debug("XForms - no existing session found so cannot register temporary file deletion upon session destruction: " + fileItem.getName());
-        }
-    }
-
-    /**
-     * Add listener to fileItem which is going to be automatically destroyed when the servlet is destroyed
-     * @param pipelineContext PipelineContext
-     * @param fileItem FileItem
-     */
-    private void deleteFileOnContextDestroyed(PipelineContext pipelineContext, final FileItem fileItem) {
-        // Try to delete the file on exit and on session termination
-        final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
-        ExternalContext.Application application = externalContext.getApplication();
-        if (application != null) {
-            application.addListener(new ExternalContext.Application.ApplicationListener() {
-                public void servletDestroyed() {
-                    try {
-                        if (logger.isDebugEnabled()) {
-                            final String temporaryFileName = ( (DeferredFileOutputStream) fileItem.getOutputStream()).getFile().getAbsolutePath();
-                            logger.debug("Deleting temporary Application file: " + temporaryFileName);
-                        }
-                        fileItem.delete();
-                    }
-                    catch (IOException e) {
-                        throw new OXFException(e);
-                    }
-                }
-            });
-        }
-        else {
-            XFormsServer.logger.debug("XForms - no Application object found so cannot register temporary file deletion upon session destruction: " +
-                    fileItem.getName());
-        }
     }
 
     public static File getFile(String configDirectory, String configFile, boolean makeDirectories, OXFProperties.PropertySet propertySet) {

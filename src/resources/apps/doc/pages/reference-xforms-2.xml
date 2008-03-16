@@ -58,23 +58,24 @@
                     <ul>
                         <li>
                             <p>
-                                Have a <code>mediatype</code> attribute on the
-                                <code>&lt;xforms:output></code>. That attribute must refer to an
-                                image, such as <code>image/*</code> or <code>image/jpeg</code>.
+                                Have a <code>mediatype</code> attribute on the <code>&lt;xforms:output></code>. That
+                                attribute must refer to an image mediatype, such as <code>image/*</code> or
+                                <code>image/jpeg</code>.
                             </p>
                         </li>
                        <li>
                             <p>
-                                Use the <code>value</code> attribute on
-                                <code>&lt;xforms:output></code> or bind to the control to a node
-                                without type or with an <code>xs:anyURI</code> type.
+                                Use the <code>value</code> attribute on <code>&lt;xforms:output></code> or bind to the
+                                control to a node without type, with an <code>xs:anyURI</code> type or with an
+                                <code>xs:base64Binary</code> type.
                             </p>
                         </li>
                    </ul>
                     <p>
-                        The resulting value is interpreted a URI pointing to an image. The image will display in place
-                        of the <code>xforms:output</code>. It is possible to dynamically change the image pointed to.
-                        For example:
+                        The resulting value from the instance is interpreted either as a URI pointing to an image, or as
+                        a base64-encoded binary representation of the image. The image will display in place of the
+                        <code>xforms:output</code>. It is possible to dynamically change the image pointed to. For
+                        example:
                     </p>
                     <xml-source show-namespaces="false">
                         <xforms:output mediatype="image/*" value="'/images/moon.jpg'"/>
@@ -90,8 +91,8 @@
                         <xforms:output mediatype="image/*" ref="image-uri"/>
                     </xml-source>
                     <p>
-                        The image URI may or may no be reachable from the client browser, but Orbeon Forms hides this
-                        from the developer. For example, to upload and show an image:
+                        The image URI may or may no be reachable from the client browser. Orbeon Forms hides this from
+                        the developer. For example, to upload and show an image:
                     </p>
                     <xml-source>
                         <comment> Hide xforms:output when there is no URI available </comment>
@@ -114,10 +115,6 @@
                         <code>file:</code> resource. While this URI is not visible from the client web browser, the
                         output control automatically proxies it so that the end user can see the image.
                     </p>
-                    <note>
-                        It is not yet possible to directly embed image data in an XForms instance
-                        using the <code>xs:base64Binary</code> type.
-                    </note>
                 </section>
                 <section>
                     <title>HTML Type</title>

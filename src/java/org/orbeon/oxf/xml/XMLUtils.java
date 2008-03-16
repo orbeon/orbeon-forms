@@ -13,12 +13,10 @@
  */
 package org.orbeon.oxf.xml;
 
-import org.apache.commons.fileupload.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -40,7 +38,6 @@ import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.stream.StreamResult;
 import java.io.*;
 import java.net.URL;
-import java.net.URI;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
@@ -65,8 +62,6 @@ public class XMLUtils {
     private static SAXParserFactory nonValidatingSAXParserFactory;
     private static SAXParserFactory validatingSAXParserFactory;
 
-    private static FileItemFactory fileItemFactory;
-
     public static final String XML_CONTENT_TYPE1 = "text/xml";
     public static final String XML_CONTENT_TYPE2 = "application/xml";
     public static final String XML_CONTENT_TYPE3_SUFFIX = "+xml";
@@ -75,11 +70,6 @@ public class XMLUtils {
 
     static {
         try {
-            // Enable XInclude
-            // 
-//            System.setProperty("orbeon.apache.xerces.xni.parser.XMLParserConfiguration",
-//                    "org.orbeon.oxf.xml.XIncludeParserConfiguration");
-
             // Create factory
             documentBuilderFactory = (DocumentBuilderFactory) Class.forName
                     ("orbeon.apache.xerces.jaxp.DocumentBuilderFactoryImpl").newInstance();
@@ -893,176 +883,6 @@ public class XMLUtils {
             os.close(); // necessary with ContentHandlerOutputStream to make sure all extra characters are written
         } catch (Exception e) {
             throw new OXFException(e);
-        }
-    }
-
-    public static byte[] base64StringToByteArray(String base64String) {
-        return Base64.decode(base64String);
-    }
-
-    /**
-     * Convert a String in xs:base64Binary to an xs:anyURI.
-     *
-     * NOTE: The implementation creates a temporary file. The Pipeline Context is required so
-     * that the file can be deleted when no longer used.
-     */
-    public static String base64BinaryToAnyURI(PipelineContext pipelineContext, String value) {
-        // Convert Base64 to binary first
-        final byte[] bytes = XMLUtils.base64StringToByteArray(value);
-
-        return inputStreamToAnyURI(pipelineContext, new ByteArrayInputStream(bytes));
-    }
-
-    /**
-     * Read an InputStream into a byte array.
-     *
-     * @param is    InputStream
-     * @return      byte array
-     */
-    public static byte[] inputStreamToByteArray(InputStream is) {
-        try {
-            final ByteArrayOutputStream os = new ByteArrayOutputStream();
-            NetUtils.copyStream(new BufferedInputStream(is), os);
-            os.close();
-            return os.toByteArray();
-        } catch (Exception e) {
-            throw new OXFException(e);
-        }
-    }
-
-    /**
-     * Read a URI into a byte array.
-     *
-     * @param uri   URI to read
-     * @return      byte array
-     */
-    public static byte[] uriToByteArray(String uri) {
-        InputStream is = null;
-        try {
-            is = new URI(uri).toURL().openStream();
-            return XMLUtils.inputStreamToByteArray(is);
-        } catch (Exception e) {
-            throw new OXFException(e);
-        } finally {
-            try {
-                if (is != null)
-                    is.close();
-            } catch (IOException e) {
-                throw new OXFException(e);
-            }
-        }
-    }
-
-    /**
-     * Convert an InputStream to an xs:anyURI.
-     *
-     * NOTE: The implementation creates a temporary file. The Pipeline Context is required so
-     * that the file can be deleted when no longer used.
-     */
-    public static String inputStreamToAnyURI(PipelineContext pipelineContext, InputStream inputStream) {
-        // Get FileItem
-        final FileItem fileItem = prepareFileItem(pipelineContext);
-        // Write to file
-        OutputStream os = null;
-        try {
-            os = fileItem.getOutputStream();
-            NetUtils.copyStream(inputStream, os);
-        } catch (IOException e) {
-            throw new OXFException(e);
-        } finally {
-            if (os != null) {
-                try {
-                    os.close();
-                } catch (IOException e) {
-                    throw new OXFException(e);
-                }
-            }
-        }
-        // Create file if it doesn't exist (necessary when the file size is 0)
-        final File storeLocation = ((DefaultFileItem) fileItem).getStoreLocation();
-        try {
-            storeLocation.createNewFile();
-        } catch (IOException e) {
-            throw new OXFException(e);
-        }
-        // Return a file URL
-        return storeLocation.toURI().toString();
-    }
-
-    /**
-     * Return a FileItem which is going to be automatically destroyed upon context destruction.
-     */
-    public static FileItem prepareFileItem(PipelineContext pipelineContext) {
-        // We use the commons fileupload utilities to save a file
-        if (fileItemFactory == null)
-            fileItemFactory = new DefaultFileItemFactory(0, SystemUtils.getTemporaryDirectory());
-        final FileItem fileItem = fileItemFactory.createItem("dummy", "dummy", false, null);
-        // Make sure the file is deleted when the context is destroyed
-        pipelineContext.addContextListener(new PipelineContext.ContextListenerAdapter() {
-            public void contextDestroyed(boolean success) {
-                try {
-                    // Log when we delete files, as there is a transient issue with temporary files
-                    // that seem to be deleted too early.
-                    if (logger.isDebugEnabled()) {
-                        final String temporaryFileName = ((DeferredFileOutputStream) fileItem.getOutputStream()).getFile().getAbsolutePath();
-                        logger.debug("Deleting temporary file: " + temporaryFileName);
-                    }
-                    fileItem.delete();
-                } catch (IOException e) {
-                    throw new OXFException(e);
-                }
-            }
-        });
-        // Return FileItem object
-        return fileItem;
-    }
-
-    /**
-     * Convert a String in xs:anyURI to an xs:base64Binary.
-     *
-     * The URI has to be a URL. It is read entirely
-     */
-    public static String anyURIToBase64Binary(String value) {
-        InputStream is = null;
-        try {
-            // Read from URL and convert to Base64
-            is = new URL(value).openStream();
-            final StringBuffer sb = new StringBuffer();
-            XMLUtils.inputStreamToBase64Characters(is, new ContentHandlerAdapter() {
-                public void characters(char ch[], int start, int length) {
-                    sb.append(ch, start, length);
-                }
-            });
-            // Return Base64 String
-            return sb.toString();
-        } catch (IOException e) {
-            throw new OXFException(e);
-        } finally {
-            if (is != null) {
-                try {
-                    is.close();
-                } catch (IOException e) {
-                    throw new OXFException(e);
-                }
-            }
-        }
-    }
-
-    public static void anyURIToOutputStream(String value, OutputStream outputStream) {
-        InputStream is = null;
-        try {
-            is = new URL(value).openStream();
-            NetUtils.copyStream(is, outputStream);
-        } catch (IOException e) {
-            throw new OXFException(e);
-        } finally {
-            if (is != null) {
-                try {
-                    is.close();
-                } catch (IOException e) {
-                    throw new OXFException(e);
-                }
-            }
         }
     }
 

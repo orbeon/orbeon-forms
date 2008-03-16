@@ -15,7 +15,6 @@ package org.orbeon.oxf.util;
 
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.xml.ContentHandlerAdapter;
-import org.orbeon.oxf.xml.XMLUtils;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -54,7 +53,7 @@ public class Base64ContentHandler extends ContentHandlerAdapter {
                 int groups = bufferSize / 4;
                 if (groups > 0) {
                     // There is data to treat
-                    byte[] result = XMLUtils.base64StringToByteArray(new String(buffer, 0, groups * 4)); // NOTE: String and byte[] creation could be both removed
+                    byte[] result = NetUtils.base64StringToByteArray(new String(buffer, 0, groups * 4)); // NOTE: String and byte[] creation could be both removed
                     charCount += groups * 4;
                     byteCount += result.length;
                     os.write(result);

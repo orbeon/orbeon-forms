@@ -325,7 +325,7 @@ public class EmailProcessor extends ProcessorImpl {
                     }
                 }));
             } else {
-                byte[] data = XMLUtils.base64StringToByteArray((String) content);
+                byte[] data = NetUtils.base64StringToByteArray((String) content);
                 parentPart.setDataHandler(new DataHandler(new SimpleBinaryDataSource(name, contentType, data)));
             }
         } else {

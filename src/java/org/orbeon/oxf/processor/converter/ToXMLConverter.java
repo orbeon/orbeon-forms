@@ -21,6 +21,7 @@ import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.processor.serializer.BinaryTextContentHandler;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.util.NetUtils;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
@@ -67,7 +68,7 @@ public class ToXMLConverter extends ProcessorImpl {
 //                });
 
                 // Get FileItem
-                final FileItem fileItem = XMLUtils.prepareFileItem(pipelineContext);
+                final FileItem fileItem = NetUtils.prepareFileItem(pipelineContext, NetUtils.REQUEST_SCOPE);
 
                 try {
                     // Read to OutputStream

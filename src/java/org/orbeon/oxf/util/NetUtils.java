@@ -14,9 +14,12 @@
 package org.orbeon.oxf.util;
 
 import org.apache.log4j.Logger;
+import org.apache.commons.fileupload.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.StaticExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.xml.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
@@ -49,6 +52,10 @@ public class NetUtils {
     };
 
     private static final TimeZone gmtZone = TimeZone.getTimeZone("GMT");
+    public static FileItemFactory fileItemFactory;
+    public static final int REQUEST_SCOPE = 0;
+    public static final int SESSION_SCOPE = 1;
+    public static final int APPLICATION_SCOPE = 2;
 
     static {
         // Set timezone to GMT as required for HTTP headers
@@ -436,7 +443,7 @@ public class NetUtils {
 
     /**
      * Check whether a URL starts with a protocol.
-     * <p/>
+     *
      * We consider that a protocol consists only of ASCII letters and must be at least two
      * characters long, to avoid confusion with Windows drive letters.
      */
@@ -506,9 +513,258 @@ public class NetUtils {
        InputStream inputStream = null;
        try {
            inputStream = urlConnection.getInputStream();
-           return org.orbeon.oxf.xml.XMLUtils.inputStreamToAnyURI(pipelineContext, inputStream);
+           return inputStreamToAnyURI(pipelineContext, inputStream, REQUEST_SCOPE);
        } finally {
            if (inputStream != null) inputStream.close();
        }
    }
+
+    public static byte[] base64StringToByteArray(String base64String) {
+        return Base64.decode(base64String);
+    }
+
+    /**
+     * Convert a String in xs:base64Binary to an xs:anyURI.
+     *
+     * NOTE: The implementation creates a temporary file. The Pipeline Context is required so
+     * that the file can be deleted when no longer used.
+     */
+    public static String base64BinaryToAnyURI(PipelineContext pipelineContext, String value, int scope) {
+        // Convert Base64 to binary first
+        final byte[] bytes = base64StringToByteArray(value);
+
+        return inputStreamToAnyURI(pipelineContext, new ByteArrayInputStream(bytes), scope);
+    }
+
+    /**
+     * Read an InputStream into a byte array.
+     *
+     * @param is    InputStream
+     * @return      byte array
+     */
+    public static byte[] inputStreamToByteArray(InputStream is) {
+        try {
+            final ByteArrayOutputStream os = new ByteArrayOutputStream();
+            copyStream(new BufferedInputStream(is), os);
+            os.close();
+            return os.toByteArray();
+        } catch (Exception e) {
+            throw new OXFException(e);
+        }
+    }
+
+    /**
+     * Read a URI into a byte array.
+     *
+     * @param uri   URI to read
+     * @return      byte array
+     */
+    public static byte[] uriToByteArray(String uri) {
+        InputStream is = null;
+        try {
+            is = new URI(uri).toURL().openStream();
+            return inputStreamToByteArray(is);
+        } catch (Exception e) {
+            throw new OXFException(e);
+        } finally {
+            try {
+                if (is != null)
+                    is.close();
+            } catch (IOException e) {
+                throw new OXFException(e);
+            }
+        }
+    }
+
+    /**
+     * Convert an InputStream to an xs:anyURI.
+     *
+     * The implementation creates a temporary file. The PipelineContext is required so that the file can be deleted
+     * when no longer used.
+     */
+    public static String inputStreamToAnyURI(PipelineContext pipelineContext, InputStream inputStream, int scope) {
+        // Get FileItem
+        final FileItem fileItem = prepareFileItem(pipelineContext, scope);
+        // Write to file
+        OutputStream os = null;
+        try {
+            os = fileItem.getOutputStream();
+            copyStream(inputStream, os);
+        } catch (IOException e) {
+            throw new OXFException(e);
+        } finally {
+            if (os != null) {
+                try {
+                    os.close();
+                } catch (IOException e) {
+                    throw new OXFException(e);
+                }
+            }
+        }
+        // Create file if it doesn't exist (necessary when the file size is 0)
+        final File storeLocation = ((DefaultFileItem) fileItem).getStoreLocation();
+        try {
+            storeLocation.createNewFile();
+        } catch (IOException e) {
+            throw new OXFException(e);
+        }
+        // Return a file URL
+        return storeLocation.toURI().toString();
+    }
+
+    /**
+     * Return a FileItem which is going to be automatically destroyed upon destruction of the request, session or
+     * application.
+     */
+    public static FileItem prepareFileItem(PipelineContext pipelineContext, int scope) {
+        // We use the commons fileupload utilities to save a file
+        if (fileItemFactory == null)
+            fileItemFactory = new DefaultFileItemFactory(0, SystemUtils.getTemporaryDirectory());
+        final FileItem fileItem = fileItemFactory.createItem("dummy", "dummy", false, null);
+        // Make sure the file is deleted appropriately
+        if (scope == REQUEST_SCOPE) {
+            deleteFileOnRequestEnd(pipelineContext, fileItem);
+        } else if (scope == SESSION_SCOPE) {
+            deleteFileOnSessionTermination(pipelineContext, fileItem);
+        } else if (scope == APPLICATION_SCOPE) {
+            deleteFileOnContextDestroyed(pipelineContext, fileItem);
+        } else {
+            throw new OXFException("Invalid context requested: " + scope);
+        }
+        // Return FileItem object
+        return fileItem;
+    }
+
+    /**
+     * Add listener to fileItem which is going to be automatically destroyed at the end of request
+     *
+     * @param pipelineContext PipelineContext
+     * @param fileItem        FileItem
+     */
+    public static void deleteFileOnRequestEnd(PipelineContext pipelineContext, final FileItem fileItem) {
+        // Make sure the file is deleted at the end of request
+        pipelineContext.addContextListener(new PipelineContext.ContextListenerAdapter() {
+            public void contextDestroyed(boolean success) {
+                try {
+                    // Log when we delete files
+                    if (logger.isDebugEnabled()) {
+                        final String temporaryFileName = ((DeferredFileOutputStream) fileItem.getOutputStream()).getFile().getAbsolutePath();
+                        logger.debug("Deleting temporary file: " + temporaryFileName);
+                    }
+                    fileItem.delete();
+                } catch (IOException e) {
+                    throw new OXFException(e);
+                }
+            }
+        });
+    }
+
+    /**
+     * Add listener to fileItem which is going to be automatically destroyed on session destruction
+     *
+     * @param pipelineContext PipelineContext
+     * @param fileItem        FileItem
+     */
+    public static void deleteFileOnSessionTermination(PipelineContext pipelineContext, final FileItem fileItem) {
+        // Try to delete the file on exit and on session termination
+        final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+        final ExternalContext.Session session = externalContext.getSession(false);
+        if (session != null) {
+            session.addListener(new ExternalContext.Session.SessionListener() {
+                public void sessionDestroyed() {
+                    try {
+                        if (logger.isDebugEnabled()) {
+                            final String temporaryFileName = ((DeferredFileOutputStream) fileItem.getOutputStream()).getFile().getAbsolutePath();
+                            logger.debug("Deleting temporary Session file: " + temporaryFileName);
+                        }
+                        fileItem.delete();
+                    }
+                    catch (IOException e) {
+                        throw new OXFException(e);
+                    }
+                }
+            });
+        } else {
+            logger.debug("No existing session found so cannot register temporary file deletion upon session destruction: " + fileItem.getName());
+        }
+    }
+
+    /**
+     * Add listener to fileItem which is going to be automatically destroyed when the servlet is destroyed
+     *
+     * @param pipelineContext PipelineContext
+     * @param fileItem        FileItem
+     */
+    public static void deleteFileOnContextDestroyed(PipelineContext pipelineContext, final FileItem fileItem) {
+        // Try to delete the file on exit and on session termination
+        final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+        ExternalContext.Application application = externalContext.getApplication();
+        if (application != null) {
+            application.addListener(new ExternalContext.Application.ApplicationListener() {
+                public void servletDestroyed() {
+                    try {
+                        if (logger.isDebugEnabled()) {
+                            final String temporaryFileName = ((DeferredFileOutputStream) fileItem.getOutputStream()).getFile().getAbsolutePath();
+                            logger.debug("Deleting temporary Application file: " + temporaryFileName);
+                        }
+                        fileItem.delete();
+                    }
+                    catch (IOException e) {
+                        throw new OXFException(e);
+                    }
+                }
+            });
+        } else {
+            logger.debug("No application object found so cannot register temporary file deletion upon session destruction: " + fileItem.getName());
+        }
+    }
+
+    /**
+     * Convert a String in xs:anyURI to an xs:base64Binary.
+     *
+     * The URI has to be a URL. It is read entirely
+     */
+    public static String anyURIToBase64Binary(String value) {
+        InputStream is = null;
+        try {
+            // Read from URL and convert to Base64
+            is = new URL(value).openStream();
+            final StringBuffer sb = new StringBuffer();
+            XMLUtils.inputStreamToBase64Characters(is, new ContentHandlerAdapter() {
+                public void characters(char ch[], int start, int length) {
+                    sb.append(ch, start, length);
+                }
+            });
+            // Return Base64 String
+            return sb.toString();
+        } catch (IOException e) {
+            throw new OXFException(e);
+        } finally {
+            if (is != null) {
+                try {
+                    is.close();
+                } catch (IOException e) {
+                    throw new OXFException(e);
+                }
+            }
+        }
+    }
+
+    public static void anyURIToOutputStream(String value, OutputStream outputStream) {
+        InputStream is = null;
+        try {
+            is = new URL(value).openStream();
+            copyStream(is, outputStream);
+        } catch (IOException e) {
+            throw new OXFException(e);
+        } finally {
+            if (is != null) {
+                try {
+                    is.close();
+                } catch (IOException e) {
+                    throw new OXFException(e);
+                }
+            }
+        }
+    }
 }

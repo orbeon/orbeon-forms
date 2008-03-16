@@ -25,8 +25,8 @@ import org.orbeon.oxf.processor.sql.SQLProcessor;
 import org.orbeon.oxf.processor.sql.SQLProcessorInterpreterContext;
 import org.orbeon.oxf.util.Base64ContentHandler;
 import org.orbeon.oxf.util.ISODateUtils;
+import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.XPathContentHandler;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -495,7 +495,7 @@ public class QueryInterpreter extends SQLProcessor.InterpreterContentHandler {
                                             blobOutputStream.close();
                                         } else {
                                             String base64Value = XPathUtils.selectStringValue(currentNode, parameter.getSelect(), prefixesMap, variableContext, getInterpreterContext().getFunctionContext());
-                                            getInterpreterContext().getDelegate().setBlob(stmt, index, XMLUtils.base64StringToByteArray(base64Value));
+                                            getInterpreterContext().getDelegate().setBlob(stmt, index, NetUtils.base64StringToByteArray(base64Value));
                                         }
                                     } else {
                                         // Simple cases
@@ -569,7 +569,7 @@ public class QueryInterpreter extends SQLProcessor.InterpreterContentHandler {
                                                 } else {
                                                     // Dereference the URI and write to the BLOB
                                                     OutputStream blobOutputStream = getInterpreterContext().getDelegate().getBlobOutputStream(stmt, index);
-                                                    XMLUtils.anyURIToOutputStream(stringValue, blobOutputStream);
+                                                    NetUtils.anyURIToOutputStream(stringValue, blobOutputStream);
                                                     blobOutputStream.close();
                                                 }
                                             } else

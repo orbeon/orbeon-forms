@@ -589,7 +589,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                     // Interpret node as anyURI
                                     // TODO: PERFORMANCE: Must pass InputStream all the way to the submission instead of storing into byte[] in memory!
                                     final String uri = documentToSubmit.getRootElement().getStringValue();
-                                    messageBody = XMLUtils.uriToByteArray(uri);
+                                    messageBody = NetUtils.uriToByteArray(uri);
                                 } else if (XMLConstants.XS_BASE64BINARY_EXPLODED_QNAME.equals(nodeType)) {
                                     // TODO
                                     throw new XFormsSubmissionException("xforms:submission: binary serialization with base64Binary type is not yet implemented.", "serializing instance");
@@ -944,6 +944,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
             documentToSubmit = reRootAndPrune(currentNodeInfo, currentInstance);
 
             // Temporarily change instance document so that we can run validation again
+            // TODO: Do we need to do this now that validation takes place before?
             modelForInstance.setInstanceDocument(documentToSubmit,
                     currentInstance.getModelId(), currentInstance.getEffectiveId(), currentInstance.getSourceURI(),
                     currentInstance.getUsername(), currentInstance.getPassword(),
@@ -970,6 +971,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
             }
         } finally {
             // Restore instance document
+            // TODO: Do we need to do this now that validation takes place before?
             modelForInstance.setInstance(currentInstance, currentInstance.isReplaced());
         }
 

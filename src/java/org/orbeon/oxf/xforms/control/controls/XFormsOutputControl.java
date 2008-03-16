@@ -29,6 +29,7 @@ import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.util.SecureUtils;
+import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.saxon.om.NodeInfo;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -92,28 +93,28 @@ public class XFormsOutputControl extends XFormsValueControl {
         final String updatedValue;
         if (mediatypeAttribute != null && mediatypeAttribute.startsWith("image/")) {
             final String type = getType();
-            if (!urlNorewrite && (type == null || type.equals(XMLConstants.XS_ANYURI_EXPLODED_QNAME)
-                    || type.equals(XFormsConstants.XFORMS_ANYURI_EXPLODED_QNAME))) {
+            if (rawValue != null && rawValue.length() > 0 && rawValue.trim().length() > 0) {
+                if (type == null || type.equals(XMLConstants.XS_ANYURI_EXPLODED_QNAME) || type.equals(XFormsConstants.XFORMS_ANYURI_EXPLODED_QNAME)) {
+                    // xs:anyURI type
+                    if (!urlNorewrite) {
+                        // We got a URI and we need to rewrite it to an absolute URI since XFormsResourceServer will have to read and stream
+                        final String rewrittenURI = XFormsUtils.resolveResourceURL(pipelineContext, getControlElement(), rawValue, true);
+                        updatedValue = proxyURI(pipelineContext, rewrittenURI);
+                    } else {
+                        // Otherwise we leave the value as is
+                        updatedValue = rawValue;
+                    }
+                } else if (XMLConstants.XS_BASE64BINARY_EXPLODED_QNAME.equals(type)) {
+                    // xs:base64Binary type
 
-                // We got a URI and we need to rewrite it to an absolute URI
-                final String rewrittenURI = XFormsUtils.resolveResourceURL(pipelineContext, getControlElement(), rawValue, true);
-                final String digest = SecureUtils.digestString(rewrittenURI, "MD5", "hex");
+                    final String uri = NetUtils.base64BinaryToAnyURI(pipelineContext, rawValue, NetUtils.SESSION_SCOPE);
+                    updatedValue = proxyURI(pipelineContext, uri);
 
-                final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
-                final ExternalContext.Session session = externalContext.getSession(true);// NOTE: We force session creation here. Should we? What's the alternative?
-                if (session != null) {
-                    // Store mapping into session
-
-                    // Rewrite to an absolute URL, since XFormsResourceServer will have to read it and stream
-                    session.getAttributesMap().put(XFormsResourceServer.DYNAMIC_RESOURCES_SESSION_KEY + digest,
-                            new XFormsResourceServer.DynamicResource(rewrittenURI, mediatypeAttribute, -1, System.currentTimeMillis()));
+                } else {
+                    updatedValue = "";
                 }
-
-                updatedValue = externalContext.getResponse().rewriteResourceURL(XFormsResourceServer.DYNAMIC_RESOURCES_PATH + digest,
-                        ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH);
             } else {
-                // Otherwise we leave the value as is
-                updatedValue = rawValue;
+                updatedValue = "";
             }
         } else if ("text/html".equals(mediatypeAttribute)) {
             // In case of HTML, we may need to do some URL rewriting
@@ -178,6 +179,34 @@ public class XFormsOutputControl extends XFormsValueControl {
         }
 
         return updatedValue;
+    }
+
+    /**
+     * Transform an URI accessible from the server into a URI accessible from the client. The mapping expires with the
+     * session.
+     *
+     * @param pipelineContext   PipelineContext to obtain session
+     * @param uri               server URI to transform
+     * @return                  client URI
+     */
+    private String proxyURI(PipelineContext pipelineContext, String uri) {
+
+        // Create a digest, so that for a given URI we always get the same key
+        final String digest = SecureUtils.digestString(uri, "MD5", "hex");
+
+        // Get session
+        final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+        final ExternalContext.Session session = externalContext.getSession(true);// NOTE: We force session creation here. Should we? What's the alternative?
+
+        if (session != null) {
+            // Store mapping into session
+            session.getAttributesMap().put(XFormsResourceServer.DYNAMIC_RESOURCES_SESSION_KEY + digest,
+                    new XFormsResourceServer.DynamicResource(uri, mediatypeAttribute, -1, System.currentTimeMillis()));
+        }
+
+        // Rewrite new URI to absolute path
+        return externalContext.getResponse().rewriteResourceURL(XFormsResourceServer.DYNAMIC_RESOURCES_PATH + digest,
+                ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH);
     }
 
     public void evaluateDisplayValue(PipelineContext pipelineContext) {

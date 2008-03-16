@@ -47,7 +47,6 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.sax.SAXResult;
 import java.io.*;
-import java.net.MalformedURLException;
 import java.util.*;
 
 /**
@@ -275,7 +274,7 @@ public class RequestGenerator extends ProcessorImpl {
                 } else {
                     // File does not exist on disk, must convert
                     try {
-                        uri = XMLUtils.inputStreamToAnyURI(pipelineContext, fileItem.getInputStream());
+                        uri = NetUtils.inputStreamToAnyURI(pipelineContext, fileItem.getInputStream(), NetUtils.REQUEST_SCOPE);
                     } catch (IOException e) {
                         throw new OXFException(e);
                     }
@@ -544,14 +543,12 @@ public class RequestGenerator extends ProcessorImpl {
     public static int getMaxSizeProperty() {
         OXFProperties.PropertySet propertySet = OXFProperties.instance().getPropertySet(XMLConstants.REQUEST_PROCESSOR_QNAME);
         Integer maxSizeProperty = propertySet.getInteger(RequestGenerator.MAX_UPLOAD_SIZE_PROPERTY);
-        int maxSize = (maxSizeProperty != null) ? maxSizeProperty.intValue() : RequestGenerator.DEFAULT_MAX_UPLOAD_SIZE;
-        return maxSize;
+        return (maxSizeProperty != null) ? maxSizeProperty.intValue() : RequestGenerator.DEFAULT_MAX_UPLOAD_SIZE;
     }
 
     public static int getMaxMemorySizeProperty() {
         OXFProperties.PropertySet propertySet = OXFProperties.instance().getPropertySet(XMLConstants.REQUEST_PROCESSOR_QNAME);
         Integer maxMemorySizeProperty = propertySet.getInteger(RequestGenerator.MAX_UPLOAD_MEMORY_SIZE_PROPERTY);
-        int maxMemorySize = (maxMemorySizeProperty != null) ? maxMemorySizeProperty.intValue() : RequestGenerator.DEFAULT_MAX_UPLOAD_MEMORY_SIZE;
-        return maxMemorySize;
+        return (maxMemorySizeProperty != null) ? maxMemorySizeProperty.intValue() : RequestGenerator.DEFAULT_MAX_UPLOAD_MEMORY_SIZE;
     }
 }

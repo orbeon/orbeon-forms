@@ -211,7 +211,7 @@ public class InstanceData {
 
     public static String getType(NodeInfo nodeInfo) {
         final InstanceData existingInstanceData = getLocalInstanceData(nodeInfo, false);
-        if (existingInstanceData == null) {
+        if (existingInstanceData == null || existingInstanceData.type == null) {
             // No type was assigned by schema or MIP
             if (nodeInfo.getNodeKind() == org.w3c.dom.Document.ELEMENT_NODE) {
                 // Check for xsi:type attribute
@@ -253,7 +253,7 @@ public class InstanceData {
 
     public static String getType(Node node) {
         final InstanceData existingInstanceData = getLocalInstanceData(node);
-        if (existingInstanceData == null) {
+        if (existingInstanceData == null || existingInstanceData.type == null) {
             // No type was assigned by schema or MIP
             if (node instanceof Element) {
                 // Check for xsi:type attribute

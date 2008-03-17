@@ -38,6 +38,8 @@
         <!-- Scope variable with Form Runner resources -->
         <xxforms:variable name="fr-resources" select="xxforms:instance('fr-fr-current-resources')"/>
 
+        <xsl:variable name="label" select="xforms:label"/>
+
         <xsl:if test="@width and not(@width = ('750px', '950px', '974px'))">
             <xsl:message terminate="yes">Value of fr:view/@view is not valid</xsl:message>
         </xsl:if>
@@ -78,7 +80,6 @@
                     <xhtml:div id="yui-main">
                         <xhtml:div class="yui-b">
                             <xhtml:div class="yui-g fr-logo">
-                                <xxforms:variable name="label" select="xforms:label"/>
                                 <xforms:group model="fr-form-model" appearance="xxforms:internal">
                                     <xhtml:table class="fr-layout-table">
                                         <xhtml:tr>
@@ -87,17 +88,19 @@
                                             </xhtml:td>
                                             <xhtml:td>
                                                 <xhtml:h1>
-                                                    <xforms:output value="((instance('fr-form-metadata')/title, $label/@ref, $label, /xhtml:html/xhtml:head/xhtml:title)[normalize-space() != ''])[1]"/>
+                                                    <xforms:output value="((instance('fr-form-metadata')/title, ({$label/@ref}), '{$label}', /xhtml:html/xhtml:head/xhtml:title)[normalize-space() != ''])[1]"/>
                                                 </xhtml:h1>
                                             </xhtml:td>
                                         </xhtml:tr>
-                                        <xhtml:tr>
-                                            <xhtml:td>
-                                                <xhtml:div class="fr-form-description">
-                                                    <xforms:output value="instance('fr-form-metadata')/description"/>
-                                                </xhtml:div>
-                                            </xhtml:td>
-                                        </xhtml:tr>
+                                        <xforms:group ref=".[normalize-space(instance('fr-form-metadata')/description) != '']">
+                                            <xhtml:tr>
+                                                <xhtml:td>
+                                                    <xhtml:div class="fr-form-description">
+                                                        <xforms:output value="instance('fr-form-metadata')/description"/>
+                                                    </xhtml:div>
+                                                </xhtml:td>
+                                            </xhtml:tr>
+                                        </xforms:group>
                                     </xhtml:table>
                                 </xforms:group>
                             </xhtml:div>
@@ -501,7 +504,7 @@
     <xsl:template match="xhtml:body//fr:grid">
         <xhtml:table class="fr-grid fr-grid-{@columns}-columns">
             <!-- Grid content -->
-            <xsl:apply-templates select="* except xforms:label"/>
+            <xsl:apply-templates select="* except xforms:label" mode="grid-content"/>
         </xhtml:table>
     </xsl:template>
 
@@ -662,6 +665,16 @@
         <!-- Handle checking dirty status -->
         <xi:include href="includes/check-dirty-script.xhtml" xxi:omit-xml-base="true"/>
 
+    </xsl:template>
+
+    <xsl:template match="xhtml:td" mode="grid-content">
+        <xsl:copy>
+            <xsl:copy-of select="@*"/>
+            <xsl:attribute name="class" select="string-join(('fr-grid-td', @class), ' ')"/>
+            <xhtml:div class="fr-grid-content">
+                <xsl:apply-templates/>
+            </xhtml:div>
+        </xsl:copy>
     </xsl:template>
 
     <xsl:template match="xhtml:tr" mode="prepend-td">

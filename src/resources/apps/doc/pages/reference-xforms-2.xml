@@ -943,17 +943,17 @@
                             </xml-source>
                         </li>
                         <li>
-                            <a name="xxforms-get-header"/>
+                            <a name="xxforms-get-request-header"/>
                             <p>
-                                <code>xxforms:get-header($header-name as xs:string) as xs:string*</code>
+                                <code>xxforms:get-request-header($header-name as xs:string) as xs:string*</code>
                             </p>
                             <p>
-                                The <code>xxforms:get-header()</code> function returns the value(s) of the given
-                                request HTTP header.
+                                The <code>xxforms:get-request-header()</code> function returns the value(s) of the
+                                given request HTTP header.
                             </p>
                             <xml-source show-namespaces="false">
                                 <comment> Remember the User-Agent header </comment>
-                                <xforms:setvalue ref="user-agent" select="xxforms:get-header('User-Agent')"/>
+                                <xforms:setvalue ref="user-agent" select="xxforms:get-request-header('User-Agent')"/>
                             </xml-source>
                             <note>
                                 <p>
@@ -965,17 +965,17 @@
                             </note>
                         </li>
                         <li>
-                            <a name="xxforms-get-parameter"/>
+                            <a name="xxforms-get-request-parameter"/>
                             <p>
-                                <code>xxforms:get-parameter($parameter-name as xs:string) xs:string*</code>
+                                <code>xxforms:get-request-parameter($parameter-name as xs:string) xs:string*</code>
                             </p>
                             <p>
-                                The <code>xxforms:get-parameter()</code> function returns the value(s) of the given
-                                request parameter.
+                                The <code>xxforms:get-request-parameter()</code> function returns the value(s) of the
+                                given request parameter.
                             </p>
                             <xml-source show-namespaces="false">
                                 <comment> Remember the "columns" parameter </comment>
-                                <xforms:setvalue ref="columns" select="xxforms:get-parameter('columns')"/>
+                                <xforms:setvalue ref="columns" select="xxforms:get-request-parameter('columns')"/>
                             </xml-source>
                             <note>
                                 <p>

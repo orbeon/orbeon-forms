@@ -21,7 +21,7 @@ import org.orbeon.saxon.value.StringValue;
 
 public class Property extends XFormsFunction {
 
-    private static final StringValue VERSION = new StringValue("1.0");
+    private static final StringValue VERSION = new StringValue("1.1");
     private static final StringValue CONFORMANCE = new StringValue("full");
 
     private static final String VERSTION_PROPERTY = "version";

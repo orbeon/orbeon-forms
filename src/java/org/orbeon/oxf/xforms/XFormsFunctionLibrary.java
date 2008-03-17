@@ -129,11 +129,11 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
         // OPS XXForms functions
 
         // xxforms:get-header()
-        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI + "}get-header", XXFormsGetHeader.class, 0, 1, 1, Type.STRING_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);
+        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI + "}get-request-header", XXFormsGetRequestHeader.class, 0, 1, 1, Type.STRING_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);
         StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
 
         // xxforms:get-parameter()
-        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI + "}get-parameter", XXFormsGetParameter.class, 0, 1, 1, Type.STRING_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);
+        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI + "}get-request-parameter", XXFormsGetRequestParameter.class, 0, 1, 1, Type.STRING_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);
         StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
 
         // xxforms:call-xpl

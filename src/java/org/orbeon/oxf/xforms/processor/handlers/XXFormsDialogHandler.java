@@ -75,7 +75,10 @@ public class XXFormsDialogHandler extends HandlerBase {
         } else {
             // Two nested xhtml:div
             reusableAttributes.clear();
+            reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "bd1");
             contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, reusableAttributes);
+            reusableAttributes.clear();
+            reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "bd2");
             contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, reusableAttributes);
         }
     }

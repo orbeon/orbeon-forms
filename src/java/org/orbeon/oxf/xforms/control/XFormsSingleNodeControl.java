@@ -76,7 +76,7 @@ public class XFormsSingleNodeControl extends XFormsControl {
 
     private void checkMIPsRead() {
         if (!mipsRead)
-            throw new OXFException("Control not evaluated when getting MIPs.");
+            throw new OXFException("Control not evaluated when getting MIPs for control: " + getEffectiveId());
     }
 
     protected void getMIPsIfNeeded() {

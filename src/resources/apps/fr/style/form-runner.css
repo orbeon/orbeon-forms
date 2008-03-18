@@ -326,13 +326,12 @@ div.fr-collapsible {
 .xforms-select-appearance-full span input { float: left; }
 .xforms-select-appearance-full span label { float: right; }
 /* Size of text for check boxes; needs to be set for every page width / columns number combination */
-#doc .fr-grid-2-columns .xforms-select-appearance-full span label { width: 24em; }
-#doc4 .fr-grid-4-columns .xforms-select-appearance-full span label { width: 14.5em; }
+#doc .fr-grid-2-columns .xforms-select-appearance-full span label { width: 22.5em; *width: 21.9em }
+#doc4 .fr-grid-4-columns .xforms-select-appearance-full span label { width: 14.5em; *width: 14.1em }
 
 /* Grid */
 
-.fr-grid { width: 100%; border-collapse: separate; clear: both; border: 1px solid red; margin-bottom: 0; }
-.fr-grid-td { border: 1px solid red;  }
+.fr-grid { width: 100%; border-collapse: separate; clear: both; margin-bottom: 0; }
 .fr-grid tr th { text-align: left }
 
 .fr-grid .fr-layout-table tr td { width: auto }
@@ -353,13 +352,16 @@ div.fr-collapsible {
 .fr-grid-td .fb-grid-content { width: 64em; *width: 60em }
 
 .fr-grid-2-columns .fr-grid-td { width: 50%; }
-.fr-grid-2-columns .fr-grid-td .fr-grid-content { width: 34em; *width: 32em }
+#doc .fr-grid-2-columns .fr-grid-td .fr-grid-content { width: 25em; *width: 24.4em }
+#doc4 .fr-grid-2-columns .fr-grid-td .fr-grid-content { width: 34em; *width: 32em }
 
 .fr-grid-3-columns .fr-grid-td { width: 33.3%; }
-.fr-grid-3-columns .fr-grid-td .fr-grid-content { width: 22em; *width: 24em }
+#doc .fr-grid-3-columns .fr-grid-td .fr-grid-content { width: 17em; *width: 16.6em }
+#doc4 .fr-grid-3-columns .fr-grid-td .fr-grid-content { width: 22em; *width: 21.4em }
 
 .fr-grid-4-columns .fr-grid-td { width: 25%; }
-.fr-grid-4-columns .fr-grid-td .fr-grid-content { width: 16.5em; *width: 16.5em }
+#doc .fr-grid-4-columns .fr-grid-td .fr-grid-content { width: 16.5em; *width: 16.1em }
+#doc4 .fr-grid-4-columns .fr-grid-td .fr-grid-content { width: 12.7em; *width: 12.7em }
 
 /* Upload control information */
 .xforms-upload-info { display: block; width: 100%; background-color: #FFFFDD; padding: 2px }

@@ -552,15 +552,16 @@
         <move file="${deployDir}/${release.number}/${project.name}-${release.number}.zip" tofile="${deployDir}/${release.number}/${project.name}.zip"/>
 
         <!-- Post the unstable build -->
-        <exec executable='rsync' failonerror='true' dir='${deployDir}/${release.number}' >
-          <arg value='--stats' />
-          <arg value='-z' />
-          <arg value='-c' />
-          <arg value='--rsh=/usr/bin/ssh' />
-          <arg value='build.log' />
-          <arg value='${project.name}.war' />
-          <arg value='${project.name}.zip' />
-          <arg value='orbeonbld2@forge.objectweb.org:/var/lib/gforge/chroot/home/groups/ops/htdocs/unstable/ops' />
+        <exec executable='rsync' failonerror='true' dir='${deployDir}/${release.number}'>
+            <arg value='--stats'/>
+            <arg value='-z'/>
+            <arg value='-c'/>
+            <arg value='--rsh=/usr/bin/ssh'/>
+            <arg value='build.log'/>
+            <arg value='${project.name}.war'/>
+            <arg value='${project.name}.zip'/>
+            <arg value='${project.name}-src.zip'/>
+            <arg value='orbeonbld2@forge.objectweb.org:/var/lib/gforge/chroot/home/groups/ops/htdocs/unstable/ops'/>
         </exec>
 
         <delete>

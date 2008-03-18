@@ -1338,7 +1338,7 @@
                                     <code>action</code> and <code>resource</code>
                                 </li>
                                 <li>
-                                    <code>target</code>
+                                    <code>xxforms:target</code>
                                 </li>
                                 <li>
                                     <code>xxforms:username</code>

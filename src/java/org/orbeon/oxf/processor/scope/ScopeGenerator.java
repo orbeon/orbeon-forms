@@ -92,8 +92,6 @@ public class ScopeGenerator extends ScopeProcessorBase {
                                 : null;
 
                         if (value != null) {
-
-                            final Mapping mapping;
                             if (value instanceof ScopeStore) {
                                 // Use the stored key/validity as internal key/validity
                                 final ScopeStore contextStore = (ScopeStore) value;
@@ -106,19 +104,21 @@ public class ScopeGenerator extends ScopeProcessorBase {
                                     state.key = null;
                                     state.validity = null;
                                 }
-                                // Don't get mappings in this case
-                                mapping = null;
+
+                                // Just get SAXStore from ScopeStore
+                                state.saxStore = contextStore.getSaxStore();
                             } else {
-                                // Get mappings
+                                // Get mappings if present
+                                final Mapping mapping;
                                 if (getConnectedInputs().get(INPUT_MAPPING) == null) {
                                     mapping = new Mapping();
                                     mapping.loadMapping(new InputSource(new StringReader("<mapping/>")));
                                 } else {
                                     mapping = readMapping(pipelineContext);
                                 }
-                            }
 
-                            getSAXStore(value, mapping);
+                                state.saxStore = getSAXStore(value, mapping);
+                            }
                         } else {
                             // Store empty document
                             if (nullDocumentSAXStore == null) {

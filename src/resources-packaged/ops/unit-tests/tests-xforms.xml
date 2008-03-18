@@ -823,7 +823,7 @@
                     </count-non-empty>
                 </number>
                 <string>
-                    <property-version xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">1.0</property-version>
+                    <property-version xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">1.1</property-version>
                     <property-conformance xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">full</property-conformance>
                 </string>
                 <date>

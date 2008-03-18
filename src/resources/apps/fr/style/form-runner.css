@@ -201,11 +201,12 @@ label.xforms-disabled, span.xforms-disabled, div.xforms-disabled  {
 
 /* Repeats: all */
 .fr-repeat td { vertical-align: top; padding: 0.2em }
+/* First column of the table with the number displayed */
 .fr-repeat .fr-repeat-column { width: auto; }
 .fr-repeat {
     background-color: #EEEEEE;
-    margin: 1em 0 1em 0;
-    width: 100%;
+    /* Fix for Firefox in cases where the top and left borders of the table are not displayed */
+    margin: 1px 0 0 1px;
 }
 
 /* Repeats: shows as sections (can have multiple lines per iteration; repeated field labels) */
@@ -213,14 +214,9 @@ label.xforms-disabled, span.xforms-disabled, div.xforms-disabled  {
 .fr-repeat-sections .xforms-label { margin-top: 0; }
 
 /* Repeats: shows as table (1 line per iteration; labels used as header of table) */
-.fr-repeat-table {
-    border-collapse: collapse;
-    /* Fix for Firefox in cases where the right-most border of the table is not displayed */
-    /*margin: 1px ;*/
-}
-.fr-repeat-table td , .fr-repeat-table th {
-    border: 1px solid black;
-}
+.fr-repeat-table { border-collapse: collapse; }
+.fr-repeat-table td , .fr-repeat-table th { border: 1px solid black; padding: .2em .5em .2em .5em; }
+.fr-repeat-table th { background-color: #DDDDDD; }
 .fr-repeat-table .xforms-label { display: none; }
 
 .fr-non-collapsible { padding-left: 1.1em; }

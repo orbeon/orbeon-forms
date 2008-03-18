@@ -3134,7 +3134,7 @@ ORBEON.xforms.Server = {
                                                  var parentElement = documentElement.parentNode;
                                                  var newDocumentElement = document.createElement("span");
                                                  newDocumentElement.setAttribute("id", controlId);
-                                                 newDocumentElement.setAttribute("class", documentElementClasses.join(" ") + " xforms-static");
+                                                 newDocumentElement.classname = documentElementClasses.join(" ") + " xforms-static";
                                                  parentElement.replaceChild(newDocumentElement, documentElement);
                                                  // Remove alert
                                                  var alertElement = ORBEON.xforms.Controls._getControlLabel(newDocumentElement, "xforms-alert");
@@ -3483,7 +3483,10 @@ ORBEON.xforms.Server = {
                                         var forAttribute = ORBEON.util.Dom.getAttribute(attributeElement, "for");
                                         var nameAttribute = ORBEON.util.Dom.getAttribute(attributeElement, "name");
                                         var htmlElement = ORBEON.util.Dom.getElementById(forAttribute);
-                                        htmlElement.setAttribute(nameAttribute, newAttributeValue);
+                                        if (nameAttribute == "class")
+                                            htmlElement.className = newAttributeValue;// don't use setAttribute with IE
+                                        else
+                                            htmlElement.setAttribute(nameAttribute, newAttributeValue);
                                     }
 
                                     // Model item properties on a repeat item

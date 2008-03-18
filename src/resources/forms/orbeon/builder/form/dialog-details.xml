@@ -44,7 +44,7 @@
                     <xforms:value>fr-search</xforms:value>
                 </xforms:item>
             </xforms:select>
-            <xhtml:div class="dialog-button">
+            <xhtml:div class="dialog-buttons">
                 <xforms:trigger class="fr-inplace-rename" ref="change-trigger" id="fb-edit-details-control-name-trigger">
                     <xforms:label>Change</xforms:label>
                 </xforms:trigger>

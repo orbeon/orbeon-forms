@@ -83,7 +83,7 @@
                                 <xforms:group model="fr-form-model" appearance="xxforms:internal">
                                     <xhtml:table class="fr-layout-table">
                                         <xhtml:tr>
-                                            <xhtml:td rowspan="2">
+                                            <xhtml:td>
                                                 <xforms:output value="((instance('fr-form-metadata')/logo, '/apps/fr/style/orbeon-logo-trimmed-transparent-42.png')[normalize-space() != ''])[1]" mediatype="image/*"/>
                                             </xhtml:td>
                                             <xhtml:td>
@@ -92,23 +92,23 @@
                                                 </xhtml:h1>
                                             </xhtml:td>
                                         </xhtml:tr>
-                                        <xforms:group ref=".[normalize-space(instance('fr-form-metadata')/description) != '']">
-                                            <xhtml:tr>
-                                                <xhtml:td>
-                                                    <xhtml:div class="fr-form-description">
-                                                        <xforms:output value="instance('fr-form-metadata')/description"/>
-                                                    </xhtml:div>
-                                                </xhtml:td>
-                                            </xhtml:tr>
-                                        </xforms:group>
                                     </xhtml:table>
                                 </xforms:group>
                             </xhtml:div>
                             <xhtml:div class="yui-g fr-separator">
                             </xhtml:div>
                             <xhtml:div class="yui-g fr-body">
+
+                                <!-- Optional description-->
+                                <xforms:group model="fr-form-model" ref=".[normalize-space(instance('fr-form-metadata')/description) != '']">
+                                    <xhtml:div class="fr-form-description">
+                                        <xforms:output value="instance('fr-form-metadata')/description"/>
+                                    </xhtml:div>
+                                </xforms:group>
+
                                 <!-- Set context on form instance and define this group as #fr-form-group as observers will refer to it -->
                                 <xforms:group id="fr-form-group" model="fr-form-model" ref="instance('fr-form-instance')">
+
                                     <!-- Main form content -->
                                     <xsl:apply-templates select="fr:body/node()"/>
                                 </xforms:group>

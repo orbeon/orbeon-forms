@@ -31,7 +31,7 @@
         <xforms:model id="fr-form-model">
 
             <xforms:action ev:event="xforms-model-construct-done">
-                <xxforms:variable name="user-agent" select="xxforms:get-header('user-agent')"/>
+                <xxforms:variable name="user-agent" select="xxforms:get-request-header('user-agent')"/>
                 <xforms:setvalue ref="instance('fb-user-agent-instance')/value" value="$user-agent"/>
                 <xforms:setvalue ref="instance('fb-user-agent-instance')/is-ie"
                                  value="contains(lower-case($user-agent), 'msie') and not(contains(lower-case($user-agent), 'opera'))"/>
@@ -925,76 +925,60 @@
 
                 -->
 
-                <xforms:group class="fb-language-choice fb-hide-alert">
-                    <xforms:select1 appearance="minimal" ref="$lang" id="fb-resources-language-select">
-                        <xforms:label>Resources Language</xforms:label>
-                        <xforms:itemset nodeset="$resources/resource">
-                            <xforms:label value="xxforms:instance('fr-languages-instance')/language[@code = context()/@xml:lang]/(if (@native-name != @english-name) then concat(@native-name, ' (', @english-name, ')') else @native-name)"/>
-                            <xforms:value ref="@xml:lang"/>
-                        </xforms:itemset>
-                    </xforms:select1>
-                    <xforms:group class="fb-language-triggers">
-                        <xforms:trigger appearance="minimal">
-                            <xforms:label>Add</xforms:label>
-                            <xxforms:show ev:event="DOMActivate" dialog="fb-add-language-dialog" neighbor="fb-resources-language-select"/>
-                        </xforms:trigger>
-                        <xforms:trigger appearance="minimal" id="fb-language-remove" ref=".[count($resources/resource) gt 1]">
-                            <xforms:label>Remove</xforms:label>
-                            <xforms:action ev:event="DOMActivate">
-                                <!-- Ask confirmation -->
-                                <xforms:setvalue ref="$variables/confirmation-message"
-                                                 value="concat('Are you sure you want to delete all resources for language ''',
-                                                 xxforms:instance('fr-languages-instance')/language[@code = $lang]/(if (@native-name != @english-name) then concat(@native-name, ' (', @english-name, ')') else @native-name),
-                                                 '''?')"/>
-                                <xforms:setvalue ref="$variables/confirmation-target">fb-language-remove</xforms:setvalue>
-                                <xxforms:show dialog="fb-confirmation-dialog"/>
-                            </xforms:action>
-                            <xforms:action ev:event="fb-confirmation-yes">
-                                <!-- Delete resources for this language -->
-                                <xforms:delete nodeset="$resources/resource[@xml:lang = $lang]"/>
-                                <xforms:setvalue ref="$lang" value="$resources/resource[1]/@xml:lang"/>
-                            </xforms:action>
-                        </xforms:trigger>
-                    </xforms:group>
-                </xforms:group>
+
 
                 <!-- Section about form metadata -->
                 <fr:section id="fb-metadata-section" class="fb-metadata-section">
                     <xforms:label>Form Metadata</xforms:label>
 
-                    <xforms:input id="application-name-control" bind="application-name-bind" appearance="fr:in-place" class="fr-summary fr-search">
-                        <xforms:label ref="$form-resources/application-name"/>
-                    </xforms:input>
-
-                    <xforms:input id="form-name-control" bind="form-name-bind" appearance="fr:in-place" class="fr-summary fr-search">
-                        <xforms:label ref="$form-resources/form-name"/>
-                    </xforms:input>
-
-                    <xforms:input id="title-control" bind="title-bind" appearance="fr:in-place" class="fr-summary fr-search">
-                        <xforms:label ref="$form-resources/title"/>
-                    </xforms:input>
-
-                    <xforms:textarea id="description-control" bind="description-bind" appearance="fr:in-place" class="fr-summary fr-search">
-                        <xforms:label ref="$form-resources/description"/>
-                    </xforms:textarea>
-
-                    <!-- Image -->
-                    <xforms:group>
-                        <xforms:label>Logo</xforms:label>
-                        <xforms:group ref="$metadata-instance/logo[normalize-space() != '']">
-                            <xforms:output ref="." mediatype="image/*">
-                                <xforms:label class="fb-xforms-disabled"/>
-                            </xforms:output>
-                        </xforms:group>
-                        <!-- File chooser -->
-                        <xforms:upload id="logo-control" bind="logo-bind" class="fr-attachment">
-                            <xforms:label class="fb-xforms-disabled"/>
-                            <xforms:filename ref="@filename"/>
-                            <xforms:mediatype ref="@mediatype"/>
-                            <xxforms:size ref="@size"/>
-                        </xforms:upload>
-                    </xforms:group>
-
+                    <fr:grid columns="2">
+                        <xhtml:tr>
+                            <xhtml:td>
+                                <xforms:input id="application-name-control" bind="application-name-bind" appearance="fr:in-place" class="fr-summary fr-search">
+                                    <xforms:label ref="$form-resources/application-name"/>
+                                </xforms:input>
+                            </xhtml:td>
+                            <xhtml:td>
+                                <xforms:input id="form-name-control" bind="form-name-bind" appearance="fr:in-place" class="fr-summary fr-search">
+                                    <xforms:label ref="$form-resources/form-name"/>
+                                </xforms:input>
+                            </xhtml:td>
+                        </xhtml:tr>
+                        <xhtml:tr>
+                            <xhtml:td>
+                                <!-- Image -->
+                                <xforms:group>
+                                    <xforms:label>Logo</xforms:label>
+                                    <xforms:group ref="$metadata-instance/logo[normalize-space() != '']" class="xxx">
+                                        <xforms:output ref="." mediatype="image/*">
+                                            <xforms:label class="fb-xforms-disabled"/>
+                                        </xforms:output>
+                                    </xforms:group>
+                                    <!-- File chooser -->
+                                    <xforms:upload id="logo-control" bind="logo-bind" class="fr-attachment">
+                                        <xforms:label class="fb-xforms-disabled"/>
+                                        <xforms:filename ref="@filename"/>
+                                        <xforms:mediatype ref="@mediatype"/>
+                                        <xxforms:size ref="@size"/>
+                                    </xforms:upload>
+                                </xforms:group>
+                            </xhtml:td>
+                            <xhtml:td>
+                                <xforms:input id="title-control" bind="title-bind" appearance="fr:in-place" class="fr-summary fr-search">
+                                    <xforms:label ref="$form-resources/title"/>
+                                </xforms:input>
+                            </xhtml:td>
+                        </xhtml:tr>
+                        <xhtml:tr>
+                            <xhtml:td colspan="2">
+                                <xhtml:div>
+                                    <xforms:textarea id="description-control" bind="description-bind" appearance="fr:in-place" class="fr-summary fr-search">
+                                        <xforms:label ref="$form-resources/description"/>
+                                    </xforms:textarea>
+                                </xhtml:div>
+                            </xhtml:td>
+                        </xhtml:tr>
+                    </fr:grid>
                 </fr:section>
 
                 <!-- Form details -->
@@ -1267,6 +1251,7 @@
                                                                                     </xforms:trigger>
                                                                                 </xforms:group>
                                                                             </xhtml:div>
+
                                                                             <xforms:group ref=".[$control]" class="fb-grid-control-icons">
                                                                                 <!-- Edit details for any control -->
                                                                                 <xforms:trigger appearance="minimal" id="fb-edit-details-trigger">
@@ -1345,7 +1330,6 @@
                                                                                         </xforms:action>
                                                                                     </xforms:trigger>
                                                                                 </xforms:group>
-
                                                                             </xforms:group>
 
 
@@ -1485,6 +1469,7 @@
                                                                                                 </xforms:output>
                                                                                             </xforms:group>
                                                                                             <!-- File chooser -->
+                                                                                            <!--<xhtml:img width="16" height="16" src="../../../../forms/orbeon/builder/images/image.png"/>-->
                                                                                             <xforms:upload ref="$instance-holder">
                                                                                                 <xforms:label class="fb-xforms-disabled"/>
                                                                                                 <xforms:filename ref="@filename"/>
@@ -1515,6 +1500,10 @@
                                                                     </xforms:repeat>
                                                                 </xhtml:tr>
                                                             </xforms:repeat>
+                                                            <!-- IE hack so that the bottom border shows up -->
+                                                            <xhtml:tr>
+                                                                <xhtml:td/>
+                                                            </xhtml:tr>
                                                         </xhtml:tbody>
                                                     </xhtml:table>
                                                 </xhtml:div>
@@ -1610,9 +1599,9 @@
                     <xhtml:div>
                         <xforms:group class="fb-hide-alert">
                             <xforms:textarea ref="$variables/new-text">
-                                <xforms:label>Help Message:</xforms:label>
+                                <xforms:label>Help Message</xforms:label>
                             </xforms:textarea>
-                            <xhtml:div>
+                            <xhtml:div class="dialog-buttons">
                                 <xforms:trigger class="fr-inplace-rename">
                                     <xforms:label>Change</xforms:label>
                                     <xforms:setvalue ev:event="DOMActivate" ref="$form-instance/root()/saxon:evaluate($variables/result-node)" value="$variables/new-text"/>
@@ -1636,13 +1625,13 @@
                     <xhtml:div class="fb-xml-dialog-view">
                         <xforms:output mediatype="text/html" value="$variables/xml-view"/>
                     </xhtml:div>
-                    <xhtml:div class="dialog-button">
+                    <xhtml:div class="dialog-buttons">
                         <xforms:trigger>
                             <xforms:label><xhtml:img src="/apps/fr/style/close.gif" alt=""/> <xhtml:span>Close</xhtml:span></xforms:label>
+                            <!-- Hide dialog -->
+                            <xxforms:hide ev:event="DOMActivate" dialog="fb-xml-dialog"/>
                         </xforms:trigger>
                     </xhtml:div>
-                    <!-- Hide dialog -->
-                    <xxforms:hide ev:event="DOMActivate" dialog="fb-xml-dialog"/>
                     <!-- Serialize XML when the dialog opens-->
                     <xforms:setvalue ev:event="xxforms-dialog-open" ref="$variables/xml-view"
                                      value="xxforms:serialize(xxforms:call-xpl(
@@ -1657,7 +1646,7 @@
                     <xhtml:div class="fb-xml-dialog-view">
                         <xforms:textarea ref="$variables/new-source"/>
                     </xhtml:div>
-                    <xhtml:div class="dialog-button">
+                    <xhtml:div class="dialog-buttons">
                         <xhtml:span class="fr-inplace-buttons">
                             <xforms:trigger class="fr-inplace-rename" ref="$variables/new-source-trigger">
                                 <xforms:label>Save</xforms:label>
@@ -1743,7 +1732,7 @@
                             <xforms:output value="$variables/confirmation-message"/>
                         </xhtml:div>
                     </xhtml:div>
-                    <xhtml:div class="dialog-button">
+                    <xhtml:div class="dialog-buttons">
                         <xforms:group>
                             <xforms:trigger>
                                 <xforms:label><xhtml:img src="/apps/fr/style/clear.gif" alt=""/> <xhtml:span>Delete</xhtml:span></xforms:label>
@@ -1813,7 +1802,7 @@
 
                         </xhtml:div>
                     </xhtml:div>
-                    <xhtml:div class="dialog-button">
+                    <xhtml:div class="dialog-buttons">
                         <xforms:group>
                             <xforms:trigger class="xforms-trigger-appearance-modal">
                                 <xforms:label>

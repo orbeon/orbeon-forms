@@ -69,7 +69,7 @@ h1 { margin-top: 0 }
 .fr-body .section h3 {
     font-size: 110%;
     font-family: inherit;
-    background: #ffffff;
+    background-color: #ffffff;
     color: #000000
 }
 
@@ -84,14 +84,17 @@ h1 { margin-top: 0 }
     background-image: url(logo-bg.gif);
     background-position: top;
     padding: 1em;
-    min-height: 75px; height: auto !important; height: 75px
+    min-height: 50px; height: auto !important; height: 50px
 }
 
 .fr-logo table { width: 100% }
 .fr-logo table tr td { vertical-align: middle }
 .fr-logo img { margin-right: 1em }
-.fr-logo h1 { margin: 0 0 .5em 0; padding: 0; font-weight: normal; white-space: nowrap; color: #3598d4 }
-.fr-logo .fr-form-description { margin: 0; padding: .5em; border: 4px solid #3598d4; background-color: white }
+.fr-logo h1 { margin: 0; padding: 0; font-weight: normal; white-space: nowrap; color: #3598d4 }
+
+.fr-form-description { display: block; margin: 2em; padding: 1em; border: 4px solid #3598d4; background-color: white }
+
+ /*{ margin: 0; padding: .5em; border: 4px solid #3598d4; background-color: white }*/
 
 .fr-header { overflow: hidden;  }
 .fr-summary-language-choice { float: right; margin-right: 1em; margin-top: .2em; color: gray; font-size: 85%; text-align: right; }
@@ -142,8 +145,6 @@ button.xforms-trigger img { padding-right: 10px; }
 .fr-layout-table { padding: 0; margin: 0 }
 .fr-layout-table tr td { width: auto; vertical-align: top }
 
-.fr-grid .fr-layout-table tr td { width: auto }
-
 h2 a, h3 a, h4 a {
     color: black;
     vertical-align: middle;
@@ -164,16 +165,13 @@ h3, h4 {
     padding: 0 0 0 0;
 }
 
-.xforms-repeat-selected-item-1 { background: transparent }
-.xforms-repeat-selected-item-2 { background: transparent }
-.xforms-repeat-selected-item-3 { background: transparent }
-.xforms-repeat-selected-item-4 { background: transparent }
+.xforms-repeat-selected-item-1 { background-color: transparent }
+.xforms-repeat-selected-item-2 { background-color: transparent }
+.xforms-repeat-selected-item-3 { background-color: transparent }
+.xforms-repeat-selected-item-4 { background-color: transparent }
 
-.fr-summary-table tbody .xforms-repeat-selected-item-1 { background: #3598D4 }
-/*.fr-summary-table .xforms-repeat-selected-item-2 { background: #3598D4 }*/
-
-.fr-summary-table tbody tr:hover { background: #3598D4 }
-/*.fr-summary-table tbody tr:hover.xforms-repeat-selected-item-1  { background: white }*/
+.fr-summary-table tbody .xforms-repeat-selected-item-1 { background-color: #3598D4 }
+.fr-summary-table tbody tr:hover { background-color: #3598D4 }
 
 .fr-summary-welcome-message { display: block; margin-top: 1em; margin-bottom: 1em }
 
@@ -330,7 +328,8 @@ div.fr-collapsible {
 /* Radio buttons spacing */
 /*.xforms-select1-appearance-full label { margin-left: .5em; margin-right: 1em }*/
 
-/* Space before paragraph in sections */
+/* Sections */
+.fr-section-container { display: block; clear: both }
 .fr-section-container p { margin-top: 1em; }
 .fr-section-container img.fr-open-close { margin-right: .5em }
 
@@ -346,32 +345,17 @@ div.fr-collapsible {
 
 /* Grid */
 
-/* Column widths */
-
-.fr-grid { width: 100%}
-/*.fr-grid td { border: 1px solid red  }*/
-/* TODO: Figure out a reliable way to control IE's cell content */
-.fr-grid-1-columns tr td { *width: 68em }
-.fr-grid-2-columns tr td { width: 50%; *width: 33.5em }
-.fr-grid-3-columns tr td { width: 33.3%; *width: 21.5em }
-.fr-grid-4-columns tr td { width: 25%; *width: 14em }
-
-/*.fr-grid-5-columns tr td { width: 20%; *width: 13.6em  }*/
-/*.fr-grid-6-columns tr td { width: 16.6%; *width: 11.33em }*/
-
-/* Cell details */
+.fr-grid { width: 100%; border-collapse: separate; clear: both; border: 1px solid red }
+.fr-grid-td { border: 1px solid red }
 .fr-grid tr th { text-align: left }
-.fr-grid { width: 100%; border-collapse: collapse }
-.fr-grid tr td { vertical-align: top }
-.fr-grid td { padding: .5em }
+
+.fr-grid .fr-layout-table tr td { width: auto }
 
 /* Cell content */
 .fr-grid .xforms-input input { width: 100% }
 .fr-grid .fr-inplace-value { width: 100% }
 .fr-grid textarea.xforms-textarea { width: 100% }
 .fr-grid .xforms-select1-appearance-minimal { width: 100% }
-/*.fr-grid .xforms-select1-appearance-full { width: 100%; display: block }*/
-/*.fr-grid .xforms-select1-appearance-full span { white-space: nowrap; display: block }*/
 .fr-grid .xforms-select1-appearance-compact { width: 100%; height: 6em }
 .fr-grid .xforms-select-appearance-compact { width: 100%; height: 6em }
 
@@ -379,33 +363,17 @@ div.fr-collapsible {
 .fr-grid .xforms-mediatype-image { width: 100%; overflow: auto; display: block }
 .fr-grid .xforms-mediatype-image img { display: block }
 
-/*#doc4 .fr-section-container .xforms-input input { width: 63em }*/
-/*#doc4 .fr-section-container textarea.xforms-textarea { width: 63em }*/
-/*#doc4 .fr-section-container .xforms-textarea-appearance-xxforms-autosize { width: 63em }*/
-/*#doc4 .fr-section-container .xforms-select1-appearance-minimal { width: 63em }*/
+.fr-grid-td { width: auto; padding: .5em; vertical-align: top; overflow: hidden }
+.fr-grid-td .fb-grid-content { width: 64em; *width: 60em }
 
-/*#doc .fr-grid-1-columns .xforms-input input { width: 46em }*/
-/*#doc .fr-grid-1-columns textarea.xforms-textarea { width: 46em }*/
-/*#doc .fr-grid-1-columns .xforms-textarea-appearance-xxforms-autosize { width: 46em; }*/
-/*#doc .fr-grid-1-columns .xforms-select1-appearance-minimal { width: 46em; }*/
-/*#doc .fr-grid-1-columns .xforms-select-appearance-full label { float: right; width: 47em; *width: 45.86em; padding-right: 5em; }*/
+.fr-grid-2-columns .fr-grid-td { width: 50%; }
+.fr-grid-2-columns .fr-grid-td .fr-grid-content { width: 34em; *width: 32em }
 
-/*#doc .fr-grid-2-columns .xforms-input input { width: 22em }*/
-/*#doc .fr-grid-2-columns textarea.xforms-textarea { width: 22em }*/
-/*#doc .fr-grid-2-columns .xforms-textarea-appearance-xxforms-autosize { width: 22em; }*/
-/*#doc .fr-grid-2-columns .xforms-select1-appearance-minimal { width: 22em; }*/
-/*#doc .fr-grid-2-columns .xforms-select-appearance-full label { float: right; width: 90%; }*/
+.fr-grid-3-columns .fr-grid-td { width: 33.3%; }
+.fr-grid-3-columns .fr-grid-td .fr-grid-content { width: 22em; *width: 24em }
 
-
-/*#doc4 .fr-grid-1-columns .xforms-input input { width: 63em }*/
-/*#doc4 .fr-grid-1-columns textarea.xforms-textarea { width: 63em }*/
-/*#doc4 .fr-grid-1-columns .xforms-textarea-appearance-xxforms-autosize { width: 63em; }*/
-/*#doc4 .fr-grid-1-columns .xforms-select1-appearance-minimal { width: 63em }*/
-
-/*#doc4 .fr-grid-2-columns .xforms-input input { width: 31em }*/
-/*#doc4 .fr-grid-2-columns textarea.xforms-textarea { width: 31em }*/
-/*#doc4 .fr-grid-2-columns .xforms-textarea-appearance-xxforms-autosize { width: 31em }*/
-/*#doc4 .fr-grid-2-columns .xforms-select1-appearance-minimal { width: 31em }*/
+.fr-grid-4-columns .fr-grid-td { width: 25%; }
+.fr-grid-4-columns .fr-grid-td .fr-grid-content { width: 16.5em; *width: 16.5em }
 
 /* Upload control information */
 .xforms-upload-info { display: block; width: 100%; background-color: #FFFFDD; padding: 2px }

@@ -35,20 +35,20 @@
             <xhtml:ul>
                 <xhtml:li>
                     <xhtml:p>
-                        <xhtml:b>Application Id:</xhtml:b>
-                        <xforms:output value="$metadata-instance/application-id"/>
+                        <xhtml:b>Application Name:</xhtml:b>
+                        <xforms:output value="$metadata-instance/application-name"/>
                     </xhtml:p>
                 </xhtml:li>
                 <xhtml:li>
                     <xhtml:p>
-                        <xhtml:b>Form Id:</xhtml:b>
-                        <xforms:output value="$metadata-instance/form-id"/>
+                        <xhtml:b>Form Name:</xhtml:b>
+                        <xforms:output value="$metadata-instance/form-name"/>
                     </xhtml:p>
                 </xhtml:li>
             </xhtml:ul>
         </xhtml:div>
     </xhtml:div>
-    <xhtml:div class="dialog-button">
+    <xhtml:div class="dialog-buttons">
         <xforms:group>
             <xforms:trigger class="xforms-trigger-appearance-modal">
                 <xforms:label>
@@ -57,8 +57,8 @@
                 </xforms:label>
                 <xforms:action ev:event="DOMActivate">
                     <xforms:dispatch name="fr-publish-form" target="fr-persistence-model">
-                        <xxforms:context name="application" select="$metadata-instance/application-id"/>
-                        <xxforms:context name="form" select="$metadata-instance/form-id"/>
+                        <xxforms:context name="application" select="$metadata-instance/application-name"/>
+                        <xxforms:context name="form" select="$metadata-instance/form-name"/>
                     </xforms:dispatch>
                 </xforms:action>
             </xforms:trigger>

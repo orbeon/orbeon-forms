@@ -94,7 +94,7 @@
                 <xforms:label>Alert Message</xforms:label>
             </xforms:textarea>
 
-            <xhtml:div class="dialog-button">
+            <xhtml:div class="dialog-buttons">
                 <xforms:trigger class="fr-inplace-rename" id="fb-edit-validation-trigger">
                     <xforms:label>Change</xforms:label>
                 </xforms:trigger>

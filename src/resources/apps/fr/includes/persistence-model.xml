@@ -54,7 +54,7 @@
         </xforms:action>
 
         <!-- Load current form configuration -->
-        <xforms:send submission="get-configuration-submission"/>
+        <xforms:send submission="get-source-form-submission"/>
         
         <!-- A document id is provided -->
         <xforms:action if="$parameters/document != ''">
@@ -75,6 +75,13 @@
 
         <!-- Mark the initial data status as clean -->
         <xforms:setvalue ref="instance('fr-persistence-instance')/data-status">clean</xforms:setvalue>
+    </xforms:action>
+
+    <!-- Clear operation -->
+    <xforms:action ev:event="fr-clear">
+        <!-- Copy original instance -->
+        <xforms:insert nodeset="xxforms:instance('fr-form-instance')"
+                       origin="instance('fr-source-form-instance')/xhtml:head/xforms:model[@id = 'fr-form-model']/xforms:instance[@id = 'fr-form-instance']/*"/>
     </xforms:action>
 
     <!-- Delete operation -->
@@ -250,7 +257,7 @@
         <form xmlns=""/>
     </xforms:instance>
 
-    <xforms:submission id="get-configuration-submission"
+    <xforms:submission id="get-source-form-submission"
         method="get" serialization="none"
         resource="{instance('fr-uris-instance')/form-collection}/crud/{$parameters/app}/{$parameters/form}/form/form.xhtml"
         replace="instance" instance="fr-source-form-instance" xxforms:readonly="true">

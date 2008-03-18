@@ -114,7 +114,7 @@
         <!--</xhtml:div>-->
     <!--</xhtml:div>-->
 
-        <xhtml:div class="fb-toolbox">
+        <xhtml:div class="fb-toolbox fb-tools">
             <!-- Add new section -->
             <xhtml:div class="fb-tool">
                 <xforms:trigger>
@@ -222,7 +222,7 @@
                 </xhtml:div>
             </xforms:group>
         </xhtml:div>
-        <xhtml:div class="fb-toolbox">
+        <xhtml:div class="fb-toolbox fb-tools">
             <xforms:repeat nodeset="instance('fb-controls-template')/template" id="fb-controls-template-repeat">
 
                 <xxforms:variable name="control-template" select="xhtml:div/xforms:*"/>
@@ -296,6 +296,41 @@
                     </xforms:trigger>
                 </xhtml:div>
             </xforms:repeat>
-        <xhtml:div class="fb-clear"/>
+        </xhtml:div>
+        <xhtml:div class="fb-toolbox">
+            <xforms:group class="fb-language-choice fb-hide-alert">
+                <xforms:select1 appearance="minimal" ref="$lang" id="fb-resources-language-select">
+                    <xforms:label>Resources Language</xforms:label>
+                    <xforms:itemset nodeset="$resources/resource">
+                        <xforms:label value="xxforms:instance('fr-languages-instance')/language[@code = context()/@xml:lang]/(if (@native-name != @english-name) then concat(@native-name, ' (', @english-name, ')') else @native-name)"/>
+                        <xforms:value ref="@xml:lang"/>
+                    </xforms:itemset>
+                </xforms:select1>
+                <xforms:group class="fb-language-triggers">
+                    <xforms:trigger appearance="minimal">
+                        <xforms:label>Add</xforms:label>
+                        <xxforms:show ev:event="DOMActivate" dialog="fb-add-language-dialog" neighbor="fb-resources-language-select"/>
+                    </xforms:trigger>
+                    <xforms:trigger appearance="minimal" id="fb-language-remove" ref=".[count($resources/resource) gt 1]">
+                        <xforms:label>Remove</xforms:label>
+                        <xforms:action ev:event="DOMActivate">
+                            <!-- Ask confirmation -->
+                            <xforms:setvalue ref="$variables/confirmation-message"
+                                             value="concat('Are you sure you want to delete all resources for language ''',
+                                             xxforms:instance('fr-languages-instance')/language[@code = $lang]/(if (@native-name != @english-name) then concat(@native-name, ' (', @english-name, ')') else @native-name),
+                                             '''?')"/>
+                            <xforms:setvalue ref="$variables/confirmation-target">fb-language-remove</xforms:setvalue>
+                            <xxforms:show dialog="fb-confirmation-dialog"/>
+                        </xforms:action>
+                        <xforms:action ev:event="fb-confirmation-yes">
+                            <!-- Delete resources for this language -->
+                            <xforms:delete nodeset="$resources/resource[@xml:lang = $lang]"/>
+                            <xforms:setvalue ref="$lang" value="$resources/resource[1]/@xml:lang"/>
+                        </xforms:action>
+                    </xforms:trigger>
+                </xforms:group>
+            </xforms:group>
+
+        <!--<xhtml:div class="fb-clear"/>-->
     </xhtml:div>
 </xxforms:dialog>

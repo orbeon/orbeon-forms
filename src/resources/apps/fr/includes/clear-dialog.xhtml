@@ -23,7 +23,7 @@
                     <xhtml:img src="../../../../apps/fr/style/clear.gif" alt=""/>
                     <xhtml:span><xforms:output value="$fr-resources/detail/labels/clear"/></xhtml:span>
                 </xforms:label>
-                <xforms:send ev:event="DOMActivate" submission="fr-get-template-submission"/>
+                <xforms:dispatch ev:event="DOMActivate" name="fr-clear" target="fr-persistence-model"/>
             </xforms:trigger>
             <xforms:trigger>
                 <xforms:label>

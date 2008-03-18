@@ -387,12 +387,24 @@
     </target>
 
     <!-- WAR file -->
-    <target name="orbeon-war" depends="classes" description="Create uncompressed WAR file">
+    <target name="orbeon-war" depends="classes" description="Create exploded WAR file">
         <antcall target="war"/>
         <antcall target="war-copy-descriptors">
             <param name="target" value="devel"/>
             <param name="build.root" value="${build.root}"/>
         </antcall>
+    </target>
+
+    <!-- Zip sources file -->
+    <target name="orbeon-src" depends="prepare" description="Create Zip file with the sources">
+        <mkdir dir="${build.distrib.dir}"/>
+        <zip zipfile="${build.distrib.dir}/${project.name}-src.zip">
+            <zipfileset dir="${build.root}">
+                <exclude name="build/**"/>
+                <exclude name="oxfmark/**"/>
+                <exclude name="src/examples/**"/>
+            </zipfileset>
+        </zip>
     </target>
 
     <target name="orbeon-javadoc" depends="classpath">
@@ -629,7 +641,7 @@
         </zip>
     </target>
 
-    <target name="orbeon-dist-packages" depends="orbeon-dist-war, orbeon-doc, orbeon-javadoc">
+    <target name="orbeon-dist-packages" depends="orbeon-dist-war, orbeon-doc, orbeon-javadoc, orbeon-src">
         <property name="prefix" value="${project.name}-${release.number}"/>
         <!-- Create temporary zip file -->
         <property name="tmp-zip" value="${build.distrib.dir}/${project.name}-${release.number}-tmp.zip"/>

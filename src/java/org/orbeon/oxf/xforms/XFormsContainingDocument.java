@@ -869,7 +869,6 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
 
             final String targetControlEffectiveId;
             {
-                // Set current context to control
                 final XFormsValueControl valueXFormsControl = (XFormsValueControl) concreteEvent.getTargetObject();
                 targetControlEffectiveId = valueXFormsControl.getEffectiveId();
 
@@ -884,6 +883,8 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                 // Handle focus change DOMFocusOut / DOMFocusIn
                 if (concreteEvent.getOtherTargetObject() != null) {
 
+                    // NOTE: setExternalValue() above may cause e.g. xforms-select / xforms-deselect events to be
+                    // dispatched, so we get the control again to have a fresh reference
                     final XFormsControl sourceXFormsControl = (XFormsControl) getObjectById(targetControlEffectiveId);
 
                     final XFormsControl otherTargetXFormsControl

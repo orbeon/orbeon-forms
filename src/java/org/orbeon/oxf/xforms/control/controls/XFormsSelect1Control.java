@@ -17,6 +17,9 @@ import org.dom4j.Element;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.event.events.XFormsSelectEvent;
+import org.orbeon.oxf.xforms.event.events.XFormsDeselectEvent;
+import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -68,6 +71,47 @@ public class XFormsSelect1Control extends XFormsValueControl {
         } catch (Exception e) {
             throw ValidationException.wrapException(e, new ExtendedLocationData(getLocationData(), "evaluating itemset", getControlElement()));
         }
+    }
+
+    public void setExternalValue(PipelineContext pipelineContext, String value, String type) {
+        if (!(this instanceof XFormsSelectControl)) {
+            // Handle xforms:select1-specific logic
+
+            // Current control value
+            final String controlValue = getValue();
+
+            // Iterate over all the items
+            final List items = getItemset(pipelineContext, true);
+            final List selectEvents = new ArrayList();
+            for (Iterator i = items.iterator(); i.hasNext();) {
+                final XFormsItemUtils.Item currentItem = (XFormsItemUtils.Item) i.next();
+                final String currentItemValue = currentItem.getValue();
+                final boolean itemWasSelected = controlValue.equals(currentItemValue);
+                final boolean itemIsSelected;
+                if (value.equals(currentItemValue)) {
+                    // Value is currently selected in the UI
+                    itemIsSelected = true;
+                } else {
+                    // Value is currently NOT selected in the UI
+                    itemIsSelected = false;
+                }
+
+                // Handle xforms-select / xforms-deselect
+                // TODO: Dispatch to itemset or item once we support doing that
+                if (!itemWasSelected && itemIsSelected)
+                    selectEvents.add(new XFormsSelectEvent(this));
+                else if (itemWasSelected && !itemIsSelected)
+                    containingDocument.dispatchEvent(pipelineContext, new XFormsDeselectEvent(this));
+            }
+            if (selectEvents.size() > 0) {
+                // Select events must be sent after all xforms-deselect events
+                for (Iterator i = selectEvents.iterator(); i.hasNext();) {
+                    containingDocument.dispatchEvent(pipelineContext, (XFormsEvent) i.next());
+                }
+            }
+        }
+
+        super.setExternalValue(pipelineContext, value, type);
     }
 
     /**

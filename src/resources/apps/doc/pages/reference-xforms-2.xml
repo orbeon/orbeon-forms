@@ -1365,12 +1365,35 @@
                                 <li>
                                     <code>target</code>
                                 </li>
+                                <li>
+                                    <code>bubbles</code>
+                                </li>
+                                <li>
+                                    <code>cancelable</code>
+                                </li>
                             </ul>
                         </li>
                         <li>
                             <p>
-                                <code>&lt;xforms:load></code>: <code>resource</code> attribute.
+                                <code>&lt;xforms:load></code> attributes:
                             </p>
+                            <ul>
+                                <li>
+                                    <code>resource</code>
+                                </li>
+                                <li>
+                                    <code>replace</code>
+                                </li>
+                                <li>
+                                    <code>xxforms:target</code>
+                                </li>
+                                <li>
+                                    <code>xxforms:show-progress</code>
+                                </li>
+                                <li>
+                                    <code>f:url-type</code>
+                                </li>
+                            </ul>
                         </li>
                         <li>
                             <p>
@@ -1380,6 +1403,27 @@
                         <li>
                             <p>
                                 <code>&lt;xforms:toggle></code>: <code>case</code> attribute.
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                <code>&lt;xxforms:show></code> attributes:
+                            </p>
+                            <ul>
+                                <li>
+                                    <code>dialog</code>
+                                </li>
+                                <li>
+                                    <code>neighbor</code>
+                                </li>
+                                <li>
+                                    <code>constrain</code>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <p>
+                                <code>&lt;xxforms:hide></code>: <code>dialog</code> attribute.
                             </p>
                         </li>
                     </ul>

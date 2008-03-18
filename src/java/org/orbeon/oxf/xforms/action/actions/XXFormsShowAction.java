@@ -17,7 +17,6 @@ import org.dom4j.Element;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsControls;
-import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.control.controls.XXFormsDialogControl;
 import org.orbeon.oxf.xforms.action.XFormsAction;
@@ -39,19 +38,26 @@ public class XXFormsShowAction extends XFormsAction {
 
         final XFormsControls xformsControls = actionInterpreter.getXFormsControls();
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
-        final String dialogId = XFormsUtils.namespaceId(containingDocument, actionElement.attributeValue("dialog"));
-        final String neighbor = XFormsUtils.namespaceId(containingDocument, actionElement.attributeValue("neighbor"));
-        final boolean constrainToViewport = !"false".equals(actionElement.attributeValue("constrain"));
 
-        final String effectiveNeighbor
-                = (neighbor != null) ? xformsControls.getCurrentControlsState().findEffectiveControlId(neighbor) : null;
+        // Resolve all attributes as AVTs
+        final String dialogId = resolveAVT(actionInterpreter, pipelineContext, actionElement, "dialog", true);
+        final String effectiveNeighborId;
+        {
+            final String neighborId = resolveAVT(actionInterpreter, pipelineContext, actionElement, "neighbor", true);
+            effectiveNeighborId = (neighborId != null) ? xformsControls.getCurrentControlsState().findEffectiveControlId(neighborId) : null;
+        }
+        final boolean constrainToViewport;
+        {
+            final String constrain = resolveAVT(actionInterpreter, pipelineContext, actionElement, "constrain", false);
+            constrainToViewport = !"false".equals(constrain);
+        }
 
         if (dialogId != null) {
             // Dispatch xxforms-dialog-open event to dialog
             final Object controlObject = (dialogId != null) ? xformsControls.getObjectById(dialogId) : null;
             if (controlObject instanceof XXFormsDialogControl) {
 
-                final XFormsEvent newEvent = new XXFormsDialogOpenEvent((XFormsEventTarget) controlObject, effectiveNeighbor, constrainToViewport);
+                final XFormsEvent newEvent = new XXFormsDialogOpenEvent((XFormsEventTarget) controlObject, effectiveNeighborId, constrainToViewport);
                 addContextAttributes(actionInterpreter, pipelineContext, actionElement, newEvent);
                 containingDocument.dispatchEvent(pipelineContext, newEvent);
             } else {

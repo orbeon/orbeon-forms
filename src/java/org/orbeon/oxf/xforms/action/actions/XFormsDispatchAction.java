@@ -16,22 +16,16 @@ package org.orbeon.oxf.xforms.action.actions;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xforms.*;
-import org.orbeon.oxf.xforms.processor.XFormsServer;
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsControls;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
+import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventFactory;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
-import org.orbeon.oxf.xforms.event.XFormsEvent;
-import org.orbeon.oxf.xforms.event.events.XFormsCustomEvent;
-import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.oxf.util.XPathCache;
+import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.saxon.om.Item;
-import org.orbeon.saxon.value.SequenceExtent;
-
-import java.util.Map;
-import java.util.Iterator;
 
 /**
  * 10.1.2 The dispatch Element
@@ -52,48 +46,34 @@ public class XFormsDispatchAction extends XFormsAction {
         if (newEventTargetIdValue == null)
             throw new OXFException("Missing mandatory target attribute on xforms:dispatch element.");
 
-        final XFormsContextStack.BindingContext bindingContext = actionInterpreter.getContextStack().getCurrentBindingContext();
-
-        final Map prefixToURIMap = containingDocument.getStaticState().getNamespaceMappings(actionElement.attributeValue("id"));
-        final LocationData locationData = (LocationData) actionElement.getData();
-        final XFormsContextStack contextStack = actionInterpreter.getContextStack();
-
         final String resolvedNewEventName;
         {
-            // NOP if there is an AVT but no context node
-            if (bindingContext.getSingleNode() == null && newEventNameAttributeValue.indexOf('{') != -1)
-                return;
-
             // Resolve AVT
-            resolvedNewEventName = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, bindingContext.getNodeset(), bindingContext.getPosition(),
-                    contextStack.getCurrentVariables(), XFormsContainingDocument.getFunctionLibrary(), actionInterpreter.getFunctionContext(), prefixToURIMap, locationData, newEventNameAttributeValue);
+            resolvedNewEventName = resolveAVTProvideValue(actionInterpreter, pipelineContext, actionElement, newEventNameAttributeValue, false);
+            if (resolvedNewEventName == null)
+                return;
         }
-
         final String resolvedNewEventTargetId;
         {
-            // NOP if there is an AVT but no context node
-            if (bindingContext.getSingleNode() == null && newEventTargetIdValue.indexOf('{') != -1)
-                return;
-
             // Resolve AVT
-            resolvedNewEventTargetId = XFormsUtils.namespaceId(containingDocument,
-                    XFormsUtils.resolveAttributeValueTemplates(pipelineContext, bindingContext.getNodeset(), bindingContext.getPosition(),
-                    contextStack.getCurrentVariables(), XFormsContainingDocument.getFunctionLibrary(), actionInterpreter.getFunctionContext(), prefixToURIMap, locationData, newEventTargetIdValue));
+            resolvedNewEventTargetId = resolveAVTProvideValue(actionInterpreter, pipelineContext, actionElement, newEventTargetIdValue, true);
+            if (resolvedNewEventTargetId == null)
+                return;
         }
 
         // Optional attributes
         final boolean newEventBubbles;
         {
-            final String newEventBubblesString = actionElement.attributeValue("bubbles");
             // "The default value depends on the definition of a custom event. For predefined events, this attribute has no effect."
             // The event factory makes sure that those values are ignored for predefined events
+            final String newEventBubblesString = resolveAVT(actionInterpreter, pipelineContext, actionElement, "bubbles", false);
             newEventBubbles = Boolean.valueOf((newEventBubblesString == null) ? "true" : newEventBubblesString).booleanValue();
         }
         final boolean newEventCancelable;
         {
             // "The default value depends on the definition of a custom event. For predefined events, this attribute has no effect."
             // The event factory makes sure that those values are ignored for predefined events
-            final String newEventCancelableString = actionElement.attributeValue("cancelable");
+            final String newEventCancelableString = resolveAVT(actionInterpreter, pipelineContext, actionElement, "cancelable", false);
             newEventCancelable = Boolean.valueOf((newEventCancelableString == null) ? "true" : newEventCancelableString).booleanValue();
         }
 

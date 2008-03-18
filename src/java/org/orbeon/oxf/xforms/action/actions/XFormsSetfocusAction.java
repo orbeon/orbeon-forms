@@ -19,18 +19,14 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsControls;
 import org.orbeon.oxf.xforms.XFormsUtils;
-import org.orbeon.oxf.xforms.XFormsContextStack;
-import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.events.XFormsFocusEvent;
-import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.saxon.om.Item;
-
-import java.util.Map;
 
 /**
  * 10.1.7 The setfocus Element
@@ -48,19 +44,12 @@ public class XFormsSetfocusAction extends XFormsAction {
         if (controlIdAttributeValue == null)
             throw new OXFException("Missing mandatory 'control' attribute on xforms:control element.");
 
-        final XFormsContextStack.BindingContext bindingContext = actionInterpreter.getContextStack().getCurrentBindingContext();
         final String resolvedControlId;
         {
-            // NOP if there is an AVT but no context node
-            if (bindingContext.getSingleNode() == null && controlIdAttributeValue.indexOf('{') != -1)
-                return;
-
             // Resolve AVT
-            final Map prefixToURIMap = containingDocument.getStaticState().getNamespaceMappings(actionElement.attributeValue("id"));
-            final LocationData locationData = (LocationData) actionElement.getData();
-            final XFormsContextStack contextStack = actionInterpreter.getContextStack();
-            resolvedControlId = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, bindingContext.getNodeset(), bindingContext.getPosition(),
-                    contextStack.getCurrentVariables(), XFormsContainingDocument.getFunctionLibrary(), actionInterpreter.getFunctionContext(), prefixToURIMap, locationData, controlIdAttributeValue);
+            resolvedControlId = resolveAVTProvideValue(actionInterpreter, pipelineContext, actionElement, controlIdAttributeValue, true);
+            if (resolvedControlId == null)
+                return;
         }
 
         final String effectiveControlId = xformsControls.getCurrentControlsState().findEffectiveControlId(resolvedControlId);

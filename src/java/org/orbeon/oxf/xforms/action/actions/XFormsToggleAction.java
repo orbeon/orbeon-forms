@@ -14,20 +14,16 @@
 package org.orbeon.oxf.xforms.action.actions;
 
 import org.dom4j.Element;
+import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsControls;
-import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.XFormsContextStack;
-import org.orbeon.oxf.xforms.processor.XFormsServer;
+import org.orbeon.oxf.xforms.XFormsControls;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
-import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.saxon.om.Item;
-
-import java.util.Map;
 
 /**
  * 9.2.3 The toggle Element
@@ -48,11 +44,7 @@ public class XFormsToggleAction extends XFormsAction {
 
         final String caseId;
         if (bindingContext.getSingleNode() != null) {
-            final Map prefixToURIMap = containingDocument.getStaticState().getNamespaceMappings(actionElement.attributeValue("id"));
-            final LocationData locationData = (LocationData) actionElement.getData();
-            final String resolvedCaseId = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, bindingContext.getNodeset(), bindingContext.getPosition(),
-                    contextStack.getCurrentVariables(), XFormsContainingDocument.getFunctionLibrary(), actionInterpreter.getFunctionContext(), prefixToURIMap, locationData, caseAttribute);
-            caseId = XFormsUtils.namespaceId(containingDocument, resolvedCaseId);
+            caseId = resolveAVTProvideValue(actionInterpreter, pipelineContext, actionElement, caseAttribute, true);
         } else {
             // TODO: Presence of context is not the right way to decide whether to evaluate AVTs or not
             caseId = caseAttribute;

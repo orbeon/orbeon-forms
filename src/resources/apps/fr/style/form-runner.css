@@ -8,7 +8,7 @@ body, body table, textarea.xforms-textarea {
     font-family: "Lucida Grande", Tahoma, Arial, Verdana, sans-serif;
 }
 
-#doc { margin-top: 1em; }   
+#doc { margin-top: 1em; }
 
 .fr-hidden-controls { display: none }
 
@@ -140,6 +140,8 @@ label.xforms-alert-inactive { display: none; }
 .xforms-disabled .xforms-label { display: none }
 .xforms-case-deselected .xforms-label { display: none }
 
+/* Make sure text in trigger does not wrap (leads to non-native widget being used on Firefox) */
+button.xforms-trigger { white-space: nowrap; }
 button.xforms-trigger img { padding-right: 10px; }
 
 .fr-layout-table { padding: 0; margin: 0 }
@@ -197,10 +199,7 @@ label.xforms-disabled, span.xforms-disabled, div.xforms-disabled  {
     width: 14em
 }
 
-.fr-repeat-table .xforms-label { margin-top: 0 }
-.fr-repeat-table .xforms-label { display: none; }
-.fr-repeat-sections th { display: none; }
-.fr-repeat-sections .xforms-label { margin-top: 0; }
+/* Repeats: all */
 .fr-repeat td { vertical-align: top; padding: 0.2em }
 .fr-repeat .fr-repeat-column { width: auto; }
 .fr-repeat {
@@ -208,38 +207,22 @@ label.xforms-disabled, span.xforms-disabled, div.xforms-disabled  {
     margin: 1em 0 1em 0;
     width: 100%;
 }
-.fr-repeat-table .fr-repeat-table {
-    background-color:#DDDDEE;
-    border:1px solid #3598D4;
-    margin:0 0 1em;
-    width: 100%;
-}
-.fr-repeat-table td { vertical-align: top; padding: 0.2em }
 
-.fr-tabular, .fr-tabular tr td, .fr-tabular tr th {
-    border-color: #600;
-    border-style: solid;
-}
+/* Repeats: shows as sections (can have multiple lines per iteration; repeated field labels) */
+.fr-repeat-sections th { display: none; }
+.fr-repeat-sections .xforms-label { margin-top: 0; }
 
-.fr-tabular tr th {
-    background-color: #f8f8f8;
-}
-
-.fr-tabular {
-    border-width: 0 0 1px 1px;
-    border-spacing: 1px;
+/* Repeats: shows as table (1 line per iteration; labels used as header of table) */
+.fr-repeat-table {
     border-collapse: collapse;
     /* Fix for Firefox in cases where the right-most border of the table is not displayed */
-    width: 99.9%;
+    /*margin: 1px ;*/
 }
-
-.fr-tabular tr td, .fr-tabular tr th {
-    margin: 0;
-    padding: 4px;
-    border-width: 1px 1px 0 0;
+.fr-repeat-table td , .fr-repeat-table th {
+    border: 1px solid black;
 }
+.fr-repeat-table .xforms-label { display: none; }
 
-.fr-tabular .xforms-label { display: none; }
 .fr-non-collapsible { padding-left: 1.1em; }
 
 .fr-search-input input {
@@ -341,12 +324,15 @@ div.fr-collapsible {
 /* Check boxes on separate lines */
 .xforms-select-appearance-full span { display: block; clear: both; }
 .xforms-select-appearance-full span input { float: left; }
-.xforms-select-appearance-full span label { margin-left: .5em; margin-right: 1em }
+.xforms-select-appearance-full span label { float: right; }
+/* Size of text for check boxes; needs to be set for every page width / columns number combination */
+#doc .fr-grid-2-columns .xforms-select-appearance-full span label { width: 24em; }
+#doc4 .fr-grid-4-columns .xforms-select-appearance-full span label { width: 14.5em; }
 
 /* Grid */
 
-.fr-grid { width: 100%; border-collapse: separate; clear: both; border: 1px solid red }
-.fr-grid-td { border: 1px solid red }
+.fr-grid { width: 100%; border-collapse: separate; clear: both; border: 1px solid red; margin-bottom: 0; }
+.fr-grid-td { border: 1px solid red;  }
 .fr-grid tr th { text-align: left }
 
 .fr-grid .fr-layout-table tr td { width: auto }

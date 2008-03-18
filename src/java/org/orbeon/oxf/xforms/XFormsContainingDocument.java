@@ -1452,9 +1452,9 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                 xformsControls.initialize(pipelineContext);
             }
 
-            // Group all xforms-ready events within a single outermost action handler in order to optimize events
-            final boolean isXFormsReady = i == 2;
-            if (isXFormsReady) {
+            // Group all xforms-model-construct-done and xforms-ready events within a single outermost action handler in
+            // order to optimize events
+            if (i == 1) {
                 // Performed deferred updates only for xforms-ready
                 startOutermostActionHandler();
             }
@@ -1472,7 +1472,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                 dispatchEvent(pipelineContext, XFormsEventFactory.createEvent(eventsToDispatch[i], currentModel));
             }
 
-            if (isXFormsReady) {
+            if (i == 2) {
                 // Performed deferred updates only for xforms-ready
                 endOutermostActionHandler(pipelineContext);
             }

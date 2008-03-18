@@ -14,8 +14,8 @@
 package org.orbeon.oxf.processor.scope;
 
 import org.dom4j.Document;
-import org.dom4j.io.DocumentSource;
 import org.exolab.castor.mapping.Mapping;
+import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.xml.Marshaller;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
@@ -34,9 +34,11 @@ import org.xml.sax.helpers.ParserAdapter;
 import org.xml.sax.helpers.AttributesImpl;
 
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXResult;
 import java.io.StringReader;
+import java.io.IOException;
 
 public class ScopeGenerator extends ScopeProcessorBase {
 
@@ -90,11 +92,11 @@ public class ScopeGenerator extends ScopeProcessorBase {
                                 : null;
 
                         if (value != null) {
-                            if (value instanceof ScopeStore) {
-                                // Case 1: use the stored key/validity as internal key/validity
-                                ScopeStore contextStore = (ScopeStore) value;
-                                state.saxStore = contextStore.getSaxStore();
 
+                            final Mapping mapping;
+                            if (value instanceof ScopeStore) {
+                                // Use the stored key/validity as internal key/validity
+                                final ScopeStore contextStore = (ScopeStore) value;
                                 if (!config.isTestIgnoreStoredKeyValidity()) {
                                     // Regular case
                                     state.key = contextStore.getKey();
@@ -104,41 +106,19 @@ public class ScopeGenerator extends ScopeProcessorBase {
                                     state.key = null;
                                     state.validity = null;
                                 }
-
+                                // Don't get mappings in this case
+                                mapping = null;
                             } else {
-                                // Case 2: "generate the validity from object" (similar to what is done in the BeanGenerator)
-                                if (value instanceof SAXStore) {
-                                    state.saxStore = (SAXStore) value;
+                                // Get mappings
+                                if (getConnectedInputs().get(INPUT_MAPPING) == null) {
+                                    mapping = new Mapping();
+                                    mapping.loadMapping(new InputSource(new StringReader("<mapping/>")));
                                 } else {
-                                    // Write "foreign" object to new SAX store
-                                    state.saxStore = new SAXStore();
-                                    if (value instanceof org.dom4j.Document) {
-                                        // dom4j document
-                                        LocationSAXWriter saxWriter = new LocationSAXWriter();
-                                        saxWriter.setContentHandler(state.saxStore);
-                                        saxWriter.write((org.dom4j.Document) value);
-                                    } else if (value instanceof org.w3c.dom.Document) {
-                                        // W3C DOM document
-                                        Transformer identity = TransformerUtils.getIdentityTransformer();
-                                        identity.transform(new DOMSource((org.w3c.dom.Document) value), new SAXResult(state.saxStore));
-                                    } else if (value instanceof String) {
-                                        // Consider the String containing a document to parse
-                                        XMLUtils.stringToSAX((String) value, "", state.saxStore, false, false);
-                                    } else {
-                                        // Consider the object a JavaBean
-                                        Mapping mapping;
-                                        if (getConnectedInputs().get(INPUT_MAPPING) == null) {
-                                            mapping = new Mapping();
-                                            mapping.loadMapping(new InputSource(new StringReader("<mapping/>")));
-                                        } else
-                                            mapping = readMapping(pipelineContext);
-
-                                        readBean(value, mapping, state.saxStore);
-//                                        throw new OXFException("Session object " + config.getKey()
-//                                                + " is of unknown type: " + value.getClass().getName());
-                                    }
+                                    mapping = readMapping(pipelineContext);
                                 }
                             }
+
+                            getSAXStore(value, mapping);
                         } else {
                             // Store empty document
                             if (nullDocumentSAXStore == null) {
@@ -173,7 +153,40 @@ public class ScopeGenerator extends ScopeProcessorBase {
         return output;
     }
 
-    protected void readBean(Object bean, Mapping mapping, ContentHandler contentHandler) {
+    public static SAXStore getSAXStore(Object value, Mapping mapping) throws SAXException, TransformerException, IOException, MappingException {
+        final SAXStore result;
+        if (value instanceof ScopeStore) {
+            final ScopeStore contextStore = (ScopeStore) value;
+            result = contextStore.getSaxStore();
+
+        } else {
+            if (value instanceof SAXStore) {
+                result = (SAXStore) value;
+            } else {
+                // Write "foreign" object to new SAX store
+                result = new SAXStore();
+                if (value instanceof Document) {
+                    // dom4j document
+                    LocationSAXWriter saxWriter = new LocationSAXWriter();
+                    saxWriter.setContentHandler(result);
+                    saxWriter.write((Document) value);
+                } else if (value instanceof org.w3c.dom.Document) {
+                    // W3C DOM document
+                    Transformer identity = TransformerUtils.getIdentityTransformer();
+                    identity.transform(new DOMSource((org.w3c.dom.Document) value), new SAXResult(result));
+                } else if (value instanceof String) {
+                    // Consider the String containing a document to parse
+                    XMLUtils.stringToSAX((String) value, "", result, false, false);
+                } else {
+                    // Consider the object a JavaBean
+                    readBean(value, mapping, result);
+                }
+            }
+        }
+        return result;
+    }
+
+    protected static void readBean(Object bean, Mapping mapping, ContentHandler contentHandler) {
         try {
             contentHandler.startDocument();
 

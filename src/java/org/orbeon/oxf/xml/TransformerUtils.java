@@ -274,6 +274,24 @@ public class TransformerUtils {
     }
 
     /**
+     * Transform a SAXStore into a TinyTree document
+     *
+     * @param   saxStore input SAXStore
+     * @return  DocumentInfo
+     */
+    public static DocumentInfo saxStoreToTinyTree(SAXStore saxStore) {
+        final TinyBuilder treeBuilder = new TinyBuilder();
+        try {
+            final TransformerHandler identity = getIdentityTransformerHandler();
+            identity.setResult(treeBuilder);
+            saxStore.replay(identity);
+        } catch (SAXException e) {
+            throw new OXFException(e);
+        }
+        return (DocumentInfo) treeBuilder.getCurrentRoot();
+    }
+
+    /**
      * Transform a SAXStore into a DOM document
      *
      * @param   saxStore input SAXStore

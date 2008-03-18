@@ -128,12 +128,20 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
 
         // OPS XXForms functions
 
-        // xxforms:get-header()
+        // xxforms:get-request-header()
         e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI + "}get-request-header", XXFormsGetRequestHeader.class, 0, 1, 1, Type.STRING_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);
         StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
 
-        // xxforms:get-parameter()
+        // xxforms:get-request-parameter()
         e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI + "}get-request-parameter", XXFormsGetRequestParameter.class, 0, 1, 1, Type.STRING_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);
+        StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
+
+        // xxforms:get-session-attribute()
+        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI + "}get-session-attribute", XXFormsGetSessionAttribute.class, 0, 1, 1, Type.ITEM_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);
+        StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
+
+        // xxforms:get-request-attribute()
+        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI + "}get-request-attribute", XXFormsGetRequestAttribute.class, 0, 1, 1, Type.ITEM_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);
         StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
 
         // xxforms:call-xpl

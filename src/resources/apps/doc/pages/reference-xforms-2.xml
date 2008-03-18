@@ -957,10 +957,9 @@
                             </xml-source>
                             <note>
                                 <p>
-                                    This function will return a non-empty result only if call during page
-                                    initialization. We recommend you use it only within event handlers called as a
-                                    result of processing <code>xforms-model-construct-done</code> or
-                                    <code>xforms-ready</code>.
+                                    This function can only be called during page initialization, otherwise it will throw
+                                    an error. We recommend you use it only within event handlers called as a result of
+                                    processing <code>xforms-model-construct-done</code> or <code>xforms-ready</code>.
                                 </p>
                             </note>
                         </li>
@@ -979,14 +978,60 @@
                             </xml-source>
                             <note>
                                 <p>
-                                    This function will return a non-empty result only if call during page
-                                    initialization. We recommend you use it only within event handlers called as a
-                                    result of processing <code>xforms-model-construct-done</code> or
-                                    <code>xforms-ready</code>.
+                                    This function can only be called during page initialization, otherwise it will throw
+                                    an error. We recommend you use it only within event handlers called as a result of
+                                    processing <code>xforms-model-construct-done</code> or <code>xforms-ready</code>.
                                 </p>
                             </note>
                         </li>
-
+                        <li>
+                            <a name="xxforms-get-request-attribute"/>
+                            <p>
+                                <code>xxforms:get-request-attribute($a as xs:string) document-node()?</code>
+                            </p>
+                            <p>
+                                The <code>xxforms:get-request-attribute()</code> function returns the value of the given
+                                request attribute. The attribute may have been previously placed in the request through
+                                Java code, for example.
+                            </p>
+                            <p>
+                                Currently, this function always returns an XML document or an empty sequence. The
+                                types of attribute objects supported are the same <a
+                                href="processors-generators#scope-generator-types">types supported by the Scope
+                                generator</a>.
+                            </p>
+                            <xml-source show-namespaces="false">
+                                <comment> Get the "document" attribute and use it to replace instance "my-instance" </comment>
+                                <xforms:insert nodeset="instance('my-instance')" origin="xxforms:get-request-attribute('document')"/>
+                            </xml-source>
+                            <note>
+                                <p>
+                                    This function can only be called during page initialization, otherwise it will throw
+                                    an error. We recommend you use it only within event handlers called as a result of
+                                    processing <code>xforms-model-construct-done</code> or <code>xforms-ready</code>.
+                                </p>
+                            </note>
+                        </li>
+                        <li>
+                            <a name="xxforms-get-session-attribute"/>
+                            <p>
+                                <code>xxforms:get-session-attribute($a as xs:string) document-node()?</code>
+                            </p>
+                            <p>
+                                The <code>xxforms:get-session-attribute()</code> function returns the value of the given
+                                session attribute.
+                            </p>
+                            <p>
+                                Currently, this function always returns an XML document or an empty sequence. The types
+                                of attribute objects supported are the same <a
+                                href="processors-generators#scope-generator-types">types supported by the Scope
+                                generator</a>.
+                            </p>
+                            <xml-source show-namespaces="false">
+                                <comment> Get the "document" attribute and use it to replace instance "my-instance" </comment>
+                                <xforms:insert nodeset="instance('my-instance')" origin="xxforms:get-session-attribute('document')"/>
+                            </xml-source>
+                        </li>
                         <li>
                             <a name="xxforms-repeat-current"/>
                             <p>

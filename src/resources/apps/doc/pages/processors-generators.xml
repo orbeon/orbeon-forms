@@ -42,28 +42,32 @@
                     documents stored by custom processors or other application modules.
                 </p>
             </section>
-            <p>
-                The following Java object types are supported and checked in this order:
-            </p>
-            <ul>
-                <li>
-                    <b>org.dom4j.Document</b> - An XML document represented using the dom4j class
-                    hierarchy.
-                </li>
-                <li>
-                    <b>org.w3c.dom.Document</b> - An XML document represented using the W3C DOM
-                    class hierarchy.
-                </li>
-                <li>
-                    <b>java.lang.String</b> - An XML document represented as a String.
-                </li>
-                <li>
-                    <b>java.lang.Object</b> - Any Java object. In this case, the object is
-                    serialized to XML using <a href="http://www.castor.org">Castor</a>. An optional
-                    <code>mapping</code> input may specify a custom <a
-                    href="http://www.castor.org/xml-mapping.html">Castor mapping document</a>.
-                </li>
-            </ul>
+            <a name="scope-generator-types"/>
+            <section>
+                <title>Types</title>
+                <p>
+                    The following Java object types are supported and checked in this order:
+                </p>
+                <ul>
+                    <li>
+                        <b>org.dom4j.Document</b> - An XML document represented using the dom4j class
+                        hierarchy.
+                    </li>
+                    <li>
+                        <b>org.w3c.dom.Document</b> - An XML document represented using the W3C DOM
+                        class hierarchy.
+                    </li>
+                    <li>
+                        <b>java.lang.String</b> - An XML document represented as a String.
+                    </li>
+                    <li>
+                        <b>java.lang.Object</b> - Any Java object. In this case, the object is
+                        serialized to XML using <a href="http://www.castor.org">Castor</a>. An optional
+                        <code>mapping</code> input may specify a custom <a
+                        href="http://www.castor.org/xml-mapping.html">Castor mapping document</a>.
+                    </li>
+                </ul>
+            </section>
             <section>
                 <title>Inputs and Outputs</title>
                 <p>

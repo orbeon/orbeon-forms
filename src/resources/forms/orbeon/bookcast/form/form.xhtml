@@ -146,7 +146,7 @@
                     <fr:grid columns="2">
                         <tr>
                             <td>
-                                <xforms:input id="title-control" bind="title-bind" class="fr-summary fr-search">
+                                <xforms:input id="title-control" bind="title-bind" class="fr-summary fr-search" incremental="true">
                                     <xforms:label ref="$form-resources/title"/>
                                     <xforms:hint>Book title</xforms:hint>
                                     <xforms:help>This input contains the book title. For example...</xforms:help>
@@ -154,7 +154,7 @@
                                 </xforms:input>
                             </td>
                             <td>
-                                <xforms:input id="author-control" bind="author-bind" class="fr-summary fr-search">
+                                <xforms:input id="author-control" bind="author-bind" class="fr-summary fr-search" incremental="true">
                                     <xforms:label ref="$form-resources/author"/>
                                     <xforms:help>This input contains the book's author name.</xforms:help>
                                     <xforms:hint>Book author</xforms:hint>
@@ -181,7 +181,7 @@
                                 </xforms:select1>
                             </td>
                             <td>
-                                <xforms:input ref="link">
+                                <xforms:input ref="link" incremental="true">
                                     <xforms:label>Link</xforms:label>
                                     <xforms:hint>Optional link to external resource</xforms:hint>
                                     <xforms:help>This input contains a link to an external resource. For example...</xforms:help>
@@ -207,12 +207,6 @@
                                 </xforms:select1>
                             </td>
                             <td>
-                                <xforms:textarea ref="notes" appearance="xxforms:autosize">
-                                    <xforms:label>Notes</xforms:label>
-                                    <xforms:hint>Notes about this book</xforms:hint>
-                                    <xforms:help>This area contains your own comments about the book. For example...</xforms:help>
-                                    <xforms:alert>The notes are invalid</xforms:alert>
-                                </xforms:textarea>
                             </td>
                         </tr>
                     </fr:grid>
@@ -227,7 +221,7 @@
                                     <xforms:label>Note</xforms:label>
                                     <tr>
                                         <td>
-                                            <xforms:textarea ref="." appearance="xxforms:autosize">
+                                            <xforms:textarea ref="." appearance="xxforms:autosize" incremental="true">
                                                 <xforms:label>Note</xforms:label>
                                                 <xforms:hint>Notes about this book</xforms:hint>
                                                 <xforms:help>This area contains your own comments about the book. For example...</xforms:help>

@@ -89,7 +89,7 @@
                     <fr:grid columns="2">
                         <xhtml:tr>
                             <xhtml:td>
-                                <xforms:input id="control-1-control" ref="control-1">
+                                <xforms:input id="control-1-control" ref="control-1" incremental="true">
                                     <xforms:label ref="$form-resources/control-1/label"/>
                                     <xforms:hint ref="$form-resources/control-1/hint"/>
                                     <xforms:help ref="$form-resources/control-1/help"/>

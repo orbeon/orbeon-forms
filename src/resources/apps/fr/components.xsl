@@ -98,7 +98,6 @@
                             <xhtml:div class="yui-g fr-separator">
                             </xhtml:div>
                             <xhtml:div class="yui-g fr-body">
-
                                 <!-- Optional description-->
                                 <xforms:group model="fr-form-model" ref=".[normalize-space(instance('fr-form-metadata')/description) != '']">
                                     <xhtml:div class="fr-form-description">

@@ -71,9 +71,19 @@
             </xforms:submission>
         </p:input>
         <p:input name="request" href="#instance" debug="xxx"/>
-        <p:output name="response" ref="data"/>
+        <p:output name="response" id="form" ref="data"/>
     </p:processor>
 
     <!-- TODO: Use digest to allow caching by XForms processor -->
+
+    <p:processor name="oxf:scope-serializer">
+        <p:input name="config">
+            <config>
+                <key>oxf.fr.form</key>
+                <scope>request</scope>
+            </config>
+        </p:input>
+        <p:input name="data" href="#form"/>
+    </p:processor>
 
 </p:config>

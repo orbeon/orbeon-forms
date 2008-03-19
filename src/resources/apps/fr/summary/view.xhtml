@@ -373,7 +373,7 @@
                         </xforms:trigger>
 
                         <span class="fr-paging-numbers">
-                            <xforms:output value="instance('fr-paging-instance')/from + index('documents-repeat') - 1"/>
+                            <xforms:output value="max((instance('fr-paging-instance')/from + index('documents-repeat') - 1, 0))"/>
                             <xforms:output value="$fr-resources/summary/titles/of"/>
                             <xforms:output value="instance('fr-paging-instance')/total"/>
                         </span>
@@ -393,11 +393,6 @@
 
                 </xforms:group>
 
-                <!-- Display this when no form is found -->
-                <xforms:group ref="instance('fr-summary-instance')[not(document)]">
-                    <xforms:output mediatype="text/html" value="saxon:serialize($fr-resources/summary/messages/no-form-found/node(), 'html')"/>
-                </xforms:group>
-
             </fr:body>
             <fr:buttons>
                 <!-- Custom buttons for the summary page -->
@@ -413,7 +408,7 @@
                         </xforms:trigger>
                         <xforms:trigger ref="instance('fr-summary-triggers-instance')/edit">
                             <xforms:label>
-                                <xhtml:img src="../../apps/fr/style/run.gif" alt="Edit"/>
+                                <xhtml:img src="../../apps/fr/style/edit.gif" alt="Edit"/>
                                 <xhtml:span><xforms:output ref="$fr-resources/summary/labels/edit-form"/></xhtml:span>
                             </xforms:label>
                             <xforms:dispatch ev:event="DOMActivate" target="fr-form-model" name="orbeon-edit"/>

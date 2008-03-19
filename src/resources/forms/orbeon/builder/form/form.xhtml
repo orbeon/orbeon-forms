@@ -377,7 +377,7 @@
                     <!-- Insert new placeholder after existing one -->
                     <xforms:insert nodeset="$current-holder" origin="xxforms:element($new-name)"/>
                     <!-- Copy existing content into new element -->
-                    <xforms:insert context="$current-holder/../*[name() = $new-name]" origin="$current-holder/(@* | node())"/>
+                    <xforms:insert context="$current-holder/following-sibling::*[1]" origin="$current-holder/(@* | node())"/>
                     <!-- Delete old element -->
                     <xforms:delete nodeset="$current-holder"/>
                 </xforms:action>

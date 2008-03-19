@@ -54,7 +54,17 @@
         </xforms:action>
 
         <!-- Load current form configuration -->
-        <xforms:send submission="get-source-form-submission"/>
+        <xxforms:variable name="source-form" select="xxforms:get-request-attribute('oxf.fr.form')"/>
+        <xforms:action if="exists($source-form)">
+            <!-- Got it from the request -->
+            <xforms:message level="xxforms:log-info">Got source form from request.</xforms:message>
+            <xforms:insert nodeset="instance('fr-source-form-instance')" origin="$source-form"/>
+        </xforms:action>
+        <xforms:action if="not(exists($source-form))">
+            <!--  Try submission -->
+            <xforms:message level="xxforms:log-info">Could not get source form from request. Trying submission instead.</xforms:message>
+            <xforms:send submission="get-source-form-submission"/>
+        </xforms:action>
         
         <!-- A document id is provided -->
         <xforms:action if="$parameters/document != ''">
@@ -253,7 +263,7 @@
             replace="instance" xxforms:instance="fr-form-instance"/>
 
     <!-- Source form with metadata -->
-    <xforms:instance id="fr-source-form-instance" xxforms:readonly="true">
+    <xforms:instance id="fr-source-form-instance" xxforms:readonly="false">
         <form xmlns=""/>
     </xforms:instance>
 

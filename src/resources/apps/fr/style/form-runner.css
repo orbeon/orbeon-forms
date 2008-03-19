@@ -333,7 +333,7 @@ div.fr-collapsible {
 .fr-grid .xforms-select1-appearance-full span input { float: left; }
 .fr-grid .xforms-select1-appearance-full span label { float: left; margin-right: 0 }
 /* Size of text for radio button; needs to be set for every page width / columns number combination */
-#doc .fr-grid-2-columns .xforms-select1-appearance-full span label { width: 24em; }
+#doc .fr-grid-2-columns .xforms-select1-appearance-full span label { width: 21em; *width: 20.5em }
 
 #doc4 .fr-grid-1-columns .xforms-select1-appearance-full span label { width: 68em; *width: 66em }
 #doc4 .fr-grid-2-columns .xforms-select1-appearance-full span label { width: 32em; *width: 31em  }

@@ -359,7 +359,7 @@ div.fr-collapsible {
 
 .fr-grid { width: 100%; border-collapse: separate; clear: both; margin-bottom: 0 }
 .fr-grid tr th { text-align: left }
-.fr-grid .fr-grid-content { overflow: hidden }/* IE HACK so that scrollable images work in the table */
+.fr-grid .fr-grid-content { *overflow: hidden }/* IE HACK so that scrollable images work in the table */
 
 .fr-grid .fr-layout-table tr td { width: auto }
 

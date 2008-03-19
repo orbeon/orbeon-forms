@@ -403,8 +403,10 @@
                 <exclude name="build/**"/>
                 <exclude name="oxfmark/**"/>
                 <exclude name="src/examples/**"/>
-                <exclude name="tools/**"/>
-                <include name="tools/ant/**"/>
+                <exclude name="tools/*.zip"/>
+                <exclude name="tools/*.sh"/>
+                <exclude name="tools/dom4j-1_4/**"/>
+                <exclude name="tools/commons-httpclient-3.2/**"/>
             </zipfileset>
         </zip>
     </target>

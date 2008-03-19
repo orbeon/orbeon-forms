@@ -175,20 +175,19 @@ h3, h4 {
 .xforms-repeat-selected-item-4 { background-color: transparent }
 
 .fr-summary-table tbody .xforms-repeat-selected-item-1 { background-color: #3598D4 }
-.fr-summary-table tbody .xforms-repeat-selected-item-2 { background-color: #3598D4 }/* needed for IE 7 only */
+.fr-summary-table tbody .xforms-repeat-selected-item-2 { background-color: #3598D4 }/* HACK for IE 7 only */
 .fr-summary-table tbody tr:hover { background-color: #3598D4 }
 
+.fr-summary-table .xforms-label { display: none; }
 .fr-summary-table, .fr-summary-table td, .fr-summary-table th { border: 1px solid #600 }
-.fr-summary-table tr th { background-color: #f8f8f8 }
-.fr-summary-table tr td, .fr-summary-table tr th { padding: 4px }
+.fr-summary-table th { background-color: #f8f8f8 }
+.fr-summary-table td, .fr-summary-table th { padding: 4px }
 
 .fr-summary-table {
     margin: 1px 0 0 1px;
     border-collapse: collapse;
     width: 100%;
 }
-
-.fr-summary-table .xforms-label { display: none; }
 
 .fr-summary-welcome-message { display: block; margin-top: 1em; margin-bottom: 1em }
 
@@ -360,6 +359,7 @@ div.fr-collapsible {
 
 .fr-grid { width: 100%; border-collapse: separate; clear: both; margin-bottom: 0 }
 .fr-grid tr th { text-align: left }
+.fr-grid .fr-grid-content { overflow: hidden }/* IE HACK so that scrollable images work in the table */
 
 .fr-grid .fr-layout-table tr td { width: auto }
 
@@ -373,6 +373,7 @@ div.fr-collapsible {
 
 /* Image output */
 .fr-grid .xforms-mediatype-image { width: 100%; overflow: auto; display: block }
+.fr-grid .xforms-mediatype-image { *padding-bottom: 17px; *overflow-y: hidden }/* IE HACK */
 .fr-grid .xforms-mediatype-image img { display: block }
 
 .fr-grid-td { width: auto; padding: .5em; vertical-align: top; overflow: hidden }

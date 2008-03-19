@@ -110,7 +110,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventHandlerCont
             try {
                 final String xmlString = containerElement.getStringValue();
                 if (!readonly) {
-                    documentInfo = new DocumentWrapper((Document) Dom4jUtils.normalizeTextNodes(Dom4jUtils.readDom4j(xmlString)), null, new Configuration());
+                    documentInfo = new DocumentWrapper((Document) Dom4jUtils.normalizeTextNodes(Dom4jUtils.readDom4j(xmlString, false, false)), null, new Configuration());
                 } else {
 
                     if (xmlString.length() > 0) {

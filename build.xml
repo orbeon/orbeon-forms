@@ -403,6 +403,8 @@
                 <exclude name="build/**"/>
                 <exclude name="oxfmark/**"/>
                 <exclude name="src/examples/**"/>
+                <exclude name="tools/**"/>
+                <include name="tools/ant/**"/>
             </zipfileset>
         </zip>
     </target>

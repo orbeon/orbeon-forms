@@ -44,8 +44,8 @@
                 <metadata>
                     <application-name/>
                     <form-name/>
-                    <title>[Give this form a title]</title>
-                    <description>[Optionally describe this form]</description>
+                    <title/>
+                    <description/>
                     <author/>
                     <logo mediatype="" filename="" size=""/>
                 </metadata>
@@ -64,11 +64,11 @@
                 <resources>
                     <resource xml:lang="en">
                         <section-1>
-                            <label>[Give this section a title]</label>
+                            <label/>
                         </section-1>
                         <control-1>
-                            <label>[Give this control a title]</label>
-                            <hint>[Optionally modify the hint]</hint>
+                            <label/>
+                            <hint/>
                             <help/>
                             <alert>The value of this field is incorrect</alert>
                         </control-1>

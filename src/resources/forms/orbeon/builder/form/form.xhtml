@@ -114,15 +114,22 @@
                     <resource xml:lang="en">
                         <application-name>
                             <label>Application Name</label>
+                            <hint>Please enter an application name</hint>
+                            <alert>The application name must be a non-empty identifier</alert>
                         </application-name>
                         <form-name>
                             <label>Form Name</label>
+                            <hint>Please enter a form name</hint>
+                            <alert>The form name must be a non-empty identifier</alert>
                         </form-name>
                         <title>
                             <label>Form Title</label>
+                            <hint>Please enter a form title</hint>
+                            <alert>The form title is required</alert>
                         </title>
                         <description>
                             <label>Form Description</label>
+                            <hint>Please enter an optional form description</hint>
                         </description>
                         <logo>
                             <label>Logo</label>
@@ -132,12 +139,18 @@
                     <resource xml:lang="fr">
                         <application-name>
                             <label>Nom de l'application</label>
+                            <hint>Veuillez entrer un nom d'application</hint>
+                            <alert>Le nom de l'application doit être un identifiant non vide</alert>
                         </application-name>
                         <form-name>
                             <label>Nom du formulaire</label>
+                            <hint>Veuillez entrer un nom de formulaire</hint>
+                            <alert>Le nom du formulaire doit être un identifiant non vide</alert>
                         </form-name>
                         <title>
                             <label>Titre du formulaire</label>
+                            <hint>Veuillez entrer un titre de formulaire</hint>
+                            <alert>Le titre de formulaire est requis</alert>
                         </title>
                         <description>
                             <label>Description du formulaire</label>
@@ -935,12 +948,14 @@
                         <xhtml:tr>
                             <xhtml:td>
                                 <xforms:input id="application-name-control" bind="application-name-bind" appearance="fr:in-place" class="fr-summary fr-search">
-                                    <xforms:label ref="$form-resources/application-name"/>
+                                    <xforms:label ref="$form-resources/application-name/label"/>
+                                    <xforms:hint ref="$form-resources/application-name/hint"/>
                                 </xforms:input>
                             </xhtml:td>
                             <xhtml:td>
                                 <xforms:input id="form-name-control" bind="form-name-bind" appearance="fr:in-place" class="fr-summary fr-search">
-                                    <xforms:label ref="$form-resources/form-name"/>
+                                    <xforms:label ref="$form-resources/form-name/label"/>
+                                    <xforms:hint ref="$form-resources/form-name/hint"/>
                                 </xforms:input>
                             </xhtml:td>
                         </xhtml:tr>
@@ -964,16 +979,20 @@
                                 </xforms:group>
                             </xhtml:td>
                             <xhtml:td>
-                                <xforms:input id="title-control" bind="title-bind" appearance="fr:in-place" class="fr-summary fr-search">
-                                    <xforms:label ref="$form-resources/title"/>
+                                <xforms:input id="title-control" bind="title-bind"
+                                              appearance="fr:in-place" class="fr-summary fr-search">
+                                    <xforms:label ref="$form-resources/title/label"/>
+                                    <xforms:hint ref="$form-resources/title/hint"/>
                                 </xforms:input>
                             </xhtml:td>
                         </xhtml:tr>
                         <xhtml:tr>
                             <xhtml:td colspan="2">
                                 <xhtml:div>
-                                    <xforms:textarea id="description-control" bind="description-bind" appearance="fr:in-place" class="fr-summary fr-search">
-                                        <xforms:label ref="$form-resources/description"/>
+                                    <xforms:textarea id="description-control" bind="description-bind"
+                                                     appearance="fr:in-place" class="fr-summary fr-search">
+                                        <xforms:label ref="$form-resources/description/label"/>
+                                        <xforms:hint ref="$form-resources/description/hint"/>
                                     </xforms:textarea>
                                 </xhtml:div>
                             </xhtml:td>
@@ -1342,6 +1361,7 @@
                                                                                         <xforms:input id="fb-control-label-control" ref="$resource-holder/label"
                                                                                                       appearance="fr:in-place" class="fb-control-label">
                                                                                             <xforms:label class="fb-xforms-disabled"/>
+                                                                                            <xforms:hint>Enter a label</xforms:hint>
                                                                                         </xforms:input>
                                                                                     </xhtml:span>
 
@@ -1492,6 +1512,7 @@
                                                                                         <xforms:input id="fb-control-hint-control" ref="$resource-holder/hint"
                                                                                                       appearance="fr:in-place" class="fb-control-hint">
                                                                                             <xforms:label class="fb-xforms-disabled"/>
+                                                                                            <xforms:hint>Enter an optional hint</xforms:hint>
                                                                                         </xforms:input>
                                                                                     </xhtml:span>
                                                                                 </xforms:group>

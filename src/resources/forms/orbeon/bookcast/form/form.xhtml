@@ -50,18 +50,50 @@
                 </xforms:bind>
             </xforms:bind>
 
+            <!-- Metadata -->
+            <xforms:instance id="fr-form-metadata" xxforms:readonly="true">
+                <metadata xmlns="">
+                    <application-name>orbeon</application-name>
+                    <form-name>bookcast</form-name>
+                    <title>Orbeon Forms Bookcast Application</title>
+                    <description>The Orbeon Forms Bookcast application is a simple form allowing you to gather information about books.</description>
+                    <author>Orbeon, Inc.</author>
+                    <logo mediatype="" filename="" size=""/>
+                </metadata>
+            </xforms:instance>
+
+            <!-- Attachments -->
+            <xforms:instance id="fr-form-attachments">
+                <attachments xmlns="">
+                    <css mediatype="text/css" filename="" size=""/>
+                    <pdf mediatype="application/pdf" filename="" size=""/>
+                </attachments>
+            </xforms:instance>
+
             <!-- XForms instance containing all the resources -->
             <xforms:instance id="fr-form-resources">
                 <resources xmlns="">
                     <resource xml:lang="en">
-                        <title>Title</title>
-                        <author>Author</author>
-                        <language>Language</language>
+                        <title>
+                            <label>Title</label>
+                        </title>
+                        <author>
+                            <label>Author</label>
+                        </author>
+                        <language>
+                            <label>Language</label>
+                        </language>
                     </resource>
                     <resource xml:lang="fr">
-                        <title>Titre</title>
-                        <author>Auteur</author>
-                        <language>Langue</language>
+                        <title>
+                            <label>Titre</label>
+                        </title>
+                        <author>
+                            <label>Auteur</label>
+                        </author>
+                        <language>
+                            <label>Langue</label>
+                        </language>
                     </resource>
                 </resources>
             </xforms:instance>
@@ -115,11 +147,6 @@
                 </ratings>
             </xforms:instance>
 
-            <!-- Submission to load the sample data -->
-            <xforms:submission id="sample-data-submission" serialization="none"
-                       method="get" action="oxf:/apps/xforms-bookcast/sample-data.xml"
-                       replace="instance" instance="fr-form-instance"/>
-
         </xforms:model>
     </head>
     <body>
@@ -127,20 +154,6 @@
             <xforms:label>XForms Bookcast</xforms:label>
             <xhtml:img src="/apps/fr/style/orbeon-logo-trimmed-transparent-42.png"/>
             <fr:body>
-                <!--<p>-->
-                    <!--<i>This example is described in details in the <a href="/doc/intro-tutorial">Orbeon Forms Tutorial</a>.</i>-->
-                <!--</p>-->
-                <!-- This table contains the main actions for the page  -->
-                <!--<table class="books-action-table">-->
-                    <!--<tr>-->
-                        <!--<td>-->
-                            <!--<xforms:submit submission="sample-data-submission" appearance="minimal">-->
-                                <!--<xforms:label><img src="/apps/fr/style/add-all.gif" alt="Load Sample Data"/> Load Sample Data</xforms:label>-->
-                            <!--</xforms:submit>-->
-                        <!--</td>-->
-                    <!--</tr>-->
-                <!--</table>-->
-
                 <fr:section id="details-section" context="details">
                     <xforms:label>Book Details</xforms:label>
                     <fr:grid columns="2">

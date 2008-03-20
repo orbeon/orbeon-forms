@@ -325,14 +325,51 @@
         </xforms:trigger>
     </xsl:template>
 
+    <xsl:template name="fr-handle-inplace-hint">
+        <xsl:choose>
+            <xsl:when test="@ref">
+                <xsl:choose>
+                    <xsl:when test="xforms:hint">
+                        <xsl:attribute name="value"
+                                       select="concat('for $value in ', @ref, '
+                                                       return if (normalize-space($value) = '''')
+                                                              then concat(''['', ', if (xforms:hint/@ref) then xforms:hint/@ref else concat('''', xforms:hint, ''''), ', '']'')
+                                                              else $value')"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:attribute name="value" select="@ref"/>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:when>
+            <xsl:when test="@bind">
+                <xsl:choose>
+                    <xsl:when test="xforms:hint">
+                        <xsl:attribute name="value"
+                                       select="concat('for $value in xxforms:bind(''', @bind, ''')
+                                                       return if (normalize-space($value) = '''')
+                                                              then concat(''['', ', if (xforms:hint/@ref) then xforms:hint/@ref else concat('''', xforms:hint, ''''), ', '']'')
+                                                              else $value')"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:copy-of select="@bind"/>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:when>
+        </xsl:choose>
+    </xsl:template>
+
     <xsl:template match="xhtml:body//xforms:input[@appearance='fr:in-place']">
         <xforms:switch id="{@id}">
             <xsl:attribute name="class" select="string-join(('fr-inplace-input', @class), ' ')"/>
             <xforms:case id="fr-inplace-{@id}-view">
+                <!-- View mode -->
                 <xhtml:div class="fr-inplace-view">
                     <xhtml:span class="fr-inplace-content">
                         <xforms:output class="fr-inplace-value">
-                            <xsl:copy-of select="@ref | @bind | xforms:label"/>
+                            <!-- Handle inline hint-->
+                            <xsl:call-template name="fr-handle-inplace-hint"/>
+                            <!-- Keep label as is -->
+                            <xsl:copy-of select="xforms:label"/>
                             <xforms:action ev:event="DOMActivate">
                                 <xforms:toggle case="fr-inplace-{@id}-edit"/>
                                 <xforms:setfocus control="fr-inplace-{@id}-input"/>
@@ -344,18 +381,12 @@
                                 <!-- Dispatch custom event to trigger -->
                                 <xforms:dispatch ev:event="DOMActivate" target="fr-inplace-{@id}-delete" name="fr-delete"/>
                             </xforms:trigger>
-                            <!--<xforms:trigger appearance="minimal" class="fr-inplace-edit">-->
-                                <!--<xforms:label>Change</xforms:label>-->
-                                <!--<xforms:action ev:event="DOMActivate">-->
-                                    <!--<xforms:toggle case="fr-inplace-{@id}-edit"/>-->
-                                    <!--<xforms:setfocus control="fr-inplace-{@id}-input"/>-->
-                                <!--</xforms:action>-->
-                            <!--</xforms:trigger>-->
                         </xhtml:span>
                     </xhtml:span>
                 </xhtml:div>
             </xforms:case>
             <xforms:case id="fr-inplace-{@id}-edit">
+                <!-- Edit mode -->
                 <xhtml:div class="fr-inplace-edit">
                     <xhtml:span class="fr-inplace-content">
                         <xforms:input id="fr-inplace-{@id}-input" class="fr-inplace-value">
@@ -377,7 +408,7 @@
                 </xhtml:div>
             </xforms:case>
             <!-- Copy other children elements, including event handlers -->
-            <xsl:apply-templates select="* except xforms:label"/>
+            <xsl:apply-templates select="* except xforms:label | xforms:hint"/>
         </xforms:switch>
     </xsl:template>
 
@@ -388,24 +419,15 @@
                 <xhtml:div class="fr-inplace-view">
                     <xhtml:span class="fr-inplace-content">
                         <xforms:output class="fr-inplace-value">
-                            <xsl:copy-of select="@ref | @bind | xforms:label"/>
+                            <!-- Handle inline hint-->
+                            <xsl:call-template name="fr-handle-inplace-hint"/>
+                            <!-- Keep label as is -->
+                            <xsl:copy-of select="xforms:label"/>
                             <xforms:action ev:event="DOMActivate">
                                 <xforms:toggle case="fr-inplace-{@id}-edit"/>
                                 <xforms:setfocus control="fr-inplace-{@id}-textarea"/>
                             </xforms:action>
                         </xforms:output>
-                        <!--<xhtml:span class="fr-inplace-buttons">-->
-                            <!--<xforms:trigger appearance="minimal" class="fr-inplace-delete">-->
-                                <!--<xforms:label><xhtml:img src="../../../../apps/fr/style/trash.gif" alt="Delete" title="Delete Section"/></xforms:label>-->
-                            <!--</xforms:trigger>-->
-                            <!--<xforms:trigger appearance="minimal" class="fr-inplace-edit">-->
-                                <!--<xforms:label>Change</xforms:label>-->
-                                <!--<xforms:action ev:event="DOMActivate">-->
-                                    <!--<xforms:toggle case="fr-inplace-{@id}-edit"/>-->
-                                    <!--<xforms:setfocus control="fr-inplace-{@id}-textarea"/>-->
-                                <!--</xforms:action>-->
-                            <!--</xforms:trigger>-->
-                        <!--</xhtml:span>-->
                     </xhtml:span>
                 </xhtml:div>
             </xforms:case>

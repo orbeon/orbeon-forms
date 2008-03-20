@@ -43,7 +43,7 @@ public class XFormsSecretHandler extends XFormsCoreControlHandler {
             final StringBuffer classes = getInitialClasses(localname, attributes, secretControl);
             handleMIPClasses(classes, secretControl);
             newAttributes = getAttributes(attributes, classes.toString(), effectiveId);
-`            handleReadOnlyAttribute(newAttributes, containingDocument, secretControl);
+            handleReadOnlyAttribute(newAttributes, containingDocument, secretControl);
         }
 
         // Create xhtml:input

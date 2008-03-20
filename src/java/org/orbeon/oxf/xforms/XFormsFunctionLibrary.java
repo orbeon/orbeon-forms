@@ -173,6 +173,10 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
         e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI + "}repeat-nodeset", XXFormsRepeatNodeset.class, 0, 1, 1, Type.NODE_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);
         StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
 
+        // xxforms:bind
+        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI + "}bind", XXFormsBind.class, 0, 1, 1, Type.NODE_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);
+        StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
+
         // xxforms:valid
         e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI  + "}valid", XXFormsValid.class, 0, 1, 1, Type.BOOLEAN_TYPE, StaticProperty.EXACTLY_ONE);
         StandardFunction.arg(e, 0, Type.NODE_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);

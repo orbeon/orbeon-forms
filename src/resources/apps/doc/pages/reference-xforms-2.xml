@@ -812,14 +812,41 @@
                             </note>
                         </li>
                         <li>
+                            <a name="xxforms-bind"/>
+                            <p>
+                                <code>xxforms:bind(bind-id as xs:string) as node()*</code>
+                            </p>
+                            <p>
+                                The <code>xxforms:bind()</code> function returns the node-set of a given
+                                <code>&lt;xforms:bind></code>:
+                            </p>
+                            <xml-source show-namespaces="false">
+                                <comment> The following... </comment>
+                                <xforms:input bind="my-bind">
+                                    ...
+                                </xforms:input>
+                                <comment> ...is equivalent to this: </comment>
+                                <xforms:input ref="xxforms:bind('my-bind')">
+                                    ...
+                                </xforms:input>
+                            </xml-source>
+                            <p>
+                                <code>xxforms:bind()</code> is particularly useful when referring to a bind is subject
+                                to a condition:
+                            </p>
+                            <xml-source>
+                                <xforms:hint ref="for $bind in xxforms:bind('my-hint') return if (normalize-space($bind) = '') then instance('default-hint') else $bind"/>
+                            </xml-source>
+                        </li>
+                        <li>
                             <a name="xxforms-repeat-nodeset"/>
                             <p>
                                 <code>xxforms:repeat-nodeset($repeat-id as xs:string) as node()*</code>
                             </p>
                             <p>
-                                The <code>xxforms:repeat-nodeset()</code> function allows you to obtain the node-set of
-                                an enclosing <code>xforms:repeat</code>. It takes one mandatory string parameter
-                                containing the id of an enclosing repeat XForms control.
+                                The <code>xxforms:repeat-nodeset()</code> function returns the node-set of an enclosing
+                                <code>xforms:repeat</code>. It takes one mandatory string parameter containing the id of
+                                an enclosing repeat XForms control.
                             </p>
                             <xml-source show-namespaces="false">
                                 <xforms:repeat id="employee-repeat" nodeset="employee">

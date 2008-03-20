@@ -23,6 +23,7 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.oxf.util.UUIDUtils;
+import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerImpl;
 import org.orbeon.oxf.xforms.processor.XFormsDocumentAnnotatorContentHandler;
@@ -32,6 +33,9 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.saxon.om.FastStringBuffer;
+import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.saxon.dom4j.DocumentWrapper;
+import org.orbeon.saxon.Configuration;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -78,7 +82,7 @@ public class XFormsStaticState {
     private LocationData locationData;
 
     // Static analysis
-    private boolean isAnalyzed;
+    private boolean isAnalyzed;             // whether this document has been analyzed already
     private Map controlNamesMap;            // Map<String, String> of control name to ""
     private Map eventNamesMap;              // Map<String, String> of event name to ""
     private Map eventHandlersMap;           // Map<String, List<XFormsEventHandler>> of control id to event handlers
@@ -88,6 +92,7 @@ public class XFormsStaticState {
     private Map repeatChildrenMap;          // Map<String, List> of repeat id to List of children
     private Map repeatDescendantsMap;       // Map<String, List> of repeat id to List of descendants (computed on demand)
     private String repeatHierarchyString;   // contains comma-separated list of space-separated repeat id and ancestor if any
+    private Map itemsInfoMap;               // Map<String, ItemsInfo> of control id to ItemsInfo
 
     /**
      * Create static state object from an encoded version.
@@ -429,6 +434,10 @@ public class XFormsStaticState {
         return controlNamesMap.get(controlName) != null;
     }
 
+    public ItemsInfo getItemsInfo(String controlId) {
+        return (XFormsStaticState.ItemsInfo) itemsInfoMap.get(controlId);
+    }
+
     /**
      * Return the list of repeat ids descendant of a given repeat id.
      */
@@ -460,7 +469,7 @@ public class XFormsStaticState {
         }
     }
 
-    public synchronized boolean analyzeIfNecessary() {
+    public synchronized boolean analyzeIfNecessary(final PipelineContext pipelineContext) {
         if (!isAnalyzed) {
             controlNamesMap = new HashMap();
             eventNamesMap = new HashMap();
@@ -469,6 +478,8 @@ public class XFormsStaticState {
             defaultRepeatIdToIndex = new HashMap();
             repeatChildrenMap = new HashMap();
             repeatDescendantsMap = new HashMap();
+
+            final DocumentWrapper controlsDocumentInfo = new DocumentWrapper(controlsDocument, null, new Configuration());
 
             // Iterate over static controls tree
             final FastStringBuffer repeatHierarchyStringBuffer = new FastStringBuffer(1024);
@@ -559,6 +570,22 @@ public class XFormsStaticState {
 
                         repeatAncestorsStack.push(controlId);
                     }
+
+                    // Gather itemset information
+                    if (controlName.equals("select") || controlName.equals("select1")) {
+
+                        final NodeInfo controlNodeInfo = controlsDocumentInfo.wrap(controlElement);
+
+                        // Try to figure out if we have dynamic items. This attempts to cover all cases, including nested xforms:output controls.
+                        final boolean hasNonStaticItem = ((Boolean) XPathCache.evaluateSingle(pipelineContext, controlNodeInfo,
+                                "exists(.//xforms:*[@ref or @nodeset or @bind or @value])", getNamespaceMappings(controlElement),
+                                null, null, null, null, locationData)).booleanValue();
+
+                        // Remember information
+                        if (itemsInfoMap == null)
+                            itemsInfoMap = new HashMap();
+                        itemsInfoMap.put(controlId, new ItemsInfo(hasNonStaticItem));
+                    }
                 }
 
                 public void endVisitControl(Element controlElement, String controlId) {
@@ -646,5 +673,17 @@ public class XFormsStaticState {
     private static interface ControlElementVisitorListener {
         public void startVisitControl(Element controlElement, String controlId);
         public void endVisitControl(Element controlElement, String controlId);
+    }
+
+    public static class ItemsInfo {
+        private boolean hasNonStaticItem;
+
+        public ItemsInfo(boolean hasNonStaticItem) {
+            this.hasNonStaticItem = hasNonStaticItem;
+        }
+
+        public boolean isHasNonStaticItem() {
+            return hasNonStaticItem;
+        }
     }
 }

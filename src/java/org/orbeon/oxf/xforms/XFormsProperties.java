@@ -34,6 +34,9 @@ public class XFormsProperties {
     public static final String READONLY_APPEARANCE_STATIC_VALUE = "static";
     public static final String READONLY_APPEARANCE_DYNAMIC_VALUE = "dynamic";
 
+    public static final String ORDER_PROPERTY = "order";
+    public static final String DEFAULT_ORDER_PROPERTY = "label help control alert hint";
+
     public static final String EXTERNAL_EVENTS_PROPERTY = "external-events";
     private static final String READONLY_PROPERTY = "readonly";
 
@@ -132,6 +135,7 @@ public class XFormsProperties {
             new PropertyDefinition(STATE_HANDLING_PROPERTY, STATE_HANDLING_SERVER_VALUE, false),
             new PropertyDefinition(READONLY_PROPERTY, false, false),
             new PropertyDefinition(READONLY_APPEARANCE_PROPERTY, READONLY_APPEARANCE_DYNAMIC_VALUE, false),
+            new PropertyDefinition(ORDER_PROPERTY, DEFAULT_ORDER_PROPERTY, false),
             new PropertyDefinition(EXTERNAL_EVENTS_PROPERTY, "", false),
             new PropertyDefinition(OPTIMIZE_GET_ALL_PROPERTY, true, false),
             new PropertyDefinition(OPTIMIZE_LOCAL_SUBMISSION_PROPERTY, true, false),
@@ -366,6 +370,10 @@ public class XFormsProperties {
 
     public static String getReadonlyAppearance(XFormsContainingDocument containingDocument) {
         return getStringProperty(containingDocument, READONLY_APPEARANCE_PROPERTY);
+    }
+
+    public static String getOrder(XFormsContainingDocument containingDocument) {
+        return getStringProperty(containingDocument, ORDER_PROPERTY);
     }
 
     public static boolean isStaticReadonlyAppearance(XFormsContainingDocument containingDocument) {

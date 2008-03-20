@@ -1344,7 +1344,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         final Element repeatIndexesElement = dynamicStateDocument.getRootElement().element("repeat-indexes");
 
         // Create XForms controls and models
-        createControlAndModel(repeatIndexesElement);
+        createControlAndModel(pipelineContext, repeatIndexesElement);
 
         // Extract and restore instances
         {
@@ -1435,7 +1435,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         // This is called upon the first creation of the XForms engine only
 
         // Create XForms controls and models
-        createControlAndModel(null);
+        createControlAndModel(pipelineContext, null);
 
         // 4.2 Initialization Events
 
@@ -1484,13 +1484,13 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         this.mustPerformInitializationFirstRefresh = false;
     }
 
-    private void createControlAndModel(Element repeatIndexesElement) {
+    private void createControlAndModel(PipelineContext pipelineContext, Element repeatIndexesElement) {
 
         if (xformsStaticState != null) {
 
             // Gather static analysis information
             final long startTime = XFormsServer.logger.isDebugEnabled() ? System.currentTimeMillis() : 0;
-            final boolean analyzed = xformsStaticState.analyzeIfNecessary();
+            final boolean analyzed = xformsStaticState.analyzeIfNecessary(pipelineContext);
             if (XFormsServer.logger.isDebugEnabled()) {
                 if (analyzed)
                     logDebug("containing document", "performed static analysis", new String[] { "time", Long.toString(System.currentTimeMillis() - startTime) });

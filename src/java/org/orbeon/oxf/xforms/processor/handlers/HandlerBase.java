@@ -44,7 +44,7 @@ public abstract class HandlerBase extends ElementHandler {
 
     // NOTE: the XForms schema seems to indicates that "style", "onchange", and others
     // cannot be used; those should probably be in the XHTML namespace
-    private static final String[] XHTML_ATTRIBUTES_TO_COPY = {"style", "onchange" };
+    private static final String[] XHTML_ATTRIBUTES_TO_COPY = { "style", "onchange" };
 
     private boolean repeating;
     private boolean forwarding;

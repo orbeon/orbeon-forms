@@ -362,20 +362,17 @@ public class XFormsToXHTML extends ProcessorImpl {
         controller.registerHandler(XHTMLHeadHandler.class.getName(), XMLConstants.XHTML_NAMESPACE_URI, "head");
         controller.registerHandler(XHTMLBodyHandler.class.getName(), XMLConstants.XHTML_NAMESPACE_URI, "body");
 
-        // Set final output with output to filter remaining xforms:* elements if any
-        // TODO: Remove this filter once the "exception elements" below are filtered at the source.
-        controller.setOutput(new DeferredContentHandlerImpl(new XFormsElementFilterContentHandler(contentHandler)));
+        // Set final output
+        controller.setOutput(new DeferredContentHandlerImpl(contentHandler));
 
         controller.setElementHandlerContext(new HandlerContext(controller, pipelineContext, containingDocument, xformsState, staticStateUUID, dynamicStateUUID, externalContext));
 
         // Process everything
         annotatedDocument.replay(new ElementFilterContentHandler(controller) {
             protected boolean isFilterElement(String uri, String localname, String qName, Attributes attributes) {
-                // We filter everything that is not a control
-                // TODO: There are some temporary exceptions, but those should actually be handled by the ControlInfo in the first place
-                return (XFormsConstants.XXFORMS_NAMESPACE_URI.equals(uri) && !(localname.equals("img") || localname.equals("dialog")))
-                        || (XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri)
-                            && !(XFormsControls.isActualControl(localname) || exceptionXFormsElements.get(localname) != null));
+                // We filter everything that is not a control element
+                return !XFormsControls.isActualControl(localname)
+                        && (XFormsConstants.XXFORMS_NAMESPACE_URI.equals(uri) || XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri));
             }
 
             // Below we wrap all the exceptions to try to add location information
@@ -477,14 +474,6 @@ public class XFormsToXHTML extends ProcessorImpl {
                     throw new OXFException(e);// this should not happen
             }
         });
-    }
-
-    private static final Map exceptionXFormsElements = new HashMap();
-
-    static {
-        // This is still used by XFormsSelect1Handler
-        exceptionXFormsElements.put("item", "");
-        exceptionXFormsElements.put("itemset", "");
     }
 
     private void testOutputResponseState(final PipelineContext pipelineContext, final XFormsContainingDocument containingDocument,

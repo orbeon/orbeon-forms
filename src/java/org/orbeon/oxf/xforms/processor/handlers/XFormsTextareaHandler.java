@@ -15,7 +15,8 @@ package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsUtils;
-import org.orbeon.oxf.xforms.control.XFormsValueControl;
+import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
+import org.orbeon.oxf.xforms.control.controls.XFormsTextareaControl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -27,56 +28,44 @@ import org.xml.sax.helpers.AttributesImpl;
 /**
  * Handle xforms:textarea.
  */
-public class XFormsTextareaHandler extends XFormsValueControlHandler {
+public class XFormsTextareaHandler extends XFormsCoreControlHandler {
 
     private static final String[] XXFORMS_ATTRIBUTES_TO_COPY = { "rows", "cols" };
-    private Attributes elementAttributes;
 
     public XFormsTextareaHandler() {
         super(false);
     }
 
-    public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
-        elementAttributes = new AttributesImpl(attributes);
-        super.start(uri, localname, qName, attributes);
-    }
+    protected void handleControl(String uri, String localname, String qName, Attributes attributes, String id, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
 
-    public void end(String uri, String localname, String qName) throws SAXException {
-
+        final XFormsTextareaControl textareaControl = (XFormsTextareaControl) xformsControl;
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
-        final String id = handlerContext.getId(elementAttributes);
-        final String effectiveId = handlerContext.getEffectiveId(elementAttributes);
-        final XFormsValueControl xformsControl = handlerContext.isGenerateTemplate()
-                ? null : (XFormsValueControl) containingDocument.getObjectById(effectiveId);
-        final boolean isConcreteControl = xformsControl != null;
-
-        // xforms:label
-        handleLabelHintHelpAlert(id, effectiveId, "label", xformsControl);
+        final boolean isConcreteControl = textareaControl != null;
 
         final AttributesImpl newAttributes;
         {
-            final StringBuffer classes = getInitialClasses(localname, elementAttributes, xformsControl);
-            handleMIPClasses(classes, xformsControl);
-            newAttributes = getAttributes(elementAttributes, classes.toString(), effectiveId);
-            handleReadOnlyAttribute(newAttributes, containingDocument, xformsControl);
+            final StringBuffer classes = getInitialClasses(localname, attributes, textareaControl);
+            handleMIPClasses(classes, textareaControl);
+            newAttributes = getAttributes(attributes, classes.toString(), effectiveId);
+            handleReadOnlyAttribute(newAttributes, containingDocument, textareaControl);
         }
 
         // Create xhtml:textarea
         {
             final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
-            if (!isStaticReadonly(xformsControl)) {
+            if (!isStaticReadonly(textareaControl)) {
                 final String textareaQName = XMLUtils.buildQName(xhtmlPrefix, "textarea");
                 newAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, effectiveId);
 
                 // Copy special attributes in xxforms namespace
-                copyAttributes(elementAttributes, XFormsConstants.XXFORMS_NAMESPACE_URI, XXFORMS_ATTRIBUTES_TO_COPY, newAttributes);
+                copyAttributes(attributes, XFormsConstants.XXFORMS_NAMESPACE_URI, XXFORMS_ATTRIBUTES_TO_COPY, newAttributes);
 
                 // Handle accessibility attributes
-                handleAccessibilityAttributes(elementAttributes, newAttributes);
+                handleAccessibilityAttributes(attributes, newAttributes);
 
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "textarea", textareaQName, newAttributes);
                 if (isConcreteControl) {
-                    final String value = xformsControl.getExternalValue(pipelineContext);
+                    final String value = textareaControl.getExternalValue(pipelineContext);
                     if (value != null)
                         contentHandler.characters(value.toCharArray(), 0, value.length());
                 }
@@ -86,27 +75,18 @@ public class XFormsTextareaHandler extends XFormsValueControlHandler {
 
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, newAttributes);
                 if (isConcreteControl) {
-                    final String value = xformsControl.getExternalValue(pipelineContext);
+                    final String value = textareaControl.getExternalValue(pipelineContext);
                     if (value != null) {
-                        final boolean isHTMLMediaType = "text/html".equals(xformsControl.getMediatype());
+                        final boolean isHTMLMediaType = "text/html".equals(textareaControl.getMediatype());
                         if (!isHTMLMediaType) {
                             contentHandler.characters(value.toCharArray(), 0, value.length());
                         } else {
-                            XFormsUtils.streamHTMLFragment(contentHandler, value, xformsControl.getLocationData(), xhtmlPrefix);
+                            XFormsUtils.streamHTMLFragment(contentHandler, value, textareaControl.getLocationData(), xhtmlPrefix);
                         }
                     }
                 }
                 contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
             }
         }
-
-        // xforms:help
-        handleLabelHintHelpAlert(id, effectiveId, "help", xformsControl);
-
-        // xforms:alert
-        handleLabelHintHelpAlert(id, effectiveId, "alert", xformsControl);
-
-        // xforms:hint
-        handleLabelHintHelpAlert(id, effectiveId, "hint", xformsControl);
     }
 }

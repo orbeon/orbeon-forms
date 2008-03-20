@@ -14,10 +14,13 @@
 package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.XFormsControls;
+import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl;
-import org.orbeon.oxf.xml.*;
+import org.orbeon.oxf.xml.ContentHandlerHelper;
+import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.XMLUtils;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -28,28 +31,13 @@ import org.xml.sax.helpers.AttributesImpl;
  * 
  * @noinspection SimplifiableIfStatement
  */
-public class XFormsOutputHandler extends XFormsValueControlHandler {
-
-    private Attributes elementAttributes;
+public class XFormsOutputHandler extends XFormsCoreControlHandler {
 
     public XFormsOutputHandler() {
         super(false);
     }
 
-    public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
-        elementAttributes = new AttributesImpl(attributes);
-        super.start(uri, localname, qName, attributes);
-    }
-
-    public void end(String uri, String localname, String qName) throws SAXException {
-
-        final ContentHandler contentHandler = handlerContext.getController().getOutput();
-        final String id = handlerContext.getId(elementAttributes);
-        final String effectiveId = handlerContext.getEffectiveId(elementAttributes);
-        final XFormsOutputControl xformsOutputControl = handlerContext.isGenerateTemplate()
-                ? null : (XFormsOutputControl) containingDocument.getObjectById(effectiveId);
-        final boolean isConcreteControl = xformsOutputControl != null;
-
+    protected boolean mustOutputControl() {
         // Don't do anything when xforms:output is used as a "pseudo-control", that is when it is within a leaf control,
         // because in that case we don't put the control in the regular hierarchy of controls.
         final String parentHandlerName = handlerContext.getController().getParentHandlerExplodedQName();
@@ -62,29 +50,40 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
                 parentHandlerLocalname = parentHandlerName;
             }
             if (XFormsControls.isLeafControl(parentHandlerLocalname))
-                return;
+                return false;
         }
+        return true;
+    }
 
-        // xforms:label
-        handleLabelHintHelpAlert(id, effectiveId, "label", xformsOutputControl);
+    protected boolean isOutputStandardAlert(Attributes attributes) {
+        // Handle alert only if there is no value attribute
+        return attributes.getValue("value") == null;
+    }
+
+    protected void handleControl(String uri, String localname, String qName, Attributes attributes, String id, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
+
+        final XFormsOutputControl outputControl = (XFormsOutputControl) xformsControl;
+
+        final ContentHandler contentHandler = handlerContext.getController().getOutput();
+        final boolean isConcreteControl = outputControl != null;
 
         final AttributesImpl newAttributes;
         final boolean isDateOrTime;
-        final StringBuffer classes = getInitialClasses(localname, elementAttributes, xformsOutputControl);
+        final StringBuffer classes = getInitialClasses(localname, attributes, outputControl);
 
-        final String mediatypeValue = elementAttributes.getValue("mediatype");
+        final String mediatypeValue = attributes.getValue("mediatype");
         final boolean isImageMediatype = mediatypeValue != null && mediatypeValue.startsWith("image/");
         final boolean isHTMLMediaType = (mediatypeValue != null && mediatypeValue.equals("text/html"))
-                || XFormsConstants.XXFORMS_HTML_APPEARANCE_QNAME.equals(getAppearance(elementAttributes));
+                || XFormsConstants.XXFORMS_HTML_APPEARANCE_QNAME.equals(getAppearance(attributes));
 
         if (!handlerContext.isGenerateTemplate()) {
             // Find classes to add
-            isDateOrTime = isConcreteControl && isDateOrTime(xformsOutputControl.getType());
+            isDateOrTime = isConcreteControl && isDateOrTime(outputControl.getType());
         } else {
             isDateOrTime = false;
         }
-        handleMIPClasses(classes, xformsOutputControl);
-        newAttributes = getAttributes(elementAttributes, classes.toString(), effectiveId);
+        handleMIPClasses(classes, outputControl);
+        newAttributes = getAttributes(attributes, classes.toString(), effectiveId);
 
         // Create xhtml:span or xhtml:div
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
@@ -108,7 +107,7 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
                 final AttributesImpl imgAttributes = new AttributesImpl();
                 // @src="..."
                 // NOTE: If producing a template, we must point to an existing image
-                final String srcValue = isConcreteControl ? xformsOutputControl.getExternalValue(pipelineContext) : XFormsConstants.DUMMY_IMAGE_URI;
+                final String srcValue = isConcreteControl ? outputControl.getExternalValue(pipelineContext) : XFormsConstants.DUMMY_IMAGE_URI;
                 imgAttributes.addAttribute("", "src", "src", ContentHandlerHelper.CDATA, srcValue);
 
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "img", imgQName, imgAttributes);
@@ -117,7 +116,7 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
             } else if (isDateOrTime) {
                 // Display formatted value for dates
                 if (isConcreteControl) {
-                    final String displayValue = xformsOutputControl.getDisplayValueOrExternalValue(pipelineContext);
+                    final String displayValue = outputControl.getDisplayValueOrExternalValue(pipelineContext);
                     if (displayValue != null)
                         contentHandler.characters(displayValue.toCharArray(), 0, displayValue.length());
                 }
@@ -125,13 +124,13 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
                 // HTML case
 
                 if (isConcreteControl) {
-                    final String displayValue = xformsOutputControl.getDisplayValueOrExternalValue(pipelineContext);
-                    XFormsUtils.streamHTMLFragment(contentHandler, displayValue, xformsOutputControl.getLocationData(), xhtmlPrefix);
+                    final String displayValue = outputControl.getDisplayValueOrExternalValue(pipelineContext);
+                    XFormsUtils.streamHTMLFragment(contentHandler, displayValue, outputControl.getLocationData(), xhtmlPrefix);
                 }
             } else {
                 // Regular text case
                 if (isConcreteControl) {
-                    final String displayValue = xformsOutputControl.getDisplayValueOrExternalValue(pipelineContext);
+                    final String displayValue = outputControl.getDisplayValueOrExternalValue(pipelineContext);
                     if (displayValue != null && displayValue.length() > 0)
                         contentHandler.characters(displayValue.toCharArray(), 0, displayValue.length());
                 }
@@ -141,16 +140,6 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
 
         // Handle namespace prefix if needed
         handlerContext.findFormattingPrefixUndeclare(formattingPrefix);
-
-        // xforms:help
-        handleLabelHintHelpAlert(id, effectiveId, "help", xformsOutputControl);
-
-        // xforms:alert
-        if (elementAttributes.getValue("value") == null)
-            handleLabelHintHelpAlert(id, effectiveId, "alert", xformsOutputControl);
-
-        // xforms:hint
-        handleLabelHintHelpAlert(id, effectiveId, "hint", xformsOutputControl);
     }
 
 }

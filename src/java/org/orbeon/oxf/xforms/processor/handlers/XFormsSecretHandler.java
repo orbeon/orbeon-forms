@@ -13,7 +13,8 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
-import org.orbeon.oxf.xforms.control.XFormsValueControl;
+import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
+import org.orbeon.oxf.xforms.control.controls.XFormsSecretControl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -25,72 +26,49 @@ import org.xml.sax.helpers.AttributesImpl;
 /**
  * Handle xforms:secret.
  */
-public class XFormsSecretHandler extends XFormsValueControlHandler {
+public class XFormsSecretHandler extends XFormsCoreControlHandler {
 
     private static final String HIDDEN_PASSWORD = "********";
-
-    private Attributes elementAttributes;
 
     public XFormsSecretHandler() {
         super(false);
     }
 
-    public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
-        elementAttributes = new AttributesImpl(attributes);
-        super.start(uri, localname, qName, attributes);
-    }
+    protected void handleControl(String uri, String localname, String qName, Attributes attributes, String id, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
 
-    public void end(String uri, String localname, String qName) throws SAXException {
-
+        final XFormsSecretControl secretControl = (XFormsSecretControl) xformsControl;
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
-        final String id = handlerContext.getId(elementAttributes);
-        final String effectiveId = handlerContext.getEffectiveId(elementAttributes);
-        final XFormsValueControl xformsControl = handlerContext.isGenerateTemplate()
-                ? null : (XFormsValueControl) containingDocument.getObjectById(effectiveId);
-
-        // xforms:label
-        handleLabelHintHelpAlert(id, effectiveId, "label", xformsControl);
-
         final AttributesImpl newAttributes;
         {
-            final StringBuffer classes = getInitialClasses(localname, elementAttributes, xformsControl);
-            handleMIPClasses(classes, xformsControl);
-            newAttributes = getAttributes(elementAttributes, classes.toString(), effectiveId);
-            handleReadOnlyAttribute(newAttributes, containingDocument, xformsControl);
+            final StringBuffer classes = getInitialClasses(localname, attributes, secretControl);
+            handleMIPClasses(classes, secretControl);
+            newAttributes = getAttributes(attributes, classes.toString(), effectiveId);
+`            handleReadOnlyAttribute(newAttributes, containingDocument, secretControl);
         }
 
         // Create xhtml:input
         {
             final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
-            if (!isStaticReadonly(xformsControl)) {
+            if (!isStaticReadonly(secretControl)) {
                 final String inputQName = XMLUtils.buildQName(xhtmlPrefix, "input");
                 newAttributes.addAttribute("", "type", "type", ContentHandlerHelper.CDATA, "password");
                 newAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, effectiveId);
                 newAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA,
-                        handlerContext.isGenerateTemplate() || xformsControl.getExternalValue(pipelineContext) == null ? "" : xformsControl.getExternalValue(pipelineContext));
+                        handlerContext.isGenerateTemplate() || secretControl.getExternalValue(pipelineContext) == null ? "" : secretControl.getExternalValue(pipelineContext));
 
                 // Handle accessibility attributes
-                handleAccessibilityAttributes(elementAttributes, newAttributes);
+                handleAccessibilityAttributes(attributes, newAttributes);
 
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName, newAttributes);
                 contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName);
             } else {
                 final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, newAttributes);
-                final String value = xformsControl.getValue();
+                final String value = secretControl.getValue();
                 if (value != null && value.length() > 0)
                     contentHandler.characters(HIDDEN_PASSWORD.toCharArray(), 0, HIDDEN_PASSWORD.length());
                 contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
             }
         }
-
-        // xforms:help
-        handleLabelHintHelpAlert(id, effectiveId, "help", xformsControl);
-
-        // xforms:alert
-        handleLabelHintHelpAlert(id, effectiveId, "alert", xformsControl);
-
-        // xforms:hint
-        handleLabelHintHelpAlert(id, effectiveId, "hint", xformsControl);
     }
 }

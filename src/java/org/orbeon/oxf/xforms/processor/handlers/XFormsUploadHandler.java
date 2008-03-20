@@ -13,8 +13,9 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
-import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
 import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
+import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -26,44 +27,31 @@ import org.xml.sax.helpers.AttributesImpl;
 /**
  * Handle xforms:upload.
  */
-public class XFormsUploadHandler extends XFormsValueControlHandler {
+public class XFormsUploadHandler extends XFormsCoreControlHandler {
 
     private static final String[] XXFORMS_ATTRIBUTES_TO_COPY = { "size" };
-
-    private Attributes elementAttributes;
 
     public XFormsUploadHandler() {
         super(false);
     }
 
-    public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
-        elementAttributes = new AttributesImpl(attributes);
-        super.start(uri, localname, qName, attributes);
-    }
+    protected void handleControl(String uri, String localname, String qName, Attributes attributes, String id, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
 
-    public void end(String uri, String localname, String qName) throws SAXException {
-
+        final XFormsUploadControl uploadControl = (XFormsUploadControl) xformsControl;
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
-        final String id = handlerContext.getId(elementAttributes);
-        final String effectiveId = handlerContext.getEffectiveId(elementAttributes);
-        final XFormsUploadControl xformsControl = handlerContext.isGenerateTemplate()
-                ? null : (XFormsUploadControl) containingDocument.getObjectById(effectiveId);
 
         // Control value
-        final String value = handlerContext.isGenerateTemplate() || xformsControl.getExternalValue(pipelineContext) == null ? "" : xformsControl.getExternalValue(pipelineContext);
-
-        // xforms:label
-        handleLabelHintHelpAlert(id, effectiveId, "label", xformsControl);
+        final String value = handlerContext.isGenerateTemplate() || uploadControl.getExternalValue(pipelineContext) == null ? "" : uploadControl.getExternalValue(pipelineContext);
 
         final AttributesImpl newAttributes;
         {
-            final StringBuffer classes = getInitialClasses(localname, elementAttributes, xformsControl);
+            final StringBuffer classes = getInitialClasses(localname, attributes, uploadControl);
             if (value.equals(""))
                 classes.append(" xforms-upload-state-empty");
             else
                 classes.append(" xforms-upload-state-file");
-            handleMIPClasses(classes, xformsControl);
-            newAttributes = getAttributes(elementAttributes, classes.toString(), effectiveId);
+            handleMIPClasses(classes, uploadControl);
+            newAttributes = getAttributes(attributes, classes.toString(), effectiveId);
         }
 
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
@@ -82,10 +70,10 @@ public class XFormsUploadHandler extends XFormsValueControlHandler {
                 // NOTE: @value was meant to suggest an initial file name, but this is not supported by browsers
 
                 // Copy special attributes in xxforms namespace
-                copyAttributes(elementAttributes, XFormsConstants.XXFORMS_NAMESPACE_URI, XXFORMS_ATTRIBUTES_TO_COPY, reusableAttributes);
+                copyAttributes(attributes, XFormsConstants.XXFORMS_NAMESPACE_URI, XXFORMS_ATTRIBUTES_TO_COPY, reusableAttributes);
 
                 // Handle accessibility attributes
-                handleAccessibilityAttributes(elementAttributes, reusableAttributes);
+                handleAccessibilityAttributes(attributes, reusableAttributes);
 
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName, reusableAttributes);
                 contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName);
@@ -100,7 +88,7 @@ public class XFormsUploadHandler extends XFormsValueControlHandler {
                     reusableAttributes.clear();
                     reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-upload-filename");
                     contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, reusableAttributes);
-                    final String filename = (xformsControl == null) ? null : xformsControl.getFilename(pipelineContext);
+                    final String filename = (uploadControl == null) ? null : uploadControl.getFilename(pipelineContext);
                     if (filename != null)
                         contentHandler.characters(filename.toCharArray(), 0, filename.length());
                     contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
@@ -109,7 +97,7 @@ public class XFormsUploadHandler extends XFormsValueControlHandler {
                     reusableAttributes.clear();
                     reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-upload-mediatype");
                     contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, reusableAttributes);
-                    final String mediatype = (xformsControl == null) ? null : xformsControl.getMediatype(pipelineContext);
+                    final String mediatype = (uploadControl == null) ? null : uploadControl.getMediatype(pipelineContext);
                     if (mediatype != null)
                         contentHandler.characters(mediatype.toCharArray(), 0, mediatype.length());
                     contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
@@ -118,7 +106,7 @@ public class XFormsUploadHandler extends XFormsValueControlHandler {
                     reusableAttributes.clear();
                     reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-upload-size");
                     contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, reusableAttributes);
-                    final String size = (xformsControl == null) ? null : xformsControl.getSize(pipelineContext);
+                    final String size = (uploadControl == null) ? null : uploadControl.getSize(pipelineContext);
                     if (size != null)
                         contentHandler.characters(size.toCharArray(), 0, size.length());
                     contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
@@ -138,14 +126,5 @@ public class XFormsUploadHandler extends XFormsValueControlHandler {
             }
             contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
         }
-
-        // xforms:help
-        handleLabelHintHelpAlert(id, effectiveId, "help", xformsControl);
-
-        // xforms:alert
-        handleLabelHintHelpAlert(id, effectiveId, "alert", xformsControl);
-
-        // xforms:hint
-        handleLabelHintHelpAlert(id, effectiveId, "hint", xformsControl);
     }
 }

@@ -34,10 +34,11 @@ import java.util.HashMap;
 import java.util.Enumeration;
 
 /**
- * ContentHandler that adds ids on all the XForms elements which don't have any, and gathers:
+ * ContentHandler that:
  *
- * o namespace information on XForms elements (xforms:* and xxforms:*).
- * o ids of XHTML elements with AVTs
+ * o adds ids on all the XForms elements which don't have any
+ * o gathers namespace information on XForms elements (xforms:* and xxforms:*).
+ * o gathers ids of XHTML elements with AVTs
  *
  * TODO: Should combine this with XFormsExtractorContentHandler?
  */
@@ -99,13 +100,13 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
         level++;
 
         if (xformsInstanceLevel >= 0) {
-            // Don't generate ids within an XForms instance,
+            // Don't generate ids within an XForms instance
             super.startElement(uri, localname, qName, attributes);
         } else if (XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri) || XFormsConstants.XXFORMS_NAMESPACE_URI.equals(uri)) {
             // This is an XForms element
 
             // Create a new id and update the attributes if needed
-            attributes = getAttribute(attributes, reusableStringArray);
+            attributes = getAttributes(attributes, reusableStringArray);
 
             super.startElement(uri, localname, qName, attributes);
 
@@ -130,7 +131,7 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
 
                             // Create a new id and update the attributes if needed
                             if (htmlElementId == null) {
-                                attributes = getAttribute(attributes, reusableStringArray);
+                                attributes = getAttributes(attributes, reusableStringArray);
                                 htmlElementId = reusableStringArray[0];
 
                                 // TODO: Clear all attributes having AVTs or XPath expressions will end up in repeat templates.
@@ -142,7 +143,7 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
                             // Create a new xxforms:attribute control
                             reusableAttributes.clear();
 
-                            final AttributesImpl newAttributes = (AttributesImpl) getAttribute(reusableAttributes, reusableStringArray);
+                            final AttributesImpl newAttributes = (AttributesImpl) getAttributes(reusableAttributes, reusableStringArray);
 
                             newAttributes.addAttribute("", "for", "for", ContentHandlerHelper.CDATA, htmlElementId);
                             newAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, attributeName);
@@ -196,7 +197,7 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
         return documentLocator;
     }
 
-    private Attributes getAttribute(Attributes attributes, String[] newIdAttribute) {
+    private Attributes getAttributes(Attributes attributes, String[] newIdAttribute) {
         final int idIndex = attributes.getIndex("id");
         final String newIdAttributeUnprefixed;
         if (idIndex == -1) {

@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
+import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRangeControl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -25,37 +26,24 @@ import org.xml.sax.helpers.AttributesImpl;
 /**
  * Handle xforms:range.
  */
-public class XFormsRangeHandler extends XFormsValueControlHandler {
-
-    private Attributes elementAttributes;
+public class XFormsRangeHandler extends XFormsCoreControlHandler {
 
     public XFormsRangeHandler() {
         super(false);
     }
 
-    public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
-        elementAttributes = new AttributesImpl(attributes);
-        super.start(uri, localname, qName, attributes);
-    }
+    protected void handleControl(String uri, String localname, String qName, Attributes attributes, String id, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
 
-    public void end(String uri, String localname, String qName) throws SAXException {
-
+        final XFormsRangeControl rangeControl = (XFormsRangeControl) xformsControl;
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
-        final String id = handlerContext.getId(elementAttributes);
-        final String effectiveId = handlerContext.getEffectiveId(elementAttributes);
-        final XFormsRangeControl xformsControl = handlerContext.isGenerateTemplate()
-                ? null : (XFormsRangeControl) containingDocument.getObjectById(effectiveId);
-
-        // xforms:label
-        handleLabelHintHelpAlert(id, effectiveId, "label", xformsControl);
 
         final AttributesImpl newAttributes;
         {
-            final StringBuffer classes = getInitialClasses(localname, elementAttributes, xformsControl);
+            final StringBuffer classes = getInitialClasses(localname, attributes, rangeControl);
             classes.append(" xforms-range-background");
 
-            handleMIPClasses(classes, xformsControl);
-            newAttributes = getAttributes(elementAttributes, classes.toString(), effectiveId);
+            handleMIPClasses(classes, rangeControl);
+            newAttributes = getAttributes(attributes, classes.toString(), effectiveId);
         }
 
         // Create xhtml:div
@@ -73,14 +61,5 @@ public class XFormsRangeHandler extends XFormsValueControlHandler {
 
             contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName);
         }
-
-        // xforms:help
-        handleLabelHintHelpAlert(id, effectiveId, "help", xformsControl);
-
-        // xforms:alert
-        handleLabelHintHelpAlert(id, effectiveId, "alert", xformsControl);
-
-        // xforms:hint
-        handleLabelHintHelpAlert(id, effectiveId, "hint", xformsControl);
     }
 }

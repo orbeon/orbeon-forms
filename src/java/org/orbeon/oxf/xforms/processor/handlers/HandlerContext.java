@@ -18,6 +18,7 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.state.XFormsState;
 import org.orbeon.oxf.xml.ElementHandlerController;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -25,6 +26,7 @@ import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.Locator;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.Stack;
 
@@ -40,6 +42,7 @@ public class HandlerContext {
     private String staticStateUUID;
     private String dynamicStateUUID;
     private ExternalContext externalContext;
+    private final String[] documentOrder;
 
     public HandlerContext(ElementHandlerController controller, PipelineContext pipelineContext,
                           XFormsContainingDocument containingDocument, XFormsState xformsState, String staticStateUUID, String dynamicStateUUID, ExternalContext externalContext) {
@@ -50,6 +53,7 @@ public class HandlerContext {
         this.staticStateUUID = staticStateUUID;
         this.dynamicStateUUID = dynamicStateUUID;
         this.externalContext = externalContext;
+        this.documentOrder = StringUtils.split(XFormsProperties.getOrder(containingDocument));
     }
 
     public ElementHandlerController getController() {
@@ -78,6 +82,10 @@ public class HandlerContext {
 
     public ExternalContext getExternalContext() {
         return externalContext;
+    }
+
+    public String[] getDocumentOrder() {
+        return documentOrder;
     }
 
     public String findXHTMLPrefix() {

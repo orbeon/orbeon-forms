@@ -17,7 +17,8 @@ import org.dom4j.QName;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsItemUtils;
-import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.XFormsStaticState;
+import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
@@ -36,54 +37,20 @@ import java.util.List;
 /**
  * Handle xforms:select and xforms:select1.
  */
-public class XFormsSelect1Handler extends XFormsValueControlHandler {
-
-    private Attributes elementAttributes;
-    private String id;
-    private String effectiveId;
-
-    private boolean hasItem;
-    private boolean hasNonStaticItem;
-    private boolean hasItemset;
+public class XFormsSelect1Handler extends XFormsCoreControlHandler {
 
     public XFormsSelect1Handler() {
         super(false);
     }
 
-    public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
-        elementAttributes = new AttributesImpl(attributes);
-        id = handlerContext.getId(elementAttributes);
-        effectiveId = handlerContext.getEffectiveId(elementAttributes);
+    protected void handleControl(String uri, String localname, String qName, Attributes attributes, String id, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
 
-        // Reset state, as this handler is reused
-        hasItem = false;
-        hasNonStaticItem = false;
-        hasItemset = false;
-
-        super.start(uri, localname, qName, attributes);
-    }
-
-    public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
-        if (XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri)) {
-            if ("itemset".equals(localname)) {
-                hasItemset = true;
-            } else if ("item".equals(localname)) {
-                hasItem = true;
-                hasNonStaticItem = true;// TODO: we don't actually test because we need to know the children
-            }
-        }
-        super.startElement(uri, localname, qName, attributes);
-    }
-
-    public void end(String uri, String localname, String qName) throws SAXException {
-
-        final XFormsSelect1Control xformsSelect1Control = (XFormsSelect1Control) (handlerContext.isGenerateTemplate()
-                ? null : (XFormsControl) containingDocument.getObjectById(effectiveId));
+        final XFormsSelect1Control xformsSelect1Control = (XFormsSelect1Control) xformsControl;
 
         final boolean isMany = localname.equals("select");
         final QName appearance;
         {
-            final QName tempAppearance = getAppearance(elementAttributes);
+            final QName tempAppearance = getAppearance(attributes);
             if (tempAppearance != null)
                 appearance = tempAppearance;
             else if (isMany)
@@ -93,14 +60,14 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
         }
 
         final List items = (xformsSelect1Control != null) ? xformsSelect1Control.getItemset(pipelineContext, true) : null;
-        outputContent(localname, xformsSelect1Control, items, isMany, appearance);
+        outputContent(attributes, id, effectiveId, localname, xformsSelect1Control, items, isMany, appearance);
     }
 
-    public void outputContent(String localname, final XFormsValueControl xformsValueControl, List items, final boolean isMany, QName appearance) throws SAXException {
+    public void outputContent(Attributes attributes, String id, String effectiveId, String localname, final XFormsValueControl xformsValueControl, List items, final boolean isMany, QName appearance) throws SAXException {
 
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
 
-        boolean isOpenSelection = "open".equals(elementAttributes.getValue("selection"));
+        boolean isOpenSelection = "open".equals(attributes.getValue("selection"));
         boolean isAutocomplete = isOpenSelection
                 && XFormsConstants.XXFORMS_AUTOCOMPLETE_APPEARANCE_QNAME.equals(appearance);
 
@@ -116,15 +83,11 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
         final boolean isTree = XFormsConstants.XXFORMS_TREE_APPEARANCE_QNAME.equals(appearance);
         final boolean isMenu = XFormsConstants.XXFORMS_MENU_APPEARANCE_QNAME.equals(appearance);
 
-        final boolean isAutocompleteNoFilter = isAutocomplete && "false".equals(elementAttributes.getValue(XFormsConstants.XXFORMS_NAMESPACE_URI, "filter"));
-
-        // xforms:label
-        final String id = handlerContext.getId(elementAttributes);
-        handleLabelHintHelpAlert(id, effectiveId, "label", xformsValueControl);
+        final boolean isAutocompleteNoFilter = isAutocomplete && "false".equals(attributes.getValue(XFormsConstants.XXFORMS_NAMESPACE_URI, "filter"));
 
         final AttributesImpl newAttributes;
         {
-            final StringBuffer classes = getInitialClasses(localname, elementAttributes, xformsValueControl, appearance, true); // incremental mode is the default
+            final StringBuffer classes = getInitialClasses(localname, attributes, xformsValueControl, appearance, true); // incremental mode is the default
 
             if (isOpenSelection)
                 classes.append(" xforms-select1-open");
@@ -135,7 +98,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                 classes.append(" xforms-initially-hidden");
 
             handleMIPClasses(classes, xformsValueControl);
-            newAttributes = getAttributes(elementAttributes, classes.toString(), effectiveId);
+            newAttributes = getAttributes(attributes, classes.toString(), effectiveId);
         }
 
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
@@ -150,21 +113,22 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                         int itemIndex = 0;
                         for (Iterator i = items.iterator(); i.hasNext(); itemIndex++) {
                             final XFormsItemUtils.Item item = (XFormsItemUtils.Item) i.next();
-                            handleItemFull(contentHandler, xhtmlPrefix, spanQName, xformsValueControl, id, effectiveId, isMany, fullItemType, item, Integer.toString(itemIndex), itemIndex == 0);
+                            handleItemFull(contentHandler, attributes, xhtmlPrefix, spanQName, xformsValueControl, id, effectiveId, isMany, fullItemType, item, Integer.toString(itemIndex), itemIndex == 0);
                         }
                     }
 
                     contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
                 }
 
-                if (hasItemset || hasNonStaticItem || hasItem && xformsValueControl == null) {
-                    // Try to produce the template only when needed
+                // Try to produce the template only when needed
+                final XFormsStaticState.ItemsInfo itemsInfo = containingDocument.getStaticState().getItemsInfo(id);
+                if (itemsInfo.isHasNonStaticItem() || xformsValueControl == null) {
                     reusableAttributes.clear();
                     reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, "xforms-select-template-" + effectiveId);
                     reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-select-template");
 
                     contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, reusableAttributes);
-                    handleItemFull(contentHandler, xhtmlPrefix, spanQName, null, id, effectiveId, isMany, fullItemType,
+                    handleItemFull(contentHandler, attributes, xhtmlPrefix, spanQName, null, id, effectiveId, isMany, fullItemType,
                             new XFormsItemUtils.Item(true, Collections.EMPTY_LIST,
                                     "$xforms-template-label$", "$xforms-template-value$", 1),
                             "$xforms-item-index$", true);
@@ -209,7 +173,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                                     reusableAttributes.addAttribute("", "multiple", "multiple", ContentHandlerHelper.CDATA, "multiple");
 
                                 // Handle accessibility attributes
-                                handleAccessibilityAttributes(elementAttributes, reusableAttributes);
+                                handleAccessibilityAttributes(attributes, reusableAttributes);
 
                                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "select", selectQName, reusableAttributes);
 
@@ -349,7 +313,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                         newAttributes.addAttribute("", "multiple", "multiple", ContentHandlerHelper.CDATA, "multiple");
 
                     // Handle accessibility attributes
-                    handleAccessibilityAttributes(elementAttributes, newAttributes);
+                    handleAccessibilityAttributes(attributes, newAttributes);
 
                     handleReadOnlyAttribute(newAttributes, containingDocument, xformsValueControl);
                     contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "select", selectQName, newAttributes);
@@ -427,15 +391,6 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
             }
             contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
         }
-
-        // xforms:help
-        handleLabelHintHelpAlert(id, effectiveId, "help", xformsValueControl);
-
-        // xforms:alert
-        handleLabelHintHelpAlert(id, effectiveId, "alert", xformsValueControl);
-
-        // xforms:hint
-        handleLabelHintHelpAlert(id, effectiveId, "hint", xformsValueControl);
     }
 
     private void outputJSONTreeInfo(XFormsValueControl xformsControl, List items, boolean many, ContentHandler contentHandler) throws SAXException {
@@ -448,7 +403,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
         }
     }
 
-    private void handleItemFull(ContentHandler contentHandler, String xhtmlPrefix, String spanQName,
+    private void handleItemFull(ContentHandler contentHandler, Attributes attributes, String xhtmlPrefix, String spanQName,
                                 XFormsValueControl xformsControl, String id, String effectiveId, boolean isMany, String type, XFormsItemUtils.Item item, String itemIndex, boolean isFirst) throws SAXException {
 
         // Create an id for the item (trying to make this unique)
@@ -479,7 +434,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
 
                 if (isFirst) {
                     // Handle accessibility attributes
-                    handleAccessibilityAttributes(elementAttributes, reusableAttributes);
+                    handleAccessibilityAttributes(attributes, reusableAttributes);
                 }
             }
 

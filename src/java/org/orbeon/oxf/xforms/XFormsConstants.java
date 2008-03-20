@@ -137,6 +137,8 @@ public class XFormsConstants {
     public static final QName XXFORMS_TARGET_QNAME = new QName("target", XFormsConstants.XXFORMS_NAMESPACE);
     public static final QName XXFORMS_ENSURE_UPLOADS_QNAME = new QName("ensure-uploads", XFormsConstants.XXFORMS_NAMESPACE);
 
+    public static final QName XXFORMS_ORDER_QNAME = new QName("order", XFormsConstants.XXFORMS_NAMESPACE);
+
     public static final QName XXFORMS_EXTERNALIZE_QNAME = new QName("externalize", XFormsConstants.XXFORMS_NAMESPACE);
 
     public static final QName XXFORMS_USERNAME_QNAME = new QName("username", XFormsConstants.XXFORMS_NAMESPACE);

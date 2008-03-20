@@ -43,15 +43,16 @@
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
-        <xforms:repeat nodeset="company">
-            <xhtml:div>
+        <xforms:repeat nodeset="company" id="company-repeat">
+            <xhtml:div style="padding: .5em .5em .5em 2em; border: 1px solid #eee">
                 <xforms:output ref="@name"/>
-                <xforms:repeat nodeset="department">
-                    <xhtml:div style="margin-left: 2em">
+                <xforms:repeat nodeset="department" id="department-repeat">
+                    <xhtml:div style="padding: .5em .5em .5em 2em; border: 1px solid #eee">
                         <xforms:output ref="@name"/>
-                        <xforms:repeat nodeset="employee">
-                            <xhtml:div style="margin-left: 2em">
+                        <xforms:repeat nodeset="employee" id="employee-repeat">
+                            <xhtml:div style="padding: .5em .5em .5em 2em; border: 1px solid #eee">
                                 <xforms:output ref="@name"/>
+                                <i>(employee name)</i>
                             </xhtml:div>
                         </xforms:repeat>
                     </xhtml:div>

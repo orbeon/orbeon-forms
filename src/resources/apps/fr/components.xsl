@@ -75,28 +75,35 @@
                         </xforms:group>
                     </xsl:if>
                 </xhtml:div>
-                <xhtml:div id="hd" class="fr-top"/>
+                <xhtml:div id="hd" class="fr-top">&#160;</xhtml:div>
                 <xhtml:div id="bd" class="fr-container">
                     <xhtml:div id="yui-main">
                         <xhtml:div class="yui-b">
                             <xhtml:div class="yui-g fr-logo">
-                                <xforms:group model="fr-form-model" appearance="xxforms:internal">
-                                    <xhtml:table class="fr-layout-table">
-                                        <xhtml:tr>
-                                            <xhtml:td>
-                                                <xforms:output value="((instance('fr-form-metadata')/logo, '/apps/fr/style/orbeon-logo-trimmed-transparent-42.png')[normalize-space() != ''])[1]" mediatype="image/*"/>
-                                            </xhtml:td>
-                                            <xhtml:td>
-                                                <xhtml:h1>
-                                                    <xforms:output value="((instance('fr-form-metadata')/title, ({$label/@ref}), '{$label}', /xhtml:html/xhtml:head/xhtml:title)[normalize-space() != ''])[1]"/>
-                                                </xhtml:h1>
-                                            </xhtml:td>
-                                        </xhtml:tr>
-                                    </xhtml:table>
-                                </xforms:group>
+                                <xsl:choose>
+                                    <!-- If custom logo section is provided, use that -->
+                                    <xsl:when test="fr:logo">
+                                        <xsl:apply-templates select="fr:logo/node()"/>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xforms:group model="fr-form-model" appearance="xxforms:internal">
+                                            <xhtml:table class="fr-layout-table">
+                                                <xhtml:tr>
+                                                    <xhtml:td>
+                                                        <xforms:output value="((instance('fr-form-metadata')/logo, '/apps/fr/style/orbeon-logo-trimmed-transparent-42.png')[normalize-space() != ''])[1]" mediatype="image/*"/>
+                                                    </xhtml:td>
+                                                    <xhtml:td>
+                                                        <xhtml:h1>
+                                                            <xforms:output value="((instance('fr-form-metadata')/title, ({$label/@ref}), '{$label}', /xhtml:html/xhtml:head/xhtml:title)[normalize-space() != ''])[1]"/>
+                                                        </xhtml:h1>
+                                                    </xhtml:td>
+                                                </xhtml:tr>
+                                            </xhtml:table>
+                                        </xforms:group>
+                                    </xsl:otherwise>
+                                </xsl:choose>
                             </xhtml:div>
-                            <xhtml:div class="yui-g fr-separator">
-                            </xhtml:div>
+                            <xhtml:div class="yui-g fr-separator">&#160;</xhtml:div>
                             <xhtml:div class="yui-g fr-body">
                                 <!-- Optional description-->
                                 <xforms:group model="fr-form-model" ref=".[normalize-space(instance('fr-form-metadata')/description) != '']">
@@ -501,7 +508,7 @@
     </xsl:template>
 
     <xsl:template match="xhtml:body//fr:grid">
-        <xhtml:table class="fr-grid fr-grid-{@columns}-columns">
+        <xhtml:table class="fr-grid fr-grid-{@columns}-columns{ if (@class) then concat(' ', @class) else ()}">
             <!-- Grid content -->
             <xsl:apply-templates select="* except xforms:label" mode="grid-content"/>
         </xhtml:table>
@@ -529,47 +536,54 @@
         <xsl:variable name="tokenized-path" select="tokenize(@nodeset, '/')"/>
         <xsl:variable name="min-occurs" select="if (@minOccurs) then @minOccurs else 0"/>
         <xsl:variable name="max-occurs" select="if (@maxOccurs) then @maxOccurs else 'unbounded'"/>
+        <xsl:variable name="readonly" as="xs:boolean" select="if (@readonly) then @readonly = 'true' else false()"/>
         <xsl:variable name="first-mandatory" as="xs:boolean" select="if (@first-mandatory) then @first-mandatory = 'true' else false()"/>
         <xsl:variable name="is-table-appearance" as="xs:boolean" select="@appearance = 'xxforms:table'"/>
         <xhtml:table class="fr-repeat {if ($is-table-appearance) then 'fr-repeat-table' else 'fr-repeat-sections'} {if (@columns) then concat('fr-grid-', @columns, '-columns') else ()}">
-            <xforms:group appearance="xxforms:internal">
-                <xhtml:tr>
-                    <xhtml:td class="fr-repeat-column"/>
-                    <!-- Add trigger (image) -->
-                    <xhtml:td class="fr-repeat-column">
-                        <xforms:trigger appearance="minimal" ref=".[{if ($max-occurs = 'unbounded') then 'true()' else concat('count(', @nodeset, ') lt ', $max-occurs)}]">
-                            <xforms:label><xhtml:img src="../../../../apps/fr/style/add.gif" alt="Add" title="Add"/></xforms:label>
-                        </xforms:trigger>
-                    </xhtml:td>
-                    <!-- Add trigger (text) -->
-                    <xhtml:td style="width: 100%" colspan="{max(for $tr in xhtml:tr return count($tr/xhtml:td))}">
-                        <xforms:trigger appearance="minimal" ref=".[{if ($max-occurs = 'unbounded') then 'true()' else concat('count(', @nodeset, ') lt ', $max-occurs)}]">
-                            <xforms:label>Add <xsl:value-of select="lower-case(xforms:label)"/></xforms:label>
-                        </xforms:trigger>
-                    </xhtml:td>
-                </xhtml:tr>
-                <xforms:insert ev:event="DOMActivate"
-                               origin="{if (@origin) then @origin else concat('instance(''templates'')/', $tokenized-path[last()])}"
-                               context="." nodeset="{if (@after) then @after else @nodeset}"/>
-                <!-- TODO: handle @at -->
-                <!-- at="index('{@id}')" position="after" -->
-            </xforms:group>
+            <!-- Line with the "add" triggers -->
+            <xsl:if test="not($readonly)">
+                <xforms:group appearance="xxforms:internal">
+                    <xhtml:tr>
+                        <xhtml:td class="fr-repeat-column"/>
+                        <!-- Add trigger (image) -->
+                        <xhtml:td class="fr-repeat-column">
+                            <xforms:trigger appearance="minimal" ref=".[{if ($max-occurs = 'unbounded') then 'true()' else concat('count(', @nodeset, ') lt ', $max-occurs)}]">
+                                <xforms:label><xhtml:img src="../../../../apps/fr/style/add.gif" alt="Add" title="Add"/></xforms:label>
+                            </xforms:trigger>
+                        </xhtml:td>
+                        <!-- Add trigger (text) -->
+                        <xhtml:td style="width: 100%" colspan="{max(for $tr in xhtml:tr return count($tr/xhtml:td))}">
+                            <xforms:trigger appearance="minimal" ref=".[{if ($max-occurs = 'unbounded') then 'true()' else concat('count(', @nodeset, ') lt ', $max-occurs)}]">
+                                <xforms:label>Add <xsl:value-of select="lower-case(xforms:label)"/></xforms:label>
+                            </xforms:trigger>
+                        </xhtml:td>
+                    </xhtml:tr>
+                    <xforms:insert ev:event="DOMActivate"
+                                   origin="{if (@origin) then @origin else concat('instance(''templates'')/', $tokenized-path[last()])}"
+                                   context="." nodeset="{if (@after) then @after else @nodeset}"/>
+                    <!-- TODO: handle @at -->
+                    <!-- at="index('{@id}')" position="after" -->
+                </xforms:group>
+            </xsl:if>
+            <!-- Line with column headers -->
             <xhtml:tr>
-                <xhtml:td class="fr-repeat-column"/>
-                <xhtml:td class="fr-repeat-column"/>
-                <!-- Line with column headers -->
+                <xhtml:th class="fr-repeat-column"/>
+                <xsl:if test="not($readonly)">
+                    <xhtml:td class="fr-repeat-column"/>
+                </xsl:if>
                 <xsl:for-each select="xhtml:tr[1]/xhtml:td/xforms:*[1]/xforms:label">
                     <xhtml:th>
                         <xsl:value-of select="."/>
                     </xhtml:th>
                 </xsl:for-each>
             </xhtml:tr>
+            <!-- Lines with the data -->
             <xforms:repeat nodeset="{@nodeset}" id="{@id}">
-                <xhtml:tbody>
-                    <xhtml:tr>
-                        <xhtml:td class="fr-repeat-column">
-                            <xforms:output value="position()"/>
-                        </xhtml:td>
+                <xhtml:tr>
+                    <xhtml:td class="fr-repeat-column">
+                        <xforms:output value="position()"/>
+                    </xhtml:td>
+                    <xsl:if test="not($readonly)">
                         <xhtml:td class="fr-repeat-column">
                             <xforms:group>
                                 <!-- Remove trigger -->
@@ -581,13 +595,12 @@
                                 <xforms:delete ev:event="DOMActivate" nodeset="."/>
                             </xforms:group>
                         </xhtml:td>
-                        <xsl:apply-templates select="xhtml:tr[1]/xhtml:td"/>
-                    </xhtml:tr>
-                </xhtml:tbody>
-                <xhtml:tbody>
-                    <xsl:apply-templates select="xhtml:tr except xhtml:tr[1] | xhtml:td" mode="prepend-td"/>
-                </xhtml:tbody>
+                    </xsl:if>
+                    <xsl:apply-templates select="xhtml:tr[1]/xhtml:td"/>
+                </xhtml:tr>
+                <xsl:apply-templates select="xhtml:tr except xhtml:tr[1] | xhtml:td" mode="prepend-td"/>
             </xforms:repeat>
+            <xhtml:tr class="fr-repeat-last-line"><xhtml:td/></xhtml:tr>
         </xhtml:table>
     </xsl:template>
 

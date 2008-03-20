@@ -87,7 +87,6 @@
 
 /* In-place editing for section titles */
 .fb-section-title .fr-inplace-content .xforms-output { background-color: white }
-#fb-details-section .fb-section-title {  }
 #fb-details-section .fb-section-title .fr-inplace-buttons { display:inline; padding-left: .5em; padding-right: .5em; margin-left: .5em; margin-right: .5em; background-color: white }
 #fb-details-section .fb-section-title .fr-inplace-buttons button { vertical-align: middle  }
 #fb-details-section .fb-section-title .fr-inplace-content { vertical-align: middle; font-size: 160% }
@@ -139,8 +138,7 @@
 
 /* Grid */
 
-/* Set min height of table using CSS hack for IE */
-.fb-grid-cell-icons { min-height: 4em; height: auto !important; height: 4em; text-align: center }
+.fb-grid-cell-icons { min-height: 4em; height: auto !important; height: 4em; text-align: center }/* IE HACK for min-height */
 
 .fb-grid-control-icons { display: block; text-align: center; float: right }
 .fb-grid-control-icons .xforms-trigger { display: inline }
@@ -158,7 +156,7 @@
 #fb-details-section .fb-grid-td .xforms-input input { width: 100%; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box }
 #fb-details-section .fb-grid-td .xforms-upload input { width: 100%; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box }
 #fb-details-section .fb-grid-td .fr-inplace-value { width: 100% }
-#fb-details-section .fb-grid-td textarea.xforms-textarea { width: 100%; height: 6em; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box }
+#fb-details-section .fb-grid-td .xforms-textarea { width: 100%; height: 6em; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box }
 #fb-details-section .fb-grid-td .xforms-select1-appearance-minimal { width: 100%; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box }
 #fb-details-section .fb-grid-td .xforms-select1-appearance-compact { width: 100%; height: 6em; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box }
 #fb-details-section .fb-grid-td .xforms-select-appearance-compact { width: 100%; height: 6em; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box }

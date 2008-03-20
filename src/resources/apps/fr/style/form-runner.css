@@ -10,28 +10,17 @@ body, body table, textarea.xforms-textarea {
     font-family: "Lucida Grande", Tahoma, Arial, Verdana, sans-serif;
 }
 
-#doc { margin-top: 1em; }
-
 .fr-hidden-controls { display: none }
 
-.fr-top {
-    height: 10px !important;
-    display: block !important;
-    background-repeat: no-repeat;
-    background-position: bottom center;
-}
+.fr-top { line-height: 10px; }
 #doc .fr-top { background-image: url(top-750-ee.png); }
 #doc4 .fr-top { background-image: url(top-974.png); }
 
-
-.fr-bottom {
-    height: 10px !important;
-    display: block !important;
-    background-repeat: no-repeat;
-    background-position: top center
-}
+.fr-bottom { background-repeat: no-repeat; }
 #doc .fr-bottom { background-image: url(bottom-750-ee.png); }
 #doc4 .fr-bottom { background-image: url(bottom-974.png); }
+
+
 
 .fr-bottom .fr-orbeon-version {
     text-align: center;
@@ -47,7 +36,8 @@ body, body table, textarea.xforms-textarea {
 
 .fr-separator {
     background-color: #3598d4;
-    min-height: 1em;
+    line-height: 1em;
+    clear: both;
 }
 
 .fr-body, .fr-buttons-block {
@@ -86,7 +76,6 @@ h1 { margin-top: 0 }
     background-image: url(logo-bg.gif);
     background-position: top;
     padding: 1em;
-    min-height: 50px; height: auto !important; height: 50px /* IE HACK for min-height */
 }
 
 .fr-logo table { width: 100% }
@@ -102,13 +91,6 @@ h1 { margin-top: 0 }
 .fr-summary-language-choice { float: right; margin-right: 1em; margin-top: .2em; color: gray; font-size: 85%; text-align: right; }
 .fr-summary-language-choice a { color: gray; }
 .fr-summary-language-choice .xforms-label { display: inline; margin-right: .5em }
-
-
-.fr-separator {
-    background-color: #3598d4;
-    min-height: 1em;
-    clear: both;
-}
 
 .xforms-label, h4  {
     display: block;
@@ -230,6 +212,8 @@ label.xforms-disabled, span.xforms-disabled, div.xforms-disabled  {
 /* Repeats: shows as table (1 line per iteration; labels used as header of table) */
 .fr-repeat-table { border-collapse: collapse; }
 .fr-repeat-table td , .fr-repeat-table th { border: 1px solid black; padding: .2em .5em .2em .5em; }
+/* Styling for last dummy line added so IE displays the bottom border of the table */
+.fr-repeat-table .fr-repeat-last-line td { border: none; padding: 0; }
 .fr-repeat-table th { background-color: #DDDDDD; }
 .fr-repeat-table .xforms-label { display: none; }
 
@@ -243,7 +227,8 @@ label.xforms-disabled, span.xforms-disabled, div.xforms-disabled  {
 
 .xforms-input input, textarea.xforms-textarea {
     background-image: url(field.png);
-    background-repeat: repeat-x
+    background-repeat: repeat-x;
+    border: 1px solid #CCCCCC;
 }
 
 /*.xforms-group { display: inline }*/
@@ -267,8 +252,8 @@ body { text-align: left }
     font-size: smaller;
     font-weight: bold;
     margin-left: .5em;
-    /*width: 22em;*/
-    width: 100%;
+    /*width: 100%;*/
+    width: auto;
     color: red;
     text-indent: 0;
     background-image: none

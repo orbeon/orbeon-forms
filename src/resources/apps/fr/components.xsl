@@ -114,13 +114,11 @@
 
                                 <!-- Set context on form instance and define this group as #fr-form-group as observers will refer to it -->
                                 <xforms:group id="fr-form-group" model="fr-form-model" ref="instance('fr-form-instance')">
-
                                     <!-- Main form content -->
                                     <xsl:apply-templates select="fr:body/node()"/>
                                 </xforms:group>
                             </xhtml:div>
-                            <xhtml:div class="yui-g fr-separator">
-                            </xhtml:div>
+                            <xhtml:div class="yui-g fr-separator">&#160;</xhtml:div>
                             <xhtml:div class="yui-g fr-buttons-block">
                                 <!-- Display the toolbar and errors -->
                                 <xforms:group model="fr-persistence-model" appearance="xxforms:internal">

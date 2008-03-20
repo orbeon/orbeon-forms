@@ -16,7 +16,7 @@
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:thread="java.lang.Thread">
 
-    <p:param type="output" name="data"/>
+    <p:param name="data" type="output"/>
 
     <p:processor name="oxf:unsafe-xslt">
         <p:input name="data"><dummy/></p:input>

@@ -1014,7 +1014,7 @@ ORBEON.xforms.Controls = {
     },
 
     treeOpenSelectedVisible: function(yuiTree, values) {
-        for (nodeIndex in yuiTree._nodes) {
+        for (var nodeIndex in yuiTree._nodes) {
             var node = yuiTree._nodes[nodeIndex];
             if (xformsArrayContains(values, node.data.value)) {
                 var nodeParent = node.parent;
@@ -1599,13 +1599,21 @@ ORBEON.xforms.Events = {
     },
 
     /**
-     * Upon scrolling or resizing, adjust position of loading indicators
+     * Called upon scrolling or resizing.
      */
     scrollOrResize: function() {
+        // Adjust position of loading indicators
         for (var formID in ORBEON.xforms.Globals.formLoadingLoadingOverlay) {
             var overlay = ORBEON.xforms.Globals.formLoadingLoadingOverlay[formID];
             if (overlay && overlay.cfg.getProperty("visible"))
                 ORBEON.xforms.Controls.updateLoadingPosition(formID);
+        }
+        // Ajust position of dialogs with "constraintoviewport" since YUI doesn't do it automatically
+        for (var yuiDialogId in ORBEON.xforms.Globals.dialogs) {
+            var yuiDialog = ORBEON.xforms.Globals.dialogs[yuiDialogId];
+            if (yuiDialog.cfg.getProperty("visible") && yuiDialog.cfg.getProperty("constraintoviewport")) {
+                yuiDialog.cfg.setProperty("xy", yuiDialog.cfg.getProperty("xy"));
+            }
         }
     },
 
@@ -1707,7 +1715,7 @@ ORBEON.xforms.Events = {
         var control = ORBEON.util.Dom.getElementById(tree.id);
         ORBEON.xforms.Events.treeClickFocus(control);
         control.value = "";
-        for (nodeIndex in tree._nodes) {
+        for (var nodeIndex in tree._nodes) {
             var node = tree._nodes[nodeIndex];
             if (node.checkState == 2) {
                 if (control.value != "") control.value += " ";
@@ -3361,7 +3369,7 @@ ORBEON.xforms.Server = {
                                                         // Select tree
                                                         var values = newControlValue.split(" ");
                                                         var yuiTree = ORBEON.xforms.Globals.treeYui[documentElement.id];
-                                                        for (nodeIndex in yuiTree._nodes) {
+                                                        for (var nodeIndex in yuiTree._nodes) {
                                                             var node = yuiTree._nodes[nodeIndex];
                                                             if (node.children.length == 0) {
                                                                 var checked = xformsArrayContains(values, node.data.value);

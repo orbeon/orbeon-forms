@@ -22,9 +22,9 @@
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
       xmlns:saxon="http://saxon.sf.net/"
 
-      id="fb-toolbox-dialog" level="modeless" draggable="true" visible="true" close="false" class="fb-toolbox-dialog" neighbor="switch-fb-details-section">
+      id="fb-toolbox-dialog" level="modeless" draggable="false" visible="true" close="false" class="fb-toolbox-dialog" neighbor="switch-fb-details-section" constrain="true">
 
-    <xforms:label>Toolbox</xforms:label>
+    <xforms:label>Form Builder Toolbox</xforms:label>
     <xhtml:div class="fb-xvc">
         <xforms:trigger appearance="minimal" ref="$xcv/cut-trigger">
             <xforms:label>

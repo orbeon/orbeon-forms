@@ -17,7 +17,6 @@
 
 /* Language toolbar */
 .fb-language-choice { display: block; text-align: left }
-/*.fb-language-choice .xforms-label { text-align: right }*/
 .fb-language-choice .xforms-select1 { width: 100% }
 .fb-language-choice .fb-language-triggers { display: block; width: 100% }
 
@@ -28,7 +27,9 @@
 .fb-tools .fb-tool button { width: 100%; text-align: left }
 .fb-xvc { text-align: center }
 .fb-xvc a { text-decoration: none }
-#fb-toolbox-dialog { width: 180px; }
+
+#fb-toolbox-dialog { width: 180px }
+.yui-panel-container > #fb-toolbox-dialog { position: fixed; left: 11px; top: 27px }/* IE HACK: hide this definition for IE 6 */
 #fb-toolbox-dialog .yui-panel .hd { background-color: #3598d4 }
 
 .fb-toolbar button { width: 12em }
@@ -144,7 +145,7 @@
 .fb-grid-control-icons .xforms-trigger { display: inline }
 /*.fb-grid-control-icons .xforms-trigger img { xxx }*/
 
-.fb-grid-table { margin-top: .5em; margin-left: 1px; width: 99.99%; *width: 99.5% }
+.fb-grid-table { margin-top: .5em; margin-left: 1px; width: 99.5%; *width: 99.5% }
 .fb-grid-td { width: auto; vertical-align: top }
 .fb-grid-td .xforms-alert { display: none }
 

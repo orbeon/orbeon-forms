@@ -39,7 +39,8 @@
 
             <xforms:action ev:event="xforms-ready">
                 <xxforms:script>
-                    <!-- Position toolbox to the left upon loading -->
+                    <!-- Position toolbox to the left upon loading (if the toolbox is positioned as fixed, this is not needed, but IE needs it) -->
+                    ORBEON.xforms.Globals.dialogs["fb-toolbox-dialog"].cfg.setProperty("constraintoviewport", true);
                     ORBEON.xforms.Globals.dialogs["fb-toolbox-dialog"].cfg.setProperty("x", 0);
                 </xxforms:script>
             </xforms:action>
@@ -688,8 +689,8 @@
 
             <xforms:instance id="fb-resource-template" xxforms:readonly="true">
                 <template>
-                    <label>[Please modify the label]</label>
-                    <hint>[Please modify the hint]</hint>
+                    <label/>
+                    <hint/>
                     <help/>
                     <alert>The value of this field is incorrect</alert>
                 </template>
@@ -1029,6 +1030,7 @@
                                                       ref="$current-resources/*[name() = $section-name]/label"
                                                       appearance="fr:in-place" class="fb-section-title">
                                             <xforms:label>Section</xforms:label>
+                                            <xforms:hint>Please enter a section name</xforms:hint>
                                         </xforms:input>
 
                                         <!-- Respond to fr-delete event to delete the current section -->

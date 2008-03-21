@@ -186,18 +186,18 @@
                 <!-- Fill-out table with rowspan / colspan data -->
                 <xforms:action xxforms:iterate="instance('fb-span-grid-instance')/*"><!-- Iterating over rows -->
                     <xxforms:variable name="r" select="."/>
-                    <xxforms:variable name="rnum" select="position()"/>
+                    <xxforms:variable name="y" select="position()"/>
 
-                    <xforms:action xxforms:iterate="$grid/xhtml:tr[$rnum]/xhtml:td"><!-- Iterating over actual tds -->
+                    <xforms:action xxforms:iterate="$grid/xhtml:tr[$y]/xhtml:td"><!-- Iterating over actual tds -->
                         <xxforms:variable name="td" select="."/>
-                        <xxforms:variable name="tdnum" select="position()"/>
+                        <xxforms:variable name="td-x" select="position()"/>
                         <xxforms:variable name="rowspan" select="if (@rowspan) then xs:integer(@rowspan) else 1"/>
 
-                        <xxforms:variable name="c" select="($r/c[. != 'x'])[$tdnum]"/>
-                        <xxforms:variable name="cnum" select="count($c/preceding-sibling::c) + 1"/>
+                        <xxforms:variable name="c" select="($r/c[. != 'x'])[$td-x]"/>
+                        <xxforms:variable name="x" select="count($c/preceding-sibling::c) + 1"/>
 
                         <xforms:action xxforms:iterate="$r/following-sibling::r[position() lt $rowspan]">
-                            <xforms:setvalue ref="c[$cnum]">x</xforms:setvalue>
+                            <xforms:setvalue ref="c[$x]">x</xforms:setvalue>
                         </xforms:action>
                     </xforms:action>
                 </xforms:action>
@@ -1117,7 +1117,7 @@
                                                         <xhtml:tbody>
                                                             <xhtml:tr>
                                                                 <!-- Top left corner td -->
-                                                                <xhtml:td>
+                                                                <xhtml:td class="fb-grid-top-left-td">
                                                                     <xforms:trigger appearance="minimal" id="fb-delete-grid-trigger">
                                                                         <xforms:label>
                                                                             <xforms:label><xhtml:img src="../../../../apps/fr/style/trash.gif" alt="Delete Grid" title="Delete Grid"/></xforms:label>
@@ -1225,19 +1225,47 @@
                                                                 <xxforms:variable name="tr-position" select="position()"/>
                                                                 <xhtml:tr class="fb-grid-tr">
                                                                     <xhtml:td>
-                                                                        <xhtml:div class="fb-grid-cell-icons">
+                                                                        <xhtml:div class="fb-grid-row-icons">
+                                                                            <!-- Insert row above -->
                                                                             <xhtml:div>
                                                                                 <xforms:trigger appearance="minimal" id="fb-insert-row-above-trigger">
                                                                                     <xforms:label><xhtml:img src="../../../../apps/fr/style/up.gif" alt="Insert Row Above" title="Insert Row Above"/></xforms:label>
                                                                                     <xforms:action context="$grid" ev:event="DOMActivate">
                                                                                         <xforms:action ev:event="DOMActivate">
+
+                                                                                            <!-- Prepare span grid -->
+                                                                                            <xforms:dispatch name="fb-prepare-span-grid" target="fr-form-model">
+                                                                                                <xxforms:context name="grid" select="$grid"/>
+                                                                                            </xforms:dispatch>
+
+                                                                                            <!-- Adjust rowspans -->
+                                                                                            <xforms:action xxforms:iterate="instance('fb-span-grid-instance')/r[$tr-position]/c[. = 'x']">
+                                                                                                <!-- This current cell in the row to delete is impacted by a rowspan -->
+                                                                                                <xxforms:variable name="x" select="count(preceding-sibling::c) + 1"/>
+
+                                                                                                <!-- Find td which contains the rowspan -->
+                                                                                                <xxforms:variable name="c" select="(../preceding-sibling::r/c[$x][. != 'x'])[last()]"/>
+                                                                                                <xxforms:variable name="y" select="count($c/../preceding-sibling::r) + 1"/>
+                                                                                                <xxforms:variable name="rowspan-td-x" select="count($c/preceding-sibling::c[. != 'x']) + 1"/>
+                                                                                                <xxforms:variable name="rowspan-td" select="$grid/xhtml:tr[$y]/xhtml:td[$rowspan-td-x]"/>
+
+                                                                                                <!-- Increment rowspan value -->
+                                                                                                <xxforms:variable name="current-rowspan" select="if ($rowspan-td/@rowspan) then xs:integer($rowspan-td/@rowspan) else 1"/>
+                                                                                                <xforms:insert context="$rowspan-td" origin="xxforms:attribute('rowspan', xs:string($current-rowspan + 1))"/>
+
+                                                                                            </xforms:action>
+
+                                                                                            <!-- Number of tds that must be in the new row -->
+                                                                                            <xxforms:variable name="new-td-count" select="count(instance('fb-span-grid-instance')/r[$tr-position]/c[. != 'x'])"/>
+                                                                                            <!-- Insert new row -->
                                                                                             <xforms:insert context="$grid" nodeset="xhtml:tr"
                                                                                                            at="$tr-position" position="before"
-                                                                                                           origin="instance(concat('fb-grid-', context()/@columns, '-template'))/xhtml:tr"/>
+                                                                                                           origin="xxforms:element('xhtml:tr', for $td in (1 to $new-td-count) return xxforms:element('xhtml:td'))"/>
                                                                                         </xforms:action>
                                                                                     </xforms:action>
                                                                                 </xforms:trigger>
                                                                             </xhtml:div>
+                                                                            <!-- Delete row -->
                                                                             <xforms:trigger appearance="minimal" ref=".[xs:integer($grid/@columns) gt 1]" id="fb-delete-row-trigger">
                                                                                 <xforms:label><xhtml:img src="../../../../apps/fr/style/trash.gif" alt="Delete Row" title="Delete Row"/></xforms:label>
                                                                                 <xforms:action ev:event="DOMActivate">
@@ -1261,6 +1289,27 @@
                                                                                 <xforms:action ev:event="fb-confirmation-yes">
                                                                                     <!-- Context is on current grid -->
 
+                                                                                    <!-- Prepare span grid -->
+                                                                                    <xforms:dispatch name="fb-prepare-span-grid" target="fr-form-model">
+                                                                                        <xxforms:context name="grid" select="$grid"/>
+                                                                                    </xforms:dispatch>
+
+                                                                                    <!-- Adjust rowspans -->
+                                                                                    <xforms:action xxforms:iterate="instance('fb-span-grid-instance')/r[$tr-position]/c[. = 'x']">
+                                                                                        <!-- This current cell in the row to delete is impacted by a rowspan -->
+                                                                                        <xxforms:variable name="x" select="count(preceding-sibling::c) + 1"/>
+
+                                                                                        <!-- Find td which contains the rowspan -->
+                                                                                        <xxforms:variable name="c" select="(../preceding-sibling::r/c[$x][. != 'x'])[last()]"/>
+                                                                                        <xxforms:variable name="y" select="count($c/../preceding-sibling::r) + 1"/>
+                                                                                        <xxforms:variable name="rowspan-td-x" select="count($c/preceding-sibling::c[. != 'x']) + 1"/>
+                                                                                        <xxforms:variable name="rowspan-td" select="$grid/xhtml:tr[$y]/xhtml:td[$rowspan-td-x]"/>
+
+                                                                                        <!-- Decrement rowspan value -->
+                                                                                        <xforms:setvalue ref="$rowspan-td/@rowspan" value=". - 1"/>
+
+                                                                                    </xforms:action>
+
                                                                                     <!-- Delete holder elements and resources -->
                                                                                     <xforms:action xxforms:iterate="$tr/xhtml:td">
                                                                                         <xforms:action if="exists(xforms:*)">
@@ -1273,14 +1322,45 @@
                                                                                     <xforms:delete nodeset="$grid/xhtml:tr" at="$tr-position"/>
                                                                                 </xforms:action>
                                                                             </xforms:trigger>
+                                                                            <!-- Insert row below -->
                                                                             <xhtml:div>
                                                                                 <xforms:trigger appearance="minimal" id="fb-insert-row-below-trigger">
                                                                                     <xforms:label><xhtml:img src="../../../../apps/fr/style/down.gif" alt="Insert Row Below" title="Insert Row Below"/></xforms:label>
                                                                                     <xforms:action ev:event="DOMActivate">
                                                                                         <xforms:action ev:event="DOMActivate">
+
+                                                                                            <!-- Prepare span grid -->
+                                                                                            <xforms:dispatch name="fb-prepare-span-grid" target="fr-form-model">
+                                                                                                <xxforms:context name="grid" select="$grid"/>
+                                                                                            </xforms:dispatch>
+
+                                                                                            <!-- Adjust rowspans -->
+                                                                                            <xforms:action xxforms:iterate="instance('fb-span-grid-instance')/r[$tr-position + 1]/c[. = 'x']">
+                                                                                                <!-- This current cell in the row to delete is impacted by a rowspan -->
+                                                                                                <xxforms:variable name="x" select="count(preceding-sibling::c) + 1"/>
+
+                                                                                                <!-- Find td which contains the rowspan -->
+                                                                                                <xxforms:variable name="c" select="(../preceding-sibling::r/c[$x][. != 'x'])[last()]"/>
+                                                                                                <xxforms:variable name="y" select="count($c/../preceding-sibling::r) + 1"/>
+                                                                                                <xxforms:variable name="rowspan-td-x" select="count($c/preceding-sibling::c[. != 'x']) + 1"/>
+                                                                                                <xxforms:variable name="rowspan-td" select="$grid/xhtml:tr[$y]/xhtml:td[$rowspan-td-x]"/>
+
+                                                                                                <!-- Increment rowspan value -->
+                                                                                                <xxforms:variable name="current-rowspan" select="if ($rowspan-td/@rowspan) then xs:integer($rowspan-td/@rowspan) else 1"/>
+                                                                                                <xforms:insert context="$rowspan-td" origin="xxforms:attribute('rowspan', xs:string($current-rowspan + 1))"/>
+
+                                                                                            </xforms:action>
+
+                                                                                            <!-- Number of tds that must be in the new row -->
+                                                                                            <xxforms:variable name="new-td-count"
+                                                                                                              select="if ($tr/following-sibling::xhtml:tr)
+                                                                                                                      then count(instance('fb-span-grid-instance')/r[$tr-position + 1]/c[. != 'x'])
+                                                                                                                      else xs:integer($grid/@columns)"/>
+
+                                                                                            <!-- Insert new row -->
                                                                                             <xforms:insert context="$grid" nodeset="xhtml:tr"
                                                                                                            at="$tr-position" position="after"
-                                                                                                           origin="instance(concat('fb-grid-', context()/@columns, '-template'))/xhtml:tr"/>
+                                                                                                           origin="xxforms:element('xhtml:tr', for $td in (1 to $new-td-count) return xxforms:element('xhtml:td'))"/>
                                                                                         </xforms:action>
                                                                                     </xforms:action>
                                                                                 </xforms:trigger>
@@ -1312,28 +1392,32 @@
                                                                                         <xforms:action ev:event="DOMActivate">
 
                                                                                             <!-- Prepare span grid -->
-                                                                                            <xforms:dispatch name="fb-prepare-span-grid" target="fb-form-model">
+                                                                                            <xforms:dispatch name="fb-prepare-span-grid" target="fr-form-model">
                                                                                                 <xxforms:context name="grid" select="$grid"/>
                                                                                             </xforms:dispatch>
 
-
+                                                                                            <!-- Value of rowspan on td to expand -->
                                                                                             <xxforms:variable name="current-rowspan" select="if ($td/@rowspan) then xs:integer($td/@rowspan) else 1"/>
-
-                                                                                            <xxforms:variable name="cnum1" select="count((instance('fb-span-grid-instance')/r[$tr-position]/c[. != 'x'])[$td-position]/preceding-sibling::c) + 1"/>
-                                                                                            <xxforms:variable name="cnum2" select="count(instance('fb-span-grid-instance')/r[$tr-position + $current-rowspan]/c[$cnum1]/preceding-sibling::c[. != 'x']) + 1"/>
+                                                                                            <!-- Column number of the td to expand -->
+                                                                                            <xxforms:variable name="x" select="count((instance('fb-span-grid-instance')/r[$tr-position]/c[. != 'x'])[$td-position]/preceding-sibling::c) + 1"/>
+                                                                                            <!-- Position of the td to delete -->
+                                                                                            <xxforms:variable name="delete-td-position" select="count(instance('fb-span-grid-instance')/r[$tr-position + $current-rowspan]/c[$x]/preceding-sibling::c[. != 'x']) + 1"/>
+                                                                                            <!-- td to delete -->
+                                                                                            <xxforms:variable name="delete-td" select="$td/../following-sibling::xhtml:tr[$current-rowspan]/xhtml:td[$delete-td-position]"/>
+                                                                                            <!-- rowspan increase -->
+                                                                                            <xxforms:variable name="rowspan-delta" select="if ($delete-td/@rowspan) then xs:integer($delete-td/@rowspan) else 1"/>
 
                                                                                             <!--<xforms:message level="xxforms:log-info">-->
-                                                                                                <!--xxx <xforms:output value="string-join(for $i in ($current-rowspan, $cnum1, $cnum2) return string($i), ' - ')"/>-->
+                                                                                                <!--xxx <xforms:output value="string-join(for $i in ($current-rowspan, $current-column, $delete-td-position) return string($i), ' - ')"/>-->
                                                                                             <!--</xforms:message>-->
 
                                                                                             <!-- Increase rowspan on current xhtml:td -->
-                                                                                            <xforms:insert context="$td" origin="xxforms:attribute('rowspan', xs:string($current-rowspan + 1))"/>
+                                                                                            <xforms:insert context="$td" origin="xxforms:attribute('rowspan', xs:string($current-rowspan + $rowspan-delta))"/>
                                                                                             <!-- Delete holder element, resources, and control in td to delete -->
-                                                                                            <xxforms:variable name="delete-td" select="$td/../following-sibling::xhtml:tr[$current-rowspan]/xhtml:td[$cnum2]"/>
                                                                                             <xforms:dispatch if="exists($delete-td/xforms:*)" name="fb-delete-control" target="fr-form-model">
                                                                                                 <xxforms:context name="control" select="$delete-td/xforms:*"/>
                                                                                             </xforms:dispatch>
-                                                                                            <!-- Delete proper xhtml:td -->
+                                                                                            <!-- Delete xhtml:td -->
                                                                                             <xforms:delete nodeset="$delete-td"/>
                                                                                         </xforms:action>
                                                                                     </xforms:trigger>

@@ -89,6 +89,7 @@ public class XXFormsElement extends XFormsFunction {
 
                     if (currentItem instanceof NodeWrapper) {
                         // dom4j node
+                        // TODO: nodes must be duplicated before being copied
                         final Node currentNode = (Node) ((NodeWrapper) currentItem).getUnderlyingNode();
 
                         if (currentNode instanceof Attribute) {

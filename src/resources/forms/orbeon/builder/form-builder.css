@@ -30,7 +30,7 @@
 
 #fb-toolbox-dialog { width: 180px }
 .yui-panel-container > #fb-toolbox-dialog { position: fixed; left: 11px; top: 27px }/* IE HACK: hide this definition for IE 6 */
-#fb-toolbox-dialog .yui-panel .hd { background-color: #3598d4 }
+#fb-toolbox-dialog .hd { background-color: #3598d4 }
 
 .fb-toolbar button { width: 12em }
 .fb-section-toolbar { margin-top: .5em }
@@ -139,11 +139,20 @@
 
 /* Grid */
 
-.fb-grid-cell-icons { min-height: 4em; height: auto !important; height: 4em; text-align: center }/* IE HACK for min-height */
+.fb-grid-cell-icons { width: 16px; min-height: 4em; height: auto !important; height: 4em; text-align: center }/* IE HACK for min-height */
 
-.fb-grid-control-icons { display: block; text-align: center; float: right }
+.fb-grid .fb-grid-td .fb-grid-cell-icons img { display: none }
+.fb-grid .fb-grid-td:hover .fb-grid-cell-icons img { display: inline }
+
+.fb-grid-control-icons { display: block; width: 16px; text-align: center; float: right }
 .fb-grid-control-icons .xforms-trigger { display: inline }
-/*.fb-grid-control-icons .xforms-trigger img { xxx }*/
+
+.fb-grid .fb-grid-td .fb-grid-control-icons img { display: none }
+.fb-grid .fb-grid-td:hover .fb-grid-control-icons img { display: inline }
+
+.fb-grid-column-toolbar-td { text-align: center }
+.fb-grid-column-toolbar-td .fb-insert-left { float: left }
+.fb-grid-column-toolbar-td .fb-insert-right { float: right }
 
 .fb-grid-table { margin-top: .5em; margin-left: 1px; width: 99.5%; *width: 99.5% }
 .fb-grid-td { width: auto; vertical-align: top }
@@ -176,20 +185,14 @@
 .fb-grid-4-columns .fb-grid-td { width: 25%; }
 .fb-grid-4-columns .fb-grid-td .fb-grid-content { width: 14em; *width: 13.66em }
 
-.fb-grid-cell-icons { width: 1em; text-align: center; margin-right: .2em; float: left }
-.fb-grid-cell-icons img { margin-bottom: 0; padding: 0; display: block }
+.fb-grid-cell-icons { display: block; width: 16px; text-align: center; margin-right: .2em; float: left }
+.fb-grid-cell-icons img { margin-bottom: 0; padding: 0; display: inline }
 
 .xforms-repeat-selected-item-4 {
     background-color: #F8F8F8;
     background-image: url(../../../apps/fr/style/logo-bg.gif);
     background-repeat: repeat-x;
 }
-
-.fb-grid td .fb-grid-cell-icons img { display: none }
-.fb-grid td:hover .fb-grid-cell-icons img { display: block }
-
-.fb-grid td .fb-grid-control-icons img { display: none }
-.fb-grid td:hover .fb-grid-control-icons img { display: block }
 
 .fb-hide-alert .xforms-alert { display: none }
 

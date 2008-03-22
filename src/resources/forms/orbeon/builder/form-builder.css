@@ -180,7 +180,7 @@
 
 /* Grid content */
 .fb-grid-td .fb-grid-content { *overflow: hidden }/* IE HACK so that scrollable images work in the table - but beware it causes clipping of inside content */
-.fb-grid-td .fb-grid-content { float: left; width: 65.6em; *width: 64em }
+.fb-grid-td .fb-grid-content { float: left; width: 65em; *width: 63.5em }
 
 .fb-control-control { *padding-right: 6px }/* To help IE move back controls within .fb-grid-content */
 #fb-details-section .fb-grid-td .xforms-input input { width: 100%; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box }
@@ -197,13 +197,13 @@
 
 
 .fb-grid-2-columns .fb-grid-td { width: 50% }
-.fb-grid-2-columns .fb-grid-td .fb-grid-content { width: 31.2em; *width: 30.5em }
+.fb-grid-2-columns .fb-grid-td .fb-grid-content { width: 30.5em; *width: 29.8em }
 
 .fb-grid-3-columns .fb-grid-td { width: 33.3%; }
-.fb-grid-3-columns .fb-grid-td .fb-grid-content { width: 19.5em; *width: 19.03em }
+.fb-grid-3-columns .fb-grid-td .fb-grid-content { width: 19.5em; *width: 19em }
 
 .fb-grid-4-columns .fb-grid-td { width: 25%; }
-.fb-grid-4-columns .fb-grid-td .fb-grid-content { width: 14em; *width: 13.66em }
+.fb-grid-4-columns .fb-grid-td .fb-grid-content { width: 13.8em; *width: 13.4em }
 
 /* Radio buttons */
 .fb-grid .xforms-select1-appearance-full span input { float: left; }

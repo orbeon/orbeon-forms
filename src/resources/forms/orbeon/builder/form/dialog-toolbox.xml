@@ -66,54 +66,6 @@
         </xforms:trigger>
     </xhtml:div>
 
-    <!--<xhtml:div class="fb-toolbox">-->
-        <!-- Cut/copy/paste-->
-        <!--<xhtml:div class="fb-tool">-->
-            <!--<xforms:trigger appearance="full" ref="$xcv/cut-trigger">-->
-                <!--<xforms:label>-->
-                    <!--<xhtml:img src="../../../../forms/orbeon/builder/images/cut.gif" alt="Cut" title="Cut"/>-->
-                    <!--<xhtml:span>Cut Control</xhtml:span>-->
-                <!--</xforms:label>-->
-                <!--<xforms:action ev:event="DOMActivate">-->
-                    <!-- Copy control -->
-                    <!--<xforms:dispatch name="fb-copy-control" target="fr-form-model">-->
-                        <!--<xxforms:context name="current-td" select="$current-td"/>-->
-                    <!--</xforms:dispatch>-->
-                    <!-- Then delete the source -->
-                    <!--<xforms:dispatch name="fb-delete-control" target="fr-form-model">-->
-                        <!--<xxforms:context name="control" select="$current-td/xforms:*"/>-->
-                    <!--</xforms:dispatch>-->
-                <!--</xforms:action>-->
-            <!--</xforms:trigger>-->
-        <!--</xhtml:div>-->
-        <!--<xhtml:div class="fb-tool">-->
-            <!--<xforms:trigger appearance="full" ref="$xcv/copy-trigger">-->
-                <!--<xforms:label>-->
-                    <!--<xhtml:img src="../../../../forms/orbeon/builder/images/copy.gif" alt="Copy" title="Copy"/>-->
-                    <!--<xhtml:span>Copy Control</xhtml:span>-->
-                <!--</xforms:label>-->
-                <!--<xforms:action ev:event="DOMActivate">-->
-                    <!-- Copy control -->
-                    <!--<xforms:dispatch name="fb-copy-control" target="fr-form-model">-->
-                        <!--<xxforms:context name="current-td" select="$current-td"/>-->
-                    <!--</xforms:dispatch>-->
-                <!--</xforms:action>-->
-            <!--</xforms:trigger>-->
-        <!--</xhtml:div>-->
-        <!--<xhtml:div class="fb-tool">-->
-            <!--<xforms:trigger appearance="full" ref="$xcv/paste-trigger">-->
-                <!--<xforms:label>-->
-                    <!--<xhtml:img src="../../../../forms/orbeon/builder/images/paste.gif" alt="Paste" title="Paste"/>-->
-                    <!--<xhtml:span>Paste Control</xhtml:span>-->
-                <!--</xforms:label>-->
-                <!--<xforms:action ev:event="DOMActivate">-->
-                    <!-- Paste control -->
-                    <!--<xforms:dispatch name="fb-paste-control" target="fr-form-model"/>-->
-                <!--</xforms:action>-->
-            <!--</xforms:trigger>-->
-        <!--</xhtml:div>-->
-    <!--</xhtml:div>-->
-
         <xhtml:div class="fb-toolbox fb-tools">
             <!-- Add new section -->
             <xhtml:div class="fb-tool">

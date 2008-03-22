@@ -956,7 +956,7 @@
                         <li>
                             <a name="xxforms-attribute"/>
                             <p>
-                                <code>xxforms:attribute($qname as xs:string, $value as xs:string?) as attribute()</code>
+                                <code>xxforms:attribute($qname as xs:string, $value as xs:anyAtomicType?) as attribute()</code>
                             </p>
                             <p>
                                 The <code>xxforms:attribute()</code> function returns a new XML attribute with the

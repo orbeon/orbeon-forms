@@ -506,6 +506,16 @@ public class Dom4jUtils {
     }
 
     /**
+     * Create a copy of a dom4j Node.
+     *
+     * @param source    source Node
+     * @return          copy of Node
+     */
+    public static Node createCopy(Node source) {
+        return (source instanceof Element) ? ((Node) ((Element) source).createCopy()) : (Node) source.clone();
+    }
+
+    /**
      * Return a new document with a copy of newRoot as its root.
      */
     public static Document createDocument(final Element newRoot) {

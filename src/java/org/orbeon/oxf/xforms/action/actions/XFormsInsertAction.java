@@ -125,7 +125,7 @@ public class XFormsInsertAction extends XFormsAction {
                     // "Otherwise, if the origin attribute is not given, then the origin node-set consists of the last
                     // node of the Node Set Binding node-set."
                     final Node singleSourceNode = XFormsUtils.getNodeFromNodeInfoConvert((NodeInfo) collectionToBeUpdated.get(collectionToBeUpdated.size() - 1), CANNOT_INSERT_READONLY_MESSAGE);
-                    final Node singleClonedNode = (singleSourceNode instanceof Element) ? ((Node) ((Element) singleSourceNode).createCopy()) : (Node) singleSourceNode.clone();
+                    final Node singleClonedNode = Dom4jUtils.createCopy(singleSourceNode);
 
                     sourceNodes = Collections.singletonList(singleSourceNode);
                     clonedNodesTemp = Collections.singletonList(singleClonedNode);

@@ -28,7 +28,7 @@ import org.orbeon.saxon.trans.XPathException;
 import java.util.Map;
 
 /**
- * xxforms:attribute(xs:string, xs:string?) as attribute()
+ * xxforms:attribute(xs:string, xs:anyAtomicType?) as attribute()
  *
  * Creates a new XML attribute. The first argument is a string representing a QName representing the name of the
  * attribute to create. If a prefix is present, it is resolved with the namespace mappings in scope where the expression
@@ -42,7 +42,8 @@ public class XXFormsAttribute extends XFormsFunction {
         final String qName = (qNameExpression == null) ? null : qNameExpression.evaluateAsString(xpathContext);
 
         final Expression valueExpression = (argument == null || argument.length < 2) ? null : argument[1];
-        final String value = (valueExpression == null) ? "" : valueExpression.evaluateAsString(xpathContext);
+        final Item item = (valueExpression == null) ? null : valueExpression.evaluateItem(xpathContext);
+        final String value = (item != null) ? item.getStringValue() : "";
 
         final int colonIndex = qName.indexOf(':');
         final Attribute attribute;

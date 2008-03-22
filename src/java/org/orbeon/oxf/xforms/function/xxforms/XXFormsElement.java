@@ -89,15 +89,19 @@ public class XXFormsElement extends XFormsFunction {
 
                     if (currentItem instanceof NodeWrapper) {
                         // dom4j node
-                        // TODO: nodes must be duplicated before being copied
-                        final Node currentNode = (Node) ((NodeWrapper) currentItem).getUnderlyingNode();
 
-                        if (currentNode instanceof Attribute) {
+                        // Copy node before using it
+                        final Node newNode; {
+                        final Node currentNode = (Node) ((NodeWrapper) currentItem).getUnderlyingNode();
+                            newNode = Dom4jUtils.createCopy(currentNode);
+                        }
+
+                        if (newNode instanceof Attribute) {
                             // Add attribute
-                            element.add((Attribute) currentNode);
+                            element.add((Attribute) newNode);
                         } else {
                             // Append node
-                            element.content().add(currentNode);
+                            element.content().add(newNode);
                         }
 
                     } else {

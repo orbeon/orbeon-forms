@@ -102,7 +102,7 @@ ORBEON.xforms.Globals = ORBEON.xforms.Globals || {
     isRenderingEnginePresto: navigator.userAgent.toLowerCase().indexOf("opera") != -1,    // Opera
     isRenderingEngineWebCore: navigator.userAgent.toLowerCase().indexOf("safari") != -1,  // Safari
     isRenderingEngineWebCore13: navigator.userAgent.indexOf("AppleWebKit/312") != -1,     // Safari 1.3
-    isRenderingEngineTridend: navigator.userAgent.toLowerCase().indexOf("msie") != -1     // Internet Explorer
+    isRenderingEngineTrident: navigator.userAgent.toLowerCase().indexOf("msie") != -1     // Internet Explorer
         && navigator.userAgent.toLowerCase().indexOf("opera") == -1,
 
     /**
@@ -362,7 +362,7 @@ ORBEON.util.Dom = {
      * Return null when the attribute is not there.
      */
     getAttribute: function(element, name) {
-        if (ORBEON.xforms.Globals.isRenderingEngineTridend) {
+        if (ORBEON.xforms.Globals.isRenderingEngineTrident) {
             // IE incorrectly already return null when the attribute is not there,
             // but this happens to be what we want to do here
             return element.getAttribute(name);
@@ -472,7 +472,7 @@ ORBEON.util.Dom = {
 };
 
 (function () {
-    var methodsFrom = ORBEON.xforms.Globals.isRenderingEngineTridend ? ORBEON.util.IEDom : ORBEON.util.MozDom;
+    var methodsFrom = ORBEON.xforms.Globals.isRenderingEngineTrident ? ORBEON.util.IEDom : ORBEON.util.MozDom;
     for (var method in methodsFrom)
         ORBEON.util.Dom[method] = methodsFrom[method];
 }());
@@ -3026,7 +3026,7 @@ ORBEON.xforms.Server = {
                                             }
 
                                             // Set content of select element
-                                            if (ORBEON.xforms.Globals.isRenderingEngineTridend) {
+                                            if (ORBEON.xforms.Globals.isRenderingEngineTrident) {
                                                 // IE does not support setting the content of a select with innerHTML
                                                 // So we have to generate the whole select, and use outerHTML
                                                 documentElement.innerHTML = "";
@@ -3491,10 +3491,49 @@ ORBEON.xforms.Server = {
                                         var forAttribute = ORBEON.util.Dom.getAttribute(attributeElement, "for");
                                         var nameAttribute = ORBEON.util.Dom.getAttribute(attributeElement, "name");
                                         var htmlElement = ORBEON.util.Dom.getElementById(forAttribute);
-                                        if (nameAttribute == "class")
-                                            htmlElement.className = newAttributeValue;// don't use setAttribute with IE
-                                        else
+                                        if (ORBEON.xforms.Globals.isRenderingEngineTrident) {
+                                            // Hack for common broken IE attributes
+                                            if (nameAttribute == "class") {
+                                                htmlElement.className = newAttributeValue;
+                                            } else if (nameAttribute == "colspan") {
+                                                htmlElement.colSpan = newAttributeValue;
+                                            } else if (nameAttribute == "rowspan") {
+                                                // Below is an attempt at adjusting automatically rowspan for IE. It
+                                                // works, but the corresponding server-side code that runs during
+                                                // initialization is non-trivial to do.
+
+//                                                var adjustedRowspan = newAttributeValue;
+//                                                if (newAttributeValue > 1) {// need to adjust only if we actually span rows
+//                                                    var cursor = htmlElement.parentNode;// should be pointing to tr
+//                                                    if (cursor.nodeName.toLowerCase() == "tr") {
+//                                                        for (var k = 1; k < newAttributeValue; k++) {
+//                                                            // Point to first node after current tr
+//                                                            cursor = cursor.nextSibling;
+//                                                            // Skip over non-elements and separators
+//                                                            while (cursor != null && (cursor.nodeType != ELEMENT_TYPE || ORBEON.util.Dom.hasClass(cursor, "xforms-repeat-delimiter"))) {
+//                                                                if (ORBEON.util.Dom.hasClass(cursor, "xforms-repeat-delimiter"))
+//                                                                    adjustedRowspan++;
+//
+//                                                                cursor = cursor.nextSibling;
+//                                                            }
+//                                                            if (!cursor)
+//                                                                break;
+//                                                        }
+//                                                        alert("xxxx adjusted rowspan for IE: " + adjustedRowspan);
+//                                                    }
+//                                                }
+//                                                htmlElement.rowSpan = adjustedRowspan;
+                                                htmlElement.rowSpan = newAttributeValue;
+                                            } else if (nameAttribute == "accesskey") {
+                                                htmlElement.accessKey = newAttributeValue;
+                                            } else if (nameAttribute == "tabindex") {
+                                                htmlElement.tabIndex = newAttributeValue;
+                                            } else {
+                                                htmlElement.setAttribute(nameAttribute, newAttributeValue);
+                                            }
+                                        } else {
                                             htmlElement.setAttribute(nameAttribute, newAttributeValue);
+                                        }
                                     }
 
                                     // Model item properties on a repeat item
@@ -4204,7 +4243,7 @@ function FCKeditor_OnComplete(editorInstance) {
     //
     // This comment can be removed after the switch to YUI RTE.
     //
-    //if (ORBEON.xforms.Globals.isRenderingEngineTridend)
+    //if (ORBEON.xforms.Globals.isRenderingEngineTrident)
     //    document.body.className = document.body.className;
 }
 
@@ -4231,7 +4270,7 @@ function xformsAddSuffixToIds(element, idSuffix, repeatDepth) {
     if (element.name) {
         var newName = xformsAppendRepeatSuffix(element.name, idSuffixWithDepth);
         if (element.tagName.toLowerCase() == "input" && element.type.toLowerCase() == "radio"
-                && ORBEON.xforms.Globals.isRenderingEngineTridend) {
+                && ORBEON.xforms.Globals.isRenderingEngineTrident) {
             // IE supports changing the name of elements, but according to the Microsoft documentation, "This does not
             // cause the name in the programming model to change in the collection of elements". This has a implication
             // for radio buttons where using a same name for a set of radio buttons is used to group them together.

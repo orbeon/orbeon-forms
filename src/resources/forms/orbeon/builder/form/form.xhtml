@@ -1474,6 +1474,30 @@
                                                                                         </xforms:action>
                                                                                     </xforms:trigger>
                                                                                 </xforms:group>
+                                                                                <!-- Shrink -->
+                                                                                <xforms:group ref=".[$td/@rowspan and $td/@rowspan > 1]">
+                                                                                    <xforms:trigger appearance="minimal" id="fb-shrink-cell-down-trigger">
+                                                                                        <xforms:label><xhtml:img src="../../../../apps/fr/style/up.gif" alt="Shrink" title="Shrink"/></xforms:label>
+                                                                                        <xforms:action ev:event="DOMActivate">
+
+                                                                                            <!-- Prepare span grid -->
+                                                                                            <xforms:dispatch name="fb-prepare-span-grid" target="fr-form-model">
+                                                                                                <xxforms:context name="grid" select="$grid"/>
+                                                                                            </xforms:dispatch>
+
+                                                                                            <!-- Decrease rowspan on current xhtml:td -->
+                                                                                            <xxforms:variable name="current-rowspan" select="xs:integer($td/@rowspan)"/>
+                                                                                            <xforms:setvalue ref="$td/@rowspan" value="$current-rowspan - 1"/>
+
+                                                                                            <!-- Insert xhtml:td in the right place -->
+                                                                                            <xxforms:variable name="x" select="count((instance('fb-span-grid-instance')/r[$tr-position]/c[. != 'x'])[$td-position]/preceding-sibling::c) + 1"/>
+                                                                                            <xxforms:variable name="insert-td-position" select="count(instance('fb-span-grid-instance')/r[$tr-position + $current-rowspan - 1]/c[$x]/preceding-sibling::c[. != 'x'])"/>
+                                                                                            <xforms:insert if="$insert-td-position > 0" context="$grid/xhtml:tr[$tr-position + $current-rowspan - 1]" nodeset="xhtml:td" at="$insert-td-position" origin="xxforms:element('xhtml:td')"/>
+                                                                                            <xforms:insert if="$insert-td-position = 0" context="$grid/xhtml:tr[$tr-position + $current-rowspan - 1]" origin="xxforms:element('xhtml:td')"/>
+
+                                                                                        </xforms:action>
+                                                                                    </xforms:trigger>
+                                                                                </xforms:group>
                                                                                 <!-- Delete control -->
                                                                                 <xforms:group ref=".[$control]">
                                                                                     <xforms:trigger appearance="minimal">

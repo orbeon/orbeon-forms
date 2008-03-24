@@ -16,15 +16,15 @@ package org.orbeon.oxf.processor.converter;
 import org.apache.commons.fileupload.FileItem;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.processor.ProcessorImpl;
-import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
-import org.orbeon.oxf.processor.ProcessorOutput;
+import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.processor.serializer.BinaryTextContentHandler;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.util.NetUtils;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
+import org.dom4j.Element;
 
 import javax.xml.parsers.SAXParser;
 
@@ -43,39 +43,33 @@ public class ToXMLConverter extends ProcessorImpl {
             public void readImpl(PipelineContext pipelineContext, ContentHandler contentHandler) {
 
                 // Read config input
-//                final Config config = (Config) readCacheInputAsObject(context, getInputByName(INPUT_CONFIG), new CacheableInputReader() {
-//                    public Object read(org.orbeon.oxf.pipeline.api.PipelineContext context, ProcessorInput input) {
-//                        Config result = new Config();
-//
-//                        Element configElement = readInputAsDOM4J(context, input).getRootElement();
-//
-//                        {
-//                            Element matchURIElement = configElement.element("match").element("uri");
-//                            result.matchURI = (matchURIElement == null) ? null : matchURIElement.getStringValue();
-//                            Element matchPrefixElement = configElement.element("match").element("prefix");
-//                            result.matchPrefix = (matchPrefixElement == null) ? null : matchPrefixElement.getStringValue();
-//                        }
-//
-//                        {
-//                            Element replaceURIElement = configElement.element("replace").element("uri");
-//                            result.replaceURI = (replaceURIElement == null) ? null : replaceURIElement.getStringValue();
-//                            Element replacePrefixElement = configElement.element("replace").element("prefix");
-//                            result.replacePrefix = (replacePrefixElement == null) ? null : replacePrefixElement.getStringValue();
-//                        }
-//
-//                        return result;
-//                    }
-//                });
+                final Config config = (Config) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_CONFIG), new CacheableInputReader() {
+                    public Object read(org.orbeon.oxf.pipeline.api.PipelineContext context, ProcessorInput input) {
+                        final Config result = new Config();
 
-                // Get FileItem
-                final FileItem fileItem = NetUtils.prepareFileItem(pipelineContext, NetUtils.REQUEST_SCOPE);
+                        final Element configElement = readInputAsDOM4J(context, input).getRootElement();
+
+                        // Validation setting
+                        result.validating = ProcessorUtils.selectBooleanValue(configElement, "/config/validating", URLGenerator.DEFAULT_VALIDATING);
+
+                        // XInclude handling
+                        result.handleXInclude = ProcessorUtils.selectBooleanValue(configElement, "/config/handle-xinclude", URLGenerator.DEFAULT_HANDLE_XINCLUDE);
+
+                        return result;
+                    }
+                });
 
                 try {
+                    // Get FileItem
+                    final FileItem fileItem = NetUtils.prepareFileItem(pipelineContext, NetUtils.REQUEST_SCOPE);
+
+                    // TODO: Can we avoid writing to a FileItem?
+
                     // Read to OutputStream
                     readInputAsSAX(pipelineContext, INPUT_DATA, new BinaryTextContentHandler(null, fileItem.getOutputStream(), false, null, false, false, null, false));
 
                     // Create parser
-                    final SAXParser parser = XMLUtils.newSAXParser();
+                    final SAXParser parser = XMLUtils.newSAXParser(config.validating, config.handleXInclude);
                     final XMLReader reader = parser.getXMLReader();
 
                     // Run parser on InputStream
@@ -90,5 +84,10 @@ public class ToXMLConverter extends ProcessorImpl {
         };
         addOutput(name, output);
         return output;
+    }
+
+    private static class Config {
+        public boolean validating;
+        public boolean handleXInclude;
     }
 }

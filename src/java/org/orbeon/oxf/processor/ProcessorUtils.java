@@ -21,6 +21,7 @@ import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.PipelineUtils;
+import org.orbeon.oxf.util.ISODateUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -198,7 +199,7 @@ public class ProcessorUtils {
      * @param output                output ContentHandler to write text document to
      * @param contentType           optional content type to set as attribute on the root element
      */
-    public static void readText(InputStream is, String encoding, ContentHandler output, String contentType) {
+    public static void readText(InputStream is, String encoding, ContentHandler output, String contentType, Long lastModified) {
 
         if (encoding == null)
             encoding = DEFAULT_TEXT_READING_ENCODING;
@@ -211,6 +212,8 @@ public class ProcessorUtils {
             attributes.addAttribute(XMLConstants.XSI_URI, "type", "xsi:type", "CDATA", XMLConstants.XS_STRING_QNAME.getQualifiedName());
             if (contentType != null)
                 attributes.addAttribute("", "content-type", "content-type", "CDATA", contentType);
+            if (lastModified != null)
+                attributes.addAttribute("", "last-modified", "last-modified", "CDATA", ISODateUtils.getRFC1123Date(lastModified.longValue()));
 
             // Write document
             output.startDocument();
@@ -231,7 +234,7 @@ public class ProcessorUtils {
      * @param output        output ContentHandler to write binary document to
      * @param contentType   optional content type to set as attribute on the root element
      */
-    public static void readBinary(InputStream is, ContentHandler output, String contentType) {
+    public static void readBinary(InputStream is, ContentHandler output, String contentType, Long lastModified) {
         try {
             // Create attributes for root element: xsi:type, and optional content-type
             AttributesImpl attributes = new AttributesImpl();
@@ -240,6 +243,8 @@ public class ProcessorUtils {
             attributes.addAttribute(XMLConstants.XSI_URI, "type", "xsi:type", "CDATA", XMLConstants.XS_BASE64BINARY_QNAME.getQualifiedName());
             if (contentType != null)
                 attributes.addAttribute("", "content-type", "content-type", "CDATA", contentType);
+            if (lastModified != null)
+                attributes.addAttribute("", "last-modified", "last-modified", "CDATA",  ISODateUtils.getRFC1123Date(lastModified.longValue()));
 
             // Write document
             output.startDocument();

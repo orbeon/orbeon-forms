@@ -61,20 +61,14 @@ public class URLGenerator extends ProcessorImpl {
 
     private static Logger logger = Logger.getLogger(URLGenerator.class);
 
-    private static final boolean DEFAULT_VALIDATING = false;
+    public static final boolean DEFAULT_VALIDATING = false;
     public static final boolean DEFAULT_HANDLE_XINCLUDE = false;
 
     private static final boolean DEFAULT_FORCE_CONTENT_TYPE = false;
     private static final boolean DEFAULT_FORCE_ENCODING = false;
     private static final boolean DEFAULT_IGNORE_CONNECTION_ENCODING = false;
 
-    private static final int CACHE_EXPIRATION_NO_CACHE = 0;
-    private static final int CACHE_EXPIRATION_NO_EXPIRATION = -1;
-    private static final int CACHE_EXPIRATION_LAST_MODIFIED = -2;
-
     private static final boolean DEFAULT_CACHE_USE_LOCAL_CACHE = true;
-    private static final boolean DEFAULT_CACHE_ALWAYS_REVALIDATE = true;
-    private static final int DEFAULT_CACHE_EXPIRATION = CACHE_EXPIRATION_LAST_MODIFIED;
 
     public static final String URL_NAMESPACE_URI = "http://www.orbeon.org/oxf/xml/url";
     public static final String VALIDATING_PROPERTY = "validating";
@@ -126,7 +120,7 @@ public class URLGenerator extends ProcessorImpl {
                       boolean cacheUseLocalCache) {
         this.localConfigURIReferences = new ConfigURIReferences(new Config(url, contentType, forceContentType, encoding,
                 forceEncoding, ignoreConnectionEncoding, validating, handleXInclude, mode, headers, cacheUseLocalCache,
-                DEFAULT_CACHE_ALWAYS_REVALIDATE, DEFAULT_CACHE_EXPIRATION, new TidyConfig(null)));
+                new TidyConfig(null)));
         addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
     }
 
@@ -144,8 +138,6 @@ public class URLGenerator extends ProcessorImpl {
         private String mode;
 
         private boolean cacheUseLocalCache = DEFAULT_CACHE_USE_LOCAL_CACHE;
-        private boolean cacheAlwaysRevalidate = DEFAULT_CACHE_ALWAYS_REVALIDATE;
-        private int cacheExpiration = DEFAULT_CACHE_EXPIRATION;
 
         private TidyConfig tidyConfig;
 
@@ -170,7 +162,7 @@ public class URLGenerator extends ProcessorImpl {
 
         public Config(URL url, String contentType, boolean forceContentType, String encoding, boolean forceEncoding,
                       boolean ignoreConnectionEncoding, boolean validating, boolean handleXInclude, String mode,Map headers,
-                      boolean cacheUseLocalCache, boolean cacheAlwaysRevalidate, int cacheExpiration, TidyConfig tidyConfig) {
+                      boolean cacheUseLocalCache, TidyConfig tidyConfig) {
             this.url = url;
             this.contentType = contentType;
             this.forceContentType = forceContentType;
@@ -184,8 +176,6 @@ public class URLGenerator extends ProcessorImpl {
             this.mode = mode;
 
             this.cacheUseLocalCache = cacheUseLocalCache;
-            this.cacheAlwaysRevalidate = cacheAlwaysRevalidate;
-            this.cacheExpiration = cacheExpiration;
 
             this.tidyConfig = tidyConfig;
         }
@@ -330,8 +320,6 @@ public class URLGenerator extends ProcessorImpl {
 
                                 // Cache control
                                 boolean cacheUseLocalCache = ProcessorUtils.selectBooleanValue(configElement, "/config/cache-control/use-local-cache", DEFAULT_CACHE_USE_LOCAL_CACHE);
-                                boolean cacheAlwaysRevalidate = ProcessorUtils.selectBooleanValue(configElement, "/config/cache-control/always-revalidate", DEFAULT_CACHE_ALWAYS_REVALIDATE);
-                                int cacheExpiration = ProcessorUtils.selectIntValue(configElement, "/config/cache-control/expiration", DEFAULT_CACHE_EXPIRATION);
 
                                 // Get Tidy config (will only apply if content-type is text/html)
                                 TidyConfig tidyConfig = new TidyConfig(XPathUtils.selectSingleNode(configElement, "/config/tidy-options"));
@@ -349,7 +337,7 @@ public class URLGenerator extends ProcessorImpl {
                                     // Create configuration
                                     Config config = new Config(fullURL, contentType, forceContentType, encoding, forceEncoding,
                                             ignoreConnectionEncoding, validating, handleXInclude, mode, headers,
-                                            cacheUseLocalCache, cacheAlwaysRevalidate, cacheExpiration, tidyConfig);
+                                            cacheUseLocalCache, tidyConfig);
                                     if (logger.isDebugEnabled())
                                         logger.debug("Read configuration: " + config.toString());
                                     return new ConfigURIReferences(config);
@@ -385,9 +373,8 @@ public class URLGenerator extends ProcessorImpl {
                         } else {
                             // We need to read the resource
 
-                            handler = OXFHandler.PROTOCOL.equals(configURIReferences.config.getURL().getProtocol())
-                                    ? (ResourceHandler) new OXFResourceHandler(configURIReferences.config)
-                                    : (ResourceHandler) new URLResourceHandler(configURIReferences.config);
+                            final URLGeneratorState state = (URLGenerator.URLGeneratorState) URLGenerator.this.getState(pipelineContext);
+                            handler = state.ensureMainResourceHandler(pipelineContext, configURIReferences.config);
 
                             // Find content-type to use. If the config says to force the
                             // content-type, we use the content-type provided by the user.
@@ -409,7 +396,7 @@ public class URLGenerator extends ProcessorImpl {
 
                             // Get and cache validity as the handler is open, as validity is likely to be used later
                             // again for caching reasons
-                            getHandlerValidity(pipelineContext, configURIReferences.config.getURL(), handler);
+                            final Long validity = (Long) getHandlerValidity(pipelineContext, configURIReferences.config.getURL(), handler);
 
                             // Create store for caching if necessary
                             final ContentHandler output = isUseLocalCache ? new SAXStore(contentHandler) : contentHandler;
@@ -426,14 +413,15 @@ public class URLGenerator extends ProcessorImpl {
                                     mode = "text";
                                 else
                                     mode = "binary";
-
                             }
 
                             // Read resource
                             if (mode.equals("html")) {
+                                // HTML mode
                                 handler.readHTML(output);
                                 configURIReferences.uriReferences = null;
                             } else if (mode.equals("xml")) {
+                                // XML mode
                                 final LocalXIncludeListener localXIncludeListener = new LocalXIncludeListener();
                                 XIncludeHandler.setXIncludeListener(localXIncludeListener);
                                 try {
@@ -441,12 +429,14 @@ public class URLGenerator extends ProcessorImpl {
                                 } finally {
                                     XIncludeHandler.setXIncludeListener(null);
                                 }
-                                localXIncludeListener.updateCache(pipelineContext, configURIReferences);
+                                localXIncludeListener.updateCache(configURIReferences);
                             } else if (mode.equals("text")) {
-                                handler.readText(output, contentType);
+                                // Text mode
+                                handler.readText(output, contentType, validity);
                                 configURIReferences.uriReferences = null;
                             } else {
-                                handler.readBinary(output, contentType);
+                                // Binary mode
+                                handler.readBinary(output, contentType, validity);
                                 configURIReferences.uriReferences = null;
                             }
 
@@ -528,7 +518,9 @@ public class URLGenerator extends ProcessorImpl {
                         validities.add(configKeyValidity.validity);
                     }
                     // Handle main document and config
-                    validities.add(getHandlerValidity(pipelineContext, configURIReferences.config.getURL(), null));
+                    final URLGeneratorState state = (URLGenerator.URLGeneratorState) URLGenerator.this.getState(pipelineContext);
+                    final ResourceHandler resourceHandler = state.ensureMainResourceHandler(pipelineContext, configURIReferences.config);
+                    validities.add(getHandlerValidity(pipelineContext, configURIReferences.config.getURL(), resourceHandler));
                     // Handle dependencies if any
                     if (configURIReferences.uriReferences != null) {
                         for (Iterator i = configURIReferences.uriReferences.references.iterator(); i.hasNext();) {
@@ -553,15 +545,19 @@ public class URLGenerator extends ProcessorImpl {
                     try {
                         final boolean mustDestroyHandler;
                         if (handler == null) {
+                            // This should happen only for dependencies
                             handler = OXFHandler.PROTOCOL.equals(url.getProtocol())
-                                ? (ResourceHandler) new OXFResourceHandler(new Config(url))
-                                : (ResourceHandler) new URLResourceHandler(new Config(url));
+                                ? (ResourceHandler) new OXFResourceHandler(new Config(url)) // Should use full config so that headers are forwarded?
+                                : (ResourceHandler) new URLResourceHandler(new Config(url));// Should use full config so that headers are forwarded?
+
                             mustDestroyHandler = true;
                         } else {
                             mustDestroyHandler = false;
                         }
                         try {
-                            // FIXME: this can potentially be very slow with some URLs
+                            // FIXME: this can potentially be very slow with some URLs like HTTP URLs. We try to
+                            // optimized this by keeping the URLConnection for the main document, but dependencies may
+                            // cause multiple requests to the same URL.
                             final Object validity = handler.getValidity();
                             state.setLastModified(urlString, (Long) validity);
                             return validity;
@@ -613,11 +609,11 @@ public class URLGenerator extends ProcessorImpl {
 
         public void readHTML(ContentHandler output) throws IOException;
 
-        public void readText(ContentHandler output, String contentType) throws IOException;
+        public void readText(ContentHandler output, String contentType, Long lastModified) throws IOException;
 
         public void readXML(PipelineContext pipelineContext, ContentHandler output) throws IOException;
 
-        public void readBinary(ContentHandler output, String contentType) throws IOException;
+        public void readBinary(ContentHandler output, String contentType, Long lastModified) throws IOException;
     }
 
     private static class OXFResourceHandler implements ResourceHandler {
@@ -678,9 +674,9 @@ public class URLGenerator extends ProcessorImpl {
             URLResourceHandler.readHTML(inputStream, config.getTidyConfig(), getExternalEncoding(), output);
         }
 
-        public void readText(ContentHandler output, String contentType) throws IOException {
+        public void readText(ContentHandler output, String contentType, Long lastModified) throws IOException {
             inputStream = ResourceManagerWrapper.instance().getContentAsStream(getKey());
-            ProcessorUtils.readText(inputStream, getExternalEncoding(), output, contentType);
+            ProcessorUtils.readText(inputStream, getExternalEncoding(), output, contentType, lastModified);
         }
 
         public void readXML(PipelineContext pipelineContext, ContentHandler output) throws IOException {
@@ -694,9 +690,9 @@ public class URLGenerator extends ProcessorImpl {
             }
         }
 
-        public void readBinary(ContentHandler output, String contentType) throws IOException {
+        public void readBinary(ContentHandler output, String contentType, Long lastModified) throws IOException {
             inputStream = ResourceManagerWrapper.instance().getContentAsStream(getKey());
-            ProcessorUtils.readBinary(inputStream, output, contentType);
+            ProcessorUtils.readBinary(inputStream, output, contentType, lastModified);
         }
 
         private String getKey() {
@@ -716,7 +712,7 @@ public class URLGenerator extends ProcessorImpl {
             uriReferences.references.add(new URIReference(base, href));
         }
 
-        public void updateCache(PipelineContext pipelineContext, ConfigURIReferences configURIReferences) {
+        public void updateCache(ConfigURIReferences configURIReferences) {
             configURIReferences.uriReferences = uriReferences;
         }
     }
@@ -767,11 +763,11 @@ public class URLGenerator extends ProcessorImpl {
         private void openConnection() throws IOException {
             if (urlConn == null) {
                 urlConn = config.getURL().openConnection();
-                Map headers = config.getHeaders();
+                final Map headers = config.getHeaders();
                 if (headers != null) {
                     for (Iterator i = headers.keySet().iterator(); i.hasNext();) {
-                        String name = (String) i.next();
-                        String value = (String) config.getHeaders().get(name);
+                        final String name = (String) i.next();
+                        final String value = (String) config.getHeaders().get(name);
                         urlConn.setRequestProperty(name, value);
                     }
                 }
@@ -798,14 +794,14 @@ public class URLGenerator extends ProcessorImpl {
             readHTML(urlConn.getInputStream(), config.getTidyConfig(), getExternalEncoding(), output);
         }
 
-        public void readText(ContentHandler output, String contentType) throws IOException {
+        public void readText(ContentHandler output, String contentType, Long lastModified) throws IOException {
             openConnection();
-            ProcessorUtils.readText(urlConn.getInputStream(), getExternalEncoding(), output, contentType);
+            ProcessorUtils.readText(urlConn.getInputStream(), getExternalEncoding(), output, contentType, lastModified);
         }
 
-        public void readBinary(ContentHandler output, String contentType) throws IOException {
+        public void readBinary(ContentHandler output, String contentType, Long lastModified) throws IOException {
             openConnection();
-            ProcessorUtils.readBinary(urlConn.getInputStream(), output, contentType);
+            ProcessorUtils.readBinary(urlConn.getInputStream(), output, contentType, lastModified);
         }
 
         public void readXML(PipelineContext pipelineContext, ContentHandler output) throws IOException {
@@ -870,6 +866,7 @@ public class URLGenerator extends ProcessorImpl {
 
     private class URLGeneratorState {
 
+        private ResourceHandler mainResourceHandler;
         private Map map;
 
         public void setLastModified(String urlString, Long lastModified) {
@@ -887,6 +884,26 @@ public class URLGenerator extends ProcessorImpl {
         public Long getLastModified(String urlString) {
             final Object result = map.get(urlString);
             return (result instanceof String) ? null : (Long) result;
+        }
+
+        public ResourceHandler ensureMainResourceHandler(PipelineContext pipelineContext, Config config) {
+            if (mainResourceHandler == null) {
+                // Create and remember handler
+                mainResourceHandler = OXFHandler.PROTOCOL.equals(config.getURL().getProtocol())
+                        ? (ResourceHandler) new OXFResourceHandler(config)
+                        : (ResourceHandler) new URLResourceHandler(config);
+                // Make sure it is destroyed when the pipeline ends at the latest
+                pipelineContext.addContextListener(new PipelineContext.ContextListener() {
+                    public void contextDestroyed(boolean success) {
+                        try {
+                            mainResourceHandler.destroy();
+                        } catch (IOException e) {
+                            logger.error("Exception caught while destroying ResourceHandler", e);
+                        }
+                    }
+                });
+            }
+            return mainResourceHandler;
         }
     }
 

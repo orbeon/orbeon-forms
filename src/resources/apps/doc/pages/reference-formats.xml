@@ -49,13 +49,32 @@
         <section>
             <title>Binary Documents</title>
             <p>
-                A binary document consist of a <code>document</code> root node containing
-                character data encoded with Base64. An <code>xsi:type</code> attribute is also
-                present, as well as an optional <code>content-type</code> attribute, for
-                example:
+                A binary document consist of a <code>document</code> root node containing character data encoded with
+                Base64. The following attributes are supported:
+            </p>
+            <ul>
+                <li>
+                    <p>
+                        <code>xsi:type</code>: mandatory, specifies the content as <code>xs:base64Binary</code>
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <code>content-type</code>: optional, provides a content-type which may be used by the consumer
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <code>last-modified</code>: optional, provides a last modification date which may be used by
+                        the consumer
+                    </p>
+                </li>
+            </ul>
+            <p>
+                Example:
             </p>
             <xml-source>
-<document xsi:type="xs:base64Binary" content-type="image/jpeg">
+<document xsi:type="xs:base64Binary" content-type="image/jpeg" last-modified="Sun, 23 Mar 2008 07:51:07 GMT">
 /9j/4AAQSkZJRgABAQEBygHKAAD/2wBDAAQDAwQDAwQEBAQFBQQFBwsHBwYGBw4KCggLEA4R
 ...
 KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
@@ -64,8 +83,8 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
             <note>
                 <p>
                     For the curious, the Base64 encoding is documented in <a
-                    href="http://www.ietf.org/rfc/rfc2045.txt">RFC 2045</a>. This encoding represents
-                    binary data by mapping it to a set of 64 ASCII characters.
+                    href="http://www.ietf.org/rfc/rfc2045.txt">RFC 2045</a>. This encoding represents binary data by
+                    mapping it to a set of 64 ASCII characters.
                 </p>
             </note>
             <p>
@@ -84,11 +103,31 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
             <title>Text Documents</title>
             <p>
                 A text document consists of a <code>document</code> root element containing the
-                text. An <code>xsi:type</code> attribute is also present, as well as an optional
-                <code>content-type</code> attribute:
+                text. The following attributes are supported:
+            </p>
+            <ul>
+                <li>
+                    <p>
+                        <code>xsi:type</code>: mandatory, specifies the content as <code>xs:string</code>
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <code>content-type</code>: optional, provides a content-type which may be used by the consumer
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <code>last-modified</code>: optional, provides a last modification date which may be used by
+                        the consumer
+                    </p>
+                </li>
+            </ul>
+            <p>
+                Example:
             </p>
             <xml-source>
-<document xsi:type="xs:string" content-type="text/plain">
+<document xsi:type="xs:string" content-type="text/plain" last-modified="Sun, 23 Mar 2008 07:51:07 GMT">
     This is line one of the input document!
     This is line two of the input document!
     This is line three of the input document!
@@ -99,7 +138,7 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
                 providing a hint for the character encoding, for example:
             </p>
             <xml-source>
-<document xsi:type="xs:string" content-type="text/plain; charset=iso-8859-1">
+<document xsi:type="xs:string" content-type="text/plain; charset=iso-8859-1" last-modified="Sun, 23 Mar 2008 07:51:07 GMT">
     This is line one of the input document!
     This is line two of the input document!
     This is line three of the input document!

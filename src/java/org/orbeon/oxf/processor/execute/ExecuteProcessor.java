@@ -228,12 +228,12 @@ public class ExecuteProcessor extends ProcessorImpl {
     }
 
     private void outputStdout(ContentHandler contentHandler, State state) {
-        ProcessorUtils.readText(new ByteArrayInputStream(state.outputBytes), "utf-8", contentHandler, "text/plain");
+        ProcessorUtils.readText(new ByteArrayInputStream(state.outputBytes), "utf-8", contentHandler, "text/plain", null);
         state.outputBytes = null;
     }
 
     private void outputStderr(ContentHandler contentHandler, State state) {
-        ProcessorUtils.readText(new ByteArrayInputStream(state.errorBytes), "utf-8", contentHandler, "text/plain");
+        ProcessorUtils.readText(new ByteArrayInputStream(state.errorBytes), "utf-8", contentHandler, "text/plain", null);
         state.errorBytes = null;
     }
 

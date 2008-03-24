@@ -19,6 +19,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.util.Base64ContentHandler;
 import org.orbeon.oxf.util.TextContentHandler;
+import org.orbeon.oxf.util.ISODateUtils;
 import org.orbeon.oxf.xml.ContentHandlerAdapter;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.xml.sax.Attributes;
@@ -87,12 +88,12 @@ public class BinaryTextContentHandler extends ContentHandlerAdapter {
         }
     }
 
-    public void startElement(String namespaceURI, String localName, String qName, Attributes atts) {
+    public void startElement(String namespaceURI, String localName, String qName, Attributes attributes) {
         if (elementLevel++ == 0) {
             // This is the root element
 
             // Get xsi:type attribute and determine whether the input is binary or text
-            String xsiType = atts.getValue(XMLConstants.XSI_TYPE_QNAME.getNamespaceURI(), XMLConstants.XSI_TYPE_QNAME.getName());
+            String xsiType = attributes.getValue(XMLConstants.XSI_TYPE_QNAME.getNamespaceURI(), XMLConstants.XSI_TYPE_QNAME.getName());
 
             if (xsiType == null)
                 throw new OXFException("Root element must contain an xsi:type attribute");
@@ -120,11 +121,19 @@ public class BinaryTextContentHandler extends ContentHandlerAdapter {
             } else
                 throw new OXFException("Type xs:string or xs:base64Binary must be specified");
 
+            // Set last-modified if available
+            final String validityAttribute = attributes.getValue("last-modified");
+            if (validityAttribute != null) {
+                // Override caching settings which may have taken place before
+                if (response != null)
+                    response.setCaching(ISODateUtils.parseRFC1123Date(validityAttribute), true, true);
+            }
+
             // Set ContentHandler and headers depending on input type
-            String contentTypeAttribute = atts.getValue("content-type");
+            final String contentTypeAttribute = attributes.getValue("content-type");
             if (isBinaryInput) {
                 // Get content-type
-                String contentType = getContentType(contentTypeAttribute, DEFAULT_BINARY_CONTENT_TYPE);
+                final String contentType = getContentType(contentTypeAttribute, DEFAULT_BINARY_CONTENT_TYPE);
 
                 if (response != null)
                     response.setContentType(contentType);
@@ -132,8 +141,8 @@ public class BinaryTextContentHandler extends ContentHandlerAdapter {
                 outputContentHandler = new Base64ContentHandler(outputStream);
             } else {
                 // Get content-type and encoding
-                String contentType = getContentType(contentTypeAttribute, DEFAULT_TEXT_CONTENT_TYPE);
-                String encoding = getEncoding(contentTypeAttribute, CachedSerializer.DEFAULT_ENCODING);
+                final String contentType = getContentType(contentTypeAttribute, DEFAULT_TEXT_CONTENT_TYPE);
+                final String encoding = getEncoding(contentTypeAttribute, CachedSerializer.DEFAULT_ENCODING);
 
                 // Always set the content type with a charset attribute
                 if (response != null)

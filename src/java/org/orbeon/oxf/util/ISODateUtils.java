@@ -76,6 +76,14 @@ public class ISODateUtils {
         return RFC1123_DATE.format(new Long(time));
     }
 
+    public static long parseRFC1123Date(String date) {
+        try {
+            return RFC1123_DATE.parse(date).getTime();
+        } catch (ParseException e) {
+            throw new OXFException(e);
+        }
+    }
+
     public static long getCurrentTimeMillis() {
         return Calendar.getInstance().getTimeInMillis();
     }

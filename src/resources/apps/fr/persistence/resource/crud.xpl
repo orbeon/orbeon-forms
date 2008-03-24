@@ -22,24 +22,18 @@
 
     <p:param type="input" name="instance"/>
 
+    <!-- Read URL -->
     <p:processor name="oxf:url-generator">
-        <p:input name="config" href="aggregate('config', aggregate('url', #instance#xpointer(concat(
-                                        'oxf:/forms/', /*/resource))))"/>
-        <p:output name="data" id="form"/>
-    </p:processor>
-
-    <!-- Convert and serialize to XML -->
-    <p:processor name="oxf:xml-converter">
-        <p:input name="config">
-            <config>
-                <indent>false</indent>
-                <encoding>utf-8</encoding>
+        <p:input name="config" transform="oxf:unsafe-xslt" href="#instance">
+            <config xsl:version="2.0">
+                <url><xsl:value-of select="concat('oxf:/forms/', /*/resource)"/></url>
+                <mode>binary</mode>
             </config>
         </p:input>
-        <p:input name="data" href="#form"/>
-        <p:output name="data" id="converted"/>
+        <p:output name="data" id="document"/>
     </p:processor>
-
+    
+    <!-- Serialize out as is -->
     <p:processor name="oxf:http-serializer">
         <p:input name="config">
             <config>
@@ -48,7 +42,7 @@
                 </cache-control>
             </config>
         </p:input>
-        <p:input name="data" href="#converted"/>
+        <p:input name="data" href="#document"/>
     </p:processor>
 
 </p:config>

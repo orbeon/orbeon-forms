@@ -13,69 +13,71 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
-        xmlns:sql="http://orbeon.org/oxf/xml/sql"
-        xmlns:odt="http://orbeon.org/oxf/xml/datatypes"
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
         xmlns:oxf="http://www.orbeon.com/oxf/processors"
-        xmlns:xi="http://www.w3.org/2001/XInclude"
-        xmlns:xforms="http://www.w3.org/2002/xforms"
-        xmlns:ev="http://www.w3.org/2001/xml-events"
-        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+        xmlns:xi="http://www.w3.org/2001/XInclude">
 
     <p:param type="input" name="instance"/>
     <p:param type="output" name="data"/>
 
-    <!-- Call up persistence layer to obtain XHTML+XForms -->
-    <p:processor name="oxf:xforms-submission">
-        <p:input name="submission">
-            <xforms:submission serialization="none" method="get" replace="instance"
-                    resource="{/*/form-collection}/crud/{/*/app}/{/*/form}/form/form.xhtml">
-
-                <!-- Called before submitting -->
-                <xforms:action ev:event="xforms-submit">
-                    <!-- Initialize URI based on hierarchy of properties -->
-
-                    <!-- TODO: This code must be moved to a function (see persistence-model.xml) -->
-                    <xxforms:variable name="prefix" select="'oxf.fr.persistence.app'"/>
-                    <xxforms:variable name="app" select="/*/app"/>
-                    <xxforms:variable name="form" select="/*/form"/>
-                    <xxforms:variable name="suffix" select="'uri'"/>
-
-                    <!-- List of properties from specific to generic -->
-                    <xxforms:variable name="form-properties"
-                                      select="(string-join(($prefix, $app, $form, 'form', $suffix), '.'),
-                                               string-join(($prefix, $app, $form, $suffix), '.'),
-                                               string-join(($prefix, $app, $suffix), '.'),
-                                               string-join(($prefix, '*', $suffix), '.'))"/>
-
-                    <!-- Create new element to hold computed element -->
-                    <xxforms:variable name="instance" select="/*"/>
-                    <xforms:insert context="$instance" nodeset="*" origin="xxforms:element('form-collection')"/>
-
-                    <!-- Iterate to find property -->
-                    <xforms:action xxforms:iterate="$form-properties">
-                        <xforms:action if="not(empty(xxforms:property(context()))) and $instance/form-collection = ''">
-                            <xforms:setvalue ref="$instance/form-collection" value="xxforms:property(context())"/>
-                        </xforms:action>
-                    </xforms:action>
-                </xforms:action>
-
-                <!-- Called in case of error -->
-                <xforms:action ev:event="xforms-submit-error">
-                    <!-- TODO: Propagate error to caller -->
-                    <xforms:delete while="/*/*" nodeset="/*/*"/>
-                    <xforms:setvalue ref="/*" value="event('response-body')"/>
-                    <xforms:message level="xxforms:log-error"><xforms:output value="event('response-body')"/></xforms:message>
-                </xforms:action>
-            </xforms:submission>
+    <p:processor name="oxf:request">
+        <p:input name="config">
+            <config stream-type="xs:anyURI">
+                <include>/request/request-path</include>
+                <include>/request/content-type</include>
+                <include>/request/method</include>
+            </config>
         </p:input>
-        <p:input name="request" href="#instance" debug="xxx"/>
-        <p:output name="response" id="form" ref="data"/>
+        <p:output name="data" id="request"/>
     </p:processor>
 
-    <!-- TODO: Use digest to allow caching by XForms processor -->
+    <p:processor name="oxf:null-serializer">
+        <p:input name="data" href="#request"/>
+    </p:processor>
 
+    <!-- Call up persistence layer to obtain XHTML+XForms -->
+    <p:processor name="oxf:url-generator">
+        <p:input name="config" transform="oxf:unsafe-xslt" href="#instance">
+            <config xsl:version="2.0" xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
+
+                <xsl:variable name="prefix" select="'oxf.fr.persistence.app'" as="xs:string"/>
+                <xsl:variable name="app" select="/*/app" as="xs:string"/>
+                <xsl:variable name="form" select="/*/form" as="xs:string"/>
+                <xsl:variable name="suffix" select="'uri'" as="xs:string"/>
+
+                <!-- List of properties from specific to generic -->
+                <xsl:variable name="names"
+                                  select="(string-join(($prefix, $app, $form, 'form', $suffix), '.'),
+                                           string-join(($prefix, $app, $form, $suffix), '.'),
+                                           string-join(($prefix, $app, $suffix), '.'),
+                                           string-join(($prefix, '*', $suffix), '.'))" as="xs:string+"/>
+
+                <!-- Find all values -->
+                <xsl:variable name="values" select="for $name in $names return pipeline:property($name)" as="xs:string*"/>
+
+                <!-- Create URI with first non-empty value -->
+                <xsl:variable name="resource" select="concat($values[normalize-space() != ''][1], '/crud/', /*/app, '/', /*/form, '/form/form.xhtml')" as="xs:string"/>
+                <url>
+                    <xsl:value-of select="pipeline:rewriteResourceURI($resource, true())"/>
+                </url>
+                <mode>binary</mode>
+            </config>
+        </p:input>
+        <p:output name="data" id="binary-document"/>
+    </p:processor>
+
+    <!-- Convert binary document to XML -->
+    <p:processor name="oxf:to-xml-converter">
+        <p:input name="config">
+            <!-- Don't handle XInclude as this is done down the line -->
+            <config><handle-xinclude>false</handle-xinclude></config>
+        </p:input>
+        <p:input name="data" href="#binary-document"/>
+        <p:output name="data" id="document" ref="data"/>
+    </p:processor>
+
+    <!-- Store document in the request for further access down the line -->
     <p:processor name="oxf:scope-serializer">
         <p:input name="config">
             <config>
@@ -83,7 +85,7 @@
                 <scope>request</scope>
             </config>
         </p:input>
-        <p:input name="data" href="#form"/>
+        <p:input name="data" href="#document"/>
     </p:processor>
 
 </p:config>

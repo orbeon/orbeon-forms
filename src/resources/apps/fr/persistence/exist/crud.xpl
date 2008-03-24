@@ -51,13 +51,17 @@
 
             <!-- Read URL -->
             <p:processor name="oxf:url-generator">
-                <!-- Build URL, force binary mode and read URL -->
-                <p:input name="config"
-                         href="aggregate('config',
-                                         aggregate('url', #matcher-groups#xpointer(p:rewrite-resource-uri(concat(p:property('oxf.fr.persistence.service.exist.uri'), '/', /*/group[1]), true()))),
-                                         aggregate('mode', #matcher-groups#xpointer('binary')))"/>
+                <p:input name="config" transform="oxf:unsafe-xslt" href="#matcher-groups">
+                    <config xsl:version="2.0" xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
+                        <url>
+                            <xsl:value-of select="pipeline:rewriteResourceURI(concat(pipeline:property('oxf.fr.persistence.service.exist.uri'), '/', /*/group[1]), true())"/>
+                        </url>
+                        <mode>binary</mode>
+                    </config>
+                </p:input>
                 <p:output name="data" id="document"/>
             </p:processor>
+
             <!-- Serialize out as is -->
             <p:processor name="oxf:http-serializer">
                 <p:input name="config">

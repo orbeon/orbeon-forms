@@ -323,7 +323,7 @@ div.fr-collapsible {
 #doc4 .fr-grid-1-columns .xforms-select1-appearance-full span label { width: 68em; *width: 66em }
 #doc4 .fr-grid-2-columns .xforms-select1-appearance-full span label { width: 32em; *width: 31em  }
 #doc4 .fr-grid-3-columns .xforms-select1-appearance-full span label { width: 20em; *width: 19em }
-#doc4 .fr-grid-4-columns .xforms-select1-appearance-full span label { width: 14.5em; *width: 14em }
+#doc4 .fr-grid-4-columns .xforms-select1-appearance-full span label { width: 14.5em; *width: 13.5em }
 
 /* Checkboxes */
 .xforms-select-appearance-full span { display: block; clear: both }
@@ -338,7 +338,7 @@ div.fr-collapsible {
 #doc4 .fr-grid-1-columns .xforms-select-appearance-full span label { width: 68em; *width: 66em }
 #doc4 .fr-grid-2-columns .xforms-select-appearance-full span label { width: 32.2em; *width: 31em }
 #doc4 .fr-grid-3-columns .xforms-select-appearance-full span label { width: 20.2em; *width: 19em }
-#doc4 .fr-grid-4-columns .xforms-select-appearance-full span label { width: 14.5em; *width: 14em }
+#doc4 .fr-grid-4-columns .xforms-select-appearance-full span label { width: 14.5em; *width: 13.5em }
 
 /* Grid */
 
@@ -376,7 +376,7 @@ div.fr-collapsible {
 
 .fr-grid-4-columns .fr-grid-td { width: 25%; }
 #doc .fr-grid-4-columns .fr-grid-td .fr-grid-content { width: 16.5em; *width: 16.1em }
-#doc4 .fr-grid-4-columns .fr-grid-td .fr-grid-content { width: 16.5em; *width: 16.10235em }
+#doc4 .fr-grid-4-columns .fr-grid-td .fr-grid-content { width: 16.5em; *width: 15.5em }
 
 /* Upload control information */
 .xforms-upload-info { display: block; width: 100%; background-color: #FFFFDD; padding: 2px }

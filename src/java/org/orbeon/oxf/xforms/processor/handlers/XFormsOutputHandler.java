@@ -106,9 +106,9 @@ public class XFormsOutputHandler extends XFormsCoreControlHandler {
                 final String imgQName = XMLUtils.buildQName(xhtmlPrefix, "img");
                 final AttributesImpl imgAttributes = new AttributesImpl();
                 // @src="..."
-                // NOTE: If producing a template, we must point to an existing image
+                // NOTE: If producing a template, or if the image URL is blank, we point to an existing image
                 final String srcValue = isConcreteControl ? outputControl.getExternalValue(pipelineContext) : XFormsConstants.DUMMY_IMAGE_URI;
-                imgAttributes.addAttribute("", "src", "src", ContentHandlerHelper.CDATA, srcValue);
+                imgAttributes.addAttribute("", "src", "src", ContentHandlerHelper.CDATA, srcValue.trim().equals("") ? XFormsConstants.DUMMY_IMAGE_URI : srcValue);
 
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "img", imgQName, imgAttributes);
                 contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "img", imgQName);

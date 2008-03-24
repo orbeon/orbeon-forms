@@ -43,11 +43,15 @@ public class RewriteResourceURI extends SystemFunction {
 
         // Get mode
         final Expression modeExpression = (argument.length < 2) ? null : argument[1];
-        final boolean mode = (modeExpression == null) ? false : modeExpression.effectiveBooleanValue(xpathContext);
+        final boolean absolute = (modeExpression == null) ? false : modeExpression.effectiveBooleanValue(xpathContext);
 
         // Get property value
-        final String rewrittenURI = StaticExternalContext.rewriteResourceURL(uri, mode);
+        final String rewrittenURI = rewriteResourceURI(uri, absolute);
 
         return new ListIterator(Collections.singletonList(new StringValue(rewrittenURI)));
+    }
+
+    public static String rewriteResourceURI(String uri, boolean absolute) {
+        return StaticExternalContext.rewriteResourceURL(uri, absolute);
     }
 }

@@ -14,10 +14,12 @@
 package org.orbeon.oxf.processor.pipeline.ast;
 
 import org.dom4j.Node;
+import org.dom4j.QName;
 
 public class ASTInput extends ASTInputOutput {
 
     private ASTHref href;
+    private QName transform;
 
     public ASTInput() {
     }
@@ -38,6 +40,14 @@ public class ASTInput extends ASTInputOutput {
 
     public void setHref(ASTHref href) {
         this.href = href;
+    }
+
+    public QName getTransform() {
+        return transform;
+    }
+
+    public void setTransform(QName transform) {
+        this.transform = transform;
     }
 
     public void walk(ASTHandler handler) {

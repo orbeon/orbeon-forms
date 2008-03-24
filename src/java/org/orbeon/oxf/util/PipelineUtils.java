@@ -38,20 +38,20 @@ public class PipelineUtils {
         input.setOutput(output);
     }
 
-    public static DOMGenerator createDOMGenerator(final Element element, final String id, final Object v, final String sid) {
-        final DOMGenerator ret = new DOMGenerator(element, id, v, sid);
+    public static DOMGenerator createDOMGenerator(final Element element, final String id, final Object v, final String systemId) {
+        final DOMGenerator ret = new DOMGenerator(element, id, v, systemId);
         configDOMGenerator(ret);
         return ret;
     }
 
-    public static DOMGenerator createDOMGenerator(final Document document, final String id, final Object v, final String sid) {
-        final DOMGenerator ret = new DOMGenerator(document, id, v, sid);
+    public static DOMGenerator createDOMGenerator(final Document document, final String id, final Object v, final String systemId) {
+        final DOMGenerator ret = new DOMGenerator(document, id, v, systemId);
         configDOMGenerator(ret);
         return ret;
     }
 
-    public static DOMGenerator createDOMGenerator(final NodeInfo nodeInfo, final String id, final Object v, final String sid) {
-        final DOMGenerator ret = new DOMGenerator(nodeInfo, id, v, sid);
+    public static DOMGenerator createDOMGenerator(final NodeInfo nodeInfo, final String id, final Object v, final String systemId) {
+        final DOMGenerator ret = new DOMGenerator(nodeInfo, id, v, systemId);
         configDOMGenerator(ret);
         return ret;
     }

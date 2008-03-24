@@ -29,8 +29,6 @@ import org.orbeon.oxf.processor.pipeline.choose.ConcreteChooseProcessor;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.xml.SchemaRepository;
-import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -259,80 +257,79 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
                 for (Iterator j = processorCall.getInputs().iterator(); j.hasNext();) {
                     ASTInput input = (ASTInput) j.next();
 
-                    ProcessorInput pin;
-                    LocationData locationData = input.getLocationData();
-                    if (input.getHref() != null) {
-                        // We reference a URI
+                    final ProcessorInput pin;
+                    LocationData inputLocationData = input.getLocationData();
+                    if (input.getHref() != null && input.getTransform() == null) {
+                        // We just reference a URI
                         pin = block.connectProcessorToHref(input.getNode(), processor, input.getName(), input.getHref());
                     } else {
                         // We have some inline XML in the <input> tag
-                        Node inlineNode = input.getContent();
+                        final Node inlineNode = input.getContent();
 
-                        final Document doc;
-                        final int ndTyp = inlineNode.getNodeType();
-                        if (ndTyp == Node.ELEMENT_NODE) {
-                            final Element elt = (Element) inlineNode;
-                            doc = Dom4jUtils.createDocumentCopyParentNamespaces(elt);
-                        } else if (ndTyp == Node.DOCUMENT_NODE) {
-                            doc = (Document) inlineNode;
-                        } else {
-                            throw new OXFException("Invalid type for inline document: " + inlineNode.getClass().getName());
+                        // Create inline document
+                        final Document inlineDocument;
+                        {
+                            final int nodeType = inlineNode.getNodeType();
+                            if (nodeType == Node.ELEMENT_NODE) {
+                                final Element element = (Element) inlineNode;
+                                inlineDocument = Dom4jUtils.createDocumentCopyParentNamespaces(element);
+                            } else if (nodeType == Node.DOCUMENT_NODE) {
+                                inlineDocument = (Document) inlineNode;
+                            } else {
+                                throw new OXFException("Invalid type for inline document: " + inlineNode.getClass().getName());
+                            }
                         }
 
-                        // Create generator for the static text
-                        final Object v = astPipeline.getValidity();
-                        final LocationData ld = astPipeline.getLocationData();
-                        String sid = ld == null ? DOMGenerator.DefaultContext : ld.getSystemID();
-                        if (sid == null) sid = DOMGenerator.DefaultContext;
-                        final DOMGenerator docPrcssr
-                                = PipelineUtils.createDOMGenerator(doc, "inline config", v, sid);
+                        // Create generator for the inline document
+                        final DOMGenerator domGenerator;
+                        {
+                            final Object validity = astPipeline.getValidity();
+                            final LocationData pipelineLocationData = astPipeline.getLocationData();
+                            String systemId = (pipelineLocationData == null) ? DOMGenerator.DefaultContext : pipelineLocationData.getSystemID();
+                            if (systemId == null)
+                                systemId = DOMGenerator.DefaultContext;
+                            domGenerator = PipelineUtils.createDOMGenerator(inlineDocument, "inline input", validity, systemId);
+                        }
 
-                        ProcessorOutput pout = docPrcssr.createOutput(OUTPUT_DATA);
-                        pin = processor.createInput(input.getName());
+                        final ProcessorOutput domProcessorDataOutput = domGenerator.createOutput(OUTPUT_DATA);
 
-                        // NOTE: We should have a customizable mechanism to do this
-                        final QName processorQName = XMLConstants.XSLT_PROCESSOR_QNAME;
-                        // Experimental, doesn't work yet within XSLT configs!
-                        // To solve this, maybe a flag specifying that we are
-                        // using a template should be explicitly specified on
-                        // the input?
-                        if (false && XPathUtils.selectBooleanValue(doc, "/*/@*[local-name() = 'version' and namespace-uri() = 'http://www.w3.org/1999/XSL/Transform'] = '2.0'").booleanValue()) {
-                            // It is embedded XSLT 2.0: connect through XSLT transformer
-
-                            ProcessorFactory processorFactory = ProcessorFactoryRegistry.lookup(processorQName);
-                            if (processorFactory == null) {
-                                throw new ValidationException("Cannot find processor factory with JNDI name \""
-                                        + processorCall.getURI() + "\"", locationData);
+                        // Check if there is an inline transformation
+                        final QName transform = input.getTransform();
+                        if (transform != null) {
+                            //XPathUtils.selectBooleanValue(inlineDocument, "/*/@*[local-name() = 'version' and namespace-uri() = 'http://www.w3.org/1999/XSL/Transform'] = '2.0'").booleanValue()
+                            // Instanciate processor
+                            final Processor transformProcessor;
+                            {
+                                final ProcessorFactory processorFactory = ProcessorFactoryRegistry.lookup(transform);
+                                if (processorFactory == null) {
+                                    throw new ValidationException("Cannot find processor factory with JNDI name \""
+                                            + processorCall.getURI() + "\"", inputLocationData);
+                                }
+                                transformProcessor = processorFactory.createInstance();
                             }
-                            Processor templateProcessor = processorFactory.createInstance();
 
                             // Set info on processor
                             //processor.setId(processorCall.getId()); // what id, if any?
-                            templateProcessor.setLocationData(locationData);
+                            transformProcessor.setLocationData(inputLocationData);
 
                             // Connect config input
-                            ProcessorInput configInput = templateProcessor.createInput(INPUT_CONFIG);
-                            pout.setInput(configInput);
-                            configInput.setOutput(pout);
+                            final ProcessorInput transformConfigInput = transformProcessor.createInput(INPUT_CONFIG);
+                            domProcessorDataOutput.setInput(transformConfigInput);
+                            transformConfigInput.setOutput(domProcessorDataOutput);
 
-                            // Connect data input (for now, a null document)
-                            ProcessorInput dataInput = templateProcessor.createInput(INPUT_DATA);
-                            DOMGenerator nullGenerator = PipelineUtils.createDOMGenerator
-                                    (Dom4jUtils.NULL_DOCUMENT, "null input", DOMGenerator.ZeroValidity
-                                            , DOMGenerator.DefaultContext);
-                            ProcessorOutput nullGeneratorOutput = nullGenerator.createOutput(OUTPUT_DATA);
-                            nullGeneratorOutput.setInput(dataInput);
-                            dataInput.setOutput(nullGeneratorOutput);
+                            // Connect transform processor data input
+                            pin = block.connectProcessorToHref(input.getNode(), transformProcessor, INPUT_DATA, input.getHref());
 
-                            // Connect data output
-                            ProcessorOutput templateProcessorOutput = templateProcessor.createOutput(OUTPUT_DATA);
-                            templateProcessorOutput.setInput(pin);
-                            pin.setOutput(templateProcessorOutput);
-
+                            // Connect transform processor data output
+                            final ProcessorOutput transformDataOutput = transformProcessor.createOutput(OUTPUT_DATA);
+                            final ProcessorInput processorDataInput = processor.createInput(input.getName());
+                            transformDataOutput.setInput(processorDataInput);
+                            processorDataInput.setOutput(transformDataOutput);
                         } else {
                             // It is regular static text: connect directly
-                            pout.setInput(pin);
-                            pin.setOutput(pout);
+                            pin = processor.createInput(input.getName());
+                            domProcessorDataOutput.setInput(pin);
+                            pin.setOutput(domProcessorDataOutput);
                         }
                     }
                     setDebugAndSchema(pin, input);

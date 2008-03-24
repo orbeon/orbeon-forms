@@ -32,17 +32,24 @@ public class XXFormsProperty extends XFormsFunction {
         final Expression propertyNameExpression = argument[0];
         final String propertyName = propertyNameExpression.evaluateAsString(xpathContext);
 
+        // Get property value
+        final String propertyValue = property(propertyName);
+
+        // Return iterator
+        if (propertyValue != null)
+            return new ListIterator(Collections.singletonList(new StringValue(propertyValue)));
+        else
+            return new ListIterator(Collections.EMPTY_LIST);
+    }
+
+    public static String property(String propertyName) {
         // Never return the password property
         if ("oxf.xforms.password".equals(propertyName.trim())) {
-            return new ListIterator(Collections.EMPTY_LIST);
+            return null;
         }
 
         // Get property value
         final Object propertyValue = OXFProperties.instance().getPropertySet().getObject(propertyName);
-
-        if (propertyValue != null)
-            return new ListIterator(Collections.singletonList(new StringValue(propertyValue.toString())));
-        else
-            return new ListIterator(Collections.EMPTY_LIST);
+        return (propertyValue == null) ? null : propertyValue.toString();
     }
 }

@@ -93,8 +93,16 @@
                         <ref name="debug"/>
                         <ref name="schemas"/>
                         <choice>
+                            <!-- Just an href and no inline content -->
                             <attribute name="href"/>
+                            <!-- Just inline content and no href -->
                             <ref name="anyElement"/>
+                            <!-- Inline content, href an a transform attribute -->
+                            <group>
+                                <attribute name="href"/>
+                                <attribute name="transform"/>
+                                <ref name="anyElement"/>
+                            </group>
                         </choice>
                     </element>
                 </zeroOrMore>

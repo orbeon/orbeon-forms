@@ -59,6 +59,16 @@ public class PipelineFunctionLibrary implements FunctionLibrary {
         return e;
     }
 
+    // Functions are exposed statically below for access through XSLT
+
+    public static String property(String name) {
+        return XXFormsProperty.property(name);
+    }
+
+    public static String rewriteResourceURI(String uri, boolean absolute) {
+        return RewriteResourceURI.rewriteResourceURI(uri, absolute);
+    }
+
     static {
         StandardFunction.Entry e;
 

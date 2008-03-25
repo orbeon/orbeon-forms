@@ -210,12 +210,12 @@ label.xforms-disabled, span.xforms-disabled, div.xforms-disabled  {
 .fr-repeat-sections .xforms-label { margin-top: 0; }
 
 /* Repeats: shows as table (1 line per iteration; labels used as header of table) */
-.fr-repeat-table { border-collapse: collapse; }
+.fr-repeat-table { margin-top: 1em; border-collapse: collapse; }
 .fr-repeat-table td , .fr-repeat-table th { border: 1px solid black; padding: .2em .5em .2em .5em; }
 /* Styling for last dummy line added so IE displays the bottom border of the table */
 .fr-repeat-table .fr-repeat-last-line td { border: none; padding: 0; }
 .fr-repeat-table th { background-color: #DDDDDD; }
-.fr-repeat-table .xforms-label { display: none; }
+.fr-repeat-table td .xforms-label { display: none; }
 
 .fr-non-collapsible { padding-left: 1.1em; }
 

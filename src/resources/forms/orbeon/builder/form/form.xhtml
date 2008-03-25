@@ -403,7 +403,7 @@
                     <xforms:setvalue ref="@bind" value="concat($new-control-name, '-bind')"/>
 
                     <!-- Set xforms:label, xforms:hint, xforms:help and xforms:alert @ref -->
-                    <xforms:action xxforms:iterate="(xforms:label, xforms:hint, xforms:help, xforms:alert)">
+                    <xforms:action xxforms:iterate="(xforms:label, xforms:hint, xforms:help, xforms:alert)[@ref = '' or starts-with(@ref, '$form-resources')]">
                         <xxforms:variable name="local-name" select="local-name()"/>
                         <xforms:setvalue ref="@ref" value="concat('$form-resources/', $new-control-name, '/', $local-name)"/>
                     </xforms:action>
@@ -776,7 +776,7 @@
                                 <xforms:label ref=""/>
                                 <xforms:hint ref=""/>
                                 <xforms:help ref=""/>
-                                <xforms:alert ref=""/>
+                                <xforms:alert ref="$fr-resources/detail/labels/alert"/>
                             </xforms:input>
                         </xhtml:div>
                     </template>
@@ -786,7 +786,7 @@
                                 <xforms:label ref=""/>
                                 <xforms:hint ref=""/>
                                 <xforms:help ref=""/>
-                                <xforms:alert ref=""/>
+                                <xforms:alert ref="$fr-resources/detail/labels/alert"/>
                             </xforms:input>
                         </xhtml:div>
                     </template>
@@ -817,7 +817,7 @@
                                 <xforms:label ref=""/>
                                 <xforms:hint ref=""/>
                                 <xforms:help ref=""/>
-                                <xforms:alert ref=""/>
+                                <xforms:alert ref="$fr-resources/detail/labels/alert"/>
                             </xforms:textarea>
                         </xhtml:div>
                     </template>
@@ -827,7 +827,7 @@
                                 <xforms:label ref=""/>
                                 <xforms:hint ref=""/>
                                 <xforms:help ref=""/>
-                                <xforms:alert ref=""/>
+                                <xforms:alert ref="$fr-resources/detail/labels/alert"/>
                                 <xforms:item>
                                     <xforms:label>[Select...]</xforms:label>
                                     <xforms:value/>
@@ -845,7 +845,7 @@
                                 <xforms:label ref=""/>
                                 <xforms:hint ref=""/>
                                 <xforms:help ref=""/>
-                                <xforms:alert ref=""/>
+                                <xforms:alert ref="$fr-resources/detail/labels/alert"/>
                                 <xforms:itemset nodeset="">
                                     <xforms:label ref="label"/>
                                     <xforms:value ref="value"/>
@@ -859,7 +859,7 @@
                                 <xforms:label ref=""/>
                                 <xforms:hint ref=""/>
                                 <xforms:help ref=""/>
-                                <xforms:alert ref=""/>
+                                <xforms:alert ref="$fr-resources/detail/labels/alert"/>
                                 <xforms:itemset nodeset="">
                                     <xforms:label ref="label"/>
                                     <xforms:value ref="value"/>
@@ -873,7 +873,7 @@
                                 <xforms:label ref=""/>
                                 <xforms:hint ref=""/>
                                 <xforms:help ref=""/>
-                                <xforms:alert ref=""/>
+                                <xforms:alert ref="$fr-resources/detail/labels/alert"/>
                                 <xforms:itemset nodeset="">
                                     <xforms:label ref="label"/>
                                     <xforms:value ref="value"/>
@@ -887,7 +887,7 @@
                                 <xforms:label ref=""/>
                                 <xforms:hint ref=""/>
                                 <xforms:help ref=""/>
-                                <xforms:alert ref=""/>
+                                <xforms:alert ref="$fr-resources/detail/labels/alert"/>
                                 <xforms:itemset nodeset="">
                                     <xforms:label ref="label"/>
                                     <xforms:value ref="value"/>
@@ -901,7 +901,7 @@
                                 <xforms:label ref=""/>
                                 <xforms:help ref=""/>
                                 <!-- No hint? -->
-                                <xforms:alert ref=""/>
+                                <xforms:alert ref="$fr-resources/detail/labels/alert"/>
                             </xforms:output>
                         </xhtml:div>
                     </template>
@@ -911,7 +911,7 @@
                                 <xforms:label ref=""/>
                                 <xforms:help ref=""/>
                                 <!-- No hint? -->
-                                <xforms:alert ref=""/>
+                                <xforms:alert ref="$fr-resources/detail/labels/alert"/>
                             </xforms:trigger>
                         </xhtml:div>
                     </template>
@@ -921,7 +921,7 @@
                                 <xforms:label ref=""/>
                                 <xforms:help ref=""/>
                                 <!-- No hint? -->
-                                <xforms:alert ref=""/>
+                                <xforms:alert ref="$fr-resources/detail/labels/alert"/>
                             </xforms:output>
                         </xhtml:div>
                     </template>
@@ -931,7 +931,7 @@
                                 <xforms:label ref=""/>
                                 <xforms:hint ref=""/>
                                 <xforms:help ref=""/>
-                                <xforms:alert ref=""/>
+                                <xforms:alert ref="$fr-resources/detail/labels/alert"/>
                                 <xforms:filename ref="@filename"/>
                                 <xforms:mediatype ref="@mediatype"/>
                                 <xxforms:size ref="@size"/>

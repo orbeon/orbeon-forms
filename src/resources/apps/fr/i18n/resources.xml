@@ -68,22 +68,10 @@
                 <clear>Clear</clear>
                 <confirm>Confirm</confirm>
                 <cancel>Cancel</cancel>
+                <publish>Publish</publish>
+                <alert>Missing or incorrect value</alert>
             </labels>
         </detail>
-        <languages>
-            <item>
-                <label>English</label>
-                <value>en</value>
-            </item>
-            <item>
-                <label>Français</label>
-                <value>fr</value>
-            </item>
-            <item>
-                <label>Español</label>
-                <value>es</value>
-            </item>
-        </languages>
     </resource>
     <resource xml:lang="fr">
         <summary>
@@ -140,22 +128,10 @@
                 <clear>Effacer</clear>
                 <confirm>Confirmer</confirm>
                 <cancel>Annuler</cancel>
+                <publish>Publier</publish>
+                <alert>Valeur manquante ou incorrecte</alert>
             </labels>
         </detail>
-        <languages>
-            <item>
-                <label>English</label>
-                <value>en</value>
-            </item>
-            <item>
-                <label>Français</label>
-                <value>fr</value>
-            </item>
-            <item>
-                <label>Español</label>
-                <value>es</value>
-            </item>
-        </languages>
     </resource>
     <resource xml:lang="es">
         <summary>
@@ -212,21 +188,9 @@
                 <clear>Borrar</clear>
                 <confirm>Confirme</confirm>
                 <cancel>Cancelar</cancel>
+                <publish>[Publish]</publish>
+                <alert>[Missing or incorrect value]</alert>
             </labels>
         </detail>
-        <languages>
-            <item>
-                <label>English</label>
-                <value>en</value>
-            </item>
-            <item>
-                <label>Français</label>
-                <value>fr</value>
-            </item>
-            <item>
-                <label>Español</label>
-                <value>es</value>
-            </item>
-        </languages>
     </resource>
 </resources>

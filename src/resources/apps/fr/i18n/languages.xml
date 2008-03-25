@@ -218,6 +218,7 @@
     <language code="yi" english-name="Yiddish" native-name="‫ייִדיש"/>
     <language code="yo" english-name="Yoruba" native-name="Yorùbá"/>
     <language code="za" english-name="Zhuang" native-name="Saɯ cueŋƅ"/>
-    <language code="zh" english-name="Chinese" native-name="中文"/>
+    <language code="zh-Hant" english-name="Traditional Chinese" native-name="中文 (正體字)"/>
+    <language code="zh-Hans" english-name="Simplified Chinese" native-name="中文 (简化字)"/>
     <language code="zu" english-name="Zulu" native-name="isiZulu"/>
 </languages>

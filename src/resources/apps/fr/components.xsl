@@ -43,7 +43,7 @@
         <xsl:if test="@width and not(@width = ('750px', '950px', '974px'))">
             <xsl:message terminate="yes">Value of fr:view/@view is not valid</xsl:message>
         </xsl:if>
-        <xhtml:div id="{if (@width = '750px') then 'doc' else if (@width = '950px') then 'doc2' else 'doc4'}" class="yui-t5xxx{if (doc('input:instance')/*/mode = 'print') then ' fr-print-mode' else ''}">
+        <xhtml:div id="{if (@width = '750px') then 'doc' else if (@width = '950px') then 'doc2' else 'doc4'}" class="{if (doc('input:instance')/*/mode = 'print') then ' fr-print-mode' else ''}">
             <xforms:group model="fr-form-model" appearance="xxforms:internal">
                 <!-- Scope form resources -->
                 <xxforms:variable name="form-resources" select="xxforms:instance('fr-current-form-resources')"/>
@@ -358,7 +358,7 @@
         </xsl:choose>
     </xsl:template>
 
-    <xsl:template match="xhtml:body//xforms:input[@appearance='fr:in-place']">
+    <xsl:template match="xhtml:body//xforms:input[@appearance = 'fr:in-place']">
         <xforms:switch id="{@id}">
             <xsl:attribute name="class" select="string-join(('fr-inplace-input', @class), ' ')"/>
             <xforms:case id="fr-inplace-{@id}-view">
@@ -412,7 +412,7 @@
         </xforms:switch>
     </xsl:template>
 
-    <xsl:template match="xhtml:body//xforms:textarea[@appearance='fr:in-place']">
+    <xsl:template match="xhtml:body//xforms:textarea[@appearance = 'fr:in-place']">
         <xforms:switch id="{@id}">
             <xsl:attribute name="class" select="string-join(('fr-inplace-textarea', @class), ' ')"/>
             <xforms:case id="fr-inplace-{@id}-view">
@@ -624,7 +624,7 @@
         </xhtml:table>
     </xsl:template>
 
-    <!-- This not a component really, but  -->
+    <!-- Add Form Runner models and scripts -->
     <xsl:template match="/xhtml:html/xhtml:head/xforms:model[1]">
 
         <!-- This model handles form sections -->
@@ -697,6 +697,14 @@
         <!-- Handle checking dirty status -->
         <xi:include href="includes/check-dirty-script.xhtml" xxi:omit-xml-base="true"/>
 
+    </xsl:template>
+
+    <!-- Add a default xforms:alert for those fields which don't have one -->
+    <xsl:template match="xhtml:body//xforms:*[local-name() = ('input', 'textarea', 'select', 'select1', 'upload') and not(xforms:alert) and not(@appearance = 'fr:in-place')]">
+        <xsl:copy>
+            <xsl:apply-templates select="@* | node()"/>
+            <xforms:alert ref="$fr-resources/detail/labels/alert"/>
+        </xsl:copy>
     </xsl:template>
 
     <xsl:template match="xhtml:td" mode="grid-content">

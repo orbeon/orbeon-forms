@@ -438,7 +438,7 @@ public class XFormsUtils {
                         } else {
                             if ("text/html".equals(outputControl.getMediatype())) {
                                 // HTML is not allowed here, better tell the user
-                                throw new OXFException("HTML not allowed in element: " + childElement.getName());
+                                throw new OXFException("HTML not allowed within element: " + childElement.getName());
                             } else {
                                 // Mediatype is not HTML so we don't escape
                                 sb.append(outputControl.getDisplayValueOrExternalValue(pipelineContext));
@@ -449,7 +449,7 @@ public class XFormsUtils {
 
                         // If HTML is not allowed here, better tell the user
                         if (!acceptHTML)
-                            throw new OXFException("HTML not allowed in element: " + childElement.getName());
+                            throw new OXFException("Nested XHTML or XForms not allowed within element: " + childElement.getName());
 
                         if (containsHTML != null)
                             containsHTML[0] = true;// this indicates for sure that there is some nested HTML

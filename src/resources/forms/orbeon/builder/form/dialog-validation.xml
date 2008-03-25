@@ -106,7 +106,7 @@
         </xforms:group>
     </xhtml:div>
 
-    <!-- Set type information into the form -->
+    <!-- Set validation information into the form -->
     <xforms:action ev:event="DOMActivate" ev:observer="fb-edit-validation-trigger">
         <xxforms:variable name="instance" select="instance('fb-validation-editor-instance')"/>
         <xxforms:variable name="current-control" select="if ($current-control-name != '') then $body//xforms:*[@id = concat($current-control-name, '-control')] else ()"/>
@@ -114,7 +114,9 @@
         <xxforms:variable name="current-bind-id" select="concat($current-control-name, '-bind')"/>
 
         <!-- Copy back the alert -->
-        <xforms:setvalue ref="$current-control-resource/alert" value="$instance/alert"/>\
+        <xforms:setvalue ref="$current-control-resource/alert" value="$instance/alert"/>
+        <!-- Make sure the control is pointing to the label resource as it may have pointed to a default message initially -->
+        <xforms:setvalue ref="$current-control/xforms:alert/@ref" value="concat('$form-resources/', $current-control-name, '/alert')"/>
 
         <xxforms:variable name="is-bind" select="$instance/schema-type != '' or $instance/builtin-type != 'string' or $instance/required = 'true'"/>
         <xforms:action if="$is-bind">

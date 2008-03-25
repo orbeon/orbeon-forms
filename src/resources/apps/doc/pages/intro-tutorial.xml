@@ -1300,7 +1300,7 @@
                 </p>
                 <xml-source show-namespaces="false">
                     <xforms:submission id="save-submission" ref="instance('books-instance')"
-                        action="/exist/rest/db/orbeon/my-bookcast/books.xml"
+                        resource="/exist/rest/db/orbeon/my-bookcast/books.xml"
                         method="put" replace="none" xmlns:xforms="http://www.w3.org/2002/xforms"/>
                 </xml-source>
                 <p>
@@ -1327,7 +1327,7 @@
                     </li>
                     <li>
                         <p>
-                            The <code>action</code> attribute specifies to what URL the submission takes place. Here,
+                            The <code>resource</code> attribute specifies to what URL the submission takes place. Here,
                             you use an absolute path:
                         </p>
                         <xml-source>
@@ -1457,7 +1457,7 @@
                 </p>
                 <xml-source show-namespaces="false">
                     <xforms:submission id="list-submission" serialization="none"
-                       method="get" action="/exist/rest/db/orbeon/my-bookcast/books.xml"
+                       method="get" resource="/exist/rest/db/orbeon/my-bookcast/books.xml"
                        replace="instance" instance="books-instance" xmlns:xforms="http://www.w3.org/2002/xforms"/>
                 </xml-source>
                 <p>
@@ -2259,7 +2259,7 @@
                 </p>
                 <xml-source show-namespaces="false" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:ev="http://www.w3.org/2001/xml-events">
                     <xforms:submission id="save-submission" ref="instance('books-instance')"
-                            action="/exist/rest/db/orbeon/xforms-bookcast/books.xml"
+                            resource="/exist/rest/db/orbeon/xforms-bookcast/books.xml"
                             method="put" replace="none">
                         <xforms:message ev:event="xforms-submit-error" level="modal">An error occurred while saving!</xforms:message>
                     </xforms:submission>
@@ -2377,7 +2377,7 @@
                     <p:processor name="oxf:xforms-submission">
                         <p:input name="submission">
                             <xforms:submission xmlns:xforms="http://www.w3.org/2002/xforms" serialization="none"
-                                               method="get" action="/exist/rest/db/orbeon/xforms-bookcast/books.xml"/>
+                                               method="get" resource="/exist/rest/db/orbeon/xforms-bookcast/books.xml"/>
                         </p:input>
                         <p:input name="request"><dummy/></p:input>
                         <p:output name="response" ref="data"/>

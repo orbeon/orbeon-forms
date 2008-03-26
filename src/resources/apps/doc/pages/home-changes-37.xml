@@ -32,7 +32,7 @@
                 Welcome to Orbeon Forms 3.7!
             </p>
             <p>
-                Orbeon Forms 3.7 features over <a href="#changes-37-full">100 improvements</a> since <a
+                Orbeon Forms 3.7 features over <a href="#changes-37-full">115 improvements</a> since <a
                 href="home-changes-36">Orbeon Forms 3.6</a>, including, in the areas of schema validation, session
                 handling, caching, core XForms engine enhancements, and application server support.
             </p>
@@ -48,7 +48,7 @@
         <section>
             <title>Changes in Version 3.7</title>
             <p>
-                Orbeon Forms 3.7 is an update to Orbeon Forms 3.6. It features over <a href="#changes-37-full">100
+                Orbeon Forms 3.7 is an update to Orbeon Forms 3.6. It features over <a href="#changes-37-full">115
                 improvements</a> since version 3.6.
             </p>
             <section>
@@ -289,7 +289,7 @@ http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=2
 <ul>
     {
         for $table in //table[tr/td/span/strong[. = 'ID']]
-            let $latest-id := '308227'
+            let $latest-id := '308864'
             let $latest-position := count(($table//tr)[td[normalize-space(.) = $latest-id]]/preceding-sibling::tr) + 1
             return
                 for $row in ($table//tr)[position() ge 2 and position() lt $latest-position and normalize-space(td[7]) = 'Fixed'] return
@@ -300,6 +300,106 @@ http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=2
 </ul>
 -->
                 <ul>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308936&amp;group_id=168&amp;atid=350207">
+                            #308936: exf:sort(): namespaces not supported in second argument
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308954&amp;group_id=168&amp;atid=350207">
+                            #308954: RFE: Documentation on how to setup a data source on JBoss
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308952&amp;group_id=168&amp;atid=350207">
+                            #308952: Regression: ClassCastException:
+                            org.orbeon.oxf.xforms.control.controls.XFormsInputControl
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306602&amp;group_id=168&amp;atid=350207">
+                            #306602: Implement URL rewriting in Ajax responses
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308380&amp;group_id=168&amp;atid=350207">
+                            #308380: xforms:trigger/xforms:output don't rewrite URLs in the same way
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308953&amp;group_id=168&amp;atid=350207">
+                            #308953: Non-fatal FileNotFound exceptions on JBoss
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308944&amp;group_id=168&amp;atid=350207">
+                            #308944: RFE: Allow inline transformations within processor inputs
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308946&amp;group_id=168&amp;atid=350207">
+                            #308946: RFE: Binary and text formats must support embedded last-modified to facilitate
+                            serialization
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308945&amp;group_id=168&amp;atid=350207">
+                            #308945: oxf:to-xml-converter must support validation and XInclude configuration
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306168&amp;group_id=168&amp;atid=350207">
+                            #306168: Issue with ancestor-or-self:: axis when using XSLT view
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308937&amp;group_id=168&amp;atid=350207">
+                            #308937: Date picker for input field of type date is shown
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308921&amp;group_id=168&amp;atid=350207">
+                            #308921: RFE: xxforms:bind() function to access a bind nodeset within another expression
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308897&amp;group_id=168&amp;atid=350207">
+                            #308897: RFE: XPath functions to access request and session attributes directly from XForms
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308896&amp;group_id=168&amp;atid=350207">
+                            #308896: Support xforms-select and xforms-deselect on selection controls upon user
+                            interaction
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308893&amp;group_id=168&amp;atid=350207">
+                            #308893: RFE: Support AVTs on xxforms:show and xxforms:hide attributes
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308895&amp;group_id=168&amp;atid=350207">
+                            #308895: RFE: Support AVTs on all attributes of xforms:dispatch
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308894&amp;group_id=168&amp;atid=350207">
+                            #308894: RFE: Support AVTs on all attributes of xxforms:load
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308846&amp;group_id=168&amp;atid=350207">
+                            #308846: PFC must not serve files if HTTP method is not GET
+                        </a>
+                    </li>
                     <li>
                         <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308864&amp;group_id=168&amp;atid=350207">
                             #308864: RFE: Support xforms:output[@mediatype = 'image/*'] and xs:base64Binary datatype

@@ -948,10 +948,7 @@
 
         <fr:view>
             <xforms:label>Orbeon Form Builder</xforms:label>
-            <!--<xhtml:img src="/apps/fr/style/orbeon-logo-trimmed-transparent-42.png"/>-->
             <fr:body>
-
-                <!--<xforms:output value="instance('fb-user-agent-instance')/value"/>-->
 
                 <xforms:group ref=".[instance('fb-user-agent-instance')/is-ie = 'true']" class="fb-ie-warning">
                     Orbeon Form Builder still needs work to provide a satisfactory experience with Internet Explorer.
@@ -1213,7 +1210,7 @@
                                                                                 <xxforms:variable name="delete-tds"
                                                                                                   select="for $c in for $r in instance('fb-span-grid-instance')/r
                                                                                                                       return $r/c[$column-number][. != 'x']
-                                                                                                            return $grid/xhtml:tr[count($c/../preceding-sibling::r) + 1]/xhtml:td[count($c/preceding-sibling::c) + 1]"/>
+                                                                                                            return $grid/xhtml:tr[count($c/../preceding-sibling::r) + 1]/xhtml:td[count($c/preceding-sibling::c[. != 'x']) + 1]"/>
 
                                                                                 <xxforms:variable name="count" select="count($delete-tds[xforms:*])"/>
 
@@ -1237,7 +1234,7 @@
                                                                                 <xxforms:variable name="delete-tds"
                                                                                                   select="for $c in for $r in instance('fb-span-grid-instance')/r
                                                                                                                       return $r/c[$column-number][. != 'x']
-                                                                                                            return $grid/xhtml:tr[count($c/../preceding-sibling::r) + 1]/xhtml:td[count($c/preceding-sibling::c) + 1]"/>
+                                                                                                            return $grid/xhtml:tr[count($c/../preceding-sibling::r) + 1]/xhtml:td[count($c/preceding-sibling::c[. != 'x']) + 1]"/>
 
                                                                                 <!-- Iterate over rows and in each delete the appropriate column -->
                                                                                 <xforms:action xxforms:iterate="$delete-tds">

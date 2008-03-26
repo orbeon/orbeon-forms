@@ -682,6 +682,7 @@
         <!-- This model handles print functionality -->
         <xforms:model id="fr-print-model">
             <xforms:instance id="fr-print-instance"><dummy/></xforms:instance>
+            <xxforms:variable name="parameters" select="xxforms:instance('fr-parameters-instance')"/>
             <xforms:submission id="fr-print-submission" resource="/fr/{{$parameters/app}}/{{$parameters/form}}/print/"
                     method="post" ref="xxforms:instance('fr-form-instance')" replace="all" validate="false" xxforms:target="_blank" xxforms:show-progress="false"/>
         </xforms:model>

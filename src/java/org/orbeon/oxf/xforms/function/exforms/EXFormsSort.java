@@ -16,15 +16,21 @@ package org.orbeon.oxf.xforms.function.exforms;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.saxon.expr.*;
 import org.orbeon.saxon.om.SequenceIterator;
+import org.orbeon.saxon.om.NamespaceResolver;
 import org.orbeon.saxon.sort.SortExpression;
 import org.orbeon.saxon.sort.SortKeyDefinition;
 import org.orbeon.saxon.trans.IndependentContext;
 import org.orbeon.saxon.trans.XPathException;
 
+import java.util.Iterator;
+
 /**
  * exforms:sort() function
  */
 public class EXFormsSort extends XFormsFunction {
+
+    // See comments in Saxon Evaluate.java
+    private IndependentContext staticContext;
 
     public SequenceIterator iterate(XPathContext xpathContext) throws XPathException {
 
@@ -34,11 +40,9 @@ public class EXFormsSort extends XFormsFunction {
             final Expression selectExpression = argument[1];
 
             sortKeyExpression = ExpressionTool.make(selectExpression.evaluateAsString(xpathContext),
-                    new IndependentContext(),
-                    0, Token.EOF,
-                    getLineNumber());
-
+                    staticContext, 0, Token.EOF, getLineNumber());
         }
+
         final Expression datatypeExpression = (argument.length > 2) ? argument[2] : null;
         final Expression orderExpression = (argument.length > 3) ? argument[3] : null;
         final Expression caseOrderExpression = (argument.length > 4) ? argument[4] : null;
@@ -64,5 +68,28 @@ public class EXFormsSort extends XFormsFunction {
         final SortKeyDefinition[] sortKeys = { sortKey };
 
         return new SortExpression(sequenceToSortExpression, sortKeys).iterate(xpathContext);
+    }
+
+    public void checkArguments(StaticContext env) throws XPathException {
+        // See same method in Saxon Evaluate.java
+        if (staticContext == null) {
+            // only do this once
+            super.checkArguments(env);
+
+            final NamespaceResolver namespaceResolver = env.getNamespaceResolver();
+            staticContext = new IndependentContext(env.getConfiguration());
+            staticContext.setBaseURI(env.getBaseURI());
+            staticContext.setImportedSchemaNamespaces(env.getImportedSchemaNamespaces());
+            staticContext.setDefaultFunctionNamespace(env.getDefaultFunctionNamespace());
+            staticContext.setDefaultElementNamespace(env.getNamePool().getURIFromURICode(env.getDefaultElementNamespace()));
+
+            for (Iterator iterator = namespaceResolver.iteratePrefixes(); iterator.hasNext();) {
+                final String prefix = (String) iterator.next();
+                if (!"".equals(prefix)) {
+                    final String uri = namespaceResolver.getURIForPrefix(prefix, true);
+                    staticContext.declareNamespace(prefix, uri);
+                }
+            }
+        }
     }
 }

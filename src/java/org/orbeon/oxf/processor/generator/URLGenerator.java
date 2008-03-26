@@ -720,6 +720,7 @@ public class URLGenerator extends ProcessorImpl {
     private static class URLResourceHandler implements ResourceHandler {
         private Config config;
         private URLConnection urlConn;
+        private InputStream inputStream;
 
         public URLResourceHandler(Config config) {
             this.config = config;
@@ -755,8 +756,8 @@ public class URLGenerator extends ProcessorImpl {
             // getting the last modified date, the stream is
             // actually opened. When using the file: protocol, the
             // file can be locked on disk.
-            if (urlConn != null && urlConn.getInputStream() != null) {
-                urlConn.getInputStream().close();
+            if (inputStream != null) {
+                inputStream.close();
             }
         }
 
@@ -771,6 +772,7 @@ public class URLGenerator extends ProcessorImpl {
                         urlConn.setRequestProperty(name, value);
                     }
                 }
+                inputStream = urlConn.getInputStream();
             }
         }
 
@@ -791,17 +793,17 @@ public class URLGenerator extends ProcessorImpl {
 
         public void readHTML(ContentHandler output) throws IOException {
             openConnection();
-            readHTML(urlConn.getInputStream(), config.getTidyConfig(), getExternalEncoding(), output);
+            readHTML(inputStream, config.getTidyConfig(), getExternalEncoding(), output);
         }
 
         public void readText(ContentHandler output, String contentType, Long lastModified) throws IOException {
             openConnection();
-            ProcessorUtils.readText(urlConn.getInputStream(), getExternalEncoding(), output, contentType, lastModified);
+            ProcessorUtils.readText(inputStream, getExternalEncoding(), output, contentType, lastModified);
         }
 
         public void readBinary(ContentHandler output, String contentType, Long lastModified) throws IOException {
             openConnection();
-            ProcessorUtils.readBinary(urlConn.getInputStream(), output, contentType, lastModified);
+            ProcessorUtils.readBinary(inputStream, output, contentType, lastModified);
         }
 
         public void readXML(PipelineContext pipelineContext, ContentHandler output) throws IOException {
@@ -816,10 +818,10 @@ public class URLGenerator extends ProcessorImpl {
                 InputSource inputSource;
                 if (getExternalEncoding() != null) {
                     // The encoding is set externally, either force by the user, or set by the connection
-                    inputSource = new InputSource(new InputStreamReader(urlConn.getInputStream(), getExternalEncoding()));
+                    inputSource = new InputSource(new InputStreamReader(inputStream, getExternalEncoding()));
                 } else {
                     // This is the regular case where the XML parser autodetects the encoding
-                    inputSource = new InputSource(urlConn.getInputStream());
+                    inputSource = new InputSource(inputStream);
                 }
                 inputSource.setSystemId(config.getURL().toExternalForm());
                 reader.parse(inputSource);

@@ -225,6 +225,32 @@
                     </li>
                     <li>
                         <p>
+                            <b>Inline transformations in XPL.</b> Often, processor configurations must be determined
+                            dynamicaly. XSLT is typically used for that purpose, but this can lead to heavier code.
+                            Inline transformations simplify the syntax by allowing transformations directly embedded
+                            within processor inputs:
+                        </p>
+                        <xml-source xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+                            <p:processor name="oxf:url-generator">
+                                <p:input name="config" transform="oxf:xslt" href="#instance">
+                                    <comment> This is an inline transformation </comment>
+                                    <config>
+                                        <url>http://www.example.org/</url>
+                                        <mode>
+                                            <xsl:value-of select="/instance/mode"/>
+                                        </mode>
+                                    </config>
+                                </p:input>
+                                <p:output name="data" id="example-document"/>
+                            </p:processor>
+                        </xml-source>
+                        <p>
+                            See also <a href="reference-xpl-piplines#inline-tranformations">Embedding Transformations
+                            within Inputs</a>.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
                             <b>Temporary files in the file serializer.</b> The file serializer can now automatically
                             create temporary files and write to those temporary files. It will also delete temporary
                             files, based on a "scope" parameter you specify in the configuration. As with the Scope

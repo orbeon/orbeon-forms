@@ -860,7 +860,7 @@
                     this feature, with XSLT 2.0's support for multiple output documents.
                 </p>
             </section>
-            <a name="inline-transformation"/>
+            <a name="inline-transformations"/>
             <section>
                 <title>Embedding Transformations within Inputs</title>
                 <p>

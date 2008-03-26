@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="windows-1252"?>
 <!--
     Copyright (C) 2004 Orbeon, Inc.
 
@@ -39,7 +38,7 @@
                 <li>BEA WebLogic Server 9.1 (JRockit)</li>
                 <li>IBM WebSphere 6</li>
                 <li>JOnAS 4.6.6 (Tomcat 5.5.12, JDK 1.5.0)</li>
-                <li>JBoss 4.0.4</li>
+                <li>JBoss 4.x and 5.x</li>
                 <li>GlassFish</li>
             </ul>
             <p>
@@ -817,7 +816,7 @@
 <!--        </section>-->
         <a name="jboss"/>
         <section>
-            <title>Installing Orbeon Forms on JBoss 4.0.4</title>
+            <title>Installing Orbeon Forms on JBoss</title>
             <ol>
                 <li>
                     <p>
@@ -905,20 +904,20 @@
                 <li>
                     <p>
                         Run and modify the example applications.
-                        <ul>
+                        <ol>
                             <li>Go to <code>http://localhost:8080/orbeon/</code></li>
                             <li>
                                 You can modify the example applications resources as the application sever is running
                                 and see the results of your modifications on the fly. The resources are stored under
                                 <code>JBOSS_HOME/server/default/deploy/orbeon.war/WEB-INF/resources</code>.
                             </li>
-                        </ul>
+                        </ol>
                     </p>
                 </li>
                 <li>
                     <p>
                         Optionally, to run the authentication sample:
-                        <ul>
+                        <ol>
                             <li>
                                 Open
                                 <code>JBOSS_HOME/server/default/deploy/orbeon.war/WEB-INF/web.xml</code>
@@ -946,7 +945,45 @@
                                     </application-policy>
                                 </xml-source>
                             </li>
-                        </ul>
+                        </ol>
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Optionally, you might want to setup a JDBC data source if your application is using the SQL
+                        Processor. What follows assumes you are configuring the SQL Processor with
+                        <code>&lt;sql:datasource>my-datasource&lt;/sql:datasource></code>.
+                        <ol>
+                            <li>
+                                Look at the files <code>JBOSS_HOME/docs/examples/jca/*-ds.xml</code>. You should find
+                                one that correspond to the database you are using. Copy it to
+                                <code>JBOSS_HOME/server/default/deploy</code>.
+                            </li>
+                            <li>
+                                Edit the file you copied and change the parameters to match your database
+                                configuration. Also assign a JNDI name to this data source with:
+                                <code>&lt;jndi-name>my-database&lt;/jndi-name></code> (instead of
+                                <code>my-database</code> you might want to use a name which is descriptive of your
+                                database).
+                            </li>
+                            <li>
+                                Edit <code>WEB-INF/web.xml</code> and uncomment the <code>&lt;resource-ref></code>.
+                                Also change there the content of <code>&lt;res-ref-name></code> to match the name you
+                                are using in the SQL Processor prefixed with <code>jdbc/</code>:
+                                <code>&lt;res-ref-name>jdbc/my-datasource&lt;/res-ref-name></code>.
+                            </li>
+                            <li>
+                                Edit <code>WEB-INF/jboss-web.xml</code>. In that file you should have
+                                <code>&lt;res-ref-name>jdbc/my-datasource&lt;/res-ref-name></code> (the same name you
+                                use to configure the SQL Processor and that you have in the <code>web.xml</code>) and
+                                <code>&lt;jndi-name>java:/my-database&lt;/jndi-name></code> (the same name you declared
+                                in the <code>...-ds.xml</code> file).
+                            </li>
+                            <li>
+                                Copy the JAR files with the JDBC driver for your database in
+                                <code>JBOSS_HOME/server/default/lib</code>.
+                            </li>
+                        </ol>
                     </p>
                 </li>
             </ol>

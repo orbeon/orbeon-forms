@@ -76,6 +76,7 @@
         <xsd:attribute name="tabindex" type="xsd:integer" use="optional"/>
         <xsd:attribute name="class" type="xsd:string" use="optional"/>
         <xsd:attribute name="context" type="xsd:string" use="optional"/>
+        <xsd:attribute name="iterate" type="xsd:string" use="optional"/>
         <xsd:anyAttribute namespace="##other" processContents="lax"/>
     </xsd:attributeGroup>
 
@@ -123,6 +124,7 @@
             <xsd:attribute name="ref" type="xforms:XPathExpression"/>
             <xsd:attribute name="bind" type="xsd:IDREF"/>
             <xsd:attribute name="action" type="xsd:string" use="optional"/>
+            <xsd:attribute name="resource" type="xsd:string" use="optional"/>
             <xsd:attribute name="instance" type="xsd:string" use="optional"/>
             <xsd:attribute name="serialize" type="xsd:boolean" use="optional"/>
             <xsd:attribute name="validate" type="xsd:boolean" use="optional"/>

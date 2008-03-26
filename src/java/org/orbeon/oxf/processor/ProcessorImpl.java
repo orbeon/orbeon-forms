@@ -1457,7 +1457,7 @@ public abstract class ProcessorImpl implements Processor {
                     if (outputCacheKey != null) {
                         Cache cache = ObjectCache.instance();
                         DigestValidity digestValidity = (DigestValidity) cache.findValid(pipelineContext, outputCacheKey, DEFAULT_VALIDITY);
-                        if (digestValidity != null &&  Arrays.equals(state.digest, digestValidity.digest)) {
+                        if (digestValidity != null && Arrays.equals(state.digest, digestValidity.digest)) {
                             state.validity = digestValidity.lastModified;
                         } else {
                             Long currentValidity = new Long(System.currentTimeMillis());

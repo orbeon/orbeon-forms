@@ -245,7 +245,7 @@
                             </p:processor>
                         </xml-source>
                         <p>
-                            See also <a href="reference-xpl-piplines#inline-tranformations">Embedding Transformations
+                            See also <a href="reference-xpl-pipelines#inline-tranformations">Embedding Transformations
                             within Inputs</a>.
                         </p>
                     </li>

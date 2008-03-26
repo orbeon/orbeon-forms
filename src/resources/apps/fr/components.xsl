@@ -258,7 +258,7 @@
         <!-- Trigger shown to go back if the data is dirty -->
         <xforms:trigger ref="instance('fr-persistence-instance')[data-status = 'dirty']">
             <xforms:label>
-                <xhtml:img src="../../../../apps/fr/style/previous.gif" alt=""/>
+                <xhtml:img src="/apps/fr/style/previous.gif" alt=""/>
                 <xhtml:span><xforms:output value="$fr-resources/detail/labels/discard"/></xhtml:span>
             </xforms:label>
             <xforms:action ev:event="DOMActivate">
@@ -268,7 +268,7 @@
         <!-- Trigger shown to go back if the data is clean -->
         <xforms:trigger ref="instance('fr-persistence-instance')[data-status = 'clean']">
             <xforms:label>
-                <xhtml:img src="../../../../apps/fr/style/previous.gif" alt=""/>
+                <xhtml:img src="/apps/fr/style/previous.gif" alt=""/>
                 <xhtml:span><xforms:output value="$fr-resources/detail/labels/return"/></xhtml:span>
             </xforms:label>
             <xforms:action ev:event="DOMActivate">
@@ -279,7 +279,7 @@
 
     <xsl:template match="fr:clear-button">
         <xforms:trigger>
-            <xforms:label><xhtml:img src="../../../../apps/fr/style/clear.gif" alt=""/>
+            <xforms:label><xhtml:img src="/apps/fr/style/clear.gif" alt=""/>
                 <xhtml:span><xforms:output value="$fr-resources/detail/labels/clear"/></xhtml:span>
             </xforms:label>
             <xforms:action ev:event="DOMActivate">
@@ -292,7 +292,7 @@
     <xsl:template match="fr:print-button">
         <xforms:trigger>
             <xforms:label>
-                <xhtml:img src="../../../../apps/fr/style/report.gif" alt=""/>
+                <xhtml:img src="/apps/fr/style/report.gif" alt=""/>
                 <xhtml:span><xforms:output value="$fr-resources/detail/labels/print"/></xhtml:span>
             </xforms:label>
             <xforms:action ev:event="DOMActivate">
@@ -304,7 +304,7 @@
     <xsl:template match="fr:save-locally-button">
         <xforms:trigger id="save-locally-button">
             <xforms:label>
-                <xhtml:img src="../../../../apps/fr/style/save.gif" alt=""/>
+                <xhtml:img src="/apps/fr/style/save.gif" alt=""/>
                 <xforms:output value="$fr-resources/detail/labels/save-locally"/>
             </xforms:label>
         </xforms:trigger>
@@ -313,7 +313,7 @@
     <xsl:template match="fr:save-button">
         <xforms:trigger ref="instance('fr-triggers-instance')/save" class="xforms-trigger-appearance-modal" id="fr-save-button">
             <xforms:label>
-                <xhtml:img src="../../../../apps/fr/style/run.gif" alt=""/>
+                <xhtml:img src="/apps/fr/style/run.gif" alt=""/>
                 <xhtml:span><xforms:output value="$fr-resources/detail/labels/save-document"/></xhtml:span>
             </xforms:label>
         </xforms:trigger>
@@ -322,7 +322,7 @@
     <xsl:template match="fr:close-button">
         <xforms:trigger>
             <xforms:label>
-                <xhtml:img src="../../../../apps/fr/style/close.gif" alt=""/>
+                <xhtml:img src="/apps/fr/style/close.gif" alt=""/>
                 <xforms:output value="$fr-resources/detail/labels/discard"/>
             </xforms:label>
             <xforms:action ev:event="DOMActivate">
@@ -383,7 +383,7 @@
                         </xforms:output>
                         <xhtml:span class="fr-inplace-buttons">
                             <xforms:trigger id="fr-inplace-{@id}-delete" appearance="minimal" class="fr-inplace-delete">
-                                <xforms:label><xhtml:img src="../../../../apps/fr/style/trash.gif" alt="Delete" title="Delete {lower-case(xforms:label)}"/></xforms:label>
+                                <xforms:label><xhtml:img src="/apps/fr/style/trash.gif" alt="Delete" title="Delete {lower-case(xforms:label)}"/></xforms:label>
                                 <!-- Dispatch custom event to trigger -->
                                 <xforms:dispatch ev:event="DOMActivate" target="fr-inplace-{@id}-delete" name="fr-delete"/>
                             </xforms:trigger>
@@ -475,7 +475,6 @@
                                 <xforms:group appearance="xxforms:internal">
                                     <xforms:trigger appearance="minimal">
                                         <xforms:label>
-                                            <!--  xxx temp links -->
                                             <xhtml:img src="/apps/fr/style/plus.png" alt="Open section" title="Open section" class="fr-open-close"/>
                                         </xforms:label>
                                     </xforms:trigger>
@@ -498,7 +497,6 @@
                                 <xforms:group appearance="xxforms:internal">
                                     <xforms:trigger appearance="minimal">
                                         <xforms:label>
-                                            <!--  xxx temp links -->
                                             <xhtml:img src="/apps/fr/style/minus.png" alt="Close section" title="Close section" class="fr-open-close"/>
                                         </xforms:label>
                                     </xforms:trigger>
@@ -546,13 +544,13 @@
         </xforms:input>
         <xforms:trigger ref=".[not({@ref})]" appearance="minimal">
             <xforms:label>
-                <xhtml:img src="../../../../apps/fr/style/add.gif" alt=""/>
+                <xhtml:img src="/apps/fr/style/add.gif" alt=""/>
                 Add <xsl:value-of select="lower-case(xforms:label)"/>
             </xforms:label>
             <xforms:insert ev:event="DOMActivate" origin="instance('templates')/{@ref}" nodeset="{@after}"/>
         </xforms:trigger>
         <xforms:trigger ref=".[{@ref}]" appearance="minimal">
-            <xforms:label><xhtml:img src="../../../../apps/fr/style/remove.gif" alt="Remove" title="Remove"/></xforms:label>
+            <xforms:label><xhtml:img src="/apps/fr/style/remove.gif" alt="Remove" title="Remove"/></xforms:label>
             <xforms:delete ev:event="DOMActivate" nodeset="{@ref}"/>
         </xforms:trigger>
     </xsl:template>
@@ -574,7 +572,7 @@
                         <!-- Add trigger (image) -->
                         <xhtml:td class="fr-repeat-column">
                             <xforms:trigger appearance="minimal" ref=".[{if ($max-occurs = 'unbounded') then 'true()' else concat('count(', @nodeset, ') lt ', $max-occurs)}]">
-                                <xforms:label><xhtml:img src="../../../../apps/fr/style/add.gif" alt="Add" title="Add"/></xforms:label>
+                                <xforms:label><xhtml:img src="/apps/fr/style/add.gif" alt="Add" title="Add"/></xforms:label>
                             </xforms:trigger>
                         </xhtml:td>
                         <!-- Add trigger (text) -->
@@ -618,7 +616,7 @@
                                 <xforms:trigger appearance="minimal" ref="if (
                                         {if ($first-mandatory) then 'position() != 1 and ' else ''}
                                         count(xxforms:repeat-nodeset('{@id}')) gt {$min-occurs}) then . else ()">
-                                    <xforms:label><xhtml:img src="../../../../apps/fr/style/remove.gif" alt="Remove" title="Remove"/></xforms:label>
+                                    <xforms:label><xhtml:img src="/apps/fr/style/remove.gif" alt="Remove" title="Remove"/></xforms:label>
                                 </xforms:trigger>
                                 <xforms:delete ev:event="DOMActivate" nodeset="."/>
                             </xforms:group>

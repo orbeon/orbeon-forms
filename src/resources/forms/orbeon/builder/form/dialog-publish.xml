@@ -52,7 +52,7 @@
         <xforms:group>
             <xforms:trigger class="xforms-trigger-appearance-modal">
                 <xforms:label>
-                    <xhtml:img src="../../../../forms/orbeon/builder/images/upload.png" alt="Publish" title="Publish"/>
+                    <xhtml:img src="/forms/orbeon/builder/images/upload.png" alt="Publish" title="Publish"/>
                     <xhtml:span>Publish</xhtml:span>
                 </xforms:label>
                 <xforms:action ev:event="DOMActivate">

@@ -155,6 +155,7 @@
                         </title>
                         <description>
                             <label>Description du formulaire</label>
+                            <hint>Veuillez entrer une description du formulaire</hint>
                         </description>
                         <logo>
                             <label>Logo</label>
@@ -1119,7 +1120,7 @@
                                                                 <xhtml:td class="fb-grid-top-left-td">
                                                                     <xforms:trigger appearance="minimal" id="fb-delete-grid-trigger">
                                                                         <xforms:label>
-                                                                            <xforms:label><xhtml:img src="../../../../apps/fr/style/trash.gif" alt="Delete Grid" title="Delete Grid"/></xforms:label>
+                                                                            <xforms:label><xhtml:img src="/apps/fr/style/trash.gif" alt="Delete Grid" title="Delete Grid"/></xforms:label>
                                                                         </xforms:label>
                                                                         <xforms:action ev:event="DOMActivate">
                                                                             <!-- Ask confirmation -->
@@ -1152,7 +1153,7 @@
                                                                         <!-- Insert column to the left -->
                                                                         <xhtml:div class="fb-insert-left">
                                                                             <xforms:trigger appearance="minimal" ref=".[xs:integer($grid/@columns) lt 4]" id="fb-insert-column-left-trigger">
-                                                                                <xforms:label><xhtml:img src="../../../../apps/fr/style/previous.gif" alt="Insert Column to the Left" title="Insert Column to the Left"/></xforms:label>
+                                                                                <xforms:label><xhtml:img src="/apps/fr/style/previous.gif" alt="Insert Column to the Left" title="Insert Column to the Left"/></xforms:label>
                                                                                 <xforms:action ev:event="DOMActivate">
                                                                                     <!-- Increment number of columns -->
                                                                                     <xforms:setvalue ref="$grid/@columns" value=". + 1"/>
@@ -1177,7 +1178,7 @@
                                                                         <!-- Insert column to the right -->
                                                                         <xhtml:div class="fb-insert-right">
                                                                             <xforms:trigger appearance="minimal" ref=".[xs:integer($grid/@columns) lt 4]" id="fb-insert-column-right-trigger">
-                                                                                <xforms:label><xhtml:img src="../../../../apps/fr/style/next.gif" alt="Insert Column to the Right" title="Insert Column to the Right"/></xforms:label>
+                                                                                <xforms:label><xhtml:img src="/apps/fr/style/next.gif" alt="Insert Column to the Right" title="Insert Column to the Right"/></xforms:label>
                                                                                 <xforms:action context="$grid" ev:event="DOMActivate">
                                                                                     <!-- Increment number of columns -->
                                                                                     <xforms:setvalue ref="$grid/@columns" value=". + 1"/>
@@ -1201,7 +1202,7 @@
                                                                         </xhtml:div>
                                                                         <!-- Delete column -->
                                                                         <xforms:trigger appearance="minimal" ref=".[xs:integer($grid/@columns) gt 1]" id="fb-delete-column-trigger">
-                                                                            <xforms:label><xhtml:img src="../../../../apps/fr/style/trash.gif" alt="Delete Column" title="Delete Column"/></xforms:label>
+                                                                            <xforms:label><xhtml:img src="/apps/fr/style/trash.gif" alt="Delete Column" title="Delete Column"/></xforms:label>
                                                                             <xforms:action ev:event="DOMActivate">
 
                                                                                 <!-- Prepare span grid -->
@@ -1263,7 +1264,7 @@
                                                                             <!-- Insert row above -->
                                                                             <xhtml:div>
                                                                                 <xforms:trigger appearance="minimal" id="fb-insert-row-above-trigger">
-                                                                                    <xforms:label><xhtml:img src="../../../../apps/fr/style/up.gif" alt="Insert Row Above" title="Insert Row Above"/></xforms:label>
+                                                                                    <xforms:label><xhtml:img src="/apps/fr/style/up.gif" alt="Insert Row Above" title="Insert Row Above"/></xforms:label>
                                                                                     <xforms:action context="$grid" ev:event="DOMActivate">
                                                                                         <xforms:action ev:event="DOMActivate">
 
@@ -1301,7 +1302,7 @@
                                                                             </xhtml:div>
                                                                             <!-- Delete row -->
                                                                             <xforms:trigger appearance="minimal" ref=".[count($grid/xhtml:tr) gt 1]" id="fb-delete-row-trigger">
-                                                                                <xforms:label><xhtml:img src="../../../../apps/fr/style/trash.gif" alt="Delete Row" title="Delete Row"/></xforms:label>
+                                                                                <xforms:label><xhtml:img src="/apps/fr/style/trash.gif" alt="Delete Row" title="Delete Row"/></xforms:label>
                                                                                 <xforms:action ev:event="DOMActivate">
 
                                                                                     <xxforms:variable name="count" select="count($tr/xhtml:td[xforms:*])"/>
@@ -1358,7 +1359,7 @@
                                                                             <!-- Insert row below -->
                                                                             <xhtml:div>
                                                                                 <xforms:trigger appearance="minimal" id="fb-insert-row-below-trigger">
-                                                                                    <xforms:label><xhtml:img src="../../../../apps/fr/style/down.gif" alt="Insert Row Below" title="Insert Row Below"/></xforms:label>
+                                                                                    <xforms:label><xhtml:img src="/apps/fr/style/down.gif" alt="Insert Row Below" title="Insert Row Below"/></xforms:label>
                                                                                     <xforms:action ev:event="DOMActivate">
                                                                                         <xforms:action ev:event="DOMActivate">
 
@@ -1417,12 +1418,12 @@
                                                                                 <!-- TODO: For now put here, but move once dnd is there and clicking on cell is enough -->
                                                                                 <!-- Drag -->
                                                                                 <xforms:trigger appearance="minimal">
-                                                                                    <xforms:label><xhtml:img src="../../../../apps/fr/style/drag_handle.gif" alt="Drag" title="Drag"/></xforms:label>
+                                                                                    <xforms:label><xhtml:img src="/apps/fr/style/drag_handle.gif" alt="Drag" title="Drag"/></xforms:label>
                                                                                 </xforms:trigger>
                                                                                 <!-- Expand cell down -->
                                                                                 <xforms:group ref=".[exists($td/../following-sibling::xhtml:tr[xs:integer(if ($td/@rowspan) then $td/@rowspan else 1)])]">
                                                                                     <xforms:trigger appearance="minimal" id="fb-expand-cell-down-trigger">
-                                                                                        <xforms:label><xhtml:img src="../../../../apps/fr/style/down.gif" alt="Expand" title="Expand"/></xforms:label>
+                                                                                        <xforms:label><xhtml:img src="/apps/fr/style/down.gif" alt="Expand" title="Expand"/></xforms:label>
                                                                                         <xforms:action ev:event="DOMActivate">
 
                                                                                             <!-- Prepare span grid -->
@@ -1477,7 +1478,7 @@
                                                                                 <!-- Shrink -->
                                                                                 <xforms:group ref=".[$td/@rowspan and $td/@rowspan > 1]">
                                                                                     <xforms:trigger appearance="minimal" id="fb-shrink-cell-down-trigger">
-                                                                                        <xforms:label><xhtml:img src="../../../../apps/fr/style/up.gif" alt="Shrink" title="Shrink"/></xforms:label>
+                                                                                        <xforms:label><xhtml:img src="/apps/fr/style/up.gif" alt="Shrink" title="Shrink"/></xforms:label>
                                                                                         <xforms:action ev:event="DOMActivate">
 
                                                                                             <!-- Prepare span grid -->
@@ -1501,7 +1502,7 @@
                                                                                 <!-- Delete control -->
                                                                                 <xforms:group ref=".[$control]">
                                                                                     <xforms:trigger appearance="minimal">
-                                                                                        <xforms:label><xhtml:img src="../../../../apps/fr/style/trash.gif" alt="Delete Control" title="Delete Control"/></xforms:label>
+                                                                                        <xforms:label><xhtml:img src="/apps/fr/style/trash.gif" alt="Delete Control" title="Delete Control"/></xforms:label>
                                                                                         <xforms:action ev:event="DOMActivate">
                                                                                             <!-- Delete control -->
                                                                                             <xforms:dispatch name="fb-delete-control" target="fr-form-model">
@@ -1515,7 +1516,7 @@
                                                                             <xforms:group ref=".[$control]" class="fb-grid-control-icons">
                                                                                 <!-- Edit details for any control -->
                                                                                 <xforms:trigger appearance="minimal" id="fb-edit-details-trigger">
-                                                                                    <xforms:label><xhtml:img class="fb-control-help" alt="Details" title="" src="../../../../apps/fr/style/edit.gif"/></xforms:label>
+                                                                                    <xforms:label><xhtml:img class="fb-control-help" alt="Details" title="" src="/apps/fr/style/edit.gif"/></xforms:label>
                                                                                     <xforms:action ev:event="DOMActivate" context="instance('fb-details-editor-instance')">
                                                                                         <xxforms:show dialog="fb-edit-details-dialog" neighbor="fb-edit-details-trigger">
                                                                                             <xxforms:context name="control" select="$control"/>
@@ -1547,7 +1548,7 @@
                                                                                 <xforms:group ref=".[xforms:select1 | xforms:select]">
                                                                                     <xforms:trigger appearance="minimal">
                                                                                         <xforms:label>
-                                                                                            <xhtml:img src="../../../../apps/fr/style/update.gif" alt="Switch Appearance" title="Switch Appearance"/>
+                                                                                            <xhtml:img src="/apps/fr/style/update.gif" alt="Switch Appearance" title="Switch Appearance"/>
                                                                                         </xforms:label>
                                                                                         <xforms:action ev:event="DOMActivate">
 
@@ -1730,7 +1731,7 @@
                                                                                                 </xforms:output>
                                                                                             </xforms:group>
                                                                                             <!-- File chooser -->
-                                                                                            <!--<xhtml:img width="16" height="16" src="../../../../forms/orbeon/builder/images/image.png"/>-->
+                                                                                            <!--<xhtml:img width="16" height="16" src="/forms/orbeon/builder/images/image.png"/>-->
                                                                                             <xforms:upload ref="$instance-holder">
                                                                                                 <xforms:label class="fb-xforms-disabled"/>
                                                                                                 <xforms:filename ref="@filename"/>
@@ -1811,7 +1812,7 @@
                     <!-- Show XML -->
                     <xforms:trigger>
                         <xforms:label>
-                            <xhtml:img src="../../../../apps/fr/style/view-xml.gif" alt="Show XML" title="Show XML"/>
+                            <xhtml:img src="/apps/fr/style/view-xml.gif" alt="Show XML" title="Show XML"/>
                             <xhtml:span>Show XML</xhtml:span>
                         </xforms:label>
                         <xxforms:show ev:event="DOMActivate" dialog="fb-xml-dialog"/>
@@ -1820,7 +1821,7 @@
                     <!-- Edit Source -->
                     <xforms:trigger>
                         <xforms:label>
-                            <xhtml:img src="../../../../apps/fr/style/edit.gif" alt="Edit Source" title="Edit Source"/>
+                            <xhtml:img src="/apps/fr/style/edit.gif" alt="Edit Source" title="Edit Source"/>
                             <xhtml:span>Edit Source</xhtml:span>
                         </xforms:label>
                         <xxforms:show ev:event="DOMActivate" dialog="fb-edit-source-dialog"/>
@@ -1829,7 +1830,7 @@
                     <!-- Upload XML Schema -->
                     <xforms:trigger>
                         <xforms:label>
-                            <xhtml:img src="../../../../forms/orbeon/builder/images/upload.png" alt="Upload XML Schema" title="Upload XML Schema"/>
+                            <xhtml:img src="/forms/orbeon/builder/images/upload.png" alt="Upload XML Schema" title="Upload XML Schema"/>
                             <xhtml:span>XML Schema</xhtml:span>
                         </xforms:label>
                         <xxforms:show ev:event="DOMActivate" dialog="fb-schema-upload-dialog"/>
@@ -1838,7 +1839,7 @@
                     <!-- Upload CSS -->
                     <xforms:trigger>
                         <xforms:label>
-                            <xhtml:img src="../../../../apps/fr/style/pdf.png" alt="Upload PDF" title="Upload PDF"/>
+                            <xhtml:img src="/apps/fr/style/pdf.png" alt="Upload PDF" title="Upload PDF"/>
                             <xhtml:span>Upload CSS</xhtml:span>
                         </xforms:label>
                         <xxforms:show ev:event="DOMActivate" dialog="fb-css-upload-dialog"/>
@@ -1847,7 +1848,7 @@
                     <!-- Upload PDF Template -->
                     <xforms:trigger>
                         <xforms:label>
-                            <xhtml:img src="../../../../apps/fr/style/pdf.png" alt="Upload PDF" title="Upload PDF"/>
+                            <xhtml:img src="/apps/fr/style/pdf.png" alt="Upload PDF" title="Upload PDF"/>
                             <xhtml:span>Upload PDF</xhtml:span>
                         </xforms:label>
                         <!-- TODO -->
@@ -2068,7 +2069,7 @@
                         <xforms:group>
                             <xforms:trigger class="xforms-trigger-appearance-modal">
                                 <xforms:label>
-                                    <!--<xhtml:img src="../../../../forms/orbeon/builder/images/upload.png" alt="Publish" title="Publish"/>-->
+                                    <!--<xhtml:img src="/forms/orbeon/builder/images/upload.png" alt="Publish" title="Publish"/>-->
                                     <xhtml:span>Done</xhtml:span>
                                 </xforms:label>
                             </xforms:trigger>
@@ -2104,7 +2105,7 @@
                 <!-- Test form -->
                 <xforms:trigger>
                     <xforms:label>
-                        <xhtml:img src="../../../../forms/orbeon/builder/images/play.png" alt="Test Form" title="Test Form"/>
+                        <xhtml:img src="/forms/orbeon/builder/images/play.png" alt="Test Form" title="Test Form"/>
                         <xhtml:span>Test</xhtml:span>
                     </xforms:label>
                     <xforms:send ev:event="DOMActivate" submission="fb-test-form-submission"/>
@@ -2113,7 +2114,7 @@
                 <!-- Publish form -->
                 <xforms:trigger id="fb-publish-button">
                     <xforms:label>
-                        <xhtml:img src="../../../../forms/orbeon/builder/images/upload.png" alt="Publish" title="Publish"/>
+                        <xhtml:img src="/forms/orbeon/builder/images/upload.png" alt="Publish" title="Publish"/>
                         <xhtml:span>Publish</xhtml:span>
                     </xforms:label>
                     <xforms:action ev:event="DOMActivate">

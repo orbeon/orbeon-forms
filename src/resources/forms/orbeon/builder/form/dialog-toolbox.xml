@@ -28,7 +28,7 @@
     <xhtml:div class="fb-xvc">
         <xforms:trigger appearance="minimal" ref="$xcv/cut-trigger">
             <xforms:label>
-                <xhtml:img src="../../../../forms/orbeon/builder/images/cut.gif" alt="Cut" title="Cut"/>
+                <xhtml:img src="/forms/orbeon/builder/images/cut.gif" alt="Cut" title="Cut"/>
                 <xhtml:span>Cut</xhtml:span>
             </xforms:label>
             <xforms:action ev:event="DOMActivate">
@@ -44,7 +44,7 @@
         </xforms:trigger>
         <xforms:trigger appearance="minimal" ref="$xcv/copy-trigger">
             <xforms:label>
-                <xhtml:img src="../../../../forms/orbeon/builder/images/copy.gif" alt="Copy" title="Copy"/>
+                <xhtml:img src="/forms/orbeon/builder/images/copy.gif" alt="Copy" title="Copy"/>
                 <xhtml:span>Copy</xhtml:span>
             </xforms:label>
             <xforms:action ev:event="DOMActivate">
@@ -56,7 +56,7 @@
         </xforms:trigger>
         <xforms:trigger appearance="minimal" ref="$xcv/paste-trigger">
             <xforms:label>
-                <xhtml:img src="../../../../forms/orbeon/builder/images/paste.gif" alt="Paste" title="Paste"/>
+                <xhtml:img src="/forms/orbeon/builder/images/paste.gif" alt="Paste" title="Paste"/>
                 <xhtml:span>Paste</xhtml:span>
             </xforms:label>
             <xforms:action ev:event="DOMActivate">
@@ -71,7 +71,7 @@
             <xhtml:div class="fb-tool">
                 <xforms:trigger>
                     <xforms:label>
-                        <xhtml:img src="../../../../apps/fr/style/plus.png" alt="Open section" title="Open section"/>
+                        <xhtml:img src="/apps/fr/style/plus.png" alt="Open section" title="Open section"/>
                         <xhtml:span>Section</xhtml:span>
                     </xforms:label>
                     <xforms:action ev:event="DOMActivate" context="$body">
@@ -123,7 +123,7 @@
                 <xhtml:div class="fb-tool">
                     <xforms:trigger appearance="full">
                         <xforms:label>
-                            <xhtml:img src="../../../../forms/orbeon/builder/images/action1.gif" alt="New 1-Column Grid" title="New 1-Column Grid"/>
+                            <xhtml:img src="/forms/orbeon/builder/images/action1.gif" alt="New 1-Column Grid" title="New 1-Column Grid"/>
                             <xhtml:span>1-Column Grid</xhtml:span>
                         </xforms:label>
                         <xforms:action ev:event="DOMActivate">
@@ -136,7 +136,7 @@
                 <xhtml:div class="fb-tool">
                     <xforms:trigger appearance="full">
                         <xforms:label>
-                            <xhtml:img src="../../../../forms/orbeon/builder/images/action2.gif" alt="New 2-Column Grid" title="New 2-Column Grid"/>
+                            <xhtml:img src="/forms/orbeon/builder/images/action2.gif" alt="New 2-Column Grid" title="New 2-Column Grid"/>
                             <xhtml:span>2-Column Grid</xhtml:span>
                         </xforms:label>
                         <xforms:action ev:event="DOMActivate">
@@ -149,7 +149,7 @@
                 <xhtml:div class="fb-tool">
                     <xforms:trigger appearance="full">
                         <xforms:label>
-                            <xhtml:img src="../../../../forms/orbeon/builder/images/action3.gif" alt="New 3-Column Grid" title="New 3-Column Grid"/>
+                            <xhtml:img src="/forms/orbeon/builder/images/action3.gif" alt="New 3-Column Grid" title="New 3-Column Grid"/>
                             <xhtml:span>3-Column Grid</xhtml:span>
                         </xforms:label>
                         <xforms:action ev:event="DOMActivate">
@@ -162,7 +162,7 @@
                 <xhtml:div class="fb-tool">
                     <xforms:trigger appearance="full">
                         <xforms:label>
-                            <xhtml:img src="../../../../forms/orbeon/builder/images/action3.gif" alt="New 4-Column Grid" title="New 4-Column Grid"/>
+                            <xhtml:img src="/forms/orbeon/builder/images/action3.gif" alt="New 4-Column Grid" title="New 4-Column Grid"/>
                             <xhtml:span>4-Column Grid</xhtml:span>
                         </xforms:label>
                         <xforms:action ev:event="DOMActivate">
@@ -182,7 +182,7 @@
                 <xhtml:div class="fb-tool">
                     <xforms:trigger id="fb-add-control-trigger" xmlns:f="http://orbeon.org/oxf/xml/formatting">
                         <xforms:label>
-                            <xforms:output value="concat('&lt;img width=''16'' height=''16'' src=''', if (@image) then @image else concat('../../../../forms/orbeon/builder/images/', xhtml:div/@class, '.png'), '''/>')" mediatype="text/html" f:url-norewrite="true"/>
+                            <xforms:output value="concat('&lt;img width=''16'' height=''16'' src=''', if (@image) then @image else concat('/forms/orbeon/builder/images/', xhtml:div/@class, '.png'), '''/>')" mediatype="text/html" f:url-norewrite="true"/>
                             <xforms:output ref="@label"/>
                         </xforms:label>
                         <xforms:action ev:event="DOMActivate">

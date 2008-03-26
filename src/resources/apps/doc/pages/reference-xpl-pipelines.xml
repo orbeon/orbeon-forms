@@ -170,46 +170,53 @@
             <ul>
                 <li>
                     <p>
-                        The kind of processor created is specified with the <code>name</code>
-                        attribute, which is an XML qualified name. A qualified name is composed of
-                        two parts:
+                        The kind of processor created is specified with the <code>name</code> attribute, which is an XML
+                        qualified name. A qualified name is composed of two parts:
                     </p>
                     <ul>
-                        <li><b>A prefix:</b> The prefix is mapped to a URI defining a namespace.</li>
-                        <li><b>A local name:</b> This name is a name in the namespace defined by the prefix.</li>
+                        <li><b>A prefix:</b> The prefix is mapped to a URI defining a namespace.</li> <li><b>A local
+                        name:</b> This name is a name in the namespace defined by the prefix.</li>
                     </ul>
                     <p>
-                        This mechanism allows grouping related processors in a namespace. For
-                        example, all the basic Orbeon Forms processors are grouped in the
-                        <code>http://www.orbeon.com/oxf/processors</code> namespace. This namespace
-                        is typically mapped to the <code>oxf</code> prefix. Processors are then
-                        referred to using names such as <code>oxf:xslt</code> or
-                        <code>oxf:scope-serializer</code>.
+                        This mechanism allows grouping related processors in a namespace. For example, all the basic
+                        Orbeon Forms processors are grouped in the <code>http://www.orbeon.com/oxf/processors</code>
+                        namespace. This namespace is typically mapped to the <code>oxf</code> prefix. Processors are
+                        then referred to using names such as <code>oxf:xslt</code> or <code>oxf:scope-serializer</code>.
                     </p>
                     <p>
-                        The name maps to a processor factory. Processor factories are registered
-                        through the <code>processors.xml</code> file described in <link
-                        href="integration-packaging">Packaging and Deployment</link>.
+                        The name maps to a processor factory. Processor factories are registered through the
+                        <code>processors.xml</code> file described in <link href="integration-packaging">Packaging and
+                        Deployment</link>.
                     </p>
                 </li>
                 <li>
                     <p>
-                        The <code>&lt;p:input&gt;</code> element connects the input of the processor
-                        with the name specified with the <code>name</code> attribute to one of:
+                        The <code>&lt;p:input&gt;</code> element connects the input of the processor specified with the
+                        <code>name</code> attribute to an XML document which may be:
                     </p>
                     <ul>
                         <li>
-                            an inline XML document embedded in the <code>&lt;p:input&gt;</code> element
+                            <p>
+                                An <b>inline XML document</b> embedded in the <code>&lt;p:input&gt;</code> element
+                            </p>
                         </li>
                         <li>
-                            an XML document obtained according to the <link href="#href-attribute">full
-                            syntax of the <code>href</code> attribute</link>, for example:
+                            <p>
+                                An XML document obtained according to the <a href="#href-attribute">full syntax of the
+                                <code>href</code> attribute</a>, for example:
+                            </p>
                             <ul>
                                 <li><code>href="#some-id"</code></li>
                                 <li><code>href="oxf:/my-document.xml"</code></li>
                                 <li><code>href="aggregate('document', #some-id,
                                 oxf:/my-document.xml#xpointer(/*/*))"</code></li>
                             </ul>
+                        </li>
+                        <li>
+                            <p>
+                                A document referenced with the <a href="#href-attribute"><code>href</code> attribute</a>
+                                and transformed with an <a href="#inline-transformation">inline transformation</a>.
+                            </p>
                         </li>
                     </ul>
                 </li>
@@ -851,6 +858,101 @@
                     Currently, no standard processor within Orbeon Forms makes uses of the
                     <code>output:</code> scheme. The XSLT processor would be a good candidate for
                     this feature, with XSLT 2.0's support for multiple output documents.
+                </p>
+            </section>
+            <a name="inline-transformation"/>
+            <section>
+                <title>Embedding Transformations within Inputs</title>
+                <p>
+                    Often, processors take configuration documents as input. When such a configuation is statically
+                    defined, you can use an inline XML document within the processor input:
+                </p>
+                <xml-source xmlns:p="http://www.orbeon.com/oxf/pipeline">
+                    <p:processor name="oxf:url-generator">
+                        <p:input name="config">
+                            <comment> This is an inline configuration </comment>
+                            <config>
+                                <url>http://www.example.org/</url>
+                                <mode>binary</mode>
+                            </config>
+                        </p:input>
+                        <p:output name="data" id="example-document"/>
+                    </p:processor>
+                </xml-source>
+                <p>
+                    When the configuration must be constructed dynamically, you can use an embedded transformation:
+                </p>
+                <xml-source xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+                    <p:processor name="oxf:url-generator">
+                        <p:input name="config" transform="oxf:xslt" href="#instance">
+                            <comment> This is an inline transformation </comment>
+                            <config>
+                                <url>http://www.example.org/</url>
+                                <mode>
+                                    <xsl:value-of select="/instance/mode"/>
+                                </mode>
+                            </config>
+                        </p:input>
+                        <p:output name="data" id="example-document"/>
+                    </p:processor>
+                </xml-source>
+                <p>
+                    An inline transformation works as follows:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            It is enabled with the <code>transform</code> attribute on <code>&lt;p:input></code>. That
+                            attribute must refer to a processor acting as a transformation. Supported built-in
+                            processors include <code>oxf:xslt</code> and <code>oxf:unsafe-xslt</code>. In general, you
+                            can refer to any processor which takes a <code>data</code> input, a <code>config</code>
+                            input, and a <code>data</code> output.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            The input of the transformation is the XML document referred to by the mandatory
+                            <code>href</code> attribute.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            The content of the transformation (e.g. the XSLT transformation in the example above) is the
+                            inline XML document within the input.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            The result of the transformation is used to produce the actual input document.
+                        </p>
+                    </li>
+                </ul>
+                <p>
+                    The example above could also be written without an embedded transformation:
+                </p>
+                <xml-source xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+                    <comment> Create the configuration using XSLT </comment>
+                    <p:processor name="oxf:xslt">
+                        <p:input name="data" href="#instance"/>
+                        <p:input name="config" transform="oxf:xslt" >
+                            <config>
+                                <url>http://www.example.org/</url>
+                                <mode>
+                                    <xsl:value-of select="/instance/mode"/>
+                                </mode>
+                            </config>
+                        </p:input>
+                        <p:output name="data" id="temp"/>
+                    </p:processor>
+                    <comment> Pass the configuration and execute URL generator </comment>
+                    <p:processor name="oxf:url-generator">
+                        <p:input name="config" href="#temp"/>
+                        <p:output name="data" id="example-document"/>
+                    </p:processor>
+                </xml-source>
+                <p>
+                    The behavior is exactly the same in both cases, but the syntax is lighter with the embedded
+                    configuration.
                 </p>
             </section>
         </section>

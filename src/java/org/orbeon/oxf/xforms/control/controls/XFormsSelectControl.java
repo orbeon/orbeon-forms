@@ -46,9 +46,9 @@ public class XFormsSelectControl extends XFormsSelect1Control {
      * @param value             list of tokens from the UI
      * @param type              should probably be null
      */
-    public void setExternalValue(PipelineContext pipelineContext, String value, String type) {
+    public void storeExternalValue(PipelineContext pipelineContext, String value, String type) {
 
-        final String controlValue = getValue();
+        final String controlValue = getValue(pipelineContext);
 
         // Actual new value to store
         final String newValue;
@@ -105,33 +105,25 @@ public class XFormsSelectControl extends XFormsSelect1Control {
             newValue = sb.toString();
         }
 
-        super.setExternalValue(pipelineContext, newValue, type);
+        super.storeExternalValue(pipelineContext, newValue, type);
     }
 
-    /**
-     * Produce an external value. This returns the intersection of values in the bound node and values in the control's
-     * itemset.
-     *
-     * @param pipelineContext   current pipeline context
-     * @return                  external value for the UI
-     */
-    protected String evaluateExternalValue(PipelineContext pipelineContext) {
+    protected void evaluateExternalValue(PipelineContext pipelineContext) {
 
-        final String controlValue = getValue();
-        if (controlValue == null)
-            return null;
+        final String internalValue = getValue(pipelineContext);
+        final String updatedValue;
+        if (internalValue == null) {
+            updatedValue = null;
+        } else {
 
-        // Current values in the instance
-        final Map instanceValues = tokenize(controlValue);
+            // Current values in the instance
+            final Map instanceValues = tokenize(internalValue);
 
-        // Values in the itemset
-        final List items = getItemset(pipelineContext, true);
+            // Values in the itemset
+            final List items = getItemset(pipelineContext, true);
 
-        // Actual value to return is the intersection of values in the instance and values in the itemset
-        final String newValue;
-        {
-            // Create resulting string
-            final FastStringBuffer sb = new FastStringBuffer(controlValue.length());
+            // Actual value to return is the intersection of values in the instance and values in the itemset
+            final FastStringBuffer sb = new FastStringBuffer(internalValue.length());
             int index = 0;
             for (Iterator i = items.iterator(); i.hasNext(); index++) {
                 final XFormsItemUtils.Item currentItem = (XFormsItemUtils.Item) i.next();
@@ -142,9 +134,9 @@ public class XFormsSelectControl extends XFormsSelect1Control {
                     sb.append(currentValue);
                 }
             }
-            newValue = sb.toString();
+            updatedValue = sb.toString();
         }
-        return newValue;
+        setExternalValue(updatedValue);
     }
 
     private static Map tokenize(String value) {

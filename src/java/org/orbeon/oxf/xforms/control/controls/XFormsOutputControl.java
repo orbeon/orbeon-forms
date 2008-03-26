@@ -15,24 +15,20 @@ package org.orbeon.oxf.xforms.control.controls;
 
 import org.dom4j.Element;
 import org.dom4j.QName;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.util.SecureUtils;
+import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsInstance;
 import org.orbeon.oxf.xforms.XFormsUtils;
-import org.orbeon.oxf.xforms.processor.XFormsResourceServer;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
-import org.orbeon.oxf.xml.ForwardingContentHandler;
+import org.orbeon.oxf.xforms.processor.XFormsResourceServer;
 import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.oxf.util.XPathCache;
-import org.orbeon.oxf.util.SecureUtils;
-import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.saxon.om.NodeInfo;
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 
 import java.util.List;
 
@@ -85,29 +81,28 @@ public class XFormsOutputControl extends XFormsValueControl {
         setValue(value);
     }
 
-    protected String evaluateExternalValue(final PipelineContext pipelineContext) {
+    protected void evaluateExternalValue(PipelineContext pipelineContext) {
 
-        final String rawValue = getValue();
-
-        // Handle image mediatype if necessary
+        final String internalValue = getValue(pipelineContext);
         final String updatedValue;
         if (mediatypeAttribute != null && mediatypeAttribute.startsWith("image/")) {
+            // Handle image mediatype
             final String type = getType();
-            if (rawValue != null && rawValue.length() > 0 && rawValue.trim().length() > 0) {
+            if (internalValue != null && internalValue.length() > 0 && internalValue.trim().length() > 0) {
                 if (type == null || type.equals(XMLConstants.XS_ANYURI_EXPLODED_QNAME) || type.equals(XFormsConstants.XFORMS_ANYURI_EXPLODED_QNAME)) {
                     // xs:anyURI type
                     if (!urlNorewrite) {
                         // We got a URI and we need to rewrite it to an absolute URI since XFormsResourceServer will have to read and stream
-                        final String rewrittenURI = XFormsUtils.resolveResourceURL(pipelineContext, getControlElement(), rawValue, true);
+                        final String rewrittenURI = XFormsUtils.resolveResourceURL(pipelineContext, getControlElement(), internalValue, true);
                         updatedValue = proxyURI(pipelineContext, rewrittenURI);
                     } else {
                         // Otherwise we leave the value as is
-                        updatedValue = rawValue;
+                        updatedValue = internalValue;
                     }
                 } else if (XMLConstants.XS_BASE64BINARY_EXPLODED_QNAME.equals(type)) {
                     // xs:base64Binary type
 
-                    final String uri = NetUtils.base64BinaryToAnyURI(pipelineContext, rawValue, NetUtils.SESSION_SCOPE);
+                    final String uri = NetUtils.base64BinaryToAnyURI(pipelineContext, internalValue, NetUtils.SESSION_SCOPE);
                     updatedValue = proxyURI(pipelineContext, uri);
 
                 } else {
@@ -116,69 +111,12 @@ public class XFormsOutputControl extends XFormsValueControl {
             } else {
                 updatedValue = "";
             }
-        } else if ("text/html".equals(mediatypeAttribute)) {
-            // In case of HTML, we may need to do some URL rewriting
-            // Check src and href attributes for now. Anything else?
-            final boolean needsRewrite = !urlNorewrite && (rawValue.indexOf("src=") != -1 || rawValue.indexOf("href=") != -1);
-            if (needsRewrite) {
-                // Rewrite URLs
-                final StringBuffer sb = new StringBuffer();
-                // NOTE: we do our own serialization here, but it's really simple (no namespaces) and probably reasonably efficient
-                XFormsUtils.streamHTMLFragment(new ForwardingContentHandler() {
-
-                    private boolean isStartElement;
-
-                    public void characters(char[] chars, int start, int length) throws SAXException {
-                        sb.append(XMLUtils.escapeXMLMinimal(new String(chars, start, length)));// NOTE: not efficient to create a new String here
-                        isStartElement = false;
-                    }
-
-                    public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
-                        sb.append('<');
-                        sb.append(localname);
-                        final int attributeCount = attributes.getLength();
-                        for (int i = 0; i < attributeCount; i++) {
-
-                            final String currentName = attributes.getLocalName(i);
-                            final String currentValue = attributes.getValue(i);
-
-                            final String rewrittenValue;
-                            if ("src".equals(currentName) || "href".equals(currentName)) {
-                                rewrittenValue = XFormsUtils.resolveResourceURL(pipelineContext, getControlElement(), currentValue, false);
-                            } else {
-                                rewrittenValue = currentValue;
-                            }
-
-                            sb.append(' ');
-                            sb.append(currentName);
-                            sb.append("=\"");
-                            sb.append(XMLUtils.escapeXMLMinimal(rewrittenValue));
-                            sb.append('"');
-                        }
-                        sb.append('>');
-                        isStartElement = true;
-                    }
-
-                    public void endElement(String uri, String localname, String qName) throws SAXException {
-                        if (!isStartElement) {
-                            // We serialize to HTML: don't close elements that just opened (will cover <br>, <hr>, etc.)
-                            sb.append("</");
-                            sb.append(localname);
-                            sb.append('>');
-                        }
-                        isStartElement = false;
-                    }
-                }, rawValue, getLocationData(), "xhtml");
-                updatedValue = sb.toString();
-            } else {
-                updatedValue = rawValue;
-            }
-
         } else {
-            updatedValue = rawValue;
+            // Not an image
+            updatedValue = internalValue;
         }
 
-        return updatedValue;
+        setExternalValue(updatedValue);
     }
 
     /**
@@ -204,9 +142,9 @@ public class XFormsOutputControl extends XFormsValueControl {
                     new XFormsResourceServer.DynamicResource(uri, mediatypeAttribute, -1, System.currentTimeMillis()));
         }
 
-        // Rewrite new URI to absolute path
+        // Rewrite new URI to absolute path without the context
         return externalContext.getResponse().rewriteResourceURL(XFormsResourceServer.DYNAMIC_RESOURCES_PATH + digest,
-                ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH);
+                ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT);
     }
 
     public void evaluateDisplayValue(PipelineContext pipelineContext) {
@@ -217,11 +155,38 @@ public class XFormsOutputControl extends XFormsValueControl {
         }
     }
 
+    public String getEscapedExternalValue(PipelineContext pipelineContext) {
+        if (mediatypeAttribute != null && mediatypeAttribute.startsWith("image/")) {
+            // We just need to prepend the context
+            final String externalValue = getExternalValue(pipelineContext);
+            if (externalValue != null && !externalValue.trim().equals("")) {
+                final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+                return externalContext.getRequest().getContextPath() + externalValue;
+            } else {
+                return externalValue;
+            }
+        } else if (mediatypeAttribute != null && mediatypeAttribute.equals("text/html")) {
+            // Rewrite the HTML value
+            return rewriteHTMLValue(pipelineContext, getExternalValue(pipelineContext));
+        } else {
+            return getExternalValue(pipelineContext);
+        }
+    }
+
     public String getMediatypeAttribute() {
         return mediatypeAttribute;
     }
 
     public String getValueAttribute() {
         return valueAttribute;
+    }
+
+    public String getType() {
+        // No type information is returned when there is a value attribute
+
+        // Question: what if we have both @ref and @value? Should a type still be provided? This is not supported in
+        // XForms 1.1 but we do support it, with the idea that the bound node does not provide the value but provides
+        // mips. Not sure if the code below makes sense after all then.
+        return (valueAttribute == null) ? super.getType() : null;
     }
 }

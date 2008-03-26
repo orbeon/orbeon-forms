@@ -73,12 +73,12 @@ public class XFormsSelect1Control extends XFormsValueControl {
         }
     }
 
-    public void setExternalValue(PipelineContext pipelineContext, String value, String type) {
+    public void storeExternalValue(PipelineContext pipelineContext, String value, String type) {
         if (!(this instanceof XFormsSelectControl)) {
             // Handle xforms:select1-specific logic
 
             // Current control value
-            final String controlValue = getValue();
+            final String controlValue = getValue(pipelineContext);
 
             // Iterate over all the items
             final List items = getItemset(pipelineContext, true);
@@ -111,7 +111,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
             }
         }
 
-        super.setExternalValue(pipelineContext, value, type);
+        super.storeExternalValue(pipelineContext, value, type);
     }
 
     /**

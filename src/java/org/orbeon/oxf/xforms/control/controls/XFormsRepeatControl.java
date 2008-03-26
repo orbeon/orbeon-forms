@@ -47,7 +47,6 @@ public class XFormsRepeatControl extends XFormsControl {
     protected void evaluate(PipelineContext pipelineContext) {
         
         // For now, repeat does not support label, help, etc. so don't call super.evaluate()
-        //super.evaluate(pipelineContext);
 
         // Evaluate iterations
         final List children = getChildren();
@@ -57,17 +56,5 @@ public class XFormsRepeatControl extends XFormsControl {
                 currentRepeatIteration.evaluate(pipelineContext);
             }
         }
-    }
-
-    public boolean equalsExternal(PipelineContext pipelineContext, Object obj) {
-
-        if (!(obj instanceof XFormsRepeatControl))
-            return false;
-
-        if (!super.equalsExternal(pipelineContext, obj))
-            return false;
-
-        final XFormsRepeatControl other = (XFormsRepeatControl) obj;
-        return this.startIndex == other.startIndex;
     }
 }

@@ -313,11 +313,9 @@ public class XFormsUtils {
         // Child element becomes the new binding
         final XFormsContextStack contextStack = containingDocument.getXFormsControls().getContextStack();
         contextStack.pushBinding(pipelineContext, childElement);
-        try {
-            return getElementValue(pipelineContext, containingDocument, contextStack, childElement, acceptHTML, containsHTML);
-        } finally {
-            contextStack.popBinding();
-        }
+        final String result = getElementValue(pipelineContext, containingDocument, contextStack, childElement, acceptHTML, containsHTML);
+        contextStack.popBinding();
+        return result;
     }
 
     /**
@@ -464,21 +462,12 @@ public class XFormsUtils {
                                 final String currentName = currentAttribute.getName();
                                 final String currentValue = currentAttribute.getValue();
 
-                                // Rewrite HTML attributes if needed
-                                final String rewrittenValue;
-                                final boolean mustRewrite = false;//TODO: issue is that further rewriting will occur (upon initialization only) unless the caller uses f:url-norewrite="true"
-                                if (mustRewrite && ("src".equals(currentName) || "href".equals(currentName))) {
-                                    rewrittenValue = XFormsUtils.resolveResourceURL(pipelineContext, childElement, currentValue, false);
-                                } else {
-                                    rewrittenValue = currentValue;
-                                }
-
                                 // Only consider attributes in no namespace
                                 if ("".equals(currentAttribute.getNamespaceURI())) {
                                     sb.append(' ');
                                     sb.append(currentName);
                                     sb.append("=\"");
-                                    sb.append(XMLUtils.escapeXMLMinimal(rewrittenValue));
+                                    sb.append(XMLUtils.escapeXMLMinimal(currentValue));
                                     sb.append('"');
                                 }
                             }

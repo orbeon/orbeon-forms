@@ -74,7 +74,7 @@ public class XFormsGroupHandler extends HandlerBase {
         if (!handlerContext.isGenerateTemplate()) {
             groupXFormsControl = ((XFormsGroupControl) containingDocument.getObjectById(effectiveGroupId));
         }
-        HandlerBase.handleMIPClasses(classes, groupXFormsControl);
+        handleMIPClasses(classes, groupXFormsControl);
 
         // Determine whether the closest xhtml:* parent is xhtml:table|xhtml:tbody|xhtml:thead|xhtml:tfoot|xhtml:tr
         final ElementHandlerController controller = handlerContext.getController();

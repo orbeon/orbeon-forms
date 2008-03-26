@@ -30,8 +30,11 @@ import java.util.Map;
  */
 public abstract class XFormsValueControl extends XFormsSingleNodeControl {
 
+    private boolean isValueEvaluated;
     private String value;
+    private boolean isDisplayValueEvaluated;
     private String displayValue;
+    private boolean isExternalValueEvaluated;
     private String externalValue;
 
     protected XFormsValueControl(XFormsContainingDocument containingDocument, XFormsControl parent, Element element, String name, String effectiveId) {
@@ -43,13 +46,15 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
         // Set context and evaluate other aspects of the control if necessary
         super.evaluate(pipelineContext);
 
-        // Evaluate control value and display value if necessary
-        evaluateValue(pipelineContext);
-        evaluateDisplayValue(pipelineContext);
+        // Evaluate control values
+        getValue(pipelineContext);
+        getDisplayValue(pipelineContext);
+        getExternalValue(pipelineContext);
     }
 
 
     protected void evaluateValue(PipelineContext pipelineContext) {
+        // Just get the value from the bound node
         final NodeInfo boundNode = getBoundNode();
         if (boundNode == null)
             return;
@@ -58,7 +63,13 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
     }
 
     protected void evaluateDisplayValue(PipelineContext pipelineContext) {
-        // NOP for most controls
+        // No display value for most controls
+        setDisplayValue(null);
+    }
+
+    protected void evaluateExternalValue(PipelineContext pipelineContext) {
+        // By default, same as value
+        setExternalValue(getValue(pipelineContext));
     }
 
     /**
@@ -67,7 +78,7 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
      *
      * @param value     the new external value
      */
-    public void setExternalValue(PipelineContext pipelineContext, String value, String type) {
+    public void storeExternalValue(PipelineContext pipelineContext, String value, String type) {
         // Set value into the instance
 
         final NodeInfo boundNode = getBoundNode();
@@ -77,17 +88,6 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
 
         // NOTE: We do *not* call evaluate() here, as that will break the difference engine. doSetValue() above marks
         // the controls as dirty, and they will be evaluated when necessary later.
-    }
-
-    /**
-     * Return the control's external value is the value as exposed to the UI layer. By default, this is the control's
-     * value.
-     *
-     * @param pipelineContext   current pipeline context
-     * @return                  external value
-     */
-    protected String evaluateExternalValue(PipelineContext pipelineContext) {
-        return getValue();
     }
 
     protected void evaluateDisplayValueUseFormat(PipelineContext pipelineContext, String format) {
@@ -164,31 +164,47 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
         setDisplayValue(result);
     }
 
-    public String getValue() {
-        evaluateIfNeeded(null);// TODO: Statistics won't be gathered. Any other consequence?
+    /**
+     * Return the control's internal value.
+     */
+    public final String getValue(PipelineContext pipelineContext) {
+        if (!isValueEvaluated) {
+            evaluateValue(pipelineContext);
+            isValueEvaluated = true;
+        }
         return value;
     }
 
     /**
      * Return a formatted display value of the control value, null if there is no such display value.
      */
-    public String getDisplayValue() {
-        evaluateIfNeeded(null);// TODO: Statistics won't be gathered. Any other consequence?
+    public final String getDisplayValue(PipelineContext pipelineContext) {
+        if (!isDisplayValueEvaluated) {
+            evaluateDisplayValue(pipelineContext);
+            isDisplayValueEvaluated = true;
+        }
         return displayValue;
     }
 
     /**
      * Return the control's external value is the value as exposed to the UI layer.
-     *
-     * @return                  external value
      */
-    public String getExternalValue(PipelineContext pipelineContext) {
-        if (externalValue == null) {
-            // Lazily evaluate the external value
-            evaluateIfNeeded(pipelineContext);
-            externalValue = evaluateExternalValue(pipelineContext);
+    public final String getExternalValue(PipelineContext pipelineContext) {
+        if (!isExternalValueEvaluated) {
+            evaluateExternalValue(pipelineContext);
+            isExternalValueEvaluated = true;
         }
         return externalValue;
+    }
+
+    /**
+     * Return the external value ready to be inserted into the client after an Ajax response.
+     *
+     * @param pipelineContext   current PipelineContext
+     * @return                  external value
+     */
+    public String getEscapedExternalValue(PipelineContext pipelineContext) {
+        return getExternalValue(pipelineContext);
     }
 
     /**
@@ -199,15 +215,19 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
         return displayValue != null ? displayValue : getExternalValue(pipelineContext);
     }
 
-    protected void setValue(String value) {
+    protected final void setValue(String value) {
         this.value = value;
     }
 
-    protected void setDisplayValue(String displayValue) {
+    protected final void setDisplayValue(String displayValue) {
         this.displayValue = displayValue;
     }
 
-    public boolean equalsExternal(PipelineContext pipelineContext, Object obj) {
+    protected final void setExternalValue(String externalValue) {
+        this.externalValue = externalValue;
+    }
+
+    public boolean equalsExternal(PipelineContext pipelineContext, XFormsControl obj) {
 
         if (obj == null || !(obj instanceof XFormsValueControl))
             return false;
@@ -217,11 +237,7 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
 
         final XFormsValueControl other = (XFormsValueControl) obj;
 
-        final String displayValueOrValue = getDisplayValueOrExternalValue(pipelineContext);
-        final String otherDisplayValueOrValue = other.getDisplayValueOrExternalValue(pipelineContext);
-
-        if (!((displayValueOrValue == null && otherDisplayValueOrValue == null)
-                || (displayValueOrValue != null && otherDisplayValueOrValue != null && displayValueOrValue.equals(otherDisplayValueOrValue))))
+        if (!compareStrings(getDisplayValueOrExternalValue(pipelineContext), other.getDisplayValueOrExternalValue(pipelineContext)))
             return false;
 
         return super.equalsExternal(pipelineContext, obj);

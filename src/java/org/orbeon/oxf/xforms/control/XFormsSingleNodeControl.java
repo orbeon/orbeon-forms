@@ -18,7 +18,6 @@ import org.orbeon.oxf.xforms.InstanceData;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.common.OXFException;
 import org.orbeon.saxon.om.NodeInfo;
 import org.dom4j.Element;
 
@@ -41,42 +40,33 @@ public class XFormsSingleNodeControl extends XFormsControl {
     }
 
     public boolean isReadonly() {
-        checkMIPsRead();
-//        getMIPsIfNeeded();// control should be evaluated so this should not be needed
+        getMIPsIfNeeded();
         return readonly;
     }
 
     public boolean isRelevant() {
-        getMIPsIfNeeded();// this may be called before the control is evaluated
+        getMIPsIfNeeded();
         return relevant;
     }
 
     public boolean isRequired() {
-        checkMIPsRead();
-//        getMIPsIfNeeded();// control should be evaluated so this should not be needed
+        getMIPsIfNeeded();
         return required;
     }
 
     public String getType() {
-        checkMIPsRead();
-//        getMIPsIfNeeded();// control should be evaluated so this should not be needed
+        getMIPsIfNeeded();
         return type;
     }
 
     public boolean isValid() {
-        checkMIPsRead();
-//        getMIPsIfNeeded();// control should be evaluated so this should not be needed
+        getMIPsIfNeeded();
         return valid;
     }
 
     protected void evaluate(PipelineContext pipelineContext) {
         super.evaluate(pipelineContext);
         getMIPsIfNeeded();
-    }
-
-    private void checkMIPsRead() {
-        if (!mipsRead)
-            throw new OXFException("Control not evaluated when getting MIPs for control: " + getEffectiveId());
     }
 
     protected void getMIPsIfNeeded() {
@@ -115,7 +105,7 @@ public class XFormsSingleNodeControl extends XFormsControl {
         }
     }
 
-    public boolean equalsExternal(PipelineContext pipelineContext, Object obj) {
+    public boolean equalsExternal(PipelineContext pipelineContext, XFormsControl obj) {
 
         if (obj == null || !(obj instanceof XFormsSingleNodeControl))
             return false;
@@ -126,10 +116,8 @@ public class XFormsSingleNodeControl extends XFormsControl {
         final XFormsSingleNodeControl other = (XFormsSingleNodeControl) obj;
 
         // Make sure the MIPs are up to date before comparing them
-        checkMIPsRead();
-//        getMIPsIfNeeded();// control should be evaluated so this should not be needed
-        other.checkMIPsRead();
-//        other.getMIPsIfNeeded();// control should be evaluated so this should not be needed
+        getMIPsIfNeeded();
+        other.getMIPsIfNeeded();;
 
         if (readonly != other.readonly)
             return false;
@@ -140,7 +128,7 @@ public class XFormsSingleNodeControl extends XFormsControl {
         if (valid != other.valid)
             return false;
 
-        if (!((type == null && other.type == null) || (type != null && other.type != null && type.equals(other.type))))
+        if (!compareStrings(type, other.type))
             return false;
 
         return super.equalsExternal(pipelineContext, obj);

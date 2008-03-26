@@ -276,7 +276,7 @@ public class NewControlsComparator extends BaseControlsComparator {
 
                                     // Check if a "display-value" attribute must be added
                                     if (!isOutputControlWithValueAttribute) {
-                                        final String displayValue = xformsValueControl.getDisplayValue();
+                                        final String displayValue = xformsValueControl.getDisplayValue(pipelineContext);
                                         if (displayValue != null) {
                                             doOutputElement |= addAttributeIfNeeded(attributesImpl, "display-value", displayValue, isNewRepeatIteration, displayValue.equals(""));
                                         }

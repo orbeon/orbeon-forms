@@ -31,7 +31,7 @@ import org.apache.commons.lang.StringUtils;
 import java.util.Stack;
 
 /**
- *
+ * Context used when converting XHTML+XForms into XHTML.
  */
 public class HandlerContext {
 
@@ -43,6 +43,8 @@ public class HandlerContext {
     private String dynamicStateUUID;
     private ExternalContext externalContext;
     private final String[] documentOrder;
+    private String userAgent;
+    private boolean isRenderingEngineTrident;
 
     public HandlerContext(ElementHandlerController controller, PipelineContext pipelineContext,
                           XFormsContainingDocument containingDocument, XFormsState xformsState, String staticStateUUID, String dynamicStateUUID, ExternalContext externalContext) {
@@ -86,6 +88,18 @@ public class HandlerContext {
 
     public String[] getDocumentOrder() {
         return documentOrder;
+    }
+
+    public boolean isRenderingEngineTrident() {
+        if (userAgent == null) {
+            userAgent = (String) externalContext.getRequest().getHeaderMap().get("user-agent");
+            if (userAgent != null) {
+                // Sniff IE
+                final String lowerCaseUserAgent = userAgent.toLowerCase();
+                isRenderingEngineTrident = lowerCaseUserAgent.indexOf("msie") != -1 && lowerCaseUserAgent.indexOf("opera") == -1;
+            }
+        }
+        return isRenderingEngineTrident;
     }
 
     public String findXHTMLPrefix() {

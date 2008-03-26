@@ -54,7 +54,66 @@ public class XHTMLElementHandler extends HandlerBase {
                         attributes = XMLUtils.addOrReplaceAttribute(attributes, "", "", "id", effectiveId);
 
                         // Find effective attribute value
-                        final String effectiveAttributeValue = (attributeControl != null) ? attributeControl.getExternalValue(pipelineContext) : "";
+                        final String effectiveAttributeValue;
+                        if (attributeControl != null) {
+                            // Below is an attempt at automatically handle rowspans for IE, but it turns out that is a
+                            // little too hard to do as it entails not only finding the element hierarchy at this point,
+                            // but also what exactly is repeated (case of xforms:repeat around two xhtml:tr, for
+                            // example).
+
+//                            final String avtAttributeValue =  attributeControl.getExternalValue(pipelineContext);
+//                            if (handlerContext.isRenderingEngineTrident()) {
+//                                // Handle IE HACKS
+//                                if ("rowspan".equals(attributeName)) {
+//
+//                                    Element parent = attributeControl.getControlElement().getParent();// should point to <xhtml:td>
+//
+//                                    // Search for <xhtml:tr>
+//                                    boolean foundTr = false;
+//                                    while ((parent = parent.getParent()) != null) {
+//                                        if ("tr".equals(parent.getName())) {
+//                                            foundTr = true;
+//                                            break;
+//                                        }
+//                                    }
+//
+//                                    // Search for <xforms:repeat> between <xhtml:tr> and <xhtml:tbody> or <xhtml:table>
+//                                    if (foundTr) {
+//                                        boolean foundRepeat = false;
+//                                        while ((parent = parent.getParent()) != null) {
+//                                            if ("table".equals(parent.getName()) || "tbody".equals(parent.getName())) {
+//                                                break;
+//                                            } else if ("repeat".equals(parent.getName())) {
+//                                                foundRepeat = true;
+//                                                break;
+//                                            }
+//                                        }
+//                                        if (foundRepeat) {
+//                                            // This td is within a repeated tr
+//                                            // Adjust to skip separators
+//                                            effectiveAttributeValue = Integer.toString(Integer.parseInt(avtAttributeValue) * 2 - 1);
+//                                        } else {
+//                                            effectiveAttributeValue = avtAttributeValue;
+//                                        }
+//                                    } else {
+//                                        effectiveAttributeValue = avtAttributeValue;
+//                                    }
+//                                } else if ("colspan".equals(attributeName)) {
+//                                    // TO DO
+//                                    effectiveAttributeValue = avtAttributeValue;
+//                                } else {
+//                                    // Keep value as is
+//                                    effectiveAttributeValue = avtAttributeValue;
+//                                }
+//                            } else {
+//                                // Keep value as is
+//                                effectiveAttributeValue = avtAttributeValue;
+//                            }
+                            effectiveAttributeValue = attributeControl.getExternalValue(pipelineContext);
+                        } else {
+                            // Use blank value
+                            effectiveAttributeValue = "";
+                        }
 
                         // Set the value of the attribute
                         attributes = XMLUtils.addOrReplaceAttribute(attributes, "", "", attributeName, effectiveAttributeValue);

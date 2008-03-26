@@ -68,20 +68,12 @@ public class XFormsOutputHandler extends XFormsCoreControlHandler {
         final boolean isConcreteControl = outputControl != null;
 
         final AttributesImpl newAttributes;
-        final boolean isDateOrTime;
         final StringBuffer classes = getInitialClasses(localname, attributes, outputControl);
 
         final String mediatypeValue = attributes.getValue("mediatype");
         final boolean isImageMediatype = mediatypeValue != null && mediatypeValue.startsWith("image/");
-        final boolean isHTMLMediaType = (mediatypeValue != null && mediatypeValue.equals("text/html"))
-                || XFormsConstants.XXFORMS_HTML_APPEARANCE_QNAME.equals(getAppearance(attributes));
+        final boolean isHTMLMediaType = (mediatypeValue != null && mediatypeValue.equals("text/html"));
 
-        if (!handlerContext.isGenerateTemplate()) {
-            // Find classes to add
-            isDateOrTime = isConcreteControl && isDateOrTime(outputControl.getType());
-        } else {
-            isDateOrTime = false;
-        }
         handleMIPClasses(classes, outputControl);
         newAttributes = getAttributes(attributes, classes.toString(), effectiveId);
 
@@ -91,14 +83,6 @@ public class XFormsOutputHandler extends XFormsCoreControlHandler {
         final String enclosingElementLocalname = isHTMLMediaType ? "div" : "span";
         final String enclosingElementQName = XMLUtils.buildQName(xhtmlPrefix, enclosingElementLocalname);
 
-        final String formattingPrefix;
-        if (isConcreteControl && (isImageMediatype || isHTMLMediaType)) {
-            formattingPrefix = handlerContext.findFormattingPrefixDeclare();
-            newAttributes.addAttribute(XMLConstants.OPS_FORMATTING_URI, "url-norewrite", XMLUtils.buildQName(formattingPrefix, "url-norewrite"), ContentHandlerHelper.CDATA, "true");
-        } else {
-            formattingPrefix = null;
-        }
-
         contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, enclosingElementLocalname, enclosingElementQName, newAttributes);
         {
             if (isImageMediatype) {
@@ -106,23 +90,14 @@ public class XFormsOutputHandler extends XFormsCoreControlHandler {
                 final String imgQName = XMLUtils.buildQName(xhtmlPrefix, "img");
                 final AttributesImpl imgAttributes = new AttributesImpl();
                 // @src="..."
-                // NOTE: If producing a template, or if the image URL is blank, we point to an existing image
+                // NOTE: If producing a template, or if the image URL is blank, we point to an existing dummy image
                 final String srcValue = isConcreteControl ? outputControl.getExternalValue(pipelineContext) : XFormsConstants.DUMMY_IMAGE_URI;
                 imgAttributes.addAttribute("", "src", "src", ContentHandlerHelper.CDATA, srcValue.trim().equals("") ? XFormsConstants.DUMMY_IMAGE_URI : srcValue);
 
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "img", imgQName, imgAttributes);
                 contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "img", imgQName);
-
-            } else if (isDateOrTime) {
-                // Display formatted value for dates
-                if (isConcreteControl) {
-                    final String displayValue = outputControl.getDisplayValueOrExternalValue(pipelineContext);
-                    if (displayValue != null)
-                        contentHandler.characters(displayValue.toCharArray(), 0, displayValue.length());
-                }
             } else if (isHTMLMediaType) {
                 // HTML case
-
                 if (isConcreteControl) {
                     final String displayValue = outputControl.getDisplayValueOrExternalValue(pipelineContext);
                     XFormsUtils.streamHTMLFragment(contentHandler, displayValue, outputControl.getLocationData(), xhtmlPrefix);
@@ -137,9 +112,5 @@ public class XFormsOutputHandler extends XFormsCoreControlHandler {
             }
         }
         contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, enclosingElementLocalname, enclosingElementQName);
-
-        // Handle namespace prefix if needed
-        handlerContext.findFormattingPrefixUndeclare(formattingPrefix);
     }
-
 }

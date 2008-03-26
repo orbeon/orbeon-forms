@@ -43,8 +43,8 @@ public class XFormsInputControl extends XFormsValueControl {
         evaluateDisplayValueUseFormat(pipelineContext, format);
     }
 
-    public void setExternalValue(PipelineContext pipelineContext, String value, String type) {
-        super.setExternalValue(pipelineContext, convertFromExternalValue(value), type);
+    public void storeExternalValue(PipelineContext pipelineContext, String value, String type) {
+        super.storeExternalValue(pipelineContext, convertFromExternalValue(value), type);
     }
 
     private String convertFromExternalValue(String externalValue) {

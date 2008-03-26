@@ -13,26 +13,25 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
+import org.dom4j.Element;
+import org.dom4j.Namespace;
+import org.dom4j.QName;
+import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.control.XFormsControl;
-import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
+import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.ElementHandler;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.util.URLRewriter;
 import org.orbeon.saxon.om.FastStringBuffer;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
-import org.dom4j.QName;
-import org.dom4j.Namespace;
-import org.dom4j.Element;
 
 import java.util.List;
 import java.util.Map;
@@ -90,7 +89,7 @@ public abstract class HandlerBase extends ElementHandler {
         }
     }
 
-    public static void handleMIPClasses(StringBuffer sb, XFormsSingleNodeControl xformsControl) {
+    public void handleMIPClasses(StringBuffer sb, XFormsSingleNodeControl xformsControl) {
         if (xformsControl != null) {
             // The case of a concrete control
             if (!xformsControl.isRelevant()) {
@@ -137,26 +136,9 @@ public abstract class HandlerBase extends ElementHandler {
         }
     }
 
-    private static boolean isEmpty(XFormsControl xformsControl) {
+    private boolean isEmpty(XFormsControl xformsControl) {
         // TODO: Configure meaning of "empty" through property (trimming vs. no strict) 
-        return xformsControl instanceof XFormsValueControl && "".equals(((XFormsValueControl) xformsControl).getValue());
-    }
-
-    public static boolean isDateOrTime(String type) {
-        if (type != null){
-            // Support both xs:* and xforms:*
-            final boolean isBuiltInSchemaType = type.startsWith(XFormsConstants.XSD_EXPLODED_TYPE_PREFIX);
-            final boolean isBuiltInXFormsType = type.startsWith(XFormsConstants.XFORMS_EXPLODED_TYPE_PREFIX);
-
-            if (isBuiltInSchemaType || isBuiltInXFormsType) {
-                final String typeName = type.substring(type.indexOf('}') + 1);
-                return "date".equals(typeName) || "dateTime".equals(typeName) || "time".equals(typeName);
-            } else {
-                return false;
-            }
-        } else {
-            return false;
-        }
+        return xformsControl instanceof XFormsValueControl && "".equals(((XFormsValueControl) xformsControl).getValue(pipelineContext));
     }
 
     protected void handleAccessibilityAttributes(Attributes srcAttributes, AttributesImpl destAttributes) {
@@ -433,22 +415,15 @@ public abstract class HandlerBase extends ElementHandler {
 
                 final AttributesImpl imgAttributes = new AttributesImpl();
                 imgAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, helpImageClasses);
-                imgAttributes.addAttribute("", "src", "src", ContentHandlerHelper.CDATA,
-                        rewriteResourceURL(XFormsConstants.HELP_IMAGE_URI));
+                imgAttributes.addAttribute("", "src", "src", ContentHandlerHelper.CDATA, XFormsConstants.HELP_IMAGE_URI);
                 imgAttributes.addAttribute("", "title", "title", ContentHandlerHelper.CDATA, "");
                 imgAttributes.addAttribute("", "alt", "alt", ContentHandlerHelper.CDATA, "Help");
-
-                // TODO: xmlns:f declaration should be placed on xhtml:body
-                final String formattingPrefix = handlerContext.findFormattingPrefixDeclare();
-                imgAttributes.addAttribute(XMLConstants.OPS_FORMATTING_URI, "url-norewrite", XMLUtils.buildQName(formattingPrefix, "url-norewrite"), ContentHandlerHelper.CDATA, "true");
 
                 final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
                 final String imgQName = XMLUtils.buildQName(xhtmlPrefix, "img");
                 final ContentHandler contentHandler = handlerContext.getController().getOutput();
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "img", imgQName, imgAttributes);
                 contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "img", imgQName);
-
-                handlerContext.findFormattingPrefixUndeclare(formattingPrefix);
             }
 
             // We handle null attributes as well because we want a placeholder for "alert" even if there is no xforms:alert
@@ -495,9 +470,5 @@ public abstract class HandlerBase extends ElementHandler {
         final String appearanceURI = uriFromQName(appearanceValue);
 
         return new QName(appearanceLocalname, new Namespace(appearancePrefix, appearanceURI));
-    }
-
-    protected String rewriteResourceURL(String resourceURL) {
-        return URLRewriter.rewriteResourceURL(externalContext.getRequest(), externalContext.getResponse(), resourceURL, pathMatchers);
     }
 }

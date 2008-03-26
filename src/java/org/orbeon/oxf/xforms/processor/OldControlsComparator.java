@@ -130,13 +130,12 @@ public class OldControlsComparator extends BaseControlsComparator {
                         }
 
                         // Type attribute
-                        final boolean isOutputControlWithValueAttribute = xformsSingleNodeControl2 instanceof XFormsOutputControl && ((XFormsOutputControl) xformsSingleNodeControl2).getValueAttribute() != null;
-                        if (!isOutputControlWithValueAttribute) {
+                        {
 
                             final String typeValue1 = isNewRepeatIteration ? null : xformsSingleNodeControl1.getType();
                             final String typeValue2 = xformsSingleNodeControl2.getType();
 
-                            if (isNewRepeatIteration || !((typeValue1 == null && typeValue2 == null) || (typeValue1 != null && typeValue2 != null && typeValue1.equals(typeValue2)))) {
+                            if (isNewRepeatIteration || !XFormsControl.compareStrings(typeValue1, typeValue2)) {
                                 final String attributeValue = typeValue2 != null ? typeValue2 : "";
                                 doOutputElement |= addAttributeIfNeeded(attributesImpl, "type", attributeValue,  isNewRepeatIteration, attributeValue.equals(""));
                             }
@@ -147,7 +146,7 @@ public class OldControlsComparator extends BaseControlsComparator {
                             final String labelValue1 = isNewRepeatIteration ? null : xformsSingleNodeControl1.getLabel(pipelineContext);
                             final String labelValue2 = xformsSingleNodeControl2.getLabel(pipelineContext);
 
-                            if (!((labelValue1 == null && labelValue2 == null) || (labelValue1 != null && labelValue2 != null && labelValue1.equals(labelValue2)))) {
+                            if (!XFormsControl.compareStrings(labelValue1, labelValue2)) {
                                 final String escapedLabelValue2 = xformsSingleNodeControl2.getEscapedLabel(pipelineContext);
                                 final String attributeValue = escapedLabelValue2 != null ? escapedLabelValue2 : "";
                                 doOutputElement |= addAttributeIfNeeded(attributesImpl, "label", attributeValue,  isNewRepeatIteration, attributeValue.equals(""));
@@ -158,7 +157,7 @@ public class OldControlsComparator extends BaseControlsComparator {
                             final String helpValue1 = isNewRepeatIteration ? null : xformsSingleNodeControl1.getHelp(pipelineContext);
                             final String helpValue2 = xformsSingleNodeControl2.getHelp(pipelineContext);
 
-                            if (!((helpValue1 == null && helpValue2 == null) || (helpValue1 != null && helpValue2 != null && helpValue1.equals(helpValue2)))) {
+                            if (!XFormsControl.compareStrings(helpValue1, helpValue2)) {
                                 final String escapedHelpValue2 = xformsSingleNodeControl2.getEscapedHelp(pipelineContext);
                                 final String attributeValue = escapedHelpValue2 != null ? escapedHelpValue2 : "";
                                 doOutputElement |= addAttributeIfNeeded(attributesImpl, "help", attributeValue,  isNewRepeatIteration, attributeValue.equals(""));
@@ -169,8 +168,9 @@ public class OldControlsComparator extends BaseControlsComparator {
                             final String hintValue1 = isNewRepeatIteration ? null : xformsSingleNodeControl1.getHint(pipelineContext);
                             final String hintValue2 = xformsSingleNodeControl2.getHint(pipelineContext);
 
-                            if (!((hintValue1 == null && hintValue2 == null) || (hintValue1 != null && hintValue2 != null && hintValue1.equals(hintValue2)))) {
-                                final String attributeValue = hintValue2 != null ? hintValue2 : "";
+                            if (!XFormsControl.compareStrings(hintValue1, hintValue2)) {
+                                final String escapedHintValue2 = xformsSingleNodeControl2.getEscapedHint(pipelineContext);
+                                final String attributeValue = escapedHintValue2 != null ? escapedHintValue2 : "";
                                 doOutputElement |= addAttributeIfNeeded(attributesImpl, "hint", attributeValue,  isNewRepeatIteration, attributeValue.equals(""));
                             }
                         }
@@ -179,7 +179,7 @@ public class OldControlsComparator extends BaseControlsComparator {
                             final String alertValue1 = isNewRepeatIteration ? null : xformsSingleNodeControl1.getAlert(pipelineContext);
                             final String alertValue2 = xformsSingleNodeControl2.getAlert(pipelineContext);
 
-                            if (!((alertValue1 == null && alertValue2 == null) || (alertValue1 != null && alertValue2 != null && alertValue1.equals(alertValue2)))) {
+                            if (!XFormsControl.compareStrings(alertValue1, alertValue2)) {
                                 final String escapedAlertValue2 = xformsSingleNodeControl2.getEscapedAlert(pipelineContext);
                                 final String attributeValue = escapedAlertValue2 != null ? escapedAlertValue2 : "";
                                 doOutputElement |= addAttributeIfNeeded(attributesImpl, "alert", attributeValue,  isNewRepeatIteration, attributeValue.equals(""));
@@ -209,7 +209,7 @@ public class OldControlsComparator extends BaseControlsComparator {
                                 final String stateValue1 = (uploadControlInfo1 == null) ? null : uploadControlInfo1.getState(pipelineContext);
                                 final String stateValue2 = uploadControlInfo2.getState(pipelineContext);
 
-                                if (!((stateValue1 == null && stateValue2 == null) || (stateValue1 != null && stateValue2 != null && stateValue1.equals(stateValue2)))) {
+                                if (!XFormsControl.compareStrings(stateValue1, stateValue2)) {
                                     final String attributeValue = stateValue2 != null ? stateValue2 : "";
                                     doOutputElement |= addAttributeIfNeeded(attributesImpl, "state", attributeValue,  isNewRepeatIteration, attributeValue.equals(""));
                                 }
@@ -219,7 +219,7 @@ public class OldControlsComparator extends BaseControlsComparator {
                                 final String mediatypeValue1 = (uploadControlInfo1 == null) ? null : uploadControlInfo1.getMediatype();
                                 final String mediatypeValue2 = uploadControlInfo2.getMediatype();
 
-                                if (!((mediatypeValue1 == null && mediatypeValue2 == null) || (mediatypeValue1 != null && mediatypeValue2 != null && mediatypeValue1.equals(mediatypeValue2)))) {
+                                if (!XFormsControl.compareStrings(mediatypeValue1, mediatypeValue2)) {
                                     final String attributeValue = mediatypeValue2 != null ? mediatypeValue2 : "";
                                     doOutputElement |= addAttributeIfNeeded(attributesImpl, "mediatype", attributeValue,  isNewRepeatIteration, attributeValue.equals(""));
                                 }
@@ -229,7 +229,7 @@ public class OldControlsComparator extends BaseControlsComparator {
                                 final String filenameValue1 = (uploadControlInfo1 == null) ? null : uploadControlInfo1.getFilename(pipelineContext);
                                 final String filenameValue2 = uploadControlInfo2.getFilename(pipelineContext);
 
-                                if (!((filenameValue1 == null && filenameValue2 == null) || (filenameValue1 != null && filenameValue2 != null && filenameValue1.equals(filenameValue2)))) {
+                                if (!XFormsControl.compareStrings(filenameValue1, filenameValue2)) {
                                     final String attributeValue = filenameValue2 != null ? filenameValue2 : "";
                                     doOutputElement |= addAttributeIfNeeded(attributesImpl, "filename", attributeValue,  isNewRepeatIteration, attributeValue.equals(""));
                                 }
@@ -239,7 +239,7 @@ public class OldControlsComparator extends BaseControlsComparator {
                                 final String sizeValue1 = (uploadControlInfo1 == null) ? null : uploadControlInfo1.getSize(pipelineContext);
                                 final String sizeValue2 = uploadControlInfo2.getSize(pipelineContext);
 
-                                if (!((sizeValue1 == null && sizeValue2 == null) || (sizeValue1 != null && sizeValue2 != null && sizeValue1.equals(sizeValue2)))) {
+                                if (!XFormsControl.compareStrings(sizeValue1, sizeValue2)) {
                                     final String attributeValue = sizeValue2 != null ? sizeValue2 : "";
                                     doOutputElement |= addAttributeIfNeeded(attributesImpl, "size", attributeValue,  isNewRepeatIteration, attributeValue.equals(""));
                                 }
@@ -256,18 +256,16 @@ public class OldControlsComparator extends BaseControlsComparator {
                             final XFormsValueControl xformsValueControl = (XFormsValueControl) xformsSingleNodeControl2;
 
                             // Check if a "display-value" attribute must be added
-                            if (!isOutputControlWithValueAttribute) {
-                                final String displayValue = xformsValueControl.getDisplayValue();
-                                if (displayValue != null) {
-                                    doOutputElement |= addAttributeIfNeeded(attributesImpl, "display-value", displayValue,  isNewRepeatIteration, displayValue.equals(""));
-                                }
+                            final String displayValue = xformsValueControl.getDisplayValue(pipelineContext);
+                            if (displayValue != null) {
+                                doOutputElement |= addAttributeIfNeeded(attributesImpl, "display-value", displayValue,  isNewRepeatIteration, displayValue.equals(""));
                             }
 
                             // Create element with text value
                             final String value;
                             {
                                 // Value may become null when controls are unbound
-                                final String tempValue = xformsValueControl.getExternalValue(pipelineContext);
+                                final String tempValue = xformsValueControl.getEscapedExternalValue(pipelineContext);
                                 value = (tempValue == null) ? "" : tempValue;
                             }
                             if (doOutputElement || !isNewRepeatIteration || (isNewRepeatIteration && !value.equals(""))) {

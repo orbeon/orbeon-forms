@@ -130,7 +130,6 @@ public class XFormsConstants {
     public static final QName XXFORMS_AUTOSIZE_APPEARANCE_QNAME = new QName("autosize", XFormsConstants.XXFORMS_NAMESPACE);
     public static final QName XXFORMS_LINK_APPEARANCE_QNAME = new QName("link", XFormsConstants.XXFORMS_NAMESPACE);
     public static final QName XXFORMS_IMAGE_APPEARANCE_QNAME = new QName("image", XFormsConstants.XXFORMS_NAMESPACE);
-    public static final QName XXFORMS_HTML_APPEARANCE_QNAME = new QName("html", XFormsConstants.XXFORMS_NAMESPACE);// legacy
     public static final QName XXFORMS_FIELDSET_APPEARANCE_QNAME = new QName("fieldset", XFormsConstants.XXFORMS_NAMESPACE);
     public static final QName XXFORMS_INTERNAL_APPEARANCE_QNAME = new QName("internal", XFormsConstants.XXFORMS_NAMESPACE);
 
@@ -166,7 +165,7 @@ public class XFormsConstants {
     public static final String DEFAULT_UPLOAD_TYPE_EXPLODED_QNAME = XMLConstants.XS_ANYURI_EXPLODED_QNAME;
     public static final QName DEFAULT_UPLOAD_TYPE_QNAME = XMLConstants.XS_ANYURI_QNAME;
 
-        public static final String DUMMY_IMAGE_URI = "/ops/images/xforms/spacer.gif";
+    public static final String DUMMY_IMAGE_URI = "/ops/images/xforms/spacer.gif";
     public static final String HELP_IMAGE_URI = "/ops/images/xforms/help.gif";
     public static final String CALENDAR_IMAGE_URI = "/ops/images/xforms/calendar.gif";
 

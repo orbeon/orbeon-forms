@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.control;
 
 import org.dom4j.*;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.control.controls.RepeatIterationControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
@@ -23,6 +24,9 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.saxon.om.FastStringBuffer;
+import org.xml.sax.SAXException;
+import org.xml.sax.Attributes;
 
 import java.util.*;
 
@@ -50,14 +54,24 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
     private NodeInfo boundNode;
 
     private boolean evaluated;
+
     private String label;
+    private boolean isLabelEvaluated;
     private boolean isHTMLLabel;
+
     private String help;
+    private boolean isHelpEvaluated;
     private boolean isHTMLHelp;
+
     private String hint;
+    private boolean isHintEvaluated;
     private boolean isHTMLHint;
+
     private String alert;
+    private boolean isAlertEvaluated;
     private boolean isHTMLAlert;
+
+    final boolean[] tempContainsHTML = new boolean[1];// temporary holder
 
     // TODO: this should be handled in a subclass (e.g. ContainingControl)
     private List children;
@@ -77,25 +91,6 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
     protected XFormsContextStack getContextStack() {
         return containingDocument.getXFormsControls().getContextStack();
     }
-
-//    protected XFormsControl(XFormsControl xformsControl) {
-//        this.controlElement = xformsControl.controlElement;
-//        this.originalId = xformsControl.originalId;
-//        this.name = xformsControl.name;
-//        this.appearance = xformsControl.appearance;
-//        this.mediatype = xformsControl.mediatype;
-//    }
-//
-//    public abstract XFormsControl getStaticControl();
-
-//    private String getChildElementId(Element element, QName qName) {
-//        // Check that there is a current child element
-//        Element childElement = element.element(qName);
-//        if (childElement == null)
-//            return null;
-//
-//        return childElement.attributeValue("id");
-//    }
 
     public void addChild(XFormsControl XFormsControl) {
         if (children == null)
@@ -120,58 +115,109 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
     }
 
     public String getAlert(PipelineContext pipelineContext) {
-        evaluateIfNeeded(pipelineContext);
+        if (!isAlertEvaluated) {
+            if (controlElement != null) {// protection for RepeatIterationControl
+                getContextStack().setBinding(this);
+                alert = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, controlElement.element(XFormsConstants.XFORMS_ALERT_QNAME), true, tempContainsHTML);
+                isHTMLAlert = alert != null && tempContainsHTML[0];
+            }
+            isAlertEvaluated = true;
+        }
         return alert;
     }
 
     public String getEscapedAlert(PipelineContext pipelineContext) {
-        evaluateIfNeeded(pipelineContext);
-        return isHTMLAlert ? alert : XMLUtils.escapeXMLMinimal(alert);
+        getAlert(pipelineContext);
+        return isHTMLAlert ? rewriteHTMLValue(pipelineContext, alert) : XMLUtils.escapeXMLMinimal(alert);
     }
 
     public boolean isHTMLAlert(PipelineContext pipelineContext) {
-        evaluateIfNeeded(pipelineContext);
+        getAlert(pipelineContext);
         return isHTMLAlert;
     }
 
     public String getHelp(PipelineContext pipelineContext) {
-        evaluateIfNeeded(pipelineContext);
+        if (!isHelpEvaluated) {
+            if (controlElement != null) {// protection for RepeatIterationControl
+                getContextStack().setBinding(this);
+                help = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, controlElement.element(XFormsConstants.XFORMS_HELP_QNAME), true, tempContainsHTML);
+                isHTMLHelp = help != null && tempContainsHTML[0];
+            }
+            isHelpEvaluated = true;
+        }
         return help;
     }
 
     public String getEscapedHelp(PipelineContext pipelineContext) {
-        evaluateIfNeeded(pipelineContext);
-        return isHTMLHelp ? help : XMLUtils.escapeXMLMinimal(help);
+        getHelp(pipelineContext);
+        return isHTMLHelp ? rewriteHTMLValue(pipelineContext, help) : XMLUtils.escapeXMLMinimal(help);
     }
 
     public boolean isHTMLHelp(PipelineContext pipelineContext) {
-        evaluateIfNeeded(pipelineContext);
+        getHelp(pipelineContext);
         return isHTMLHelp;
     }
 
     public String getHint(PipelineContext pipelineContext) {
-        evaluateIfNeeded(pipelineContext);
+        if (!isHintEvaluated) {
+            if (controlElement != null) {// protection for RepeatIterationControl
+                getContextStack().setBinding(this);
+                hint = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, controlElement.element(XFormsConstants.XFORMS_HINT_QNAME), isSupportHTMLHints(), tempContainsHTML);
+                isHTMLHint = hint != null && tempContainsHTML[0];
+            }
+            isHintEvaluated = true;
+        }
         return hint;
     }
 
+    public String getEscapedHint(PipelineContext pipelineContext) {
+        getHint(pipelineContext);
+        return isHTMLHint ? rewriteHTMLValue(pipelineContext, hint) : XMLUtils.escapeXMLMinimal(hint);
+    }
+
     public boolean isHTMLHint(PipelineContext pipelineContext) {
-        evaluateIfNeeded(pipelineContext);
+        getHint(pipelineContext);
         return isHTMLHint;
     }
 
     public String getLabel(PipelineContext pipelineContext) {
-        evaluateIfNeeded(pipelineContext);
+        if (!isLabelEvaluated) {
+            if (controlElement != null) {// protection for RepeatIterationControl
+                getContextStack().setBinding(this);
+                label = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, controlElement.element(XFormsConstants.XFORMS_LABEL_QNAME), isSupportHTMLLabels(), tempContainsHTML);
+                isHTMLLabel = label != null && tempContainsHTML[0];
+            }
+            isLabelEvaluated = true;
+        }
         return label;
     }
 
     public String getEscapedLabel(PipelineContext pipelineContext) {
-        evaluateIfNeeded(pipelineContext);
-        return isHTMLLabel ? label : XMLUtils.escapeXMLMinimal(label);
+        getLabel(pipelineContext);
+        return isHTMLLabel ? rewriteHTMLValue(pipelineContext, label) : XMLUtils.escapeXMLMinimal(label);
     }
 
     public boolean isHTMLLabel(PipelineContext pipelineContext) {
-        evaluateIfNeeded(pipelineContext);
+        getLabel(pipelineContext);
         return isHTMLLabel;
+    }
+
+    /**
+     * Whether the control supports labels containing HTML. The default is true as most controls do support it.
+     *
+     * @return  true if HTML labels are supported, false otherwise
+     */
+    protected boolean isSupportHTMLLabels() {
+        return true;
+    }
+
+    /**
+     * Whether the control supports hints containing HTML. The default is true as most controls do support it.
+     *
+     * @return  true if HTML hints are supported, false otherwise
+     */
+    protected boolean isSupportHTMLHints() {
+        return true;
     }
 
     public String getName() {
@@ -223,27 +269,29 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
         return false;
     }
 
-    public boolean equalsExternal(PipelineContext pipelineContext, Object obj) {
+    /**
+     * Compare this control with another control, as far as the comparison is relevant for the external world.
+     *
+     * @param pipelineContext   current PipelineContext
+     * @param other               other control
+     * @return                  true is the controls have identical external values, false otherwise
+     */
+    public boolean equalsExternal(PipelineContext pipelineContext, XFormsControl other) {
 
-        if (obj == null || !(obj instanceof XFormsControl))
+        if (other == null)
             return false;
 
-        if (this == obj)
+        if (this == other)
             return true;
 
-        final XFormsControl other = (XFormsControl) obj;
-
-        if (!((name == null && other.name == null) || (name != null && other.name != null && name.equals(other.name))))
+        // Compare only what matters
+        if (!compareStrings(getLabel(pipelineContext), other.getLabel(pipelineContext)))
             return false;
-        if (!((effectiveId == null && other.effectiveId == null) || (effectiveId != null && other.effectiveId != null && effectiveId.equals(other.effectiveId))))
+        if (!compareStrings(getHelp(pipelineContext), other.getHelp(pipelineContext)))
             return false;
-        if (!((label == null && other.label == null) || (label != null && other.label != null && label.equals(other.label))))
+        if (!compareStrings(getHint(pipelineContext), other.getHint(pipelineContext)))
             return false;
-        if (!((help == null && other.help == null) || (help != null && other.help != null && help.equals(other.help))))
-            return false;
-        if (!((hint == null && other.hint == null) || (hint != null && other.hint != null && hint.equals(other.hint))))
-            return false;
-        if (!((alert == null && other.alert == null) || (alert != null && other.alert != null && alert.equals(other.alert))))
+        if (!compareStrings(getAlert(pipelineContext), other.getAlert(pipelineContext)))
             return false;
 
         return true;
@@ -304,48 +352,10 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
     }
 
     protected void evaluate(PipelineContext pipelineContext) {
-
-        // Set context to this control
-        getContextStack().setBinding(this);
-
-//        if (false) {
-//            // XXX TEST don't run expressions to compute labels and helps assuming they will be
-//            this.label="foobarlabel";
-//            this.help="foobarhelp";
-//            this.hint="";
-//            this.alert="";
-//        } else {
-            final boolean[] containsHTML = new boolean[1];
-            this.label = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, controlElement.element(XFormsConstants.XFORMS_LABEL_QNAME), isSupportHTMLLabels(), containsHTML);
-            this.isHTMLLabel = containsHTML[0];
-
-            this.help = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, controlElement.element(XFormsConstants.XFORMS_HELP_QNAME), true, containsHTML);
-            this.isHTMLHelp = containsHTML[0];
-
-            this.hint = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, controlElement.element(XFormsConstants.XFORMS_HINT_QNAME), isSupportHTMLHints(), containsHTML);
-            this.isHTMLHint = containsHTML[0];
-
-            this.alert = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, controlElement.element(XFormsConstants.XFORMS_ALERT_QNAME), true, containsHTML);
-            this.isHTMLAlert = containsHTML[0];
-//        }
-    }
-
-    /**
-     * Whether the control supports labels containing HTML. The default is true as most controls do support it.
-     *
-     * @return  true if HTML labels are supported, false otherwise
-     */
-    protected boolean isSupportHTMLLabels() {
-        return true;
-    }
-
-    /**
-     * Whether the control supports hints containing HTML. The default is true as most controls do support it.
-     *
-     * @return  true if HTML hints are supported, false otherwise
-     */
-    protected boolean isSupportHTMLHints() {
-        return true;
+        getLabel(pipelineContext);
+        getHint(pipelineContext);
+        getHelp(pipelineContext);
+        getAlert(pipelineContext);
     }
 
     public XFormsEventHandlerContainer getParentContainer(XFormsContainingDocument containingDocument) {
@@ -466,5 +476,86 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
 
     public boolean isStaticReadonly() {
         return false;
+    }
+
+    /**
+     * Rewrite an HTML value which may contain URLs, for example in @src or @href attributes.
+     *
+     * @param pipelineContext   current PipelineContext
+     * @param rawValue          value to rewrite
+     * @return                  rewritten value
+     */
+    public String rewriteHTMLValue(final PipelineContext pipelineContext, String rawValue) {
+        // Quick check for the most common attributes, src and href. Ideally we should check more.
+        final boolean needsRewrite = rawValue.indexOf("src=") != -1 || rawValue.indexOf("href=") != -1;
+        final String result;
+        if (needsRewrite) {
+            // Rewrite URLs
+            final FastStringBuffer sb = new FastStringBuffer(rawValue.length() * 2);// just an approx of the size it may take
+            // NOTE: we do our own serialization here, but it's really simple (no namespaces) and probably reasonably efficient
+            XFormsUtils.streamHTMLFragment(new ForwardingContentHandler() {
+
+                private boolean isStartElement;
+                private final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+
+                public void characters(char[] chars, int start, int length) throws SAXException {
+                    sb.append(XMLUtils.escapeXMLMinimal(new String(chars, start, length)));// NOTE: not efficient to create a new String here
+                    isStartElement = false;
+                }
+
+                public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
+                    sb.append('<');
+                    sb.append(localname);
+                    final int attributeCount = attributes.getLength();
+                    for (int i = 0; i < attributeCount; i++) {
+
+                        final String currentName = attributes.getLocalName(i);
+                        final String currentValue = attributes.getValue(i);
+
+                        final String rewrittenValue;
+                        if ("src".equals(currentName) || "href".equals(currentName)) {
+                            // We should probably use xml:base, but AbstractRewrite doesn't use xml:base
+                            rewrittenValue = externalContext.getResponse().rewriteResourceURL(currentValue, false);
+                        } else {
+                            rewrittenValue = currentValue;
+                        }
+
+                        sb.append(' ');
+                        sb.append(currentName);
+                        sb.append("=\"");
+                        sb.append(XMLUtils.escapeXMLMinimal(rewrittenValue));
+                        sb.append('"');
+                    }
+                    sb.append('>');
+                    isStartElement = true;
+                }
+
+                public void endElement(String uri, String localname, String qName) throws SAXException {
+                    if (!isStartElement) {
+                        // We serialize to HTML: don't close elements that just opened (will cover <br>, <hr>, etc.)
+                        sb.append("</");
+                        sb.append(localname);
+                        sb.append('>');
+                    }
+                    isStartElement = false;
+                }
+            }, rawValue, getLocationData(), "xhtml");
+            result = sb.toString();
+        } else {
+            // No rewriting needed
+            result = rawValue;
+        }
+        return result;
+    }
+
+    /**
+     * Compare two strings, handling null values as well.
+     *
+     * @param value1    first value or null
+     * @param value2    second value or null
+     * @return          whether the values are identical or both null
+     */
+    public static final boolean compareStrings(String value1, String value2) {
+        return (value1 == null && value2 == null) || (value1 != null && value2 != null && value1.equals(value2));
     }
 }

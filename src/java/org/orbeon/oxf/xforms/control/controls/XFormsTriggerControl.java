@@ -34,9 +34,6 @@ public class XFormsTriggerControl extends XFormsSingleNodeControl {
         if (appearance != null && (XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME.equals(appearance) || XFormsConstants.XXFORMS_LINK_APPEARANCE_QNAME.equals(appearance))) {
             // Minimal or link appearance
             return true;
-        } else if (appearance != null && XFormsConstants.XXFORMS_IMAGE_APPEARANCE_QNAME.equals(appearance)) {
-            // Image appearance
-            return false;
         } else {
             // Default appearance (button)
             return true;

@@ -42,9 +42,13 @@ public class XFormsUploadControl extends XFormsValueControl {
     private Element filenameElement;
     private Element sizeElement;
 
+    private boolean isStateEvaluated;
     private String state;
+    private boolean isMediatypeEvaluated;
     private String mediatype;
+    private boolean isSizeEvaluated;
     private String size;
+    private boolean isFilenameEvaluated;
     private String filename;
 
 
@@ -59,13 +63,13 @@ public class XFormsUploadControl extends XFormsValueControl {
     protected void evaluate(PipelineContext pipelineContext) {
         super.evaluate(pipelineContext);
 
-        evaluateState();
-        evaluateMediatype(pipelineContext);
-        evaluateFilename(pipelineContext);
-        evaluateSize(pipelineContext);
+        getState(pipelineContext);
+        getMediatype(pipelineContext);
+        getFilename(pipelineContext);
+        getSize(pipelineContext);
     }
 
-    public void setExternalValue(PipelineContext pipelineContext, String value, String type) {
+    public void storeExternalValue(PipelineContext pipelineContext, String value, String type) {
 
         // Set value and handle temporary files
         setExternalValue(pipelineContext, value, type, true);
@@ -80,7 +84,7 @@ public class XFormsUploadControl extends XFormsValueControl {
 
     public void setExternalValue(PipelineContext pipelineContext, String value, String type, boolean handleTemporaryFiles){
 
-        final String oldValue = getValue();
+        final String oldValue = getValue(pipelineContext);
 
         if ((value == null || value.trim().equals("")) && !(oldValue == null || oldValue.trim().equals(""))) {
             // Consider that file got "deselected" in the UI
@@ -149,47 +153,43 @@ public class XFormsUploadControl extends XFormsValueControl {
             }
 
             // Call the super method
-            super.setExternalValue(pipelineContext, newValue, type);
+            super.storeExternalValue(pipelineContext, newValue, type);
         } catch (Exception e) {
             throw new OXFException(e);
         }
     }
 
     public String getState(PipelineContext pipelineContext) {
-        evaluateIfNeeded(pipelineContext);
+        if (!isStateEvaluated) {
+            final boolean isEmpty = getValue(pipelineContext) == null || getValue(pipelineContext).length() == 0;
+            state = isEmpty ? "empty" : "file";
+            isStateEvaluated = true;
+        }
         return state;
     }
 
     public String getMediatype(PipelineContext pipelineContext) {
-        evaluateIfNeeded(pipelineContext);
+        if (!isMediatypeEvaluated) {
+            mediatype = (mediatypeElement == null) ? null : getInfoValue(pipelineContext, mediatypeElement);
+            isMediatypeEvaluated = true;
+        }
         return mediatype;
     }
 
     public String getFilename(PipelineContext pipelineContext) {
-        evaluateIfNeeded(pipelineContext);
+        if (!isFilenameEvaluated) {
+            filename = (filenameElement == null) ? null : getInfoValue(pipelineContext, filenameElement);
+            isFilenameEvaluated = true;
+        }
         return filename;
     }
 
     public String getSize(PipelineContext pipelineContext) {
-        evaluateIfNeeded(pipelineContext);
+        if (!isSizeEvaluated) {
+            size = (sizeElement == null) ? null : getInfoValue(pipelineContext, sizeElement);
+            isSizeEvaluated = true;
+        }
         return size;
-    }
-
-    private void evaluateState() {
-        final boolean isEmpty = getValue() == null || getValue().length() == 0;
-        this.state = isEmpty ? "empty" : "file";
-    }
-
-    private void evaluateMediatype(PipelineContext pipelineContext) {
-        this.mediatype = (mediatypeElement == null) ? null : getInfoValue(pipelineContext, mediatypeElement);
-    }
-
-    private void evaluateFilename(PipelineContext pipelineContext) {
-        this.filename = (filenameElement == null) ? null : getInfoValue(pipelineContext, filenameElement);
-    }
-
-    private void evaluateSize(PipelineContext pipelineContext) {
-        this.size = (sizeElement == null) ? null : getInfoValue(pipelineContext, sizeElement);
     }
 
     private String getInfoValue(PipelineContext pipelineContext, Element element) {
@@ -239,7 +239,7 @@ public class XFormsUploadControl extends XFormsValueControl {
         }
     }
 
-    public boolean equalsExternal(PipelineContext pipelineContext, Object obj) {
+    public boolean equalsExternal(PipelineContext pipelineContext, XFormsControl obj) {
 
         if (obj == null || !(obj instanceof XFormsUploadControl))
             return false;
@@ -249,16 +249,13 @@ public class XFormsUploadControl extends XFormsValueControl {
 
         final XFormsUploadControl other = (XFormsUploadControl) obj;
 
-        if (!((state == null && other.state == null) || (state != null && other.state != null && state.equals(other.state))))
+        if (!compareStrings(getState(pipelineContext), other.getState(pipelineContext)))
             return false;
-
-        if (!((mediatype == null && other.mediatype == null) || (mediatype != null && other.mediatype != null && mediatype.equals(other.mediatype))))
+        if (!compareStrings(getMediatype(pipelineContext), other.getMediatype(pipelineContext)))
             return false;
-
-        if (!((size == null && other.size == null) || (size != null && other.size != null && size.equals(other.size))))
+        if (!compareStrings(getSize(pipelineContext), other.getSize(pipelineContext)))
             return false;
-
-        if (!((filename == null && other.filename == null) || (filename != null && other.filename != null && filename.equals(other.filename))))
+        if (!compareStrings(getFilename(pipelineContext), other.getFilename(pipelineContext)))
             return false;
 
         return super.equalsExternal(pipelineContext, obj);

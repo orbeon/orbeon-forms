@@ -874,7 +874,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
 
                 // Notify the control of the value change
                 final String eventValue = concreteEvent.getNewValue();
-                valueXFormsControl.setExternalValue(pipelineContext, eventValue, null);
+                valueXFormsControl.storeExternalValue(pipelineContext, eventValue, null);
             }
 
             {

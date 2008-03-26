@@ -53,12 +53,11 @@ public class XFormsRangeControl extends XFormsValueControl {
         return step;
     }
 
-    public void setExternalValue(PipelineContext pipelineContext, String value, String type) {
-        super.setExternalValue(pipelineContext, convertFromExternalValue(value), type);
+    public void storeExternalValue(PipelineContext pipelineContext, String value, String type) {
+        super.storeExternalValue(pipelineContext, convertFromExternalValue(value), type);
     }
 
     private String convertFromExternalValue(String externalValue) {
-
         if (getStart() != null && getEnd() != null
                 && (XMLConstants.XS_INTEGER_EXPLODED_QNAME.equals(getType()) || XFormsConstants.XFORMS_INTEGER_EXPLODED_QNAME.equals(getType()))) {
 
@@ -72,10 +71,11 @@ public class XFormsRangeControl extends XFormsValueControl {
         }
     }
 
-    protected String evaluateExternalValue(PipelineContext pipelineContext) {
-        final String internalValue = getValue();
-        if (internalValue == null) {
-            return null;
+    protected void evaluateExternalValue(PipelineContext pipelineContext) {
+        final String internalValue = getValue(pipelineContext);
+        final String updatedValue;
+        if (internalValue == null) {// can it be really?
+            updatedValue = null;
         } else if (getStart() != null && getEnd() != null
                 && (XMLConstants.XS_INTEGER_EXPLODED_QNAME.equals(getType()) || XFormsConstants.XFORMS_INTEGER_EXPLODED_QNAME.equals(getType()))) {
 
@@ -83,9 +83,10 @@ public class XFormsRangeControl extends XFormsValueControl {
             final int end = Integer.parseInt(getEnd());
 
             final double value = ((double) (Integer.parseInt(internalValue) - start)) / ((double) end - start);
-            return Double.toString(value);
+            updatedValue = Double.toString(value);
         } else {
-            return internalValue;
+            updatedValue = internalValue;
         }
+        setExternalValue(updatedValue);
     }
 }

@@ -119,9 +119,8 @@ public class XHTMLHeadHandler extends HandlerBase {
             final String combinedResourceName = combinedResourcesPrefix + ".css";
 
             attributesImpl.clear();
-            final String[] attributesList = new String[] { "rel", "stylesheet", "href", response.rewriteResourceURL(combinedResourceName, false), "type", "text/css" };
+            final String[] attributesList = new String[] { "rel", "stylesheet", "href", combinedResourceName, "type", "text/css" };
             ContentHandlerHelper.populateAttributes(attributesImpl, attributesList);
-            attributesImpl.addAttribute(XMLConstants.OPS_FORMATTING_URI, "url-norewrite", XMLUtils.buildQName(formattingPrefix, "url-norewrite"), ContentHandlerHelper.CDATA, "true");
             helper.element(prefix, XMLConstants.XHTML_NAMESPACE_URI, "link", attributesImpl);
 
             if (isCacheCombinedResources) {
@@ -136,9 +135,8 @@ public class XHTMLHeadHandler extends HandlerBase {
                 final XFormsFeatures.ResourceConfig resourceConfig = (XFormsFeatures.ResourceConfig) i.next();
                 // Only include stylesheet if needed
                 attributesImpl.clear();
-                final String[] attributesList = new String[] { "rel", "stylesheet", "href", response.rewriteResourceURL(resourceConfig.getResourcePath(isMinimal), false), "type", "text/css" };
+                final String[] attributesList = new String[] { "rel", "stylesheet", "href", resourceConfig.getResourcePath(isMinimal), "type", "text/css" };
                 ContentHandlerHelper.populateAttributes(attributesImpl, attributesList);
-                attributesImpl.addAttribute(XMLConstants.OPS_FORMATTING_URI, "url-norewrite", XMLUtils.buildQName(formattingPrefix, "url-norewrite"), ContentHandlerHelper.CDATA, "true");
                 helper.element(prefix, XMLConstants.XHTML_NAMESPACE_URI, "link", attributesImpl);
             }
         }
@@ -150,9 +148,8 @@ public class XHTMLHeadHandler extends HandlerBase {
                 final String combinedResourceName = combinedResourcesPrefix + ".js";
 
                 attributesImpl.clear();
-                final String[] attributesList = new String[] { "type", "text/javascript", "src", response.rewriteResourceURL(combinedResourceName, false) };
+                final String[] attributesList = new String[] { "type", "text/javascript", "src", combinedResourceName };
                 ContentHandlerHelper.populateAttributes(attributesImpl, attributesList);
-                attributesImpl.addAttribute(XMLConstants.OPS_FORMATTING_URI, "url-norewrite", XMLUtils.buildQName(formattingPrefix, "url-norewrite"), ContentHandlerHelper.CDATA, "true");
                 helper.element(prefix, XMLConstants.XHTML_NAMESPACE_URI, "script", attributesImpl);
 
                 if (isCacheCombinedResources) {
@@ -169,9 +166,8 @@ public class XHTMLHeadHandler extends HandlerBase {
                     // Only include stylesheet if needed
 
                     attributesImpl.clear();
-                    final String[] attributesList =  new String[] { "type", "text/javascript", "src", response.rewriteResourceURL(resourceConfig.getResourcePath(isMinimal), false) };
+                    final String[] attributesList =  new String[] { "type", "text/javascript", "src", resourceConfig.getResourcePath(isMinimal) };
                     ContentHandlerHelper.populateAttributes(attributesImpl, attributesList);
-                    attributesImpl.addAttribute(XMLConstants.OPS_FORMATTING_URI, "url-norewrite", XMLUtils.buildQName(formattingPrefix, "url-norewrite"), ContentHandlerHelper.CDATA, "true");
                     helper.element(prefix, XMLConstants.XHTML_NAMESPACE_URI, "script", attributesImpl);
                 }
             }

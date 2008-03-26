@@ -104,16 +104,21 @@ public class XFormsContextStack {
      */
     public void setBinding(XFormsControl xformsControl) {
 
+        BindingContext controlBindingContext = xformsControl.getBindingContext();
+
+        // Don't do the work if the current context is already as requested
+        if (contextStack.size() > 0 && getCurrentBindingContext() == controlBindingContext)
+            return;
+
         // Create ancestors-or-self list
         final List ancestorsOrSelf = new ArrayList();
-        BindingContext controlBindingContext = xformsControl.getBindingContext();
         while (controlBindingContext != null) {
             ancestorsOrSelf.add(controlBindingContext);
             controlBindingContext = controlBindingContext.getParent();
         }
         Collections.reverse(ancestorsOrSelf);
 
-        // Bind up to the specified element
+        // Bind up to the specified control
         contextStack.clear();
         contextStack.addAll(ancestorsOrSelf);
     }

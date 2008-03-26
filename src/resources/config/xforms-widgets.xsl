@@ -362,4 +362,21 @@
 
     </xsl:template>
 
+    <!-- Support for legacy image appearance -->
+    <xsl:template match="xforms:trigger[@appearance = 'xxforms:image']">
+        <xsl:copy>
+            <!-- Copy all attributes but replace the appearance with "minimal" -->
+            <xsl:copy-of select="@* except @appearance"/>
+            <xsl:attribute name="appearance" select="'minimal'"/>
+            <!-- Create label with embedded image -->
+            <xforms:label>
+                <xhtml:img>
+                    <xsl:copy-of select="xxforms:img/@*"/>
+                </xhtml:img>
+            </xforms:label>
+            <!-- Process the rest of the stuff -->
+            <xsl:apply-templates select="node() except (xforms:label, xxforms:img)"/>
+        </xsl:copy>
+    </xsl:template>
+
 </xsl:stylesheet>

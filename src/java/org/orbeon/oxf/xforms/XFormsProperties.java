@@ -35,7 +35,7 @@ public class XFormsProperties {
     public static final String READONLY_APPEARANCE_DYNAMIC_VALUE = "dynamic";
 
     public static final String ORDER_PROPERTY = "order";
-    public static final String DEFAULT_ORDER_PROPERTY = "label help control alert hint";
+    public static final String DEFAULT_ORDER_PROPERTY = "label control help alert hint";
 
     public static final String EXTERNAL_EVENTS_PROPERTY = "external-events";
     private static final String READONLY_PROPERTY = "readonly";

@@ -363,7 +363,7 @@
     </xsl:template>
 
     <!-- Support for legacy image appearance -->
-    <xsl:template match="xforms:trigger[@appearance = 'xxforms:image']">
+    <xsl:template match="xforms:trigger[@appearance = 'xxforms:image'] | xforms:submit[@appearance = 'xxforms:image']">
         <xsl:copy>
             <!-- Copy all attributes but replace the appearance with "minimal" -->
             <xsl:copy-of select="@* except @appearance"/>

@@ -122,7 +122,7 @@ public class XFormsSelect1Handler extends XFormsCoreControlHandler {
 
                 // Try to produce the template only when needed
                 final XFormsStaticState.ItemsInfo itemsInfo = containingDocument.getStaticState().getItemsInfo(id);
-                if (itemsInfo.isHasNonStaticItem() || xformsValueControl == null) {
+                if (itemsInfo != null && (itemsInfo.isHasNonStaticItem() || xformsValueControl == null)) {
                     reusableAttributes.clear();
                     reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, "xforms-select-template-" + effectiveId);
                     reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-select-template");

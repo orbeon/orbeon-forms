@@ -87,7 +87,6 @@ public class XFormsInputHandler extends XFormsCoreControlHandler {
             select1Handler.setContentHandler(getContentHandler());
             select1Handler.setContext(getContext());
 //            select1Handler.setDocumentLocator(get);
-            select1Handler.start(uri, localname, qName, attributes);
             select1Handler.outputContent(attributes, id, effectiveId, localname, inputControl, items, isMany, appearance);
 
         } else {

@@ -190,15 +190,13 @@
             <section>
                 <title>Input Document Format</title>
                 <p>
-                    The binary mode is enabled when the root element of the input document
-                    contains an <code>xsi:type</code> attribute containing a reference to the
-                    <code>xs:base64Encoding</code> type.
+                    The binary mode is enabled when the root element of the input document contains an
+                    <code>xsi:type</code> attribute containing a reference to the <code>xs:base64Encoding</code> type.
                 </p>
                 <p>
-                    In this mode, all the character content under the root element is considered
-                    as Base64-encoded binary content according to the <a
-                    href="reference-formats#binary-documents">binary document format</a>, for
-                    example:
+                    In this mode, all the character content under the root element is considered as Base64-encoded
+                    binary content according to the <a href="reference-formats#binary-documents">binary document
+                    format</a>, for example:
                 </p>
                 <xml-source>
 <document xsi:type="xs:base64Binary" content-type="image/jpeg">
@@ -208,9 +206,14 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
 </document>
                 </xml-source>
                 <p>
-                    An optional <code>content-type</code> attribute provides information about
-                    the content type of the document. This attribute may be used to set the HTTP
-                    <code>content-type</code> header, as discussed above.
+                    An optional <code>content-type</code> attribute provides information about the content type of the
+                    document. This attribute may be used to set the HTTP <code>content-type</code> header, as discussed
+                    above.
+                </p>
+                <p>
+                    An optional <code>last-modified</code> attribute provides information about the last modification
+                    date of the resource, and is used by the HTTP serializer if present. In this case, the value
+                    overrides the value normally automatically computed by the HTTP serializer.
                 </p>
             </section>
             <section>
@@ -419,18 +422,16 @@ complète la grave harmonie.
         </note>
         <note>
             <p>
-                When using the command-line mode, instead of sending the output through HTTP, the
-                HTTP serializer sends its output to the standard console output. In such a case, the
-                parameters that do not affect the content of the data, such as content-type,
-                status-code, etc. are ignored.
+                When using the command-line mode, instead of sending the output through HTTP, the HTTP serializer sends
+                its output to the standard console output. In such a case, the parameters that do not affect the
+                content of the data, such as content-type, status-code, etc. are ignored.
             </p>
         </note>
         <note>
             <p>
-                The HTTP serializer sends the cache control HTTP headers, including
-                <code>Last-Modified</code>, <code>Expires</code> and <code>Cache-Control</code>.
-                The <code>Content-Type</code> and <code>Content-Length</code> headers are also
-                supported.
+                The HTTP serializer sends the cache control HTTP headers, including <code>Last-Modified</code>,
+                <code>Expires</code> and <code>Cache-Control</code>. The <code>Content-Type</code> and
+                <code>Content-Length</code> headers are also supported.
             </p>
         </note>
     </body>

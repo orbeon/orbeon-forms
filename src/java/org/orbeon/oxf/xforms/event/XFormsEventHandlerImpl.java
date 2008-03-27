@@ -99,10 +99,10 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
      * Utility method to extract event handlers.
      *
      * @param containingElement         element possibly containing event handlers
-     * @param eventNames                Map<String, String> of event name to ""
+     * @param eventNamesMap             Map<String, String> of event name to ""
      * @return                          Map<String, List<XFormsEventHandler>> of observer id to List of XFormsEventHandler
      */
-    public static Map extractEventHandlers(Element containingElement, Map eventNames) {
+    public static Map extractEventHandlers(Element containingElement, Map eventNamesMap) {
 
         // Nothing to do if there are no children elements
         final List children = containingElement.elements();
@@ -115,8 +115,8 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
             final Element currentElement = (Element) i.next();
 
             if (XFormsActions.isActionName(currentElement.getNamespaceURI(), currentElement.getName())) {
-                final String eventName = currentElement.attributeValue(XFormsConstants.XML_EVENTS_EVENT_ATTRIBUTE_QNAME);
-                if (eventName != null) {
+                final String eventAttribute = currentElement.attributeValue(XFormsConstants.XML_EVENTS_EVENT_ATTRIBUTE_QNAME);
+                if (eventAttribute != null) {
 
                     // Found an action with ev:event attribute
                     if (eventHandlersMap == null)
@@ -142,8 +142,10 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
                         eventHandlersForObserver.add(newEventHandlerImpl);
                     }
                     
-                    // Remember that there is an event
-                    eventNames.put(eventName, "");
+                    // Remember all event names
+                    final String[] eventNames = StringUtils.split(eventAttribute);
+                    for (int j = 0; j < eventNames.length; j++)
+                        eventNamesMap.put(eventNames[j], "");
                 }
             }
         }

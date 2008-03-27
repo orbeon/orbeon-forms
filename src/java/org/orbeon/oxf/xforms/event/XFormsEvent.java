@@ -88,6 +88,7 @@ public abstract class XFormsEvent {
             return new ListIterator(Collections.singletonList(new StringValue(originalId)));
         } else if ("event".equals(name)) {
             // Return the name of the event
+            // TODO: Should this be called name instead?
             return new ListIterator(Collections.singletonList(new StringValue(eventName)));
         } else if (customAttributes != null && customAttributes.get(name) != null) {
             // Return custom attribute if found

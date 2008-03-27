@@ -37,7 +37,7 @@ public class XFormsOutputHandler extends XFormsCoreControlHandler {
         super(false);
     }
 
-    protected boolean mustOutputControl() {
+    protected boolean isMustOutputControl() {
         // Don't do anything when xforms:output is used as a "pseudo-control", that is when it is within a leaf control,
         // because in that case we don't put the control in the regular hierarchy of controls.
         final String parentHandlerName = handlerContext.getController().getParentHandlerExplodedQName();
@@ -55,7 +55,7 @@ public class XFormsOutputHandler extends XFormsCoreControlHandler {
         return true;
     }
 
-    protected boolean isOutputStandardAlert(Attributes attributes) {
+    protected boolean isMustOutputStandardAlert(Attributes attributes) {
         // Handle alert only if there is no value attribute
         return attributes.getValue("value") == null;
     }

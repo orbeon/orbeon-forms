@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.xml.sax.SAXException;
 import org.xml.sax.Attributes;
-import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.apache.commons.lang.StringUtils;
@@ -36,7 +35,7 @@ public abstract class XFormsCoreControlHandler extends HandlerBase {
         final XFormsSingleNodeControl xformsControl = handlerContext.isGenerateTemplate()
                 ? null : (XFormsSingleNodeControl) containingDocument.getObjectById(effectiveId);
 
-        if (mustOutputControl()) {
+        if (isMustOutputControl()) {
             // Get local order for control
             final String localOrder = attributes.getValue(XFormsConstants.XXFORMS_ORDER_QNAME.getNamespaceURI(),
                     XFormsConstants.XXFORMS_ORDER_QNAME.getName());
@@ -52,17 +51,17 @@ public abstract class XFormsCoreControlHandler extends HandlerBase {
                     handleControl(uri, localname, qName, attributes, id, effectiveId, xformsControl);
                 } else if ("label".equals(current)) {
                     // xforms:label
-                    if (isOutputStandardLabel()) {
+                    if (isMustOutputStandardLabel()) {
                         handleLabelHintHelpAlert(id, effectiveId, current, xformsControl);
                     }
                 } else if ("alert".equals(current)) {
                     // xforms:alert
-                    if (isOutputStandardAlert(attributes)) {
+                    if (isMustOutputStandardAlert(attributes)) {
                         handleLabelHintHelpAlert(id, effectiveId, current, xformsControl);
                     }
                 } else if ("hint".equals(current)) {
                     // xforms:hint
-                    if (isOutputStandardHint()) {
+                    if (isMustOutputStandardHint()) {
                         handleLabelHintHelpAlert(id, effectiveId, current, xformsControl);
                     }
                 } else {
@@ -73,22 +72,22 @@ public abstract class XFormsCoreControlHandler extends HandlerBase {
         }
     }
 
-    protected boolean mustOutputControl() {
+    protected boolean isMustOutputControl() {
         // May be overridden by subclasses
         return true;
     }
 
-    protected boolean isOutputStandardLabel() {
+    protected boolean isMustOutputStandardLabel() {
         // May be overridden by subclasses
         return true;
     }
 
-    protected boolean isOutputStandardHint() {
+    protected boolean isMustOutputStandardHint() {
         // May be overridden by subclasses
         return true;
     }
 
-    protected boolean isOutputStandardAlert(Attributes attributes) {
+    protected boolean isMustOutputStandardAlert(Attributes attributes) {
         // May be overridden by subclasses
         return true;
     }

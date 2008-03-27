@@ -39,11 +39,18 @@ public class XFormsTriggerHandler extends XFormsCoreControlHandler {
         super(false);
     }
 
-    protected boolean isOutputStandardLabel() {
+    protected boolean isMustOutputStandardLabel() {
+        // Label is handled differently
         return false;
     }
 
-    protected boolean isOutputStandardHint() {
+    protected boolean isMustOutputStandardHint() {
+        // Hint is handled differently
+        return false;
+    }
+
+    protected boolean isMustOutputStandardAlert(Attributes attributes) {
+        // Triggers don't need an alert
         return false;
     }
 

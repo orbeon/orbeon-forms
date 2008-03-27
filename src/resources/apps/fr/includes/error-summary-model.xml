@@ -63,34 +63,40 @@
 
     <!-- Handle xforms-invalid event on #fr-form-group -->
     <!-- NOTE: Only handle events coming from controls bound to "fr-form-instance" instance -->
-    <xforms:action ev:observer="fr-form-group" ev:event="xforms-invalid"
+    <xforms:action ev:observer="fr-form-group" ev:event="xforms-invalid xforms-value-changed"
                    if="event('target-ref')/root()/* is xxforms:instance('fr-form-instance') and normalize-space(event('label')) != ''"
                    context="instance('fr-errors-instance')">
-        <!-- Try to find current error -->
-        <xxforms:variable name="current-error" select="error[@id = event('target') and @indexes = string-join(event('repeat-indexes'), '-')]"/>
-        <!-- Just update the label and alert if it already exists -->
-        <xforms:action if="exists($current-error)" context="$current-error">
-            <xforms:setvalue ref="$current-error/@alert" value="event('alert')"/>
-            <xforms:setvalue ref="$current-error/@label" value="event('label')"/>
-        </xforms:action>
-        <!-- Otherwise insert new element and sets its values -->
-        <xforms:action if="not(exists($current-error))">
-            <xforms:insert context="." nodeset="error" origin="instance('fr-error-template')"/>
-            <xforms:action context="error[last()]">
-                <xforms:setvalue ref="@id" value="event('target')"/>
-                <xforms:setvalue ref="@indexes" value="string-join(event('repeat-indexes'), '-')"/>
-                <xforms:setvalue ref="@alert" value="event('alert')"/>
-                <xforms:setvalue ref="@label" value="event('label')"/>
+
+        <!-- Insert if the value is invalid or if it is required but empty -->
+        <xforms:action if="event('event') = 'xforms-invalid' or (exforms:required(event('target-ref')) and event('target-ref') = '')">
+            <xxforms:variable name="current-error" select="error[@id = event('target') and @indexes = string-join(event('repeat-indexes'), '-')]"/>
+            <!-- Just update the label and alert if it already exists -->
+            <xforms:action if="exists($current-error)" context="$current-error">
+                <xforms:setvalue ref="$current-error/@alert" value="event('alert')"/>
+                <xforms:setvalue ref="$current-error/@label" value="event('label')"/>
+            </xforms:action>
+            <!-- Otherwise insert new element and sets its values -->
+            <xforms:action if="not(exists($current-error))">
+                <xforms:insert context="." nodeset="error" origin="instance('fr-error-template')"/>
+                <xforms:action context="error[last()]">
+                    <xforms:setvalue ref="@id" value="event('target')"/>
+                    <xforms:setvalue ref="@indexes" value="string-join(event('repeat-indexes'), '-')"/>
+                    <xforms:setvalue ref="@alert" value="event('alert')"/>
+                    <xforms:setvalue ref="@label" value="event('label')"/>
+                </xforms:action>
             </xforms:action>
         </xforms:action>
     </xforms:action>
 
     <!-- Handle xforms-valid event on #fr-form-group -->
     <!-- NOTE: Only handle events coming from controls bound to "fr-form-instance" instance -->
-    <xforms:action ev:observer="fr-form-group" ev:event="xforms-valid"
+    <xforms:action ev:observer="fr-form-group" ev:event="xforms-valid xforms-value-changed"
                    if="event('target-ref')/root()/* is xxforms:instance('fr-form-instance') and instance('fr-errors-instance')/error[@id = event('target') and @indexes = string-join(event('repeat-indexes'), '-')]"
                    context="instance('fr-errors-instance')">
-        <xforms:delete nodeset="error[@id = event('target') and @indexes = string-join(event('repeat-indexes'), '-')]"/>
+        <!-- Don't remove error if the value is required but empty -->
+        <xforms:action if="not(exforms:required(event('target-ref')) and event('target-ref') = '')">
+            <xforms:delete nodeset="error[@id = event('target') and @indexes = string-join(event('repeat-indexes'), '-')]"/>
+        </xforms:action>
     </xforms:action>
 
 </xforms:model>

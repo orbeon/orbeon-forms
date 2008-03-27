@@ -34,20 +34,34 @@
                     <xs:complexType>
                         <!-- Allow 0 to n books -->
                         <xs:sequence minOccurs="0" maxOccurs="unbounded">
-                            <xs:element name="book" type="book"/>
+                            <xs:element ref="book"/>
                         </xs:sequence>
                     </xs:complexType>
                 </xs:element>
 
                 <!-- Individual book element -->
-                <xs:complexType name="book">
+                <xs:element name="book">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="details" type="details"/>
+                            <xs:element name="notes" type="notes"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+
+                <xs:complexType name="details">
                     <xs:sequence>
                         <xs:element name="title" type="xs:string"/>
                         <xs:element name="author" type="xs:string"/>
                         <xs:element name="language" type="language"/>
                         <xs:element name="link" type="link"/>
                         <xs:element name="rating" type="rating"/>
-                        <xs:element name="notes" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+
+                <xs:complexType name="notes">
+                    <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                        <xs:element name="note" type="xs:string"/>
                     </xs:sequence>
                 </xs:complexType>
 

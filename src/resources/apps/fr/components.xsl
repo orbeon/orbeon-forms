@@ -248,7 +248,7 @@
         <xi:include href="import-export/import-export-dialog.xml" xxi:omit-xml-base="true"/>
         <xi:include href="includes/clear-dialog.xhtml" xxi:omit-xml-base="true"/>
 
-        <xhtml:span class="fr-hidden-controls">
+        <xhtml:span class="fr-hidden">
             <!-- Hidden field to communicate to the client the current section to collapse or expand -->
             <xforms:input model="fr-sections-model" ref="instance('fr-current-section-instance')" id="fr-current-section-input" class="xforms-disabled"/>
             <!-- Hidden field to communicate to the client whether the data is clean or dirty -->
@@ -374,15 +374,20 @@
                 <!-- View mode -->
                 <xhtml:div class="fr-inplace-view">
                     <xhtml:span class="fr-inplace-content">
-                        <xforms:output class="fr-inplace-value">
+                        <xforms:output>
                             <!-- Handle inline hint-->
                             <xsl:call-template name="fr-handle-inplace-hint"/>
                             <!-- Keep label as is -->
                             <xsl:copy-of select="xforms:label"/>
+                            <!-- React to user click -->
                             <xforms:action ev:event="DOMActivate">
                                 <xforms:toggle case="fr-inplace-{@id}-edit"/>
                                 <xforms:setfocus control="fr-inplace-{@id}-input"/>
                             </xforms:action>
+                        </xforms:output>
+                        <!-- Hidden output just to display alert -->
+                        <xforms:output class="fr-hidden">
+                            <xsl:copy-of select="@ref | @bind | xforms:alert"/>
                         </xforms:output>
                         <xhtml:span class="fr-inplace-buttons">
                             <xforms:trigger id="fr-inplace-{@id}-delete" appearance="minimal" class="fr-inplace-delete">
@@ -398,8 +403,8 @@
                 <!-- Edit mode -->
                 <xhtml:div class="fr-inplace-edit">
                     <xhtml:span class="fr-inplace-content">
-                        <xforms:input id="fr-inplace-{@id}-input" class="fr-inplace-value">
-                            <xsl:copy-of select="@ref | @bind | xforms:label"/>
+                        <xforms:input id="fr-inplace-{@id}-input">
+                            <xsl:copy-of select="@ref | @bind | xforms:label | xforms:alert"/>
                             <xforms:toggle ev:event="DOMActivate" case="fr-inplace-{@id}-view"/>
                         </xforms:input>
                         <xhtml:span class="fr-inplace-buttons">
@@ -427,15 +432,20 @@
             <xforms:case id="fr-inplace-{@id}-view">
                 <xhtml:div class="fr-inplace-view">
                     <xhtml:span class="fr-inplace-content">
-                        <xforms:output class="fr-inplace-value">
+                        <xforms:output>
                             <!-- Handle inline hint-->
                             <xsl:call-template name="fr-handle-inplace-hint"/>
                             <!-- Keep label as is -->
                             <xsl:copy-of select="xforms:label"/>
+                            <!-- React to user click -->
                             <xforms:action ev:event="DOMActivate">
                                 <xforms:toggle case="fr-inplace-{@id}-edit"/>
                                 <xforms:setfocus control="fr-inplace-{@id}-textarea"/>
                             </xforms:action>
+                        </xforms:output>
+                        <!-- Hidden output just to display alert -->
+                        <xforms:output class="fr-hidden">
+                            <xsl:copy-of select="@ref | @bind | xforms:alert"/>
                         </xforms:output>
                     </xhtml:span>
                 </xhtml:div>
@@ -443,8 +453,8 @@
             <xforms:case id="fr-inplace-{@id}-edit">
                 <xhtml:div class="fr-inplace-edit">
                     <xhtml:span class="fr-inplace-content">
-                        <xforms:textarea id="fr-inplace-{@id}-textarea" class="fr-inplace-value" appearance="xxforms:autosize">
-                            <xsl:copy-of select="@ref | @bind | xforms:label"/>
+                        <xforms:textarea id="fr-inplace-{@id}-textarea" appearance="xxforms:autosize">
+                            <xsl:copy-of select="@ref | @bind | xforms:label | xforms:alert"/>
                             <xforms:toggle ev:event="DOMActivate" case="fr-inplace-{@id}-view"/>
                         </xforms:textarea>
                         <xhtml:span class="fr-inplace-buttons">

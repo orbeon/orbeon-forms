@@ -69,10 +69,10 @@
             <xforms:bind nodeset=".">
                 <!-- Form metadata (also used by Form Runner) -->
                 <xforms:bind nodeset="xhtml:head/xforms:model[@id = 'fr-form-model']/xforms:instance[@id = 'fr-form-metadata']/*">
-                    <xforms:bind id="application-name-bind" nodeset="application-name" required="true()" type="xs:NCName" readonly="false()"
-                                 calculate="if (normalize-space() = '') then concat('ID', digest(string(random(true)), 'MD5', 'hex')) else ."/>
-                    <xforms:bind id="form-name-bind" nodeset="form-name" required="true()" type="xs:NCName" readonly="false()"
-                                 calculate="if (normalize-space() = '') then concat('ID', digest(string(random(true)), 'MD5', 'hex')) else ."/>
+                    <xforms:bind id="application-name-bind" nodeset="application-name" required="true()" type="xs:NCName" readonly="false()"/>
+                    <!-- calculate="if (normalize-space() = '') then concat('ID', digest(string(random(true)), 'MD5', 'hex')) else ." -->
+                    <xforms:bind id="form-name-bind" nodeset="form-name" required="true()" type="xs:NCName" readonly="false()"/>
+                    <!-- calculate="if (normalize-space() = '') then concat('ID', digest(string(random(true)), 'MD5', 'hex')) else ." -->
                     <xforms:bind id="title-bind" nodeset="title" required="true()"/>
                     <xforms:bind id="description-bind" nodeset="description"/>
                     <xforms:bind id="logo-bind" nodeset="logo" type="xs:anyURI"/>
@@ -983,12 +983,14 @@
                                 <xforms:input id="application-name-control" bind="application-name-bind" appearance="fr:in-place" class="fr-summary fr-search">
                                     <xforms:label ref="$form-resources/application-name/label"/>
                                     <xforms:hint ref="$form-resources/application-name/hint"/>
+                                    <xforms:alert ref="$form-resources/application-name/alert"/>
                                 </xforms:input>
                             </xhtml:td>
                             <xhtml:td>
                                 <xforms:input id="form-name-control" bind="form-name-bind" appearance="fr:in-place" class="fr-summary fr-search">
                                     <xforms:label ref="$form-resources/form-name/label"/>
                                     <xforms:hint ref="$form-resources/form-name/hint"/>
+                                    <xforms:alert ref="$form-resources/form-name/alert"/>
                                 </xforms:input>
                             </xhtml:td>
                         </xhtml:tr>
@@ -1016,6 +1018,7 @@
                                               appearance="fr:in-place" class="fr-summary fr-search">
                                     <xforms:label ref="$form-resources/title/label"/>
                                     <xforms:hint ref="$form-resources/title/hint"/>
+                                    <xforms:alert ref="$form-resources/title/alert"/>
                                 </xforms:input>
                             </xhtml:td>
                         </xhtml:tr>

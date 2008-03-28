@@ -941,9 +941,9 @@ ORBEON.xforms.Controls = {
     /**
      * Update the xforms-required-empty class as necessary.
      */
-    updateRequiredEmpty: function(control) {
+    updateRequiredEmpty: function(control, newValue) {
         if (ORBEON.util.Dom.hasClass(control, "xforms-required")) {
-            if (ORBEON.xforms.Controls.getCurrentValue(control) == "") {
+            if (newValue == "") {
                 ORBEON.util.Dom.addClass(control, "xforms-required-empty");
                 ORBEON.util.Dom.removeClass(control, "xforms-required-filled");
                 return true;
@@ -3450,7 +3450,7 @@ ORBEON.xforms.Server = {
                                                 // is not specified as the value may have changed
                                                 var isRequiredEmpty;
                                                 if (!isStaticReadonly) {
-                                                    isRequiredEmpty = ORBEON.xforms.Controls.updateRequiredEmpty(documentElement);
+                                                    isRequiredEmpty = ORBEON.xforms.Controls.updateRequiredEmpty(documentElement, newControlValue);
                                                 } else {
                                                     isRequiredEmpty = false;
                                                 }

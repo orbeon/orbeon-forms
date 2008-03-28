@@ -10,7 +10,7 @@ body, body table, textarea.xforms-textarea {
     font-family: "Lucida Grande", Tahoma, Arial, Verdana, sans-serif;
 }
 
-.fr-hidden-controls { display: none }
+.fr-hidden { display: none }
 
 .fr-top { line-height: 10px; }
 #doc .fr-top { background-image: url(top-750-ee.png); }
@@ -251,7 +251,8 @@ body { text-align: left }
     display: block;
     font-size: smaller;
     font-weight: bold;
-    margin-left: .5em;
+    /*margin-left: .5em;*/
+    height: auto;
     /*width: 100%;*/
     width: auto;
     color: red;
@@ -352,7 +353,7 @@ div.fr-collapsible {
 .fr-grid-content { *padding-right: 6px }/* To help IE move back controls within .fr-grid-content */
 .fr-grid .xforms-input input { width: 100%; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box }
 .fr-grid .xforms-upload input { width: 100%; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box }
-.fr-grid .fr-inplace-value { width: 100% }
+.fr-grid .fr-inplace-edit .xforms-input input { width: 100% }
 .fr-grid .xforms-textarea { width: 100%; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box }
 .fr-grid .xforms-select1-appearance-minimal { width: 100%; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box }
 .fr-grid .xforms-select1-appearance-compact { width: 100%; height: 6em; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box }
@@ -382,3 +383,6 @@ div.fr-collapsible {
 .xforms-upload-info { display: block; width: 100%; background-color: #FFFFDD; padding: 2px }
 .xforms-upload-mediatype, xforms-upload-size { padding-left: 1em }
 .xforms-upload-remove { vertical-align: top }
+
+/* Test */
+/*.xforms-required::before { content: "*"; color:red }*/

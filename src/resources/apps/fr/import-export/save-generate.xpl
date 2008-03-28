@@ -39,7 +39,7 @@
                             <xsl:variable name="request-url" as="element(request-url)" select="$request/request-url"/>
                             <xsl:variable name="app" as="element(value)" select="$request/parameters/parameter[name = 'app']/value"/>
                             <xsl:variable name="form" as="element(value)" select="$request/parameters/parameter[name = 'form']/value"/>
-                            <form name="form1" method="post" resource="{substring-before($request-url, '/fr/service')}/fr/upload" id="form1">
+                            <form name="form1" method="post" action="{substring-before($request-url, '/fr/service')}/fr/upload" id="form1">
                                 <input type="hidden" name="form-data" value="{saxon:string-to-base64Binary(saxon:serialize(/*, 'xml'), 'UTF8')}"/>
                                 <input type="hidden" name="app" value="{$app}"/>
                                 <input type="hidden" name="form" value="{$form}"/>

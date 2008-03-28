@@ -25,7 +25,7 @@
 
     <!-- Call up persistence layer to obtain XHTML+XForms -->
     <p:processor name="oxf:url-generator">
-        <p:input name="config" transform="oxf:unsafe-xslt" href="#instance" debug="instance app">
+        <p:input name="config" transform="oxf:unsafe-xslt" href="#instance">
             <config xsl:version="2.0" xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
 
                 <xsl:variable name="prefix" select="'oxf.fr.persistence.app'" as="xs:string"/>

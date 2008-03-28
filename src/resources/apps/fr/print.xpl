@@ -88,7 +88,7 @@
                 </xsl:template>
             </xsl:stylesheet>
         </p:input>
-        <p:output name="data" ref="data" debug="final-xforms"/>
+        <p:output name="data" ref="data"/>
     </p:processor>
 
     <!-- Return page detail as instance -->

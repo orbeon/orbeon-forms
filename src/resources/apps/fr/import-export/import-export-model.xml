@@ -23,6 +23,8 @@
               xmlns:exist="http://exist.sourceforge.net/NS/exist"
               xmlns:xhtml="http://www.w3.org/1999/xhtml">
 
+    <xxforms:variable name="parameters" select="xxforms:instance('fr-parameters-instance')"/>
+
     <!-- Contains the UUID returned after the Word document has been produced from us to be able to retrieve that document -->
     <xforms:instance id="fr-uuid">
         <uuid/>

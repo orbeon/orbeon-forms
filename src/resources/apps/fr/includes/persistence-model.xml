@@ -75,6 +75,12 @@
         <xforms:action if="$parameters/document = '' and $parameters/mode != 'print'">
             <!-- Create random document id -->
             <xforms:setvalue ref="$parameters/document" value="digest(string(random(true)), 'MD5', 'hex')"/>
+            <!-- If we find form data in the session, use it and reset session -->
+            <xxforms:variable name="form-data-from-session" select="xxforms:get-session-attribute('fr-upload-form-data')"/>
+            <xforms:action if="exists($form-data-from-session)">
+                <xforms:insert nodeset="xxforms:instance('fr-form-instance')" origin="$form-data-from-session"/>
+                <!-- TODO: reset session -->
+            </xforms:action>
         </xforms:action>
 
         <!-- Force all this so we can safely mark the data status as clean -->

@@ -635,7 +635,7 @@
     <xsd:element name="rebuild">
         <xsd:complexType>
             <xsd:attributeGroup ref="xforms:Common.Attributes"/>
-            <xsd:attribute name="model" type="xsd:NMTOKEN" use="required"/>
+            <xsd:attribute name="model" type="xsd:NMTOKEN" use="optional"/>
             <xsd:attributeGroup ref="xforms:XML.Events"/>
         </xsd:complexType>
     </xsd:element>

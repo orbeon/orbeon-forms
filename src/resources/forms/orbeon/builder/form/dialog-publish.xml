@@ -32,6 +32,8 @@
                 Are you sure you want to publish this form? This will override the existing form with
                 the following properties:
             </xhtml:p>
+            <!-- TODO: check whether a form already exists -->
+            <!-- TODO: if so, also check whether data for that form already exists -->
             <xhtml:ul>
                 <xhtml:li>
                     <xhtml:p>
@@ -56,10 +58,25 @@
                     <xhtml:span>Publish</xhtml:span>
                 </xforms:label>
                 <xforms:action ev:event="DOMActivate">
+                    <!-- TODO: make sure form is saved -->
                     <xforms:dispatch name="fr-publish-form" target="fr-persistence-model">
                         <xxforms:context name="application" select="$metadata-instance/application-name"/>
                         <xxforms:context name="form" select="$metadata-instance/form-name"/>
                     </xforms:dispatch>
+                </xforms:action>
+            </xforms:trigger>
+            <xforms:trigger class="xforms-trigger-appearance-modal">
+                <xforms:label>
+                    <xhtml:img src="/forms/orbeon/builder/images/upload.png" alt="Publish" title="Publish"/>
+                    <xhtml:span>Publish and Open</xhtml:span>
+                </xforms:label>
+                <xforms:action ev:event="DOMActivate">
+                    <!-- TODO: make sure form is saved -->
+                    <xforms:dispatch name="fr-publish-form" target="fr-persistence-model">
+                        <xxforms:context name="application" select="$metadata-instance/application-name"/>
+                        <xxforms:context name="form" select="$metadata-instance/form-name"/>
+                    </xforms:dispatch>
+                    <xforms:load resource="/fr/{$metadata-instance/application-name}/{$metadata-instance/form-name}" xxforms:target="_blank"/>
                 </xforms:action>
             </xforms:trigger>
             <xforms:trigger>

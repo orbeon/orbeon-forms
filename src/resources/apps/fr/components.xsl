@@ -191,8 +191,8 @@
                                 </xhtml:table>
                                 <xhtml:div class="fr-buttons">
                                     <xsl:choose>
-                                        <!-- In print mode, only include a close button -->
-                                        <xsl:when test="doc('input:instance')/*/mode = 'print'">
+                                        <!-- In print and test modes, only include a close button -->
+                                        <xsl:when test="doc('input:instance')/*/mode = ('print', 'test')">
                                             <xsl:variable name="default-buttons" as="element(fr:buttons)">
                                                 <fr:buttons>
                                                     <fr:close-button/>

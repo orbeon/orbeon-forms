@@ -22,12 +22,14 @@
         xmlns:xforms="http://www.w3.org/2002/xforms"
         xmlns:ev="http://www.w3.org/2001/xml-events">
 
+    <!-- fr-form-instance -->
     <p:param type="input" name="instance"/>
-    <p:param type="input" name="data"/>
+    <!-- XHTML+XForms -->
     <p:param type="output" name="data"/>
+    <!-- Page detail (app, form, document, and mode) -->
     <p:param type="output" name="instance"/>
 
-    <!-- Extract app, form, and mode from URL -->
+    <!-- Extract page detail (app, form, document, and mode) from URL -->
     <p:processor name="oxf:request">
         <p:input name="config">
             <config>
@@ -42,7 +44,7 @@
         <p:output name="data" id="matcher-groups"/>
     </p:processor>
 
-    <!-- Put app, form, and mode in format understood by components.xpl -->
+    <!-- Put app, form, and mode in format understood by read-form.xpl -->
     <p:processor name="oxf:xslt">
         <p:input name="data" href="#matcher-groups"/>
         <p:input name="config">
@@ -53,20 +55,27 @@
                 <mode><xsl:value-of select="/result/group[3]"/></mode>
             </request>
         </p:input>
-        <p:output name="data" id="url-info" ref="instance"/>
+        <p:output name="data" id="page-detail"/>
+    </p:processor>
+    
+    <!-- Generate the page -->
+    <p:processor name="oxf:pipeline">
+        <p:input name="config" href="detail/read-form.xpl"/>
+        <p:input name="instance" href="#page-detail"/>
+        <p:output name="data" id="xhtml-fr-xforms"/>
     </p:processor>
 
     <!-- Generate the page -->
     <p:processor name="oxf:pipeline">
         <p:input name="config" href="components.xpl"/>
-        <p:input name="instance" href="#url-info"/>
-        <p:input name="data" href="#data"/>
-        <p:output name="data" id="xforms-page"/>
+        <p:input name="instance" href="#page-detail"/>
+        <p:input name="data" href="#xhtml-fr-xforms"/>
+        <p:output name="data" id="xhtml-xforms"/>
     </p:processor>
 
     <!-- Insert the instance posted to this URL in the XForms -->
     <p:processor name="oxf:xslt">
-        <p:input name="data" href="#xforms-page"/>
+        <p:input name="data" href="#xhtml-xforms"/>
         <p:input name="form-data" href="#instance"/>
         <p:input name="config">
             <xsl:stylesheet version="2.0">
@@ -79,7 +88,12 @@
                 </xsl:template>
             </xsl:stylesheet>
         </p:input>
-        <p:output name="data" ref="data"/>
+        <p:output name="data" ref="data" debug="final-xforms"/>
     </p:processor>
-    
+
+    <!-- Return page detail as instance -->
+    <p:processor name="oxf:identity">
+        <p:input name="data" href="#page-detail"/>
+        <p:output name="data" ref="instance"/>
+    </p:processor>
 </p:config>

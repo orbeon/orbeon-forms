@@ -50,25 +50,27 @@
             <xxforms:variable name="form-resources" select="xxforms:instance('fr-current-form-resources')"/>
             <xhtml:div class="fr-header">
                 <!-- Switch language -->
-                <xhtml:div class="fr-summary-language-choice">
-                    <xxforms:variable name="available-languages"
-                                      select="xxforms:instance('fr-form-resources')/resource/@xml:lang"/>
-                    <!-- This implements a sort of xforms:select1[@appearance = 'xxforms:full']. Should be componentized. -->
-                    <xforms:group id="fr-language-selector">
-                        <xforms:repeat model="fr-resources-model" nodeset="$available-languages">
-                            <xxforms:variable name="position" select="position()"/>
-                            <xxforms:variable name="label" select="(instance('fr-languages-instance')/language[@code = context()]/@native-name, context())[1]"/>
-                            <xforms:group ref=".[$position > 1]"> | </xforms:group>
-                            <xforms:trigger ref=".[context() != instance('fr-language-instance')]" appearance="minimal">
-                                <xforms:label value="$label"/>
-                                <xforms:action ev:event="DOMActivate">
-                                    <xforms:setvalue ref="instance('fr-language-instance')" value="context()"/>
-                                </xforms:action>
-                            </xforms:trigger>
-                            <xforms:output ref=".[context() = instance('fr-language-instance')]" value="$label"/>
-                        </xforms:repeat>
-                    </xforms:group>
-                </xhtml:div>
+                <xsl:if test="doc('input:instance')/*/mode != 'print'">
+                    <xhtml:div class="fr-summary-language-choice">
+                        <xxforms:variable name="available-languages"
+                                          select="xxforms:instance('fr-form-resources')/resource/@xml:lang"/>
+                        <!-- This implements a sort of xforms:select1[@appearance = 'xxforms:full']. Should be componentized. -->
+                        <xforms:group id="fr-language-selector">
+                            <xforms:repeat model="fr-resources-model" nodeset="$available-languages">
+                                <xxforms:variable name="position" select="position()"/>
+                                <xxforms:variable name="label" select="(instance('fr-languages-instance')/language[@code = context()]/@native-name, context())[1]"/>
+                                <xforms:group ref=".[$position > 1]"> | </xforms:group>
+                                <xforms:trigger ref=".[context() != instance('fr-language-instance')]" appearance="minimal">
+                                    <xforms:label value="$label"/>
+                                    <xforms:action ev:event="DOMActivate">
+                                        <xforms:setvalue ref="instance('fr-language-instance')" value="context()"/>
+                                    </xforms:action>
+                                </xforms:trigger>
+                                <xforms:output ref=".[context() = instance('fr-language-instance')]" value="$label"/>
+                            </xforms:repeat>
+                        </xforms:group>
+                    </xhtml:div>
+                </xsl:if>
                 <!-- Custom content added to the header -->
                 <xsl:if test="fr:header">
                     <xforms:group model="fr-form-model" context="instance('fr-form-instance')">
@@ -323,7 +325,7 @@
         <xforms:trigger>
             <xforms:label>
                 <xhtml:img src="/apps/fr/style/close.gif" alt=""/>
-                <xforms:output value="$fr-resources/detail/labels/discard"/>
+                <xforms:output value="$fr-resources/detail/labels/close"/>
             </xforms:label>
             <xforms:action ev:event="DOMActivate">
                 <xxforms:script>window.close();</xxforms:script>
@@ -683,7 +685,7 @@
         <xforms:model id="fr-print-model">
             <xforms:instance id="fr-print-instance"><dummy/></xforms:instance>
             <xxforms:variable name="parameters" select="xxforms:instance('fr-parameters-instance')"/>
-            <xforms:submission id="fr-print-submission" resource="/fr/{{$parameters/app}}/{{$parameters/form}}/print/"
+            <xforms:submission id="fr-print-submission" resource="/fr/{{$parameters/app}}/{{$parameters/form}}/print/?fr-language={{xxforms:instance('fr-language-instance')}}"
                     method="post" ref="xxforms:instance('fr-form-instance')" replace="all" validate="false" xxforms:target="_blank" xxforms:show-progress="false"/>
         </xforms:model>
 

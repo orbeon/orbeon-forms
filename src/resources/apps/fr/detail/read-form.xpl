@@ -18,27 +18,14 @@
         xmlns:oxf="http://www.orbeon.com/oxf/processors"
         xmlns:xi="http://www.w3.org/2001/XInclude">
 
+    <!-- Page detail (app, form, document, and mode) -->
     <p:param type="input" name="instance"/>
+    <!-- XHTML+FR+XForms for the from obtained from persistence layer -->
     <p:param type="output" name="data"/>
-
-    <p:processor name="oxf:request">
-        <p:input name="config">
-            <config stream-type="xs:anyURI">
-                <include>/request/request-path</include>
-                <include>/request/content-type</include>
-                <include>/request/method</include>
-            </config>
-        </p:input>
-        <p:output name="data" id="request"/>
-    </p:processor>
-
-    <p:processor name="oxf:null-serializer">
-        <p:input name="data" href="#request"/>
-    </p:processor>
 
     <!-- Call up persistence layer to obtain XHTML+XForms -->
     <p:processor name="oxf:url-generator">
-        <p:input name="config" transform="oxf:unsafe-xslt" href="#instance">
+        <p:input name="config" transform="oxf:unsafe-xslt" href="#instance" debug="instance app">
             <config xsl:version="2.0" xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
 
                 <xsl:variable name="prefix" select="'oxf.fr.persistence.app'" as="xs:string"/>

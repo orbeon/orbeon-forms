@@ -43,8 +43,7 @@
 
     <!-- Print document -->
     <page path-info="/fr/([^/]+)/([^/]+)/(print)(/)?" matcher="oxf:perl5-matcher"
-          default-submission="submission-page-detail.xml"
-          model="detail/read-form.xpl" view="print.xpl"/>
+          view="print.xpl"/>
 
     <!-- Edit document -->
     <page path-info="/fr/([^/]+)/([^/]+)/([^/]+)/(edit)" matcher="oxf:perl5-matcher"

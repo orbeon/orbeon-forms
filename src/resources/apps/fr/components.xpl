@@ -20,8 +20,11 @@
         xmlns:xi="http://www.w3.org/2001/XInclude"
         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude">
 
+    <!-- Page detail (app, form, document, and mode) -->
     <p:param type="input" name="instance"/>
+    <!-- XHTML+FR+XForms for the from -->
     <p:param type="input" name="data"/>
+    <!-- XHTML+XForms -->
     <p:param type="output" name="data"/>
 
     <!-- Apply project-specific theme -->

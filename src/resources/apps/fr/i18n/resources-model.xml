@@ -9,10 +9,6 @@
         xmlns:ev="http://www.w3.org/2001/xml-events"
         id="fr-resources-model">
 
-    <xforms:action ev:event="xforms-model-construct-done">
-        <xforms:dispatch name="fr-update-language" target="fr-resources-model"/>
-    </xforms:action>
-
     <!-- Instance containing the current language -->
     <xforms:instance id="fr-language-instance">
         <language xmlns="">en</language>
@@ -53,4 +49,14 @@
                        origin="instance('fr-fr-resources')/(resource[@xml:lang = $lang], resource[1])[1]"/>
     </xforms:action>
 
+    <xforms:action ev:event="xforms-model-construct-done">
+        <!-- Use language provided as a request parameter if it exists -->
+        <xxforms:variable name="language-from-request-parameter" select="xxforms:get-request-parameter('fr-language')"/>
+        <xforms:action if="$language-from-request-parameter != ''">
+            <xforms:setvalue ref="instance('fr-language-instance')" value="$language-from-request-parameter"/>
+        </xforms:action>
+        <!-- Get initial resources for current language -->
+        <xforms:dispatch name="fr-update-language" target="fr-resources-model"/>
+    </xforms:action>
+    
 </xforms:model>

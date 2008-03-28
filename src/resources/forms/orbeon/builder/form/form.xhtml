@@ -1164,7 +1164,7 @@
                                                                                     <xxforms:variable name="insert-tds"
                                                                                                       select="for $c in for $r in instance('fb-span-grid-instance')/r
                                                                                                                           return $r/c[$column-number][. != 'x']
-                                                                                                                return $grid/xhtml:tr[count($c/../preceding-sibling::r) + 1]/xhtml:td[count($c/preceding-sibling::c) + 1]"/>
+                                                                                                                return $grid/xhtml:tr[count($c/../preceding-sibling::r) + 1]/xhtml:td[count($c/preceding-sibling::c[. != 'x']) + 1]"/>
 
                                                                                     <xforms:action xxforms:iterate="$insert-tds">
                                                                                         <xforms:insert nodeset="." origin="xxforms:element('xhtml:td', context()/@rowspan)" position="before"/>
@@ -1189,7 +1189,7 @@
                                                                                     <xxforms:variable name="insert-tds"
                                                                                                       select="for $c in for $r in instance('fb-span-grid-instance')/r
                                                                                                                           return $r/c[$column-number][. != 'x']
-                                                                                                                return $grid/xhtml:tr[count($c/../preceding-sibling::r) + 1]/xhtml:td[count($c/preceding-sibling::c) + 1]"/>
+                                                                                                                return $grid/xhtml:tr[count($c/../preceding-sibling::r) + 1]/xhtml:td[count($c/preceding-sibling::c[. != 'x']) + 1]"/>
 
                                                                                     <xforms:action xxforms:iterate="$insert-tds">
                                                                                         <xforms:insert nodeset="." origin="xxforms:element('xhtml:td', context()/@rowspan)" position="after"/>

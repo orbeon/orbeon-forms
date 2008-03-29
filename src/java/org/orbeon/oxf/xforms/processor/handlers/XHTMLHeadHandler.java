@@ -119,7 +119,7 @@ public class XHTMLHeadHandler extends HandlerBase {
             final String combinedResourceName = combinedResourcesPrefix + ".css";
 
             attributesImpl.clear();
-            final String[] attributesList = new String[] { "rel", "stylesheet", "href", combinedResourceName, "type", "text/css" };
+            final String[] attributesList = new String[] { "rel", "stylesheet", "href", combinedResourceName, "type", "text/css", "media", "all" };
             ContentHandlerHelper.populateAttributes(attributesImpl, attributesList);
             helper.element(prefix, XMLConstants.XHTML_NAMESPACE_URI, "link", attributesImpl);
 
@@ -135,7 +135,7 @@ public class XHTMLHeadHandler extends HandlerBase {
                 final XFormsFeatures.ResourceConfig resourceConfig = (XFormsFeatures.ResourceConfig) i.next();
                 // Only include stylesheet if needed
                 attributesImpl.clear();
-                final String[] attributesList = new String[] { "rel", "stylesheet", "href", resourceConfig.getResourcePath(isMinimal), "type", "text/css" };
+                final String[] attributesList = new String[] { "rel", "stylesheet", "href", resourceConfig.getResourcePath(isMinimal), "type", "text/css", "media", "all"  };
                 ContentHandlerHelper.populateAttributes(attributesImpl, attributesList);
                 helper.element(prefix, XMLConstants.XHTML_NAMESPACE_URI, "link", attributesImpl);
             }

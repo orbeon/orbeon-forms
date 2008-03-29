@@ -49,7 +49,7 @@
                 <xhtml:title>Orbeon Forms Example Applications - <xsl:value-of select="$title"/></xhtml:title>
                 <!-- Standard scripts/styles -->
                 <!-- NOTE: The XForms engine may place additional scripts and stylesheets here as needed -->
-                <xhtml:link rel="stylesheet" href="/config/theme/orbeon.css" type="text/css"/>
+                <xhtml:link rel="stylesheet" href="/config/theme/orbeon.css" type="text/css" media="all"/>
                 <!-- Handle head elements -->
                 <xsl:for-each select="/xhtml:html/xhtml:head/(xhtml:meta | xhtml:link | xhtml:style | xhtml:script)">
                     <xsl:element name="xhtml:{local-name()}" namespace="{namespace-uri()}">

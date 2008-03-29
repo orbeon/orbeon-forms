@@ -25,7 +25,7 @@
         <xhtml:html>
             <xhtml:head>
                 <xhtml:title>Orbeon Forms User Guide - <xsl:value-of select="/document/header/title"/></xhtml:title>
-                <xhtml:link rel="stylesheet" href="/config/theme/orbeon.css" type="text/css"/>
+                <xhtml:link rel="stylesheet" href="/config/theme/orbeon.css" type="text/css" media="all"/>
             </xhtml:head>
             <xhtml:body>
                 <xhtml:table cellpadding="0" cellspacing="0" border="0" id="main">

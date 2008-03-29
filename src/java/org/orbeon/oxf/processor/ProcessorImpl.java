@@ -42,6 +42,7 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
 import javax.xml.transform.sax.TransformerHandler;
+import javax.xml.transform.dom.DOMResult;
 import java.util.*;
 
 /**
@@ -354,52 +355,15 @@ public abstract class ProcessorImpl implements Processor {
     }
 
     protected Document readInputAsDOM(PipelineContext context, ProcessorInput input) {
-        /*
-        HACK: The default DOMBuild ignores startPrefixMapping, and so does
-        not create xmlns attributes. We need those with the DOM API (as opposed
-        to the DOM4j API).
-
-        TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
-        DOMResult domResult = new DOMResult(XMLUtils.createDocument());
+        final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
+        final DOMResult domResult = new DOMResult(XMLUtils.createDocument());
         identity.setResult(domResult);
         readInputAsSAX(context, input, identity);
         return (Document) domResult.getNode();
-        */
-        Document result = XMLUtils.createDocument();
-        DOMBuilder domBuilder = new DOMBuilder(result) {
-
-            private List prefixes = new ArrayList();
-            private List uris = new ArrayList();
-
-            public void startPrefixMapping(String prefix, String uri) {
-                prefixes.add(prefix);
-                uris.add(uri);
-            }
-
-            public void startElement( String ns, String localName, String name, Attributes atts) throws SAXException {
-                super.startElement(ns, localName, name, atts);
-                org.w3c.dom.Element currentElement = (org.w3c.dom.Element) m_currentNode;
-                for (Iterator i = prefixes.iterator(), j = uris.iterator(); i.hasNext();) {
-                    String prefix = (String) i.next();
-                    String uri = (String) j.next();
-                    String currentURI = currentElement.getAttributeNS(XMLConstants.XMLNS_URI, prefix);
-                    if (currentURI == null || "".equals(currentURI)) {
-                        currentElement.setAttributeNS(XMLConstants.XMLNS_URI, "xmlns:" + prefix, uri);
-                    } else if (!currentURI.equals(uri)) {
-                        throw new OXFException("Different URI for same prefix '" + prefix + "'");
-                    }
-                }
-                prefixes.clear();
-                uris.clear();
-            }
-        };
-        readInputAsSAX(context, input, domBuilder);
-        return result;
     }
 
     protected org.dom4j.Document readInputAsDOM4J(PipelineContext context, ProcessorInput input) {
         LocationSAXContentHandler ch = new LocationSAXContentHandler();
-//        readInputAsSAX(context, input, new SAXLoggerProcessor.DebugContentHandler(ch));
         readInputAsSAX(context, input, ch);
         return ch.getDocument();
     }

@@ -41,9 +41,13 @@
         <setvalue ref="/*/mode" matcher-group="3"/>
     </page>
 
-    <!-- Print document -->
+    <!-- Print document to HTML or PDF -->
     <page path-info="/fr/([^/]+)/([^/]+)/(print)(/)?" matcher="oxf:perl5-matcher"
           view="print.xpl"/>
+
+    <!-- Print document to HTML or PDF -->
+    <page path-info="/fr/([^/]+)/([^/]+)/(pdf)(/)?" matcher="oxf:perl5-matcher"
+          view="print-pdf.xpl"/>
 
     <!-- Edit document -->
     <page path-info="/fr/([^/]+)/([^/]+)/([^/]+)/(edit)" matcher="oxf:perl5-matcher"
@@ -59,6 +63,16 @@
     <page path-info="/fr/([^/]+)/([^/]+)/([^/]+)/(view)" matcher="oxf:perl5-matcher"
           default-submission="submission-page-detail.xml"
           model="detail/read-form.xpl" view="components.xpl">
+        <setvalue ref="/*/app" matcher-group="1"/>
+        <setvalue ref="/*/form" matcher-group="2"/>
+        <setvalue ref="/*/document" matcher-group="3"/>
+        <setvalue ref="/*/mode" matcher-group="4"/>
+    </page>
+
+    <!-- View document as PDF -->
+    <page path-info="/fr/([^/]+)/([^/]+)/([^/]+)/(pdf)" matcher="oxf:perl5-matcher"
+          default-submission="submission-page-detail.xml"
+          model="detail/read-form.xpl" view="pdf-view.xpl">
         <setvalue ref="/*/app" matcher-group="1"/>
         <setvalue ref="/*/form" matcher-group="2"/>
         <setvalue ref="/*/document" matcher-group="3"/>

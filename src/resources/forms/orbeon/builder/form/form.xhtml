@@ -980,14 +980,14 @@
                     <fr:grid columns="2">
                         <xhtml:tr>
                             <xhtml:td>
-                                <xforms:input id="application-name-control" bind="application-name-bind" appearance="fr:in-place" class="fr-summary fr-search">
+                                <xforms:input id="application-name-control" bind="application-name-bind" appearance="fr:in-place" class="fr-summary fr-search" incremental="true">
                                     <xforms:label ref="$form-resources/application-name/label"/>
                                     <xforms:hint ref="$form-resources/application-name/hint"/>
                                     <xforms:alert ref="$form-resources/application-name/alert"/>
                                 </xforms:input>
                             </xhtml:td>
                             <xhtml:td>
-                                <xforms:input id="form-name-control" bind="form-name-bind" appearance="fr:in-place" class="fr-summary fr-search">
+                                <xforms:input id="form-name-control" bind="form-name-bind" appearance="fr:in-place" class="fr-summary fr-search" incremental="true">
                                     <xforms:label ref="$form-resources/form-name/label"/>
                                     <xforms:hint ref="$form-resources/form-name/hint"/>
                                     <xforms:alert ref="$form-resources/form-name/alert"/>
@@ -1015,7 +1015,7 @@
                             </xhtml:td>
                             <xhtml:td>
                                 <xforms:input id="title-control" bind="title-bind"
-                                              appearance="fr:in-place" class="fr-summary fr-search">
+                                              appearance="fr:in-place" class="fr-summary fr-search" incremental="true">
                                     <xforms:label ref="$form-resources/title/label"/>
                                     <xforms:hint ref="$form-resources/title/hint"/>
                                     <xforms:alert ref="$form-resources/title/alert"/>
@@ -1026,7 +1026,7 @@
                             <xhtml:td colspan="2">
                                 <xhtml:div>
                                     <xforms:textarea id="description-control" bind="description-bind"
-                                                     appearance="fr:in-place" class="fr-summary fr-search">
+                                                     appearance="fr:in-place" class="fr-summary fr-search" incremental="true">
                                         <xforms:label ref="$form-resources/description/label"/>
                                         <xforms:hint ref="$form-resources/description/hint"/>
                                     </xforms:textarea>
@@ -1839,7 +1839,7 @@
                     <!-- Upload CSS -->
                     <xforms:trigger>
                         <xforms:label>
-                            <xhtml:img src="/apps/fr/style/pdf.png" alt="Upload PDF" title="Upload PDF"/>
+                            <xhtml:img src="/apps/fr/style/css.gif" alt="Upload PDF" title="Upload PDF"/>
                             <xhtml:span>Upload CSS</xhtml:span>
                         </xforms:label>
                         <xxforms:show ev:event="DOMActivate" dialog="fb-css-upload-dialog"/>

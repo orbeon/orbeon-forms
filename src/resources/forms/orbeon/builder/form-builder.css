@@ -234,3 +234,7 @@
 #doc4 .fb-grid-2-columns .xforms-select-appearance-full span label { width: 28.3em; *width: 27em }
 #doc4 .fb-grid-3-columns .xforms-select-appearance-full span label { width: 17em; *width: 16em }
 #doc4 .fb-grid-4-columns .xforms-select-appearance-full span label { width: 11.3em; *width: 10.5em }
+
+@media print {
+    #doc, #doc2, #doc3, #doc4 { margin-left: auto; *margin-left: auto }
+}

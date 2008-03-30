@@ -386,3 +386,10 @@ div.fr-collapsible {
 
 /* Test */
 /*.xforms-required::before { content: "*"; color:red }*/
+
+@media print {
+    body { background-color: white }
+    .fr-bottom { display: none }
+    .fr-top { display: none }
+    .fr-section-container img.fr-open-close { display: none }
+}

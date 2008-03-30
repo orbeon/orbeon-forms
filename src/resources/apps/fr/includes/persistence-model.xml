@@ -248,7 +248,7 @@
     </xforms:instance>
 
     <!-- Special cross-model bind to set the form instance read-only when necessary -->
-    <xforms:bind nodeset="xxforms:instance('fr-form-instance')" readonly="$parameters/mode = ('view', 'print')"/>
+    <xforms:bind nodeset="xxforms:instance('fr-form-instance')" readonly="$parameters/mode = ('view', 'print', 'pdf')"/>
 
     <xforms:submission id="fr-create-update-submission"
             validate="true" method="put"

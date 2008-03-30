@@ -51,7 +51,7 @@
             <xxforms:variable name="form-resources" select="xxforms:instance('fr-current-form-resources')"/>
             <xhtml:div class="fr-header">
                 <!-- Switch language -->
-                <xsl:if test="doc('input:instance')/*/mode != 'print'">
+                <xsl:if test="not(doc('input:instance')/*/mode = ('print', 'pdf'))">
                     <xhtml:div class="fr-summary-language-choice">
                         <xxforms:variable name="available-languages"
                                           select="xxforms:instance('fr-form-resources')/resource/@xml:lang"/>
@@ -201,15 +201,21 @@
                                             </xsl:variable>
                                             <xsl:apply-templates select="$default-buttons/*"/>
                                         </xsl:when>
+                                        <!-- In PDF mode, don't include anything -->
+                                        <xsl:when test="doc('input:instance')/*/mode = ('pdf')">
+                                        </xsl:when>
+                                        <!-- Use user-provided buttons -->
                                         <xsl:when test="fr:buttons">
                                             <xsl:apply-templates select="fr:buttons/node()"/>
                                         </xsl:when>
+                                        <!-- Use default buttons -->
                                         <xsl:otherwise>
                                             <xsl:variable name="default-buttons" as="element(fr:buttons)">
                                                 <fr:buttons>
                                                     <fr:back-button/>
                                                     <fr:clear-button/>
                                                     <fr:print-button/>
+                                                    <fr:pdf-button/>
                                                     <fr:save-locally-button/>
                                                     <fr:save-button/>
                                                 </fr:buttons>
@@ -300,6 +306,18 @@
             </xforms:label>
             <xforms:action ev:event="DOMActivate">
                 <xforms:send submission="fr-print-submission"/>
+            </xforms:action>
+        </xforms:trigger>
+    </xsl:template>
+
+    <xsl:template match="fr:pdf-button">
+        <xforms:trigger>
+            <xforms:label>
+                <xhtml:img src="/apps/fr/style/pdf.png" alt=""/>
+                <xhtml:span><xforms:output value="$fr-resources/detail/labels/print"/></xhtml:span>
+            </xforms:label>
+            <xforms:action ev:event="DOMActivate">
+                <xforms:send submission="fr-pdf-submission"/>
             </xforms:action>
         </xforms:trigger>
     </xsl:template>
@@ -404,7 +422,7 @@
                 <xhtml:div class="fr-inplace-edit">
                     <xhtml:span class="fr-inplace-content">
                         <xforms:input id="fr-inplace-{@id}-input">
-                            <xsl:copy-of select="@ref | @bind | xforms:label | xforms:alert"/>
+                            <xsl:copy-of select="@ref | @bind | @incremental | xforms:label | xforms:alert"/>
                             <xforms:toggle ev:event="DOMActivate" case="fr-inplace-{@id}-view"/>
                         </xforms:input>
                         <xhtml:span class="fr-inplace-buttons">
@@ -454,7 +472,7 @@
                 <xhtml:div class="fr-inplace-edit">
                     <xhtml:span class="fr-inplace-content">
                         <xforms:textarea id="fr-inplace-{@id}-textarea" appearance="xxforms:autosize">
-                            <xsl:copy-of select="@ref | @bind | xforms:label | xforms:alert"/>
+                            <xsl:copy-of select="@ref | @bind | @incremental | xforms:label | xforms:alert"/>
                             <xforms:toggle ev:event="DOMActivate" case="fr-inplace-{@id}-view"/>
                         </xforms:textarea>
                         <xhtml:span class="fr-inplace-buttons">
@@ -647,7 +665,7 @@
     <xsl:template match="/xhtml:html/xhtml:head/xforms:model[1]">
 
         <!-- This model handles form sections -->
-        <xforms:model id="fr-sections-model" xxforms:external-events="fr-after-collapse {@xxforms:external-events}" xxforms:readonly-appearance="{if (doc('input:instance')/*/mode = ('view', 'print')) then 'static' else 'dynamic'}">
+        <xforms:model id="fr-sections-model" xxforms:external-events="fr-after-collapse {@xxforms:external-events}" xxforms:readonly-appearance="{if (doc('input:instance')/*/mode = ('view', 'print', 'pdf')) then 'static' else 'dynamic'}">
             <xsl:copy-of select="@* except (@id, @xxforms:external-events)"/>
             <!-- Contain section being currently expanded/collapsed -->
             <!-- TODO: This probably doesn't quite work for sections within repeats -->
@@ -696,7 +714,11 @@
         <xforms:model id="fr-print-model">
             <xforms:instance id="fr-print-instance"><dummy/></xforms:instance>
             <xxforms:variable name="parameters" select="xxforms:instance('fr-parameters-instance')"/>
+
             <xforms:submission id="fr-print-submission" resource="/fr/{{$parameters/app}}/{{$parameters/form}}/print/?fr-language={{xxforms:instance('fr-language-instance')}}"
+                    method="post" ref="xxforms:instance('fr-form-instance')" replace="all" validate="false" xxforms:target="_blank" xxforms:show-progress="false"/>
+
+            <xforms:submission id="fr-pdf-submission" resource="/fr/{{$parameters/app}}/{{$parameters/form}}/pdf/?fr-language={{xxforms:instance('fr-language-instance')}}"
                     method="post" ref="xxforms:instance('fr-form-instance')" replace="all" validate="false" xxforms:target="_blank" xxforms:show-progress="false"/>
         </xforms:model>
 

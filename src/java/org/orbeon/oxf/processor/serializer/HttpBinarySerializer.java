@@ -71,7 +71,7 @@ public abstract class HttpBinarySerializer extends HttpSerializerBase {
                     outputStream.startDocument(contentType);
 
                     // Write content
-                    readInput(pipelineContext, null, config, outputStream);
+                    readInput(pipelineContext, getInputByName(INPUT_DATA), config, outputStream);
                     outputStream.close();
 
                     // End document

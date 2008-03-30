@@ -72,7 +72,7 @@ public abstract class HttpSerializerBase extends CachedSerializer {
             final Config config = readConfig(pipelineContext);
 
             // Get data input information
-            ProcessorInput dataInput = getInputByName(INPUT_DATA);
+            final ProcessorInput dataInput = getInputByName(INPUT_DATA);
 
             ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
             final ExternalContext.Response response = externalContext.getResponse();

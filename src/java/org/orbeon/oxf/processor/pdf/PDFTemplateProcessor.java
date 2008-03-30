@@ -51,7 +51,7 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {
 
     public PDFTemplateProcessor() {
         addInputInfo(new ProcessorInputOutputInfo("model", PDF_TEMPLATE_MODEL_NAMESPACE_URI));
-        addInputInfo(new ProcessorInputOutputInfo("instance"));
+        addInputInfo(new ProcessorInputOutputInfo("data"));
     }
 
     protected String getDefaultContentType() {
@@ -59,8 +59,8 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {
     }
 
     protected void readInput(PipelineContext pipelineContext, ProcessorInput input, Config config, OutputStream outputStream) {
-        final org.dom4j.Document configDocument = readCacheInputAsDOM4J(pipelineContext, "model");
-        final org.dom4j.Document instanceDocument = readInputAsDOM4J(pipelineContext, "instance");
+        final org.dom4j.Document configDocument = readCacheInputAsDOM4J(pipelineContext, "model");// TODO: after all, should we use "config"?
+        final org.dom4j.Document instanceDocument = readInputAsDOM4J(pipelineContext, input);
 
         final Configuration configuration = new Configuration();
         final DocumentInfo configDocumentInfo = new DocumentWrapper(configDocument, null, configuration);

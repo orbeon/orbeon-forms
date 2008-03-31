@@ -561,9 +561,20 @@
         <class name="org.orbeon.oxf.processor.pdf.PDFTemplateProcessor"/>
     </processor>
 
+    <processor name="oxf:xhtml-to-pdf-base">
+        <class name="org.orbeon.oxf.processor.pdf.XHTMLToPDFProcessor"/>
+    </processor>
+
     <!-- Temporary hack to get rid of the config input -->
     <processor name="oxf:pdf-template">
         <instantiation name="oxf:pdf-template-base">
+            <input name="config"><config/></input>
+        </instantiation>
+    </processor>
+
+    <!-- Temporary hack to get rid of the config input -->
+    <processor name="oxf:xhtml-to-pdf">
+        <instantiation name="oxf:xhtml-to-pdf-base">
             <input name="config"><config/></input>
         </instantiation>
     </processor>

@@ -205,7 +205,7 @@
                                         <xsl:when test="doc('input:instance')/*/mode = ('view')">
                                             <xsl:variable name="default-buttons" as="element(fr:buttons)">
                                                 <fr:buttons>
-                                                    <fr:back-button/>>
+                                                    <fr:back-button/>
                                                     <fr:pdf-button/>
                                                 </fr:buttons>
                                             </xsl:variable>

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <!--
     Copyright (C) 2008 Orbeon, Inc.
 
@@ -13,26 +13,24 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
+        xmlns:sql="http://orbeon.org/oxf/xml/sql"
+        xmlns:odt="http://orbeon.org/oxf/xml/datatypes"
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml"
         xmlns:oxf="http://www.orbeon.com/oxf/processors"
         xmlns:xi="http://www.w3.org/2001/XInclude"
-        xmlns:xxi="http://orbeon.org/oxf/xml/xinclude">
+        xmlns:xforms="http://www.w3.org/2002/xforms"
+        xmlns:ev="http://www.w3.org/2001/xml-events">
 
-    <!-- Page detail (app, form, document, and mode) -->
     <p:param type="input" name="instance"/>
-    <!-- XHTML+FR+XForms for the form -->
-    <p:param type="input" name="data"/>
-
     <p:param type="output" name="data"/>
 
-    <!-- Apply components -->
+    <!-- Obtain the form -->
     <p:processor name="oxf:pipeline">
-        <p:input name="config" href="html-view.xpl"/>
+        <p:input name="config" href="print-html.xpl"/>
         <p:input name="instance" href="#instance"/>
-        <p:input name="data" href="#data"/>
+        <p:output name="instance" id="updated-instance"/>
         <p:output name="data" id="xhtml-document"/>
     </p:processor>
 
@@ -41,7 +39,7 @@
         <p:input name="config" href="/ops/pfc/xforms-epilogue.xpl"/>
         <p:input name="data" href="#xhtml-document"/>
         <p:input name="model-data"><null xsi:nil="true"/></p:input>
-        <p:input name="instance" href="#instance"/>
+        <p:input name="instance" href="#updated-instance"/>
         <p:input name="xforms-model"><null xsi:nil="true"/></p:input>
         <p:output name="xformed-data" id="xformed-data"/>
     </p:processor>
@@ -62,7 +60,7 @@
         <p:output name="data" id="xhtml-data"/>
     </p:processor>
 
-    <!-- Serialize -->
+    <!-- Serialize HTML to PDF -->
     <p:processor name="oxf:xhtml-to-pdf">
         <p:input name="data" href="#xhtml-data"/>
         <p:output name="data" ref="data"/>

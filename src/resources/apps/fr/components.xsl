@@ -201,9 +201,18 @@
                                             </xsl:variable>
                                             <xsl:apply-templates select="$default-buttons/*"/>
                                         </xsl:when>
-                                        <!-- In PDF mode, don't include anything -->
-                                        <xsl:when test="doc('input:instance')/*/mode = ('pdf')">
+                                        <!-- In view mode  -->
+                                        <xsl:when test="doc('input:instance')/*/mode = ('view')">
+                                            <xsl:variable name="default-buttons" as="element(fr:buttons)">
+                                                <fr:buttons>
+                                                    <fr:back-button/>>
+                                                    <fr:pdf-button/>
+                                                </fr:buttons>
+                                            </xsl:variable>
+                                            <xsl:apply-templates select="$default-buttons/*"/>
                                         </xsl:when>
+                                        <!-- In PDF mode, don't include anything -->
+                                        <xsl:when test="doc('input:instance')/*/mode = ('pdf')"/>
                                         <!-- Use user-provided buttons -->
                                         <xsl:when test="fr:buttons">
                                             <xsl:apply-templates select="fr:buttons/node()"/>
@@ -665,7 +674,8 @@
     <xsl:template match="/xhtml:html/xhtml:head/xforms:model[1]">
 
         <!-- This model handles form sections -->
-        <xforms:model id="fr-sections-model" xxforms:external-events="fr-after-collapse {@xxforms:external-events}" xxforms:readonly-appearance="{if (doc('input:instance')/*/mode = ('view', 'print', 'pdf')) then 'static' else 'dynamic'}">
+        <xforms:model id="fr-sections-model" xxforms:external-events="fr-after-collapse {@xxforms:external-events}"
+                      xxforms:readonly-appearance="{if (doc('input:instance')/*/mode = ('view', 'print', 'pdf')) then 'static' else 'dynamic'}">
             <xsl:copy-of select="@* except (@id, @xxforms:external-events)"/>
             <!-- Contain section being currently expanded/collapsed -->
             <!-- TODO: This probably doesn't quite work for sections within repeats -->

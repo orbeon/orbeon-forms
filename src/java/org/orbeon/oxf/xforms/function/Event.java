@@ -13,14 +13,21 @@
  */
 package org.orbeon.oxf.xforms.function;
 
+import org.dom4j.QName;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.expr.Expression;
+import org.orbeon.saxon.expr.StaticContext;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.ListIterator;
+import org.orbeon.saxon.om.NamespaceResolver;
 import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.trans.XPathException;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * 2.4 Accessing Context Information for Events
@@ -28,6 +35,8 @@ import java.util.Collections;
  * This is the event() function which returns "context specific information" for an event.
  */
 public class Event extends XFormsFunction {
+
+    private Map namespaceMappings;
 
     public SequenceIterator iterate(XPathContext xpathContext) throws XPathException {
         // Get parameter name
@@ -41,7 +50,36 @@ public class Event extends XFormsFunction {
         if (event == null)
             return new ListIterator(Collections.EMPTY_LIST);
 
+        // As an extension, we allow a QName
+
+        // NOTE: Here the idea is to find the namespaces in scope. We assume that the expression occurs on an XForms
+        // element. There are other ways of obtaining the namespaces, for example we could extract them from the static
+        // state.
+//        final Element element = getContextStack(xpathContext).getCurrentBindingContext().getControlElement();
+//        final Map namespaceMappings = getContainingDocument(xpathContext).getStaticState().getNamespaceMappings(element);
+
+        final QName attributeQName = Dom4jUtils.extractTextValueQName(namespaceMappings, attributeName);
+
         // Simply ask the event for the attribute
-        return event.getAttribute(attributeName);
+        return event.getAttribute(Dom4jUtils.qNameToexplodedQName(attributeQName));
+    }
+
+    // The following copies StaticContext namespace information
+    public void checkArguments(StaticContext env) throws XPathException {
+        // See also Saxon Evaluate.java
+        if (namespaceMappings == null) { // only do this once
+            super.checkArguments(env);
+
+            namespaceMappings = new HashMap();
+
+            final NamespaceResolver namespaceResolver = env.getNamespaceResolver();
+            for (Iterator iterator = namespaceResolver.iteratePrefixes(); iterator.hasNext();) {
+                final String prefix = (String) iterator.next();
+                if (!"".equals(prefix)) {
+                    final String uri = namespaceResolver.getURIForPrefix(prefix, true);
+                    namespaceMappings.put(prefix, uri);
+                }
+            }
+        }
     }
 }

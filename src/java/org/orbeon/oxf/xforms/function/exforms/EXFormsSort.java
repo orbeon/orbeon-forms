@@ -70,10 +70,10 @@ public class EXFormsSort extends XFormsFunction {
         return new SortExpression(sequenceToSortExpression, sortKeys).iterate(xpathContext);
     }
 
+    // The following copies all the StaticContext information into a new StaticContext
     public void checkArguments(StaticContext env) throws XPathException {
         // See same method in Saxon Evaluate.java
-        if (staticContext == null) {
-            // only do this once
+        if (staticContext == null) { // only do this once
             super.checkArguments(env);
 
             final NamespaceResolver namespaceResolver = env.getNamespaceResolver();

@@ -82,9 +82,9 @@ public class XFormsSelectControl extends XFormsSelect1Control {
                 // Handle xforms-select / xforms-deselect
                 // TODO: Dispatch to itemset or item once we support doing that
                 if (!itemWasSelected && itemIsSelected)
-                    selectEvents.add(new XFormsSelectEvent(this));
+                    selectEvents.add(new XFormsSelectEvent(this, currentItemValue));
                 else if (itemWasSelected && !itemIsSelected)
-                    containingDocument.dispatchEvent(pipelineContext, new XFormsDeselectEvent(this));
+                    containingDocument.dispatchEvent(pipelineContext, new XFormsDeselectEvent(this, currentItemValue));
             }
             if (selectEvents.size() > 0) {
                 // Select events must be sent after all xforms-deselect events

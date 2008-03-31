@@ -428,12 +428,23 @@ public class Dom4jUtils {
      * @return              a QName object or null if not found
      */
     public static QName extractTextValueQName(Element element, String qNameString) {
+        return extractTextValueQName(getNamespaceContext(element), qNameString);
+    }
+
+    /**
+     * Extract a QName from a string value, given namespace mappings. Return null if the text is empty.
+     *
+     * @param namespaces    prefix -> URI mappings
+     * @param qNameString   QName to analyze
+     * @return              a QName object or null if not found
+     */
+    public static QName extractTextValueQName(Map namespaces, String qNameString) {
         if (qNameString == null)
             return null;
         qNameString = qNameString.trim();
         if (qNameString.length() == 0)
             return null;
-        final Map namespaces = getNamespaceContext(element);
+
         final int colonIndex = qNameString.indexOf(':');
         final String prefix;
         final String localName;
@@ -443,6 +454,8 @@ public class Dom4jUtils {
             localName = qNameString;
             final String nsURI = (String) namespaces.get(prefix);
             namespaceURI = nsURI == null ? "" : nsURI;
+        } else if (colonIndex == 0) {
+            throw new OXFException("Empty prefix for QName: " + qNameString);
         } else {
             prefix = qNameString.substring(0, colonIndex);
             localName = qNameString.substring(colonIndex + 1);

@@ -106,7 +106,7 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
             // This is an XForms element
 
             // Create a new id and update the attributes if needed
-            attributes = getAttributes(attributes, reusableStringArray);
+            attributes = getAttributesGatherNamespaces(attributes, reusableStringArray);
 
             super.startElement(uri, localname, qName, attributes);
 
@@ -131,7 +131,7 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
 
                             // Create a new id and update the attributes if needed
                             if (htmlElementId == null) {
-                                attributes = getAttributes(attributes, reusableStringArray);
+                                attributes = getAttributesGatherNamespaces(attributes, reusableStringArray);
                                 htmlElementId = reusableStringArray[0];
 
                                 // TODO: Clear all attributes having AVTs or XPath expressions will end up in repeat templates.
@@ -143,7 +143,7 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
                             // Create a new xxforms:attribute control
                             reusableAttributes.clear();
 
-                            final AttributesImpl newAttributes = (AttributesImpl) getAttributes(reusableAttributes, reusableStringArray);
+                            final AttributesImpl newAttributes = (AttributesImpl) getAttributesGatherNamespaces(reusableAttributes, reusableStringArray);
 
                             newAttributes.addAttribute("", "for", "for", ContentHandlerHelper.CDATA, htmlElementId);
                             newAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, attributeName);
@@ -197,7 +197,7 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
         return documentLocator;
     }
 
-    private Attributes getAttributes(Attributes attributes, String[] newIdAttribute) {
+    private Attributes getAttributesGatherNamespaces(Attributes attributes, String[] newIdAttribute) {
         final int idIndex = attributes.getIndex("id");
         final String newIdAttributeUnprefixed;
         if (idIndex == -1) {

@@ -13,9 +13,17 @@
  */
 package org.orbeon.oxf.xforms.event.events;
 
+import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
-import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.saxon.om.SequenceIterator;
+import org.orbeon.saxon.om.ListIterator;
+import org.orbeon.saxon.om.EmptyIterator;
+import org.orbeon.saxon.value.StringValue;
+
+import java.util.Collections;
 
 
 /**
@@ -25,7 +33,28 @@ import org.orbeon.oxf.xforms.control.XFormsControl;
  * The default action for this event results in the following: None; notification event only.
  */
 public class XFormsSelectEvent extends XFormsUIEvent {
+
+    public static final String XXFORMS_ITEM_VALUE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "item-value");
+
+    private String itemValue;
+
     public XFormsSelectEvent(XFormsEventTarget targetObject) {
         super(XFormsEvents.XFORMS_SELECT, (XFormsControl) targetObject, true, false);
+    }
+    public XFormsSelectEvent(XFormsEventTarget targetObject, String itemValue) {
+        this(targetObject);
+        this.itemValue = itemValue;
+    }
+
+    public SequenceIterator getAttribute(String name) {
+        if (XXFORMS_ITEM_VALUE.equals(name)) {
+            // Return the selected item value
+            if (itemValue != null)
+                return new ListIterator(Collections.singletonList(new StringValue(itemValue)));
+            else
+                return new EmptyIterator();
+        } else {
+            return super.getAttribute(name);
+        }
     }
 }

@@ -13,9 +13,15 @@
  */
 package org.orbeon.oxf.xforms.event.events;
 
+import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
-import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.saxon.om.EmptyIterator;
+import org.orbeon.saxon.om.ListIterator;
+import org.orbeon.saxon.om.SequenceIterator;
+import org.orbeon.saxon.value.StringValue;
+
+import java.util.Collections;
 
 
 /**
@@ -25,7 +31,27 @@ import org.orbeon.oxf.xforms.control.XFormsControl;
  * The default action for this event results in the following: None; notification event only.
  */
 public class XFormsDeselectEvent extends XFormsUIEvent {
+
+    private String itemValue;
+
     public XFormsDeselectEvent(XFormsEventTarget targetObject) {
         super(XFormsEvents.XFORMS_DESELECT, (XFormsControl) targetObject, true, false);
+    }
+
+    public XFormsDeselectEvent(XFormsEventTarget targetObject, String itemValue) {
+        this(targetObject);
+        this.itemValue = itemValue;
+    }
+
+    public SequenceIterator getAttribute(String name) {
+        if (XFormsSelectEvent.XXFORMS_ITEM_VALUE.equals(name)) {
+            // Return the selected item value
+            if (itemValue != null)
+                return new ListIterator(Collections.singletonList(new StringValue(itemValue)));
+            else
+                return new EmptyIterator();
+        } else {
+            return super.getAttribute(name);
+        }
     }
 }

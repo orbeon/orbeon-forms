@@ -583,8 +583,29 @@
             <section>
                 <title>Enhanced <code>event()</code> Function Support</title>
                 <p>
+                    The following standard event attributes are implemented:
+                </p>
+                <p>
                     [TODO: describe Orbeon Forms support for event() function for each event]
                 </p>
+                <p>
+                    The following extension event attributes are implemented:
+                </p>
+                <p>
+                    [TODO: describe Orbeon Forms support for event() function for each event]
+                </p>
+                <ul>
+                    <li>
+                        <a name="xforms-select"/>
+                        <p>
+                            <code>event('xxforms:item-value')</code>
+                        </p>
+                        <p>
+                            When this event is dispatched to in response to a selection control item being selected,
+                            returns the value of the selected item.
+                        </p>
+                    </li>
+                </ul>
             </section>
             <a name="dispatch-context"/>
             <section>

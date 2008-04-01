@@ -18,23 +18,17 @@
 
     <p:param type="input" name="instance"/>
 
-    <p:processor name="oxf:xslt">
-        <p:input name="data" href="#instance"/>
-        <p:input name="config">
+    <p:processor name="oxf:url-generator">
+        <p:input name="config" transform="oxf:xslt" href="#instance">
             <config xsl:version="2.0">
                 <xsl:variable name="applications-list" select="document('oxf:/apps-list.xml')" as="document-node()"/>
                 <xsl:variable name="application-id" select="/*/application-id" as="xs:string"/>
                 <xsl:variable name="application" select="$applications-list//application[@id = $application-id]" as="element()"/>
                 <xsl:variable name="url" select="concat('oxf:/apps/', $application/@id, '/', string(/*/source-url))" as="xs:string"/>
                 <url><xsl:value-of select="$url"/></url>
-                <content-type>text/plain</content-type>
+                <mode>binary</mode>
             </config>
         </p:input>
-        <p:output name="data" id="url-config"/>
-    </p:processor>
-
-    <p:processor name="oxf:url-generator">
-        <p:input name="config" href="#url-config"/>
         <p:output name="data" id="source-file"/>
     </p:processor>
 

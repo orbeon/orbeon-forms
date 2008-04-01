@@ -12,25 +12,14 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <config xmlns="http://www.orbeon.com/oxf/controller"
-        xmlns:xu="http://www.xmldb.org/xupdate"
         xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
-    <!-- Files to serve directly -->
-    <files path-info="*.gif"/>
-    <files path-info="*.css"/>
-    <files path-info="*.pdf"/>
-    <files path-info="*.js"/>
-    <files path-info="*.png"/>
-    <files path-info="*.jpg"/>
-    <files path-info="*.xsd"/>
-    <files path-info="*.xml" mime-type="application/xml"/>
-    <files path-info="*.svg" mime-type="image/svg+xml"/>
-    <files path-info="*.html" mime-type="text/html"/>
-    <files path-info="*.htm" mime-type="text/html"/>
-    <files path-info="*.java" mime-type="text/plain"/>
-    <files path-info="*.txt" mime-type="text/plain"/>
-    <files path-info="*.xq" mime-type="text/plain"/>
-    <files path-info="*.jar" mime-type="application/zip"/>
+    <!-- Files to serve directly (and exclude files under /[app]/service/) -->
+    <files path-info="(?!/([^/]+)/service/).+\.(gif|css|pdf|js|png|jpg|xsd)" matcher="oxf:perl5-matcher"/>
+    <files path-info="(?!/([^/]+)/service/).+\.xml" matcher="oxf:perl5-matcher" mime-type="application/xml"/>
+    <files path-info="(?!/([^/]+)/service/).+\.html?" matcher="oxf:perl5-matcher" mime-type="text/html"/>
+    <files path-info="(?!/([^/]+)/service/).+\.(java|txt|xq)" matcher="oxf:perl5-matcher" mime-type="text/plain"/>
+    <files path-info="(?!/([^/]+)/service/).+\.jar" matcher="oxf:perl5-matcher" mime-type="application/zip"/>
 
     <!-- Home redirects to Welcome application -->
     <page id="home" path-info="/">

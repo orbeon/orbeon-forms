@@ -561,7 +561,7 @@
         <pattern>*.png</pattern>
     </mime-type>
     <mime-type>
-        <name>image/svg</name>
+        <name>image/svg+xml</name>
         <pattern>*.xml</pattern>
         <pattern>*.svg</pattern>
         <pattern>*.svgz</pattern>

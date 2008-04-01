@@ -265,9 +265,9 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
 
                             // Can we just add this condition to the previous "when" statement?
                             boolean canAddToPreviousWhen =
-                                    previousIsFile  && currentIsFile &&
+                                    previousIsFile && currentIsFile &&
                                     previousFileIsVersioned == currentFileIsVersioned &&
-                                    previousIsSimple && matcherURI == null && matcherQName == null && mimeType ==null;
+                                    previousIsSimple && matcherURI == null && matcherQName == null && mimeType == null;
 
                             // Create <p:when>
                             ASTWhen when;
@@ -354,14 +354,17 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                                 // Create new "when"
                                 currentChoose.getWhen().add(when);
                                 if (currentIsFile) {
+                                    // Handle file
                                     previousIsFile = true;
                                     previousFileIsVersioned = currentFileIsVersioned;
 
                                     // For files, enforce GET method
-                                    when.setTest("/request/method = 'GET' and (" + when.getTest() + ")");
+                                    if (matcherURI == null && matcherQName == null)// TODO: should do this when we have matchers as well, but the condition applies to the #matcher-* input
+                                        when.setTest("/request/method = 'GET' and (" + when.getTest() + ")");
 
                                     handleFile(when, request, mimeType, epilogueData, epilogueModelData, epilogueInstance, epilogueXFormsModel, currentFileIsVersioned);
                                 } else if ("page".equals(element.getName())) {
+                                    // Handle page
                                     previousIsFile = false;
                                     // Get unique page number
                                     int pageNumber = element.getParent().elements().indexOf(element);

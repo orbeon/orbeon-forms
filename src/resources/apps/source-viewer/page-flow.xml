@@ -16,7 +16,7 @@
         xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
     <!-- Download a given file -->
-    <page id="download" path-info="/source-viewer/download/([^/]+)/(.+)" matcher="oxf:perl5-matcher"
+    <page id="download" path-info="/source-viewer/service/download/([^/]+)/(.+)" matcher="oxf:perl5-matcher"
             default-submission="default-submission.xml"
             model="download-model.xpl">
         <setvalue ref="/form/application-id" matcher-group="1"/>

@@ -96,7 +96,6 @@
             <!-- Control instance -->
             <xforms:instance id="control-instance">
                 <control xmlns="">
-                    <path/>
                     <show-xml>false</show-xml>
                     <xml-trigger/>
                     <text-trigger/>
@@ -198,8 +197,8 @@
                 <td>
                     <xforms:group>
                         <xforms:action ev:event="DOMActivate" >
-                            <xforms:setvalue ref="instance('control-instance')/path" value="concat('/source-viewer/download/', instance('parameters-instance')/application-id, '/', (instance('source-files-instance')//file)[index('files-repeat')]/@path)"/>
-                            <xforms:load ref="instance('control-instance')/path" f:url-type="resource"/>
+                            <xforms:load resource="/source-viewer/service/download/{instance('parameters-instance')/application-id}/{(instance('source-files-instance')//file)[index('files-repeat')]/@path}"
+                                         f:url-type="resource" xxforms:show-progress="false"/>
                         </xforms:action>
                         <xforms:trigger appearance="minimal">
                             <xforms:label>

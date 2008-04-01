@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.servlet;
 
-import org.apache.commons.fileupload.DefaultFileItemFactory;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.FileItem;
 import org.orbeon.oxf.util.SystemUtils;
 import org.orbeon.oxf.util.NetUtils;
@@ -123,7 +123,7 @@ public class MultipartFormDataBuilder {
      * Save a temporary file with all the values according to RFC 2388.
      */
     private void createTemporaryFile() throws IOException {
-        fileItem = new DefaultFileItemFactory(maxMemorySize, SystemUtils.getTemporaryDirectory()).createItem("dummy", "dummy", false, null);
+        fileItem = new DiskFileItemFactory(maxMemorySize, SystemUtils.getTemporaryDirectory()).createItem("dummy", "dummy", false, null);
         OutputStream outputStream = new BufferedOutputStream(fileItem.getOutputStream());
 
         // Write content

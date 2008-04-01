@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.servlet;
 
-import org.apache.commons.fileupload.DefaultFileItemFactory;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.FileItem;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
@@ -75,7 +75,7 @@ public class ServletInputStreamRepeater {
         public SavingInputStream(InputStream in) throws IOException {
             super(in);
 
-            fileItem = new DefaultFileItemFactory(maxMemorySize, SystemUtils.getTemporaryDirectory()).createItem("dummy", "dummy", false, null);
+            fileItem = new DiskFileItemFactory(maxMemorySize, SystemUtils.getTemporaryDirectory()).createItem("dummy", "dummy", false, null);
             outputStream = fileItem.getOutputStream();
         }
 

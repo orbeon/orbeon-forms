@@ -13,23 +13,30 @@
  */
 package org.orbeon.oxf.servlet;
 
-import org.apache.commons.fileupload.*;
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileUploadBase;
+import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.fileupload.RequestContext;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.externalcontext.ExternalContextToHttpServletResponseWrapper;
 import org.orbeon.oxf.externalcontext.ForwardHttpServletRequestWrapper;
 import org.orbeon.oxf.externalcontext.ServletToExternalContextRequestDispatcherWrapper;
-import org.orbeon.oxf.externalcontext.ExternalContextToHttpServletResponseWrapper;
 import org.orbeon.oxf.pipeline.InitUtils;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.generator.RequestGenerator;
 import org.orbeon.oxf.resources.OXFProperties;
-import org.orbeon.oxf.util.*;
+import org.orbeon.oxf.util.LoggerFactory;
+import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.util.SystemUtils;
+import org.orbeon.oxf.util.URLRewriter;
 import org.orbeon.oxf.webapp.ProcessorService;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
-import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -63,7 +70,6 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
         private Map headerValuesMap;
         private Map sessionMap;
         private Map parameterMap;
-        private ServletInputStreamRepeater repeater;
 
         private boolean getParameterMapMultipartFormDataCalled;
         private boolean getInputStreamCalled;
@@ -137,22 +143,8 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
                     if (getInputStreamCalled)
                         throw new OXFException("Cannot call getParameterMap() after getInputStream() when a form was posted with multipart/form-data");
 
-                    // If needed, instanciate the repeater that may take care of temporarily storing the input stream
-                    boolean enableInputStreamSaving = false;// no longer do this; this was required for upload and portlets, now we do it differently
-
-                    ServletInputStreamRepeater localRepeater = null;
-                    try {
-                        if (enableInputStreamSaving)
-                            localRepeater = new ServletInputStreamRepeater(request);
-
-                        // Decode the multipart data
-                        parameterMap = getParameterMapMultipart(pipelineContext, request, localRepeater, DEFAULT_HEADER_ENCODING);
-
-                        if (enableInputStreamSaving)
-                            repeater = localRepeater;
-                    } catch (IOException e) {
-                        throw new OXFException(e);
-                    }
+                    // Decode the multipart data
+                    parameterMap = getParameterMapMultipart(pipelineContext, request, DEFAULT_HEADER_ENCODING);
 
                     // Remember that we were called, so we can display a meaningful exception if getInputStream() is called after this
                     getParameterMapMultipartFormDataCalled = true;
@@ -206,26 +198,18 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
         }
 
         public String getCharacterEncoding() {
-            if (repeater != null)
-                return repeater.getCharacterEncoding();
-            else if (inputStreamCharset != null)
+            if (inputStreamCharset != null)
                 return inputStreamCharset;
             else
                 return nativeRequest.getCharacterEncoding();
         }
 
         public int getContentLength() {
-            if (repeater != null)
-                return repeater.getContentLength();
-            else
-                return nativeRequest.getContentLength();
+            return nativeRequest.getContentLength();
         }
 
         public String getContentType() {
-            if (repeater != null)
-                return repeater.getContentType();
-            else
-                return nativeRequest.getContentType();
+            return nativeRequest.getContentType();
         }
 
         public String getServerName() {
@@ -285,20 +269,16 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
         }
 
         public InputStream getInputStream() throws IOException {
-            if (repeater != null) {
-                return repeater.getSavedInputStream();
-            } else {
-                if (getParameterMapMultipartFormDataCalled)
-                    throw new OXFException("Cannot call getInputStream() after getParameterMap() when a form was posted with multipart/form-data");
+            if (getParameterMapMultipartFormDataCalled)
+                throw new OXFException("Cannot call getInputStream() after getParameterMap() when a form was posted with multipart/form-data");
 
-                // Set the input character encoding before getting the stream as this can cause issues with Jetty
-                handleInputEncoding();
+            // Set the input character encoding before getting the stream as this can cause issues with Jetty
+            handleInputEncoding();
 
-                // Remember that we were called, so we can display a meaningful exception if getParameterMap() is called after this
-                getInputStreamCalled = true;
+            // Remember that we were called, so we can display a meaningful exception if getParameterMap() is called after this
+            getInputStreamCalled = true;
 
-                return nativeRequest.getInputStream();
-            }
+            return nativeRequest.getInputStream();
         }
 
         public Locale getLocale() {
@@ -353,14 +333,23 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
      * NOTE: This is used also by PortletExternalContext. Should probably remove this dependency
      * at some point.
      */
-    public static Map getParameterMapMultipart(PipelineContext pipelineContext, final ExternalContext.Request request, final ServletInputStreamRepeater repeater, String headerEncoding) {
+    public static Map getParameterMapMultipart(PipelineContext pipelineContext, final ExternalContext.Request request, String headerEncoding) {
 
         final Map uploadParameterMap = new HashMap();
         try {
             // Setup commons upload
-            final DiskFileUpload upload = new DiskFileUpload() {
+
+            // Read properties
+            // NOTE: We use properties scoped in the Request generator for historical reasons. Not too good.
+            int maxSize = RequestGenerator.getMaxSizeProperty();
+            int maxMemorySize = RequestGenerator.getMaxMemorySizeProperty();
+
+            final DiskFileItemFactory diskFileItemFactory = new DiskFileItemFactory(maxSize, SystemUtils.getTemporaryDirectory());
+
+            final ServletFileUpload upload = new ServletFileUpload(diskFileItemFactory) {
                 protected FileItem createItem(Map headers, boolean isFormField) throws FileUploadException {
                     if (isFormField) {
+                        // Handle externalized values
                         final String externalizeFormValuesPrefix = OXFProperties.instance().getPropertySet().getString(EXTERNALIZE_FORM_VALUES_PREFIX_PROPERTY);
                         final String fieldName = getFieldName(headers);
                         if (externalizeFormValuesPrefix != null && fieldName.startsWith(externalizeFormValuesPrefix)) {
@@ -377,14 +366,7 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
                 }
             };
             upload.setHeaderEncoding(headerEncoding);
-
-            // Read properties
-            // NOTE: We use properties scoped in the Request generator for historical reasons. Not too good.
-            int maxSize = RequestGenerator.getMaxSizeProperty();
-            int maxMemorySize = RequestGenerator.getMaxMemorySizeProperty();
-
-            if (repeater != null)
-                repeater.setMaxMemorySize(maxMemorySize);
+            upload.setSizeMax(maxMemorySize);
 
             // Add a listener to destroy file items when the pipeline context is destroyed
             pipelineContext.addContextListener(new PipelineContext.ContextListenerAdapter() {
@@ -399,45 +381,28 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
                             }
                         }
                     }
-                    // Also cleanup repeater
-                    if (repeater != null)
-                        repeater.delete();
                 }
             });
 
             // Wrap and implement just the required methods for the upload code
             final InputStream inputStream;
             try {
-                inputStream = (repeater != null) ? repeater.getInputStream() : request.getInputStream();
+                inputStream = request.getInputStream();
             } catch (IOException e) {
                 throw new OXFException(e);
             }
 
-            final HttpServletRequest wrapper = new HttpServletRequestStub() {
-
-                public String getHeader(String s) {
-                    if ("content-type".equalsIgnoreCase(s)) {
-                        if (repeater != null)
-                            return repeater.getContentType();
-                        else
-                            return request.getContentType();
-                    }
-                    return null;
-                }
+            final RequestContext requestContext = new RequestContext() {
 
                 public int getContentLength() {
-                    if (repeater != null)
-                        return repeater.getContentLength();
-                    else
-                        return request.getContentLength();
+                    return request.getContentLength();
                 }
 
-                public ServletInputStream getInputStream() {
-                    // NOTE: The upload code does not actually check that it
-                    // doesn't read more than the content-length sent by the client!
-                    // Maybe here would be a good place to put an interceptor and
-                    // make sure we don't read too much.
-                    return new ServletInputStream() {
+                public InputStream getInputStream() {
+                    // NOTE: The upload code does not actually check that it doesn't read more than the content-length
+                    // sent by the client! Maybe here would be a good place to put an interceptor and make sure we
+                    // don't read too much.
+                    return new InputStream() {
                         public int read() throws IOException {
                             return inputStream.read();
                         }
@@ -445,13 +410,17 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
                 }
 
                 public String getContentType() {
-                    return request.getContainerType();
+                    return request.getContentType();
+                }
+
+                public String getCharacterEncoding() {
+                    return request.getCharacterEncoding();
                 }
             };
 
             // Parse the request and add file information
             try {
-                for (Iterator i = upload.parseRequest(wrapper, maxMemorySize, maxSize, SystemUtils.getTemporaryDirectory().getPath()).iterator(); i.hasNext();) {
+                for (Iterator i = upload.parseRequest(requestContext).iterator(); i.hasNext();) {
                     FileItem fileItem = (FileItem) i.next();
                     if (fileItem.isFormField()) {
                         // Simple form filled: add value to existing values, if any
@@ -460,13 +429,6 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
                         // It is a file, store the FileItem object
                         uploadParameterMap.put(fileItem.getFieldName(), fileItem);
                     }
-                }
-                // Make sure repeater finishes its job
-                if (repeater != null) {
-                    repeater.finishReading();
-                    logger.debug("Finished reading InputStream repeater (announced content length "
-                            + repeater.getContentLength() + " bytes, actual read "
-                            + repeater.getActualByteCount() + " bytes)");
                 }
             } catch (FileUploadBase.SizeLimitExceededException e) {
                 // Should we do something smart so we can use the Presentation

@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.processor;
 
-import org.apache.commons.fileupload.DefaultFileItemFactory;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.log4j.Logger;
 import org.dom4j.Document;
@@ -238,7 +238,7 @@ public class EmailProcessor extends ProcessorImpl {
                 throw new OXFException("mime-multipart attribute on body element requires part children elements");
             String contentTypeFromAttribute = NetUtils.getContentTypeMediaType(bodyElement.attributeValue("content-type"));
             if (contentTypeFromAttribute != null && contentTypeFromAttribute.startsWith("multipart/"))
-                contentTypeFromAttribute.substring("multipart/".length());
+                contentTypeFromAttribute.substring("multipart/".length());// TODO: This is doing nothing!
             if (parts.hasNext() && multipart == null)
                 multipart = DEFAULT_MULTIPART;
         } else {
@@ -251,7 +251,7 @@ public class EmailProcessor extends ProcessorImpl {
             MimeMultipart mimeMultipart = new MimeMultipart(multipart);
 
             // Iterate through parts
-            for (Iterator i = parts; i.hasNext();) {
+            for (final Iterator i = parts; i.hasNext();) {
                 Element partElement = (Element) i.next();
 
                 MimeBodyPart mimeBodyPart = new MimeBodyPart();
@@ -390,7 +390,7 @@ public class EmailProcessor extends ProcessorImpl {
     public static FileItem handleStreamedPartContent(PipelineContext pipelineContext, SAXSource source, String contentType, String encoding)
             throws IOException, TransformerException {
 
-        final FileItem fileItem = new DefaultFileItemFactory(RequestGenerator.getMaxMemorySizeProperty(), SystemUtils.getTemporaryDirectory())
+        final FileItem fileItem = new DiskFileItemFactory(RequestGenerator.getMaxMemorySizeProperty(), SystemUtils.getTemporaryDirectory())
                 .createItem("dummy", "dummy", false, null);
         // Make sure the file is deleted when the context is destroyed
         pipelineContext.addContextListener(new PipelineContext.ContextListenerAdapter() {

@@ -15,6 +15,8 @@ package org.orbeon.oxf.util;
 
 import org.apache.log4j.Logger;
 import org.apache.commons.fileupload.*;
+import org.apache.commons.fileupload.disk.DiskFileItem;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.StaticExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -602,7 +604,7 @@ public class NetUtils {
             }
         }
         // Create file if it doesn't exist (necessary when the file size is 0)
-        final File storeLocation = ((DefaultFileItem) fileItem).getStoreLocation();
+        final File storeLocation = ((DiskFileItem) fileItem).getStoreLocation();
         try {
             storeLocation.createNewFile();
         } catch (IOException e) {
@@ -619,7 +621,7 @@ public class NetUtils {
     public static FileItem prepareFileItem(PipelineContext pipelineContext, int scope) {
         // We use the commons fileupload utilities to save a file
         if (fileItemFactory == null)
-            fileItemFactory = new DefaultFileItemFactory(0, SystemUtils.getTemporaryDirectory());
+            fileItemFactory = new DiskFileItemFactory(0, SystemUtils.getTemporaryDirectory());
         final FileItem fileItem = fileItemFactory.createItem("dummy", "dummy", false, null);
         // Make sure the file is deleted appropriately
         if (scope == REQUEST_SCOPE) {
@@ -645,16 +647,7 @@ public class NetUtils {
         // Make sure the file is deleted at the end of request
         pipelineContext.addContextListener(new PipelineContext.ContextListenerAdapter() {
             public void contextDestroyed(boolean success) {
-                try {
-                    // Log when we delete files
-                    if (logger.isDebugEnabled()) {
-                        final String temporaryFileName = ((DeferredFileOutputStream) fileItem.getOutputStream()).getFile().getAbsolutePath();
-                        logger.debug("Deleting temporary file: " + temporaryFileName);
-                    }
-                    fileItem.delete();
-                } catch (IOException e) {
-                    throw new OXFException(e);
-                }
+                deleteFileItem(fileItem, REQUEST_SCOPE);
             }
         });
     }
@@ -672,16 +665,7 @@ public class NetUtils {
         if (session != null) {
             session.addListener(new ExternalContext.Session.SessionListener() {
                 public void sessionDestroyed() {
-                    try {
-                        if (logger.isDebugEnabled()) {
-                            final String temporaryFileName = ((DeferredFileOutputStream) fileItem.getOutputStream()).getFile().getAbsolutePath();
-                            logger.debug("Deleting temporary Session file: " + temporaryFileName);
-                        }
-                        fileItem.delete();
-                    }
-                    catch (IOException e) {
-                        throw new OXFException(e);
-                    }
+                    deleteFileItem(fileItem, SESSION_SCOPE);
                 }
             });
         } else {
@@ -702,21 +686,24 @@ public class NetUtils {
         if (application != null) {
             application.addListener(new ExternalContext.Application.ApplicationListener() {
                 public void servletDestroyed() {
-                    try {
-                        if (logger.isDebugEnabled()) {
-                            final String temporaryFileName = ((DeferredFileOutputStream) fileItem.getOutputStream()).getFile().getAbsolutePath();
-                            logger.debug("Deleting temporary Application file: " + temporaryFileName);
-                        }
-                        fileItem.delete();
-                    }
-                    catch (IOException e) {
-                        throw new OXFException(e);
-                    }
+                    deleteFileItem(fileItem, APPLICATION_SCOPE);
                 }
             });
         } else {
             logger.debug("No application object found so cannot register temporary file deletion upon session destruction: " + fileItem.getName());
         }
+    }
+
+    private static void deleteFileItem(FileItem fileItem, int scope) {
+        if (logger.isDebugEnabled() && fileItem instanceof DiskFileItem) {
+            final File storeLocation = ((DiskFileItem) fileItem).getStoreLocation();
+            if (storeLocation != null) {
+                final String temporaryFileName = storeLocation.getAbsolutePath();
+                final String scopeString = (scope == REQUEST_SCOPE) ? "request" : (scope == SESSION_SCOPE) ? "session" : "application";
+                logger.debug("Deleting temporary " + scopeString + "-scoped file: " + temporaryFileName);
+            }
+        }
+        fileItem.delete();
     }
 
     /**

@@ -160,7 +160,7 @@ public class PortletExternalContext extends PortletWebAppExternalContext impleme
                     // Special handling for multipart/form-data
 
                     // Decode the multipart data
-                    parameterMap = ServletExternalContext.getParameterMapMultipart(pipelineContext, request, null, ServletExternalContext.DEFAULT_FORM_CHARSET_DEFAULT);
+                    parameterMap = ServletExternalContext.getParameterMapMultipart(pipelineContext, request, ServletExternalContext.DEFAULT_FORM_CHARSET_DEFAULT);
 
                 } else {
                     // Just use native request parameters

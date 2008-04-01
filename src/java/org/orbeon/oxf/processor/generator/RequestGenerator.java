@@ -13,8 +13,8 @@
  */
 package org.orbeon.oxf.processor.generator;
 
-import org.apache.commons.fileupload.DefaultFileItem;
-import org.apache.commons.fileupload.DefaultFileItemFactory;
+import org.apache.commons.fileupload.disk.DiskFileItem;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.log4j.Logger;
 import org.dom4j.*;
@@ -100,11 +100,11 @@ public class RequestGenerator extends ProcessorImpl {
     private static final String FILE_ITEM_ELEMENT = "request:file-item";
     private static final String PARAMETER_NAME_ATTRIBUTE = "parameter-name";
 
-    private static final Map prefixes = new HashMap();
-
-    {
-        prefixes.put("request", REQUEST_PRIVATE_NAMESPACE_URI);
-    }
+//    private static final Map prefixes = new HashMap();
+//
+//    {
+//        prefixes.put("request", REQUEST_PRIVATE_NAMESPACE_URI);
+//    }
 
     public RequestGenerator() {
         addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG, REQUEST_CONFIG_NAMESPACE_URI));
@@ -153,7 +153,7 @@ public class RequestGenerator extends ProcessorImpl {
                                     Context context = getContext(pipelineContext);
                                     if (context.bodyFileItem != null || getRequest(pipelineContext).getInputStream() != null) {
                                         if (context.bodyFileItem == null) {
-                                            final FileItem fileItem = new DefaultFileItemFactory(getMaxMemorySizeProperty(), SystemUtils.getTemporaryDirectory()).createItem("dummy", "dummy", false, null);
+                                            final FileItem fileItem = new DiskFileItemFactory(getMaxMemorySizeProperty(), SystemUtils.getTemporaryDirectory()).createItem("dummy", "dummy", false, null);
                                             pipelineContext.addContextListener(new PipelineContext.ContextListenerAdapter() {
                                                 public void contextDestroyed(boolean success) {
                                                     fileItem.delete();
@@ -265,11 +265,11 @@ public class RequestGenerator extends ProcessorImpl {
                 }
             } else {
                 // Only a reference to the file is output (xs:anyURI)
-                DefaultFileItem defaultFileItem = (DefaultFileItem) fileItem;
-                String uri;
+                final DiskFileItem diskFileItem = (DiskFileItem) fileItem;
+                final String uri;
                 if (!fileItem.isInMemory()) {
                     // File must exist on disk since isInMemory() returns false
-                    File file = defaultFileItem.getStoreLocation();
+                    final File file = diskFileItem.getStoreLocation();
                     uri = file.toURI().toString();
                 } else {
                     // File does not exist on disk, must convert
@@ -279,7 +279,7 @@ public class RequestGenerator extends ProcessorImpl {
                         throw new OXFException(e);
                     }
                 }
-                char[] chars = uri.toCharArray();
+                final char[] chars = uri.toCharArray();
                 contentHandler.characters(chars, 0, chars.length);
             }
         }
@@ -318,7 +318,7 @@ public class RequestGenerator extends ProcessorImpl {
             addTextElement(requestElement, "content-type", (contentType == null) ? "" : contentType);
         }
         addParameters(context, requestElement, request);
-        addBody(context, requestElement);
+        addBody(requestElement);
         addTextElement(requestElement, "protocol", request.getProtocol());
         addTextElement(requestElement, "remote-addr", request.getRemoteAddr());
         // TODO: Handle this differently as it can take a long time to work
@@ -329,7 +329,7 @@ public class RequestGenerator extends ProcessorImpl {
         addTextElement(requestElement, "is-secure", new Boolean(request.isSecure()).toString());
         addTextElement(requestElement, "auth-type", request.getAuthType());
         addTextElement(requestElement, "context-path", request.getContextPath());
-        addHeaders(context, requestElement, request);
+        addHeaders(requestElement, request);
         addTextElement(requestElement, "method", request.getMethod());
         addTextElement(requestElement, "path-info", request.getPathInfo());
         addTextElement(requestElement, "path-translated", request.getPathTranslated());
@@ -455,14 +455,14 @@ public class RequestGenerator extends ProcessorImpl {
             }
         }
         // Add parameters elements
-        addElements(pipelineContext, requestElement, parametersMap, "parameters", "parameter");
+        addElements(requestElement, parametersMap, "parameters", "parameter");
     }
 
-    protected void addHeaders(PipelineContext pipelineContext, Element requestElement, ExternalContext.Request request) {
-        addElements(pipelineContext, requestElement, request.getHeaderValuesMap(), "headers", "header");
+    protected void addHeaders(Element requestElement, ExternalContext.Request request) {
+        addElements(requestElement, request.getHeaderValuesMap(), "headers", "header");
     }
 
-    protected void addElements(PipelineContext pipelineContext, Element requestElement, Map map, String name1, String name2) {
+    protected void addElements(Element requestElement, Map map, String name1, String name2) {
         Element parametersElement = requestElement.addElement(name1);
         for (Iterator i = map.keySet().iterator(); i.hasNext();) {
             Element parameterElement = parametersElement.addElement(name2);
@@ -506,7 +506,7 @@ public class RequestGenerator extends ProcessorImpl {
         return fileItem.getSize() <= 0 && (fileItem.getName() == null || fileItem.getName().trim().equals(""));
     }
 
-    protected void addBody(PipelineContext pipelineContext, Element requestElement) {
+    protected void addBody(Element requestElement) {
         // This just adds a placeholder element
         requestElement.addElement("body");
     }

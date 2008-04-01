@@ -14,8 +14,8 @@
 package org.orbeon.oxf.processor.serializer;
 
 import org.apache.log4j.Logger;
-import org.apache.commons.fileupload.DefaultFileItem;
 import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.xml.sax.SAXException;
 import org.dom4j.Document;
 import org.orbeon.oxf.common.OXFException;
@@ -303,11 +303,11 @@ public class FileSerializer extends ProcessorImpl {
                     writeToFile(pipelineContext, config, dataInput, fileOutputStream);
 
                     // Create file if it doesn't exist
-                    final File storeLocation = ((DefaultFileItem) fileItem).getStoreLocation();
+                    final File storeLocation = ((DiskFileItem) fileItem).getStoreLocation();
                     storeLocation.createNewFile();
 
                     // Get the url of the file
-                    final String url = ((DefaultFileItem) fileItem).getStoreLocation().toURI().toString();
+                    final String url = ((DiskFileItem) fileItem).getStoreLocation().toURI().toString();
                     contentHandler.startDocument();
                     contentHandler.startElement("", "url", "url", XMLUtils.EMPTY_ATTRIBUTES);
                     contentHandler.characters(url.toCharArray(), 0, url.length());

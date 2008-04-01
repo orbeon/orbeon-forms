@@ -103,10 +103,20 @@ public abstract class XFormsEvent {
     public SequenceIterator getAttribute(String name) {
         if ("target".equals(name) || XXFORMS_TARGET_ATTRIBUTE.equals(name)) {// first is legacy name
             // Return the target id
+
+            if ("target".equals(name)) {
+                XFormsServer.logger.warn("event('target') is deprecated. Use event('xxforms:target') instead.");
+            }
+
             final String originalId = (targetObject instanceof XFormsControl) ? ((XFormsControl) targetObject).getId() : targetObject.getEffectiveId();
             return new ListIterator(Collections.singletonList(new StringValue(originalId)));
         } else if ("event".equals(name) || XXFORMS_TYPE_ATTRIBUTE.equals(name)) {// first is legacy name
             // Return the event type
+
+            if ("event".equals(name)) {
+                XFormsServer.logger.warn("event('event') is deprecated. Use event('xxforms:type') instead.");
+            }
+
             return new ListIterator(Collections.singletonList(new StringValue(eventName)));
         } else if (XXFORMS_BUBBLES_ATTRIBUTE.equals(name)) {
             // Return whether the event bubbles

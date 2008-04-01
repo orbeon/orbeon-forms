@@ -19,7 +19,6 @@ import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
-import org.orbeon.oxf.xforms.XFormsModelSubmission;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.om.ListIterator;
 import org.orbeon.saxon.om.SequenceIterator;
@@ -89,7 +88,7 @@ public class XFormsSubmitErrorEvent extends XFormsEvent {
             // Return the body of the response if possible
 
             if ("body".equals(name)) {
-                XFormsModelSubmission.logger.warn("Property event('body') on xforms-submit-error event is deprecated. Use event('response-body') instead.");
+                XFormsServer.logger.warn("event('body') on xforms-submit-error is deprecated. Use event('response-body') instead.");
             }
 
             // "When the error response specifies an XML media type as defined by [RFC 3023], the response body is

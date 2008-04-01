@@ -37,13 +37,22 @@
         let $value := request:get-parameter('value', '')
 
         (: Count total number of results, independently from paging :)
+        let $search-total := count(for $resource in collection()
+                                     let $resource-uri := document-uri($resource)
+                                     let $resource-name := tokenize($resource-uri, '/')[last()]
+                                   where ]]><where/><![CDATA[
+                                     and exists($resource/*) and $resource-name = ('data', 'data.xml')
+                                   return 1)
+                            
         let $total := count(for $resource in collection()
-                            where ]]><where/><![CDATA[
-                            return 1)
+                             let $resource-uri := document-uri($resource)
+                             let $resource-name := tokenize($resource-uri, '/')[last()]
+                             where exists($resource/*) and $resource-name = ('data', 'data.xml')
+                             return 1)
 
         (: Return actual results :)
         return
-            <documents total="{$total}" page-size="{$page-size}"
+            <documents total="{$total}" search-total="{$search-total}" page-size="{$page-size}"
                        page-number="{$page-number}" query="{$query}">
                 {
                     subsequence(for $resource in collection()
@@ -53,6 +62,7 @@
                         let $resource-id := tokenize($resource-uri, '/')[last() - 1]
                         let $last-modified := xmldb:last-modified($collection-name, $resource-name)
                         where ]]><where/><![CDATA[
+                            and exists($resource/*) and $resource-name = ('data', 'data.xml')
                         order by $last-modified descending
                         return
                         <document created="{xmldb:created($collection-name, $resource-name)}" last-modified="{$last-modified}" name="{$resource-id}">

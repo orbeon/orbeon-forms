@@ -121,7 +121,7 @@
                     <!-- Free text search query -->
                     <query/>
                     <!-- Paging -->
-                    <page-size>10</page-size>
+                    <page-size>5</page-size>
                     <page-number>1</page-number>
                     <!-- Sorting -->
                     <sort-key/>
@@ -136,6 +136,7 @@
             <xforms:instance id="fr-paging-instance">
                 <search xmlns="">
                     <total/>
+                    <search-total/>
                     <page-size/>
                     <page-number/>
                     <from>0</from>
@@ -148,12 +149,13 @@
             <!-- Calculations for page navigation -->
             <xforms:bind nodeset="instance('fr-paging-instance')">
                 <xforms:bind nodeset="total" calculate="(instance('fr-summary-instance')/@total, 0)[1]"/>
+                <xforms:bind nodeset="search-total" calculate="(instance('fr-summary-instance')/@search-total, 0)[1]"/>
                 <xforms:bind nodeset="page-size" calculate="instance('fr-search-instance')/page-size"/>
                 <xforms:bind nodeset="page-number" calculate="instance('fr-search-instance')/page-number"/>
-                <xforms:bind nodeset="from" calculate="if (../total = 0) then 0 else (../page-number - 1)* ../page-size + 1"/>
-                <xforms:bind nodeset="to" calculate="min((../page-number * ../page-size, ../total))"/>
-                <xforms:bind nodeset="prev-trigger" readonly="../total = 0 or xs:integer(../page-number) le 1"/>
-                <xforms:bind nodeset="next-trigger" readonly="../total = 0 or ../total le ../to"/>
+                <xforms:bind nodeset="from" calculate="if (../search-total = 0) then 0 else (../page-number - 1) * ../page-size + 1"/>
+                <xforms:bind nodeset="to" calculate="min((../page-number * ../page-size, ../search-total))"/>
+                <xforms:bind nodeset="prev-trigger" readonly="../search-total = 0 or xs:integer(../page-number) le 1"/>
+                <xforms:bind nodeset="next-trigger" readonly="../search-total = 0 or xs:integer(../search-total) le xs:integer(../to)"/>
             </xforms:bind>
 
             <xforms:instance id="fr-summary-headers-instance">
@@ -204,7 +206,7 @@
 
             <!-- Summary data -->
             <xforms:instance id="fr-summary-instance">
-                <documents xmlns="" total="0">
+                <documents xmlns="" total="0" search-total="0">
                     <!-- Content will be like this -->
                     <!--<document name="" created="" last-modified="">-->
                         <!--<id/>-->
@@ -285,6 +287,14 @@
                         <xforms:output mediatype="text/html"
                                        value="saxon:serialize($fr-resources/summary/messages/intro/node(), 'html')"
                                        class="fr-summary-welcome-message"/>
+                    </xforms:group>
+
+                    <xforms:group ref="instance('fr-paging-instance')[search-total != total]" class="fr-summary-search-count">
+                        <xforms:output value="$fr-resources/summary/titles/search-1"/>
+                        <xforms:output value="instance('fr-paging-instance')/search-total"/>
+                        <xforms:output value="$fr-resources/summary/titles/of"/>
+                        <xforms:output value="instance('fr-paging-instance')/total"/>
+                        <xforms:output value="$fr-resources/summary/titles/search-2"/>
                     </xforms:group>
 
                     <table class="fr-summary-table">
@@ -374,8 +384,10 @@
 
                         <span class="fr-paging-numbers">
                             <xforms:output value="max((instance('fr-paging-instance')/from + index('documents-repeat') - 1, 0))"/>
+                            <xforms:output value="$fr-resources/summary/titles/to"/>
+                            <xforms:output value="max((instance('fr-paging-instance')/to + index('documents-repeat') - 1, 0))"/>
                             <xforms:output value="$fr-resources/summary/titles/of"/>
-                            <xforms:output value="instance('fr-paging-instance')/total"/>
+                            <xforms:output value="instance('fr-paging-instance')/search-total"/>
                         </span>
 
                         <xforms:trigger ref="instance('fr-paging-instance')/next-trigger">

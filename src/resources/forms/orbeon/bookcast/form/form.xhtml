@@ -144,6 +144,12 @@
             <xforms:instance id="fr-form-resources">
                 <resources xmlns="">
                     <resource xml:lang="en">
+                        <details>
+                            <label>Book Details</label>
+                        </details>
+                        <notes>
+                            <label>Notes</label>
+                        </notes>
                         <title>
                             <label>Title</label>
                         </title>
@@ -153,8 +159,23 @@
                         <language>
                             <label>Language</label>
                         </language>
+                        <link>
+                            <label>Link</label>
+                        </link>
+                        <rating>
+                            <label>Rating</label>
+                        </rating>
+                        <note>
+                            <label>Note</label>
+                        </note>
                     </resource>
                     <resource xml:lang="fr">
+                        <details>
+                            <label>Détails du livre</label>
+                        </details>
+                        <notes>
+                            <label>Notes</label>
+                        </notes>
                         <title>
                             <label>Titre</label>
                         </title>
@@ -164,6 +185,15 @@
                         <language>
                             <label>Langue</label>
                         </language>
+                        <link>
+                            <label>Lien</label>
+                        </link>
+                        <rating>
+                            <label>Evaluation</label>
+                        </rating>
+                        <note>
+                            <label>Note</label>
+                        </note>
                     </resource>
                 </resources>
             </xforms:instance>
@@ -225,7 +255,7 @@
             <xhtml:img src="/apps/fr/style/orbeon-logo-trimmed-transparent-42.png"/>
             <fr:body>
                 <fr:section id="details-section" context="details">
-                    <xforms:label>Book Details</xforms:label>
+                    <xforms:label ref="$form-resources/details"/>
                     <fr:grid columns="2">
                         <tr>
                             <td>
@@ -248,7 +278,7 @@
                         <tr>
                             <td>
                                 <xforms:select1 id="language-control" bind="language-bind" class="fr-summary fr-search">
-                                    <xforms:label ref="$form-resources/author"/>
+                                    <xforms:label ref="$form-resources/language"/>
                                     <xforms:hint>Book language</xforms:hint>
                                     <xforms:help>This contains the book language. For example...</xforms:help>
                                     <xforms:alert>The language selected is invalid</xforms:alert>
@@ -265,17 +295,17 @@
                             </td>
                             <td>
                                 <xforms:input ref="link" incremental="true">
-                                    <xforms:label>Link</xforms:label>
+                                    <xforms:label ref="$form-resources/link"/>
                                     <xforms:hint>Optional link to external resource</xforms:hint>
                                     <xforms:help>This input contains a link to an external resource. For example...</xforms:help>
-                                    <xforms:alert>The link must be a valid HTTP URL</xforms:alert>
+                                    <xforms:alert>The link must be a valid HTTP or HTTPS URL</xforms:alert>
                                 </xforms:input>
                             </td>
                         </tr>
                         <tr>
                             <td>
                                 <xforms:select1 ref="rating" appearance="full">
-                                    <xforms:label>Rating</xforms:label>
+                                    <xforms:label ref="$form-resources/rating"/>
                                     <xforms:hint>Your rating</xforms:hint>
                                     <xforms:help>This contains your rating about the book. For example...</xforms:help>
                                     <xforms:alert>The rating selected is invalid</xforms:alert>
@@ -296,16 +326,16 @@
                 </fr:section>
 
                 <fr:section id="notes-section" context="notes">
-                    <xforms:label>Notes</xforms:label>
+                    <xforms:label ref="$form-resources/notes"/>
                     <fr:grid columns="1">
                         <tr>
                             <td>
-                                <fr:repeat nodeset="note" id="book-repeat" origin="instance('note-template')" columns="1">
+                                <fr:repeat nodeset="note" id="book-repeat" origin="instance('note-template')" columns="1" appearance="xxforms:table">
                                     <xforms:label>Note</xforms:label>
                                     <tr>
                                         <td>
                                             <xforms:textarea ref="." appearance="xxforms:autosize" incremental="true">
-                                                <xforms:label>Note</xforms:label>
+                                                <xforms:label ref="$form-resources/note"/>
                                                 <xforms:hint>Notes about this book</xforms:hint>
                                                 <xforms:help>This area contains your own comments about the book. For example...</xforms:help>
                                                 <xforms:alert>The notes are invalid</xforms:alert>

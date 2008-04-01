@@ -237,4 +237,5 @@
 
 @media print {
     #doc, #doc2, #doc3, #doc4 { margin-left: auto; *margin-left: auto }
+    input { height: 1em }
 }

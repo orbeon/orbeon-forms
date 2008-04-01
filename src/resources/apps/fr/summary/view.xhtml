@@ -84,28 +84,33 @@
 
             <xxforms:variable name="parameters" select="xxforms:instance('fr-parameters-instance')"/>
 
-            <xforms:action ev:event="orbeon-create">
+            <xforms:action ev:event="fr-summary-create">
                 <xforms:recalculate/>
                 <xforms:load resource="/fr/{$parameters/app}/{$parameters/form}/new/"/>
             </xforms:action>
 
-            <xforms:action ev:event="orbeon-edit">
+            <xforms:action ev:event="fr-summary-edit">
                 <xforms:recalculate/>
                 <xforms:load resource="/fr/{$parameters/app}/{$parameters/form}/{instance('fr-summary-instance')/document[index('documents-repeat')]/@name}/edit"/>
             </xforms:action>
 
-            <xforms:action ev:event="orbeon-view">
+            <xforms:action ev:event="fr-summary-view">
                 <xforms:recalculate/>
                 <xforms:load resource="/fr/{$parameters/app}/{$parameters/form}/{instance('fr-summary-instance')/document[index('documents-repeat')]/@name}/view"/>
             </xforms:action>
 
-            <xforms:action ev:event="orbeon-xml">
+            <xforms:action ev:event="fr-summary-pdf">
+                <xforms:recalculate/>
+                <xforms:load resource="/fr/{$parameters/app}/{$parameters/form}/{instance('fr-summary-instance')/document[index('documents-repeat')]/@name}/pdf" xxforms:show-progress="false"/>
+            </xforms:action>
+
+            <xforms:action ev:event="fr-summary-xml">
                 <xforms:recalculate/>
                 <!-- TODO -->
                 <!--<xforms:load resource="xxx" f:url-type="resource"/>-->
             </xforms:action>
 
-            <xforms:action ev:event="orbeon-pdf">
+            <xforms:action ev:event="fr-summary-pdf">
                 <xforms:recalculate/>
                 <!-- TODO -->
                 <!--<xforms:load resource="xxx" f:url-type="resource" xxforms:show-progress="false"/>-->
@@ -372,7 +377,7 @@
                     <div class="fr-paging-buttons">
                         <xforms:trigger ref="instance('fr-paging-instance')/prev-trigger" class="fr-form-model">
                             <xforms:label>
-                                <xhtml:img src="../../apps/fr/style/previous.gif" alt="Previous" title="Previous"/>
+                                <xhtml:img src="/apps/fr/style/previous.gif" alt="Previous" title="Previous"/>
                                 <xhtml:span><xforms:output value="$fr-resources/summary/labels/previous"/></xhtml:span>
                             </xforms:label>
                             <xforms:action ev:event="DOMActivate">
@@ -393,7 +398,7 @@
                         <xforms:trigger ref="instance('fr-paging-instance')/next-trigger">
                             <xforms:label>
                                 <xhtml:span><xforms:output value="$fr-resources/summary/labels/next"/></xhtml:span>
-                                <xhtml:img src="../../apps/fr/style/next.gif" alt="Next" title="Next"/>
+                                <xhtml:img src="/apps/fr/style/next.gif" alt="Next" title="Next"/>
                             </xforms:label>
                             <xforms:action ev:event="DOMActivate">
                                 <xforms:setvalue ref="instance('fr-search-instance')/page-number" value=". + 1"/>
@@ -413,28 +418,35 @@
                     <xforms:group model="fr-form-model" appearance="xxforms:internal">
                         <xforms:trigger ref="instance('fr-summary-triggers-instance')/new">
                             <xforms:label>
-                                <xhtml:img src="../../apps/fr/style/add.gif" alt="Create"/>
+                                <xhtml:img src="/apps/fr/style/add.gif" alt="Create"/>
                                 <xhtml:span><xforms:output ref="$fr-resources/summary/labels/new-form"/></xhtml:span>
                             </xforms:label>
-                            <xforms:dispatch ev:event="DOMActivate" target="fr-form-model" name="orbeon-create"/>
+                            <xforms:dispatch ev:event="DOMActivate" target="fr-form-model" name="fr-summary-create"/>
                         </xforms:trigger>
                         <xforms:trigger ref="instance('fr-summary-triggers-instance')/edit">
                             <xforms:label>
-                                <xhtml:img src="../../apps/fr/style/edit.gif" alt="Edit"/>
+                                <xhtml:img src="/apps/fr/style/edit.gif" alt="Edit"/>
                                 <xhtml:span><xforms:output ref="$fr-resources/summary/labels/edit-form"/></xhtml:span>
                             </xforms:label>
-                            <xforms:dispatch ev:event="DOMActivate" target="fr-form-model" name="orbeon-edit"/>
+                            <xforms:dispatch ev:event="DOMActivate" target="fr-form-model" name="fr-summary-edit"/>
                         </xforms:trigger>
                         <xforms:trigger ref="instance('fr-summary-triggers-instance')/edit">
                             <xforms:label>
-                                <xhtml:img src="../../apps/fr/style/lockedstate.gif" alt="Delete"/>
-                                <xhtml:span><xforms:output ref="$fr-resources/summary/labels/view-readonly"/></xhtml:span>
+                                <xhtml:img src="/apps/fr/style/report.gif" alt="Print"/>
+                                <xhtml:span><xforms:output value="$fr-resources/detail/labels/print"/></xhtml:span>
                             </xforms:label>
-                            <xforms:dispatch ev:event="DOMActivate" target="fr-form-model" name="orbeon-view"/>
+                            <xforms:dispatch ev:event="DOMActivate" target="fr-form-model" name="fr-summary-view"/>
+                        </xforms:trigger>
+                        <xforms:trigger ref="instance('fr-summary-triggers-instance')/edit">
+                            <xforms:label>
+                                <xhtml:img src="/apps/fr/style/pdf.png" alt="Print PDF"/>
+                                <xhtml:span><xforms:output value="$fr-resources/detail/labels/print-pdf"/></xhtml:span>
+                            </xforms:label>
+                            <xforms:dispatch ev:event="DOMActivate" target="fr-form-model" name="fr-summary-pdf"/>
                         </xforms:trigger>
                         <xforms:trigger ref="instance('fr-summary-triggers-instance')/delete">
                             <xforms:label>
-                                <xhtml:img src="../../apps/fr/style/delete.gif" alt="Delete"/>
+                                <xhtml:img src="/apps/fr/style/delete.gif" alt="Delete"/>
                                 <xhtml:span><xforms:output ref="$fr-resources/summary/labels/delete-form"/></xhtml:span>
                             </xforms:label>
                             <xforms:action ev:event="DOMActivate">
@@ -449,17 +461,17 @@
                     <!-- TODO
                     <xforms:trigger>
                         <xforms:label>
-                            <xhtml:img src="../../apps/fr/style/view-xml.gif" alt="XML"/>
+                            <xhtml:img src="/apps/fr/style/view-xml.gif" alt="XML"/>
                             <xforms:output ref="$fr-resources/summary/labels/view-xml"/>
                         </xforms:label>
-                        <xforms:dispatch ev:event="DOMActivate" target="fr-persistence-model" name="orbeon-xml"/>
+                        <xforms:dispatch ev:event="DOMActivate" target="fr-persistence-model" name="fr-summary-xml"/>
                     </xforms:trigger>
                     <xforms:trigger>
                         <xforms:label>
-                            <xhtml:img src="../../apps/fr/style/pdf.png" alt="PDF"/>
+                            <xhtml:img src="/apps/fr/style/pdf.png" alt="PDF"/>
                             <xforms:output ref="$fr-resources/summary/labels/view-pdf"/>
                         </xforms:label>
-                        <xforms:dispatch ev:event="DOMActivate" target="fr-persistence-model" name="orbeon-pdf"/>
+                        <xforms:dispatch ev:event="DOMActivate" target="fr-persistence-model" name="fr-summary-pdf"/>
                     </xforms:trigger>
                     -->
                 </xhtml:div>

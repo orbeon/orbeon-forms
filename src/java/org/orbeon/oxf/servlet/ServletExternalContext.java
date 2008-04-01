@@ -344,7 +344,7 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
             int maxSize = RequestGenerator.getMaxSizeProperty();
             int maxMemorySize = RequestGenerator.getMaxMemorySizeProperty();
 
-            final DiskFileItemFactory diskFileItemFactory = new DiskFileItemFactory(maxSize, SystemUtils.getTemporaryDirectory());
+            final DiskFileItemFactory diskFileItemFactory = new DiskFileItemFactory(maxMemorySize, SystemUtils.getTemporaryDirectory());
 
             final ServletFileUpload upload = new ServletFileUpload(diskFileItemFactory) {
                 protected FileItem createItem(Map headers, boolean isFormField) throws FileUploadException {
@@ -366,7 +366,7 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
                 }
             };
             upload.setHeaderEncoding(headerEncoding);
-            upload.setSizeMax(maxMemorySize);
+            upload.setSizeMax(maxSize);
 
             // Add a listener to destroy file items when the pipeline context is destroyed
             pipelineContext.addContextListener(new PipelineContext.ContextListenerAdapter() {

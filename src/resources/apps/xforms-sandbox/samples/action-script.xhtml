@@ -14,11 +14,11 @@
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
-        <xforms:group id="group">
+        <xforms:group id="my-group">
             <xxforms:script ev:event="DOMActivate">
                 document.getElementById("out").innerHTML = this.id + " " + event.target.id;
             </xxforms:script>
-            <xforms:trigger id="trigger">
+            <xforms:trigger id="my-trigger">
                 <xforms:label>Press me</xforms:label>
             </xforms:trigger>
         </xforms:group>

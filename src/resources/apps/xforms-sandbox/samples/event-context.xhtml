@@ -44,20 +44,20 @@
     </xhtml:head>
     <xhtml:body>
         <xforms:group>
-            <xforms:setvalue ev:event="DOMFocusIn" ref="dom-focus-in-target" value="event('target')"/>
-            <xforms:setvalue ev:event="DOMFocusOut" ref="dom-focus-out-target" value="event('target')"/>
-            <xforms:setvalue ev:event="xforms-value-changed" ref="value-changed-target" value="event('target')"/>
+            <xforms:setvalue ev:event="DOMFocusIn" ref="dom-focus-in-target" value="event('xxforms:target')"/>
+            <xforms:setvalue ev:event="DOMFocusOut" ref="dom-focus-out-target" value="event('xxforms:target')"/>
+            <xforms:setvalue ev:event="xforms-value-changed" ref="value-changed-target" value="event('xxforms:target')"/>
             <xforms:action ev:event="DOMFocusIn">
                 <xforms:insert context="event-names" nodeset="event-name"/>
-                <xforms:setvalue ref="event-names/event-name[last() - 1]" value="event('event')"/>
+                <xforms:setvalue ref="event-names/event-name[last() - 1]" value="event('xxforms:type')"/>
             </xforms:action>
             <xforms:action ev:event="DOMFocusOut">
                 <xforms:insert context="event-names" nodeset="event-name"/>
-                <xforms:setvalue ref="event-names/event-name[last() - 1]" value="event('event')"/>
+                <xforms:setvalue ref="event-names/event-name[last() - 1]" value="event('xxforms:type')"/>
             </xforms:action>
             <xforms:action ev:event="xforms-value-changed">
                 <xforms:insert context="event-names" nodeset="event-name"/>
-                <xforms:setvalue ref="event-names/event-name[last() - 1]" value="event('event')"/>
+                <xforms:setvalue ref="event-names/event-name[last() - 1]" value="event('xxforms:type')"/>
             </xforms:action>
             <xhtml:p>
                 <xforms:input ref="name" id="name-control">

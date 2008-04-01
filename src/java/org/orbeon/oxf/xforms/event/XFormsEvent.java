@@ -15,8 +15,10 @@ package org.orbeon.oxf.xforms.event;
 
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.StaticExternalContext;
 import org.orbeon.saxon.om.ListIterator;
@@ -24,6 +26,7 @@ import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.om.EmptyIterator;
 import org.orbeon.saxon.value.StringValue;
 import org.orbeon.saxon.value.SequenceExtent;
+import org.orbeon.saxon.value.BooleanValue;
 
 import java.util.Collections;
 import java.util.Map;
@@ -34,6 +37,22 @@ import java.util.HashMap;
  * XFormsEvent represents an XForms event passed to all events and actions.
  */
 public abstract class XFormsEvent {
+
+    private static final String XXFORMS_TYPE_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "type");
+    private static final String XXFORMS_TARGET_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "target");
+    private static final String XXFORMS_BUBBLES_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "bubbles");
+    private static final String XXFORMS_CANCELABLE_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "cancelable");
+
+    // Properties that change as the event propagates
+    // TODO
+//    private static final String XXFORMS_PHASE_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "phase");
+//    private static final String XXFORMS_DEFAULT_PREVENTED_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "default-prevented");
+//    private static final String XXFORMS_CURRENT_TARGET_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "current-target");// same as observer?
+//    private static final String XXFORMS_OBSERVER_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "observer");
+//    See DOM 3 events for phase:
+//    const unsigned short      CAPTURING_PHASE                = 1;
+//    const unsigned short      AT_TARGET                      = 2;
+//    const unsigned short      BUBBLING_PHASE                 = 3;
 
     private String eventName;
     private XFormsEventTarget targetObject;
@@ -82,14 +101,19 @@ public abstract class XFormsEvent {
     }
 
     public SequenceIterator getAttribute(String name) {
-        if ("target".equals(name)) {
-            // Return the id of the target of the event
+        if ("target".equals(name) || XXFORMS_TARGET_ATTRIBUTE.equals(name)) {// first is legacy name
+            // Return the target id
             final String originalId = (targetObject instanceof XFormsControl) ? ((XFormsControl) targetObject).getId() : targetObject.getEffectiveId();
             return new ListIterator(Collections.singletonList(new StringValue(originalId)));
-        } else if ("event".equals(name)) {
-            // Return the name of the event
-            // TODO: Should this be called name instead?
+        } else if ("event".equals(name) || XXFORMS_TYPE_ATTRIBUTE.equals(name)) {// first is legacy name
+            // Return the event type
             return new ListIterator(Collections.singletonList(new StringValue(eventName)));
+        } else if (XXFORMS_BUBBLES_ATTRIBUTE.equals(name)) {
+            // Return whether the event bubbles
+            return new ListIterator(Collections.singletonList(BooleanValue.get(bubbles)));
+        } else if (XXFORMS_CANCELABLE_ATTRIBUTE.equals(name)) {
+            // Return whether the event is cancelable
+            return new ListIterator(Collections.singletonList(BooleanValue.get(cancelable)));
         } else if (customAttributes != null && customAttributes.get(name) != null) {
             // Return custom attribute if found
             return (SequenceIterator) customAttributes.get(name);
@@ -98,7 +122,6 @@ public abstract class XFormsEvent {
             // empty node-set is returned."
             return new EmptyIterator();
         }
-        // TODO: We should add in the future: observer (id), phase (capture|default), and maybe propagate (stop|continue), defaultAction (cancel|perform)
     }
 
     /**

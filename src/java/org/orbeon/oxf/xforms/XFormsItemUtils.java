@@ -263,27 +263,38 @@ public class XFormsItemUtils {
                                 // Push iteration
                                 contextStack.pushIteration(currentPosition);
                                 {
+                                    final NodeInfo currentNodeInfo = (NodeInfo) currentNodeSet.get(currentPosition - 1);
+
+                                    // NOTE: We support relevance of items as an extension to XForms.
+                                    final boolean isRelevant = InstanceData.getInheritedRelevant(currentNodeInfo);
+
                                     // Handle children of xforms:itemset
                                     final String label;
-                                    {
-                                        final Element labelElement = element.element(XFormsConstants.XFORMS_LABEL_QNAME);
-                                        if (labelElement == null)
-                                            throw new ValidationException("xforms:itemset element must contain one xforms:label element.", select1Control.getLocationData());
-
-                                        label = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, element.element(XFormsConstants.XFORMS_LABEL_QNAME), false, null);
-                                    }
-
                                     final Element valueCopyElement;
-                                    {
-                                        final Element valueElement = element.element(XFormsConstants.XFORMS_VALUE_QNAME);
-                                        valueCopyElement = (element != null)
-                                                ? valueElement : element.element(XFormsConstants.XFORMS_COPY_QNAME);
+                                    if (isRelevant) {
+                                        {
+                                            final Element labelElement = element.element(XFormsConstants.XFORMS_LABEL_QNAME);
+                                            if (labelElement == null)
+                                                throw new ValidationException("xforms:itemset element must contain one xforms:label element.", select1Control.getLocationData());
+
+                                            label = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, element.element(XFormsConstants.XFORMS_LABEL_QNAME), false, null);
+                                        }
+
+
+                                        {
+                                            final Element valueElement = element.element(XFormsConstants.XFORMS_VALUE_QNAME);
+                                            valueCopyElement = (element != null)
+                                                    ? valueElement : element.element(XFormsConstants.XFORMS_COPY_QNAME);
+                                        }
+                                        if (valueCopyElement == null)
+                                            throw new ValidationException("xforms:itemset element must contain one xforms:value or one xforms:copy element.", select1Control.getLocationData());
+                                    } else {
+                                        label = null;
+                                        valueCopyElement = null;
                                     }
-                                    if (valueCopyElement == null)
-                                        throw new ValidationException("xforms:itemset element must contain one xforms:value or one xforms:copy element.", select1Control.getLocationData());
 
-
-                                    final NodeInfo currentNodeInfo = (NodeInfo) currentNodeSet.get(currentPosition - 1);
+                                    // NOTE: For now, we calculate the position in the hierarchy even if the node is
+                                    // non-relevant. Is this the right thing to do?
                                     final int newLevel = itemsetLevel + getNodeLevel(currentNodeInfo, nodeStack);
                                     if (hierarchyLevel - newLevel >= 0) {
                                         //  We are going down one or more levels
@@ -292,13 +303,17 @@ public class XFormsItemUtils {
                                         }
                                     }
 
-                                    if (valueCopyElement.getName().equals("value")) {
-                                        // Handle xforms:value
-                                        // TODO: This could be optimized for xforms:value/@ref|@value as we could get the expression from the cache only once
-                                        final String value = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, element.element(XFormsConstants.XFORMS_VALUE_QNAME), false, null);
-                                        newItems.add(new Item(true, element.attributes(), label != null ? label : "", value, newLevel));// TODO: must filter attributes on element.attributes()
-                                    } else {
-                                        // TODO: handle xforms:copy
+                                    // Handle new item if relevant
+                                    if (isRelevant) {
+                                        if (valueCopyElement.getName().equals("value")) {
+                                            // Handle xforms:value
+                                            // TODO: This could be optimized for xforms:value/@ref|@value as we could get the expression from the cache only once
+                                            final String value = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, element.element(XFormsConstants.XFORMS_VALUE_QNAME), false, null);
+                                            newItems.add(new Item(true, element.attributes(), label != null ? label : "", value, newLevel));// TODO: must filter attributes on element.attributes()
+                                        } else {
+                                            // TODO: handle xforms:copy
+                                            throw new ValidationException("xforms:copy is not yet supported.", select1Control.getLocationData());
+                                        }
                                     }
 
                                     nodeStack.push(currentNodeInfo);

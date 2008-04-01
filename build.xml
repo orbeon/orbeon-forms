@@ -104,6 +104,8 @@
         <include name="flying-saucer-itext-paulo-155.jar"/>
         <include name="flying-saucer-minium.jar"/>
 
+        <include name="barcode4j-1.0.jar"/>
+
         <include name="jms-api-1_1.jar"/>
         <include name="mail-1_3_2.jar"/>
 

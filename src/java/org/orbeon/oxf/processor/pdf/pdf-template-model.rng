@@ -29,13 +29,7 @@
                     <data type="anyURI"/>
                 </attribute>
             </element>
-            <zeroOrMore>
-                <choice>
-                    <ref name="field"/>
-                    <ref name="group"/>
-                    <ref name="repeat"/>
-                </choice>
-            </zeroOrMore>
+            <ref name="components"/>
         </element>
     </start>
 
@@ -97,6 +91,100 @@
         </element>
     </define>
 
+    <define name="barcode">
+        <element name="barcode">
+            <optional>
+                <attribute name="page">
+                    <choice>
+                        <data type="positiveInteger"/>
+                        <ref name="avt"/>
+                    </choice>
+                </attribute>
+            </optional>
+            <attribute name="left">
+                <choice>
+                    <data type="decimal"/>
+                    <ref name="avt"/>
+                </choice>
+            </attribute>
+            <attribute name="top">
+                <choice>
+                    <data type="decimal"/>
+                    <ref name="avt"/>
+                </choice>
+            </attribute>
+            <ref name="font-attributes"/>
+            <optional>
+                <attribute name="height">
+                    <choice>
+                        <data type="decimal"/>
+                    </choice>
+                </attribute>
+            </optional>
+            <optional>
+                <attribute name="size">
+                    <choice>
+                        <data type="positiveInteger"/>
+                        <ref name="avt"/>
+                    </choice>
+                </attribute>
+            </optional>
+            <optional>
+                <attribute name="type">
+                    <choice>
+                        <data type="string"/>
+                    </choice>
+                </attribute>
+            </optional>
+            <choice>
+                <attribute name="value">
+                    <data type="string"/>
+                </attribute>
+                <attribute name="ref">
+                    <data type="string"/>
+                </attribute>
+            </choice>
+        </element>
+    </define>
+
+    <define name="image">
+        <element name="image">
+            <optional>
+                <attribute name="page">
+                    <choice>
+                        <data type="positiveInteger"/>
+                        <ref name="avt"/>
+                    </choice>
+                </attribute>
+            </optional>
+            <attribute name="left">
+                <choice>
+                    <data type="decimal"/>
+                    <ref name="avt"/>
+                </choice>
+            </attribute>
+            <attribute name="top">
+                <choice>
+                    <data type="decimal"/>
+                    <ref name="avt"/>
+                </choice>
+            </attribute>
+            <optional>
+                <attribute name="scale-percent">
+                    <data type="float"/>
+                </attribute>
+            </optional>
+            <optional>
+                <attribute name="dpi">
+                    <data type="integer"/>
+                </attribute>
+            </optional>
+            <attribute name="href">
+                <data type="anyURI"/>
+            </attribute>
+        </element>
+    </define>
+
     <define name="group">
         <element name="group">
             <optional>
@@ -124,13 +212,7 @@
                 </attribute>
             </optional>
             <ref name="font-attributes"/>
-            <zeroOrMore>
-                <choice>
-                    <ref name="field"/>
-                    <ref name="group"/>
-                    <ref name="repeat"/>
-                </choice>
-            </zeroOrMore>
+            <ref name="components"/>
         </element>
     </define>
 
@@ -158,13 +240,7 @@
                     </choice>
                 </attribute>
             </optional>
-            <zeroOrMore>
-                <choice>
-                    <ref name="field"/>
-                    <ref name="group"/>
-                    <ref name="repeat"/>
-                </choice>
-            </zeroOrMore>
+            <ref name="components"/>
         </element>
     </define>
 
@@ -172,6 +248,18 @@
         <data type="string">
             <param name="pattern">.*\{.*</param>
         </data>
+    </define>
+
+    <define name="components">
+        <zeroOrMore>
+            <choice>
+                <ref name="field"/>
+                <ref name="group"/>
+                <ref name="repeat"/>
+                <ref name="barcode"/>
+                <ref name="image"/>
+            </choice>
+        </zeroOrMore>
     </define>
 
     <define name="font-attributes">

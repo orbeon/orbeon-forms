@@ -565,6 +565,16 @@
         <class name="org.orbeon.oxf.processor.pdf.XHTMLToPDFProcessor"/>
     </processor>
 
+    <processor name="oxf:barcode-base">
+        <class name="org.orbeon.oxf.processor.barcode.BarcodeProcessor"/>
+    </processor>
+
+    <processor name="oxf:word-template">
+        <instantiation name="oxf:pipeline">
+            <input name="config" href="oxf:/ops/utils/word-template/word-template.xpl"/>
+        </instantiation>
+    </processor>
+
     <!-- Temporary hack to get rid of the config input -->
     <processor name="oxf:pdf-template">
         <instantiation name="oxf:pdf-template-base">
@@ -579,9 +589,10 @@
         </instantiation>
     </processor>
 
-    <processor name="oxf:word-template">
-        <instantiation name="oxf:pipeline">
-            <input name="config" href="oxf:/ops/utils/word-template/word-template.xpl"/>
+    <!-- Temporary hack to get rid of the config input -->
+    <processor name="oxf:barcode">
+        <instantiation name="oxf:barcode-base">
+            <input name="config"><config/></input>
         </instantiation>
     </processor>
 

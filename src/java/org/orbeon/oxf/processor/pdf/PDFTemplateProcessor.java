@@ -14,6 +14,7 @@
 package org.orbeon.oxf.processor.pdf;
 
 import com.lowagie.text.DocumentException;
+import com.lowagie.text.Image;
 import com.lowagie.text.Rectangle;
 import com.lowagie.text.pdf.*;
 import org.dom4j.Element;
@@ -21,20 +22,24 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
+import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.serializer.HttpBinarySerializer;
+import org.orbeon.oxf.processor.serializer.BinaryTextContentHandler;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.Configuration;
-import org.orbeon.saxon.functions.FunctionLibrary;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
+import org.orbeon.saxon.functions.FunctionLibrary;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.om.NodeInfo;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.ByteArrayOutputStream;
 import java.util.*;
+import java.net.URL;
 
 /**
  * The PDF Template processor reads a PDF template and performs textual annotations on it.
@@ -231,8 +236,8 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {
                 continue;
 
             final Map namespaceMap = Dom4jUtils.getNamespaceContextNoDefault(currentElement);
-
-            if (currentElement.getName().equals("group")) {
+            final String elementName = currentElement.getName();
+            if (elementName.equals("group")) {
                 // Handle group
 
                 final GroupContext newGroupContext = new GroupContext(groupContext);
@@ -272,7 +277,7 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {
 
                 handleGroup(pipelineContext, newGroupContext, currentElement.elements(), functionLibrary);
 
-            } else if (currentElement.getName().equals("repeat")) {
+            } else if (elementName.equals("repeat")) {
                 // Handle repeat
 
                 final String nodeset = currentElement.attributeValue("nodeset");
@@ -296,8 +301,7 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {
 
                     handleGroup(pipelineContext, newGroupContext, currentElement.elements(), functionLibrary);
                 }
-
-            } else if (currentElement.getName().equals("field")) {
+            } else if (elementName.equals("field")) {
 
             	final String fieldNameStr = currentElement.attributeValue("acro-field-name");
 
@@ -321,38 +325,13 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {
 	                final String size = resolveAttributeValueTemplates(pipelineContext, contextNode, variableToValueMap, null, null, currentElement, currentElement.attributeValue("size"));
 	                final String value = currentElement.attributeValue("value") == null ? currentElement.attributeValue("ref") : currentElement.attributeValue("value");
 
-	                final float fontPitch;
-	                {
-	                    final String fontPitchAttribute = currentElement.attributeValue("font-pitch") == null ? currentElement.attributeValue("spacing") : currentElement.attributeValue("font-pitch");
-	                    if (fontPitchAttribute != null)
-	                        fontPitch = Float.parseFloat(resolveAttributeValueTemplates(pipelineContext, contextNode, variableToValueMap, null, null, currentElement, fontPitchAttribute));
-	                    else
-	                        fontPitch = groupContext.fontPitch;
-	                }
-
-	                final String fontFamily;
-	                {
-	                    final String fontFamilyAttribute = currentElement.attributeValue("font-family");
-	                    if (fontFamilyAttribute != null)
-	                        fontFamily = resolveAttributeValueTemplates(pipelineContext, contextNode, variableToValueMap, null, null, currentElement, fontFamilyAttribute);
-	                    else
-	                        fontFamily = groupContext.fontFamily;
-	                }
-
-	                final float fontSize;
-	                {
-	                    final String fontSizeAttribute = currentElement.attributeValue("font-size");
-	                    if (fontSizeAttribute != null)
-	                        fontSize = Float.parseFloat(resolveAttributeValueTemplates(pipelineContext, contextNode, variableToValueMap, null, null, currentElement, fontSizeAttribute));
-	                    else
-	                        fontSize = groupContext.fontSize;
-	                }
+	                final FontAttributes fontAttributes = getFontAttributes(currentElement, pipelineContext, groupContext, variableToValueMap, contextNode);
 
 	                // Output value
-	                final BaseFont baseFont = BaseFont.createFont(fontFamily, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
+	                final BaseFont baseFont = BaseFont.createFont(fontAttributes.fontFamily, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
 	                groupContext.contentByte.beginText();
 	                {
-	                    groupContext.contentByte.setFontAndSize(baseFont, fontSize);
+	                    groupContext.contentByte.setFontAndSize(baseFont, fontAttributes.fontSize);
 
 	                    final float xPosition = Float.parseFloat(leftPosition) + groupContext.offsetX;
 	                    final float yPosition = groupContext.pageHeight - (Float.parseFloat(topPosition) + groupContext.offsetY);
@@ -364,14 +343,142 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {
 	                    if (text != null) {
 	                        int len = Math.min(text.length(), (size != null) ? Integer.parseInt(size) : Integer.MAX_VALUE);
 	                        for (int j = 0; j < len; j++)
-	                            groupContext.contentByte.showTextAligned(PdfContentByte.ALIGN_CENTER, text.substring(j, j + 1), xPosition + ((float) j) * fontPitch, yPosition, 0);
+	                            groupContext.contentByte.showTextAligned(PdfContentByte.ALIGN_CENTER, text.substring(j, j + 1), xPosition + ((float) j) * fontAttributes.fontPitch, yPosition, 0);
 	                    }
 	                }
 	                groupContext.contentByte.endText();
             	}
+            } else if (elementName.equals("barcode")) {
+                // Handle barcode
+                
+                final String leftAttribute = currentElement.attributeValue("left");
+                final String topAttribute = currentElement.attributeValue("top");
+
+                final String leftPosition = resolveAttributeValueTemplates(pipelineContext, contextNode, variableToValueMap, null, null, currentElement, leftAttribute);
+                final String topPosition = resolveAttributeValueTemplates(pipelineContext, contextNode, variableToValueMap, null, null, currentElement, topAttribute);
+
+//                final String size = resolveAttributeValueTemplates(pipelineContext, contextNode, variableToValueMap, null, null, currentElement, currentElement.attributeValue("size"));
+                final String value = currentElement.attributeValue("value") == null ? currentElement.attributeValue("ref") : currentElement.attributeValue("value");
+                final String type = currentElement.attributeValue("type") == null ? "CODE39" : currentElement.attributeValue("type");
+                final float height = currentElement.attributeValue("height") == null ? 10.0f : Float.parseFloat(currentElement.attributeValue("height"));
+
+                final float xPosition = Float.parseFloat(leftPosition) + groupContext.offsetX;
+                final float yPosition = groupContext.pageHeight - (Float.parseFloat(topPosition) + groupContext.offsetY);
+                final String text = XPathCache.evaluateAsString(pipelineContext, groupContext.contextNodeSet, groupContext.contextPosition, value, namespaceMap, variableToValueMap, functionLibrary, null, null, (LocationData) currentElement.getData());
+
+                final FontAttributes fontAttributes = getFontAttributes(currentElement, pipelineContext, groupContext, variableToValueMap, contextNode);
+                final BaseFont baseFont = BaseFont.createFont(fontAttributes.fontFamily, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
+
+                final Barcode barcode = createBarCode(type);
+                barcode.setCode(text);
+                barcode.setBarHeight(height);
+                barcode.setFont(baseFont);
+                barcode.setSize(fontAttributes.fontSize);
+                final Image barcodeImage = barcode.createImageWithBarcode(groupContext.contentByte, null, null);
+                barcodeImage.setAbsolutePosition(xPosition, yPosition);
+                groupContext.contentByte.addImage(barcodeImage);
+            } else if (elementName.equals("image")) {
+                // Handle image
+
+                final String leftAttribute = currentElement.attributeValue("left");
+                final String topAttribute = currentElement.attributeValue("top");
+                final String scalePercentAttribute = currentElement.attributeValue("scale-percent");
+                final String dpiAttribute = currentElement.attributeValue("dpi");
+
+                final String leftPosition = resolveAttributeValueTemplates(pipelineContext, contextNode, variableToValueMap, null, null, currentElement, leftAttribute);
+                final String topPosition = resolveAttributeValueTemplates(pipelineContext, contextNode, variableToValueMap, null, null, currentElement, topAttribute);
+                final String scalePercent = resolveAttributeValueTemplates(pipelineContext, contextNode, variableToValueMap, null, null, currentElement, scalePercentAttribute);
+                final String dpi = resolveAttributeValueTemplates(pipelineContext, contextNode, variableToValueMap, null, null, currentElement, dpiAttribute);
+
+                final float xPosition = Float.parseFloat(leftPosition) + groupContext.offsetX;
+                final float yPosition = groupContext.pageHeight - (Float.parseFloat(topPosition) + groupContext.offsetY);
+
+                final String hrefAttribute = currentElement.attributeValue("href");
+
+                final Image image;
+                final String inputName = ProcessorImpl.getProcessorInputSchemeInputName(hrefAttribute);
+                if (inputName != null) {
+                    // Read the input
+                    final ByteArrayOutputStream os = new ByteArrayOutputStream();
+                    readInputAsSAX(pipelineContext, inputName,  new BinaryTextContentHandler(null, os, false, null, false, false, null, false));
+
+                    // Create the image
+                    image = Image.getInstance(os.toByteArray());
+                } else {
+                    // Read and create the image
+                    image = Image.getInstance(new URL(hrefAttribute));
+                }
+
+                // Set image parameters
+                image.setAbsolutePosition(xPosition, yPosition);
+                if (scalePercent != null) {
+                    image.scalePercent(Float.parseFloat(scalePercent));
+                }
+                if (dpi != null) {
+                    final int dpiInt = Integer.parseInt(dpi);
+                    image.setDpi(dpiInt, dpiInt);
+                }
+                // TODO: Lots of other parameters can be used to configure the image here
+                // Add image
+                groupContext.contentByte.addImage(image);
             } else {
                 // NOP
             }
         }
     }
+
+    class FontAttributes {
+    	float fontPitch;
+    	String fontFamily;
+    	float fontSize;
+    	public FontAttributes(float fontPitch,String fontFamily,float fontSize) {
+    		this.fontPitch = fontPitch;
+    		this.fontFamily = fontFamily;
+    		this.fontSize = fontSize;
+    	}
+    }
+    private FontAttributes getFontAttributes(Element currentElement,
+    		PipelineContext pipelineContext,
+    		GroupContext groupContext,
+    		Map variableToValueMap,
+    		NodeInfo contextNode){
+
+        final float fontPitch;
+        {
+            final String fontPitchAttribute = currentElement.attributeValue("font-pitch") == null ? currentElement.attributeValue("spacing") : currentElement.attributeValue("font-pitch");
+            if (fontPitchAttribute != null)
+                fontPitch = Float.parseFloat(resolveAttributeValueTemplates(pipelineContext, contextNode, variableToValueMap, null, null, currentElement, fontPitchAttribute));
+            else
+                fontPitch = groupContext.fontPitch;
+        }
+
+        final String fontFamily;
+        {
+            final String fontFamilyAttribute = currentElement.attributeValue("font-family");
+            if (fontFamilyAttribute != null)
+                fontFamily = resolveAttributeValueTemplates(pipelineContext, contextNode, variableToValueMap, null, null, currentElement, fontFamilyAttribute);
+            else
+                fontFamily = groupContext.fontFamily;
+        }
+
+        final float fontSize;
+        {
+            final String fontSizeAttribute = currentElement.attributeValue("font-size");
+            if (fontSizeAttribute != null)
+                fontSize = Float.parseFloat(resolveAttributeValueTemplates(pipelineContext, contextNode, variableToValueMap, null, null, currentElement, fontSizeAttribute));
+            else
+                fontSize = groupContext.fontSize;
+        }
+        return new FontAttributes(fontPitch,fontFamily,fontSize);
+
+    }
+
+    private Barcode createBarCode(String type) {
+		if (type.equals("CODE39")) {
+			return new Barcode39();
+		} else if (type.equals("EAN")) {
+			return new BarcodeEAN();
+		}
+		return new Barcode39();
+	}
 }

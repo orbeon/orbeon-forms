@@ -15,6 +15,10 @@
                                substring(dmv:birth-date, 1, 4))"/>
 
             <field left="456" top="138" size="8" value="dmv:driver-license-number"/>
+
+            <barcode left="490" top="181" size="2" height="25" value="dmv:driver-license-number"/>
+            <!--<image left="290" top="401" dpi="300" scale-percent="40" href="input:barcode"/>-->
+
         </group>
 
         <group ref="dmv:address-information">

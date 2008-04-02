@@ -74,9 +74,27 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {
         try {
             // Get reader
             final String templateHref = XPathCache.evaluateAsString(pipelineContext, configDocumentInfo, "/*/template/@href", null, null, functionLibrary, null, null, null);//TODO: LocationData
-            final PdfReader reader = new PdfReader(URLFactory.createURL(templateHref));
+
+            // Create PDF reader
+            final PdfReader reader;
+            {
+                final String inputName = ProcessorImpl.getProcessorInputSchemeInputName(templateHref);
+                if (inputName != null) {
+                    // Read the input
+                    final ByteArrayOutputStream os = new ByteArrayOutputStream();
+                    readInputAsSAX(pipelineContext, inputName,  new BinaryTextContentHandler(null, os, false, null, false, false, null, false));
+
+                    // Create the reader
+                    reader = new PdfReader(os.toByteArray());
+                } else {
+                    // Read and create the reader
+                    reader = new PdfReader(URLFactory.createURL(templateHref));
+                }
+            }
+
             // Get total number of pages
             final int pageCount = reader.getNumberOfPages();
+
             // Get size of first page
             final Rectangle psize = reader.getPageSize(1);
             final float width = psize.width();
@@ -84,8 +102,8 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {
 
             final String showGrid = XPathCache.evaluateAsString(pipelineContext, configDocumentInfo, "/*/template/@show-grid", null, null, functionLibrary, null, null, null);//TODO: LocationData
 
-             final PdfStamper stamper = new PdfStamper(reader,outputStream);
-             stamper.setFormFlattening(true);
+            final PdfStamper stamper = new PdfStamper(reader,outputStream);
+            stamper.setFormFlattening(true);
 
             for (int currentPage = 1; currentPage <= pageCount; currentPage++) {
             	final PdfContentByte contentByte = stamper.getOverContent(currentPage);

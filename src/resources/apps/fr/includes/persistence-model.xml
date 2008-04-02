@@ -72,7 +72,7 @@
             <xforms:send submission="get-document-submission"/>
         </xforms:action>
         <!-- No document id is provided and we are not in print view -->
-        <xforms:action if="$parameters/document = '' and $parameters/mode != 'print'">
+        <xforms:action if="$parameters/document = '' and not($parameters/mode = ('print', 'view', 'pdf'))">
             <!-- Create random document id -->
             <xforms:setvalue ref="$parameters/document" value="digest(string(random(true)), 'MD5', 'hex')"/>
             <!-- If we find form data in the session, use it and reset session -->
@@ -109,7 +109,7 @@
 
     <xforms:submission id="fr-delete-document-submission"
             method="delete" serialization="none"
-            resource="{instance('fr-uris-instance')/data-collection}/crud/{$parameters/app}/{$parameters/form}/data/{event('document-id')}/data"
+            resource="{instance('fr-uris-instance')/data-collection}/crud/{$parameters/app}/{$parameters/form}/data/{event('document-id')}/data.xml"
             replace="none"/>
 
     <!-- Publish form operation -->
@@ -194,16 +194,28 @@
                         <xforms:action if="$uri != '' and starts-with($uri, 'file:')">
                             <!-- There is a URI to process -->
 
+                            <xxforms:variable name="upload-extension" select="normalize-space(tokenize($holder/@filename, '\.')[last()])"/>
+                            <xxforms:variable name="upload-has-extension" select="count(tokenize($holder/@filename, '\.')) gt 1 and $upload-extension != ''"/>
+                            <xxforms:variable name="new-id" select="digest(string(random(true)), 'MD5', 'hex')"/>
+                            <xxforms:variable name="new-filename" select="string-join(($new-id,
+                                                                                        if (not($upload-has-extension)) then 'bin' else $upload-extension), '.')"/>
                             <xxforms:variable name="resource"
                                               select="concat(instance('fr-uris-instance')/data-collection, '/crud/',
                                                         $parameters/app, '/', $parameters/form, '/data/',
-                                                        $parameters/document, '/', tokenize($holder, '/')[last()])"/>
+                                                        $parameters/document, '/', $new-filename)"/>
+
+
+                            <!--<xforms:message level="xxforms:log-error">-->
+                                <!--<xforms:output value="$upload-extension"/> - -->
+                                <!--<xforms:output value="$upload-has-extension"/> - -->
+                                <!--<xforms:output value="$new-id"/> - -->
+                                <!--<xforms:output value="$new-filename"/> - -->
+                                <!--<xforms:output value="$resource"/>-->
+                            <!--</xforms:message>-->
 
                             <!-- Save attachment -->
                             <xforms:send submission="fr-create-update-attachment-submission">
                                 <xxforms:context name="holder" select="$holder"/>
-                                <!-- TODO: We should really specify an extension, but when reading back from the Page flow, .png, e.g., will match on the <files> section -->
-                                <!-- For now, use last part as temp file name, which has a .tmp extension -->
                                 <xxforms:context name="resource" select="$resource"/>
                             </xforms:send>
 
@@ -219,8 +231,8 @@
             <!-- Handle XML document if there was no submission error -->
             <xforms:send submission="fr-create-update-submission" if="instance('fr-persistence-instance')/is-error = 'false'">
                 <xxforms:context name="holder" select="xxforms:instance('fr-form-instance')"/>
-                <!-- TODO: We should really specify an extension, but when reading back from the Page flow, .xml will match on the <files> section -->
-                <xxforms:context name="resource" select="'data'"/>
+                <!-- We always store form data as "data.xml" -->
+                <xxforms:context name="resource" select="'data.xml'"/>
             </xforms:send>
         </xforms:action>
     </xforms:action>
@@ -265,7 +277,7 @@
     <!-- Get document -->
     <xforms:submission id="get-document-submission"
             method="get" serialization="none"
-            resource="{instance('fr-uris-instance')/data-collection}/crud/{$parameters/app}/{$parameters/form}/data/{$parameters/document}/data"
+            resource="{instance('fr-uris-instance')/data-collection}/crud/{$parameters/app}/{$parameters/form}/data/{$parameters/document}/data.xml"
             replace="instance" xxforms:instance="fr-form-instance"/>
 
     <!-- Source form with metadata -->
@@ -354,6 +366,11 @@
             if="event('target-ref')/root()/* is xxforms:instance('fr-form-instance') and event('target-ref')/(@filename and @mediatype and @size)">
         <xforms:send submission="fr-upload-attachment-submission"/>
     </xforms:action>
+
+    <!-- TEST XXX -->
+    <!--<xforms:action ev:observer="fr-form-group" ev:event="xforms-select">-->
+        <!--<xforms:message level="xxforms:log-debug"><xforms:output value="event('xxforms:item-value')"/></xforms:message>-->
+    <!--</xforms:action>-->
 
     <xforms:submission id="fr-upload-attachment-submission" xxforms:ensure-uploads="true"
                        ref="xxforms:instance('fr-form-instance')" validate="false" relevant="false"

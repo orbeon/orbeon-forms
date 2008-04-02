@@ -30,7 +30,7 @@
     <!-- Apply project-specific theme -->
     <p:choose href="#instance">
         <p:when test="doc-available(concat('oxf:/forms/', /*/app, '/theme.xsl'))">
-            <!-- TODO: Also fetch from persistence layer -->
+            <!-- TODO: Also fetch theme from persistence layer -->
             <p:processor name="oxf:url-generator">
                 <p:input name="config" href="aggregate('config', aggregate('url', #instance#xpointer(concat(
                                                 'oxf:/forms/', /*/app, '/theme.xsl'))))"/>

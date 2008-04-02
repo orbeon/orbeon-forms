@@ -17,6 +17,7 @@
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
         xmlns:xforms="http://www.w3.org/2002/xforms"
         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+        xmlns:exforms="http://www.exforms.org/exf/1-0"
         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
         xmlns:xhtml="http://www.w3.org/1999/xhtml"
         xmlns:xi="http://www.w3.org/2001/XInclude"
@@ -323,7 +324,7 @@
         <xforms:trigger>
             <xforms:label>
                 <xhtml:img src="/apps/fr/style/pdf.png" alt=""/>
-                <xhtml:span><xforms:output value="$fr-resources/detail/labels/print"/></xhtml:span>
+                <xhtml:span><xforms:output value="$fr-resources/detail/labels/print-pdf"/></xhtml:span>
             </xforms:label>
             <xforms:action ev:event="DOMActivate">
                 <xforms:send submission="fr-pdf-submission"/>
@@ -606,7 +607,7 @@
         <xhtml:table class="fr-repeat {if ($is-table-appearance) then 'fr-repeat-table' else 'fr-repeat-sections'} {if (@columns) then concat('fr-grid-', @columns, '-columns') else ()}">
             <!-- Line with the "add" triggers -->
             <xsl:if test="not($readonly)">
-                <xforms:group appearance="xxforms:internal">
+                <xforms:group ref=".[not(exforms:readonly(.))]">
                     <xhtml:tr>
                         <xhtml:td class="fr-repeat-column"/>
                         <!-- Add trigger (image) -->
@@ -633,12 +634,14 @@
             <xhtml:tr>
                 <xhtml:td class="fr-repeat-column"/>
                 <xsl:if test="not($readonly)">
-                    <xhtml:td class="fr-repeat-column"/>
+                    <xforms:group ref=".[not(exforms:readonly(.))]">
+                        <xhtml:td class="fr-repeat-column"/>
+                    </xforms:group>
                 </xsl:if>
-                <xsl:for-each select="xhtml:tr[1]/xhtml:td/xforms:*[1]/xforms:label">
+                <xsl:for-each select="xhtml:tr[1]/xhtml:td/xforms:*[1]">
                     <xhtml:th>
                         <xforms:output value="''">
-                            <xsl:copy-of select="."/>
+                            <xsl:copy-of select="xforms:label | xforms:help"/>
                         </xforms:output>
                     </xhtml:th>
                 </xsl:for-each>
@@ -650,17 +653,19 @@
                         <xforms:output value="position()"/>
                     </xhtml:td>
                     <xsl:if test="not($readonly)">
-                        <xhtml:td class="fr-repeat-column">
-                            <xforms:group>
-                                <!-- Remove trigger -->
-                                <xforms:trigger appearance="minimal" ref="if (
-                                        {if ($first-mandatory) then 'position() != 1 and ' else ''}
-                                        count(xxforms:repeat-nodeset('{@id}')) gt {$min-occurs}) then . else ()">
-                                    <xforms:label><xhtml:img src="/apps/fr/style/remove.gif" alt="Remove" title="Remove"/></xforms:label>
-                                </xforms:trigger>
-                                <xforms:delete ev:event="DOMActivate" nodeset="."/>
-                            </xforms:group>
-                        </xhtml:td>
+                        <xforms:group ref=".[not(exforms:readonly(.))]">
+                            <xhtml:td class="fr-repeat-column">
+                                <xforms:group>
+                                    <!-- Remove trigger -->
+                                    <xforms:trigger appearance="minimal" ref="if (
+                                            {if ($first-mandatory) then 'position() != 1 and ' else ''}
+                                            count(xxforms:repeat-nodeset('{@id}')) gt {$min-occurs}) then . else ()">
+                                        <xforms:label><xhtml:img src="/apps/fr/style/remove.gif" alt="Remove" title="Remove"/></xforms:label>
+                                    </xforms:trigger>
+                                    <xforms:delete ev:event="DOMActivate" nodeset="."/>
+                                </xforms:group>
+                            </xhtml:td>
+                        </xforms:group>
                     </xsl:if>
                     <xsl:apply-templates select="xhtml:tr[1]/xhtml:td"/>
                 </xhtml:tr>

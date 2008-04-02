@@ -1017,8 +1017,8 @@
                         XInclude element. That element must be in the
                         <code>http://www.w3.org/2001/XInclude</code> namespace:
                     </p>
-                    <xml-source show-namespaces="false">
-                        <xforms:model xmlns:xi="dummy">
+                    <xml-source show-namespaces="false" xmlns:xi="dummy">
+                        <xforms:model>
                             <xforms:instance>
                                 <xi:include href="employee.xml"/>
                             </xforms:instance>

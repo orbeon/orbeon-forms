@@ -91,7 +91,7 @@
                     <p>
                         Alternatively, you can use XInclude to keep the XForms model external:
                     </p>
-                    <xml-source>
+                    <xml-source show-namespaces="false" xmlns:xi="dummy">
                         <xhtml:html>
                             <xhtml:head>
                                 <xhtml:title>My Page</xhtml:title>

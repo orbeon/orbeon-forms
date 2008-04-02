@@ -421,7 +421,7 @@
                                 that file in your XHTML page view under the <code>xhtml:head</code>
                                 element.
                             </p>
-                            <xml-source show-namespaces="false">
+                            <xml-source show-namespaces="false" xmlns:xi="dummy">
                                 <xhtml:head>
                                     <xhtml:title>My Title</xhtml:title>
                                     <xi:include href="my-model.xml"/>

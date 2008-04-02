@@ -96,10 +96,9 @@
                     </tr>
                 </table>
                 <p>
-                    Orbeon Forms uses the <fork
-                    href="http://jakarta.apache.org/log4j/docs/index.html">Log4J</fork> logging
-                    framework. Log4J is configured with an XML file conforming to the <link
-                    href="log4j.dtd.html">Log4J DTD</link>. Here is a sample Log4J configuration:
+                    Orbeon Forms uses the <fork href="http://jakarta.apache.org/log4j/docs/index.html">log4j</fork>
+                    logging framework. In Orbeon Forms, log4j is configured with an XML file. Here is a sample log4j
+                    configuration:
                 </p>
                 <xml-source>
                     <log4j:configuration xmlns:log4j="log4j">
@@ -119,9 +118,8 @@
                     </log4j:configuration>
                 </xml-source>
                 <p>
-                    If this property is not set, the Log4J initialization is skipped. This is
-                    useful if another subsystem of your application has already initialized Log4J
-                    prior to the loading of Orbeon Forms.
+                    If this property is not set, the log4j initialization is skipped. This is useful if another
+                    subsystem of your application has already initialized log4j prior to the loading of Orbeon Forms.
                 </p>
             </section>
 

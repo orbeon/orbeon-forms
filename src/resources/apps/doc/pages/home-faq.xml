@@ -1782,8 +1782,8 @@
                     When using the <a href="processors-xinclude">XInclude processor</a>, you can
                     also use the <code>xxi:omit-xml-base</code> extension attribute:
                 </p>
-                <xml-source>
-                    <xi:include xmlns:xxi="http://orbeon.org/oxf/xml/xinclude" xmlns:xi="http://www.w3.org/2001/XInclude"
+                <xml-source show-namespaces="false" xmlns:xi="dummy">
+                    <xi:include xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
                                 href="included-file.xml" xxi:omit-xml-base="true"/>
                 </xml-source>
                 <p>

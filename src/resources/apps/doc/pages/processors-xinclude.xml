@@ -208,11 +208,10 @@
                     This is a fragment of an XForms page using XInclude, in a resource named
                     <code>view.xhtml</code>:
                 </p>
-                <xml-source show-namespaces="false">
+                <xml-source show-namespaces="false" xmlns:xi="dummy">
                     <xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
                                 xmlns:xhtml="http://www.w3.org/1999/xhtml"
-                                xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
-                                xmlns:xi="http://www.w3.org/2001/XInclude-doc">
+                                xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                         <xhtml:head>
                             <xhtml:title>XForms Text Controls</xhtml:title>
                             <xforms:model id="main-model">
@@ -292,10 +291,9 @@
                     <code>true</code>, and the namespace must be mapped for example using
                     <code>xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"</code>. Example:
                 </p>
-                <xml-source show-namespaces="false">
+                <xml-source show-namespaces="false" xmlns:xi="dummy">
                     <xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
                                 xmlns:xhtml="http://www.w3.org/1999/xhtml"
-                                xmlns:xi="http://www.w3.org/2001/XInclude-doc"
                                 xmlns:xxi="http://orbeon.org/oxf/xml/xinclude">
                         <xhtml:head>
                             <xhtml:title>XForms Text Controls</xhtml:title>
@@ -368,11 +366,10 @@
                     <code>my-dynamic-content</code> input by using <code>input:*</code> URIs, for
                     example with the following document as the <code>config</code> input:
                 </p>
-                <xml-source show-namespaces="false">
+                <xml-source show-namespaces="false" xmlns:xi="dummy">
                     <xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
                                 xmlns:xhtml="http://www.w3.org/1999/xhtml"
-                                xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
-                                xmlns:xi="http://www.w3.org/2001/XInclude-doc">
+                                xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                         <xhtml:head>
                             <xhtml:title>XForms Text Controls</xhtml:title>
                             <xforms:model id="main-model">

@@ -2197,9 +2197,8 @@
                         instance on its <code>data</code> output. A static PFC page view then includes this document
                         using <code>xi:include</code>, as follows:
                     </p>
-                    <xml-source show-namespaces="false">
+                    <xml-source show-namespaces="false" xmlns:xi="dummy">
                         <html xmlns:xforms="http://www.w3.org/2002/xforms"
-                              xmlns:xi="http://www.w3.org/2001/XInclude-doc"
                               xmlns="http://www.w3.org/1999/xhtml">
                             <head>
                                 <title>Summary</title>
@@ -2222,7 +2221,7 @@
                         page model. Note that you can also use the <code>instance</code> input, which then refers to the
                         current XML submission:
                     </p>
-                    <xml-source show-namespaces="false">
+                    <xml-source show-namespaces="false" xmlns:xi="dummy">
                         <xforms:instance id="document-infos-instance">
                             <comment xmlns=""> This is where the XML document produced by the page model is included </comment>
                             <xi:include href="input:instance"/>

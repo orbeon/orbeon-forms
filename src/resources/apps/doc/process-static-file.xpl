@@ -134,12 +134,12 @@
                     <uri>http://www.w3.org/1999/xhtml</uri>
                 </match>
                 <replace>
-                    <uri></uri>
-                    <prefix></prefix>
+                    <uri/>
+                    <prefix/>
                 </replace>
             </config>
         </p:input>
-        <p:input name="data" href="#more-rewritten-data"/>
+        <p:input name="data" href="#rewritten-data"/>
         <p:output name="data" ref="html"/>
     </p:processor>
 

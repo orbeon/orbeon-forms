@@ -36,7 +36,7 @@ fieldset {
 }
 
 .tt, textarea, code {
-    font-family: Lucida Console, Courrier, monospace;
+    font-family: "Lucida Console", "Courier New", Courier, monospace;
     font-size: 12px;
 }
 
@@ -476,9 +476,8 @@ ul {
     .tabs { display: none }
     .tab { display: none }
     #cleaner { display: none }
-    #orbeon-logo { margin-left: 0; margin-bottom: 2em; }
+    /*#orbeon-logo { margin-left: 0; margin-bottom: 2em; }*/
     #navigation { display: none}
-    #xmaincontent { position: relative; top: -2cm; left: -3.5cm; width: 15cm;}
     #main .maincontent { margin: 0; border: none; }
 
     .maincontent h1 {
@@ -519,6 +518,7 @@ ul {
     .maincontent thead { display: table-header-group }
     .maincontent tfoot { display: table-footer-group }
 
-    a :link { color: black }
-    a :visited { color: black }
+    a:link { color: black }
+    a:visited { color: black }
+    a { border: none }
 }

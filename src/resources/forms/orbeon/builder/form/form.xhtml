@@ -248,9 +248,16 @@
                     <new-source/>
                     <new-source-trigger/>
 
+                    <publish-trigger/>
+
                     <xml-view/>
                 </variables>
             </xforms:instance>
+
+            <xforms:bind nodeset="instance('fb-variables')">
+                <!-- Publish is enabled only when the data is clean -->
+                <xforms:bind nodeset="publish-trigger" readonly="xxforms:instance('fr-persistence-instance')[data-status = 'dirty']"/>
+            </xforms:bind>
 
             <!-- Ensure there is an empty xhtml:td to place a new control (may fail) -->
             <xforms:action ev:event="fb-ensure-empty-td">
@@ -2112,7 +2119,7 @@
                 </xforms:trigger>
 
                 <!-- Publish form -->
-                <xforms:trigger id="fb-publish-button">
+                <xforms:trigger id="fb-publish-button" model="fr-form-model" ref="instance('fb-variables')/publish-trigger">
                     <xforms:label>
                         <xhtml:img src="/forms/orbeon/builder/images/upload.png" alt="Publish" title="Publish"/>
                         <xhtml:span>Publish</xhtml:span>

@@ -111,9 +111,9 @@
                             <xforms:insert context="*[last()]" origin="instance('fb-resource-template')/*"/>
                         </xforms:action>
 
-                        <!-- Insert a first component into the section -->
-                        <!--<xforms:setindex repeat="fb-controls-template-repeat" index="1"/>-->
-                        <!--<xforms:dispatch name="DOMActivate" target="fb-add-control-trigger"/>-->
+                        <!-- Open label editor for newly inserted section -->
+                        <xforms:toggle case="fr-inplace-fb-section-title-input-edit"/>
+                        <xforms:setfocus control="fr-inplace-fb-section-title-input-input"/>
 
                     </xforms:action>
                 </xforms:trigger>
@@ -242,6 +242,11 @@
                                     <xforms:delete nodeset="$control/@ref"/>
                                     <xforms:insert context="$control" origin="xxforms:attribute('bind', $bind/@id)"/>
                                 </xforms:action>
+
+                                <!-- Open label editor for newly inserted control -->
+                                <xforms:toggle case="fr-inplace-fb-control-label-control-edit"/>
+                                <xforms:setfocus control="fr-inplace-fb-control-label-control-input"/>
+
                             </xforms:action>
 
                         </xforms:action>

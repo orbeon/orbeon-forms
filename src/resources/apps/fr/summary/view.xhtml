@@ -235,7 +235,7 @@
             <xforms:label>Orbeon Form Runner</xforms:label>
             <xhtml:img src="/apps/fr/style/orbeon-logo-trimmed-transparent-42.png"/> 
             <fr:body>
-                <xforms:group appearance="xxforms:internal">
+                <xforms:group class="fr-summary-search">
 
                     <!-- Free-text search -->
                     <xforms:input ref="instance('fr-search-instance')/query" incremental="true" class="fr-search-input">
@@ -243,43 +243,39 @@
                     </xforms:input>
 
                     <!-- Structured search -->
-                    <table>
-                        <tr>
-                            <xforms:repeat nodeset="instance('fr-search-instance')/query[@path]" id="search-repeat">
-                                <td>
-                                    <xxforms:variable name="label" select="$form-resources/*[local-name() = context()/@name]/label"/>
-                                    <!-- input -->
-                                    <xforms:input ref=".[@control = 'input']" incremental="true" >
-                                        <xforms:label>
-                                            <xforms:output value="$label"/>
-                                        </xforms:label>
-                                    </xforms:input>
-                                    <!-- textarea -->
-                                    <xforms:input ref=".[@control = 'textarea']" incremental="true" >
-                                        <xforms:label>
-                                            <xforms:output value="$label"/>
-                                        </xforms:label>
-                                    </xforms:input>
-                                    <!-- select1 -->
-                                    <xforms:select1 ref=".[@control = 'select1']">
-                                        <xforms:label>
-                                            <xforms:output value="$label"/>
-                                        </xforms:label>
-                                        <xforms:item>
-                                            <xforms:label>[Any]</xforms:label>
-                                            <xforms:value/>
-                                        </xforms:item>
-                                        <xforms:itemset model="fr-persistence-model"
-                                                        nodeset="instance('fr-source-form-instance')/xhtml:head/xforms:model/xforms:instance[@id = concat(context()/@name, 's-itemset')]/*/*"
-                                                        xxforms:refresh-items="false">
-                                            <xforms:label ref="name"/>
-                                            <xforms:value ref="value"/>
-                                        </xforms:itemset>
-                                    </xforms:select1>
-                                </td>
-                            </xforms:repeat>
-                        </tr>
-                    </table>
+                    <xforms:repeat nodeset="instance('fr-search-instance')/query[@path]" id="search-repeat">
+                        <div class="fr-summary-search-item">
+                            <xxforms:variable name="label" select="$form-resources/*[local-name() = context()/@name]/label"/>
+                            <!-- input -->
+                            <xforms:input ref=".[@control = 'input']" incremental="true" >
+                                <xforms:label>
+                                    <xforms:output value="$label"/>
+                                </xforms:label>
+                            </xforms:input>
+                            <!-- textarea -->
+                            <xforms:input ref=".[@control = 'textarea']" incremental="true" >
+                                <xforms:label>
+                                    <xforms:output value="$label"/>
+                                </xforms:label>
+                            </xforms:input>
+                            <!-- select1 -->
+                            <xforms:select1 ref=".[@control = 'select1']">
+                                <xforms:label>
+                                    <xforms:output value="$label"/>
+                                </xforms:label>
+                                <xforms:item>
+                                    <xforms:label>[Any]</xforms:label>
+                                    <xforms:value/>
+                                </xforms:item>
+                                <xforms:itemset model="fr-persistence-model"
+                                                nodeset="instance('fr-source-form-instance')/xhtml:head/xforms:model/xforms:instance[@id = concat(context()/@name, 's-itemset')]/*/*"
+                                                xxforms:refresh-items="false">
+                                    <xforms:label ref="name"/>
+                                    <xforms:value ref="value"/>
+                                </xforms:itemset>
+                            </xforms:select1>
+                        </div>
+                    </xforms:repeat>
                     
                     <!-- Send search when values change -->
                     <xforms:send ev:event="xforms-value-changed" submission="search-submission"/>

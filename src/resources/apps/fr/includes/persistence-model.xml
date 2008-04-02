@@ -72,7 +72,8 @@
             <xforms:send submission="get-document-submission"/>
         </xforms:action>
         <!-- No document id is provided and we are not in print view -->
-        <xforms:action if="$parameters/document = '' and not($parameters/mode = ('print', 'view', 'pdf'))">
+        <xxforms:variable name="is-new-document" select="$parameters/document = '' and not($parameters/mode = ('print', 'view', 'pdf'))"/>
+        <xforms:action if="$is-new-document">
             <!-- Create random document id -->
             <xforms:setvalue ref="$parameters/document" value="digest(string(random(true)), 'MD5', 'hex')"/>
             <!-- If we find form data in the session, use it and reset session -->
@@ -83,14 +84,14 @@
             </xforms:action>
         </xforms:action>
 
-        <!-- Force all this so we can safely mark the data status as clean -->
+        <!-- Force all this so we can safely set the data status -->
         <xforms:rebuild/>
         <xforms:recalculate/>
         <xforms:revalidate/>
         <xforms:refresh/>
 
-        <!-- Mark the initial data status as clean -->
-        <xforms:setvalue ref="instance('fr-persistence-instance')/data-status">clean</xforms:setvalue>
+        <!-- Set the initial data status -->
+        <xforms:setvalue ref="instance('fr-persistence-instance')/data-status" value="if ($is-new-document) then 'dirty' else 'clean'"/>
     </xforms:action>
 
     <!-- Clear operation -->

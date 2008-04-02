@@ -62,9 +62,24 @@
         <p:output name="data" id="xhtml-data"/>
     </p:processor>
 
-    <!-- Serialize -->
+    <!-- Serialize to PDF -->
     <p:processor name="oxf:xhtml-to-pdf">
         <p:input name="data" href="#xhtml-data"/>
+        <p:output name="data" id="pdf-document"/>
+    </p:processor>
+
+    <!-- Add barcode to PDF -->
+    <p:processor name="oxf:pdf-template">
+        <p:input name="pdf-document" href="#pdf-document"/>
+        <p:input name="data" href="#instance"/>
+        <p:input name="model">
+            <config>
+                <template href="input:pdf-document" show-grid="false"/>
+                <group ref="/*" font-pitch="15.9" font-family="Courier" font-size="12">
+                    <barcode left="50" top="780" height="15" value="/*/document"/>
+                </group>
+            </config>
+        </p:input>
         <p:output name="data" ref="data"/>
     </p:processor>
 

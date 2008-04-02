@@ -915,6 +915,6 @@ public class URLGenerator extends ProcessorImpl {
     }
 
     public void reset(PipelineContext pipelineContext) {
-        makeSureStateIsSet(pipelineContext);
+        setState(pipelineContext, new URLGeneratorState());
     }
 }

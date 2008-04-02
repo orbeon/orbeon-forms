@@ -155,7 +155,7 @@
                         <xsl:copy-of select="@*"/>
 
                         <div class="maincontent">
-                            <xsl:apply-templates select="(//h2)[1]/../*"/>
+                            <xsl:apply-templates select=".//div[tokenize(@class, '\s+') = 'maincontent']"/>
                         </div>
 
                         <!--<table style="width: 100%; border: 0px; table-layout: fixed;" class="maincontent">-->
@@ -179,8 +179,18 @@
                         <!--</table>-->
                     </xsl:copy>
                 </xsl:template>
-                <!--<xsl:template match="h1">-->
-                    <!--<h2>Table of Contents</h2>-->
+                <xsl:template match="h1">
+                    <h1>Table of Contents</h1>
+                </xsl:template>
+                <!--<xsl:template match="h2">-->
+                    <!--<h1>-->
+                        <!--<xsl:apply-templates/>-->
+                    <!--</h1>-->
+                <!--</xsl:template>-->
+                <!--<xsl:template match="h3">-->
+                    <!--<h2>-->
+                        <!--<xsl:apply-templates/>-->
+                    <!--</h2>-->
                 <!--</xsl:template>-->
             </xsl:stylesheet>
         </p:input>

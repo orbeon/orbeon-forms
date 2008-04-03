@@ -20,6 +20,7 @@ import org.orbeon.oxf.xforms.control.controls.XFormsTextareaControl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.saxon.om.FastStringBuffer;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -44,7 +45,7 @@ public class XFormsTextareaHandler extends XFormsCoreControlHandler {
 
         final AttributesImpl newAttributes;
         {
-            final StringBuffer classes = getInitialClasses(localname, attributes, textareaControl);
+            final FastStringBuffer classes = getInitialClasses(localname, attributes, textareaControl);
             handleMIPClasses(classes, textareaControl);
             newAttributes = getAttributes(attributes, classes.toString(), effectiveId);
             handleReadOnlyAttribute(newAttributes, containingDocument, textareaControl);

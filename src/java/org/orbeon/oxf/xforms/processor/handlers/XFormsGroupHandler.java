@@ -70,7 +70,7 @@ public class XFormsGroupHandler extends HandlerBase {
         isFieldsetAppearance = XFormsConstants.XXFORMS_FIELDSET_APPEARANCE_QNAME.equals(getAppearance(attributes));
 
         // Find classes to add
-        final StringBuffer classes = getInitialClasses(localname, attributes, null);
+        final FastStringBuffer classes = getInitialClasses(localname, attributes, null);
         if (!handlerContext.isGenerateTemplate()) {
             groupXFormsControl = ((XFormsGroupControl) containingDocument.getObjectById(effectiveGroupId));
         }

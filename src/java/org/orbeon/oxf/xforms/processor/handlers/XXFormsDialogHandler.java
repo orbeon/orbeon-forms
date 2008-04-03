@@ -18,6 +18,7 @@ import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.saxon.om.FastStringBuffer;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -40,7 +41,7 @@ public class XXFormsDialogHandler extends HandlerBase {
         isMinimalAppearance = XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME.equals(getAppearance(attributes));
 
         // Find classes to add
-        final StringBuffer classes = getInitialClasses(localname, attributes, null);
+        final FastStringBuffer classes = getInitialClasses(localname, attributes, null);
         classes.append(" xforms-initially-hidden");
         classes.append(" xforms-dialog-");
         classes.append(dialogXFormsControl.getLevel());

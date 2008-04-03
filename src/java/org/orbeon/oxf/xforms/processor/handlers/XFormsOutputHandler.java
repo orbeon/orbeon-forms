@@ -21,6 +21,7 @@ import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.saxon.om.FastStringBuffer;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -68,7 +69,7 @@ public class XFormsOutputHandler extends XFormsCoreControlHandler {
         final boolean isConcreteControl = outputControl != null;
 
         final AttributesImpl newAttributes;
-        final StringBuffer classes = getInitialClasses(localname, attributes, outputControl);
+        final FastStringBuffer classes = getInitialClasses(localname, attributes, outputControl);
 
         final String mediatypeValue = attributes.getValue("mediatype");
         final boolean isImageMediatype = mediatypeValue != null && mediatypeValue.startsWith("image/");

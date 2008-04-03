@@ -18,6 +18,7 @@ import org.orbeon.oxf.xforms.control.controls.XFormsRangeControl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.saxon.om.FastStringBuffer;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -39,7 +40,7 @@ public class XFormsRangeHandler extends XFormsCoreControlHandler {
 
         final AttributesImpl newAttributes;
         {
-            final StringBuffer classes = getInitialClasses(localname, attributes, rangeControl);
+            final FastStringBuffer classes = getInitialClasses(localname, attributes, rangeControl);
             classes.append(" xforms-range-background");
 
             handleMIPClasses(classes, rangeControl);

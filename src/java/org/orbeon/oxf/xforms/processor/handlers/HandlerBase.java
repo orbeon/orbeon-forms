@@ -89,7 +89,7 @@ public abstract class HandlerBase extends ElementHandler {
         }
     }
 
-    public void handleMIPClasses(StringBuffer sb, XFormsSingleNodeControl xformsControl) {
+    public void handleMIPClasses(FastStringBuffer sb, XFormsSingleNodeControl xformsControl) {
         if (xformsControl != null) {
             // The case of a concrete control
             if (!xformsControl.isRelevant()) {
@@ -217,20 +217,20 @@ public abstract class HandlerBase extends ElementHandler {
         return reusableAttributes;
     }
 
-    protected StringBuffer getInitialClasses(String controlName, Attributes controlAttributes, XFormsControl xformsControl) {
+    protected FastStringBuffer getInitialClasses(String controlName, Attributes controlAttributes, XFormsControl xformsControl) {
         return getInitialClasses(controlName, controlAttributes, xformsControl, null, false);
     }
 
-    protected StringBuffer getInitialClasses(String controlName, Attributes controlAttributes, XFormsControl xformsControl, QName appearance, boolean incrementalDefault) {
+    protected FastStringBuffer getInitialClasses(String controlName, Attributes controlAttributes, XFormsControl xformsControl, QName appearance, boolean incrementalDefault) {
 
         // Control name
-        final StringBuffer sb;
+        final FastStringBuffer sb;
         {
             // We only call xforms-control the actual controls as per the spec
             if (!XFormsControls.isGroupingControl(controlName))
-                sb = new StringBuffer("xforms-control xforms-");
+                sb = new FastStringBuffer("xforms-control xforms-");
             else
-                sb = new StringBuffer("xforms-");
+                sb = new FastStringBuffer("xforms-");
             sb.append(controlName);
         }
         {

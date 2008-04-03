@@ -23,6 +23,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.saxon.om.FastStringBuffer;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -73,7 +74,7 @@ public class XFormsTriggerHandler extends XFormsCoreControlHandler {
 
         final QName appearance = getAppearance(attributes);
 
-        final StringBuffer classes = getInitialClasses(localname, attributes, triggerControl);
+        final FastStringBuffer classes = getInitialClasses(localname, attributes, triggerControl);
         handleMIPClasses(classes, triggerControl);
         final AttributesImpl newAttributes = getAttributes(attributes, classes.toString(), effectiveId);
 

@@ -18,6 +18,7 @@ import org.orbeon.oxf.xforms.control.controls.XFormsSecretControl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.saxon.om.FastStringBuffer;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -40,7 +41,7 @@ public class XFormsSecretHandler extends XFormsCoreControlHandler {
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
         final AttributesImpl newAttributes;
         {
-            final StringBuffer classes = getInitialClasses(localname, attributes, secretControl);
+            final FastStringBuffer classes = getInitialClasses(localname, attributes, secretControl);
             handleMIPClasses(classes, secretControl);
             newAttributes = getAttributes(attributes, classes.toString(), effectiveId);
             handleReadOnlyAttribute(newAttributes, containingDocument, secretControl);

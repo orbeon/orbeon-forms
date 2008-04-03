@@ -17,6 +17,7 @@ import org.orbeon.oxf.xforms.processor.XFormsElementFilterContentHandler;
 import org.orbeon.oxf.xforms.control.controls.XFormsCaseControl;
 import org.orbeon.oxf.xforms.XFormsControls;
 import org.orbeon.oxf.xml.*;
+import org.orbeon.saxon.om.FastStringBuffer;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
@@ -38,7 +39,7 @@ public class XFormsCaseHandler extends HandlerBase {
         currentCaseEffectiveId = handlerContext.getEffectiveId(attributes);
 
         // Find classes to add
-        final StringBuffer classes = getInitialClasses(localname, attributes, null);
+        final FastStringBuffer classes = getInitialClasses(localname, attributes, null);
 
         final AttributesImpl newAttributes = getAttributes(attributes, classes.toString(), currentCaseEffectiveId);
 
@@ -69,7 +70,7 @@ public class XFormsCaseHandler extends HandlerBase {
             }
         });
 
-        currentOutputInterceptor.setAddedClasses(new StringBuffer(isVisible ? "xforms-case-selected" : "xforms-case-deselected"));
+        currentOutputInterceptor.setAddedClasses(new FastStringBuffer(isVisible ? "xforms-case-selected" : "xforms-case-deselected"));
 
         handlerContext.getController().setOutput(new DeferredContentHandlerImpl(new XFormsElementFilterContentHandler(currentOutputInterceptor)));
         setContentHandler(handlerContext.getController().getOutput());

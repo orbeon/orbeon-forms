@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.processor.handlers;
 import org.orbeon.oxf.xforms.control.controls.XFormsSwitchControl;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.saxon.om.FastStringBuffer;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -34,7 +35,7 @@ public class XFormsSwitchHandler extends HandlerBase {
         effectiveSwitchId = handlerContext.getEffectiveId(attributes);
 
         // Find classes to add
-        final StringBuffer classes = getInitialClasses(localname, attributes, null);
+        final FastStringBuffer classes = getInitialClasses(localname, attributes, null);
         final XFormsSwitchControl switchXFormsControl = ((XFormsSwitchControl) containingDocument.getObjectById(effectiveSwitchId));
         handleMIPClasses(classes, switchXFormsControl);
 

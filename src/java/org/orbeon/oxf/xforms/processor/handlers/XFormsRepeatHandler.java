@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.orbeon.oxf.xforms.XFormsControls;
+import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.control.controls.RepeatIterationControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.processor.XFormsElementFilterContentHandler;
@@ -22,6 +23,7 @@ import org.orbeon.oxf.xml.DeferredContentHandlerImpl;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.common.ValidationException;
+import org.orbeon.saxon.om.FastStringBuffer;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -39,7 +41,7 @@ public class XFormsRepeatHandler extends HandlerBase {
 
     public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
 
-        final String repeatId = attributes.getValue("id");
+        final String repeatId = handlerContext.getId(attributes);
         final String effectiveId = handlerContext.getEffectiveId(attributes);
 
         final boolean isTopLevelRepeat = handlerContext.countParentRepeats() == 0;
@@ -85,25 +87,27 @@ public class XFormsRepeatHandler extends HandlerBase {
                 }
 
                 // Is the current iteration selected?
-                final boolean isCurrentRepeatSelected = isRepeatSelected && i == currentRepeatIndex;
-                final boolean isCurrentRepeatRelevant = ((RepeatIterationControl) repeatControl.getChildren().get(i - 1)).isRelevant();
-                final int numberParentRepeat = handlerContext.countParentRepeats();
+                final boolean isCurrentIterationSelected = isRepeatSelected && i == currentRepeatIndex;
+                final boolean isCurrentIterationRelevant = ((RepeatIterationControl) repeatControl.getChildren().get(i - 1)).isRelevant();
+                final int numberOfParentRepeats = handlerContext.countParentRepeats();
 
                 // Determine classes to add on root elements and around root characters
-                final StringBuffer addedClasses;
+                final FastStringBuffer addedClasses;
                 {
-                    addedClasses = new StringBuffer();
-                    if (isCurrentRepeatSelected && !isStaticReadonly(repeatControl)) {
+                    addedClasses = new FastStringBuffer(200);
+                    if (isCurrentIterationSelected && !isStaticReadonly(repeatControl)) {
                         addedClasses.append("xforms-repeat-selected-item-");
-                        addedClasses.append(Integer.toString((numberParentRepeat % 4) + 1));
+                        addedClasses.append(Integer.toString((numberOfParentRepeats % 4) + 1));
                     }
-                    if (!isCurrentRepeatRelevant)
+                    if (!isCurrentIterationRelevant)
                         addedClasses.append(" xforms-disabled");
+                    // Add classes such as Dnd classes, etc.
+                    addRepeatClasses(addedClasses, attributes);
                 }
                 outputInterceptor.setAddedClasses(addedClasses);
 
                 // Apply the content of the body for this iteration
-                handlerContext.pushRepeatContext(false, i, false, isCurrentRepeatSelected);
+                handlerContext.pushRepeatContext(false, i, false, isCurrentIterationSelected);
                 try {
                     handlerContext.getController().repeatBody();
                 } catch (Exception e) {
@@ -124,7 +128,12 @@ public class XFormsRepeatHandler extends HandlerBase {
             }
 
             // Determine classes to add on root elements and around root characters
-            outputInterceptor.setAddedClasses(new StringBuffer(isTopLevelRepeat ? "xforms-repeat-template" : ""));
+            final FastStringBuffer addedClasses = new FastStringBuffer(isTopLevelRepeat ? "xforms-repeat-template" : "");
+
+            // Add classes such as Dnd classes, etc.
+            addRepeatClasses(addedClasses, attributes);
+
+            outputInterceptor.setAddedClasses(addedClasses);
 
             // Apply the content of the body for this iteration
             handlerContext.pushRepeatContext(true, 0, false, false);
@@ -153,6 +162,19 @@ public class XFormsRepeatHandler extends HandlerBase {
                 outputInterceptor.getDelimiterPrefix(), outputInterceptor.getDelimiterLocalName(), "xforms-repeat-begin-end", "repeat-end-" + effectiveId);
     }
 
-    public void end(String uri, String localname, String qName) throws SAXException {
+    private static void addRepeatClasses(FastStringBuffer sb, Attributes attributes) {
+        final String dndAttribute = attributes.getValue(XFormsConstants.XXFORMS_NAMESPACE_URI, "dnd");
+
+        if (dndAttribute != null) {
+            sb.append(" xforms-dnd");
+
+            if (dndAttribute.equals("vertical"))
+                sb.append(" xforms-dnd-vertical");
+            if (dndAttribute.equals("horizontal"))
+                sb.append(" xforms-dnd-horizontal");
+
+            if (attributes.getValue(XFormsConstants.XXFORMS_NAMESPACE_URI, "dnd-over") != null)
+                sb.append(" xforms-dnd-over");
+        }
     }
 }

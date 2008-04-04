@@ -41,7 +41,7 @@ public class XFormsEventFactory {
         });
         nameToClassMap.put(XFormsEvents.XFORMS_DELETE, new Factory() {
             public XFormsEvent createEvent(String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Element filesElement) {
-                return new XFormsDeleteEvent(targetObject, contextString);
+                return new XFormsDeleteEvent(targetObject);
             }
         });
         nameToClassMap.put(XFormsEvents.XFORMS_DESELECT, new Factory() {
@@ -51,7 +51,7 @@ public class XFormsEventFactory {
         });
         nameToClassMap.put(XFormsEvents.XFORMS_INSERT, new Factory() {
             public XFormsEvent createEvent(String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Element filesElement) {
-                return new XFormsInsertEvent(targetObject, contextString);
+                return new XFormsInsertEvent(targetObject);
             }
         });
         nameToClassMap.put(XFormsEvents.XFORMS_LINK_ERROR, new Factory() {

@@ -34,24 +34,19 @@ import java.util.Collections;
  */
 public class XFormsInsertEvent extends XFormsEvent {
 
-    private String xpathExpression;
-
-    private String binding;
     private List insertedNodeInfos;
     private List originObjects;
     private NodeInfo insertLocationNodeInfo;
     private String position;
 
-    public XFormsInsertEvent(XFormsEventTarget targetObject, String xpathExpression) {
+    public XFormsInsertEvent(XFormsEventTarget targetObject) {
         super(XFormsEvents.XFORMS_INSERT, targetObject, true, false);
-        this.xpathExpression = xpathExpression;
     }
 
     public XFormsInsertEvent(XFormsEventTarget targetObject,
-                             String binding, List insertedNodes, List originObjects,
+                             List insertedNodes, List originObjects,
                              NodeInfo insertLocationNodeInfo, String position) {
         super(XFormsEvents.XFORMS_INSERT, targetObject, true, false);
-        this.binding = binding;
         this.insertedNodeInfos = insertedNodes;
         this.originObjects = originObjects;
         this.insertLocationNodeInfo = insertLocationNodeInfo;
@@ -59,10 +54,7 @@ public class XFormsInsertEvent extends XFormsEvent {
     }
 
     public SequenceIterator getAttribute(String name) {
-        if ("binding".equals(name)) {
-            // "The attribute value of the insert action's nodeset or bind attribute."
-            return (binding == null) ? new EmptyIterator() : (SequenceIterator) new ListIterator(Collections.singletonList(new StringValue(binding)));
-        } else if ("inserted-nodes".equals(name)) {
+        if ("inserted-nodes".equals(name)) {
             // "The instance data nodes inserted."
             return (insertedNodeInfos == null) ? new EmptyIterator() : (SequenceIterator) new ListIterator(insertedNodeInfos);
         } else if ("origin-nodes".equals(name)) {

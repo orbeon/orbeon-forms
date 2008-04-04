@@ -16,6 +16,8 @@ package org.orbeon.oxf.xforms.event.events;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.processor.XFormsServer;
+import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.om.ListIterator;
 import org.orbeon.saxon.om.EmptyIterator;
@@ -30,6 +32,14 @@ import java.util.ArrayList;
  * Base class for UI events.
  */
 public abstract class XFormsUIEvent extends XFormsEvent {
+
+    private static final String XXFORMS_BINDING_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "binding");
+    private static final String XXFORMS_ALERT_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "alert");
+    private static final String XXFORMS_LABEL_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "label");
+    private static final String XXFORMS_HINT_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "hint");
+    private static final String XXFORMS_HELP_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "help");
+    private static final String XXFORMS_REPEAT_INDEXES_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "repeat-indexes");
+
     private XFormsControl targetXFormsControl;
 
     public XFormsUIEvent(String eventName, XFormsControl targetObject) {
@@ -43,35 +53,64 @@ public abstract class XFormsUIEvent extends XFormsEvent {
     }
 
     public SequenceIterator getAttribute(String name) {
-        if ("target-ref".equals(name)) {
-            // TODO: This is ill-named in case we use @bind
+        if ("target-ref".equals(name) || XXFORMS_BINDING_ATTRIBUTE.equals(name)) {
+
+            if ("target-ref".equals(name)) {
+                XFormsServer.logger.warn("event('target-ref') is deprecated. Use event('xxforms:binding') instead.");
+            }
+
             // Return the node to which the control is bound
             return new ListIterator(Collections.singletonList(targetXFormsControl.getBoundNode()));
-        } else if ("alert".equals(name)) {
+        } else if ("alert".equals(name) || XXFORMS_ALERT_ATTRIBUTE.equals(name)) {
+
+            if ("alert".equals(name)) {
+                XFormsServer.logger.warn("event('alert') is deprecated. Use event('xxforms:alert') instead.");
+            }
+
             final String alert = targetXFormsControl.getAlert(getPipelineContext());
             if (alert != null)
                 return new ListIterator(Collections.singletonList(new StringValue(alert)));
             else
                 return new EmptyIterator();
-        } else if ("label".equals(name)) {
+        } else if ("label".equals(name) || XXFORMS_LABEL_ATTRIBUTE.equals(name)) {
+
+            if ("label".equals(name)) {
+                XFormsServer.logger.warn("event('label') is deprecated. Use event('xxforms:label') instead.");
+            }
+
             final String label = targetXFormsControl.getLabel(getPipelineContext());
             if (label != null)
                 return new ListIterator(Collections.singletonList(new StringValue(label)));
             else
                 return new EmptyIterator();
-        } else if ("hint".equals(name)) {
+        } else if ("hint".equals(name) || XXFORMS_HINT_ATTRIBUTE.equals(name)) {
+
+            if ("hint".equals(name)) {
+                XFormsServer.logger.warn("event('hint') is deprecated. Use event('xxforms:hint') instead.");
+            }
+
             final String hint = targetXFormsControl.getHint(getPipelineContext());
             if (hint != null)
                 return new ListIterator(Collections.singletonList(new StringValue(hint)));
             else
                 return new EmptyIterator();
-        } else if ("help".equals(name)) {
+        } else if ("help".equals(name) || XXFORMS_HELP_ATTRIBUTE.equals(name)) {
+
+            if ("help".equals(name)) {
+                XFormsServer.logger.warn("event('help') is deprecated. Use event('xxforms:help') instead.");
+            }
+
             final String help = targetXFormsControl.getHelp(getPipelineContext());
             if (help != null)
                 return new ListIterator(Collections.singletonList(new StringValue(help)));
             else
                 return new EmptyIterator();
-        } else if ("repeat-indexes".equals(name)) {
+        } else if ("repeat-indexes".equals(name) || XXFORMS_REPEAT_INDEXES_ATTRIBUTE.equals(name)) {
+
+            if ("repeat-indexes".equals(name)) {
+                XFormsServer.logger.warn("event('repeat-indexes') is deprecated. Use event('xxforms:repeat-indexes') instead.");
+            }
+
             final String effectiveTargetId = targetXFormsControl.getEffectiveId();
             final int index = (effectiveTargetId == null) ? - 1 : effectiveTargetId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1);
 

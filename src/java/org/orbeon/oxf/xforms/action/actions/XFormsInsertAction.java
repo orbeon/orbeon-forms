@@ -54,13 +54,6 @@ public class XFormsInsertAction extends XFormsAction {
         final String originAttribute = actionElement.attributeValue("origin");
         final String contextAttribute = actionElement.attributeValue("context");
 
-        final String binding;
-        {
-            final String nodesetAttribute = actionElement.attributeValue("nodeset");
-            final String bindAttribute = actionElement.attributeValue("bind");
-            binding = (bindAttribute != null) ? bindAttribute : nodesetAttribute;
-        }
-
         // "2. The Node Set Binding node-set is determined."
         final List collectionToBeUpdated; {
             final XFormsContextStack.BindingContext currentBindingContext = contextStack.getCurrentBindingContext();
@@ -386,7 +379,7 @@ public class XFormsInsertAction extends XFormsAction {
 
 
                 containingDocument.dispatchEvent(pipelineContext,
-                        new XFormsInsertEvent(modifiedInstance, binding, insertedNodeInfos, originObjects, insertLocationNodeInfo, positionAttribute == null ? "after" : positionAttribute));
+                        new XFormsInsertEvent(modifiedInstance, insertedNodeInfos, originObjects, insertLocationNodeInfo, positionAttribute == null ? "after" : positionAttribute));
             }
 
             // "XForms Actions that change the tree structure of instance data result in setting all four flags to true"

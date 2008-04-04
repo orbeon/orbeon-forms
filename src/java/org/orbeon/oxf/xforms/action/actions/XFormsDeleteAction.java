@@ -50,13 +50,6 @@ public class XFormsDeleteAction extends XFormsAction {
         final String atAttribute = actionElement.attributeValue("at");
         final String contextAttribute = actionElement.attributeValue("context");
 
-        final String binding;
-        {
-            final String nodesetAttribute = actionElement.attributeValue("nodeset");
-            final String bindAttribute = actionElement.attributeValue("bind");
-            binding = (bindAttribute != null) ? bindAttribute : nodesetAttribute;
-        }
-
         final List collectionToUpdate = contextStack.getCurrentNodeset();
         final boolean isEmptyNodesetBinding = collectionToUpdate == null || collectionToUpdate.size() == 0;
 
@@ -203,7 +196,7 @@ public class XFormsDeleteAction extends XFormsAction {
             // "4. If the delete is successful, the event xforms-delete is dispatched."
             {
                 final List deletedNodeInfos = Collections.singletonList(nodeInfoToRemove);
-                containingDocument.dispatchEvent(pipelineContext, new XFormsDeleteEvent(modifiedInstance, binding, deletedNodeInfos, deleteIndex));
+                containingDocument.dispatchEvent(pipelineContext, new XFormsDeleteEvent(modifiedInstance, deletedNodeInfos, deleteIndex));
             }
 
             // "XForms Actions that change the tree structure of instance data result in setting all four flags to true"

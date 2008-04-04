@@ -360,7 +360,7 @@ div.fr-collapsible {
 /* Cell content */
 .fr-grid-content { *padding-right: 6px }/* To help IE move back controls within .fr-grid-content */
 .fr-grid .xforms-input input { width: 100%; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box }
-.fr-grid .xforms-upload input { width: 100%; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box }
+.fr-grid .xforms-upload input { -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box } /* The upload field responds to 100% width on IE, which gives strange result */
 .fr-grid .fr-inplace-edit .xforms-input input { width: 100% }
 .fr-grid .xforms-textarea { width: 100%; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box }
 .fr-grid .xforms-select1-appearance-minimal { width: 100%; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box }

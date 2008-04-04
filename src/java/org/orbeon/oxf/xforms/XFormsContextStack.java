@@ -64,20 +64,23 @@ public class XFormsContextStack {
      * Reset the binding context to the root of the given model's first instance.
      */
     public void resetBindingContext(PipelineContext pipelineContext, XFormsModel xformsModel) {
+
         // Clear existing stack
         contextStack.clear();
 
-        // Push the default context
-        if (xformsModel.getInstanceCount() > 0) {
+        if (xformsModel != null && xformsModel.getInstanceCount() > 0) {
+            // Push the default context
             final NodeInfo defaultNode = xformsModel.getDefaultInstance().getInstanceRootElementInfo();
             final List defaultNodeset = Arrays.asList(new Object[]{ defaultNode });
             contextStack.push(new BindingContext(null, xformsModel, defaultNodeset, 1, null, true, null, xformsModel.getDefaultInstance().getLocationData(), false, defaultNode));
         } else {
+            // Push empty context
             contextStack.push(new BindingContext(null, xformsModel, Collections.EMPTY_LIST, 0, null, true, null, xformsModel.getLocationData(), false, null));
         }
 
         // Add model variables for default model
-        addVariables(pipelineContext, getCurrentBindingContext(), xformsModel);
+        if (xformsModel != null)
+            addVariables(pipelineContext, getCurrentBindingContext(), xformsModel);
     }
 
     private void addVariables(PipelineContext pipelineContext, BindingContext bindingContext, XFormsModel xformsModel) {

@@ -94,6 +94,11 @@ public class XFormsStaticState {
     private String repeatHierarchyString;   // contains comma-separated list of space-separated repeat id and ancestor if any
     private Map itemsInfoMap;               // Map<String, ItemsInfo> of control id to ItemsInfo
 
+    private static final HashMap XFORMS_NAMESPACE_MAPPING = new HashMap();
+    static {
+        XFORMS_NAMESPACE_MAPPING.put(XFormsConstants.XFORMS_PREFIX, XFormsConstants.XFORMS_NAMESPACE_URI);
+    }
+
     /**
      * Create static state object from an encoded version.
      *
@@ -576,9 +581,10 @@ public class XFormsStaticState {
 
                         final NodeInfo controlNodeInfo = controlsDocumentInfo.wrap(controlElement);
 
-                        // Try to figure out if we have dynamic items. This attempts to cover all cases, including nested xforms:output controls.
+                        // Try to figure out if we have dynamic items. This attempts to cover all cases, including
+                        // nested xforms:output controls.
                         final boolean hasNonStaticItem = ((Boolean) XPathCache.evaluateSingle(pipelineContext, controlNodeInfo,
-                                "exists(.//xforms:*[@ref or @nodeset or @bind or @value])", getNamespaceMappings(controlElement),
+                                "exists(.//xforms:*[@ref or @nodeset or @bind or @value])", XFORMS_NAMESPACE_MAPPING,
                                 null, null, null, null, locationData)).booleanValue();
 
                         // Remember information

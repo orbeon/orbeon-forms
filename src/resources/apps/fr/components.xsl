@@ -266,7 +266,8 @@
 
         <xhtml:span class="fr-hidden">
             <!-- Hidden field to communicate to the client the current section to collapse or expand -->
-            <xforms:input model="fr-sections-model" ref="instance('fr-current-section-instance')" id="fr-current-section-input" class="xforms-disabled"/>
+            <xforms:input model="fr-sections-model" ref="instance('fr-current-section-instance')/id" id="fr-current-section-id-input" class="xforms-disabled"/>
+            <xforms:input model="fr-sections-model" ref="instance('fr-current-section-instance')/repeat-indexes" id="fr-current-section-repeat-indexes-input" class="xforms-disabled"/>
             <!-- Hidden field to communicate to the client whether the data is clean or dirty -->
             <xforms:input model="fr-persistence-model" ref="instance('fr-persistence-instance')/data-status" id="fr-data-status-input" class="xforms-disabled"/>
         </xhtml:span>
@@ -524,9 +525,10 @@
                                         <xsl:apply-templates select="xforms:label"/>
                                     </xforms:trigger>
                                     <xforms:action ev:event="DOMActivate">
-                                        <xforms:setvalue model="fr-sections-model" ref="instance('fr-current-section-instance')">
+                                        <xforms:setvalue model="fr-sections-model" ref="instance('fr-current-section-instance')/id">
                                             <xsl:value-of select="$section-id"/>
                                         </xforms:setvalue>
+                                        <xforms:setvalue model="fr-sections-model" ref="instance('fr-current-section-instance')/repeat-indexes" value="event('repeat-indexes')"/>
                                         <xforms:dispatch target="fr-sections-model" name="fr-expand"/>
                                     </xforms:action>
                                 </xforms:group>
@@ -547,12 +549,11 @@
                                         <xsl:apply-templates select="xforms:label"/>
                                     </xforms:trigger>
                                     <xforms:action ev:event="DOMActivate">
-                                        <xforms:setvalue model="fr-sections-model" ref="instance('fr-current-section-instance')">
+                                        <xforms:setvalue model="fr-sections-model" ref="instance('fr-current-section-instance')/id">
                                             <xsl:value-of select="$section-id"/>
                                         </xforms:setvalue>
-                                        <xforms:dispatch target="fr-sections-model" name="fr-collapse">
-                                            <xxforms:context name="repeat-indexes" select="event('repeat-indexes')"/>
-                                        </xforms:dispatch>
+                                        <xforms:setvalue model="fr-sections-model" ref="instance('fr-current-section-instance')/repeat-indexes" value="event('repeat-indexes')"/>
+                                        <xforms:dispatch target="fr-sections-model" name="fr-collapse"/>
                                     </xforms:action>
                                 </xforms:group>
                             </xsl:element>
@@ -690,25 +691,25 @@
             <!-- Contain section being currently expanded/collapsed -->
             <!-- TODO: This probably doesn't quite work for sections within repeats -->
             <xforms:instance id="fr-current-section-instance">
-                <section xmlns=""/>
+                <section xmlns="">
+                    <id/>
+                    <repeat-indexes/>
+                </section>
             </xforms:instance>
 
             <!-- Handle section collapse -->
             <xforms:action ev:event="fr-after-collapse">
-                <xforms:toggle case="case-{{instance('fr-current-section-instance')}}-closed"/>
+                <xforms:toggle case="case-{{instance('fr-current-section-instance')/id}}-closed"/>
             </xforms:action>
 
             <!-- Close section -->
             <xforms:action ev:event="fr-collapse">
-                <!-- If we are in a repeated section, we can't animate the close, as when fr-after-collapse is received, we don't have the correct repeat index -->
-                <xxforms:variable name="can-do-animation" select="empty(event('repeat-indexes'))"/>
-                <xxforms:script if="$can-do-animation">frCollapse();</xxforms:script>
-                <xforms:toggle if="not($can-do-animation)" case="case-{{instance('fr-current-section-instance')}}-closed"/>
+                <xxforms:script>frCollapse();</xxforms:script>
             </xforms:action>
 
             <!-- Open section -->
             <xforms:action ev:event="fr-expand">
-                <xforms:toggle case="case-{{instance('fr-current-section-instance')}}-open"/>
+                <xforms:toggle case="case-{{instance('fr-current-section-instance')/id}}-open"/>
                 <xxforms:script>frExpand();</xxforms:script>
             </xforms:action>
         </xforms:model>

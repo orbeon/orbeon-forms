@@ -49,7 +49,11 @@
     }
 
     function frGetElementToAnimate() {
-        var switchElement = ORBEON.util.Dom.getElementById("switch-" + ORBEON.xforms.Document.getValue("fr-current-section-input"));
+        var currentSectionId = ORBEON.xforms.Document.getValue("fr-current-section-id-input");
+        var currentSectionRepeatIndexes = ORBEON.xforms.Document.getValue("fr-current-section-repeat-indexes-input");
+
+        var switchElement = ORBEON.util.Dom.getElementById("switch-" + currentSectionId +
+            (currentSectionRepeatIndexes == "" ? "" : XFORMS_SEPARATOR_1 + currentSectionRepeatIndexes)) ;
         if (switchElement == null)
             return null;
         var possibleElements = YAHOO.util.Dom.getElementsByClassName("xforms-case-selected", null, switchElement);

@@ -213,7 +213,8 @@ select.xforms-required-empty {
     display: none;
 }
 
-.xforms-repeat-template {
+/* Try to give more precedence to this rule as top-level template elements may have other display: properties */
+html body .xforms-form .xforms-repeat-template {
     display: none;
 }
 

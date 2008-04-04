@@ -1050,7 +1050,7 @@
                     <xhtml:div>
 
                         <!-- Handle top-level blocks -->
-                        <xforms:repeat nodeset="fr:section | fr:repeat | fr:grid" id="fb-top-level-repeat">
+                        <xforms:repeat nodeset="fr:section | fr:repeat | fr:grid" id="fb-top-level-repeat" xxforms:dnd="vertical">
 
                             <xxforms:variable name="top-level-position" select="position()"/>
                             <xxforms:variable name="is-top-level-current" select="$top-level-position = index('fb-top-level-repeat')"/>
@@ -1535,7 +1535,7 @@
 
                                                                                 <!-- Edit help for any control -->
                                                                                 <xforms:trigger appearance="minimal" id="fb-edit-help-trigger">
-                                                                                    <xforms:label><xhtml:img class="fb-control-help" alt="Help" title="" src="../../../../ops/images/xforms/help.gif"/></xforms:label>
+                                                                                    <xforms:label><xhtml:img class="fb-control-help" alt="Help" title="" src="/ops/images/xforms/help.gif"/></xforms:label>
                                                                                     <xforms:action ev:event="DOMActivate">
                                                                                         <xforms:setvalue ref="$variables/result-node" value="$resource-holder/help/saxon:path()"/>
                                                                                         <xxforms:show dialog="fb-edit-help-dialog" neighbor="fb-edit-help-trigger"/>
@@ -1544,7 +1544,7 @@
 
                                                                                 <!-- Edit validation for any control -->
                                                                                 <xforms:trigger appearance="minimal" id="fb-edit-alert-trigger">
-                                                                                    <xforms:label><xhtml:img class="fb-control-alert" alt="Alert" title="" src="../../../../ops/images/xforms/error.gif"/></xforms:label>
+                                                                                    <xforms:label><xhtml:img class="fb-control-alert" alt="Alert" title="" src="/ops/images/xforms/error.gif"/></xforms:label>
                                                                                     <xforms:action ev:event="DOMActivate">
                                                                                         <xforms:setvalue ref="$current-control-name" value="$control-name"/>
                                                                                         <xxforms:show dialog="fb-edit-validation-dialog" neighbor="fb-edit-alert-trigger"/>

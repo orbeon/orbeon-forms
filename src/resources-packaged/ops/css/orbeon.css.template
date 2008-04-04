@@ -502,10 +502,13 @@ ul {
     .maincontent h3 {
         color: black;
         border: none;
+        page-break-before: always;
         font-size: 10pt;
         margin-left: 0;
         padding-left: 0;
     }
+
+    .maincontent a:first-child + h3 { page-break-before: avoid }
 
     .maincontent h4 {
         color: black;

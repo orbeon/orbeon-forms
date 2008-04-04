@@ -66,228 +66,226 @@
         </xforms:trigger>
     </xhtml:div>
 
-        <xhtml:div class="fb-toolbox fb-tools">
-            <!-- Add new section -->
-            <xhtml:div class="fb-tool">
-                <xforms:trigger>
-                    <xforms:label>
-                        <xhtml:img src="/apps/fr/style/plus.png" alt="Open section" title="Open section"/>
-                        <xhtml:span>Section</xhtml:span>
-                    </xforms:label>
-                    <xforms:action ev:event="DOMActivate" context="$body">
-                        <!-- Insert section -->
+    <xhtml:div class="fb-toolbox fb-tools">
+        <!-- Add new section -->
+        <xhtml:div class="fb-tool">
+            <xforms:trigger>
+                <xforms:label>
+                    <xhtml:img src="/apps/fr/style/plus.png" alt="Open section" title="Open section"/>
+                    <xhtml:span>Section</xhtml:span>
+                </xforms:label>
+                <xforms:action ev:event="DOMActivate" context="$body">
+                    <!-- Insert section -->
 
-                        <!-- Insert section template in the UI -->
-                        <xforms:insert context="." nodeset="fr:section | fr:repeat | fr:grid"
+                    <!-- Insert section template in the UI -->
+                    <xforms:insert context="." nodeset="fr:section | fr:repeat | fr:grid"
+                                   at="index('fb-top-level-repeat')" position="after"
+                                   origin="instance('fb-section-template')"/>
+
+                    <!-- Compute next section id -->
+                    <xforms:dispatch target="fr-form-model" name="fb-compute-section-id"/>
+
+                    <!-- Set xforms:label @ref value -->
+                    <xforms:setvalue ref="*[index('fb-top-level-repeat')]/xforms:label/@ref" value="concat('$form-resources/section-', $next-section-id, '/label')"/>
+
+                    <!-- Set @id value -->
+                    <xforms:setvalue ref="*[index('fb-top-level-repeat')]/@id" value="concat('section-', $next-section-id, '-section')"/>
+
+                    <!-- Set @context value -->
+                    <xforms:setvalue ref="*[index('fb-top-level-repeat')]/@context" value="concat('section-', $next-section-id)"/>
+
+                    <!-- Insert container in the instance -->
+                    <xforms:action context="$form-instance">
+                        <!-- TODO: for now assume a top-level section containing a grid -->
+                        <xforms:insert context="." nodeset="*"
                                        at="index('fb-top-level-repeat')" position="after"
-                                       origin="instance('fb-section-template')"/>
+                                       origin="xxforms:element(concat('section-', $next-section-id))"/>
 
-                        <!-- Compute next section id -->
-                        <xforms:dispatch target="fr-form-model" name="fb-compute-section-id"/>
+                    </xforms:action>
 
-                        <!-- Set xforms:label @ref value -->
-                        <xforms:setvalue ref="*[index('fb-top-level-repeat')]/xforms:label/@ref" value="concat('$form-resources/section-', $next-section-id, '/label')"/>
+                    <!-- Insert resources placeholders for all languages -->
+                    <xforms:action xxforms:iterate="$resources/resource">
+                        <xforms:insert context="." nodeset="*"
+                                       origin="xxforms:element(concat('section-', $next-section-id))"/>
 
-                        <!-- Set @id value -->
-                        <xforms:setvalue ref="*[index('fb-top-level-repeat')]/@id" value="concat('section-', $next-section-id, '-section')"/>
+                        <xforms:insert context="*[last()]" origin="instance('fb-resource-template')/*"/>
+                    </xforms:action>
 
-                        <!-- Set @context value -->
-                        <xforms:setvalue ref="*[index('fb-top-level-repeat')]/@context" value="concat('section-', $next-section-id)"/>
+                    <!-- Open label editor for newly inserted section -->
+                    <xforms:toggle case="fr-inplace-fb-section-title-input-edit"/>
+                    <xforms:setfocus control="fr-inplace-fb-section-title-input-input"/>
 
-                        <!-- Insert container in the instance -->
-                        <xforms:action context="$form-instance">
-                            <!-- TODO: for now assume a top-level section containing a grid -->
-                            <xforms:insert context="." nodeset="*"
-                                           at="index('fb-top-level-repeat')" position="after"
-                                           origin="xxforms:element(concat('section-', $next-section-id))"/>
+                </xforms:action>
+            </xforms:trigger>
+        </xhtml:div>
+        <!-- Add grids -->
+        <xforms:group context="$current-top-level-block" appearance="xxforms:internal">
+            <xhtml:div class="fb-tool">
+                <xforms:trigger appearance="full">
+                    <xforms:label>
+                        <xhtml:img src="/forms/orbeon/builder/images/action1.gif" alt="New 1-Column Grid" title="New 1-Column Grid"/>
+                        <xhtml:span>1-Column Grid</xhtml:span>
+                    </xforms:label>
+                    <xforms:action ev:event="DOMActivate">
+                        <xforms:insert context="." nodeset="fr:section | fr:repeat | fr:grid"
+                                       at="index('fb-section-content-repeat')" position="after"
+                                       origin="instance('fb-grid-1-template')"/>
+                    </xforms:action>
+                </xforms:trigger>
+            </xhtml:div>
+            <xhtml:div class="fb-tool">
+                <xforms:trigger appearance="full">
+                    <xforms:label>
+                        <xhtml:img src="/forms/orbeon/builder/images/action2.gif" alt="New 2-Column Grid" title="New 2-Column Grid"/>
+                        <xhtml:span>2-Column Grid</xhtml:span>
+                    </xforms:label>
+                    <xforms:action ev:event="DOMActivate">
+                        <xforms:insert context="." nodeset="fr:section | fr:repeat | fr:grid"
+                                       at="index('fb-section-content-repeat')" position="after"
+                                       origin="instance('fb-grid-2-template')"/>
+                    </xforms:action>
+                </xforms:trigger>
+            </xhtml:div>
+            <xhtml:div class="fb-tool">
+                <xforms:trigger appearance="full">
+                    <xforms:label>
+                        <xhtml:img src="/forms/orbeon/builder/images/action3.gif" alt="New 3-Column Grid" title="New 3-Column Grid"/>
+                        <xhtml:span>3-Column Grid</xhtml:span>
+                    </xforms:label>
+                    <xforms:action ev:event="DOMActivate">
+                        <xforms:insert context="." nodeset="fr:section | fr:repeat | fr:grid"
+                                       at="index('fb-section-content-repeat')" position="after"
+                                       origin="instance('fb-grid-3-template')"/>
+                    </xforms:action>
+                </xforms:trigger>
+            </xhtml:div>
+            <xhtml:div class="fb-tool">
+                <xforms:trigger appearance="full">
+                    <xforms:label>
+                        <xhtml:img src="/forms/orbeon/builder/images/action3.gif" alt="New 4-Column Grid" title="New 4-Column Grid"/>
+                        <xhtml:span>4-Column Grid</xhtml:span>
+                    </xforms:label>
+                    <xforms:action ev:event="DOMActivate">
+                        <xforms:insert context="." nodeset="fr:section | fr:repeat | fr:grid"
+                                       at="index('fb-section-content-repeat')" position="after"
+                                       origin="instance('fb-grid-4-template')"/>
+                    </xforms:action>
+                </xforms:trigger>
+            </xhtml:div>
+        </xforms:group>
+    </xhtml:div>
+    <xhtml:div class="fb-toolbox fb-tools">
+        <xforms:repeat nodeset="instance('fb-controls-template')/template" id="fb-controls-template-repeat">
+
+            <xxforms:variable name="control-template" select="xhtml:div/xforms:*"/>
+
+            <xhtml:div class="fb-tool">
+                <xforms:trigger id="fb-add-control-trigger" xmlns:f="http://orbeon.org/oxf/xml/formatting">
+                    <xforms:label>
+                        <xforms:output value="concat('&lt;img width=''16'' height=''16'' src=''', if (@image) then @image else concat('/forms/orbeon/builder/images/', xhtml:div/@class, '.png'), '''/>')" mediatype="text/html" f:url-norewrite="true"/>
+                        <xforms:output ref="@label"/>
+                    </xforms:label>
+                    <xforms:action ev:event="DOMActivate">
+                        <!-- Insert a new control -->
+
+                        <!-- Compute next control id -->
+                        <xforms:dispatch target="fr-form-model" name="fb-compute-control-id"/>
+                        <xxforms:variable name="new-control-name" select="concat('control-', $next-control-id)"/>
+                        <xxforms:variable name="section-name" select="$current-td/ancestor::fr:section[1]/@context"/>
+
+                        <!-- Try to find empty td -->
+                        <xforms:dispatch name="fb-ensure-empty-td" target="fr-form-model"/>
+
+                        <!-- This ensures the context is recomputed -->
+                        <xxforms:variable name="new-td" select="$current-section-content-block/
+                            xhtml:tr[index('fb-section-content-grid-tr-repeat')]/
+                            xhtml:td[index('fb-section-content-grid-td-repeat')]"/>
+                        <xforms:action context="$new-td" if="not(exists(xforms:*))">
+                            <!-- Context is now on td and there is room for insertion -->
+
+                            <!-- Insert control into td -->
+                            <xforms:insert context="." origin="$control-template"/>
+                            <xxforms:variable name="control" select="xforms:*"/>
+                            <xxforms:variable name="control-type" select="$control-template/../@class"/>
+
+                            <!-- Adjust bindings on newly inserted control -->
+                            <xforms:dispatch name="fb-rename-control" target="fr-form-model">
+                                <xxforms:context name="control" select="$control"/>
+                                <xxforms:context name="new-name" select="$new-control-name"/>
+                            </xforms:dispatch>
+
+                            <!-- Insert instance and resource holders -->
+                            <xforms:dispatch name="fb-insert-holders" target="fr-form-model">
+                                <xxforms:context name="current-td" select="$new-td"/>
+                                <xxforms:context name="section-name" select="$section-name"/>
+                                <!-- Instance holder, with extra attributes if needed -->
+                                <xxforms:context name="instance-holder"
+                                                 select="xxforms:element($new-control-name,
+                                                            if ($control-type = ('upload', 'image'))
+                                                            then (xxforms:attribute('filename'), xxforms:attribute('mediatype'), xxforms:attribute('size'))
+                                                            else ())"/>
+                                <xxforms:context name="resource-holders" select="for $r in $resources/resource return xxforms:element($new-control-name)"/>
+                            </xforms:dispatch>
+
+                            <!-- Insert the bind element if needed -->
+                            <xforms:action if="$control-type = ('date-input', 'upload', 'image')">
+                                <xforms:dispatch name="fb-ensure-bind" target="fr-form-model">
+                                    <xxforms:context name="control-name" select="$new-control-name"/>
+                                </xforms:dispatch>
+
+                                <xxforms:variable name="bind" select="$model//xforms:bind[@nodeset = $new-control-name]"/>
+
+                                <xforms:insert if="$control-type = 'date-input'" context="$bind" origin="xxforms:attribute('type', 'xs:date')"/>
+                                <xforms:insert if="$control-type = ('upload', 'image')" context="$bind" origin="xxforms:attribute('type', 'xs:anyURI')"/>
+
+                                <!-- Use @bind instead of @ref -->
+                                <xforms:delete nodeset="$control/@ref"/>
+                                <xforms:insert context="$control" origin="xxforms:attribute('bind', $bind/@id)"/>
+                            </xforms:action>
+
+                            <!-- Open label editor for newly inserted control -->
+                            <xforms:toggle case="fr-inplace-fb-control-label-control-edit"/>
+                            <xforms:setfocus control="fr-inplace-fb-control-label-control-input"/>
 
                         </xforms:action>
-
-                        <!-- Insert resources placeholders for all languages -->
-                        <xforms:action xxforms:iterate="$resources/resource">
-                            <xforms:insert context="." nodeset="*"
-                                           origin="xxforms:element(concat('section-', $next-section-id))"/>
-
-                            <xforms:insert context="*[last()]" origin="instance('fb-resource-template')/*"/>
-                        </xforms:action>
-
-                        <!-- Open label editor for newly inserted section -->
-                        <xforms:toggle case="fr-inplace-fb-section-title-input-edit"/>
-                        <xforms:setfocus control="fr-inplace-fb-section-title-input-input"/>
 
                     </xforms:action>
                 </xforms:trigger>
             </xhtml:div>
-            <!-- Add grids -->
-            <xforms:group context="$current-top-level-block" appearance="xxforms:internal">
-                <xhtml:div class="fb-tool">
-                    <xforms:trigger appearance="full">
-                        <xforms:label>
-                            <xhtml:img src="/forms/orbeon/builder/images/action1.gif" alt="New 1-Column Grid" title="New 1-Column Grid"/>
-                            <xhtml:span>1-Column Grid</xhtml:span>
-                        </xforms:label>
-                        <xforms:action ev:event="DOMActivate">
-                            <xforms:insert context="." nodeset="fr:section | fr:repeat | fr:grid"
-                                           at="index('fb-section-content-repeat')" position="after"
-                                           origin="instance('fb-grid-1-template')"/>
-                        </xforms:action>
-                    </xforms:trigger>
-                </xhtml:div>
-                <xhtml:div class="fb-tool">
-                    <xforms:trigger appearance="full">
-                        <xforms:label>
-                            <xhtml:img src="/forms/orbeon/builder/images/action2.gif" alt="New 2-Column Grid" title="New 2-Column Grid"/>
-                            <xhtml:span>2-Column Grid</xhtml:span>
-                        </xforms:label>
-                        <xforms:action ev:event="DOMActivate">
-                            <xforms:insert context="." nodeset="fr:section | fr:repeat | fr:grid"
-                                           at="index('fb-section-content-repeat')" position="after"
-                                           origin="instance('fb-grid-2-template')"/>
-                        </xforms:action>
-                    </xforms:trigger>
-                </xhtml:div>
-                <xhtml:div class="fb-tool">
-                    <xforms:trigger appearance="full">
-                        <xforms:label>
-                            <xhtml:img src="/forms/orbeon/builder/images/action3.gif" alt="New 3-Column Grid" title="New 3-Column Grid"/>
-                            <xhtml:span>3-Column Grid</xhtml:span>
-                        </xforms:label>
-                        <xforms:action ev:event="DOMActivate">
-                            <xforms:insert context="." nodeset="fr:section | fr:repeat | fr:grid"
-                                           at="index('fb-section-content-repeat')" position="after"
-                                           origin="instance('fb-grid-3-template')"/>
-                        </xforms:action>
-                    </xforms:trigger>
-                </xhtml:div>
-                <xhtml:div class="fb-tool">
-                    <xforms:trigger appearance="full">
-                        <xforms:label>
-                            <xhtml:img src="/forms/orbeon/builder/images/action3.gif" alt="New 4-Column Grid" title="New 4-Column Grid"/>
-                            <xhtml:span>4-Column Grid</xhtml:span>
-                        </xforms:label>
-                        <xforms:action ev:event="DOMActivate">
-                            <xforms:insert context="." nodeset="fr:section | fr:repeat | fr:grid"
-                                           at="index('fb-section-content-repeat')" position="after"
-                                           origin="instance('fb-grid-4-template')"/>
-                        </xforms:action>
-                    </xforms:trigger>
-                </xhtml:div>
+        </xforms:repeat>
+    </xhtml:div>
+    <xhtml:div class="fb-toolbox">
+        <xforms:group class="fb-language-choice fb-hide-alert">
+            <xforms:select1 appearance="minimal" ref="$lang" id="fb-resources-language-select">
+                <xforms:label>Resources Language</xforms:label>
+                <xforms:itemset nodeset="$resources/resource">
+                    <xforms:label value="xxforms:instance('fr-languages-instance')/language[@code = context()/@xml:lang]/(if (@native-name != @english-name) then concat(@native-name, ' (', @english-name, ')') else @native-name)"/>
+                    <xforms:value ref="@xml:lang"/>
+                </xforms:itemset>
+            </xforms:select1>
+            <xforms:group class="fb-language-triggers">
+                <xforms:trigger appearance="minimal">
+                    <xforms:label>Add</xforms:label>
+                    <xxforms:show ev:event="DOMActivate" dialog="fb-add-language-dialog" neighbor="fb-resources-language-select"/>
+                </xforms:trigger>
+                <xforms:trigger appearance="minimal" id="fb-language-remove" ref=".[count($resources/resource) gt 1]">
+                    <xforms:label>Remove</xforms:label>
+                    <xforms:action ev:event="DOMActivate">
+                        <!-- Ask confirmation -->
+                        <xforms:setvalue ref="$variables/confirmation-message"
+                                         value="concat('Are you sure you want to delete all resources for language ''',
+                                         xxforms:instance('fr-languages-instance')/language[@code = $lang]/(if (@native-name != @english-name) then concat(@native-name, ' (', @english-name, ')') else @native-name),
+                                         '''?')"/>
+                        <xforms:setvalue ref="$variables/confirmation-target">fb-language-remove</xforms:setvalue>
+                        <xxforms:show dialog="fb-confirmation-dialog"/>
+                    </xforms:action>
+                    <xforms:action ev:event="fb-confirmation-yes">
+                        <!-- Delete resources for this language -->
+                        <xforms:delete nodeset="$resources/resource[@xml:lang = $lang]"/>
+                        <xforms:setvalue ref="$lang" value="$resources/resource[1]/@xml:lang"/>
+                    </xforms:action>
+                </xforms:trigger>
             </xforms:group>
-        </xhtml:div>
-        <xhtml:div class="fb-toolbox fb-tools">
-            <xforms:repeat nodeset="instance('fb-controls-template')/template" id="fb-controls-template-repeat">
-
-                <xxforms:variable name="control-template" select="xhtml:div/xforms:*"/>
-
-                <xhtml:div class="fb-tool">
-                    <xforms:trigger id="fb-add-control-trigger" xmlns:f="http://orbeon.org/oxf/xml/formatting">
-                        <xforms:label>
-                            <xforms:output value="concat('&lt;img width=''16'' height=''16'' src=''', if (@image) then @image else concat('/forms/orbeon/builder/images/', xhtml:div/@class, '.png'), '''/>')" mediatype="text/html" f:url-norewrite="true"/>
-                            <xforms:output ref="@label"/>
-                        </xforms:label>
-                        <xforms:action ev:event="DOMActivate">
-                            <!-- Insert a new control -->
-
-                            <!-- Compute next control id -->
-                            <xforms:dispatch target="fr-form-model" name="fb-compute-control-id"/>
-                            <xxforms:variable name="new-control-name" select="concat('control-', $next-control-id)"/>
-                            <xxforms:variable name="section-name" select="$current-td/ancestor::fr:section[1]/@context"/>
-
-                            <!-- Try to find empty td -->
-                            <xforms:dispatch name="fb-ensure-empty-td" target="fr-form-model"/>
-
-                            <!-- This ensures the context is recomputed -->
-                            <xxforms:variable name="new-td" select="$current-section-content-block/
-                                xhtml:tr[index('fb-section-content-grid-tr-repeat')]/
-                                xhtml:td[index('fb-section-content-grid-td-repeat')]"/>
-                            <xforms:action context="$new-td" if="not(exists(xforms:*))">
-                                <!-- Context is now on td and there is room for insertion -->
-
-                                <!-- Insert control into td -->
-                                <xforms:insert context="." origin="$control-template"/>
-                                <xxforms:variable name="control" select="xforms:*"/>
-                                <xxforms:variable name="control-type" select="$control-template/../@class"/>
-
-                                <!-- Adjust bindings on newly inserted control -->
-                                <xforms:dispatch name="fb-rename-control" target="fr-form-model">
-                                    <xxforms:context name="control" select="$control"/>
-                                    <xxforms:context name="new-name" select="$new-control-name"/>
-                                </xforms:dispatch>
-
-                                <!-- Insert instance and resource holders -->
-                                <xforms:dispatch name="fb-insert-holders" target="fr-form-model">
-                                    <xxforms:context name="current-td" select="$new-td"/>
-                                    <xxforms:context name="section-name" select="$section-name"/>
-                                    <!-- Instance holder, with extra attributes if needed -->
-                                    <xxforms:context name="instance-holder"
-                                                     select="xxforms:element($new-control-name,
-                                                                if ($control-type = ('upload', 'image'))
-                                                                then (xxforms:attribute('filename'), xxforms:attribute('mediatype'), xxforms:attribute('size'))
-                                                                else ())"/>
-                                    <xxforms:context name="resource-holders" select="for $r in $resources/resource return xxforms:element($new-control-name)"/>
-                                </xforms:dispatch>
-
-                                <!-- Insert the bind element if needed -->
-                                <xforms:action if="$control-type = ('date-input', 'upload', 'image')">
-                                    <xforms:dispatch name="fb-ensure-bind" target="fr-form-model">
-                                        <xxforms:context name="control-name" select="$new-control-name"/>
-                                    </xforms:dispatch>
-
-                                    <xxforms:variable name="bind" select="$model//xforms:bind[@nodeset = $new-control-name]"/>
-
-                                    <xforms:insert if="$control-type = 'date-input'" context="$bind" origin="xxforms:attribute('type', 'xs:date')"/>
-                                    <xforms:insert if="$control-type = ('upload', 'image')" context="$bind" origin="xxforms:attribute('type', 'xs:anyURI')"/>
-
-                                    <!-- Use @bind instead of @ref -->
-                                    <xforms:delete nodeset="$control/@ref"/>
-                                    <xforms:insert context="$control" origin="xxforms:attribute('bind', $bind/@id)"/>
-                                </xforms:action>
-
-                                <!-- Open label editor for newly inserted control -->
-                                <xforms:toggle case="fr-inplace-fb-control-label-control-edit"/>
-                                <xforms:setfocus control="fr-inplace-fb-control-label-control-input"/>
-
-                            </xforms:action>
-
-                        </xforms:action>
-                    </xforms:trigger>
-                </xhtml:div>
-            </xforms:repeat>
-        </xhtml:div>
-        <xhtml:div class="fb-toolbox">
-            <xforms:group class="fb-language-choice fb-hide-alert">
-                <xforms:select1 appearance="minimal" ref="$lang" id="fb-resources-language-select">
-                    <xforms:label>Resources Language</xforms:label>
-                    <xforms:itemset nodeset="$resources/resource">
-                        <xforms:label value="xxforms:instance('fr-languages-instance')/language[@code = context()/@xml:lang]/(if (@native-name != @english-name) then concat(@native-name, ' (', @english-name, ')') else @native-name)"/>
-                        <xforms:value ref="@xml:lang"/>
-                    </xforms:itemset>
-                </xforms:select1>
-                <xforms:group class="fb-language-triggers">
-                    <xforms:trigger appearance="minimal">
-                        <xforms:label>Add</xforms:label>
-                        <xxforms:show ev:event="DOMActivate" dialog="fb-add-language-dialog" neighbor="fb-resources-language-select"/>
-                    </xforms:trigger>
-                    <xforms:trigger appearance="minimal" id="fb-language-remove" ref=".[count($resources/resource) gt 1]">
-                        <xforms:label>Remove</xforms:label>
-                        <xforms:action ev:event="DOMActivate">
-                            <!-- Ask confirmation -->
-                            <xforms:setvalue ref="$variables/confirmation-message"
-                                             value="concat('Are you sure you want to delete all resources for language ''',
-                                             xxforms:instance('fr-languages-instance')/language[@code = $lang]/(if (@native-name != @english-name) then concat(@native-name, ' (', @english-name, ')') else @native-name),
-                                             '''?')"/>
-                            <xforms:setvalue ref="$variables/confirmation-target">fb-language-remove</xforms:setvalue>
-                            <xxforms:show dialog="fb-confirmation-dialog"/>
-                        </xforms:action>
-                        <xforms:action ev:event="fb-confirmation-yes">
-                            <!-- Delete resources for this language -->
-                            <xforms:delete nodeset="$resources/resource[@xml:lang = $lang]"/>
-                            <xforms:setvalue ref="$lang" value="$resources/resource[1]/@xml:lang"/>
-                        </xforms:action>
-                    </xforms:trigger>
-                </xforms:group>
-            </xforms:group>
-
-        <!--<xhtml:div class="fb-clear"/>-->
+        </xforms:group>
     </xhtml:div>
 </xxforms:dialog>

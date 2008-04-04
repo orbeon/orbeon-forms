@@ -279,6 +279,8 @@
                     
                     <!-- Send search when values change -->
                     <xforms:send ev:event="xforms-value-changed" submission="search-submission"/>
+
+                    <div class="fr-clear"/>
                 </xforms:group>
 
                 <xforms:group ref="instance('fr-summary-instance')">
@@ -298,70 +300,72 @@
                         <xforms:output value="$fr-resources/summary/titles/search-2"/>
                     </xforms:group>
 
-                    <table class="fr-summary-table">
-                        <thead>
-                            <tr>
-                                <th><xforms:output value="$fr-resources/summary/titles/row-number"/></th>
-                                <th><xforms:output value="$fr-resources/summary/titles/created"/></th>
-                                <th><xforms:output value="$fr-resources/summary/titles/last-modified"/></th>
-                                <!-- Iterate through specially marked controls and derive resource id then resource -->
-                                <xforms:repeat nodeset="instance('fr-configuration-instance')/xforms:*[tokenize(@class, ' ') = 'fr-summary']">
-                                    <th>
-                                        <xforms:output value="for $id in substring-before(context()/@id, '-control')
-                                                              return for $resource in ($form-resources/*[local-name() = $id], '')
-                                                                     return if ($resource != '') then $resource/label else concat('[', $id, ']')"/>
-
-                                    </th>
-                                </xforms:repeat>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <xforms:repeat nodeset="document" id="documents-repeat">
+                    <div class="fr-summary-table-div">
+                        <table class="fr-summary-table">
+                            <thead>
                                 <tr>
-                                    <td>
-                                        <xforms:output value="instance('fr-paging-instance')/from + count(preceding-sibling::document)"/>
-                                    </td>
-                                    <td>
-                                        <xforms:group ref="@created">
-                                            <xforms:output value="if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), $fr-resources/summary/formats/save-datetime, xxforms:instance('fr-language-instance'), (), ()) else ."/>
-                                        </xforms:group>
-                                    </td>
-                                    <td>
-                                        <xforms:group ref="@last-modified">
-                                            <xforms:output value="if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), $fr-resources/summary/formats/save-datetime, xxforms:instance('fr-language-instance'), (), ()) else ."/>
-                                        </xforms:group>
-                                    </td>
-                                    <xforms:repeat nodeset="details/detail">
-                                        <td>
-                                            <!-- input -->
-                                            <xforms:group ref=".[instance('fr-search-instance')/query[count(context()/preceding-sibling::detail) + 2]/@control = 'input']">
-                                                <xforms:output value="if (. castable as xs:date) then format-date(xs:date(.), $fr-resources/summary/formats/date, xxforms:instance('fr-language-instance'), (), ()) else ."/>
-                                            </xforms:group>
+                                    <th><xforms:output value="$fr-resources/summary/titles/row-number"/></th>
+                                    <th><xforms:output value="$fr-resources/summary/titles/created"/></th>
+                                    <th><xforms:output value="$fr-resources/summary/titles/last-modified"/></th>
+                                    <!-- Iterate through specially marked controls and derive resource id then resource -->
+                                    <xforms:repeat nodeset="instance('fr-configuration-instance')/xforms:*[tokenize(@class, ' ') = 'fr-summary']">
+                                        <th>
+                                            <xforms:output value="for $id in substring-before(context()/@id, '-control')
+                                                                  return for $resource in ($form-resources/*[local-name() = $id], '')
+                                                                         return if ($resource != '') then $resource/label else concat('[', $id, ']')"/>
 
-                                            <!-- textarea -->
-                                            <xforms:group ref=".[instance('fr-search-instance')/query[count(context()/preceding-sibling::detail) + 2]/@control = 'textarea']">
-                                                <xforms:output value="if (string-length(context()) > 20) then concat(substring(context(), 1, 20), '...') else context()"/>
-                                            </xforms:group>
-
-                                            <!-- select1 -->
-                                            <xforms:group ref=".[instance('fr-search-instance')/query[count(context()/preceding-sibling::detail) + 2]/@control = 'select1']">
-                                                <xforms:output value="."/>
-                                                <!-- TODO: Obtain value from itemset -->
-                                                <!--instance('fr-source-form-instance')/xhtml:head/xforms:model/xforms:instance[@id = concat(xxforms:context('documents-repeat')/@name, 's-itemset')]/*/*-->
-                                            </xforms:group>
-                                        </td>
+                                        </th>
                                     </xforms:repeat>
                                 </tr>
-                            </xforms:repeat>
-                            <xforms:group ref=".[not(document)]">
-                                <tr>
-                                    <td colspan="{3 + count(instance('fr-configuration-instance')/xforms:*[tokenize(@class, ' ') = 'fr-summary'])}">
-                                        <xforms:output mediatype="text/html" value="saxon:serialize($fr-resources/summary/messages/no-form-found/node(), 'html')"/>
-                                    </td>
-                                </tr>
-                            </xforms:group>
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                <xforms:repeat nodeset="document" id="documents-repeat">
+                                    <tr>
+                                        <td>
+                                            <xforms:output value="instance('fr-paging-instance')/from + count(preceding-sibling::document)"/>
+                                        </td>
+                                        <td>
+                                            <xforms:group ref="@created">
+                                                <xforms:output value="if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), $fr-resources/summary/formats/save-datetime, xxforms:instance('fr-language-instance'), (), ()) else ."/>
+                                            </xforms:group>
+                                        </td>
+                                        <td>
+                                            <xforms:group ref="@last-modified">
+                                                <xforms:output value="if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), $fr-resources/summary/formats/save-datetime, xxforms:instance('fr-language-instance'), (), ()) else ."/>
+                                            </xforms:group>
+                                        </td>
+                                        <xforms:repeat nodeset="details/detail">
+                                            <td>
+                                                <!-- input -->
+                                                <xforms:group ref=".[instance('fr-search-instance')/query[count(context()/preceding-sibling::detail) + 2]/@control = 'input']">
+                                                    <xforms:output value="if (. castable as xs:date) then format-date(xs:date(.), $fr-resources/summary/formats/date, xxforms:instance('fr-language-instance'), (), ()) else ."/>
+                                                </xforms:group>
+
+                                                <!-- textarea -->
+                                                <xforms:group ref=".[instance('fr-search-instance')/query[count(context()/preceding-sibling::detail) + 2]/@control = 'textarea']">
+                                                    <xforms:output value="if (string-length(context()) > 20) then concat(substring(context(), 1, 20), '...') else context()"/>
+                                                </xforms:group>
+
+                                                <!-- select1 -->
+                                                <xforms:group ref=".[instance('fr-search-instance')/query[count(context()/preceding-sibling::detail) + 2]/@control = 'select1']">
+                                                    <xforms:output value="."/>
+                                                    <!-- TODO: Obtain value from itemset -->
+                                                    <!--instance('fr-source-form-instance')/xhtml:head/xforms:model/xforms:instance[@id = concat(xxforms:context('documents-repeat')/@name, 's-itemset')]/*/*-->
+                                                </xforms:group>
+                                            </td>
+                                        </xforms:repeat>
+                                    </tr>
+                                </xforms:repeat>
+                                <xforms:group ref=".[not(document)]">
+                                    <tr>
+                                        <td colspan="{3 + count(instance('fr-configuration-instance')/xforms:*[tokenize(@class, ' ') = 'fr-summary'])}">
+                                            <xforms:output mediatype="text/html" value="saxon:serialize($fr-resources/summary/messages/no-form-found/node(), 'html')"/>
+                                        </td>
+                                    </tr>
+                                </xforms:group>
+                            </tbody>
+                        </table>
+                    </div>
 
                     <!--<p>-->
                         <!--<xforms:output value="$fr-resources/summary/titles/selected"/>:-->

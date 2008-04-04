@@ -11,6 +11,7 @@ body, body table, textarea.xforms-textarea {
 }
 
 .fr-hidden { display: none }
+.fr-clear { clear: both }
 
 .fr-top { line-height: 10px; }
 #doc .fr-top { background-image: url(top-750-ee.png); }
@@ -152,6 +153,9 @@ h3, h4 {
 .xforms-repeat-selected-item-2 { background-color: transparent }
 .xforms-repeat-selected-item-3 { background-color: transparent }
 .xforms-repeat-selected-item-4 { background-color: transparent }
+
+/*.fr-summary-table-div { overflow: auto }*/
+/*.fr-summary-table td, .fr-summary-table th { white-space: nowrap }*/
 
 .fr-summary-table tbody .xforms-repeat-selected-item-1 { background-color: #3598D4 }
 .fr-summary-table tbody .xforms-repeat-selected-item-2 { background-color: #3598D4 }/* HACK for IE 7 only */

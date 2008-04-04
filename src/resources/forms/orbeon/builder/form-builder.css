@@ -10,7 +10,6 @@
     background: white url(../../../apps/fr/style/separator.gif) repeat-x scroll left center
 }
 
-.fb-clear { clear: both }
 .fb-xforms-disabled { display:none }
 .fb-hide-alert .xforms-alert { display: none }
 
@@ -109,7 +108,7 @@
 #fb-details-section .fb-section-title .xforms-input input { width: 20em }
 
 /* Highlighting of top-level blocks (sections, ...) */
-.fb-top-level-content { display: block; padding-left: .5em; margin-bottom: .5em; border-left: 4px solid transparent }
+.fb-top-level-content { padding-left: .5em; margin-bottom: .5em; border-left: 4px solid transparent }
 .fb-top-level-content:hover { border-left: 4px solid #ccc }
 .fr-section-container .xforms-repeat-selected-item-1 { border-left: 4px solid #3598D4}
 

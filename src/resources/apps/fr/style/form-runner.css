@@ -288,8 +288,8 @@ div.fr-collapsible {
 .fr-dialog .bd p { margin: 1em 0 1em 0; }
 .fr-dialog .bd { margin: 0 1em 1em 1em; }
 /* Style for icon in dialogs  */
-.fr-dialog-icon { float: left; margin-right: 2em; margin-left: 1em; padding-bottom: 1em; }
-.fr-dialog-message { margin-top: 1em; padding-top: 0.5em; }
+.fr-dialog-icon { float: left; margin-right: 2em; margin-left: 1em; padding-top: 1em; padding-bottom: 1em; }
+.fr-dialog-message { padding-top: 0.5em; }
 .fr-dialog-buttons { text-align: right; padding-right: 2em; padding-top: 2em; }
 
 /* Messages */

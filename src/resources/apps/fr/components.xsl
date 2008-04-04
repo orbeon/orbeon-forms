@@ -504,12 +504,13 @@
 
     <xsl:template match="xhtml:body//fr:section">
         <xsl:variable name="open" as="xs:boolean" select="if (doc('input:instance')/*/mode = 'print') then true() else if (@open = 'false') then false() else true()"/>
+        <xsl:variable name="section-id" as="xs:string" select="@id"/>
         <xsl:variable name="content">
             <xsl:variable name="ancestor-sections" as="xs:integer" select="count(ancestor::fr:section)"/>
-            <xhtml:div id="{@id}">
+            <xforms:group id="{$section-id}">
                 <xsl:attribute name="class" select="string-join(('fr-section-container', @class), ' ')"/>
-                <xforms:switch id="switch-{@id}" context="{if (@context) then @context else '.'}" xxforms:readonly-appearance="dynamic">
-                    <xforms:case id="case-{@id}-closed" selected="{if (not($open)) then 'true' else 'false'}">
+                <xforms:switch id="switch-{$section-id}" context="{if (@context) then @context else '.'}" xxforms:readonly-appearance="dynamic">
+                    <xforms:case id="case-{$section-id}-closed" selected="{if (not($open)) then 'true' else 'false'}">
                         <xhtml:div>
                             <xsl:element name="{if ($ancestor-sections = 0) then 'h2' else 'h3'}">
                                 <xsl:attribute name="class" select="'fr-section-title'"/>
@@ -523,15 +524,16 @@
                                         <xsl:apply-templates select="xforms:label"/>
                                     </xforms:trigger>
                                     <xforms:action ev:event="DOMActivate">
-                                        <xforms:setvalue model="fr-sections-model" ref="instance('fr-current-section-instance')"
-                                                         value="concat('{@id}', if (empty(event('repeat-indexes'))) then '' else concat('·', string-join(event('repeat-indexes'), '-')))"/>
+                                        <xforms:setvalue model="fr-sections-model" ref="instance('fr-current-section-instance')">
+                                            <xsl:value-of select="$section-id"/>
+                                        </xforms:setvalue>
                                         <xforms:dispatch target="fr-sections-model" name="fr-expand"/>
                                     </xforms:action>
                                 </xforms:group>
                             </xsl:element>
                         </xhtml:div>
                     </xforms:case>
-                    <xforms:case id="case-{@id}-open" selected="{if ($open) then 'true' else 'false'}">
+                    <xforms:case id="case-{$section-id}-open" selected="{if ($open) then 'true' else 'false'}">
                         <xhtml:div>
                             <xsl:element name="{if ($ancestor-sections = 0) then 'h2' else 'h3'}">
                                 <xsl:attribute name="class" select="'fr-section-title'"/>
@@ -545,9 +547,12 @@
                                         <xsl:apply-templates select="xforms:label"/>
                                     </xforms:trigger>
                                     <xforms:action ev:event="DOMActivate">
-                                        <xforms:setvalue model="fr-sections-model" ref="instance('fr-current-section-instance')"
-                                                         value="concat('{@id}', if (empty(event('repeat-indexes'))) then '' else concat('·', string-join(event('repeat-indexes'), '-')))"/>
-                                        <xforms:dispatch target="fr-sections-model" name="fr-collapse" />
+                                        <xforms:setvalue model="fr-sections-model" ref="instance('fr-current-section-instance')">
+                                            <xsl:value-of select="$section-id"/>
+                                        </xforms:setvalue>
+                                        <xforms:dispatch target="fr-sections-model" name="fr-collapse">
+                                            <xxforms:context name="repeat-indexes" select="event('repeat-indexes')"/>
+                                        </xforms:dispatch>
                                     </xforms:action>
                                 </xforms:group>
                             </xsl:element>
@@ -558,7 +563,7 @@
                         </xhtml:div>
                     </xforms:case>
                 </xforms:switch>
-            </xhtml:div>
+            </xforms:group>
         </xsl:variable>
         <xsl:choose>
             <xsl:when test="@ref">
@@ -695,7 +700,10 @@
 
             <!-- Close section -->
             <xforms:action ev:event="fr-collapse">
-                <xxforms:script>frCollapse();</xxforms:script>
+                <!-- If we are in a repeated section, we can't animate the close, as when fr-after-collapse is received, we don't have the correct repeat index -->
+                <xxforms:variable name="can-do-animation" select="empty(event('repeat-indexes'))"/>
+                <xxforms:script if="$can-do-animation">frCollapse();</xxforms:script>
+                <xforms:toggle if="not($can-do-animation)" case="case-{{instance('fr-current-section-instance')}}-closed"/>
             </xforms:action>
 
             <!-- Open section -->

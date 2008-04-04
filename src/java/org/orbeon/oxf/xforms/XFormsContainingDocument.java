@@ -239,7 +239,14 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
      * the default model, i.e. the first model.
      */
     public XFormsModel getModel(String modelId) {
-        return (XFormsModel) ("".equals(modelId) ? models.get(0) : modelsMap.get(modelId));
+        return (XFormsModel) ("".equals(modelId) ? getDefaultModel() : modelsMap.get(modelId));
+    }
+
+    public XFormsModel getDefaultModel() {
+        if (models != null && models.size() > 0)
+            return (XFormsModel) models.get(0);
+        else
+            return null;
     }
 
     /**

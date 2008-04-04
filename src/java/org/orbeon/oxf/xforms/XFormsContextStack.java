@@ -57,7 +57,7 @@ public class XFormsContextStack {
      * Reset the binding context to the root of the first model's first instance.
      */
     public void resetBindingContext(PipelineContext pipelineContext) {
-        resetBindingContext(pipelineContext, containingDocument.getModel(""));
+        resetBindingContext(pipelineContext, containingDocument.getDefaultModel());
     }
 
     /**
@@ -131,7 +131,13 @@ public class XFormsContextStack {
      */
     public void setBinding(PipelineContext pipelineContext, XFormsEventHandlerContainer eventHandlerContainer) {
 
-        if (eventHandlerContainer instanceof XFormsControl) {
+        if (eventHandlerContainer == null) {
+            // Odd case which can happen when a handler and control are in a removed iteration. Set an empty context.
+            // NOTE: Should ideally still try to figure out the context model, for example.
+            resetBindingContext(pipelineContext);
+            final XFormsModel xformsModel = containingDocument.getDefaultModel();
+            contextStack.push(new BindingContext(null, xformsModel, Collections.EMPTY_LIST, 0, null, true, null, xformsModel.getLocationData(), false, null));
+        } else if (eventHandlerContainer instanceof XFormsControl) {
             setBinding((XFormsControl) eventHandlerContainer);
         } else if (eventHandlerContainer instanceof XFormsModel) {
             final XFormsModel xformsModel = (XFormsModel) eventHandlerContainer;

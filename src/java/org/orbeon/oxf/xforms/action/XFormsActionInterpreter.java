@@ -24,7 +24,6 @@ import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.util.XPathCache;
-import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.om.Item;
 
 import java.util.List;

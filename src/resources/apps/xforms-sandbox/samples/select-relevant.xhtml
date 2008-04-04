@@ -25,10 +25,22 @@
             <xforms:instance id="instance">
                 <instance>
                     <select/>
+                    <select-item-relevance/>
                     <relevant>false</relevant>
+                    <itemset>
+                        <item>
+                            <label>Yes</label>
+                            <value>true</value>
+                        </item>
+                        <item>
+                            <label>No</label>
+                            <value>false</value>
+                        </item>
+                    </itemset>
                 </instance>
             </xforms:instance>
             <xforms:bind nodeset="/instance/select" relevant="/instance/relevant = 'true'"/>
+            <xforms:bind nodeset="/instance/itemset/item[value = 'true']" relevant="/instance/relevant = 'true'"/>
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
@@ -45,13 +57,22 @@
                 </xforms:item>
             </xforms:select1>
         </xhtml:div>
+        <!--<xhtml:div style="margin-bottom: 1em">-->
+            <!--<xforms:select1 ref="/instance/select" appearance="full">-->
+                <!--<xforms:label class="gaga">Label for select</xforms:label>-->
+                <!--<xforms:item>-->
+                    <!--<xforms:label>Dummy</xforms:label>-->
+                    <!--<xforms:value>dummy</xforms:value>-->
+                <!--</xforms:item>-->
+            <!--</xforms:select1>-->
+        <!--</xhtml:div>-->
         <xhtml:div style="margin-bottom: 1em">
-            <xforms:select1 ref="/instance/select" appearance="full">
+            <xforms:select1 ref="/instance/select-item-relevance" appearance="minimal">
                 <xforms:label class="gaga">Label for select</xforms:label>
-                <xforms:item>
-                    <xforms:label>Dummy</xforms:label>
-                    <xforms:value>dummy</xforms:value>
-                </xforms:item>
+                <xforms:itemset nodeset="/instance/itemset/item">
+                    <xforms:label ref="label"/>
+                    <xforms:value ref="value"/>
+                </xforms:itemset>
             </xforms:select1>
         </xhtml:div>
     </xhtml:body>

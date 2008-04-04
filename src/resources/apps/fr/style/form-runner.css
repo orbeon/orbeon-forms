@@ -305,7 +305,7 @@ div.fr-collapsible {
 /* Errors */
 .fr-error-buttons { float: left }
 .fr-error-buttons td { padding: 0.2em }
-.fr-error-title { color: #f90; font-size: 160%; }
+.fr-error-title { font-size: 123.1%; }
 .fr-error-list li { margin-bottom: .5em; }
 .fr-error-list label { display: none }
 .fr-error-label { font-weight: bold }

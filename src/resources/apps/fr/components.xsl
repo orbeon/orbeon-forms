@@ -725,8 +725,8 @@
 
             <!-- Take action upon xforms-help on #fr-form-group -->
             <!--<xforms:action ev:observer="fr-form-group" ev:event="xforms-help" ev:defaultAction="cancel">-->
-                <!--<xforms:setvalue ref="instance('fr-help-instance')/label" value="event('label')"/>-->
-                <!--<xforms:setvalue ref="instance('fr-help-instance')/help" value="event('help')"/>-->
+                <!--<xforms:setvalue ref="instance('fr-help-instance')/label" value="event('xxforms:label')"/>-->
+                <!--<xforms:setvalue ref="instance('fr-help-instance')/help" value="event('xxforms:help')"/>-->
             <!--</xforms:action>-->
 
         </xforms:model>

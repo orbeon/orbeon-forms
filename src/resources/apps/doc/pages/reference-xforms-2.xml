@@ -596,7 +596,7 @@
                     The following standard event attributes are implemented:
                 </p>
                 <p>
-                    [TODO: describe Orbeon Forms support for event() function for each event]
+                    [TODO: describe standard Orbeon Forms support for event() function]
                 </p>
                 <a name="xforms-events-event-attributes"/>
                 <p>

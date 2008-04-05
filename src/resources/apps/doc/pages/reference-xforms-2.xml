@@ -583,20 +583,125 @@
             <section>
                 <title>Enhanced <code>event()</code> Function Support</title>
                 <p>
+                    Orbeon Forms enhances the XML Events <code>event()</code> function to take a qualified name as
+                    parameter:
+                </p>
+                <xml-source>
+                    event($attribute-name as QName) item()*
+                </xml-source>
+                <p>
+                    This allows namespacing attribute names, therefore better allowing for extension attributes.
+                </p>
+                <p>
                     The following standard event attributes are implemented:
                 </p>
                 <p>
                     [TODO: describe Orbeon Forms support for event() function for each event]
                 </p>
+                <a name="xforms-events-event-attributes"/>
                 <p>
-                    The following extension event attributes are implemented:
-                </p>
-                <p>
-                    [TODO: describe Orbeon Forms support for event() function for each event]
+                    On all events, the following extension attributes are supported:
                 </p>
                 <ul>
                     <li>
-                        <a name="xforms-select"/>
+                        <p>
+                            <code>event('xxforms:type') as xs:string</code>
+                        </p>
+                        <p>
+                            Return the event type (also known as event name), for example <code>"DOMActivate"</code>.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>event('xxforms:target') as xs:string</code>
+                        </p>
+                        <p>
+                            Return the id of the event target.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>event('xxforms:bubbles') as xs:boolean</code>
+                        </p>
+                        <p>
+                            Return whether the event is allowed to bubble or not.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>event('xxforms:cancelable') as xs:boolean</code>
+                        </p>
+                        <p>
+                            Return whether the event is cancelable or not.
+                        </p>
+                    </li>
+                </ul>
+                <a name="xforms-ui-events-event-attributes"/>
+                <p>
+                    On all UI events (<code>DOMActivate</code>, <code>DOMFocusIn</code>, <code>DOMFocusOut</code>,
+                    <code>xforms-select</code>, <code>xforms-deselect</code>, <code>xforms-enabled</code>,
+                    <code>xforms-disabled</code>, <code>xforms-help</code>, <code>xforms-hint</code>,
+                    <code>xforms-valid</code>, <code>xforms-invalid</code>, <code>xforms-required</code>,
+                    <code>xforms-optional</code>, <code>xforms-readonly</code>, <code>xforms-readwrite</code>,
+                    <code>xforms-value-change</code>), the following extension attributes are supported:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            <code>event('xxforms:binding') as node()?</code>
+                        </p>
+                        <p>
+                            Return the event target's single-node binding if any.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>event('xxforms:label') as xs:string?</code>
+                        </p>
+                        <p>
+                            Return the event target's label value if any.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>event('xxforms:hint') as xs:string?</code>
+                        </p>
+                        <p>
+                            Return the event target's hint value if any.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>event('xxforms:help') as xs:string?</code>
+                        </p>
+                        <p>
+                            Return the event target's help value if any.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>event('xxforms:alert') as xs:string?</code>
+                        </p>
+                        <p>
+                            Return the event target's alert value if any.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>event('xxforms:repeat-indexes') as xs:string*</code>
+                        </p>
+                        <p>
+                            Return the event target's current repeat indexes, if any, starting from the ancestor
+                            repeat.
+                        </p>
+                    </li>
+                </ul>
+                <p>
+                    On <code>xforms-select</code>, the following extension attributes are supported:
+                </p>
+                <ul>
+                    <li>
+                        <a name="xforms-select-event-attributes"/>
                         <p>
                             <code>event('xxforms:item-value')</code>
                         </p>

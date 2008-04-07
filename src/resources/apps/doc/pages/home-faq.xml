@@ -743,6 +743,7 @@
                     In the future we hope to also add support in XForms NG for non-JavaScript (and non-Ajax) browsers.
                 </p>
             </section>
+            <a name="designing-forms"/>
             <section added="2006-12-06">
                 <title>How do I design forms in Orbeon Forms?</title>
                 <p>

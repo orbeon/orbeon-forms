@@ -696,7 +696,7 @@
         <pattern>*.wmls</pattern>
     </mime-type>
     <mime-type>
-        <name>text/xml</name>
+        <name>application/xml</name>
         <pattern>*.xml</pattern>
         <pattern>*.xsl</pattern>
     </mime-type>
@@ -827,5 +827,14 @@
         <pattern>*.vrml</pattern>
         <pattern>*.wrl</pattern>
     </mime-type>
-
+    <mime-type>
+        <name>text/html</name>
+        <pattern>*.html</pattern>
+        <pattern>*.htm</pattern>
+    </mime-type>
+    <!-- RFC 4627 -->
+    <mime-type>
+        <name>application/json</name>
+        <pattern>*.json</pattern>
+    </mime-type>
 </mime-types>

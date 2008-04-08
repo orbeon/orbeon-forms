@@ -33,8 +33,8 @@
             <labels>
                 <new-form>New Form</new-form>
                 <import-forms>Import Forms</import-forms>
-                <edit-form>Edit Selected</edit-form>
-                <delete-form>Delete Selected</delete-form>
+                <edit-form>Edit Form</edit-form>
+                <delete-form>Delete Form</delete-form>
                 <view-readonly>View HTML</view-readonly>
                 <view-xml>View XML</view-xml>
                 <view-pdf>View PDF</view-pdf>

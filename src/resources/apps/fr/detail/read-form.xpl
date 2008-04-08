@@ -18,7 +18,7 @@
         xmlns:oxf="http://www.orbeon.com/oxf/processors"
         xmlns:xi="http://www.w3.org/2001/XInclude">
 
-    <!-- Page detail (app, form, document, and mode) -->
+    <!-- Parameters (app, form, document, and mode) -->
     <p:param type="input" name="instance"/>
     <!-- XHTML+FR+XForms for the from obtained from persistence layer -->
     <p:param type="output" name="data"/>

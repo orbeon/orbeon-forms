@@ -19,44 +19,78 @@
         xmlns:oxf="http://www.orbeon.com/oxf/processors"
         xmlns:xi="http://www.w3.org/2001/XInclude"
         xmlns:xforms="http://www.w3.org/2002/xforms"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
         xmlns:ev="http://www.w3.org/2001/xml-events">
 
+    <!-- Page detail (app, form, document, and mode) -->
     <p:param type="input" name="instance"/>
+    <!-- XHTML+FR+XForms for the from obtained from persistence layer -->
     <p:param type="output" name="data"/>
+    <!-- Instance usable by the view -->
     <p:param type="output" name="instance"/>
 
-    <!-- NOTE: It's disappointing that we have to use oxf:request/oxf:perl5-matcher rather than using the page flow
-         directly, but because we want to support the PUT and POST methods, this is currently the only solution. -->
-    <p:processor name="oxf:request">
-        <p:input name="config">
-            <config>
-                <include>/request/request-path</include>
-                <include>/request/method</include>
+    <!-- Call up persistence layer to obtain XHTML+XForms -->
+    <p:processor name="oxf:url-generator">
+        <p:input name="config" transform="oxf:unsafe-xslt" href="#instance">
+            <config xsl:version="2.0" xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
+
+                <xsl:variable name="prefix" select="'oxf.fr.persistence.app'" as="xs:string"/>
+                <xsl:variable name="app" select="/*/app" as="xs:string"/>
+                <xsl:variable name="form" select="/*/form" as="xs:string"/>
+                <xsl:variable name="suffix" select="'uri'" as="xs:string"/>
+
+                <!-- List of properties from specific to generic -->
+                <xsl:variable name="names"
+                                  select="(string-join(($prefix, $app, $form, 'data', $suffix), '.'),
+                                           string-join(($prefix, $app, $form, $suffix), '.'),
+                                           string-join(($prefix, $app, $suffix), '.'),
+                                           string-join(($prefix, '*', $suffix), '.'))" as="xs:string+"/>
+
+                <!-- Find all values -->
+                <xsl:variable name="values" select="for $name in $names return pipeline:property($name)" as="xs:string*"/>
+
+                <!-- Create URI with first non-empty value -->
+                <xsl:variable name="resource" select="concat($values[normalize-space() != ''][1], '/crud/', /*/app, '/', /*/form, '/data/', /*/document, '/data.xml')" as="xs:string"/>
+                <url>
+                    <xsl:value-of select="pipeline:rewriteResourceURI($resource, true())"/>
+                </url>
+                <mode>binary</mode>
             </config>
         </p:input>
-        <p:output name="data" id="request"/>
+        <p:output name="data" id="binary-document"/>
     </p:processor>
 
-    <p:processor name="oxf:perl5-matcher">
-        <p:input name="config"><config>/fr/([^/]+)/([^/]+)/(test)(/)?</config></p:input>
-        <p:input name="data" href="#request#xpointer(/request/request-path)"/>
-        <p:output name="data" id="matcher-groups"/>
+    <!-- Convert binary document to XML -->
+    <p:processor name="oxf:to-xml-converter">
+        <p:input name="config">
+            <!-- Don't handle XInclude as this is done down the line -->
+            <config><handle-xinclude>false</handle-xinclude></config>
+        </p:input>
+        <p:input name="data" href="#binary-document"/>
+        <p:output name="data" id="document" ref="data"/>
     </p:processor>
 
-    <!-- Incoming submission goes to model's data output -->
-    <p:processor name="oxf:identity">
-        <p:input name="data" href="#instance"/>
-        <p:output name="data" ref="data"/>
+    <!-- Store document in the request for further access down the line -->
+    <p:processor name="oxf:scope-serializer">
+        <p:input name="config">
+            <config>
+                <key>oxf.fr.form</key>
+                <scope>request</scope>
+            </config>
+        </p:input>
+        <p:input name="data" href="#document"/>
     </p:processor>
 
+    <!-- And we recreate an instance usable by the view -->
     <p:processor name="oxf:xslt">
-        <p:input name="data" href="#matcher-groups"/>
+        <p:input name="data" href="#document"/>
         <p:input name="config">
             <request xsl:version="2.0">
-                <app><xsl:value-of select="/*/group[1]"/></app>
-                <form><xsl:value-of select="/*/group[2]"/></form>
+                <xsl:variable name="metadata" select="/xhtml:html/xhtml:head/xforms:model[@id = 'fr-form-model']/xforms:instance[@id = 'fr-form-metadata']/*" as="element(metadata)"/>
+                <app><xsl:value-of select="$metadata/application-name"/></app>
+                <form><xsl:value-of select="$metadata/form-name"/></form>
                 <document/>
-                <mode><xsl:value-of select="/*/group[2]"/></mode>
+                <mode>test</mode>
             </request>
         </p:input>
         <p:output name="data" ref="instance"/>

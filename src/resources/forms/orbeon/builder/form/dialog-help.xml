@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Copyright (C) 2008 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xxforms:dialog xmlns:xhtml="http://www.w3.org/1999/xhtml"
+      xmlns:xforms="http://www.w3.org/2002/xforms"
+      xmlns:xs="http://www.w3.org/2001/XMLSchema"
+      xmlns:ev="http://www.w3.org/2001/xml-events"
+      xmlns:xi="http://www.w3.org/2001/XInclude"
+      xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+      xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+      xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+      xmlns:saxon="http://saxon.sf.net/"
+
+      id="fb-edit-help-dialog" appearance="minimal">
+
+    <xforms:label>Edit Help</xforms:label>
+    <xhtml:div>
+        <xforms:group class="fb-hide-alert">
+            <xforms:textarea ref="$variables/new-text">
+                <xforms:label>Help Message</xforms:label>
+            </xforms:textarea>
+            <xhtml:div class="dialog-buttons">
+                <xforms:trigger class="fr-inplace-rename">
+                    <xforms:label>Change</xforms:label>
+                    <!-- Close and save upon DOMActivate -->
+                    <xforms:dispatch ev:event="DOMActivate" name="xxforms-dialog-close" target="fb-edit-help-dialog"/>
+                </xforms:trigger>
+                or
+                <xforms:trigger appearance="minimal" class="fr-inplace-cancel">
+                    <xforms:label>Cancel</xforms:label>
+                    <!-- Close and cancel upon DOMActivate -->
+                    <xforms:dispatch ev:event="DOMActivate" name="xxforms-dialog-close" target="fb-edit-help-dialog">
+                        <xxforms:context name="fb:save" select="false()"/>
+                    </xforms:dispatch>
+                </xforms:trigger>
+            </xhtml:div>
+        </xforms:group>
+    </xhtml:div>
+
+    <!-- Save data upon close, unless explicitly prevented -->
+    <xforms:action ev:event="xxforms-dialog-close" if="not(event('fb:save') = false())">
+        <xforms:setvalue ref="$form-instance/root()/saxon:evaluate($variables/result-node)" value="$variables/new-text"/>
+    </xforms:action>
+
+    <!-- Copy help value when the dialog opens -->
+    <xforms:setvalue ev:event="xxforms-dialog-open" ref="$variables/new-text" value="$form-instance/root()/saxon:evaluate($variables/result-node)"/>
+</xxforms:dialog>

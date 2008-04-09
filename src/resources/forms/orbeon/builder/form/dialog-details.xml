@@ -20,6 +20,7 @@
       xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
       xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+      xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
       xmlns:saxon="http://saxon.sf.net/"
 
       id="fb-edit-details-dialog" appearance="minimal">
@@ -29,9 +30,11 @@
     <xhtml:div>
         <xxforms:variable name="instance" select="instance('fb-details-editor-instance')"/>
         <xforms:group context="$instance">
-            <xforms:input ref="control-name" incremental="true" id="fb-edit-details-control-name-input">
+            <xforms:input ref="control-name" incremental="true">
                 <xforms:label>Control Name</xforms:label>
                 <xforms:alert>Name is already in use or incorrect</xforms:alert>
+                <!-- Close and save upon DOMActivate -->
+                <xforms:dispatch ev:event="DOMActivate" name="xxforms-dialog-close" target="fb-edit-details-dialog"/>
             </xforms:input>
             <xforms:select ref="classes" appearance="full">
                 <xforms:label>Summary Page</xforms:label>
@@ -44,20 +47,27 @@
                     <xforms:value>fr-search</xforms:value>
                 </xforms:item>
             </xforms:select>
+
             <xhtml:div class="dialog-buttons">
-                <xforms:trigger class="fr-inplace-rename" ref="change-trigger" id="fb-edit-details-control-name-trigger">
+                <xforms:trigger class="fr-inplace-rename">
                     <xforms:label>Change</xforms:label>
+                    <!-- Close and save upon DOMActivate -->
+                    <xforms:dispatch ev:event="DOMActivate" name="xxforms-dialog-close" target="fb-edit-details-dialog"/>
                 </xforms:trigger>
                 or
                 <xforms:trigger appearance="minimal" class="fr-inplace-cancel">
                     <xforms:label>Cancel</xforms:label>
+                    <!-- Close and cancel upon DOMActivate -->
+                    <xforms:dispatch ev:event="DOMActivate" name="xxforms-dialog-close" target="fb-edit-details-dialog">
+                        <xxforms:context name="fb:save" select="false()"/>
+                    </xforms:dispatch>
                 </xforms:trigger>
             </xhtml:div>
         </xforms:group>
     </xhtml:div>
 
-    <!-- Rename the control instance holder and resource holder -->
-    <xforms:action ev:event="DOMActivate" ev:observer="fb-edit-details-control-name-input fb-edit-details-control-name-trigger">
+    <!-- Save data upon close, unless explicitly prevented -->
+    <xforms:action ev:event="xxforms-dialog-close" if="not(event('fb:save') = false())">
 
         <xxforms:variable name="instance" select="instance('fb-details-editor-instance')"/>
 
@@ -98,8 +108,6 @@
 
     </xforms:action>
 
-    <!-- Hide dialog -->
-    <xxforms:hide ev:event="DOMActivate" dialog="fb-edit-details-dialog"/>
     <!-- Show dialog -->
     <xforms:action ev:event="xxforms-dialog-open">
         <!-- Copy over values -->

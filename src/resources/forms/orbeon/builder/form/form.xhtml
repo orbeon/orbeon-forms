@@ -21,6 +21,7 @@
       xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
       xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+      xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
       xmlns:saxon="http://saxon.sf.net/">
     <xhtml:head>
         <xhtml:title>Orbeon Form Builder</xhtml:title>
@@ -1863,32 +1864,6 @@
                     </xforms:trigger>
                 </xhtml:div>
 
-                <!-- Edit help -->
-                <xxforms:dialog id="fb-edit-help-dialog" appearance="minimal">
-                    <xforms:label>Edit Help</xforms:label>
-                    <xhtml:div>
-                        <xforms:group class="fb-hide-alert">
-                            <xforms:textarea ref="$variables/new-text">
-                                <xforms:label>Help Message</xforms:label>
-                            </xforms:textarea>
-                            <xhtml:div class="dialog-buttons">
-                                <xforms:trigger class="fr-inplace-rename">
-                                    <xforms:label>Change</xforms:label>
-                                    <xforms:setvalue ev:event="DOMActivate" ref="$form-instance/root()/saxon:evaluate($variables/result-node)" value="$variables/new-text"/>
-                                </xforms:trigger>
-                                or
-                                <xforms:trigger appearance="minimal" class="fr-inplace-cancel">
-                                    <xforms:label>Cancel</xforms:label>
-                                </xforms:trigger>
-                            </xhtml:div>
-                        </xforms:group>
-                    </xhtml:div>
-                    <!-- Hide dialog -->
-                    <xxforms:hide ev:event="DOMActivate" dialog="fb-edit-help-dialog"/>
-                    <!-- Copy help value when the dialog opens -->
-                    <xforms:setvalue ev:event="xxforms-dialog-open" ref="$variables/new-text" value="$form-instance/root()/saxon:evaluate($variables/result-node)"/>
-                </xxforms:dialog>
-
                 <!-- Dialog to show the XML -->
                 <xxforms:dialog id="fb-xml-dialog" level="modeless" close="true" draggable="true">
                     <xforms:label>View XML</xforms:label>
@@ -2085,6 +2060,9 @@
                     <!-- Hide dialog -->
                     <xxforms:hide ev:event="DOMActivate" dialog="fb-css-upload-dialog"/>
                 </xxforms:dialog>
+
+                <!-- Help dialog -->
+                <xi:include href="oxf:/forms/orbeon/builder/form/dialog-help.xml" xxi:omit-xml-base="true"/>
 
                 <!-- Publish dialog -->
                 <xi:include href="oxf:/forms/orbeon/builder/form/dialog-publish.xml" xxi:omit-xml-base="true"/>

@@ -95,19 +95,25 @@
             </xforms:textarea>
 
             <xhtml:div class="dialog-buttons">
-                <xforms:trigger class="fr-inplace-rename" id="fb-edit-validation-trigger">
+                <xforms:trigger class="fr-inplace-rename">
                     <xforms:label>Change</xforms:label>
+                    <!-- Close and save upon DOMActivate -->
+                    <xforms:dispatch ev:event="DOMActivate" name="xxforms-dialog-close" target="fb-edit-validation-dialog"/>
                 </xforms:trigger>
                 or
                 <xforms:trigger appearance="minimal" class="fr-inplace-cancel">
                     <xforms:label>Cancel</xforms:label>
+                    <!-- Close and cancel upon DOMActivate -->
+                    <xforms:dispatch ev:event="DOMActivate" name="xxforms-dialog-close" target="fb-edit-validation-dialog">
+                        <xxforms:context name="fb:save" select="false()"/>
+                    </xforms:dispatch>
                 </xforms:trigger>
             </xhtml:div>
         </xforms:group>
     </xhtml:div>
 
-    <!-- Set validation information into the form -->
-    <xforms:action ev:event="DOMActivate" ev:observer="fb-edit-validation-trigger">
+    <!-- Save data upon close, unless explicitly prevented -->
+    <xforms:action ev:event="xxforms-dialog-close" if="not(event('fb:save') = false())">
         <xxforms:variable name="instance" select="instance('fb-validation-editor-instance')"/>
         <xxforms:variable name="current-control" select="if ($current-control-name != '') then $body//xforms:*[@id = concat($current-control-name, '-control')] else ()"/>
         <xxforms:variable name="current-control-resource" select="$current-resources/*[name() = $current-control-name]"/>
@@ -163,11 +169,7 @@
             <xforms:delete nodeset="$bind"/>
 
         </xforms:action>
-
     </xforms:action>
-
-    <!-- Hide dialog -->
-    <xxforms:hide ev:event="DOMActivate" dialog="fb-edit-validation-dialog"/>
 
     <!-- When the dialog opens, get type information from the form -->
     <xforms:action ev:event="xxforms-dialog-open">

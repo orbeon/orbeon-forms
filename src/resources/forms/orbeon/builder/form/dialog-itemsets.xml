@@ -20,6 +20,7 @@
       xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
       xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+      xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
       xmlns:saxon="http://saxon.sf.net/"
 
       id="fb-itemset-editor-dialog" appearance="minimal">
@@ -63,6 +64,22 @@
                 </xhtml:tr>
             </fr:repeat>
         </xforms:group>
+        
+        <xhtml:div class="dialog-buttons">
+            <xforms:trigger class="fr-inplace-rename">
+                <xforms:label>Change</xforms:label>
+                <!-- Close and save upon DOMActivate -->
+                <xforms:dispatch ev:event="DOMActivate" name="xxforms-dialog-close" target="fb-itemset-editor-dialog"/>
+            </xforms:trigger>
+            or
+            <xforms:trigger appearance="minimal" class="fr-inplace-cancel">
+                <xforms:label>Cancel</xforms:label>
+                <!-- Close and cancel upon DOMActivate -->
+                <xforms:dispatch ev:event="DOMActivate" name="xxforms-dialog-close" target="fb-itemset-editor-dialog">
+                    <xxforms:context name="fb:save" select="false()"/>
+                </xforms:dispatch>
+            </xforms:trigger>
+        </xhtml:div>
     </xhtml:div>
 
     <xforms:action ev:event="xxforms-dialog-open">
@@ -108,7 +125,8 @@
         <xforms:setfocus control="fb-itemset-label-input"/>
     </xforms:action>
 
-    <xforms:action ev:event="xxforms-dialog-close">
+    <!-- Save data upon close, unless explicitly prevented -->
+    <xforms:action ev:event="xxforms-dialog-close" if="not(event('fb:save') = false())">
 
         <!-- Copy back the items to all languages -->
 

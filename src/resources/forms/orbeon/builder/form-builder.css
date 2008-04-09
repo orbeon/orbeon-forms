@@ -66,7 +66,7 @@
 
 .dialog-icon { float: left; margin-right: 2em; margin-left: 1em; padding-bottom: 1em; }
 .dialog-message { margin-top: 1em; padding-top: 0.5em; }
-.dialog-buttons { text-align: right; padding-right: 1em; padding-top: 1.5em; padding-bottom: 1em; }
+.dialog-buttons { text-align: right; padding-right: .5em; padding-top: .5em; padding-bottom: .5em; }
 
 /* In-place editing for regular fields */
 

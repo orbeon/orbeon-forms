@@ -185,7 +185,7 @@ hr {
 }
 
 /* Make sure xforms-disabled takes precendence over display: block on other classes */
-label.xforms-disabled, span.xforms-disabled, div.xforms-disabled  {
+.fr-grid label.xforms-disabled, .fr-grid span.xforms-disabled, .fr-grid div.xforms-disabled  {
     display: none;
 }
 

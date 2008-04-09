@@ -342,40 +342,28 @@
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
-                            <xxf:control-values>
-                                <xxf:control id="group111" relevant="true"/>
-                                <xxf:control id="group112" relevant="true"/>
-                                <xxf:control id="group113" relevant="true"/>
-                                <xxf:control id="id111" relevant="true">111</xxf:control>
-                                <xxf:control id="id112" relevant="true">112</xxf:control>
-                                <xxf:control id="id113" relevant="true">113</xxf:control>
-                                <xxf:control id="id114" relevant="true">114</xxf:control>
-                                <xxf:control id="group121" relevant="true"/>
-                                <xxf:control id="group122" relevant="true"/>
-                                <xxf:control id="id121" relevant="true">121</xxf:control>
-                                <xxf:control id="id122" relevant="true">122</xxf:control>
-                                <xxf:control id="id123" relevant="true">123</xxf:control>
-                                <xxf:control id="id124" relevant="true">124</xxf:control>
-                                <xxf:control id="group211" relevant="true"/>
-                                <xxf:control id="group212" relevant="true"/>
-                                <xxf:control id="group213" relevant="true"/>
-                                <xxf:control id="id211" relevant="true">211</xxf:control>
-                                <xxf:control id="id212" relevant="true">212</xxf:control>
-                                <xxf:control id="id213" relevant="true">213</xxf:control>
-                                <xxf:control id="id214" relevant="true">214</xxf:control>
-                                <xxf:control id="group214" relevant="true"/>
-                                <xxf:control id="group8" relevant="true"/>
-                                <xxf:control id="id221" relevant="true">221</xxf:control>
-                                <xxf:control id="id222" relevant="true">222</xxf:control>
-                                <xxf:control id="id223" relevant="true">223</xxf:control>
-                                <xxf:control id="id224" relevant="true">224</xxf:control>
-                                <xxf:control id="group215" relevant="true"/>
-                                <xxf:control id="group10" relevant="true"/>
-                                <xxf:control id="id211b" relevant="true">211</xxf:control>
-                                <xxf:control id="id212b" relevant="true">212</xxf:control>
-                                <xxf:control id="id213b" relevant="true">213</xxf:control>
-                                <xxf:control id="id214b" relevant="true">214</xxf:control>
-                            </xxf:control-values>
+                    <xxf:control-values>
+                        <xxf:control id="id111">111</xxf:control>
+                        <xxf:control id="id112">112</xxf:control>
+                        <xxf:control id="id113">113</xxf:control>
+                        <xxf:control id="id114">114</xxf:control>
+                        <xxf:control id="id121">121</xxf:control>
+                        <xxf:control id="id122">122</xxf:control>
+                        <xxf:control id="id123">123</xxf:control>
+                        <xxf:control id="id124">124</xxf:control>
+                        <xxf:control id="id211">211</xxf:control>
+                        <xxf:control id="id212">212</xxf:control>
+                        <xxf:control id="id213">213</xxf:control>
+                        <xxf:control id="id214">214</xxf:control>
+                        <xxf:control id="id221">221</xxf:control>
+                        <xxf:control id="id222">222</xxf:control>
+                        <xxf:control id="id223">223</xxf:control>
+                        <xxf:control id="id224">224</xxf:control>
+                        <xxf:control id="id211b">211</xxf:control>
+                        <xxf:control id="id212b">212</xxf:control>
+                        <xxf:control id="id213b">213</xxf:control>
+                        <xxf:control id="id214b">214</xxf:control>
+                    </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
         </output>
@@ -464,11 +452,9 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="group1" relevant="true"/>
-                        <xxf:control id="group2" relevant="true"/>
-                        <xxf:control id="1" relevant="true">0</xxf:control>
-                        <xxf:control id="2" relevant="true" label="M:">12</xxf:control>
-                        <xxf:control id="3" relevant="true" label="Clear"/>
+                        <xxf:control id="1">0</xxf:control>
+                        <xxf:control id="2" label="M:">12</xxf:control>
+                        <xxf:control id="3" label="Clear"/>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -676,26 +662,23 @@
                 </xxf:dynamic-state>
                 <xxf:action xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                     <xxf:control-values>
-                        <xxf:copy-repeat-template id="id123" parent-indexes="" id-suffix="2"/>
-                        <xxf:copy-repeat-template id="id123" parent-indexes="" id-suffix="3"/>
-                        <xxf:copy-repeat-template id="id124" parent-indexes="1" id-suffix="2"/>
-                        <xxf:control id="id125·1-1" relevant="true">f11</xxf:control>
-                        <xxf:control id="id126·1-1" relevant="true">l11</xxf:control>
-                        <xxf:control id="id125·1-2" relevant="true">f12</xxf:control>
-                        <xxf:control id="id126·1-2" relevant="true">l12</xxf:control>
-                        <xxf:control id="id125·2-1" relevant="true">f21</xxf:control>
-                        <xxf:control id="id126·2-1" relevant="true">l21</xxf:control>
-                        <xxf:copy-repeat-template id="id124" parent-indexes="3" id-suffix="2"/>
-                        <xxf:copy-repeat-template id="id124" parent-indexes="3" id-suffix="3"/>
-                        <xxf:copy-repeat-template id="id124" parent-indexes="3" id-suffix="4"/>
-                        <xxf:control id="id125·3-1" relevant="true">f31</xxf:control>
-                        <xxf:control id="id126·3-1" relevant="true">l31</xxf:control>
-                        <xxf:control id="id125·3-2" relevant="true">f32</xxf:control>
-                        <xxf:control id="id126·3-2" relevant="true">l32</xxf:control>
-                        <xxf:control id="id125·3-3" relevant="true">f33</xxf:control>
-                        <xxf:control id="id126·3-3" relevant="true">l33</xxf:control>
-                        <xxf:control id="id125·3-4" relevant="true">f34</xxf:control>
-                        <xxf:control id="id126·3-4" relevant="true">l34</xxf:control>
+                        <xxf:copy-repeat-template id="id123" parent-indexes="" start-suffix="2" end-suffix="3"/>
+                        <xxf:copy-repeat-template id="id124" parent-indexes="1" start-suffix="2" end-suffix="2"/>
+                        <xxf:control id="id125·1-1">f11</xxf:control>
+                        <xxf:control id="id126·1-1">l11</xxf:control>
+                        <xxf:control id="id125·1-2">f12</xxf:control>
+                        <xxf:control id="id126·1-2">l12</xxf:control>
+                        <xxf:control id="id125·2-1">f21</xxf:control>
+                        <xxf:control id="id126·2-1">l21</xxf:control>
+                        <xxf:copy-repeat-template id="id124" parent-indexes="3" start-suffix="2" end-suffix="4"/>
+                        <xxf:control id="id125·3-1">f31</xxf:control>
+                        <xxf:control id="id126·3-1">l31</xxf:control>
+                        <xxf:control id="id125·3-2">f32</xxf:control>
+                        <xxf:control id="id126·3-2">l32</xxf:control>
+                        <xxf:control id="id125·3-3">f33</xxf:control>
+                        <xxf:control id="id126·3-3">l33</xxf:control>
+                        <xxf:control id="id125·3-4">f34</xxf:control>
+                        <xxf:control id="id126·3-4">l34</xxf:control>
                     </xxf:control-values>
                     <xxf:repeats>
                         <xxf:repeat-index id="id123" index="1"/>
@@ -771,26 +754,24 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:copy-repeat-template id="id123" parent-indexes="" id-suffix="4"/>
-                        <xxf:copy-repeat-template id="id124" parent-indexes="1" id-suffix="3"/>
-                        <xxf:control id="id127·1-3" relevant="true" label="Insert"/>
-                        <xxf:control id="id125·1-3" relevant="true">f12</xxf:control>
-                        <xxf:control id="id126·1-3" relevant="true">l12</xxf:control>
-                        <xxf:copy-repeat-template id="id124" parent-indexes="4" id-suffix="2"/>
-                        <xxf:copy-repeat-template id="id124" parent-indexes="4" id-suffix="3"/>
-                        <xxf:copy-repeat-template id="id124" parent-indexes="4" id-suffix="4"/>
-                        <xxf:control id="id127·4-1" relevant="true" label="Insert"/>
-                        <xxf:control id="id125·4-1" relevant="true">f31</xxf:control>
-                        <xxf:control id="id126·4-1" relevant="true">l31</xxf:control>
-                        <xxf:control id="id127·4-2" relevant="true" label="Insert"/>
-                        <xxf:control id="id125·4-2" relevant="true">f32</xxf:control>
-                        <xxf:control id="id126·4-2" relevant="true">l32</xxf:control>
-                        <xxf:control id="id127·4-3" relevant="true" label="Insert"/>
-                        <xxf:control id="id125·4-3" relevant="true">f33</xxf:control>
-                        <xxf:control id="id126·4-3" relevant="true">l33</xxf:control>
-                        <xxf:control id="id127·4-4" relevant="true" label="Insert"/>
-                        <xxf:control id="id125·4-4" relevant="true">f34</xxf:control>
-                        <xxf:control id="id126·4-4" relevant="true">l34</xxf:control>
+                        <xxf:copy-repeat-template id="id123" parent-indexes="" start-suffix="4" end-suffix="4"/>
+                        <xxf:copy-repeat-template id="id124" parent-indexes="1" start-suffix="3" end-suffix="3"/>
+                        <xxf:control id="id127·1-3" label="Insert"/>
+                        <xxf:control id="id125·1-3">f12</xxf:control>
+                        <xxf:control id="id126·1-3">l12</xxf:control>
+                        <xxf:copy-repeat-template id="id124" parent-indexes="4" start-suffix="2" end-suffix="4"/>
+                        <xxf:control id="id127·4-1" label="Insert"/>
+                        <xxf:control id="id125·4-1">f31</xxf:control>
+                        <xxf:control id="id126·4-1">l31</xxf:control>
+                        <xxf:control id="id127·4-2" label="Insert"/>
+                        <xxf:control id="id125·4-2">f32</xxf:control>
+                        <xxf:control id="id126·4-2">l32</xxf:control>
+                        <xxf:control id="id127·4-3" label="Insert"/>
+                        <xxf:control id="id125·4-3">f33</xxf:control>
+                        <xxf:control id="id126·4-3">l33</xxf:control>
+                        <xxf:control id="id127·4-4" label="Insert"/>
+                        <xxf:control id="id125·4-4">f34</xxf:control>
+                        <xxf:control id="id126·4-4">l34</xxf:control>
                     </xxf:control-values>
                     <xxf:repeat-indexes>
                         <xxf:repeat-index id="id123" old-index="1" new-index="3"/>
@@ -1088,8 +1069,7 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="id1" relevant="true"/>
-                        <xxf:control id="id2" readonly="true" relevant="true" label="test noFoundData:">1</xxf:control>
+                         <xxf:control id="id2" readonly="true" label="test noFoundData:">1</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1141,8 +1121,7 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="id1" relevant="true"/>
-                        <xxf:control id="id2" relevant="true"/>
+                        <xxf:control id="id3" relevant="false"/>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1508,7 +1487,7 @@
                     <xxf:control-values>
                         <xxf:delete-repeat-elements id="repeat2" parent-indexes="2" count="1"/>
                         <xxf:delete-repeat-elements id="repeat3" parent-indexes="" count="1"/>
-                        <xxf:copy-repeat-template id="repeat5" parent-indexes="1" id-suffix="1"/>
+                        <xxf:copy-repeat-template id="repeat5" parent-indexes="1" start-suffix="1" end-suffix="1"/>
                     </xxf:control-values>
                     <xxf:repeat-indexes>
                         <xxf:repeat-index id="repeat2" old-index="2" new-index="1"/>
@@ -1584,9 +1563,9 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="id1" relevant="true">gigi1</xxf:control>
-                        <xxf:control id="id2">gigi2</xxf:control>
-                        <xxf:control id="id3" readonly="true" relevant="true">gigi3</xxf:control>
+                        <xxf:control id="id1">gigi1</xxf:control>
+                        <xxf:control id="id2" relevant="false">gigi2</xxf:control>
+                        <xxf:control id="id3" readonly="true">gigi3</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1697,12 +1676,10 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:copy-repeat-template id="employee-repeat" parent-indexes="" id-suffix="1"/>
-                        <xxf:copy-repeat-template id="employee-repeat" parent-indexes="" id-suffix="2"/>
-                        <xxf:copy-repeat-template id="employee-repeat" parent-indexes="" id-suffix="3"/>
-                        <xxf:control id="first-name-input·1" relevant="true">Joe</xxf:control>
-                        <xxf:control id="first-name-input·2" relevant="true">Billy</xxf:control>
-                        <xxf:control id="first-name-input·3" relevant="true">Mary</xxf:control>
+                        <xxf:copy-repeat-template id="employee-repeat" parent-indexes="" start-suffix="1" end-suffix="3"/>
+                        <xxf:control id="first-name-input·1">Joe</xxf:control>
+                        <xxf:control id="first-name-input·2">Billy</xxf:control>
+                        <xxf:control id="first-name-input·3">Mary</xxf:control>
                     </xxf:control-values>
                     <xxf:repeat-indexes>
                         <xxf:repeat-index id="employee-repeat" old-index="0" new-index="2"/>
@@ -1855,14 +1832,13 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:copy-repeat-template id="xforms-element-6" parent-indexes="" id-suffix="2"/>
-                        <xxf:copy-repeat-template id="xforms-element-6" parent-indexes="" id-suffix="3"/>
-                        <xxf:control id="title-control·1" required="true" relevant="true" label="Title">Don Quixote de la Mancha</xxf:control>
-                        <xxf:control id="author-control·1" required="true" relevant="true" label="Author">Miguel de Cervantes Saavedra</xxf:control>
-                        <xxf:control id="title-control·2" required="true" relevant="true" label="Title">Jacques le fataliste et son maître</xxf:control>
-                        <xxf:control id="author-control·2" required="true" relevant="true" label="Author">Denis Diderot</xxf:control>
-                        <xxf:control id="title-control·3" required="true" relevant="true" label="Title">Childhood's End</xxf:control>
-                        <xxf:control id="author-control·3" required="true" relevant="true" label="Author">Arthur C. Clarke</xxf:control>
+                        <xxf:copy-repeat-template id="xforms-element-6" parent-indexes="" start-suffix="2" end-suffix="3"/>
+                        <xxf:control id="title-control·1" required="true" label="Title">Don Quixote de la Mancha</xxf:control>
+                        <xxf:control id="author-control·1" required="true" label="Author">Miguel de Cervantes Saavedra</xxf:control>
+                        <xxf:control id="title-control·2" required="true" label="Title">Jacques le fataliste et son maître</xxf:control>
+                        <xxf:control id="author-control·2" required="true" label="Author">Denis Diderot</xxf:control>
+                        <xxf:control id="title-control·3" required="true" label="Title">Childhood's End</xxf:control>
+                        <xxf:control id="author-control·3" required="true" label="Author">Arthur C. Clarke</xxf:control>
                     </xxf:control-values>
                     <xxf:repeats>
                         <xxf:repeat-index id="xforms-element-6" index="1"/>
@@ -2070,14 +2046,13 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:copy-repeat-template id="xforms-element-3" parent-indexes="" id-suffix="2"/>
-                        <xxf:copy-repeat-template id="xforms-element-3" parent-indexes="" id-suffix="3"/>
-                        <xxf:control id="xforms-element-4·1" relevant="true" label="City: ">San Francisco</xxf:control>
-                        <xxf:control id="xforms-element-6·1" relevant="true" label="Position: ">1</xxf:control>
-                        <xxf:control id="xforms-element-4·2" relevant="true" label="City: ">Los Angeles</xxf:control>
-                        <xxf:control id="xforms-element-6·2" relevant="true" label="Position: ">2</xxf:control>
-                        <xxf:control id="xforms-element-4·3" relevant="true" label="City: ">San Diego</xxf:control>
-                        <xxf:control id="xforms-element-6·3" relevant="true" label="Position: ">3</xxf:control>
+                        <xxf:copy-repeat-template id="xforms-element-3" parent-indexes="" start-suffix="2" end-suffix="3"/>
+                        <xxf:control id="xforms-element-4·1" label="City: ">San Francisco</xxf:control>
+                        <xxf:control id="xforms-element-6·1" label="Position: ">1</xxf:control>
+                        <xxf:control id="xforms-element-4·2" label="City: ">Los Angeles</xxf:control>
+                        <xxf:control id="xforms-element-6·2" label="Position: ">2</xxf:control>
+                        <xxf:control id="xforms-element-4·3" label="City: ">San Diego</xxf:control>
+                        <xxf:control id="xforms-element-6·3" label="Position: ">3</xxf:control>
                     </xxf:control-values>
                     <xxf:repeats>
                         <xxf:repeat-index id="xforms-element-3" index="1"/>
@@ -2140,8 +2115,7 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-group" relevant="true"/>
-                        <xxf:control id="my-input" relevant="true" label="My Data">new</xxf:control>
+                        <xxf:control id="my-input" label="My Data">new</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -2234,11 +2208,10 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:copy-repeat-template id="items-repeat" parent-indexes="" id-suffix="2"/>
-                        <xxf:copy-repeat-template id="items-repeat" parent-indexes="" id-suffix="3"/>
-                        <xxf:control id="my-count·1" relevant="true" label="One:">4</xxf:control>
-                        <xxf:control id="my-count·2" relevant="true" label="Two:">5</xxf:control>
-                        <xxf:control id="my-count·3" relevant="true" label="Three:">6</xxf:control>
+                        <xxf:copy-repeat-template id="items-repeat" parent-indexes="" start-suffix="2" end-suffix="3"/>
+                        <xxf:control id="my-count·1" label="One:">4</xxf:control>
+                        <xxf:control id="my-count·2" label="Two:">5</xxf:control>
+                        <xxf:control id="my-count·3" label="Three:">6</xxf:control>
                     </xxf:control-values>
                     <xxf:repeats>
                         <xxf:repeat-index id="items-repeat" index="3"/>
@@ -2354,7 +2327,7 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="xforms-element-7" relevant="true">2</xxf:control>
+                        <xxf:control id="xforms-element-7">2</xxf:control>
                     </xxf:control-values>
                     <xxf:itemsets>
                         <xxf:itemset id="xforms-element-7">[["Select...",""],["One","1"],["Two","2"],["Three","3"]]</xxf:itemset>
@@ -2411,7 +2384,7 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="xforms-element-4" relevant="true">green-bloody, williams-bloody, yellow-bloody</xxf:control>
+                        <xxf:control id="xforms-element-4">green-bloody, williams-bloody, yellow-bloody</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -2480,69 +2453,55 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:copy-repeat-template id="my-repeat" parent-indexes="" id-suffix="2"/>
-                        <xxf:copy-repeat-template id="my-repeat" parent-indexes="" id-suffix="3"/>
-                        <xxf:copy-repeat-template id="my-repeat" parent-indexes="" id-suffix="4"/>
-                        <xxf:copy-repeat-template id="my-repeat" parent-indexes="" id-suffix="5"/>
-                        <xxf:copy-repeat-template id="my-repeat" parent-indexes="" id-suffix="6"/>
-                        <xxf:copy-repeat-template id="my-repeat" parent-indexes="" id-suffix="7"/>
-                        <xxf:copy-repeat-template id="my-repeat" parent-indexes="" id-suffix="8"/>
-                        <xxf:control id="my-group·1" relevant="true"/>
-                        <xxf:control id="repeat-current-output-1·1" relevant="true">bloody</xxf:control>
-                        <xxf:control id="repeat-current-output-2·1" relevant="true">bloody</xxf:control>
-                        <xxf:control id="repeat-index-1·1" relevant="true">5</xxf:control>
-                        <xxf:control id="repeat-index-2·1" relevant="true">5</xxf:control>
-                        <xxf:control id="repeat-context-1·1" relevant="true">fruits</xxf:control>
-                        <xxf:control id="repeat-context-2·1" relevant="true">bloody</xxf:control>
-                        <xxf:control id="my-group·2" relevant="true"/>
-                        <xxf:control id="repeat-current-output-1·2" relevant="true">valencia</xxf:control>
-                        <xxf:control id="repeat-current-output-2·2" relevant="true">valencia</xxf:control>
-                        <xxf:control id="repeat-index-1·2" relevant="true">5</xxf:control>
-                        <xxf:control id="repeat-index-2·2" relevant="true">5</xxf:control>
-                        <xxf:control id="repeat-context-1·2" relevant="true">fruits</xxf:control>
-                        <xxf:control id="repeat-context-2·2" relevant="true">valencia</xxf:control>
-                        <xxf:control id="my-group·3" relevant="true"/>
-                        <xxf:control id="repeat-current-output-1·3" relevant="true">green</xxf:control>
-                        <xxf:control id="repeat-current-output-2·3" relevant="true">green</xxf:control>
-                        <xxf:control id="repeat-index-1·3" relevant="true">5</xxf:control>
-                        <xxf:control id="repeat-index-2·3" relevant="true">5</xxf:control>
-                        <xxf:control id="repeat-context-1·3" relevant="true">fruits</xxf:control>
-                        <xxf:control id="repeat-context-2·3" relevant="true">green</xxf:control>
-                        <xxf:control id="my-group·4" relevant="true"/>
-                        <xxf:control id="repeat-current-output-1·4" relevant="true">red</xxf:control>
-                        <xxf:control id="repeat-current-output-2·4" relevant="true">red</xxf:control>
-                        <xxf:control id="repeat-index-1·4" relevant="true">5</xxf:control>
-                        <xxf:control id="repeat-index-2·4" relevant="true">5</xxf:control>
-                        <xxf:control id="repeat-context-1·4" relevant="true">fruits</xxf:control>
-                        <xxf:control id="repeat-context-2·4" relevant="true">red</xxf:control>
-                        <xxf:control id="my-group·5" relevant="true"/>
-                        <xxf:control id="repeat-current-output-1·5" relevant="true">iPod</xxf:control>
-                        <xxf:control id="repeat-current-output-2·5" relevant="true">iPod</xxf:control>
-                        <xxf:control id="repeat-index-1·5" relevant="true">5</xxf:control>
-                        <xxf:control id="repeat-index-2·5" relevant="true">5</xxf:control>
-                        <xxf:control id="repeat-context-1·5" relevant="true">fruits</xxf:control>
-                        <xxf:control id="repeat-context-2·5" relevant="true">iPod</xxf:control>
-                        <xxf:control id="my-group·6" relevant="true"/>
-                        <xxf:control id="repeat-current-output-1·6" relevant="true">green</xxf:control>
-                        <xxf:control id="repeat-current-output-2·6" relevant="true">green</xxf:control>
-                        <xxf:control id="repeat-index-1·6" relevant="true">5</xxf:control>
-                        <xxf:control id="repeat-index-2·6" relevant="true">5</xxf:control>
-                        <xxf:control id="repeat-context-1·6" relevant="true">fruits</xxf:control>
-                        <xxf:control id="repeat-context-2·6" relevant="true">green</xxf:control>
-                        <xxf:control id="my-group·7" relevant="true"/>
-                        <xxf:control id="repeat-current-output-1·7" relevant="true">williams</xxf:control>
-                        <xxf:control id="repeat-current-output-2·7" relevant="true">williams</xxf:control>
-                        <xxf:control id="repeat-index-1·7" relevant="true">5</xxf:control>
-                        <xxf:control id="repeat-index-2·7" relevant="true">5</xxf:control>
-                        <xxf:control id="repeat-context-1·7" relevant="true">fruits</xxf:control>
-                        <xxf:control id="repeat-context-2·7" relevant="true">williams</xxf:control>
-                        <xxf:control id="my-group·8" relevant="true"/>
-                        <xxf:control id="repeat-current-output-1·8" relevant="true">yellow</xxf:control>
-                        <xxf:control id="repeat-current-output-2·8" relevant="true">yellow</xxf:control>
-                        <xxf:control id="repeat-index-1·8" relevant="true">5</xxf:control>
-                        <xxf:control id="repeat-index-2·8" relevant="true">5</xxf:control>
-                        <xxf:control id="repeat-context-1·8" relevant="true">fruits</xxf:control>
-                        <xxf:control id="repeat-context-2·8" relevant="true">yellow</xxf:control>
+                        <xxf:copy-repeat-template id="my-repeat" parent-indexes="" start-suffix="2" end-suffix="8"/>
+                        <xxf:control id="repeat-current-output-1·1">bloody</xxf:control>
+                        <xxf:control id="repeat-current-output-2·1">bloody</xxf:control>
+                        <xxf:control id="repeat-index-1·1">5</xxf:control>
+                        <xxf:control id="repeat-index-2·1">5</xxf:control>
+                        <xxf:control id="repeat-context-1·1">fruits</xxf:control>
+                        <xxf:control id="repeat-context-2·1">bloody</xxf:control>
+                        <xxf:control id="repeat-current-output-1·2">valencia</xxf:control>
+                        <xxf:control id="repeat-current-output-2·2">valencia</xxf:control>
+                        <xxf:control id="repeat-index-1·2">5</xxf:control>
+                        <xxf:control id="repeat-index-2·2">5</xxf:control>
+                        <xxf:control id="repeat-context-1·2">fruits</xxf:control>
+                        <xxf:control id="repeat-context-2·2">valencia</xxf:control>
+                        <xxf:control id="repeat-current-output-1·3">green</xxf:control>
+                        <xxf:control id="repeat-current-output-2·3">green</xxf:control>
+                        <xxf:control id="repeat-index-1·3">5</xxf:control>
+                        <xxf:control id="repeat-index-2·3">5</xxf:control>
+                        <xxf:control id="repeat-context-1·3">fruits</xxf:control>
+                        <xxf:control id="repeat-context-2·3">green</xxf:control>
+                        <xxf:control id="repeat-current-output-1·4">red</xxf:control>
+                        <xxf:control id="repeat-current-output-2·4">red</xxf:control>
+                        <xxf:control id="repeat-index-1·4">5</xxf:control>
+                        <xxf:control id="repeat-index-2·4">5</xxf:control>
+                        <xxf:control id="repeat-context-1·4">fruits</xxf:control>
+                        <xxf:control id="repeat-context-2·4">red</xxf:control>
+                        <xxf:control id="repeat-current-output-1·5">iPod</xxf:control>
+                        <xxf:control id="repeat-current-output-2·5">iPod</xxf:control>
+                        <xxf:control id="repeat-index-1·5">5</xxf:control>
+                        <xxf:control id="repeat-index-2·5">5</xxf:control>
+                        <xxf:control id="repeat-context-1·5">fruits</xxf:control>
+                        <xxf:control id="repeat-context-2·5">iPod</xxf:control>
+                        <xxf:control id="repeat-current-output-1·6">green</xxf:control>
+                        <xxf:control id="repeat-current-output-2·6">green</xxf:control>
+                        <xxf:control id="repeat-index-1·6">5</xxf:control>
+                        <xxf:control id="repeat-index-2·6">5</xxf:control>
+                        <xxf:control id="repeat-context-1·6">fruits</xxf:control>
+                        <xxf:control id="repeat-context-2·6">green</xxf:control>
+                        <xxf:control id="repeat-current-output-1·7">williams</xxf:control>
+                        <xxf:control id="repeat-current-output-2·7">williams</xxf:control>
+                        <xxf:control id="repeat-index-1·7">5</xxf:control>
+                        <xxf:control id="repeat-index-2·7">5</xxf:control>
+                        <xxf:control id="repeat-context-1·7">fruits</xxf:control>
+                        <xxf:control id="repeat-context-2·7">williams</xxf:control>
+                        <xxf:control id="repeat-current-output-1·8">yellow</xxf:control>
+                        <xxf:control id="repeat-current-output-2·8">yellow</xxf:control>
+                        <xxf:control id="repeat-index-1·8">5</xxf:control>
+                        <xxf:control id="repeat-index-2·8">5</xxf:control>
+                        <xxf:control id="repeat-context-1·8">fruits</xxf:control>
+                        <xxf:control id="repeat-context-2·8">yellow</xxf:control>
                     </xxf:control-values>
                     <xxf:repeats>
                         <xxf:repeat-index id="my-repeat" index="5"/>

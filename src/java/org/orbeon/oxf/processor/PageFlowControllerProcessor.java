@@ -1013,7 +1013,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
             // We use the current page's submitted instance, if any.
             instanceToUpdate = paramedInstance;
         } else {
-            // We use the resulting page's instance if possible (deprecated since xforms attribute on <page> is deprecated)
+            // DEPRECATED: We use the resulting page's instance if possible (deprecated since xforms attribute on <page> is deprecated)
             instanceToUpdate = new ASTOutput("data", "other-page-instance");
             // Run the other page's XForms model
             final ASTOutput otherPageXFormsModel = new ASTOutput("data", "other-page-model");

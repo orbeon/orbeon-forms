@@ -11,9 +11,10 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<!-- Given a set of paths (under /root/paths) and the result of a match (under
-     /root/result), this will return the paths replacing the {1}, etc with the
-     corresponding group in the match result. -->
+<!--
+    Given a set of paths (under /root/paths) and the result of a match (under /root/result), this will return the paths
+    replacing the ${1}, etc with the corresponding group in the match result.
+-->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0">
     <xsl:template match="/">
         <config>

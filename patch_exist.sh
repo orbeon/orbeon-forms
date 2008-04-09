@@ -7,6 +7,7 @@
 #
 # 1) Set ORBEON_HOME to point to your Orbeon Forms source directory (which contains Orbeon's build.xml).
 # 2) Make sure that you have compile version of Orbeon Forms (will look for $ORBEON_HOME/build/lib/orbeon.jar)
+# 3) Run this script from the eXist root directory
 
 ORBEON_HOME=../orbeon
 rm lib/endorsed/xercesImpl-2.9.1.jar
@@ -21,6 +22,7 @@ do
     sed -i -e 's/org.apache.xalan/orbeon.apache.xalan/g' $F
     sed -i -e 's/net.sf.saxon/org.orbeon.saxon/g' $F
     sed -i -e 's/SAXParserFactory.newInstance()/new org.orbeon.oxf.xml.xerces.XercesSAXParserFactoryImpl()/g' $F
+    #sed -i -e 's/= DocumentBuilderFactory/= orbeon.apache.xerces.jaxp.DocumentBuilderFactoryImpl/g' $F
 done
 ant clean
 ant

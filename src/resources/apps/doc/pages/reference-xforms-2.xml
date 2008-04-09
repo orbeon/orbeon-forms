@@ -746,8 +746,8 @@
                 </p>
                 <xml-source>
                     <xforms:dispatch name="rename-control" target="my-model">
-                        <xxforms:context name="control" select="my/control"/>
-                        <xxforms:context name="control-name" select="'beverage-selection'"/>
+                        <xxforms:context name="my:control" select="my/control"/>
+                        <xxforms:context name="my:control-name" select="'beverage-selection'"/>
                     </xforms:dispatch>
                 </xml-source>
                 <p>
@@ -758,7 +758,8 @@
                         <th><code>name</code></th>
                         <td>Mandatory</td>
                         <td>
-                            Name of the context attribute.
+                            Name of the context attribute. In order to avoid confusion with standard XForms names, we
+                            recommend you use qualified names.
                         </td>
                     </tr>
                     <tr>

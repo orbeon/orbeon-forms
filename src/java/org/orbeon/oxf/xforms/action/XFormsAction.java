@@ -25,6 +25,7 @@ import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.value.SequenceExtent;
 
@@ -56,7 +57,7 @@ public abstract class XFormsAction {
         for (Iterator i = actionElement.elements(XFormsConstants.XXFORMS_CONTEXT_QNAME).iterator(); i.hasNext();) {
             final Element currentContextInfo = (Element) i.next();
 
-            final String name = currentContextInfo.attributeValue("name");
+            final String name = Dom4jUtils.qNameToexplodedQName(Dom4jUtils.extractAttributeValueQName(currentContextInfo, "name"));
             if (name == null)
                 throw new OXFException(XFormsConstants.XXFORMS_CONTEXT_QNAME + " element must have a \"name\" attribute.");
 

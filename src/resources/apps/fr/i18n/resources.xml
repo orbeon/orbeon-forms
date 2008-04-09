@@ -69,6 +69,7 @@
                 <close>Close</close>
                 <print>Print</print>
                 <print-pdf>Print PDF</print-pdf>
+                <print-pdf-template>Print PDF (Template)</print-pdf-template>
                 <clear>Clear</clear>
                 <confirm>Confirm</confirm>
                 <cancel>Cancel</cancel>
@@ -133,6 +134,7 @@
                 <close>Fermer</close>
                 <print>Imprimer</print>
                 <print-pdf>Imprimer PDF</print-pdf>
+                <print-pdf-template>Imprimer PDF (Template)</print-pdf-template>
                 <clear>Effacer</clear>
                 <confirm>Confirmer</confirm>
                 <cancel>Annuler</cancel>
@@ -197,6 +199,7 @@
                 <close>Cerrar</close>
                 <print>Imprimir</print>
                 <print-pdf>Imprimir PDF</print-pdf>
+                <print-pdf-template>[Print PDF (Template)]</print-pdf-template>
                 <clear>Borrar</clear>
                 <confirm>Confirme</confirm>
                 <cancel>Cancelar</cancel>

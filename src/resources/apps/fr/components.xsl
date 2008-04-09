@@ -331,6 +331,15 @@
                 <xforms:send submission="fr-pdf-submission"/>
             </xforms:action>
         </xforms:trigger>
+        <xforms:trigger>
+            <xforms:label>
+                <xhtml:img src="/apps/fr/style/pdf.png" alt=""/>
+                <xhtml:span><xforms:output value="$fr-resources/detail/labels/print-pdf"/> (Template)</xhtml:span>
+            </xforms:label>
+            <xforms:action ev:event="DOMActivate">
+                <xforms:send submission="fr-pdf-template-submission"/>
+            </xforms:action>
+        </xforms:trigger>
     </xsl:template>
 
     <xsl:template match="fr:save-locally-button">
@@ -685,8 +694,10 @@
     <xsl:template match="/xhtml:html/xhtml:head/xforms:model[1]">
 
         <!-- This model handles form sections -->
-        <xforms:model id="fr-sections-model" xxforms:external-events="fr-after-collapse {@xxforms:external-events}"
-                      xxforms:readonly-appearance="{if (doc('input:instance')/*/mode = ('view', 'print', 'pdf')) then 'static' else 'dynamic'}">
+        <xforms:model id="fr-sections-model"
+                      xxforms:external-events="fr-after-collapse {@xxforms:external-events}"
+                      xxforms:readonly-appearance="{if (doc('input:instance')/*/mode = ('view', 'print', 'pdf')) then 'static' else 'dynamic'}"
+                      xxforms:order="label help control alert hint">
             <xsl:copy-of select="@* except (@id, @xxforms:external-events)"/>
             <!-- Contain section being currently expanded/collapsed -->
             <!-- TODO: This probably doesn't quite work for sections within repeats -->
@@ -739,10 +750,13 @@
             <xforms:instance id="fr-print-instance"><dummy/></xforms:instance>
             <xxforms:variable name="parameters" select="xxforms:instance('fr-parameters-instance')"/>
 
-            <xforms:submission id="fr-print-submission" resource="/fr/{{$parameters/app}}/{{$parameters/form}}/print/?fr-language={{xxforms:instance('fr-language-instance')}}"
+            <xforms:submission id="fr-print-submission" resource="/fr/{{$parameters/app}}/{{$parameters/form}}/print?fr-language={{xxforms:instance('fr-language-instance')}}"
                     method="post" ref="xxforms:instance('fr-form-instance')" replace="all" validate="false" xxforms:target="_blank" xxforms:show-progress="false"/>
 
-            <xforms:submission id="fr-pdf-submission" resource="/fr/{{$parameters/app}}/{{$parameters/form}}/pdf/?fr-language={{xxforms:instance('fr-language-instance')}}"
+            <xforms:submission id="fr-pdf-submission" resource="/fr/{{$parameters/app}}/{{$parameters/form}}/pdf?fr-language={{xxforms:instance('fr-language-instance')}}"
+                    method="post" ref="xxforms:instance('fr-form-instance')" replace="all" validate="false" xxforms:target="_blank" xxforms:show-progress="false"/>
+
+            <xforms:submission id="fr-pdf-template-submission" resource="/fr/{{$parameters/app}}/{{$parameters/form}}/pdf-template?fr-language={{xxforms:instance('fr-language-instance')}}"
                     method="post" ref="xxforms:instance('fr-form-instance')" replace="all" validate="false" xxforms:target="_blank" xxforms:show-progress="false"/>
         </xforms:model>
 

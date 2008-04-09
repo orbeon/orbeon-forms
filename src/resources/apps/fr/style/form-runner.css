@@ -90,11 +90,14 @@ h1 { margin-top: 0 }
 .fr-summary-language-choice .xforms-label { display: inline; margin-right: .5em }
 
 .xforms-label, h4  {
-    display: block;
     font-weight: bold;
-    padding-bottom: .2em;
+    padding-bottom: 1em;
     text-align: left;
-    margin-bottom: 0;
+}
+
+.fr-grid .xforms-control {
+    display: block;     /* So control is not displayed next to the help icon but on a new line */ 
+    margin-top: 0.5em;  /* Insert some space between the label / help and the control */
 }
 
 div.fr-body {
@@ -356,14 +359,20 @@ div.fr-collapsible {
 .fr-grid .fr-layout-table tr td { width: auto }
 
 /* Cell content */
-.fr-grid-content { *padding-right: 6px }/* To help IE move back controls within .fr-grid-content */
-.fr-grid .xforms-input input { width: 100%; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box }
-.fr-grid .xforms-upload input { -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box } /* The upload field responds to 100% width on IE, which gives strange result */
+.fr-grid-content { *padding-right: 6px } /* To help IE move back controls within .fr-grid-content */
 .fr-grid .fr-inplace-edit .xforms-input input { width: 100% }
-.fr-grid .xforms-textarea { width: 100%; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box }
-.fr-grid .xforms-select1-appearance-minimal { width: 100%; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box }
-.fr-grid .xforms-select1-appearance-compact { width: 100%; height: 6em; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box }
-.fr-grid .xforms-select-appearance-compact { width: 100%; height: 6em; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box  }
+
+/* Styling comon to all HTML form controls */
+.fr-grid .xforms-input input,
+.fr-grid .xforms-upload input,
+.fr-grid .xforms-textarea,
+.fr-grid .xforms-select1-appearance-minimal,
+.fr-grid .xforms-select1-appearance-compact,
+.fr-grid .xforms-select-appearance-compact
+    { width: 100%; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; }
+
+.fr-grid .xforms-upload input { width: auto; } /* The upload field responds to 100% width on IE, which gives strange result */
+.fr-grid .xforms-select1-appearance-compact, .fr-grid .xforms-select-appearance-compact { height: 6em; }
 
 /* Image output */
 .fr-grid .xforms-mediatype-image { width: 100%; overflow: auto; display: block }

@@ -226,6 +226,8 @@
                                                     <fr:clear-button/>
                                                     <fr:print-button/>
                                                     <fr:pdf-button/>
+                                                    <fr:take-offline/>
+                                                    <fr:take-online/>
                                                     <fr:save-locally-button/>
                                                     <fr:save-button/>
                                                 </fr:buttons>
@@ -338,6 +340,31 @@
             </xforms:label>
             <xforms:action ev:event="DOMActivate">
                 <xforms:send submission="fr-pdf-template-submission"/>
+            </xforms:action>
+        </xforms:trigger>
+    </xsl:template>
+
+    <xsl:template match="fr:take-offline">
+        <xforms:trigger id="take-offline-button">
+            <xforms:label>
+                <xhtml:img src="/apps/fr/style/take-offline.gif" alt=""/>
+                <xhtml:span>Take offline</xhtml:span>
+            </xforms:label>
+            <xforms:action ev:event="DOMActivate">
+                <!--<xxforms:take-offline/>-->
+                <xxforms:script>ORBEON.xforms.Offline.takeOffline();</xxforms:script>
+            </xforms:action>
+        </xforms:trigger>
+    </xsl:template>
+
+    <xsl:template match="fr:take-online">
+        <xforms:trigger id="take-online-button" class="xxforms-take-online">
+            <xforms:label>
+                <xhtml:img src="/apps/fr/style/take-online.gif" alt=""/>
+                <xhtml:span>Take online</xhtml:span>
+            </xforms:label>
+            <xforms:action ev:event="DOMActivate">
+                <!--<xxforms:take-online/>-->
             </xforms:action>
         </xforms:trigger>
     </xsl:template>

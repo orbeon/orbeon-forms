@@ -13,6 +13,8 @@ body, body table, textarea.xforms-textarea {
 .fr-hidden { display: none }
 .fr-clear { clear: both }
 
+.xforms-help-image { vertical-align: -0.2em }
+
 .fr-top { line-height: 10px; }
 #doc .fr-top { background-image: url(top-750-ee.png); }
 #doc4 .fr-top { background-image: url(top-974-ee.png); }
@@ -91,13 +93,13 @@ h1 { margin-top: 0 }
 
 .xforms-label, h4  {
     font-weight: bold;
-    padding-bottom: 1em;
+    /*padding-bottom: 1em;*/
     text-align: left;
 }
 
-.fr-grid .xforms-control {
+.fr-grid .fr-grid-content .xforms-control {
     display: block;     /* So control is not displayed next to the help icon but on a new line */ 
-    margin-top: 0.5em;  /* Insert some space between the label / help and the control */
+    margin-top: 0.3em;  /* Insert some space between the label / help and the control */
 }
 
 div.fr-body {

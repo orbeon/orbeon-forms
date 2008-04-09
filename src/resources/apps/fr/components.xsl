@@ -682,7 +682,7 @@
                 </xsl:if>
                 <xsl:for-each select="xhtml:tr[1]/xhtml:td/xforms:*[1]">
                     <xhtml:th>
-                        <xforms:output value="''">
+                        <xforms:output value="''" style="display: none"><!-- hide the actual output control -->
                             <xsl:copy-of select="xforms:label | xforms:help"/>
                         </xforms:output>
                     </xhtml:th>

@@ -83,6 +83,8 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     private String focusEffectiveControlId;
     private String helpEffectiveControlId;
 
+    private boolean goingOffline;
+
     // Global flag used during initialization only
     private boolean mustPerformInitializationFirstRefresh;
 
@@ -421,6 +423,8 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         this.scriptsToRun = null;
         this.focusEffectiveControlId = null;
         this.helpEffectiveControlId = null;
+
+        this.goingOffline = false;
     }
 
     /**
@@ -990,7 +994,35 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
             } catch (IOException e) {
                 throw new ValidationException(e, getLocationData());
             }
+        } else if (XFormsEvents.XXFORMS_ONLINE.equals(eventName)) {
+            // Internal event for going online
+            goOnline(pipelineContext);
+        } else if (XFormsEvents.XXFORMS_OFFLINE.equals(eventName)) {
+            // Internal event for going offline
+            goOffline(pipelineContext);
         }
+    }
+
+    public void goOnline(PipelineContext pipelineContext) {
+        // Dispatch to all models
+        for (Iterator i = getModels().iterator(); i.hasNext();) {
+            final XFormsModel currentModel = (XFormsModel) i.next();
+            dispatchEvent(pipelineContext, new XXFormsOnlineEvent(currentModel));
+        }
+        this.goingOffline = false;
+    }
+
+    public void goOffline(PipelineContext pipelineContext) {
+        // Dispatch to all models
+        for (Iterator i = getModels().iterator(); i.hasNext();) {
+            final XFormsModel currentModel = (XFormsModel) i.next();
+            dispatchEvent(pipelineContext, new XXFormsOfflineEvent(currentModel));
+        }
+        this.goingOffline = true;
+    }
+
+    public boolean goingOffline() {
+        return goingOffline;
     }
 
     /**

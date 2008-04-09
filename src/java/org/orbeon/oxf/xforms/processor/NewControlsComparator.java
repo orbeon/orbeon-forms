@@ -389,9 +389,7 @@ public class NewControlsComparator extends BaseControlsComparator {
                             // Size has grown
 
                             // Copy template instructions
-                            for (int k = size1 + 1; k <= size2; k++) {
-                                outputCopyRepeatTemplate(ch, repeatControlInfo, k);
-                            }
+                            outputCopyRepeatTemplate(ch, repeatControlInfo, size1 + 1, size2);
 
                             // Diff the common subset
                             diff(children1, children2.subList(0, size1));

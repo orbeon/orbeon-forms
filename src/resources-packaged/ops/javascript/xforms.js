@@ -2817,7 +2817,7 @@ ORBEON.xforms.Server = {
 
                                 case "control-values": {
                                     var controlValuesElement = actionElement.childNodes[actionIndex];
-                                    var copyRepeatTemplateElements = ORBEON.util.Dom.getElementsByName(controlValuesElement,"copy-repeat-template",xmlNamespace);
+                                    var copyRepeatTemplateElements = ORBEON.util.Dom.getElementsByName(controlValuesElement, "copy-repeat-template", xmlNamespace);
                                     var copyRepeatTemplateElementsLength = copyRepeatTemplateElements.length;
                                     for (var j = 0; j < copyRepeatTemplateElementsLength; j++) {
 
@@ -2825,7 +2825,8 @@ ORBEON.xforms.Server = {
                                         var copyRepeatTemplateElement = copyRepeatTemplateElements[j];
                                         var repeatId = ORBEON.util.Dom.getAttribute(copyRepeatTemplateElement, "id");
                                         var parentIndexes = ORBEON.util.Dom.getAttribute(copyRepeatTemplateElement, "parent-indexes");
-                                        var idSuffix = ORBEON.util.Dom.getAttribute(copyRepeatTemplateElement, "id-suffix");
+                                        var startSuffix = Number(ORBEON.util.Dom.getAttribute(copyRepeatTemplateElement, "start-suffix"));
+                                        var endSuffix = Number(ORBEON.util.Dom.getAttribute(copyRepeatTemplateElement, "end-suffix"));
                                         // Put nodes of the template in an array
                                         var templateNodes = new Array();
                                         {
@@ -2844,8 +2845,6 @@ ORBEON.xforms.Server = {
                                                      if (ORBEON.util.Dom.hasClass(templateNode, "xforms-repeat-begin-end") &&
                                                              templateNode.id.indexOf("repeat-begin-") == 0)
                                                          nestedRepeatLevel--;
-                                                     // Add suffix to all the ids
-                                                     xformsAddSuffixToIds(nodeCopy, parentIndexes == "" ? idSuffix : parentIndexes + XFORMS_SEPARATOR_2 + idSuffix, nestedRepeatLevel);
                                                      // Increment nestedRepeatLevel when we enter a nested repeat
                                                      if (ORBEON.util.Dom.hasClass(templateNode, "xforms-repeat-begin-end") &&
                                                              templateNode.id.indexOf("repeat-end-") == 0)
@@ -2890,10 +2889,25 @@ ORBEON.xforms.Server = {
                                             }
                                         }
                                         // Insert copy of template nodes
-                                        for (var templateNodeIndex = 0; templateNodeIndex < templateNodes.length; templateNodeIndex++) {
-                                            templateNode = templateNodes[templateNodeIndex];
-                                            afterInsertionPoint.parentNode.insertBefore(templateNode, afterInsertionPoint);
-                                            ORBEON.xforms.Init.insertedElement(templateNode);
+
+                                        for (var suffix = startSuffix; suffix <= endSuffix; suffix++) {
+                                            for (var templateNodeIndex = 0; templateNodeIndex < templateNodes.length; templateNodeIndex++) {
+                                                var templateNode = templateNodes[templateNodeIndex];
+
+                                                // Add suffix to all the ids
+                                                var newTemplateNode;
+                                                if (startSuffix == endSuffix || suffix == endSuffix) {
+                                                    // Just one template to copy, or we are at the end: do the work on the initial copy
+                                                    newTemplateNode = templateNodes[templateNodeIndex];
+                                                } else {
+                                                    // Clone again
+                                                    newTemplateNode = templateNodes[templateNodeIndex].cloneNode(true)
+                                                }
+                                                xformsAddSuffixToIds(newTemplateNode, parentIndexes == "" ? String(suffix) : parentIndexes + XFORMS_SEPARATOR_2 + suffix, nestedRepeatLevel);
+
+                                                afterInsertionPoint.parentNode.insertBefore(newTemplateNode, afterInsertionPoint);
+                                                ORBEON.xforms.Init.insertedElement(newTemplateNode);
+                                            }
                                         }
                                         // Initialize newly added form elements. We don't need to do this for IE, because with
                                         // IE when an element is cloned, the clone has the same event listeners as the original.

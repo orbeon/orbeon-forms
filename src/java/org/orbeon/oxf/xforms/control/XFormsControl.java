@@ -285,13 +285,13 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
             return true;
 
         // Compare only what matters
-        if (!compareStrings(getLabel(pipelineContext), other.getLabel(pipelineContext)))
+        if (!XFormsUtils.compareStrings(getLabel(pipelineContext), other.getLabel(pipelineContext)))
             return false;
-        if (!compareStrings(getHelp(pipelineContext), other.getHelp(pipelineContext)))
+        if (!XFormsUtils.compareStrings(getHelp(pipelineContext), other.getHelp(pipelineContext)))
             return false;
-        if (!compareStrings(getHint(pipelineContext), other.getHint(pipelineContext)))
+        if (!XFormsUtils.compareStrings(getHint(pipelineContext), other.getHint(pipelineContext)))
             return false;
-        if (!compareStrings(getAlert(pipelineContext), other.getAlert(pipelineContext)))
+        if (!XFormsUtils.compareStrings(getAlert(pipelineContext), other.getAlert(pipelineContext)))
             return false;
 
         return true;
@@ -546,16 +546,5 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
             result = rawValue;
         }
         return result;
-    }
-
-    /**
-     * Compare two strings, handling null values as well.
-     *
-     * @param value1    first value or null
-     * @param value2    second value or null
-     * @return          whether the values are identical or both null
-     */
-    public static final boolean compareStrings(String value1, String value2) {
-        return (value1 == null && value2 == null) || (value1 != null && value2 != null && value1.equals(value2));
     }
 }

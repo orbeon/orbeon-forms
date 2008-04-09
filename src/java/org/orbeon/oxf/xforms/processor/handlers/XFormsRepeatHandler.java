@@ -46,14 +46,14 @@ public class XFormsRepeatHandler extends HandlerBase {
 
         final boolean isTopLevelRepeat = handlerContext.countParentRepeats() == 0;
         final boolean isRepeatSelected = handlerContext.isRepeatSelected() || isTopLevelRepeat;
-        final boolean isMustGenerateTemplate = handlerContext.isGenerateTemplate() || isTopLevelRepeat;
+        final boolean isMustGenerateTemplate = handlerContext.isTemplate() || isTopLevelRepeat;
         final int currentIteration = handlerContext.getCurrentIteration();
 
         final XFormsControls.ControlsState currentControlState = containingDocument.getXFormsControls().getCurrentControlsState();
         final Map effectiveRepeatIdToIterations = currentControlState.getEffectiveRepeatIdToIterations();
         final Map repeatIdToIndex = currentControlState.getRepeatIdToIndex();
 
-        final XFormsRepeatControl repeatControl = handlerContext.isGenerateTemplate() ? null : (XFormsRepeatControl) containingDocument.getObjectById(effectiveId);
+        final XFormsRepeatControl repeatControl = handlerContext.isTemplate() ? null : (XFormsRepeatControl) containingDocument.getObjectById(effectiveId);
         final boolean isConcreteControl = repeatControl != null;
 
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();

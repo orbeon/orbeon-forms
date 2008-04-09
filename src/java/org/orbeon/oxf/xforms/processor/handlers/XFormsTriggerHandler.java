@@ -70,12 +70,14 @@ public class XFormsTriggerHandler extends XFormsCoreControlHandler {
         if (isConcreteControl && !triggerControl.hasLabel())
             throw new ValidationException("Missing label on xforms:trigger element.", triggerControl.getLocationData());
 
-        final String labelValue = handlerContext.isGenerateTemplate() ? "$xforms-template-label$" : isConcreteControl ? (triggerControl.getLabel(pipelineContext) != null ? triggerControl.getLabel(pipelineContext) : "") : "";
+        final String labelValue = handlerContext.isTemplate() ? "$xforms-template-label$" : isConcreteControl ? (triggerControl.getLabel(pipelineContext) != null ? triggerControl.getLabel(pipelineContext) : "") : "";
 
         final QName appearance = getAppearance(attributes);
 
         final FastStringBuffer classes = getInitialClasses(localname, attributes, triggerControl);
         handleMIPClasses(classes, triggerControl);
+        containingDocument.getStaticState().appendClasses(classes, id);
+
         final AttributesImpl newAttributes = getAttributes(attributes, classes.toString(), effectiveId);
 
         // Handle accessibility attributes

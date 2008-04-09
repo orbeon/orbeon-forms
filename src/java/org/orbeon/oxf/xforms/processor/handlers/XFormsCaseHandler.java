@@ -46,7 +46,7 @@ public class XFormsCaseHandler extends HandlerBase {
         final XFormsControls.ControlsState controlsState = containingDocument.getXFormsControls().getCurrentControlsState();
 
         final boolean isVisible;
-        if (!handlerContext.isGenerateTemplate()) {
+        if (!handlerContext.isTemplate()) {
             final XFormsCaseControl caseControl = (XFormsCaseControl) controlsState.getIdsToXFormsControls().get(currentCaseEffectiveId);
 
             // This case is visible if it is selected or if the switch is read-only and we display read-only as static

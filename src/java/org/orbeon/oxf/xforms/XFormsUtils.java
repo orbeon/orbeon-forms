@@ -500,6 +500,17 @@ public class XFormsUtils {
         }
     }
 
+    /**
+     * Compare two strings, handling null values as well.
+     *
+     * @param value1    first value or null
+     * @param value2    second value or null
+     * @return          whether the values are identical or both null
+     */
+    public static final boolean compareStrings(String value1, String value2) {
+        return (value1 == null && value2 == null) || (value1 != null && value2 != null && value1.equals(value2));
+    }
+
     private static class DeflaterPoolableObjetFactory implements PoolableObjectFactory {
         public Object makeObject() throws Exception {
             XFormsServer.logger.debug("XForms - creating new Deflater.");

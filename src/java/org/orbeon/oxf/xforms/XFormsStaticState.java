@@ -93,10 +93,14 @@ public class XFormsStaticState {
     private Map repeatDescendantsMap;       // Map<String, List> of repeat id to List of descendants (computed on demand)
     private String repeatHierarchyString;   // contains comma-separated list of space-separated repeat id and ancestor if any
     private Map itemsInfoMap;               // Map<String, ItemsInfo> of control id to ItemsInfo
+    private Map controlClasses;             // Map<String, String> of control id to class
 
-    private static final HashMap XFORMS_NAMESPACE_MAPPING = new HashMap();
+    private static final HashMap XFORMS_NAMESPACE_MAPPINGS = new HashMap();
     static {
-        XFORMS_NAMESPACE_MAPPING.put(XFormsConstants.XFORMS_PREFIX, XFormsConstants.XFORMS_NAMESPACE_URI);
+        XFORMS_NAMESPACE_MAPPINGS.put(XFormsConstants.XFORMS_PREFIX, XFormsConstants.XFORMS_NAMESPACE_URI);
+        XFORMS_NAMESPACE_MAPPINGS.put(XFormsConstants.XXFORMS_PREFIX, XFormsConstants.XXFORMS_NAMESPACE_URI);
+        XFORMS_NAMESPACE_MAPPINGS.put(XFormsConstants.XML_EVENTS_PREFIX, XFormsConstants.XML_EVENTS_NAMESPACE_URI);
+        XFORMS_NAMESPACE_MAPPINGS.put(XMLConstants.XHTML_PREFIX, XMLConstants.XHTML_NAMESPACE_URI);
     }
 
     /**
@@ -584,7 +588,7 @@ public class XFormsStaticState {
                         // Try to figure out if we have dynamic items. This attempts to cover all cases, including
                         // nested xforms:output controls.
                         final boolean hasNonStaticItem = ((Boolean) XPathCache.evaluateSingle(pipelineContext, controlNodeInfo,
-                                "exists(.//xforms:*[@ref or @nodeset or @bind or @value])", XFORMS_NAMESPACE_MAPPING,
+                                "exists(.//xforms:*[@ref or @nodeset or @bind or @value])", XFORMS_NAMESPACE_MAPPINGS,
                                 null, null, null, null, locationData)).booleanValue();
 
                         // Remember information
@@ -601,6 +605,30 @@ public class XFormsStaticState {
                     }
                 }
             });
+
+            // Gather online/offline information
+            {
+                // NOTE: We attempt to localize what triggers can cause, upon DOMActivate, xxforms:online and xxforms:offline actions
+                final List onlineTriggerIds = XPathCache.evaluate(pipelineContext, controlsDocumentInfo,
+                    "for $handler in for $online in //xxforms:online return ($online/ancestor-or-self::*[@ev:event and tokenize(@ev:event, '\\s+') = 'DOMActivate'])[1]" +
+                    "   return for $id in $handler/../descendant-or-self::xforms:trigger/@id return string($id)", XFORMS_NAMESPACE_MAPPINGS,
+                    null, null, null, null, locationData);
+
+                final List offlineTriggerIds = XPathCache.evaluate(pipelineContext, controlsDocumentInfo,
+                    "for $handler in for $online in //xxforms:offline return ($online/ancestor-or-self::*[@ev:event and tokenize(@ev:event, '\\s+') = 'DOMActivate'])[1]" +
+                    "   return for $id in $handler/../descendant-or-self::xforms:trigger/@id return string($id)", XFORMS_NAMESPACE_MAPPINGS,
+                    null, null, null, null, locationData);
+
+                for (Iterator i = onlineTriggerIds.iterator(); i.hasNext();) {
+                    final String currentId = (String) i.next();
+                    addClasses(currentId, "xxforms-online");
+                }
+
+                for (Iterator i = offlineTriggerIds.iterator(); i.hasNext();) {
+                    final String currentId = (String) i.next();
+                    addClasses(currentId, "xxforms-offline");
+                }
+            }
 
             repeatHierarchyString = repeatHierarchyStringBuffer.toString();
 
@@ -628,6 +656,31 @@ public class XFormsStaticState {
         } else {
             return false;
         }
+    }
+
+    private void addClasses(String controlId, String classes) {
+        if (controlClasses == null)
+            controlClasses = new HashMap();
+        final String currentClasses = (String) controlClasses.get(controlId);
+        if (currentClasses == null) {
+            // Set
+            controlClasses.put(controlId, classes);
+        } else {
+            // Append
+            controlClasses.put(controlId, currentClasses + ' ' + classes);
+        }
+    }
+    
+    public void appendClasses(FastStringBuffer sb, String controlId) {
+        if ((controlClasses == null))
+            return;
+
+        if (sb.length() > 0)
+            sb.append(' ');
+
+        final String classes = (String) controlClasses.get(controlId);
+        if (classes != null)
+            sb.append(classes);
     }
 
     private static void mergeEventHandlers(Map destination, Map source) {

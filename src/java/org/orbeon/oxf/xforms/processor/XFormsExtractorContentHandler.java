@@ -34,6 +34,8 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
         ALLOWED_XXFORMS_ELEMENTS.put("script", "");
         ALLOWED_XXFORMS_ELEMENTS.put("show", "");
         ALLOWED_XXFORMS_ELEMENTS.put("hide", "");
+        ALLOWED_XXFORMS_ELEMENTS.put("online", "");
+        ALLOWED_XXFORMS_ELEMENTS.put("offline", "");
         ALLOWED_XXFORMS_ELEMENTS.put("dialog", "");
         ALLOWED_XXFORMS_ELEMENTS.put("variable", "");
         ALLOWED_XXFORMS_ELEMENTS.put("attribute", "");

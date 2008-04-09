@@ -114,6 +114,7 @@ public class XMLConstants {
     public static final String XSLT_PREFIX = "xsl";
     public static final String XSLT_NAMESPACE = "http://www.w3.org/1999/XSL/Transform";
 
+    public static final String XHTML_PREFIX = "xhtml";
     public static final String XHTML_NAMESPACE_URI = "http://www.w3.org/1999/xhtml";
     public static final String XPATH_FUNCTIONS_NAMESPACE_URI = "http://www.w3.org/2005/xpath-functions";
 

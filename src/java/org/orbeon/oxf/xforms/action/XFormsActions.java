@@ -47,6 +47,8 @@ public class XFormsActions {
     public static final String XXFORMS_SHOW_ACTION = "show";
     public static final String XXFORMS_HIDE_ACTION = "hide";
     public static final String XXFORMS_INVALIDATE_INSTANCES_ACTION = "invalidate-instances";
+    public static final String XXFORMS_ONLINE_ACTION = "online";
+    public static final String XXFORMS_OFFLINE_ACTION = "offline";
 
     private static final Map actions = new HashMap();
 
@@ -72,6 +74,8 @@ public class XFormsActions {
         actions.put(XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, XXFORMS_SHOW_ACTION), new XXFormsShowAction());
         actions.put(XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, XXFORMS_HIDE_ACTION), new XXFormsHideAction());
         actions.put(XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, XXFORMS_INVALIDATE_INSTANCES_ACTION), new XXFormsInvalidateInstancesAction());
+        actions.put(XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, XXFORMS_ONLINE_ACTION), new XXFormsOnlineAction());
+        actions.put(XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, XXFORMS_OFFLINE_ACTION), new XXFormsOfflineAction());
     }
 
     /**

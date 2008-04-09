@@ -249,13 +249,13 @@ public class XFormsUploadControl extends XFormsValueControl {
 
         final XFormsUploadControl other = (XFormsUploadControl) obj;
 
-        if (!compareStrings(getState(pipelineContext), other.getState(pipelineContext)))
+        if (!XFormsUtils.compareStrings(getState(pipelineContext), other.getState(pipelineContext)))
             return false;
-        if (!compareStrings(getMediatype(pipelineContext), other.getMediatype(pipelineContext)))
+        if (!XFormsUtils.compareStrings(getMediatype(pipelineContext), other.getMediatype(pipelineContext)))
             return false;
-        if (!compareStrings(getSize(pipelineContext), other.getSize(pipelineContext)))
+        if (!XFormsUtils.compareStrings(getSize(pipelineContext), other.getSize(pipelineContext)))
             return false;
-        if (!compareStrings(getFilename(pipelineContext), other.getFilename(pipelineContext)))
+        if (!XFormsUtils.compareStrings(getFilename(pipelineContext), other.getFilename(pipelineContext)))
             return false;
 
         return super.equalsExternal(pipelineContext, obj);

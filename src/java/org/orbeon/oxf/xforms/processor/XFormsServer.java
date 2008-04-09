@@ -544,6 +544,14 @@ public class XFormsServer extends ProcessorImpl {
                     }
                 }
 
+                // Output go offline instruction
+                {
+                    if (containingDocument.goingOffline()) {
+                        ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "offline");
+                        ch.endElement();
+                    }
+                }
+
                 ch.endElement();
             }
 

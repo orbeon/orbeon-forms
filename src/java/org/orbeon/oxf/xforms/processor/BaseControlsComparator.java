@@ -37,15 +37,16 @@ public abstract class BaseControlsComparator implements ControlsComparator {
         final String parentIndexes = (indexOfRepeatHierarchySeparator == -1) ? "" : repeatControlId.substring(indexOfRepeatHierarchySeparator + 1);
 
         ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "delete-repeat-elements",
-                new String[]{"id", templateId, "parent-indexes", parentIndexes, "count", "" + count});
+                new String[] { "id", templateId, "parent-indexes", parentIndexes, "count", "" + count });
     }
 
-    protected static void outputCopyRepeatTemplate(ContentHandlerHelper ch, XFormsRepeatControl repeatControlInfo, int idSuffix) {
+    protected static void outputCopyRepeatTemplate(ContentHandlerHelper ch, XFormsRepeatControl repeatControlInfo, int startSuffix, int endSuffix) {
         final String repeatControlId = repeatControlInfo.getEffectiveId();
         final int indexOfRepeatHierarchySeparator = repeatControlId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1);
         final String parentIndexes = (indexOfRepeatHierarchySeparator == -1) ? "" : repeatControlId.substring(indexOfRepeatHierarchySeparator + 1);
 
         ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "copy-repeat-template",
-                new String[]{"id", repeatControlInfo.getRepeatId(), "parent-indexes", parentIndexes,  "id-suffix", Integer.toString(idSuffix) });
+                new String[] { "id", repeatControlInfo.getRepeatId(), "parent-indexes", parentIndexes, "start-suffix",
+                        Integer.toString(startSuffix), "end-suffix", Integer.toString(endSuffix) });
     }
 }

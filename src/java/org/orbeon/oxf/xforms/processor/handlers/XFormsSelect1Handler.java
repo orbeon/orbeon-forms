@@ -369,7 +369,7 @@ public class XFormsSelect1Handler extends XFormsCoreControlHandler {
 
             final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
             contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, newAttributes);
-            if (!handlerContext.isGenerateTemplate()) {
+            if (!handlerContext.isTemplate()) {
                 final String value = (xformsValueControl == null || xformsValueControl.getValue(pipelineContext) == null) ? "" : xformsValueControl.getValue(pipelineContext);
                 final StringBuffer sb = new StringBuffer();
                 if (items != null) {
@@ -395,7 +395,7 @@ public class XFormsSelect1Handler extends XFormsCoreControlHandler {
     }
 
     private void outputJSONTreeInfo(XFormsValueControl xformsControl, List items, boolean many, ContentHandler contentHandler) throws SAXException {
-        if (xformsControl != null && !handlerContext.isGenerateTemplate()) {
+        if (xformsControl != null && !handlerContext.isTemplate()) {
             // Produce a JSON fragment with hierachical information
             final String result = XFormsItemUtils.getJSONTreeInfo(items, xformsControl.getValue(pipelineContext), many, handlerContext.getLocationData());
             contentHandler.characters(result.toCharArray(), 0, result.length());
@@ -424,7 +424,7 @@ public class XFormsSelect1Handler extends XFormsCoreControlHandler {
             reusableAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, effectiveId);// TODO: may have duplicate ids for itemsets
             reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, item.getValue() == null ? "" : item.getValue());
 
-            if (!handlerContext.isGenerateTemplate() && xformsControl != null) {
+            if (!handlerContext.isTemplate() && xformsControl != null) {
                 final String itemValue = ((item.getValue() == null) ? "" : item.getValue()).trim();
                 final String controlValue = ((xformsControl.getValue(pipelineContext) == null) ? "" : xformsControl.getValue(pipelineContext)).trim();
 
@@ -462,7 +462,7 @@ public class XFormsSelect1Handler extends XFormsCoreControlHandler {
         optionAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, optionValue == null ? "" : optionValue);
 
         // Figure out whether what items are selected
-        if (!handlerContext.isGenerateTemplate() && xformsControl != null) {
+        if (!handlerContext.isTemplate() && xformsControl != null) {
             final String controlValue = xformsControl.getValue(pipelineContext);
             final boolean selected = (controlValue != null) && XFormsItemUtils.isSelected(isMany, controlValue, optionValue);
             if (selected)

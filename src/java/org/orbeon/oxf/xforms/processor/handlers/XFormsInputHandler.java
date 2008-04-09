@@ -54,7 +54,7 @@ public class XFormsInputHandler extends XFormsCoreControlHandler {
         final boolean isBoolean;
         {
             final FastStringBuffer classes = getInitialClasses(localname, attributes, inputControl);
-            if (!handlerContext.isGenerateTemplate()) {
+            if (!handlerContext.isTemplate()) {
                 if (isConcreteControl) {
                     final String controlType = inputControl.getType();
                     isDate = XMLConstants.XS_DATE_EXPLODED_QNAME.equals(controlType) || XFormsConstants.XFORMS_DATE_EXPLODED_QNAME.equals(controlType);

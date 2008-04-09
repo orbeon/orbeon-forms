@@ -32,7 +32,7 @@ public abstract class XFormsCoreControlHandler extends HandlerBase {
 
         final String id = handlerContext.getId(attributes);
         final String effectiveId = handlerContext.getEffectiveId(attributes);
-        final XFormsSingleNodeControl xformsControl = handlerContext.isGenerateTemplate()
+        final XFormsSingleNodeControl xformsControl = handlerContext.isTemplate()
                 ? null : (XFormsSingleNodeControl) containingDocument.getObjectById(effectiveId);
 
         if (isMustOutputControl()) {
@@ -43,6 +43,8 @@ public abstract class XFormsCoreControlHandler extends HandlerBase {
             // Use local or default config
             final String[] config = (localOrder != null) ? StringUtils.split(localOrder) : handlerContext.getDocumentOrder();
 
+            final boolean isTemplate = handlerContext.isTemplate();
+
             for (int i = 0; i < config.length; i++) {
                 final String current = config[i];
 
@@ -52,21 +54,21 @@ public abstract class XFormsCoreControlHandler extends HandlerBase {
                 } else if ("label".equals(current)) {
                     // xforms:label
                     if (isMustOutputStandardLabel()) {
-                        handleLabelHintHelpAlert(id, effectiveId, current, xformsControl);
+                        handleLabelHintHelpAlert(id, effectiveId, current, xformsControl, isTemplate);
                     }
                 } else if ("alert".equals(current)) {
                     // xforms:alert
                     if (isMustOutputStandardAlert(attributes)) {
-                        handleLabelHintHelpAlert(id, effectiveId, current, xformsControl);
+                        handleLabelHintHelpAlert(id, effectiveId, current, xformsControl, isTemplate);
                     }
                 } else if ("hint".equals(current)) {
                     // xforms:hint
                     if (isMustOutputStandardHint()) {
-                        handleLabelHintHelpAlert(id, effectiveId, current, xformsControl);
+                        handleLabelHintHelpAlert(id, effectiveId, current, xformsControl, isTemplate);
                     }
                 } else {
                     // xforms:help
-                    handleLabelHintHelpAlert(id, effectiveId, current, xformsControl);
+                    handleLabelHintHelpAlert(id, effectiveId, current, xformsControl, isTemplate);
                 }
             }
         }

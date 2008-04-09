@@ -42,7 +42,7 @@ public class XFormsUploadHandler extends XFormsCoreControlHandler {
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
 
         // Control value
-        final String value = handlerContext.isGenerateTemplate() || uploadControl.getExternalValue(pipelineContext) == null ? "" : uploadControl.getExternalValue(pipelineContext);
+        final String value = handlerContext.isTemplate() || uploadControl.getExternalValue(pipelineContext) == null ? "" : uploadControl.getExternalValue(pipelineContext);
 
         final AttributesImpl newAttributes;
         {

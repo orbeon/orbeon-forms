@@ -13,10 +13,7 @@
  */
 package org.orbeon.oxf.xforms.control;
 
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.InstanceData;
-import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsProperties;
+import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.saxon.om.NodeInfo;
 import org.dom4j.Element;
@@ -128,7 +125,7 @@ public class XFormsSingleNodeControl extends XFormsControl {
         if (valid != other.valid)
             return false;
 
-        if (!compareStrings(type, other.type))
+        if (!XFormsUtils.compareStrings(type, other.type))
             return false;
 
         return super.equalsExternal(pipelineContext, obj);

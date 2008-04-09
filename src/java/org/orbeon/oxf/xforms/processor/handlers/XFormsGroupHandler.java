@@ -71,7 +71,7 @@ public class XFormsGroupHandler extends HandlerBase {
 
         // Find classes to add
         final FastStringBuffer classes = getInitialClasses(localname, attributes, null);
-        if (!handlerContext.isGenerateTemplate()) {
+        if (!handlerContext.isTemplate()) {
             groupXFormsControl = ((XFormsGroupControl) containingDocument.getObjectById(effectiveGroupId));
         }
         handleMIPClasses(classes, groupXFormsControl);
@@ -103,7 +103,7 @@ public class XFormsGroupHandler extends HandlerBase {
             final boolean hasLabel;
             final String labelValue;
             final String labelClassAttribute;
-            if (handlerContext.isGenerateTemplate() || groupXFormsControl == null) {
+            if (handlerContext.isTemplate() || groupXFormsControl == null) {
                 // Determine information statically
 
                 final Element groupElement = (Element) containingDocument.getStaticState().getControlElementsMap().get(handlerContext.getId(attributes));
@@ -135,8 +135,9 @@ public class XFormsGroupHandler extends HandlerBase {
                 final FastStringBuffer labelClasses = new FastStringBuffer("xforms-label");
 
                 // Handle relevance
-                if (handlerContext.isGenerateTemplate() || groupXFormsControl != null && !groupXFormsControl.isRelevant())
+                if ((groupXFormsControl == null && !handlerContext.isTemplate()) || (groupXFormsControl != null && !groupXFormsControl.isRelevant())) {
                     labelClasses.append(" xforms-disabled");
+                }
 
                 // Copy over existing classes if any
                 if (labelClassAttribute != null) {
@@ -214,15 +215,16 @@ public class XFormsGroupHandler extends HandlerBase {
             final String groupElementName = isFieldsetAppearance ? "fieldset" : "span";
             final String groupElementQName = XMLUtils.buildQName(xhtmlPrefix, groupElementName);
             controller.getOutput().endElement(XMLConstants.XHTML_NAMESPACE_URI, groupElementName, groupElementQName);
+            final boolean isTemplate = handlerContext.isTemplate();
 
             // xforms:help
-            handleLabelHintHelpAlert(groupId, effectiveGroupId, "help", groupXFormsControl, false);
+            handleLabelHintHelpAlert(groupId, effectiveGroupId, "help", groupXFormsControl, isTemplate, false);
 
             // xforms:alert
-            handleLabelHintHelpAlert(groupId, effectiveGroupId, "alert", groupXFormsControl, false);
+            handleLabelHintHelpAlert(groupId, effectiveGroupId, "alert", groupXFormsControl, isTemplate, false);
 
             // xforms:hint
-            handleLabelHintHelpAlert(groupId, effectiveGroupId, "hint", groupXFormsControl, false);
+            handleLabelHintHelpAlert(groupId, effectiveGroupId, "hint", groupXFormsControl, isTemplate, false);
         } else {
 
             // Restore output

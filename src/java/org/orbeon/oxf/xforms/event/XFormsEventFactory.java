@@ -119,6 +119,16 @@ public class XFormsEventFactory {
                 return new XXFormsLoadEvent(targetObject, contextString);
             }
         });
+        nameToClassMap.put(XFormsEvents.XXFORMS_ONLINE, new Factory() {
+            public XFormsEvent createEvent(String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Element filesElement) {
+                return new XXFormsOnlineEvent(targetObject);
+            }
+        });
+        nameToClassMap.put(XFormsEvents.XXFORMS_OFFLINE, new Factory() {
+            public XFormsEvent createEvent(String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Element filesElement) {
+                return new XXFormsOfflineEvent(targetObject);
+            }
+        });
         nameToClassMap.put(XFormsEvents.XFORMS_MODEL_CONSTRUCT, new Factory() {
             public XFormsEvent createEvent(String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Element filesElement) {
                 return new XFormsModelConstructEvent(targetObject);

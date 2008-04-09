@@ -237,7 +237,7 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
 
         final XFormsValueControl other = (XFormsValueControl) obj;
 
-        if (!compareStrings(getDisplayValueOrExternalValue(pipelineContext), other.getDisplayValueOrExternalValue(pipelineContext)))
+        if (!XFormsUtils.compareStrings(getDisplayValueOrExternalValue(pipelineContext), other.getDisplayValueOrExternalValue(pipelineContext)))
             return false;
 
         return super.equalsExternal(pipelineContext, obj);

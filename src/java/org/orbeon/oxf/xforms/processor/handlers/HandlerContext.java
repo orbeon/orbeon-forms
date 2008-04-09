@@ -201,7 +201,7 @@ public class HandlerContext {
             return ((RepeatContext) repeatContextStack.peek()).getIdPostifx();
     }
 
-    public boolean isGenerateTemplate() {
+    public boolean isTemplate() {
         if (repeatContextStack == null || repeatContextStack.size() == 0)
             return false;
         else

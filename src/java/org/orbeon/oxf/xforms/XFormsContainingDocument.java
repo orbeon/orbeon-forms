@@ -124,6 +124,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
 
         // External events allowed on containing document
         allowedXFormsContainingDocumentExternalEvents.put(XFormsEvents.XXFORMS_LOAD, "");
+        allowedXFormsContainingDocumentExternalEvents.put(XFormsEvents.XXFORMS_OFFLINE, "");
 
         // External events allowed on xxforms:dialog
         allowedXXFormsDialogExternalEvents.put(XFormsEvents.XXFORMS_DIALOG_CLOSE, "");

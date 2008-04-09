@@ -71,22 +71,38 @@
             <element name="xxforms:action">
                 <zeroOrMore>
                     <element name="xxforms:event">
-                        <optional>
-                            <attribute name="name" type="NCName"/>
+                        <choice>
+                            <!-- Most events -->
                             <optional>
+                                <attribute name="name" type="NCName"/>
+                                <optional>
+                                    <attribute name="source-control-id">
+                                        <data type="string"/>
+                                    </attribute>
+                                </optional>
+                                <optional>
+                                    <attribute name="other-control-id">
+                                        <data type="string"/>
+                                    </attribute>
+                                </optional>
+                                <optional>
+                                    <data type="string"/>
+                                </optional>
+                            </optional>
+                            <!-- xxforms-dnd event -->
+                            <group>
+                                <attribute name="name" type="NCName"/>
                                 <attribute name="source-control-id">
                                     <data type="string"/>
                                 </attribute>
-                            </optional>
-                            <optional>
-                                <attribute name="other-control-id">
+                                <attribute name="dnd-start">
                                     <data type="string"/>
                                 </attribute>
-                            </optional>
-                            <optional>
-                                <data type="string"/>
-                            </optional>
-                        </optional>
+                                <attribute name="dnd-end">
+                                    <data type="string"/>
+                                </attribute>
+                            </group>
+                        </choice>
                     </element>
                 </zeroOrMore>
             </element>

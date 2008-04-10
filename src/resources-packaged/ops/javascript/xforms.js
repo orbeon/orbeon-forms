@@ -1065,7 +1065,7 @@ ORBEON.xforms.Controls = {
                         fixedcenter: false,
                         underlay: "shadow",
                         visible: false,
-                        constraintoviewport: false,
+                        constraintoviewport: true,
                         draggable: true,
                         effect: {effect:YAHOO.widget.ContainerEffect.FADE,duration: 0.3}
                     });

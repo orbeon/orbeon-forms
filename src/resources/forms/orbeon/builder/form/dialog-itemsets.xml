@@ -109,6 +109,12 @@
             </xforms:action>
         </xforms:action>
 
+        <!-- Insert new blank item if there were no items -->
+        <xforms:action if="not(exists(instance('fb-itemset-instance')/item))">
+            <xforms:insert context="instance('fb-itemset-instance')"
+                           origin="xxforms:element('item', (xxforms:element('label', xxforms:attribute('xml:lang', $lang)), xxforms:element('value')))"/>
+        </xforms:action>
+
         <!-- Prepare insert template -->
         <xforms:delete context="instance('fb-item-template')" while="*" nodeset="*"/>
         <xforms:action xxforms:iterate="$resources/resource">

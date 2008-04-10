@@ -91,6 +91,7 @@
 /* In-place editing for metadata section */
 #fb-metadata-section .fr-inplace-input .xforms-input input { width: 100% }
 #fb-metadata-section .fr-inplace-textarea textarea.xforms-textarea { width: 100% }
+#fb-metadata-section .fr-inplace-buttons .xforms-control { display: inline }
 #fb-metadata-section .fr-inplace-view .fr-inplace-buttons { display: none }
 
 #fb-metadata-section .fr-grid .fr-cell-content { width: 30em }

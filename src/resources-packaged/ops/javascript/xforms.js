@@ -1119,7 +1119,7 @@ ORBEON.xforms.Controls = {
         if (showAndRepositionPanel) {
             var helpImage = ORBEON.util.Dom.getChildElementByClass(control.parentNode, "xforms-help-image");
             ORBEON.xforms.Globals.formHelpPanel[form.id].element.style.display = "block";
-            ORBEON.xforms.Globals.formHelpPanel[form.id].cfg.setProperty("context", [helpImage, "tl", "tr"]);
+            ORBEON.xforms.Globals.formHelpPanel[form.id].cfg.setProperty("context", [helpImage, "bl", "tl"]);
             ORBEON.xforms.Globals.formHelpPanel[form.id].show();
         }
 
@@ -1473,6 +1473,10 @@ ORBEON.xforms.Events = {
             } else  if ((ORBEON.util.Dom.hasClass(target, "xforms-trigger") || ORBEON.util.Dom.hasClass(target, "xforms-submit"))) {
                 // Click on trigger
                 YAHOO.util.Event.preventDefault(event);
+                if (ORBEON.util.Dom.hasClass(target, "xxforms-online")) {
+                    // This is a trigger take takes the form back online
+                    ORBEON.xforms.Offline.takeOnline();
+                }
                 if (!ORBEON.util.Dom.hasClass(target, "xforms-readonly")) {
                     // If this is an anchor and we didn't get a chance to register the focus event,
                     // send the focus event here. This is useful for anchors (we don't listen on the
@@ -1933,6 +1937,9 @@ ORBEON.xforms.Init = {
     },
 
     document: function() {
+
+        // Notify the offline module that the page was loaded
+        ORBEON.xforms.Offline.pageLoad();
 
         // Register events in the capture phase for W3C-compliant browsers.
         if (ORBEON.xforms.Globals.supportsCaptureEvents) {
@@ -2513,35 +2520,38 @@ ORBEON.xforms.Server = {
     },
 
     fireEvents: function(events, incremental) {
-        // Store the time of the first event to be sent in the queue
-        var currentTime = new Date().getTime();
-        if (ORBEON.xforms.Globals.eventQueue.length == 0)
-            ORBEON.xforms.Globals.eventsFirstEventTime = currentTime;
-
-        // Store events to fire
-        for (var eventIndex = 0; eventIndex < events.length; eventIndex++) {
-            ORBEON.xforms.Globals.eventQueue.push(events[eventIndex]);
-        }
-
-        // Fire them with a delay to give us a change to aggregate events together
-        ORBEON.xforms.Globals.executeEventFunctionQueued++;
-        if (incremental && !(currentTime - ORBEON.xforms.Globals.eventsFirstEventTime >
-                    ORBEON.util.Utils.getProperty(DELAY_BEFORE_FORCE_INCREMENTAL_REQUEST_PROPERTY))) {
-            // After a delay (e.g. 500 ms), run executeNextRequest() and send queued events to server
-            // if there are no other executeNextRequest() that have been added to the queue after this
-            // request.
-            window.setTimeout(function() { ORBEON.xforms.Server.executeNextRequest(false); },
-                    ORBEON.util.Utils.getProperty(DELAY_BEFORE_INCREMENTAL_REQUEST_PROPERTY));
+        if (! ORBEON.xforms.Offline.isOnline) {
+            ORBEON.xforms.Offline.storeEvents(events, incremental);
         } else {
-            // After a very short delay (e.g. 20 ms), run executeNextRequest() and force queued events
-            // to be sent to the server, even if there are other executeNextRequest() queued.
-            // The small delay is here so we don't send multiple requests to the server when the
-            // browser gives us a sequence of events (e.g. focus out, change, focus in).
-            window.setTimeout(function() { ORBEON.xforms.Server.executeNextRequest(true); },
-                    ORBEON.util.Utils.getProperty(INTERNAL_SHORT_DELAY_PROPERTY));
+            // Store the time of the first event to be sent in the queue
+            var currentTime = new Date().getTime();
+            if (ORBEON.xforms.Globals.eventQueue.length == 0)
+                ORBEON.xforms.Globals.eventsFirstEventTime = currentTime;
+
+            // Store events to fire
+            for (var eventIndex = 0; eventIndex < events.length; eventIndex++) {
+                ORBEON.xforms.Globals.eventQueue.push(events[eventIndex]);
+            }
+
+            // Fire them with a delay to give us a change to aggregate events together
+            ORBEON.xforms.Globals.executeEventFunctionQueued++;
+            if (incremental && !(currentTime - ORBEON.xforms.Globals.eventsFirstEventTime >
+                        ORBEON.util.Utils.getProperty(DELAY_BEFORE_FORCE_INCREMENTAL_REQUEST_PROPERTY))) {
+                // After a delay (e.g. 500 ms), run executeNextRequest() and send queued events to server
+                // if there are no other executeNextRequest() that have been added to the queue after this
+                // request.
+                window.setTimeout(function() { ORBEON.xforms.Server.executeNextRequest(false); },
+                        ORBEON.util.Utils.getProperty(DELAY_BEFORE_INCREMENTAL_REQUEST_PROPERTY));
+            } else {
+                // After a very short delay (e.g. 20 ms), run executeNextRequest() and force queued events
+                // to be sent to the server, even if there are other executeNextRequest() queued.
+                // The small delay is here so we don't send multiple requests to the server when the
+                // browser gives us a sequence of events (e.g. focus out, change, focus in).
+                window.setTimeout(function() { ORBEON.xforms.Server.executeNextRequest(true); },
+                        ORBEON.util.Utils.getProperty(INTERNAL_SHORT_DELAY_PROPERTY));
+            }
+            ORBEON.xforms.Globals.lastEventSentTime = new Date().getTime(); // Update the last event sent time
         }
-        ORBEON.xforms.Globals.lastEventSentTime = new Date().getTime(); // Update the last event sent time
-        return false;
     },
 
     executeNextRequest: function(bypassRequestQueue) {
@@ -3845,6 +3855,11 @@ ORBEON.xforms.Server = {
                                     ORBEON.xforms.Controls.showHelp(control);
                                     break;
                                 }
+
+                                // Take form offline
+                                case "offline": {
+                                    ORBEON.xforms.Offline.takeOffline();
+                                }
                             }
                         }
                     }
@@ -3891,6 +3906,186 @@ ORBEON.xforms.Server = {
         var event = { "target" : targetElement };
         var theFunction = eval(functionName);
         theFunction.call(observer, event);
+    }
+};
+
+ORBEON.xforms.Offline = {
+
+    isOnline: true,                  // True if we are online, false otherwise
+    hasGears: false,                 // True if Gears is installed
+    gearsDatabase: null,             // The Gears SQL database
+    formStore: null,                 // The Gears ResourceStore
+
+
+    /**
+     * Google Gears initialization function.
+     * Some of the code below is aken gears_init.js which is part of Google Gears.
+     */
+    init: function() {
+
+        // === START gears_init.js
+
+        // We are already defined. Hooray!
+        if (window.google && google.gears) {
+            return;
+        }
+
+        var factory = null;
+
+        // Firefox
+        if (typeof GearsFactory != 'undefined') {
+            factory = new GearsFactory();
+        } else {
+            // IE
+            try {
+                factory = new ActiveXObject('Gears.Factory');
+                // privateSetGlobalObject is only required and supported on WinCE.
+                if (factory.getBuildInfo().indexOf('ie_mobile') != -1) {
+                    factory.privateSetGlobalObject(this);
+                }
+            } catch (e) {
+                // Safari
+                if ((typeof navigator.mimeTypes != 'undefined')
+                        && navigator.mimeTypes["application/x-googlegears"]) {
+                    factory = document.createElement("object");
+                    factory.style.display = "none";
+                    factory.width = 0;
+                    factory.height = 0;
+                    factory.type = "application/x-googlegears";
+                    document.documentElement.appendChild(factory);
+                }
+            }
+        }
+
+        // *Do not* define any objects if Gears is not installed. This mimics the
+        // behavior of Gears defining the objects in the future.
+        if (!factory) {
+            return;
+        }
+
+        // Now set up the objects, being careful not to overwrite anything.
+        //
+        // Note: In Internet Explorer for Windows Mobile, you can't add properties to
+        // the window object. However, global objects are automatically added as
+        // properties of the window object in all browsers.
+        if (!window.google) {
+            google = {};
+        }
+
+        if (!google.gears) {
+            google.gears = {factory: factory};
+        }
+
+        // === END gears_init.js
+
+        ORBEON.xforms.Offline.hasGears = typeof GearsFactory != "undefined";
+        if (ORBEON.xforms.Offline.hasGears) {
+
+            // Create database and create the tables we need if necessary
+            var database = google.gears.factory.create('beta.database');
+            ORBEON.xforms.Offline.gearsDatabase = database;
+            database.open('orbeon.xforms.events');
+            database.execute("create table if not exists Events" +
+                " (form text, targetId text, otherId text, value text, eventName text, bubbles integer, " +
+                "  cancelable integer, ignoreErrors integer, incremental integer)");
+            database.execute("create table if not exists Offline_Forms (url text)");
+
+            // Create form store
+            var localServer = google.gears.factory.create("beta.localserver");
+            ORBEON.xforms.Offline.formStore = localServer.createStore("orbeon.form");
+        }
+    },
+
+    /**
+     * On page load, check in the database if this form is online or offline
+     */
+    pageLoad: function() {
+        ORBEON.xforms.Offline.init();
+        if (ORBEON.xforms.Offline.hasGears) {
+            var resultSet = ORBEON.xforms.Offline.gearsDatabase.execute("select * from Offline_Forms where url = ?",
+                    [ window.location.href ]);
+            // If we find that this URL is in the store, then we are not online
+            ORBEON.xforms.Offline.isOnline = ! resultSet.isValidRow();
+        }
+    },
+
+    /**
+     * Called when the form is taken offline.
+     * Makes sure we have everything in the store so we can run this form while offline.
+     */
+    takeOffline: function() {
+        ORBEON.xforms.Offline.init();
+
+        // Load current form in form store        
+        ORBEON.xforms.Offline.formStore.capture(window.location.href, function (url, success, captureId) {
+            // Use this handler to hide waiting dialog
+        });
+
+        // Remember that we took this form offline
+        ORBEON.xforms.Offline.gearsDatabase.execute("insert into Offline_Forms values (?)", [ window.location.href ]);
+        ORBEON.xforms.Offline.isOnline = false;
+    },
+
+    /**
+     * Called when the form is taken back online.
+     * Send the events that have been stored in the database to the server.
+     */
+    takeOnline: function() {
+        // Just one event with incremental set to false wil be enough for all the events to be sent right away
+        var incremental = true;
+
+        // Get all events from the database to create events array
+        var resultSet = ORBEON.xforms.Offline.gearsDatabase.execute("select * from Events");
+        var events = [];
+        while (resultSet.isValidRow()) {
+            events.push(new ORBEON.xforms.Server.Event(
+                ORBEON.util.Dom.getElementById(resultSet.fieldByName("form")),
+                resultSet.fieldByName("targetId"),
+                resultSet.fieldByName("otherId"),
+                resultSet.fieldByName("value"),
+                resultSet.fieldByName("eventName"),
+                resultSet.fieldByName("bubbles") == 1,
+                resultSet.fieldByName("cancelable") == 1,
+                resultSet.fieldByName("ignoreErrors") == 1
+            ));
+            if (resultSet.fieldByName("incremental") == 0)
+                incremental = false;
+            resultSet.next();
+        }
+        resultSet.close();
+
+        // Go back online
+        ORBEON.xforms.Offline.gearsDatabase.execute("delete from Offline_Forms where url = ?", [ window.location.href ]);
+        ORBEON.xforms.Offline.isOnline = true;
+
+        // Send all the events back to the server
+        ORBEON.xforms.Server.fireEvents(events, incremental);
+
+        // Delete events from the database the events we just sent to the server
+        ORBEON.xforms.Offline.gearsDatabase.execute("delete from Events");
+    },
+
+    /**
+     * Stores the events (which have just been fired) in the store (instead of the sending the events to the server).
+     */
+    storeEvents: function(events, incremental) {
+        ORBEON.xforms.Offline.init();
+        for (var eventIndex = 0; eventIndex < events.length; eventIndex++) {
+            var event = events[eventIndex];
+            // Make sure we have an ID on this form, so we can then retrieve it
+            YAHOO.util.Dom.generateId(event.form);
+            ORBEON.xforms.Offline.gearsDatabase.execute("insert into Events values (?, ?, ?, ?, ?, ?, ?, ?, ?)", [
+                event.form.id,
+                event.targetId,
+                event.otherId,
+                event.value,
+                event.eventName,
+                event.bubbles ? 1 : 0,
+                event.cancelable ? 1 : 0,
+                event.ignoreErrors ? 1 : 0,
+                incremental ? 1 : 0
+            ]);
+        }
     }
 };
 

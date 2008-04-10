@@ -345,27 +345,22 @@
     </xsl:template>
 
     <xsl:template match="fr:take-offline">
-        <xforms:trigger id="take-offline-button">
+        <xforms:trigger id="take-offline-button" ref="if (xxforms:instance('fr-offline-instance')/is-online = 'true') then . else ()">
             <xforms:label>
                 <xhtml:img src="/apps/fr/style/take-offline.gif" alt=""/>
-                <xhtml:span>Take offline</xhtml:span>
+                <xhtml:span><xforms:output value="$fr-resources/detail/labels/offline"/></xhtml:span>
             </xforms:label>
-            <xforms:action ev:event="DOMActivate">
-                <!--<xxforms:take-offline/>-->
-                <xxforms:script>ORBEON.xforms.Offline.takeOffline();</xxforms:script>
-            </xforms:action>
+            <xxforms:offline ev:event="DOMActivate"/>
         </xforms:trigger>
     </xsl:template>
 
     <xsl:template match="fr:take-online">
-        <xforms:trigger id="take-online-button" class="xxforms-take-online">
+        <xforms:trigger id="take-online-button" ref="if (xxforms:instance('fr-offline-instance')/is-online = 'false') then . else ()">
             <xforms:label>
                 <xhtml:img src="/apps/fr/style/take-online.gif" alt=""/>
-                <xhtml:span>Take online</xhtml:span>
+                <xhtml:span><xforms:output value="$fr-resources/detail/labels/online"/></xhtml:span>
             </xforms:label>
-            <xforms:action ev:event="DOMActivate">
-                <!--<xxforms:take-online/>-->
-            </xforms:action>
+            <xxforms:online ev:event="DOMActivate"/>
         </xforms:trigger>
     </xsl:template>
 
@@ -721,10 +716,12 @@
     <xsl:template match="/xhtml:html/xhtml:head/xforms:model[1]">
 
         <!-- This model handles form sections -->
+        <!-- State handling is set to "client" for the offline mode until the server supports switching back and forth between client and server -->
         <xforms:model id="fr-sections-model"
                       xxforms:external-events="fr-after-collapse {@xxforms:external-events}"
                       xxforms:readonly-appearance="{if (doc('input:instance')/*/mode = ('view', 'print', 'pdf')) then 'static' else 'dynamic'}"
-                      xxforms:order="label help control alert hint">
+                      xxforms:order="label help control alert hint"
+                      xxforms:state-handling="client">
             <xsl:copy-of select="@* except (@id, @xxforms:external-events)"/>
             <!-- Contain section being currently expanded/collapsed -->
             <!-- TODO: This probably doesn't quite work for sections within repeats -->
@@ -771,6 +768,8 @@
 
         <!-- This model handles i18n resources -->
         <xi:include href="i18n/resources-model.xml" xxi:omit-xml-base="true"/>
+        <!-- This model handles offline functionality through Google Gears -->
+        <xi:include href="offline/offline-model.xml" xxi:omit-xml-base="true"/>
 
         <!-- This model handles print functionality -->
         <xforms:model id="fr-print-model">

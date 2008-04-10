@@ -74,6 +74,8 @@
                 <confirm>Confirm</confirm>
                 <cancel>Cancel</cancel>
                 <publish>Publish</publish>
+                <offline>Take offline</offline>
+                <online>Take online</online>
                 <alert>Missing or incorrect value</alert>
             </labels>
         </detail>
@@ -139,6 +141,8 @@
                 <confirm>Confirmer</confirm>
                 <cancel>Annuler</cancel>
                 <publish>Publier</publish>
+                <offline>Or-ligne</offline>
+                <online>En-ligne</online>
                 <alert>Valeur manquante ou incorrecte</alert>
             </labels>
         </detail>
@@ -204,7 +208,9 @@
                 <confirm>Confirme</confirm>
                 <cancel>Cancelar</cancel>
                 <publish>[Publish]</publish>
-                <alert>[Missing or incorrect value]</alert>
+                <offline>Sin conexión</offline>
+                <online>En línea</online>
+                <alert>Desaparición o valor incorrecto</alert>
             </labels>
         </detail>
     </resource>

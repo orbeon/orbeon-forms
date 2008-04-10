@@ -448,6 +448,20 @@
                             </xforms:label>
                             <xforms:dispatch ev:event="DOMActivate" target="fr-form-model" name="fr-summary-pdf"/>
                         </xforms:trigger>
+                        <!-- Take offline -->
+                        <xforms:trigger>
+                            <xforms:label>
+                                <xhtml:img src="/apps/fr/style/take-offline.gif" alt="Take offline"/>
+                                <xhtml:span><xforms:output value="$fr-resources/detail/labels/offline"/></xhtml:span>
+                            </xforms:label>
+                        </xforms:trigger>
+                        <!-- Take online -->
+                        <xforms:trigger>
+                            <xforms:label>
+                                <xhtml:img src="/apps/fr/style/take-online.gif" alt="Take online"/>
+                                <xhtml:span><xforms:output value="$fr-resources/detail/labels/online"/></xhtml:span>
+                            </xforms:label>
+                        </xforms:trigger>
                         <!-- Test button (if Form Builder) -->
                         <!-- TODO -->
                         <xforms:trigger ref="instance('fr-summary-triggers-instance')/edit[$is-form-builder]">

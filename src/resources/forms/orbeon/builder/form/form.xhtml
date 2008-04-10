@@ -236,6 +236,10 @@
                     <itemset-resource-id/>
                     <itemset-lang/>
 
+                    <!-- Currently open in-place editor xxx -->
+                    <inplace-id/>
+                    <inplace-repeat-indexes/>
+
                     <result-node/>
 
                     <next-section-id/>
@@ -958,6 +962,33 @@
             <xforms:label>Orbeon Form Builder</xforms:label>
             <fr:body>
 
+                <!-- In-place view deselected, remember id -->
+                <xforms:action ev:event="xforms-deselect" if="for $target in event('xxforms:target') return starts-with($target, 'fr-inplace-') and ends-with($target, '-view')">
+
+                    <!-- Hide currently visible in-place edit if any -->
+                    <xforms:toggle if="$variables/inplace-id != ''" case="{$variables/inplace-id}" xxforms:repeat-indexes="{$variables/inplace-repeat-indexes}"/>
+
+                    <!-- Remember new id and indexes -->
+                    <xforms:setvalue ref="$variables/inplace-id" value="event('xxforms:target')"/>
+                    <xforms:setvalue ref="$variables/inplace-repeat-indexes" value="string-join(event('xxforms:repeat-indexes'), '-')"/>
+
+                    <!--<xforms:message level="xxforms:log-error">-->
+                        <!--xxx-->
+                        <!--<xforms:output value="event('xxforms:target')"/>-->
+                    <!--</xforms:message>-->
+                </xforms:action>
+
+                <!-- In-place edit deselected, forget id -->
+                <xforms:action ev:event="xforms-deselect" if="for $target in event('xxforms:target') return starts-with($target, 'fr-inplace-') and ends-with($target, '-edit')">
+                    <xforms:setvalue ref="$variables/inplace-id"/>
+                    <xforms:setvalue ref="$variables/inplace-repeat-indexes"/>
+
+                    <!--<xforms:message level="xxforms:log-error">-->
+                        <!--yyy-->
+                        <!--<xforms:output value="event('xxforms:target')"/>-->
+                    <!--</xforms:message>-->
+                </xforms:action>
+
                 <xforms:group ref=".[instance('fb-user-agent-instance')/is-ie = 'true']" class="fb-ie-warning">
                     Orbeon Form Builder still needs work to provide a satisfactory experience with Internet Explorer.
                     Please bear with us while we fix this. In the meanwhile, we recommend you use <a
@@ -978,8 +1009,6 @@
                     NOTE: section and repeat can have some properties, such as a label.  
 
                 -->
-
-
 
                 <!-- Section about form metadata -->
                 <fr:section id="fb-metadata-section" class="fb-metadata-section">

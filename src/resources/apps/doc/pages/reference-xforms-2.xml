@@ -793,6 +793,43 @@
                     [TODO: describe support for these events on xforms:upload]
                 </p>
             </section>
+            <a name="repeat-indexes"/>
+            <section>
+                <title>Targetting effective controls within repeat iterations</title>
+                <p>
+                    The following actions: <code>xforms:dispatch</code> (<code>target</code> attribute),
+                    <code>xforms:setfocus</code> (<code>control</code> attribute), <code>xforms:toggle</code>
+                    (<code>case</code> attribute) and <code>xxforms:show</code> (<code>neighbor</code> attribute)
+                    all support attributes resolving to a particular control.
+                </p>
+                <p>
+                    When that control is within a repeat iteration, the actual control targetted is chosen based on the
+                    current set of repeat indexes. However, in some cases, it is useful to be able to target the control
+                    within a particular iteration. This is achieved with the <code>xxforms:repeat-indexes</code>
+                    extension attribute on these actions. This attribute takes a list of repeat indexes, starting
+                    with the outermost repeat, and separated by dashes (<code>-</code>). Example:
+                </p>
+                <xml-source>
+                    <comment> Repeat hierarchy </comment>
+                    <xforms:repeat nodeset="todo-list">
+                        <xforms:repeat nodeset="todo-item">
+                            <xforms:switch>
+                                <xforms:case id="edit-case">
+                                    ...
+                                </xforms:case>
+                                <xforms:case id="view-case">
+                                    ...
+                                </xforms:case>
+                            </xforms:switch>
+                        </xforms:repeat>
+                    </xforms:repeat>
+                    <xforms:trigger>
+                        <xforms:label>Toggle Me!</xforms:label>
+                        <comment> Toggle the case within the 5th todo item of the 3rd todo list </comment>
+                        <xforms:toggle ev:event="DOMActivate" case="edit-case" xxforms:repeat-indexes="3-5"/>
+                    </xforms:trigger>
+                </xml-source>
+            </section>
             <a name="xpath-extensions"/>
             <section>
                 <title>XPath Extension Functions</title>

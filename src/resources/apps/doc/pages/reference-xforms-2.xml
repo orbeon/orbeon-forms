@@ -797,11 +797,30 @@
             <section>
                 <title>Targetting effective controls within repeat iterations</title>
                 <p>
-                    The following actions: <code>xforms:dispatch</code> (<code>target</code> attribute),
-                    <code>xforms:setfocus</code> (<code>control</code> attribute), <code>xforms:toggle</code>
-                    (<code>case</code> attribute) and <code>xxforms:show</code> (<code>neighbor</code> attribute)
-                    all support attributes resolving to a particular control.
+                    The following actions all support attributes resolving to a particular control:
                 </p>
+                <ul>
+                    <li>
+                        <p>
+                            <code>&lt;xforms:dispatch></code> (<code>target</code> attribute)
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>&lt;xforms:setfocus></code> (<code>control</code> attribute)
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>&lt;xforms:toggle></code> (<code>case</code> attribute)
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>&lt;xxforms:show></code> (<code>neighbor</code> attribute)
+                        </p>
+                    </li>
+                </ul>
                 <p>
                     When that control is within a repeat iteration, the actual control targetted is chosen based on the
                     current set of repeat indexes. However, in some cases, it is useful to be able to target the control

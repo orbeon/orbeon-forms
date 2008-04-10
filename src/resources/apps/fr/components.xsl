@@ -720,7 +720,7 @@
         <xforms:model id="fr-sections-model"
                       xxforms:external-events="fr-after-collapse {@xxforms:external-events}"
                       xxforms:readonly-appearance="{if (doc('input:instance')/*/mode = ('view', 'print', 'pdf')) then 'static' else 'dynamic'}"
-                      xxforms:order="label help control alert hint"
+                      xxforms:order="help label control alert hint"
                       xxforms:state-handling="client">
             <xsl:copy-of select="@* except (@id, @xxforms:external-events)"/>
             <!-- Contain section being currently expanded/collapsed -->

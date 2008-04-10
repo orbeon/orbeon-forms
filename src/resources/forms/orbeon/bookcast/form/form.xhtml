@@ -158,12 +158,48 @@
                         </author>
                         <language>
                             <label>Language</label>
+                            <item>
+                                <label>English</label>
+                                <value>en</value>
+                            </item>
+                            <item>
+                                <label>French</label>
+                                <value>fr</value>
+                            </item>
+                            <item>
+                                <label>Spanish</label>
+                                <value>es</value>
+                            </item>
                         </language>
                         <link>
                             <label>Link</label>
                         </link>
                         <rating>
                             <label>Rating</label>
+                            <item>
+                                <label>None</label>
+                                <value/>
+                            </item>
+                            <item>
+                                <label>1</label>
+                                <value>1</value>
+                            </item>
+                            <item>
+                                <label>2</label>
+                                <value>2</value>
+                            </item>
+                            <item>
+                                <label>3</label>
+                                <value>3</value>
+                            </item>
+                            <item>
+                                <label>4</label>
+                                <value>4</value>
+                            </item>
+                            <item>
+                                <label>5</label>
+                                <value>5</value>
+                            </item>
                         </rating>
                         <note>
                             <label>Note</label>
@@ -184,12 +220,48 @@
                         </author>
                         <language>
                             <label>Langue</label>
+                            <item>
+                                <label>Anglais</label>
+                                <value>en</value>
+                            </item>
+                            <item>
+                                <label>Français</label>
+                                <value>fr</value>
+                            </item>
+                            <item>
+                                <label>Espagnol</label>
+                                <value>es</value>
+                            </item>
                         </language>
                         <link>
                             <label>Lien</label>
                         </link>
                         <rating>
                             <label>Evaluation</label>
+                            <item>
+                                <label>Aucune</label>
+                                <value/>
+                            </item>
+                            <item>
+                                <label>1</label>
+                                <value>1</value>
+                            </item>
+                            <item>
+                                <label>2</label>
+                                <value>2</value>
+                            </item>
+                            <item>
+                                <label>3</label>
+                                <value>3</value>
+                            </item>
+                            <item>
+                                <label>4</label>
+                                <value>4</value>
+                            </item>
+                            <item>
+                                <label>5</label>
+                                <value>5</value>
+                            </item>
                         </rating>
                         <note>
                             <label>Note</label>
@@ -200,51 +272,6 @@
 
             <xforms:instance id="note-template">
                 <note xmlns=""/>
-            </xforms:instance>
-
-            <xforms:instance id="languages-itemset">
-                <languages xmlns="">
-                    <language>
-                        <name xml:lang="en">English</name>
-                        <name xml:lang="fr">Anglais</name>
-                        <value>en</value>
-                    </language>
-                    <language>
-                        <name xml:lang="en">French</name>
-                        <name xml:lang="fr">Français</name>
-                        <value>fr</value>
-                    </language>
-                    <language>
-                        <name xml:lang="en">Spanish</name>
-                        <name xml:lang="fr">Espagnol</name>
-                        <value>es</value>
-                    </language>
-                </languages>
-            </xforms:instance>
-
-            <xforms:instance id="ratings-itemset">
-                <ratings xmlns="">
-                    <rating>
-                        <name>1</name>
-                        <value>1</value>
-                    </rating>
-                    <rating>
-                        <name>2</name>
-                        <value>2</value>
-                    </rating>
-                    <rating>
-                        <name>3</name>
-                        <value>3</value>
-                    </rating>
-                    <rating>
-                        <name>4</name>
-                        <value>4</value>
-                    </rating>
-                    <rating>
-                        <name>5</name>
-                        <value>5</value>
-                    </rating>
-                </ratings>
             </xforms:instance>
 
         </xforms:model>
@@ -286,9 +313,8 @@
                                         <xforms:label>Choose One...</xforms:label>
                                         <xforms:value/>
                                     </xforms:item>
-                                    <xforms:itemset nodeset="instance('languages-itemset')/language">
-                                        <!-- TODO: language selection -->
-                                        <xforms:label ref="name[not(@xml:lang) or @xml:lang = 'en']"/>
+                                    <xforms:itemset nodeset="$form-resources/language/item">
+                                        <xforms:label ref="label"/>
                                         <xforms:value ref="value"/>
                                     </xforms:itemset>
                                 </xforms:select1>
@@ -309,12 +335,8 @@
                                     <xforms:hint>Your rating</xforms:hint>
                                     <xforms:help>This contains your rating about the book. For example...</xforms:help>
                                     <xforms:alert>The rating selected is invalid</xforms:alert>
-                                    <xforms:item>
-                                        <xforms:label>None</xforms:label>
-                                        <xforms:value/>
-                                    </xforms:item>
-                                    <xforms:itemset nodeset="instance('ratings-itemset')/rating">
-                                        <xforms:label ref="name"/>
+                                    <xforms:itemset nodeset="$form-resources/rating/item">
+                                        <xforms:label ref="label"/>
                                         <xforms:value ref="value"/>
                                     </xforms:itemset>
                                 </xforms:select1>

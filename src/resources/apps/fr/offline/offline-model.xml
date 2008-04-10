@@ -1,0 +1,26 @@
+<xforms:model xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:xforms="http://www.w3.org/2002/xforms"
+        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+        xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:xi="http://www.w3.org/2001/XInclude"
+        xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+        xmlns:ev="http://www.w3.org/2001/xml-events"
+        id="fr-offline-model">
+
+    <xforms:instance id="fr-offline-instance">
+        <offline>
+            <is-online>true</is-online>
+        </offline>
+    </xforms:instance>
+
+    <xforms:action ev:event="xxforms-offline">
+        <xforms:setvalue ref="instance('fr-offline-instance')/is-online">false</xforms:setvalue>
+    </xforms:action>
+
+    <xforms:action ev:event="xxforms-online">
+        <xforms:setvalue ref="instance('fr-offline-instance')/is-online">true</xforms:setvalue>
+    </xforms:action>
+
+</xforms:model>

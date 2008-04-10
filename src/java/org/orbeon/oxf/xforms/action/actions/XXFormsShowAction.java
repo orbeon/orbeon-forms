@@ -44,7 +44,7 @@ public class XXFormsShowAction extends XFormsAction {
         final String effectiveNeighborId;
         {
             final String neighborId = resolveAVT(actionInterpreter, pipelineContext, actionElement, "neighbor", true);
-            effectiveNeighborId = (neighborId != null) ? xformsControls.getCurrentControlsState().findEffectiveControlId(neighborId) : null;
+            effectiveNeighborId = (neighborId != null) ? findEffectiveControlId(actionInterpreter, pipelineContext, neighborId, actionElement) : null;
         }
         final boolean constrainToViewport;
         {

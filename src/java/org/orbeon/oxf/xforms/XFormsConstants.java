@@ -150,8 +150,8 @@ public class XFormsConstants {
     public static final QName XXFORMS_SHOW_PROGRESS_QNAME = new QName("show-progress", XFormsConstants.XXFORMS_NAMESPACE);
 
     public static final QName XXFORMS_REFRESH_ITEMS_QNAME = new QName("refresh-items", XFormsConstants.XXFORMS_NAMESPACE);
-
     public static final QName XXFORMS_CONTEXT_QNAME = new QName("context", XFormsConstants.XXFORMS_NAMESPACE);
+    public static final QName XXFORMS_REPEAT_INDEXES_QNAME = new QName("repeat-indexes", XFormsConstants.XXFORMS_NAMESPACE);
 
     public static final String XFORMS_BOOLEAN_EXPLODED_QNAME = XMLUtils.buildExplodedQName(XFORMS_NAMESPACE_URI, "boolean");
     public static final String XFORMS_INTEGER_EXPLODED_QNAME = XMLUtils.buildExplodedQName(XFORMS_NAMESPACE_URI, "integer");

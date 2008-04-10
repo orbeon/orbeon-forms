@@ -309,15 +309,12 @@ public class XFormsControls {
     }
 
     /**
-     * For the given case id and the current binding, try to find an effective case id.
+     * For the given control id and the current binding, try to find an effective control id.
      *
-     * The effective case id is for now the effective case id following repeat branches. This can be improved in the
-     * future.
-     *
-     * @param caseId    a case id
-     * @return          an effective case id if possible
+     * @param caseId    a control id
+     * @return          an effective control id if possible
      */
-    public String findEffectiveCaseId(String caseId) {
+    public String findEffectiveControlId(String caseId) {
         return getCurrentControlsState().findEffectiveControlId(caseId);
     }
 

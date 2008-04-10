@@ -50,7 +50,7 @@ public class XFormsToggleAction extends XFormsAction {
             caseId = caseAttribute;
         }
 
-        final String effectiveCaseId = xformsControls.findEffectiveCaseId(caseId);
+        final String effectiveCaseId = findEffectiveControlId(actionInterpreter, pipelineContext, caseId, actionElement);
 
         if (effectiveCaseId != null) { // can be null if the switch is not relevant
             // Update xforms:switch info and dispatch events

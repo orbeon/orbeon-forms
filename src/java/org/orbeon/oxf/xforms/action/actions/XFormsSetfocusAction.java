@@ -17,7 +17,6 @@ import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsControls;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
@@ -36,7 +35,6 @@ public class XFormsSetfocusAction extends XFormsAction {
                         XFormsEventHandlerContainer eventHandlerContainer, Element actionElement,
                         boolean hasOverriddenContext, Item overriddenContext) {
 
-        final XFormsControls xformsControls = actionInterpreter.getXFormsControls();
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
 
 
@@ -52,7 +50,7 @@ public class XFormsSetfocusAction extends XFormsAction {
                 return;
         }
 
-        final String effectiveControlId = xformsControls.getCurrentControlsState().findEffectiveControlId(resolvedControlId);
+        final String effectiveControlId = findEffectiveControlId(actionInterpreter, pipelineContext, resolvedControlId, actionElement);
         final Object controlObject = (effectiveControlId != null) ? containingDocument.getObjectById(effectiveControlId) : null;
 
         if (controlObject instanceof XFormsControl) {

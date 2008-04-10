@@ -158,4 +158,26 @@ public abstract class XFormsAction {
 
         return isNamespace ? XFormsUtils.namespaceId(containingDocument, resolvedAVTValue) : resolvedAVTValue;
     }
+
+    /**
+     * Find an effective control id based on either the xxforms:repeat-indexes attribute, or on the current repeat
+     * indexes.
+     *
+     * @param actionInterpreter current XFormsActionInterpreter
+     * @param pipelineContext   current PipelineContext
+     * @param id                control id to resolve
+     * @param actionElement     current action element
+     * @return                  effective control id if possible
+     */
+    protected String findEffectiveControlId(XFormsActionInterpreter actionInterpreter, PipelineContext pipelineContext, String id, Element actionElement) {
+        final String repeatindexes = resolveAVT(actionInterpreter, pipelineContext, actionElement, XFormsConstants.XXFORMS_REPEAT_INDEXES_QNAME, false);
+
+        if (repeatindexes != null && !"".equals(repeatindexes)) {
+            // Effective id is provided
+            return id + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1 + repeatindexes;
+        } else {
+            // Figure out effective id
+            return actionInterpreter.getXFormsControls().findEffectiveControlId(id);
+        }
+    }
 }

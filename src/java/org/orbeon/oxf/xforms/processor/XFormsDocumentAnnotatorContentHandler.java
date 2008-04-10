@@ -235,7 +235,8 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
                 if (!namespacePrefix.startsWith("xml") && !namespacePrefix.equals(""))
                     namespaces.put(namespacePrefix, namespaceSupport.getURI(namespacePrefix));
             }
-
+            // Re-add standard "xml" prefix mapping
+            namespaces.put(XMLConstants.XML_PREFIX, XMLConstants.XML_URI);
             namespaceMappings.put(newIdAttribute[0], namespaces);
         }
 

@@ -84,6 +84,9 @@ public class XFormsOutputHandler extends XFormsCoreControlHandler {
         final String enclosingElementLocalname = isHTMLMediaType ? "div" : "span";
         final String enclosingElementQName = XMLUtils.buildQName(xhtmlPrefix, enclosingElementLocalname);
 
+        // Handle accessibility attributes (de facto, tabindex is supported on all elements)
+        handleAccessibilityAttributes(attributes, newAttributes);
+
         contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, enclosingElementLocalname, enclosingElementQName, newAttributes);
         {
             if (isImageMediatype) {

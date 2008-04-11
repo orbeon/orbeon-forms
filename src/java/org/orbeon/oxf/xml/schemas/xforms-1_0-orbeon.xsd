@@ -624,6 +624,11 @@
     </xsd:element>
     <xsd:element name="dispatch">
         <xsd:complexType>
+            <xsd:sequence>
+                <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+                    <xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
+            </xsd:sequence>
             <xsd:attributeGroup ref="xforms:Common.Attributes"/>
             <xsd:attribute name="name" type="xsd:NMTOKEN" use="required"/>
             <xsd:attribute name="target" type="xsd:NMTOKEN" use="required"/>

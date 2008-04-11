@@ -41,7 +41,8 @@
                 <language-choice>Choose language</language-choice>
                 <form-choice>Choose a Form</form-choice>
                 <free-search>Free Search</free-search>
-                <previous>Previous</previous>
+                <any>[Any]</any>
+                <previous>Back</previous>
                 <next>Next</next>
             </labels>
             <formats>
@@ -108,6 +109,7 @@
                 <language-choice>Choix de la langue</language-choice>
                 <form-choice>Choisisez un formulaire</form-choice>
                 <free-search>Recherche libre</free-search>
+                <any>[Tous]</any>
                 <previous>Précédent</previous>
                 <next>Suivant</next>
             </labels>
@@ -175,6 +177,7 @@
                 <language-choice>Elegir idioma</language-choice>
                 <form-choice>Elige una Forma</form-choice>
                 <free-search>Búsqueda Libre</free-search>
+                <any>[[Any]]</any>
                 <previous>Anterior</previous>
                 <next>Siguiente</next>
             </labels>

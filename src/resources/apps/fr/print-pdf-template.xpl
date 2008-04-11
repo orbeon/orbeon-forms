@@ -25,49 +25,114 @@
     <p:param type="output" name="data"/>
 
     <!-- Obtain the form and data -->
+    <!-- TODO: print-html.xpl does too much, we should just get what is necessary -->
     <p:processor name="oxf:pipeline">
         <p:input name="config" href="print-html.xpl"/>
         <p:input name="instance" href="#instance"/>
         <p:output name="instance" id="updated-instance"/>
-        <p:output name="data" id="xhtml-document"/>
+        <p:output name="data" id="unrolled-form-document"/>
     </p:processor>
 
-    <!-- Extract data -->
+    <!-- Extract data only -->
     <p:processor name="oxf:identity">
-        <p:input name="data" href="#xhtml-document#xpointer((//xforms:instance[@id = 'fr-form-instance'])[1]/*)"/>
+        <p:input name="data" href="#unrolled-form-document#xpointer((//xforms:instance[@id = 'fr-form-instance'])[1]/*)"/>
         <p:output name="data" id="form-data"/>
+    </p:processor>
+
+    <!-- Obtain original form document -->
+    <p:processor name="oxf:scope-generator">
+        <p:input name="config">
+            <config>
+                <key>oxf.fr.form</key>
+                <scope>request</scope>
+            </config>
+        </p:input>
+        <p:output name="data" id="form-document"/>
+    </p:processor>
+
+    <!-- Call up persistence layer to obtain the PDF file -->
+    <p:processor name="oxf:url-generator">
+        <p:input name="config" transform="oxf:unsafe-xslt" href="#form-document">
+            <config xsl:version="2.0" xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
+                <url>
+                    <xsl:value-of select="pipeline:rewriteResourceURI(//xforms:instance[@id = 'fr-form-attachments']/*/pdf, true())"/>
+                </url>
+                <mode>binary</mode>
+            </config>
+        </p:input>
+        <p:output name="data" id="pdf-template"/>
+    </p:processor>
+
+    <p:processor name="oxf:request">
+        <p:input name="config">
+            <config>
+                <include>/request/parameters/parameter[name = 'fr-language']</include>
+            </config>
+        </p:input>
+        <p:output name="data" id="request"/>
     </p:processor>
 
     <!-- Create mapping file -->
     <p:processor name="oxf:xslt">
         <p:input name="data" href="#form-data"/>
-        <p:input name="xhtml" href="#xhtml-document" debug="ddddd"/>
+        <p:input name="xhtml" href="#form-document"/>
+        <p:input name="request" href="#request"/>
         <p:input name="config">
             <config xsl:version="2.0"
                     xmlns:xforms="http://www.w3.org/2002/xforms"
                     xmlns:xhtml="http://www.w3.org/1999/xhtml"
                     xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
-                
+
+
+                <xsl:variable name="data" select="/*" as="element()"/>
                 <xsl:variable name="xhtml" select="doc('input:xhtml')/*" as="element(xhtml:html)"/>
+                <xsl:variable name="request" select="doc('input:request')/*" as="element(request)"/>
 
-                <!-- TODO: load template -->
-                <!--<template href="input:template" show-grid="false"/>-->
-                <template href="file:/Users/ebruchez/Desktop/bookcast.pdf" show-grid="false"/>
+                <!-- Get current resources -->
+                <xsl:variable name="request-language" select="$request/parameters/parameter[name = 'fr-language']/value" as="xs:string"/>
+                <xsl:variable name="resources-instance" select="$xhtml/xhtml:head/xforms:model[@id = 'fr-form-model']/xforms:instance[@id = 'fr-form-resources']/resources" as="element(resources)"/>
+                <xsl:variable name="current-resources" select="$resources-instance/resource[@xml:lang = $request-language]" as="element(resource)"/>
 
+                <xsl:variable name="fr-resources" select="doc('oxf:/apps/fr/i18n/resources.xml')/*" as="element(resources)"/>
+                <xsl:variable name="fr-current-resources" select="($fr-resources/(resource[xml:lang = $request-language], resource[1]))[1]" as="element(resource)"/>
+
+                <template href="input:template" show-grid="false"/>
                 <group ref="/*" font-pitch="15.9" font-family="Courier" font-size="14">
                     <xsl:for-each select="$xhtml/xhtml:body//fr:body//fr:section">
                         <xsl:variable name="section-name" select="@context" as="xs:string"/>
                         <group ref="{$section-name}" >
-                            <xsl:for-each select=".//xforms:*[@ref or @bind]">
+                            <xsl:for-each select=".//xforms:*[(@ref or @bind) and ends-with(@id, '-control')]">
                                 <xsl:variable name="control" select="." as="element()"/>
-                                <xsl:variable name="control-name" select="substring-before($control, '-control')" as="xs:string"/>
+                                <xsl:variable name="control-name" select="substring-before($control/@id, '-control')" as="xs:string"/>
+                                <!-- Obtain the value directly from the data (makes it easier to deal with itemsets) -->
+                                <!--<xsl:message>-->
+                                    <!--aaa <xsl:value-of select="$section-name"/>-->
+                                    <!--aaa <xsl:value-of select="$control-name"/>-->
+                                    <!--aaa <xsl:value-of select="$data/*[local-name() = $section-name]/*[local-name() = $control-name]"/>-->
+                                <!--</xsl:message>-->
+                                <xsl:variable name="control-value" select="$data/*[local-name() = $section-name]/*[local-name() = $control-name]" as="xs:string"/>
 
                                 <xsl:variable name="bind" select="$xhtml/xhtml:head/xforms:model//xforms:bind[@id = $control/@bind]" as="element(xforms:bind)?"/>
                                 <xsl:variable name="path" select="if ($bind)
                                     then string-join(($bind/ancestor-or-self::xforms:bind/@nodeset)[position() gt 1], '/')
                                     else string-join(($control/ancestor-or-self::*/(@ref | @context)), '/')" as="xs:string"/>
 
-                                <field acro-field-name="'{$control-name}'" value="{$control-name}"/>
+                                <xsl:choose>
+                                    <xsl:when test="local-name($control) = ('select', 'select1')">
+                                        <!-- Selection control -->
+                                        <xsl:variable name="control-resources" select="$current-resources/*[local-name() = $control-name]" as="element()"/>
+
+                                        <field acro-field-name="'{$control-name}'" value="'{$control-resources/item[value = $control-value]/label}'"/>
+                                    </xsl:when>
+                                    <xsl:when test="$bind/@type and substring-after($bind/@type, ':') = 'date'">
+                                        <!-- Date -->
+                                        <field acro-field-name="'{$control-name}'" value="'{if (. castable as xs:date) then format-date(xs:date(.), $fr-current-resources/formats/date, $request-language, (), ()) else .}'"/>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <!-- Other control -->
+                                        <field acro-field-name="'{$control-name}'" value="'{$control-value}'"/>
+                                    </xsl:otherwise>
+                                </xsl:choose>
 
                             </xsl:for-each>
                         </group>
@@ -75,17 +140,14 @@
                 </group>
             </config>
         </p:input>
-        <p:output name="data" id="mapping" debug="zzzzz"/>
+        <p:output name="data" id="mapping"/>
     </p:processor>
-
-    <!-- Load PDF template -->
-    <!-- TODO -->
 
     <!-- Produce PDF document -->
     <p:processor name="oxf:pdf-template">
-        <p:input name="data" href="#form-data" debug="xxxxx"/>
+        <p:input name="data" href="#form-data"/>
         <p:input name="model" href="#mapping"/>
-        <!--<p:input name="template" href="xxx"/>-->
+        <p:input name="template" href="#pdf-template"/>
         <p:output name="data" ref="data"/>
     </p:processor>
 

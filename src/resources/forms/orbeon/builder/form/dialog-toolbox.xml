@@ -25,6 +25,8 @@
       id="fb-toolbox-dialog" level="modeless" draggable="false" visible="true" close="false" class="fb-toolbox-dialog" neighbor="switch-fb-details-section" constrain="true">
 
     <xforms:label>Form Builder Toolbox</xforms:label>
+
+    <!-- XVC toolbox -->
     <xhtml:div class="fb-xvc">
         <xforms:trigger appearance="minimal" ref="$xcv/cut-trigger">
             <xforms:label>
@@ -65,7 +67,7 @@
             </xforms:action>
         </xforms:trigger>
     </xhtml:div>
-
+    <!-- Sections, grids, etc. toolbox -->
     <xhtml:div class="fb-toolbox fb-tools">
         <!-- Add new section -->
         <xhtml:div class="fb-tool">
@@ -174,6 +176,7 @@
             </xhtml:div>
         </xforms:group>
     </xhtml:div>
+    <!-- Controls toolbox -->
     <xhtml:div class="fb-toolbox fb-tools">
         <xforms:repeat nodeset="instance('fb-controls-template')/template" id="fb-controls-template-repeat">
 
@@ -254,6 +257,66 @@
             </xhtml:div>
         </xforms:repeat>
     </xhtml:div>
+    <!-- Actions toolbox -->
+    <xhtml:div class="fb-toolbox fb-tools">
+        <xhtml:div class="fb-tool">
+            <!-- Upload XML Schema -->
+            <xforms:trigger>
+                <xforms:label>
+                    <xhtml:img src="/forms/orbeon/builder/images/upload.png" alt="Upload XML Schema" title="Upload XML Schema"/>
+                    <xhtml:span>
+                        <xforms:output value="if (exists($model/xs:schema)) then 'Change Schema' else 'Upload Schema'"/>
+                    </xhtml:span>
+                </xforms:label>
+                <xxforms:show ev:event="DOMActivate" dialog="fb-schema-upload-dialog"/>
+            </xforms:trigger>
+        </xhtml:div>
+        <xhtml:div class="fb-tool">
+            <!-- Upload CSS -->
+            <xforms:trigger>
+                <xforms:label>
+                    <xhtml:img src="/apps/fr/style/css.gif" alt="Upload PDF" title="Upload PDF"/>
+                    <xhtml:span>
+                        <xforms:output value="if (xxforms:bind('css-attachment-bind') = '') then 'Upload CSS' else 'Change CSS'"/>
+                    </xhtml:span>
+                </xforms:label>
+                <xxforms:show ev:event="DOMActivate" dialog="fb-css-upload-dialog"/>
+            </xforms:trigger>
+        </xhtml:div>
+        <xhtml:div class="fb-tool">
+            <!-- Upload PDF Template -->
+            <xforms:trigger>
+                <xforms:label>
+                    <xhtml:img src="/apps/fr/style/pdf.png" alt="Upload PDF" title="Upload PDF"/>
+                    <xhtml:span>
+                        <xforms:output value="if (xxforms:bind('pdf-attachment-bind') = '') then 'Upload PDF' else 'Change PDF'"/>
+                    </xhtml:span>
+                </xforms:label>
+                <xxforms:show ev:event="DOMActivate" dialog="fb-pdf-upload-dialog"/>
+            </xforms:trigger>
+        </xhtml:div>
+        <xhtml:div class="fb-tool">
+            <!-- Show XML -->
+            <xforms:trigger>
+                <xforms:label>
+                    <xhtml:img src="/apps/fr/style/view-xml.gif" alt="Show XML" title="Show XML"/>
+                    <xhtml:span>Show Source</xhtml:span>
+                </xforms:label>
+                <xxforms:show ev:event="DOMActivate" dialog="fb-xml-dialog"/>
+            </xforms:trigger>
+        </xhtml:div>
+        <xhtml:div class="fb-tool">
+            <!-- Edit Source -->
+            <xforms:trigger>
+                <xforms:label>
+                    <xhtml:img src="/apps/fr/style/edit.gif" alt="Edit Source" title="Edit Source"/>
+                    <xhtml:span>Edit Source</xhtml:span>
+                </xforms:label>
+                <xxforms:show ev:event="DOMActivate" dialog="fb-edit-source-dialog"/>
+            </xforms:trigger>
+        </xhtml:div>
+    </xhtml:div>
+    <!-- Languages toolbox -->
     <xhtml:div class="fb-toolbox">
         <xforms:group class="fb-language-choice fb-hide-alert">
             <xforms:select1 appearance="minimal" ref="$lang" id="fb-resources-language-select">
@@ -288,4 +351,5 @@
             </xforms:group>
         </xforms:group>
     </xhtml:div>
+
 </xxforms:dialog>

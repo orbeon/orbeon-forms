@@ -1844,55 +1844,6 @@
                     </xhtml:div>
                 </fr:section>
 
-                <xhtml:div class="fb-toolbar fb-form-toolbar">
-
-                    <!-- Show XML -->
-                    <xforms:trigger>
-                        <xforms:label>
-                            <xhtml:img src="/apps/fr/style/view-xml.gif" alt="Show XML" title="Show XML"/>
-                            <xhtml:span>Show XML</xhtml:span>
-                        </xforms:label>
-                        <xxforms:show ev:event="DOMActivate" dialog="fb-xml-dialog"/>
-                    </xforms:trigger>
-
-                    <!-- Edit Source -->
-                    <xforms:trigger>
-                        <xforms:label>
-                            <xhtml:img src="/apps/fr/style/edit.gif" alt="Edit Source" title="Edit Source"/>
-                            <xhtml:span>Edit Source</xhtml:span>
-                        </xforms:label>
-                        <xxforms:show ev:event="DOMActivate" dialog="fb-edit-source-dialog"/>
-                    </xforms:trigger>
-
-                    <!-- Upload XML Schema -->
-                    <xforms:trigger>
-                        <xforms:label>
-                            <xhtml:img src="/forms/orbeon/builder/images/upload.png" alt="Upload XML Schema" title="Upload XML Schema"/>
-                            <xhtml:span>XML Schema</xhtml:span>
-                        </xforms:label>
-                        <xxforms:show ev:event="DOMActivate" dialog="fb-schema-upload-dialog"/>
-                    </xforms:trigger>
-
-                    <!-- Upload CSS -->
-                    <xforms:trigger>
-                        <xforms:label>
-                            <xhtml:img src="/apps/fr/style/css.gif" alt="Upload PDF" title="Upload PDF"/>
-                            <xhtml:span>Upload CSS</xhtml:span>
-                        </xforms:label>
-                        <xxforms:show ev:event="DOMActivate" dialog="fb-css-upload-dialog"/>
-                    </xforms:trigger>
-
-                    <!-- Upload PDF Template -->
-                    <xforms:trigger>
-                        <xforms:label>
-                            <xhtml:img src="/apps/fr/style/pdf.png" alt="Upload PDF" title="Upload PDF"/>
-                            <xhtml:span>Upload PDF</xhtml:span>
-                        </xforms:label>
-                        <!-- TODO -->
-                        <!--<xxforms:show ev:event="DOMActivate" dialog="fb-xml-dialog"/>-->
-                    </xforms:trigger>
-                </xhtml:div>
-
                 <!-- Dialog to show the XML -->
                 <xxforms:dialog id="fb-xml-dialog" level="modeless" close="true" draggable="true">
                     <xforms:label>View XML</xforms:label>
@@ -2088,6 +2039,72 @@
                     </xhtml:div>
                     <!-- Hide dialog -->
                     <xxforms:hide ev:event="DOMActivate" dialog="fb-css-upload-dialog"/>
+                </xxforms:dialog>
+
+                <!-- PDF upload dialog -->
+                <!--<xi:include href="oxf:/forms/orbeon/builder/form/dialog-pdf.xml" xxi:omit-xml-base="true"/>-->
+                <!-- NOTE: For now don't XInclude, otherwise the Form Runner can't see the fr-attachment -->
+                <xxforms:dialog id="fb-pdf-upload-dialog" level="modal" close="true" draggable="true">
+
+                    <xforms:label>Upload PDF</xforms:label>
+                    <xxforms:variable name="attachments-instance" select="$model/xforms:instance[@id = 'fr-form-attachments']/*"/>
+                    <xhtml:div>
+                        <xhtml:div class="dialog-message">
+
+                            <!-- Upload a PDF file -->
+                            <xforms:upload bind="pdf-attachment-bind" class="fr-attachment">
+                                <xforms:label>PDF File</xforms:label>
+                                <xforms:filename ref="@filename"/>
+                                <xforms:mediatype ref="@mediatype"/>
+                                <xxforms:size ref="@size"/>
+
+                                <!-- Clear information when deselected -->
+                                <xforms:action ev:event="xforms-deselect">
+                                    <!-- Clear uploaded content -->
+                                    <xforms:setvalue ref="."/>
+                                    <xforms:setvalue ref="@filename"/>
+                                    <xforms:setvalue ref="@mediatype"/>
+                                    <xforms:setvalue ref="@size"/>
+                                </xforms:action>
+                            </xforms:upload>
+
+                            <!--<xforms:group context="$attachments-instance/attachment[1]" appearance="xxforms:internal">-->
+                                <!--<xhtml:ul>-->
+                                    <!--<xhtml:li>-->
+                                        <!--<xhtml:p>-->
+                                            <!--<xhtml:b>File Name:</xhtml:b>-->
+                                            <!--<xforms:output value="@filename"/>-->
+                                        <!--</xhtml:p>-->
+                                    <!--</xhtml:li>-->
+                                    <!--<xhtml:li>-->
+                                        <!--<xhtml:p>-->
+                                            <!--<xhtml:b>Mediatype:</xhtml:b>-->
+                                            <!--<xforms:output value="@mediatype"/>-->
+                                        <!--</xhtml:p>-->
+                                    <!--</xhtml:li>-->
+                                    <!--<xhtml:li>-->
+                                        <!--<xhtml:p>-->
+                                            <!--<xhtml:b>Size:</xhtml:b>-->
+                                            <!--<xforms:output value="@size"/>-->
+                                        <!--</xhtml:p>-->
+                                    <!--</xhtml:li>-->
+                                <!--</xhtml:ul>-->
+                            <!--</xforms:group>-->
+
+                        </xhtml:div>
+                    </xhtml:div>
+                    <xhtml:div class="dialog-buttons">
+                        <xforms:group>
+                            <xforms:trigger class="xforms-trigger-appearance-modal">
+                                <xforms:label>
+                                    <!--<xhtml:img src="/forms/orbeon/builder/images/upload.png" alt="Publish" title="Publish"/>-->
+                                    <xhtml:span>Done</xhtml:span>
+                                </xforms:label>
+                            </xforms:trigger>
+                        </xforms:group>
+                    </xhtml:div>
+                    <!-- Hide dialog -->
+                    <xxforms:hide ev:event="DOMActivate" dialog="fb-pdf-upload-dialog"/>
                 </xxforms:dialog>
 
                 <!-- Help dialog -->

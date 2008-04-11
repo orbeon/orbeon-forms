@@ -133,64 +133,69 @@
                         <xhtml:div class="yui-g fr-buttons-block">
                             <!-- Display the toolbar and errors -->
                             <xforms:group model="fr-persistence-model" appearance="xxforms:internal">
-                                <xhtml:table class="fr-error-buttons">
-                                    <xhtml:tr>
-                                        <xhtml:td>
-                                            <!-- Display clean/dirty status -->
-                                            <xforms:group ref="instance('fr-persistence-instance')[data-status = 'dirty']">
-                                                <!-- TODO: i18n or use icon instead -->
-                                                <xhtml:p class="fr-unsaved-data">Your document contains unsaved changes.</xhtml:p>
-                                            </xforms:group>
-                                            <xforms:group ref="instance('fr-persistence-instance')[data-status = 'clean']"/>
-                                            <!-- Display messages -->
-                                            <xforms:switch>
-                                                <xforms:case id="orbeon-message-none">
-                                                    <xhtml:p/>
-                                                </xforms:case>
-                                                <xforms:case id="fr-message-success">
-                                                    <xhtml:p class="fr-message-success">
-                                                        <xforms:output value="instance('fr-persistence-instance')/message"/>
-                                                    </xhtml:p>
-                                                </xforms:case>
-                                                <xforms:case id="fr-message-validation-error">
-                                                    <xhtml:p class="fr-message-validation-error">
-                                                        <xforms:output value="instance('fr-persistence-instance')/message"/>
-                                                    </xhtml:p>
-                                                </xforms:case>
-                                                <xforms:case id="fr-message-fatal-error">
-                                                    <xhtml:p class="fr-message-fatal-error">
-                                                        <xforms:output value="instance('fr-persistence-instance')/message"/>
-                                                    </xhtml:p>
-                                                </xforms:case>
-                                            </xforms:switch>
-                                        </xhtml:td>
-                                    </xhtml:tr>
-                                    <xhtml:tr>
-                                        <xhtml:td>
-                                            <xforms:group ref=".">
-                                                <xforms:group model="fr-error-summary-model" ref="instance('fr-errors-instance')[error[@id = instance('fr-visited-instance')/control/@id]]">
-                                                    <!-- TODO: i18n -->
-                                                    <xhtml:span class="fr-error-title">Your document has the following issues:</xhtml:span>
-                                                    <xhtml:ol class="fr-error-list">
-                                                        <xforms:repeat nodeset="error" id="fr-errors-repeat">
-                                                            <xhtml:li>
-                                                                <xforms:output value="@label" class="fr-error-label"/>
-                                                                <xforms:group ref=".[string-length(@indexes) > 0]" class="fr-error-row">
-                                                                    <xforms:output value="concat(' (row ', @indexes, ')')"/>
-                                                                </xforms:group>
-                                                                <xforms:group ref=".[normalize-space(@alert) != '']" class="fr-error-alert">
-                                                                    - <xforms:output value="@alert"/>
-                                                                </xforms:group>
-                                                            </xhtml:li>
-                                                        </xforms:repeat>
-                                                    </xhtml:ol>
+
+                                <!-- Only show messages and error table if necessary -->
+                                <xforms:group model="fr-persistence-model" ref=".[instance('fr-persistence-instance')[data-status = 'dirty']
+                                                                                or instance('fr-persistence-instance')/message != ''
+                                                                                or xxforms:instance('fr-errors-instance')/error]">
+                                    <xhtml:table class="fr-error-messages">
+                                        <xhtml:tr>
+                                            <xhtml:td>
+                                                <!-- Display clean/dirty status -->
+                                                <xforms:group ref="instance('fr-persistence-instance')[data-status = 'dirty']">
+                                                    <!-- TODO: i18n or use icon instead -->
+                                                    <xhtml:p class="fr-unsaved-data">Your document contains unsaved changes.</xhtml:p>
                                                 </xforms:group>
-                                                <xforms:group model="fr-error-summary-model" ref="instance('fr-errors-instance')[not(error)]">
+                                                <!-- Display messages -->
+                                                <xforms:switch>
+                                                    <xforms:case id="fr-message-none">
+                                                        <xhtml:p/>
+                                                    </xforms:case>
+                                                    <xforms:case id="fr-message-success">
+                                                        <xhtml:p class="fr-message-success">
+                                                            <xforms:output value="instance('fr-persistence-instance')/message"/>
+                                                        </xhtml:p>
+                                                    </xforms:case>
+                                                    <xforms:case id="fr-message-validation-error">
+                                                        <xhtml:p class="fr-message-validation-error">
+                                                            <xforms:output value="instance('fr-persistence-instance')/message"/>
+                                                        </xhtml:p>
+                                                    </xforms:case>
+                                                    <xforms:case id="fr-message-fatal-error">
+                                                        <xhtml:p class="fr-message-fatal-error">
+                                                            <xforms:output value="instance('fr-persistence-instance')/message"/>
+                                                        </xhtml:p>
+                                                    </xforms:case>
+                                                </xforms:switch>
+                                            </xhtml:td>
+                                        </xhtml:tr>
+                                        <xhtml:tr>
+                                            <xhtml:td>
+                                                <xforms:group ref=".">
+                                                    <xforms:group model="fr-error-summary-model" ref="instance('fr-errors-instance')[error[@id = instance('fr-visited-instance')/control/@id]]">
+                                                        <!-- TODO: i18n -->
+                                                        <xhtml:span class="fr-error-title">Please correct the following issues:</xhtml:span>
+                                                        <xhtml:ol class="fr-error-list">
+                                                            <xforms:repeat nodeset="error" id="fr-errors-repeat">
+                                                                <xhtml:li>
+                                                                    <xforms:output value="@label" class="fr-error-label"/>
+                                                                    <xforms:group ref=".[string-length(@indexes) > 0]" class="fr-error-row">
+                                                                        <xforms:output value="concat(' (row ', @indexes, ')')"/>
+                                                                    </xforms:group>
+                                                                    <xforms:group ref=".[normalize-space(@alert) != '']" class="fr-error-alert">
+                                                                        - <xforms:output value="@alert"/>
+                                                                    </xforms:group>
+                                                                </xhtml:li>
+                                                            </xforms:repeat>
+                                                        </xhtml:ol>
+                                                    </xforms:group>
+                                                    <xforms:group model="fr-error-summary-model" ref="instance('fr-errors-instance')[not(error)]">
+                                                    </xforms:group>
                                                 </xforms:group>
-                                            </xforms:group>
-                                        </xhtml:td>
-                                    </xhtml:tr>
-                                </xhtml:table>
+                                            </xhtml:td>
+                                        </xhtml:tr>
+                                    </xhtml:table>
+                                </xforms:group>
                                 <xhtml:div class="fr-buttons">
                                     <xsl:choose>
                                         <!-- In print and test modes, only include a close button -->
@@ -226,8 +231,8 @@
                                                     <fr:clear-button/>
                                                     <fr:print-button/>
                                                     <fr:pdf-button/>
-                                                    <fr:take-offline/>
-                                                    <fr:take-online/>
+                                                    <!--<fr:take-offline/>-->
+                                                    <!--<fr:take-online/>-->
                                                     <fr:save-locally-button/>
                                                     <fr:save-button/>
                                                 </fr:buttons>
@@ -324,7 +329,9 @@
     </xsl:template>
 
     <xsl:template match="fr:pdf-button">
-        <xforms:trigger>
+        <!-- Show button only if there is no PDF template -->
+        <xforms:trigger model="fr-persistence-model"
+                        ref=".[instance('fr-source-form-instance')/xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-attachments']/*/pdf = '']">
             <xforms:label>
                 <xhtml:img src="/apps/fr/style/pdf.png" alt=""/>
                 <xhtml:span><xforms:output value="$fr-resources/detail/labels/print-pdf"/></xhtml:span>
@@ -333,10 +340,12 @@
                 <xforms:send submission="fr-pdf-submission"/>
             </xforms:action>
         </xforms:trigger>
-        <xforms:trigger>
+        <!-- Show button only if there is a PDF template -->
+        <xforms:trigger model="fr-persistence-model"
+                        ref=".[instance('fr-source-form-instance')/xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-attachments']/*/pdf != '']">
             <xforms:label>
                 <xhtml:img src="/apps/fr/style/pdf.png" alt=""/>
-                <xhtml:span><xforms:output value="$fr-resources/detail/labels/print-pdf"/> (Template)</xhtml:span>
+                <xhtml:span><xforms:output value="$fr-resources/detail/labels/print-pdf"/></xhtml:span>
             </xforms:label>
             <xforms:action ev:event="DOMActivate">
                 <xforms:send submission="fr-pdf-template-submission"/>
@@ -677,7 +686,7 @@
                 </xsl:if>
                 <xsl:for-each select="xhtml:tr[1]/xhtml:td/xforms:*[1]">
                     <xhtml:th>
-                        <xforms:output value="''" style="display: none"><!-- hide the actual output control -->
+                        <xforms:output value="''" class="fr-hidden"><!-- hide the actual output control -->
                             <xsl:copy-of select="xforms:label | xforms:help"/>
                         </xforms:output>
                     </xhtml:th>

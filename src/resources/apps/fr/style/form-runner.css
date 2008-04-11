@@ -10,7 +10,7 @@ body, body table, textarea.xforms-textarea {
     font-family: "Lucida Grande", Tahoma, Arial, Verdana, sans-serif;
 }
 
-.fr-hidden { display: none }
+#doc .fr-hidden, #doc4 .fr-hidden { display: none }
 .fr-clear { clear: both }
 
 .xforms-help-image { vertical-align: -0.2em; display: inline; padding: 0 .5em 0 0; margin: 0; }
@@ -157,6 +157,12 @@ h3, h4 {
 /*.fr-summary-table-div { overflow: auto }*/
 /*.fr-summary-table td, .fr-summary-table th { white-space: nowrap }*/
 
+.fr-summary-search .xforms-label {
+    display: block;     /* So control is not displayed next to the help icon but on a new line */
+    /*margin-top: 0.3em;  *//* Insert some space between the label / help and the control */
+    /*clear: both;*/
+}
+
 .fr-summary-table tbody .xforms-repeat-selected-item-1 { background-color: #3598D4 }
 .fr-summary-table tbody .xforms-repeat-selected-item-2 { background-color: #3598D4 }/* HACK for IE 7 only */
 .fr-summary-table tbody tr:hover { background-color: #3598D4 }
@@ -259,7 +265,8 @@ body { text-align: left }
     display: block;
     font-size: smaller;
     font-weight: bold;
-    /*margin-left: .5em;*/
+    margin-top: .2em;
+    margin-left: .25em;
     height: auto;
     /*width: 100%;*/
     width: auto;
@@ -272,8 +279,8 @@ body { text-align: left }
 .xforms-hint {
     display: block;
     font-size: smaller;
-    margin-left: .5em;
-    /*width: 22em;*/
+    margin-top: .2em;
+    margin-left: .25em;
     width: 100%;
     color: gray
 }
@@ -303,9 +310,9 @@ div.fr-collapsible {
 .fr-unsaved-data { color: red }
 
 /* Errors */
-.fr-error-buttons { float: left }
-.fr-error-buttons td { padding: 0.2em }
-.fr-error-title { font-size: 123.1%; }
+.fr-error-messages { float: left; margin-bottom: 0 }
+.fr-error-messages td { padding: 0.2em }
+.fr-error-title { }
 .fr-error-list li { margin-bottom: .5em; }
 .fr-error-list label { display: none }
 .fr-error-label { font-weight: bold }

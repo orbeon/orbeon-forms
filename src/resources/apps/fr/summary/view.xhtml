@@ -241,8 +241,9 @@
 
                     <!-- Structured search -->
                     <xforms:repeat nodeset="instance('fr-search-instance')/query[@path]" id="search-repeat">
+                        <xxforms:variable name="control-name" select="context()/@name"/>
                         <div class="fr-summary-search-item">
-                            <xxforms:variable name="label" select="$form-resources/*[local-name() = context()/@name]/label"/>
+                            <xxforms:variable name="label" select="$form-resources/*[local-name() = $control-name]/label"/>
                             <!-- input -->
                             <xforms:input ref=".[@control = 'input']" incremental="true" >
                                 <xforms:label>
@@ -261,13 +262,13 @@
                                     <xforms:output value="$label"/>
                                 </xforms:label>
                                 <xforms:item>
-                                    <xforms:label>[Any]</xforms:label>
+                                    <xforms:label ref="$fr-resources/summary/labels/any"/>
                                     <xforms:value/>
                                 </xforms:item>
                                 <xforms:itemset model="fr-persistence-model"
-                                                nodeset="instance('fr-source-form-instance')/xhtml:head/xforms:model/xforms:instance[@id = concat(context()/@name, 's-itemset')]/*/*"
+                                                nodeset="$form-resources/*[local-name() = $control-name]/item"
                                                 xxforms:refresh-items="false">
-                                    <xforms:label ref="name"/>
+                                    <xforms:label ref="label"/>
                                     <xforms:value ref="value"/>
                                 </xforms:itemset>
                             </xforms:select1>
@@ -384,13 +385,17 @@
                             </xforms:action>
                         </xforms:trigger>
 
-                        <span class="fr-paging-numbers">
-                            <xforms:output value="max((instance('fr-paging-instance')/from + index('documents-repeat') - 1, 0))"/>
+                        <xforms:group class="fr-paging-numbers" ref=".[xs:integer(instance('fr-paging-instance')/search-total) gt 0]">
+                            <!-- Some results -->
+                            <xforms:output value="max((instance('fr-paging-instance')/from, 0))"/>
                             <xforms:output value="$fr-resources/summary/titles/to"/>
-                            <xforms:output value="max((instance('fr-paging-instance')/to + index('documents-repeat') - 1, 0))"/>
+                            <xforms:output value="max((instance('fr-paging-instance')/to, 0))"/>
                             <xforms:output value="$fr-resources/summary/titles/of"/>
                             <xforms:output value="instance('fr-paging-instance')/search-total"/>
-                        </span>
+                        </xforms:group>
+                        <xforms:group class="fr-paging-numbers" ref=".[xs:integer(instance('fr-paging-instance')/search-total) = 0]">
+                            <!-- No results -->
+                        </xforms:group>
 
                         <xforms:trigger ref="instance('fr-paging-instance')/next-trigger">
                             <xforms:label>

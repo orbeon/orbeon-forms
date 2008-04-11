@@ -116,7 +116,6 @@
             <xsd:documentation>submit info container.</xsd:documentation>
         </xsd:annotation>
         <xsd:complexType>
-
             <xsd:sequence minOccurs="0" maxOccurs="unbounded">
                 <xsd:group ref="xforms:Action"/>
             </xsd:sequence>
@@ -608,9 +607,9 @@
                 <xsd:element ref="xforms:setindex"/>
                 <xsd:element ref="xforms:toggle"/>
                 <xsd:element ref="xforms:message"/>
+                <xsd:any namespace="##other" processContents="lax"/>
             </xsd:choice>
         </xsd:sequence>
-
     </xsd:group>
     <xsd:element name="action">
         <xsd:complexType>

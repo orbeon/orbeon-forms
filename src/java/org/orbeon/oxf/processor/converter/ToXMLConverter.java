@@ -14,19 +14,17 @@
 package org.orbeon.oxf.processor.converter;
 
 import org.apache.commons.fileupload.FileItem;
+import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.processor.serializer.BinaryTextContentHandler;
-import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.xml.XMLUtils;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
-import org.dom4j.Element;
-
-import javax.xml.parsers.SAXParser;
 
 /**
  * This converter converts from a binary document or a text document to a parsed XML document.
@@ -69,8 +67,7 @@ public class ToXMLConverter extends ProcessorImpl {
                     readInputAsSAX(pipelineContext, INPUT_DATA, new BinaryTextContentHandler(null, fileItem.getOutputStream(), false, null, false, false, null, false));
 
                     // Create parser
-                    final SAXParser parser = XMLUtils.newSAXParser(config.validating, config.handleXInclude);
-                    final XMLReader reader = parser.getXMLReader();
+                    final XMLReader reader = XMLUtils.newXMLReader(config.validating, config.handleXInclude);
 
                     // Run parser on InputStream
                     //inputSource.setSystemId();

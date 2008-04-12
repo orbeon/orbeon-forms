@@ -28,7 +28,7 @@ public class LocationSAXContentHandler extends NonLazySAXContentHandler {
 
     public void startElement(String namespaceURI, String localName, String qualifiedName, Attributes attributes) throws SAXException {
         super.startElement(namespaceURI, localName, qualifiedName, attributes);
-        ElementPath path = getElementStack();
+        final ElementPath path = getElementStack();
         path.getCurrent().setData(new LocationData(locator));
     }
 }

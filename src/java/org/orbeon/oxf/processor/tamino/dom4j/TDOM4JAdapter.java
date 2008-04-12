@@ -198,8 +198,7 @@ public class TDOM4JAdapter extends TXMLObject implements Serializable {
     public void readFrom(InputStream inputStream, String baseUri) throws TStreamReadException {
         try {
             // Obtain the created DOM4J document.
-//			document = TString.isEmpty( baseUri ) ? Dom4jUtils.read( inputStream ) : Dom4jUtils.read( inputStream, baseUri );
-            document = TString.isEmpty(baseUri) ? Dom4jUtils.readDom4j(inputStream) : TransformerUtils.readDom4j(inputStream, baseUri);
+            document = TransformerUtils.readDom4j(inputStream, baseUri, false);
             // Reset the temporay id and docname that might be given in base class if element previously has been null.
             if (element == null) {
                 super.setDocname(null);
@@ -255,7 +254,7 @@ public class TDOM4JAdapter extends TXMLObject implements Serializable {
     public void readFrom(InputStream inputStream) throws TStreamReadException {
         try {
             // Obtain the created DOM4J document.
-            document = Dom4jUtils.readDom4j(inputStream);
+            document = TransformerUtils.readDom4j(inputStream, null, false);
             // Reset the temporay id and docname that might be given in base class if element previously has been null.
             if (element == null) {
                 super.setDocname(null);

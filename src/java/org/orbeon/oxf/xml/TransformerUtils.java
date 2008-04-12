@@ -13,13 +13,15 @@
  */
 package org.orbeon.oxf.xml;
 
-import orbeon.apache.xalan.processor.StylesheetHandler;
 import org.dom4j.Document;
 import org.dom4j.io.DocumentSource;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentSource;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
+import org.orbeon.oxf.processor.xinclude.XIncludeProcessor;
+import org.orbeon.oxf.processor.transformer.TransformerURIResolver;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.tinytree.TinyBuilder;
@@ -48,7 +50,6 @@ public class TransformerUtils {
 
     public static final String DEFAULT_OUTPUT_ENCODING = "utf-8";
 
-    public static final String XALAN_BUILTIN_TRANSFORMER_TYPE = "orbeon.apache.xalan.processor.TransformerFactoryImpl";
     public static final String SAXON_BUILTIN_TRANSFORMER_TYPE = "org.orbeon.saxon.TransformerFactoryImpl";
     public static final String IDENTITY_TYPE = SAXON_BUILTIN_TRANSFORMER_TYPE;
     public static final String DEFAULT_TYPE = SAXON_BUILTIN_TRANSFORMER_TYPE;
@@ -97,39 +98,7 @@ public class TransformerUtils {
      */
     public static SAXTransformerFactory getFactory(String clazz) {
         try {
-            if (XALAN_BUILTIN_TRANSFORMER_TYPE.equals(clazz)) {
-                // Special case for Xalan
-//                if (transformerFactories.get(XALAN_BUILTIN_TRANSFORMER_TYPE) == null) {
-
-                    // HACK
-                    //
-                    // When we create a Templates (object representing the stylesheet) based on an
-                    // JAXP Source, we call the TransformerFactoryImpl.newTemplates(Source source)
-                    // method of Xalan.
-                    //
-                    // This method has a "bug": if the sytemId is not set on the Source (and it's
-                    // not in the case of a SAXSource since the SAXSource is based on am XMLReader
-                    // and the XMLReader will set the Locator on which is based the systemId when
-                    // the parse() method is called), the
-                    // TransformerFactoryImpl.newTemplates(Source) method will set the systemId on
-                    // the StylesheetHandler to the home directory.
-                    //
-                    // We prevent this to overriding the StylesheetHandler.setSystemId below.
-
-                    return new orbeon.apache.xalan.processor.TransformerFactoryImpl() {
-                        public TemplatesHandler newTemplatesHandler()
-                                throws TransformerConfigurationException {
-                            return new StylesheetHandler(this) {
-                                public void setSystemId(String baseID) {
-                                    // Do nothing.
-                                }
-                            };
-                        }
-                    };
-            } else {
-                // Any other factory
-                return (SAXTransformerFactory) getTransformerClass(clazz).newInstance();
-            }
+            return (SAXTransformerFactory) getTransformerClass(clazz).newInstance();
         } catch (Exception e) {
             throw new OXFException(e);
         }
@@ -357,39 +326,52 @@ public class TransformerUtils {
     /**
      * Transform an InputStream to a dom4j Document.
      */
-    public static Document readDom4j(InputStream inputStream, String systemId) {
-        return readDom4j(new StreamSource(inputStream, systemId));
+    public static Document readDom4j(InputStream inputStream, String systemId, boolean handleXInclude) {
+        return readDom4j(new StreamSource(inputStream, systemId), handleXInclude);
     }
 
     /**
      * Transform a SAX Source to a dom4j Document.
      */
-    public static Document readDom4j(Source source) {
-        final LocationDocumentResult documentResult = new LocationDocumentResult();
+    private static Document readDom4j(Source source, boolean handleXInclude) {
+        final LocationSAXContentHandler dom4jResult = new LocationSAXContentHandler();
         try {
             final Transformer identity = getIdentityTransformer();
-            identity.transform(source, documentResult);
+            if (handleXInclude) {
+                // Insert XIncludeContentHandler
+                identity.transform(source, new SAXResult(new XIncludeProcessor.XIncludeContentHandler(null, dom4jResult, null, new TransformerURIResolver(false))));
+            } else {
+                identity.transform(source, new SAXResult(dom4jResult));
+            }
         } catch (TransformerException e) {
             throw new OXFException(e);
         }
-        return documentResult.getDocument();
+        return dom4jResult.getDocument();
     }
 
     /**
      * Transform an InputStream to a TinyTree.
      */
-    public static DocumentInfo readTinyTree(InputStream inputStream, String systemId) {
-        return readTinyTree(new StreamSource(inputStream, systemId));
+    public static DocumentInfo readTinyTree(InputStream inputStream, String systemId, boolean handleXInclude) {
+        return readTinyTree(new StreamSource(inputStream, systemId), handleXInclude);
     }
 
     /**
      * Transform a SAX Source to a TinyTree.
      */
-    public static DocumentInfo readTinyTree(Source source) {
+    public static DocumentInfo readTinyTree(Source source, boolean handleXInclude) {
         final TinyBuilder treeBuilder = new TinyBuilder();
         try {
             final Transformer identity = getIdentityTransformer();
-            identity.transform(source, treeBuilder);
+            if (handleXInclude) {
+                // Insert XIncludeContentHandler
+                final TransformerHandler identityHandler = getIdentityTransformerHandler();
+                identityHandler.setResult(treeBuilder);
+                identity.transform(source, new SAXResult(new XIncludeProcessor.XIncludeContentHandler(null, identityHandler, null, new TransformerURIResolver(false))));
+            } else {
+                identity.transform(source, treeBuilder);
+            }
+
         } catch (TransformerException e) {
             throw new OXFException(e);
         }
@@ -428,7 +410,7 @@ public class TransformerUtils {
      * Transform a String to a TinyTree.
      */
     public static DocumentInfo stringToTinyTree(String string) {
-        return readTinyTree(new StreamSource(new StringReader(string)));
+        return readTinyTree(new StreamSource(new StringReader(string)), false);
     }
 
     /**

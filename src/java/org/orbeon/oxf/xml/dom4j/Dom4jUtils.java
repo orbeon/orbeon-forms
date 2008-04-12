@@ -57,21 +57,16 @@ public class Dom4jUtils {
     }
 
     private static SAXReader createSAXReader(boolean validating, boolean handleXInclude) throws SAXException {
-        final SAXParser sxPrs = XMLUtils.newSAXParser(validating, handleXInclude);
-        final XMLReader xr = sxPrs.getXMLReader();
-        final SAXReader sxRdr = new SAXReader(xr);
-        final NonLazyUserDataDocumentFactory fctry = NonLazyUserDataDocumentFactory.getInstance14();
-        sxRdr.setDocumentFactory(fctry);
-        return sxRdr;
+        final XMLReader xmlReader = XMLUtils.newXMLReader(validating, handleXInclude);
+
+        final SAXReader saxReader = new SAXReader(xmlReader);
+        final NonLazyUserDataDocumentFactory factory = NonLazyUserDataDocumentFactory.getInstance14();
+        saxReader.setDocumentFactory(factory);
+        return saxReader;
     }
 
     private static SAXReader createSAXReader() throws SAXException {
-        final SAXParser sxPrs = XMLUtils.newSAXParser();
-        final XMLReader xr = sxPrs.getXMLReader();
-        final SAXReader sxRdr = new SAXReader(xr);
-        final NonLazyUserDataDocumentFactory fctry = NonLazyUserDataDocumentFactory.getInstance14();
-        sxRdr.setDocumentFactory(fctry);
-        return sxRdr;
+        return createSAXReader(XMLUtils.DEFAULT_VALIDATING, XMLUtils.DEFAULT_HANDLE_XINCLUDE);
     }
 
     private static String domToString
@@ -113,12 +108,6 @@ public class Dom4jUtils {
     public static Document readDom4j(Reader reader, String uri) throws SAXException, DocumentException {
         final SAXReader saxReader = createSAXReader();
         return saxReader.read(reader, uri);
-    }
-
-    public static Document readDom4j(InputStream inputStream) throws SAXException, DocumentException {
-        // TODO: See TransformerUtils.readDom4j() instead and remove?
-        final SAXReader saxReader = createSAXReader();
-        return saxReader.read(inputStream);
     }
 
     /*

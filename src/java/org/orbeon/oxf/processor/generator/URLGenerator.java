@@ -35,7 +35,6 @@ import org.w3c.dom.Document;
 import org.w3c.tidy.Tidy;
 import org.xml.sax.*;
 
-import javax.xml.parsers.SAXParser;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.dom.DOMSource;
@@ -810,12 +809,9 @@ public class URLGenerator extends ProcessorImpl {
             openConnection();
             // Read the resource from the resource manager and parse it as XML
             try {
-                SAXParser parser = XMLUtils.newSAXParser(config.isValidating(), config.isHandleXInclude());
-                XMLReader reader = parser.getXMLReader();
+                final XMLReader reader = XMLUtils.newXMLReader(config.isValidating(), config.isHandleXInclude());
                 reader.setContentHandler(output);
-                reader.setEntityResolver(XMLUtils.ENTITY_RESOLVER);
-                reader.setErrorHandler(XMLUtils.ERROR_HANDLER);
-                InputSource inputSource;
+                final InputSource inputSource;
                 if (getExternalEncoding() != null) {
                     // The encoding is set externally, either force by the user, or set by the connection
                     inputSource = new InputSource(new InputStreamReader(inputStream, getExternalEncoding()));

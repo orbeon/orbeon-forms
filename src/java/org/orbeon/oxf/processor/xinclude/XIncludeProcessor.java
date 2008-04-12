@@ -130,10 +130,6 @@ public class XIncludeProcessor extends ProcessorImpl {
 
         private boolean generateXMLBase;
 
-        public XIncludeContentHandler(ContentHandler contentHandler, NamespaceSupport3 parentNamespaceSupport, OutputLocator outputLocator) {
-            this(false, null, contentHandler, null, null, false, null, parentNamespaceSupport, false, outputLocator);
-        }
-
         public XIncludeContentHandler(PipelineContext pipelineContext, ContentHandler contentHandler, URIProcessorOutputImpl.URIReferences uriReferences, TransformerURIResolver uriResolver) {
             this(true, pipelineContext, contentHandler, uriReferences, uriResolver, true, null, null, true, new OutputLocator());
         }
@@ -213,6 +209,7 @@ public class XIncludeProcessor extends ProcessorImpl {
                         if (parse != null && !parse.equals("xml"))
                             throw new ValidationException("Invalid 'parse' attribute value: " + parse, new LocationData(outputLocator));
 
+                        String systemId = null;
                         try {
                             // Get SAXSource
                             final String base = outputLocator == null ? null : outputLocator.getSystemId();
@@ -225,11 +222,15 @@ public class XIncludeProcessor extends ProcessorImpl {
                                 uriReferences.addReference(base, href, null, null);
 
                             // Read document
-                            xmlReader.parse(new InputSource(source.getSystemId())); // Yeah, the SAX API doesn't make much sense
+                            systemId = source.getSystemId();
+                            xmlReader.parse(new InputSource(systemId)); // Yeah, the SAX API doesn't make much sense
 
                         } catch (Exception e) {
                             // Resource error, must go to fallback if possible
-                            throw new OXFException(e);
+                            if (systemId != null)
+                                throw new OXFException("Error while parsing: " + systemId, e);
+                            else
+                                throw new OXFException(e);
                         }
 
                     } else if ("fallback".equals(localname)) {

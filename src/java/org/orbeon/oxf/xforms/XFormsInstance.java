@@ -115,7 +115,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventHandlerCont
 
                     if (xmlString.length() > 0) {
                         // Instance document is available in serialized form
-                        documentInfo = TransformerUtils.readTinyTree(new StreamSource(new StringReader(xmlString)));
+                        documentInfo = TransformerUtils.readTinyTree(new StreamSource(new StringReader(xmlString)), false);
                     } else {
                         // Instance document is not available, defer to later initialization
                         documentInfo = null;

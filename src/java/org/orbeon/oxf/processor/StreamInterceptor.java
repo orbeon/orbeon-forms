@@ -24,14 +24,12 @@ import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.w3c.dom.Document;
-import org.w3c.tidy.Configuration;
 import org.w3c.tidy.Tidy;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
 
-import javax.xml.parsers.SAXParser;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXResult;
@@ -161,8 +159,7 @@ public class StreamInterceptor {
                     }
                 } else {
                     // Assume it is XML and parse the output
-                    SAXParser parser = XMLUtils.newSAXParser();
-                    XMLReader reader = parser.getXMLReader();
+                    final XMLReader reader = XMLUtils.newXMLReader(false, false);
 
                     if (fragment) {
                         // Do not generate start and end document events

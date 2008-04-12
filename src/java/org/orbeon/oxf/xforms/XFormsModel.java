@@ -980,9 +980,9 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
                                         // Read result as XML
                                         if (!isReadonlyHint) {
-                                            instanceDocument = TransformerUtils.readDom4j(connectionResult.getResultInputStream(), connectionResult.resourceURI);
+                                            instanceDocument = TransformerUtils.readDom4j(connectionResult.getResultInputStream(), connectionResult.resourceURI, false);
                                         } else {
-                                            instanceDocument = TransformerUtils.readTinyTree(connectionResult.getResultInputStream(), connectionResult.resourceURI);
+                                            instanceDocument = TransformerUtils.readTinyTree(connectionResult.getResultInputStream(), connectionResult.resourceURI, false);
                                         }
                                     } catch (Exception e) {
                                         final LocationData extendedLocationData = new ExtendedLocationData(locationData, "reading external XForms instance (optimized)", instanceContainerElement);
@@ -1044,13 +1044,13 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                                                 throw new OXFException("Got invalid return code while loading instance: " + instanceResource + ", " + connectionResult.resultCode);
                                             }
 
-                                            // TODO: Handle validating and handleXInclude!
+                                            // TODO: Handle validating and XInclude!
 
                                             // Read result as XML
                                             if (!isReadonlyHint) {
-                                                instanceDocument = TransformerUtils.readDom4j(connectionResult.getResultInputStream(), connectionResult.resourceURI);
+                                                instanceDocument = TransformerUtils.readDom4j(connectionResult.getResultInputStream(), connectionResult.resourceURI, false);
                                             } else {
-                                                instanceDocument = TransformerUtils.readTinyTree(connectionResult.getResultInputStream(), connectionResult.resourceURI);
+                                                instanceDocument = TransformerUtils.readTinyTree(connectionResult.getResultInputStream(), connectionResult.resourceURI, false);
                                             }
                                         } catch (Exception e) {
                                             final LocationData extendedLocationData = new ExtendedLocationData(locationData, "reading external instance (no resolver)", instanceContainerElement);

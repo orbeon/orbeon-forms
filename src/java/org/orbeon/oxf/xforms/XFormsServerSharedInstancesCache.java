@@ -100,7 +100,7 @@ public class XFormsServerSharedInstancesCache {
             try {
                 // Read result as XML and create new shared instance
                 // TODO: Handle validating and handleXInclude!
-                final DocumentInfo documentInfo = TransformerUtils.readTinyTree(connectionResult.getResultInputStream(), connectionResult.resourceURI);
+                final DocumentInfo documentInfo = TransformerUtils.readTinyTree(connectionResult.getResultInputStream(), connectionResult.resourceURI, false);
                 final SharedXFormsInstance newInstance = new SharedXFormsInstance(modelId, instanceId, documentInfo, sourceURI, null, null, true, timeToLive, validation);
 
                 // Add result to cache

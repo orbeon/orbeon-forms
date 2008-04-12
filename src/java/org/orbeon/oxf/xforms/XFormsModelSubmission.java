@@ -104,6 +104,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
     private String resolvedXXFormsShared;
     private String avtXXFormsTarget;
     private String resolvedXXFormsTarget;
+    private String avtXXFormsHandleXInclude;
+    private boolean resolvedXXFormsHandleXInclude;
 
     private boolean xxfFormsEnsureUploads;
 
@@ -233,8 +235,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
             avtXXFormsShared = submissionElement.attributeValue(XFormsConstants.XXFORMS_SHARED_QNAME);
 
             avtXXFormsTarget = submissionElement.attributeValue(XFormsConstants.XXFORMS_TARGET_QNAME);
-
             xxfFormsEnsureUploads = !"false".equals(submissionElement.attributeValue(XFormsConstants.XXFORMS_ENSURE_UPLOADS_QNAME));
+            avtXXFormsHandleXInclude = submissionElement.attributeValue(XFormsConstants.XXFORMS_HANDLE_XINCLUDE);
 
             // Whether we must show progress or not
             xxfShowProgress = !"false".equals(submissionElement.attributeValue(XFormsConstants.XXFORMS_SHOW_PROGRESS_QNAME));
@@ -424,6 +426,10 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                     resolvedXXFormsPassword = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, currentNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtXXFormsPassword);
                     resolvedXXFormsReadonly = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, currentNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtXXFormsReadonly);
                     resolvedXXFormsShared = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, currentNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtXXFormsShared);
+
+                    // Default is "false" for security reasons
+                    final String tempHandleXInclude = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, currentNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtXXFormsHandleXInclude);
+                    resolvedXXFormsHandleXInclude = "true".equals(tempHandleXInclude);
                 }
 
                 // Check read-only and shared hints
@@ -802,16 +808,9 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                                         containingDocument.logDebug("submission", "replacing instance with mutable instance",
                                                             new String[] { "instance", replaceInstance.getEffectiveId() });
 
-                                                    // TODO: Sure what default we want. In most cases, we don't use DTDs. Will XML Schema validate as well?
-                                                    final boolean validating = false;
-
-                                                    // We don't want XInclude automatically handled for security reasons
-                                                    final boolean handleXInclude = false;
-
-                                                    // TODO: Use TransformerUtils.readDom4j() instead? What about configuring validation and XInclude?
-
+                                                    // TODO: What about configuring validation? And what default to choose?
                                                     final Document resultingInstanceDocument
-                                                            = Dom4jUtils.readDom4j(connectionResult.getResultInputStream(), connectionResult.resourceURI, validating, handleXInclude);
+                                                            = TransformerUtils.readDom4j(connectionResult.getResultInputStream(), connectionResult.resourceURI, resolvedXXFormsHandleXInclude);
                                                     newInstance = new XFormsInstance(replaceInstance.getModelId(), replaceInstance.getEffectiveId(), resultingInstanceDocument,
                                                             connectionResult.resourceURI, resolvedXXFormsUsername, resolvedXXFormsPassword, false, -1, replaceInstance.getValidation());
                                                 } else {
@@ -821,15 +820,14 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                                         containingDocument.logDebug("submission", "replacing instance with read-only instance",
                                                             new String[] { "instance", replaceInstance.getEffectiveId() });
 
-                                                    // TODO: Handle validating and handleXInclude!
-
+                                                    // TODO: What about configuring validation? And what default to choose?
                                                     // NOTE: isApplicationSharedHint is always false when get get here. isApplicationSharedHint="true" is handled above.
-                                                    final DocumentInfo resultingInstanceDocument = TransformerUtils.readTinyTree(connectionResult.getResultInputStream(), connectionResult.resourceURI);
+                                                    final DocumentInfo resultingInstanceDocument = TransformerUtils.readTinyTree(connectionResult.getResultInputStream(), connectionResult.resourceURI, resolvedXXFormsHandleXInclude);
                                                     newInstance = new SharedXFormsInstance(replaceInstance.getModelId(), replaceInstance.getEffectiveId(), resultingInstanceDocument,
                                                             connectionResult.resourceURI, resolvedXXFormsUsername, resolvedXXFormsPassword, false, -1, replaceInstance.getValidation());
                                                 }    
                                             } catch (Exception e) {
-                                                submitErrorEvent = createErrorEvent(connectionResult, XFormsSubmitErrorEvent.ErrorType.PARSE_ERROR);
+                                                submitErrorEvent = createErrorEvent(pipelineContext, connectionResult, XFormsSubmitErrorEvent.ErrorType.PARSE_ERROR);
                                                 throw new XFormsSubmissionException(e, "xforms:submission: exception while serializing XML to instance.", "processing instance replacement");
                                             }
 
@@ -842,14 +840,14 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                         }
                                     } else {
                                         // Other media type
-                                        submitErrorEvent = createErrorEvent(connectionResult, XFormsSubmitErrorEvent.ErrorType.RESOURCE_ERROR);
+                                        submitErrorEvent = createErrorEvent(pipelineContext, connectionResult, XFormsSubmitErrorEvent.ErrorType.RESOURCE_ERROR);
                                         throw new XFormsSubmissionException("Body received with non-XML media type for replace=\"instance\": " + connectionResult.resultMediaType, "processing instance replacement");
                                     }
                                 } else if (replace.equals(XFormsConstants.XFORMS_SUBMIT_REPLACE_NONE)) {
                                     // Just notify that processing is terminated
                                     submitDoneEvent = new XFormsSubmitDoneEvent(XFormsModelSubmission.this, connectionResult.resourceURI);
                                 } else {
-                                    submitErrorEvent = createErrorEvent(connectionResult, XFormsSubmitErrorEvent.ErrorType.XXFORMS_INTERNAL_ERROR);
+                                    submitErrorEvent = createErrorEvent(pipelineContext, connectionResult, XFormsSubmitErrorEvent.ErrorType.XXFORMS_INTERNAL_ERROR);
                                     throw new XFormsSubmissionException("xforms:submission: invalid replace attribute: " + replace, "processing instance replacement");
                                 }
 
@@ -878,7 +876,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                         } else {
                             // Error code received
-                            submitErrorEvent = createErrorEvent(connectionResult, XFormsSubmitErrorEvent.ErrorType.RESOURCE_ERROR);
+                            submitErrorEvent = createErrorEvent(pipelineContext, connectionResult, XFormsSubmitErrorEvent.ErrorType.RESOURCE_ERROR);
                             throw new XFormsSubmissionException("xforms:submission for submission id: " + id + ", error code received when submitting instance: " + connectionResult.resultCode, "processing submission response");
                         }
                     }
@@ -1122,8 +1120,12 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
         return instanceSatisfiesValidRequired[0];
     }
 
-    private XFormsSubmitErrorEvent createErrorEvent(ConnectionResult connectionResult, ErrorType errorType) throws IOException {
+    private XFormsSubmitErrorEvent createErrorEvent(PipelineContext pipelineContext, ConnectionResult connectionResult, ErrorType errorType) throws IOException {
+
+        // Create the event
         final XFormsSubmitErrorEvent submitErrorEvent = new XFormsSubmitErrorEvent(XFormsModelSubmission.this, resolvedActionOrResource, errorType);
+
+        // Try to add body information
         if (connectionResult.hasContent()) {
 
             // "When the error response specifies an XML media type as defined by [RFC 3023], the response body is
@@ -1131,17 +1133,34 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
             // the error response specifies a text media type (starting with text/), then the response body is returned
             // as a string. Otherwise, an empty string is returned."
 
+            // Read the whole stream to a temp URI so we can read it more than once if needed
+            final String tempURI;
+            try {
+                tempURI = NetUtils.inputStreamToAnyURI(pipelineContext, connectionResult.getResultInputStream(), NetUtils.REQUEST_SCOPE);
+                connectionResult.getResultInputStream().close();
+            } catch (Exception e) {
+                // Simply can't read the bocy
+                XFormsServer.logger.error("XForms - submission - error while reading response body ", e);
+                return submitErrorEvent;
+            }
+
             boolean isXMLParseFailed = false;
             if (XMLUtils.isXMLMediatype(connectionResult.resultMediaType)) {
                 // XML content-type
                 // Read stream into Document
+                final InputStream is = new URL(tempURI).openStream();
                 try {
-                    final DocumentInfo responseBody = TransformerUtils.readTinyTree(connectionResult.getResultInputStream(), connectionResult.resourceURI);
+                    final DocumentInfo responseBody = TransformerUtils.readTinyTree(is, connectionResult.resourceURI, false);
                     submitErrorEvent.setBodyDocument(responseBody);
                     return submitErrorEvent;
                 } catch (Exception e) {
                     XFormsServer.logger.error("XForms - submission - error while parsing response body as XML, defaulting to plain text.", e);
                     isXMLParseFailed = true;
+                } finally {
+                    try {
+                        is.close();
+                    } catch (Exception e) {
+                    }
                 }
             }
 
@@ -1157,15 +1176,23 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         else
                             charset = DEFAULT_TEXT_READING_ENCODING;
                     }
-                    final Reader reader = new InputStreamReader(connectionResult.getResultInputStream(), charset);
-                    final String responseBody = NetUtils.readStreamAsString(reader);
-                    submitErrorEvent.setBodyString(responseBody);
+                    final InputStream is = new URL(tempURI).openStream();
+                    final Reader reader = new InputStreamReader(is, charset);
+                    try {
+                        final String responseBody = NetUtils.readStreamAsString(reader);
+                        submitErrorEvent.setBodyString(responseBody);
+                    } finally {
+                        try {
+                            reader.close();
+                        } catch (Exception e) {
+                        }
+                    }
                 } catch (Exception e) {
                     XFormsServer.logger.error("XForms - submission - error while reading response body ", e);
                 }
             } else {
                 // This is binary
-                // Don't store anything
+                // Don't store anything for now
             }
         }
         return submitErrorEvent;

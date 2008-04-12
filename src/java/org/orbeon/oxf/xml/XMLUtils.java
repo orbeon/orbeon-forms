@@ -15,10 +15,14 @@ package org.orbeon.oxf.xml;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.resources.URLFactory;
-import org.orbeon.oxf.util.*;
+import org.orbeon.oxf.util.Base64;
+import org.orbeon.oxf.util.ContentHandlerOutputStream;
+import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.util.SequenceReader;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.xerces.XercesSAXParserFactoryImpl;
 import org.orbeon.saxon.om.FastStringBuffer;
@@ -27,7 +31,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.*;
 import org.xml.sax.helpers.AttributesImpl;
-import org.dom4j.Element;
 
 import javax.xml.parsers.*;
 import javax.xml.transform.Source;
@@ -49,6 +52,9 @@ import java.util.*;
 public class XMLUtils {
 
     private static Logger logger = Logger.getLogger(XMLUtils.class);
+
+    public static final boolean DEFAULT_VALIDATING = false;
+    public static final boolean DEFAULT_HANDLE_XINCLUDE = true;// TODO: this should probably not be the default
 
     public static final Attributes EMPTY_ATTRIBUTES = new AttributesImpl();
     public static final EntityResolver ENTITY_RESOLVER = new EntityResolver();
@@ -115,10 +121,6 @@ public class XMLUtils {
         }
     }
 
-    public static SAXParser newSAXParser() {
-        return newSAXParser(false, true);
-    }
-
     /**
      * Get a SAXParserFactory to build combinations of validating and XInclude-aware SAXParser.
      *
@@ -157,9 +159,25 @@ public class XMLUtils {
      * @param handleXInclude    whether the parser is XInclude-aware
      * @return                  the SAXParser
      */
-    public static synchronized SAXParser newSAXParser(boolean validating, boolean handleXInclude) {
+    private static synchronized SAXParser newSAXParser(boolean validating, boolean handleXInclude) {
         try {
             return getSAXParserFactory(validating, handleXInclude).newSAXParser();
+        } catch (Exception e) {
+            throw new OXFException(e);
+        }
+    }
+
+    public static SAXParser newSAXParser() {
+        return newSAXParser(DEFAULT_VALIDATING, DEFAULT_HANDLE_XINCLUDE);
+    }
+
+    public static XMLReader newXMLReader(boolean validating, boolean handleXInclude) {
+        final SAXParser saxParser = XMLUtils.newSAXParser(validating, handleXInclude);
+        try {
+            final XMLReader xmlReader = saxParser.getXMLReader();
+            xmlReader.setEntityResolver(XMLUtils.ENTITY_RESOLVER);
+            xmlReader.setErrorHandler(XMLUtils.ERROR_HANDLER);
+            return xmlReader;
         } catch (Exception e) {
             throw new OXFException(e);
         }
@@ -241,9 +259,8 @@ public class XMLUtils {
     }
 
     public static class EntityResolver implements org.xml.sax.EntityResolver {
-        public InputSource resolveEntity(String publicId, String systemId)
-                throws SAXException, IOException {
-            InputSource is = new InputSource();
+        public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
+            final InputSource is = new InputSource();
             is.setSystemId(systemId);
             is.setPublicId(publicId);
             final URL url = URLFactory.createURL(systemId);
@@ -286,20 +303,20 @@ public class XMLUtils {
     }
 
     public static void inputStreamToSAX(InputStream inputStream, String systemId, ContentHandler contentHandler, boolean validating, boolean handleXInclude) {
-        InputSource inputSource = new InputSource(inputStream);
+        final InputSource inputSource = new InputSource(inputStream);
         inputSource.setSystemId(systemId);
         inputSourceToSAX(inputSource, contentHandler, validating, handleXInclude);
     }
 
     public static void readerToSAX(Reader reader, String systemId, ContentHandler contentHandler, boolean validating, boolean handleXInclude) {
-        InputSource inputSource = new InputSource(reader);
+        final InputSource inputSource = new InputSource(reader);
         inputSource.setSystemId(systemId);
         inputSourceToSAX(inputSource, contentHandler, validating, handleXInclude);
     }
 
     private static void inputSourceToSAX(InputSource inputSource, ContentHandler contentHandler, boolean validating, boolean handleXInclude) {
         try {
-            XMLReader xmlReader = newSAXParser(validating, handleXInclude).getXMLReader();
+            final XMLReader xmlReader = newSAXParser(validating, handleXInclude).getXMLReader();
             xmlReader.setContentHandler(contentHandler);
             xmlReader.setEntityResolver(ENTITY_RESOLVER);
             xmlReader.setErrorHandler(ERROR_HANDLER);
@@ -735,9 +752,9 @@ public class XMLUtils {
 
     public static void parseDocumentFragment(Reader reader, ContentHandler contentHandler) throws SAXException {
         try {
-            XMLReader xmlReader = newSAXParser().getXMLReader();
+            final XMLReader xmlReader = newSAXParser().getXMLReader();
             xmlReader.setContentHandler(new XMLFragmentContentHandler(contentHandler));
-            ArrayList readers = new ArrayList(3);
+            final ArrayList readers = new ArrayList(3);
             readers.add(new StringReader("<root>"));
             readers.add(reader);
             readers.add(new StringReader("</root>"));
@@ -750,7 +767,7 @@ public class XMLUtils {
     public static void parseDocumentFragment(String fragment, ContentHandler contentHandler) throws SAXException {
         if (fragment.indexOf("<") != -1 || fragment.indexOf("&") != -1) {
             try {
-                XMLReader xmlReader = newSAXParser().getXMLReader();
+                final XMLReader xmlReader = newSAXParser().getXMLReader();
                 xmlReader.setContentHandler(new XMLFragmentContentHandler(contentHandler));
                 xmlReader.parse(new InputSource(new StringReader("<root>" + fragment + "</root>")));
             } catch (IOException e) {

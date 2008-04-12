@@ -140,7 +140,7 @@ public final class DOMGenerator extends ProcessorImpl {
         if (nodeInfo instanceof DocumentInfo)
             return (DocumentInfo) nodeInfo;
         else
-            return TransformerUtils.readTinyTree(nodeInfo);
+            return TransformerUtils.readTinyTree(nodeInfo, false);
     }
 
     private final SourceFactory sourceFactory;

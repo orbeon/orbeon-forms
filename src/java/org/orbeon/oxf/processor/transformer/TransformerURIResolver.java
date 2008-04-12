@@ -62,6 +62,15 @@ public class TransformerURIResolver implements URIResolver {
         this.handleXInclude = handleXInclude;
     }
 
+    /**
+     * Create a URI resolver. Use this constructor when using this from outside a processor.
+     *
+     * @param handleXInclude    true if, when reading a regular URL (i.e. not "input:*"), XInclude processing must be done by the parser
+     */
+    public TransformerURIResolver(boolean handleXInclude) {
+        this(null, new PipelineContext(), null, handleXInclude);
+    }
+
     public Source resolve(String href, String base) throws TransformerException {
         try {
             // Create XML reader for URI
@@ -74,6 +83,9 @@ public class TransformerURIResolver implements URIResolver {
                     throw new OXFException("Can't read '" + prohibitedInput + "' input. If you are calling this from XSLT, use a '/' expression in XPath instead.");
                 } else if (inputName != null) {
                     // Resolve to input of current processor
+                    if (processor == null)
+                        throw new OXFException("Can't read URL '" + href + "'.");
+
                     xmlReader = new ProcessorOutputXMLReader(pipelineContext, processor.getInputByName(inputName).getOutput());
                     systemId = href;
                 } else {
@@ -90,8 +102,8 @@ public class TransformerURIResolver implements URIResolver {
             }
 
             // Also send data to listener, if there is one
-            final URIResolverListener uriResolverListener = (URIResolverListener)
-                    pipelineContext.getAttribute(PipelineContext.XSLT_STYLESHEET_URI_LISTENER);
+            final URIResolverListener uriResolverListener =
+                    (URIResolverListener) pipelineContext.getAttribute(PipelineContext.XSLT_STYLESHEET_URI_LISTENER);
             if (uriResolverListener != null) {
                 xmlReader = new ForwardingXMLReader(xmlReader) {
 

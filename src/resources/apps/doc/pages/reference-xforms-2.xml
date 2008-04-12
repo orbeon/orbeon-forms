@@ -825,8 +825,8 @@
                     When that control is within a repeat iteration, the actual control targetted is chosen based on the
                     current set of repeat indexes. However, in some cases, it is useful to be able to target the control
                     within a particular iteration. This is achieved with the <code>xxforms:repeat-indexes</code>
-                    extension attribute on these actions. This attribute takes a list of repeat indexes, starting
-                    with the outermost repeat, and separated by dashes (<code>-</code>). Example:
+                    extension attribute on these actions. This attribute takes a space-separated list of repeat
+                    indexes, starting with the outermost repeat. Example:
                 </p>
                 <xml-source>
                     <comment> Repeat hierarchy </comment>
@@ -845,7 +845,7 @@
                     <xforms:trigger>
                         <xforms:label>Toggle Me!</xforms:label>
                         <comment> Toggle the case within the 5th todo item of the 3rd todo list </comment>
-                        <xforms:toggle ev:event="DOMActivate" case="edit-case" xxforms:repeat-indexes="3-5"/>
+                        <xforms:toggle ev:event="DOMActivate" case="edit-case" xxforms:repeat-indexes="3 5"/>
                     </xforms:trigger>
                 </xml-source>
             </section>

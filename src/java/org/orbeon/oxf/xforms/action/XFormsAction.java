@@ -28,6 +28,7 @@ import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.value.SequenceExtent;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -170,11 +171,12 @@ public abstract class XFormsAction {
      * @return                  effective control id if possible
      */
     protected String findEffectiveControlId(XFormsActionInterpreter actionInterpreter, PipelineContext pipelineContext, String id, Element actionElement) {
-        final String repeatindexes = resolveAVT(actionInterpreter, pipelineContext, actionElement, XFormsConstants.XXFORMS_REPEAT_INDEXES_QNAME, false);
 
-        if (repeatindexes != null && !"".equals(repeatindexes)) {
-            // Effective id is provided
-            return id + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1 + repeatindexes;
+        // Get indexes as space-separated list
+        final String repeatindexes = resolveAVT(actionInterpreter, pipelineContext, actionElement, XFormsConstants.XXFORMS_REPEAT_INDEXES_QNAME, false);
+        if (repeatindexes != null && !"".equals(repeatindexes.trim())) {
+            // Effective id is provided, modify appropriately
+            return id + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1 + StringUtils.join(StringUtils.split(repeatindexes), XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_2);
         } else {
             // Figure out effective id
             return actionInterpreter.getXFormsControls().findEffectiveControlId(id);

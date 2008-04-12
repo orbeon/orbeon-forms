@@ -27,7 +27,7 @@
     <xforms:label>Publish Form</xforms:label>
     <xhtml:div>
         <!--<xhtml:img src="/apps/fr/style/question-large.gif" alt="Question" class="dialog-icon"/>-->
-        <xhtml:div class="dialog-message">
+        <xhtml:div class="fr-dialog-message">
             <xhtml:p>
                 Are you sure you want to publish this form? This will override the existing form with
                 the following properties:
@@ -50,7 +50,7 @@
             </xhtml:ul>
         </xhtml:div>
     </xhtml:div>
-    <xhtml:div class="dialog-buttons">
+    <xhtml:div class="fr-dialog-buttons">
         <xforms:group>
             <xforms:trigger class="xforms-trigger-appearance-modal">
                 <xforms:label>

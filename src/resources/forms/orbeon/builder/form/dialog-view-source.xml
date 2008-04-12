@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Copyright (C) 2008 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xxforms:dialog  xmlns:xhtml="http://www.w3.org/1999/xhtml"
+      xmlns:xforms="http://www.w3.org/2002/xforms"
+      xmlns:xs="http://www.w3.org/2001/XMLSchema"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:ev="http://www.w3.org/2001/xml-events"
+      xmlns:xi="http://www.w3.org/2001/XInclude"
+      xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+      xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+      xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+      xmlns:saxon="http://saxon.sf.net/"
+
+      id="fb-xml-dialog" level="modeless" close="true" draggable="true">
+
+    <xforms:label>View XML</xforms:label>
+    <xhtml:div class="fb-xml-dialog-view">
+        <xforms:output mediatype="text/html" value="$variables/xml-view"/>
+    </xhtml:div>
+    <xhtml:div class="fr-dialog-buttons">
+        <xforms:trigger>
+            <xforms:label><xhtml:img src="/apps/fr/style/close.gif" alt=""/> <xhtml:span>Close</xhtml:span></xforms:label>
+            <!-- Hide dialog -->
+            <xxforms:hide ev:event="DOMActivate" dialog="fb-xml-dialog"/>
+        </xforms:trigger>
+    </xhtml:div>
+    <!-- Serialize XML when the dialog opens-->
+    <xforms:setvalue ev:event="xxforms-dialog-open" ref="$variables/xml-view"
+                     value="xxforms:serialize(xxforms:call-xpl(
+                         'oxf:/ops/utils/formatting/format.xpl', 'data', instance('fr-form-instance'), 'data')/*, 'html')"/>
+    <!-- Clear XML when the dialog closes-->
+    <xforms:setvalue ev:event="xxforms-dialog-close" ref="$variables/xml-view"/>
+</xxforms:dialog>
+        

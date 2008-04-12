@@ -31,7 +31,7 @@
             <xforms:textarea ref="$variables/new-text">
                 <xforms:label>Help Message</xforms:label>
             </xforms:textarea>
-            <xhtml:div class="dialog-buttons">
+            <xhtml:div class="fr-dialog-buttons">
                 <xforms:trigger class="fr-inplace-rename">
                     <xforms:label>Change</xforms:label>
                     <!-- Close and save upon DOMActivate -->

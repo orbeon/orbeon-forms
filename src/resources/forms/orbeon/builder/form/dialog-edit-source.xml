@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Copyright (C) 2008 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xxforms:dialog  xmlns:xhtml="http://www.w3.org/1999/xhtml"
+      xmlns:xforms="http://www.w3.org/2002/xforms"
+      xmlns:xs="http://www.w3.org/2001/XMLSchema"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:ev="http://www.w3.org/2001/xml-events"
+      xmlns:xi="http://www.w3.org/2001/XInclude"
+      xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+      xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+      xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+      xmlns:saxon="http://saxon.sf.net/"
+
+      id="fb-edit-source-dialog" level="modeless" close="true" draggable="true">
+
+    <xforms:label>Edit source</xforms:label>
+    <xhtml:div class="fb-xml-dialog-view">
+        <xforms:textarea ref="$variables/new-source"/>
+    </xhtml:div>
+    <xhtml:div class="fr-dialog-buttons">
+        <xhtml:span class="fr-inplace-buttons">
+            <xforms:trigger class="fr-inplace-rename" ref="$variables/new-source-trigger">
+                <xforms:label>Accept Changes</xforms:label>
+                <!-- TODO: At the very least, should make sure the XML is well-formed. Even better would be to validate it. -->
+                <xforms:action ev:event="DOMActivate">
+
+                    <!-- Parse the XML and insert it -->
+
+                    <!-- TODO: extra line breaks are added as you edit and save the XML -->
+                    <!--<xforms:message level="xxforms:log-debug">-->
+                        <!--<xforms:output value="replace($variables/new-source, '&#x0d;', '&#x0d;')"/>-->
+                    <!--</xforms:message>-->
+
+                    <xforms:insert nodeset="instance('fr-form-instance')" origin="saxon:parse($variables/new-source)"/>
+                    <!-- Saxon serialization adds an extra meta element -->
+                    <xforms:delete nodeset="instance('fr-form-instance')/xhtml:head/meta[@http-equiv = 'Content-Type']"/>
+
+                </xforms:action>
+            </xforms:trigger>
+            or
+            <xforms:trigger appearance="minimal" class="fr-inplace-cancel">
+                <xforms:label>Cancel</xforms:label>
+            </xforms:trigger>
+        </xhtml:span>
+    </xhtml:div>
+    <!-- Hide dialog -->
+    <xxforms:hide ev:event="DOMActivate" dialog="fb-edit-source-dialog"/>
+    <!-- Serialize XML when the dialog opens -->
+    <xforms:setvalue ev:event="xxforms-dialog-open" ref="$variables/new-source"
+                     value="saxon:serialize(instance('fr-form-instance'), xxforms:instance('fb-xsl-output-instance'))"/>
+</xxforms:dialog>

@@ -61,7 +61,13 @@
             <config><handle-xinclude>false</handle-xinclude></config>
         </p:input>
         <p:input name="data" href="#binary-document"/>
-        <p:output name="data" id="document" ref="data"/>
+        <p:output name="data" id="document"/>
+    </p:processor>
+
+    <!-- Handle XInclude (mainly for "resource" type of persistence) -->
+    <p:processor name="oxf:xinclude">
+        <p:input name="config" href="#document"/>
+        <p:output name="data" id="after-xinclude" ref="data"/>
     </p:processor>
 
     <!-- Store document in the request for further access down the line -->
@@ -72,7 +78,7 @@
                 <scope>request</scope>
             </config>
         </p:input>
-        <p:input name="data" href="#document"/>
+        <p:input name="data" href="#after-xinclude"/>
     </p:processor>
 
 </p:config>

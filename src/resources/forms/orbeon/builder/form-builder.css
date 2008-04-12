@@ -42,6 +42,7 @@
 #fb-itemset-editor-dialog .fb-dialog-body { }
 #fb-itemset-editor-dialog .fb-language-choice { text-align: right; display: block }
 #fb-itemset-editor-dialog .fb-language-choice .xforms-select1 { width: auto }
+#fb-itemset-editor-dialog .fr-repeat-table td, #fb-itemset-editor-dialog .fr-repeat-table th { border: 1px solid #DDDDEE}
 
 /* Other dialogs */
 .xforms-dialog .bd { padding-left: .5em; padding-right: .5em }
@@ -65,9 +66,9 @@
 #fb-edit-source-dialog .fb-xml-dialog-view textarea.xforms-textarea { width: 100%; height: 29em }
 
 /* TODO: use fb- or fr- prefix for .dialog classes */
-.dialog-icon { float: left; margin-right: 2em; margin-left: 1em; padding-bottom: 1em; }
-.dialog-message { margin-top: 1em; padding-top: 0.5em; }
-.dialog-buttons { text-align: right; padding-right: .5em; padding-top: .5em; padding-bottom: .5em; margin-top: .5em; border-top: 2px solid #DDDDEE }
+.fr-dialog-icon { float: left; margin-right: 2em; margin-left: 1em; padding-bottom: 1em; }
+.fr-dialog-message { margin-top: 1em; padding-top: 0.5em; }
+.fr-dialog-buttons { text-align: right; padding-right: .5em; padding-top: .5em; padding-bottom: .5em; margin-top: .5em; border-top: 2px solid #DDDDEE }
 
 /* In-place editing for regular fields */
 

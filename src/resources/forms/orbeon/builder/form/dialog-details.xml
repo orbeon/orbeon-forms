@@ -30,7 +30,7 @@
     <xhtml:div>
         <xxforms:variable name="instance" select="instance('fb-details-editor-instance')"/>
         <xforms:group context="$instance">
-            <xforms:input ref="control-name" incremental="true">
+            <xforms:input ref="control-name" incremental="true" id="fb-edit-details-control-name-input">
                 <xforms:label>Control Name</xforms:label>
                 <xforms:alert>Name is already in use or incorrect</xforms:alert>
                 <!-- Close and save upon DOMActivate -->
@@ -48,7 +48,7 @@
                 </xforms:item>
             </xforms:select>
 
-            <xhtml:div class="dialog-buttons">
+            <xhtml:div class="fr-dialog-buttons">
                 <xforms:trigger class="fr-inplace-rename">
                     <xforms:label>Change</xforms:label>
                     <!-- Close and save upon DOMActivate -->

@@ -50,15 +50,11 @@
         </p:otherwise>
     </p:choose>
 
-    <!-- Handle XInclude -->
-    <p:processor name="oxf:xinclude">
-        <p:input name="config" href="#themed-data"/>
-        <p:output name="data" id="after-xinclude"/>
-    </p:processor>
+    <!-- NOTE: First pass of XInclude is handled when reading the form from the persistence layer -->
 
     <!-- Apply generic components -->
     <p:processor name="oxf:unsafe-xslt">
-        <p:input name="data" href="#after-xinclude"/>
+        <p:input name="data" href="#themed-data"/>
         <p:input name="instance" href="#instance"/>
         <p:input name="config" href="oxf:/apps/fr/components.xsl"/>
         <p:output name="data" id="after-components"/>

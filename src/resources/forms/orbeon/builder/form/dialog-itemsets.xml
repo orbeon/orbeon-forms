@@ -39,10 +39,11 @@
         </xforms:group>
 
         <xforms:group context="instance('fb-itemset-instance')" appearance="xxforms:internal">
-            <fr:repeat nodeset="item" id="fb-itemset-repeat" origin="instance('fb-item-template')" columns="2">
+            <fr:repeat nodeset="item" id="fb-itemset-repeat" origin="instance('fb-item-template')" columns="2" appearance="xxforms:table">
                 <xhtml:tr>
                     <xhtml:td>
                         <xforms:input ref="label[@xml:lang = $variables/itemset-lang]" id="fb-itemset-label-input">
+                            <xforms:label>Label</xforms:label>
                             <xforms:action ev:event="DOMActivate">
                                 <xforms:insert origin="instance('fb-item-template')" nodeset=".."/>
                                 <xforms:setfocus control="fb-itemset-label-input"/>
@@ -51,6 +52,7 @@
                     </xhtml:td>
                     <xhtml:td>
                         <xforms:input ref="value">
+                            <xforms:label>Value</xforms:label>
                             <!-- Propose default value upon focus -->
                             <xforms:action ev:event="DOMFocusIn" if="normalize-space() = ''">
                                 <xforms:setvalue ref="." value="string-join(for $w in tokenize(normalize-space(../label[@xml:lang = $variables/itemset-lang]), '\s') return lower-case($w), '-')"/>
@@ -65,7 +67,7 @@
             </fr:repeat>
         </xforms:group>
         
-        <xhtml:div class="dialog-buttons">
+        <xhtml:div class="fr-dialog-buttons">
             <xforms:trigger class="fr-inplace-rename">
                 <xforms:label>Change</xforms:label>
                 <!-- Close and save upon DOMActivate -->

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Copyright (C) 2008 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xxforms:dialog  xmlns:xhtml="http://www.w3.org/1999/xhtml"
+      xmlns:xforms="http://www.w3.org/2002/xforms"
+      xmlns:xs="http://www.w3.org/2001/XMLSchema"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:ev="http://www.w3.org/2001/xml-events"
+      xmlns:xi="http://www.w3.org/2001/XInclude"
+      xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+      xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+      xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+      xmlns:saxon="http://saxon.sf.net/"
+
+      id="fb-add-language-dialog" appearance="minimal">
+    
+    <xforms:label>Add Language</xforms:label>
+    <xhtml:div>
+        <xforms:group>
+            <xforms:group class="fb-hide-alert">
+                <xforms:select1 ref="$variables/new-language" id="fb-add-language-select1">
+                    <xforms:label>Add the following language:</xforms:label>
+                    <xforms:item>
+                        <xforms:label>[Select...]</xforms:label>
+                        <xforms:value/>
+                    </xforms:item>
+                    <xforms:itemset model="fr-resources-model"
+                                    nodeset="instance('fr-languages-instance')/language[not(@exclude = 'true') and not(@code = $resources/resource/@xml:lang)]">
+                        <xforms:label value="if (@native-name != @english-name) then concat(@native-name, ' (', @english-name, ')') else @native-name"/>
+                        <xforms:value ref="@code"/>
+                    </xforms:itemset>
+                </xforms:select1>
+            </xforms:group>
+            <xhtml:span class="fr-inplace-buttons">
+                <xforms:trigger class="fr-inplace-rename" ref="$variables/new-language-trigger">
+                    <xforms:label>Add</xforms:label>
+                    <xforms:action ev:event="DOMActivate">
+                        <xforms:insert context="$resources" nodeset="resource" origin="resource[1]"/>
+                        <xforms:setvalue ref="$resources/resource[last()]/@xml:lang" value="$variables/new-language"/>
+                        <xforms:setvalue ref="$lang" value="$variables/new-language"/>
+                    </xforms:action>
+                </xforms:trigger>
+                or
+                <xforms:trigger appearance="minimal" class="fr-inplace-cancel">
+                    <xforms:label>Cancel</xforms:label>
+                </xforms:trigger>
+            </xhtml:span>
+        </xforms:group>
+    </xhtml:div>
+    <!-- Hide dialog -->
+    <xxforms:hide ev:event="DOMActivate" dialog="fb-add-language-dialog"/>
+    <!-- Clear selection list when the dialog opens -->
+    <xforms:action ev:event="xxforms-dialog-open">
+        <xforms:setvalue ref="$variables/new-language"/>
+        <xforms:setfocus control="fb-add-language-select1"/>
+    </xforms:action>
+</xxforms:dialog>

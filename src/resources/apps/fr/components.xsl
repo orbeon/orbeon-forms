@@ -444,6 +444,9 @@
                 <xhtml:div class="fr-inplace-view">
                     <xhtml:span class="fr-inplace-content">
                         <xforms:output>
+                            <xsl:if test="@tabindex | @navindex">
+                                <xsl:attribute name="navindex" select="(@navindex, @tabindex)[1]"/>
+                            </xsl:if>
                             <!-- Handle inline hint-->
                             <xsl:call-template name="fr-handle-inplace-hint"/>
                             <!-- Keep label as is -->
@@ -473,6 +476,9 @@
                 <xhtml:div class="fr-inplace-edit">
                     <xhtml:span class="fr-inplace-content">
                         <xforms:input id="fr-inplace-{@id}-input">
+                            <xsl:if test="@tabindex | @navindex">
+                                <xsl:attribute name="navindex" select="(@navindex, @tabindex)[1]"/>
+                            </xsl:if>
                             <xsl:copy-of select="@ref | @bind | @incremental | xforms:label | xforms:alert"/>
                             <xforms:toggle ev:event="DOMActivate" case="fr-inplace-{@id}-view"/>
                         </xforms:input>

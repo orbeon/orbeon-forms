@@ -133,7 +133,7 @@
 
         </xforms:group>
     </xhtml:div>
-    <xhtml:div class="dialog-buttons">
+    <xhtml:div class="fr-dialog-buttons">
         <xforms:group appearance="xxforms:internal">
             <xforms:trigger class="fr-inplace-rename" id="fb-edit-schema-trigger">
                 <xforms:label>Change</xforms:label>

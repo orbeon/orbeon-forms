@@ -282,14 +282,14 @@
             replace="instance" xxforms:instance="fr-form-instance"/>
 
     <!-- Source form with metadata -->
-    <xforms:instance id="fr-source-form-instance" xxforms:readonly="false">
+    <xforms:instance id="fr-source-form-instance" xxforms:readonly="false"><!-- Set to false so that xforms:insert works -->
         <form xmlns=""/>
     </xforms:instance>
 
     <xforms:submission id="get-source-form-submission"
         method="get" serialization="none"
         resource="{instance('fr-uris-instance')/form-collection}/crud/{$parameters/app}/{$parameters/form}/form/form.xhtml"
-        replace="instance" instance="fr-source-form-instance" xxforms:readonly="true">
+        replace="instance" instance="fr-source-form-instance" xxforms:readonly="true" xxforms:xinclude="true">
     </xforms:submission>
 
     <xforms:instance id="fr-persistence-instance">

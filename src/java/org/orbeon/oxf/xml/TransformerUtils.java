@@ -438,6 +438,20 @@ public class TransformerUtils {
     }
 
     /**
+     * Transform a dom4j document to a String.
+     */
+    public static String dom4jToString(Document document) {
+        try {
+            final Transformer identity = getXMLIdentityTransformer();
+            final StringWriter writer = new StringWriter();
+            identity.transform(new LocationDocumentSource(document), new StreamResult(writer));
+            return writer.toString();
+        } catch (TransformerException e) {
+            throw new OXFException(e);
+        }
+    }
+
+    /**
      * Transform a TinyTree to a String.
      */
     public static String tinyTreeToString(NodeInfo nodeInfo) {

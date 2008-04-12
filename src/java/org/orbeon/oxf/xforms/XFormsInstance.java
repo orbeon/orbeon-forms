@@ -110,7 +110,12 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventHandlerCont
             try {
                 final String xmlString = containerElement.getStringValue();
                 if (!readonly) {
-                    documentInfo = new DocumentWrapper((Document) Dom4jUtils.normalizeTextNodes(Dom4jUtils.readDom4j(xmlString, false, false)), null, new Configuration());
+//                    try {
+                        documentInfo = new DocumentWrapper((Document) Dom4jUtils.normalizeTextNodes(Dom4jUtils.readDom4j(xmlString, false, false)), null, new Configuration());
+//                    } catch (Exception e) {
+//                        XFormsServer.logger.error(xmlString);
+//                        throw e;
+//                    }
                 } else {
 
                     if (xmlString.length() > 0) {
@@ -192,7 +197,14 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventHandlerCont
             instanceElement.addAttribute("replaced", "true");
 
         if (serialize) {
-            final String instanceString = TransformerUtils.tinyTreeToString(getDocumentInfo());
+            final String instanceString;
+            if (getDocument() != null) {
+                // This is probably more optimal than going through NodeInfo. Furthermore, there may be an issue with
+                // namespaces when using tinyTreeToString(). Bug in the NodeWrapper or dom4j?]
+                instanceString = TransformerUtils.dom4jToString(getDocument());
+            } else {
+                instanceString = TransformerUtils.tinyTreeToString(getDocumentInfo());
+            }
             instanceElement.addText(instanceString);
         }
 

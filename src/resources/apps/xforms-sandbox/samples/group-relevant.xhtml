@@ -53,9 +53,11 @@
                     <xforms:label>Input 1</xforms:label>
                 </xforms:input>
                 <xforms:group ref=".[../show-trigger = 'yes']">
-                    <xforms:trigger id="trigger1" appearance="xxforms:image">
-                        <xforms:label>Trigger 1</xforms:label>
-                        <xxforms:img src="/config/theme/images/plus.gif"/>
+                    <xforms:trigger id="trigger1" appearance="minimal">
+                        <xforms:label>
+                            <xhtml:img src="/config/theme/images/plus.gif"/>
+                            <xhtml:span>Trigger 1</xhtml:span>
+                        </xforms:label>
                     </xforms:trigger>
                 </xforms:group>
                 [<xforms:repeat nodeset="repeat1a">
@@ -69,9 +71,11 @@
                     <xforms:label>Input 2</xforms:label>
                 </xforms:input>
                 <xforms:group ref=".[../show-trigger = 'yes']">
-                    <xforms:trigger id="trigger2" appearance="xxforms:image">
-                        <xforms:label>Trigger 2</xforms:label>
-                        <xxforms:img src="/config/theme/images/plus.gif"/>
+                    <xforms:trigger id="trigger2" appearance="minimal">
+                        <xforms:label>
+                            <xhtml:img src="/config/theme/images/plus.gif"/>
+                            <xhtml:span>Trigger 2</xhtml:span>
+                        </xforms:label>
                     </xforms:trigger>
                 </xforms:group>
                 [<xforms:repeat nodeset="repeat2a">

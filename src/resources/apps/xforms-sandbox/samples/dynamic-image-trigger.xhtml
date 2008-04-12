@@ -36,7 +36,7 @@
     </xhtml:head>
     <xhtml:body>
         <!-- Dynamic image via action support in xforms:output -->
-        <b>Case 1:</b> [works because now, DOMActivate is fired on xforms:output]
+        <b>Case 1: Output with "image/*" mediatype</b> [Works because Orbeon Forms fires DOMActivate on xforms:output]
         <xhtml:table>
             <xhtml:tr>
                 <xhtml:td>
@@ -52,27 +52,8 @@
                 </xhtml:td>
             </xhtml:tr>
         </xhtml:table>
-        <br/>
-        <!-- Dynamic image via AVT support within xxforms:img -->
-        <b>Case 2:</b> [won't work because AVTs are not supported in xxforms:img]
-        <xhtml:table>
-            <xhtml:tr>
-                <xhtml:td>
-                    <xforms:repeat nodeset="instance('main-instance')/button">
-                        <xhtml:td>
-                            <xforms:trigger appearance="xxforms:image">
-                                <xforms:label>Image label</xforms:label>
-                                <xxforms:img src="{image}"/>
-                                <xforms:message ref="url" ev:event="DOMActivate" level="modal"/>
-                            </xforms:trigger>
-                        </xhtml:td>
-                    </xforms:repeat>
-                </xhtml:td>
-            </xhtml:tr>
-        </xhtml:table>
-        <br/>
         <!-- Dynamic Image via mediatype support in xforms:output control within trigger's label -->
-        <b>Case 3:</b> [won't work, probably because of a bug]
+        <b>Case 2: Trigger with label containing "image/*" mediatype</b> [DOESN'T WORK!]
         <xhtml:table>
             <xhtml:tr>
                 <xhtml:td>
@@ -88,13 +69,13 @@
             </xhtml:tr>
         </xhtml:table>
         <!-- Dynamic image via text/html mediatype within label -->
-        <b>Case 4:</b> [works but only with f:url-norewrite="true"]
+        <b>Case 3: Trigger with label containing "text/html" mediatype generating relative path</b> [Works]
         <xhtml:table>
             <xhtml:tr>
                 <xforms:repeat nodeset="instance('main-instance')/button">
                     <xhtml:td>
                         <xforms:trigger>
-                            <xforms:label><b>Bold:</b> <xforms:output value="concat('&lt;img src=''../..', image, '''>')" mediatype="text/html" f:url-norewrite="true"/></xforms:label>
+                            <xforms:label><b>Bold:</b> <xforms:output value="concat('&lt;img src=''../..', image, '''>')" mediatype="text/html"/></xforms:label>
                             <xforms:message ref="url" ev:event="DOMActivate" level="modal"/>
                         </xforms:trigger>
                     </xhtml:td>
@@ -104,7 +85,32 @@
                 <xforms:repeat nodeset="instance('main-instance')/button">
                     <xhtml:td>
                         <xforms:trigger appearance="minimal">
-                            <xforms:label><b>Bold:</b> <xforms:output value="concat('&lt;img src=''../..', image, '''>')" mediatype="text/html" f:url-norewrite="true"/></xforms:label>
+                            <xforms:label><b>Bold:</b> <xforms:output value="concat('&lt;img src=''../..', image, '''>')" mediatype="text/html"/></xforms:label>
+                            <xforms:message ref="url" ev:event="DOMActivate" level="modal"/>
+                        </xforms:trigger>
+                    </xhtml:td>
+                </xforms:repeat>
+            </xhtml:tr>
+        </xhtml:table>
+
+        <!-- Dynamic image via text/html mediatype within label -->
+        <b>Case 4: Trigger with label containing "text/html" mediatype generating absolute path</b> [Works]
+        <xhtml:table>
+            <xhtml:tr>
+                <xforms:repeat nodeset="instance('main-instance')/button">
+                    <xhtml:td>
+                        <xforms:trigger>
+                            <xforms:label><b>Bold:</b> <xforms:output value="concat('&lt;img src=''', image, '''>')" mediatype="text/html"/></xforms:label>
+                            <xforms:message ref="url" ev:event="DOMActivate" level="modal"/>
+                        </xforms:trigger>
+                    </xhtml:td>
+                </xforms:repeat>
+            </xhtml:tr>
+            <xhtml:tr>
+                <xforms:repeat nodeset="instance('main-instance')/button">
+                    <xhtml:td>
+                        <xforms:trigger appearance="minimal">
+                            <xforms:label><b>Bold:</b> <xforms:output value="concat('&lt;img src=''', image, '''>')" mediatype="text/html"/></xforms:label>
                             <xforms:message ref="url" ev:event="DOMActivate" level="modal"/>
                         </xforms:trigger>
                     </xhtml:td>

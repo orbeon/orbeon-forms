@@ -236,7 +236,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
             avtXXFormsTarget = submissionElement.attributeValue(XFormsConstants.XXFORMS_TARGET_QNAME);
             xxfFormsEnsureUploads = !"false".equals(submissionElement.attributeValue(XFormsConstants.XXFORMS_ENSURE_UPLOADS_QNAME));
-            avtXXFormsHandleXInclude = submissionElement.attributeValue(XFormsConstants.XXFORMS_HANDLE_XINCLUDE);
+            avtXXFormsHandleXInclude = submissionElement.attributeValue(XFormsConstants.XXFORMS_XINCLUDE);
 
             // Whether we must show progress or not
             xxfShowProgress = !"false".equals(submissionElement.attributeValue(XFormsConstants.XXFORMS_SHOW_PROGRESS_QNAME));

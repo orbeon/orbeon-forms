@@ -135,7 +135,7 @@ public class XFormsConstants {
 
     public static final QName XXFORMS_TARGET_QNAME = new QName("target", XFormsConstants.XXFORMS_NAMESPACE);
     public static final QName XXFORMS_ENSURE_UPLOADS_QNAME = new QName("ensure-uploads", XFormsConstants.XXFORMS_NAMESPACE);
-    public static final QName XXFORMS_HANDLE_XINCLUDE = new QName("handle-xinclude", XFormsConstants.XXFORMS_NAMESPACE);
+    public static final QName XXFORMS_XINCLUDE = new QName("xinclude", XFormsConstants.XXFORMS_NAMESPACE);
 
     public static final QName XXFORMS_ORDER_QNAME = new QName("order", XFormsConstants.XXFORMS_NAMESPACE);
 

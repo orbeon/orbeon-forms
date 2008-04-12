@@ -1607,6 +1607,9 @@
                                 <li>
                                     <code>xxforms:shared</code>
                                 </li>
+                                <li>
+                                    <code>xxforms:xinclude</code>
+                                </li>
                             </ul>
                         </li>
                         <li>
@@ -2213,6 +2216,20 @@
                     <xml-source>
                         <xforms:submission id="my-submission" method="post" resource="http://example.org/"
                                            replace="instance" xxforms:instance="my-instance"/>
+                    </xml-source>
+                </section>
+                <a name="submission-xxforms-xinclude"/>
+                <section>
+                    <title><code>xxforms:xinclude</code> Attribute</title>
+                    <p>
+                        On an <code>&lt;xforms:submission></code> element with <code>replace="instance"</code>, the
+                        optional <code>xxforms:xinclude</code> attribute specifies whether XInclude processing should be
+                        performed on the XML document returned, before storing it into the destination instance. The
+                        default is <code>false</code>.
+                    </p>
+                    <xml-source>
+                        <xforms:submission id="my-submission" method="post" resource="http://example.org/"
+                                           replace="instance" xxforms:xinclude="true"/>
                     </xml-source>
                 </section>
                 <a name="submission-binary"/>

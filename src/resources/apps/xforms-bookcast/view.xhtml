@@ -21,7 +21,63 @@
     <head>
         <title>XForms Bookcast</title>
         <link rel="alternate" type="application/atom+xml" title="Orbeon XForms Bookcast Tutorial Feed" href="atom"/>
-        <xforms:model schema="oxf:/apps/xforms-bookcast/schema.xsd">
+        <xforms:model>
+
+            <xs:schema elementFormDefault="qualified" attributeFormDefault="unqualified">
+
+                <!-- Top-level element -->
+                <xs:element name="books">
+                    <xs:complexType>
+                        <!-- Allow 0 to n books -->
+                        <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                            <xs:element name="book" type="book"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+
+                <!-- Individual book element -->
+                <xs:complexType name="book">
+                    <xs:sequence>
+                        <xs:element name="title" type="xs:string"/>
+                        <xs:element name="author" type="xs:string"/>
+                        <xs:element name="language" type="language"/>
+                        <xs:element name="link" type="link"/>
+                        <xs:element name="rating" type="rating"/>
+                        <xs:element name="notes" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+
+                <!-- Type for rating -->
+                <xs:simpleType name="rating">
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value=""/>
+                        <xs:enumeration value="1"/>
+                        <xs:enumeration value="2"/>
+                        <xs:enumeration value="3"/>
+                        <xs:enumeration value="4"/>
+                        <xs:enumeration value="5"/>
+                    </xs:restriction>
+                </xs:simpleType>
+
+                <!-- Type for language -->
+                <xs:simpleType name="language">
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value=""/>
+                        <xs:enumeration value="en"/>
+                        <xs:enumeration value="fr"/>
+                        <xs:enumeration value="es"/>
+                    </xs:restriction>
+                </xs:simpleType>
+
+                <!-- Type for link -->
+                <xs:simpleType name="link">
+                    <xs:restriction base="xs:string">
+                        <!-- Approximative regexp for HTTP URLs -->
+                        <xs:pattern value="(https?\://([^/?#]+)/([^?#]*)(\?([^?#]+))?(#(.*))?)?"/>
+                    </xs:restriction>
+                </xs:simpleType>
+
+            </xs:schema>
 
             <!-- Load list of books when the XForms engine is ready -->
             <xforms:send ev:event="xforms-ready" submission="list-submission"/>

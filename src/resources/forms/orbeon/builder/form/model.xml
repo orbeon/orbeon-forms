@@ -734,7 +734,7 @@
             <label/>
             <hint/>
             <help/>
-            <alert>The value of this field is incorrect</alert>
+            <alert/>
         </template>
     </xforms:instance>
 

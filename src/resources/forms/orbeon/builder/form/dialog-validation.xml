@@ -121,8 +121,9 @@
 
         <!-- Copy back the alert -->
         <xforms:setvalue ref="$current-control-resource/alert" value="$instance/alert"/>
-        <!-- Make sure the control is pointing to the label resource as it may have pointed to a default message initially -->
-        <xforms:setvalue ref="$current-control/xforms:alert/@ref" value="concat('$form-resources/', $current-control-name, '/alert')"/>
+        <!-- Switch between default alert message and user-specified alert message as needed -->
+        <xforms:setvalue if="normalize-space($instance/alert) != ''" ref="$current-control/xforms:alert/@ref" value="concat('$form-resources/', $current-control-name, '/alert')"/>
+        <xforms:setvalue if="normalize-space($instance/alert) = ''" ref="$current-control/xforms:alert/@ref" value="'$fr-resources/detail/labels/alert'"/>
 
         <xxforms:variable name="is-bind" select="$instance/schema-type != '' or $instance/builtin-type != 'string' or $instance/required = 'true'"/>
         <xforms:action if="$is-bind">

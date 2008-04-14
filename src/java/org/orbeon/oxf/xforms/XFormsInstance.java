@@ -200,7 +200,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventHandlerCont
             final String instanceString;
             if (getDocument() != null) {
                 // This is probably more optimal than going through NodeInfo. Furthermore, there may be an issue with
-                // namespaces when using tinyTreeToString(). Bug in the NodeWrapper or dom4j?]
+                // namespaces when using tinyTreeToString(). Bug in the NodeWrapper or dom4j?
                 instanceString = TransformerUtils.dom4jToString(getDocument());
             } else {
                 instanceString = TransformerUtils.tinyTreeToString(getDocumentInfo());

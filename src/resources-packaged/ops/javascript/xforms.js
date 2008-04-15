@@ -16,6 +16,26 @@
  * Parameters
  */
 
+/**
+ * === How state handling works
+ *
+ * Places where state are stored:
+ *
+ * - The current dynamic state is stored in:
+ *      ORBEON.xforms.Globals.formDynamicState[formID].value
+ * - The initial dynamic state is stored in the client state:
+ *      xformsGetFromClientState(formID, "initial-dynamic-state")
+ * - The static state is stored in
+ *      ORBEON.xforms.Globals.formStaticState[formID].value
+ *
+ * Modifcations to the state information:
+ * 
+ * - When the page is loaded if the client state is empty, the dynamic state is stored in the client state.
+ * - When a response to an Ajax response is received the new dynamic state is stored right away.
+ * - When an Ajax response also contains an updated static state, that state is stored as well.
+ *
+ */
+
 // Parameter names
 // NOTE: Names below MUST match the ones in XFormsProperties
 var SESSION_HEARTBEAT_PROPERTY = "session-heartbeat";
@@ -584,7 +604,7 @@ ORBEON.util.Utils = {
 }
 
 /**
- * This object contains function generally designed to be called from JavaScript code
+ * This object contains function designed to be called from JavaScript code
  * embedded in forms.
  */
 ORBEON.xforms.Document = {
@@ -638,6 +658,65 @@ ORBEON.xforms.Document = {
      */
     isReloading: function() {
         return ORBEON.xforms.Globals.isReloading;
+    },
+
+    /**
+     * Exposes to JavaScript the current index of all the repeats. This is the JavaScript equivalent to the
+     * XForms XPath function index(repeatId).
+     */
+    getRepeatIndex: function(repeatId) {
+        return ORBEON.xforms.Globals.repeatIndexes[repeatId];
+    },
+
+    /**
+     * Is it possible to take forms offline. This will require Gears to be installed. If Gears is not installed, it
+     * is the responsability of the application (not the XForms engine) to detect if Gears can be installed and to
+     * guide the user through the installation of Gears.
+     */
+    isOfflineAvailable: function() {
+        ORBEON.xforms.Offline.init();
+        return ORBEON.xforms.Offline.hasGears;
+    },
+
+    /**
+     * Returns true if a form identified by URL has been taken offline. This should only be called if the offline
+     * mode is available.
+     */
+    isFormOffline: function(url) {
+        ORBEON.xforms.Offline.init();
+        var resultSet = ORBEON.xforms.Offline.gearsDatabase.execute("select * from Offline_Forms where url = ?", [ url ]);
+        var result = resultSet.isValidRow();
+        resultSet.close();
+        return result;
+    },
+
+    /**
+     * Function that be called from a summary page to take a form offline.
+     * @param url                   The URL of the form to take offline
+     * @param formOfflineListener   An optional function which will be called when the form has been taken offline.
+     *                              This function receives window in which the form is loaded as parameter.
+     */
+    takeOfflineFromSummary: function(url, formOfflineListener) {
+        ORBEON.xforms.Offline.loadFormInIframe(url, function(offlineIframe) {
+            offlineIframe.contentWindow.ORBEON.xforms.Document.dispatchEvent("$containing-document$", "xxforms-offline");
+            if (formOfflineListener)
+                formOfflineListener(offlineIframe.contentWindow);
+        });
+    },
+
+    /**
+     * Function that be called from a summary page to take a form online.
+     * @param url                   The URL of the form to take online
+     * @param formOnlineListener    An optional function which will be called when the form has been taken online.
+     *                              This function receives window in which the form is loaded as parameter.
+     */
+    takeOnlineFromSummary: function(url, formOnlineListener) {
+        ORBEON.xforms.Offline.loadFormInIframe(url, function(offlineIframe) {
+            offlineIframe.contentWindow.ORBEON.xforms.Offline.takeOnline();
+            offlineIframe.contentWindow.ORBEON.xforms.Document.dispatchEvent("$containing-document$", "xxforms-online");
+            if (formOnlineListener)
+                formOnlineListener(offlineIframe.contentWindow);
+        });
     }
 };
 
@@ -2124,8 +2203,9 @@ ORBEON.xforms.Init = {
                     } else if (element.name.indexOf("$client-state") != -1) {
                         ORBEON.xforms.Globals.formClientState[formID] = element;
                         if (element.value == "") {
-                            xformsStoreInClientState(formID, "ajax-dynamic-state",
-                                    ORBEON.xforms.Globals.formDynamicState[formID].value);
+                            // Store the initial dynamic state in client state. We do this only if formClientState is empty.
+                            // If it is not empty, this means that we already have an initial state stored there, and that this
+                            // function runs because the user reloaded or navigated back to this page.
                             xformsStoreInClientState(formID, "initial-dynamic-state",
                                     ORBEON.xforms.Globals.formDynamicState[formID].value);
                         }
@@ -2648,7 +2728,7 @@ ORBEON.xforms.Server = {
                     // Add dynamic state
                     requestDocumentString += indent;
                     requestDocumentString += '<xxforms:dynamic-state>';
-                    requestDocumentString += xformsGetFromClientState(formID, "ajax-dynamic-state");
+                    requestDocumentString += ORBEON.xforms.Globals.formDynamicState[formID].value;
                     requestDocumentString += '</xxforms:dynamic-state>\n';
 
                     // Add initial dynamic state if needed
@@ -2791,7 +2871,6 @@ ORBEON.xforms.Server = {
 
                 // Good: we received an XML document from the server
                 var responseRoot = responseXML.documentElement;
-                var newDynamicState = null;
 
                 // Whether this response has triggered a load which will replace the current page.
                 var newDynamicStateTriggersReplace = false;
@@ -2808,16 +2887,16 @@ ORBEON.xforms.Server = {
 
                 for (var i = 0; i < responseRoot.childNodes.length; i++) {
 
-                    // Update instances
+                    // Store new dynamic and static state as soon as we find it. This is because the server only keeps the last
+                    // dynamic state. So if a JavaScript error happens later on while processing the response,
+                    // the next request we do we still want to send the latest dynamic state known to the server.
                     if (xformsGetLocalName(responseRoot.childNodes[i]) == "dynamic-state") {
-                        newDynamicState = ORBEON.util.Dom.getStringValue(responseRoot.childNodes[i]);
-                        // Store new dynamic state as soon as we find it. This is because the server only keeps the last
-                        // dynamic state. So if a JavaScript error happens later on while processing the response,
-                        // the next request we do we still want to send the latest dynamic state known to the server.
-                        xformsStoreInClientState(formID, "ajax-dynamic-state", newDynamicState);
-                    }
-
-                    if (xformsGetLocalName(responseRoot.childNodes[i]) == "action") {
+                        var newDynamicState = ORBEON.util.Dom.getStringValue(responseRoot.childNodes[i]);
+                        ORBEON.xforms.Globals.formDynamicState[formID].value = newDynamicState;
+                    } else if (xformsGetLocalName(responseRoot.childNodes[i]) == "static-state") {
+                        var newStaticState = ORBEON.util.Dom.getStringValue(responseRoot.childNodes[i]);
+                        ORBEON.xforms.Globals.formStaticState[formID].value = newStaticState;
+                    } else if (xformsGetLocalName(responseRoot.childNodes[i]) == "action") {
                         var actionElement = responseRoot.childNodes[i];
 
                         // Firt repeat and delete "lines" in repeat (as itemset changed below might be in a new line)
@@ -3757,7 +3836,6 @@ ORBEON.xforms.Server = {
                                     var replace = ORBEON.util.Dom.getAttribute(submissionElement, "replace");
                                     var target = ORBEON.util.Dom.getAttribute(submissionElement, "target");
                                     if (replace == null) replace = "all";
-                                    ORBEON.xforms.Globals.formDynamicState[formID].value = newDynamicState;
                                     if (serverEventsIndex != -1) {
                                         ORBEON.xforms.Globals.formServerEvents[formID].value = ORBEON.util.Dom.getStringValue(actionElement.childNodes[serverEventsIndex]);
                                     } else {
@@ -3916,7 +3994,6 @@ ORBEON.xforms.Offline = {
     gearsDatabase: null,             // The Gears SQL database
     formStore: null,                 // The Gears ResourceStore
 
-
     /**
      * Google Gears initialization function.
      * Some of the code below is aken gears_init.js which is part of Google Gears.
@@ -3982,18 +4059,26 @@ ORBEON.xforms.Offline = {
         if (ORBEON.xforms.Offline.hasGears) {
 
             // Create database and create the tables we need if necessary
-            var database = google.gears.factory.create('beta.database');
+            var database = google.gears.factory.create("beta.database");
             ORBEON.xforms.Offline.gearsDatabase = database;
-            database.open('orbeon.xforms.events');
+            database.open("orbeon.xforms");
             database.execute("create table if not exists Events" +
-                " (form text, targetId text, otherId text, value text, eventName text, bubbles integer, " +
-                "  cancelable integer, ignoreErrors integer, incremental integer)");
-            database.execute("create table if not exists Offline_Forms (url text)");
+                " (url text, form text, targetId text, otherId text, value text, eventName text, bubbles integer, " +
+                "  cancelable integer, ignoreErrors integer, incremental integer)").close();
+            database.execute("create table if not exists Offline_Forms (url text)").close();
 
             // Create form store
             var localServer = google.gears.factory.create("beta.localserver");
             ORBEON.xforms.Offline.formStore = localServer.createStore("orbeon.form");
         }
+    },
+
+    reset: function() {
+        ORBEON.xforms.Offline.init();
+        var localServer = google.gears.factory.create("beta.localserver");
+        localServer.removeStore("orbeon.form");
+        ORBEON.xforms.Offline.gearsDatabase.execute("drop table Events").close();
+        ORBEON.xforms.Offline.gearsDatabase.execute("drop table Offline_Forms").close();
     },
 
     /**
@@ -4006,6 +4091,7 @@ ORBEON.xforms.Offline = {
                     [ window.location.href ]);
             // If we find that this URL is in the store, then we are not online
             ORBEON.xforms.Offline.isOnline = ! resultSet.isValidRow();
+            resultSet.close();
         }
     },
 
@@ -4022,7 +4108,7 @@ ORBEON.xforms.Offline = {
         });
 
         // Remember that we took this form offline
-        ORBEON.xforms.Offline.gearsDatabase.execute("insert into Offline_Forms values (?)", [ window.location.href ]);
+        ORBEON.xforms.Offline.gearsDatabase.execute("insert into Offline_Forms values (?)", [ window.location.href ]).close();
         ORBEON.xforms.Offline.isOnline = false;
     },
 
@@ -4031,11 +4117,11 @@ ORBEON.xforms.Offline = {
      * Send the events that have been stored in the database to the server.
      */
     takeOnline: function() {
+        ORBEON.xforms.Offline.init();
         // Just one event with incremental set to false wil be enough for all the events to be sent right away
         var incremental = true;
-
         // Get all events from the database to create events array
-        var resultSet = ORBEON.xforms.Offline.gearsDatabase.execute("select * from Events");
+        var resultSet = ORBEON.xforms.Offline.gearsDatabase.execute("select * from Events where url = ?", [window.location.href]);
         var events = [];
         while (resultSet.isValidRow()) {
             events.push(new ORBEON.xforms.Server.Event(
@@ -4055,14 +4141,16 @@ ORBEON.xforms.Offline = {
         resultSet.close();
 
         // Go back online
-        ORBEON.xforms.Offline.gearsDatabase.execute("delete from Offline_Forms where url = ?", [ window.location.href ]);
+        ORBEON.xforms.Offline.gearsDatabase.execute("delete from Offline_Forms where url = ?", [ window.location.href ]).close();
         ORBEON.xforms.Offline.isOnline = true;
 
         // Send all the events back to the server
         ORBEON.xforms.Server.fireEvents(events, incremental);
 
+        // Remove form from store
+        ORBEON.xforms.Offline.formStore.remove(window.location.href);
         // Delete events from the database the events we just sent to the server
-        ORBEON.xforms.Offline.gearsDatabase.execute("delete from Events");
+        ORBEON.xforms.Offline.gearsDatabase.execute("delete from Events where url = ?", [window.location.href]).close();
     },
 
     /**
@@ -4074,7 +4162,8 @@ ORBEON.xforms.Offline = {
             var event = events[eventIndex];
             // Make sure we have an ID on this form, so we can then retrieve it
             YAHOO.util.Dom.generateId(event.form);
-            ORBEON.xforms.Offline.gearsDatabase.execute("insert into Events values (?, ?, ?, ?, ?, ?, ?, ?, ?)", [
+            ORBEON.xforms.Offline.gearsDatabase.execute("insert into Events values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [
+                window.location.href,
                 event.form.id,
                 event.targetId,
                 event.otherId,
@@ -4084,8 +4173,29 @@ ORBEON.xforms.Offline = {
                 event.cancelable ? 1 : 0,
                 event.ignoreErrors ? 1 : 0,
                 incremental ? 1 : 0
-            ]);
+            ]).close();
         }
+    },
+
+    loadFormInIframe: function(url, loadListener) {
+
+        // Remove existing iframe, if it exists
+        var offlineIframeId = "orbeon-offline-iframe";
+        var offlineIframe = ORBEON.util.Dom.getElementById(offlineIframeId);
+        if (offlineIframe != null)
+            offlineIframe.parentNode.removeChild(offlineIframe);
+
+        // Create new iframe
+        offlineIframe = document.createElement("iframe");
+        offlineIframe.id = offlineIframeId;
+        offlineIframe.style.display = "none";
+        document.body.appendChild(offlineIframe);
+
+        // Load URL and call listener when done
+        YAHOO.util.Event.addListener(offlineIframe.contentWindow, "load", function() {
+            loadListener(offlineIframe);
+        });
+        offlineIframe.src = url;
     }
 };
 

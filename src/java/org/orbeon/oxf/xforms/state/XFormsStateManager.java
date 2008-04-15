@@ -248,6 +248,22 @@ public class XFormsStateManager {
         return xformsDecodedClientState;
     }
 
+    public static XFormsState getEncodedClientState(XFormsContainingDocument containingDocument, PipelineContext pipelineContext, XFormsDecodedClientState xformsDecodedClientState) {
+
+        // Create encoded static state and make sure encryption is used
+        final String newEncodedStaticState;
+        {
+            final String encodedStaticState = xformsDecodedClientState.getXFormsState().getStaticState();
+            final Document staticStateDocument = XFormsUtils.decodeXML(pipelineContext, encodedStaticState);
+            newEncodedStaticState = XFormsUtils.encodeXML(pipelineContext, staticStateDocument, XFormsProperties.getXFormsPassword(), false);
+        }
+
+        // Create encoded dynamic state and make sure encryption is used
+        final String newEncodedDynamicState = containingDocument.createEncodedDynamicState(pipelineContext, true);
+
+        return new XFormsState(newEncodedStaticState, newEncodedDynamicState);
+    }
+
 
     /**
      * Get the encoded XForms state as it must be sent to the client within an Ajax response.
@@ -263,7 +279,7 @@ public class XFormsStateManager {
 
         final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
 
-        // Output static state (FOR TESTING ONLY)
+        // Get static state
         final String staticStateString = xformsDecodedClientState.getXFormsState().getStaticState();
 
         // Output dynamic state
@@ -278,7 +294,7 @@ public class XFormsStateManager {
                 final String currentPageGenerationId = (xformsDecodedClientState.getStaticStateUUID() != null) ? xformsDecodedClientState.getStaticStateUUID() : UUIDUtils.createPseudoUUID();
 
                 // Create and encode dynamic state
-                final String newEncodedDynamicState = containingDocument.createEncodedDynamicState(pipelineContext);
+                final String newEncodedDynamicState = containingDocument.createEncodedDynamicState(pipelineContext, false);
                 newXFormsState = new XFormsState(staticStateString, newEncodedDynamicState);
 
                 if (!XFormsProperties.isClientStateHandling(containingDocument)) {
@@ -323,8 +339,8 @@ public class XFormsStateManager {
 
                 if (logger.isDebugEnabled() && !XFormsProperties.isClientStateHandling(containingDocument)) {
                     // Check that dynamic state is the same
-                    final String newEncodedDynamicState = containingDocument.createEncodedDynamicState(pipelineContext);
                     // TODO: Need XML-aware comparison here
+//                    final String newEncodedDynamicState = containingDocument.createEncodedDynamicState(pipelineContext);
 //                    if (!newEncodedDynamicState.equals(xformsDecodedClientState.getXFormsState().getDynamicState())) {
 //
 //                        final Document oldDocument = XFormsUtils.decodeXML(pipelineContext, xformsDecodedClientState.getXFormsState().getDynamicState());

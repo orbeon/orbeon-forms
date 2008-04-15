@@ -26,7 +26,6 @@ import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.util.URLRewriter;
 import org.orbeon.oxf.common.Version;
 import org.orbeon.saxon.om.FastStringBuffer;
@@ -52,7 +51,6 @@ public class XHTMLHeadHandler extends HandlerBase {
     public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
 
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
-        final ExternalContext.Response response = externalContext.getResponse();
 
         // Declare xmlns:f
         formattingPrefix = handlerContext.findFormattingPrefixDeclare();

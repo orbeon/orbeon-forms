@@ -174,7 +174,7 @@ public class XFormsSubmissionUtils {
                         if (userInfo != null) {
                             final int colonIndex = userInfo.indexOf(':');
                             if (colonIndex != -1)
-                                userInfo = userInfo.substring(0, colonIndex + 1) + "xxxxxxxx";
+                                userInfo = userInfo.substring(0, colonIndex + 1) + "xxxxxxxx";// hide password in logs
                         }
                         submissionURI = new URI(submissionURL.getProtocol(), userInfo, submissionURL.getHost(),
                                 submissionURL.getPort(), submissionURL.getPath(), submissionURL.getQuery(), submissionURL.getRef());
@@ -275,8 +275,6 @@ public class XFormsSubmissionUtils {
                     }
 
                     // Forward cookies for session handling
-                    // TODO: The Servlet spec mandates JSESSIONID as cookie name; we should only forward this cookie
-                    // TODO: We should also forward selected cookies such as JSESSIONIDSSO (Tomcat) and possibly more
                     if (username == null) {
 
                         final ExternalContext.Session session = externalContext.getSession(false);
@@ -287,14 +285,18 @@ public class XFormsSubmissionUtils {
                             urlConnection.setRequestProperty("Cookie", "JSESSIONID=" + session.getId());
                         }
 
-//                        final String[] cookies = (String[]) externalContext.getRequest().getHeaderValuesMap().get("cookie");
-//                        if (cookies != null) {
-//                            for (int i = 0; i < cookies.length; i++) {
-//                                final String cookie = cookies[i];
-//                                XFormsServer.logger.debug("XForms - forwarding cookie: " + cookie);
-//                                urlConnection.setRequestProperty("Cookie", cookie);
-//                            }
-//                        }
+                        // TODO: ExternalContext must provide direct access to cookies
+                        final String[] cookies = (String[]) externalContext.getRequest().getHeaderValuesMap().get("cookie");
+                        if (cookies != null) {
+                            for (int i = 0; i < cookies.length; i++) {
+                                final String cookie = cookies[i];
+                                // Forward JSESSIONID (if not already done above) and JSESSIONIDSSO
+                                if ((cookie.startsWith("JSESSIONID") && session == null) || cookie.startsWith("JSESSIONIDSSO")) {
+                                    XFormsServer.logger.debug("XForms - forwarding cookie: " + cookie);
+                                    urlConnection.setRequestProperty("Cookie", cookie);
+                                }
+                            }
+                        }
                     }
 
                     // Forward authorization header

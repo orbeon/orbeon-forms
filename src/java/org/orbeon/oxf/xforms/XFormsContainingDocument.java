@@ -1245,11 +1245,12 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
      * Create an encoded dynamic state that represents the dynamic state of this XFormsContainingDocument.
      *
      * @param pipelineContext       current PipelineContext
+     * @param isForceEncryption      whether to force encryption or not
      * @return                      encoded dynamic state
      */
-    public String createEncodedDynamicState(PipelineContext pipelineContext) {
+    public String createEncodedDynamicState(PipelineContext pipelineContext, boolean isForceEncryption) {
         return XFormsUtils.encodeXML(pipelineContext, createDynamicStateDocument(),
-            XFormsProperties.isClientStateHandling(this) ? XFormsProperties.getXFormsPassword() : null, false);
+            (isForceEncryption || XFormsProperties.isClientStateHandling(this)) ? XFormsProperties.getXFormsPassword() : null, false);
     }
 
     private Document createDynamicStateDocument() {

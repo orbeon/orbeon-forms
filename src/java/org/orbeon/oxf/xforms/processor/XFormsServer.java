@@ -396,23 +396,30 @@ public class XFormsServer extends ProcessorImpl {
             }
 
             // Get encoded state to send to the client
-            // NOTE: This will also cache the containing document if needed
-            final XFormsState encodedClientState
-                    = XFormsStateManager.getEncodedClientStateDoCache(containingDocument, pipelineContext, xformsDecodedClientState, allEvents);
-
-            // Output static state (FOR TESTING ONLY)
-            if (testOutputStaticState) {
-                ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "static-state", new String[] { "container-type", externalContext.getRequest().getContainerType() });
-                // NOTE: Should output static state the same way as XFormsToXHTML does, but it's just for tests for for now it's ok
-                ch.text(encodedClientState.getStaticState());
-                ch.endElement();
-            }
-
-            // Output dynamic state
             {
-                ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "dynamic-state");
-                ch.text(encodedClientState.getDynamicState());
-                ch.endElement();
+                final XFormsState encodedClientState;
+                if (containingDocument.goingOffline()) {
+                    // We force client state if we are going offline, and do not cache as it is likely that the result won't be used soon
+                    encodedClientState = XFormsStateManager.getEncodedClientState(containingDocument, pipelineContext, xformsDecodedClientState);
+                } else {
+                    // This will also cache the containing document if needed
+                    encodedClientState = XFormsStateManager.getEncodedClientStateDoCache(containingDocument, pipelineContext, xformsDecodedClientState, allEvents);
+                }
+
+                // Output static state if needed (when going offline or testing)
+                if (containingDocument.goingOffline() || testOutputStaticState) {
+                    ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "static-state", new String[] { "container-type", externalContext.getRequest().getContainerType() });
+                    // NOTE: Should output static state the same way as XFormsToXHTML does, but it's just for tests for for now it's ok
+                    ch.text(encodedClientState.getStaticState());
+                    ch.endElement();
+                }
+
+                // Output dynamic state
+                {
+                    ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "dynamic-state");
+                    ch.text(encodedClientState.getDynamicState());
+                    ch.endElement();
+                }
             }
 
             // Output action

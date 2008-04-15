@@ -111,6 +111,9 @@ div.fr-body {
     padding: 0 0 0 0;
 }
 
+/* Controls added just to expose instance nodes to JavaScript */
+.fr-expose-to-javascript { display: none; }
+
 /* Make sure xforms-disabled  and xforms-repeat-template takes precendence over display: block on other classes */
 label.xforms-disabled, span.xforms-disabled, div.xforms-disabled  { display: none; }
 label.xforms-repeat-template { display: none; }
@@ -358,14 +361,19 @@ div.fr-collapsible {
 
 /* Grid */
 
-.fr-grid { width: 100%; border-collapse: separate; clear: both; margin-bottom: 0 }
+.fr-grid { width: 100%; border-collapse: separate; clear: both;
+    margin: 1em 0 0 0; /* Adding space before grid, so grid is not right below title or previous grid */ 
+}
 .fr-grid tr th { text-align: left }
 .fr-grid .fr-grid-content { *overflow: hidden }/* IE HACK so that scrollable images work in the table */
 
 .fr-grid .fr-layout-table tr td { width: auto }
 
 /* Cell content */
-.fr-grid-content { *padding-right: 6px } /* To help IE move back controls within .fr-grid-content */
+.fr-grid-content {
+    padding: 0.5em;      /* Add some space arround control */
+    *padding-right: 6px; /* To help IE move back controls within .fr-grid-content */
+} 
 .fr-grid .fr-inplace-edit .xforms-input input { width: 100% }
 
 /* Styling comon to all HTML form controls */
@@ -385,7 +393,7 @@ div.fr-collapsible {
 .fr-grid .xforms-mediatype-image { *padding-bottom: 17px; *overflow-y: hidden }/* IE HACK */
 .fr-grid .xforms-mediatype-image img { display: block }
 
-.fr-grid-td { width: auto; padding: .5em; vertical-align: top; overflow: hidden }
+.fr-grid-td { width: auto; vertical-align: top; overflow: hidden }
 .fr-grid-td .fb-grid-content { width: 64em; *width: 62.4576em }
 
 .fr-grid-2-columns .fr-grid-td { width: 50%; }

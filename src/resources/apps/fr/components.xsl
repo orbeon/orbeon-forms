@@ -231,6 +231,8 @@
                                                     <fr:clear-button/>
                                                     <fr:print-button/>
                                                     <fr:pdf-button/>
+                                                    <!-- These buttons are disabled until we can save initial changes to the DOM in store and
+                                                         replay them when the form is first loaded offline -->
                                                     <!--<fr:take-offline/>-->
                                                     <!--<fr:take-online/>-->
                                                     <fr:save-locally-button/>
@@ -735,9 +737,7 @@
         <xforms:model id="fr-sections-model"
                       xxforms:external-events="fr-after-collapse {@xxforms:external-events}"
                       xxforms:readonly-appearance="{if (doc('input:instance')/*/mode = ('view', 'print', 'pdf')) then 'static' else 'dynamic'}"
-                      xxforms:order="help label control alert hint"
-                      xxforms:state-handling="client"
-                      xxforms:help-tooltip="false">
+                      xxforms:order="help label control alert hint">
             <xsl:copy-of select="@* except (@id, @xxforms:external-events)"/>
             <!-- Contain section being currently expanded/collapsed -->
             <!-- TODO: This probably doesn't quite work for sections within repeats -->

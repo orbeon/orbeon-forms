@@ -115,6 +115,18 @@
                 <!--<xforms:load resource="xxx" f:url-type="resource"/>-->
             </xforms:action>
 
+            <xforms:action ev:event="fr-offline">
+                <xxforms:script ev:event="DOMActivate">
+                    frTakeOnlineOrOffline(false);
+                </xxforms:script>
+            </xforms:action>
+
+            <xforms:action ev:event="fr-online">
+                <xxforms:script ev:event="DOMActivate">
+                    frTakeOnlineOrOffline(true);
+                </xxforms:script>
+            </xforms:action>
+
             <!-- Instance to track search results and paging -->
             <xforms:instance id="fr-search-instance">
                 <search xmlns="">
@@ -223,9 +235,80 @@
             <xforms:submission id="search-submission"
                     ref="instance('fr-search-instance')" method="post"
                     resource="{xxforms:instance('fr-uris-instance')/data-collection}/search/{$parameters/app}/{$parameters/form}"
-                    replace="instance" instance="fr-summary-instance"/>
-
+                    replace="instance" instance="fr-summary-instance">
+                <xxforms:script ev:event="xforms-submit-done">
+                    if (ORBEON.xforms.Document.isOfflineAvailable()) {
+                        var summaryIndex = 1;
+                        while (true) {
+                            // Check if there is an item at this index; otherwise stop
+                            var nameControlId = "fr-document-name" + XFORMS_SEPARATOR_1 + summaryIndex;
+                            if (ORBEON.util.Dom.getElementById(nameControlId) == null) break;
+                            // Get URL for edit page of this form
+                            var name = ORBEON.xforms.Document.getValue(nameControlId);
+                            var url = window.location.href + "/" + name + "/edit";
+                            // Store in instance if this form is offline or not
+                            var offlineControlId = "fr-document-offline" + XFORMS_SEPARATOR_1 + summaryIndex;
+                            var isOffline = ORBEON.xforms.Document.isFormOffline(url);
+                            ORBEON.xforms.Document.setValue(offlineControlId, isOffline ? "true" : "false");
+                            summaryIndex++;
+                        }
+                    }
+                </xxforms:script>
+            </xforms:submission>
         </xforms:model>
+        <xhtml:script type="text/javascript">
+            function frTakeOnlineOrOffline(isTakeOnline) {
+
+                // Figure out the URL of the form we want to take offline
+                var documentsRepeatIndex = ORBEON.xforms.Document.getRepeatIndex("documents-repeat");
+                var nameControlId = "fr-document-name" + XFORMS_SEPARATOR_1 + documentsRepeatIndex;
+                var name = ORBEON.xforms.Document.getValue(nameControlId);
+                var url = window.location.href + "/" + name + "/edit";
+
+                // Take if offline
+                if (isTakeOnline) {
+                    ORBEON.xforms.Document.takeOnlineFromSummary(url, function(formWindow) {
+                        formWindow.ORBEON.xforms.Document.dispatchEvent("fr-save-button", "DOMActivate");
+                    });
+                } else {
+                    console.log("calling takeOfflineFromSummary", url);
+                    ORBEON.xforms.Document.takeOfflineFromSummary(url);
+                }
+
+                // Update instance as this form is now offline
+                var offlineControlId = "fr-document-offline" + XFORMS_SEPARATOR_1 + documentsRepeatIndex;
+                ORBEON.xforms.Document.setValue(offlineControlId, isTakeOnline ? "false" : "true");
+
+                // Delete information we have in the database about form, if any
+                var database = google.gears.factory.create("beta.database");
+                database.open("orbeon.fr");
+                database.execute("create table if not exists Offline_Form_Info" +
+                    " (url text, name text, value text)");
+                database.execute("delete from Offline_Form_Info where url = ?", [url]);
+
+                // When taking form offline, also store latest information about the form in the database
+                if (!isTakeOnline) {
+                    var nameIndex = 1;
+                    // Iterate over columns in the summary table
+                    while (true) {
+
+                        // Get name for a given column
+                        var nameControlId = "input-fr-document-document-detail-id" + XFORMS_SEPARATOR_1 + nameIndex;
+                        if (ORBEON.util.Dom.getElementById(nameControlId) == null) break;
+                        var controlId = ORBEON.xforms.Document.getValue(nameControlId);
+                        var name = controlId.substring(0, controlId.indexOf("-control"));
+
+                        // Get value for a given column
+                        var valueControlId = "fr-document-document-detail-value" + XFORMS_SEPARATOR_1 + documentsRepeatIndex + XFORMS_SEPARATOR_2 + nameIndex;
+                        var value = ORBEON.xforms.Document.getValue(valueControlId);
+
+                        // Store this name/value pair in the database
+                        database.execute("insert into Offline_Form_Info (url, name, value) values (?, ?, ?)", [url, name, value]);
+                        nameIndex++;
+                    }
+                }
+            }
+        </xhtml:script>
     </head>
     <body>
         <fr:view>
@@ -308,9 +391,12 @@
                                     <!-- Iterate through specially marked controls and derive resource id then resource -->
                                     <xforms:repeat nodeset="instance('fr-configuration-instance')/xforms:*[tokenize(@class, ' ') = 'fr-summary']">
                                         <th>
-                                            <xforms:output value="for $id in substring-before(context()/@id, '-control')
-                                                                  return for $resource in ($form-resources/*[local-name() = $id], '')
-                                                                         return if ($resource != '') then $resource/label else concat('[', $id, ']')"/>
+                                            <xxforms:variable name="resourceId" select="substring-before(context()/@id, '-control')"/>
+                                            <xxforms:variable name="resource" select="$form-resources/*[local-name() = $resourceId]"/>
+                                            <!-- control to make data accessible to JavaScript -->
+                                            <xforms:input ref="@id" id="fr-document-document-detail-id" class="fr-expose-to-javascript"/>
+                                            <!-- Output showing as the header of the column -->
+                                            <xforms:output value="if (exists($resource)) then $resource/label else concat('[', $resourceId, ']')"/>
 
                                         </th>
                                     </xforms:repeat>
@@ -320,6 +406,10 @@
                                 <xforms:repeat nodeset="document" id="documents-repeat">
                                     <tr>
                                         <td>
+                                            <!-- Expose to JavaScript attribute that will be by JavaScript, telling us if the form if offline or online -->
+                                            <xforms:input ref="@offline" id="fr-document-offline" class="fr-expose-to-javascript"/>
+                                            <!-- Expose to JavaScript name of this form -->
+                                            <xforms:input ref="@name" id="fr-document-name" class="fr-expose-to-javascript"/>
                                             <xforms:output value="instance('fr-paging-instance')/from + count(preceding-sibling::document)"/>
                                         </td>
                                         <td>
@@ -334,6 +424,9 @@
                                         </td>
                                         <xforms:repeat nodeset="details/detail">
                                             <td>
+                                                <!-- control to make data accessible to JavaScript -->
+                                                <xforms:input ref="." id="fr-document-document-detail-value" class="fr-expose-to-javascript"/>
+
                                                 <!-- input -->
                                                 <xforms:group ref=".[instance('fr-search-instance')/query[count(context()/preceding-sibling::detail) + 2]/@control = 'input']">
                                                     <xforms:output value="if (. castable as xs:date) then format-date(xs:date(.), $fr-resources/summary/formats/date, xxforms:instance('fr-language-instance'), (), ()) else ."/>
@@ -454,18 +547,20 @@
                             <xforms:dispatch ev:event="DOMActivate" target="fr-form-model" name="fr-summary-pdf"/>
                         </xforms:trigger>
                         <!-- Take offline -->
-                        <xforms:trigger>
+                        <xforms:trigger ref="if (instance('fr-summary-instance')/document[index('documents-repeat')]/@offline = 'false') then . else ()">
                             <xforms:label>
                                 <xhtml:img src="/apps/fr/style/take-offline.gif" alt="Take offline"/>
                                 <xhtml:span><xforms:output value="$fr-resources/detail/labels/offline"/></xhtml:span>
                             </xforms:label>
+                            <xforms:dispatch ev:event="DOMActivate" target="fr-form-model" name="fr-offline"/>
                         </xforms:trigger>
                         <!-- Take online -->
-                        <xforms:trigger>
+                        <xforms:trigger ref="if (instance('fr-summary-instance')/document[index('documents-repeat')]/@offline = 'true') then . else ()">
                             <xforms:label>
                                 <xhtml:img src="/apps/fr/style/take-online.gif" alt="Take online"/>
                                 <xhtml:span><xforms:output value="$fr-resources/detail/labels/online"/></xhtml:span>
                             </xforms:label>
+                            <xforms:dispatch ev:event="DOMActivate" target="fr-form-model" name="fr-online"/>
                         </xforms:trigger>
                         <!-- Test button (if Form Builder) -->
                         <!-- TODO -->
@@ -502,7 +597,7 @@
                     -->
                 </xhtml:div>
             </fr:buttons>
-
         </fr:view>
+        <!--<widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>-->
     </body>
 </html>

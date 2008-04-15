@@ -65,7 +65,7 @@
                             and exists($resource/*) and $resource-name = ('data', 'data.xml')
                         order by $last-modified descending
                         return
-                        <document created="{xmldb:created($collection-name, $resource-name)}" last-modified="{$last-modified}" name="{$resource-id}">
+                        <document created="{xmldb:created($collection-name, $resource-name)}" last-modified="{$last-modified}" name="{$resource-id}" offline="">
                             <details>
                                 ]]><details/><![CDATA[
                             </details>

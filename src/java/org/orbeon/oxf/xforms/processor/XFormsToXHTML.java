@@ -335,7 +335,7 @@ public class XFormsToXHTML extends ProcessorImpl {
 
             // This is the state after XForms initialization
             xformsState[0] = new XFormsState(xformsStaticState.getEncodedStaticState(pipelineContext),
-                    containingDocument[0].createEncodedDynamicState(pipelineContext));
+                    containingDocument[0].createEncodedDynamicState(pipelineContext, false));
         }
 
         // Cache ContainingDocument if requested and possible

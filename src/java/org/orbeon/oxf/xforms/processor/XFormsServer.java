@@ -400,7 +400,7 @@ public class XFormsServer extends ProcessorImpl {
                 final XFormsState encodedClientState;
                 if (containingDocument.goingOffline()) {
                     // We force client state if we are going offline, and do not cache as it is likely that the result won't be used soon
-                    encodedClientState = XFormsStateManager.getEncodedClientState(containingDocument, pipelineContext, xformsDecodedClientState);
+                    encodedClientState = XFormsStateManager.getEncryptedSerializedClientState(containingDocument, pipelineContext, xformsDecodedClientState);
                 } else {
                     // This will also cache the containing document if needed
                     encodedClientState = XFormsStateManager.getEncodedClientStateDoCache(containingDocument, pipelineContext, xformsDecodedClientState, allEvents);

@@ -23,7 +23,6 @@ import org.orbeon.oxf.util.UUIDUtils;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.XFormsUtils;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
 /**
  * Centralize XForms state management.
@@ -248,7 +247,16 @@ public class XFormsStateManager {
         return xformsDecodedClientState;
     }
 
-    public static XFormsState getEncodedClientState(XFormsContainingDocument containingDocument, PipelineContext pipelineContext, XFormsDecodedClientState xformsDecodedClientState) {
+    /**
+     * Get serialized and encrypted XForms state. This does not use the document's state handling preferences, and
+     * doesn't attempt to cache the containing document.
+     *
+     * @param containingDocument        containing document
+     * @param pipelineContext           pipeline context
+     * @param xformsDecodedClientState  decoded state as received in Ajax request
+     * @return                          XFormsState serialized and encrypted
+     */
+    public static XFormsState getEncryptedSerializedClientState(XFormsContainingDocument containingDocument, PipelineContext pipelineContext, XFormsDecodedClientState xformsDecodedClientState) {
 
         // Create encoded static state and make sure encryption is used
         final String newEncodedStaticState;

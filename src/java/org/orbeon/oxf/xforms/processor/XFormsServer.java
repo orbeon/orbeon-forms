@@ -407,7 +407,7 @@ public class XFormsServer extends ProcessorImpl {
                 }
 
                 // Output static state if needed (when going offline or testing)
-                if (containingDocument.goingOffline() || testOutputStaticState) {
+                if (containingDocument.goingOffline() || containingDocument.goingOnline() || testOutputStaticState) {
                     ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "static-state", new String[] { "container-type", externalContext.getRequest().getContainerType() });
                     // NOTE: Should output static state the same way as XFormsToXHTML does, but it's just for tests for for now it's ok
                     ch.text(encodedClientState.getStaticState());

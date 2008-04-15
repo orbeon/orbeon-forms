@@ -84,6 +84,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     private String helpEffectiveControlId;
 
     private boolean goingOffline;
+    private boolean goingOnline;
 
     // Global flag used during initialization only
     private boolean mustPerformInitializationFirstRefresh;
@@ -426,6 +427,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         this.helpEffectiveControlId = null;
 
         this.goingOffline = false;
+        this.goingOnline = false;
     }
 
     /**
@@ -1010,6 +1012,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
             final XFormsModel currentModel = (XFormsModel) i.next();
             dispatchEvent(pipelineContext, new XXFormsOnlineEvent(currentModel));
         }
+        this.goingOnline = true;
         this.goingOffline = false;
     }
 
@@ -1019,11 +1022,16 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
             final XFormsModel currentModel = (XFormsModel) i.next();
             dispatchEvent(pipelineContext, new XXFormsOfflineEvent(currentModel));
         }
+        this.goingOnline = false;
         this.goingOffline = true;
     }
 
     public boolean goingOffline() {
         return goingOffline;
+    }
+
+    public boolean goingOnline() {
+        return goingOnline;
     }
 
     /**

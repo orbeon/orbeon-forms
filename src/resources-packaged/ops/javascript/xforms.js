@@ -2698,13 +2698,16 @@ ORBEON.xforms.Server = {
                         ORBEON.xforms.Globals.requestIgnoreErrors = false;
                     }
                     // Figure out whether we need to send the initial dynamic state
-                    if (event.eventName == "xxforms-all-events-required") {
+                    if (event.eventName == "xxforms-all-events-required" || event.eventName == "xxforms-offline") {
                         sendInitialDynamicState = true;
                     }
                     // Display progress panel if trigger with "xforms-trigger-appearance-modal" class was activated
                     var eventElement =  ORBEON.util.Dom.getElementById(event.targetId);
-                    if (event.eventName == 'DOMActivate' && ORBEON.util.Dom.hasClass(eventElement, "xforms-trigger-appearance-modal")) {
-						ORBEON.util.Utils.displayModalProgressPanel();
+                    if (event.eventName == 'DOMActivate') {
+                        if (ORBEON.util.Dom.hasClass(eventElement, "xforms-trigger-appearance-modal"))
+                            ORBEON.util.Utils.displayModalProgressPanel();
+                        else if (ORBEON.util.Dom.hasClass(eventElement, "xxforms-offline"))
+                            sendInitialDynamicState = true;// case of going offline
                     }
                 }
 

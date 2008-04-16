@@ -293,7 +293,8 @@
                     </optional>
                     <optional>
                         <element name="xxforms:offline">
-                            <empty/>
+                            <!-- Contains serialized form of all events to replay up to this response -->
+                            <data type="string"/>
                         </element>
                     </optional>
                 </element>

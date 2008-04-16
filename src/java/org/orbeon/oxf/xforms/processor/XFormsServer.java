@@ -20,24 +20,31 @@ import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.processor.PageFlowControllerProcessor;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
-import org.orbeon.oxf.processor.PageFlowControllerProcessor;
+import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.*;
-import org.orbeon.oxf.xforms.state.*;
 import org.orbeon.oxf.xforms.control.XFormsControl;
-import org.orbeon.oxf.xforms.control.controls.*;
+import org.orbeon.oxf.xforms.control.controls.XXFormsDialogControl;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
+import org.orbeon.oxf.xforms.state.XFormsDocumentCache;
+import org.orbeon.oxf.xforms.state.XFormsState;
+import org.orbeon.oxf.xforms.state.XFormsStateManager;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
+import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.oxf.resources.OXFProperties;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
+import javax.xml.transform.sax.TransformerHandler;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.OutputKeys;
+import java.io.StringWriter;
 import java.util.*;
 
 /**
@@ -216,6 +223,7 @@ public class XFormsServer extends ProcessorImpl {
 
                 // Run events if any
                 final Map valueChangeControlIds = new HashMap();
+                boolean allEvents = false;
                 if (eventElements.size() > 0) {
                     // NOTE: We store here the last xxforms-value-change-with-focus-change event so
                     // we can coalesce values in case several such events are sent for the same
@@ -237,6 +245,10 @@ public class XFormsServer extends ProcessorImpl {
                             // Special event telling us to resend the client all the events since initialization
                             if (xformsDecodedInitialClientState == null)
                                 throw new OXFException("Got xxforms-all-events-required event without initial dynamic state.");
+
+                            // Remember that we got this event
+                            allEvents = true;
+
                         } else if (sourceControlId != null && eventName != null) {
                             // An event is passed
                             if (eventName.equals(XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE) && otherControlId == null) {
@@ -256,6 +268,11 @@ public class XFormsServer extends ProcessorImpl {
                                     lastValueChangeEventValue = value;
                                 }
                             } else {
+
+                                // xxforms-offline requires initial dynamic state
+                                if (eventName.equals(XFormsEvents.XXFORMS_OFFLINE) && xformsDecodedInitialClientState == null)
+                                    throw new OXFException("Got xxforms-offline event without initial dynamic state.");
+
                                 if (lastSourceControlId != null) {
                                     // Send old event
                                     executeExternalEventPrepareIfNecessary(pipelineContext, containingDocument, XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE, lastSourceControlId, null, lastValueChangeEventValue, filesElement);
@@ -283,7 +300,7 @@ public class XFormsServer extends ProcessorImpl {
 
                 if (contentHandler != null) {
                     // Create resulting document if there is a ContentHandler
-                    outputResponse(containingDocument, valueChangeControlIds, pipelineContext, contentHandler, xformsDecodedClientState, xformsDecodedInitialClientState, false, false);
+                    outputResponse(containingDocument, valueChangeControlIds, pipelineContext, contentHandler, xformsDecodedClientState, xformsDecodedInitialClientState, allEvents, false, false, false);
                 } else {
                     // This is the second pass of a submission with replace="all". We make it so that the document is
                     // not modified. However, we must then return it to its pool.
@@ -330,12 +347,10 @@ public class XFormsServer extends ProcessorImpl {
     public static void outputResponse(XFormsContainingDocument containingDocument, Map valueChangeControlIds,
                                 PipelineContext pipelineContext, ContentHandler contentHandler, XFormsStateManager.XFormsDecodedClientState xformsDecodedClientState,
                                 XFormsStateManager.XFormsDecodedClientState xformsDecodedInitialClientState,
-                                boolean testOutputStaticState, boolean testOutputAllActions) {
+                                boolean allEvents, boolean isOfflineEvents, boolean testOutputStaticState, boolean testOutputAllActions) {
 
         final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
         final XFormsControls xformsControls = containingDocument.getXFormsControls();
-
-        final boolean allEvents = xformsDecodedInitialClientState != null;
 
         try {
             final ContentHandlerHelper ch = new ContentHandlerHelper(contentHandler);
@@ -395,19 +410,25 @@ public class XFormsServer extends ProcessorImpl {
                 xformsControls.evaluateAllControlsIfNeeded(pipelineContext);
             }
 
-            // Get encoded state to send to the client
-            {
+            // Get encoded state to send to the client (unless computing the list of offline events)
+            if (!isOfflineEvents) {
+                // State ready to send to the client
                 final XFormsState encodedClientState;
+                // Whether the incoming state handling mode is different from the outgoing state handling mode
+                final boolean isMustChangeStateHandling;
                 if (containingDocument.goingOffline()) {
                     // We force client state if we are going offline, and do not cache as it is likely that the result won't be used soon
                     encodedClientState = XFormsStateManager.getEncryptedSerializedClientState(containingDocument, pipelineContext, xformsDecodedClientState);
+                    // Outgoing mode is always "client", so in effect we are changing when the regular mode is not client
+                    isMustChangeStateHandling = !xformsDecodedClientState.isClientStateHandling();
                 } else {
                     // This will also cache the containing document if needed
                     encodedClientState = XFormsStateManager.getEncodedClientStateDoCache(containingDocument, pipelineContext, xformsDecodedClientState, allEvents);
+                    isMustChangeStateHandling = xformsDecodedClientState.isClientStateHandling() != XFormsProperties.isClientStateHandling(containingDocument);
                 }
 
-                // Output static state if needed (when going offline or testing)
-                if (containingDocument.goingOffline() || containingDocument.goingOnline() || testOutputStaticState) {
+                // Output static state when changing state handling mode, or when testing
+                if (isMustChangeStateHandling || testOutputStaticState) {
                     ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "static-state", new String[] { "container-type", externalContext.getRequest().getContainerType() });
                     // NOTE: Should output static state the same way as XFormsToXHTML does, but it's just for tests for for now it's ok
                     ch.text(encodedClientState.getStaticState());
@@ -551,10 +572,27 @@ public class XFormsServer extends ProcessorImpl {
                     }
                 }
 
-                // Output go offline instruction
+                // Output go offline instruction (unless computing the list of offline events)
                 {
-                    if (containingDocument.goingOffline()) {
+                    if (containingDocument.goingOffline() && !isOfflineEvents) {
                         ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "offline");
+
+                        // We send all the changes between the initial state and the time the form go offline, so when
+                        // reloading the page the client can apply those changes when the page is reloaded from the
+                        // client-side database.
+
+                        final StringWriter writer = new StringWriter();
+                        final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
+                        identity.getTransformer().setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");// no XML decl.
+                        identity.setResult(new StreamResult(writer));
+
+                        // Output response by asking for all events, and passing a flag telling that we are processing
+                        // offline events so as to avoid recursion
+                        outputResponse(containingDocument, valueChangeControlIds, pipelineContext, identity, xformsDecodedClientState, xformsDecodedInitialClientState, true, true, false, false);
+
+                        // Output serialized list of events
+                        ch.text(writer.toString());
+
                         ch.endElement();
                     }
                 }

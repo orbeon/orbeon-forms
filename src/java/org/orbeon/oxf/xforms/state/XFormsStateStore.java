@@ -36,10 +36,17 @@ public abstract class XFormsStateStore {
 
     protected abstract String getStoreDebugName();
 
-    public synchronized void add(String pageGenerationId, String oldRequestId, String requestId, XFormsState xformsState, String currentSessionId) {
-
-         // Whether this is an initial dynamic state entry which has preferential treatment
-        final boolean isInitialEntry = oldRequestId == null;
+    /**
+     * Add an XForms state to the store.
+     *
+     * @param pageGenerationId  page generation id
+     * @param oldRequestId      old request id if available
+     * @param newRequestId      new request id
+     * @param xformsState       state to store
+     * @param currentSessionId  current session id
+     * @param isInitialEntry    whether this is an initial dynamic state entry which has preferential treatment
+     */
+    public synchronized void add(String pageGenerationId, String oldRequestId, String newRequestId, XFormsState xformsState, String currentSessionId, boolean isInitialEntry) {
 
         // Remove old dynamic state if present as we keep only one entry per page generation
         // NOTE: We try to keep the initial dynamic state entry in the store however, because the client is still likely to request it
@@ -102,7 +109,7 @@ public abstract class XFormsStateStore {
         addOrReplaceOne(pageGenerationId, xformsState.getStaticState(), false, currentSessionId, null);
 
         // Add new dynamic state and move it to the front
-        addOrReplaceOne(requestId, xformsState.getDynamicState(), isInitialEntry, currentSessionId, oldRequestId);
+        addOrReplaceOne(newRequestId, xformsState.getDynamicState(), isInitialEntry, currentSessionId, oldRequestId);
 
         if (XFormsStateManager.logger.isDebugEnabled()) {
             debug("store size after adding: " + currentStoreSize + " bytes.");

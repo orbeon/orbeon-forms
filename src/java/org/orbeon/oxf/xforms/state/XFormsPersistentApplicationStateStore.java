@@ -158,10 +158,10 @@ public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
         return "global application";
     }
 
-    public synchronized void add(String pageGenerationId, String oldRequestId, String requestId, XFormsState xformsState, final String sessionId) {
+    public synchronized void add(String pageGenerationId, String oldRequestId, String requestId, XFormsState xformsState, final String sessionId, boolean isInitialEntry) {
 
         // Do the operation
-        super.add(pageGenerationId, oldRequestId, requestId, xformsState, sessionId);
+        super.add(pageGenerationId, oldRequestId, requestId, xformsState, sessionId, isInitialEntry);
 
         // Add session listener if needed
         if (sessionId != null) {

@@ -2808,7 +2808,7 @@ ORBEON.xforms.Server = {
             YAHOO.util.Connect.setDefaultPostHeader(false);
             YAHOO.util.Connect.initHeader("Content-Type", "application/xml");
             var callback = {
-                success: ORBEON.xforms.Server.handleResponse,
+                success: ORBEON.xforms.Server.handleResponseAjax,
                 failure: ORBEON.xforms.Server.handleFailure
             };
             var ajaxTimeout = ORBEON.util.Utils.getProperty(DELAY_BEFORE_AJAX_TIMEOUT_PROPERTY);
@@ -2855,11 +2855,11 @@ ORBEON.xforms.Server = {
             if (ORBEON.util.Dom.hasClass(uploadElement, "xforms-upload-state-empty"))// this also excludes templates
                 ORBEON.util.Dom.clearUploadControl(uploadElement);
         }
-        ORBEON.xforms.Server.handleResponse(o);
+        ORBEON.xforms.Server.handleResponseAjax(o);
     },
 
-    handleResponse: function(o) {
-        var formID = ORBEON.xforms.Globals.requestForm.id;
+
+    handleResponseAjax: function(o) {
         var responseXML = o.responseXML;
         if (!responseXML || (responseXML && responseXML.documentElement && responseXML.documentElement.tagName.toLowerCase() == "html")) {
             // The XML docucment does not come in o.responseXML: parse o.responseText.
@@ -2867,6 +2867,16 @@ ORBEON.xforms.Server = {
             var xmlString = o.responseText.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
             responseXML = ORBEON.util.Dom.stringToDom(xmlString);
         }
+        var formID = ORBEON.xforms.Globals.requestForm.id;
+        ORBEON.xforms.Server.handleResponseDom(responseXML, formID);
+    },
+
+    /**
+     * Process events in the DOM passed as parameter.
+     *
+     * @param responseXML       DOM containing events to process
+     */
+    handleResponseDom: function(responseXML, formID) {
 
         try {
             if (responseXML && responseXML.documentElement
@@ -3850,18 +3860,19 @@ ORBEON.xforms.Server = {
                                             // Display loading indicator unless the server tells us not to display it
                                             newDynamicStateTriggersReplace = true;
                                         }
-                                        ORBEON.xforms.Globals.requestForm.action = action;
+                                        var requestForm = ORBEON.util.Dom.getElementById(formID);
+                                        requestForm.action = action;
                                         if (target == null) {
                                             // Reset as this may have been changed before by asyncRequest
-                                            ORBEON.xforms.Globals.requestForm.removeAttribute("target");
+                                            requestForm.removeAttribute("target");
                                         } else {
                                             // Set the requested target
-                                            ORBEON.xforms.Globals.requestForm.target = target;
+                                            requestForm.target = target;
                                         }
-                                        ORBEON.xforms.Globals.requestForm.submit();
+                                        requestForm.submit();
                                     } else {
                                         // Submit form in the background
-                                        YAHOO.util.Connect.setForm(ORBEON.xforms.Globals.requestForm, true, true);
+                                        YAHOO.util.Connect.setForm(requestForm, true, true);
                                         var callback =  {
                                             upload: ORBEON.xforms.Server.handleUploadResponse,
                                             failure: ORBEON.xforms.Server.handleFailure
@@ -3939,7 +3950,9 @@ ORBEON.xforms.Server = {
 
                                 // Take form offline
                                 case "offline": {
-                                    ORBEON.xforms.Offline.takeOffline();
+                                    var offlineElement = actionElement.childNodes[actionIndex];
+                                    var replayResponse = ORBEON.util.Dom.getStringValue(offlineElement);
+                                    ORBEON.xforms.Offline.takeOffline(replayResponse, formID);
                                 }
                             }
                         }
@@ -4068,7 +4081,7 @@ ORBEON.xforms.Offline = {
             database.execute("create table if not exists Events" +
                 " (url text, form text, targetId text, otherId text, value text, eventName text, bubbles integer, " +
                 "  cancelable integer, ignoreErrors integer, incremental integer)").close();
-            database.execute("create table if not exists Offline_Forms (url text)").close();
+            database.execute("create table if not exists Offline_Forms (url text, event_response text, form_id text)").close();
 
             // Create form store
             var localServer = google.gears.factory.create("beta.localserver");
@@ -4094,6 +4107,13 @@ ORBEON.xforms.Offline = {
                     [ window.location.href ]);
             // If we find that this URL is in the store, then we are not online
             ORBEON.xforms.Offline.isOnline = ! resultSet.isValidRow();
+            // If we are offline, replay initial events saved in Gears
+            if (! ORBEON.xforms.Offline.isOnline) {
+                var initialEvents = resultSet.fieldByName("event_response");
+                var formID = resultSet.fieldByName("form_id");
+                var initialEventsXML = ORBEON.util.Dom.stringToDom(initialEvents);
+                ORBEON.xforms.Server.handleResponseDom(initialEventsXML, formID);
+            }
             resultSet.close();
         }
     },
@@ -4102,7 +4122,7 @@ ORBEON.xforms.Offline = {
      * Called when the form is taken offline.
      * Makes sure we have everything in the store so we can run this form while offline.
      */
-    takeOffline: function() {
+    takeOffline: function(eventReponse, formID) {
         ORBEON.xforms.Offline.init();
 
         // Load current form in form store        
@@ -4111,7 +4131,8 @@ ORBEON.xforms.Offline = {
         });
 
         // Remember that we took this form offline
-        ORBEON.xforms.Offline.gearsDatabase.execute("insert into Offline_Forms values (?)", [ window.location.href ]).close();
+        ORBEON.xforms.Offline.gearsDatabase.execute("insert into Offline_Forms (url, event_response, form_id) values (?, ?, ?)",
+                [ window.location.href, eventReponse, formID ]).close();
         ORBEON.xforms.Offline.isOnline = false;
     },
 

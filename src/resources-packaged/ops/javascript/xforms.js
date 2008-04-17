@@ -1465,9 +1465,12 @@ ORBEON.xforms.Events = {
                     // Otherwise, with dialogs, the tooltip might end up being below the dialog and be invisible.
                     zIndex: 1000
                 });
+            var context = ORBEON.util.Dom.getElementById(targetId);
+            // Send the mouse move event, because the tooltip gets positioned when receiving a mouse move.
+            // Without this, sometimes the first time the tooltip is shows at the top left of the screen
+            yuiTooltip.onContextMouseMove.call(context, event, yuiTooltip);
             // Send the mouse over event to the tooltip, since the YUI tooltip didn't receive it as it didn't
             // exist yet when the event was dispatched by the browser
-            var context = ORBEON.util.Dom.getElementById(targetId);
             yuiTooltip.onContextMouseOver.call(context, event, yuiTooltip);
             // Save reference to YUI tooltip
             tooltipForControl[controlId] = yuiTooltip;
@@ -1505,14 +1508,17 @@ ORBEON.xforms.Events = {
             // Help tooltip
             if (ORBEON.util.Utils.getProperty(HELP_TOOLTIP_PROPERTY)
                     &&  ORBEON.util.Dom.hasClass(target, "xforms-help-image")) {
-                // Get control, assuming it is right before the help icon
-                var control = target.previousSibling;
-                while (control != null && ! ORBEON.util.Dom.hasClass(control, "xforms-control"))
-                    control = control.previousSibling;
+                // Get help label which is right after the image; there might be a text node between the two elements
+                
+                var helpLabel = target.nextSibling;
+                if (!ORBEON.util.Dom.isElement(helpLabel))
+                    helpLabel = helpLabel.nextSibling;
+                // Get control
+                var control = ORBEON.util.Dom.getElementById(helpLabel.htmlFor);
                 if (ORBEON.xforms.Globals.helpTooltipForControl[control.id] == null) {
                     var message = ORBEON.xforms.Controls.getHelpMessage(control);
                     YAHOO.util.Dom.generateId(target);
-                    ORBEON.xforms.Events._showToolTip(ORBEON.xforms.Globals.helpTooltipForControl, control.id, target.id, "-orbeon-help-tooltip", message, 10, event);
+                    ORBEON.xforms.Events._showToolTip(ORBEON.xforms.Globals.helpTooltipForControl, control.id, target.id, "-orbeon-help-tooltip", message, 0, event);
                 }
             }
 

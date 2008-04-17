@@ -96,9 +96,15 @@ public class XFormsRepeatControl extends XFormsControl {
             final List destinationNodeset;
             final int requestedDestinationIndex;
             {
-                final String containingRepeatEffectiveId
-                    = getId() + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1
-                        + StringUtils.join(dndEnd, XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_2, 0, dndEnd.length - 1);
+                final String containingRepeatEffectiveId;
+                if (dndEnd.length > 1) {
+                    containingRepeatEffectiveId
+                            = getId() + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1
+                                + StringUtils.join(dndEnd, XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_2, 0, dndEnd.length - 1);
+                } else {
+                    containingRepeatEffectiveId = getId();
+                }
+
 
                 final XFormsRepeatControl destinationControl = (XFormsRepeatControl) containingDocument.getObjectById(containingRepeatEffectiveId);
                 destinationNodeset = destinationControl.getBindingContext().getNodeset();
@@ -116,12 +122,12 @@ public class XFormsRepeatControl extends XFormsControl {
                 // Deleted node was part of the destination nodeset
                 destinationNodeset.remove(deletedNodePosition);
                 // If the insertion position is after the delete node, must adjust it
-                if (requestedDestinationIndex < deletedNodePosition + 1) {
-                    // Insertion point is before deleted node
+                if (requestedDestinationIndex <= deletedNodePosition + 1) {
+                    // Insertion point is before or on (degenerate case) deleted node
                     actualDestinationIndex = requestedDestinationIndex;
                     destinationPosition = "before";
                 } else {
-                    // Insertion point is on or after deleted node
+                    // Insertion point is after deleted node
                     actualDestinationIndex = requestedDestinationIndex - 1;
                     destinationPosition = "after";
                 }

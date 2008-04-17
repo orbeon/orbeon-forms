@@ -25,7 +25,7 @@
             <xforms:instance id="main-instance">
                 <table xmlns="">
                     <tr>
-                        <td/>
+                        <td>1</td>
                     </tr>
                 </table>
             </xforms:instance>
@@ -34,6 +34,7 @@
                 <variable xmlns="">
                     <iteration-count/>
                     <column-count/>
+                    <count>1</count>
                 </variable>
             </xforms:instance>
         </xforms:model>
@@ -53,6 +54,10 @@
                 <xforms:action while="instance('variable')/iteration-count != 0">
                     <xforms:insert ev:event="DOMActivate" nodeset="tr"/>
                     <xforms:setvalue ref="instance('variable')/iteration-count" value=". - 1"/>
+                    <xforms:action xxforms:iterate="tr[last()]/td">
+                        <xforms:setvalue ref="instance('variable')/count" value=". + 1"/>
+                        <xforms:setvalue ref="." value="instance('variable')/count"/>
+                    </xforms:action>
                 </xforms:action>
             </xforms:action>
         </xforms:trigger>
@@ -64,6 +69,10 @@
                 <xforms:action while="instance('variable')/iteration-count != 0">
                     <xforms:insert ev:event="DOMActivate" nodeset="tr"/>
                     <xforms:setvalue ref="instance('variable')/iteration-count" value=". - 1"/>
+                    <xforms:action xxforms:iterate="tr[last()]/td">
+                        <xforms:setvalue ref="instance('variable')/count" value=". + 1"/>
+                        <xforms:setvalue ref="." value="instance('variable')/count"/>
+                    </xforms:action>
                 </xforms:action>
             </xforms:action>
         </xforms:trigger>
@@ -72,7 +81,13 @@
             <xforms:label>Insert column</xforms:label>
             <xforms:action ev:event="DOMActivate">
                 <xforms:setvalue ref="instance('variable')/column-count" value="count(instance('main-instance')/tr[1]/td) + 1"/>
-                <xforms:insert while="tr[count(td) != instance('variable')/column-count]" nodeset="tr[count(td) != instance('variable')/column-count]/td"/>
+
+                <xforms:action xxforms:iterate="tr">
+                    <xforms:insert nodeset="td"/>
+                    <xforms:setvalue ref="instance('variable')/count" value=". + 1"/>
+                    <xforms:setvalue ref="td[last()]" value="instance('variable')/count"/>
+                </xforms:action>
+
             </xforms:action>
         </xforms:trigger>
 
@@ -80,20 +95,34 @@
             <xforms:label>Insert 10 columns</xforms:label>
             <xforms:action ev:event="DOMActivate">
                 <xforms:setvalue ref="instance('variable')/iteration-count">10</xforms:setvalue>
+
+                <!-- Repeat 10 times -->
                 <xforms:action while="instance('variable')/iteration-count != 0">
+                    <!-- Set number of cols to add  -->
                     <xforms:setvalue ref="instance('variable')/column-count" value="count(instance('main-instance')/tr[1]/td) + 1"/>
-                    <xforms:insert while="tr[count(td) != instance('variable')/column-count]" nodeset="tr[count(td) != instance('variable')/column-count]/td"/>
+                    
+                    <xforms:action xxforms:iterate="tr">
+                        <xforms:insert nodeset="td"/>
+                        <xforms:setvalue ref="instance('variable')/count" value=". + 1"/>
+                        <xforms:setvalue ref="td[last()]" value="instance('variable')/count"/>
+                    </xforms:action>
+
                     <xforms:setvalue ref="instance('variable')/iteration-count" value=". - 1"/>
                 </xforms:action>
             </xforms:action>
         </xforms:trigger>
 
+        <!--<xforms:trigger id="test-trigger">-->
+            <!--<xforms:label>Test DnD EVents</xforms:label>-->
+        <!--</xforms:trigger>-->
+
         <table>
-            <xforms:repeat nodeset="tr" id="row-repeat">
+            <xforms:repeat nodeset="tr" id="row-repeat" xxforms:dnd="true">
                 <tr>
-                    <xforms:repeat nodeset="td" id="cell-repeat">
+                    <xforms:repeat nodeset="td" id="cell-repeat" xxforms:dnd="true" xxforms:dnd-over="true">
                         <td>
                             (<xforms:output value="count(xxforms:context('row-repeat')/preceding-sibling::*) + 1"/>,
+                            <xforms:output value="."/>,
                             <xforms:output value="position()"/>)
                         </td>
                     </xforms:repeat>

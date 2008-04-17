@@ -19,7 +19,7 @@
  * than modifying calendar.js itself).
  */
 
-// $Id: calendar-setup.js,v 1.2 2008/04/17 22:50:31 avernet Exp $
+// $Id: calendar-setup.js,v 1.3 2008/04/17 22:50:52 avernet Exp $
 
 /**
  *  This function "patches" an input field (or other element) to use a calendar
@@ -191,7 +191,7 @@ Calendar.setup = function (params) {
 		cal.refresh();
 		if (!params.position) {
             cal.showAtElement(params.button || params.displayArea || params.inputField, params.align);
-            // avernet 2008-04-17
+            // Orbeon 2008-04-17
             // The following code is added to reposition the calendar using YUI. This is to fix issues where sometimes
             // the calendar is not correctly positioned on IE.
             var relativeTo = params.button || params.displayArea || params.inputField;

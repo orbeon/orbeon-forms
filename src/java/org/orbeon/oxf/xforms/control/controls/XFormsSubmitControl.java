@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.control.controls;
 
 import org.dom4j.Element;
-import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsModelSubmission;
@@ -39,7 +39,7 @@ public class XFormsSubmitControl extends XFormsTriggerControl {
             // Find submission id
             final String submissionId =  XFormsUtils.namespaceId(containingDocument, getControlElement().attributeValue("submission"));
             if (submissionId == null)
-                throw new OXFException("xforms:submit requires a submission attribute.");
+                throw new ValidationException("xforms:submit requires a submission attribute.", getLocationData());
 
             // Find submission object and dispatch submit event to it
             final Object object = containingDocument.getObjectById(submissionId);
@@ -47,7 +47,7 @@ public class XFormsSubmitControl extends XFormsTriggerControl {
                 final XFormsModelSubmission submission = (XFormsModelSubmission) object;
                 containingDocument.dispatchEvent(pipelineContext, new XFormsSubmitEvent(submission));
             } else {
-                throw new OXFException("xforms:submit submission attribute must point to an xforms:submission element: " + submissionId);
+                throw new ValidationException("xforms:submit submission attribute must point to an xforms:submission element: " + submissionId, getLocationData());
             }
         }
         super.performDefaultAction(pipelineContext, event);

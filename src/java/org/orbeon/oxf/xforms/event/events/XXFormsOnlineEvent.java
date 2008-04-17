@@ -17,6 +17,9 @@ import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 
+/**
+ * Extension xxforms-online event.
+ */
 public class XXFormsOnlineEvent extends XFormsEvent {
 
     public XXFormsOnlineEvent(XFormsEventTarget targetObject) {

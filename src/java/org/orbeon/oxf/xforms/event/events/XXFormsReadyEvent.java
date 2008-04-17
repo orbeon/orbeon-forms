@@ -17,6 +17,9 @@ import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 
+/**
+ * Internal xxforms-ready event.
+ */
 public class XXFormsReadyEvent extends XFormsEvent {
 
     public XXFormsReadyEvent(XFormsEventTarget targetObject) {

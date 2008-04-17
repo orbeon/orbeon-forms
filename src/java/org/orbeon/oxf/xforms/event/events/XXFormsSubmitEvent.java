@@ -20,7 +20,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvents;
 
 
 /**
- * Internal XXFORMS_SUBMIT event.
+ * Internal xxforms-submit event.
  */
 public class XXFormsSubmitEvent extends XFormsEvent {
 

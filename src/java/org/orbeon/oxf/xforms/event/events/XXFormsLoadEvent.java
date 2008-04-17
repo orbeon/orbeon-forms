@@ -19,7 +19,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvents;
 
 
 /**
- * Internal XXFORMS_LOAD event.
+ * Internal xxforms-loade event.
  */
 public class XXFormsLoadEvent extends XFormsEvent {
 

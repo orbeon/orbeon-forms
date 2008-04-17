@@ -13,19 +13,19 @@
  */
 package org.orbeon.oxf.xforms.control.controls;
 
+import org.apache.commons.lang.StringUtils;
 import org.dom4j.Element;
+import org.orbeon.oxf.common.ValidationException;
+import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.*;
-import org.orbeon.oxf.xforms.event.events.XFormsDeselectEvent;
 import org.orbeon.oxf.xforms.action.actions.XFormsSetvalueAction;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.xforms.event.events.XFormsDeselectEvent;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.saxon.om.NodeInfo;
-import org.apache.commons.lang.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -155,7 +155,7 @@ public class XFormsUploadControl extends XFormsValueControl {
             // Call the super method
             super.storeExternalValue(pipelineContext, newValue, type);
         } catch (Exception e) {
-            throw new OXFException(e);
+            throw new ValidationException(e, getLocationData());
         }
     }
 

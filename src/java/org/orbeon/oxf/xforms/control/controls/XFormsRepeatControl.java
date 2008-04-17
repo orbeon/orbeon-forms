@@ -15,8 +15,17 @@ package org.orbeon.oxf.xforms.control.controls;
 
 import org.dom4j.Element;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.action.actions.XFormsDeleteAction;
+import org.orbeon.oxf.xforms.action.actions.XFormsInsertAction;
+import org.orbeon.oxf.xforms.event.XFormsEvent;
+import org.orbeon.oxf.xforms.event.XFormsEvents;
+import org.orbeon.oxf.xforms.event.events.XXFormsDndEvent;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.common.ValidationException;
+import org.orbeon.saxon.om.NodeInfo;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.List;
 import java.util.Iterator;
@@ -56,5 +65,89 @@ public class XFormsRepeatControl extends XFormsControl {
                 currentRepeatIteration.evaluate(pipelineContext);
             }
         }
+    }
+
+    public void performDefaultAction(PipelineContext pipelineContext, XFormsEvent event) {
+        if (XFormsEvents.XXFORMS_DND.equals(event.getEventName())) {
+
+            // Only support this on DnD-enabled controls
+            if (!isDnD())
+                throw new ValidationException("Attempt to process xxforms-dnd event on non-DnD-enabled control: " + getEffectiveId(), getLocationData());
+
+            // Perform DnD operation on node data
+            final XXFormsDndEvent dndEvent = (XXFormsDndEvent) event;
+
+            // Get all repeat iteration details
+            final String[] dndStart = StringUtils.split(dndEvent.getDndStart(), '-');
+            final String[] dndEnd = StringUtils.split(dndEvent.getDndEnd(), '-');
+
+            // Find source information
+            final List sourceNodeset;
+            final int requestedSourceIndex;
+            {
+                sourceNodeset = getBindingContext().getNodeset();
+                requestedSourceIndex = Integer.parseInt(dndStart[dndStart.length - 1]);
+
+                if (requestedSourceIndex < 1 || requestedSourceIndex > sourceNodeset.size())
+                    throw new ValidationException("Out of range Dnd start iteration: " + requestedSourceIndex, getLocationData());
+            }
+
+            // Find destination
+            final List destinationNodeset;
+            final int requestedDestinationIndex;
+            {
+                final String containingRepeatEffectiveId
+                    = getId() + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1
+                        + StringUtils.join(dndEnd, XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_2, 0, dndEnd.length - 1);
+
+                final XFormsRepeatControl destinationControl = (XFormsRepeatControl) containingDocument.getObjectById(containingRepeatEffectiveId);
+                destinationNodeset = destinationControl.getBindingContext().getNodeset();
+                requestedDestinationIndex = Integer.parseInt(dndEnd[dndEnd.length - 1]);
+            }
+
+            // Delete node from source
+            final List deletedNodes = XFormsDeleteAction.doDelete(pipelineContext, containingDocument, sourceNodeset, requestedSourceIndex);
+
+            // Adjust destination collection to reflect new state
+            final int deletedNodePosition = destinationNodeset.indexOf(deletedNodes.get(0));
+            final int actualDestinationIndex;
+            final String destinationPosition;
+            if (deletedNodePosition != -1) {
+                // Deleted node was part of the destination nodeset
+                destinationNodeset.remove(deletedNodePosition);
+                // If the insertion position is after the delete node, must adjust it
+                if (requestedDestinationIndex < deletedNodePosition + 1) {
+                    // Insertion point is before deleted node
+                    actualDestinationIndex = requestedDestinationIndex;
+                    destinationPosition = "before";
+                } else {
+                    // Insertion point is on or after deleted node
+                    actualDestinationIndex = requestedDestinationIndex - 1;
+                    destinationPosition = "after";
+                }
+            } else {
+                // Deleted node was not part of the destination nodeset
+                if (requestedDestinationIndex <= destinationNodeset.size()) {
+                    // Position within nodeset
+                    actualDestinationIndex = requestedDestinationIndex;
+                    destinationPosition = "before";
+                } else {
+                    // Position at the end of the nodeset
+                    actualDestinationIndex = requestedDestinationIndex - 1;
+                    destinationPosition = "after";
+                }
+            }
+
+            // Insert nodes into destination
+            final NodeInfo insertContextNodeInfo = ((NodeInfo) deletedNodes.get(0)).getParent();
+            XFormsInsertAction.doInsert(pipelineContext, containingDocument, destinationPosition, destinationNodeset, insertContextNodeInfo, deletedNodes, actualDestinationIndex);
+
+        }
+        super.performDefaultAction(pipelineContext, event);
+    }
+
+    public boolean isDnD() {
+        final String dndAttribute = getControlElement().attributeValue(XFormsConstants.XXFORMS_DND_QNAME);
+        return "true".equals(dndAttribute);
     }
 }

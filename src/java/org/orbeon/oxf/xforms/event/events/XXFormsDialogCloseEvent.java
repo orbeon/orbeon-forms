@@ -18,7 +18,7 @@ import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 
 /**
- * Internal xxforms-dialog-close event.
+ * Extension xxforms-dialog-close event.
  */
 public class XXFormsDialogCloseEvent extends XFormsEvent {
 

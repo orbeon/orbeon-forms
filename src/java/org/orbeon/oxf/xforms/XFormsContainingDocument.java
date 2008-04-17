@@ -27,6 +27,7 @@ import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
 import org.orbeon.oxf.xforms.control.controls.XXFormsDialogControl;
+import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
@@ -97,7 +98,9 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     private static final Map ignoredXFormsOutputExternalEvents = new HashMap();
     private static final Map allowedXFormsOutputExternalEvents = new HashMap();
     private static final Map allowedXFormsUploadExternalEvents = new HashMap();
-    private static final Map allowedExternalEvents = new HashMap();
+    private static final Map allowedXFormsControlsExternalEvents = new HashMap();
+
+    private static final Map allowedXFormsRepeatExternalEvents = new HashMap();
     private static final Map allowedXFormsSubmissionExternalEvents = new HashMap();
     private static final Map allowedXFormsContainingDocumentExternalEvents = new HashMap();
     private static final Map allowedXXFormsDialogExternalEvents = new HashMap();
@@ -116,9 +119,12 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         allowedXFormsUploadExternalEvents.put(XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE, "");
 
         // External events allowed on other controls
-        allowedExternalEvents.putAll(allowedXFormsOutputExternalEvents);
-        allowedExternalEvents.put(XFormsEvents.XFORMS_DOM_ACTIVATE, "");
-        allowedExternalEvents.put(XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE, "");
+        allowedXFormsControlsExternalEvents.putAll(allowedXFormsOutputExternalEvents);
+        allowedXFormsControlsExternalEvents.put(XFormsEvents.XFORMS_DOM_ACTIVATE, "");
+        allowedXFormsControlsExternalEvents.put(XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE, "");
+
+        // External events allowed on xforms:repeat
+        allowedXFormsRepeatExternalEvents.put(XFormsEvents.XXFORMS_DND, "");
 
         // External events allowed on xforms:submission
         allowedXFormsSubmissionExternalEvents.put(XFormsEvents.XXFORMS_SUBMIT, "");
@@ -686,10 +692,10 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     /**
      * Execute an external event on element with id targetElementId and event eventName.
      */
-    public void executeExternalEvent(PipelineContext pipelineContext, String eventName, String controlId, String otherControlId, String contextString, Element filesElement) {
+    public void executeExternalEvent(PipelineContext pipelineContext, String eventName, String controlId, String otherControlId, String valueString, Element filesElement, String dndStart, String dndEnd) {
 
         // Get event target object
-        final XFormsEventTarget eventTarget;
+        XFormsEventTarget eventTarget;
         {
             final Object eventTargetObject = getObjectById(controlId);
             if (!(eventTargetObject instanceof XFormsEventTarget)) {
@@ -721,6 +727,15 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                     }
                     return;
                 }
+            } else if (eventTarget instanceof XFormsRepeatControl) {
+                // Target is a repeat
+                if (allowedXFormsRepeatExternalEvents.get(eventName) == null) {
+                    if (XFormsServer.logger.isDebugEnabled()) {
+                        logDebug("containing document", "ignoring invalid client event on xforms:repeat", new String[] { "control id", controlId, "event name", eventName });
+                    }
+                    return;
+                }
+
             } else {
                 // Target is a regular control
 
@@ -759,7 +774,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                             return;
                         }
                     } else {
-                        if (allowedExternalEvents.get(eventName) == null) {
+                        if (allowedXFormsControlsExternalEvents.get(eventName) == null) {
                             if (XFormsServer.logger.isDebugEnabled()) {
                                 logDebug("containing document", "ignoring invalid client event", new String[] { "control id", controlId, "event name", eventName });
                             }
@@ -823,13 +838,14 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         if (controlId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1) != -1 && !XFormsEvents.XFORMS_DOM_FOCUS_OUT.equals(eventName)) {
             // The event target is in a repeated structure, so make sure it gets repeat focus
             dispatchEvent(pipelineContext, new XXFormsRepeatFocusEvent(eventTarget));
+            // Get a fresh reference
+            eventTarget = (XFormsControl) getObjectById(eventTarget.getEffectiveId());
         }
 
         // Handle xforms:output
         if (eventTarget instanceof XFormsOutputControl) {
 
             // Note that repeat focus may have been dispatched already
-
             if (XFormsEvents.XFORMS_DOM_FOCUS_IN.equals(eventName)) {
                 // We convert the focus event into a DOMActivate unless the control is read-only
                 final XFormsOutputControl xformsOutputControl = (XFormsOutputControl) eventTarget;
@@ -849,18 +865,19 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                 if ("category-select1".equals(controlId)) {
                     if (testAjaxToggleValue == 0) {
                         testAjaxToggleValue = 1;
-                        contextString = "supplier";
+                        valueString = "supplier";
                     } else {
                         testAjaxToggleValue = 0;
-                        contextString = "customer";
+                        valueString = "customer";
                     }
                 } else if (("xforms-element-287" + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1 + "1").equals(controlId)) {
-                    contextString = "value" + System.currentTimeMillis();
+                    valueString = "value" + System.currentTimeMillis();
                 }
             }
         }
         
-        final XFormsEvent xformsEvent = XFormsEventFactory.createEvent(eventName, eventTarget, otherEventTarget, true, true, true, contextString, null, null, filesElement);
+        final XFormsEvent xformsEvent = XFormsEventFactory.createEvent(eventName, eventTarget, otherEventTarget,
+                true, true, true, valueString, filesElement, new String[] { dndStart, dndEnd} );
 
         // Interpret event
         if (xformsEvent instanceof XXFormsValueChangeWithFocusChangeEvent) {
@@ -870,7 +887,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
             // has already been changed on the client. This means that this event(s) must be the
             // first to come!
 
-            final XXFormsValueChangeWithFocusChangeEvent concreteEvent = (XXFormsValueChangeWithFocusChangeEvent) xformsEvent;
+            final XXFormsValueChangeWithFocusChangeEvent valueChangeWithFocusChangeEvent = (XXFormsValueChangeWithFocusChangeEvent) xformsEvent;
 
             // 1. xforms-recalculate
             // 2. xforms-revalidate
@@ -881,28 +898,24 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
             // xforms-disabled, [n] xforms-optional or xforms-required, [n] xforms-readonly or
             // xforms-readwrite, [n] xforms-out-of-range or xforms-in-range
 
-            final String targetControlEffectiveId;
             {
-                final XFormsValueControl valueXFormsControl = (XFormsValueControl) concreteEvent.getTargetObject();
-                targetControlEffectiveId = valueXFormsControl.getEffectiveId();
-
-                // Notify the control of the value change
-                final String eventValue = concreteEvent.getNewValue();
-                valueXFormsControl.storeExternalValue(pipelineContext, eventValue, null);
+                // Store value into instance data through the control
+                final XFormsValueControl valueXFormsControl = (XFormsValueControl) eventTarget;
+                valueXFormsControl.storeExternalValue(pipelineContext, valueChangeWithFocusChangeEvent.getNewValue(), null);
             }
 
             {
                 // NOTE: Recalculate and revalidate are done with the automatic deferred updates
 
                 // Handle focus change DOMFocusOut / DOMFocusIn
-                if (concreteEvent.getOtherTargetObject() != null) {
+                if (valueChangeWithFocusChangeEvent.getOtherTargetObject() != null) {
 
                     // NOTE: setExternalValue() above may cause e.g. xforms-select / xforms-deselect events to be
                     // dispatched, so we get the control again to have a fresh reference
-                    final XFormsControl sourceXFormsControl = (XFormsControl) getObjectById(targetControlEffectiveId);
+                    final XFormsControl sourceXFormsControl = (XFormsControl) getObjectById(eventTarget.getEffectiveId());
 
                     final XFormsControl otherTargetXFormsControl
-                        = (XFormsControl) getObjectById(((XFormsControl) concreteEvent.getOtherTargetObject()).getEffectiveId());
+                        = (XFormsControl) getObjectById(((XFormsControl) valueChangeWithFocusChangeEvent.getOtherTargetObject()).getEffectiveId());
 
                     // We have a focus change (otherwise, the focus is assumed to remain the same)
                     if (sourceXFormsControl != null)

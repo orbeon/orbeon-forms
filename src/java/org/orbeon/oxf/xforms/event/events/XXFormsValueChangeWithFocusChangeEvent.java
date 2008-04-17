@@ -19,7 +19,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvents;
 
 
 /**
- * Internal XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE event.
+ * Internal xxforms-value-change-with-focus-change event.
  */
 public class XXFormsValueChangeWithFocusChangeEvent extends XFormsEvent {
     private String newValue;

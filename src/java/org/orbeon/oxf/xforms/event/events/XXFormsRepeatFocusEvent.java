@@ -18,10 +18,10 @@ import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 
 /**
- * Custom focus event.
+ * Extension xxforms-focus event.
  */
 public class XXFormsRepeatFocusEvent extends XFormsEvent {
     public XXFormsRepeatFocusEvent(XFormsEventTarget targetObject) {
-        super(XFormsEvents.XXFORMS_REPEAT_FOCUS, targetObject, false, false);
+        super(XFormsEvents.XXFORMS_FOCUS, targetObject, false, false);
     }
 }

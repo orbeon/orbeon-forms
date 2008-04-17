@@ -239,6 +239,10 @@ public class XFormsServer extends ProcessorImpl {
                         final String sourceControlId = eventElement.attributeValue("source-control-id");
                         final String otherControlId = eventElement.attributeValue("other-control-id");
                         final String eventName = eventElement.attributeValue("name");
+
+                        final String dndStart = eventElement.attributeValue("dnd-start");
+                        final String dndEnd = eventElement.attributeValue("dnd-end");
+
                         final String value = eventElement.getText();
 
                         if (XFormsEvents.XXFORMS_ALL_EVENTS_REQUIRED.equals(eventName)) {
@@ -262,7 +266,7 @@ public class XFormsServer extends ProcessorImpl {
                                     lastValueChangeEventValue = value;
                                 } else {
                                     // Send old event
-                                    executeExternalEventPrepareIfNecessary(pipelineContext, containingDocument, XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE, lastSourceControlId, null, lastValueChangeEventValue, filesElement);
+                                    executeExternalEventHandleDeferredEvents(pipelineContext, containingDocument, XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE, lastSourceControlId, null, lastValueChangeEventValue, filesElement, null, null);
                                     // Remember new event
                                     lastSourceControlId = sourceControlId;
                                     lastValueChangeEventValue = value;
@@ -275,12 +279,12 @@ public class XFormsServer extends ProcessorImpl {
 
                                 if (lastSourceControlId != null) {
                                     // Send old event
-                                    executeExternalEventPrepareIfNecessary(pipelineContext, containingDocument, XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE, lastSourceControlId, null, lastValueChangeEventValue, filesElement);
+                                    executeExternalEventHandleDeferredEvents(pipelineContext, containingDocument, XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE, lastSourceControlId, null, lastValueChangeEventValue, filesElement, null, null);
                                     lastSourceControlId = null;
                                     lastValueChangeEventValue = null;
                                 }
                                 // Send new event
-                                executeExternalEventPrepareIfNecessary(pipelineContext, containingDocument, eventName, sourceControlId, otherControlId, value, filesElement);
+                                executeExternalEventHandleDeferredEvents(pipelineContext, containingDocument, eventName, sourceControlId, otherControlId, value, filesElement, dndStart, dndEnd);
                             }
 
                             if (eventName.equals(XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE)) {
@@ -294,7 +298,7 @@ public class XFormsServer extends ProcessorImpl {
                     // Flush stored event if needed
                     if (lastSourceControlId != null) {
                         // Send old event
-                        executeExternalEventPrepareIfNecessary(pipelineContext, containingDocument, XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE, lastSourceControlId, null, lastValueChangeEventValue, filesElement);
+                        executeExternalEventHandleDeferredEvents(pipelineContext, containingDocument, XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE, lastSourceControlId, null, lastValueChangeEventValue, filesElement, null, null);
                     }
                 }
 
@@ -327,20 +331,19 @@ public class XFormsServer extends ProcessorImpl {
     }
 
     /**
-     * Execute an external event while preparing containing document and controls state if an event was already
-     * executed.
+     * Execute an external event and ensure deferred event handling.
      *
      * @param pipelineContext       current PipelineContext
      * @param containingDocument    XFormsContainingDocument to which events must be dispatched
      * @param eventName             name of the event
      * @param controlId             effective control id to dispatch to
      * @param otherControlId        other effective control id if any
-     * @param contextString         optional context string
+     * @param valueString           optional context string
      * @param filesElement          optional files elements for upload
      */
-    private void executeExternalEventPrepareIfNecessary(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, String eventName, String controlId, String otherControlId, String contextString, Element filesElement) {
+    private void executeExternalEventHandleDeferredEvents(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, String eventName, String controlId, String otherControlId, String valueString, Element filesElement, String dndStart, String dndEnd) {
         containingDocument.startOutermostActionHandler();
-        containingDocument.executeExternalEvent(pipelineContext, eventName, controlId, otherControlId, contextString, filesElement);
+        containingDocument.executeExternalEvent(pipelineContext, eventName, controlId, otherControlId, valueString, filesElement, dndStart, dndEnd);
         containingDocument.endOutermostActionHandler(pipelineContext);
     }
 

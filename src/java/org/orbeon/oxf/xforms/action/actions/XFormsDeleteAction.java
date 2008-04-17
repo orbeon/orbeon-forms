@@ -43,7 +43,6 @@ public class XFormsDeleteAction extends XFormsAction {
                         XFormsEventHandlerContainer eventHandlerContainer, Element actionElement,
                         boolean hasOverriddenContext, Item overriddenContext) {
 
-        final XFormsControls xformsControls = actionInterpreter.getXFormsControls();
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
         final XFormsContextStack contextStack = actionInterpreter.getContextStack();
 
@@ -70,138 +69,147 @@ public class XFormsDeleteAction extends XFormsAction {
         }
 
         {
-            final NodeInfo nodeInfoToRemove;
-            final Node nodeToRemove;
-            final List parentContent;
-            final int actualIndexInParentContentCollection;
             int deleteIndex;
             {
-                {
-                    if (isEmptyNodesetBinding) {
-                        // "If the Node Set Binding node-set empty, then this attribute is ignored"
-                        deleteIndex = 0;
-                    } else if (atAttribute == null) {
-                        // "If the attribute is not given, then the default is the size of the Node Set Binding node-set"
-                        deleteIndex = collectionToUpdate.size();
-                    } else {
-                        // "1. The evaluation context node is the first node in document order from the Node Set Binding
-                        // node-set, the context size is the size of the Node Set Binding node-set, and the context
-                        // position is 1."
-
-                        // "2. The return value is processed according to the rules of the XPath function round()"
-                        final String insertionIndexString = XPathCache.evaluateAsString(pipelineContext,
-                                collectionToUpdate, 1,
-                                "round(" + atAttribute + ")",
-                                containingDocument.getNamespaceMappings(actionElement), contextStack.getCurrentVariables(),
-                                XFormsContainingDocument.getFunctionLibrary(), contextStack.getFunctionContext(), null,
-                                (LocationData) actionElement.getData());
-
-                        // "3. If the result is in the range 1 to the Node Set Binding node-set size, then the insert
-                        // location is equal to the result. If the result is non-positive, then the insert location is
-                        // 1. Otherwise, the result is NaN or exceeds the Node Set Binding node-set size, so the insert
-                        // location is the Node Set Binding node-set size."
-
-                        // Don't think we will get NaN with XPath 2.0...
-                        deleteIndex = "NaN".equals(insertionIndexString) ? collectionToUpdate.size() : Integer.parseInt(insertionIndexString) ;
-
-                        // Adjust index to be in range
-                        if (deleteIndex > collectionToUpdate.size())
-                            deleteIndex = collectionToUpdate.size();
-
-                        if (deleteIndex < 1)
-                            deleteIndex = 1;
-                    }
-                }
-
                 if (isEmptyNodesetBinding) {
-                    if (XFormsServer.logger.isDebugEnabled())
-                        containingDocument.logDebug("xforms:delete", "empty node-set binding, terminating");
-                    return;
+                    // "If the Node Set Binding node-set empty, then this attribute is ignored"
+                    deleteIndex = 0;
+                } else if (atAttribute == null) {
+                    // "If the attribute is not given, then the default is the size of the Node Set Binding node-set"
+                    deleteIndex = collectionToUpdate.size();
                 } else {
-                    // Find actual deletion point
-                    nodeInfoToRemove = (NodeInfo) collectionToUpdate.get(deleteIndex - 1);
-                    nodeToRemove = XFormsUtils.getNodeFromNodeInfo(nodeInfoToRemove, CANNOT_DELETE_READONLY_MESSAGE);
+                    // "1. The evaluation context node is the first node in document order from the Node Set Binding
+                    // node-set, the context size is the size of the Node Set Binding node-set, and the context
+                    // position is 1."
 
-                    final Element parentElement = nodeToRemove.getParent();
-                    if (parentElement != null) {
-                        // Regular case
-                        if (nodeToRemove instanceof Attribute) {
-                            parentContent = parentElement.attributes();
-                        } else {
-                            parentContent = parentElement.content();
-                        }
-                        actualIndexInParentContentCollection = parentContent.indexOf(nodeToRemove);
-                    } else if (nodeToRemove == nodeToRemove.getDocument().getRootElement()) {
-                        // Case of root element where parent is Document
-                        parentContent = nodeToRemove.getDocument().content();
-                        actualIndexInParentContentCollection = parentContent.indexOf(nodeToRemove);
-                    } else if (nodeToRemove instanceof Document) {
-                        // Case where node to remove is Document
+                    // "2. The return value is processed according to the rules of the XPath function round()"
+                    final String insertionIndexString = XPathCache.evaluateAsString(pipelineContext,
+                            collectionToUpdate, 1,
+                            "round(" + atAttribute + ")",
+                            containingDocument.getNamespaceMappings(actionElement), contextStack.getCurrentVariables(),
+                            XFormsContainingDocument.getFunctionLibrary(), contextStack.getFunctionContext(), null,
+                            (LocationData) actionElement.getData());
 
-                        // "except if the node is the root document element of an instance then the delete action
-                        // is terminated with no effect."
+                    // "3. If the result is in the range 1 to the Node Set Binding node-set size, then the insert
+                    // location is equal to the result. If the result is non-positive, then the insert location is
+                    // 1. Otherwise, the result is NaN or exceeds the Node Set Binding node-set size, so the insert
+                    // location is the Node Set Binding node-set size."
 
-                        if (XFormsServer.logger.isDebugEnabled())
-                            containingDocument.logDebug("xforms:delete", "attempt to delete document node, terminating");
+                    // Don't think we will get NaN with XPath 2.0...
+                    deleteIndex = "NaN".equals(insertionIndexString) ? collectionToUpdate.size() : Integer.parseInt(insertionIndexString) ;
 
-                        return;
-                    } else {
-                        throw new OXFException("Node to delete doesn't have a parent.");
-                    }
+                    // Adjust index to be in range
+                    if (deleteIndex > collectionToUpdate.size())
+                        deleteIndex = collectionToUpdate.size();
+
+                    if (deleteIndex < 1)
+                        deleteIndex = 1;
                 }
             }
 
-            // Identify the instance that actually changes
-            final XFormsInstance modifiedInstance = containingDocument.getInstanceForNode(nodeInfoToRemove);
-
-            // Get current repeat indexes
-            final Map previousRepeatIdToIndex = xformsControls.getCurrentControlsState().getRepeatIdToIndex();
-
-            // Find updates to repeat indexes
-            final Map repeatIndexUpdates = new HashMap();
-            final Map nestedRepeatIndexUpdates = new HashMap();
-            XFormsIndexUtils.adjustIndexesForDelete(xformsControls, previousRepeatIdToIndex,
-                    repeatIndexUpdates, nestedRepeatIndexUpdates, nodeToRemove);
-
-            // Prepare switches
-            XFormsSwitchUtils.prepareSwitches(xformsControls);
-
-            // Then only perform the deletion
-            // "The node at the delete location in the Node Set Binding node-set is deleted"
-            parentContent.remove(actualIndexInParentContentCollection);
-
-            // TODO: Support removing all the nodes in @nodeset, as per XForms 1.1
-            final int removedNodesCount = 1;
-            if (XFormsServer.logger.isDebugEnabled())
-                containingDocument.logDebug("xforms:delete", "removed nodes",
-                        new String[] { "count", Integer.toString(removedNodesCount), "instance", modifiedInstance.getId() });
-
-            // Rebuild ControlsState
-            xformsControls.rebuildCurrentControlsState(pipelineContext);
-
-            // Update switches
-            XFormsSwitchUtils.updateSwitches(xformsControls);
-
-            // Update affected repeat index information
-            if (repeatIndexUpdates.size() > 0) {
-                for (Iterator i = repeatIndexUpdates.entrySet().iterator(); i.hasNext();) {
-                    final Map.Entry currentEntry = (Map.Entry) i.next();
-                    xformsControls.getCurrentControlsState().updateRepeatIndex((String) currentEntry.getKey(), ((Integer) currentEntry.getValue()).intValue());
-                }
-            }
-
-            // Adjust indexes that could have gone out of bounds
-            XFormsIndexUtils.adjustRepeatIndexes(xformsControls, nestedRepeatIndexUpdates);
-
-            // "4. If the delete is successful, the event xforms-delete is dispatched."
-            {
-                final List deletedNodeInfos = Collections.singletonList(nodeInfoToRemove);
-                containingDocument.dispatchEvent(pipelineContext, new XFormsDeleteEvent(modifiedInstance, deletedNodeInfos, deleteIndex));
-            }
-
-            // "XForms Actions that change the tree structure of instance data result in setting all four flags to true"
-            modifiedInstance.getModel(containingDocument).setAllDeferredFlags(true);
-            containingDocument.getXFormsControls().markDirtySinceLastRequest();
+            doDelete(pipelineContext, containingDocument, collectionToUpdate, deleteIndex);
         }
+    }
+
+    public static List doDelete(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, List collectionToUpdate, int deleteIndex) {
+
+        final boolean isEmptyNodesetBinding = collectionToUpdate == null || collectionToUpdate.size() == 0;
+
+        final NodeInfo nodeInfoToRemove;
+        final Node nodeToRemove;
+        final List parentContent;
+        final int actualIndexInParentContentCollection;
+        if (isEmptyNodesetBinding) {
+            if (XFormsServer.logger.isDebugEnabled())
+                containingDocument.logDebug("xforms:delete", "empty node-set binding, terminating");
+            return Collections.EMPTY_LIST;
+        } else {
+            // Find actual deletion point
+            nodeInfoToRemove = (NodeInfo) collectionToUpdate.get(deleteIndex - 1);
+            nodeToRemove = XFormsUtils.getNodeFromNodeInfo(nodeInfoToRemove, CANNOT_DELETE_READONLY_MESSAGE);
+
+            final Element parentElement = nodeToRemove.getParent();
+            if (parentElement != null) {
+                // Regular case
+                if (nodeToRemove instanceof Attribute) {
+                    parentContent = parentElement.attributes();
+                } else {
+                    parentContent = parentElement.content();
+                }
+                actualIndexInParentContentCollection = parentContent.indexOf(nodeToRemove);
+            } else if (nodeToRemove == nodeToRemove.getDocument().getRootElement()) {
+                // Case of root element where parent is Document
+                parentContent = nodeToRemove.getDocument().content();
+                actualIndexInParentContentCollection = parentContent.indexOf(nodeToRemove);
+            } else if (nodeToRemove instanceof Document) {
+                // Case where node to remove is Document
+
+                // "except if the node is the root document element of an instance then the delete action
+                // is terminated with no effect."
+
+                if (XFormsServer.logger.isDebugEnabled())
+                    containingDocument.logDebug("xforms:delete", "attempt to delete document node, terminating");
+
+                return Collections.EMPTY_LIST;
+            } else {
+                throw new OXFException("Node to delete doesn't have a parent.");
+            }
+        }
+
+        // Identify the instance that actually changes
+        final XFormsInstance modifiedInstance = containingDocument.getInstanceForNode(nodeInfoToRemove);
+
+        // Get current repeat indexes
+        final XFormsControls xformsControls = containingDocument.getXFormsControls();
+        final Map previousRepeatIdToIndex = xformsControls.getCurrentControlsState().getRepeatIdToIndex();
+
+        // Find updates to repeat indexes
+        final Map repeatIndexUpdates = new HashMap();
+        final Map nestedRepeatIndexUpdates = new HashMap();
+        XFormsIndexUtils.adjustIndexesForDelete(xformsControls, previousRepeatIdToIndex,
+                repeatIndexUpdates, nestedRepeatIndexUpdates, nodeToRemove);
+
+        // Prepare switches
+        XFormsSwitchUtils.prepareSwitches(xformsControls);
+
+        // Then only perform the deletion
+        // "The node at the delete location in the Node Set Binding node-set is deleted"
+        parentContent.remove(actualIndexInParentContentCollection);
+
+        // TODO: Support removing all the nodes in @nodeset, as per XForms 1.1
+        final int removedNodesCount = 1;
+        if (XFormsServer.logger.isDebugEnabled())
+            containingDocument.logDebug("xforms:delete", "removed nodes",
+                    new String[] { "count", Integer.toString(removedNodesCount), "instance", modifiedInstance.getId() });
+
+        // Rebuild ControlsState
+        xformsControls.rebuildCurrentControlsState(pipelineContext);
+
+        // Update switches
+        XFormsSwitchUtils.updateSwitches(xformsControls);
+
+        // Update affected repeat index information
+        if (repeatIndexUpdates.size() > 0) {
+            for (Iterator i = repeatIndexUpdates.entrySet().iterator(); i.hasNext();) {
+                final Map.Entry currentEntry = (Map.Entry) i.next();
+                xformsControls.getCurrentControlsState().updateRepeatIndex((String) currentEntry.getKey(), ((Integer) currentEntry.getValue()).intValue());
+            }
+        }
+
+        // Adjust indexes that could have gone out of bounds
+        XFormsIndexUtils.adjustRepeatIndexes(xformsControls, nestedRepeatIndexUpdates);
+
+        // "4. If the delete is successful, the event xforms-delete is dispatched."
+        final List deletedNodeInfos;
+        {
+            deletedNodeInfos = Collections.singletonList(nodeInfoToRemove);
+            containingDocument.dispatchEvent(pipelineContext, new XFormsDeleteEvent(modifiedInstance, deletedNodeInfos, deleteIndex));
+        }
+
+        // "XForms Actions that change the tree structure of instance data result in setting all four flags to true"
+        modifiedInstance.getModel(containingDocument).setAllDeferredFlags(true);
+        containingDocument.getXFormsControls().markDirtySinceLastRequest();
+
+        return deletedNodeInfos;
     }
 }

@@ -3860,13 +3860,13 @@ ORBEON.xforms.Server = {
                                     } else {
                                         ORBEON.xforms.Globals.formServerEvents[formID].value = "";
                                     }
+                                    var requestForm = ORBEON.util.Dom.getElementById(formID);
                                     if (replace == "all") {
                                         // Go to another page
                                         if (showProcess != "false") {
                                             // Display loading indicator unless the server tells us not to display it
                                             newDynamicStateTriggersReplace = true;
                                         }
-                                        var requestForm = ORBEON.util.Dom.getElementById(formID);
                                         requestForm.action = action;
                                         if (target == null) {
                                             // Reset as this may have been changed before by asyncRequest

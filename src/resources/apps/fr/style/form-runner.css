@@ -32,7 +32,8 @@ body, body table, textarea.xforms-textarea {
 
 .fr-container {
     background-color: white;
-    border: 1px solid #cccccc
+    border: 1px solid #cccccc;
+    width: 100%; /* For IE6: otherwise the container can be narrower than the containing doc */
 }
 
 .fr-separator {
@@ -86,14 +87,14 @@ h1 { margin-top: 0 }
 
 .fr-form-description { display: block; margin: 2em; padding: 1em; border: 4px solid #3598d4; background-color: white }
 
-.fr-header { overflow: hidden;  }
-.fr-summary-language-choice { float: right; margin-right: 1em; margin-top: .2em; color: gray; font-size: 85%; text-align: right; }
+.fr-header { overflow: hidden; }
+.fr-summary-language-choice { margin-right: 1em; margin-top: .2em; color: gray; font-size: 85%; text-align: right; }
 .fr-summary-language-choice a { color: gray; }
 .fr-summary-language-choice .xforms-label { display: inline; margin-right: .5em }
 
 .xforms-label, h4  { font-weight: bold; text-align: left; }
 
-.fr-grid .fr-grid-content .xforms-control {
+.fr-grid-content .xforms-control {
     display: block;     /* So control is not displayed next to the help icon but on a new line */ 
     margin-top: 0.3em;  /* Insert some space between the label / help and the control */
     clear: both;
@@ -115,7 +116,7 @@ div.fr-body {
 .fr-expose-to-javascript { display: none; }
 
 /* Make sure xforms-disabled  and xforms-repeat-template takes precendence over display: block on other classes */
-label.xforms-disabled, span.xforms-disabled, div.xforms-disabled  { display: none; }
+.fr-grid label.xforms-disabled, .fr-grid span.xforms-disabled, .fr-grid div.xforms-disabled , .fr-grid textarea.xforms-disabled { display: none; }
 label.xforms-repeat-template { display: none; }
 
 /* Make sure non-relevant labels don't appear */
@@ -345,13 +346,14 @@ div.fr-collapsible {
 #doc4 .fr-grid-4-columns .xforms-select1-appearance-full span label { width: 14.5em; *width: 13.5em }
 
 /* Checkboxes */
-.xforms-select-appearance-full span { display: block; clear: both }
+.xforms-select-appearance-full span { display: block; clear: both; }
 .xforms-select-appearance-full span label { margin-left: .5em; margin-right: 1em }
 
 .fr-grid .xforms-select-appearance-full span input { float: left; }
 .fr-grid .xforms-select-appearance-full span label { float: left; margin-right: 0 }
 
 /* Size of text for checkboxes; needs to be set for every page width / columns number combination */
+#doc .fr-grid-1-columns .xforms-select-appearance-full span label { width: 50em; *width: 48.8em }
 #doc .fr-grid-2-columns .xforms-select-appearance-full span label { width: 22.5em; *width: 21.9em }
 
 #doc4 .fr-grid-1-columns .xforms-select-appearance-full span label { width: 68em; *width: 66em }

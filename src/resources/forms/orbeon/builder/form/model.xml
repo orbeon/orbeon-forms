@@ -683,6 +683,23 @@
         </item>
     </xforms:instance>
 
+    <!-- Instance for the submission editor -->
+    <xforms:instance id="fb-submission-editor-instance">
+        <submission>
+            <id/>
+            <resource/>
+            <soap-action/>
+            <content/>
+        </submission>
+    </xforms:instance>
+
+    <xforms:bind nodeset="instance('fb-submission-editor-instance')">
+        <xforms:bind nodeset="id" type="xs:NCName"/>
+        <xforms:bind nodeset="resource" type="xs:anyURI"/>
+        <xforms:bind nodeset="soap-action"/>
+        <xforms:bind nodeset="content" required="true()"/>
+    </xforms:bind>
+
     <!-- Template for outer bind -->
     <xforms:instance id="fb-bind-template" xxforms:readonly="true">
         <xforms:bind id="fr-form-binds" nodeset="."/>

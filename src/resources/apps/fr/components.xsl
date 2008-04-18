@@ -232,7 +232,7 @@
                                                     <fr:print-button/>
                                                     <fr:pdf-button/>
                                                     <!-- These buttons are disabled until we can save initial changes to the DOM in store and
-                                                         replay them when the form is first loaded offline -->
+                                                          replay them when the form is first loaded offline -->
                                                     <!--<fr:take-offline/>-->
                                                     <!--<fr:take-online/>-->
                                                     <fr:save-locally-button/>
@@ -385,7 +385,7 @@
     </xsl:template>
 
     <xsl:template match="fr:save-button">
-        <xforms:trigger ref="instance('fr-triggers-instance')/save" class="xforms-trigger-appearance-modal" id="fr-save-button">
+        <xforms:trigger ref="instance('fr-triggers-instance')/save" xxforms:modal="true" id="fr-save-button">
             <xforms:label>
                 <xhtml:img src="/apps/fr/style/run.gif" alt=""/>
                 <xhtml:span><xforms:output value="$fr-resources/detail/labels/save-document"/></xhtml:span>
@@ -798,7 +798,7 @@
             <xforms:submission id="fr-pdf-submission" resource="/fr/{{$parameters/app}}/{{$parameters/form}}/pdf?fr-language={{xxforms:instance('fr-language-instance')}}"
                     method="post" ref="xxforms:instance('fr-form-instance')" replace="all" validate="false" xxforms:target="_blank" xxforms:show-progress="false"/>
 
-            <xforms:submission id="fr-pdf-template-submission" resource="/fr/{{$parameters/app}}/{{$parameters/form}}/pdf-template?fr-language={{xxforms:instance('fr-language-instance')}}"
+            <xforms:submission id="fr-pdf-template-submission" resource="/fr/{{$parameters/app}}/{{$parameters/form}}/pdf-template?document={{xxforms:instance('fr-parameters-instance')/document}}&amp;fr-language={{xxforms:instance('fr-language-instance')}}"
                     method="post" ref="xxforms:instance('fr-form-instance')" replace="all" validate="false" xxforms:target="_blank" xxforms:show-progress="false"/>
         </xforms:model>
 

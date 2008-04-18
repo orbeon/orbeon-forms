@@ -22,7 +22,7 @@
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
       xmlns:saxon="http://saxon.sf.net/"
 
-      id="fb-schema-upload-dialog" level="modal">
+      id="fb-schema-upload-dialog" level="modal" class="fr-dialog">
 
     <xforms:label>XML Schema Upload</xforms:label>
     <xxforms:variable name="instance" select="instance('fb-schema-upload-instance')"/>

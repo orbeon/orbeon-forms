@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Copyright (C) 2008 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xxforms:dialog xmlns:xhtml="http://www.w3.org/1999/xhtml"
+      xmlns:xforms="http://www.w3.org/2002/xforms"
+      xmlns:xs="http://www.w3.org/2001/XMLSchema"
+      xmlns:ev="http://www.w3.org/2001/xml-events"
+      xmlns:xi="http://www.w3.org/2001/XInclude"
+      xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+      xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+      xmlns:saxon="http://saxon.sf.net/"
+
+      id="fb-submission-dialog" level="modal" close="true" draggable="true" class="fr-dialog">
+
+    <xforms:label>Submission Editor</xforms:label>
+    <xhtml:div class="fr-grid">
+        <xhtml:div class="fr-grid-content">
+            <xforms:group ref="instance('fb-submission-editor-instance')">
+                <xforms:input ref="id" id="fb-submission-id-input">
+                    <xforms:label>Submission Id</xforms:label>
+                    <xforms:hint>Choose a unique id for this submission</xforms:hint>
+                </xforms:input>
+
+                <xforms:input ref="resource">
+                    <xforms:label>Resource URL</xforms:label>
+                    <xforms:hint>HTTP URI to which the submission is performed</xforms:hint>
+                </xforms:input>
+
+                <xforms:input ref="soap-action">
+                    <xforms:label>SOAP Action</xforms:label>
+                    <xforms:hint>Optional SOAPAction header</xforms:hint>
+                </xforms:input>
+
+                <xforms:textarea ref="content">
+                    <xforms:label>Submission Content</xforms:label>
+                    <xforms:hint>XML data, for example a SOAP envelope</xforms:hint>
+                </xforms:textarea>
+            </xforms:group>
+        </xhtml:div>
+    </xhtml:div>
+    <xhtml:div class="fr-dialog-buttons">
+        <xforms:group>
+            <xforms:trigger>
+                <xforms:label>
+                    <xhtml:img src="/forms/orbeon/builder/images/play.png" alt="Publish" title="Publish"/>
+                    <xhtml:span>Test</xhtml:span>
+                </xforms:label>
+                <xforms:action ev:event="DOMActivate">
+                    xxx
+                </xforms:action>
+            </xforms:trigger>
+            <xforms:trigger xxforms:modal="true">
+                <xforms:label>
+                    <xhtml:img src="/forms/orbeon/builder/images/upload.png" alt="Publish" title="Publish"/>
+                    <xhtml:span>Save</xhtml:span>
+                </xforms:label>
+                <xforms:action ev:event="DOMActivate">
+                    xxx
+                </xforms:action>
+            </xforms:trigger>
+            <xforms:trigger>
+                <xforms:label><xhtml:img src="/apps/fr/style/close.gif" alt=""/> <xhtml:span>Cancel</xhtml:span></xforms:label>
+            </xforms:trigger>
+        </xforms:group>
+    </xhtml:div>
+    <!-- Hide dialog -->
+    <xxforms:hide ev:event="DOMActivate" dialog="fb-submission-dialog"/>
+    <!-- Set focus when the dialog open  -->
+    <xforms:setfocus ev:event="xxforms-dialog-open" control="fb-submission-id-input"/>
+</xxforms:dialog>

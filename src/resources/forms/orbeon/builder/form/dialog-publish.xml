@@ -22,37 +22,31 @@
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
       xmlns:saxon="http://saxon.sf.net/"
 
-      id="fb-publish-dialog" level="modal" close="true" draggable="true">
+      id="fb-publish-dialog" level="modal" close="true" draggable="true" class="fr-dialog">
 
     <xforms:label>Publish Form</xforms:label>
     <xhtml:div>
         <!--<xhtml:img src="/apps/fr/style/question-large.gif" alt="Question" class="dialog-icon"/>-->
-        <xhtml:div class="fr-dialog-message">
-            <xhtml:p>
-                Are you sure you want to publish this form? This will override the existing form with
-                the following properties:
-            </xhtml:p>
-            <!-- TODO: check whether a form already exists -->
-            <!-- TODO: if so, also check whether data for that form already exists -->
-            <xhtml:ul>
-                <xhtml:li>
-                    <xhtml:p>
-                        <xhtml:b>Application Name:</xhtml:b>
-                        <xforms:output value="$metadata-instance/application-name"/>
-                    </xhtml:p>
-                </xhtml:li>
-                <xhtml:li>
-                    <xhtml:p>
-                        <xhtml:b>Form Name:</xhtml:b>
-                        <xforms:output value="$metadata-instance/form-name"/>
-                    </xhtml:p>
-                </xhtml:li>
-            </xhtml:ul>
+        <xhtml:p>
+            Are you sure you want to publish this form? This will override the existing form with
+            the following properties:
+        </xhtml:p>
+        <!-- TODO: check whether a form already exists -->
+        <!-- TODO: if so, also check whether data for that form already exists -->
+        <xhtml:div class="fr-grid">
+            <xhtml:div class="fr-grid-content">
+                <xforms:output value="$metadata-instance/application-name">
+                    <xforms:label>Application Name</xforms:label>
+                </xforms:output>
+                <xforms:output value="$metadata-instance/form-name">
+                    <xforms:label>Form Name</xforms:label>
+                </xforms:output>
+            </xhtml:div>
         </xhtml:div>
     </xhtml:div>
     <xhtml:div class="fr-dialog-buttons">
         <xforms:group>
-            <xforms:trigger class="xforms-trigger-appearance-modal">
+            <xforms:trigger xxforms:modal="true">
                 <xforms:label>
                     <xhtml:img src="/forms/orbeon/builder/images/upload.png" alt="Publish" title="Publish"/>
                     <xhtml:span>Publish</xhtml:span>
@@ -65,7 +59,7 @@
                     </xforms:dispatch>
                 </xforms:action>
             </xforms:trigger>
-            <xforms:trigger class="xforms-trigger-appearance-modal">
+            <xforms:trigger xxforms:modal="true">
                 <xforms:label>
                     <xhtml:img src="/forms/orbeon/builder/images/upload.png" alt="Publish" title="Publish"/>
                     <xhtml:span>Publish and Open</xhtml:span>

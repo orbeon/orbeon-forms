@@ -751,7 +751,7 @@
                                                                                                 </xforms:itemset>
                                                                                             </xforms:select1>
                                                                                             <xforms:trigger appearance="minimal">
-                                                                                                <xforms:label>Edit</xforms:label>
+                                                                                                <xforms:label>Edit Items</xforms:label>
                                                                                                 <xforms:action ev:event="DOMActivate">
                                                                                                     <xforms:setvalue ref="$variables/itemset-resource-id" value="name($resource-holder)"/>
                                                                                                     <xxforms:show dialog="fb-itemset-editor-dialog" neighbor="fb-edit-select1-minimal-control"/>
@@ -767,7 +767,7 @@
                                                                                                 </xforms:itemset>
                                                                                             </xforms:select1>
                                                                                             <xforms:trigger appearance="minimal">
-                                                                                                <xforms:label>Edit</xforms:label>
+                                                                                                <xforms:label>Edit Items</xforms:label>
                                                                                                 <xforms:action ev:event="DOMActivate">
                                                                                                     <xforms:setvalue ref="$variables/itemset-resource-id" value="name($resource-holder)"/>
                                                                                                     <xxforms:show dialog="fb-itemset-editor-dialog" neighbor="fb-edit-select1-full-control"/>
@@ -783,7 +783,7 @@
                                                                                                 </xforms:itemset>
                                                                                             </xforms:select1>
                                                                                             <xforms:trigger appearance="minimal">
-                                                                                                <xforms:label>Edit</xforms:label>
+                                                                                                <xforms:label>Edit Items</xforms:label>
                                                                                                 <xforms:action ev:event="DOMActivate">
                                                                                                     <xforms:setvalue ref="$variables/itemset-resource-id" value="name($resource-holder)"/>
                                                                                                     <xxforms:show dialog="fb-itemset-editor-dialog" neighbor="fb-edit-select1-compact-control"/>
@@ -799,7 +799,7 @@
                                                                                                 </xforms:itemset>
                                                                                             </xforms:select>
                                                                                             <xforms:trigger appearance="minimal">
-                                                                                                <xforms:label>Edit</xforms:label>
+                                                                                                <xforms:label>Edit Items</xforms:label>
                                                                                                 <xforms:action ev:event="DOMActivate">
                                                                                                     <xforms:setvalue ref="$variables/itemset-resource-id" value="name($resource-holder)"/>
                                                                                                     <xxforms:show dialog="fb-itemset-editor-dialog" neighbor="fb-edit-select-full-control"/>
@@ -815,7 +815,7 @@
                                                                                                 </xforms:itemset>
                                                                                             </xforms:select>
                                                                                             <xforms:trigger appearance="minimal">
-                                                                                                <xforms:label>Edit</xforms:label>
+                                                                                                <xforms:label>Edit Items</xforms:label>
                                                                                                 <xforms:action ev:event="DOMActivate">
                                                                                                     <xforms:setvalue ref="$variables/itemset-resource-id" value="name($resource-holder)"/>
                                                                                                     <xxforms:show dialog="fb-itemset-editor-dialog" neighbor="fb-edit-select-compact-control"/>
@@ -827,7 +827,7 @@
                                                                                                 <xforms:label class="fb-xforms-disabled"/>
                                                                                             </xforms:output>
                                                                                             <xforms:trigger appearance="minimal">
-                                                                                                <xforms:label>Edit</xforms:label>
+                                                                                                <xforms:label>Edit Items</xforms:label>
                                                                                                 <xforms:action ev:event="DOMActivate">
                                                                                                     <!--<xforms:setvalue ref="$variables/itemset-resource-id" value="name($resource-holder)"/>-->
                                                                                                     <!--<xxforms:show dialog="fb-itemset-editor-dialog" neighbor="fb-edit-select1-minimal-control"/>-->
@@ -961,6 +961,9 @@
 
                 <!-- Schema upload -->
                 <xi:include href="oxf:/forms/orbeon/builder/form/dialog-schema.xml" xxi:omit-xml-base="true"/>
+
+                <!-- Submission editor -->
+                <xi:include href="oxf:/forms/orbeon/builder/form/dialog-submission.xml" xxi:omit-xml-base="true"/>
 
                 <!-- Generic confirmation dialog -->
                 <xxforms:dialog id="fb-confirmation-dialog" level="modal" close="false" draggable="true">

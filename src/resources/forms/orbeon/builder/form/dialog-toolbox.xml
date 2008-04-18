@@ -263,7 +263,7 @@
             <!-- Upload XML Schema -->
             <xforms:trigger>
                 <xforms:label>
-                    <xhtml:img src="/forms/orbeon/builder/images/upload.png" alt="Upload XML Schema" title="Upload XML Schema"/>
+                    <xhtml:img src="/forms/orbeon/builder/images/schema.gif" alt="Upload XML Schema" title="Upload XML Schema"/>
                     <xhtml:span>
                         <xforms:output value="if (exists($model/xs:schema)) then 'Change Schema' else 'Upload Schema'"/>
                     </xhtml:span>
@@ -313,6 +313,16 @@
                     <xhtml:span>Edit Source</xhtml:span>
                 </xforms:label>
                 <xxforms:show ev:event="DOMActivate" dialog="fb-edit-source-dialog"/>
+            </xforms:trigger>
+        </xhtml:div>
+        <xhtml:div class="fb-tool">
+            <!-- SOAP Submission -->
+            <xforms:trigger>
+                <xforms:label>
+                    <xhtml:img src="/apps/fr/style/run.gif" alt="Edit Submission" title="Edit Submission"/>
+                    <xhtml:span>Submission</xhtml:span>
+                </xforms:label>
+                <xxforms:show ev:event="DOMActivate" dialog="fb-submission-dialog"/>
             </xforms:trigger>
         </xhtml:div>
     </xhtml:div>

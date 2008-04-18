@@ -115,16 +115,12 @@ div.fr-body {
 /* Controls added just to expose instance nodes to JavaScript */
 .fr-expose-to-javascript { display: none; }
 
-/* Make sure xforms-disabled  and xforms-repeat-template takes precendence over display: block on other classes */
-.fr-grid label.xforms-disabled, .fr-grid span.xforms-disabled, .fr-grid div.xforms-disabled , .fr-grid textarea.xforms-disabled { display: none; }
-label.xforms-repeat-template { display: none; }
-
-/* Make sure non-relevant labels don't appear */
-/*label.xforms-disabled { display: none; }*/
-label.xforms-alert-inactive { display: none; }
-/*img.xforms-disabled { display: none; }*/
-.xforms-disabled .xforms-label { display: none }
-.xforms-case-deselected .xforms-label { display: none }
+/* Make sure disabled items take precendence over display: block on other classes */
+#doc .xforms-disabled, #doc4 .xforms-disabled { display: none }
+#doc .xforms-repeat-template, #doc4 .xforms-repeat-template { display: none; }
+#doc label.xforms-alert-inactive, #doc4 label.xforms-alert-inactive { display: none; }
+#doc .xforms-disabled .xforms-label, #doc4 .xforms-disabled .xforms-label { display: none }
+#doc .xforms-case-deselected .xforms-label, #doc4 .xforms-case-deselected .xforms-label { display: none }
 
 /* Make sure text in trigger does not wrap (leads to non-native widget being used on Firefox) */
 button.xforms-trigger { white-space: nowrap; }
@@ -222,10 +218,14 @@ hr {
 .fr-repeat-sections .xforms-label { margin-top: 0; }
 
 /* Repeats: shows as table (1 line per iteration; labels used as header of table) */
-.fr-repeat-table { margin-top: 1em; border-collapse: collapse; }
+.fr-repeat-table {
+    /*margin-top: 1em;*/
+    border-collapse: collapse;
+}
 .fr-repeat-table td , .fr-repeat-table th { border: 1px solid black; padding: .2em .5em .2em .5em; }
 /* Styling for last dummy line added so IE displays the bottom border of the table */
 .fr-repeat-table .fr-repeat-last-line td { border: none; padding: 0; }
+.fr-repeat-table .fr-repeat-last-line { display: none }
 .fr-repeat-table th { background-color: #DDDDDD; }
 .fr-repeat-table td .xforms-label { display: none; }
 .fr-repeat-table td .xforms-help-image { display: none; }
@@ -274,9 +274,11 @@ body { text-align: left }
     height: auto;
     /*width: 100%;*/
     width: auto;
-    color: red;
     text-indent: 0;
-    background-image: none
+    background-image: none;
+    background-color: red;
+    color: white;
+    padding: 1px
 }
 
 /* Display hints under each control */
@@ -297,15 +299,14 @@ div.fr-collapsible {
 
 /* Dialogs */
 .fr-dialog { width: 400px; }
-/* Overrides YUI reset so numbers in enumaration do show */
 .fr-dialog ol { padding-left: 3em; }
-.fr-dialog li { list-style-type: decimal; }
-.fr-dialog .bd p { margin: 1em 0 1em 0; }
-.fr-dialog .bd { margin: 0 1em 1em 1em; }
-/* Style for icon in dialogs  */
-.fr-dialog-icon { float: left; margin-right: 2em; margin-left: 1em; padding-top: 1em; padding-bottom: 1em; }
-.fr-dialog-message { padding-top: 0.5em; }
-.fr-dialog-buttons { text-align: right; padding-right: 2em; padding-top: 2em; }
+.fr-dialog li { list-style-type: decimal; }/* overrides YUI reset so numbers in enumeration do show */
+.fr-dialog .bd p { margin: .5em 0 .5em 0; }
+.fr-dialog .bd { margin: 0 .5em .5em .5em; }
+/* Style for dialogs  */
+.fr-dialog-icon { float: left; margin-right: 2em; margin-left: 1em; padding-bottom: 1em; }
+.fr-dialog-message { margin-top: .5em; padding-top: 0.5em; }
+.fr-dialog-buttons { text-align: right; padding-right: .5em; padding-top: .5em; padding-bottom: .5em; margin-top: .5em; border-top: 2px solid #DDDDEE }
 
 /* Messages */
 .fr-message-success { color: green  }
@@ -363,8 +364,11 @@ div.fr-collapsible {
 
 /* Grid */
 
-.fr-grid { width: 100%; border-collapse: separate; clear: both;
-    margin: 1em 0 0 0; /* Adding space before grid, so grid is not right below title or previous grid */ 
+.fr-grid {
+    width: 100%;
+    border-collapse: separate;
+    clear: both;
+    margin: .5em 0 0 0; /* Adding space before grid, so grid is not right below title or previous grid */
 }
 .fr-grid tr th { text-align: left }
 .fr-grid .fr-grid-content { *overflow: hidden }/* IE HACK so that scrollable images work in the table */

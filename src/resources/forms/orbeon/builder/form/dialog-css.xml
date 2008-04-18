@@ -24,7 +24,7 @@
       xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
       xmlns:saxon="http://saxon.sf.net/"
 
-      id="fb-css-upload-dialog" level="modal" close="true" draggable="true">
+      id="fb-css-upload-dialog" level="modal" close="true" draggable="true" class="fr-dialog">
 
     <xforms:label>Upload CSS</xforms:label>
     <xxforms:variable name="attachments-instance" select="$model/xforms:instance[@id = 'fr-form-attachments']/*"/>
@@ -75,7 +75,7 @@
     </xhtml:div>
     <xhtml:div class="fr-dialog-buttons">
         <xforms:group>
-            <xforms:trigger class="xforms-trigger-appearance-modal">
+            <xforms:trigger xxforms:modal="true">
                 <xforms:label>
                     <!--<xhtml:img src="/forms/orbeon/builder/images/upload.png" alt="Publish" title="Publish"/>-->
                     <xhtml:span>Done</xhtml:span>

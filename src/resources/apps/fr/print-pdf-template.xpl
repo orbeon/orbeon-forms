@@ -66,7 +66,7 @@
     <p:processor name="oxf:request">
         <p:input name="config">
             <config>
-                <include>/request/parameters/parameter[name = 'fr-language']</include>
+                <include>/request/parameters/parameter</include>
             </config>
         </p:input>
         <p:output name="data" id="request"/>
@@ -96,7 +96,17 @@
                 <xsl:variable name="fr-resources" select="doc('oxf:/apps/fr/i18n/resources.xml')/*" as="element(resources)"/>
                 <xsl:variable name="fr-current-resources" select="($fr-resources/(resource[xml:lang = $request-language], resource[1]))[1]" as="element(resource)"/>
 
+                <!-- Template -->
                 <template href="input:template" show-grid="false"/>
+
+                <!-- Barcode -->
+                <xsl:variable name="barcode-value" select="$request/parameters/parameter[name = 'document']/value" as="xs:string?"/>
+                <xsl:if test="normalize-space($barcode-value) != ''">
+                    <group ref="/*" font-pitch="15.9" font-family="Courier" font-size="12">
+                        <barcode left="50" top="780" height="15" value="'{$barcode-value}'"/>
+                    </group>
+                </xsl:if>
+
                 <group ref="/*" font-pitch="15.9" font-family="Courier" font-size="14">
                     <xsl:for-each select="$xhtml/xhtml:body//fr:body//fr:section">
                         <xsl:variable name="section-name" select="@context" as="xs:string"/>
@@ -110,7 +120,7 @@
                                     <!--aaa <xsl:value-of select="$control-name"/>-->
                                     <!--aaa <xsl:value-of select="$data/*[local-name() = $section-name]/*[local-name() = $control-name]"/>-->
                                 <!--</xsl:message>-->
-                                <xsl:variable name="control-value" select="$data/*[local-name() = $section-name]/*[local-name() = $control-name]" as="xs:string"/>
+                                <xsl:variable name="control-value" select="$data/*[local-name() = $section-name]/*[local-name() = $control-name]" as="xs:string?"/>
 
                                 <xsl:variable name="bind" select="$xhtml/xhtml:head/xforms:model//xforms:bind[@id = $control/@bind]" as="element(xforms:bind)?"/>
                                 <xsl:variable name="path" select="if ($bind)
@@ -122,11 +132,20 @@
                                         <!-- Selection control -->
                                         <xsl:variable name="control-resources" select="$current-resources/*[local-name() = $control-name]" as="element()"/>
 
-                                        <field acro-field-name="'{$control-name}'" value="'{$control-resources/item[value = $control-value]/label}'"/>
+                                        <xsl:choose>
+                                            <xsl:when test="local-name($control) = 'select' and $control/@appearance = 'full'">
+                                                <!-- Checkboxes -->
+                                                <field acro-field-name="'{$control-name}.{$control-value}'" value="'X'"/>
+                                            </xsl:when>
+                                            <xsl:otherwise>
+                                                <!-- Other selection controls -->
+                                                <field acro-field-name="'{$control-name}'" value="'{$control-resources/item[value = $control-value]/label}'"/>
+                                            </xsl:otherwise>
+                                        </xsl:choose>
                                     </xsl:when>
                                     <xsl:when test="$bind/@type and substring-after($bind/@type, ':') = 'date'">
                                         <!-- Date -->
-                                        <field acro-field-name="'{$control-name}'" value="'{if (. castable as xs:date) then format-date(xs:date(.), $fr-current-resources/formats/date, $request-language, (), ()) else .}'"/>
+                                        <field acro-field-name="'{$control-name}'" value="'{if ($control-value castable as xs:date) then format-date(xs:date($control-value), $fr-current-resources/summary/formats/date, $request-language, (), ()) else $control-value}'"/>
                                     </xsl:when>
                                     <xsl:otherwise>
                                         <!-- Other control -->

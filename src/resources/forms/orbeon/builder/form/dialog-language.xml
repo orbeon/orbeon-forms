@@ -30,18 +30,22 @@
     <xhtml:div>
         <xforms:group>
             <xforms:group class="fb-hide-alert">
-                <xforms:select1 ref="$variables/new-language" id="fb-add-language-select1">
-                    <xforms:label>Add the following language:</xforms:label>
-                    <xforms:item>
-                        <xforms:label>[Select...]</xforms:label>
-                        <xforms:value/>
-                    </xforms:item>
-                    <xforms:itemset model="fr-resources-model"
-                                    nodeset="instance('fr-languages-instance')/language[not(@exclude = 'true') and not(@code = $resources/resource/@xml:lang)]">
-                        <xforms:label value="if (@native-name != @english-name) then concat(@native-name, ' (', @english-name, ')') else @native-name"/>
-                        <xforms:value ref="@code"/>
-                    </xforms:itemset>
-                </xforms:select1>
+                <xhtml:div class="fr-grid">
+                    <xhtml:div class="fr-grid-content">
+                        <xforms:select1 ref="$variables/new-language" id="fb-add-language-select1">
+                            <xforms:label>Add the following language:</xforms:label>
+                            <xforms:item>
+                                <xforms:label>[Select...]</xforms:label>
+                                <xforms:value/>
+                            </xforms:item>
+                            <xforms:itemset model="fr-resources-model"
+                                            nodeset="instance('fr-languages-instance')/language[not(@exclude = 'true') and not(@code = $resources/resource/@xml:lang)]">
+                                <xforms:label value="if (@native-name != @english-name) then concat(@native-name, ' (', @english-name, ')') else @native-name"/>
+                                <xforms:value ref="@code"/>
+                            </xforms:itemset>
+                        </xforms:select1>
+                    </xhtml:div>
+                </xhtml:div>
             </xforms:group>
             <xhtml:span class="fr-inplace-buttons">
                 <xforms:trigger class="fr-inplace-rename" ref="$variables/new-language-trigger">

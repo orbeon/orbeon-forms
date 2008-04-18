@@ -2594,26 +2594,26 @@
                 </section>
                 <a name="modal-trigger"/>
                 <section>
-                    <title>Modal Trigger Behavior</title>
+                    <title>Modal Trigger / Submit Behavior</title>
                     <p>
-                        Usually, activating a trigger on the client doesn't prevent further actions in the user
-                        interface. Sometimes, it is however useful to block such further actions until some processing
-                        is complete, for example calling a submission that saves a document.
+                        Usually, activating a trigger or submit button on the client doesn't prevent further actions in
+                        the user interface. Sometimes however it is useful to block such actions until further
+                        processing is complete, for example calling a submission that saves a document.
                     </p>
                     <p>
-                        You can obtain this behavior by using the <code>xforms-trigger-appearance-modal</code> class on
-                        <code>&lt;xforms:trigger></code>:
+                        You can obtain this behavior by using the <code>xxforms:modal="true"</code> attribute on
+                        <code>&lt;xforms:trigger></code> and <code>&lt;xforms:submit></code>:
                     </p>
                     <xml-source>
-                        <xforms:trigger class="xforms-trigger-appearance-modal">
+                        <xforms:trigger xxforms:modal="true">
                             <xforms:label>Save</xforms:label>
                             <xforms:send ev:event="DOMActivate" submission="save-submission"/>
                         </xforms:trigger>
                     </xml-source>
                     <p>
-                        With this class, user input is blocked until all the events triggered by
-                        <code>DOMActivate</code> are processed. In the meanwhile, the page is grayed out and an icon
-                        appears indicating that background processing is taking place.
+                        With this attribute set to <code>true</code>, user input is blocked until all the events
+                        triggered by <code>DOMActivate</code> are processed. In the meanwhile, the page is grayed out
+                        and an icon appears indicating that background processing is taking place.
                     </p>
                 </section>
             </section>

@@ -78,6 +78,16 @@ public class XFormsTriggerHandler extends XFormsCoreControlHandler {
         handleMIPClasses(classes, triggerControl);
         containingDocument.getStaticState().appendClasses(classes, id);
 
+        {
+            // Set modal class
+            final String modalAttribute = attributes.getValue(XFormsConstants.XXFORMS_NAMESPACE_URI, "modal");
+            // Code below implements a different default for xforms:trigger and xforms:submit, but it's not clear we want that
+//            final boolean isSubmit = localname.equals("submit");
+//            if ((!isSubmit && "true".equals(modalAttribute)) || (isSubmit && !"false".equals(modalAttribute)))
+            if ("true".equals(modalAttribute))
+                classes.append(" xforms-trigger-appearance-modal");
+        }
+
         final AttributesImpl newAttributes = getAttributes(attributes, classes.toString(), effectiveId);
 
         // Handle accessibility attributes

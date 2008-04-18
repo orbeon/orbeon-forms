@@ -30,7 +30,7 @@
         <xforms:output mediatype="text/html" value="concat('&lt;a href=&quot;../../../serve?uuid=',
             xxforms:instance('fr-uuid'), '&amp;filename=',
             encode-for-uri(concat(xxforms:instance('fr-save-locally-file-name'), '.html')),
-            '&quot;&gt;Download project file&lt;a&gt;')"/>
+            '&quot; target=&quot;_blank&quot;&gt;Download project file&lt;a&gt;')"/>
     </xhtml:p>
     <xhtml:div class="fr-dialog-buttons">
         <xforms:trigger>

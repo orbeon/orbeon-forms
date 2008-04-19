@@ -335,7 +335,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 // o we only check for replace="instance|none" and if serialization must take place
 
                 boolean hasBoundRelevantUploadControl = false;
-                if (currentInstance!= null && containingDocument.isInitializing() && !containingDocument.isGotSubmissionSecondPass() && xxfFormsEnsureUploads && !isReplaceAll && serialize) {
+                if (currentInstance!= null && !containingDocument.isInitializing() && !containingDocument.isGotSubmissionSecondPass() && xxfFormsEnsureUploads && !isReplaceAll && serialize) {
                     final XFormsControls xformsControls = containingDocument.getXFormsControls();
                     final List uploadControls = xformsControls.getCurrentControlsState().getUploadControls();
                     if (uploadControls != null) {

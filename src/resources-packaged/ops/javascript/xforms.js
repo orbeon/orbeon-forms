@@ -130,7 +130,6 @@ ORBEON.xforms.Globals = ORBEON.xforms.Globals || {
      * in the capture phase, we need to register a listener for certain events on the elements itself, instead of
      * just registering the event handler on the window object.
      */
-    supportsCaptureEvents: window.addEventListener && navigator.userAgent.indexOf("AppleWebKit/312") == -1,
     eventQueue: [],                      // Events to be sent to the server
     eventsFirstEventTime: 0,             // Time when the first event in the queue was added
     requestForm: null,                   // HTML for the request currently in progress
@@ -445,7 +444,7 @@ ORBEON.util.Dom = {
         newInputElement.setAttribute("size", inputElement.size);
         parentElement.replaceChild(newInputElement, inputElement);
         // For non-w3c compliant browsers we must re-register listeners on the new upload element we just created
-        if (! ORBEON.xforms.Globals.supportsCaptureEvents) {
+        if (ORBEON.xforms.Globals.isRenderingEngineTrident) {
             ORBEON.xforms.Init.registerListenersOnFormElement(newInputElement);
         }
 
@@ -2015,9 +2014,10 @@ ORBEON.xforms.Init = {
         }
     },
 
+    /**
+     * For IE, since we haven't found a way to have one listener on the whole document the "change" event.
+     */
     registerListenersOnFormElement: function(element) {
-        YAHOO.util.Event.addListener(element, "focus", ORBEON.xforms.Events.focus);
-        YAHOO.util.Event.addListener(element, "blur", ORBEON.xforms.Events.blur);
         YAHOO.util.Event.addListener(element, "change", ORBEON.xforms.Events.change);
     },
 
@@ -2027,12 +2027,15 @@ ORBEON.xforms.Init = {
         ORBEON.xforms.Offline.pageLoad();
 
         // Register events in the capture phase for W3C-compliant browsers.
-        if (ORBEON.xforms.Globals.supportsCaptureEvents) {
-            window.addEventListener("focus", ORBEON.xforms.Events.focus, true);
-            window.addEventListener("blur", ORBEON.xforms.Events.blur, true);
-            window.addEventListener("change", ORBEON.xforms.Events.change, true);
-        } else {
+        if (ORBEON.xforms.Globals.isRenderingEngineTrident) {
             ORBEON.xforms.Init.registerListenersOnFormElements();
+            YAHOO.util.Event.addListener(document, "focusin", ORBEON.xforms.Events.focus);
+            YAHOO.util.Event.addListener(document, "focusout", ORBEON.xforms.Events.blur);
+            YAHOO.util.Event.addListener(document, "change", ORBEON.xforms.Events.change);
+        } else {
+            document.addEventListener("focus", ORBEON.xforms.Events.focus, true);
+            document.addEventListener("blur", ORBEON.xforms.Events.blur, true);
+            document.addEventListener("change", ORBEON.xforms.Events.change, true);
         }
 
         // Register events that bubble on document for all browsers

@@ -92,9 +92,7 @@ public class NewControlsComparator extends BaseControlsComparator {
 
                     // Output diffs between controlInfo1 and controlInfo2
 
-                    // Control id
                     attributesImpl.clear();
-                    attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, leadingControl.getEffectiveId());
 
                     final boolean isValueChangeControl = valueChangeControlIds != null && valueChangeControlIds.get(leadingControl.getEffectiveId()) != null;
                     if (xformsSingleNodeControl2 != null) {
@@ -114,6 +112,9 @@ public class NewControlsComparator extends BaseControlsComparator {
 
                             if (!(xformsSingleNodeControl2 instanceof RepeatIterationControl)) {
                                 // Anything but a repeat iteration
+
+                                // Control id
+                                attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, leadingControl.getEffectiveId());
 
                                 // Model item properties
                                 if (isNewRepeatIteration && xformsSingleNodeControl2.isReadonly()
@@ -301,6 +302,9 @@ public class NewControlsComparator extends BaseControlsComparator {
                                 }
                             } else {
 
+                                // Use the effective id of the parent repeat
+                                attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, xformsSingleNodeControl2.getParent().getEffectiveId());
+
                                 // Repeat iteration only handles relevance
                                 if (isNewRepeatIteration && !xformsSingleNodeControl2.isRelevant() // NOTE: we output if we are NOT relevant as the client must mark non-relevant elements
                                         || xformsSingleNodeControl1 != null && xformsSingleNodeControl1.isRelevant() != xformsSingleNodeControl2.isRelevant()) {
@@ -340,6 +344,9 @@ public class NewControlsComparator extends BaseControlsComparator {
                     } else {
                         // xformsControl2 == null (&& xformsControl1 != null)
                         // We went from an existing control to a non-relevant control
+
+                        // Control id
+                        attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, leadingControl.getEffectiveId());
 
                         // The only information we send is the non-relevance of the control if needed
                         if (xformsSingleNodeControl1.isRelevant()) {

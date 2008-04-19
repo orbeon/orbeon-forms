@@ -81,9 +81,6 @@ public class OldControlsComparator extends BaseControlsComparator {
 
                     attributesImpl.clear();
 
-                    // Control id
-                    attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, xformsSingleNodeControl2.getEffectiveId());
-
                     // Whether it is necessary to output information about this control
                     // TODO: distinction between new iteration AND control just becoming relevant
                     final boolean isNewRepeatIteration = xformsSingleNodeControl1 == null;
@@ -96,6 +93,9 @@ public class OldControlsComparator extends BaseControlsComparator {
                     final boolean isAttributeControl = xformsSingleNodeControl2 instanceof XXFormsAttributeControl;
                     if (!(isRepeatIterationControl || isAttributeControl)) {
                         // Anything but a repeat iteration or an attribute
+
+                        // Control id
+                        attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, xformsSingleNodeControl2.getEffectiveId());
 
                         // Model item properties
                         if (isNewRepeatIteration && xformsSingleNodeControl2.isReadonly()
@@ -285,6 +285,9 @@ public class OldControlsComparator extends BaseControlsComparator {
                         // Attribute control
                         final XXFormsAttributeControl attributeControlInfo2 = (XXFormsAttributeControl) xformsSingleNodeControl2;
 
+                        // Control id
+                        attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, xformsSingleNodeControl2.getEffectiveId());
+
                         // The client does not store an HTML representation of the xxforms:attribute control, so we
                         // have to output these attributes.
                         {
@@ -314,8 +317,11 @@ public class OldControlsComparator extends BaseControlsComparator {
                             ch.endElement();
                         }
                     } else {
-
                         // Repeat iteration only handles relevance
+
+                        // Use the effective id of the parent repeat
+                        attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, xformsSingleNodeControl2.getParent().getEffectiveId());
+
                         if (isNewRepeatIteration && !xformsSingleNodeControl2.isRelevant() // NOTE: we output if we are NOT relevant as the client must mark non-relevant elements
                                 || xformsSingleNodeControl1 != null && xformsSingleNodeControl1.isRelevant() != xformsSingleNodeControl2.isRelevant()) {
                             attributesImpl.addAttribute("", XFormsConstants.XXFORMS_RELEVANT_ATTRIBUTE_NAME,

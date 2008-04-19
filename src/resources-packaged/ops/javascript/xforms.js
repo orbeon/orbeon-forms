@@ -141,7 +141,7 @@ ORBEON.xforms.Globals = ORBEON.xforms.Globals || {
     maskFocusEvents: false,              // Avoid catching focus event when we do it because the server told us to
     previousDOMFocusOut: null,           // We only send a focus out when we receive a focus in, or another focus out
     htmlAreaNames: [],                   // Names of the FCK editors, which we need to reenable them on Firefox
-    repeatTreeChildToParent: [],         // Describes the repeat hierarchy
+    repeatTreeChildToParent: {},         // Describes the repeat hierarchy
     repeatIndexes: {},                   // The current index for each repeat
     repeatTreeParentToAllChildren: {},   // Map from parent to array with children, used when highlight changes
     inputCalendarCreated: {},            // Maps input id to true when the calendar has been created for that input
@@ -2233,8 +2233,10 @@ ORBEON.xforms.Init = {
                 for (var repeatIndex = 0; repeatIndex < repeatTree.length; repeatIndex++) {
                     var repeatInfo = repeatTree[repeatIndex].split(" ");
                     var id = repeatInfo[0];
-                    var parent = repeatInfo.length > 1 ? repeatInfo[repeatInfo.length - 1] : null;
-                    ORBEON.xforms.Globals.repeatTreeChildToParent[id] = parent;
+                    if (repeatInfo.length > 1) {
+                        var parent =  repeatInfo[repeatInfo.length - 1];
+                        ORBEON.xforms.Globals.repeatTreeChildToParent[id] = parent;
+                    }
                 }
                 for (var child in ORBEON.xforms.Globals.repeatTreeChildToParent) {
                     var parent = ORBEON.xforms.Globals.repeatTreeChildToParent[child];
@@ -3686,9 +3688,9 @@ ORBEON.xforms.Server = {
                                     // Model item properties on a repeat item
                                     var repeatIterationElements = ORBEON.util.Dom.getElementsByName(controlValuesElement,"repeat-iteration",xmlNamespace);
                                     var repeatIterationElementslength = repeatIterationElements.length;
-                                    // Extract data from server response
                                     for(var j = 0 ; j < repeatIterationElementslength; j++) {
                                         var repeatIterationElement = repeatIterationElements[j];
+                                        // Extract data from server response
                                         var repeatId = ORBEON.util.Dom.getAttribute(repeatIterationElement, "id");
                                         var iteration = ORBEON.util.Dom.getAttribute(repeatIterationElement, "iteration");
                                         var relevant = ORBEON.util.Dom.getAttribute(repeatIterationElement, "relevant");
@@ -4304,8 +4306,16 @@ function xformsAppendRepeatSuffix(id, suffix) {
 }
 
 /**
-* Locate the delimiter at the given position starting from a repeat begin element.
-*/
+ * Locate the delimiter at the given position starting from a repeat begin element.
+ *
+ * @param repeatId      Can be either a pure repeat ID, such as "todo" or an ID that contains information of its
+ *                      position relative to its parents, such as "todo.1". The former happens when we handle an
+ *                      event such as <xxf:repeat-index id="todo" old-index="4" new-index="6"/>. In this case
+ *                      "todo" means the "current todo". The latter happens when we handle an event such as
+ *                      <xxf:repeat-iteration id="todo.1" relevant="false" iteration="10"/>, which does not
+ *                      necessarily apply to the current "todo".
+ * @param index
+ */
 function xformsFindRepeatDelimiter(repeatId, index) {
 
     // Find id of repeat begin for the current repeatId

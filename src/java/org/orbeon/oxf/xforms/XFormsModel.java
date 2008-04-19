@@ -972,8 +972,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                                 try {
                                     try {
                                         // Handle connection errors
-                                        if (connectionResult.resultCode != 200) {
-                                            throw new OXFException("Got invalid return code while loading instance: " + instanceResource + ", " + connectionResult.resultCode);
+                                        if (connectionResult.statusCode != 200) {
+                                            throw new OXFException("Got invalid return code while loading instance: " + instanceResource + ", " + connectionResult.statusCode);
                                         }
 
                                         // TODO: Handle validating and handleXInclude!
@@ -1040,8 +1040,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                                     try {
                                         try {
                                             // Handle connection errors
-                                            if (connectionResult.resultCode != 200) {
-                                                throw new OXFException("Got invalid return code while loading instance: " + instanceResource + ", " + connectionResult.resultCode);
+                                            if (connectionResult.statusCode != 200) {
+                                                throw new OXFException("Got invalid return code while loading instance: " + instanceResource + ", " + connectionResult.statusCode);
                                             }
 
                                             // TODO: Handle validating and XInclude!

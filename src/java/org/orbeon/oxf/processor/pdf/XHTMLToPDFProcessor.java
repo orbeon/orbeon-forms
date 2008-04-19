@@ -73,9 +73,9 @@ public class XHTMLToPDFProcessor extends HttpBinarySerializer {
                             = XFormsSubmissionUtils.doRegular(externalContext, null, "get", new URL(resolvedURI),
                                 null, null, null, null, null, null);
 
-                    if (connectionResult.resultCode != 200) {
+                    if (connectionResult.statusCode != 200) {
                         connectionResult.close();
-                        throw new OXFException("Got invalid return code while loading resource: " + uri + ", " + connectionResult.resultCode);
+                        throw new OXFException("Got invalid return code while loading resource: " + uri + ", " + connectionResult.statusCode);
                     }
 
                     pipelineContext.addContextListener(new PipelineContext.ContextListener() {

@@ -92,9 +92,9 @@ public class XFormsServerSharedInstancesCache {
                     null, "get", sourceURL, null, null, null, null, null, null);
 
             // Handle connection errors
-            if (connectionResult.resultCode != 200) {
+            if (connectionResult.statusCode != 200) {
                 connectionResult.close();
-                throw new OXFException("Got invalid return code while loading instance from URI: " + sourceURI + ", " + connectionResult.resultCode);
+                throw new OXFException("Got invalid return code while loading instance from URI: " + sourceURI + ", " + connectionResult.statusCode);
             }
 
             try {

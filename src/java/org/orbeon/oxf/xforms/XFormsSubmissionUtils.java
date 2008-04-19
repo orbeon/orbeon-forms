@@ -105,7 +105,7 @@ public class XFormsSubmissionUtils {
                 if (doReplace) {
                     // "the event xforms-submit-done is dispatched"
                     if (xformsModelSubmission != null)
-                        xformsModelSubmission.getContainingDocument().dispatchEvent(pipelineContext, new XFormsSubmitDoneEvent(xformsModelSubmission, connectionResult.resourceURI));
+                        xformsModelSubmission.getContainingDocument().dispatchEvent(pipelineContext, new XFormsSubmitDoneEvent(xformsModelSubmission, connectionResult.resourceURI, connectionResult.statusCode));
                     // Just forward the reply
                     requestDispatcher.forward(requestAdapter, externalContext.getResponse());
                     connectionResult.dontHandleResponse = true;
@@ -120,10 +120,10 @@ public class XFormsSubmissionUtils {
                     // when including Servlets. Similarly, it is not possible to obtain the
                     // included resource's content type or headers. Because of this we should not
                     // use an optimized submission from within a servlet.
-                    connectionResult.resultCode = responseAdapter.getResponseCode();
-                    connectionResult.resultMediaType = XMLUtils.XML_CONTENT_TYPE;
+                    connectionResult.statusCode = responseAdapter.getResponseCode();
+                    connectionResult.responseMediaType = XMLUtils.XML_CONTENT_TYPE;
                     connectionResult.setResultInputStream(responseAdapter.getInputStream());
-                    connectionResult.resultHeaders = new HashMap();
+                    connectionResult.responseHeaders = new HashMap();
                     connectionResult.lastModified = 0;
                 }
 
@@ -343,10 +343,10 @@ public class XFormsSubmissionUtils {
                     };
 
                     // Get response information that needs to be forwarded
-                    connectionResult.resultCode = (httpURLConnection != null) ? httpURLConnection.getResponseCode() : 200;
+                    connectionResult.statusCode = (httpURLConnection != null) ? httpURLConnection.getResponseCode() : 200;
                     final String contentType = urlConnection.getContentType();
-                    connectionResult.resultMediaType = (contentType != null) ? NetUtils.getContentTypeMediaType(contentType) : "application/xml";
-                    connectionResult.resultHeaders = urlConnection.getHeaderFields();
+                    connectionResult.responseMediaType = (contentType != null) ? NetUtils.getContentTypeMediaType(contentType) : "application/xml";
+                    connectionResult.responseHeaders = urlConnection.getHeaderFields();
                     connectionResult.lastModified = urlConnection.getLastModified();
                     connectionResult.setResultInputStream(urlConnection.getInputStream());
 

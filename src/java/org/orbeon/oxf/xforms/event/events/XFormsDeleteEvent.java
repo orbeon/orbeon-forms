@@ -51,10 +51,10 @@ public class XFormsDeleteEvent extends XFormsEvent {
     public SequenceIterator getAttribute(String name) {
         if ("deleted-nodes".equals(name)) {
             // "The instance data node deleted. Note that these nodes are no longer referenced by their parents."
-            return (deletedNodeInfos == null) ? new EmptyIterator() : (SequenceIterator) new ListIterator(deletedNodeInfos);
+            return (deletedNodeInfos == null) ? EmptyIterator.getInstance() : (SequenceIterator) new ListIterator(deletedNodeInfos);
         } else if ("delete-location".equals(name)) {
             // "The delete location as defined by the delete action, or NaN if there is no delete location."
-            return (deleteIndex < 1) ? new EmptyIterator() : (SequenceIterator) new ListIterator(Collections.singletonList(new IntegerValue(deleteIndex)));
+            return (deleteIndex < 1) ? EmptyIterator.getInstance() : (SequenceIterator) new ListIterator(Collections.singletonList(new IntegerValue(deleteIndex)));
         } else {
             return super.getAttribute(name);
         }

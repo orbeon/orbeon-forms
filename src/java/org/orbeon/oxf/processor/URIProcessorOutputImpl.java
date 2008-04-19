@@ -393,8 +393,8 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
                     = XFormsSubmissionUtils.doRegular(externalContext, null, "get", urlString, username, password, null, null, null, null, null);
 
                 // Throw if connection failed (this is caught by the caller)
-                if (connectionResult.resultCode != 200)
-                    throw new OXFException("Got invalid return code while loading URI: " + urlString + ", " + connectionResult.resultCode);
+                if (connectionResult.statusCode != 200)
+                    throw new OXFException("Got invalid return code while loading URI: " + urlString + ", " + connectionResult.statusCode);
 
                 // Read connection into SAXStore
                 final boolean handleXInclude = false;

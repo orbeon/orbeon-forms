@@ -71,7 +71,7 @@ public abstract class XFormsUIEvent extends XFormsEvent {
             if (alert != null)
                 return new ListIterator(Collections.singletonList(new StringValue(alert)));
             else
-                return new EmptyIterator();
+                return EmptyIterator.getInstance();
         } else if ("label".equals(name) || XXFORMS_LABEL_ATTRIBUTE.equals(name)) {
 
             if ("label".equals(name)) {
@@ -82,7 +82,7 @@ public abstract class XFormsUIEvent extends XFormsEvent {
             if (label != null)
                 return new ListIterator(Collections.singletonList(new StringValue(label)));
             else
-                return new EmptyIterator();
+                return EmptyIterator.getInstance();
         } else if ("hint".equals(name) || XXFORMS_HINT_ATTRIBUTE.equals(name)) {
 
             if ("hint".equals(name)) {
@@ -93,7 +93,7 @@ public abstract class XFormsUIEvent extends XFormsEvent {
             if (hint != null)
                 return new ListIterator(Collections.singletonList(new StringValue(hint)));
             else
-                return new EmptyIterator();
+                return EmptyIterator.getInstance();
         } else if ("help".equals(name) || XXFORMS_HELP_ATTRIBUTE.equals(name)) {
 
             if ("help".equals(name)) {
@@ -104,7 +104,7 @@ public abstract class XFormsUIEvent extends XFormsEvent {
             if (help != null)
                 return new ListIterator(Collections.singletonList(new StringValue(help)));
             else
-                return new EmptyIterator();
+                return EmptyIterator.getInstance();
         } else if ("repeat-indexes".equals(name) || XXFORMS_REPEAT_INDEXES_ATTRIBUTE.equals(name)) {
 
             if ("repeat-indexes".equals(name)) {
@@ -124,7 +124,7 @@ public abstract class XFormsUIEvent extends XFormsEvent {
                 }
                 return new ListIterator(tokens);
             } else {
-                return new EmptyIterator();
+                return EmptyIterator.getInstance();
             }
         } else {
             return super.getAttribute(name);

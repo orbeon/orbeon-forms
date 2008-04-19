@@ -49,7 +49,7 @@ public class XFormsDeselectEvent extends XFormsUIEvent {
             if (itemValue != null)
                 return new ListIterator(Collections.singletonList(new StringValue(itemValue)));
             else
-                return new EmptyIterator();
+                return EmptyIterator.getInstance();
         } else {
             return super.getAttribute(name);
         }

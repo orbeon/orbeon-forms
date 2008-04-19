@@ -13,14 +13,10 @@
  */
 package org.orbeon.oxf.xforms.event.events;
 
-import org.orbeon.oxf.xforms.event.XFormsEvent;
+import org.orbeon.oxf.xforms.XFormsModelSubmission;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.saxon.om.SequenceIterator;
-import org.orbeon.saxon.om.ListIterator;
-import org.orbeon.saxon.value.StringValue;
-
-import java.util.Collections;
 
 
 /**
@@ -29,28 +25,22 @@ import java.util.Collections;
  * Target: submission / Bubbles: Yes / Cancelable: No / Context Info: None
  * The default action for this event results in the following: None; notification event only.
  */
-public class XFormsSubmitDoneEvent extends XFormsEvent {
+public class XFormsSubmitDoneEvent extends XFormsSubmitResponseEvent {
 
-    private String urlString;
-
-    public XFormsSubmitDoneEvent(XFormsEventTarget targetObject, String urlString) {
-        super(XFormsEvents.XFORMS_SUBMIT_DONE, targetObject, true, false);
-        this.urlString = urlString;
+    public XFormsSubmitDoneEvent(XFormsEventTarget targetObject) {
+        this(targetObject, null);
     }
 
-    public String getUrlString() {
-        return urlString;
+    public XFormsSubmitDoneEvent(XFormsEventTarget targetObject, XFormsModelSubmission.ConnectionResult connectionResult) {
+        super(XFormsEvents.XFORMS_SUBMIT_DONE, targetObject, connectionResult);
+    }
+
+    public XFormsSubmitDoneEvent(XFormsEventTarget targetObject, String resourceURI, int statusCode) {
+        super(XFormsEvents.XFORMS_SUBMIT_DONE, targetObject, resourceURI, statusCode);
     }
 
     public SequenceIterator getAttribute(String name) {
-        if ("resource-uri".equals(name)) {
-            // "The submission resource URI that failed (xsd:anyURI)"
-            return new ListIterator(Collections.singletonList(new StringValue(getUrlString())));
-
-            // TODO: response-status-code, response-headers, response-reason-phrase
-
-        } else {
-            return super.getAttribute(name);
-        }
+        // All attributes are handled by the base class
+        return super.getAttribute(name);
     }
 }

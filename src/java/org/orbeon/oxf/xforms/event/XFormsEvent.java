@@ -130,7 +130,7 @@ public abstract class XFormsEvent {
         } else {
             // "If the event context information does not contain the property indicated by the string argument, then an
             // empty node-set is returned."
-            return new EmptyIterator();
+            return EmptyIterator.getInstance();
         }
     }
 

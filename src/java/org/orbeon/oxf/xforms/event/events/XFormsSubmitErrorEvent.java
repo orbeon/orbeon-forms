@@ -14,18 +14,21 @@
 package org.orbeon.oxf.xforms.event.events;
 
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.xforms.event.XFormsEvent;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.xforms.XFormsModelSubmission;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
+import org.orbeon.oxf.xml.TransformerUtils;
+import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.om.ListIterator;
 import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.value.StringValue;
 
-import java.io.CharArrayWriter;
-import java.io.PrintWriter;
+import java.io.*;
+import java.net.URL;
 import java.util.Collections;
 
 
@@ -35,18 +38,101 @@ import java.util.Collections;
  * Target: model / Bubbles: Yes / Cancelable: No / Context Info: The submit method URI that failed (xsd:anyURI)
  * The default action for this event results in the following: None; notification event only.
  */
-public class XFormsSubmitErrorEvent extends XFormsEvent {
+public class XFormsSubmitErrorEvent extends XFormsSubmitResponseEvent {
+
+    public static final String DEFAULT_TEXT_READING_ENCODING = "iso-8859-1";
 
     private Throwable throwable;
-    private String urlString;
+
     private DocumentInfo bodyDocument;
     private String bodyString;
+
     private final ErrorType errorType;
 
-    public XFormsSubmitErrorEvent(XFormsEventTarget targetObject, String urlString, ErrorType errorType) {
-        super(XFormsEvents.XFORMS_SUBMIT_ERROR, targetObject, true, false);
-        this.urlString = urlString;
+    public XFormsSubmitErrorEvent(XFormsEventTarget targetObject) {
+        this(null, targetObject, ErrorType.XXFORMS_INTERNAL_ERROR, null);
+    }
+
+    public XFormsSubmitErrorEvent(XFormsEventTarget targetObject, String resourceURI, ErrorType errorType, int statusCode) {
+        super(XFormsEvents.XFORMS_SUBMIT_ERROR, targetObject, resourceURI, statusCode);
         this.errorType = errorType;
+    }
+
+    public XFormsSubmitErrorEvent(PipelineContext pipelineContext, XFormsEventTarget targetObject, ErrorType errorType, XFormsModelSubmission.ConnectionResult connectionResult) {
+        super(XFormsEvents.XFORMS_SUBMIT_ERROR, targetObject, connectionResult);
+        this.errorType = errorType;
+
+        // Try to add body information
+        if (connectionResult.hasContent()) {
+
+            // "When the error response specifies an XML media type as defined by [RFC 3023], the response body is
+            // parsed into an XML document and the root element of the document is returned. If the parse fails, or if
+            // the error response specifies a text media type (starting with text/), then the response body is returned
+            // as a string. Otherwise, an empty string is returned."
+
+            // Read the whole stream to a temp URI so we can read it more than once if needed
+            final String tempURI;
+            try {
+                tempURI = NetUtils.inputStreamToAnyURI(pipelineContext, connectionResult.getResultInputStream(), NetUtils.REQUEST_SCOPE);
+                connectionResult.getResultInputStream().close();
+            } catch (Exception e) {
+                // Simply can't read the bocy
+                XFormsServer.logger.error("XForms - submission - error while reading response body ", e);
+                return;
+            }
+
+            boolean isXMLParseFailed = false;
+            if (XMLUtils.isXMLMediatype(connectionResult.responseMediaType)) {
+                // XML content-type
+                // Read stream into Document
+                InputStream is = null; 
+                try {
+                    is = new URL(tempURI).openStream();
+                    final DocumentInfo responseBody = TransformerUtils.readTinyTree(is, connectionResult.resourceURI, false);
+                    setBodyDocument(responseBody);
+                    return;
+                } catch (Exception e) {
+                    XFormsServer.logger.error("XForms - submission - error while parsing response body as XML, defaulting to plain text.", e);
+                    isXMLParseFailed = true;
+                } finally {
+                    try {
+                        is.close();
+                    } catch (Exception e) {
+                    }
+                }
+            }
+
+            if (isXMLParseFailed || XMLUtils.isTextContentType(connectionResult.responseMediaType)) {
+                // XML parsing failed, or we got a text content-type
+                // Read stream into String
+                try {
+                    final String charset;
+                    {
+                        final String connectionCharset = NetUtils.getContentTypeCharset(connectionResult.responseMediaType);
+                        if (connectionCharset != null)
+                            charset = connectionCharset;
+                        else
+                            charset = DEFAULT_TEXT_READING_ENCODING;
+                    }
+                    final InputStream is = new URL(tempURI).openStream();
+                    final Reader reader = new InputStreamReader(is, charset);
+                    try {
+                        final String responseBody = NetUtils.readStreamAsString(reader);
+                        setBodyString(responseBody);
+                    } finally {
+                        try {
+                            reader.close();
+                        } catch (Exception e) {
+                        }
+                    }
+                } catch (Exception e) {
+                    XFormsServer.logger.error("XForms - submission - error while reading response body ", e);
+                }
+            } else {
+                // This is binary
+                // Don't store anything for now
+            }
+        }
     }
 
     public Throwable getThrowable() {
@@ -60,10 +146,6 @@ public class XFormsSubmitErrorEvent extends XFormsEvent {
         final CharArrayWriter writer = new CharArrayWriter();
         OXFException.getRootThrowable(throwable).printStackTrace(new PrintWriter(writer));
         XFormsServer.logger.error("XForms - submission - xforms-submit-error throwable: " + writer.toString());
-    }
-
-    public String getUrlString() {
-        return urlString;
     }
 
     public DocumentInfo getBodyDocument() {
@@ -102,31 +184,10 @@ public class XFormsSubmitErrorEvent extends XFormsEvent {
                 return new ListIterator(Collections.singletonList(new StringValue(getBodyString())));
             else
                 return new ListIterator(Collections.singletonList(StringValue.EMPTY_STRING));
-        } else if ("resource-uri".equals(name)) {
-            // "The submission resource URI that failed (xsd:anyURI)"
-            return new ListIterator(Collections.singletonList(new StringValue(getUrlString())));
         } else if ("error-type".equals(name)) {
             // "One of the following: submission-in-progress, no-data, validation-error, parse-error, resource-error,
             // target-error."
             return new ListIterator(Collections.singletonList(new StringValue(String.valueOf(errorType))));
-        } else if ("response-status-code".equals(name)) {
-            // "The protocol return code of the error response, or NaN if the failed submission did not receive an error
-            // response."
-            throw new ValidationException("Property Not implemented yet: " + name, getLocationData());
-            // TODO
-        } else if ("response-headers".equals(name)) {
-            // "Zero or more elements, each one representing a content header in the error response received by a
-            // failed submission. The returned node-set is empty if the failed submission did not receive an error
-            // response or if there were no headers. Each element has a local name of header with no namespace URI and
-            // two child elements, name and value, whose string contents are the name and value of the header,
-            // respectively."
-            throw new ValidationException("Property Not implemented yet: " + name, getLocationData());
-            // TODO
-        } else if ("response-reason-phrase".equals(name)) {
-            // "The protocol response reason phrase of the error response. The string is empty if the failed submission
-            // did not receive an error response or if the error response did not contain a reason phrase."
-            throw new ValidationException("Property Not implemented yet: " + name, getLocationData());
-            // TODO
         } else {
             return super.getAttribute(name);
         }

@@ -56,10 +56,10 @@ public class XFormsInsertEvent extends XFormsEvent {
     public SequenceIterator getAttribute(String name) {
         if ("inserted-nodes".equals(name)) {
             // "The instance data nodes inserted."
-            return (insertedNodeInfos == null) ? new EmptyIterator() : (SequenceIterator) new ListIterator(insertedNodeInfos);
+            return (insertedNodeInfos == null) ? EmptyIterator.getInstance() : (SequenceIterator) new ListIterator(insertedNodeInfos);
         } else if ("origin-nodes".equals(name)) {
             // "The instance data nodes referenced by the insert action's origin attribute if present, or the empty nodeset if not present."
-            return (originObjects == null) ? new EmptyIterator() : (SequenceIterator) new ListIterator(originObjects);
+            return (originObjects == null) ? EmptyIterator.getInstance() : (SequenceIterator) new ListIterator(originObjects);
         } else if ("insert-location-node".equals(name)) {
             // "The insert location node as defined by the insert action."
             return new ListIterator(Collections.singletonList(insertLocationNodeInfo));

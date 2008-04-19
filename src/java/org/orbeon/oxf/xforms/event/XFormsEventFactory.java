@@ -81,7 +81,7 @@ public class XFormsEventFactory {
         });
         nameToClassMap.put(XFormsEvents.XFORMS_SUBMIT_ERROR, new Factory() {
             public XFormsEvent createEvent(String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Element filesElement, String[] parameters) {
-                return new XFormsSubmitErrorEvent(targetObject, contextString, XFormsSubmitErrorEvent.ErrorType.XXFORMS_INTERNAL_ERROR);
+                return new XFormsSubmitErrorEvent(targetObject);
             }
         });
         nameToClassMap.put(XFormsEvents.XFORMS_SUBMIT, new Factory() {
@@ -96,7 +96,7 @@ public class XFormsEventFactory {
         });
         nameToClassMap.put(XFormsEvents.XFORMS_SUBMIT_DONE, new Factory() {
             public XFormsEvent createEvent(String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Element filesElement, String[] parameters) {
-                return new XFormsSubmitDoneEvent(targetObject, contextString);
+                return new XFormsSubmitDoneEvent(targetObject);
             }
         });
         nameToClassMap.put(XFormsEvents.XXFORMS_READY, new Factory() {

@@ -686,19 +686,34 @@
     <!-- Instance for the submission editor -->
     <xforms:instance id="fb-submission-editor-instance">
         <submission>
-            <id/>
-            <resource/>
-            <soap-action/>
-            <content/>
+            <id>foobar</id>
+            <request>
+                <resource-uri>/xforms-sandbox/service/sleep-5-seconds</resource-uri>
+                <soap-action/>
+                <content>&lt;test/></content>
+            </request>
+            <response>
+                <error-type/>
+                <body/>
+                <resource-uri/>
+                <status-code/>
+                <reason-phrase/>
+                <headers/>
+            </response>
         </submission>
     </xforms:instance>
 
     <xforms:bind nodeset="instance('fb-submission-editor-instance')">
         <xforms:bind nodeset="id" type="xs:NCName"/>
-        <xforms:bind nodeset="resource" type="xs:anyURI"/>
-        <xforms:bind nodeset="soap-action"/>
-        <xforms:bind nodeset="content" required="true()"/>
+        <xforms:bind nodeset="request/resource" type="xs:anyURI" required="true()"/>
+        <xforms:bind nodeset="request/soap-action"/>
+        <xforms:bind nodeset="request/content" required="true()"/>
+        <xforms:bind nodeset="response/error-type" readonly="true()"/>
     </xforms:bind>
+
+    <xforms:submission id="fb-test-submission-submission"
+            ref="saxon:parse(instance('fb-submission-editor-instance')/request/content)/*"
+            method="post" resource="{instance('fb-submission-editor-instance')/request/resource-uri}" replace="none"/>
 
     <!-- Template for outer bind -->
     <xforms:instance id="fb-bind-template" xxforms:readonly="true">

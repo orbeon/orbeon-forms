@@ -44,6 +44,12 @@
 #fb-itemset-editor-dialog .fb-language-choice .xforms-select1 { width: auto }
 #fb-itemset-editor-dialog .fr-repeat-table td, #fb-itemset-editor-dialog .fr-repeat-table th { border: 1px solid #DDDDEE}
 
+/* Submission editor dialog */
+#fb-submission-dialog { width: 45em }
+.fb-submission-dialog-error { display: block; padding: .25em; border: 2px solid red }
+.fb-submission-dialog-success { border: 2px solid green }
+.fb-submission-response { display: block; height: 200px; overflow-y: scroll }
+
 /* Other dialogs */
 .xforms-dialog .bd { padding-left: .5em; padding-right: .5em }
 

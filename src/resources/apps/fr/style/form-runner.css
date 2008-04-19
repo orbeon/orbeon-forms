@@ -120,6 +120,7 @@ div.fr-body {
 #doc .xforms-repeat-template, #doc4 .xforms-repeat-template { display: none; }
 #doc label.xforms-alert-inactive, #doc4 label.xforms-alert-inactive { display: none; }
 #doc .xforms-disabled .xforms-label, #doc4 .xforms-disabled .xforms-label { display: none }
+#doc .xforms-case-deselected, #doc4 .xforms-case-deselected { display: none }
 #doc .xforms-case-deselected .xforms-label, #doc4 .xforms-case-deselected .xforms-label { display: none }
 
 /* Make sure text in trigger does not wrap (leads to non-native widget being used on Firefox) */
@@ -270,15 +271,15 @@ body { text-align: left }
     font-size: smaller;
     font-weight: bold;
     margin-top: .2em;
-    margin-left: .25em;
+    margin-left: 0;/* used to have margin here but with new colors no margin seems better */
     height: auto;
-    /*width: 100%;*/
-    width: auto;
+    width: auto;/*width: 100%;*/
     text-indent: 0;
     background-image: none;
     background-color: red;
     color: white;
-    padding: 1px
+    padding: 1px;
+    border-radius: 2px; -moz-border-radius: 2px; -webkit-border-radius: 2px; -ms-border-radius: 2px 
 }
 
 /* Display hints under each control */
@@ -286,7 +287,7 @@ body { text-align: left }
     display: block;
     font-size: smaller;
     margin-top: .2em;
-    margin-left: .25em;
+    margin-left: 0;/* used to have margin here but with new colors no margin seems better */
     width: 100%;
     color: gray
 }
@@ -302,6 +303,7 @@ div.fr-collapsible {
 .fr-dialog ol { padding-left: 3em; }
 .fr-dialog li { list-style-type: decimal; }/* overrides YUI reset so numbers in enumeration do show */
 .fr-dialog .bd p { margin: .5em 0 .5em 0; }
+.fr-dialog .hd { background-color: #3598d4 }
 .fr-dialog .bd { margin: 0 .5em .5em .5em; }
 /* Style for dialogs  */
 .fr-dialog-icon { float: left; margin-right: 2em; margin-left: 1em; padding-bottom: 1em; }

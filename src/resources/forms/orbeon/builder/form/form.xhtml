@@ -49,29 +49,30 @@
                     <!-- Remember new id and indexes -->
                     <xforms:setvalue ref="$variables/inplace-id" value="event('xxforms:target')"/>
                     <xforms:setvalue ref="$variables/inplace-repeat-indexes" value="string-join(event('xxforms:repeat-indexes'), ' ')"/>
-
-                    <!--<xforms:message level="xxforms:log-error">-->
-                        <!--xxx-->
-                        <!--<xforms:output value="event('xxforms:target')"/>-->
-                    <!--</xforms:message>-->
                 </xforms:action>
 
                 <!-- In-place edit deselected, forget id -->
                 <xforms:action ev:event="xforms-deselect" if="for $target in event('xxforms:target') return starts-with($target, 'fr-inplace-') and ends-with($target, '-edit')">
                     <xforms:setvalue ref="$variables/inplace-id"/>
                     <xforms:setvalue ref="$variables/inplace-repeat-indexes"/>
-
-                    <!--<xforms:message level="xxforms:log-error">-->
-                        <!--yyy-->
-                        <!--<xforms:output value="event('xxforms:target')"/>-->
-                    <!--</xforms:message>-->
                 </xforms:action>
 
-                <xforms:group ref=".[instance('fb-user-agent-instance')/is-ie = 'true']" class="fb-ie-warning">
-                    Orbeon Form Builder still needs work to provide a satisfactory experience with Internet Explorer.
-                    Please bear with us while we fix this. In the meanwhile, we recommend you use <a
-                    href="http://www.mozilla.com/firefox/">Firefox</a>, <a
-                    href="http://www.apple.com/safari/">Safari</a>, or <a href="http://www.opera.com/">Opera</a>.
+                <xforms:group ref=".[instance('fb-user-agent-instance')/is-ie = 'true']">
+                    <xforms:switch>
+                        <xforms:case id="fb-ie-warning-case-on">
+                            <xhtml:div class="fb-ie-warning">
+                                Orbeon Form Builder still needs work to provide a satisfactory experience with Internet Explorer.
+                                Please bear with us while we fix this. In the meanwhile, we recommend you use <a
+                                href="http://www.mozilla.com/firefox/">Firefox</a>, <a
+                                href="http://www.apple.com/safari/">Safari</a>, or <a href="http://www.opera.com/">Opera</a>.
+                                <xforms:trigger appearance="minimal">
+                                    <xforms:label>[close]</xforms:label>
+                                    <xforms:toggle ev:event="DOMActivate" case="fb-ie-warning-case-off"/>
+                                </xforms:trigger>
+                            </xhtml:div>
+                        </xforms:case>
+                        <xforms:case id="fb-ie-warning-case-off"/>
+                    </xforms:switch>
                 </xforms:group>
 
                 <!--
@@ -998,7 +999,7 @@
                 <fr:clear-button/>
 
                 <!-- Test form -->
-                <xforms:trigger>
+                <xforms:trigger model="fr-form-model" ref="instance('fb-variables')/publish-trigger">
                     <xforms:label>
                         <xhtml:img src="/forms/orbeon/builder/images/play.png" alt="Test Form" title="Test Form"/>
                         <xhtml:span>Test</xhtml:span>

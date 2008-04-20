@@ -118,9 +118,18 @@
                         <xhtml:div class="yui-g fr-body">
                             <!-- Optional description-->
                             <xforms:group model="fr-form-model" ref=".[normalize-space(instance('fr-form-metadata')/description) != '']">
-                                <xhtml:div class="fr-form-description">
-                                    <xforms:output value="instance('fr-form-metadata')/description"/>
-                                </xhtml:div>
+                                <xforms:switch>
+                                    <xforms:case id="fr-form-description-case-on">
+                                        <xhtml:div class="fr-form-description">
+                                            <xforms:output value="instance('fr-form-metadata')/description"/>
+                                            <xforms:trigger appearance="minimal">
+                                                <xforms:label> [close]</xforms:label>
+                                                <xforms:toggle ev:event="DOMActivate" case="fr-form-description-case-off"/>
+                                            </xforms:trigger>
+                                        </xhtml:div>
+                                    </xforms:case>
+                                    <xforms:case id="fr-form-description-case-off"/>
+                                </xforms:switch>
                             </xforms:group>
 
                             <!-- Set context on form instance and define this group as #fr-form-group as observers will refer to it -->

@@ -21,10 +21,26 @@
 .fb-toolbox .fb-language-choice .fb-language-triggers { display: block; width: 100% }
 
 /* Toolbox */
-.fb-toolbox { margin: .5em; padding: .5em; width: auto; text-align: center }
-.fb-tools { background-color: #3598D4 }
+.fb-toolbox { margin-left: .5em; margin-right: .5em;padding: .5em; width: auto; text-align: center }
+.fb-tools {
+    /*background-color: #3598D4;*/
+    border-bottom: 2px solid #3598D4 
+}
 .fb-tools .fb-tool { display: block }
-.fb-tools .fb-tool button { width: 100%; text-align: left }
+.fb-tools .fb-tool button {
+    width: 100%;
+    text-align: left;
+    border: 2px solid #3598d4;
+    margin: 1px;
+    padding: 1px 2px 1px 2px;
+    background-color: #F8F8F8;
+    background-image: url(../../../apps/fr/style/logo-bg.gif);
+    background-repeat: repeat-x;
+    border-radius: 3px; -moz-border-radius: 2px; -webkit-border-radius: 3px; -ms-border-radius: 2px /* radius appears differently w/ Safari 3.1 vs. Firefox 3.0b4 */
+}
+.fb-tools .fb-tool button img { margin-left: .5em }
+.fb-tools .fb-tool button:hover { background-color: white; background-image: none }
+
 .fb-xvc { text-align: center }
 .fb-xvc a { text-decoration: none }
 

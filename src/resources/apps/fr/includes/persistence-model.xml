@@ -91,7 +91,8 @@
         <xforms:refresh/>
 
         <!-- Set the initial data status -->
-        <xforms:setvalue ref="instance('fr-persistence-instance')/data-status" value="if ($is-new-document) then 'dirty' else 'clean'"/>
+        <!--<xforms:setvalue ref="instance('fr-persistence-instance')/data-status" value="if ($is-new-document) then 'dirty' else 'clean'"/>-->
+        <xforms:setvalue ref="instance('fr-persistence-instance')/data-status">clean</xforms:setvalue>
     </xforms:action>
 
     <!-- Clear operation -->

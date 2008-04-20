@@ -138,7 +138,7 @@ h2 a, h3 a, h4 a {
 h2 {
     font-weight: normal;
     font-size: 160%;
-    margin: .5em 0 .5em 0;
+    margin: .25em 0 .5em 0;/* try smaller margins */
     clear: left;
 }
 
@@ -279,7 +279,7 @@ body { text-align: left }
     background-color: red;
     color: white;
     padding: 1px;
-    border-radius: 2px; -moz-border-radius: 2px; -webkit-border-radius: 2px; -ms-border-radius: 2px 
+    border-radius: 3px; -moz-border-radius: 2px; -webkit-border-radius: 3px; -ms-border-radius: 2px /* radius appears differently w/ Safari 3.1 vs. Firefox 3.0b4*/ 
 }
 
 /* Display hints under each control */

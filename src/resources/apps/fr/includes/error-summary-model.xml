@@ -61,7 +61,7 @@
         <xforms:setvalue ref="instance('fr-visited-instance')/control[last()]/@id" value="event('xxforms:target')"/>
     </xforms:action>
 
-    <!-- Handle xforms-invalid event on #fr-form-group -->
+    <!-- Handle xforms-invalid and xforms-value-changed events on #fr-form-group -->
     <!-- NOTE: Only handle events coming from controls bound to "fr-form-instance" instance -->
     <xforms:action ev:observer="fr-form-group" ev:event="xforms-invalid xforms-value-changed"
                    if="event('xxforms:binding')/root()/* is xxforms:instance('fr-form-instance') and normalize-space(event('xxforms:label')) != ''"

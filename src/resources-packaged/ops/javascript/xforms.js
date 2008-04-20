@@ -1153,11 +1153,12 @@ ORBEON.xforms.Controls = {
 
                     // Find div for help body
                     var bodyDiv = ORBEON.util.Dom.getChildElementByClass(formChild, "bd");
-                    var messageDiv = ORBEON.util.Dom.getChildElementByClass(bodyDiv, "xforms-help-panel-message");
+
+                    var messageDiv = YAHOO.util.Dom.getElementsByClassName("xforms-help-panel-message", null, bodyDiv)[0];
                     ORBEON.xforms.Globals.formHelpPanelMessageDiv[form.id] = messageDiv;
 
                     // Get the close button and register listener on that button
-                    var closeDiv = ORBEON.util.Dom.getChildElementByClass(bodyDiv, "xforms-help-panel-close");
+                    var closeDiv = YAHOO.util.Dom.getElementsByClassName("xforms-help-panel-close", null, bodyDiv)[0];
                     var closeButton = ORBEON.util.Dom.getChildElementByIndex(closeDiv, 0);
                     ORBEON.xforms.Globals.formHelpPanelCloseButton[form.id] = closeButton;
                     YAHOO.util.Event.addListener(closeButton, "click", ORBEON.xforms.Events.helpDialogButtonClose, form.id);

@@ -1038,6 +1038,28 @@ public class XFormsUtils {
         return result;
     }
 
+    /**
+     * Return whether the given node has at least one child element.
+     *
+     * @param nodeInfo  NodeInfo to look at
+     * @return          true iff NodeInfo has at least one child element
+     */
+    public static boolean hasChildrenElements(NodeInfo nodeInfo) {
+        final AxisIterator i = nodeInfo.iterateAxis(Axis.CHILD);
+        i.next();
+        while (i.current() != null) {
+            final Item current = i.current();
+            if (current instanceof NodeInfo) {
+                final NodeInfo currentNodeInfo = (NodeInfo) current;
+                if (currentNodeInfo.getNodeKind() == org.w3c.dom.Document.ELEMENT_NODE) {
+                    return true;
+                }
+            }
+            i.next();
+        }
+        return false;
+    }
+
     public static List getAttributes(NodeInfo nodeInfo) {
 
         if (nodeInfo.getNodeKind() != org.w3c.dom.Document.ELEMENT_NODE)

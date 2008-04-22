@@ -251,10 +251,7 @@ public class XFormsContextStack {
         {
             if (bindId != null) {
                 // Resolve the bind id to a nodeset
-                final ModelBind modelBind = newModel.getModelBindById(bindId);
-                if (modelBind == null)
-                    throw new ValidationException("Cannot find bind for id: " + bindId, locationData);
-                newNodeset = newModel.getBindNodeset(pipelineContext, modelBind, currentBindingContext.getSingleItem());
+                newNodeset = newModel.getBinds().getBindNodeset(bindId, currentBindingContext.getSingleItem());
                 hasOverriddenContext = false;
                 contextItem = currentBindingContext.getSingleItem();
                 isNewBind = true;

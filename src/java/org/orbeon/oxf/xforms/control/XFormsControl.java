@@ -302,8 +302,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
      */
     public void setBindingContext(XFormsContextStack.BindingContext bindingContext) {
         this.bindingContext = bindingContext;
-        // Set the bound node at this time as well. This won't change until next refresh.
-        setBoundNode();
+        this.boundNode = bindingContext.getSingleNode();
     }
 
     /**
@@ -311,27 +310,6 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
      */
     public XFormsContextStack.BindingContext getBindingContext() {
         return bindingContext;
-    }
-
-    /**
-     * Set the node to which the control is bound, if any. If the control is not bound to any node, the bound node is
-     * null. If the node to which the control no longer exists, return null.
-     */
-    private void setBoundNode() {
-        final NodeInfo boundSingleNode = bindingContext.getSingleNode();
-        if (boundSingleNode == null) {
-            this.boundNode = null;
-            return;
-        }
-
-        // Is this needed now that we set the bound node upon setBindingContext()?
-        final XFormsInstance boundInstance = containingDocument.getInstanceForNode(boundSingleNode);
-        if (boundInstance == null) {
-            this.boundNode = null;
-            return;
-        }
-
-        this.boundNode = boundSingleNode;
     }
 
     /**
@@ -455,7 +433,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
                         // those are updated, but is that what we should do?
                         for (Iterator i = containingDocument.getModels().iterator(); i.hasNext();) {
                             XFormsModel currentModel = (XFormsModel) i.next();
-                            currentModel.applyComputedExpressionBinds(pipelineContext);
+                            currentModel.getBinds().applyComputedExpressionBinds(pipelineContext);
                             //containingDocument.dispatchEvent(pipelineContext, new XFormsRecalculateEvent(currentModel, true));
                         }
                         // TODO: Should try to use the code of the <setindex> action

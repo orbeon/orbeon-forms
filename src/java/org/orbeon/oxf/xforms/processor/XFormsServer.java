@@ -594,7 +594,14 @@ public class XFormsServer extends ProcessorImpl {
                         outputResponse(containingDocument, valueChangeControlIds, pipelineContext, identity, xformsDecodedClientState, xformsDecodedInitialClientState, true, true, false, false);
 
                         // Output serialized list of events
+                        ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "events");
                         ch.text(writer.toString());
+                        ch.endElement();
+
+                        ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "mappings");
+                        final String offlineBindMappings = XFormsModelBinds.getOfflineBindMappings(containingDocument);
+                        ch.text(offlineBindMappings);
+                        ch.endElement();
 
                         ch.endElement();
                     }

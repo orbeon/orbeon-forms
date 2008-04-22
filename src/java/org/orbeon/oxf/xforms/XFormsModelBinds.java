@@ -182,6 +182,19 @@ public class XFormsModelBinds {
     /**
      * Return a JSON string containing the control -> mips and variable -> control mappings for all models.
      *
+     * Example of output:
+     *
+     * {
+     *     "mips": {
+     *         "total-control": { "calculate": "$units * $price", ... other MIPs ... },
+     *         ... other controls ...
+     *     },
+     *     "variables": {
+     *         "units": "units-control",
+     *         "price": "price-control"
+     *     }
+     * };
+     *
      * @return  JSON string
      */
     public static String getOfflineBindMappings(XFormsContainingDocument containingDocument) {

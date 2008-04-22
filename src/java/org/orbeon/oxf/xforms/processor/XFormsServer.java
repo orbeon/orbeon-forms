@@ -589,15 +589,18 @@ public class XFormsServer extends ProcessorImpl {
                         identity.getTransformer().setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");// no XML decl.
                         identity.setResult(new StreamResult(writer));
 
-                        // Output response by asking for all events, and passing a flag telling that we are processing
-                        // offline events so as to avoid recursion
+                        // Output response into writer. We ask for all events, and passing a flag telling that we are
+                        // processing offline events so as to avoid recursion
                         outputResponse(containingDocument, valueChangeControlIds, pipelineContext, identity, xformsDecodedClientState, xformsDecodedInitialClientState, true, true, false, false);
 
-                        // Output serialized list of events
+                        // List of events needed to update the page from the time the page was initially sent to the
+                        // client until right before sending the xxforms:offline event.
                         ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "events");
                         ch.text(writer.toString());
                         ch.endElement();
 
+                        // List of offline bind mappings. This allows the client to perform simple handling of
+                        // validation, relevance, readonly, and required for xforms:bind[@xxforms:offline = 'true'].
                         ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "mappings");
                         final String offlineBindMappings = XFormsModelBinds.getOfflineBindMappings(containingDocument);
                         ch.text(offlineBindMappings);

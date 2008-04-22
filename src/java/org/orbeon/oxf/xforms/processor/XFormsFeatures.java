@@ -139,6 +139,7 @@ public class XFormsFeatures {
             new ResourceConfig("/ops/javascript/jscalendar/calendar-setup.js", "/ops/javascript/jscalendar/calendar-setup-min.js"),// our min version
             // Yahoo UI Library
             new ResourceConfig("/ops/javascript/yui/yahoo.js", "/ops/javascript/yui/yahoo-min.js"),
+            new ResourceConfig("/ops/javascript/yui/selector-beta.js", "/ops/javascript/yui/selector-beta-min.js"),
             new ResourceConfig("/ops/javascript/yui/event.js", "/ops/javascript/yui/event-min.js"),
             new ResourceConfig("/ops/javascript/yui/dom.js", "/ops/javascript/yui/dom-min.js"),
             new ResourceConfig("/ops/javascript/yui/connection.js", "/ops/javascript/yui/connection-min.js"),

@@ -238,19 +238,23 @@
                     replace="instance" instance="fr-summary-instance">
                 <xxforms:script ev:event="xforms-submit-done">
                     if (ORBEON.xforms.Document.isOfflineAvailable()) {
-                        var summaryIndex = 1;
-                        while (true) {
-                            // Check if there is an item at this index; otherwise stop
-                            var nameControlId = "fr-document-name" + XFORMS_SEPARATOR_1 + summaryIndex;
-                            if (ORBEON.util.Dom.getElementById(nameControlId) == null) break;
-                            // Get URL for edit page of this form
-                            var name = ORBEON.xforms.Document.getValue(nameControlId);
-                            var url = window.location.href + "/" + name + "/edit";
-                            // Store in instance if this form is offline or not
-                            var offlineControlId = "fr-document-offline" + XFORMS_SEPARATOR_1 + summaryIndex;
-                            var isOffline = ORBEON.xforms.Document.isFormOffline(url);
-                            ORBEON.xforms.Document.setValue(offlineControlId, isOffline ? "true" : "false");
-                            summaryIndex++;
+                        var noFormDataDiv = ORBEON.util.Dom.getElementById("fr-no-form-data");
+                        // If the table is empty, skip this
+                        if (! ORBEON.util.Dom.hasClass(noFormDataDiv, "xforms-disabled")) {
+                            var summaryIndex = 1;
+                            while (true) {
+                                // Check if there is an item at this index; otherwise stop.
+                                var nameControlId = "fr-document-name" + XFORMS_SEPARATOR_1 + summaryIndex;
+                                if (ORBEON.util.Dom.getElementById(nameControlId) == null) break;
+                                // Get URL for edit page of this form
+                                var name = ORBEON.xforms.Document.getValue(nameControlId);
+                                var url = window.location.href + "/" + name + "/edit";
+                                // Store in instance if this form is offline or not
+                                var offlineControlId = "fr-document-offline" + XFORMS_SEPARATOR_1 + summaryIndex;
+                                var isOffline = ORBEON.xforms.Document.isFormOffline(url);
+                                ORBEON.xforms.Document.setValue(offlineControlId, isOffline ? "true" : "false");
+                                summaryIndex++;
+                            }
                         }
                     }
                 </xxforms:script>
@@ -271,7 +275,6 @@
                         formWindow.ORBEON.xforms.Document.dispatchEvent("fr-save-button", "DOMActivate");
                     });
                 } else {
-                    console.log("calling takeOfflineFromSummary", url);
                     ORBEON.xforms.Document.takeOfflineFromSummary(url);
                 }
 
@@ -450,7 +453,7 @@
                                 <xforms:group ref=".[not(document)]">
                                     <tr>
                                         <td colspan="{3 + count(instance('fr-configuration-instance')/xforms:*[tokenize(@class, ' ') = 'fr-summary'])}">
-                                            <xforms:output mediatype="text/html" value="saxon:serialize($fr-resources/summary/messages/no-form-found/node(), 'html')"/>
+                                            <xforms:output id="fr-no-form-data" mediatype="text/html" value="saxon:serialize($fr-resources/summary/messages/no-form-found/node(), 'html')"/>
                                         </td>
                                     </tr>
                                 </xforms:group>
@@ -598,6 +601,6 @@
                 </xhtml:div>
             </fr:buttons>
         </fr:view>
-        <!--<widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>-->
+        <widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>
     </body>
 </html>

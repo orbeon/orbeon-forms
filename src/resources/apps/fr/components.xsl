@@ -122,8 +122,8 @@
                                     <xforms:case id="fr-form-description-case-on">
                                         <xhtml:div class="fr-form-description">
                                             <xforms:output value="instance('fr-form-metadata')/description"/>
-                                            <xforms:trigger appearance="minimal">
-                                                <xforms:label> [close]</xforms:label>
+                                            <xforms:trigger appearance="minimal" class="fr-close">
+                                                <xforms:label>[close]</xforms:label>
                                                 <xforms:toggle ev:event="DOMActivate" case="fr-form-description-case-off"/>
                                             </xforms:trigger>
                                         </xhtml:div>

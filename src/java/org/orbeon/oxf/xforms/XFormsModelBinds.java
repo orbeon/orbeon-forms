@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms;
 import org.dom4j.Element;
 import org.dom4j.QName;
 import org.orbeon.oxf.common.ValidationException;
+import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.action.actions.XFormsSetvalueAction;
@@ -30,9 +31,11 @@ import org.orbeon.saxon.expr.XPathContextMajor;
 import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.FastStringBuffer;
+import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.style.StandardNames;
 import org.orbeon.saxon.sxpath.XPathEvaluator;
 import org.orbeon.saxon.trans.IndependentContext;
+import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.type.BuiltInAtomicType;
 import org.orbeon.saxon.type.BuiltInSchemaFactory;
 import org.orbeon.saxon.value.AtomicValue;
@@ -250,14 +253,15 @@ public class XFormsModelBinds {
 
                 // Iterate through variables
                 // NOTE: We assume top-level or single-node context binds
-                final Map variables = currentModel.getBinds().getVariables(null, false);
+                final Map variables = currentModel.getBinds().getVariables(null);
                 boolean controlFound = false;
                 for (Iterator i = variables.entrySet().iterator(); i.hasNext();) {
                     final Map.Entry currentEntry = (Map.Entry) i.next();
                     final String currentVariableName = (String) currentEntry.getKey();
-                    final List currentNodeset = (List) currentEntry.getValue();
+                    final SequenceExtent currentSequenceExtent = (SequenceExtent) currentEntry.getValue();
 
                     // Find controls bound to the bind exposed as a variable
+                    final List currentNodeset = sequenceExtentToList(currentSequenceExtent);
                     final List boundControls = getBoundControls(idsToXFormsControls, currentNodeset);
                     if (boundControls.size() > 0) {
                         // NOTE: We only handle the first control found
@@ -269,6 +273,20 @@ public class XFormsModelBinds {
         }
         sb.append('}');
         return sb.toString();
+    }
+
+    private static final List sequenceExtentToList(SequenceExtent sequenceExtent) {
+        try {
+            final List result = new ArrayList(sequenceExtent.getLength());
+            final SequenceIterator si = sequenceExtent.iterate(null);
+            for (Item item = si.next(); item != null; item = si.next()) {
+                result.add(item);
+            }
+            return result;
+        } catch (XPathException e) {
+            // Should not happen with SequenceExtent
+            throw new OXFException(e);
+        }
     }
 
     private static List getBoundControls(Map idsToXFormsControls, List nodeset) {
@@ -334,7 +352,7 @@ public class XFormsModelBinds {
                 final NodeInfo currentNodeInfo = (NodeInfo) nodeset.get(position - 1);
 
                 final String stringResult = XPathCache.evaluateAsString(pipelineContext, nodeset, position, bind.getCalculate(),
-                        containingDocument.getNamespaceMappings(bind.getBindElement()), getVariables(currentNodeInfo, true),
+                        containingDocument.getNamespaceMappings(bind.getBindElement()), getVariables(currentNodeInfo),
                         XFormsContainingDocument.getFunctionLibrary(), contextStack.getFunctionContext(),
                         bind.getLocationData().getSystemID(), bind.getLocationData());
 
@@ -349,7 +367,7 @@ public class XFormsModelBinds {
         }
     }
 
-    private Map getVariables(NodeInfo contextNodeInfo, boolean asExtent) {
+    private Map getVariables(NodeInfo contextNodeInfo) {
 
         if (variableNamesToIds.size() > 0) {
             final Map bindVariablesValues = new HashMap();
@@ -361,7 +379,7 @@ public class XFormsModelBinds {
                 final String currentBindId = (String) currentEntry.getValue();
 
                 final List currentBindNodeset = getBindNodeset(currentBindId, contextNodeInfo);
-                bindVariablesValues.put(currentVariableName, asExtent ? (Object) new SequenceExtent(currentBindNodeset) : currentBindNodeset);
+                bindVariablesValues.put(currentVariableName, new SequenceExtent(currentBindNodeset));
             }
 
             // Combine bind variables with model variables
@@ -375,7 +393,7 @@ public class XFormsModelBinds {
     private void handleComputedExpressionBinds(PipelineContext pipelineContext, Bind bind, List nodeset, int position) {
 
         final NodeInfo currentNodeInfo = (NodeInfo) nodeset.get(position - 1);
-        final Map currentVariables = getVariables(currentNodeInfo, true);
+        final Map currentVariables = getVariables(currentNodeInfo);
 
         // Handle required MIP
         if (bind.getRequired() != null) {
@@ -463,7 +481,7 @@ public class XFormsModelBinds {
                 // Get MIP value
                 final String xpath = "boolean(" + bind.getConstraint() + ")";
                 final Boolean valid = (Boolean) XPathCache.evaluateSingle(pipelineContext,
-                    nodeset, position, xpath, containingDocument.getNamespaceMappings(bind.getBindElement()), getVariables(currentNodeInfo, true),
+                    nodeset, position, xpath, containingDocument.getNamespaceMappings(bind.getBindElement()), getVariables(currentNodeInfo),
                     XFormsContainingDocument.getFunctionLibrary(), contextStack.getFunctionContext(), bind.getLocationData().getSystemID(), bind.getLocationData());
 
                 // Update node with MIP value

@@ -24,8 +24,8 @@ public class CountNonEmpty extends XFormsFunction {
     public Item evaluateItem(XPathContext c) throws XPathException {
         int count = 0;
         SequenceIterator iterator = argument[0].iterate(c);
-        for(Item item = iterator.next(); item != null; item = iterator.next()) {
-            if(item.getStringValue().length() > 0)
+        for (Item item = iterator.next(); item != null; item = iterator.next()) {
+            if (item.getStringValue().length() > 0)
                 count++;
         }
         return new IntegerValue(count);

@@ -596,13 +596,6 @@ public class XFormsModelBinds {
             if (name != null)
                 variableNamesToIds.put(name, id);
 
-            // "4.7.2 References to Elements within a bind Element [...] If a target bind element is outermost, or if
-            // all of its ancestor bind elements have nodeset attributes that select only one node, then the target bind
-            // only has one associated bind object, so this is the desired target bind object whose nodeset is used in
-            // the Single Node Binding or Node Set Binding"
-            if (isSingleNodeContext)
-                singleNodeContextBinds.put(id, this);
-
             // If this bind is marked for offline handling, remember it
             if ("true".equals(bindElement.attributeValue(XFormsConstants.XXFORMS_OFFLINE_QNAME)))
                 offlineBinds.add(this);
@@ -611,18 +604,27 @@ public class XFormsModelBinds {
             contextStack.pushBinding(pipelineContext, bindElement);
             {
                 this.nodeset = contextStack.getCurrentNodeset();
+                final int nodesetSize = nodeset.size();
+                final boolean isNewSingleNodeContext = isSingleNodeContext && nodesetSize == 1;
+
+                // "4.7.2 References to Elements within a bind Element [...] If a target bind element is outermost, or if
+                // all of its ancestor bind elements have nodeset attributes that select only one node, then the target bind
+                // only has one associated bind object, so this is the desired target bind object whose nodeset is used in
+                // the Single Node Binding or Node Set Binding"
+                if (isNewSingleNodeContext)
+                    singleNodeContextBinds.put(id, this);
+
                 final List childElements = bindElement.elements(new QName("bind", XFormsConstants.XFORMS_NAMESPACE));
                 if (childElements.size() > 0) {
                     // There are children binds
                     childrenIterations = new ArrayList();
 
                     // Iterate over nodeset and produce child iterations
-                    final int size = nodeset.size();
-                    for (int currentPosition = 1; currentPosition <= size; currentPosition++) {
+                    for (int currentPosition = 1; currentPosition <= nodesetSize; currentPosition++) {
                         contextStack.pushIteration(currentPosition);
                         {
                             // Create iteration and remember it
-                            final BindIteration currentBindIteration = new BindIteration(pipelineContext, isSingleNodeContext && size == 1, childElements);
+                            final BindIteration currentBindIteration = new BindIteration(pipelineContext, isNewSingleNodeContext, childElements);
                             childrenIterations.add(currentBindIteration);
 
                             // Create mapping context node -> iteration

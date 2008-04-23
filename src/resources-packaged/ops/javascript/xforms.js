@@ -4014,7 +4014,9 @@ ORBEON.xforms.Server = {
                                 // Take form offline
                                 case "offline": {
                                     var offlineElement = actionElement.childNodes[actionIndex];
-                                    var replayResponse = ORBEON.util.Dom.getStringValue(offlineElement);
+                                    var eventsElement = ORBEON.util.Dom.getElementsByName(offlineElement, "events", xmlNamespace)[0];
+                                    var mappingElement = ORBEON.util.Dom.getElementsByName(offlineElement, "mappings", xmlNamespace)[0];
+                                    var replayResponse = ORBEON.util.Dom.getStringValue(eventsElement);
                                     ORBEON.xforms.Offline.takeOffline(replayResponse, formID);
                                 }
                             }

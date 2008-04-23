@@ -696,11 +696,38 @@ ORBEON.xforms.Document = {
      *                              This function receives window in which the form is loaded as parameter.
      */
     takeOfflineFromSummary: function(url, formOfflineListener) {
-        ORBEON.xforms.Offline.loadFormInIframe(url, function(offlineIframe) {
-            offlineIframe.contentWindow.ORBEON.xforms.Document.dispatchEvent("$containing-document$", "xxforms-offline");
-            if (formOfflineListener)
-                formOfflineListener(offlineIframe.contentWindow);
+        ORBEON.xforms.Offline.init();
+        var formLoadingComplete = false;
+        // We first capture the form
+        ORBEON.xforms.Offline.formStore.capture(window.location.href, function (url, success, captureId) {
+            // When capture is done, set a flag.
+            // We need to resort to this trick because the code here does not run the same context and setting src
+            // attribute on the iframe would otherwise fail.
+            formLoadingComplete = true;
         });
+        // Check at a regular interval if the flag is set, when it is load the form in the frame.
+        var formLoadingIntervalID = window.setInterval(function() {
+            if (formLoadingComplete) {
+                window.clearInterval(formLoadingIntervalID);
+                // Load the form in the iframe
+                ORBEON.xforms.Offline.loadFormInIframe(url, function(offlineIframe) {
+                    // Send offline event to the server
+                    console.log("offlineIframe", offlineIframe);
+                    offlineIframe.contentWindow.ORBEON.xforms.Document.dispatchEvent("$containing-document$", "xxforms-offline");
+                    // Wait for the form to be marked as offline before we call the listener
+                    var takingFormOfflineIntervalID = window.setInterval(function() {
+                        console.log("Form still not offline");
+                        if (! offlineIframe.contentWindow.ORBEON.xforms.Offline.isOnline) {
+                            window.clearInterval(takingFormOfflineIntervalID);
+                            console.log("Now really offline");
+                            // Calling listener to notify that the form is now completely offline
+                            if (formOfflineListener)
+                                formOfflineListener(offlineIframe.contentWindow);
+                        }
+                    }, 100);
+                });
+            }
+        }, 100)
     },
 
     /**
@@ -4050,6 +4077,21 @@ ORBEON.xforms.Offline = {
     formStore: null,                 // The Gears ResourceStore
 
     /**
+     * A failed (so far) attempt at trying to figure out if Gears is available and usable by this web application
+     * without having Gears ask users if they want to grant the right to this application to use Gears.
+     */
+    isGearsEnabled: function() {
+        try {
+            // Try to create factory
+            var factory = typeof GearsFactory != "undefined" ? new GearsFactory() : new ActiveXObject("Gears.Factory");
+            //return factory.getPermission();
+        } catch (e) {
+            // ActiveX object not there either, then Gears is not available
+            return false;
+        }
+    },
+
+    /**
      * Google Gears initialization function.
      * Some of the code below is aken gears_init.js which is part of Google Gears.
      */
@@ -4165,19 +4207,34 @@ ORBEON.xforms.Offline = {
     takeOffline: function(eventReponse, formID) {
         ORBEON.xforms.Offline.init();
 
-        // Load current form in form store        
-        ORBEON.xforms.Offline.formStore.capture(window.location.href, function (url, success, captureId) {
-            // Use this handler to hide waiting dialog
-        });
-
         // Remember that we took this form offline
         var resultSet = ORBEON.xforms.Offline.gearsDatabase.execute(
                 "insert into Offline_Forms (url, event_response, form_id, static_state, dynamic_state) values (?, ?, ?, ?, ?)",
                 [ window.location.href, eventReponse, formID,
                     ORBEON.xforms.Globals.formStaticState[formID].value,
                     ORBEON.xforms.Globals.formDynamicState[formID].value ]);
-        resultSet.close()
-        ORBEON.xforms.Offline.isOnline = false;
+        resultSet.close();
+
+        // Capture all the resources this form needs.
+        // Here we don't capture the form itself, as we assume this has been done already. (If we were to capture the
+        // the form here, when the form is taken offline from a summary page, we would have two requests made to the server.)
+        var htmlElements = [].concat(
+            YAHOO.util.Selector.query("script"),
+            YAHOO.util.Selector.query("link"),
+            YAHOO.util.Selector.query("img")
+        );
+        var urlsToCapture = [];
+        for (var elementIndex = 0; elementIndex < htmlElements.length; elementIndex++) {
+            var element = htmlElements[elementIndex];
+            if (YAHOO.lang.isString(element.href))
+                urlsToCapture.push(element.href);
+            if (YAHOO.lang.isString(element.src))
+                urlsToCapture.push(element.src);
+        }
+        ORBEON.xforms.Offline.formStore.capture(urlsToCapture, function (url, success, captureId) {
+            // When capture is done, mark the form as offline to prevent any event from being sent to the server
+            ORBEON.xforms.Offline.isOnline = false;
+        });
     },
 
     /**
@@ -4379,7 +4436,7 @@ function xformsFindRepeatDelimiter(repeatId, index) {
     var cursor = beginElement;
     var cursorPosition = 0;
     while (true) {
-        while (cursor.nodeType != ELEMENT_TYPE || !ORBEON.util.Dom.hasClass(cursor, "xforms-repeat-delimiter")) {
+            while (cursor.nodeType != ELEMENT_TYPE || !ORBEON.util.Dom.hasClass(cursor, "xforms-repeat-delimiter")) {
             cursor = cursor.nextSibling;
             if (!cursor) return null;
         }

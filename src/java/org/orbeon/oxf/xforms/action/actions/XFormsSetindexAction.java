@@ -122,6 +122,7 @@ public class XFormsSetindexAction extends XFormsAction {
             // rebuilt or updated as a result of this action."
             for (Iterator i = containingDocument.getModels().iterator(); i.hasNext();) {
                 XFormsModel currentModel = (XFormsModel) i.next();
+                currentModel.getBinds().rebuild(pipelineContext);
                 currentModel.getBinds().applyComputedExpressionBinds(pipelineContext);
             }
 

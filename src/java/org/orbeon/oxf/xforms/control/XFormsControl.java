@@ -433,6 +433,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
                         // those are updated, but is that what we should do?
                         for (Iterator i = containingDocument.getModels().iterator(); i.hasNext();) {
                             XFormsModel currentModel = (XFormsModel) i.next();
+                            currentModel.getBinds().rebuild(pipelineContext);
                             currentModel.getBinds().applyComputedExpressionBinds(pipelineContext);
                             //containingDocument.dispatchEvent(pipelineContext, new XFormsRecalculateEvent(currentModel, true));
                         }

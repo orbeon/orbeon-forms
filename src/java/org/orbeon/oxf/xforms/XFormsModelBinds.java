@@ -77,10 +77,10 @@ public class XFormsModelBinds {
      */
     public void rebuild(PipelineContext pipelineContext) {
         // Reset everything
+        contextStack.resetBindingContext(pipelineContext, model);
         topLevelBinds.clear();
         singleNodeContextBinds.clear();
         iterationsForContextNodeInfo.clear();
-        contextStack.resetBindingContext(pipelineContext, model);
         offlineBinds.clear();
         variableNamesToIds.clear();
 

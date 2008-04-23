@@ -835,6 +835,9 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         binds.rebuild(pipelineContext);
         // TODO: rebuild computational dependency data structures
 
+        // Controls may have @bind or xxforms:bind() references, so we need to mark them as dirty. Will need dependencies for controls to fix this.
+        containingDocument.getXFormsControls().markDirtySinceLastRequest();
+
         // "Actions that directly invoke rebuild, recalculate, revalidate, or refresh always
         // have an immediate effect, and clear the corresponding flag."
         if (deferredActionContext != null)

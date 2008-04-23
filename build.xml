@@ -75,7 +75,7 @@
         <include name="jtidy-8.0-20060801.131059-3.jar"/>
         <!--<include name="tagsoup-1.1.3.jar"/>-->
         <include name="junit.jar"/>
-        <include name="saxon-8_8_orbeon_20080328.jar"/>
+        <include name="saxon-8_8_orbeon_20080423.jar"/>
         <include name="joost-20030623_orbeon.jar"/>
         <include name="batik-all-1_6.jar"/>
         <include name="avalon-framework-4_2_0.jar"/>

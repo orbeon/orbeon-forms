@@ -56,6 +56,8 @@ var LOADING_MIN_TOP_PADDING_PROPERTY = "loading-min-top-padding";
 var REVISIT_HANDLING_PROPERTY = "revisit-handling";
 var HELP_HANDLER_PROPERTY = "help-handler";
 var HELP_TOOLTIP_PROPERTY = "help-tooltip";
+var OFFLINE_SUPPORT = "offline-support";
+
 var APPLICATION_RESOURCES_VERSION_PROPERTY = "oxf.resources.version-number";
 
 // Parameter defaults
@@ -78,6 +80,8 @@ var XFORMS_LOADING_MIN_TOP_PADDING = 10;
 var XFORMS_REVISIT_HANDLING = "restore";
 var XFORMS_HELP_HANDLER = false;
 var XFORMS_HELP_TOOLTIP = false;
+var XFORMS_OFFLINE_SUPPORT = false;
+
 var APPLICATION_RESOURCES_VERSION = "1.0";
 
 /**
@@ -572,6 +576,7 @@ ORBEON.util.Utils = {
             case LOADING_MIN_TOP_PADDING_PROPERTY: { return XFORMS_LOADING_MIN_TOP_PADDING; }
             case HELP_HANDLER_PROPERTY: { return XFORMS_HELP_HANDLER; }
             case HELP_TOOLTIP_PROPERTY: { return XFORMS_HELP_TOOLTIP; }
+            case OFFLINE_SUPPORT: { return XFORMS_OFFLINE_SUPPORT; }
             }
     	// Neither the property's value was supplied, nor a default value exists for the property
         return null;

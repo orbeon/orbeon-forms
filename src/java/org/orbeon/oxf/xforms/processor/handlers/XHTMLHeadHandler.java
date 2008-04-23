@@ -213,6 +213,7 @@ public class XHTMLHeadHandler extends HandlerBase {
                                 dynamicProperties.put(XFormsProperties.HELP_HANDLER_PROPERTY, Boolean.TRUE);
                             }
                         }
+
                         // Application version
                         {
                             if (isVersionedResources) {
@@ -222,6 +223,11 @@ public class XHTMLHeadHandler extends HandlerBase {
                                     dynamicProperties.put(URLRewriter.RESOURCES_VERSION_NUMBER_PROPERTY, "1.0");
                                 }
                             }
+                        }
+
+                        // Offline mode
+                        if (containingDocument.getStaticState().isHasOfflineSupport()) {
+                            dynamicProperties.put(XFormsProperties.OFFLINE_SUPPORT_PROPERTY, Boolean.TRUE);
                         }
                     }
 

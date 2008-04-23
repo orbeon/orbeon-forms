@@ -83,6 +83,7 @@ public class XFormsProperties {
 
     public static final String HELP_HANDLER_PROPERTY = "help-handler";
     private static final String HELP_TOOLTIP_PROPERTY = "help-tooltip";
+    public static final String OFFLINE_SUPPORT_PROPERTY = "offline-support";
 
     public static class PropertyDefinition {
 
@@ -156,9 +157,9 @@ public class XFormsProperties {
 
             // Properties to propagate to the client
             new PropertyDefinition(SESSION_HEARTBEAT_PROPERTY, true, true),
-            new PropertyDefinition(SESSION_HEARTBEAT_DELAY_PROPERTY, 12 * 60 * 60 * 800, true), // 80 % of 12 hours in ms
-            new PropertyDefinition(FCK_EDITOR_BASE_PATH_PROPERTY, "/ops/fckeditor/", true),
-            new PropertyDefinition(YUI_BASE_PATH_PROPERTY, "/ops/images/yui/", true),
+            new PropertyDefinition(SESSION_HEARTBEAT_DELAY_PROPERTY, 12 * 60 * 60 * 800, true), // dynamic; 80 % of 12 hours in ms
+            new PropertyDefinition(FCK_EDITOR_BASE_PATH_PROPERTY, "/ops/fckeditor/", true),// dynamic
+            new PropertyDefinition(YUI_BASE_PATH_PROPERTY, "/ops/images/yui/", true),// dynamic
             new PropertyDefinition(DELAY_BEFORE_INCREMENTAL_REQUEST_PROPERTY, 500, true),
             new PropertyDefinition(DELAY_BEFORE_FORCE_INCREMENTAL_REQUEST_PROPERTY, 2000, true),
             new PropertyDefinition(DELAY_BEFORE_GECKO_COMMUNICATION_ERROR_PROPERTY, 5000, true),
@@ -171,8 +172,9 @@ public class XFormsProperties {
             new PropertyDefinition(DEBUG_WINDOW_WIDTH_PROPERTY, 300, true),
             new PropertyDefinition(LOADING_MIN_TOP_PADDING_PROPERTY, 10, true),
             new PropertyDefinition(REVISIT_HANDLING_PROPERTY, REVISIT_HANDLING_RESTORE_VALUE, true),
-            new PropertyDefinition(HELP_HANDLER_PROPERTY, false, true),
-            new PropertyDefinition(HELP_TOOLTIP_PROPERTY, false, true)
+            new PropertyDefinition(HELP_HANDLER_PROPERTY, false, true),// dynamic
+            new PropertyDefinition(HELP_TOOLTIP_PROPERTY, false, true),
+            new PropertyDefinition(OFFLINE_SUPPORT_PROPERTY, false, true)// dynamic
     };
 
     private static final Map SUPPORTED_DOCUMENT_PROPERTIES;

@@ -34,6 +34,7 @@ import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.saxon.om.FastStringBuffer;
 import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.Configuration;
 
@@ -94,13 +95,14 @@ public class XFormsStaticState {
     private String repeatHierarchyString;   // contains comma-separated list of space-separated repeat id and ancestor if any
     private Map itemsInfoMap;               // Map<String, ItemsInfo> of control id to ItemsInfo
     private Map controlClasses;             // Map<String, String> of control id to class
+    private boolean hasOfflineSupport;      // whether the document requires offline support
 
-    private static final HashMap XFORMS_NAMESPACE_MAPPINGS = new HashMap();
+    private static final HashMap BASIC_NAMESPACE_MAPPINGS = new HashMap();
     static {
-        XFORMS_NAMESPACE_MAPPINGS.put(XFormsConstants.XFORMS_PREFIX, XFormsConstants.XFORMS_NAMESPACE_URI);
-        XFORMS_NAMESPACE_MAPPINGS.put(XFormsConstants.XXFORMS_PREFIX, XFormsConstants.XXFORMS_NAMESPACE_URI);
-        XFORMS_NAMESPACE_MAPPINGS.put(XFormsConstants.XML_EVENTS_PREFIX, XFormsConstants.XML_EVENTS_NAMESPACE_URI);
-        XFORMS_NAMESPACE_MAPPINGS.put(XMLConstants.XHTML_PREFIX, XMLConstants.XHTML_NAMESPACE_URI);
+        BASIC_NAMESPACE_MAPPINGS.put(XFormsConstants.XFORMS_PREFIX, XFormsConstants.XFORMS_NAMESPACE_URI);
+        BASIC_NAMESPACE_MAPPINGS.put(XFormsConstants.XXFORMS_PREFIX, XFormsConstants.XXFORMS_NAMESPACE_URI);
+        BASIC_NAMESPACE_MAPPINGS.put(XFormsConstants.XML_EVENTS_PREFIX, XFormsConstants.XML_EVENTS_NAMESPACE_URI);
+        BASIC_NAMESPACE_MAPPINGS.put(XMLConstants.XHTML_PREFIX, XMLConstants.XHTML_NAMESPACE_URI);
     }
 
     /**
@@ -488,7 +490,8 @@ public class XFormsStaticState {
             repeatChildrenMap = new HashMap();
             repeatDescendantsMap = new HashMap();
 
-            final DocumentWrapper controlsDocumentInfo = new DocumentWrapper(controlsDocument, null, new Configuration());
+            final Configuration xpathConfiguration = new Configuration();
+            final DocumentWrapper controlsDocumentInfo = new DocumentWrapper(controlsDocument, null, xpathConfiguration);
 
             // Iterate over static controls tree
             final FastStringBuffer repeatHierarchyStringBuffer = new FastStringBuffer(1024);
@@ -588,7 +591,7 @@ public class XFormsStaticState {
                         // Try to figure out if we have dynamic items. This attempts to cover all cases, including
                         // nested xforms:output controls.
                         final boolean hasNonStaticItem = ((Boolean) XPathCache.evaluateSingle(pipelineContext, controlNodeInfo,
-                                "exists(.//xforms:*[@ref or @nodeset or @bind or @value])", XFORMS_NAMESPACE_MAPPINGS,
+                                "exists(.//xforms:*[@ref or @nodeset or @bind or @value])", BASIC_NAMESPACE_MAPPINGS,
                                 null, null, null, null, locationData)).booleanValue();
 
                         // Remember information
@@ -611,12 +614,12 @@ public class XFormsStaticState {
                 // NOTE: We attempt to localize what triggers can cause, upon DOMActivate, xxforms:online and xxforms:offline actions
                 final List onlineTriggerIds = XPathCache.evaluate(pipelineContext, controlsDocumentInfo,
                     "for $handler in for $online in //xxforms:online return ($online/ancestor-or-self::*[@ev:event and tokenize(@ev:event, '\\s+') = 'DOMActivate'])[1]" +
-                    "   return for $id in $handler/../descendant-or-self::xforms:trigger/@id return string($id)", XFORMS_NAMESPACE_MAPPINGS,
+                    "   return for $id in $handler/../descendant-or-self::xforms:trigger/@id return string($id)", BASIC_NAMESPACE_MAPPINGS,
                     null, null, null, null, locationData);
 
                 final List offlineTriggerIds = XPathCache.evaluate(pipelineContext, controlsDocumentInfo,
                     "for $handler in for $online in //xxforms:offline return ($online/ancestor-or-self::*[@ev:event and tokenize(@ev:event, '\\s+') = 'DOMActivate'])[1]" +
-                    "   return for $id in $handler/../descendant-or-self::xforms:trigger/@id return string($id)", XFORMS_NAMESPACE_MAPPINGS,
+                    "   return for $id in $handler/../descendant-or-self::xforms:trigger/@id return string($id)", BASIC_NAMESPACE_MAPPINGS,
                     null, null, null, null, locationData);
 
                 for (Iterator i = onlineTriggerIds.iterator(); i.hasNext();) {
@@ -627,6 +630,23 @@ public class XFormsStaticState {
                 for (Iterator i = offlineTriggerIds.iterator(); i.hasNext();) {
                     final String currentId = (String) i.next();
                     addClasses(currentId, "xxforms-offline");
+                }
+
+                {
+                    // Create list of all the documents to search
+                    final List documentInfos = new ArrayList(modelDocuments.size() + 1);
+                    for (Iterator i = modelDocuments.iterator(); i.hasNext();) {
+                        documentInfos.add(new DocumentWrapper((Document) i.next(), null, xpathConfiguration));
+                    }
+                    documentInfos.add(controlsDocumentInfo);
+
+                    // Search for xxforms:offline which are not within instances
+                    for (Iterator i = documentInfos.iterator(); i.hasNext();) {
+                        final DocumentInfo currentDocumentInfo = (DocumentInfo) i.next();
+                        hasOfflineSupport |= ((Boolean) XPathCache.evaluateSingle(pipelineContext, currentDocumentInfo,
+                            "exists(//xxforms:offline[not(ancestor::xforms:instance)])", BASIC_NAMESPACE_MAPPINGS,
+                            null, null, null, null, locationData)).booleanValue();
+                    }
                 }
             }
 
@@ -656,6 +676,10 @@ public class XFormsStaticState {
         } else {
             return false;
         }
+    }
+
+    public boolean isHasOfflineSupport() {
+        return hasOfflineSupport;
     }
 
     private void addClasses(String controlId, String classes) {

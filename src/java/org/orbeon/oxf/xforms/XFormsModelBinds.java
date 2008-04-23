@@ -605,13 +605,12 @@ public class XFormsModelBinds {
             {
                 this.nodeset = contextStack.getCurrentNodeset();
                 final int nodesetSize = nodeset.size();
-                final boolean isNewSingleNodeContext = isSingleNodeContext && nodesetSize == 1;
 
                 // "4.7.2 References to Elements within a bind Element [...] If a target bind element is outermost, or if
                 // all of its ancestor bind elements have nodeset attributes that select only one node, then the target bind
                 // only has one associated bind object, so this is the desired target bind object whose nodeset is used in
                 // the Single Node Binding or Node Set Binding"
-                if (isNewSingleNodeContext)
+                if (isSingleNodeContext)
                     singleNodeContextBinds.put(id, this);
 
                 final List childElements = bindElement.elements(new QName("bind", XFormsConstants.XFORMS_NAMESPACE));
@@ -624,6 +623,7 @@ public class XFormsModelBinds {
                         contextStack.pushIteration(currentPosition);
                         {
                             // Create iteration and remember it
+                            final boolean isNewSingleNodeContext = isSingleNodeContext && nodesetSize == 1;
                             final BindIteration currentBindIteration = new BindIteration(pipelineContext, isNewSingleNodeContext, childElements);
                             childrenIterations.add(currentBindIteration);
 

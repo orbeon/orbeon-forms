@@ -712,14 +712,11 @@ ORBEON.xforms.Document = {
                 // Load the form in the iframe
                 ORBEON.xforms.Offline.loadFormInIframe(url, function(offlineIframe) {
                     // Send offline event to the server
-                    console.log("offlineIframe", offlineIframe);
                     offlineIframe.contentWindow.ORBEON.xforms.Document.dispatchEvent("$containing-document$", "xxforms-offline");
                     // Wait for the form to be marked as offline before we call the listener
                     var takingFormOfflineIntervalID = window.setInterval(function() {
-                        console.log("Form still not offline");
                         if (! offlineIframe.contentWindow.ORBEON.xforms.Offline.isOnline) {
                             window.clearInterval(takingFormOfflineIntervalID);
-                            console.log("Now really offline");
                             // Calling listener to notify that the form is now completely offline
                             if (formOfflineListener)
                                 formOfflineListener(offlineIframe.contentWindow);

@@ -21,6 +21,7 @@
         xmlns:oxf="http://www.orbeon.com/oxf/processors"
         xmlns:xi="http://www.w3.org/2001/XInclude"
         xmlns:xforms="http://www.w3.org/2002/xforms"
+        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
         xmlns:ev="http://www.w3.org/2001/xml-events">
 
     <!-- Search instance -->
@@ -41,7 +42,7 @@
                                                 concat(/*/query[1],
                                                        string-join(for $query in /*/query[position() gt 1]
                                                          return concat('&amp;path=', encode-for-uri($query/@path), '&amp;value=', $query), ''))
-                                            }&amp;sort-key={/*/sort-key}" replace="instance">
+                                            }&amp;sort-key={/*/sort-key}&amp;lang={/*/lang}" replace="instance">
                 <!-- Move resulting <document> element as root element -->
                 <xforms:insert ev:event="xforms-submit-done" nodeset="/*" origin="/*/*[1]"/>
                 <!-- Copy eXist error -->

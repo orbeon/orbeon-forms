@@ -44,8 +44,8 @@
                 <metadata>
                     <application-name/>
                     <form-name/>
-                    <title/>
-                    <description/>
+                    <title xml:lang="en"/>
+                    <description xml:lang="en"/>
                     <author/>
                     <logo mediatype="" filename="" size=""/>
                 </metadata>

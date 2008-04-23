@@ -329,12 +329,19 @@
     <!-- Languages toolbox -->
     <xhtml:div class="fb-toolbox">
         <xforms:group class="fb-language-choice fb-hide-alert">
-            <xforms:select1 appearance="minimal" ref="$lang" id="fb-resources-language-select">
+            <xforms:select1 appearance="minimal" ref="$fb-lang" id="fb-resources-language-select">
                 <xforms:label>Resources Language</xforms:label>
                 <xforms:itemset nodeset="$resources/resource">
                     <xforms:label value="xxforms:instance('fr-languages-instance')/language[@code = context()/@xml:lang]/(if (@native-name != @english-name) then concat(@native-name, ' (', @english-name, ')') else @native-name)"/>
                     <xforms:value ref="@xml:lang"/>
                 </xforms:itemset>
+                <!-- Force RRR when the value changes. The value change doesn't cause a rebuild, therefore the binds don't update. -->
+                <xforms:action ev:event="xforms-value-changed">
+                    <xforms:rebuild model="fr-form-model"/>
+                    <xforms:recalculate model="fr-form-model"/>
+                    <xforms:revalidate model="fr-form-model"/>
+                    <xforms:refresh model="fr-form-model"/>
+                </xforms:action>
             </xforms:select1>
             <xforms:group class="fb-language-triggers">
                 <xforms:trigger appearance="minimal">
@@ -347,15 +354,22 @@
                         <!-- Ask confirmation -->
                         <xforms:setvalue ref="$variables/confirmation-message"
                                          value="concat('Are you sure you want to delete all resources for language ''',
-                                         xxforms:instance('fr-languages-instance')/language[@code = $lang]/(if (@native-name != @english-name) then concat(@native-name, ' (', @english-name, ')') else @native-name),
+                                         xxforms:instance('fr-languages-instance')/language[@code = $fb-lang]/(if (@native-name != @english-name) then concat(@native-name, ' (', @english-name, ')') else @native-name),
                                          '''?')"/>
                         <xforms:setvalue ref="$variables/confirmation-target">fb-language-remove</xforms:setvalue>
                         <xxforms:show dialog="fb-confirmation-dialog"/>
                     </xforms:action>
                     <xforms:action ev:event="fb-confirmation-yes">
                         <!-- Delete resources for this language -->
-                        <xforms:delete nodeset="$resources/resource[@xml:lang = $lang]"/>
-                        <xforms:setvalue ref="$lang" value="$resources/resource[1]/@xml:lang"/>
+                        <xforms:delete nodeset="$resources/resource[@xml:lang = $fb-lang]"/>
+                        <xforms:delete nodeset="$metadata-instance/title[@xml:lang = $fb-lang]"/>
+                        <xforms:delete nodeset="$metadata-instance/description[@xml:lang = $fb-lang]"/>
+                        <xforms:setvalue ref="$fb-lang" value="$resources/resource[1]/@xml:lang"/>
+
+                        <!-- Force RRR when the value changes. The value change doesn't cause a rebuild, therefore the binds don't update. -->
+                        <xforms:rebuild model="fr-form-model"/>
+                        <xforms:recalculate model="fr-form-model"/>
+                        <xforms:revalidate model="fr-form-model"/>
                     </xforms:action>
                 </xforms:trigger>
             </xforms:group>

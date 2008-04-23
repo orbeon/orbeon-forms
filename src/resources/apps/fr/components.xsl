@@ -90,6 +90,11 @@
             <xhtml:div id="bd" class="fr-container">
                 <xhtml:div id="yui-main">
                     <xhtml:div class="yui-b">
+                        <xxforms:variable name="metadata-lang" select="xxforms:instance('fr-language-instance')"/>
+                        <!-- title in chosen language or first one if not found -->
+                        <xxforms:variable name="title" select="((instance('fr-form-metadata')/(title[@xml:lang = $metadata-lang], title[1])[1], ({$label/@ref}), '{$label}', /xhtml:html/xhtml:head/xhtml:title)[normalize-space() != ''])[1]"/>
+                        <!-- description in chosen language or first one if not found -->
+                        <xxforms:variable name="description" select="instance('fr-form-metadata')/(description[@xml:lang = $metadata-lang], description[1])[1]"/>
                         <xhtml:div class="yui-g fr-logo">
                             <xsl:choose>
                                 <!-- If custom logo section is provided, use that -->
@@ -105,7 +110,7 @@
                                                 </xhtml:td>
                                                 <xhtml:td>
                                                     <xhtml:h1>
-                                                        <xforms:output value="((instance('fr-form-metadata')/title, ({$label/@ref}), '{$label}', /xhtml:html/xhtml:head/xhtml:title)[normalize-space() != ''])[1]"/>
+                                                        <xforms:output value="$title"/>
                                                     </xhtml:h1>
                                                 </xhtml:td>
                                             </xhtml:tr>
@@ -117,11 +122,11 @@
                         <xhtml:div class="yui-g fr-separator">&#160;</xhtml:div>
                         <xhtml:div class="yui-g fr-body">
                             <!-- Optional description-->
-                            <xforms:group model="fr-form-model" ref=".[normalize-space(instance('fr-form-metadata')/description) != '']">
+                            <xforms:group model="fr-form-model" ref=".[normalize-space($description) != '']">
                                 <xforms:switch>
                                     <xforms:case id="fr-form-description-case-on">
                                         <xhtml:div class="fr-form-description">
-                                            <xforms:output value="instance('fr-form-metadata')/description"/>
+                                            <xforms:output value="$description"/>
                                             <xforms:trigger appearance="minimal" class="fr-close">
                                                 <xforms:label>[close]</xforms:label>
                                                 <xforms:toggle ev:event="DOMActivate" case="fr-form-description-case-off"/>

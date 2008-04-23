@@ -38,6 +38,7 @@
                                 <xforms:label>[Select...]</xforms:label>
                                 <xforms:value/>
                             </xforms:item>
+                            <!-- All the languages except the languages already selected -->
                             <xforms:itemset model="fr-resources-model"
                                             nodeset="instance('fr-languages-instance')/language[not(@exclude = 'true') and not(@code = $resources/resource/@xml:lang)]">
                                 <xforms:label value="if (@native-name != @english-name) then concat(@native-name, ' (', @english-name, ')') else @native-name"/>
@@ -51,9 +52,24 @@
                 <xforms:trigger class="fr-inplace-rename" ref="$variables/new-language-trigger">
                     <xforms:label>Add</xforms:label>
                     <xforms:action ev:event="DOMActivate">
-                        <xforms:insert context="$resources" nodeset="resource" origin="resource[1]"/>
-                        <xforms:setvalue ref="$resources/resource[last()]/@xml:lang" value="$variables/new-language"/>
-                        <xforms:setvalue ref="$lang" value="$variables/new-language"/>
+                        <!-- Copy first resources into new resources and set new language -->
+                        <xforms:action context="$resources">
+                            <xforms:insert context="." nodeset="resource" origin="resource[1]"/>
+                            <xforms:setvalue ref="resource[last()]/@xml:lang" value="$variables/new-language"/>
+                        </xforms:action>
+                        <!-- Copy form metadata and set new language -->
+                        <xforms:action context="$metadata-instance">
+                            <xforms:insert context="." nodeset="title | description" origin="title[1] | description[1]"/>
+                            <xforms:setvalue ref="title[last()]/@xml:lang" value="$variables/new-language"/>
+                            <xforms:setvalue ref="description[last()]/@xml:lang" value="$variables/new-language"/>
+                        </xforms:action>
+                        <!-- Change current language -->
+                        <xforms:setvalue ref="$fb-lang" value="$variables/new-language"/>
+
+                        <!-- Force RRR when the value changes. The value change doesn't cause a rebuild, therefore the binds don't update. -->
+                        <xforms:rebuild model="fr-form-model"/>
+                        <xforms:recalculate model="fr-form-model"/>
+                        <xforms:revalidate model="fr-form-model"/> 
                     </xforms:action>
                 </xforms:trigger>
                 or

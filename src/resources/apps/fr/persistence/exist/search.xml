@@ -35,6 +35,8 @@
         let $decision := request:get-parameter('decision', '')
         let $path := request:get-parameter('path', '')
         let $value := request:get-parameter('value', '')
+        (: Special language variable used for now by Form Builder :)
+        let $fb-lang := request:get-parameter('lang', 'en')
 
         (: Count total number of results, independently from paging :)
         let $search-total := count(for $resource in collection()

@@ -42,14 +42,14 @@
     </xforms:action>
 
     <!-- Variable pointing to the current language -->
-    <xxforms:variable name="lang" select="instance('fb-language-instance')"/>
+    <xxforms:variable name="fb-lang" select="instance('fb-language-instance')"/>
 
     <!-- Other variables -->
     <xxforms:variable name="model" select="xhtml:head/xforms:model[@id = 'fr-form-model']"/>
     <xxforms:variable name="form-instance" select="$model/xforms:instance[@id = 'fr-form-instance']/*"/>
     <xxforms:variable name="metadata-instance" select="$model/xforms:instance[@id = 'fr-form-metadata']/*"/>
     <xxforms:variable name="resources" select="$model/xforms:instance[@id = 'fr-form-resources']/*"/>
-    <xxforms:variable name="current-resources" select="$resources/resource[@xml:lang = $lang]"/>
+    <xxforms:variable name="current-resources" select="$resources/resource[@xml:lang = $fb-lang]"/>
     <xxforms:variable name="body" select="xhtml:body/fr:view/fr:body"/>
 
     <xxforms:variable name="current-top-level-block" select="$body/fr:*[index('fb-top-level-repeat')]"/>
@@ -66,11 +66,9 @@
         <!-- Form metadata (also used by Form Runner) -->
         <xforms:bind nodeset="xhtml:head/xforms:model[@id = 'fr-form-model']/xforms:instance[@id = 'fr-form-metadata']/*">
             <xforms:bind id="application-name-bind" nodeset="application-name" required="true()" type="xs:NCName" readonly="false()"/>
-            <!-- calculate="if (normalize-space() = '') then concat('ID', digest(string(random(true)), 'MD5', 'hex')) else ." -->
             <xforms:bind id="form-name-bind" nodeset="form-name" required="true()" type="xs:NCName" readonly="false()"/>
-            <!-- calculate="if (normalize-space() = '') then concat('ID', digest(string(random(true)), 'MD5', 'hex')) else ." -->
-            <xforms:bind id="title-bind" nodeset="title" required="true()"/>
-            <xforms:bind id="description-bind" nodeset="description"/>
+            <xforms:bind id="title-bind" nodeset="title[@xml:lang = $fb-lang]" required="true()"/>
+            <xforms:bind id="description-bind" nodeset="description[@xml:lang = $fb-lang]"/>
             <xforms:bind id="logo-bind" nodeset="logo" type="xs:anyURI"/>
         </xforms:bind>
         <!-- Global attachments (also used by Form Runner) -->

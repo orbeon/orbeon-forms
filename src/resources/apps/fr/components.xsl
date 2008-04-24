@@ -249,6 +249,7 @@
                                                           replay them when the form is first loaded offline -->
                                                     <!--<fr:take-offline/>-->
                                                     <!--<fr:take-online/>-->
+                                                    <!--<fr:save-offline/>-->
                                                     <fr:save-locally-button/>
                                                     <fr:save-button/>
                                                 </fr:buttons>
@@ -386,6 +387,16 @@
                 <xhtml:span><xforms:output value="$fr-resources/detail/labels/online"/></xhtml:span>
             </xforms:label>
             <xxforms:online ev:event="DOMActivate"/>
+        </xforms:trigger>
+    </xsl:template>
+
+    <xsl:template match="fr:save-offline">
+        <xforms:trigger id="save-offline-button" ref="if (xxforms:instance('fr-offline-instance')/is-online = 'false') then . else ()" class="xxforms-save-offline">
+            <xforms:label>
+                <xhtml:img src="/apps/fr/style/save.gif" alt=""/>
+                <xhtml:span><xforms:output value="$fr-resources/detail/labels/save-offline"/></xhtml:span>
+            </xforms:label>
+            <!--<xxforms:save-offline ev:event="DOMActivate"/>-->
         </xforms:trigger>
     </xsl:template>
 

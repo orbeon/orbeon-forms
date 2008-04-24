@@ -29,7 +29,12 @@ public class XFormsFeatures {
             new FeatureConfig("menu", "select1", XFormsSelect1Control.MENU_APPEARANCE),
             new FeatureConfig("autocomplete", "select1", XFormsSelect1Control.AUTOCOMPLETE_APPEARANCE),
             new FeatureConfig("htmlarea", "textarea", "text/html"),
-            new FeatureConfig("dialog", "dialog")
+            new FeatureConfig("dialog", "dialog"),
+            new FeatureConfig("offline") {
+                public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
+                    return containingDocument.getStaticState().isHasOfflineSupport();
+                }
+            }
     };
     
     public static class FeatureConfig {
@@ -37,6 +42,10 @@ public class XFormsFeatures {
 //        private String id;
         private String[] controlNames;
         private String[] controlAppearanceOrMediatypes;
+
+        public FeatureConfig(String name) {
+            this(name, (String[]) null, (String[]) null);
+        }
 
         public FeatureConfig(String name, String controlName) {
             this(name, new String[] { controlName }, (String[]) null);
@@ -66,7 +75,7 @@ public class XFormsFeatures {
             return name;
         }
 
-        public boolean isInUse(Map appearancesMap) {
+        public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
             if (controlAppearanceOrMediatypes != null && controlAppearanceOrMediatypes.length > 0) {
                 // Test by control name and appearance/mediatype
                 for (int i = 0; i < controlNames.length; i++) {
@@ -102,19 +111,19 @@ public class XFormsFeatures {
             new ResourceConfig("/ops/css/yui/container.css", null),
             // Yahoo! UI Library
             new ResourceConfig("/ops/css/yui/tree.css", null) {
-                public boolean isInUse(Map appearancesMap) {
+                public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
                     return isTreeInUse(appearancesMap);
                 }
                 public String getFeatureName() { return "tree"; }
             },
             new ResourceConfig("/ops/css/yui/tree-check.css", null) {
-                public boolean isInUse(Map appearancesMap) {
+                public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
                     return isTreeInUse(appearancesMap);
                 }
                 public String getFeatureName() { return "tree"; }
             },
             new ResourceConfig("/ops/css/yui/menu.css", null) {
-                public boolean isInUse(Map appearancesMap) {
+                public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
                     return isMenuInUse(appearancesMap);
                 }
                 public String getFeatureName() { return "menu"; }
@@ -139,7 +148,12 @@ public class XFormsFeatures {
             new ResourceConfig("/ops/javascript/jscalendar/calendar-setup.js", "/ops/javascript/jscalendar/calendar-setup-min.js"),// our min version
             // Yahoo UI Library
             new ResourceConfig("/ops/javascript/yui/yahoo.js", "/ops/javascript/yui/yahoo-min.js"),
-            new ResourceConfig("/ops/javascript/yui/selector-beta.js", "/ops/javascript/yui/selector-beta-min.js"),
+            new ResourceConfig("/ops/javascript/yui/selector-beta.js", "/ops/javascript/yui/selector-beta-min.js") {
+                public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
+                    return containingDocument.getStaticState().isHasOfflineSupport();
+                }
+                public String getFeatureName() { return "offline"; }
+            },
             new ResourceConfig("/ops/javascript/yui/event.js", "/ops/javascript/yui/event-min.js"),
             new ResourceConfig("/ops/javascript/yui/dom.js", "/ops/javascript/yui/dom-min.js"),
             new ResourceConfig("/ops/javascript/yui/connection.js", "/ops/javascript/yui/connection-min.js"),
@@ -147,51 +161,51 @@ public class XFormsFeatures {
             new ResourceConfig("/ops/javascript/yui/dragdrop.js", "/ops/javascript/yui/dragdrop-min.js"),
             new ResourceConfig("/ops/javascript/yui/container.js", "/ops/javascript/yui/container-min.js"),
             new ResourceConfig("/ops/javascript/yui/slider.js", "/ops/javascript/yui/slider-min.js") {
-                public boolean isInUse(Map appearancesMap) {
+                public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
                     return isRangeInUse(appearancesMap);
                 }
                 public String getFeatureName() { return "range"; }
             },
             new ResourceConfig("/ops/javascript/yui/treeview.js", "/ops/javascript/yui/treeview-min.js") {
-                public boolean isInUse(Map appearancesMap) {
+                public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
                     return isTreeInUse(appearancesMap);
                 }
                 public String getFeatureName() { return "tree"; }
             },
             new ResourceConfig("/ops/javascript/yui/treeview-tasknode.js", null) {
-                public boolean isInUse(Map appearancesMap) {
+                public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
                     return isTreeInUse(appearancesMap);
                 }
                 public String getFeatureName() { return "tree"; }
             },
             new ResourceConfig("/ops/javascript/yui/treeview-checkonclicknode.js", null) {
-                public boolean isInUse(Map appearancesMap) {
+                public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
                     return isTreeInUse(appearancesMap);
                 }
                 public String getFeatureName() { return "tree"; }
             },
             new ResourceConfig("/ops/javascript/yui/menu.js", "/ops/javascript/yui/menu-min.js") {
-                public boolean isInUse(Map appearancesMap) {
+                public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
                     return isMenuInUse(appearancesMap);
                 }
                 public String getFeatureName() { return "menu"; }
             },
             // HTML area
             new ResourceConfig("/ops/fckeditor/fckeditor.js", null) {
-                public boolean isInUse(Map appearancesMap) {
+                public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
                     return isHtmlAreaInUse(appearancesMap);
                 }
                 public String getFeatureName() { return "htmlarea"; }
             },
             // Autocomplete
             new ResourceConfig("/ops/javascript/suggest-common.js", "/ops/javascript/suggest-common-min.js") {// our min version
-                public boolean isInUse(Map appearancesMap) {
+                public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
                     return isAutocompleteInUse(appearancesMap);
                 }
                 public String getFeatureName() { return "autocomplete"; }
             },
             new ResourceConfig("/ops/javascript/suggest-actb.js", "/ops/javascript/suggest-actb-min.js") {// our min version
-                public boolean isInUse(Map appearancesMap) {
+                public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
                     return isAutocompleteInUse(appearancesMap);
                 }
                 public String getFeatureName() { return "autocomplete"; }
@@ -216,7 +230,7 @@ public class XFormsFeatures {
             return (tryMinimal && minResource != null) ? minResource : fullResource;
         }
 
-        public boolean isInUse(Map appearancesMap) {
+        public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
             // Default to true but can be overridden
             return true;
         }
@@ -288,7 +302,7 @@ public class XFormsFeatures {
 
             for (int i = 0; i < features.length; i++) {
                 final FeatureConfig currentFeature = features[i];
-                if (currentFeature.isInUse(appearancesMap)) {
+                if (currentFeature.isInUse(containingDocument, appearancesMap)) {
                     sb.append('-');
                     sb.append(currentFeature.getId());
                 }
@@ -301,11 +315,11 @@ public class XFormsFeatures {
         }
     }
 
-    public static List getCSSResources(Map appearancesMap) {
+    public static List getCSSResources(XFormsContainingDocument containingDocument, Map appearancesMap) {
         final List result = new ArrayList();
         for (int i = 0; i < stylesheets.length; i++) {
             final ResourceConfig resourceConfig = stylesheets[i];
-            if (resourceConfig.isInUse(appearancesMap)) {
+            if (resourceConfig.isInUse(containingDocument, appearancesMap)) {
                 // Only include stylesheet if needed
                 result.add(resourceConfig);
             }
@@ -325,11 +339,11 @@ public class XFormsFeatures {
         return result;
     }
 
-    public static List getJavaScriptResources(Map appearancesMap) {
+    public static List getJavaScriptResources(XFormsContainingDocument containingDocument, Map appearancesMap) {
         final List result = new ArrayList();
         for (int i = 0; i < scripts.length; i++) {
             final ResourceConfig resourceConfig = scripts[i];
-            if (resourceConfig.isInUse(appearancesMap)) {
+            if (resourceConfig.isInUse(containingDocument, appearancesMap)) {
                 // Only include script if needed
                 result.add(resourceConfig);
             }

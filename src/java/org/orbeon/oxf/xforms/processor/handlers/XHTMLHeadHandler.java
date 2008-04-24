@@ -61,8 +61,9 @@ public class XHTMLHeadHandler extends HandlerBase {
         final ContentHandlerHelper helper = new ContentHandlerHelper(contentHandler);
         final String prefix = XMLUtils.prefixFromQName(qName); // current prefix for XHTML
 
-        // Gather information about controls appearances
-        final Map appearancesMap = new HashMap();
+        // Gather information about appearances of controls which use Script
+        // Map<String controlName, Map<String appearanceOrMediatype, List<String effectiveId>>>
+        final Map javaScriptControlsAppearancesMap = new HashMap();
         {
             final XFormsControls xformsControls = containingDocument.getXFormsControls();
             xformsControls.visitAllControls(new XFormsControls.XFormsControlVisitorListener() {
@@ -73,10 +74,10 @@ public class XHTMLHeadHandler extends HandlerBase {
                     // future if some static readonly controls require JS initialization)
                     final boolean hasJavaScriptInitialization = control.hasJavaScriptInitialization() && !control.isStaticReadonly();
                     if (hasJavaScriptInitialization) {
-                        Map listForControlNameMap = (Map) appearancesMap.get(controlName);
+                        Map listForControlNameMap = (Map) javaScriptControlsAppearancesMap.get(controlName);
                         if (listForControlNameMap == null) {
                             listForControlNameMap = new HashMap();
-                            appearancesMap.put(control.getName(), listForControlNameMap);
+                            javaScriptControlsAppearancesMap.put(control.getName(), listForControlNameMap);
                         }
                         final String controlAppearanceOrMediatype;
                         {
@@ -100,7 +101,7 @@ public class XHTMLHeadHandler extends HandlerBase {
         // Create prefix for combined resources if needed
         final boolean isMinimal = XFormsProperties.isMinimalResources(containingDocument);
         final boolean isVersionedResources = URLRewriter.isResourcesVersioned();
-        final String combinedResourcesPrefix = XFormsFeatures.getCombinedResourcesPrefix(containingDocument, appearancesMap, isMinimal, isVersionedResources);
+        final String combinedResourcesPrefix = XFormsFeatures.getCombinedResourcesPrefix(containingDocument, javaScriptControlsAppearancesMap, isMinimal, isVersionedResources);
 
         final boolean isCombineResources = XFormsProperties.isCombinedResources(containingDocument);
         final boolean isCacheCombinedResources = isCombineResources && XFormsProperties.isCacheCombinedResources();
@@ -124,12 +125,12 @@ public class XHTMLHeadHandler extends HandlerBase {
             if (isCacheCombinedResources) {
                 // Attempt to cache combined resources
                 // Do it at this point so that deployments using an HTTP server front-end can access the resource on disk directly
-                final List resources = XFormsFeatures.getCSSResources(appearancesMap);
+                final List resources = XFormsFeatures.getCSSResources(containingDocument, javaScriptControlsAppearancesMap);
                 final long combinedLastModified = XFormsResourceServer.computeCombinedLastModified(resources, isMinimal);
                 XFormsResourceServer.cacheResources(resources, pipelineContext, combinedResourceName, combinedLastModified, true, isMinimal);
             }
         } else {
-            for (Iterator i = XFormsFeatures.getCSSResources(appearancesMap).iterator(); i.hasNext();) {
+            for (Iterator i = XFormsFeatures.getCSSResources(containingDocument, javaScriptControlsAppearancesMap).iterator(); i.hasNext();) {
                 final XFormsFeatures.ResourceConfig resourceConfig = (XFormsFeatures.ResourceConfig) i.next();
                 // Only include stylesheet if needed
                 attributesImpl.clear();
@@ -153,13 +154,13 @@ public class XHTMLHeadHandler extends HandlerBase {
                 if (isCacheCombinedResources) {
                     // Attempt to cache combined resources
                     // Do it at this point so that deployments using an HTTP server front-end can access the resource on disk directly
-                    final List resources = XFormsFeatures.getJavaScriptResources(appearancesMap);
+                    final List resources = XFormsFeatures.getJavaScriptResources(containingDocument, javaScriptControlsAppearancesMap);
                     final long combinedLastModified = XFormsResourceServer.computeCombinedLastModified(resources, isMinimal);
                     XFormsResourceServer.cacheResources(resources, pipelineContext, combinedResourceName, combinedLastModified, false, isMinimal);
                 }
 
             } else {
-                for (Iterator i = XFormsFeatures.getJavaScriptResources(appearancesMap).iterator(); i.hasNext();) {
+                for (Iterator i = XFormsFeatures.getJavaScriptResources(containingDocument, javaScriptControlsAppearancesMap).iterator(); i.hasNext();) {
                     final XFormsFeatures.ResourceConfig resourceConfig = (XFormsFeatures.ResourceConfig) i.next();
                     // Only include stylesheet if needed
 
@@ -336,10 +337,10 @@ public class XHTMLHeadHandler extends HandlerBase {
                         "type", "text/javascript"});
 
                 // Produce JSON output
-                if (appearancesMap.size() > 0) {
+                if (javaScriptControlsAppearancesMap.size() > 0) {
                     final FastStringBuffer sb = new FastStringBuffer("var opsXFormsControls = {\"controls\":{");
 
-                    for (Iterator i = appearancesMap.entrySet().iterator(); i.hasNext();) {
+                    for (Iterator i = javaScriptControlsAppearancesMap.entrySet().iterator(); i.hasNext();) {
                         final Map.Entry currentEntry1 = (Map.Entry) i.next();
                         final String controlName = (String) currentEntry1.getKey();
                         final Map controlMap = (Map) currentEntry1.getValue();

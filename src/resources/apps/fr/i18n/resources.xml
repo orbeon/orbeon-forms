@@ -60,6 +60,7 @@
             <labels>
                 <save-document>Save Document</save-document>
                 <save-locally>Save Locally</save-locally>
+                <save-offline>Save Offline</save-offline>
                 <return>Back to Forms</return>
                 <discard>Forget Changes</discard>
                 <language-choice>Language</language-choice>
@@ -128,6 +129,7 @@
             <labels>
                 <save-document>Sauvegarder</save-document>
                 <save-locally>Sauvegarde Locale</save-locally>
+                <save-offline>Sauvegarde Or-ligne</save-offline>
                 <return>Retour</return>
                 <discard>Ignorer Changements</discard>
                 <language-choice>Langue</language-choice>
@@ -196,6 +198,7 @@
             <labels>
                 <save-document>Guardar Documento</save-document>
                 <save-locally>Guardar Localmente</save-locally>
+                <save-offline>Guardar Sin conexión</save-offline>
                 <return>Volver a las formas</return>
                 <discard>Olvídese de los cambios</discard>
                 <language-choice>Idioma</language-choice>

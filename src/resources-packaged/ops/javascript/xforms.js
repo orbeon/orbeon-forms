@@ -704,7 +704,7 @@ ORBEON.xforms.Document = {
         ORBEON.xforms.Offline.init();
         var formLoadingComplete = false;
         // We first capture the form
-        ORBEON.xforms.Offline.formStore.capture(window.location.href, function (url, success, captureId) {
+        ORBEON.xforms.Offline.formStore.capture(url, function (url, success, captureId) {
             // When capture is done, set a flag.
             // We need to resort to this trick because the code here does not run the same context and setting src
             // attribute on the iframe would otherwise fail.
@@ -740,8 +740,8 @@ ORBEON.xforms.Document = {
      */
     takeOnlineFromSummary: function(url, formOnlineListener) {
         ORBEON.xforms.Offline.loadFormInIframe(url, function(offlineIframe) {
-            offlineIframe.contentWindow.ORBEON.xforms.Offline.takeOnline();
             offlineIframe.contentWindow.ORBEON.xforms.Document.dispatchEvent("$containing-document$", "xxforms-online");
+            offlineIframe.contentWindow.ORBEON.xforms.Offline.takeOnline();
             if (formOnlineListener)
                 formOnlineListener(offlineIframe.contentWindow);
         });
@@ -1600,6 +1600,11 @@ ORBEON.xforms.Events = {
             } else  if ((ORBEON.util.Dom.hasClass(target, "xforms-trigger") || ORBEON.util.Dom.hasClass(target, "xforms-submit"))) {
                 // Click on trigger
                 YAHOO.util.Event.preventDefault(event);
+                if (ORBEON.util.Dom.hasClass(target, "xxforms-save-offline")) {
+                    // This is a trigger take commits the data changed so far in Gears
+                    ORBEON.xforms.Offline.storeEvents(ORBEON.xforms.Offline.memoryOfflineEvents);
+                    ORBEON.xforms.Offline.memoryOfflineEvents = [];
+                }
                 if (ORBEON.util.Dom.hasClass(target, "xxforms-online")) {
                     // This is a trigger take takes the form back online
                     ORBEON.xforms.Offline.takeOnline();
@@ -2663,7 +2668,7 @@ ORBEON.xforms.Server = {
 
     fireEvents: function(events, incremental) {
         if (! ORBEON.xforms.Offline.isOnline) {
-            ORBEON.xforms.Offline.storeEvents(events, incremental);
+            ORBEON.xforms.Offline.memoryOfflineEvents = ORBEON.xforms.Offline.memoryOfflineEvents.concat(events);
         } else {
             // Store the time of the first event to be sent in the queue
             var currentTime = new Date().getTime();
@@ -4079,6 +4084,7 @@ ORBEON.xforms.Offline = {
     hasGears: false,                 // True if Gears is installed
     gearsDatabase: null,             // The Gears SQL database
     formStore: null,                 // The Gears ResourceStore
+    memoryOfflineEvents: [],         // Holds events happening offline before they are commited to Gears
 
     /**
      * A failed (so far) attempt at trying to figure out if Gears is available and usable by this web application
@@ -4165,7 +4171,7 @@ ORBEON.xforms.Offline = {
             database.open("orbeon.xforms");
             database.execute("create table if not exists Events" +
                              " (url text, form text, targetId text, otherId text, value text, eventName text, bubbles integer, " +
-                             "  cancelable integer, ignoreErrors integer, incremental integer)").close();
+                             "  cancelable integer, ignoreErrors integer)").close();
             database.execute("create table if not exists Offline_Forms (url text, event_response text, form_id text, static_state text, dynamic_state text)").close();
 
             // Create form store
@@ -4255,8 +4261,6 @@ ORBEON.xforms.Offline = {
         ORBEON.xforms.Globals.formStaticState[formID].value = resultSet.fieldByName("static_state");
 
         // Prepare array with all the events that happened since the form was taken offline
-        // Just one event with incremental set to false wil be enough for all the events to be sent right away
-        var incremental = true;
         // Get all events from the database to create events array
         var resultSet = ORBEON.xforms.Offline.gearsDatabase.execute("select * from Events where url = ?", [window.location.href]);
         var events = [];
@@ -4271,8 +4275,6 @@ ORBEON.xforms.Offline = {
                     resultSet.fieldByName("cancelable") == 1,
                     resultSet.fieldByName("ignoreErrors") == 1
                     ));
-            if (resultSet.fieldByName("incremental") == 0)
-                incremental = false;
             resultSet.next();
         }
         resultSet.close();
@@ -4282,7 +4284,7 @@ ORBEON.xforms.Offline = {
         ORBEON.xforms.Offline.isOnline = true;
 
         // Send all the events back to the server
-        ORBEON.xforms.Server.fireEvents(events, incremental);
+        ORBEON.xforms.Server.fireEvents(events, false);
 
         // Remove form from store
         ORBEON.xforms.Offline.formStore.remove(window.location.href);
@@ -4293,13 +4295,13 @@ ORBEON.xforms.Offline = {
     /**
      * Stores the events (which have just been fired) in the store (instead of the sending the events to the server).
      */
-    storeEvents: function(events, incremental) {
+    storeEvents: function(events) {
         ORBEON.xforms.Offline.init();
         for (var eventIndex = 0; eventIndex < events.length; eventIndex++) {
             var event = events[eventIndex];
             // Make sure we have an ID on this form, so we can then retrieve it
             YAHOO.util.Dom.generateId(event.form);
-            ORBEON.xforms.Offline.gearsDatabase.execute("insert into Events values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [
+            ORBEON.xforms.Offline.gearsDatabase.execute("insert into Events values (?, ?, ?, ?, ?, ?, ?, ?, ?)", [
                 window.location.href,
                 event.form.id,
                 event.targetId,
@@ -4308,8 +4310,7 @@ ORBEON.xforms.Offline = {
                 event.eventName,
                 event.bubbles ? 1 : 0,
                 event.cancelable ? 1 : 0,
-                event.ignoreErrors ? 1 : 0,
-                incremental ? 1 : 0
+                event.ignoreErrors ? 1 : 0
             ]).close();
         }
     },

@@ -943,32 +943,44 @@ http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=2
         <a name="compatibility"/>
         <section>
             <title>Compatibility Notes</title>
-            <p>
-                Orbeon Forms 3.6 and earlier allowed using images within <code>xforms:trigger</code> and
-                <code>xforms:submit</code> using a special appearance, <code>xxforms:image</code>, and a nested element,
-                <code>xxforms:img</code>. This has long been deprecated and is now no longer supported. Use instead the
-                <code>minimal</code> appearance. For example, replace the following:
-            </p>
-            <xml-source>
-                <xforms:trigger appearance="xxforms:image">
-                    <xforms:label>Save</xforms:label>
-                    <xxforms:img src="save.png" alt="Save"/>
-                </xforms:trigger>
-            </xml-source>
-            <p>
-                with:
-            </p>
-            <xml-source>
-                <xforms:trigger appearance="minimal">
-                    <xforms:label>
-                        <xhtml:img src="save.png" alt="Save"/>
-                        Save
-                    </xforms:label>
-                </xforms:trigger>
-            </xml-source>
-            <p>
-                Notice how the image is now in the XHTML namespace, and placed within the label of the trigger.
-            </p>
+            <section>
+                <title>Image Triggers</title>
+                <p>
+                    Orbeon Forms 3.6 and earlier allowed using images within <code>xforms:trigger</code> and
+                    <code>xforms:submit</code> using a special appearance, <code>xxforms:image</code>, and a nested element,
+                    <code>xxforms:img</code>. This has long been deprecated and is now no longer supported. Use instead the
+                    <code>minimal</code> appearance. For example, replace the following:
+                </p>
+                <xml-source>
+                    <xforms:trigger appearance="xxforms:image">
+                        <xforms:label>Save</xforms:label>
+                        <xxforms:img src="save.png" alt="Save"/>
+                    </xforms:trigger>
+                </xml-source>
+                <p>
+                    with:
+                </p>
+                <xml-source>
+                    <xforms:trigger appearance="minimal">
+                        <xforms:label>
+                            <xhtml:img src="save.png" alt="Save"/>
+                            Save
+                        </xforms:label>
+                    </xforms:trigger>
+                </xml-source>
+                <p>
+                    Notice how the image is now in the XHTML namespace, and placed within the label of the trigger.
+                </p>
+            </section>
+            <section>
+                <title>Default HTML DOCTYPE</title>
+                <p>
+                    The default HTML DOCTYPE produced by the epilogue has changed from <code>-//W3C//DTD HTML 4.01
+                    Transitional//EN</code> (HTML 4.01 transitional) to <code>-//W3C//DTD HTML 4.01//EN</code> (HTML
+                    4.01 strict). This may have an impact on how your web browser interpets CSS rules.
+                </p>
+            </section>
+
         </section>
     </body>
 </document>

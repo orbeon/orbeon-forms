@@ -237,6 +237,7 @@ public class XFormsModelBinds {
                             mipFound = appendNameValue(sb, mipFound, "relevant", currentBind.getRelevant());
                             mipFound = appendNameValue(sb, mipFound, "readonly", currentBind.getReadonly());
                             mipFound = appendNameValue(sb, mipFound, "required", currentBind.getRequired());
+                            mipFound = appendNameValue(sb, mipFound, "constraint", currentBind.getConstraint());
 
                             sb.append('}');
                         }

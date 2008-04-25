@@ -426,6 +426,8 @@
             <fileset dir="${java-src.dir}">
                 <include name="org/orbeon/oxf/processor/SimpleProcessor.java"/>
                 <include name="org/orbeon/oxf/processor/ProcessorInputOutputInfo.java"/>
+                <include name="org/orbeon/oxf/processor/Processor.java"/>
+                <include name="org/orbeon/oxf/processor/ProcessorImpl.java"/>
                 <include name="org/orbeon/oxf/common/*.java"/>
                 <include name="org/orbeon/oxf/pipeline/api/*.java"/>
                 <include name="org/orbeon/oxf/resources/ResourceManager.java"/>

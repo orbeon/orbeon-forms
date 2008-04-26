@@ -49,6 +49,11 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
+import orbeon.apache.xerces.xni.parser.XMLInputSource;
+import orbeon.apache.xerces.impl.XMLEntityManager;
+import orbeon.apache.xerces.impl.Constants;
+import orbeon.apache.xerces.impl.XMLErrorReporter;
+
 public class XMLUtils {
 
     private static Logger logger = Logger.getLogger(XMLUtils.class);
@@ -256,6 +261,26 @@ public class XMLUtils {
 
     public static boolean isTextContentType(String contentType) {
         return contentType != null && contentType.startsWith(TEXT_CONTENT_TYPE_PREFIX);
+    }
+
+    /**
+     * Given an input stream, return a reader. This performs encoding detection as per the XML spec. Caller must close
+     * the resulting Reader when done.
+     *
+     * @param uri           resource URI (probably unneeded)
+     * @param inputStream   InputStream to process
+     * @return              Reader initialized with the proper encoding
+     * @throws IOException
+     */
+    public static Reader getReaderFromXMLInputStream(String uri, InputStream inputStream) throws IOException {
+        // Create a Xerces XMLInputSource
+        final XMLInputSource inputSource = new XMLInputSource(uri, null, null, inputStream, null);
+        // Obtain encoding from Xerces
+        final XMLEntityManager entityManager = new XMLEntityManager();
+        entityManager.setProperty(Constants.XERCES_PROPERTY_PREFIX + Constants.ERROR_REPORTER_PROPERTY, new XMLErrorReporter());// prevent NPE by providing this
+        entityManager.setupCurrentEntity("[xml]", inputSource, false, true);// the result is the encoding, but we don't use it directly
+
+        return entityManager.getCurrentEntity().reader;
     }
 
     public static class EntityResolver implements org.xml.sax.EntityResolver {

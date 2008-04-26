@@ -40,8 +40,6 @@ import java.util.Collections;
  */
 public class XFormsSubmitErrorEvent extends XFormsSubmitResponseEvent {
 
-    public static final String DEFAULT_TEXT_READING_ENCODING = "iso-8859-1";
-
     private Throwable throwable;
 
     private DocumentInfo bodyDocument;
@@ -73,8 +71,8 @@ public class XFormsSubmitErrorEvent extends XFormsSubmitResponseEvent {
             // Read the whole stream to a temp URI so we can read it more than once if needed
             final String tempURI;
             try {
-                tempURI = NetUtils.inputStreamToAnyURI(pipelineContext, connectionResult.getResultInputStream(), NetUtils.REQUEST_SCOPE);
-                connectionResult.getResultInputStream().close();
+                tempURI = NetUtils.inputStreamToAnyURI(pipelineContext, connectionResult.getResponseInputStream(), NetUtils.REQUEST_SCOPE);
+                connectionResult.getResponseInputStream().close();
             } catch (Exception e) {
                 // Simply can't read the bocy
                 XFormsServer.logger.error("XForms - submission - error while reading response body ", e);
@@ -112,7 +110,7 @@ public class XFormsSubmitErrorEvent extends XFormsSubmitResponseEvent {
                         if (connectionCharset != null)
                             charset = connectionCharset;
                         else
-                            charset = DEFAULT_TEXT_READING_ENCODING;
+                            charset = XFormsModelSubmission.DEFAULT_TEXT_READING_ENCODING;
                     }
                     final InputStream is = new URL(tempURI).openStream();
                     final Reader reader = new InputStreamReader(is, charset);

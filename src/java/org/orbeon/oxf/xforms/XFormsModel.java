@@ -499,9 +499,9 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
                                         // Read result as XML
                                         if (!isReadonlyHint) {
-                                            instanceDocument = TransformerUtils.readDom4j(connectionResult.getResultInputStream(), connectionResult.resourceURI, false);
+                                            instanceDocument = TransformerUtils.readDom4j(connectionResult.getResponseInputStream(), connectionResult.resourceURI, false);
                                         } else {
-                                            instanceDocument = TransformerUtils.readTinyTree(connectionResult.getResultInputStream(), connectionResult.resourceURI, false);
+                                            instanceDocument = TransformerUtils.readTinyTree(connectionResult.getResponseInputStream(), connectionResult.resourceURI, false);
                                         }
                                     } catch (Exception e) {
                                         final LocationData extendedLocationData = new ExtendedLocationData(locationData, "reading external XForms instance (optimized)", instanceContainerElement);
@@ -567,9 +567,9 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
                                             // Read result as XML
                                             if (!isReadonlyHint) {
-                                                instanceDocument = TransformerUtils.readDom4j(connectionResult.getResultInputStream(), connectionResult.resourceURI, false);
+                                                instanceDocument = TransformerUtils.readDom4j(connectionResult.getResponseInputStream(), connectionResult.resourceURI, false);
                                             } else {
-                                                instanceDocument = TransformerUtils.readTinyTree(connectionResult.getResultInputStream(), connectionResult.resourceURI, false);
+                                                instanceDocument = TransformerUtils.readTinyTree(connectionResult.getResponseInputStream(), connectionResult.resourceURI, false);
                                             }
                                         } catch (Exception e) {
                                             final LocationData extendedLocationData = new ExtendedLocationData(locationData, "reading external instance (no resolver)", instanceContainerElement);

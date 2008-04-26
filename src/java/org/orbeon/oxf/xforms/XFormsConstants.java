@@ -103,6 +103,7 @@ public class XFormsConstants {
 
     public static final String XFORMS_SUBMIT_REPLACE_ALL = "all";
     public static final String XFORMS_SUBMIT_REPLACE_INSTANCE = "instance";
+    public static final String XFORMS_SUBMIT_REPLACE_TEXT = "text";
     public static final String XFORMS_SUBMIT_REPLACE_NONE = "none";
 
     public static final String XXFORMS_STATE_HANDLING_ATTRIBUTE_NAME = "state-handling";

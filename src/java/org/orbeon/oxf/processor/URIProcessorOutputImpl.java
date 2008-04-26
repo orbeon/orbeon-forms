@@ -399,7 +399,7 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
                 // Read connection into SAXStore
                 final boolean handleXInclude = false;
                 documentSAXStore = new SAXStore();
-                XMLUtils.inputStreamToSAX(connectionResult.getResultInputStream(), connectionResult.resourceURI, documentSAXStore, false, handleXInclude);
+                XMLUtils.inputStreamToSAX(connectionResult.getResponseInputStream(), connectionResult.resourceURI, documentSAXStore, false, handleXInclude);
 
                 // Obtain last modified
                 lastModified = connectionResult.lastModified;

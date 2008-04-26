@@ -93,9 +93,9 @@ public class XFormsSubmissionUtils {
                 final ExternalContext.RequestDispatcher requestDispatcher = externalContext.getRequestDispatcher(action);
                 final XFormsModelSubmission.ConnectionResult connectionResult = new XFormsModelSubmission.ConnectionResult(effectiveResourceURI) {
                     public void close() {
-                        if (getResultInputStream() != null) {
+                        if (getResponseInputStream() != null) {
                             try {
-                                getResultInputStream().close();
+                                getResponseInputStream().close();
                             } catch (IOException e) {
                                 throw new OXFException("Exception while closing input stream for action: " + action);
                             }
@@ -122,7 +122,7 @@ public class XFormsSubmissionUtils {
                     // use an optimized submission from within a servlet.
                     connectionResult.statusCode = responseAdapter.getResponseCode();
                     connectionResult.responseMediaType = XMLUtils.XML_CONTENT_TYPE;
-                    connectionResult.setResultInputStream(responseAdapter.getInputStream());
+                    connectionResult.setResponseInputStream(responseAdapter.getInputStream());
                     connectionResult.responseHeaders = new HashMap();
                     connectionResult.lastModified = 0;
                 }
@@ -329,9 +329,9 @@ public class XFormsSubmissionUtils {
                     // Create result
                     final XFormsModelSubmission.ConnectionResult connectionResult = new XFormsModelSubmission.ConnectionResult(submissionURL.toExternalForm()) {
                         public void close() {
-                            if (getResultInputStream() != null) {
+                            if (getResponseInputStream() != null) {
                                 try {
-                                    getResultInputStream().close();
+                                    getResponseInputStream().close();
                                 } catch (IOException e) {
                                     throw new OXFException("Exception while closing input stream for action: " + submissionURL);
                                 }
@@ -348,7 +348,7 @@ public class XFormsSubmissionUtils {
                     connectionResult.responseMediaType = (contentType != null) ? NetUtils.getContentTypeMediaType(contentType) : "application/xml";
                     connectionResult.responseHeaders = urlConnection.getHeaderFields();
                     connectionResult.lastModified = urlConnection.getLastModified();
-                    connectionResult.setResultInputStream(urlConnection.getInputStream());
+                    connectionResult.setResponseInputStream(urlConnection.getInputStream());
 
                     return connectionResult;
 

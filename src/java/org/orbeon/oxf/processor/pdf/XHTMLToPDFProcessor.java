@@ -85,7 +85,7 @@ public class XHTMLToPDFProcessor extends HttpBinarySerializer {
                         }
                     });
 
-                    return connectionResult.getResultInputStream();
+                    return connectionResult.getResponseInputStream();
 
                 } catch (IOException e) {
                     throw new OXFException(e);

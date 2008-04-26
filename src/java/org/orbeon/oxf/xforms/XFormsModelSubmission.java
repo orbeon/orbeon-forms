@@ -22,7 +22,9 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.action.actions.XFormsLoadAction;
+import org.orbeon.oxf.xforms.action.actions.XFormsSetvalueAction;
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
@@ -60,6 +62,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
 	public final static Logger logger = LoggerFactory.createLogger(XFormsModelSubmission.class);
 
+    public static final String DEFAULT_TEXT_READING_ENCODING = "iso-8859-1";
+
     private final XFormsContainingDocument containingDocument;
     private final String id;
     private final XFormsModel model;
@@ -75,6 +79,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
     private String serialization;
     private boolean serialize = true;// for backward compability only (was in XForms 1.1 draft)
+
+    private String target;
 
     private String version;
     private boolean indent;
@@ -165,6 +171,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 // For backward compability only, support @serialize if there is no @serialization attribute
                 serialize = !"false".equals(submissionElement.attributeValue("serialize"));
             }
+
+            target = submissionElement.attributeValue("target");
 
             version = submissionElement.attributeValue("version");
 
@@ -290,6 +298,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
             try {
                 final boolean isReplaceAll = replace.equals(XFormsConstants.XFORMS_SUBMIT_REPLACE_ALL);
                 final boolean isReplaceInstance = replace.equals(XFormsConstants.XFORMS_SUBMIT_REPLACE_INSTANCE);
+                final boolean isReplaceText = replace.equals(XFormsConstants.XFORMS_SUBMIT_REPLACE_TEXT);
                 final boolean isReplaceNone = replace.equals(XFormsConstants.XFORMS_SUBMIT_REPLACE_NONE);
 
                 final boolean isHandlingOptimizedGet = XFormsProperties.isOptimizeGetAllSubmission(containingDocument) && XFormsSubmissionUtils.isGet(method)
@@ -667,7 +676,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         connectionResult.lastModified = 0;
                         connectionResult.responseMediaType = "application/xml";
                         connectionResult.dontHandleResponse = false;
-                        connectionResult.setResultInputStream(new ByteArrayInputStream(messageBody));
+                        connectionResult.setResponseInputStream(new ByteArrayInputStream(messageBody));
 
                     } else if (isHandlingOptimizedGet) {
                         // GET with replace="all": we can optimize and tell the client to just load the URL
@@ -780,7 +789,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                     connectionResult.forwardHeaders(response);
 
                                     // Forward content to response
-                                    NetUtils.copyStream(connectionResult.getResultInputStream(), response.getOutputStream());
+                                    NetUtils.copyStream(connectionResult.getResponseInputStream(), response.getOutputStream());
 
                                     // TODO: [#306918] RFE: Must be able to do replace="all" during initialization.
                                     // http://forge.objectweb.org/tracker/index.php?func=detail&aid=306918&group_id=168&atid=350207
@@ -814,7 +823,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                                                     // TODO: What about configuring validation? And what default to choose?
                                                     final Document resultingInstanceDocument
-                                                            = TransformerUtils.readDom4j(connectionResult.getResultInputStream(), connectionResult.resourceURI, resolvedXXFormsHandleXInclude);
+                                                            = TransformerUtils.readDom4j(connectionResult.getResponseInputStream(), connectionResult.resourceURI, resolvedXXFormsHandleXInclude);
                                                     newInstance = new XFormsInstance(replaceInstance.getModelId(), replaceInstance.getEffectiveId(), resultingInstanceDocument,
                                                             connectionResult.resourceURI, resolvedXXFormsUsername, resolvedXXFormsPassword, false, -1, replaceInstance.getValidation());
                                                 } else {
@@ -826,7 +835,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                                                     // TODO: What about configuring validation? And what default to choose?
                                                     // NOTE: isApplicationSharedHint is always false when get get here. isApplicationSharedHint="true" is handled above.
-                                                    final DocumentInfo resultingInstanceDocument = TransformerUtils.readTinyTree(connectionResult.getResultInputStream(), connectionResult.resourceURI, resolvedXXFormsHandleXInclude);
+                                                    final DocumentInfo resultingInstanceDocument = TransformerUtils.readTinyTree(connectionResult.getResponseInputStream(), connectionResult.resourceURI, resolvedXXFormsHandleXInclude);
                                                     newInstance = new SharedXFormsInstance(replaceInstance.getModelId(), replaceInstance.getEffectiveId(), resultingInstanceDocument,
                                                             connectionResult.resourceURI, resolvedXXFormsUsername, resolvedXXFormsPassword, false, -1, replaceInstance.getValidation());
                                                 }    
@@ -847,7 +856,111 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                         submitErrorEvent = createErrorEvent(pipelineContext, connectionResult, XFormsSubmitErrorEvent.ErrorType.RESOURCE_ERROR);
                                         throw new XFormsSubmissionException("Body received with non-XML media type for replace=\"instance\": " + connectionResult.responseMediaType, "processing instance replacement");
                                     }
-                                } else if (replace.equals(XFormsConstants.XFORMS_SUBMIT_REPLACE_NONE)) {
+                                } else if (isReplaceText) {
+
+                                    // XForms 1.1: "If the replace attribute contains the value "text" and the
+                                    // submission response conforms to an XML mediatype (as defined by the content type
+                                    // specifiers in [RFC 3023]) or a text media type (as defined by a content type
+                                    // specifier of text/*), then the response data is encoded as text and replaces the
+                                    // content of the replacement target node."
+
+                                    // Get response body
+                                    String responseBody = "";
+                                    if (XMLUtils.isTextContentType(connectionResult.responseMediaType)) {
+                                        // Text mediatype (including text/xml), read stream into String
+                                        try {
+                                            final String charset;
+                                            {
+                                                final String connectionCharset = NetUtils.getContentTypeCharset(connectionResult.responseMediaType);
+                                                if (connectionCharset != null)
+                                                    charset = connectionCharset;
+                                                else
+                                                    charset = DEFAULT_TEXT_READING_ENCODING;
+                                            }
+                                            
+                                            final Reader reader = new InputStreamReader(connectionResult.responseInputStream, charset);
+                                            try {
+                                                responseBody = NetUtils.readStreamAsString(reader);
+                                            } finally {
+                                                try {
+                                                    reader.close();
+                                                } catch (Exception e) {
+                                                }
+                                            }
+                                        } catch (Exception e) {
+                                            XFormsServer.logger.error("XForms - submission - error while reading response body ", e);
+                                        }
+                                    } else if (XMLUtils.isXMLMediatype(connectionResult.responseMediaType)) {
+                                        // XML mediatype other than text/xml
+
+                                        // TODO: What should we do if the response Content-Type includes a charset parameter?
+                                        final Reader reader = XMLUtils.getReaderFromXMLInputStream(connectionResult.resourceURI, connectionResult.responseInputStream);
+                                        try {
+                                            responseBody = NetUtils.readStreamAsString(reader);
+                                        } finally {
+                                            try {
+                                                reader.close();
+                                            } catch (Exception e) {
+                                            }
+                                        }
+                                    } else {
+                                        // This is a binary result
+
+                                        // Don't store anything for now as per the spec, but we could do something better by going beyond the spec
+                                        // NetUtils.inputStreamToAnyURI(pipelineContext, connectionResult.resultInputStream, NetUtils.SESSION_SCOPE);
+
+                                        // XForms 1.1: "For a success response including a body that is both a non-XML
+                                        // media type (i.e. with a content type not matching any of the specifiers in
+                                        // [RFC 3023]) and a non-text type (i.e. with a content type not matching
+                                        // text/*), when the value of the replace attribute on element submission is
+                                        // "text", nothing in the document is replaced and submission processing
+                                        // concludes after dispatching xforms-submit-error with appropriate context
+                                        // information, including an error-type of resource-error."
+                                        submitErrorEvent = createErrorEvent(pipelineContext, connectionResult, XFormsSubmitErrorEvent.ErrorType.RESOURCE_ERROR);
+                                        throw new XFormsSubmissionException("Mediatype is neither text nor XML for replace=\"text\": " + connectionResult.responseMediaType, "reading response body");
+                                    }
+
+                                    // Find target location
+                                    final NodeInfo destinationNodeInfo;
+                                    if (target != null) {
+                                        // Evaluate destination node
+                                        final FunctionLibrary functionLibrary = XFormsContainingDocument.getFunctionLibrary();
+                                        final Object destinationObject
+                                                = XPathCache.evaluateSingle(pipelineContext, currentNodeInfo, target, prefixToURIMap,
+                                                contextStack.getCurrentVariables(), functionLibrary, functionContext, null, getLocationData());
+
+                                        if (destinationObject instanceof NodeInfo) {
+                                            destinationNodeInfo = (NodeInfo) destinationObject;
+                                            if (destinationNodeInfo.getNodeKind() != org.w3c.dom.Document.ELEMENT_NODE && destinationNodeInfo.getNodeKind() != org.w3c.dom.Document.ATTRIBUTE_NODE) {
+                                                // Throw target-error
+
+                                                // XForms 1.1: "If the processing of the target attribute fails, then
+                                                // submission processing ends after dispatching the event
+                                                // xforms-submit-error with an error-type of target-error."
+                                                submitErrorEvent = createErrorEvent(pipelineContext, connectionResult, XFormsSubmitErrorEvent.ErrorType.TARGET_ERROR);
+                                                throw new XFormsSubmissionException("target attribute doesn't point to an element or attribute for replace=\"text\".", "processing target attribute");
+                                            }
+                                        } else {
+                                            // Throw target-error
+
+                                            // XForms 1.1: "If the processing of the target attribute fails, then
+                                            // submission processing ends after dispatching the event
+                                            // xforms-submit-error with an error-type of target-error."
+                                            submitErrorEvent = createErrorEvent(pipelineContext, connectionResult, XFormsSubmitErrorEvent.ErrorType.TARGET_ERROR);
+                                            throw new XFormsSubmissionException("target attribute doesn't point to a node for replace=\"text\".", "processing target attribute");
+                                        }
+                                    } else {
+                                        // Handle default destination
+                                        destinationNodeInfo = replaceInstance.getInstanceRootElementInfo();
+                                    }
+
+                                    // Set value into the instance
+                                    XFormsSetvalueAction.doSetValue(pipelineContext, containingDocument, this, destinationNodeInfo, responseBody, null, false);
+
+                                    // Notify that processing is terminated
+                                    submitDoneEvent = new XFormsSubmitDoneEvent(XFormsModelSubmission.this, connectionResult);
+
+                                } else if (isReplaceNone) {
                                     // Just notify that processing is terminated
                                     submitDoneEvent = new XFormsSubmitDoneEvent(XFormsModelSubmission.this, connectionResult);
                                 } else {
@@ -1132,37 +1245,37 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
         public long lastModified;
         public String resourceURI;
 
-        private InputStream resultInputStream;
+        private InputStream responseInputStream;
         private boolean hasContent;
 
         public ConnectionResult(String resourceURI) {
             this.resourceURI = resourceURI;
         }
 
-        public InputStream getResultInputStream() {
-        	return resultInputStream;
+        public InputStream getResponseInputStream() {
+        	return responseInputStream;
         }
 
         public boolean hasContent() {
             return hasContent;
         }
 
-        public void setResultInputStream(final InputStream resultInputStream) throws IOException {
-        	this.resultInputStream = resultInputStream;
+        public void setResponseInputStream(final InputStream responseInputStream) throws IOException {
+        	this.responseInputStream = responseInputStream;
         	setHasContentFlag();
 
         }
 
         private void setHasContentFlag() throws IOException {
-            if (resultInputStream == null) {
+            if (responseInputStream == null) {
                 hasContent = false;
             } else {
-                if (!resultInputStream.markSupported())
-                    this.resultInputStream = new BufferedInputStream(resultInputStream);
+                if (!responseInputStream.markSupported())
+                    this.responseInputStream = new BufferedInputStream(responseInputStream);
 
-                resultInputStream.mark(1);
-                hasContent = resultInputStream.read() != -1;
-                resultInputStream.reset();
+                responseInputStream.mark(1);
+                hasContent = responseInputStream.read() != -1;
+                responseInputStream.reset();
             }
         }
 

@@ -143,7 +143,7 @@ public class XFormsFeatures {
     private static final ResourceConfig[] scripts = {
             // Calendar scripts
             // TODO: move to YUI in the future if possible
-             new ResourceConfig("/ops/javascript/jscalendar/calendar.js", "/ops/javascript/jscalendar/calendar-min.js"),// our min version
+            new ResourceConfig("/ops/javascript/jscalendar/calendar.js", "/ops/javascript/jscalendar/calendar-min.js"),// our min version
             new ResourceConfig("/ops/javascript/jscalendar/lang/calendar-en.js", "/ops/javascript/jscalendar/lang/calendar-en-min.js"),// our min version
             new ResourceConfig("/ops/javascript/jscalendar/calendar-setup.js", "/ops/javascript/jscalendar/calendar-setup-min.js"),// our min version
             // Yahoo UI Library
@@ -212,6 +212,13 @@ public class XFormsFeatures {
             },
             // Other standard scripts
             new ResourceConfig("/ops/javascript/time-utils.js", "/ops/javascript/time-utils-min.js"),// TODO: check who uses this // our min version
+            // ajaxxslt (to compute XPath expressions on the client-side when offline)
+            new ResourceConfig("/ops/javascript/ajaxxslt/util.js", "/ops/javascript/ajaxxslt/util.js"),
+            new ResourceConfig("/ops/javascript/ajaxxslt/xmltoken.js", "/ops/javascript/ajaxxslt/xmltoken.js"),
+            new ResourceConfig("/ops/javascript/ajaxxslt/dom.js", "/ops/javascript/ajaxxslt/dom.js"),
+            new ResourceConfig("/ops/javascript/ajaxxslt/xpath.js", "/ops/javascript/ajaxxslt/xpath.js"),
+            // Encrytion library to encrypt data stored in the Gears store
+            new ResourceConfig("/ops/javascript/encryption.js", "/ops/javascript/encryption.js"),
             // XForms client
             new ResourceConfig("/ops/javascript/xforms.js", null)// TODO: our min version
     };

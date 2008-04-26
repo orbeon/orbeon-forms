@@ -180,7 +180,7 @@ h3, h4 {
     width: 100%
 }
 
-.fr-summary-welcome-message { display: block; margin-top: 1em; margin-bottom: 1em; clear: both }
+.fr-summary-welcome-message { display: block; margin-top: .5em; margin-bottom: .5em; clear: both }
 .fr-summary-search-count {  display: block; margin-top: 1em; margin-bottom: 1em }
 
 .fr-paging-buttons button { width: 12em; vertical-align: middle; margin-top: .5em }
@@ -235,7 +235,7 @@ hr {
 
 .fr-non-collapsible { padding-left: 1.1em; }
 
-.fr-summary-search { display: block }
+.fr-summary-search { display: block; margin-bottom: .5em }
 
 .fr-search-input input {
     background-image: url(search.gif);

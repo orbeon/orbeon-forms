@@ -315,16 +315,16 @@
                 <xxforms:show ev:event="DOMActivate" dialog="fb-edit-source-dialog"/>
             </xforms:trigger>
         </xhtml:div>
-        <xhtml:div class="fb-tool">
-            <!-- SOAP Submission -->
-            <xforms:trigger>
-                <xforms:label>
-                    <xhtml:img src="/apps/fr/style/run.gif" alt="Edit Submission" title="Edit Submission"/>
-                    <xhtml:span>Submission</xhtml:span>
-                </xforms:label>
-                <xxforms:show ev:event="DOMActivate" dialog="fb-submission-dialog"/>
-            </xforms:trigger>
-        </xhtml:div>
+        <!-- SOAP Submission -->
+        <!--<xhtml:div class="fb-tool">-->
+            <!--<xforms:trigger>-->
+                <!--<xforms:label>-->
+                    <!--<xhtml:img src="/apps/fr/style/run.gif" alt="Edit Submission" title="Edit Submission"/>-->
+                    <!--<xhtml:span>Submission</xhtml:span>-->
+                <!--</xforms:label>-->
+                <!--<xxforms:show ev:event="DOMActivate" dialog="fb-submission-dialog"/>-->
+            <!--</xforms:trigger>-->
+        <!--</xhtml:div>-->
     </xhtml:div>
     <!-- Languages toolbox -->
     <xhtml:div class="fb-toolbox">
@@ -345,7 +345,7 @@
             </xforms:select1>
             <xforms:group class="fb-language-triggers">
                 <xforms:trigger appearance="minimal">
-                    <xforms:label>Add</xforms:label>
+                    <xforms:label>Add Language</xforms:label>
                     <xxforms:show ev:event="DOMActivate" dialog="fb-add-language-dialog" neighbor="fb-resources-language-select"/>
                 </xforms:trigger>
                 <xforms:trigger appearance="minimal" id="fb-language-remove" ref=".[count($resources/resource) gt 1]">
@@ -371,6 +371,55 @@
                         <xforms:recalculate model="fr-form-model"/>
                         <xforms:revalidate model="fr-form-model"/>
                     </xforms:action>
+                </xforms:trigger>
+            </xforms:group>
+        </xforms:group>
+    </xhtml:div>
+
+    <!-- Submissions -->
+    <xhtml:div class="fb-toolbox">
+        <xforms:group class="fb-hide-alert">
+            <xforms:label>Submissions</xforms:label>
+            <!-- Repeat over existing submissions -->
+            <xhtml:ul>
+                <xforms:repeat nodeset="$model/xforms:submission[ends-with(@id, '-submission')]">
+                    <xhtml:li>
+                        <xxforms:variable name="submission-name" select="substring-before(@id, '-submission')"/>
+                        <xforms:output value="$submission-name"/>
+                        <xforms:trigger appearance="minimal">
+                            <xforms:label>
+                                <xhtml:img src="/apps/fr/style/edit.gif" alt="Edit" title="Edit"/>
+                            </xforms:label>
+                            <xxforms:show ev:event="DOMActivate" dialog="fb-submission-dialog">
+                                <xxforms:context name="submission-id" select="$submission-name"/>
+                            </xxforms:show>
+                        </xforms:trigger>
+                        <xforms:trigger appearance="minimal" id="fb-submission-remove">
+                            <xforms:label>
+                                <xforms:label><xhtml:img src="/apps/fr/style/trash.gif" alt="Delete" title="Delete"/></xforms:label>
+                            </xforms:label>
+                            <xforms:action ev:event="DOMActivate">
+                                <!-- Ask confirmation -->
+                                <xforms:setvalue ref="$variables/confirmation-message"
+                                                 value="concat('Are you sure you want to delete submission ''',
+                                                 $submission-name,
+                                                 '''?')"/>
+                                <xforms:setvalue ref="$variables/confirmation-target">fb-submission-remove</xforms:setvalue>
+                                <xxforms:show dialog="fb-confirmation-dialog"/>
+                            </xforms:action>
+                            <xforms:action ev:event="fb-confirmation-yes">
+                                <!-- Delete stuff -->
+                                <xforms:delete nodeset="$model/xforms:submission[@id = context()/@id]"/>
+                                <xforms:delete nodeset="$model/xforms:instance[@id = concat($submission-name, '-instance')]"/>
+                            </xforms:action>
+                        </xforms:trigger>
+                    </xhtml:li>
+                </xforms:repeat>
+            </xhtml:ul>
+            <xforms:group class="fb-language-triggers">
+                <xforms:trigger appearance="minimal">
+                    <xforms:label>Add Submission</xforms:label>
+                    <xxforms:show ev:event="DOMActivate" dialog="fb-submission-dialog"/>
                 </xforms:trigger>
             </xforms:group>
         </xforms:group>

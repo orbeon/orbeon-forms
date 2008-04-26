@@ -25,16 +25,17 @@
       id="fb-submission-dialog" level="modal" close="true" draggable="true" class="fr-dialog">
 
     <xforms:label>Submission Editor</xforms:label>
+    <xxforms:variable name="instance" select="instance('fb-submission-editor-instance')"/>
     <xhtml:div class="fr-grid">
         <xhtml:div class="fr-grid-content">
-            <xforms:group ref="instance('fb-submission-editor-instance')">
+            <xforms:group ref="$instance">
                 <xforms:input ref="id" id="fb-submission-id-input" incremental="true">
                     <xforms:label>Submission Id</xforms:label>
                     <xforms:hint>Choose a unique id for this submission</xforms:hint>
                 </xforms:input>
 
                 <xforms:group ref="request" xxforms:internal="true">
-                    <xforms:input ref="resource-uri" incremental="true">
+                    <xforms:input ref="resource" incremental="true">
                         <xforms:label>Resource URL</xforms:label>
                         <xforms:hint>HTTP URI to which the submission is performed</xforms:hint>
                     </xforms:input>
@@ -58,77 +59,83 @@
                         <xforms:group class="fb-submission-response">
                             <xforms:label>Response</xforms:label>
 
-                            <xforms:group ref=".[response/error-type != '']" class="fb-submission-dialog-error">
-                                <xforms:select1 ref="response/error-type" xxforms:readonly-appearance="static" >
-                                    <xforms:label>Error Type</xforms:label>
-                                    <xforms:item>
-                                        <xforms:label/>
-                                        <xforms:value/>
-                                    </xforms:item>
-                                    <xforms:item>
-                                        <xforms:label>Submission in progress</xforms:label>
-                                        <xforms:value>submission-in-progress</xforms:value>
-                                    </xforms:item>
-                                    <xforms:item>
-                                        <xforms:label>No data</xforms:label>
-                                        <xforms:value>no-data</xforms:value>
-                                    </xforms:item>
-                                    <xforms:item>
-                                        <xforms:label>Validation error</xforms:label>
-                                        <xforms:value>validation-error</xforms:value>
-                                    </xforms:item>
-                                    <xforms:item>
-                                        <xforms:label>Resource error</xforms:label>
-                                        <xforms:value>resource-error</xforms:value>
-                                    </xforms:item>
-                                    <xforms:item>
-                                        <xforms:label>Target error</xforms:label>
-                                        <xforms:value>target-error</xforms:value>
-                                    </xforms:item>
-                                    <xforms:item>
-                                        <xforms:label>Internal error</xforms:label>
-                                        <xforms:value>xxforms-internal-error</xforms:value>
-                                    </xforms:item>
-                                </xforms:select1>
-                            </xforms:group>
+                            <xhtml:div class="fb-submission-dialog-{if (response/error-type = '') then 'success' else 'error'}">
+                                <xforms:group ref=".[response/error-type != '']">
+                                    <xforms:select1 ref="response/error-type" xxforms:readonly-appearance="static" >
+                                        <xforms:label>Error Type</xforms:label>
+                                        <xforms:item>
+                                            <xforms:label/>
+                                            <xforms:value/>
+                                        </xforms:item>
+                                        <xforms:item>
+                                            <xforms:label>Submission in progress</xforms:label>
+                                            <xforms:value>submission-in-progress</xforms:value>
+                                        </xforms:item>
+                                        <xforms:item>
+                                            <xforms:label>No data</xforms:label>
+                                            <xforms:value>no-data</xforms:value>
+                                        </xforms:item>
+                                        <xforms:item>
+                                            <xforms:label>Validation error</xforms:label>
+                                            <xforms:value>validation-error</xforms:value>
+                                        </xforms:item>
+                                        <xforms:item>
+                                            <xforms:label>Resource error</xforms:label>
+                                            <xforms:value>resource-error</xforms:value>
+                                        </xforms:item>
+                                        <xforms:item>
+                                            <xforms:label>Target error</xforms:label>
+                                            <xforms:value>target-error</xforms:value>
+                                        </xforms:item>
+                                        <xforms:item>
+                                            <xforms:label>Internal error</xforms:label>
+                                            <xforms:value>xxforms-internal-error</xforms:value>
+                                        </xforms:item>
+                                    </xforms:select1>
+                                </xforms:group>
 
-                            <xforms:output value="response/resource-uri">
-                                <xforms:label>Resource URI</xforms:label>
-                            </xforms:output>
+                                <xforms:output value="response/resource-uri">
+                                    <xforms:label>Resource URI</xforms:label>
+                                </xforms:output>
 
-                            <xforms:output value="response/status-code">
-                                <xforms:label>Status Code</xforms:label>
-                            </xforms:output>
+                                <xforms:output value="response/status-code">
+                                    <xforms:label>Status Code</xforms:label>
+                                </xforms:output>
 
-                            <!-- Not yet supported -->
-                            <!--<xforms:output value="response/reason-phrase">-->
-                                <!--<xforms:label>Reason Phrase</xforms:label>-->
-                            <!--</xforms:output>-->
+                                <!-- Not yet supported -->
+                                <!--<xforms:output value="response/reason-phrase">-->
+                                    <!--<xforms:label>Reason Phrase</xforms:label>-->
+                                <!--</xforms:output>-->
 
-                            <xforms:group>
-                                <xforms:label>Headers</xforms:label>
-                                <fr:grid columns="1">
-                                    <xhtml:tr>
-                                        <xhtml:td>
-                                            <fr:repeat nodeset="response/header" id="fb-response-headers-repeat" origin="instance('note-template')"
-                                                       columns="2" appearance="xxforms:table" readonly="true">
-                                                <xhtml:tr>
-                                                    <xhtml:td>
-                                                        <xforms:output value="name">
-                                                            <xforms:label>Name</xforms:label>
-                                                        </xforms:output>
-                                                    </xhtml:td>
-                                                    <xhtml:td>
-                                                        <xforms:output value="string-join(value, ', ')">
-                                                            <xforms:label>Value(s)</xforms:label>
-                                                        </xforms:output>
-                                                    </xhtml:td>
-                                                </xhtml:tr>
-                                            </fr:repeat>
-                                        </xhtml:td>
-                                    </xhtml:tr>
-                                </fr:grid>
-                            </xforms:group>
+                                <xforms:group ref=".[response/header]">
+                                    <xforms:label>Headers</xforms:label>
+                                    <fr:grid columns="1">
+                                        <xhtml:tr>
+                                            <xhtml:td>
+                                                <fr:repeat nodeset="response/header" id="fb-response-headers-repeat"
+                                                           columns="2" appearance="xxforms:table" readonly="true">
+                                                    <xhtml:tr>
+                                                        <xhtml:td>
+                                                            <xforms:output value="name">
+                                                                <xforms:label>Name</xforms:label>
+                                                            </xforms:output>
+                                                        </xhtml:td>
+                                                        <xhtml:td>
+                                                            <xforms:output value="string-join(value, ', ')">
+                                                                <xforms:label>Value(s)</xforms:label>
+                                                            </xforms:output>
+                                                        </xhtml:td>
+                                                    </xhtml:tr>
+                                                </fr:repeat>
+                                            </xhtml:td>
+                                        </xhtml:tr>
+                                    </fr:grid>
+                                </xforms:group>
+
+                                <xforms:textarea ref="response/content">
+                                    <xforms:label>Response Body</xforms:label>
+                                </xforms:textarea>
+                            </xhtml:div>
                         </xforms:group>
                     </xforms:case>
                 </xforms:switch>
@@ -137,43 +144,85 @@
     </xhtml:div>
     <xhtml:div class="fr-dialog-buttons">
         <xforms:group>
+            <!-- Test button -->
             <xforms:trigger>
                 <xforms:label>
                     <xhtml:img src="/forms/orbeon/builder/images/play.png" alt="Publish" title="Publish"/>
                     <xhtml:span>Test</xhtml:span>
                 </xforms:label>
+
+                <!-- Test submission -->
                 <xforms:action ev:event="DOMActivate">
                     <xforms:toggle case="fb-submission-dialog-none"/>
-                    <xforms:action context="instance('fb-submission-editor-instance')/response">
-                        <xforms:setvalue ref="error-type"/>
-                    </xforms:action>
+                    <!-- Clear response data -->
+                    <xforms:delete nodeset="$instance/response/headers"/>
+                    <xforms:setvalue xxforms:iterate="$instance/response/*[not(*)]"/>
+                    <xforms:setvalue ref="instance('fb-test-submission-result-instance')"/>
+                    <!-- Send submission -->
                     <xforms:send submission="fb-test-submission-submission"/>
                 </xforms:action>
 
                 <!-- Common response actions -->
                 <xforms:action ev:event="xforms-submit-done xforms-submit-error" ev:observer="fb-test-submission-submission">
                     <xforms:toggle case="fb-submission-dialog-response"/>
-                    <xforms:action context="instance('fb-submission-editor-instance')/response">
+                    <xforms:action context="$instance/response">
                         <xforms:setvalue ref="resource-uri" value="event('resource-uri')"/>
                         <xforms:setvalue ref="status-code" value="event('response-status-code')"/>
                         <xforms:delete nodeset="header" while="header"/>
                         <xforms:insert nodeset="*" origin="event('response-headers')"/>
+                        <!-- Handle response body -->
+                        <xxforms:variable name="error-body" select="event('response-body')"/>
+                        <xforms:setvalue if="$error-body" ref="content" value="if ($error-body castable as xs:string)
+                            then $error-body else saxon:serialize($error-body, xxforms:instance('fb-xsl-output-instance'))"/>
+                        <xforms:setvalue if="not($error-body)" ref="content" value="instance('fb-test-submission-result-instance')"/>
                     </xforms:action>
                 </xforms:action>
                 <!-- Error actions -->
                 <xforms:action ev:event="xforms-submit-error" ev:observer="fb-test-submission-submission">
-                    <xforms:action context="instance('fb-submission-editor-instance')/response">
+                    <xforms:action context="$instance/response">
                         <xforms:setvalue ref="error-type" value="event('error-type')"/>
                     </xforms:action>
                 </xforms:action>
             </xforms:trigger>
+            <!-- Save button -->
             <xforms:trigger xxforms:modal="true">
                 <xforms:label>
                     <xhtml:img src="/forms/orbeon/builder/images/upload.png" alt="Publish" title="Publish"/>
                     <xhtml:span>Save</xhtml:span>
                 </xforms:label>
+                <!-- Save changes to form -->
                 <xforms:action ev:event="DOMActivate">
-                    xxx
+                    <!-- Actual id of the submission and instance -->
+                    <xxforms:variable name="submission-id" select="concat($instance/id, '-submission')"/>
+                    <xxforms:variable name="instance-id" select="concat($instance/id, '-instance')"/>
+
+                    <!-- Insert new submission if needed -->
+                    <xforms:action if="not(exists($model/xforms:submission[@id = $submission-id]))">
+                        <xforms:insert context="$model" nodeset="xforms:instance | xforms:submission" origin="instance('fb-submission-template')"/>
+                        <xforms:setvalue ref="$model/xforms:submission[last()]/@id" value="$submission-id"/>
+                    </xforms:action>
+
+                    <!-- Set submission properties -->
+                    <xxforms:variable name="submission" select="$model/xforms:submission[@id = $submission-id]"/>
+                    <xforms:action context="$submission">
+                        <xforms:setvalue ref="@ref" value="xxx"/>
+                        <xforms:setvalue ref="@method" value="$instance/request/method"/>
+                        <xforms:setvalue ref="@resource" value="$instance/request/resource"/>
+                        <xforms:setvalue ref="@replace" value="$instance/request/replace"/>
+                    </xforms:action>
+
+                    <!-- Insert new instance just before submission if needed -->
+                    <xforms:action if="not(exists($model/xforms:instance[@id = $instance-id]))">
+                        <xforms:insert nodeset="$submission" position="before" origin="instance('fb-instance-template')"/>
+                        <xforms:setvalue ref="$submission/preceding-sibling::xforms:instance[1]/@id" value="$instance-id"/>
+                    </xforms:action>
+
+                    <!-- Set instance parameters -->
+                    <xforms:action context="$model/xforms:instance[@id = $instance-id]">
+                        <xforms:setvalue ref="request" value="$instance/request/content"/>
+                        <!--<xforms:insert context="." origin="saxon:parse($instance/request/content)"/>-->
+                    </xforms:action>
+
                     <!-- Hide dialog -->
                     <xxforms:hide dialog="fb-submission-dialog"/>
                 </xforms:action>
@@ -185,6 +234,28 @@
             </xforms:trigger>
         </xforms:group>
     </xhtml:div>
-    <!-- Set focus when the dialog open  -->
-    <xforms:setfocus ev:event="xxforms-dialog-open" control="fb-submission-id-input"/>
+
+    <xforms:action ev:event="xxforms-dialog-open">
+        <xxforms:variable name="instance" select="instance('fb-submission-editor-instance')"/>
+        <xxforms:variable name="submission-id" select="event('submission-id')"/>
+        <!-- Clear instance -->
+        <xforms:setvalue xxforms:iterate="$instance//*[not(*)]" ref="."/>
+        <xforms:delete nodeset="$instance/response/headers"/>
+
+        <!-- Set parameters if any -->
+        <xforms:action if="$submission-id">
+            <xforms:setvalue ref="$instance/id" value="$submission-id"/>
+            <xforms:setvalue ref="$instance/initial-id" value="$submission-id"/>
+            
+            <xxforms:variable name="submission" select="$model/xforms:submission[@id = concat($submission-id, '-submission')]"/>
+            <xforms:setvalue ref="$instance/request/method" value="$submission/@method"/>
+            <xforms:setvalue ref="$instance/request/resource" value="$submission/@resource"/>
+            <xforms:setvalue ref="$instance/request/replace" value="$submission/@replace"/>
+            <xforms:setvalue ref="$instance/request/content" value="$model/xforms:instance[@id = concat($submission-id, '-instance')]/request"/>
+            <!--<xforms:setvalue ref="$instance/request/content" value="saxon:serialize($model/xforms:instance[@id = concat($submission-id, '-instance')]/*, xxforms:instance('fb-xsl-output-instance'))"/>-->
+        </xforms:action>
+
+        <!-- Set focus when the dialog opens -->
+        <xforms:setfocus control="fb-submission-id-input"/>
+    </xforms:action>
 </xxforms:dialog>

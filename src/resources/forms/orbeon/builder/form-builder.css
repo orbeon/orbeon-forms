@@ -21,10 +21,10 @@
 .fb-toolbox .fb-language-choice .fb-language-triggers { display: block; width: 100% }
 
 /* Toolbox */
-.fb-toolbox { margin-left: .5em; margin-right: .5em;padding: .5em; width: auto; text-align: center }
+.fb-toolbox { margin-left: .5em; margin-right: .5em;padding: .5em; width: auto; border-bottom: 2px solid #3598D4 }
 .fb-tools {
+    text-align: center; 
     /*background-color: #3598D4;*/
-    border-bottom: 2px solid #3598D4 
 }
 .fb-tools .fb-tool { display: block }
 .fb-tools .fb-tool button {
@@ -45,8 +45,10 @@
 .fb-xvc a { text-decoration: none }
 
 #fb-toolbox-dialog { width: 180px }
-.yui-panel-container > #fb-toolbox-dialog { position: fixed; left: 11px; top: 27px }/* IE HACK: hide this definition for IE 6 */
+.yui-panel-container > #fb-toolbox-dialog { position: fixed; left: 11px; top: 27px } /* IE HACK: hide this definition for IE 6 */ 
 #fb-toolbox-dialog .hd { background-color: #3598d4 }
+/*.yui-panel-container > #fb-toolbox-dialog { position: fixed; left: 0; top: 0; height: 100%; border-width: 0 1px 0 0; border-color: #3598D4 }*//* IE HACK: hide this definition for IE 6 */
+/*#fb-toolbox-dialog .hd { display: none }*/
 
 .fb-toolbar button { width: 12em }
 .fb-section-toolbar { margin-top: .5em }
@@ -62,9 +64,11 @@
 
 /* Submission editor dialog */
 #fb-submission-dialog { width: 45em }
-.fb-submission-dialog-error { display: block; padding: .25em; border: 2px solid red }
-.fb-submission-dialog-success { border: 2px solid green }
-.fb-submission-response { display: block; height: 200px; overflow-y: scroll }
+.fb-submission-dialog-error { border: 2px solid red; padding: .25em }
+.fb-submission-dialog-error select { border: none }
+.fb-submission-dialog-success { border: 2px solid green; padding: .25em }
+.fb-submission-response { display: block; height: 200px; overflow-y: auto }
+.fb-submission-response textarea { height: 10em }
 
 /* Other dialogs */
 .xforms-dialog .bd { padding-left: .5em; padding-right: .5em }

@@ -26,6 +26,7 @@ import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.expr.XPathContextMajor;
 import org.orbeon.saxon.om.NodeInfo;
@@ -238,6 +239,13 @@ public class XFormsModelBinds {
                             mipFound = appendNameValue(sb, mipFound, "readonly", currentBind.getReadonly());
                             mipFound = appendNameValue(sb, mipFound, "required", currentBind.getRequired());
                             mipFound = appendNameValue(sb, mipFound, "constraint", currentBind.getConstraint());
+
+                            // Output type MIP as an exploded QName
+                            final String typeMip = currentBind.getType();
+                            if (typeMip != null) {
+                                final QName typeMipQName = Dom4jUtils.extractTextValueQName(containingDocument.getStaticState().getNamespaceMappings(currentBind.getBindElement()), typeMip);
+                                mipFound = appendNameValue(sb, mipFound, "type", Dom4jUtils.qNameToexplodedQName(typeMipQName));
+                            }
 
                             sb.append('}');
                         }

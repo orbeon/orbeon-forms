@@ -49,7 +49,7 @@ public class XFormsActions {
     public static final String XXFORMS_INVALIDATE_INSTANCES_ACTION = "invalidate-instances";
     public static final String XXFORMS_ONLINE_ACTION = "online";
     public static final String XXFORMS_OFFLINE_ACTION = "offline";
-    public static final String XXFORMS_OFFLINE_SAVE_ACTION = "offline";
+    public static final String XXFORMS_OFFLINE_SAVE_ACTION = "offline-save";
 
     private static final Map actions = new HashMap();
 

@@ -62,8 +62,6 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
 	public final static Logger logger = LoggerFactory.createLogger(XFormsModelSubmission.class);
 
-    public static final String DEFAULT_TEXT_READING_ENCODING = "iso-8859-1";
-
     private final XFormsContainingDocument containingDocument;
     private final String id;
     private final XFormsModel model;
@@ -869,15 +867,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                     if (XMLUtils.isTextContentType(connectionResult.responseMediaType)) {
                                         // Text mediatype (including text/xml), read stream into String
                                         try {
-                                            final String charset;
-                                            {
-                                                final String connectionCharset = NetUtils.getContentTypeCharset(connectionResult.responseMediaType);
-                                                if (connectionCharset != null)
-                                                    charset = connectionCharset;
-                                                else
-                                                    charset = DEFAULT_TEXT_READING_ENCODING;
-                                            }
-                                            
+                                            final String charset = NetUtils.getTextCharsetFromContentType(connectionResult.responseMediaType);
                                             final Reader reader = new InputStreamReader(connectionResult.responseInputStream, charset);
                                             try {
                                                 responseBody = NetUtils.readStreamAsString(reader);

@@ -54,10 +54,16 @@ public class NetUtils {
     };
 
     private static final TimeZone gmtZone = TimeZone.getTimeZone("GMT");
-    public static FileItemFactory fileItemFactory;
+    private static FileItemFactory fileItemFactory;
+
     public static final int REQUEST_SCOPE = 0;
     public static final int SESSION_SCOPE = 1;
     public static final int APPLICATION_SCOPE = 2;
+
+    // Default HTTP 1.1 charset for text/* mediatype
+    public static final String DEFAULT_HTTP_TEXT_READING_ENCODING = "iso-8859-1";
+    // Default RFC 3023 default charset for txt/xml mediatype
+    public static final String DEFAULT_TEXT_XML_READING_ENCODING = "us-ascii";
 
     static {
         // Set timezone to GMT as required for HTTP headers
@@ -753,5 +759,39 @@ public class NetUtils {
                 }
             }
         }
+    }
+
+    /**
+     * Return the charset associated with a text/* Content-Type header. If a charset is present, return it. Otherwise,
+     * guess depending on whether the mediatype is text/xml or not.
+     *
+     * @param contentType   Content-Type header value
+     * @return              charset
+     */
+    public static String getTextCharsetFromContentType(String contentType) {
+        final String charset;
+        final String connectionCharset = getContentTypeCharset(contentType);
+        if (connectionCharset != null) {
+            charset = connectionCharset;
+        } else {
+
+            // RFC 3023: "Conformant with [RFC2046], if a text/xml entity is
+            // received with the charset parameter omitted, MIME processors and
+            // XML processors MUST use the default charset value of
+            // "us-ascii"[ASCII]. In cases where the XML MIME entity is
+            // transmitted via HTTP, the default charset value is still
+            // "us-ascii". (Note: There is an inconsistency between this
+            // specification and HTTP/1.1, which uses ISO-8859-1[ISO8859] as the
+            // default for a historical reason. Since XML is a new format, a new
+            // default should be chosen for better I18N. US-ASCII was chosen,
+            // since it is the intersection of UTF-8 and ISO-8859-1 and since it
+            // is already used by MIME.)"
+
+            if (XMLUtils.isXMLMediatype(contentType))
+                charset = DEFAULT_TEXT_XML_READING_ENCODING;
+            else
+                charset = DEFAULT_HTTP_TEXT_READING_ENCODING;
+        }
+        return charset;
     }
 }

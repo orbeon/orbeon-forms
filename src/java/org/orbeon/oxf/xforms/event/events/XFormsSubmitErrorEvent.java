@@ -83,6 +83,7 @@ public class XFormsSubmitErrorEvent extends XFormsSubmitResponseEvent {
             if (XMLUtils.isXMLMediatype(connectionResult.responseMediaType)) {
                 // XML content-type
                 // Read stream into Document
+                // TODO: In case of text/xml, charset is not handled. Should modify readTinyTree() and readDom4j()
                 InputStream is = null; 
                 try {
                     is = new URL(tempURI).openStream();
@@ -104,14 +105,7 @@ public class XFormsSubmitErrorEvent extends XFormsSubmitResponseEvent {
                 // XML parsing failed, or we got a text content-type
                 // Read stream into String
                 try {
-                    final String charset;
-                    {
-                        final String connectionCharset = NetUtils.getContentTypeCharset(connectionResult.responseMediaType);
-                        if (connectionCharset != null)
-                            charset = connectionCharset;
-                        else
-                            charset = XFormsModelSubmission.DEFAULT_TEXT_READING_ENCODING;
-                    }
+                    final String charset = NetUtils.getTextCharsetFromContentType(connectionResult.responseMediaType);
                     final InputStream is = new URL(tempURI).openStream();
                     final Reader reader = new InputStreamReader(is, charset);
                     try {

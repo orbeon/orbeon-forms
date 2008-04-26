@@ -611,14 +611,19 @@ public class XFormsStaticState {
 
             // Gather online/offline information
             {
-                // NOTE: We attempt to localize what triggers can cause, upon DOMActivate, xxforms:online and xxforms:offline actions
+                // NOTE: We attempt to localize what triggers can cause, upon DOMActivate, xxforms:online, xxforms:offline and xxforms:offline-save actions
                 final List onlineTriggerIds = XPathCache.evaluate(pipelineContext, controlsDocumentInfo,
-                    "for $handler in for $online in //xxforms:online return ($online/ancestor-or-self::*[@ev:event and tokenize(@ev:event, '\\s+') = 'DOMActivate'])[1]" +
+                    "for $handler in for $action in //xxforms:online return ($action/ancestor-or-self::*[@ev:event and tokenize(@ev:event, '\\s+') = 'DOMActivate'])[1]" +
                     "   return for $id in $handler/../descendant-or-self::xforms:trigger/@id return string($id)", BASIC_NAMESPACE_MAPPINGS,
                     null, null, null, null, locationData);
 
                 final List offlineTriggerIds = XPathCache.evaluate(pipelineContext, controlsDocumentInfo,
-                    "for $handler in for $online in //xxforms:offline return ($online/ancestor-or-self::*[@ev:event and tokenize(@ev:event, '\\s+') = 'DOMActivate'])[1]" +
+                    "for $handler in for $action in //xxforms:offline return ($action/ancestor-or-self::*[@ev:event and tokenize(@ev:event, '\\s+') = 'DOMActivate'])[1]" +
+                    "   return for $id in $handler/../descendant-or-self::xforms:trigger/@id return string($id)", BASIC_NAMESPACE_MAPPINGS,
+                    null, null, null, null, locationData);
+
+                final List offlineSaveTriggerIds = XPathCache.evaluate(pipelineContext, controlsDocumentInfo,
+                    "for $handler in for $action in //xxforms:offline-save return ($action/ancestor-or-self::*[@ev:event and tokenize(@ev:event, '\\s+') = 'DOMActivate'])[1]" +
                     "   return for $id in $handler/../descendant-or-self::xforms:trigger/@id return string($id)", BASIC_NAMESPACE_MAPPINGS,
                     null, null, null, null, locationData);
 
@@ -630,6 +635,11 @@ public class XFormsStaticState {
                 for (Iterator i = offlineTriggerIds.iterator(); i.hasNext();) {
                     final String currentId = (String) i.next();
                     addClasses(currentId, "xxforms-offline");
+                }
+
+                for (Iterator i = offlineSaveTriggerIds.iterator(); i.hasNext();) {
+                    final String currentId = (String) i.next();
+                    addClasses(currentId, "xxforms-offline-save");
                 }
 
                 {

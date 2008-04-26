@@ -5,6 +5,7 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsProperties;
+import org.orbeon.oxf.xforms.action.XFormsActions;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.servlet.OPSXFormsFilter;
@@ -30,18 +31,16 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
 
     private static final Map ALLOWED_XXFORMS_ELEMENTS = new HashMap();
     static {
-        ALLOWED_XXFORMS_ELEMENTS.put("size", "");
-        ALLOWED_XXFORMS_ELEMENTS.put("script", "");
-        ALLOWED_XXFORMS_ELEMENTS.put("show", "");
-        ALLOWED_XXFORMS_ELEMENTS.put("hide", "");
-        ALLOWED_XXFORMS_ELEMENTS.put("online", "");
-        ALLOWED_XXFORMS_ELEMENTS.put("offline", "");
+        ALLOWED_XXFORMS_ELEMENTS.put(XFormsActions.XXFORMS_SCRIPT_ACTION, "");
+        ALLOWED_XXFORMS_ELEMENTS.put(XFormsActions.XXFORMS_SHOW_ACTION, "");
+        ALLOWED_XXFORMS_ELEMENTS.put(XFormsActions.XXFORMS_HIDE_ACTION, "");
+        ALLOWED_XXFORMS_ELEMENTS.put(XFormsActions.XXFORMS_ONLINE_ACTION, "");
+        ALLOWED_XXFORMS_ELEMENTS.put(XFormsActions.XXFORMS_OFFLINE_ACTION, "");
+        ALLOWED_XXFORMS_ELEMENTS.put(XFormsActions.XXFORMS_OFFLINE_SAVE_ACTION, "");
         ALLOWED_XXFORMS_ELEMENTS.put("dialog", "");
         ALLOWED_XXFORMS_ELEMENTS.put("variable", "");
         ALLOWED_XXFORMS_ELEMENTS.put("attribute", "");
         ALLOWED_XXFORMS_ELEMENTS.put("context", "");
-
-        ALLOWED_XXFORMS_ELEMENTS.put("img", "");// deprecated
     }
 
     private static final Map ALLOWED_EXFORMS_ELEMENTS = new HashMap();

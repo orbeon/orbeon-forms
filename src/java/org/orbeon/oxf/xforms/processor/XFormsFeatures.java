@@ -212,6 +212,8 @@ public class XFormsFeatures {
             },
             // Other standard scripts
             new ResourceConfig("/ops/javascript/time-utils.js", "/ops/javascript/time-utils-min.js"),// TODO: check who uses this // our min version
+            // Selector is so far only used offline
+            new ResourceConfig("/ops/javascript/yui/selector-beta.js", "/ops/javascript/yui/selector-beta-min.js"),
             // ajaxxslt (to compute XPath expressions on the client-side when offline)
             new ResourceConfig("/ops/javascript/ajaxxslt/util.js", "/ops/javascript/ajaxxslt/util.js"),
             new ResourceConfig("/ops/javascript/ajaxxslt/xmltoken.js", "/ops/javascript/ajaxxslt/xmltoken.js"),

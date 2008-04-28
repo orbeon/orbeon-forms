@@ -842,23 +842,6 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
             eventTarget = (XFormsControl) getObjectById(eventTarget.getEffectiveId());
         }
 
-        // Handle xforms:output
-        if (eventTarget instanceof XFormsOutputControl) {
-
-            // Note that repeat focus may have been dispatched already
-            if (XFormsEvents.XFORMS_DOM_FOCUS_IN.equals(eventName)) {
-                // We convert the focus event into a DOMActivate unless the control is read-only
-                final XFormsOutputControl xformsOutputControl = (XFormsOutputControl) eventTarget;
-                if (xformsOutputControl.isReadonly()) {
-                    return;
-                } else {
-                    eventName = XFormsEvents.XFORMS_DOM_ACTIVATE;
-                }
-            } else if (ignoredXFormsOutputExternalEvents.equals(eventName)) {
-                return;
-            }
-        }
-
         // Create event
         if (XFormsProperties.isAjaxTest()) {
             if (eventName.equals(XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE)) {
@@ -875,12 +858,30 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                 }
             }
         }
-        
+
         final XFormsEvent xformsEvent = XFormsEventFactory.createEvent(eventName, eventTarget, otherEventTarget,
                 true, true, true, valueString, filesElement, new String[] { dndStart, dndEnd} );
 
         // Interpret event
-        if (xformsEvent instanceof XXFormsValueChangeWithFocusChangeEvent) {
+        if (eventTarget instanceof XFormsOutputControl) {
+            // Special xforms:output case
+            // Note that repeat focus may have been dispatched already
+
+            if (XFormsEvents.XFORMS_DOM_FOCUS_IN.equals(eventName)) {
+
+                // First, dispatch DOMFocusIn
+                dispatchEvent(pipelineContext, xformsEvent);
+
+                // Then, dispatch DOMActivate unless the control is read-only
+                final XFormsOutputControl xformsOutputControl = (XFormsOutputControl) getObjectById(eventTarget.getEffectiveId());
+                if (!xformsOutputControl.isReadonly()) {
+                    dispatchEvent(pipelineContext, new XFormsDOMActivateEvent(xformsOutputControl));
+                }
+            } else if (!ignoredXFormsOutputExternalEvents.equals(eventName)) {
+                // Dispatch other event
+                dispatchEvent(pipelineContext, xformsEvent);
+            }
+        } else if (xformsEvent instanceof XXFormsValueChangeWithFocusChangeEvent) {
             // 4.6.7 Sequence: Value Change
 
             // What we want to do here is set the value on the initial controls state, as the value
@@ -910,16 +911,18 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                 // Handle focus change DOMFocusOut / DOMFocusIn
                 if (valueChangeWithFocusChangeEvent.getOtherTargetObject() != null) {
 
+                    // We have a focus change (otherwise, the focus is assumed to remain the same)
+
+                    // Dispatch DOMFocusOut
                     // NOTE: setExternalValue() above may cause e.g. xforms-select / xforms-deselect events to be
                     // dispatched, so we get the control again to have a fresh reference
                     final XFormsControl sourceXFormsControl = (XFormsControl) getObjectById(eventTarget.getEffectiveId());
-
-                    final XFormsControl otherTargetXFormsControl
-                        = (XFormsControl) getObjectById(((XFormsControl) valueChangeWithFocusChangeEvent.getOtherTargetObject()).getEffectiveId());
-
-                    // We have a focus change (otherwise, the focus is assumed to remain the same)
                     if (sourceXFormsControl != null)
                         dispatchEvent(pipelineContext, new XFormsDOMFocusOutEvent(sourceXFormsControl));
+
+                    // Dispatch DOMFocusIn
+                    final XFormsControl otherTargetXFormsControl
+                        = (XFormsControl) getObjectById(((XFormsControl) valueChangeWithFocusChangeEvent.getOtherTargetObject()).getEffectiveId());
                     if (otherTargetXFormsControl != null)
                         dispatchEvent(pipelineContext, new XFormsDOMFocusInEvent(otherTargetXFormsControl));
                 }

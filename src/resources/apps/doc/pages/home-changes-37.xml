@@ -275,6 +275,10 @@
             <section>
                 <title>Complete List of Issues Addressed in this Release</title>
                 <p>
+                    <b style="color: red">NOTE: Orbeon Forms 3.7 is still UNDER DEVELOPMENT as of March 2008. The
+                    latest stable release of Orbeon Forms is 3.6.</b>
+                </p>
+                <p>
                     Orbeon Forms 3.7 addresses the following bugs and features:
                 </p>
                 <!--
@@ -296,6 +300,107 @@ http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=2
 </ul>
 -->
                 <ul>
+
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=309290&amp;group_id=168&amp;atid=350207">
+                            #309290: RFE: Implement XForms 1.1 replace="text" for submissions
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=309265&amp;group_id=168&amp;atid=350207">
+                            #309265: Bug with preceding-sibling after insertion
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=309210&amp;group_id=168&amp;atid=350207">
+                            #309210: As per XForms 1.1, do not apply the @type MIP to instance nodes that contain child
+                            elements
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308956&amp;group_id=168&amp;atid=350207">
+                            #308956: Regression: To-Do Lists example is broken
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=309165&amp;group_id=168&amp;atid=350207">
+                            #309165: xforms:submission throws an NPE when submissing content not located in an instance
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=309163&amp;group_id=168&amp;atid=350207">
+                            #309163: Implement support for event('response-headers') as per XForms 1.1
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=309164&amp;group_id=168&amp;atid=350207">
+                            #309164: Implement event('response-status-code') on xforms-submit-done as per XForms 1.1
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=309162&amp;group_id=168&amp;atid=350207">
+                            #309162: RFE: Optimization for IE, to avoid registering events for focus and blur on every
+                            form control
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308915&amp;group_id=168&amp;atid=350207">
+                            #308915: Occasional dom4j serialization error when restoring static state
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=309090&amp;group_id=168&amp;atid=350207">
+                            #309090: RFE: Support xxforms:xinclude on xforms:submission
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=309003&amp;group_id=168&amp;atid=350207">
+                            #309003: RFE: Custom event attributes should use xxforms prefix
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=309021&amp;group_id=168&amp;atid=350207">
+                            #309021: NPE upon deleting row containing xforms-valid event handler
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306367&amp;group_id=168&amp;atid=350207">
+                            #306367: Text missing in PDF Documentation
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=304697&amp;group_id=168&amp;atid=350207">
+                            #304697: Source Code Viewer: issue downloading .txt, .java, and .xsd
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308995&amp;group_id=168&amp;atid=350207">
+                            #308995: RFE: Support relevance in itemsets
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308994&amp;group_id=168&amp;atid=350207">
+                            #308994: RFE: Upgrade commons-fileupload to version 1.2.1
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308993&amp;group_id=168&amp;atid=350207">
+                            #308993: RFE: Support item-value property in xforms-selected event
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308825&amp;group_id=168&amp;atid=350207">
+                            #308825: RFE: Set media="all" on external CSS stylesheet
+                        </a>
+                    </li>                    
+
                     <li>
                         <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308936&amp;group_id=168&amp;atid=350207">
                             #308936: exf:sort(): namespaces not supported in second argument

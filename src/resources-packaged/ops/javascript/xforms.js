@@ -2331,7 +2331,8 @@ ORBEON.xforms.Init = {
 
     document: function() {
         // Notify the offline module that the page was loaded
-        ORBEON.xforms.Offline.pageLoad();
+        if (ORBEON.util.Utils.getProperty(OFFLINE_SUPPORT))
+            ORBEON.xforms.Offline.pageLoad();
 
         // Register events in the capture phase for W3C-compliant browsers.
         if (ORBEON.xforms.Globals.isRenderingEngineTrident) {

@@ -494,7 +494,9 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {
     private Barcode createBarCode(String type) {
 		if (type.equals("CODE39")) {
 			return new Barcode39();
-		} else if (type.equals("EAN")) {
+        } else if (type.equals("CODE128")) {
+			return new Barcode128();
+        } else if (type.equals("EAN")) {
 			return new BarcodeEAN();
 		}
 		return new Barcode39();

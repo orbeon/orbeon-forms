@@ -674,10 +674,49 @@ ORBEON.xforms.Document = {
 
     setOfflineEncryptionPassword: function(password) {
         if (password.length < 16)
-            throw "Password must have at least 8 characters";
+            throw "Password must have at least 16 characters";
+        var resultSet = ORBEON.xforms.Offline.gearsDatabase.execute("select * from Current_Password");
+        var newEncryptedPassword = ORBEON.xforms.Offline._encrypt(password, stringToByteArray(password));
+        if (resultSet.isValidRow()) {
+            // If we have a current password, check that this is the right password
+            var encryptedPassword = resultSet.fieldByName("encrypted_password");
+            var newEncryptedPassword = ORBEON.xforms.Offline._encrypt(password, stringToByteArray(password));
+            if (encryptedPassword != newEncryptedPassword)
+                throw "Invalid password";
+        } else {
+            // Store encrypted password
+            ORBEON.xforms.Offline.gearsDatabase.execute("insert into Current_Password (encrypted_password) values (?)", [ newEncryptedPassword ]);
+        }
         // Encode the password so it won't be immediatly visible to one looking at cookies
         password = byteArrayToHex(stringToByteArray(password));
         document.cookie = "orbeon.forms.encryption.password" + "=" + password + "; path=/";
+        // Reset key, in case we already had another key previously
+        ORBEON.xforms.Offline.encryptionKey = null;
+    },
+
+    changeOfflineEncryptionPassword: function(currentPassword, newPassword) {
+        // Get old key
+        ORBEON.xforms.Document.setOfflineEncryptionPassword(currentPassword);
+        var oldKey = ORBEON.xforms.Offline.getEncryptionKey();
+        // Scrap encrypted password in database
+        ORBEON.xforms.Offline.gearsDatabase.execute("delete from Current_Password");
+        // Get new key
+        ORBEON.xforms.Document.setOfflineEncryptionPassword(newPassword);
+        var newKey = ORBEON.xforms.Offline.getEncryptionKey();
+
+        // Go over events in SQL database and reencrypt them
+        var resultSet = ORBEON.xforms.Offline.gearsDatabase.execute("select id, event from Events");
+        while (resultSet.isValidRow()) {
+            var id = resultSet.fieldByName("id");
+            var event = resultSet.fieldByName("event");
+            // Decrypt and reencrypt event
+            event = ORBEON.xforms.Offline._decrypt(event, oldKey);
+            event = ORBEON.xforms.Offline._encrypt(event, newKey);
+            // Update event for this id
+            ORBEON.xforms.Offline.gearsDatabase.execute("update Events set event = ? where id = ?", [event, id]).close();
+            resultSet.next();
+        }
+        resultSet.close();
     },
 
     /**
@@ -4104,7 +4143,9 @@ ORBEON.xforms.Offline = {
     variables: {},                                  // Mapping: variable name -> control ID
     xpathNode: document.createElement("dummy"),     // Node used as current node to evaluate XPath expression
     encryptionKey: null,                            // Key that will be used when storing events in the store
-
+    typeRegExps: {
+        "{http://www.w3.org/2001/XMLSchema}decimal": new RegExp("^[+-]?[0-9]+(\\.[0-9]+)?$", "g")
+    },
 
     /**
      * A failed (so far) attempt at trying to figure out if Gears is available and usable by this web application
@@ -4189,8 +4230,12 @@ ORBEON.xforms.Offline = {
             var database = google.gears.factory.create("beta.database");
             ORBEON.xforms.Offline.gearsDatabase = database;
             database.open("orbeon.xforms");
-            database.execute("create table if not exists Events (url text, event text)").close();
+            // Table storing events happening while offline
+            database.execute("create table if not exists Events (id integer primary key autoincrement, url text, event text)").close();
+            // Table storing the list of the forms taken offline
             database.execute("create table if not exists Offline_Forms (url text, event_response text, form_id text, static_state text, dynamic_state text, mappings text)").close();
+            // Table storing the current password if any, in encrypted form
+            database.execute("create table if not exists Current_Password (encrypted_password text)").close();
 
             // Create form store
             var localServer = google.gears.factory.create("beta.localserver");
@@ -4314,12 +4359,12 @@ ORBEON.xforms.Offline = {
 
         // Prepare array with all the events that happened since the form was taken offline
         // Get all events from the database to create events array
-        var resultSet = ORBEON.xforms.Offline.gearsDatabase.execute("select * from Events where url = ?", [window.location.href]);
+        var resultSet = ORBEON.xforms.Offline.gearsDatabase.execute("select * from Events where url = ? order by id", [window.location.href]);
         var events = [];
         while (resultSet.isValidRow()) {
             var eventString = resultSet.fieldByName("event");
             // Decrypt event if we have a password
-            eventString = ORBEON.xforms.Offline._decrypt(eventString);
+            eventString = ORBEON.xforms.Offline._decrypt(eventString, ORBEON.xforms.Offline.getEncryptionKey());
             // Extract components of event into an array and unescape each one
             var eventArray = eventString.split(" ");
             for (var eventComponentIndex = 0; eventComponentIndex < eventArray.length; eventComponentIndex++)
@@ -4379,9 +4424,9 @@ ORBEON.xforms.Offline = {
                 eventString += escape(eventArray[eventComponentIndex]);
             }
             // Encrypt eventString if a password was provided
-            eventString = ORBEON.xforms.Offline._encrypt(eventString);
+            eventString = ORBEON.xforms.Offline._encrypt(eventString, ORBEON.xforms.Offline.getEncryptionKey());
             // Store eventString in database
-            ORBEON.xforms.Offline.gearsDatabase.execute("insert into Events values (?, ?)", [ window.location.href, eventString ]).close();
+            ORBEON.xforms.Offline.gearsDatabase.execute("insert into Events (url, event) values (?, ?)", [ window.location.href, eventString ]).close();
         }
     },
 
@@ -4462,11 +4507,13 @@ ORBEON.xforms.Offline = {
             }
 
             // Type
-//            if (mips.type) {
-//                switch (mips.type) {
-//                    case ""
-//                }
-//            }
+            if (mips.type) {
+                var regExp = ORBEON.xforms.Offline.typeRegExps[mips.type];
+                if (regExp != null) {
+                    if (!regExp.test(controlValue))
+                        isValid = false;
+                }
+            }
 
             ORBEON.xforms.Controls.setValid(control, isValid ? "true" : "false", requiredButEmpty);
         }
@@ -4475,8 +4522,7 @@ ORBEON.xforms.Offline = {
     /**
      * Encrypt text with the offline key
      */
-    _encrypt: function(text) {
-        var key = ORBEON.xforms.Offline.getEncryptionKey();
+    _encrypt: function(text, key) {
         return key == null ? text :
                byteArrayToHex(rijndaelEncrypt(text, key, "ECB"));
     },
@@ -4484,8 +4530,7 @@ ORBEON.xforms.Offline = {
     /**
      * Decrypt text with the offline key
      */
-    _decrypt: function(text) {
-        var key = ORBEON.xforms.Offline.getEncryptionKey();
+    _decrypt: function(text, key) {
         return key == null ? text :
                byteArrayToString(rijndaelDecrypt(hexToByteArray(text), key, "ECB"));
     }

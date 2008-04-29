@@ -44,7 +44,7 @@
 }
 
 .xforms-alert-active {
-    background-image: url(../../ops/images/xforms/error.gif);
+    background-image: url(../../ops/images/xforms/exclamation.png);
     background-repeat: no-repeat;
     background-position: left center;
 }

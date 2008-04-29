@@ -22,9 +22,10 @@
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
       xmlns:saxon="http://saxon.sf.net/"
 
-      id="fb-submission-dialog" level="modal" close="true" draggable="true" class="fr-dialog">
+      id="fb-submission-dialog" level="modal" close="true" draggable="true" class="fr-dialog" model="fb-submission-model">
 
     <xforms:label>Submission Editor</xforms:label>
+
     <xxforms:variable name="instance" select="instance('fb-submission-editor-instance')"/>
     <xhtml:div class="fr-grid">
         <xhtml:div class="fr-grid-content">
@@ -40,10 +41,37 @@
                         <xforms:hint>HTTP URI to which the submission is performed</xforms:hint>
                     </xforms:input>
 
-                    <xforms:input ref="soap-action" incremental="true">
-                        <xforms:label>SOAP Action</xforms:label>
-                        <xforms:hint>Optional SOAPAction header</xforms:hint>
+                    <xforms:select1 ref="method">
+                        <xforms:label>Method</xforms:label>
+                        <xforms:item>
+                            <xforms:label>GET</xforms:label>
+                            <xforms:value>get</xforms:value>
+                        </xforms:item>
+                        <xforms:item>
+                            <xforms:label>POST</xforms:label>
+                            <xforms:value>post</xforms:value>
+                        </xforms:item>
+                        <xforms:item>
+                            <xforms:label>PUT</xforms:label>
+                            <xforms:value>put</xforms:value>
+                        </xforms:item>
+                        <xforms:item>
+                            <xforms:label>DELETE</xforms:label>
+                            <xforms:value>delete</xforms:value>
+                        </xforms:item>
+                    </xforms:select1>
+
+                    <xforms:input ref="is-soap">
+                        <xforms:label>SOAP Submission</xforms:label>
+                        <xforms:hint>Wheather this is a SOAP submission</xforms:hint>
                     </xforms:input>
+
+                    <xforms:group ref=".[is-soap = 'true']">
+                        <xforms:input ref="soap-action" incremental="true">
+                            <xforms:label>SOAP Action</xforms:label>
+                            <xforms:hint>Optional SOAPAction header</xforms:hint>
+                        </xforms:input>
+                    </xforms:group>
 
                     <xforms:textarea ref="content" incremental="true">
                         <xforms:label>Submission Content</xforms:label>
@@ -145,7 +173,7 @@
     <xhtml:div class="fr-dialog-buttons">
         <xforms:group>
             <!-- Test button -->
-            <xforms:trigger>
+            <xforms:trigger ref="$instance/save-test-trigger">
                 <xforms:label>
                     <xhtml:img src="/forms/orbeon/builder/images/play.png" alt="Publish" title="Publish"/>
                     <xhtml:span>Test</xhtml:span>
@@ -185,7 +213,7 @@
                 </xforms:action>
             </xforms:trigger>
             <!-- Save button -->
-            <xforms:trigger xxforms:modal="true">
+            <xforms:trigger ref="$instance/save-test-trigger">
                 <xforms:label>
                     <xhtml:img src="/forms/orbeon/builder/images/upload.png" alt="Publish" title="Publish"/>
                     <xhtml:span>Save</xhtml:span>
@@ -204,11 +232,16 @@
 
                     <!-- Set submission properties -->
                     <xxforms:variable name="submission" select="$model/xforms:submission[@id = $submission-id]"/>
+                    <xxforms:variable name="request" select="$instance/request"/>
                     <xforms:action context="$submission">
                         <xforms:setvalue ref="@ref" value="xxx"/>
-                        <xforms:setvalue ref="@method" value="$instance/request/method"/>
-                        <xforms:setvalue ref="@resource" value="$instance/request/resource"/>
-                        <xforms:setvalue ref="@replace" value="$instance/request/replace"/>
+                        <xforms:setvalue ref="@method" value="$request/method"/>
+                        <xforms:setvalue ref="@resource" value="$request/resource"/>
+                        <xforms:setvalue ref="@replace" value="$request/replace"/>
+                        <xforms:setvalue ref="@mediatype"
+                                         value="if ($request/is-soap = 'true')
+                                                then string-join(('application/soap+xml', if (normalize-space($request/soap-action) != '') then concat('action=', normalize-space($request/soap-action)) else ()), '; ')
+                                                else 'application/xml'"/>
                     </xforms:action>
 
                     <!-- Insert new instance just before submission if needed -->
@@ -219,8 +252,7 @@
 
                     <!-- Set instance parameters -->
                     <xforms:action context="$model/xforms:instance[@id = $instance-id]">
-                        <xforms:setvalue ref="request" value="$instance/request/content"/>
-                        <!--<xforms:insert context="." origin="saxon:parse($instance/request/content)"/>-->
+                        <xforms:setvalue ref="request" value="$request/content"/>
                     </xforms:action>
 
                     <!-- Hide dialog -->
@@ -240,6 +272,10 @@
         <xxforms:variable name="submission-id" select="event('submission-id')"/>
         <!-- Clear instance -->
         <xforms:setvalue xxforms:iterate="$instance//*[not(*)]" ref="."/>
+        <xforms:setvalue ref="$instance/request/is-soap">false</xforms:setvalue>
+        <xforms:setvalue ref="$instance/request/method" value="instance('fb-submission-template')/@method"/>
+        <xforms:setvalue ref="$instance/request/mediatype" value="instance('fb-submission-template')/@mediatype"/>
+        <xforms:setvalue ref="$instance/request/replace" value="instance('fb-submission-template')/@replace"/>
         <xforms:delete nodeset="$instance/response/headers"/>
 
         <!-- Set parameters if any -->
@@ -258,4 +294,77 @@
         <!-- Set focus when the dialog opens -->
         <xforms:setfocus control="fb-submission-id-input"/>
     </xforms:action>
+
+    <!-- Model for the submission editor -->
+    <xforms:model id="fb-submission-model">
+
+        <xxforms:variable name="model" select="xxforms:instance('fr-form-instance')/xhtml:head/xforms:model[@id = 'fr-form-model']"/>
+
+        <xforms:instance id="fb-submission-editor-instance">
+            <submission>
+                <id/>
+                <initial-id/>
+                <submission-id/>
+                <instance-id/>
+                <request>
+                    <method/>
+                    <resource/>
+                    <replace/>
+                    <is-soap>false</is-soap>
+                    <soap-action/>
+                    <content/>
+                </request>
+                <response>
+                    <error-type/>
+                    <body/>
+                    <resource-uri/>
+                    <status-code/>
+                    <reason-phrase/>
+                    <headers/>
+                    <content/>
+                </response>
+                <save-test-trigger/>
+            </submission>
+        </xforms:instance>
+
+        <xforms:bind nodeset="instance('fb-submission-editor-instance')">
+            <xforms:bind nodeset="id" type="xs:NCName"
+                         constraint="(normalize-space() != '' and normalize-space() = ../initial-id)
+                                        or not(../submission-id = $model/xforms:submission/@id
+                                            or ../instance-id = $model/xforms:instance/@id)"/>
+            <xforms:bind nodeset="submission-id" calculate="concat(../id, '-submission')"/>
+            <xforms:bind nodeset="instance-id" calculate="concat(../id, '-instance')"/>
+            <xforms:bind nodeset="request/resource" type="xs:anyURI" required="true()"/>
+            <xforms:bind nodeset="request/is-soap" type="xs:boolean"/>
+            <xforms:bind nodeset="request/soap-action"/>
+            <xforms:bind nodeset="request/content" required="true()"/>
+            <xforms:bind nodeset="response/error-type" readonly="true()"/>
+            <xforms:bind nodeset="save-test-trigger" readonly="not(xxforms:valid(.., true(), true()))"/>
+        </xforms:bind>
+
+        <!-- Template for inserting a submission -->
+        <xforms:instance id="fb-submission-template" xxforms:readonly="true">
+            <xforms:submission id="" ref="" resource="" method="get" mediatype="application/xml" replace="instance"/>
+        </xforms:instance>
+
+        <!-- Template for inserting an instance-->
+        <xforms:instance id="fb-instance-template" xxforms:readonly="true">
+            <xforms:instance id="">
+                <request/>
+            </xforms:instance>
+        </xforms:instance>
+
+        <!-- Submission to test a submission -->
+        <xforms:submission id="fb-test-submission-submission"
+                ref="saxon:parse(instance('fb-submission-editor-instance')/request/content)/*"
+                method="{instance('fb-submission-editor-instance')/request/method}" resource="{instance('fb-submission-editor-instance')/request/resource}"
+                mediatype="application/xml"
+                replace="text" target="instance('fb-test-submission-result-instance')"/>
+
+        <!-- Submission results end up here as text -->
+        <xforms:instance id="fb-test-submission-result-instance">
+            <dummy/>
+        </xforms:instance>
+    </xforms:model>
+
 </xxforms:dialog>

@@ -762,7 +762,8 @@
         <xforms:model id="fr-sections-model"
                       xxforms:external-events="fr-after-collapse {@xxforms:external-events}"
                       xxforms:readonly-appearance="{if (doc('input:instance')/*/mode = ('view', 'print', 'pdf')) then 'static' else 'dynamic'}"
-                      xxforms:order="help label control alert hint">
+                      xxforms:order="help label control alert hint"
+                      xxforms:computed-binds="revalidate">
             <xsl:copy-of select="@* except (@id, @xxforms:external-events)"/>
             <!-- Contain section being currently expanded/collapsed -->
             <!-- TODO: This probably doesn't quite work for sections within repeats -->
@@ -834,10 +835,13 @@
         <!-- Handle error summary -->
         <xi:include href="includes/error-summary-model.xml" xxi:omit-xml-base="true"/>
 
-        <!-- Copy existing model -->
+        <!-- Copy existing main model -->
         <xsl:copy>
             <xsl:apply-templates select="@*|node()"/>
         </xsl:copy>
+
+        <!-- Copy other models present in the UI -->
+        <xsl:copy-of select="/xhtml:html/xhtml:body//xforms:model"/>
 
         <!-- Handle collapsible sections -->
         <xi:include href="includes/collapse-script.xhtml" xxi:omit-xml-base="true"/>
@@ -845,6 +849,9 @@
         <xi:include href="includes/check-dirty-script.xhtml" xxi:omit-xml-base="true"/>
 
     </xsl:template>
+
+    <!-- Filter out models in the UI as they are copied separately -->
+    <xsl:template match="xhtml:body//xforms:model"/>
 
     <!-- Add a default xforms:alert for those fields which don't have one -->
     <xsl:template match="xhtml:body//xforms:*[local-name() = ('input', 'textarea', 'select', 'select1', 'upload') and not(xforms:alert) and not(@appearance = 'fr:in-place')]">

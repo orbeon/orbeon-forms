@@ -135,12 +135,12 @@
                                     <!--<xforms:label>Reason Phrase</xforms:label>-->
                                 <!--</xforms:output>-->
 
-                                <xforms:group ref=".[response/header]">
+                                <xforms:group ref=".[response/headers/header]">
                                     <xforms:label>Headers</xforms:label>
                                     <fr:grid columns="1">
                                         <xhtml:tr>
                                             <xhtml:td>
-                                                <fr:repeat nodeset="response/header" id="fb-response-headers-repeat"
+                                                <fr:repeat nodeset="response/headers/header" id="fb-response-headers-repeat"
                                                            columns="2" appearance="xxforms:table" readonly="true">
                                                     <xhtml:tr>
                                                         <xhtml:td>
@@ -181,11 +181,13 @@
 
                 <!-- Test submission -->
                 <xforms:action ev:event="DOMActivate">
+                    <!-- Clear response -->
+                    <xforms:setvalue xxforms:iterate="$instance/response/*[not(*)]" ref="."/>
+                    <xforms:delete xxforms:iterate="$instance/response/headers/header" nodeset="."/>
+
+                    <!-- Toggle back response submission -->
                     <xforms:toggle case="fb-submission-dialog-none"/>
-                    <!-- Clear response data -->
-                    <xforms:delete nodeset="$instance/response/headers"/>
-                    <xforms:setvalue xxforms:iterate="$instance/response/*[not(*)]"/>
-                    <xforms:setvalue ref="instance('fb-test-submission-result-instance')"/>
+
                     <!-- Send submission -->
                     <xforms:send submission="fb-test-submission-submission"/>
                 </xforms:action>
@@ -196,13 +198,12 @@
                     <xforms:action context="$instance/response">
                         <xforms:setvalue ref="resource-uri" value="event('resource-uri')"/>
                         <xforms:setvalue ref="status-code" value="event('response-status-code')"/>
-                        <xforms:delete nodeset="header" while="header"/>
-                        <xforms:insert nodeset="*" origin="event('response-headers')"/>
+                        <xforms:delete xxforms:iterate="headers/header" nodeset="."/>
+                        <xforms:insert context="headers" origin="event('response-headers')"/>
                         <!-- Handle response body -->
                         <xxforms:variable name="error-body" select="event('response-body')"/>
                         <xforms:setvalue if="$error-body" ref="content" value="if ($error-body castable as xs:string)
                             then $error-body else saxon:serialize($error-body, xxforms:instance('fb-xsl-output-instance'))"/>
-                        <xforms:setvalue if="not($error-body)" ref="content" value="instance('fb-test-submission-result-instance')"/>
                     </xforms:action>
                 </xforms:action>
                 <!-- Error actions -->
@@ -270,15 +271,19 @@
     <xforms:action ev:event="xxforms-dialog-open">
         <xxforms:variable name="instance" select="instance('fb-submission-editor-instance')"/>
         <xxforms:variable name="submission-id" select="event('submission-id')"/>
-        <!-- Clear instance -->
+
+        <!-- Clear instance entirely -->
         <xforms:setvalue xxforms:iterate="$instance//*[not(*)]" ref="."/>
         <xforms:setvalue ref="$instance/request/is-soap">false</xforms:setvalue>
         <xforms:setvalue ref="$instance/request/method" value="instance('fb-submission-template')/@method"/>
         <xforms:setvalue ref="$instance/request/mediatype" value="instance('fb-submission-template')/@mediatype"/>
         <xforms:setvalue ref="$instance/request/replace" value="instance('fb-submission-template')/@replace"/>
-        <xforms:delete nodeset="$instance/response/headers"/>
+        <xforms:delete xxforms:iterate="$instance/response/headers/header" nodeset="."/>
 
-        <!-- Set parameters if any -->
+        <!-- Toggle back response submission -->
+        <xforms:toggle case="fb-submission-dialog-none"/>
+
+        <!-- Copy parameters if any -->
         <xforms:action if="$submission-id">
             <xforms:setvalue ref="$instance/id" value="$submission-id"/>
             <xforms:setvalue ref="$instance/initial-id" value="$submission-id"/>
@@ -288,10 +293,9 @@
             <xforms:setvalue ref="$instance/request/resource" value="$submission/@resource"/>
             <xforms:setvalue ref="$instance/request/replace" value="$submission/@replace"/>
             <xforms:setvalue ref="$instance/request/content" value="$model/xforms:instance[@id = concat($submission-id, '-instance')]/request"/>
-            <!--<xforms:setvalue ref="$instance/request/content" value="saxon:serialize($model/xforms:instance[@id = concat($submission-id, '-instance')]/*, xxforms:instance('fb-xsl-output-instance'))"/>-->
         </xforms:action>
 
-        <!-- Set focus when the dialog opens -->
+        <!-- Set focus to first input -->
         <xforms:setfocus control="fb-submission-id-input"/>
     </xforms:action>
 
@@ -357,14 +361,11 @@
         <!-- Submission to test a submission -->
         <xforms:submission id="fb-test-submission-submission"
                 ref="saxon:parse(instance('fb-submission-editor-instance')/request/content)/*"
-                method="{instance('fb-submission-editor-instance')/request/method}" resource="{instance('fb-submission-editor-instance')/request/resource}"
+                method="{instance('fb-submission-editor-instance')/request/method}"
+                resource="{instance('fb-submission-editor-instance')/request/resource}"
                 mediatype="application/xml"
-                replace="text" target="instance('fb-test-submission-result-instance')"/>
+                replace="text" target="instance('fb-submission-editor-instance')/response/content"/>
 
-        <!-- Submission results end up here as text -->
-        <xforms:instance id="fb-test-submission-result-instance">
-            <dummy/>
-        </xforms:instance>
     </xforms:model>
 
 </xxforms:dialog>

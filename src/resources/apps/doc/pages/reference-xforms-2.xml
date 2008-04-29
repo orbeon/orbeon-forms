@@ -1243,6 +1243,56 @@
                             </xml-source>
                         </li>
                         <li>
+                            <a name="xxforms-valid"/>
+                            <p>
+                                <code>xxforms:valid($node as node(), $recurse as xs:boolean, $check-required-empty as xs:boolean) as xs:boolean</code>.
+                            </p>
+                            <p>
+                                The <code>xxforms:valid()</code> function returns the validity of a instance data node
+                                or of a subtree of instance data. It recurses into attribute and descendant nodes if the
+                                optional second argument is <code>true()</code>. It takes into account nodes which are
+                                required but empty if the optional third argument is <code>true()</code>.
+                            </p>
+                            <p>
+                                Because of the way the XForms processing model is defined, the evaluation of
+                                <code>calculate</code>, <code>required</code>, <code>readonly</code> and
+                                <code>relevant</code> takes place during the procesing of the
+                                <code>xforms-recalculate</code> event, which generally takes place before the processing
+                                of vaidation with the <code>xforms-revalidate</code> event. This means that by default
+                                using <code>xxforms:valid()</code> to control, for example, whether a button is
+                                read-only or relevant will not work.
+                            </p>
+                            <p>
+                                However, Orbeon Forms allows you to switch the computation of the
+                                <code>required</code>, <code>readonly</code> MIPs to after validation to cover this use
+                                case, with the <code>xxforms:computed-binds</code> property set to
+                                <code>revalidate</code>:
+                            </p>
+                            <xml-source show-namespaces="false">
+                                <xforms:model xxforms:computed-binds="revalidate">
+                                    <xforms:instance id="my-instance">
+                                        <form>
+                                            ...
+                                        </form>
+                                    </xforms:instance>
+                                    <xforms:instance id="triggers">
+                                        <triggers>
+                                            <save-trigger/>
+                                        </triggers>
+                                    </xforms:instance>
+                                    <xforms:bind nodeset="instance('triggers')/save-trigger" readonly="not(xxforms:valid(instance('my-instance'), true(), true()))"/>
+                                </xforms:model>
+                                ...
+                                <xforms:trigger ref="instance('triggers')/save-trigger">
+                                    <xforms:label>Save</xforms:label>
+                                </xforms:trigger>
+                            </xml-source>
+                            <p>
+                                The <code>xxforms:repeat-current()</code> function must be called from within an
+                                <code>xforms:repeat</code> element.
+                            </p>
+                        </li>
+                        <li>
                             <a name="xxforms-repeat-current"/>
                             <p>
                                 <code>xxforms:repeat-current($repeat-id as xs:string?) as node()</code>.

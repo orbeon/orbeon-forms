@@ -25,7 +25,10 @@ import org.orbeon.oxf.xforms.event.events.XFormsSubmitDoneEvent;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.om.FastStringBuffer;
+import org.orbeon.saxon.om.NodeInfo;
+import org.dom4j.*;
 
 import java.io.*;
 import java.net.*;
@@ -435,6 +438,98 @@ public class XFormsSubmissionUtils {
 
     public static String getHttpMethod(String method) {
         return isGet(method) ? "GET" : isPost(method) ? "POST" : isPut(method) ? "PUT" : isDelete(method) ? "DELETE" : null;
+    }
+
+    /**
+     * Check whether an XML sub-tree satifies validity and required MIPs.
+     *
+     * @param containingDocument    current containing document (for logging)
+     * @param startNode             node to recursively check
+     * @param checkValid            whether to check validity
+     * @param checkRequired         whether to check required
+     * @return                      true iif the sub-tree passes the checks
+     */
+    public static boolean isSatisfiesValidRequired(final XFormsContainingDocument containingDocument, final Node startNode, boolean recurse, final boolean checkValid, final boolean checkRequired) {
+
+        if (recurse) {
+            // Recurse into attributes and descendant nodes
+            final boolean[] instanceSatisfiesValidRequired = new boolean[]{true};
+            startNode.accept(new VisitorSupport() {
+
+                public final void visit(Element element) {
+                    final boolean valid = checkInstanceData(element);
+
+                    instanceSatisfiesValidRequired[0] &= valid;
+
+                    if (!valid && XFormsServer.logger.isDebugEnabled()) {
+                        containingDocument.logDebug("submission", "found invalid element",
+                            new String[] { "element name", Dom4jUtils.elementToString(element) });
+                    }
+                }
+
+                public final void visit(Attribute attribute) {
+                    final boolean valid = checkInstanceData(attribute);
+
+                    instanceSatisfiesValidRequired[0] &= valid;
+
+                    if (!valid && XFormsServer.logger.isDebugEnabled()) {
+                        containingDocument.logDebug("submission", "found invalid attribute",
+                            new String[] { "attribute name", Dom4jUtils.attributeToString(attribute), "parent element", Dom4jUtils.elementToString(attribute.getParent()) });
+                    }
+                }
+
+                private final boolean checkInstanceData(Node node) {
+                    // Check "valid" MIP
+                    if (checkValid && !InstanceData.getValid(node)) return false;
+                    // Check "required" MIP
+                    if (checkRequired) {
+                        final boolean isRequired = InstanceData.getRequired(node);
+                        if (isRequired) {
+                            final String value = XFormsInstance.getValueForNode(node);
+                            if (value.length() == 0) {
+                                // Required and empty
+                                return false;
+                            }
+                        }
+                    }
+                    return true;
+                }
+            });
+            return instanceSatisfiesValidRequired[0];
+        } else {
+            // Just check the current node
+            // Check "valid" MIP
+            if (checkValid && !InstanceData.getValid(startNode)) return false;
+            // Check "required" MIP
+            if (checkRequired) {
+                final boolean isRequired = InstanceData.getRequired(startNode);
+                if (isRequired) {
+                    final String value = XFormsInstance.getValueForNode(startNode);
+                    if (value.length() == 0) {
+                        // Required and empty
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+    }
+
+    public static boolean isSatisfiesValidRequired(NodeInfo nodeInfo, boolean checkValid, boolean checkRequired) {
+        // Check "valid" MIP
+        if (checkValid && !InstanceData.getValid(nodeInfo)) return false;
+        // Check "required" MIP
+        if (checkRequired) {
+            final boolean isRequired = InstanceData.getRequired(nodeInfo);
+            if (isRequired) {
+                final String value = XFormsInstance.getValueForNodeInfo(nodeInfo);
+                if (value.length() == 0) {
+                    // Required and empty
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }
 

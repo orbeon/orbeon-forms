@@ -1036,44 +1036,29 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
     private Document createDocumentToSubmit(PipelineContext pipelineContext, NodeInfo currentNodeInfo, XFormsInstance currentInstance, XFormsModel modelForInstance) {
         final Document documentToSubmit;
 
-        // Create document to submit
-        try {
-            // Revalidate instance
+        // Revalidate instance
+        // NOTE: We need to do this here so that bind/@type works correctly. XForms 1.1 seems to say that this
+        // must be done after pruning, but then it is not clear how XML Schema validation would work then.
+        if (modelForInstance != null)
+            modelForInstance.doRevalidate(pipelineContext);
 
-            // NOTE: We need to do this here so that bind/@type works correctly. XForms 1.1 seems to say that this
-            // must be done after pruning, but then it is not clear how XML Schema validation would work then.
+        // Get selected nodes (re-root and prune)
+        documentToSubmit = reRootAndPrune(currentNodeInfo);
 
-            if (modelForInstance != null)
-                modelForInstance.doRevalidate(pipelineContext);
-
-            // Get selected nodes (re-root and prune)
-            documentToSubmit = reRootAndPrune(currentNodeInfo);
-
-            // Temporarily change instance document so that we can run validation again
-            // TODO: Do we need to do this now that validation takes place before?
-//            modelForInstance.setInstanceDocument(documentToSubmit,
-//                    currentInstance.getModelId(), currentInstance.getEffectiveId(), currentInstance.getSourceURI(),
-//                    currentInstance.getUsername(), currentInstance.getPassword(),
-//                    currentInstance.isApplicationShared(),
-//                    currentInstance.getTimeToLive(),
-//                    currentInstance.getValidation());
-
-            // Check that there are no validation errors
-            // NOTE: If the instance is read-only, it can't have MIPs, and can't fail validation/requiredness, so we don't go through the process at all.
-            final boolean instanceSatisfiesValidRequired = (currentInstance != null && currentInstance.isReadOnly()) || isDocumentSatisfiesValidRequired(documentToSubmit);
-            if (!instanceSatisfiesValidRequired) {
-                if (logger.isDebugEnabled()) {
-                    final String documentString = TransformerUtils.tinyTreeToString(currentNodeInfo);
-                    containingDocument.logDebug("submission", "instance document or subset thereof cannot be submitted",
-                            new String[] { "document", documentString });
-                }
-                throw new XFormsSubmissionException("xforms:submission: instance to submit does not satisfy valid and/or required model item properties.",
-                        "checking instance validity", XFormsSubmitErrorEvent.ErrorType.VALIDATION_ERROR);
+        // Check that there are no validation errors
+        // NOTE: If the instance is read-only, it can't have MIPs at the moment, and can't fail validation/requiredness, so we don't go through the process at all.
+        final boolean instanceSatisfiesValidRequired
+                = (currentInstance != null && currentInstance.isReadOnly())
+                || !validate
+                || XFormsSubmissionUtils.isSatisfiesValidRequired(containingDocument, documentToSubmit, true, true, true);
+        if (!instanceSatisfiesValidRequired) {
+            if (logger.isDebugEnabled()) {
+                final String documentString = TransformerUtils.tinyTreeToString(currentNodeInfo);
+                containingDocument.logDebug("submission", "instance document or subset thereof cannot be submitted",
+                        new String[] { "document", documentString });
             }
-        } finally {
-            // Restore instance document
-            // TODO: Do we need to do this now that validation takes place before?
-//            modelForInstance.setInstance(currentInstance, currentInstance.isReplaced());
+            throw new XFormsSubmissionException("xforms:submission: instance to submit does not satisfy valid and/or required model item properties.",
+                    "checking instance validity", XFormsSubmitErrorEvent.ErrorType.VALIDATION_ERROR);
         }
 
         return documentToSubmit;
@@ -1173,54 +1158,6 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
         });
 
         return sb.toString();
-    }
-
-    private boolean isDocumentSatisfiesValidRequired(final Document documentToSubmit) {
-        final boolean[] instanceSatisfiesValidRequired = new boolean[]{true};
-        if (validate) {
-            documentToSubmit.accept(new VisitorSupport() {
-
-                public final void visit(Element element) {
-                    final boolean valid = checkInstanceData(element);
-
-                    instanceSatisfiesValidRequired[0] &= valid;
-
-                    if (!valid && XFormsServer.logger.isDebugEnabled()) {
-                        containingDocument.logDebug("submission", "found invalid element",
-                            new String[] { "element name", Dom4jUtils.elementToString(element) });
-                    }
-                }
-
-                public final void visit(Attribute attribute) {
-                    final boolean valid = checkInstanceData(attribute);
-
-                    instanceSatisfiesValidRequired[0] &= valid;
-
-                    if (!valid && XFormsServer.logger.isDebugEnabled()) {
-                        containingDocument.logDebug("submission", "found invalid attribute",
-                            new String[] { "attribute name", Dom4jUtils.attributeToString(attribute), "parent element", Dom4jUtils.elementToString(attribute.getParent()) });
-                    }
-                }
-
-                private final boolean checkInstanceData(Node node) {
-                    // Check "valid" MIP
-                    if (!InstanceData.getValid(node)) return false;
-                    // Check "required" MIP
-                    {
-                        final boolean isRequired = InstanceData.getRequired(node);
-                        if (isRequired) {
-                            final String value = XFormsInstance.getValueForNode(node);
-                            if (value.length() == 0) {
-                                // Required and empty
-                                return false;
-                            }
-                        }
-                    }
-                    return true;
-                }
-            });
-        }
-        return instanceSatisfiesValidRequired[0];
     }
 
     private XFormsSubmitErrorEvent createErrorEvent(PipelineContext pipelineContext, ConnectionResult connectionResult, ErrorType errorType) throws IOException {

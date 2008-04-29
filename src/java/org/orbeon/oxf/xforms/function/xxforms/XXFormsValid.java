@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2005 Orbeon, Inc.
+ *  Copyright (C) 2008 Orbeon, Inc.
  *
  *  This program is free software; you can redistribute it and/or modify it under the terms of the
  *  GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -13,12 +13,53 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms;
 
-import org.orbeon.oxf.xforms.InstanceData;
-import org.orbeon.oxf.xforms.function.exforms.EXFormsMIP;
+import org.dom4j.Node;
+import org.orbeon.oxf.xforms.XFormsSubmissionUtils;
+import org.orbeon.oxf.xforms.function.XFormsFunction;
+import org.orbeon.saxon.dom4j.NodeWrapper;
+import org.orbeon.saxon.expr.Expression;
+import org.orbeon.saxon.expr.ExpressionTool;
+import org.orbeon.saxon.expr.XPathContext;
+import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.saxon.trans.XPathException;
+import org.orbeon.saxon.value.BooleanValue;
 
-public class XXFormsValid  extends EXFormsMIP {
-    protected boolean getResult(NodeInfo nodeInfo) {
-        return InstanceData.getValid(nodeInfo);
+public class XXFormsValid extends XFormsFunction {
+
+    public Item evaluateItem(XPathContext xpathContext) throws XPathException {
+
+        final Expression nodesetExpression = argument[0];
+        // "If the argument is omitted, it defaults to a node-set with the context node as its only
+        // member."
+        final Item item;
+        if (nodesetExpression == null)
+            item = xpathContext.getContextItem();
+        else
+            item = nodesetExpression.iterate(xpathContext).next();
+
+        // Whether to recurse
+        final Expression recurseExpression = (argument == null || argument.length < 2) ? null : argument[1];
+        final boolean recurse = (recurseExpression != null) ? ExpressionTool.effectiveBooleanValue(recurseExpression.iterate(xpathContext)) : false;
+
+        // Whether to check required-but-empty
+        final Expression requiredButEmptyExpression = (argument == null || argument.length < 3) ? null : argument[2];
+        final boolean requiredButEmpty = (requiredButEmptyExpression != null) ? ExpressionTool.effectiveBooleanValue(requiredButEmptyExpression.iterate(xpathContext)) : false;
+
+        // "If the node-set is empty then the function returns false."
+        if (item == null || !(item instanceof NodeInfo))
+            return BooleanValue.FALSE;
+
+        final boolean result;
+        if (recurse && item instanceof NodeWrapper) {
+            // Recurse starting with the current node
+            // NOTE: Don't recurse if we don't have a NodeWrapper, as those con't support MIPs anyway yet
+            final Node node = (Node) ((NodeWrapper) item).getUnderlyingNode();
+            result = XFormsSubmissionUtils.isSatisfiesValidRequired(getContainingDocument(xpathContext), node, true, true, requiredButEmpty);
+        } else {
+            // Just return the value associated with this node
+            result = XFormsSubmissionUtils.isSatisfiesValidRequired((NodeInfo) item, true, requiredButEmpty);
+        }
+        return BooleanValue.get(result);
     }
 }

@@ -52,14 +52,10 @@ import java.util.*;
  */
 public class XFormsModelBinds {
 
-    // Model to which we belong
-    private final XFormsModel model;
-
-    // Current containing document
-    private final XFormsContainingDocument containingDocument;
-
-    // Context stack for evaluation
-    private XFormsContextStack contextStack;
+    private final XFormsModel model;                            // model to which we belong
+    private final XFormsContainingDocument containingDocument;  // current containing document
+    private final boolean computedBindsCalculate;               // whether computed binds (readonly, required, relevant) are evaluated with recalculate or revalidate
+    private XFormsContextStack contextStack;                    // context stack for evaluation
 
     private List topLevelBinds = new ArrayList();               // List<Bind>
     private Map singleNodeContextBinds = new HashMap();         // Map<String, Bind>
@@ -72,6 +68,7 @@ public class XFormsModelBinds {
         this.contextStack = new XFormsContextStack(model);
 
         this.containingDocument = model.getContainingDocument();
+        this.computedBindsCalculate = XFormsProperties.getComputedBinds(containingDocument).equals(XFormsProperties.COMPUTED_BINDS_RECALCULATE_VALUE);
     }
 
     /**
@@ -104,11 +101,17 @@ public class XFormsModelBinds {
      * @param pipelineContext   current PipelineContext
      */
     public void applyCalculateBinds(final PipelineContext pipelineContext) {
+        // Handle calculations
         iterateBinds(pipelineContext, new BindRunner() {
             public void applyBind(PipelineContext pipelineContext, Bind bind, List nodeset, int position) {
                 handleCalculateBinds(pipelineContext, bind, nodeset, position);
             }
         });
+
+        // Update computed expression binds
+        if (computedBindsCalculate) {
+            applyComputedExpressionBinds(pipelineContext);
+        }
     }
 
     /**
@@ -117,11 +120,23 @@ public class XFormsModelBinds {
      * @param pipelineContext   current PipelineContext
      */
     public void applyComputedExpressionBinds(final PipelineContext pipelineContext) {
-        iterateBinds(pipelineContext, new BindRunner() {
-            public void applyBind(PipelineContext pipelineContext, Bind bind, List nodeset, int position) {
-                handleComputedExpressionBinds(pipelineContext, bind, nodeset, position);
+        // Clear state
+        final List instances = model.getInstances();
+        if (instances != null) {
+            for (Iterator i =  instances.iterator(); i.hasNext();) {
+                XFormsUtils.iterateInstanceData(((XFormsInstance) i.next()), new XFormsUtils.InstanceWalker() {
+                    public void walk(NodeInfo nodeInfo) {
+                        InstanceData.clearOtherState(nodeInfo);
+                    }
+                }, true);
             }
-        });
+
+            iterateBinds(pipelineContext, new BindRunner() {
+                public void applyBind(PipelineContext pipelineContext, Bind bind, List nodeset, int position) {
+                    handleComputedExpressionBinds(pipelineContext, bind, nodeset, position);
+                }
+            });
+        }
     }
 
     /**
@@ -130,11 +145,17 @@ public class XFormsModelBinds {
      * @param pipelineContext   current PipelineContext
      */
     public void applyValidationBinds(final PipelineContext pipelineContext) {
+        // Handle validation
         iterateBinds(pipelineContext, new BindRunner() {
             public void applyBind(PipelineContext pipelineContext, Bind bind, List nodeset, int position) {
                 handleValidationBind(pipelineContext, bind, nodeset, position);
             }
         });
+
+        // Update computed expression binds
+        if (!computedBindsCalculate) {
+            applyComputedExpressionBinds(pipelineContext);
+        }
     }
 
     /**

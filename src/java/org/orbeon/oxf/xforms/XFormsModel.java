@@ -333,7 +333,6 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         // Refresh binds
         doRebuild(pipelineContext);
         binds.applyComputedExpressionBinds(pipelineContext);
-
         doRevalidate(pipelineContext);
 
         synchronizeInstanceDataEventState();
@@ -855,20 +854,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
             final long recalculateStartTime = XFormsServer.logger.isDebugEnabled() ? System.currentTimeMillis() : 0;
 
-            // Clear state
-            for (Iterator i = instances.iterator(); i.hasNext();) {
-                XFormsUtils.iterateInstanceData(((XFormsInstance) i.next()), new XFormsUtils.InstanceWalker() {
-                    public void walk(NodeInfo nodeInfo) {
-                        InstanceData.clearOtherState(nodeInfo);
-                    }
-                }, true);
-            }
-
             // Apply calculate binds
             binds.applyCalculateBinds(pipelineContext);
-
-            // Update computed expression binds
-            binds.applyComputedExpressionBinds(pipelineContext);
 
             if (XFormsServer.logger.isDebugEnabled()) {
                 final long recalculateTime = System.currentTimeMillis() - recalculateStartTime;

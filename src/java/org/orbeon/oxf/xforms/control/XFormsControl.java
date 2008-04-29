@@ -434,7 +434,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
                         for (Iterator i = containingDocument.getModels().iterator(); i.hasNext();) {
                             XFormsModel currentModel = (XFormsModel) i.next();
                             currentModel.getBinds().rebuild(pipelineContext);
-                            currentModel.getBinds().applyComputedExpressionBinds(pipelineContext);
+//                            currentModel.getBinds().applyComputedExpressionBinds(pipelineContext);
                             //containingDocument.dispatchEvent(pipelineContext, new XFormsRecalculateEvent(currentModel, true));
                         }
                         // TODO: Should try to use the code of the <setindex> action

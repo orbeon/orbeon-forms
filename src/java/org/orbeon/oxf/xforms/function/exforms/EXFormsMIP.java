@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms.function.exforms;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.expr.Expression;
-import org.orbeon.saxon.expr.StaticContext;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
@@ -27,14 +26,6 @@ import org.orbeon.saxon.value.BooleanValue;
  * Base class for eXForms MIP functions.
  */
 public abstract class EXFormsMIP extends XFormsFunction {
-
-    /**
-     * preEvaluate: this method suppresses compile-time evaluation by doing nothing
-     * (because the value of the expression depends on the runtime context)
-     */
-    public Expression preEvaluate(StaticContext env) {
-        return this;
-    }
 
     public Item evaluateItem(XPathContext c) throws XPathException {
 
@@ -49,7 +40,7 @@ public abstract class EXFormsMIP extends XFormsFunction {
 
         // "If the node-set is empty then the function returns false."
         if (item == null)
-            return BooleanValue.get(false);
+            return BooleanValue.FALSE;
 
         return BooleanValue.get(getResult((NodeWrapper) item));
     }

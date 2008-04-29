@@ -41,6 +41,7 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
         ALLOWED_XXFORMS_ELEMENTS.put("variable", "");
         ALLOWED_XXFORMS_ELEMENTS.put("attribute", "");
         ALLOWED_XXFORMS_ELEMENTS.put("context", "");
+        ALLOWED_XXFORMS_ELEMENTS.put("size", "");//xforms:upload/xxforms:size
     }
 
     private static final Map ALLOWED_EXFORMS_ELEMENTS = new HashMap();
@@ -329,35 +330,6 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
             }
 
             if (inModel) {
-
-//                boolean found = false;
-//                if (isXForms && "instance".equals(localname)) {
-//                    // Processing an xforms:instance element
-//                    final String srcAttribute = attributes.getValue("src");
-//                    if (srcAttribute != null) {
-//                        final String inputName = ProcessorImpl.getProcessorInputSchemeInputName(srcAttribute);
-//                        if (inputName != null) {
-//                            // Found an input:* URI
-//
-//                            // Take care of namespaces and other fun stuff
-//                            // TODO: Handle locator
-//                            final ContentHandler includeContentHandler = new XIncludeProcessor.XIncludeContentHandler(null, super.getContentHandler(), null, null, null, namespaceSupport, false, new XIncludeProcessor.OutputLocator());
-//
-//                            // Output instance element without @src attribute
-//                            final AttributesImpl newAttributes = new AttributesImpl(attributes);
-//                            newAttributes.removeAttribute(newAttributes.getIndex("src"));
-//                            super.startElement(uri, localname, qName, newAttributes);
-//
-//                            // Include document in the output stream
-//                            uriResolver.readURLAsSAX(srcAttribute, null, null, includeContentHandler);
-//
-//                            found = true;
-//                        }
-//                    }
-//                }
-//                if (!found)
-//                    super.startElement(uri, localname, qName, attributes);
-
                 super.startElement(uri, localname, qName, attributes);
             }
         }

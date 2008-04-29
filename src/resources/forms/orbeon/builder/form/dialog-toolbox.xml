@@ -30,7 +30,7 @@
     <xhtml:div class="fb-xvc">
         <xforms:trigger appearance="minimal" ref="$xcv/cut-trigger">
             <xforms:label>
-                <xhtml:img src="/forms/orbeon/builder/images/cut.gif" alt="Cut" title="Cut"/>
+                <xhtml:img src="/apps/fr/style/images/silk/cut.png" alt="Cut" title="Cut"/>
                 <xhtml:span>Cut</xhtml:span>
             </xforms:label>
             <xforms:action ev:event="DOMActivate">
@@ -58,7 +58,7 @@
         </xforms:trigger>
         <xforms:trigger appearance="minimal" ref="$xcv/paste-trigger">
             <xforms:label>
-                <xhtml:img src="/forms/orbeon/builder/images/paste.gif" alt="Paste" title="Paste"/>
+                <xhtml:img src="/apps/fr/style/images/silk/paste_plain.png" alt="Paste" title="Paste"/>
                 <xhtml:span>Paste</xhtml:span>
             </xforms:label>
             <xforms:action ev:event="DOMActivate">
@@ -73,7 +73,7 @@
         <xhtml:div class="fb-tool">
             <xforms:trigger>
                 <xforms:label>
-                    <xhtml:img src="/apps/fr/style/plus.png" alt="Open section" title="Open section"/>
+                    <xhtml:img src="/apps/fr/style/images/silk/layout_add.png" alt="New Section" title="New Section"/>
                     <xhtml:span>Section</xhtml:span>
                 </xforms:label>
                 <xforms:action ev:event="DOMActivate" context="$body">
@@ -125,8 +125,9 @@
             <xhtml:div class="fb-tool">
                 <xforms:trigger appearance="full">
                     <xforms:label>
-                        <xhtml:img src="/forms/orbeon/builder/images/action1.gif" alt="New 1-Column Grid" title="New 1-Column Grid"/>
-                        <xhtml:span>1-Column Grid</xhtml:span>
+                        <xhtml:img src="/apps/fr/style/images/silk/table_add.png" alt="New 1-Column Grid" title="New 1-Column Grid"/>
+                        <xhtml:span>Grid</xhtml:span>
+                        <!--<xhtml:span>1-Column Grid</xhtml:span>-->
                     </xforms:label>
                     <xforms:action ev:event="DOMActivate">
                         <xforms:insert context="." nodeset="fr:section | fr:repeat | fr:grid"
@@ -135,45 +136,45 @@
                     </xforms:action>
                 </xforms:trigger>
             </xhtml:div>
-            <xhtml:div class="fb-tool">
-                <xforms:trigger appearance="full">
-                    <xforms:label>
-                        <xhtml:img src="/forms/orbeon/builder/images/action2.gif" alt="New 2-Column Grid" title="New 2-Column Grid"/>
-                        <xhtml:span>2-Column Grid</xhtml:span>
-                    </xforms:label>
-                    <xforms:action ev:event="DOMActivate">
-                        <xforms:insert context="." nodeset="fr:section | fr:repeat | fr:grid"
-                                       at="index('fb-section-content-repeat')" position="after"
-                                       origin="instance('fb-grid-2-template')"/>
-                    </xforms:action>
-                </xforms:trigger>
-            </xhtml:div>
-            <xhtml:div class="fb-tool">
-                <xforms:trigger appearance="full">
-                    <xforms:label>
-                        <xhtml:img src="/forms/orbeon/builder/images/action3.gif" alt="New 3-Column Grid" title="New 3-Column Grid"/>
-                        <xhtml:span>3-Column Grid</xhtml:span>
-                    </xforms:label>
-                    <xforms:action ev:event="DOMActivate">
-                        <xforms:insert context="." nodeset="fr:section | fr:repeat | fr:grid"
-                                       at="index('fb-section-content-repeat')" position="after"
-                                       origin="instance('fb-grid-3-template')"/>
-                    </xforms:action>
-                </xforms:trigger>
-            </xhtml:div>
-            <xhtml:div class="fb-tool">
-                <xforms:trigger appearance="full">
-                    <xforms:label>
-                        <xhtml:img src="/forms/orbeon/builder/images/action3.gif" alt="New 4-Column Grid" title="New 4-Column Grid"/>
-                        <xhtml:span>4-Column Grid</xhtml:span>
-                    </xforms:label>
-                    <xforms:action ev:event="DOMActivate">
-                        <xforms:insert context="." nodeset="fr:section | fr:repeat | fr:grid"
-                                       at="index('fb-section-content-repeat')" position="after"
-                                       origin="instance('fb-grid-4-template')"/>
-                    </xforms:action>
-                </xforms:trigger>
-            </xhtml:div>
+            <!--<xhtml:div class="fb-tool">-->
+                <!--<xforms:trigger appearance="full">-->
+                    <!--<xforms:label>-->
+                        <!--<xhtml:img src="/apps/fr/style/images/silk/table_add.png" alt="New 2-Column Grid" title="New 2-Column Grid"/>-->
+                        <!--<xhtml:span>2-Column Grid</xhtml:span>-->
+                    <!--</xforms:label>-->
+                    <!--<xforms:action ev:event="DOMActivate">-->
+                        <!--<xforms:insert context="." nodeset="fr:section | fr:repeat | fr:grid"-->
+                                       <!--at="index('fb-section-content-repeat')" position="after"-->
+                                       <!--origin="instance('fb-grid-2-template')"/>-->
+                    <!--</xforms:action>-->
+                <!--</xforms:trigger>-->
+            <!--</xhtml:div>-->
+            <!--<xhtml:div class="fb-tool">-->
+                <!--<xforms:trigger appearance="full">-->
+                    <!--<xforms:label>-->
+                        <!--<xhtml:img src="/apps/fr/style/images/silk/table_add.png" alt="New 3-Column Grid" title="New 3-Column Grid"/>-->
+                        <!--<xhtml:span>3-Column Grid</xhtml:span>-->
+                    <!--</xforms:label>-->
+                    <!--<xforms:action ev:event="DOMActivate">-->
+                        <!--<xforms:insert context="." nodeset="fr:section | fr:repeat | fr:grid"-->
+                                       <!--at="index('fb-section-content-repeat')" position="after"-->
+                                       <!--origin="instance('fb-grid-3-template')"/>-->
+                    <!--</xforms:action>-->
+                <!--</xforms:trigger>-->
+            <!--</xhtml:div>-->
+            <!--<xhtml:div class="fb-tool">-->
+                <!--<xforms:trigger appearance="full">-->
+                    <!--<xforms:label>-->
+                        <!--<xhtml:img src="/apps/fr/style/images/silk/table_add.png" alt="New 4-Column Grid" title="New 4-Column Grid"/>-->
+                        <!--<xhtml:span>4-Column Grid</xhtml:span>-->
+                    <!--</xforms:label>-->
+                    <!--<xforms:action ev:event="DOMActivate">-->
+                        <!--<xforms:insert context="." nodeset="fr:section | fr:repeat | fr:grid"-->
+                                       <!--at="index('fb-section-content-repeat')" position="after"-->
+                                       <!--origin="instance('fb-grid-4-template')"/>-->
+                    <!--</xforms:action>-->
+                <!--</xforms:trigger>-->
+            <!--</xhtml:div>-->
         </xforms:group>
     </xhtml:div>
     <!-- Controls toolbox -->
@@ -275,7 +276,7 @@
             <!-- Upload CSS -->
             <xforms:trigger>
                 <xforms:label>
-                    <xhtml:img src="/apps/fr/style/css.gif" alt="Upload PDF" title="Upload PDF"/>
+                    <xhtml:img src="/apps/fr/style/images/silk/css.png" alt="Upload CSS" title="Upload CSS"/>
                     <xhtml:span>
                         <xforms:output value="if (xxforms:bind('css-attachment-bind') = '') then 'Upload CSS' else 'Change CSS'"/>
                     </xhtml:span>
@@ -309,7 +310,7 @@
             <!-- Edit Source -->
             <xforms:trigger>
                 <xforms:label>
-                    <xhtml:img src="/apps/fr/style/edit.gif" alt="Edit Source" title="Edit Source"/>
+                    <xhtml:img src="/apps/fr/style/images/silk/xhtml.png" alt="Edit Source" title="Edit Source"/>
                     <xhtml:span>Edit Source</xhtml:span>
                 </xforms:label>
                 <xxforms:show ev:event="DOMActivate" dialog="fb-edit-source-dialog"/>
@@ -396,7 +397,7 @@
                         </xforms:trigger>
                         <xforms:trigger appearance="minimal" id="fb-submission-remove">
                             <xforms:label>
-                                <xforms:label><xhtml:img src="/apps/fr/style/trash.gif" alt="Delete" title="Delete"/></xforms:label>
+                                <xforms:label><xhtml:img src="/apps/fr/style/images/silk/bin_closed.png" alt="Delete" title="Delete"/></xforms:label>
                             </xforms:label>
                             <xforms:action ev:event="DOMActivate">
                                 <!-- Ask confirmation -->

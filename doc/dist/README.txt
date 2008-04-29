@@ -148,10 +148,10 @@ Here are some pointers to useful information related to this release.
 7. Known Issues
 ****************************************
 
-For a list of known issues ordered by priority, consult the ObjectWeb
-issue tracking system:
+For a list of known issues ordered by priority, consult the OW2 issue
+tracking system:
 
-  http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=1&_category=100&_group=100&_sort_col=priority&_sort_ord=DESC&submit=Browse&atid=350207&group_id=168&func=browse
+  http://tinyurl.com/kycl3
 
 
 ****************************************
@@ -192,6 +192,9 @@ This software makes use of a schema for XSLT 2.0 provided under W3C
 Software License. The schema is available at the following location:
 
     jar:orbeon.jar!/org/orbeon/oxf/xml/schemas/xslt-2_0.xsd
+
+This software makes use of the Silk Icons, released under a Creative Commons
+Attribution 2.5 License: http://www.famfamfam.com/lab/icons/silk/
 
 Please consult the third-party-licenses directory for more information
 about individual licenses.

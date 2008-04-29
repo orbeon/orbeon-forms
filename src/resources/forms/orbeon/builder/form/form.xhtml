@@ -236,7 +236,7 @@
                                                                 <xhtml:td class="fb-grid-top-left-td">
                                                                     <xforms:trigger appearance="minimal" id="fb-delete-grid-trigger">
                                                                         <xforms:label>
-                                                                            <xforms:label><xhtml:img src="/apps/fr/style/trash.gif" alt="Delete Grid" title="Delete Grid"/></xforms:label>
+                                                                            <xforms:label><xhtml:img src="/apps/fr/style/images/silk/bin_closed.png" alt="Delete Grid" title="Delete Grid"/></xforms:label>
                                                                         </xforms:label>
                                                                         <xforms:action ev:event="DOMActivate">
                                                                             <!-- Ask confirmation -->
@@ -318,7 +318,7 @@
                                                                         </xhtml:div>
                                                                         <!-- Delete column -->
                                                                         <xforms:trigger appearance="minimal" ref=".[xs:integer($grid/@columns) gt 1]" id="fb-delete-column-trigger">
-                                                                            <xforms:label><xhtml:img src="/apps/fr/style/trash.gif" alt="Delete Column" title="Delete Column"/></xforms:label>
+                                                                            <xforms:label><xhtml:img src="/apps/fr/style/images/silk/bin_closed.png" alt="Delete Column" title="Delete Column"/></xforms:label>
                                                                             <xforms:action ev:event="DOMActivate">
 
                                                                                 <!-- Prepare span grid -->
@@ -418,7 +418,7 @@
                                                                             </xhtml:div>
                                                                             <!-- Delete row -->
                                                                             <xforms:trigger appearance="minimal" ref=".[count($grid/xhtml:tr) gt 1]" id="fb-delete-row-trigger">
-                                                                                <xforms:label><xhtml:img src="/apps/fr/style/trash.gif" alt="Delete Row" title="Delete Row"/></xforms:label>
+                                                                                <xforms:label><xhtml:img src="/apps/fr/style/images/silk/bin_closed.png" alt="Delete Row" title="Delete Row"/></xforms:label>
                                                                                 <xforms:action ev:event="DOMActivate">
 
                                                                                     <xxforms:variable name="count" select="count($tr/xhtml:td[xforms:*])"/>
@@ -539,7 +539,7 @@
                                                                                 <!-- Expand cell down -->
                                                                                 <xforms:group ref=".[exists($td/../following-sibling::xhtml:tr[xs:integer(if ($td/@rowspan) then $td/@rowspan else 1)])]">
                                                                                     <xforms:trigger appearance="minimal" id="fb-expand-cell-down-trigger">
-                                                                                        <xforms:label><xhtml:img src="/apps/fr/style/down.gif" alt="Expand" title="Expand"/></xforms:label>
+                                                                                        <xforms:label><xhtml:img src="/apps/fr/style/images/silk/arrow_down.png" alt="Expand" title="Expand"/></xforms:label>
                                                                                         <xforms:action ev:event="DOMActivate">
 
                                                                                             <!-- Prepare span grid -->
@@ -594,10 +594,10 @@
                                                                                 <!-- Shrink -->
                                                                                 <xforms:group ref=".[$td/@rowspan and $td/@rowspan > 1]">
                                                                                     <xforms:trigger appearance="minimal" id="fb-shrink-cell-down-trigger">
-                                                                                        <xforms:label><xhtml:img src="/apps/fr/style/up.gif" alt="Shrink" title="Shrink"/></xforms:label>
+                                                                                        <xforms:label><xhtml:img src="/apps/fr/style/images/silk/arrow_up.png" alt="Shrink" title="Shrink"/></xforms:label>
                                                                                         <xforms:action ev:event="DOMActivate">
 
-                                                                                            <!-- Prepare span grid -->
+                                                                       pub                     <!-- Prepare span grid -->
                                                                                             <xforms:dispatch name="fb-prepare-span-grid" target="fr-form-model">
                                                                                                 <xxforms:context name="grid" select="$grid"/>
                                                                                             </xforms:dispatch>
@@ -618,7 +618,7 @@
                                                                                 <!-- Delete control -->
                                                                                 <xforms:group ref=".[$control]">
                                                                                     <xforms:trigger appearance="minimal">
-                                                                                        <xforms:label><xhtml:img src="/apps/fr/style/trash.gif" alt="Delete Control" title="Delete Control"/></xforms:label>
+                                                                                        <xforms:label><xhtml:img src="/apps/fr/style/images/silk/bin_closed.png" alt="Delete Control" title="Delete Control"/></xforms:label>
                                                                                         <xforms:action ev:event="DOMActivate">
                                                                                             <!-- Delete control -->
                                                                                             <xforms:dispatch name="fb-delete-control" target="fr-form-model">
@@ -632,7 +632,7 @@
                                                                             <xforms:group ref=".[$control]" class="fb-grid-control-icons">
                                                                                 <!-- Edit details for any control -->
                                                                                 <xforms:trigger appearance="minimal" id="fb-edit-details-trigger">
-                                                                                    <xforms:label><xhtml:img class="fb-control-help" alt="Details" title="" src="/apps/fr/style/edit.gif"/></xforms:label>
+                                                                                    <xforms:label><xhtml:img class="fb-control-help" alt="Details" title="" src="/apps/fr/style/images/silk/cog.png"/></xforms:label>
                                                                                     <xforms:action ev:event="DOMActivate" context="instance('fb-details-editor-instance')">
                                                                                         <xxforms:show dialog="fb-edit-details-dialog" neighbor="fb-edit-details-trigger">
                                                                                             <xxforms:context name="control" select="$control"/>
@@ -644,7 +644,7 @@
 
                                                                                 <!-- Edit help for any control -->
                                                                                 <xforms:trigger appearance="minimal" id="fb-edit-help-trigger">
-                                                                                    <xforms:label><xhtml:img class="fb-control-help" alt="Help" title="" src="/ops/images/xforms/help.gif"/></xforms:label>
+                                                                                    <xforms:label><xhtml:img class="fb-control-help" alt="Help" title="" src="/ops/images/xforms/help.png"/></xforms:label>
                                                                                     <xforms:action ev:event="DOMActivate">
                                                                                         <xforms:setvalue ref="$variables/result-node" value="$resource-holder/help/saxon:path()"/>
                                                                                         <xxforms:show dialog="fb-edit-help-dialog" neighbor="fb-edit-help-trigger"/>
@@ -653,7 +653,7 @@
 
                                                                                 <!-- Edit validation for any control -->
                                                                                 <xforms:trigger appearance="minimal" id="fb-edit-alert-trigger">
-                                                                                    <xforms:label><xhtml:img class="fb-control-alert" alt="Alert" title="" src="/ops/images/xforms/error.gif"/></xforms:label>
+                                                                                    <xforms:label><xhtml:img class="fb-control-alert" alt="Alert" title="" src="/apps/fr/style/images/silk/exclamation.png"/></xforms:label>
                                                                                     <xforms:action ev:event="DOMActivate">
                                                                                         <xforms:setvalue ref="$current-control-name" value="$control-name"/>
                                                                                         <xxforms:show dialog="fb-edit-validation-dialog" neighbor="fb-edit-alert-trigger"/>
@@ -1010,7 +1010,7 @@
                 <!-- Publish form -->
                 <xforms:trigger id="fb-publish-button" model="fr-form-model" ref="instance('fb-variables')/publish-trigger">
                     <xforms:label>
-                        <xhtml:img src="/forms/orbeon/builder/images/upload.png" alt="Publish" title="Publish"/>
+                        <xhtml:img src="/apps/fr/style/images/silk/world.png" alt="Publish" title="Publish"/>
                         <xhtml:span>Publish</xhtml:span>
                     </xforms:label>
                     <xforms:action ev:event="DOMActivate">

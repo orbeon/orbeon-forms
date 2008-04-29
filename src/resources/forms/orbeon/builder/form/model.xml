@@ -786,7 +786,7 @@
                     </xforms:input>
                 </xhtml:div>
             </template>
-            <template label="Date Picker" image="/ops/images/xforms/calendar.gif">
+            <template label="Date Picker" image="/ops/images/xforms/calendar.png">
                 <xhtml:div class="date-input">
                     <xforms:input id="" ref="" incremental="true">
                         <xforms:label ref=""/>
@@ -807,7 +807,7 @@
                     <!--</xforms:input>-->
                 <!--</xhtml:div>-->
             <!--</template>-->
-            <!--<template label="Date and Time" image="/ops/images/xforms/calendar.gif">-->
+            <!--<template label="Date and Time" image="/ops/images/xforms/calendar.png">-->
                 <!--<xhtml:div class="dateTime-input">-->
                     <!--<xforms:input id="" ref="" incremental="true">-->
                         <!--<xforms:label ref=""/>-->
@@ -921,7 +921,7 @@
                     </xforms:trigger>
                 </xhtml:div>
             </template>
-            <template label="Image">
+            <template label="Image" image="/apps/fr/style/images/silk/images.png">
                 <xhtml:div class="image">
                     <xforms:output id="" bind="" mediatype="image/*" class="fr-attachment">
                         <xforms:label ref=""/>

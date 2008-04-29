@@ -30,7 +30,7 @@
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
-        <xforms:trigger class="xforms-trigger-appearance-modal">
+        <xforms:trigger xxforms:modal="true">
             <xforms:label>Do long operation</xforms:label>
             <xforms:send ev:event="DOMActivate" submission="sleep-5-seconds"/>
         </xforms:trigger>

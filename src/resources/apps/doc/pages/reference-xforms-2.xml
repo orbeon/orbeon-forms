@@ -1640,6 +1640,9 @@
                             </p>
                             <ul>
                                 <li>
+                                    <code>method</code>
+                                </li>
+                                <li>
                                     <code>action</code> and <code>resource</code>
                                 </li>
                                 <li>

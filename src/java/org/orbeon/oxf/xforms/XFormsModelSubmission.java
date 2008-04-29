@@ -70,7 +70,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
     private String avtActionOrResource; // required unless there is a nested xforms:resource element
     private String resolvedActionOrResource;
-    private String method; // required
+    private String avtMethod; // required
+    private String resolvedMethod;
 
     private boolean validate = true;
     private boolean relevant = true;
@@ -156,8 +157,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         "processing xforms:submission attributes");
             }
 
-            method = submissionElement.attributeValue("method");
-            method = Dom4jUtils.qNameToexplodedQName(Dom4jUtils.extractAttributeValueQName(submissionElement, "method"));
+            avtMethod = submissionElement.attributeValue("method");
 
             validate = !"false".equals(submissionElement.attributeValue("validate"));
             relevant = !"false".equals(submissionElement.attributeValue("relevant"));
@@ -252,8 +252,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
     }
 
     private boolean isMethodOptimizedLocalSubmission() {
-        return method.startsWith(XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, ""))
-                && (XFormsSubmissionUtils.isGet(method) || XFormsSubmissionUtils.isPost(method) || XFormsSubmissionUtils.isPut(method));
+        return resolvedMethod.startsWith(XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, ""))
+                && (XFormsSubmissionUtils.isGet(resolvedMethod) || XFormsSubmissionUtils.isPost(resolvedMethod) || XFormsSubmissionUtils.isPut(resolvedMethod));
     }
 
     public String getId() {
@@ -293,15 +293,15 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
             // Make sure submission element info is extracted
             extractSubmissionElement();
 
+            // XPath function library and namespace mappings
+            final FunctionLibrary functionLibrary = XFormsContainingDocument.getFunctionLibrary();
+            final Map prefixToURIMap = containingDocument.getStaticState().getNamespaceMappings(getEffectiveId());
+
             try {
                 final boolean isReplaceAll = replace.equals(XFormsConstants.XFORMS_SUBMIT_REPLACE_ALL);
                 final boolean isReplaceInstance = replace.equals(XFormsConstants.XFORMS_SUBMIT_REPLACE_INSTANCE);
                 final boolean isReplaceText = replace.equals(XFormsConstants.XFORMS_SUBMIT_REPLACE_TEXT);
                 final boolean isReplaceNone = replace.equals(XFormsConstants.XFORMS_SUBMIT_REPLACE_NONE);
-
-                final boolean isHandlingOptimizedGet = XFormsProperties.isOptimizeGetAllSubmission(containingDocument) && XFormsSubmissionUtils.isGet(method)
-                        && isReplaceAll
-                        && avtXXFormsUsername == null; // can't optimize if there are authentication credentials
 
                 // Get current node for xforms:submission and instance containing the node to submit
                 final NodeInfo currentNodeInfo;
@@ -360,6 +360,16 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                     }
                 }
 
+                // Evaluate early AVTs
+                {
+                    final String resolvedMethodQName = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, currentNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtMethod);
+                    resolvedMethod = Dom4jUtils.qNameToexplodedQName(Dom4jUtils.extractTextValueQName(prefixToURIMap, resolvedMethodQName));
+                }
+
+                final boolean isHandlingOptimizedGet = XFormsProperties.isOptimizeGetAllSubmission(containingDocument) && XFormsSubmissionUtils.isGet(resolvedMethod)
+                        && isReplaceAll
+                        && avtXXFormsUsername == null; // can't optimize if there are authentication credentials
+
                 final boolean isDeferredSubmission = (isReplaceAll && !isHandlingOptimizedGet) || (!isReplaceAll && serialize && hasBoundRelevantUploadControl);
                 final boolean isDeferredSubmissionFirstPass = isDeferredSubmission && XFormsEvents.XFORMS_SUBMIT.equals(eventName);
                 final boolean isDeferredSubmissionSecondPass = isDeferredSubmission && !isDeferredSubmissionFirstPass; // here we get XXFORMS_SUBMIT
@@ -411,13 +421,10 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                     initialDocumentToSubmit = null;
                 }
 
-                final Map prefixToURIMap = containingDocument.getStaticState().getNamespaceMappings(getEffectiveId());
-
                 // Deferred submission: end of the first pass
                 if (isDeferredSubmissionFirstPass) {
 
                     // Resolve the target AVT if needed
-                    final FunctionLibrary functionLibrary = XFormsContainingDocument.getFunctionLibrary();
                     resolvedXXFormsTarget = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, currentNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtXXFormsTarget);
 
                     // When replace="all", we wait for the submission of an XXFormsSubmissionEvent from the client
@@ -425,10 +432,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                     return;
                 }
 
-                // Evaluate AVTs
+                // Evaluate late AVTs
                 {
-                    final FunctionLibrary functionLibrary = XFormsContainingDocument.getFunctionLibrary();
-
                     final String tempActionOrResource = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, currentNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtActionOrResource);
                     resolvedActionOrResource = XFormsUtils.encodeHRRI(tempActionOrResource, true);
 
@@ -448,7 +453,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 final boolean isApplicationSharedHint = "application".equals(resolvedXXFormsShared);
                 final long timeToLive = XFormsInstance.getTimeToLive(submissionElement);
                 if (isApplicationSharedHint) {
-                    if (!XFormsSubmissionUtils.isGet(method))
+                    if (!XFormsSubmissionUtils.isGet(resolvedMethod))
                         throw new XFormsSubmissionException("xforms:submission: xxforms:shared=\"application\" can be set only with method=\"get\".",
                                 "checking read-only and shared hints");
                     if (!isReplaceInstance)
@@ -536,15 +541,15 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 final String queryString;
                 final String defaultMediatypeForSerialization;
                 {
-                    if (method.equals("multipart-post")) {
+                    if (resolvedMethod.equals("multipart-post")) {
 
                         // Set default serialization based on method
                         if (serialization == null)
                             serialization = "multipart/related";
 
                         // TODO
-                        throw new XFormsSubmissionException("xforms:submission: submission method not yet implemented: " + method, "serializing instance");
-                    } else if (method.equals("form-data-post")) {
+                        throw new XFormsSubmissionException("xforms:submission: submission method not yet implemented: " + resolvedMethod, "serializing instance");
+                    } else if (resolvedMethod.equals("form-data-post")) {
 
                         // Set default serialization based on method
                         if (serialization == null)
@@ -554,8 +559,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
 //                        final MultipartFormDataBuilder builder = new MultipartFormDataBuilder(, , null);
 
-                        throw new XFormsSubmissionException("xforms:submission: submission method not yet implemented: " + method, "serializing instance");
-                    } else if (method.equals("urlencoded-post")) {
+                        throw new XFormsSubmissionException("xforms:submission: submission method not yet implemented: " + resolvedMethod, "serializing instance");
+                    } else if (resolvedMethod.equals("urlencoded-post")) {
 
                         // Set default serialization based on method
                         if (serialization == null)
@@ -566,7 +571,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         messageBody = serialize? createWwwFormUrlEncoded(documentToSubmit).getBytes("UTF-8") : null;// the resulting string is already ASCII
                         defaultMediatypeForSerialization = "application/x-www-form-urlencoded";
 
-                    } else if (XFormsSubmissionUtils.isPost(method) || XFormsSubmissionUtils.isPut(method)) {
+                    } else if (XFormsSubmissionUtils.isPost(resolvedMethod) || XFormsSubmissionUtils.isPut(resolvedMethod)) {
 
                         // Set default serialization based on method
                         if (serialization == null)
@@ -621,7 +626,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         }
                         queryString = null;
 
-                    } else if (XFormsSubmissionUtils.isGet(method) || XFormsSubmissionUtils.isDelete(method)) {
+                    } else if (XFormsSubmissionUtils.isGet(resolvedMethod) || XFormsSubmissionUtils.isDelete(resolvedMethod)) {
 
                         // Set default serialization based on method
                         if (serialization == null)
@@ -633,7 +638,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         defaultMediatypeForSerialization = null;
 
                     } else {
-                        throw new XFormsSubmissionException("xforms:submission: invalid submission method requested: " + method, "serializing instance");
+                        throw new XFormsSubmissionException("xforms:submission: invalid submission method requested: " + resolvedMethod, "serializing instance");
                     }
                 }
 
@@ -712,7 +717,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         // a new document so we don't dispatch xforms-submit-done and pass a null XFormsModelSubmission
                         // in that case
                         connectionResult = XFormsSubmissionUtils.doOptimized(pipelineContext, externalContext,
-                                isDeferredSubmissionSecondPassReplaceAll ? null : this, method, resolvedURI.toString(), (mediatype == null) ? defaultMediatypeForSerialization : mediatype, isReplaceAll,
+                                isDeferredSubmissionSecondPassReplaceAll ? null : this, resolvedMethod, resolvedURI.toString(), (mediatype == null) ? defaultMediatypeForSerialization : mediatype, isReplaceAll,
                                 messageBody, queryString);
 
                     } else {
@@ -761,7 +766,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         } else {
                             // Perform actual submission
                             connectionResult = XFormsSubmissionUtils.doRegular(externalContext, containingDocument,
-                                    method, resolvedURL, resolvedXXFormsUsername, resolvedXXFormsPassword, (mediatype == null) ? defaultMediatypeForSerialization : mediatype,
+                                    resolvedMethod, resolvedURL, resolvedXXFormsUsername, resolvedXXFormsPassword, (mediatype == null) ? defaultMediatypeForSerialization : mediatype,
                                     messageBody, queryString, headerNames, headerNameValues);
                         }
                     }
@@ -914,7 +919,6 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                     final NodeInfo destinationNodeInfo;
                                     if (target != null) {
                                         // Evaluate destination node
-                                        final FunctionLibrary functionLibrary = XFormsContainingDocument.getFunctionLibrary();
                                         final Object destinationObject
                                                 = XPathCache.evaluateSingle(pipelineContext, currentNodeInfo, target, prefixToURIMap,
                                                 contextStack.getCurrentVariables(), functionLibrary, functionContext, null, getLocationData());

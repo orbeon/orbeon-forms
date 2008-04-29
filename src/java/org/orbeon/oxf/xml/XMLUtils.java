@@ -65,6 +65,8 @@ public class XMLUtils {
     public static final EntityResolver ENTITY_RESOLVER = new EntityResolver();
     public static final ErrorHandler ERROR_HANDLER = new ErrorHandler();
 
+    private static final ContentHandler NULL_CONTENT_HANDLER = new ContentHandlerAdapter();
+
     private static DocumentBuilderFactory documentBuilderFactory;
     private static Map documentBuilders = null;
 
@@ -353,8 +355,12 @@ public class XMLUtils {
         }
     }
 
-    private static final ContentHandler NULL_CONTENT_HANDLER = new ContentHandlerAdapter();
-
+    /**
+     * Return whether the given string contains well-formed XML.
+     *
+     * @param xmlString     string to check
+     * @return              true iif the given string contains well-formed XML.
+     */
     public static boolean isWellFormedXML(String xmlString) {
         try {
             final XMLReader xmlReader = newSAXParser(false, false).getXMLReader();

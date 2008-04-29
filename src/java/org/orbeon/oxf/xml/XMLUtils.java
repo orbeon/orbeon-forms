@@ -348,10 +348,35 @@ public class XMLUtils {
             xmlReader.parse(inputSource);
         } catch (SAXParseException e) {
             throw new ValidationException(e.getMessage(), new LocationData(e));
-        } catch (SAXException e) {
+        } catch (Exception e) {
             throw new OXFException(e);
-        } catch (IOException e) {
-            throw new OXFException(e);
+        }
+    }
+
+    private static final ContentHandler NULL_CONTENT_HANDLER = new ContentHandlerAdapter();
+
+    public static boolean isWellFormedXML(String xmlString) {
+        try {
+            final XMLReader xmlReader = newSAXParser(false, false).getXMLReader();
+            xmlReader.setContentHandler(NULL_CONTENT_HANDLER);
+            xmlReader.setEntityResolver(ENTITY_RESOLVER);
+            xmlReader.setErrorHandler(new org.xml.sax.ErrorHandler() {
+                public void error(SAXParseException exception) throws SAXException {
+                    throw exception;
+                }
+
+                public void fatalError(SAXParseException exception) throws SAXException {
+                    throw exception;
+                }
+
+                public void warning(SAXParseException exception) throws SAXException {
+                }
+            });
+            xmlReader.parse(new InputSource(new StringReader(xmlString)));
+            return true;
+        } catch (Exception e) {
+            // Ideally we would like the parser to not throw as this is time-consuming, but not sure how to achieve that
+            return false;
         }
     }
 

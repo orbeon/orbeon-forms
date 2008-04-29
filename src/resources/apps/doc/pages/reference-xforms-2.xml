@@ -849,6 +849,64 @@
                     </xforms:trigger>
                 </xml-source>
             </section>
+            <a name="validation-extensions"/>
+            <section>
+                <title>Validation Extensions</title>
+                <a name="validation-extensions-types"/>
+                <section>
+                    <title>Extension Types</title>
+                    <p>
+                        Orbeon Forms supports the built-in <code>xxforms:xml</code> extension type. This types checks
+                        that the value is well-formed XML:
+                    </p>
+                    <xml-source>
+                        <xforms:bind nodeset="my-xml" type="xxforms:xml"/>
+                    </xml-source>
+                    <p>
+                        Note that this checks the <b>string value</b> of the node, which means that the node must
+                        contain escaped XML.
+                    </p>
+                </section>
+                <a name="validation-extensions-schema"/>
+                <section>
+                    <title>Controlling the XML Schema Validation Mode</title>
+                    <p>
+                        When an XML Schema is provided, Orbeon Forms supports controlling whether a particular instance
+                        is validated in "lax" mode, "strict" mode, or not validated at all.
+                    </p>
+                    <p>
+                        Orbeon Forms implements a "lax" validation mode by default, where only elements that have
+                        definitions in the imported schemas are validated. Other elements are not considered for
+                        validation. This is in line with XML Schema and XSLT 2.0 lax validation modes, and with the
+                        default validation mode as specified in XForms 1.1
+                    </p>
+                    <p>
+                        In addition, the author can specify the validation mode directly on each instance with the
+                        extension <code>xxforms:validation</code> attribute, which takes values <code>lax</code>
+                        (the default), <code>strict</code> (the root element has to have a definition in the schema
+                        and must be valid), or <code>skip</code> (no validation at all for that instance).
+                    </p>
+                    <xml-source>
+                        <xforms:model schema="my-schema.xsd">
+                            <xforms:instance id="my-form" xxforms:validation="strict">
+                                <my-form>
+                                    ...
+                                </my-form>
+                            </xforms:instance>
+                            <xforms:instance id="items" xxforms:validation="skip">
+                                <items>
+                                    ...
+                                </items>
+                            </xforms:instance>
+                        </xforms:model>
+                    </xml-source>
+                    <p>
+                        Nodes validated through a schema receive datatype annotations, which means that if an element
+                        or attribute is validated against <code>xs:date</code> in a schema, an XForms control bound to
+                        that node will display a date picker.
+                    </p>
+                </section>
+            </section>
             <a name="xpath-extensions"/>
             <section>
                 <title>XPath Extension Functions</title>

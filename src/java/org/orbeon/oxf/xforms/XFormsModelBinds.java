@@ -564,7 +564,6 @@ public class XFormsModelBinds {
                         }
                     }
 
-
                     // Get value to validate
                     final String nodeValue = XFormsInstance.getValueForNodeInfo(currentNodeInfo);
 
@@ -574,6 +573,7 @@ public class XFormsModelBinds {
 
                     final boolean isBuiltInSchemaType = XMLConstants.XSD_URI.equals(typeNamespaceURI);
                     final boolean isBuiltInXFormsType = XFormsConstants.XFORMS_NAMESPACE_URI.equals(typeNamespaceURI);
+                    final boolean isBuiltInXXFormsType = XFormsConstants.XXFORMS_NAMESPACE_URI.equals(typeNamespaceURI);
 
                     if (isBuiltInXFormsType && nodeValue.length() == 0) {
                         // Don't consider the node invalid if the string is empty with xforms:* types
@@ -598,6 +598,18 @@ public class XFormsModelBinds {
                         // Set error on node if necessary
                         if (result instanceof ValidationErrorValue) {
                             InstanceData.updateValueValid(currentNodeInfo, false, bind.getId());
+                        }
+                    } else if (isBuiltInXXFormsType) {
+                        // Built-in extension types
+
+                        if (typeLocalname.equals("xml")) {
+                            // xxforms:xml type
+
+                            if (!XMLUtils.isWellFormedXML(nodeValue))
+                                InstanceData.updateValueValid(currentNodeInfo, false, bind.getId());
+
+                        } else {
+                            throw new ValidationException("Invalid schema type '" + bind.getType() + "'", bind.getLocationData());
                         }
 
                     } else if (model.getSchemaValidator() != null) {

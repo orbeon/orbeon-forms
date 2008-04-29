@@ -742,6 +742,18 @@ ORBEON.xforms.Document = {
     },
 
     /**
+     * Returns the current value of controls for the specified form.
+     *
+     */
+    getOfflineControlValues: function(url) {
+        var resultSet = ORBEON.xforms.Offline.gearsDatabase.execute("select control_values from Offline_Forms where url = ?", [ url ]);
+        if (! resultSet.isValidRow) return null;
+        var controlValues = resultSet.fieldByName("control_values");
+        controlValues = ORBEON.xforms.Offline._deserializerControlValues(controlValues);
+        return controlValues;
+    },
+
+    /**
      * Function that be called from a summary page to take a form offline.
      * @param url                   The URL of the form to take offline
      * @param formOfflineListener   An optional function which will be called when the form has been taken offline.
@@ -1042,7 +1054,7 @@ ORBEON.xforms.Controls = {
             if (xformsNormalizeEndlines(control.value) != xformsNormalizeEndlines(newControlValue)) {
                 control.value = newControlValue;
                 control.previousValue = newControlValue;
-                        // Autosize textarea
+                // Autosize textarea
                 if (ORBEON.util.Dom.hasClass(control, "xforms-textarea-appearance-xxforms-autosize")) {
                     ORBEON.xforms.Controls.autosizeTextarea(control);
                 }
@@ -1715,11 +1727,6 @@ ORBEON.xforms.Events = {
                 // Fire change event
                 xformsFireEvents([xformsCreateEventArray(target, "xxforms-value-change-with-focus-change",
                         ORBEON.xforms.Controls.getCurrentValue(target))], false);
-
-                // If we are offline, reevalute MIPs
-                if (! ORBEON.xforms.Offline.isOnline) {
-                    ORBEON.xforms.Offline.evaluateMIPs();
-                }
             }
         }
     },
@@ -2967,7 +2974,21 @@ ORBEON.xforms.Server = {
 
     fireEvents: function(events, incremental) {
         if (! ORBEON.xforms.Offline.isOnline) {
+            // Store these events
             ORBEON.xforms.Offline.memoryOfflineEvents = ORBEON.xforms.Offline.memoryOfflineEvents.concat(events);
+            // Go through all events
+            var foundValueChangeEvent = false;
+            for (var eventIndex = 0; eventIndex < events.length; eventIndex++) {
+                var event = events[eventIndex];
+                if (event.eventName == "xxforms-value-change-with-focus-change") {
+                    foundValueChangeEvent = true;
+                    // Store new value of control
+                    ORBEON.xforms.Offline.controlValues[event.targetId] = event.value;
+                }
+            }
+            // Evaluate MIPS if there was a value change event
+            if (foundValueChangeEvent)
+                ORBEON.xforms.Offline.evaluateMIPs();
         } else {
             // Store the time of the first event to be sent in the queue
             var currentTime = new Date().getTime();
@@ -3303,65 +3324,65 @@ ORBEON.xforms.Server = {
                                         var endSuffix = Number(ORBEON.util.Dom.getAttribute(copyRepeatTemplateElement, "end-suffix"));
                                         // Put nodes of the template in an array
                                         var templateNodes = new Array();
-                                    {
-                                        // Locate end of the repeat
-                                        var delimiterTagName = null;
-                                        var templateRepeatEnd = ORBEON.util.Dom.getElementById("repeat-end-" + repeatId);
-                                        var templateNode = templateRepeatEnd.previousSibling;
-                                        var nestedRepeatLevel = 0;
-                                        while (!(nestedRepeatLevel == 0 && templateNode.nodeType == ELEMENT_TYPE
-                                                && ORBEON.util.Dom.hasClass(templateNode, "xforms-repeat-delimiter"))) {
-                                            var nodeCopy = templateNode.cloneNode(true);
-                                            if (templateNode.nodeType == ELEMENT_TYPE) {
-                                                // Save tag name to be used for delimiter
-                                                delimiterTagName = templateNode.tagName;
-                                                     // Decrement nestedRepeatLevel when we we exit a nested repeat
-                                                if (ORBEON.util.Dom.hasClass(templateNode, "xforms-repeat-begin-end") &&
-                                                    templateNode.id.indexOf("repeat-begin-") == 0)
-                                                    nestedRepeatLevel--;
-                                                     // Increment nestedRepeatLevel when we enter a nested repeat
-                                                if (ORBEON.util.Dom.hasClass(templateNode, "xforms-repeat-begin-end") &&
-                                                    templateNode.id.indexOf("repeat-end-") == 0)
-                                                    nestedRepeatLevel++;
-                                                     // Remove "xforms-repeat-template" from classes on copy of element
-                                                var nodeCopyClasses = nodeCopy.className.split(" ");
-                                                var nodeCopyNewClasses = new Array();
-                                                for (var nodeCopyClassIndex = 0; nodeCopyClassIndex < nodeCopyClasses.length; nodeCopyClassIndex++) {
-                                                    var currentClass = nodeCopyClasses[nodeCopyClassIndex];
-                                                    if (currentClass != "xforms-repeat-template")
-                                                        nodeCopyNewClasses.push(currentClass);
+                                        {
+                                            // Locate end of the repeat
+                                            var delimiterTagName = null;
+                                            var templateRepeatEnd = ORBEON.util.Dom.getElementById("repeat-end-" + repeatId);
+                                            var templateNode = templateRepeatEnd.previousSibling;
+                                            var nestedRepeatLevel = 0;
+                                            while (!(nestedRepeatLevel == 0 && templateNode.nodeType == ELEMENT_TYPE
+                                                    && ORBEON.util.Dom.hasClass(templateNode, "xforms-repeat-delimiter"))) {
+                                                var nodeCopy = templateNode.cloneNode(true);
+                                                if (templateNode.nodeType == ELEMENT_TYPE) {
+                                                    // Save tag name to be used for delimiter
+                                                    delimiterTagName = templateNode.tagName;
+                                                         // Decrement nestedRepeatLevel when we we exit a nested repeat
+                                                    if (ORBEON.util.Dom.hasClass(templateNode, "xforms-repeat-begin-end") &&
+                                                        templateNode.id.indexOf("repeat-begin-") == 0)
+                                                        nestedRepeatLevel--;
+                                                         // Increment nestedRepeatLevel when we enter a nested repeat
+                                                    if (ORBEON.util.Dom.hasClass(templateNode, "xforms-repeat-begin-end") &&
+                                                        templateNode.id.indexOf("repeat-end-") == 0)
+                                                        nestedRepeatLevel++;
+                                                         // Remove "xforms-repeat-template" from classes on copy of element
+                                                    var nodeCopyClasses = nodeCopy.className.split(" ");
+                                                    var nodeCopyNewClasses = new Array();
+                                                    for (var nodeCopyClassIndex = 0; nodeCopyClassIndex < nodeCopyClasses.length; nodeCopyClassIndex++) {
+                                                        var currentClass = nodeCopyClasses[nodeCopyClassIndex];
+                                                        if (currentClass != "xforms-repeat-template")
+                                                            nodeCopyNewClasses.push(currentClass);
+                                                    }
+                                                    nodeCopy.className = nodeCopyNewClasses.join(" ");
                                                 }
-                                                nodeCopy.className = nodeCopyNewClasses.join(" ");
+                                                templateNodes.push(nodeCopy);
+                                                templateNode = templateNode.previousSibling;
                                             }
-                                            templateNodes.push(nodeCopy);
-                                            templateNode = templateNode.previousSibling;
+                                                // Add a delimiter
+                                            var newDelimiter = document.createElement(delimiterTagName);
+                                            newDelimiter.className = "xforms-repeat-delimiter";
+                                            templateNodes.push(newDelimiter);
+                                                // Reverse nodes as they were inserted in reverse order
+                                            templateNodes = templateNodes.reverse();
                                         }
-                                            // Add a delimiter
-                                        var newDelimiter = document.createElement(delimiterTagName);
-                                        newDelimiter.className = "xforms-repeat-delimiter";
-                                        templateNodes.push(newDelimiter);
-                                            // Reverse nodes as they were inserted in reverse order
-                                        templateNodes = templateNodes.reverse();
-                                    }
                                         // Find element after insertion point
                                         var afterInsertionPoint;
-                                    {
-                                        if (parentIndexes == "") {
-                                            // Top level repeat: contains a template
-                                            var repeatEnd = ORBEON.util.Dom.getElementById("repeat-end-" + repeatId);
-                                            var cursor = repeatEnd.previousSibling;
-                                            while (!(cursor.nodeType == ELEMENT_TYPE
-                                                    && ORBEON.util.Dom.hasClass(cursor, "xforms-repeat-delimiter")
-                                                    && !ORBEON.util.Dom.hasClass(cursor, "xforms-repeat-template"))) {
-                                                cursor = cursor.previousSibling;
+                                        {
+                                            if (parentIndexes == "") {
+                                                // Top level repeat: contains a template
+                                                var repeatEnd = ORBEON.util.Dom.getElementById("repeat-end-" + repeatId);
+                                                var cursor = repeatEnd.previousSibling;
+                                                while (!(cursor.nodeType == ELEMENT_TYPE
+                                                        && ORBEON.util.Dom.hasClass(cursor, "xforms-repeat-delimiter")
+                                                        && !ORBEON.util.Dom.hasClass(cursor, "xforms-repeat-template"))) {
+                                                    cursor = cursor.previousSibling;
+                                                }
+                                                afterInsertionPoint = cursor;
+                                                    // Nested repeat: does not contain a template
+                                            } else {
+                                                var repeatEnd = ORBEON.util.Dom.getElementById("repeat-end-" + xformsAppendRepeatSuffix(repeatId, parentIndexes));
+                                                afterInsertionPoint = repeatEnd;
                                             }
-                                            afterInsertionPoint = cursor;
-                                                // Nested repeat: does not contain a template
-                                        } else {
-                                            var repeatEnd = ORBEON.util.Dom.getElementById("repeat-end-" + xformsAppendRepeatSuffix(repeatId, parentIndexes));
-                                            afterInsertionPoint = repeatEnd;
                                         }
-                                    }
                                         // Insert copy of template nodes
 
                                         for (var suffix = startSuffix; suffix <= endSuffix; suffix++) {
@@ -4143,6 +4164,7 @@ ORBEON.xforms.Offline = {
     variables: {},                                  // Mapping: variable name -> control ID
     xpathNode: document.createElement("dummy"),     // Node used as current node to evaluate XPath expression
     encryptionKey: null,                            // Key that will be used when storing events in the store
+    controlValues: null,                            // While offline, contains the latest value of the controls
     typeRegExps: {
         "{http://www.w3.org/2001/XMLSchema}decimal": new RegExp("^[+-]?[0-9]+(\\.[0-9]+)?$", "g")
     },
@@ -4233,7 +4255,7 @@ ORBEON.xforms.Offline = {
             // Table storing events happening while offline
             database.execute("create table if not exists Events (id integer primary key autoincrement, url text, event text)").close();
             // Table storing the list of the forms taken offline
-            database.execute("create table if not exists Offline_Forms (url text, event_response text, form_id text, static_state text, dynamic_state text, mappings text)").close();
+            database.execute("create table if not exists Offline_Forms (url text, event_response text, form_id text, static_state text, dynamic_state text, mappings text, control_values text)").close();
             // Table storing the current password if any, in encrypted form
             database.execute("create table if not exists Current_Password (encrypted_password text)").close();
 
@@ -4263,15 +4285,27 @@ ORBEON.xforms.Offline = {
             ORBEON.xforms.Offline.isOnline = ! resultSet.isValidRow();
             // If we are offline, replay initial events saved in Gears
             if (! ORBEON.xforms.Offline.isOnline) {
-                var initialEvents = resultSet.fieldByName("event_response");
+                var initialEvents = ORBEON.xforms.Offline._decrypt(resultSet.fieldByName("event_response"), ORBEON.xforms.Offline.getEncryptionKey());
+                var controlValues = resultSet.fieldByName("control_values");
                 var formID = resultSet.fieldByName("form_id");
+                // Get mappings, evaluate JSON, and save mips and variables mapping in attributes
                 var mappingsString = resultSet.fieldByName("mappings");
                 var mappings = ORBEON.util.String.eval("({" + mappingsString + "})");
                 ORBEON.xforms.Offline.mips = mappings.mips;
                 ORBEON.xforms.Offline.variables = mappings.variables;
+                // Replay initial events
                 var initialEventsXML = ORBEON.util.Dom.stringToDom(initialEvents);
                 ORBEON.xforms.Globals.requestForm = ORBEON.util.Dom.getElementById(formID);
                 ORBEON.xforms.Server.handleResponseDom(initialEventsXML, formID);
+                // Set control values
+                controlValues = ORBEON.xforms.Offline._deserializerControlValues(controlValues);
+                for (var controlID in controlValues) {
+                    var controlValue = controlValues[controlID];
+                    var control = ORBEON.util.Dom.getElementById(controlID);
+                    ORBEON.xforms.Controls.setCurrentValue(control, controlValue, controlValue);
+                }
+                // Store controlValues in variable, so it can be updated on value change
+                ORBEON.xforms.Offline.controlValues = controlValues;
             }
             resultSet.close();
         }
@@ -4309,16 +4343,49 @@ ORBEON.xforms.Offline = {
      * Called when the form is taken offline.
      * Makes sure we have everything in the store so we can run this form while offline.
      */
-    takeOffline: function(eventReponse, formID, mappings) {
+    takeOffline: function(eventResponse, formID, mappings) {
         ORBEON.xforms.Offline.init();
+
+        // Figure out the list of controls which value we want to keep
+        var controlKeepValueIDs = [];
+
+        // Controls for which we go a value in the eventResponse
+        var initialEventsXML = ORBEON.util.Dom.stringToDom(eventResponse);
+        var actionElement = ORBEON.util.Dom.getChildElementByIndex(initialEventsXML.documentElement, 0)
+        var controlValuesElement = ORBEON.util.Dom.getChildElementByIndex(actionElement, 0)
+        for (var controlIndex = 0; controlIndex < controlValuesElement.childNodes.length; controlIndex++) {
+            var controlElement = controlValuesElement.childNodes[controlIndex];
+            if (ORBEON.util.Dom.isElement(controlElement)) {
+                var controlId = ORBEON.util.Dom.getAttribute(controlElement, "id");
+                controlKeepValueIDs.push(controlId);
+            }
+        }
+
+        // Controls for which there is a variable defined
+        var variables = ORBEON.util.String.eval("({" + mappings + "})").variables;
+        for (var variableName in variables) {
+            var controlID = variables[variableName];
+            controlKeepValueIDs.push(controlID);
+        }
+
+        // Compute the value for those controls
+        var controlValues = {};
+        for (var controlIndex = 0; controlIndex < controlKeepValueIDs.length; controlIndex++) {
+            var controlID = controlKeepValueIDs[controlIndex];
+            controlValues[controlID] = ORBEON.xforms.Controls.getCurrentValue(ORBEON.util.Dom.getElementById(controlID));
+        }
+        var controlValuesString = ORBEON.xforms.Offline._serializeControlValues(controlValues);
 
         // Remember that we took this form offline
         var resultSet = ORBEON.xforms.Offline.gearsDatabase.execute(
-                "insert into Offline_Forms (url, event_response, form_id, static_state, dynamic_state, mappings) values (?, ?, ?, ?, ?, ?)",
-                [ window.location.href, eventReponse, formID,
-                    ORBEON.xforms.Globals.formStaticState[formID].value,
-                    ORBEON.xforms.Globals.formDynamicState[formID].value,
-                    mappings]);
+            "insert into Offline_Forms (url, event_response, form_id, static_state, dynamic_state, mappings, control_values) values (?, ?, ?, ?, ?, ?, ?)", [
+                window.location.href,
+                ORBEON.xforms.Offline._encrypt(eventResponse, ORBEON.xforms.Offline.getEncryptionKey()),
+                formID,
+                ORBEON.xforms.Globals.formStaticState[formID].value,
+                ORBEON.xforms.Globals.formDynamicState[formID].value,
+                mappings,
+                controlValuesString]);
         resultSet.close();
 
         // Capture all the resources this form needs.
@@ -4337,7 +4404,6 @@ ORBEON.xforms.Offline = {
             if (YAHOO.lang.isString(element.src))
                 urlsToCapture.push(element.src);
         }
-//        ORBEON.xforms.Offline.isOnline = false;
         ORBEON.xforms.Offline.formStore.capture(urlsToCapture, function (url, success, captureId) {
             // When capture is done, mark the form as offline to prevent any event from being sent to the server
             ORBEON.xforms.Offline.isOnline = false;
@@ -4403,6 +4469,8 @@ ORBEON.xforms.Offline = {
         function emptyStringIfNull(value) { return value == null ? "" : value; }
 
         ORBEON.xforms.Offline.init();
+
+        // Store new events
         for (var eventIndex = 0; eventIndex < events.length; eventIndex++) {
             var event = events[eventIndex];
 
@@ -4428,6 +4496,10 @@ ORBEON.xforms.Offline = {
             // Store eventString in database
             ORBEON.xforms.Offline.gearsDatabase.execute("insert into Events (url, event) values (?, ?)", [ window.location.href, eventString ]).close();
         }
+
+        // Store new values of controls
+        var controlValuesString = ORBEON.xforms.Offline._serializeControlValues(ORBEON.xforms.Offline.controlValues);
+        ORBEON.xforms.Offline.gearsDatabase.execute("update Offline_Forms set control_values = ? where url = ?", [ controlValuesString, window.location.href ]).close();
     },
 
     loadFormInIframe: function(url, loadListener) {
@@ -4510,13 +4582,35 @@ ORBEON.xforms.Offline = {
             if (mips.type) {
                 var regExp = ORBEON.xforms.Offline.typeRegExps[mips.type];
                 if (regExp != null) {
-                    if (!regExp.test(controlValue))
+                    if (! controlValue.match(regExp))
                         isValid = false;
                 }
             }
 
             ORBEON.xforms.Controls.setValid(control, isValid ? "true" : "false", requiredButEmpty);
         }
+    },
+
+    _serializeControlValues: function(controlValues) {
+        var controlValuesString = "";
+        for (controlID in controlValues) {
+            if (controlValuesString != "") controlValuesString += " ";
+            controlValuesString += escape(controlID) + " " + escape(controlValues[controlID]);
+        }
+        controlValuesString = ORBEON.xforms.Offline._encrypt(controlValuesString, ORBEON.xforms.Offline.getEncryptionKey());
+        return controlValuesString;
+    },
+
+    _deserializerControlValues: function(controlValuesString) {
+        controlValuesString = ORBEON.xforms.Offline._decrypt(controlValuesString, ORBEON.xforms.Offline.getEncryptionKey());
+        var controlValuesArray = controlValuesString.split(" ");
+        var controlValues = {};
+        for (var controlIndex = 0; controlIndex < controlValuesArray.length / 2; controlIndex++) {
+            var controlID = unescape(controlValuesArray[controlIndex * 2]);
+            var controlValue = unescape(controlValuesArray[controlIndex * 2 + 1]);
+            controlValues[controlID] = controlValue;
+        }
+        return controlValues;
     },
 
     /**

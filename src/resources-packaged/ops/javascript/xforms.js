@@ -880,7 +880,18 @@ ORBEON.xforms.Controls = {
         }
     },
 
-    setCurrentValue: function(control, newControlValue, displayValue) {
+    /**
+     * Updates the value of a control in the UI.
+     *
+     * @param control           HTML element for the control we want to update
+     * @param newControlValue   New value
+     * @param displayValue      Optional display value when different from newControlValue
+     * @param uploadState       Optional
+     * @param uploadFilename    Optional
+     * @param uploadMediatype   Optional
+     * @param uploadSize        Optional
+     */
+    setCurrentValue: function(control, newControlValue, displayValue, uploadState, uploadFilename, uploadMediatype, uploadSize) {
         var isStaticReadonly = ORBEON.util.Dom.hasClass(control, "xforms-static");
         if (ORBEON.util.Dom.hasClass(control, "xforms-output") || isStaticReadonly) {
             // XForms output or "static readonly" mode
@@ -1013,40 +1024,31 @@ ORBEON.xforms.Controls = {
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-upload")) {
             // Upload
 
-            // <xxforms:control id="xforms-control-id"
-            //    state="empty|file"
-            //    filename="filename.txt" mediatype="text/plain" size="23kb"/>
-
-            // Get attributes from response
-            var state = ORBEON.util.Dom.getAttribute(controlElement, "state");
-            var filename = ORBEON.util.Dom.getAttribute(controlElement, "filename");
-            var mediatype = ORBEON.util.Dom.getAttribute(controlElement, "mediatype");
-            var size = ORBEON.util.Dom.getAttribute(controlElement, "size");
-                    // Get elements we want to modify from the DOM
+            // Get elements we want to modify from the DOM
             var fileInfoSpan = ORBEON.util.Dom.getChildElementByClass(control, "xforms-upload-info");
             var fileNameSpan = ORBEON.util.Dom.getChildElementByClass(fileInfoSpan, "xforms-upload-filename");
             var mediatypeSpan = ORBEON.util.Dom.getChildElementByClass(fileInfoSpan, "xforms-upload-mediatype");
             var sizeSpan = ORBEON.util.Dom.getChildElementByClass(fileInfoSpan, "xforms-upload-size");
-                    // Set values in DOM
-            if (state == "empty") {
+            // Set values in DOM
+            if (uploadState == "empty") {
                 ORBEON.util.Dom.removeClass(control, "xforms-upload-state-file")
                 ORBEON.util.Dom.addClass(control, "xforms-upload-state-empty")
             }
-            if (state == "file") {
+            if (uploadState == "file") {
                 ORBEON.util.Dom.removeClass(control, "xforms-upload-state-empty")
                 ORBEON.util.Dom.addClass(control, "xforms-upload-state-file")
 
                         // Clear upload input by replacing the control
                 ORBEON.util.Dom.clearUploadControl(control);
             }
-            if (filename != null)
-                ORBEON.util.Dom.setStringValue(fileNameSpan, filename);
-            if (mediatype != null)
-                ORBEON.util.Dom.setStringValue(mediatypeSpan, mediatype);
-            if (size != null) {
-                var displaySize = size > 1024 * 1024 ? Math.round(size / (1024 * 1024) * 10) / 10 + " MB"
-                        : size > 1024 ? Math.round(size / 1024 * 10) / 10 + " KB"
-                        : size + " B";
+            if (uploadFilename != null)
+                ORBEON.util.Dom.setStringValue(fileNameSpan, uploadFilename);
+            if (uploadMediatype != null)
+                ORBEON.util.Dom.setStringValue(mediatypeSpan, uploadMediatype);
+            if (uploadSize != null) {
+                var displaySize = uploadSize > 1024 * 1024 ? Math.round(uploadSize / (1024 * 1024) * 10) / 10 + " MB"
+                        : uploadSize > 1024 ? Math.round(uploadSize / 1024 * 10) / 10 + " KB"
+                        : uploadSize + " B";
                 ORBEON.util.Dom.setStringValue(sizeSpan, displaySize);
             }
         } else if (typeof(control.value) == "string") {
@@ -3728,8 +3730,22 @@ ORBEON.xforms.Server = {
                                         }
 
                                         // Update value
-                                        if (isControl)
-                                            ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue, displayValue);
+                                        if (isControl) {
+                                            if (ORBEON.util.Dom.hasClass(documentElement, "xforms-upload")) {
+                                                // Additional parameters for upload control
+                                                // <xxforms:control id="xforms-control-id"
+                                                //    state="empty|file"
+                                                //    filename="filename.txt" mediatype="text/plain" size="23kb"/>
+                                                var state = ORBEON.util.Dom.getAttribute(controlElement, "state");
+                                                var filename = ORBEON.util.Dom.getAttribute(controlElement, "filename");
+                                                var mediatype = ORBEON.util.Dom.getAttribute(controlElement, "mediatype");
+                                                var size = ORBEON.util.Dom.getAttribute(controlElement, "size");
+                                                ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue, displayValue, state, filename, mediatype, size);
+                                            } else {
+                                                // Other control just have a new value (and optional display value)
+                                                ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue, displayValue);
+                                            }
+                                        }
 
                                         // Update the required-empty/required-full even if the required has not changed or
                                         // is not specified as the value may have changed
@@ -4302,7 +4318,7 @@ ORBEON.xforms.Offline = {
                 for (var controlID in controlValues) {
                     var controlValue = controlValues[controlID];
                     var control = ORBEON.util.Dom.getElementById(controlID);
-                    ORBEON.xforms.Controls.setCurrentValue(control, controlValue, controlValue);
+                    ORBEON.xforms.Controls.setCurrentValue(control, controlValue);
                 }
                 // Store controlValues in variable, so it can be updated on value change
                 ORBEON.xforms.Offline.controlValues = controlValues;
@@ -4549,7 +4565,7 @@ ORBEON.xforms.Offline = {
             // Calculate
             if (mips.calculate) {
                 var newValue = xpathParse(mips.calculate).evaluate(xpathContext).value;
-                ORBEON.xforms.Controls.setCurrentValue(control, newValue, newValue);
+                ORBEON.xforms.Controls.setCurrentValue(control, newValue);
             }
 
             // Constraint

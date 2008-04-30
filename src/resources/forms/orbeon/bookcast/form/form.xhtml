@@ -357,17 +357,7 @@
                                     </xforms:itemset>
                                 </xforms:select1>
                             </td>
-                            <td>
-                                <xforms:input ref="link" incremental="true">
-                                    <xforms:label ref="$form-resources/link/label"/>
-                                    <xforms:hint ref="$form-resources/link/hint"/>
-                                    <xforms:help ref="$form-resources/link/help"/>
-                                    <xforms:alert ref="$form-resources/link/alert"/>
-                                </xforms:input>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
+                            <td rowspan="2">
                                 <xforms:select1 ref="rating" appearance="full">
                                     <xforms:label ref="$form-resources/rating/label"/>
                                     <xforms:hint ref="$form-resources/rating/hint"/>
@@ -379,7 +369,15 @@
                                     </xforms:itemset>
                                 </xforms:select1>
                             </td>
+                        </tr>
+                        <tr>
                             <td>
+                                <xforms:input ref="link" incremental="true">
+                                    <xforms:label ref="$form-resources/link/label"/>
+                                    <xforms:hint ref="$form-resources/link/hint"/>
+                                    <xforms:help ref="$form-resources/link/help"/>
+                                    <xforms:alert ref="$form-resources/link/alert"/>
+                                </xforms:input>
                             </td>
                         </tr>
                     </fr:grid>

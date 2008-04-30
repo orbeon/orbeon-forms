@@ -216,6 +216,7 @@
             </xsd:sequence>
             <xsd:attributeGroup ref="xforms:Common.Attributes"/>
             <xsd:attribute name="nodeset" type="xforms:XPathExpression" use="optional"/>
+            <xsd:attribute name="name" type="xsd:QName" use="optional"/>
             <xsd:attribute name="type" type="xsd:QName" use="optional"/>
             <xsd:attribute name="readonly" type="xforms:XPathExpression" use="optional"/>
             <xsd:attribute name="required" type="xforms:XPathExpression" use="optional"/>

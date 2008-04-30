@@ -255,17 +255,17 @@ public class XFormsModelBinds {
 
                             // Output MIPs
                             boolean mipFound = false;
-                            mipFound = mipFound || appendNameValue(sb, mipFound, "calculate", currentBind.getCalculate());
-                            mipFound = mipFound || appendNameValue(sb, mipFound, "relevant", currentBind.getRelevant());
-                            mipFound = mipFound || appendNameValue(sb, mipFound, "readonly", currentBind.getReadonly());
-                            mipFound = mipFound || appendNameValue(sb, mipFound, "required", currentBind.getRequired());
-                            mipFound = mipFound || appendNameValue(sb, mipFound, "constraint", currentBind.getConstraint());
+                            mipFound = appendNameValue(sb, mipFound, "calculate", currentBind.getCalculate());
+                            mipFound = appendNameValue(sb, mipFound, "relevant", currentBind.getRelevant());
+                            mipFound = appendNameValue(sb, mipFound, "readonly", currentBind.getReadonly());
+                            mipFound = appendNameValue(sb, mipFound, "required", currentBind.getRequired());
+                            mipFound = appendNameValue(sb, mipFound, "constraint", currentBind.getConstraint());
 
                             // Output type MIP as an exploded QName
                             final String typeMip = currentBind.getType();
                             if (typeMip != null) {
                                 final QName typeMipQName = Dom4jUtils.extractTextValueQName(containingDocument.getStaticState().getNamespaceMappings(currentBind.getBindElement()), typeMip);
-                                mipFound = mipFound || appendNameValue(sb, mipFound, "type", Dom4jUtils.qNameToexplodedQName(typeMipQName));
+                                mipFound = appendNameValue(sb, mipFound, "type", Dom4jUtils.qNameToexplodedQName(typeMipQName));
                             }
 
                             sb.append('}');
@@ -355,7 +355,7 @@ public class XFormsModelBinds {
             sb.append('"');
             return true;
         } else {
-            return false;
+            return found;
         }
     }
 

@@ -685,7 +685,7 @@
         <xsl:variable name="is-table-appearance" as="xs:boolean" select="@appearance = 'xxforms:table'"/>
         <xhtml:table class="fr-repeat {if ($is-table-appearance) then 'fr-repeat-table' else 'fr-repeat-sections'} {if (@columns) then concat('fr-grid-', @columns, '-columns') else ()}">
             <!-- Line with the "add" triggers -->
-            <xsl:if test="not($readonly)">
+            <xsl:if test="false() and not($readonly)">
                 <xforms:group ref=".[not(exforms:readonly(.))]">
                     <xhtml:tr>
                         <xhtml:td class="fr-repeat-column"/>
@@ -711,16 +711,34 @@
             </xsl:if>
             <!-- Line with column headers -->
             <xhtml:tr>
-                <xhtml:td class="fr-repeat-column"/>
                 <xsl:if test="not($readonly)">
                     <xforms:group ref=".[not(exforms:readonly(.))]">
-                        <xhtml:td class="fr-repeat-column"/>
+                        <!-- Try to create enough space for a 2-digit number on the left -->
+                        <!--<xhtml:td class="fr-repeat-column">&#160;&#160;&#160;&#160;</xhtml:td>-->
+                        <xhtml:td class="fr-repeat-column"><xhtml:div style="width: 1.5em"/></xhtml:td>
                     </xforms:group>
                 </xsl:if>
+                <xhtml:td class="fr-repeat-column">
+                    <xsl:if test="not($readonly)">
+                        <xforms:group ref=".[not(exforms:readonly(.))]">
+                            <xforms:trigger appearance="minimal" ref=".[{if ($max-occurs = 'unbounded') then 'true()' else concat('count(', @nodeset, ') lt ', $max-occurs)}]">
+                                <xforms:label><xhtml:img src="/apps/fr/style/images/silk/add.png" alt="Add" title="Add"/></xforms:label>
+                            </xforms:trigger>
+                            <xforms:insert ev:event="DOMActivate"
+                                           origin="{if (@origin) then @origin else concat('instance(''templates'')/', $tokenized-path[last()])}"
+                                           context="." nodeset="{if (@after) then @after else @nodeset}"/>
+                            <!-- TODO: handle @at -->
+                            <!-- at="index('{@id}')" position="after" -->
+                        </xforms:group>
+                    </xsl:if>
+                </xhtml:td>
                 <xsl:for-each select="xhtml:tr[1]/xhtml:td/xforms:*[1]">
                     <xhtml:th>
+                        <xsl:if test="last()">
+                            <xsl:attribute name="width" select="'100%'"/>
+                        </xsl:if>
                         <xforms:output value="''" class="fr-hidden"><!-- hide the actual output control -->
-                            <xsl:copy-of select="xforms:label | xforms:help"/>
+                            <xsl:copy-of select="xforms:label | xforms:help | xforms:hint"/>
                         </xforms:output>
                     </xhtml:th>
                 </xsl:for-each>

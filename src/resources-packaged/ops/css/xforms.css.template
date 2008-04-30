@@ -288,7 +288,8 @@ button.xforms-submit img { vertical-align: middle }
 button.xforms-submit span { vertical-align: middle }
 
 /* Reasonable defaults for alignment of anchor content */
-a.xforms-trigger img { vertical-align: middle }
+a.xforms-trigger img { vertical-align: middle; cursor: pointer }
+a.xforms-readonly img { cursor: default }
 a.xforms-trigger span { vertical-align: middle }
 
 /* Hide input field for <xforms:input> when type is date */
@@ -296,9 +297,7 @@ a.xforms-trigger span { vertical-align: middle }
     display: none;
 }
 
-a.xforms-readonly {
-    color: gray; cursor: default;
-}
+a.xforms-readonly { color: gray; cursor: default }
 
 .xforms-message {
     list-style: disc;

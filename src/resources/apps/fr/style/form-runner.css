@@ -183,6 +183,7 @@ h3, h4 {
 .fr-summary-welcome-message { display: block; margin-top: .5em; margin-bottom: .5em; clear: both }
 .fr-summary-search-count {  display: block; margin-top: 1em; margin-bottom: 1em }
 
+.fr-paging-buttons { padding-top: .5em }
 .fr-paging-buttons button { width: 12em; vertical-align: middle; margin-top: .5em }
 .fr-paging-numbers { vertical-align: middle; margin-left: .5em; margin-right: .5em }
 
@@ -224,14 +225,15 @@ hr {
     /*margin-top: 1em;*/
     border-collapse: collapse;
 }
-.fr-repeat-table td , .fr-repeat-table th { border: 1px solid black; padding: .2em .5em .2em .5em; }
+.fr-repeat-table td , .fr-repeat-table th { border: 1px solid #ddd; padding: .2em .5em .2em .5em; }
 /* Styling for last dummy line added so IE displays the bottom border of the table */
 .fr-repeat-table .fr-repeat-last-line td { border: none; padding: 0; }
 .fr-repeat-table .fr-repeat-last-line { display: none }
-.fr-repeat-table th { background-color: #DDDDDD; }
+.fr-repeat-table th { background-color: #ddd; }
 .fr-repeat-table td .xforms-label { display: none; }
 .fr-repeat-table td .xforms-help-image { display: none; }
 .fr-repeat-table td .xforms-help { display: none; }
+.fr-repeat-table td .xforms-hint { display: none; }
 
 .fr-non-collapsible { padding-left: 1.1em; }
 

@@ -56,11 +56,11 @@
 /* Itemset editor dialog */
 #fb-itemset-editor-dialog { width: 35em }
 #fb-itemset-editor-dialog .fr-grid-2-columns .xforms-input input { width: 13em }
-#fb-itemset-editor-dialog .fr-repeat { margin: 0; background-color: transparent }
+/*#fb-itemset-editor-dialog .fr-repeat { margin: 0; background-color: transparent }*/
 #fb-itemset-editor-dialog .fb-dialog-body { }
 #fb-itemset-editor-dialog .fb-language-choice { text-align: right; display: block }
 #fb-itemset-editor-dialog .fb-language-choice .xforms-select1 { width: auto }
-#fb-itemset-editor-dialog .fr-repeat-table td, #fb-itemset-editor-dialog .fr-repeat-table th { border: 1px solid #DDDDEE}
+/*#fb-itemset-editor-dialog .fr-repeat-table td, #fb-itemset-editor-dialog .fr-repeat-table th { border: 1px solid #DDDDEE}*/
 
 /* Submission editor dialog */
 #fb-submission-dialog { width: 45em }

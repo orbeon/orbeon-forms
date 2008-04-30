@@ -154,12 +154,21 @@
                         </notes>
                         <title>
                             <label>Title</label>
+                            <hint>Book title</hint>
+                            <help>This input contains the book title. For example...</help>
+                            <alert>The book title is missing</alert>
                         </title>
                         <author>
                             <label>Author</label>
+                            <help>This input contains the book's author name.</help>
+                            <hint>Book author</hint>
+                            <alert>The author name is missing</alert>
                         </author>
                         <language>
                             <label>Language</label>
+                            <hint>Book language</hint>
+                            <help>This contains the book language. For example...</help>
+                            <alert>The language selected is invalid</alert>
                             <item>
                                 <label>English</label>
                                 <value>en</value>
@@ -175,9 +184,15 @@
                         </language>
                         <link>
                             <label>Link</label>
+                            <hint>Optional link to external resource</hint>
+                            <help>This input contains a link to an external resource. For example...</help>
+                            <alert>The link must be a valid HTTP or HTTPS URL</alert>
                         </link>
                         <rating>
                             <label>Rating</label>
+                            <hint>Your rating</hint>
+                            <help>This contains your rating about the book. For example...</help>
+                            <alert>The rating selected is invalid</alert>
                             <item>
                                 <label>None</label>
                                 <value/>
@@ -205,6 +220,9 @@
                         </rating>
                         <note>
                             <label>Note</label>
+                            <hint>Notes about this book</hint>
+                            <help>These notes contain your own comments about the book. For example...</help>
+                            <alert>The notes are invalid</alert>
                         </note>
                     </resource>
                     <resource xml:lang="fr">
@@ -216,12 +234,21 @@
                         </notes>
                         <title>
                             <label>Titre</label>
+                            <hint>Titre du livre</hint>
+                            <help>Ce champ contient le titre du livre, par exemple...</help>
+                            <alert>Le titre du livre manque</alert>
                         </title>
                         <author>
                             <label>Auteur</label>
+                            <help>Ce champ contient le nom de l'auteur du livre.</help>
+                            <hint>Auteur du livre</hint>
+                            <alert>L'auteur du livre manque</alert>
                         </author>
                         <language>
                             <label>Langue</label>
+                            <hint>Langue du livre</hint>
+                            <help>Ce champ contient la langue du livre, par exemple...</help>
+                            <alert>La langue sélectionnée est invalide</alert>
                             <item>
                                 <label>Anglais</label>
                                 <value>en</value>
@@ -237,9 +264,15 @@
                         </language>
                         <link>
                             <label>Lien</label>
+                            <hint>Lien optionnel vers une ressource externe</hint>
+                            <help>Ce champ contient un lien vers une ressource externe, par exemple...</help>
+                            <alert>Le lien doit être un URL HTTP ou HTTPS valide</alert>
                         </link>
                         <rating>
                             <label>Evaluation</label>
+                            <hint>Votre évaluation</hint>
+                            <help>Ce champ contient votre évaluation du livre, par exemple...</help>
+                            <alert>L'évaluation sélectionnée est invalide</alert>
                             <item>
                                 <label>Aucune</label>
                                 <value/>
@@ -267,6 +300,9 @@
                         </rating>
                         <note>
                             <label>Note</label>
+                            <hint>Notes au sujet de ce livre</hint>
+                            <help>Ce champ de texte contient vos propres commentaires au sujet du livre, par exemple...</help>
+                            <alert>Cette note n'est pas valide</alert>
                         </note>
                     </resource>
                 </resources>
@@ -290,17 +326,17 @@
                             <td>
                                 <xforms:input id="title-control" bind="title-bind" class="fr-summary fr-search" incremental="true">
                                     <xforms:label ref="$form-resources/title/label"/>
-                                    <xforms:hint>Book title</xforms:hint>
-                                    <xforms:help>This input contains the book title. For example...</xforms:help>
-                                    <xforms:alert>The book title is missing</xforms:alert>
+                                    <xforms:hint ref="$form-resources/title/hint"/>
+                                    <xforms:help ref="$form-resources/title/help"/>
+                                    <xforms:alert ref="$form-resources/title/alert"/>
                                 </xforms:input>
                             </td>
                             <td>
                                 <xforms:input id="author-control" bind="author-bind" class="fr-summary fr-search" incremental="true">
                                     <xforms:label ref="$form-resources/author/label"/>
-                                    <xforms:help>This input contains the book's author name.</xforms:help>
-                                    <xforms:hint>Book author</xforms:hint>
-                                    <xforms:alert>The author name is missing</xforms:alert>
+                                    <xforms:hint ref="$form-resources/author/hint"/>
+                                    <xforms:help ref="$form-resources/author/help"/>
+                                    <xforms:alert ref="$form-resources/author/alert"/>
                                 </xforms:input>
                             </td>
                         </tr>
@@ -308,9 +344,9 @@
                             <td>
                                 <xforms:select1 id="language-control" bind="language-bind" class="fr-summary fr-search">
                                     <xforms:label ref="$form-resources/language/label"/>
-                                    <xforms:hint>Book language</xforms:hint>
-                                    <xforms:help>This contains the book language. For example...</xforms:help>
-                                    <xforms:alert>The language selected is invalid</xforms:alert>
+                                    <xforms:hint ref="$form-resources/language/hint"/>
+                                    <xforms:help ref="$form-resources/language/help"/>
+                                    <xforms:alert ref="$form-resources/language/alert"/>
                                     <xforms:item>
                                         <xforms:label>Choose One...</xforms:label>
                                         <xforms:value/>
@@ -324,9 +360,9 @@
                             <td>
                                 <xforms:input ref="link" incremental="true">
                                     <xforms:label ref="$form-resources/link/label"/>
-                                    <xforms:hint>Optional link to external resource</xforms:hint>
-                                    <xforms:help>This input contains a link to an external resource. For example...</xforms:help>
-                                    <xforms:alert>The link must be a valid HTTP or HTTPS URL</xforms:alert>
+                                    <xforms:hint ref="$form-resources/link/hint"/>
+                                    <xforms:help ref="$form-resources/link/help"/>
+                                    <xforms:alert ref="$form-resources/link/alert"/>
                                 </xforms:input>
                             </td>
                         </tr>
@@ -334,9 +370,9 @@
                             <td>
                                 <xforms:select1 ref="rating" appearance="full">
                                     <xforms:label ref="$form-resources/rating/label"/>
-                                    <xforms:hint>Your rating</xforms:hint>
-                                    <xforms:help>This contains your rating about the book. For example...</xforms:help>
-                                    <xforms:alert>The rating selected is invalid</xforms:alert>
+                                    <xforms:hint ref="$form-resources/rating/hint"/>
+                                    <xforms:help ref="$form-resources/rating/help"/>
+                                    <xforms:alert ref="$form-resources/rating/alert"/>
                                     <xforms:itemset nodeset="$form-resources/rating/item">
                                         <xforms:label ref="label"/>
                                         <xforms:value ref="value"/>
@@ -360,9 +396,9 @@
                                         <td>
                                             <xforms:textarea ref="." appearance="xxforms:autosize" incremental="true">
                                                 <xforms:label ref="$form-resources/note/label"/>
-                                                <xforms:hint>Notes about this book</xforms:hint>
-                                                <xforms:help>This area contains your own comments about the book. For example...</xforms:help>
-                                                <xforms:alert>The notes are invalid</xforms:alert>
+                                                <xforms:hint ref="$form-resources/note/hint"/>
+                                                <xforms:help ref="$form-resources/note/help"/>
+                                                <xforms:alert ref="$form-resources/note/alert"/>
                                             </xforms:textarea>
                                         </td>
                                     </tr>

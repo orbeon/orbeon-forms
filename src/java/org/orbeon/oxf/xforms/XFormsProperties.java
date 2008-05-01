@@ -422,6 +422,10 @@ public class XFormsProperties {
         return getBooleanProperty(containingDocument, SESSION_HEARTBEAT_PROPERTY);
     }
 
+    public static boolean isOfflineMode(XFormsContainingDocument containingDocument) {
+        return getBooleanProperty(containingDocument, OFFLINE_SUPPORT_PROPERTY);
+    }
+
     private static boolean getBooleanProperty(XFormsContainingDocument containingDocument, String propertyName) {
         if (containingDocument.getStaticState() != null)
             return containingDocument.getStaticState().getBooleanProperty(propertyName);
@@ -435,13 +439,6 @@ public class XFormsProperties {
         else // case of legacy XForms engine which doesn't have a static state object
             return OXFProperties.instance().getPropertySet().getString(propertyName, (XFormsProperties.getPropertyDefinition(propertyName)).getDefaultValue().toString());
     }
-
-    // This is not used currently
-//    public static boolean isOptimizeLocalInstanceLoads() {
-//        return OXFProperties.instance().getPropertySet().getBoolean
-//                (XFormsConstants.XFORMS_OPTIMIZE_LOCAL_INSTANCE_LOADS_PROPERTY, true).booleanValue();
-//    }
-
 
     /**
      * @return  whether name encryption is enabled (legacy XForms engine only).

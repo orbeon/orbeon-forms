@@ -227,9 +227,9 @@ public class XHTMLHeadHandler extends HandlerBase {
                         }
 
                         // Offline mode
-                        if (containingDocument.getStaticState().isHasOfflineSupport()) {
-                            dynamicProperties.put(XFormsProperties.OFFLINE_SUPPORT_PROPERTY, Boolean.TRUE);
-                        }
+//                        if (containingDocument.getStaticState().isHasOfflineSupport()) {
+//                            dynamicProperties.put(XFormsProperties.OFFLINE_SUPPORT_PROPERTY, Boolean.TRUE);
+//                        }
                     }
 
                     final Map nonDefaultProperties = containingDocument.getStaticState().getNonDefaultProperties();

@@ -32,7 +32,7 @@ public class XFormsFeatures {
             new FeatureConfig("dialog", "dialog"),
             new FeatureConfig("offline") {
                 public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
-                    return containingDocument.getStaticState().isHasOfflineSupport();
+                    return XFormsProperties.isOfflineMode(containingDocument);
                 }
             }
     };
@@ -150,7 +150,7 @@ public class XFormsFeatures {
             new ResourceConfig("/ops/javascript/yui/yahoo.js", "/ops/javascript/yui/yahoo-min.js"),
             new ResourceConfig("/ops/javascript/yui/selector-beta.js", "/ops/javascript/yui/selector-beta-min.js") {
                 public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
-                    return containingDocument.getStaticState().isHasOfflineSupport();
+                    return XFormsProperties.isOfflineMode(containingDocument);
                 }
                 public String getFeatureName() { return "offline"; }
             },
@@ -215,39 +215,39 @@ public class XFormsFeatures {
             // Selector is so far only used offline
             new ResourceConfig("/ops/javascript/yui/selector-beta.js", "/ops/javascript/yui/selector-beta-min.js") {
                 public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
-                    return containingDocument.getStaticState().isHasOfflineSupport();
+                    return XFormsProperties.isOfflineMode(containingDocument);
                 }
                 public String getFeatureName() { return "offline"; }
             },
             // ajaxxslt (to compute XPath expressions on the client-side when offline)
             new ResourceConfig("/ops/javascript/ajaxxslt/util.js", "/ops/javascript/ajaxxslt/util.js") {
                 public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
-                    return containingDocument.getStaticState().isHasOfflineSupport();
+                    return XFormsProperties.isOfflineMode(containingDocument);
                 }
                 public String getFeatureName() { return "offline"; }
             },
             new ResourceConfig("/ops/javascript/ajaxxslt/xmltoken.js", "/ops/javascript/ajaxxslt/xmltoken.js") {
                 public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
-                    return containingDocument.getStaticState().isHasOfflineSupport();
+                    return XFormsProperties.isOfflineMode(containingDocument);
                 }
                 public String getFeatureName() { return "offline"; }
             },
             new ResourceConfig("/ops/javascript/ajaxxslt/dom.js", "/ops/javascript/ajaxxslt/dom.js") {
                 public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
-                    return containingDocument.getStaticState().isHasOfflineSupport();
+                    return XFormsProperties.isOfflineMode(containingDocument);
                 }
                 public String getFeatureName() { return "offline"; }
             },
             new ResourceConfig("/ops/javascript/ajaxxslt/xpath.js", "/ops/javascript/ajaxxslt/xpath.js") {
                 public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
-                    return containingDocument.getStaticState().isHasOfflineSupport();
+                    return XFormsProperties.isOfflineMode(containingDocument);
                 }
                 public String getFeatureName() { return "offline"; }
             },
             // Encrytion library to encrypt data stored in the Gears store
             new ResourceConfig("/ops/javascript/encryption.js", "/ops/javascript/encryption.js") {
                 public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
-                    return containingDocument.getStaticState().isHasOfflineSupport();
+                    return XFormsProperties.isOfflineMode(containingDocument);
                 }
                 public String getFeatureName() { return "offline"; }
             },

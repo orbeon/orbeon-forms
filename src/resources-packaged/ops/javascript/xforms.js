@@ -4261,7 +4261,7 @@ ORBEON.xforms.Offline = {
 
         // === END gears_init.js
 
-        ORBEON.xforms.Offline.hasGears = typeof GearsFactory != "undefined";
+        ORBEON.xforms.Offline.hasGears = window.google && google.gears;
         if (ORBEON.xforms.Offline.hasGears) {
 
             // Create database and create the tables we need if necessary
@@ -4415,9 +4415,9 @@ ORBEON.xforms.Offline = {
         var urlsToCapture = [];
         for (var elementIndex = 0; elementIndex < htmlElements.length; elementIndex++) {
             var element = htmlElements[elementIndex];
-            if (YAHOO.lang.isString(element.href))
+            if (YAHOO.lang.isString(element.href) && element.href != "")
                 urlsToCapture.push(element.href);
-            if (YAHOO.lang.isString(element.src))
+            if (YAHOO.lang.isString(element.src) && element.src != "")
                 urlsToCapture.push(element.src);
         }
         ORBEON.xforms.Offline.formStore.capture(urlsToCapture, function (url, success, captureId) {

@@ -343,18 +343,25 @@ public class OldControlsComparator extends BaseControlsComparator {
                 // Handle itemsets
                 if (xformsSingleNodeControl2 instanceof XFormsSelect1Control) {
                     final XFormsSelect1Control xformsSelect1Control1 = (XFormsSelect1Control) xformsSingleNodeControl1;
-                    final XFormsSelect1Control xformsSelect1Control2 = (XFormsSelect1Control) xformsSingleNodeControl2;
+                    final XFormsSelect1Control xformsSelect1Control2 = (XFormsSelect1Control) xformsSingleNodeControl2;// not null
 
-                    if (itemsetsFull1 != null && xformsSelect1Control1 != null && xformsSelect1Control1.isRelevant()) {
-                        final Object items = xformsSelect1Control1.getItemset(pipelineContext, true);
-                        if (items != null)
-                            itemsetsFull1.put(xformsSelect1Control1.getEffectiveId(), items);
-                    }
+                    // Try to get static itemset info
+                    final XFormsStaticState.ItemsInfo itemsInfo = containingDocument.getStaticState().getItemsInfo(xformsSingleNodeControl2.getId());
+                    if (itemsInfo != null && !itemsInfo.hasNonStaticItem()) {
+                        // No update to send
+                    } else {
+                        // There is a possible change
+                        if (itemsetsFull1 != null && xformsSelect1Control1 != null && xformsSelect1Control1.isRelevant()) {
+                            final Object items = xformsSelect1Control1.getItemset(pipelineContext, true);
+                            if (items != null)
+                                itemsetsFull1.put(xformsSelect1Control1.getEffectiveId(), items);
+                        }
 
-                    if (itemsetsFull2 != null && xformsSelect1Control2 != null && xformsSelect1Control2.isRelevant()) {
-                        final Object items = xformsSelect1Control2.getItemset(pipelineContext, true);
-                        if (items != null)
-                            itemsetsFull2.put(xformsSelect1Control2.getEffectiveId(), items);
+                        if (itemsetsFull2 != null && xformsSelect1Control2.isRelevant()) {
+                            final Object items = xformsSelect1Control2.getItemset(pipelineContext, true);
+                            if (items != null)
+                                itemsetsFull2.put(xformsSelect1Control2.getEffectiveId(), items);
+                        }
                     }
                 }
             }

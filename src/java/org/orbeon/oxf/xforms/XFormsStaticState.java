@@ -775,7 +775,7 @@ public class XFormsStaticState {
             this.hasNonStaticItem = hasNonStaticItem;
         }
 
-        public boolean isHasNonStaticItem() {
+        public boolean hasNonStaticItem() {
             return hasNonStaticItem;
         }
     }

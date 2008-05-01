@@ -52,14 +52,14 @@
                 <li>
                     <p>
                         Assuming that <code>TOMCAT_HOME</code> represents the location of your
-                        Tomcat installation: create a new <code>TOMCAT_HOME/webapps/ops</code>
+                        Tomcat installation: create a new <code>TOMCAT_HOME/webapps/orbeon</code>
                         directory.
                     </p>
                 </li>
 
                 <li>
                     <p>
-                        Unzip <code>orbeon.war</code> in the <code>ops</code> directory you just
+                        Unzip <code>orbeon.war</code> in the <code>orbeon</code> directory you just
                         created.
                     </p>
                 </li>
@@ -253,14 +253,14 @@
                 <li>
                     <p>
                         Select a directory where you want to store your web application. Let's
-                        assume the path you chose is <code>C:/WebApps/ops</code>.
+                        assume the path you chose is <code>C:/WebApps/orbeon</code>.
                     </p>
                 </li>
                 <li>
                     <p>
-                        Unzip <code>orbeon.war</code> into <code>C:/WebApps/ops</code>. There should
+                        Unzip <code>orbeon.war</code> into <code>C:/WebApps/orbeon</code>. There should
                         now be a directory called <code>WEB-INF</code> under
-                        <code>C:/WebApps/ops</code>.
+                        <code>C:/WebApps/orbeon</code>.
                     </p>
                 </li>
                 <li>
@@ -271,8 +271,8 @@
                 <li>
                     <p>
                         Use the console to install a new Web application. When prompted to select a
-                        WAR file, point to the directory <code>C:/WebApps/ops</code>. When prompted
-                        for a context path, choose a value such as <code>ops</code>. Complete the
+                        WAR file, point to the directory <code>C:/WebApps/orbeon</code>. When prompted
+                        for a context path, choose a value such as <code>orbeon</code>. Complete the
                         installation and start the web application.
                     </p>
                 </li>
@@ -579,7 +579,7 @@
                             <li>Click on Applications / Install New Application.</li>
                             <li>
                                 Select the <code>orbeon.war</code> to upload, choose a context path
-                                like <code>/ops</code> (from now on we will assume this was your
+                                like <code>/orbeon</code> (from now on we will assume this was your
                                 choice).
                             </li>
                             <li>
@@ -589,7 +589,7 @@
                             </li>
                             <li>Save the configuration.</li>
                             <li>Click on Applications / Enterprise Applications.</li>
-                            <li>Select <code>ops_war</code> and click on the "start" button.</li>
+                            <li>Select <code>orbeon_war</code> and click on the "start" button.</li>
                             <li>
                                 <p>
                                     <i>Note:</i>
@@ -600,7 +600,7 @@
                                         </li>
                                         <li>
                                             The WAR file is uncompressed by WebSphere in
-                                            <code>WSAS_HOME/installedApps/NODE_NAME/ops_war.ear/orbeon.war</code> on
+                                            <code>WSAS_HOME/installedApps/NODE_NAME/orbeon_war.ear/orbeon.war</code> on
                                             WebSphere 5, where NODE_NAME if usualy your machine name.
                                         </li>
                                     </ul>

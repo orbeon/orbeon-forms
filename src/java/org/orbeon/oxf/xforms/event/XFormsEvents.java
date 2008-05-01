@@ -36,6 +36,9 @@ public class XFormsEvents {
 
     public static final String XXFORMS_DND = "xxforms-dnd";
 
+    public static final String XXFORMS_VALID = "xxforms-valid";
+    public static final String XXFORMS_INVALID = "xxforms-invalid";
+
     public static final String XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE = "xxforms-value-change-with-focus-change";
 
     // Standard XForms events

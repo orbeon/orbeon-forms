@@ -852,6 +852,32 @@
             <a name="validation-extensions"/>
             <section>
                 <title>Validation Extensions</title>
+                <a name="validation-extensions-events"/>
+                <section>
+                    <title>Extension Events</title>
+                    <p>
+                        Orbeon Forms supports extensions events dispatched to an instance when it becomes valid or
+                        invalid: <code>xxforms-valid</code> and <code>xxforms-invalid</code>. These events are
+                        dispatched just before <code>xforms-revalidate</code> completes, to all instances of the model
+                        being revalidated. For a given instance, either <code>xxforms-valid</code> or
+                        <code>xxforms-invalid</code> is dispatched for a given revalidation.
+                    </p>
+                    <p>
+                        These events can be used, for example, to toggle the appearance of icons indicating that a form
+                        is valid or invalid:
+                    </p>
+                    <xml-source>
+                        <xforms:instance id="my-instance">
+                            ...
+                        </xforms:instance>
+                        <xforms:action ev:event="xxforms-invalid" ev:observer="my-instance">
+                            <xforms:toggle case="invalid-form-case"/>
+                        </xforms:action>
+                        <xforms:action ev:event="xxforms-valid" ev:observer="my-instance">
+                            <xforms:toggle case="valid-form-case"/>
+                        </xforms:action>
+                    </xml-source>
+                </section>
                 <a name="validation-extensions-types"/>
                 <section>
                     <title>Extension Types</title>

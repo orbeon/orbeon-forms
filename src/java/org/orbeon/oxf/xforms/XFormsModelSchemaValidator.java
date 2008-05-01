@@ -268,15 +268,20 @@ public class XFormsModelSchemaValidator {
         InstanceData.addSchemaError(attribute, schemaError, attribute.getStringValue(), null);
     }
 
-    private void handleIDErrors(final IDConstraintChecker icc) {
+    private boolean handleIDErrors(final IDConstraintChecker icc) {
+        boolean isValid = true;
         for (ErrorInfo errorInfo = icc.clearErrorInfo(); errorInfo != null; errorInfo = icc.clearErrorInfo()) {
             if (XFormsServer.logger.isDebugEnabled())
                 XFormsServer.logger.debug("Schema validation error: " + errorInfo.message);
             addSchemaError(errorInfo.element, errorInfo.message);
+            isValid = false;
         }
+        return isValid;
     }
 
     private boolean validateElement(final Element element, final Acceptor acceptor, final IDConstraintChecker icc, final boolean isReportErrors) {
+
+        boolean isElementValid = true;
 
         // Create StartTagInfo
         final StartTagInfo startTagInfo;
@@ -309,6 +314,7 @@ public class XFormsModelSchemaValidator {
                 if (isReportErrors) {
                     tempChildAcceptor = acceptor.createChildAcceptor(startTagInfo, stringRef);
                     addSchemaError(element, stringRef.str);
+                    isElementValid = false;
                 } else {
                     return false;
                 }
@@ -319,20 +325,25 @@ public class XFormsModelSchemaValidator {
         // Handle id errors
         if (icc != null && isReportErrors) {
             icc.onNextAcceptorReady(startTagInfo, childAcceptor, element);
-            handleIDErrors(icc);
+            isElementValid &= handleIDErrors(icc);
         }
 
         // Validate children
         final int stringCareLevel = childAcceptor.getStringCareLevel();
         final DatatypeRef datatypeRef = new DatatypeRef();
         final boolean childrenValid = validateChildren(element, childAcceptor, startTagInfo, stringCareLevel, icc, datatypeRef, isReportErrors);
-        if (!childrenValid && !isReportErrors)
-            return false;
+        if (!childrenValid) {
+            if (isReportErrors)
+                isElementValid = false;
+            else
+                return false;
+        }
 
         if (!childAcceptor.isAcceptState(null)) {
             if (isReportErrors) {
                 childAcceptor.isAcceptState(stringRef);
                 addSchemaError(element, stringRef.str);
+                isElementValid = false;
             } else {
                 return false;
             }
@@ -354,7 +365,7 @@ public class XFormsModelSchemaValidator {
         // Handle id errors
         if (icc != null && isReportErrors) {
             icc.endElement(element, datatypeRef.types);
-            handleIDErrors(icc);
+            isElementValid &= handleIDErrors(icc);
         }
 
         // Get back to parent acceptor
@@ -362,13 +373,19 @@ public class XFormsModelSchemaValidator {
             if (isReportErrors) {
                 acceptor.stepForward(childAcceptor, stringRef);
                 addSchemaError(element, stringRef.str);
+                isElementValid = false;
             } else {
                 return false;
             }
         }
 
-        // This element is valid
-        return true;
+        if (isReportErrors) {
+            // Element may be invalid or not
+            return isElementValid;
+        } else {
+            // This element is valid
+            return true;
+        }
     }
 
     /**
@@ -376,7 +393,7 @@ public class XFormsModelSchemaValidator {
      *
      * @param element   element to validate
      */
-    private void validateElementLax(final Element element) {
+    private boolean validateElementLax(final Element element) {
 
         final String elementURI;
         final String elementName;
@@ -395,6 +412,7 @@ public class XFormsModelSchemaValidator {
             elementName = element.getName();
         }
 
+        boolean isValid = true;
         {
             // Find expression for element type
             final Expression expression;
@@ -423,12 +441,14 @@ public class XFormsModelSchemaValidator {
             if (expression != null) {
                 // Found type for element, so validate element
                 final Acceptor acceptor = documentDeclaration.createAcceptor();
-                validateElement(element, acceptor, null, true);
+                isValid &= validateElement(element, acceptor, null, true);
             } else {
                 // Element does not have type, so try to validate attributes and children elements
 
                 // Attributes
-                {
+                if (false) {
+                    // TODO: find out way of validating an attribute only
+                    // TODO: should we also look at schema.attributeGroups?
                     final List attributesList = element.attributes();
                     for (final Iterator iterator = attributesList.iterator(); iterator.hasNext();)   {
                         final Attribute attribute = (Attribute) iterator.next();
@@ -449,9 +469,6 @@ public class XFormsModelSchemaValidator {
                             }
                         }
                         if (attributeExpression != null) {
-                            // TODO: find out way of validating an attribute only
-                            // TODO: should we also look at schema.attributeGroups?
-
 //                            final ExpressionAcceptor expressionAcceptor = new SimpleAcceptor(documentDeclaration, attributeExpression, null, null);
 //                            // Validate attribute value
 //                            final StringRef errorStringRef = new StringRef();
@@ -482,10 +499,11 @@ public class XFormsModelSchemaValidator {
                 // Validate children elements
                 for (final Iterator iterator = element.elementIterator(); iterator.hasNext();) {
                     final Element childElement = (Element) iterator.next();
-                    validateElementLax(childElement);
+                    isValid &= validateElementLax(childElement);
                 }
             }
         }
+        return isValid;
     }
 
     /**
@@ -495,6 +513,7 @@ public class XFormsModelSchemaValidator {
     private boolean validateChildren(final Element element, final Acceptor acceptor, final StartTagInfo startTagInfo, final int stringCareLevel,
                                      final IDConstraintChecker icc, final DatatypeRef datatypeRef, final boolean isReportErrors) {
 
+        boolean isElementChildrenValid = true;
 
         // Validate attributes
         final StringRef stringRef = new StringRef();
@@ -503,10 +522,6 @@ public class XFormsModelSchemaValidator {
             final int end = startTagInfo.attributes.getLength();
             for (int i = 0; i < end; i++) {
                 final String uri = startTagInfo.attributes.getURI(i);
-
-                // TODO: Is this legacy XForms Classic check still useful?
-                if (XFormsConstants.XXFORMS_NAMESPACE_URI.equals(uri))
-                    continue;
 
                 final String name = startTagInfo.attributes.getLocalName(i);
                 final String qName = startTagInfo.attributes.getQName(i);
@@ -517,6 +532,7 @@ public class XFormsModelSchemaValidator {
                         final Attribute attribute = element.attribute(i);
                         acceptor.onAttribute2(uri, name, qName, value, startTagInfo.context, stringRef, (DatatypeRef) null);
                         addSchemaError(attribute, stringRef.str);
+                        isElementChildrenValid = false;
                     } else {
                         return false;
                     }
@@ -524,7 +540,7 @@ public class XFormsModelSchemaValidator {
                 final Attribute attribute = element.attribute(i);
                 if (icc != null && isReportErrors) {
                     icc.feedAttribute(acceptor, attribute, attributeDatatypeRef.types);
-                    handleIDErrors(icc);
+                    isElementChildrenValid &= handleIDErrors(icc);
                 }
             }
 
@@ -532,6 +548,7 @@ public class XFormsModelSchemaValidator {
                 if (isReportErrors) {
                     acceptor.onEndAttributes(startTagInfo, stringRef);
                     addSchemaError(element, stringRef.str);
+                    isElementChildrenValid = false;
                 } else {
                     return false;
                 }
@@ -542,8 +559,13 @@ public class XFormsModelSchemaValidator {
         for (final Iterator iterator = element.elementIterator(); iterator.hasNext();) {
             final Element childElement = (Element) iterator.next();
             final boolean isChildElementValid = validateElement((Element) childElement, acceptor, icc, isReportErrors);
-            if (!isReportErrors && !isChildElementValid)
-                return false;
+            if (!isChildElementValid) {
+                if (isReportErrors) {
+                    isElementChildrenValid = false;
+                } else {
+                    return false;
+                }
+            }
         }
 
         // If we just iterate over nodes, i.e. use nodeIterator() ) then validation of char data ends up being
@@ -572,6 +594,7 @@ public class XFormsModelSchemaValidator {
                     if (trimmed.length() > 0) {
                         if (isReportErrors) {
                             addSchemaError(element, stringRef.str);
+                            isElementChildrenValid = false;
                         } else {
                             return false;
                         }
@@ -585,6 +608,7 @@ public class XFormsModelSchemaValidator {
                         if (isReportErrors) {
                             acceptor.onText2(text, startTagInfo.context, stringRef, null);
                             addSchemaError(element, stringRef.str);
+                            isElementChildrenValid = false;
                         } else {
                             return false;
                         }
@@ -593,8 +617,13 @@ public class XFormsModelSchemaValidator {
                 }
         }
 
-        // The element children are valid
-        return true;
+        if (isReportErrors) {
+            // Element children may be invalid or not
+            return isElementChildrenValid;
+        } else {
+            // The element children are valid
+            return true;
+        }
     }
 
     /**
@@ -691,7 +720,7 @@ public class XFormsModelSchemaValidator {
      *
      * @param instance          instance to validate
      */
-    public void validateInstance(XFormsInstance instance) {
+    public boolean validateInstance(XFormsInstance instance) {
         if (schemaGrammar != null) {
 
             // Create REDocumentDeclaration if needed
@@ -701,22 +730,26 @@ public class XFormsModelSchemaValidator {
 
             // Get validation mode ("lax" is the default)
             final String validation = (instance.getValidation() == null) ? "lax" : instance.getValidation();
+            boolean isValid = true;
             if ("lax".equals(validation)) {
                 // Lax validation
                 final Element instanceRootElement = instance.getDocument().getRootElement();
-                validateElementLax(instanceRootElement);
+                isValid &= validateElementLax(instanceRootElement);
             } else if ("strict".equals(instance.getValidation())) {
                 // Strict validation
                 final Acceptor acceptor = documentDeclaration.createAcceptor();
                 final Element instanceRootElement = instance.getDocument().getRootElement();
                 final IDConstraintChecker idConstraintChecker = new IDConstraintChecker();
 
-                validateElement(instanceRootElement, acceptor, idConstraintChecker, true);
+                isValid &= validateElement(instanceRootElement, acceptor, idConstraintChecker, true);
                 idConstraintChecker.endDocument();
-                handleIDErrors(idConstraintChecker);
+                isValid &= handleIDErrors(idConstraintChecker);
             } else {
                 // Skip validation
             }
+            return isValid;
+        } else {
+            return true;
         }
     }
 

@@ -274,6 +274,16 @@ public class XFormsEventFactory {
                 return new XXFormsDndEvent(targetObject, parameters[0], parameters[1]);
             }
         });
+        nameToClassMap.put(XFormsEvents.XXFORMS_VALID, new Factory() {
+            public XFormsEvent createEvent(String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Element filesElement, String[] parameters) {
+                return new XXFormsValidEvent(targetObject);
+            }
+        });
+        nameToClassMap.put(XFormsEvents.XXFORMS_INVALID, new Factory() {
+            public XFormsEvent createEvent(String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Element filesElement, String[] parameters) {
+                return new XXFormsInvalidEvent(targetObject);
+            }
+        });
     }
 
     public static XFormsEvent createEvent(String newEventName, XFormsEventTarget targetObject) {

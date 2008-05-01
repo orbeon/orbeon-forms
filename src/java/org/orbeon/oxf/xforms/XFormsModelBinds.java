@@ -108,7 +108,7 @@ public class XFormsModelBinds {
             }
         });
 
-        // Update computed expression binds
+        // Update computed expression binds if requested (done here according to XForms 1.1)
         if (computedBindsCalculate) {
             applyComputedExpressionBinds(pipelineContext);
         }
@@ -144,15 +144,15 @@ public class XFormsModelBinds {
      *
      * @param pipelineContext   current PipelineContext
      */
-    public void applyValidationBinds(final PipelineContext pipelineContext) {
+    public void applyValidationBinds(final PipelineContext pipelineContext, final Map invalidInstances) {
         // Handle validation
         iterateBinds(pipelineContext, new BindRunner() {
             public void applyBind(PipelineContext pipelineContext, Bind bind, List nodeset, int position) {
-                handleValidationBind(pipelineContext, bind, nodeset, position);
+                handleValidationBind(pipelineContext, bind, nodeset, position, invalidInstances);
             }
         });
 
-        // Update computed expression binds
+        // Update computed expression binds if requested (done here upon a preference)
         if (!computedBindsCalculate) {
             applyComputedExpressionBinds(pipelineContext);
         }
@@ -500,7 +500,7 @@ public class XFormsModelBinds {
         }
     }
 
-    private void handleValidationBind(PipelineContext pipelineContext, Bind bind, List nodeset, int position) {
+    private void handleValidationBind(PipelineContext pipelineContext, Bind bind, List nodeset, int position, Map invalidInstances) {
 
         final NodeInfo currentNodeInfo = (NodeInfo) nodeset.get(position - 1);
 
@@ -519,6 +519,21 @@ public class XFormsModelBinds {
             } catch (Exception e) {
                 throw ValidationException.wrapException(e, new ExtendedLocationData(bind.getLocationData(), "evaluating XForms constraint bind",
                         bind.getBindElement(), new String[] { "expression", bind.getConstraint() }));
+            }
+        }
+
+        boolean isMarkedInvalid = false;
+        String nodeValue = null;
+
+        // Handle required MIP
+        if (InstanceData.getRequired(currentNodeInfo)) {// this assumes that the required MIP has been already computed (during recalculate)
+            // Current node is required...
+            nodeValue = XFormsInstance.getValueForNodeInfo(currentNodeInfo);
+
+            if ("".equals(nodeValue)) {
+                // ...and empty
+                InstanceData.updateValueValid(currentNodeInfo, false, bind.getId());
+                isMarkedInvalid = true;
             }
         }
 
@@ -564,8 +579,9 @@ public class XFormsModelBinds {
                         }
                     }
 
-                    // Get value to validate
-                    final String nodeValue = XFormsInstance.getValueForNodeInfo(currentNodeInfo);
+                    // Get value to validate if not already computed above
+                    if (nodeValue == null)
+                        nodeValue = XFormsInstance.getValueForNodeInfo(currentNodeInfo);
 
                     // TODO: "[...] these datatypes can be used in the type model item property without the addition of the
                     // XForms namespace qualifier if the namespace context has the XForms namespace as the default
@@ -598,15 +614,17 @@ public class XFormsModelBinds {
                         // Set error on node if necessary
                         if (result instanceof ValidationErrorValue) {
                             InstanceData.updateValueValid(currentNodeInfo, false, bind.getId());
+                            isMarkedInvalid = true;
                         }
                     } else if (isBuiltInXXFormsType) {
                         // Built-in extension types
 
                         if (typeLocalname.equals("xml")) {
                             // xxforms:xml type
-
-                            if (!XMLUtils.isWellFormedXML(nodeValue))
+                            if (!XMLUtils.isWellFormedXML(nodeValue)) {
                                 InstanceData.updateValueValid(currentNodeInfo, false, bind.getId());
+                                isMarkedInvalid = true;
+                            }
 
                         } else {
                             throw new ValidationException("Invalid schema type '" + bind.getType() + "'", bind.getLocationData());
@@ -622,6 +640,7 @@ public class XFormsModelBinds {
                         // Set error on node if necessary
                         if (validationError != null) {
                             InstanceData.addSchemaError(currentNodeInfo, validationError, nodeValue, bind.getId());
+                            isMarkedInvalid = true;
                         }
                     } else {
                         throw new ValidationException("Invalid schema type '" + bind.getType() + "'", bind.getLocationData());
@@ -631,6 +650,12 @@ public class XFormsModelBinds {
                     InstanceData.setType(currentNodeInfo, XMLUtils.buildExplodedQName(typeNamespaceURI, typeLocalname));
                 }
             }
+        }
+
+        // Remember invalid instances
+        if (isMarkedInvalid) {
+            final XFormsInstance instanceForNodeInfo = containingDocument.getInstanceForNode(currentNodeInfo);
+            invalidInstances.put(instanceForNodeInfo.getId(), "");
         }
     }
 

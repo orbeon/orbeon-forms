@@ -300,7 +300,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         }
     }
 
-    private void applySchemasIfNeeded() {
+    private void applySchemasIfNeeded(Map invalidInstances) {
         // Don't do anything if there is no schema
         if (schemaValidator != null) {
             // Apply schemas to all instances
@@ -308,8 +308,12 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                 for (Iterator i = getInstances().iterator(); i.hasNext();) {
                     final XFormsInstance currentInstance = (XFormsInstance) i.next();
                     // Currently we don't support validating read-only instances
-                    if (!currentInstance.isReadOnly())
-                        schemaValidator.validateInstance(currentInstance);
+                    if (!currentInstance.isReadOnly()) {
+                        if (!schemaValidator.validateInstance(currentInstance)) {
+                            // Remember that instance is invalid
+                            invalidInstances.put(currentInstance.getId(), "");
+                        }
+                    }
                 }
             }
         }
@@ -888,8 +892,21 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
             }
 
             // Run validation
-            applySchemasIfNeeded();
-            binds.applyValidationBinds(pipelineContext);
+            final Map invalidInstances = new HashMap();
+            applySchemasIfNeeded(invalidInstances);
+            binds.applyValidationBinds(pipelineContext, invalidInstances);
+
+            // NOTE: It is possible, with binds and the use of xxforms:instance(), that some instances in
+            // invalidInstances do not belong to this model. Those instances won't get events with the dispatching
+            // algorithm below.
+            for (Iterator i = instances.iterator(); i.hasNext();) {
+                final XFormsInstance instance = (XFormsInstance) i.next();
+                if (invalidInstances.get(instance.getId()) == null) {
+                    containingDocument.dispatchEvent(pipelineContext, new XXFormsValidEvent(instance));
+                } else {
+                    containingDocument.dispatchEvent(pipelineContext, new XXFormsInvalidEvent(instance));
+                }
+            }
 
             if (XFormsServer.logger.isDebugEnabled()) {
                 final long revalidateTime = System.currentTimeMillis() - revalidateStartTime;

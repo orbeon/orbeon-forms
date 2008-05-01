@@ -83,7 +83,7 @@ public class XFormsProperties {
 
     public static final String HELP_HANDLER_PROPERTY = "help-handler";
     private static final String HELP_TOOLTIP_PROPERTY = "help-tooltip";
-    public static final String OFFLINE_SUPPORT_PROPERTY = "offline-support";
+    public static final String OFFLINE_SUPPORT_PROPERTY = "offline";
 
     private static final String COMPUTED_BINDS_PROPERTY = "computed-binds";
     public static final String COMPUTED_BINDS_RECALCULATE_VALUE = "recalculate";

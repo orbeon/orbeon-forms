@@ -425,17 +425,21 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
                         // Adjust controls ids that could have gone out of bounds
                         XFormsIndexUtils.adjustRepeatIndexes(xformsControls, null);
 
-                        // After changing indexes, must recalculate
-                        // NOTE: The <setindex> action is supposed to "The implementation data
-                        // structures for tracking computational dependencies are rebuilt or
-                        // updated as a result of this action."
-                        // What should we do here? We run the computed expression binds so that
-                        // those are updated, but is that what we should do?
+                        // XForms 1.1: "This action affects deferred updates by performing deferred update in its
+                        // initialization and by setting the deferred update flags for recalculate, revalidate and
+                        // refresh."
                         for (Iterator i = containingDocument.getModels().iterator(); i.hasNext();) {
-                            XFormsModel currentModel = (XFormsModel) i.next();
-                            currentModel.getBinds().rebuild(pipelineContext);
-//                            currentModel.getBinds().applyComputedExpressionBinds(pipelineContext);
-                            //containingDocument.dispatchEvent(pipelineContext, new XFormsRecalculateEvent(currentModel, true));
+                            final XFormsModel currentModel = (XFormsModel) i.next();
+
+                            // NOTE: We used to do this, following XForms 1.0, but XForms 1.1 has changed the behavior
+                            //currentModel.getBinds().rebuild(pipelineContext);
+
+                            final XFormsModel.DeferredActionContext deferredActionContext = currentModel.getDeferredActionContext();
+                            if (deferredActionContext != null) {
+                                deferredActionContext.recalculate = true;
+                                deferredActionContext.revalidate = true;
+                                deferredActionContext.refresh = true;
+                            }
                         }
                         // TODO: Should try to use the code of the <setindex> action
 

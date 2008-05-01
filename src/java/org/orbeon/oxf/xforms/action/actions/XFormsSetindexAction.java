@@ -118,12 +118,20 @@ public class XFormsSetindexAction extends XFormsAction {
                 XFormsIndexUtils.adjustRepeatIndexes(xformsControls, nestedRepeatIdsMap);
             }
 
-            // TODO: "The implementation data structures for tracking computational dependencies are
-            // rebuilt or updated as a result of this action."
+            // XForms 1.1: "This action affects deferred updates by performing deferred update in its initialization
+            // and by setting the deferred update flags for recalculate, revalidate and refresh."
             for (Iterator i = containingDocument.getModels().iterator(); i.hasNext();) {
-                XFormsModel currentModel = (XFormsModel) i.next();
-                currentModel.getBinds().rebuild(pipelineContext);
-//                currentModel.getBinds().applyComputedExpressionBinds(pipelineContext);
+                final XFormsModel currentModel = (XFormsModel) i.next();
+
+                // NOTE: We used to do this, following XForms 1.0, but XForms 1.1 has changed the behavior
+                //currentModel.getBinds().rebuild(pipelineContext);
+
+                final XFormsModel.DeferredActionContext deferredActionContext = currentModel.getDeferredActionContext();
+                if (deferredActionContext != null) {
+                    deferredActionContext.recalculate = true;
+                    deferredActionContext.revalidate = true;
+                    deferredActionContext.refresh = true;
+                }
             }
 
             containingDocument.getXFormsControls().markDirtySinceLastRequest();

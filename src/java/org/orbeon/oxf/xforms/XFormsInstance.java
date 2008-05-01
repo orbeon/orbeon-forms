@@ -588,7 +588,8 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventHandlerCont
     }
 
     public List getEventHandlers(XFormsContainingDocument containingDocument) {
-        return containingDocument.getStaticState().getEventHandlers(instanceId);
+        final XFormsStaticState staticState = containingDocument.getStaticState();
+        return (staticState != null) ? staticState.getEventHandlers(instanceId) : null;
     }
 
     public void logIfNeeded(XFormsContainingDocument containingDocument, String message) {

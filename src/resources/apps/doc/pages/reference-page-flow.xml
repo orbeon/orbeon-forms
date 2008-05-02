@@ -685,6 +685,19 @@
                     <code>/blog/jdoe/456</code>, the first group contains the value
                     <code>jdoe</code>, and the second group the value <code>456</code>.
                 </p>
+                <p>
+                    The <code>&lt;setvalue></code> element also supports a <code>value</code> attribute, which can be
+                    used to set a value using an XPath expression:
+                </p>
+                <xml-source>
+                    <setvalue ref="/form/date-time" value="current-dateTime()"/>
+                </xml-source>
+                <p>
+                    Finally, <code>&lt;setvalue></code> supports setting a literal value:
+                </p>
+                <xml-source>
+                    <setvalue ref="/form/mode">print</setvalue>
+                </xml-source>
             </section>
             <note>
                 <p>

@@ -57,7 +57,12 @@
                         <xforms:output value="if (is-date-type = 'true') then 'Date ' else 'No type '"/>
                         <xforms:trigger appearance="xxforms:link">
                             <xforms:label>[change]</xforms:label>
-                            <xforms:setvalue ev:event="DOMActivate" ref="is-date-type" value="if (. = 'true') then 'false' else 'true'"/>
+                            <xforms:action ev:event="DOMActivate">
+                                <xforms:setvalue ref="is-date-type" value="if (. = 'true') then 'false' else 'true'"/>
+                                <!-- We need to do a rebuild as the XPath expressions in the bind nodeset are only reevaluated upon
+                                     insert, delete, instance replacement, but not when a value is set. -->
+                                <xforms:rebuild/>
+                            </xforms:action>
                         </xforms:trigger>
                     </xhtml:td>
                     <xhtml:td>
@@ -75,12 +80,12 @@
                         </xforms:trigger>
                     </xhtml:td>
                     <xhtml:td>
-                        <xforms:input ref="date">
+                        <xforms:input ref="date" id="input-control">
                             <xforms:hint>Hint</xforms:hint>
                         </xforms:input>
                     </xhtml:td>
                     <xhtml:td>
-                        <xforms:output ref="date"/>
+                        <xforms:output ref="date" id="output-control"/>
                     </xhtml:td>
                 </xhtml:tr>
             </xforms:repeat>

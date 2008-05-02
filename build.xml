@@ -465,6 +465,7 @@
     <target name="orbeon-minify-js" depends="init">
         <mkdir dir="${war.dir}/WEB-INF/resources/ops/javascript/yui"/>
         <mkdir dir="${war.dir}/WEB-INF/resources/ops/javascript/jscalendar/lang"/>
+        <mkdir dir="${war.dir}/WEB-INF/resources/ops/javascript/ajaxxslt"/>
         <!-- YUI -->
         <antcall target="orbeon-minify-maybe-js">
             <param name="name" value="xforms"/>
@@ -520,6 +521,24 @@
         </antcall>
         <antcall target="orbeon-minify-maybe-js">
             <param name="name" value="suggest-actb"/>
+        </antcall>
+
+        <!-- AJAXXSLT -->
+        <antcall target="orbeon-minify-maybe-js">
+            <param name="name" value="ajaxxslt/util"/>
+        </antcall>
+        <antcall target="orbeon-minify-maybe-js">
+            <param name="name" value="ajaxxslt/xmltoken"/>
+        </antcall>
+        <antcall target="orbeon-minify-maybe-js">
+            <param name="name" value="ajaxxslt/dom"/>
+        </antcall>
+        <antcall target="orbeon-minify-maybe-js">
+            <param name="name" value="ajaxxslt/xpath"/>
+        </antcall>
+
+        <antcall target="orbeon-minify-maybe-js">
+            <param name="name" value="encryption"/>
         </antcall>
 
     </target>

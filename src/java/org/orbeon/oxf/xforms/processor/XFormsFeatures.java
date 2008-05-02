@@ -218,32 +218,32 @@ public class XFormsFeatures {
                 public String getFeatureName() { return "offline"; }
             },
             // ajaxxslt (to compute XPath expressions on the client-side when offline)
-            new ResourceConfig("/ops/javascript/ajaxxslt/util.js", "/ops/javascript/ajaxxslt/util.js") {
+            new ResourceConfig("/ops/javascript/ajaxxslt/util.js", "/ops/javascript/ajaxxslt/util-min.js") {
                 public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
                     return XFormsProperties.isOfflineMode(containingDocument);
                 }
                 public String getFeatureName() { return "offline"; }
             },
-            new ResourceConfig("/ops/javascript/ajaxxslt/xmltoken.js", "/ops/javascript/ajaxxslt/xmltoken.js") {
+            new ResourceConfig("/ops/javascript/ajaxxslt/xmltoken.js", "/ops/javascript/ajaxxslt/xmltoken-min.js") {
                 public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
                     return XFormsProperties.isOfflineMode(containingDocument);
                 }
                 public String getFeatureName() { return "offline"; }
             },
-            new ResourceConfig("/ops/javascript/ajaxxslt/dom.js", "/ops/javascript/ajaxxslt/dom.js") {
+            new ResourceConfig("/ops/javascript/ajaxxslt/dom.js", "/ops/javascript/ajaxxslt/dom-min.js") {
                 public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
                     return XFormsProperties.isOfflineMode(containingDocument);
                 }
                 public String getFeatureName() { return "offline"; }
             },
-            new ResourceConfig("/ops/javascript/ajaxxslt/xpath.js", "/ops/javascript/ajaxxslt/xpath.js") {
+            new ResourceConfig("/ops/javascript/ajaxxslt/xpath.js", "/ops/javascript/ajaxxslt/xpath-min.js") {
                 public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
                     return XFormsProperties.isOfflineMode(containingDocument);
                 }
                 public String getFeatureName() { return "offline"; }
             },
             // Encrytion library to encrypt data stored in the Gears store
-            new ResourceConfig("/ops/javascript/encryption.js", "/ops/javascript/encryption.js") {
+            new ResourceConfig("/ops/javascript/encryption.js", "/ops/javascript/encryption-min.js") {
                 public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
                     return XFormsProperties.isOfflineMode(containingDocument);
                 }

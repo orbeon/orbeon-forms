@@ -1049,6 +1049,41 @@ http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=2
         <section>
             <title>Compatibility Notes</title>
             <section>
+                <title>Binds Evaluation</title>
+                <p>
+                    With Orbeon Forms 3.6 and earlier, <code>&lt;xforms:bind></code> node-sets were re-evaluated
+                    everytime an XForms recalculation or revalidation was performed. In this version, this is no longer
+                    the case: <code>&lt;xforms:bind></code> node-sets are re-evaluated during the XForms rebuild
+                    operation only, as per the XForms specification. This is meant to improve performance, but it also
+                    has a side-effect: in certain circumstances, an explicit <code>&lt;xforms:rebuild></code> action may
+                    be necessary.
+                </p>
+                <xml-source>
+                    <xforms:instance>
+                        <instance>
+                            <date>2002-08-02</date>
+                            <is-date-type>false</is-date-type>
+                        </instance>
+                    </xforms:instance>
+                    <comment> This expression sets the xs:date type to the date element depending on another instance value </comment>
+                    <xforms:bind nodeset="/instance/date[../is-date-type = 'true']" type="xs:date"/>
+                    <comment> Input bound to the date element </comment>
+                    <xforms:input ref="date">
+                        <xforms:label>Value</xforms:label>
+                    </xforms:input>
+                    <comment> This trigger allows changing the type back and forth </comment>
+                    <xforms:trigger>
+                        <xforms:label>Change Type</xforms:label>
+                        <xforms:action ev:event="DOMActivate">
+                            <xforms:setvalue ref="is-date-type" value="if (. = 'true') then 'false' else 'true'"/>
+                            <comment> We need to do a rebuild as the XPath expressions in the bind nodeset are only reevaluated upon
+                                 insert, delete, instance replacement, but not when a value is set</comment>
+                            <xforms:rebuild/>
+                        </xforms:action>
+                    </xforms:trigger>
+                </xml-source>
+            </section>
+            <section>
                 <title>Image Triggers</title>
                 <p>
                     Orbeon Forms 3.6 and earlier allowed using images within <code>xforms:trigger</code> and
@@ -1085,7 +1120,6 @@ http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=2
                     4.01 strict). This may have an impact on how your web browser interpets CSS rules.
                 </p>
             </section>
-
         </section>
     </body>
 </document>

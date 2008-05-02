@@ -143,9 +143,9 @@ public class XFormsFeatures {
     private static final ResourceConfig[] scripts = {
             // Calendar scripts
             // TODO: move to YUI in the future if possible
-            new ResourceConfig("/ops/javascript/jscalendar/calendar.js", "/ops/javascript/jscalendar/calendar-min.js"),// our min version
-            new ResourceConfig("/ops/javascript/jscalendar/lang/calendar-en.js", "/ops/javascript/jscalendar/lang/calendar-en-min.js"),// our min version
-            new ResourceConfig("/ops/javascript/jscalendar/calendar-setup.js", "/ops/javascript/jscalendar/calendar-setup-min.js"),// our min version
+            new ResourceConfig("/ops/javascript/jscalendar/calendar.js", "/ops/javascript/jscalendar/calendar-min.js"),
+            new ResourceConfig("/ops/javascript/jscalendar/lang/calendar-en.js", "/ops/javascript/jscalendar/lang/calendar-en-min.js"),
+            new ResourceConfig("/ops/javascript/jscalendar/calendar-setup.js", "/ops/javascript/jscalendar/calendar-setup-min.js"),
             // Yahoo UI Library
             new ResourceConfig("/ops/javascript/yui/yahoo.js", "/ops/javascript/yui/yahoo-min.js"),
             new ResourceConfig("/ops/javascript/yui/selector-beta.js", "/ops/javascript/yui/selector-beta-min.js") {
@@ -172,13 +172,13 @@ public class XFormsFeatures {
                 }
                 public String getFeatureName() { return "tree"; }
             },
-            new ResourceConfig("/ops/javascript/yui/treeview-tasknode.js", null) {
+            new ResourceConfig("/ops/javascript/yui/treeview-tasknode.js", "/ops/javascript/yui/treeview-tasknode-min.js") {
                 public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
                     return isTreeInUse(appearancesMap);
                 }
                 public String getFeatureName() { return "tree"; }
             },
-            new ResourceConfig("/ops/javascript/yui/treeview-checkonclicknode.js", null) {
+            new ResourceConfig("/ops/javascript/yui/treeview-checkonclicknode.js", "/ops/javascript/yui/treeview-checkonclicknode-min.js") {
                 public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
                     return isTreeInUse(appearancesMap);
                 }
@@ -198,20 +198,18 @@ public class XFormsFeatures {
                 public String getFeatureName() { return "htmlarea"; }
             },
             // Autocomplete
-            new ResourceConfig("/ops/javascript/suggest-common.js", "/ops/javascript/suggest-common-min.js") {// our min version
+            new ResourceConfig("/ops/javascript/suggest-common.js", "/ops/javascript/suggest-common-min.js") {
                 public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
                     return isAutocompleteInUse(appearancesMap);
                 }
                 public String getFeatureName() { return "autocomplete"; }
             },
-            new ResourceConfig("/ops/javascript/suggest-actb.js", "/ops/javascript/suggest-actb-min.js") {// our min version
+            new ResourceConfig("/ops/javascript/suggest-actb.js", "/ops/javascript/suggest-actb-min.js") {
                 public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
                     return isAutocompleteInUse(appearancesMap);
                 }
                 public String getFeatureName() { return "autocomplete"; }
             },
-            // Other standard scripts
-            new ResourceConfig("/ops/javascript/time-utils.js", "/ops/javascript/time-utils-min.js"),// TODO: check who uses this // our min version
             // Selector is so far only used offline
             new ResourceConfig("/ops/javascript/yui/selector-beta.js", "/ops/javascript/yui/selector-beta-min.js") {
                 public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
@@ -252,7 +250,7 @@ public class XFormsFeatures {
                 public String getFeatureName() { return "offline"; }
             },
             // XForms client
-            new ResourceConfig("/ops/javascript/xforms.js", null)// TODO: our min version
+            new ResourceConfig("/ops/javascript/xforms.js", "/ops/javascript/xforms-min.js")
     };
 
     public static class ResourceConfig {

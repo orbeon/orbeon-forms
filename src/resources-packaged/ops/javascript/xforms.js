@@ -1667,7 +1667,6 @@ ORBEON.xforms.Events = {
                         }
                         // Send focus out/focus in events
                         var events = new Array();
-                        if (ORBEON.xforms.Controls.getForm(previousDOMFocusOut) == null) debugger;
                         events.push(xformsCreateEventArray(previousDOMFocusOut, "DOMFocusOut", null));
                         events.push(xformsCreateEventArray(target, "DOMFocusIn", null));
                         xformsFireEvents(events, true);
@@ -2146,7 +2145,7 @@ ORBEON.xforms.Events = {
      * Called when the help dialog is closed with the "x" button or after helpDialogButtonClose()
      * runs formHelpPanel.hide().
      */
-    helpDialogXClose: function(_dummy, _dummy, formID) {
+    helpDialogXClose: function(_dummy1, _dummy2, formID) {
         // Fixes cursor Firefox issue; more on this in dialog init code
         var formHelpPanel = ORBEON.xforms.Globals.formHelpPanel[formID];
         formHelpPanel.element.style.display = "none";
@@ -3307,7 +3306,7 @@ ORBEON.xforms.Server = {
                     } else if (xformsGetLocalName(responseRoot.childNodes[i]) == "action") {
                         var actionElement = responseRoot.childNodes[i];
 
-                        // Firt repeat and delete "lines" in repeat (as itemset changed below might be in a new line)
+                        // First repeat and delete "lines" in repeat (as itemset changed below might be in a new line)
                         for (var actionIndex = 0; actionIndex < actionElement.childNodes.length; actionIndex++) {
                             var actionName = xformsGetLocalName(actionElement.childNodes[actionIndex]);
                             switch (actionName) {
@@ -3799,31 +3798,6 @@ ORBEON.xforms.Server = {
                                             } else if (nameAttribute == "colspan") {
                                                 htmlElement.colSpan = newAttributeValue;
                                             } else if (nameAttribute == "rowspan") {
-                                                // Below is an attempt at adjusting automatically rowspan for IE. It
-                                                // works, but the corresponding server-side code that runs during
-                                                // initialization is non-trivial to do.
-
-                                                //                                                var adjustedRowspan = newAttributeValue;
-                                                //                                                if (newAttributeValue > 1) {// need to adjust only if we actually span rows
-                                                //                                                    var cursor = htmlElement.parentNode;// should be pointing to tr
-                                                //                                                    if (cursor.nodeName.toLowerCase() == "tr") {
-                                                //                                                        for (var k = 1; k < newAttributeValue; k++) {
-                                                //                                                            // Point to first node after current tr
-                                                //                                                            cursor = cursor.nextSibling;
-                                                //                                                            // Skip over non-elements and separators
-                                                //                                                            while (cursor != null && (cursor.nodeType != ELEMENT_TYPE || ORBEON.util.Dom.hasClass(cursor, "xforms-repeat-delimiter"))) {
-                                                //                                                                if (ORBEON.util.Dom.hasClass(cursor, "xforms-repeat-delimiter"))
-                                                //                                                                    adjustedRowspan++;
-                                                //
-                                                //                                                                cursor = cursor.nextSibling;
-                                                //                                                            }
-                                                //                                                            if (!cursor)
-                                                //                                                                break;
-                                                //                                                        }
-                                                //                                                        alert("xxxx adjusted rowspan for IE: " + adjustedRowspan);
-                                                //                                                    }
-                                                //                                                }
-                                                //                                                htmlElement.rowSpan = adjustedRowspan;
                                                 htmlElement.rowSpan = newAttributeValue;
                                             } else if (nameAttribute == "accesskey") {
                                                 htmlElement.accessKey = newAttributeValue;
@@ -3911,17 +3885,17 @@ ORBEON.xforms.Server = {
                                     // After we display divs, we must reenable the HTML editors.
                                     // This is a workaround for a Gecko bug documented at:
                                     // http://wiki.fckeditor.net/Troubleshooting#gecko_hidden_div
-                                    if (XFORMS_IS_GECKO && ORBEON.xforms.Globals.htmlAreaNames.length > 0) {
-                                        for (var htmlAreaIndex = 0; htmlAreaIndex < ORBEON.xforms.Globals.htmlAreaNames.length; htmlAreaIndex++) {
-                                            var name = ORBEON.xforms.Globals.htmlAreaNames[htmlAreaIndex];
-                                            var editor = FCKeditorAPI.GetInstance(name);
-                                            try {
-                                                editor.EditorDocument.designMode = "on";
-                                            } catch (e) {
-                                                // Nop
-                                            }
-                                        }
-                                    }
+//                                    if (XFORMS_IS_GECKO && ORBEON.xforms.Globals.htmlAreaNames.length > 0) {
+//                                        for (var htmlAreaIndex = 0; htmlAreaIndex < ORBEON.xforms.Globals.htmlAreaNames.length; htmlAreaIndex++) {
+//                                            var name = ORBEON.xforms.Globals.htmlAreaNames[htmlAreaIndex];
+//                                            var editor = FCKeditorAPI.GetInstance(name);
+//                                            try {
+//                                                editor.EditorDocument.designMode = "on";
+//                                            } catch (e) {
+//                                                // Nop
+//                                            }
+//                                        }
+//                                    }
 
                                     break;
                                 }
@@ -5137,4 +5111,5 @@ if (!ORBEON.xforms.Globals.pageLoadedRegistered) {
     ORBEON.xforms.Globals.debugLastTime = new Date().getTime();
     ORBEON.xforms.Globals.lastEventSentTime = new Date().getTime();
 }
+
 

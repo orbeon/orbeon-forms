@@ -607,21 +607,6 @@
                                                         those found in orbeon-resources-public.jar.
                                                    </p>
                                                 </li>
-                                                <!--
-                                                <li>
-                                                    <p>
-                                                        <b><code>xs:time</code></b> &#8213; The
-                                                        input field is broken up into three fields:
-                                                        hours, minutes, and seconds. JavaScript
-                                                        validation verifies the user's entries, and
-                                                        prevents non-numeric characters, as well as
-                                                        overflowing values (hours greater than 23,
-                                                        minutes and seconds over 59). The JavaScript
-                                                        code is customizable in the following file:
-                                                        <code>oxf:/config/theme/JavaScript/time-utils.js</code>
-                                                    </p>
-                                                </li>
-                                                -->
                                             </ul>
                                         </p>
                                     </li>

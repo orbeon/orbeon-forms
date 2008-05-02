@@ -3720,14 +3720,16 @@ ORBEON.xforms.Server = {
                                         if (readonly != null && !isStaticReadonly) 
                                             ORBEON.xforms.Controls.setReadonly(documentElement, readonly == "true");
 
-                                        // Change classes on control and date pick based on type
-                                        if (type == "{http://www.w3.org/2001/XMLSchema}date" || type == "{http://www.w3.org/2002/xforms}date") {
-                                            ORBEON.util.Dom.addClass(documentElement, "xforms-type-date");
-                                            ORBEON.util.Dom.removeClass(documentElement, "xforms-type-string");
-                                        } else if (type != null && type != "{http://www.w3.org/2001/XMLSchema}date" && type != "{http://www.w3.org/2002/xforms}date") {
-                                            ORBEON.util.Dom.removeClass(documentElement, "xforms-type-date");
-                                            var dateDisplayElement = ORBEON.util.Dom.getChildElementByClass(documentElement, "xforms-date-display");
-                                            ORBEON.util.Dom.setStringValue(dateDisplayElement, "");
+                                        // Change classes on input control and date pick based on type
+                                        if (ORBEON.util.Dom.hasClass(documentElement, "xforms-input")) {
+                                            if (type == "{http://www.w3.org/2001/XMLSchema}date" || type == "{http://www.w3.org/2002/xforms}date") {
+                                                ORBEON.util.Dom.addClass(documentElement, "xforms-type-date");
+                                                ORBEON.util.Dom.removeClass(documentElement, "xforms-type-string");
+                                            } else if (type != null && type != "{http://www.w3.org/2001/XMLSchema}date" && type != "{http://www.w3.org/2002/xforms}date") {
+                                                ORBEON.util.Dom.removeClass(documentElement, "xforms-type-date");
+                                                var dateDisplayElement = ORBEON.util.Dom.getChildElementByClass(documentElement, "xforms-date-display");
+                                                ORBEON.util.Dom.setStringValue(dateDisplayElement, "");
+                                            }
                                         }
 
                                         // Update value

@@ -673,6 +673,7 @@ ORBEON.xforms.Document = {
     },
 
     setOfflineEncryptionPassword: function(password) {
+        ORBEON.xforms.Offline.init();
         if (password.length < 16)
             throw "Password must have at least 16 characters";
         var resultSet = ORBEON.xforms.Offline.gearsDatabase.execute("select * from Current_Password");
@@ -695,6 +696,7 @@ ORBEON.xforms.Document = {
     },
 
     changeOfflineEncryptionPassword: function(currentPassword, newPassword) {
+        ORBEON.xforms.Offline.init();
         // Get old key
         ORBEON.xforms.Document.setOfflineEncryptionPassword(currentPassword);
         var oldKey = ORBEON.xforms.Offline.getEncryptionKey();

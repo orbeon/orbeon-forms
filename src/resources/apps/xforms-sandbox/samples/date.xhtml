@@ -55,7 +55,7 @@
                 <xhtml:tr>
                     <xhtml:td>
                         <xforms:output value="if (is-date-type = 'true') then 'Date ' else 'No type '"/>
-                        <xforms:trigger appearance="xxforms:link">
+                        <xforms:trigger appearance="minimal">
                             <xforms:label>[change]</xforms:label>
                             <xforms:action ev:event="DOMActivate">
                                 <xforms:setvalue ref="is-date-type" value="if (. = 'true') then 'false' else 'true'"/>
@@ -67,14 +67,14 @@
                     </xhtml:td>
                     <xhtml:td>
                         <xforms:output value="readonly"/>
-                        <xforms:trigger appearance="xxforms:link">
+                        <xforms:trigger appearance="minimal">
                             <xforms:label>[change]</xforms:label>
                             <xforms:setvalue ev:event="DOMActivate" ref="readonly" value="if (. = 'true') then 'false' else 'true'"/>
                         </xforms:trigger>
                     </xhtml:td>
                     <xhtml:td>
                         <xforms:output value="relevant"/>
-                        <xforms:trigger appearance="xxforms:link">
+                        <xforms:trigger appearance="minimal">
                             <xforms:label>[change]</xforms:label>
                             <xforms:setvalue ev:event="DOMActivate" ref="relevant" value="if (. = 'true') then 'false' else 'true'"/>
                         </xforms:trigger>

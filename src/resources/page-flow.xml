@@ -15,7 +15,7 @@
         xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
     <!-- Files to serve directly (and exclude files under /[app]/service/) -->
-    <files path-info="(?!/([^/]+)/service/).+\.(gif|css|pdf|json|js|png|jpg|xsd)" matcher="oxf:perl5-matcher"/>
+    <files path-info="(?!/([^/]+)/service/).+\.(gif|css|pdf|json|js|png|jpg|xsd|htc)" matcher="oxf:perl5-matcher"/>
     <files path-info="(?!/([^/]+)/service/).+\.xml" matcher="oxf:perl5-matcher" mime-type="application/xml"/>
     <files path-info="(?!/([^/]+)/service/).+\.html?" matcher="oxf:perl5-matcher" mime-type="text/html"/>
     <files path-info="(?!/([^/]+)/service/).+\.(java|txt|xq)" matcher="oxf:perl5-matcher" mime-type="text/plain"/>

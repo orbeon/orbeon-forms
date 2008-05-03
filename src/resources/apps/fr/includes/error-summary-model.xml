@@ -52,6 +52,15 @@
         <control xmlns="" id=""/>
     </xforms:instance>
 
+    <!-- Whether the form is valid or invalid -->
+    <xforms:instance id="fr-form-valid-instance">
+        <valid xmlns=""/>
+    </xforms:instance>
+
+    <!-- Keep track of whether the form is valid or invalid -->
+    <xforms:setvalue ev:event="xxforms-invalid" ev:observer="fr-form-instance" ref="instance('fr-form-valid-instance')">false</xforms:setvalue>
+    <xforms:setvalue ev:event="xxforms-valid" ev:observer="fr-form-instance" ref="instance('fr-form-valid-instance')">true</xforms:setvalue>
+
     <!-- Handle "control visited" events on #fr-form-group -->
     <!-- NOTE: Only handle events coming from controls bound to "fr-form-instance" instance -->
     <xforms:action ev:observer="fr-form-group" ev:event="xforms-value-changed DOMFocusOut"

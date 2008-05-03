@@ -36,8 +36,12 @@
     </xhtml:head>
     <xhtml:body>
 
-        <fr:view>
+        <fr:view width="974px">
             <xforms:label>Orbeon Form Builder</xforms:label>
+            <fr:left>
+                <!-- Toolbox -->
+                <xi:include href="oxf:/forms/orbeon/builder/form/dialog-toolbox.xml" xxi:omit-xml-base="true"/>
+            </fr:left>
             <fr:body>
 
                 <!-- In-place view deselected, remember id -->
@@ -153,8 +157,9 @@
                 </fr:section>
 
                 <!-- Form details -->
-                <fr:section id="fb-details-section" context="$body">
-                    <xforms:label>Form Details</xforms:label>
+                <xforms:group context="$body" id="fb-details-section">
+                <!--<fr:section id="fb-details-section" context="$body">-->
+                    <!--<xforms:label>Form Details</xforms:label>-->
 
                     <xhtml:div>
 
@@ -173,16 +178,18 @@
                                     <!-- Holder element for the section -->
                                     <xxforms:variable name="section-holder" select="$form-instance/*[name() = $section-name]"/>
 
-                                    <!--<xhtml:img src="/apps/fr/style/minus.png" alt="Close section" title="Close section"/>-->
+                                    <fr:section id="fb-top-level-section">
+                                        <xforms:label editable="true" ref="$current-resources/*[name() = $section-name]/label"/>
+                                        <!--<xforms:label>FOOBAR</xforms:label>-->
 
                                     <!-- Editable section title -->
                                     <xforms:group appearance="xxforms:internal" id="fb-section-title-input-container">
-                                        <xforms:input id="fb-section-title-input"
-                                                      ref="$current-resources/*[name() = $section-name]/label"
-                                                      appearance="fr:in-place" class="fb-section-title">
-                                            <xforms:label>Section</xforms:label>
-                                            <xforms:hint>Enter a section name</xforms:hint>
-                                        </xforms:input>
+                                        <!--<xforms:input id="fb-section-title-input"-->
+                                                      <!--ref="$current-resources/*[name() = $section-name]/label"-->
+                                                      <!--appearance="fr:in-place" class="fb-section-title">-->
+                                            <!--<xforms:label>Section</xforms:label>-->
+                                            <!--<xforms:hint>Enter a section name</xforms:hint>-->
+                                        <!--</xforms:input>-->
 
                                         <!-- Respond to fr-delete event to delete the current section -->
                                         <xforms:action ev:event="fr-delete">
@@ -236,7 +243,7 @@
                                                                 <xhtml:td class="fb-grid-top-left-td">
                                                                     <xforms:trigger appearance="minimal" id="fb-delete-grid-trigger">
                                                                         <xforms:label>
-                                                                            <xforms:label><xhtml:img src="/apps/fr/style/images/silk/bin_closed.png" alt="Delete Grid" title="Delete Grid"/></xforms:label>
+                                                                            <xforms:label><xhtml:img src="/apps/fr/style/images/silk/bin.png" alt="Delete Grid" title="Delete Grid"/></xforms:label>
                                                                         </xforms:label>
                                                                         <xforms:action ev:event="DOMActivate">
                                                                             <!-- Ask confirmation -->
@@ -269,7 +276,7 @@
                                                                         <!-- Insert column to the left -->
                                                                         <xhtml:div class="fb-insert-left">
                                                                             <xforms:trigger appearance="minimal" ref=".[xs:integer($grid/@columns) lt 4]" id="fb-insert-column-left-trigger">
-                                                                                <xforms:label><xhtml:img src="/apps/fr/style/previous.gif" alt="Insert Column to the Left" title="Insert Column to the Left"/></xforms:label>
+                                                                                <xforms:label><xhtml:img src="/apps/fr/style/images/silk/bullet_arrow_left.png" alt="Insert Column to the Left" title="Insert Column to the Left"/></xforms:label>
                                                                                 <xforms:action ev:event="DOMActivate">
                                                                                     <!-- Increment number of columns -->
                                                                                     <xforms:setvalue ref="$grid/@columns" value=". + 1"/>
@@ -294,7 +301,7 @@
                                                                         <!-- Insert column to the right -->
                                                                         <xhtml:div class="fb-insert-right">
                                                                             <xforms:trigger appearance="minimal" ref=".[xs:integer($grid/@columns) lt 4]" id="fb-insert-column-right-trigger">
-                                                                                <xforms:label><xhtml:img src="/apps/fr/style/next.gif" alt="Insert Column to the Right" title="Insert Column to the Right"/></xforms:label>
+                                                                                <xforms:label><xhtml:img src="/apps/fr/style/images/silk/bullet_arrow_right.png" alt="Insert Column to the Right" title="Insert Column to the Right"/></xforms:label>
                                                                                 <xforms:action context="$grid" ev:event="DOMActivate">
                                                                                     <!-- Increment number of columns -->
                                                                                     <xforms:setvalue ref="$grid/@columns" value=". + 1"/>
@@ -318,7 +325,7 @@
                                                                         </xhtml:div>
                                                                         <!-- Delete column -->
                                                                         <xforms:trigger appearance="minimal" ref=".[xs:integer($grid/@columns) gt 1]" id="fb-delete-column-trigger">
-                                                                            <xforms:label><xhtml:img src="/apps/fr/style/images/silk/bin_closed.png" alt="Delete Column" title="Delete Column"/></xforms:label>
+                                                                            <xforms:label><xhtml:img src="/apps/fr/style/images/silk/bin.png" alt="Delete Column" title="Delete Column"/></xforms:label>
                                                                             <xforms:action ev:event="DOMActivate">
 
                                                                                 <!-- Prepare span grid -->
@@ -380,7 +387,7 @@
                                                                             <!-- Insert row above -->
                                                                             <xhtml:div>
                                                                                 <xforms:trigger appearance="minimal" id="fb-insert-row-above-trigger">
-                                                                                    <xforms:label><xhtml:img src="/apps/fr/style/up.gif" alt="Insert Row Above" title="Insert Row Above"/></xforms:label>
+                                                                                    <xforms:label><xhtml:img src="/apps/fr/style/images/silk/bullet_arrow_top.png" alt="Insert Row Above" title="Insert Row Above"/></xforms:label>
                                                                                     <xforms:action context="$grid" ev:event="DOMActivate">
                                                                                         <xforms:action ev:event="DOMActivate">
 
@@ -418,7 +425,7 @@
                                                                             </xhtml:div>
                                                                             <!-- Delete row -->
                                                                             <xforms:trigger appearance="minimal" ref=".[count($grid/xhtml:tr) gt 1]" id="fb-delete-row-trigger">
-                                                                                <xforms:label><xhtml:img src="/apps/fr/style/images/silk/bin_closed.png" alt="Delete Row" title="Delete Row"/></xforms:label>
+                                                                                <xforms:label><xhtml:img src="/apps/fr/style/images/silk/bin.png" alt="Delete Row" title="Delete Row"/></xforms:label>
                                                                                 <xforms:action ev:event="DOMActivate">
 
                                                                                     <xxforms:variable name="count" select="count($tr/xhtml:td[xforms:*])"/>
@@ -475,7 +482,7 @@
                                                                             <!-- Insert row below -->
                                                                             <xhtml:div>
                                                                                 <xforms:trigger appearance="minimal" id="fb-insert-row-below-trigger">
-                                                                                    <xforms:label><xhtml:img src="/apps/fr/style/down.gif" alt="Insert Row Below" title="Insert Row Below"/></xforms:label>
+                                                                                    <xforms:label><xhtml:img src="/apps/fr/style/images/silk/bullet_arrow_bottom.png" alt="Insert Row Below" title="Insert Row Below"/></xforms:label>
                                                                                     <xforms:action ev:event="DOMActivate">
                                                                                         <xforms:action ev:event="DOMActivate">
 
@@ -597,7 +604,7 @@
                                                                                         <xforms:label><xhtml:img src="/apps/fr/style/images/silk/arrow_up.png" alt="Shrink" title="Shrink"/></xforms:label>
                                                                                         <xforms:action ev:event="DOMActivate">
 
-                                                                       pub                     <!-- Prepare span grid -->
+                                                                                            <!-- Prepare span grid -->
                                                                                             <xforms:dispatch name="fb-prepare-span-grid" target="fr-form-model">
                                                                                                 <xxforms:context name="grid" select="$grid"/>
                                                                                             </xforms:dispatch>
@@ -618,7 +625,7 @@
                                                                                 <!-- Delete control -->
                                                                                 <xforms:group ref=".[$control]">
                                                                                     <xforms:trigger appearance="minimal">
-                                                                                        <xforms:label><xhtml:img src="/apps/fr/style/images/silk/bin_closed.png" alt="Delete Control" title="Delete Control"/></xforms:label>
+                                                                                        <xforms:label><xhtml:img src="/apps/fr/style/images/silk/bin.png" alt="Delete Control" title="Delete Control"/></xforms:label>
                                                                                         <xforms:action ev:event="DOMActivate">
                                                                                             <!-- Delete control -->
                                                                                             <xforms:dispatch name="fb-delete-control" target="fr-form-model">
@@ -751,8 +758,11 @@
                                                                                                     <xforms:value ref="value"/>
                                                                                                 </xforms:itemset>
                                                                                             </xforms:select1>
-                                                                                            <xforms:trigger appearance="minimal">
-                                                                                                <xforms:label>Edit Items</xforms:label>
+                                                                                            <xforms:trigger appearance="minimal" class="fb-edit-items">
+                                                                                                <xforms:label>
+                                                                                                    <xhtml:img src="/apps/fr/style/images/silk/text_list_bullets.png" alt="Edit Items" title="Edit Items"/>
+                                                                                                    <xhtml:span>Edit Items</xhtml:span>
+                                                                                                </xforms:label>
                                                                                                 <xforms:action ev:event="DOMActivate">
                                                                                                     <xforms:setvalue ref="$variables/itemset-resource-id" value="name($resource-holder)"/>
                                                                                                     <xxforms:show dialog="fb-itemset-editor-dialog" neighbor="fb-edit-select1-minimal-control"/>
@@ -767,8 +777,11 @@
                                                                                                     <xforms:value ref="value"/>
                                                                                                 </xforms:itemset>
                                                                                             </xforms:select1>
-                                                                                            <xforms:trigger appearance="minimal">
-                                                                                                <xforms:label>Edit Items</xforms:label>
+                                                                                            <xforms:trigger appearance="minimal" class="fb-edit-items">
+                                                                                                <xforms:label>
+                                                                                                    <xhtml:img src="/apps/fr/style/images/silk/text_list_bullets.png" alt="Edit Items" title="Edit Items"/>
+                                                                                                    <xhtml:span>Edit Items</xhtml:span>
+                                                                                                </xforms:label>
                                                                                                 <xforms:action ev:event="DOMActivate">
                                                                                                     <xforms:setvalue ref="$variables/itemset-resource-id" value="name($resource-holder)"/>
                                                                                                     <xxforms:show dialog="fb-itemset-editor-dialog" neighbor="fb-edit-select1-full-control"/>
@@ -783,8 +796,11 @@
                                                                                                     <xforms:value ref="value"/>
                                                                                                 </xforms:itemset>
                                                                                             </xforms:select1>
-                                                                                            <xforms:trigger appearance="minimal">
-                                                                                                <xforms:label>Edit Items</xforms:label>
+                                                                                            <xforms:trigger appearance="minimal" class="fb-edit-items">
+                                                                                                <xforms:label>
+                                                                                                    <xhtml:img src="/apps/fr/style/images/silk/text_list_bullets.png" alt="Edit Items" title="Edit Items"/>
+                                                                                                    <xhtml:span>Edit Items</xhtml:span>
+                                                                                                </xforms:label>
                                                                                                 <xforms:action ev:event="DOMActivate">
                                                                                                     <xforms:setvalue ref="$variables/itemset-resource-id" value="name($resource-holder)"/>
                                                                                                     <xxforms:show dialog="fb-itemset-editor-dialog" neighbor="fb-edit-select1-compact-control"/>
@@ -799,8 +815,11 @@
                                                                                                     <xforms:value ref="value"/>
                                                                                                 </xforms:itemset>
                                                                                             </xforms:select>
-                                                                                            <xforms:trigger appearance="minimal">
-                                                                                                <xforms:label>Edit Items</xforms:label>
+                                                                                            <xforms:trigger appearance="minimal" class="fb-edit-items">
+                                                                                                <xforms:label>
+                                                                                                    <xhtml:img src="/apps/fr/style/images/silk/text_list_bullets.png" alt="Edit Items" title="Edit Items"/>
+                                                                                                    <xhtml:span>Edit Items</xhtml:span>
+                                                                                                </xforms:label>
                                                                                                 <xforms:action ev:event="DOMActivate">
                                                                                                     <xforms:setvalue ref="$variables/itemset-resource-id" value="name($resource-holder)"/>
                                                                                                     <xxforms:show dialog="fb-itemset-editor-dialog" neighbor="fb-edit-select-full-control"/>
@@ -815,8 +834,11 @@
                                                                                                     <xforms:value ref="value"/>
                                                                                                 </xforms:itemset>
                                                                                             </xforms:select>
-                                                                                            <xforms:trigger appearance="minimal">
-                                                                                                <xforms:label>Edit Items</xforms:label>
+                                                                                            <xforms:trigger appearance="minimal" class="fb-edit-items">
+                                                                                                <xforms:label>
+                                                                                                    <xhtml:img src="/apps/fr/style/images/silk/text_list_bullets.png" alt="Edit Items" title="Edit Items"/>
+                                                                                                    <xhtml:span>Edit Items</xhtml:span>
+                                                                                                </xforms:label>
                                                                                                 <xforms:action ev:event="DOMActivate">
                                                                                                     <xforms:setvalue ref="$variables/itemset-resource-id" value="name($resource-holder)"/>
                                                                                                     <xxforms:show dialog="fb-itemset-editor-dialog" neighbor="fb-edit-select-compact-control"/>
@@ -827,8 +849,11 @@
                                                                                             <xforms:output ref="$instance-holder" id="fb-edit-output-control">
                                                                                                 <xforms:label class="fb-xforms-disabled"/>
                                                                                             </xforms:output>
-                                                                                            <xforms:trigger appearance="minimal">
-                                                                                                <xforms:label>Edit Items</xforms:label>
+                                                                                            <xforms:trigger appearance="minimal" class="fb-edit-items">
+                                                                                                <xforms:label>
+                                                                                                    <xhtml:img src="/apps/fr/style/images/silk/text_list_bullets.png" alt="Edit Items" title="Edit Items"/>
+                                                                                                    <xhtml:span>Edit Items</xhtml:span>
+                                                                                                </xforms:label>
                                                                                                 <xforms:action ev:event="DOMActivate">
                                                                                                     <!--<xforms:setvalue ref="$variables/itemset-resource-id" value="name($resource-holder)"/>-->
                                                                                                     <!--<xxforms:show dialog="fb-itemset-editor-dialog" neighbor="fb-edit-select1-minimal-control"/>-->
@@ -906,6 +931,7 @@
                                         </xhtml:div>
                                     </xforms:repeat>
 
+                                </fr:section>
                                 </xforms:group>
 
                                 <!-- Top-level grid -->
@@ -925,7 +951,8 @@
                             </xhtml:div>
                         </xforms:repeat>
                     </xhtml:div>
-                </fr:section>
+                </xforms:group>
+                <!--</fr:section>-->
 
                 <!-- Dialog to view the source -->
                 <xi:include href="oxf:/forms/orbeon/builder/form/dialog-view-source.xml" xxi:omit-xml-base="true"/>
@@ -949,7 +976,7 @@
                 <xi:include href="oxf:/forms/orbeon/builder/form/dialog-publish.xml" xxi:omit-xml-base="true"/>
 
                 <!-- Toolbox dialog -->
-                <xi:include href="oxf:/forms/orbeon/builder/form/dialog-toolbox.xml" xxi:omit-xml-base="true"/>
+                <!--<xi:include href="oxf:/forms/orbeon/builder/form/dialog-toolbox.xml" xxi:omit-xml-base="true"/>-->
 
                 <!-- Dialog to edit itemsets -->
                 <xi:include href="oxf:/forms/orbeon/builder/form/dialog-itemsets.xml" xxi:omit-xml-base="true"/>
@@ -965,6 +992,9 @@
 
                 <!-- Submission editor -->
                 <xi:include href="oxf:/forms/orbeon/builder/form/dialog-submission.xml" xxi:omit-xml-base="true"/>
+
+                <!-- Bindings editor -->
+                <xi:include href="oxf:/forms/orbeon/builder/form/dialog-bindings.xml" xxi:omit-xml-base="true"/>
 
                 <!-- Generic confirmation dialog -->
                 <xxforms:dialog id="fb-confirmation-dialog" level="modal" close="false" draggable="true">

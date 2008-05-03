@@ -2,32 +2,39 @@
 
 html { overflow: scroll; }
 
+/* Test for iepngfix.htc */
+/*#fr-view button.xforms-trigger img, #fr-view a.xforms-trigger img,*/
+    /*#fr-view .fr-logo img,*/
+    /*#fr-view img.xforms-help-image { behavior: url(/orbeon/apps/fr/style/iepngfix.htc) }*/
+
 body {
-    background-color: #eee;
+    background-color: #FFE27F;
 }
 
 body, body table, textarea.xforms-textarea {
     font-family: "Lucida Grande", Tahoma, Arial, Verdana, sans-serif;
 }
 
-#doc .fr-hidden, #doc4 .fr-hidden { display: none }
+#fr-view .fr-hidden { display: none }
 .fr-clear { clear: both }
 
-.xforms-help-image { vertical-align: -0.2em; display: inline; padding: 0 .5em 0 0; margin: 0; }
+.xforms-help-image { vertical-align: -0.2em; display: inline; margin: 0 .5em 0 0; padding: 0; }
 
 .fr-top { line-height: 10px; }
-#doc .fr-top { background-image: url(top-750-ee.png); }
-#doc4 .fr-top { background-image: url(top-974-ee.png); }
+#doc .fr-top { background-image: url(top-750.png); }
+#doc4 .fr-top { background-image: url(top-974.png); }
+#doc-fb .fr-top { background-image: url(top-974.png); }
 
 .fr-bottom { background-repeat: no-repeat; }
-#doc .fr-bottom { background-image: url(bottom-750-ee.png); }
-#doc4 .fr-bottom { background-image: url(bottom-974-ee.png); }
+#doc .fr-bottom { background-image: url(bottom-750.png); }
+#doc4 .fr-bottom { background-image: url(bottom-974.png); }
+#doc-fb .fr-bottom { background-image: url(bottom-974.png); }
 
 .fr-bottom .fr-orbeon-version {
     text-align: center;
     font-size: smaller;
     padding: 10px;
-    color: gray;
+    color: #666699;
 }
 
 .fr-container {
@@ -37,8 +44,8 @@ body, body table, textarea.xforms-textarea {
 }
 
 .fr-separator {
-    background-color: #3598d4;
-    line-height: 1em;
+    background-color: orange;
+    line-height: .5em;
     clear: both;
 }
 
@@ -73,7 +80,7 @@ h1 { margin-top: 0 }
     color: #444444
 }
 
-.fr-logo {
+.fr-logo, .fr-buttons-block {
     background-color: #F8F8F8;
     background-image: url(logo-bg.gif);
     background-position: top;
@@ -83,14 +90,14 @@ h1 { margin-top: 0 }
 .fr-logo table { width: 100% }
 .fr-logo table tr td { vertical-align: middle }
 .fr-logo img { margin-right: 1em }
-.fr-logo h1 { margin: 0; padding: 0; font-weight: normal; white-space: nowrap; color: #3598d4; text-align: right }
+.fr-logo h1 { margin: 0; padding: 0; font-weight: normal; white-space: nowrap; color: #666699; text-align: right }
 
-.fr-form-description { display: block; margin: 1em; padding: .5em; border: 4px solid #3598d4; background-color: white }
+.fr-form-description { display: block; margin: 1em; padding: .5em; border: 4px solid orange; background-color: white }
 .fr-form-description .fr-close { margin-left: .5em }
 
 .fr-header { overflow: hidden; }
-.fr-summary-language-choice { margin-right: 1em; margin-top: .2em; color: gray; font-size: 85%; text-align: right; }
-.fr-summary-language-choice a { color: gray; }
+.fr-summary-language-choice { margin-right: 1em; margin-top: .2em; color: #666699; font-size: 85%; text-align: right; }
+.fr-summary-language-choice a { color: #666699; }
 .fr-summary-language-choice .xforms-label { display: inline; margin-right: .5em }
 
 .xforms-label, h4  { font-weight: bold; text-align: left; }
@@ -117,23 +124,23 @@ div.fr-body {
 .fr-expose-to-javascript { display: none; }
 
 /* Make sure disabled items take precendence over display: block on other classes */
-#doc .xforms-disabled, #doc4 .xforms-disabled { display: none }
-#doc .xforms-repeat-template, #doc4 .xforms-repeat-template { display: none; }
-#doc label.xforms-alert-inactive, #doc4 label.xforms-alert-inactive { display: none; }
-#doc .xforms-disabled .xforms-label, #doc4 .xforms-disabled .xforms-label { display: none }
-#doc .xforms-case-deselected, #doc4 .xforms-case-deselected { display: none }
-#doc .xforms-case-deselected .xforms-label, #doc4 .xforms-case-deselected .xforms-label { display: none }
+#fr-view .xforms-disabled { display: none }
+#fr-view .xforms-repeat-template { display: none; }
+#fr-view label.xforms-alert-inactive { display: none; }
+#fr-view .xforms-disabled .xforms-label { display: none }
+#fr-view .xforms-case-deselected { display: none }
+#fr-view .xforms-case-deselected .xforms-label { display: none }
 
 /* Make sure text in trigger does not wrap (leads to non-native widget being used on Firefox) */
 button.xforms-trigger { white-space: nowrap; }
-button.xforms-trigger img { padding-right: 10px; }
+button.xforms-trigger img { margin-right: 10px; }
 
 .fr-layout-table { padding: 0; margin: 0 }
 .fr-layout-table tr td { width: auto; vertical-align: top }
 
 h2 a, h3 a, h4 a {
-    color: black;
-    vertical-align: middle;
+    color: #666699;
+    /*vertical-align: middle;*/ /* not sure why this was done, but it does not show right in Form Builder */
 }
 
 h2 {
@@ -165,9 +172,9 @@ h3, h4 {
     /*clear: both;*/
 }
 
-.fr-summary-table tbody .xforms-repeat-selected-item-1 { background-color: #3598D4 }
-.fr-summary-table tbody .xforms-repeat-selected-item-2 { background-color: #3598D4 }/* HACK for IE 7 only */
-.fr-summary-table tbody tr:hover { background-color: #3598D4 }
+.fr-summary-table tbody .xforms-repeat-selected-item-1 { background-image: url(logo-bg.gif) }
+.fr-summary-table tbody .xforms-repeat-selected-item-2 { background-image: url(logo-bg.gif) }/* HACK for IE 7 only */
+.fr-summary-table tbody tr:hover { background-image: url(logo-bg.gif) }
 
 .fr-summary-table .xforms-label { display: none; }
 .fr-summary-table, .fr-summary-table td, .fr-summary-table th { border: 1px solid #600 }
@@ -203,7 +210,7 @@ hr {
 }
 
 .fr-buttons button {
-    width: 14em
+    width: 14em; *width: 11em
 }
 
 /* Repeats: all */
@@ -259,7 +266,7 @@ hr {
 td { border: 0 }
 h1 { font-size: 197% }
 i { font-style: italic }
-a { color: #3598D4 }
+a { color: #666699 }
 th, td {border: 0; padding: 0 }
 
 .fr-print-mode .fr-section-title img { display: none; }
@@ -279,7 +286,7 @@ body { text-align: left }
     width: auto;/*width: 100%;*/
     text-indent: 0;
     background-image: none;
-    background-color: red;
+    background-color: #DF731B;
     color: white;
     padding: 1px;
     border-radius: 3px; -moz-border-radius: 2px; -webkit-border-radius: 3px; -ms-border-radius: 2px /* radius appears differently w/ Safari 3.1 vs. Firefox 3.0b4*/ 
@@ -293,6 +300,7 @@ body { text-align: left }
     margin-left: 0;/* used to have margin here but with new colors no margin seems better */
     width: 100%;
     color: gray
+    /*color: #666699*/
 }
 
 /* Do this for collapsible sections so that YUI animations work */
@@ -306,7 +314,7 @@ div.fr-collapsible {
 .fr-dialog ol { padding-left: 3em; }
 .fr-dialog li { list-style-type: decimal; }/* overrides YUI reset so numbers in enumeration do show */
 .fr-dialog .bd p { margin: .5em 0 .5em 0; }
-.fr-dialog .hd { background-color: #3598d4 }
+.fr-dialog .hd { background-color: #666699 }
 .fr-dialog .bd { margin: 0 .5em .5em .5em; }
 /* Style for dialogs  */
 .fr-dialog-icon { float: left; margin-right: 2em; margin-left: 1em; padding-bottom: 1em; }
@@ -316,24 +324,38 @@ div.fr-collapsible {
 /* Messages */
 .fr-message-success { color: green  }
 .fr-message-validation-error { color: orange }
-.fr-message-fatal-error { color: red }
-.fr-unsaved-data { color: red }
+.fr-message-fatal-error { color: #cc0000}
+.fr-unsaved-data { color: #cc0000 }
 
 /* Errors */
-.fr-error-messages { float: left; margin-bottom: 0 }
+.fr-error-messages { float: left; margin-bottom: 0; width: 100% }
 .fr-error-messages td { padding: 0.2em }
-.fr-error-title { }
+.fr-error-title {
+    display: block;
+    font-size: smaller;
+    font-weight: bold;
+    /*margin-top: .2em;*/
+    margin-left: 0;/* used to have margin here but with new colors no margin seems better */
+    background-color: #DF731B;
+    color: white;
+    padding: 1px;
+    border-radius: 3px; -moz-border-radius: 2px; -webkit-border-radius: 3px; -ms-border-radius: 2px /* radius appears differently w/ Safari 3.1 vs. Firefox 3.0b4*/
+}
 .fr-error-list li { margin-bottom: .5em; }
 .fr-error-list label { display: none }
 .fr-error-label { font-weight: bold }
 .fr-error-row { font-weight: bold }
 .fr-error-alert {}
 
+/* Status */
+.fr-status-icons { margin-bottom: .5em; float: left }
+.fr-status-icons img { margin-right: .5em }
+
 /* Radio buttons spacing */
 /*.xforms-select1-appearance-full label { margin-left: .5em; margin-right: 1em }*/
 
 /* Sections */
-.fr-section-container { display: block; clear: both }
+.fr-section-container { display: block; clear: both; border-bottom: 1px dotted #666699 }
 .fr-section-container p { margin-top: 1em; }
 .fr-section-container img.fr-open-close { margin-right: .5em }
 
@@ -387,14 +409,18 @@ div.fr-collapsible {
 } 
 .fr-grid .fr-inplace-edit .xforms-input input { width: 100% }
 
+.fb-edit-items { text-decoration: none; display: block; clear: both }
+
 /* Styling comon to all HTML form controls */
 .fr-grid .xforms-input input,
-.fr-grid .xforms-upload input,
-.fr-grid .xforms-textarea,
-.fr-grid .xforms-select1-appearance-minimal,
-.fr-grid .xforms-select1-appearance-compact,
-.fr-grid .xforms-select-appearance-compact
-    { width: 100%; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; }
+    .fr-grid .xforms-upload input,
+    .fr-grid .xforms-textarea,
+    .fr-grid .xforms-select1-appearance-minimal,
+    .fr-grid .xforms-select1-appearance-compact,
+    .fr-grid .xforms-select-appearance-compact {
+    width: 100%;
+    -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
+}
 
 .fr-grid .xforms-upload input { width: auto; } /* The upload field responds to 100% width on IE, which gives strange result */
 .fr-grid .xforms-select1-appearance-compact, .fr-grid .xforms-select-appearance-compact { height: 6em; }
@@ -427,6 +453,7 @@ div.fr-collapsible {
 /* Test */
 /*.xforms-required::before { content: "*"; color:red }*/
 
+/* This is also used for PDF generation */
 @media print {
     body { background-color: white }
     .fr-bottom { display: none }

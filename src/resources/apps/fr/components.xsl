@@ -44,246 +44,268 @@
 
         <xsl:variable name="label" select="xforms:label"/>
 
-        <xsl:if test="@width and not(@width = ('750px', '950px', '974px'))">
+        <xsl:if test="@width and not(@width = ('750px', '950px', '974px', '1154px'))">
             <xsl:message terminate="yes">Value of fr:view/@view is not valid</xsl:message>
         </xsl:if>
-        <xhtml:div id="{if (@width = '750px') then 'doc' else if (@width = '950px') then 'doc2' else 'doc4'}" class="{if (doc('input:instance')/*/mode = 'print') then ' fr-print-mode' else ''}">
-            <!-- Scope form resources -->
-            <xxforms:variable name="form-resources" select="xxforms:instance('fr-current-form-resources')"/>
-            <xhtml:div class="fr-header">
-                <!-- Switch language -->
-                <xsl:if test="not(doc('input:instance')/*/mode = ('print', 'pdf'))">
-                    <xhtml:div class="fr-summary-language-choice">
-                        <xxforms:variable name="available-languages"
-                                          select="xxforms:instance('fr-form-resources')/resource/@xml:lang"/>
-                        <!-- This implements a sort of xforms:select1[@appearance = 'xxforms:full']. Should be componentized. -->
-                        <xforms:group id="fr-language-selector">
-                            <xforms:repeat model="fr-resources-model" nodeset="$available-languages">
-                                <xxforms:variable name="position" select="position()"/>
-                                <xxforms:variable name="label" select="(instance('fr-languages-instance')/language[@code = context()]/@native-name, context())[1]"/>
-                                <xforms:group ref=".[$position > 1]"> | </xforms:group>
-                                <xforms:trigger ref=".[context() != instance('fr-language-instance')]" appearance="minimal">
-                                    <xforms:label value="$label"/>
-                                    <xforms:action ev:event="DOMActivate">
-                                        <xforms:setvalue ref="instance('fr-language-instance')" value="context()"/>
-                                    </xforms:action>
-                                </xforms:trigger>
-                                <xforms:output ref=".[context() = instance('fr-language-instance')]" value="$label"/>
-                            </xforms:repeat>
+        <xhtml:div id="fr-view">
+            <xhtml:div id="{if (@width = '750px') then 'doc' else if (@width = '950px') then 'doc2' else if (@width = '1154px') then 'doc-fb' else 'doc4'}"
+                       class="{if (fr:leftxxx) then 'yui-t2 ' else ''}{if (doc('input:instance')/*/mode = 'print') then ' fr-print-mode' else ''}">
+                <!-- Scope form resources -->
+                <xxforms:variable name="form-resources" select="xxforms:instance('fr-current-form-resources')"/>
+                <xhtml:div class="fr-header">
+                    <!-- Switch language -->
+                    <xsl:if test="not(doc('input:instance')/*/mode = ('print', 'pdf'))">
+                        <xhtml:div class="fr-summary-language-choice">
+                            <xxforms:variable name="available-languages"
+                                              select="xxforms:instance('fr-form-resources')/resource/@xml:lang"/>
+                            <!-- This implements a sort of xforms:select1[@appearance = 'xxforms:full']. Should be componentized. -->
+                            <xforms:group id="fr-language-selector">
+                                <xforms:repeat model="fr-resources-model" nodeset="$available-languages">
+                                    <xxforms:variable name="position" select="position()"/>
+                                    <xxforms:variable name="label" select="(instance('fr-languages-instance')/language[@code = context()]/@native-name, context())[1]"/>
+                                    <xforms:group ref=".[$position > 1]"> | </xforms:group>
+                                    <xforms:trigger ref=".[context() != instance('fr-language-instance')]" appearance="minimal">
+                                        <xforms:label value="$label"/>
+                                        <xforms:action ev:event="DOMActivate">
+                                            <xforms:setvalue ref="instance('fr-language-instance')" value="context()"/>
+                                        </xforms:action>
+                                    </xforms:trigger>
+                                    <xforms:output ref=".[context() = instance('fr-language-instance')]" value="$label"/>
+                                </xforms:repeat>
+                            </xforms:group>
+                        </xhtml:div>
+                    </xsl:if>
+                    <!-- Custom content added to the header -->
+                    <xsl:if test="fr:header">
+                        <xforms:group model="fr-form-model" context="instance('fr-form-instance')">
+                            <xsl:apply-templates select="fr:header/node()"/>
                         </xforms:group>
-                    </xhtml:div>
-                </xsl:if>
+                    </xsl:if>
+                </xhtml:div>
                 <!-- Custom content added to the header -->
                 <xsl:if test="fr:header">
                     <xforms:group model="fr-form-model" context="instance('fr-form-instance')">
                         <xsl:apply-templates select="fr:header/node()"/>
                     </xforms:group>
                 </xsl:if>
-            </xhtml:div>
-            <!-- Custom content added to the header -->
-            <xsl:if test="fr:header">
-                <xforms:group model="fr-form-model" context="instance('fr-form-instance')">
-                    <xsl:apply-templates select="fr:header/node()"/>
-                </xforms:group>
-            </xsl:if>
-            <xhtml:div id="hd" class="fr-top">&#160;</xhtml:div>
-            <xhtml:div id="bd" class="fr-container">
-                <xhtml:div id="yui-main">
-                    <xhtml:div class="yui-b">
-                        <xxforms:variable name="metadata-lang" select="xxforms:instance('fr-language-instance')"/>
-                        <!-- title in chosen language or first one if not found -->
-                        <xxforms:variable name="title" select="((instance('fr-form-metadata')/(title[@xml:lang = $metadata-lang], title[1])[1], ({$label/@ref}), '{$label}', /xhtml:html/xhtml:head/xhtml:title)[normalize-space() != ''])[1]"/>
-                        <!-- description in chosen language or first one if not found -->
-                        <xxforms:variable name="description" select="instance('fr-form-metadata')/(description[@xml:lang = $metadata-lang], description[1])[1]"/>
-                        <xhtml:div class="yui-g fr-logo">
-                            <xsl:choose>
-                                <!-- If custom logo section is provided, use that -->
-                                <xsl:when test="fr:logo">
-                                    <xsl:apply-templates select="fr:logo/node()"/>
-                                </xsl:when>
-                                <xsl:otherwise>
-                                    <xforms:group model="fr-form-model" appearance="xxforms:internal">
-                                        <xhtml:table class="fr-layout-table">
+                <xhtml:div id="hd" class="fr-top">&#160;</xhtml:div>
+                <xhtml:div id="bd" class="fr-container">
+                    <xhtml:div id="yui-main">
+                        <xhtml:div class="yui-b">
+                            <xxforms:variable name="metadata-lang" select="xxforms:instance('fr-language-instance')"/>
+                            <!-- title in chosen language or first one if not found -->
+                            <xxforms:variable name="title" select="((instance('fr-form-metadata')/(title[@xml:lang = $metadata-lang], title[1])[1], ({$label/@ref}), '{$label}', /xhtml:html/xhtml:head/xhtml:title)[normalize-space() != ''])[1]"/>
+                            <!-- description in chosen language or first one if not found -->
+                            <xxforms:variable name="description" select="instance('fr-form-metadata')/(description[@xml:lang = $metadata-lang], description[1])[1]"/>
+                            <xhtml:div class="yui-g fr-logo">
+                                <xsl:choose>
+                                    <!-- If custom logo section is provided, use that -->
+                                    <xsl:when test="fr:logo">
+                                        <xsl:apply-templates select="fr:logo/node()"/>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xforms:group model="fr-form-model" appearance="xxforms:internal">
+                                            <xhtml:table class="fr-layout-table">
+                                                <xhtml:tr>
+                                                    <xhtml:td>
+                                                        <xforms:output value="((instance('fr-form-metadata')/logo, '/apps/fr/style/orbeon-logo-trimmed-transparent-42.png')[normalize-space() != ''])[1]" mediatype="image/*"/>
+                                                    </xhtml:td>
+                                                    <xhtml:td>
+                                                        <xhtml:h1>
+                                                            <xforms:output value="$title"/>
+                                                        </xhtml:h1>
+                                                    </xhtml:td>
+                                                </xhtml:tr>
+                                            </xhtml:table>
+                                        </xforms:group>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </xhtml:div>
+                            <xhtml:div class="yui-g fr-separator">&#160;</xhtml:div>
+                            <xhtml:div class="yui-g fr-body">
+                                <!-- Optional description-->
+                                <xforms:group model="fr-form-model" ref=".[normalize-space($description) != '']">
+                                    <xforms:switch>
+                                        <xforms:case id="fr-form-description-case-on">
+                                            <xhtml:div class="fr-form-description">
+                                                <xforms:output value="$description"/>
+                                                <xforms:trigger appearance="minimal" class="fr-close">
+                                                    <xforms:label>[close]</xforms:label>
+                                                    <xforms:toggle ev:event="DOMActivate" case="fr-form-description-case-off"/>
+                                                </xforms:trigger>
+                                            </xhtml:div>
+                                        </xforms:case>
+                                        <xforms:case id="fr-form-description-case-off"/>
+                                    </xforms:switch>
+                                </xforms:group>
+
+                                <!-- Set context on form instance and define this group as #fr-form-group as observers will refer to it -->
+                                <xforms:group id="fr-form-group" model="fr-form-model" ref="instance('fr-form-instance')">
+                                    <!-- Main form content -->
+                                    <xsl:apply-templates select="fr:body/node()"/>
+                                </xforms:group>
+                            </xhtml:div>
+                            <xhtml:div class="yui-g fr-separator">&#160;</xhtml:div>
+                            <xhtml:div class="yui-g fr-buttons-block">
+                                <!-- Display the toolbar and errors -->
+                                <xforms:group model="fr-persistence-model" appearance="xxforms:internal">
+
+                                    <xhtml:div class="fr-status-icons">
+                                        <xforms:group model="fr-error-summary-model" ref=".[instance('fr-form-valid-instance') = 'false']">
+                                            <!-- Form is invalid -->
+                                            <xhtml:img src="/apps/fr/style/images/silk/exclamation.png" alt="Errors on Form" title="Errors on Form"/>
+                                        </xforms:group>
+                                        <xforms:group model="fr-error-summary-model" ref=".[instance('fr-form-valid-instance') = 'true']">
+                                            <!-- Form is valid -->
+                                            <xhtml:img src="/apps/fr/style/images/silk/tick.png" alt="No Errors on Form" title="No Errors on Form"/>
+                                        </xforms:group>
+                                        <xforms:group ref="instance('fr-persistence-instance')[data-status = 'dirty']">
+                                            <!-- Data is dirty -->
+                                            <xhtml:img src="/apps/fr/style/images/silk/disk.png" alt="Unsaved Changes" title="Unsaved Changes"/>
+                                            <!--<xhtml:p class="fr-unsaved-data">-->
+                                                <!-- TODO: i18n -->
+                                                <!--Your document contains unsaved changes.-->
+                                            <!--</xhtml:p>-->
+                                        </xforms:group>
+                                    </xhtml:div>
+
+                                    <!-- Only show messages and error table if necessary -->
+                                    <xforms:group model="fr-persistence-model" ref=".[instance('fr-persistence-instance')/message != ''
+                                                                                    or xxforms:instance('fr-errors-instance')/error]">
+                                        <xhtml:table class="fr-error-messages">
+                                            <xforms:group ref=".[instance('fr-persistence-instance')/message != '']">
+                                                <xhtml:tr>
+                                                    <xhtml:td>
+                                                        <!-- Display messages -->
+                                                        <xforms:switch>
+                                                            <xforms:case id="fr-message-none">
+                                                                <xhtml:p/>
+                                                            </xforms:case>
+                                                            <xforms:case id="fr-message-success">
+                                                                <xhtml:p class="fr-message-success">
+                                                                    <xforms:output value="instance('fr-persistence-instance')/message"/>
+                                                                </xhtml:p>
+                                                            </xforms:case>
+                                                            <xforms:case id="fr-message-validation-error">
+                                                                <xhtml:p class="fr-message-validation-error">
+                                                                    <xforms:output value="instance('fr-persistence-instance')/message"/>
+                                                                </xhtml:p>
+                                                            </xforms:case>
+                                                            <xforms:case id="fr-message-fatal-error">
+                                                                <xhtml:p class="fr-message-fatal-error">
+                                                                    <xforms:output value="instance('fr-persistence-instance')/message"/>
+                                                                </xhtml:p>
+                                                            </xforms:case>
+                                                        </xforms:switch>
+                                                    </xhtml:td>
+                                                </xhtml:tr>
+                                            </xforms:group>
                                             <xhtml:tr>
                                                 <xhtml:td>
-                                                    <xforms:output value="((instance('fr-form-metadata')/logo, '/apps/fr/style/orbeon-logo-trimmed-transparent-42.png')[normalize-space() != ''])[1]" mediatype="image/*"/>
-                                                </xhtml:td>
-                                                <xhtml:td>
-                                                    <xhtml:h1>
-                                                        <xforms:output value="$title"/>
-                                                    </xhtml:h1>
+                                                    <xforms:group ref=".">
+                                                        <xforms:group model="fr-error-summary-model" ref="instance('fr-errors-instance')[error[@id = instance('fr-visited-instance')/control/@id]]">
+                                                            <!-- TODO: i18n -->
+                                                            <xhtml:span class="fr-error-title">Form Errors</xhtml:span>
+                                                            <xhtml:ol class="fr-error-list">
+                                                                <xforms:repeat nodeset="error" id="fr-errors-repeat">
+                                                                    <xhtml:li>
+                                                                        <xhtml:a href="#{{@id}}">
+                                                                            <xforms:output value="@label" class="fr-error-label"/>
+                                                                        </xhtml:a>
+                                                                        <xforms:group ref=".[string-length(@indexes) > 0]" class="fr-error-row">
+                                                                            <xforms:output value="concat(' (row ', @indexes, ')')"/>
+                                                                        </xforms:group>
+                                                                        <xforms:group ref=".[normalize-space(@alert) != '']" class="fr-error-alert">
+                                                                            - <xforms:output value="@alert"/>
+                                                                        </xforms:group>
+                                                                    </xhtml:li>
+                                                                </xforms:repeat>
+                                                            </xhtml:ol>
+                                                        </xforms:group>
+                                                        <xforms:group model="fr-error-summary-model" ref="instance('fr-errors-instance')[not(error)]">
+                                                        </xforms:group>
+                                                    </xforms:group>
                                                 </xhtml:td>
                                             </xhtml:tr>
                                         </xhtml:table>
                                     </xforms:group>
-                                </xsl:otherwise>
-                            </xsl:choose>
-                        </xhtml:div>
-                        <xhtml:div class="yui-g fr-separator">&#160;</xhtml:div>
-                        <xhtml:div class="yui-g fr-body">
-                            <!-- Optional description-->
-                            <xforms:group model="fr-form-model" ref=".[normalize-space($description) != '']">
-                                <xforms:switch>
-                                    <xforms:case id="fr-form-description-case-on">
-                                        <xhtml:div class="fr-form-description">
-                                            <xforms:output value="$description"/>
-                                            <xforms:trigger appearance="minimal" class="fr-close">
-                                                <xforms:label>[close]</xforms:label>
-                                                <xforms:toggle ev:event="DOMActivate" case="fr-form-description-case-off"/>
-                                            </xforms:trigger>
-                                        </xhtml:div>
-                                    </xforms:case>
-                                    <xforms:case id="fr-form-description-case-off"/>
-                                </xforms:switch>
-                            </xforms:group>
-
-                            <!-- Set context on form instance and define this group as #fr-form-group as observers will refer to it -->
-                            <xforms:group id="fr-form-group" model="fr-form-model" ref="instance('fr-form-instance')">
-                                <!-- Main form content -->
-                                <xsl:apply-templates select="fr:body/node()"/>
-                            </xforms:group>
-                        </xhtml:div>
-                        <xhtml:div class="yui-g fr-separator">&#160;</xhtml:div>
-                        <xhtml:div class="yui-g fr-buttons-block">
-                            <!-- Display the toolbar and errors -->
-                            <xforms:group model="fr-persistence-model" appearance="xxforms:internal">
-
-                                <!-- Only show messages and error table if necessary -->
-                                <xforms:group model="fr-persistence-model" ref=".[instance('fr-persistence-instance')[data-status = 'dirty']
-                                                                                or instance('fr-persistence-instance')/message != ''
-                                                                                or xxforms:instance('fr-errors-instance')/error]">
-                                    <xhtml:table class="fr-error-messages">
-                                        <xhtml:tr>
-                                            <xhtml:td>
-                                                <!-- Display clean/dirty status -->
-                                                <xforms:group ref="instance('fr-persistence-instance')[data-status = 'dirty']">
-                                                    <!-- TODO: i18n or use icon instead -->
-                                                    <xhtml:p class="fr-unsaved-data">Your document contains unsaved changes.</xhtml:p>
-                                                </xforms:group>
-                                                <!-- Display messages -->
-                                                <xforms:switch>
-                                                    <xforms:case id="fr-message-none">
-                                                        <xhtml:p/>
-                                                    </xforms:case>
-                                                    <xforms:case id="fr-message-success">
-                                                        <xhtml:p class="fr-message-success">
-                                                            <xforms:output value="instance('fr-persistence-instance')/message"/>
-                                                        </xhtml:p>
-                                                    </xforms:case>
-                                                    <xforms:case id="fr-message-validation-error">
-                                                        <xhtml:p class="fr-message-validation-error">
-                                                            <xforms:output value="instance('fr-persistence-instance')/message"/>
-                                                        </xhtml:p>
-                                                    </xforms:case>
-                                                    <xforms:case id="fr-message-fatal-error">
-                                                        <xhtml:p class="fr-message-fatal-error">
-                                                            <xforms:output value="instance('fr-persistence-instance')/message"/>
-                                                        </xhtml:p>
-                                                    </xforms:case>
-                                                </xforms:switch>
-                                            </xhtml:td>
-                                        </xhtml:tr>
-                                        <xhtml:tr>
-                                            <xhtml:td>
-                                                <xforms:group ref=".">
-                                                    <xforms:group model="fr-error-summary-model" ref="instance('fr-errors-instance')[error[@id = instance('fr-visited-instance')/control/@id]]">
-                                                        <!-- TODO: i18n -->
-                                                        <xhtml:span class="fr-error-title">Please correct the following issues:</xhtml:span>
-                                                        <xhtml:ol class="fr-error-list">
-                                                            <xforms:repeat nodeset="error" id="fr-errors-repeat">
-                                                                <xhtml:li>
-                                                                    <xforms:output value="@label" class="fr-error-label"/>
-                                                                    <xforms:group ref=".[string-length(@indexes) > 0]" class="fr-error-row">
-                                                                        <xforms:output value="concat(' (row ', @indexes, ')')"/>
-                                                                    </xforms:group>
-                                                                    <xforms:group ref=".[normalize-space(@alert) != '']" class="fr-error-alert">
-                                                                        - <xforms:output value="@alert"/>
-                                                                    </xforms:group>
-                                                                </xhtml:li>
-                                                            </xforms:repeat>
-                                                        </xhtml:ol>
-                                                    </xforms:group>
-                                                    <xforms:group model="fr-error-summary-model" ref="instance('fr-errors-instance')[not(error)]">
-                                                    </xforms:group>
-                                                </xforms:group>
-                                            </xhtml:td>
-                                        </xhtml:tr>
-                                    </xhtml:table>
+                                    <xhtml:div class="fr-buttons">
+                                        <xsl:choose>
+                                            <!-- In print and test modes, only include a close button -->
+                                            <xsl:when test="doc('input:instance')/*/mode = ('print', 'test')">
+                                                <xsl:variable name="default-buttons" as="element(fr:buttons)">
+                                                    <fr:buttons>
+                                                        <fr:close-button/>
+                                                    </fr:buttons>
+                                                </xsl:variable>
+                                                <xsl:apply-templates select="$default-buttons/*"/>
+                                            </xsl:when>
+                                            <!-- In view mode  -->
+                                            <xsl:when test="doc('input:instance')/*/mode = ('view')">
+                                                <xsl:variable name="default-buttons" as="element(fr:buttons)">
+                                                    <fr:buttons>
+                                                        <fr:back-button/>
+                                                        <fr:pdf-button/>
+                                                    </fr:buttons>
+                                                </xsl:variable>
+                                                <xsl:apply-templates select="$default-buttons/*"/>
+                                            </xsl:when>
+                                            <!-- In PDF mode, don't include anything -->
+                                            <xsl:when test="doc('input:instance')/*/mode = ('pdf')"/>
+                                            <!-- Use user-provided buttons -->
+                                            <xsl:when test="fr:buttons">
+                                                <xsl:apply-templates select="fr:buttons/node()"/>
+                                            </xsl:when>
+                                            <!-- Use default buttons -->
+                                            <xsl:otherwise>
+                                                <xsl:variable name="default-buttons" as="element(fr:buttons)">
+                                                    <fr:buttons>
+                                                        <fr:back-button/>
+                                                        <fr:clear-button/>
+                                                        <fr:print-button/>
+                                                        <fr:pdf-button/>
+                                                        <!-- These buttons are disabled until we can save initial changes to the DOM in store and
+                                                              replay them when the form is first loaded offline -->
+                                                        <!--<fr:take-offline/>-->
+                                                        <!--<fr:take-online/>-->
+                                                        <!--<fr:save-offline/>-->
+                                                        <fr:save-locally-button/>
+                                                        <fr:save-button/>
+                                                    </fr:buttons>
+                                                </xsl:variable>
+                                                <xsl:apply-templates select="$default-buttons/*"/>
+                                            </xsl:otherwise>
+                                        </xsl:choose>
+                                    </xhtml:div>
                                 </xforms:group>
-                                <xhtml:div class="fr-buttons">
-                                    <xsl:choose>
-                                        <!-- In print and test modes, only include a close button -->
-                                        <xsl:when test="doc('input:instance')/*/mode = ('print', 'test')">
-                                            <xsl:variable name="default-buttons" as="element(fr:buttons)">
-                                                <fr:buttons>
-                                                    <fr:close-button/>
-                                                </fr:buttons>
-                                            </xsl:variable>
-                                            <xsl:apply-templates select="$default-buttons/*"/>
-                                        </xsl:when>
-                                        <!-- In view mode  -->
-                                        <xsl:when test="doc('input:instance')/*/mode = ('view')">
-                                            <xsl:variable name="default-buttons" as="element(fr:buttons)">
-                                                <fr:buttons>
-                                                    <fr:back-button/>
-                                                    <fr:pdf-button/>
-                                                </fr:buttons>
-                                            </xsl:variable>
-                                            <xsl:apply-templates select="$default-buttons/*"/>
-                                        </xsl:when>
-                                        <!-- In PDF mode, don't include anything -->
-                                        <xsl:when test="doc('input:instance')/*/mode = ('pdf')"/>
-                                        <!-- Use user-provided buttons -->
-                                        <xsl:when test="fr:buttons">
-                                            <xsl:apply-templates select="fr:buttons/node()"/>
-                                        </xsl:when>
-                                        <!-- Use default buttons -->
-                                        <xsl:otherwise>
-                                            <xsl:variable name="default-buttons" as="element(fr:buttons)">
-                                                <fr:buttons>
-                                                    <fr:back-button/>
-                                                    <fr:clear-button/>
-                                                    <fr:print-button/>
-                                                    <fr:pdf-button/>
-                                                    <!-- These buttons are disabled until we can save initial changes to the DOM in store and
-                                                          replay them when the form is first loaded offline -->
-                                                    <!--<fr:take-offline/>-->
-                                                    <!--<fr:take-online/>-->
-                                                    <!--<fr:save-offline/>-->
-                                                    <fr:save-locally-button/>
-                                                    <fr:save-button/>
-                                                </fr:buttons>
-                                            </xsl:variable>
-                                            <xsl:apply-templates select="$default-buttons/*"/>
-                                        </xsl:otherwise>
-                                    </xsl:choose>
-                                </xhtml:div>
-                            </xforms:group>
+                            </xhtml:div>
                         </xhtml:div>
                     </xhtml:div>
+                    <xsl:if test="fr:leftxxx">
+                        <xhtml:div class="yui-b">
+                            <xsl:apply-templates select="fr:left/node()"/>
+                        </xhtml:div>
+                    </xsl:if>
                 </xhtml:div>
-                <xhtml:div class="yui-b">
-                    <!--<xhtml:div class="yui-g fr-logo">-->
-                    <!--</xhtml:div>-->
-                    <!--<xhtml:div class="yui-g fr-separator">-->
-                    <!--</xhtml:div>-->
-                    <!--<xhtml:h2><xforms:output model="fr-help-model" value="instance('fr-help-instance')/label"/></xhtml:h2>-->
-                    <!--<xhtml:div>-->
-                        <!--<xforms:output model="fr-help-model" value="instance('fr-help-instance')/help"/>-->
-                    <!--</xhtml:div>-->
+                <xhtml:div id="ft" class="fr-bottom">
+                    <xsl:choose>
+                        <xsl:when test="fr:footer">
+                            <xsl:apply-templates select="fr:footer/node()"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:variable xmlns:version="java:org.orbeon.oxf.common.Version" name="orbeon-forms-version" select="version:getVersion()" as="xs:string"/>
+                            <xhtml:div class="fr-orbeon-version">Orbeon Forms <xsl:value-of select="$orbeon-forms-version"/></xhtml:div>
+                        </xsl:otherwise>
+                    </xsl:choose>
                 </xhtml:div>
             </xhtml:div>
-            <xhtml:div id="ft" class="fr-bottom">
-                <xsl:choose>
-                    <xsl:when test="fr:footer">
-                        <xsl:apply-templates select="fr:footer/node()"/>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <xsl:variable xmlns:version="java:org.orbeon.oxf.common.Version" name="orbeon-forms-version" select="version:getVersion()" as="xs:string"/>
-                        <xhtml:div class="fr-orbeon-version">Orbeon Forms <xsl:value-of select="$orbeon-forms-version"/></xhtml:div>
-                    </xsl:otherwise>
-                </xsl:choose>
-            </xhtml:div>
+
+            <xsl:if test="fr:left">
+                <xhtml:div>
+                    <xsl:apply-templates select="fr:left/node()"/>
+                </xhtml:div>
+            </xsl:if>
+
         </xhtml:div>
         <xi:include href="import-export/import-export-dialog.xml" xxi:omit-xml-base="true"/>
         <xi:include href="includes/clear-dialog.xhtml" xxi:omit-xml-base="true"/>
@@ -302,7 +324,7 @@
         <!-- Trigger shown to go back if the data is dirty -->
         <xforms:trigger ref="instance('fr-persistence-instance')[data-status = 'dirty']">
             <xforms:label>
-                <xhtml:img src="/apps/fr/style/previous.gif" alt=""/>
+                <xhtml:img src="/apps/fr/style/images/silk/house.png" alt="Home"/>
                 <xhtml:span><xforms:output value="$fr-resources/detail/labels/discard"/></xhtml:span>
             </xforms:label>
             <xforms:action ev:event="DOMActivate">
@@ -312,7 +334,7 @@
         <!-- Trigger shown to go back if the data is clean -->
         <xforms:trigger ref="instance('fr-persistence-instance')[data-status = 'clean']">
             <xforms:label>
-                <xhtml:img src="/apps/fr/style/previous.gif" alt=""/>
+                <xhtml:img src="/apps/fr/style/images/silk/house.png" alt="Home"/>
                 <xhtml:span><xforms:output value="$fr-resources/detail/labels/return"/></xhtml:span>
             </xforms:label>
             <xforms:action ev:event="DOMActivate">
@@ -403,7 +425,7 @@
     <xsl:template match="fr:save-locally-button">
         <xforms:trigger id="save-locally-button">
             <xforms:label>
-                <xhtml:img src="/apps/fr/style/save.gif" alt=""/>
+                <xhtml:img src="/apps/fr/style/images/silk/disk.png" alt=""/>
                 <xforms:output value="$fr-resources/detail/labels/save-locally"/>
             </xforms:label>
         </xforms:trigger>
@@ -462,13 +484,14 @@
             </xsl:when>
         </xsl:choose>
     </xsl:template>
+    
 
-    <xsl:template match="xhtml:body//xforms:input[@appearance = 'fr:in-place']">
+    <xsl:template match="xforms:input[@appearance = 'fr:in-place']">
         <xforms:switch id="{@id}">
             <xsl:attribute name="class" select="string-join(('fr-inplace-input', @class), ' ')"/>
             <xforms:case id="fr-inplace-{@id}-view">
                 <!-- View mode -->
-                <xhtml:div class="fr-inplace-view">
+                <xhtml:span class="fr-inplace-view">
                     <xhtml:span class="fr-inplace-content">
                         <xforms:output>
                             <xsl:if test="@tabindex | @navindex">
@@ -490,17 +513,17 @@
                         </xforms:output>
                         <xhtml:span class="fr-inplace-buttons">
                             <xforms:trigger id="fr-inplace-{@id}-delete" appearance="minimal" class="fr-inplace-delete">
-                                <xforms:label><xhtml:img src="/apps/fr/style/images/silk/bin_closed.png" alt="Delete" title="Delete {lower-case(xforms:label)}"/></xforms:label>
+                                <xforms:label><xhtml:img src="/apps/fr/style/images/silk/bin.png" alt="Delete" title="Delete {lower-case(xforms:label)}"/></xforms:label>
                                 <!-- Dispatch custom event to trigger -->
                                 <xforms:dispatch ev:event="DOMActivate" target="fr-inplace-{@id}-delete" name="fr-delete"/>
                             </xforms:trigger>
                         </xhtml:span>
                     </xhtml:span>
-                </xhtml:div>
+                </xhtml:span>
             </xforms:case>
             <xforms:case id="fr-inplace-{@id}-edit">
                 <!-- Edit mode -->
-                <xhtml:div class="fr-inplace-edit">
+                <xhtml:span class="fr-inplace-edit">
                     <xhtml:span class="fr-inplace-content">
                         <xforms:input id="fr-inplace-{@id}-input">
                             <xsl:if test="@tabindex | @navindex">
@@ -521,7 +544,7 @@
                             </xforms:trigger>
                         </xhtml:span>
                     </xhtml:span>
-                </xhtml:div>
+                </xhtml:span>
             </xforms:case>
             <!-- Copy other children elements, including event handlers -->
             <xsl:apply-templates select="* except xforms:label | xforms:hint"/>
@@ -579,6 +602,7 @@
     <xsl:template match="xhtml:body//fr:section">
         <xsl:variable name="open" as="xs:boolean" select="if (doc('input:instance')/*/mode = 'print') then true() else if (@open = 'false') then false() else true()"/>
         <xsl:variable name="section-id" as="xs:string" select="@id"/>
+
         <xsl:variable name="content">
             <xsl:variable name="ancestor-sections" as="xs:integer" select="count(ancestor::fr:section)"/>
             <xforms:group id="{$section-id}">
@@ -588,22 +612,48 @@
                         <xhtml:div>
                             <xsl:element name="{if ($ancestor-sections = 0) then 'h2' else 'h3'}">
                                 <xsl:attribute name="class" select="'fr-section-title'"/>
+
+                                <xsl:variable name="action" as="element(xforms:action)">
+                                    <xforms:action ev:event="DOMActivate">
+                                        <xforms:setvalue model="fr-sections-model" ref="instance('fr-current-section-instance')/id">
+                                            <xsl:value-of select="$section-id"/>
+                                        </xforms:setvalue>
+                                        <xforms:setvalue model="fr-sections-model" ref="instance('fr-current-section-instance')/repeat-indexes" value="event('xxforms:repeat-indexes')"/>
+                                        <xforms:dispatch target="fr-sections-model" name="fr-expand"/>
+                                    </xforms:action>
+                                </xsl:variable>
+
+                                <xsl:variable name="input" as="element(xforms:input)">
+                                    <xforms:input id="{$section-id}-input-closed" ref="{xforms:label/@ref}"
+                                                  appearance="fr:in-place" class="fb-section-title">
+                                        <!-- TODO -->
+                                        <!--<xforms:label>Section</xforms:label>-->
+                                        <xforms:hint>Enter a section name</xforms:hint>
+                                    </xforms:input>
+                                </xsl:variable>
+
                                 <xforms:group appearance="xxforms:internal">
                                     <xforms:trigger appearance="minimal">
                                         <xforms:label>
                                             <xhtml:img src="/apps/fr/style/plus.png" alt="Open section" title="Open section" class="fr-open-close"/>
                                         </xforms:label>
+                                        <xsl:if test="xforms:label/@editable = 'true'">
+                                            <xsl:apply-templates select="$action"/>
+                                        </xsl:if>
                                     </xforms:trigger>
-                                    <xforms:trigger appearance="minimal">
-                                        <xsl:apply-templates select="xforms:label"/>
-                                    </xforms:trigger>
-                                    <xforms:action ev:event="DOMActivate">
-                                        <xforms:setvalue model="fr-sections-model" ref="instance('fr-current-section-instance')/id">
-                                            <xsl:value-of select="$section-id"/>
-                                        </xforms:setvalue>
-                                        <xforms:setvalue model="fr-sections-model" ref="instance('fr-current-section-instance')/repeat-indexes" value="event('repeat-indexes')"/>
-                                        <xforms:dispatch target="fr-sections-model" name="fr-expand"/>
-                                    </xforms:action>
+                                    <xsl:choose>
+                                        <xsl:when test="xforms:label/@editable = 'true'">
+                                            <xsl:apply-templates select="$input"/>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xforms:trigger appearance="minimal">
+                                                <xsl:apply-templates select="xforms:label"/>
+                                            </xforms:trigger>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
+                                    <xsl:if test="not(xforms:label/@editable = 'true')">
+                                        <xsl:apply-templates select="$action"/>
+                                    </xsl:if>
                                 </xforms:group>
                             </xsl:element>
                         </xhtml:div>
@@ -612,22 +662,48 @@
                         <xhtml:div>
                             <xsl:element name="{if ($ancestor-sections = 0) then 'h2' else 'h3'}">
                                 <xsl:attribute name="class" select="'fr-section-title'"/>
+
+                                <xsl:variable name="action" as="element(xforms:action)">
+                                    <xforms:action ev:event="DOMActivate">
+                                        <xforms:setvalue model="fr-sections-model" ref="instance('fr-current-section-instance')/id">
+                                            <xsl:value-of select="$section-id"/>
+                                        </xforms:setvalue>
+                                        <xforms:setvalue model="fr-sections-model" ref="instance('fr-current-section-instance')/repeat-indexes" value="event('xxforms:repeat-indexes')"/>
+                                        <xforms:dispatch target="fr-sections-model" name="fr-collapse"/>
+                                    </xforms:action>
+                                </xsl:variable>
+
+                                <xsl:variable name="input" as="element(xforms:input)">
+                                    <xforms:input id="{$section-id}-input-open" ref="{xforms:label/@ref}"
+                                                  appearance="fr:in-place" class="fb-section-title">
+                                        <!-- TODO -->
+                                        <!--<xforms:label>Section</xforms:label>-->
+                                        <xforms:hint>Enter a section name</xforms:hint>
+                                    </xforms:input>
+                                </xsl:variable>
+
                                 <xforms:group appearance="xxforms:internal">
                                     <xforms:trigger appearance="minimal">
                                         <xforms:label>
                                             <xhtml:img src="/apps/fr/style/minus.png" alt="Close section" title="Close section" class="fr-open-close"/>
                                         </xforms:label>
+                                        <xsl:if test="xforms:label/@editable = 'true'">
+                                            <xsl:apply-templates select="$action"/>
+                                        </xsl:if>
                                     </xforms:trigger>
-                                    <xforms:trigger appearance="minimal">
-                                        <xsl:apply-templates select="xforms:label"/>
-                                    </xforms:trigger>
-                                    <xforms:action ev:event="DOMActivate">
-                                        <xforms:setvalue model="fr-sections-model" ref="instance('fr-current-section-instance')/id">
-                                            <xsl:value-of select="$section-id"/>
-                                        </xforms:setvalue>
-                                        <xforms:setvalue model="fr-sections-model" ref="instance('fr-current-section-instance')/repeat-indexes" value="event('repeat-indexes')"/>
-                                        <xforms:dispatch target="fr-sections-model" name="fr-collapse"/>
-                                    </xforms:action>
+                                    <xsl:choose>
+                                        <xsl:when test="xforms:label/@editable = 'true'">
+                                            <xsl:apply-templates select="$input"/>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xforms:trigger appearance="minimal">
+                                                <xsl:apply-templates select="xforms:label"/>
+                                            </xforms:trigger>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
+                                    <xsl:if test="not(xforms:label/@editable = 'true')">
+                                        <xsl:apply-templates select="$action"/>
+                                    </xsl:if>
                                 </xforms:group>
                             </xsl:element>
                             <xhtml:div class="fr-collapsible">
@@ -734,7 +810,8 @@
                 </xhtml:td>
                 <xsl:for-each select="xhtml:tr[1]/xhtml:td/xforms:*[1]">
                     <xhtml:th>
-                        <xsl:if test="last()">
+                        <xsl:if test="count(../following-sibling::xhtml:td) = 0">
+                            <!-- Last th gets 100% with to push things to the left -->
                             <xsl:attribute name="width" select="'100%'"/>
                         </xsl:if>
                         <xforms:output value="''" class="fr-hidden"><!-- hide the actual output control -->
@@ -746,9 +823,9 @@
             <!-- Lines with the data -->
             <xforms:repeat nodeset="{@nodeset}" id="{@id}">
                 <xhtml:tr>
-                    <xhtml:td class="fr-repeat-column">
+                    <xhtml:th class="fr-repeat-column">
                         <xforms:output value="position()"/>
-                    </xhtml:td>
+                    </xhtml:th>
                     <xsl:if test="not($readonly)">
                         <xforms:group ref=".[not(exforms:readonly(.))]">
                             <xhtml:td class="fr-repeat-column">
@@ -781,7 +858,7 @@
                       xxforms:external-events="fr-after-collapse {@xxforms:external-events}"
                       xxforms:readonly-appearance="{if (doc('input:instance')/*/mode = ('view', 'print', 'pdf')) then 'static' else 'dynamic'}"
                       xxforms:order="help label control alert hint"
-                      xxforms:computed-binds="revalidate"
+                      xxforms:computed-binds="recalculate"
                       xxforms:offline="true">
             <xsl:copy-of select="@* except (@id, @xxforms:external-events)"/>
             <!-- Contain section being currently expanded/collapsed -->
@@ -847,12 +924,12 @@
                     method="post" ref="xxforms:instance('fr-form-instance')" replace="all" validate="false" xxforms:target="_blank" xxforms:show-progress="false"/>
         </xforms:model>
 
+        <!-- Handle error summary -->
+        <xi:include href="includes/error-summary-model.xml" xxi:omit-xml-base="true"/>
         <!-- Handle document persistence -->
         <xi:include href="includes/persistence-model.xml" xxi:omit-xml-base="true"/>
         <!-- Handle import/export -->
         <xi:include href="import-export/import-export-model.xml" xxi:omit-xml-base="true"/>
-        <!-- Handle error summary -->
-        <xi:include href="includes/error-summary-model.xml" xxi:omit-xml-base="true"/>
 
         <!-- Copy existing main model -->
         <xsl:copy>

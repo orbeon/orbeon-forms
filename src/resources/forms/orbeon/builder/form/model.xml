@@ -254,7 +254,7 @@
 
     <xforms:bind nodeset="instance('fb-variables')">
         <!-- Publish is enabled only when the data is clean -->
-        <xforms:bind nodeset="publish-trigger" readonly="xxforms:instance('fr-persistence-instance')[data-status = 'dirty']"/>
+        <xforms:bind nodeset="publish-trigger" readonly="xxforms:instance('fr-form-valid-instance') = 'false'"/>
     </xforms:bind>
 
     <!-- Ensure there is an empty xhtml:td to place a new control (may fail) -->
@@ -859,7 +859,7 @@
                     </xforms:select1>
                 </xhtml:div>
             </template>
-            <template label="List box (single)">
+            <template label="Single list box">
                 <xhtml:div class="listbox">
                     <xforms:select1 id="" appearance="compact" ref="">
                         <xforms:label ref=""/>
@@ -887,7 +887,7 @@
                     </xforms:select>
                 </xhtml:div>
             </template>
-            <template label="List box (mult.)" image="/forms/orbeon/builder/images/listbox.png">
+            <template label="Multi list box" image="/forms/orbeon/builder/images/listbox.png">
                 <xhtml:div class="listbox-multiple">
                     <xforms:select id="" appearance="compact" ref="">
                         <xforms:label ref=""/>
@@ -901,7 +901,7 @@
                     </xforms:select>
                 </xhtml:div>
             </template>
-            <template label="Output">
+            <template label="Text Output" image="/apps/fr/style/images/silk/text_align_left.png">
                 <xhtml:div class="output">
                     <xforms:output id="" ref="">
                         <xforms:label ref=""/>
@@ -931,7 +931,7 @@
                     </xforms:output>
                 </xhtml:div>
             </template>
-            <template label="Upload">
+            <template label="Attachment" image="/apps/fr/style/images/silk/attach.png">
                 <xhtml:div class="upload">
                     <xforms:upload id="" ref="" class="fr-attachment">
                         <xforms:label ref=""/>

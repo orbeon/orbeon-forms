@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Copyright (C) 2008 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xxforms:dialog xmlns:xhtml="http://www.w3.org/1999/xhtml"
+      xmlns:xforms="http://www.w3.org/2002/xforms"
+      xmlns:xs="http://www.w3.org/2001/XMLSchema"
+      xmlns:ev="http://www.w3.org/2001/xml-events"
+      xmlns:xi="http://www.w3.org/2001/XInclude"
+      xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+      xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+      xmlns:saxon="http://saxon.sf.net/"
+
+      id="fb-bindings-dialog" level="modal" close="true" draggable="true" class="fr-dialog" model="fb-bindings-model">
+
+    <xforms:label>Bindings Editor</xforms:label>
+
+    <xxforms:variable name="instance" select="instance('fb-bindings-editor-instance')"/>
+    <xhtml:div class="fr-grid">
+        <xhtml:div class="fr-grid-content">
+            <xforms:group ref="$instance">
+                <xforms:select1 ref="submission-id" id="fb-bindings-submission-select">
+                    <xforms:label>Submission to Call</xforms:label>
+                    <xforms:item>
+                        <xforms:label>[Select...]</xforms:label>
+                        <xforms:value/>
+                    </xforms:item>
+                    <xforms:itemset nodeset="$model/xforms:submission[ends-with(@id, '-submission')]">
+                        <xforms:label value="substring-before(@id, '-submission')"/>
+                        <xforms:value value="substring-before(@id, '-submission')"/>
+                    </xforms:itemset>
+                </xforms:select1>
+                <xforms:select1 ref="event">
+                    <xforms:label>Event to React To</xforms:label>
+                    <xforms:item>
+                        <xforms:label>[Select...]</xforms:label>
+                        <xforms:value/>
+                    </xforms:item>
+                    <xforms:item>
+                        <xforms:label>Value Change</xforms:label>
+                        <xforms:value>xforms-value-changed</xforms:value>
+                    </xforms:item>
+                    <xforms:item>
+                        <xforms:label>Activation</xforms:label>
+                        <xforms:value>DOMActivate</xforms:value>
+                    </xforms:item>
+                    <xforms:item>
+                        <xforms:label>Form Load</xforms:label>
+                        <xforms:value>xforms-ready</xforms:value>
+                    </xforms:item>
+                </xforms:select1>
+                <xforms:group ref="request">
+                    <xforms:label>Submission Values</xforms:label>
+                    <fr:repeat nodeset="setvalue" id="fb-bindings-request-repeat" origin="instance('fb-bindings-editor-request-template')" columns="2" appearance="xxforms:table">
+                        <xhtml:tr>
+                            <xhtml:td>
+                                <xforms:select1 ref="@control-name">
+                                    <xforms:label>Control</xforms:label>
+                                    <xforms:item>
+                                        <xforms:label>[Select...]</xforms:label>
+                                        <xforms:value/>
+                                    </xforms:item>
+                                    <xforms:itemset nodeset="$body//xforms:*[(@ref or @bind) and ends-with(@id, '-control')]">
+                                        <xforms:label value="substring-before(@id, '-control')"/>
+                                        <xforms:value value="substring-before(@id, '-control')"/>
+                                    </xforms:itemset>
+                                </xforms:select1>
+                            </xhtml:td>
+                            <xhtml:td>
+                                <xforms:input ref="@ref">
+                                    <xforms:label>XPath Expression</xforms:label>
+                                </xforms:input>
+                            </xhtml:td>
+                        </xhtml:tr>
+                    </fr:repeat>
+                </xforms:group>
+                <xforms:group ref="response">
+                    <xforms:label>Actions</xforms:label>
+                    <fr:repeat nodeset="action" id="fb-bindings-response-repeat" origin="instance('fb-bindings-editor-response-template')" columns="3" appearance="xxforms:table">
+                        <xhtml:tr>
+                            <xhtml:td>
+                                <xforms:select1 ref="@name">
+                                    <xforms:label>Action</xforms:label>
+                                    <xforms:item>
+                                        <xforms:label>[Select...]</xforms:label>
+                                        <xforms:value/>
+                                    </xforms:item>
+                                    <xforms:item>
+                                        <xforms:label>Set Control Value</xforms:label>
+                                        <xforms:value>setvalue</xforms:value>
+                                    </xforms:item>
+                                    <xforms:item>
+                                        <xforms:label>Validate</xforms:label>
+                                        <xforms:value>validate</xforms:value>
+                                    </xforms:item>
+                                    <xforms:item>
+                                        <xforms:label>Set Items</xforms:label>
+                                        <xforms:value>itemset</xforms:value>
+                                    </xforms:item>
+                                </xforms:select1>
+                            </xhtml:td>
+                            <xhtml:td>
+                                <xforms:group>
+                                    <xforms:label>Parameters</xforms:label>
+                                    <xforms:select1 ref="@control-name[../@name = 'setvalue']">
+                                        <xforms:label>Control</xforms:label>
+                                        <xforms:item>
+                                            <xforms:label>[Select...]</xforms:label>
+                                            <xforms:value/>
+                                        </xforms:item>
+                                        <xforms:itemset nodeset="$body//xforms:*[(@ref or @bind) and ends-with(@id, '-control')]">
+                                            <xforms:label value="substring-before(@id, '-control')"/>
+                                            <xforms:value value="substring-before(@id, '-control')"/>
+                                        </xforms:itemset>
+                                    </xforms:select1>
+                                    <xforms:input ref="@xpath[../@name = ('setvalue', 'validate', 'itemset')]">
+                                        <xforms:label>XPath Expression</xforms:label>
+                                    </xforms:input>
+                                    <xforms:input ref="@label[../@name = 'itemset']">
+                                        <xforms:label>Label</xforms:label>
+                                    </xforms:input>
+                                    <xforms:input ref="@value[../@name = 'itemset']">
+                                        <xforms:label>Value</xforms:label>
+                                    </xforms:input>
+                                </xforms:group>
+                            </xhtml:td>
+                        </xhtml:tr>
+                    </fr:repeat>
+                </xforms:group>
+                
+            </xforms:group>
+        </xhtml:div>
+    </xhtml:div>
+
+    <xhtml:div class="fr-dialog-buttons">
+        <xforms:group>
+            <!-- Test button -->
+            <xforms:trigger ref="$instance/save-test-trigger">
+                <!-- TODO-->
+                <xforms:label>
+                    <xhtml:img src="/forms/orbeon/builder/images/play.png" alt="Publish" title="Publish"/>
+                    <xhtml:span>Test</xhtml:span>
+                </xforms:label>
+
+                <!-- Test submission -->
+                <xforms:action ev:event="DOMActivate">
+                    <!-- Clear response -->
+                    <xforms:setvalue xxforms:iterate="$instance/response/*[not(*)]" ref="."/>
+                    <xforms:delete xxforms:iterate="$instance/response/headers/header" nodeset="."/>
+
+                    <!-- Toggle back response submission -->
+                    <xforms:toggle case="fb-submission-dialog-none"/>
+
+                    <!-- Send submission -->
+                    <xforms:send submission="fb-test-submission-submission"/>
+                </xforms:action>
+
+                <!-- Common response actions -->
+                <xforms:action ev:event="xforms-submit-done xforms-submit-error" ev:observer="fb-test-submission-submission">
+                    <xforms:toggle case="fb-submission-dialog-response"/>
+                    <xforms:action context="$instance/response">
+                        <xforms:setvalue ref="resource-uri" value="event('resource-uri')"/>
+                        <xforms:setvalue ref="status-code" value="event('response-status-code')"/>
+                        <xforms:delete xxforms:iterate="headers/header" nodeset="."/>
+                        <xforms:insert context="headers" origin="event('response-headers')"/>
+                        <!-- Handle response body -->
+                        <xxforms:variable name="error-body" select="event('response-body')"/>
+                        <xforms:setvalue if="$error-body" ref="content" value="if ($error-body castable as xs:string)
+                            then $error-body else saxon:serialize($error-body, xxforms:instance('fb-xsl-output-instance'))"/>
+                    </xforms:action>
+                </xforms:action>
+                <!-- Error actions -->
+                <xforms:action ev:event="xforms-submit-error" ev:observer="fb-test-submission-submission">
+                    <xforms:action context="$instance/response">
+                        <xforms:setvalue ref="error-type" value="event('error-type')"/>
+                    </xforms:action>
+                </xforms:action>
+            </xforms:trigger>
+            <!-- Save button -->
+            <xforms:trigger ref="$instance/save-test-trigger">
+                <!-- TODO-->
+                <xforms:label>
+                    <xhtml:img src="/apps/fr/style/images/silk/disk.png" alt="Publish" title="Publish"/>
+                    <xhtml:span>Save</xhtml:span>
+                </xforms:label>
+                <!-- Save changes to form -->
+                <xforms:action ev:event="DOMActivate">
+                    <!-- Actual id of the submission and instance -->
+                    <xxforms:variable name="submission-id" select="concat($instance/id, '-submission')"/>
+                    <xxforms:variable name="instance-id" select="concat($instance/id, '-instance')"/>
+
+                    <!-- Insert new submission if needed -->
+                    <xforms:action if="not(exists($model/xforms:submission[@id = $submission-id]))">
+                        <xforms:insert context="$model" nodeset="xforms:instance | xforms:submission" origin="instance('fb-submission-template')"/>
+                        <xforms:setvalue ref="$model/xforms:submission[last()]/@id" value="$submission-id"/>
+                    </xforms:action>
+
+                    <!-- Set submission properties -->
+                    <xxforms:variable name="submission" select="$model/xforms:submission[@id = $submission-id]"/>
+                    <xxforms:variable name="request" select="$instance/request"/>
+                    <xforms:action context="$submission">
+                        <xforms:setvalue ref="@ref" value="xxx"/>
+                        <xforms:setvalue ref="@method" value="$request/method"/>
+                        <xforms:setvalue ref="@resource" value="$request/resource"/>
+                        <xforms:setvalue ref="@replace" value="$request/replace"/>
+                        <xforms:setvalue ref="@mediatype"
+                                         value="if ($request/is-soap = 'true')
+                                                then string-join(('application/soap+xml', if (normalize-space($request/soap-action) != '') then concat('action=', normalize-space($request/soap-action)) else ()), '; ')
+                                                else 'application/xml'"/>
+                    </xforms:action>
+
+                    <!-- Insert new instance just before submission if needed -->
+                    <xforms:action if="not(exists($model/xforms:instance[@id = $instance-id]))">
+                        <xforms:insert nodeset="$submission" position="before" origin="instance('fb-instance-template')"/>
+                        <xforms:setvalue ref="$submission/preceding-sibling::xforms:instance[1]/@id" value="$instance-id"/>
+                    </xforms:action>
+
+                    <!-- Set instance parameters -->
+                    <xforms:action context="$model/xforms:instance[@id = $instance-id]">
+                        <xforms:setvalue ref="request" value="$request/content"/>
+                    </xforms:action>
+
+                    <!-- Hide dialog -->
+                    <xxforms:hide dialog="fb-submission-dialog"/>
+                </xforms:action>
+            </xforms:trigger>
+            <xforms:trigger>
+                <xforms:label><xhtml:img src="/apps/fr/style/close.gif" alt=""/> <xhtml:span>Cancel</xhtml:span></xforms:label>
+                <!-- Hide dialog -->
+                <xxforms:hide ev:event="DOMActivate" dialog="fb-bindings-dialog"/>
+            </xforms:trigger>
+        </xforms:group>
+    </xhtml:div>
+
+    <xforms:action ev:event="xxforms-dialog-open">
+        <xxforms:variable name="instance" select="instance('fb-bindings-editor-instance')"/>
+
+        <!-- Clear instance entirely -->
+        <xforms:setvalue xxforms:iterate="$instance//*[not(*)]" ref="."/>
+        <xforms:delete xxforms:iterate="$instance/request/setvalue | $instance/response/action" nodeset="."/>
+
+        <!-- Set focus to first input -->
+        <xforms:setfocus control="fb-bindings-submission-select"/>
+    </xforms:action>
+
+    <!-- Model for the bindings editor -->
+    <xforms:model id="fb-bindings-model">
+
+        <xxforms:variable name="model" select="xxforms:instance('fr-form-instance')/xhtml:head/xforms:model[@id = 'fr-form-model']"/>
+
+        <xforms:instance id="fb-bindings-editor-instance">
+            <bindings>
+                <submission-id/>
+                <event/>
+                <request>
+                    <setvalue ref="" control-name=""/>
+                </request>
+                <response>
+                    <action name="" xpath="" control-name="" nodeset="" label="" value=""/>
+                    <!--<setvalue ref="" control-name=""/>-->
+                    <!--<itemset nodeset="" label="" value=""/>-->
+                    <!--<validity constraint=""/>-->
+                </response>
+                <save-test-trigger/>
+            </bindings>
+        </xforms:instance>
+
+        <!-- Enable/disable trigger -->
+        <xforms:setvalue ev:event="xxforms-invalid" ev:observer="fb-bindings-editor-instance" ref="save-test-trigger">disabled</xforms:setvalue>
+        <xforms:setvalue ev:event="xxforms-valid" ev:observer="fb-bindings-editor-instance" ref="save-test-trigger">enabled</xforms:setvalue>
+
+        <xforms:bind nodeset="instance('fb-bindings-editor-instance')">
+            <xforms:bind nodeset="submission-id | event" required="true()"/>
+            <xforms:bind nodeset="save-test-trigger" readonly=". = 'disabled'"/>
+        </xforms:bind>
+
+        <xforms:instance id="fb-bindings-editor-request-template">
+            <setvalue ref="" control-name=""/>
+        </xforms:instance>
+
+        <xforms:instance id="fb-bindings-editor-response-template">
+            <action name="" xpath="" control-name="" nodeset="" label="" value=""/>
+        </xforms:instance>
+
+    </xforms:model>
+
+</xxforms:dialog>

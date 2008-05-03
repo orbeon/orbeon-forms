@@ -97,14 +97,7 @@
 .xforms-showcalendar {
     margin-left: .5em;
     margin-right: .5em;
-    /*background-image: url(../../ops/images/xforms/calendar.png);*/
-    /*background-repeat: no-repeat;*/
-    /*background-position: left center;*/
-    /*display: -moz-inline-box;*/
-    /*display: inline-block;*/
-    /*width: 26px;*/
-    /*height: 19px;*/
-    vertical-align: middle;
+    vertical-align: bottom;
 }
 
 /* Hide date pickend for <xforms:input> when type not date */

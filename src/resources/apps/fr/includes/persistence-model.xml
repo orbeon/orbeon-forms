@@ -297,7 +297,7 @@
         <save xmlns="">
             <!-- Whether an attempt to submit was ever done -->
             <save-attempted>false</save-attempted>
-            <!-- Whether form data is clean or dirty -->
+            <!-- Whether form data is clean or dirty (i.e. saved or not saved) -->
             <data-status>clean</data-status>
             <!-- Success or error message to display -->
             <message/>
@@ -316,7 +316,7 @@
     </xforms:instance>
 
     <xforms:bind nodeset="instance('fr-triggers-instance')">
-        <xforms:bind nodeset="save" readonly="instance('fr-persistence-instance')/data-status = 'clean'"/>
+        <xforms:bind nodeset="save" readonly="instance('fr-persistence-instance')/data-status = 'clean' or xxforms:instance('fr-form-valid-instance') = 'false'"/>
     </xforms:bind>
 
     <!-- React to successful submission when saving/updating -->

@@ -837,4 +837,8 @@
         <name>application/json</name>
         <pattern>*.json</pattern>
     </mime-type>
+    <mime-type>
+        <name>text/x-component</name>
+        <pattern>*.htc</pattern>
+    </mime-type>
 </mime-types>

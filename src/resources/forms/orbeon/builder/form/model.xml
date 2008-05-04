@@ -221,11 +221,8 @@
         <variables>
             <done/>
 
-            <!-- Confirmation dialog -->
-            <confirmation-message/>
-            <confirmation-target/>
-
             <!-- Itemset editor dialog -->
+            <!-- TODO: This can be refactored to a local model for sure -->
             <itemset-resource-id/>
             <itemset-lang/>
 

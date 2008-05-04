@@ -626,9 +626,7 @@
                                 <xsl:variable name="input" as="element(xforms:input)">
                                     <xforms:input id="{$section-id}-input-closed" ref="{xforms:label/@ref}"
                                                   appearance="fr:in-place" class="fb-section-title">
-                                        <!-- TODO -->
-                                        <!--<xforms:label>Section</xforms:label>-->
-                                        <xforms:hint>Enter a section name</xforms:hint>
+                                        <xsl:apply-templates select="xforms:hint"/>
                                     </xforms:input>
                                 </xsl:variable>
 
@@ -637,12 +635,12 @@
                                         <xforms:label>
                                             <xhtml:img src="/apps/fr/style/plus.png" alt="Open section" title="Open section" class="fr-open-close"/>
                                         </xforms:label>
-                                        <xsl:if test="xforms:label/@editable = 'true'">
+                                        <xsl:if test="@editable = 'true'">
                                             <xsl:apply-templates select="$action"/>
                                         </xsl:if>
                                     </xforms:trigger>
                                     <xsl:choose>
-                                        <xsl:when test="xforms:label/@editable = 'true'">
+                                        <xsl:when test="@editable = 'true'">
                                             <xsl:apply-templates select="$input"/>
                                         </xsl:when>
                                         <xsl:otherwise>
@@ -651,7 +649,7 @@
                                             </xforms:trigger>
                                         </xsl:otherwise>
                                     </xsl:choose>
-                                    <xsl:if test="not(xforms:label/@editable = 'true')">
+                                    <xsl:if test="not(@editable = 'true')">
                                         <xsl:apply-templates select="$action"/>
                                     </xsl:if>
                                 </xforms:group>
@@ -676,9 +674,7 @@
                                 <xsl:variable name="input" as="element(xforms:input)">
                                     <xforms:input id="{$section-id}-input-open" ref="{xforms:label/@ref}"
                                                   appearance="fr:in-place" class="fb-section-title">
-                                        <!-- TODO -->
-                                        <!--<xforms:label>Section</xforms:label>-->
-                                        <xforms:hint>Enter a section name</xforms:hint>
+                                        <xsl:apply-templates select="xforms:hint"/>
                                     </xforms:input>
                                 </xsl:variable>
 
@@ -687,12 +683,12 @@
                                         <xforms:label>
                                             <xhtml:img src="/apps/fr/style/minus.png" alt="Close section" title="Close section" class="fr-open-close"/>
                                         </xforms:label>
-                                        <xsl:if test="xforms:label/@editable = 'true'">
+                                        <xsl:if test="@editable = 'true'">
                                             <xsl:apply-templates select="$action"/>
                                         </xsl:if>
                                     </xforms:trigger>
                                     <xsl:choose>
-                                        <xsl:when test="xforms:label/@editable = 'true'">
+                                        <xsl:when test="@editable = 'true'">
                                             <xsl:apply-templates select="$input"/>
                                         </xsl:when>
                                         <xsl:otherwise>
@@ -701,18 +697,20 @@
                                             </xforms:trigger>
                                         </xsl:otherwise>
                                     </xsl:choose>
-                                    <xsl:if test="not(xforms:label/@editable = 'true')">
+                                    <xsl:if test="not(@editable = 'true')">
                                         <xsl:apply-templates select="$action"/>
                                     </xsl:if>
                                 </xforms:group>
                             </xsl:element>
                             <xhtml:div class="fr-collapsible">
-                                <!-- Section content -->
-                                <xsl:apply-templates select="* except xforms:label"/>
+                                <!-- Section content except event handlers -->
+                                <xsl:apply-templates select="* except (xforms:label, *[@ev:*])"/>
                             </xhtml:div>
                         </xhtml:div>
                     </xforms:case>
                 </xforms:switch>
+                <!-- Event handlers children of fr:seciton -->
+                <xsl:apply-templates select="*[@ev:*]"/>
             </xforms:group>
         </xsl:variable>
         <xsl:choose>

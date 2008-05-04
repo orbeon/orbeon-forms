@@ -374,12 +374,14 @@
                     </xforms:label>
                     <xforms:action ev:event="DOMActivate">
                         <!-- Ask confirmation -->
-                        <xforms:setvalue ref="$variables/confirmation-message"
-                                         value="concat('Are you sure you want to delete all resources for language ''',
-                                         xxforms:instance('fr-languages-instance')/language[@code = $fb-lang]/(if (@native-name != @english-name) then concat(@native-name, ' (', @english-name, ')') else @native-name),
-                                         '''?')"/>
-                        <xforms:setvalue ref="$variables/confirmation-target">fb-language-remove</xforms:setvalue>
-                        <xxforms:show dialog="fb-confirmation-dialog"/>
+                        <xxforms:show dialog="fb-confirmation-dialog">
+                            <xxforms:context name="fr:message"
+                                             select="concat('Are you sure you want to delete all resources for language ''',
+                                                         xxforms:instance('fr-languages-instance')/language[@code = $fb-lang]/(if (@native-name != @english-name) then concat(@native-name, ' (', @english-name, ')') else @native-name),
+                                                         '''?')"/>
+
+                            <xxforms:context name="fr:confirmation-target" select="'fb-language-remove'"/>
+                        </xxforms:show>
                     </xforms:action>
                     <xforms:action ev:event="fb-confirmation-yes">
                         <!-- Delete resources for this language -->
@@ -421,12 +423,13 @@
                             </xforms:label>
                             <xforms:action ev:event="DOMActivate">
                                 <!-- Ask confirmation -->
-                                <xforms:setvalue ref="$variables/confirmation-message"
-                                                 value="concat('Are you sure you want to delete submission ''',
-                                                 $submission-name,
-                                                 '''?')"/>
-                                <xforms:setvalue ref="$variables/confirmation-target">fb-submission-remove</xforms:setvalue>
-                                <xxforms:show dialog="fb-confirmation-dialog"/>
+                                <xxforms:show dialog="fb-confirmation-dialog">
+                                    <xxforms:context name="fr:message"
+                                                     select="concat('Are you sure you want to delete submission ''',
+                                                                 $submission-name,
+                                                                 '''?')"/>
+                                    <xxforms:context name="fr:confirmation-target" select="'fb-submission-remove'"/>
+                                </xxforms:show>
                             </xforms:action>
                             <xforms:action ev:event="fb-confirmation-yes">
                                 <!-- Delete stuff -->
@@ -473,12 +476,13 @@
                             </xforms:label>
                             <xforms:action ev:event="DOMActivate">
                                 <!-- Ask confirmation -->
-                                <xforms:setvalue ref="$variables/confirmation-message"
-                                                 value="concat('Are you sure you want to delete submission ''',
-                                                 $submission-name,
-                                                 '''?')"/>
-                                <xforms:setvalue ref="$variables/confirmation-target">fb-binding-remove</xforms:setvalue>
-                                <xxforms:show dialog="fb-confirmation-dialog"/>
+                                <xxforms:show dialog="fb-confirmation-dialog">
+                                    <xxforms:context name="fr:message"
+                                                     select="concat('Are you sure you want to delete submission ''',
+                                                                 $submission-name,
+                                                                 '''?')"/>
+                                    <xxforms:context name="fr:confirmation-target" select="'fb-binding-remove'"/>
+                                </xxforms:show>
                             </xforms:action>
                             <xforms:action ev:event="fb-confirmation-yes">
                                 <!-- Delete stuff -->

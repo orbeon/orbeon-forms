@@ -44,7 +44,9 @@
         elementToAnimate.style.height = 0;
         var anim = new YAHOO.util.Anim(elementToAnimate, { height: {  to: fullHeight } }, .2);
         // Set back the height to auto when the animation is finished
-        anim.onComplete.subscribe(function() { elementToAnimate.style.height =  "auto"; });
+        anim.onComplete.subscribe(function() {
+            elementToAnimate.style.height = "auto";
+        });
         anim.animate();
     }
 
@@ -53,11 +55,11 @@
         var currentSectionRepeatIndexes = ORBEON.xforms.Document.getValue("fr-current-section-repeat-indexes-input");
 
         var switchElement = ORBEON.util.Dom.getElementById("switch-" + currentSectionId +
-            (currentSectionRepeatIndexes == "" ? "" : XFORMS_SEPARATOR_1 + currentSectionRepeatIndexes)) ;
+                                                           (currentSectionRepeatIndexes == "" ? "" : XFORMS_SEPARATOR_1 + currentSectionRepeatIndexes)) ;
         if (switchElement == null)
             return null;
-        var possibleElements = YAHOO.util.Dom.getElementsByClassName("xforms-case-selected", null, switchElement);
-        if (possibleElements == null || possibleElements.length == 0)
+        var possibleElements = ORBEON.util.Dom.getChildElementsByClass(switchElement, "xforms-case-selected");
+        if (possibleElements == null)
             return null;
 
         var caseElement = null;
@@ -69,6 +71,9 @@
             }
         }
         if (caseElement == null)
+            return null;
+
+        if (ORBEON.util.Dom.hasClass(caseElement, "xforms-case-begin-end"))
             return null;
 
         var collapsibleElements = YAHOO.util.Dom.getElementsByClassName("fr-collapsible", null, caseElement);

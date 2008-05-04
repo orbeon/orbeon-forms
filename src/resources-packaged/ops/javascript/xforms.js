@@ -425,6 +425,17 @@ ORBEON.util.Dom = {
         return null;
     },
 
+    getChildElementsByClass: function(parent, clazz) {
+        var nodes = [];
+        for (var i = 0; i < parent.childNodes.length; i++) {
+            var child = parent.childNodes[i];
+            if (ORBEON.util.Dom.isElement(child) && ORBEON.util.Dom.hasClass(child, clazz)) {
+                nodes[nodes.length] = child;
+            }
+        }
+        return nodes.length == 0 ? null : nodes;
+    },
+
     stringToDom: function(xmlString) {
         if (document.implementation.createDocument) {
             return (new DOMParser()).parseFromString(xmlString, "application/xml")

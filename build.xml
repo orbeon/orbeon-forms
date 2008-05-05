@@ -223,7 +223,7 @@
     </target>
 
     <!-- JARs -->
-    <target name="jars" depends="classes,transform,orbeon-css-templates">
+    <target name="jars" depends="classes,transform,orbeon-css-templates,orbeon-minify-js">
       <pathconvert dirsep='/' pathsep=' ' property='jar.mf.cp' refid='war.libs.private' >
         <map from='${lib.dir}' to='private' />
       </pathconvert>

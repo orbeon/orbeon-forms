@@ -209,9 +209,15 @@
                                                             <xhtml:ol class="fr-error-list">
                                                                 <xforms:repeat nodeset="error" id="fr-errors-repeat">
                                                                     <xhtml:li>
-                                                                        <xhtml:a href="#{{@id}}">
-                                                                            <xforms:output value="@label" class="fr-error-label"/>
-                                                                        </xhtml:a>
+                                                                        <xforms:trigger appearance="minimal">
+                                                                            <xforms:label>
+                                                                                <xforms:output value="@label" class="fr-error-label"/>
+                                                                            </xforms:label>
+                                                                            <xforms:sefocus ev:event="DOMActivate" control="{@id}"/>
+                                                                        </xforms:trigger>
+                                                                        <!--<xhtml:a href="#{{@id}}">-->
+                                                                            <!--<xforms:output value="@label" class="fr-error-label"/>-->
+                                                                        <!--</xhtml:a>-->
                                                                         <xforms:group ref=".[string-length(@indexes) > 0]" class="fr-error-row">
                                                                             <xforms:output value="concat(' (row ', @indexes, ')')"/>
                                                                         </xforms:group>

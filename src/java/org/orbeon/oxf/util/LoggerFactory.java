@@ -33,7 +33,14 @@ public class LoggerFactory {
     	//                loaded from the Axis jar.  
     	//                Since this is't a behaviour we want we hack around it by
     	//                specifying a file that doesn't exist.
-    	System.setProperty( "log4j.configuration", "-there-aint-no-such-file-" );
+        // 2008-05-05 a : It is clear if this solves a problem with an older version of
+        //                Axis we were shipping with Orbeon Forms back in 2004, or a more
+        //                complex interaction with a particular application server.
+        //                We don't think this is relevant anymore and are commenting this out.
+        //                Also see this thread on ops-users:
+        //                http://www.nabble.com/Problem-with-log-in-orbeon-with-multiple-webapp-tt16932990.html
+
+        // System.setProperty( "log4j.configuration", "-there-aint-no-such-file-" );
     }
 
     private static final Logger logger = LoggerFactory.createLogger(LoggerFactory.class);

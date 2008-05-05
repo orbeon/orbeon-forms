@@ -12,6 +12,14 @@
 .fb-xforms-disabled { display: none }
 .fb-hide-alert .xforms-alert { display: none }
 
+/* This is like the form runner's help image */
+a.fb-edit-help-trigger img {
+    vertical-align: -0.2em;
+    display: inline;
+    margin: 0 .5em 0 0;
+    padding: 0;
+}
+
 /*.section-container { border-top: 1px solid #666699; margin-top: .5em }*/
 
 /* Language choice */
@@ -179,7 +187,7 @@
 .fb-control-label .xforms-label { display: none }
 .fb-control-label .fr-inplace-content {
     font-weight: bold;
-    display: block;
+    display: inline;
     margin-bottom: .2em;
 }
 
@@ -187,12 +195,8 @@
 .fb-control-label .fr-inplace-view .fr-inplace-buttons { display: none }
 .fb-control-control .xforms-label { display: none }
 .fb-control-control .xforms-alert { display: none }
-.fb-control-help {
-    display: -moz-inline-box;
-    display: inline-block;
-    margin-left: .2em;
-    vertical-align: middle;
-}
+
+a.xforms-help-image .fb-control-help { vertical-align: baseline; }/*  */
 
 .fb-control-hint .fr-inplace-content {
     font-size: smaller;
@@ -249,6 +253,7 @@
 .fb-grid-td .fb-grid-content { float: left; width: 65em; *width: 63.5em }
 
 .fb-control-control { *padding-right: 6px }/* To help IE move back controls within .fb-grid-content */
+.fb-control-control { margin-top: .3em }
 #fb-details-section .fb-grid-td .xforms-input input { width: 100%; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box }
 #fb-details-section .fb-grid-td .xforms-upload input { width: 100%; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box }
 #fb-details-section .fb-grid-td .fr-inplace-edit .xforms-input input { width: 100% }

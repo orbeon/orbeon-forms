@@ -403,8 +403,8 @@
     <!-- Submissions -->
     <xhtml:div class="fb-toolbox">
         <xforms:group class="fb-hide-alert">
-            <xforms:label>Submissions</xforms:label>
-            <!-- Repeat over existing submissions -->
+            <xforms:label>Services</xforms:label>
+            <!-- Repeat over existing services -->
             <xhtml:ul>
                 <xforms:repeat nodeset="$model/xforms:submission[ends-with(@id, '-submission')]">
                     <xhtml:li>
@@ -425,7 +425,7 @@
                                 <!-- Ask confirmation -->
                                 <xxforms:show dialog="fb-confirmation-dialog">
                                     <xxforms:context name="fr:message"
-                                                     select="concat('Are you sure you want to delete submission ''',
+                                                     select="concat('Are you sure you want to delete service ''',
                                                                  $submission-name,
                                                                  '''?')"/>
                                     <xxforms:context name="fr:confirmation-target" select="'fb-submission-remove'"/>
@@ -444,7 +444,7 @@
             <xforms:group class="fb-language-triggers">
                 <xforms:trigger appearance="minimal">
                     <xforms:label>
-                        <xhtml:img src="/apps/fr/style/images/silk/add.png" alt="Add Submission" title="Add Submission"/>
+                        <xhtml:img src="/apps/fr/style/images/silk/add.png" alt="Add Service" title="Add Service"/>
                         <xhtml:span>Add</xhtml:span>
                     </xforms:label>
                     <xxforms:show ev:event="DOMActivate" dialog="fb-submission-dialog"/>

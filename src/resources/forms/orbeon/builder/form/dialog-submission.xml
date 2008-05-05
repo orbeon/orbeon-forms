@@ -24,14 +24,14 @@
 
       id="fb-submission-dialog" level="modal" close="true" draggable="true" class="fr-dialog" model="fb-submission-model">
 
-    <xforms:label>Submission Editor</xforms:label>
+    <xforms:label>Service Editor</xforms:label>
 
     <xxforms:variable name="instance" select="instance('fb-submission-editor-instance')"/>
     <xhtml:div class="fr-grid">
         <xhtml:div class="fr-grid-content">
             <xforms:group ref="$instance">
                 <xforms:input ref="id" id="fb-submission-id-input" incremental="true">
-                    <xforms:label>Submission Id</xforms:label>
+                    <xforms:label>Service Id</xforms:label>
                     <xforms:hint>Choose a unique id for this submission</xforms:hint>
                 </xforms:input>
 

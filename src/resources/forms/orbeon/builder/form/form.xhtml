@@ -643,7 +643,7 @@
                                                                                 <xforms:group ref=".[$control]" class="fb-grid-control-icons">
                                                                                     <!-- Edit details for any control -->
                                                                                     <xforms:trigger appearance="minimal" id="fb-edit-details-trigger">
-                                                                                        <xforms:label><xhtml:img class="fb-control-help" alt="Details" title="" src="/apps/fr/style/images/silk/cog.png"/></xforms:label>
+                                                                                        <xforms:label><xhtml:img alt="Details" title="" src="/apps/fr/style/images/silk/cog.png"/></xforms:label>
                                                                                         <xforms:action ev:event="DOMActivate" context="instance('fb-details-editor-instance')">
                                                                                             <xxforms:show dialog="fb-edit-details-dialog" neighbor="fb-edit-details-trigger">
                                                                                                 <xxforms:context name="control" select="$control"/>
@@ -654,13 +654,13 @@
                                                                                     </xforms:trigger>
 
                                                                                     <!-- Edit help for any control -->
-                                                                                    <xforms:trigger appearance="minimal" id="fb-edit-help-trigger">
-                                                                                        <xforms:label><xhtml:img class="fb-control-help" alt="Help" title="" src="/ops/images/xforms/help.png"/></xforms:label>
-                                                                                        <xforms:action ev:event="DOMActivate">
-                                                                                            <xforms:setvalue ref="$variables/result-node" value="$resource-holder/help/saxon:path()"/>
-                                                                                            <xxforms:show dialog="fb-edit-help-dialog" neighbor="fb-edit-help-trigger"/>
-                                                                                        </xforms:action>
-                                                                                    </xforms:trigger>
+                                                                                    <!--<xforms:trigger appearance="minimal" id="fb-edit-help-trigger">-->
+                                                                                        <!--<xforms:label><xhtml:img class="fb-control-help" alt="Help" title="" src="/ops/images/xforms/help.png"/></xforms:label>-->
+                                                                                        <!--<xforms:action ev:event="DOMActivate">-->
+                                                                                            <!--<xforms:setvalue ref="$variables/result-node" value="$resource-holder/help/saxon:path()"/>-->
+                                                                                            <!--<xxforms:show dialog="fb-edit-help-dialog" neighbor="fb-edit-help-trigger"/>-->
+                                                                                        <!--</xforms:action>-->
+                                                                                    <!--</xforms:trigger>-->
 
                                                                                     <!-- Edit validation for any control -->
                                                                                     <xforms:trigger appearance="minimal" id="fb-edit-alert-trigger">
@@ -724,6 +724,15 @@
                                                                                 <xhtml:div class="fb-grid-content">
 
                                                                                     <xforms:group ref=".[$control]">
+
+                                                                                        <!-- Edit help for any control -->
+                                                                                        <xforms:trigger appearance="minimal" id="fb-edit-help-trigger" class="fb-edit-help-trigger">
+                                                                                            <xforms:label><xhtml:img alt="Help" title="" src="/ops/images/xforms/help.png"/></xforms:label>
+                                                                                            <xforms:action ev:event="DOMActivate">
+                                                                                                <xforms:setvalue ref="$variables/result-node" value="$resource-holder/help/saxon:path()"/>
+                                                                                                <xxforms:show dialog="fb-edit-help-dialog" neighbor="fb-edit-help-trigger"/>
+                                                                                            </xforms:action>
+                                                                                        </xforms:trigger>
 
                                                                                         <!-- Set label for any control -->
                                                                                         <xhtml:span>

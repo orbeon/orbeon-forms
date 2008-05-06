@@ -78,7 +78,7 @@
                             <td>The chart type. The following value are supported
                                 vertical-bar; horizontal-bar; vertical-bar-3d; horizontal-bar-3d;
                                 stacked-vertical-bar; stacked-horizontal-bar; stacked-vertical-bar-3d;
-                                stacked-horizontal-bar-3d; line; area; pie; pie-3d
+                                stacked-horizontal-bar-3d; line; area; pie; pie-3d; xy-line; time-series.
                             </td>
                         </tr>
                         <tr>
@@ -161,6 +161,12 @@
                                 <code>legend</code>
                             </th>
                             <td>Controls the legend box.</td>
+                        </tr>
+                        <tr>
+                            <th>
+                                <code>max-number-of-labels</code>
+                            </th>
+                            <td>The maximum number of labels you want to have on the X axis.</td>
                         </tr>
                         <tr>
                             <th>

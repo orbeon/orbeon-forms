@@ -269,6 +269,14 @@
                             Forms</a> you are running.
                         </p>
                     </li>
+                    <li>
+                        <p>
+                            <b>Chart Processor enhancements.</b> The chart processor now support two new types of
+                            chart: XY charts and time series. For charts that show a lot of data points, you can also
+                            limit the number of labels shown in the categories axis with the new
+                            <code>max-number-of-labels</code> option.
+                        </p>
+                    </li>
                 </ul>
             </section>
             <a name="changes-37-full"/>

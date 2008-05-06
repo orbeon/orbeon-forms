@@ -1,0 +1,197 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<form>
+    <action/>
+    <data>
+        <entries>
+            <entry>
+                <category>1</category>
+                <value1>10</value1>
+                <value2>11</value2>
+            </entry>
+            <entry>
+                <category>2</category>
+                <value1>9</value1>
+                <value2>8</value2>
+            </entry>
+            <entry>
+                <category>3</category>
+                <value1>8</value1>
+                <value2>6</value2>
+            </entry>
+            <entry>
+                <category>4</category>
+                <value1>7</value1>
+                <value2>10</value2>
+            </entry>
+            <entry>
+                <category>5</category>
+                <value1>6</value1>
+                <value2>4</value2>
+            </entry>
+            <entry>
+                <category>6</category>
+                <value1>20</value1>
+                <value2>25</value2>
+            </entry>
+            <entry>
+                <category>7</category>
+                <value1>17</value1>
+                <value2>18</value2>
+            </entry>
+            <entry>
+                <category>8</category>
+                <value1>22</value1>
+                <value2>28</value2>
+            </entry>
+            <entry>
+                <category>9</category>
+                <value1>27</value1>
+                <value2>13</value2>
+            </entry>
+            <entry>
+                <category>10</category>
+                <value1>7</value1>
+                <value2>19</value2>
+            </entry>
+            <entry>
+                <category>11</category>
+                <value1>22</value1>
+                <value2>14</value2>
+            </entry>
+            <entry>
+                <category>12</category>
+                <value1>33</value1>
+                <value2>18</value2>
+            </entry>
+            <entry>
+                <category>13</category>
+                <value1>38</value1>
+                <value2>16</value2>
+            </entry>
+            <entry>
+                <category>14</category>
+                <value1>37</value1>
+                <value2>14</value2>
+            </entry>
+            <entry>
+                <category>15</category>
+                <value1>22</value1>
+                <value2>22</value2>
+            </entry>
+            <entry>
+                <category>16</category>
+                <value1>12</value1>
+                <value2>19</value2>
+            </entry>
+            <entry>
+                <category>17</category>
+                <value1>9</value1>
+                <value2>28</value2>
+            </entry>
+            <entry>
+                <category>18</category>
+                <value1>8</value1>
+                <value2>19</value2>
+            </entry>
+            <entry>
+                <category>19</category>
+                <value1>17</value1>
+                <value2>10</value2>
+            </entry>
+            <entry>
+                <category>20</category>
+                <value1>6</value1>
+                <value2>14</value2>
+            </entry>
+            <entry>
+                <category>21</category>
+                <value1>10</value1>
+                <value2>5</value2>
+            </entry>
+            <entry>
+                <category>22</category>
+                <value1>9</value1>
+                <value2>18</value2>
+            </entry>
+            <entry>
+                <category>23</category>
+                <value1>18</value1>
+                <value2>6</value2>
+            </entry>
+            <entry>
+                <category>24</category>
+                <value1>17</value1>
+                <value2>10</value2>
+            </entry>
+            <entry>
+                <category>25</category>
+                <value1>6</value1>
+                <value2>14</value2>
+            </entry>
+            <entry>
+                <category>26</category>
+                <value1>2</value1>
+                <value2>11</value2>
+            </entry>
+            <entry>
+                <category>27</category>
+                <value1>9</value1>
+                <value2>18</value2>
+            </entry>
+            <entry>
+                <category>28</category>
+                <value1>18</value1>
+                <value2>6</value2>
+            </entry>
+            <entry>
+                <category>29</category>
+                <value1>17</value1>
+                <value2>10</value2>
+            </entry>
+            <entry>
+                <category>30</category>
+                <value1>16</value1>
+                <value2>14</value2>
+            </entry>
+        </entries>
+    </data>
+    <chart>
+        <map>Temperature</map>
+        <background-color>#EFF6EF</background-color>
+        <title-color>#281154</title-color>
+        <type>xy-line</type>
+        <title>Temperature comparison</title>
+        <category-title>Day Number</category-title>
+        <category-margin>0.2</category-margin>
+        <serie-title>Centigrade</serie-title>                      
+        <bar-margin>0.1</bar-margin>
+        <category-label-angle>0</category-label-angle>
+        <max-number-of-labels>5</max-number-of-labels>
+        <value title="October"
+            categories="/form/data/entries/entry/category"
+            series="/form/data/entries/entry/value1"
+            color="#ff0000"/>
+
+        <value title="November"
+            categories="/form/data/entries/entry/category"
+            series="/form/data/entries/entry/value2"
+            color="#00ff00"/>
+
+        <legend visible="true" position="south"/>
+
+        <x-size>500</x-size>
+        <y-size>375</y-size>
+    </chart>
+</form>

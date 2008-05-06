@@ -32,9 +32,11 @@
                         <value>stacked-vertical-bar-3d</value>
                         <value>stacked-horizontal-bar-3d</value>
                         <value>line</value>
+                        <value>xy-line</value>
                         <value>area</value>
                         <value>pie</value>
                         <value>pie-3d</value>
+                        <value>time-series</value>
                     </choice>
                 </element>
 
@@ -113,8 +115,14 @@
                 </optional>
 
                 <optional>
-                    <element name="tick-unit">
-                        <data type="double"/>
+                    <element name="date-format">
+                        <data type="string"/>
+                    </element>
+                </optional>
+
+                <optional>
+                    <element name="max-number-of-labels">
+                        <data type="int"/>
                     </element>
                 </optional>
 

@@ -12,10 +12,10 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <config xmlns="http://www.orbeon.com/oxf/controller"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
         xmlns:xu="http://www.xmldb.org/xupdate">
 
-    <page path-info="*" default-submission="default-submission.xml" model="model.xpl" view="view.xsl"/>
-
+    <page path-info="/chart/" default-submission="default-submission-default.xml" model="model.xpl" view="view.xsl"/>
     <epilogue url="oxf:/config/epilogue.xpl"/>
 
 </config>

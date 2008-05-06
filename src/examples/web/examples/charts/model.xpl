@@ -13,6 +13,7 @@
 -->
 <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
     xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
     <p:param name="instance" type="input"/>

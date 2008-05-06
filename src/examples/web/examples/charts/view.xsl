@@ -14,6 +14,7 @@
  <html xmlns:f="http://orbeon.org/oxf/xml/formatting"
        xmlns:xhtml="http://www.w3.org/1999/xhtml"
        xmlns:xforms="http://www.w3.org/2002/xforms"
+       xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
        xmlns:ev="http://www.w3.org/2001/xml-events"
        xmlns:xs="http://www.w3.org/2001/XMLSchema"
        xmlns:widget="http://orbeon.org/oxf/xml/widget"
@@ -24,26 +25,39 @@
          <title>Charts</title>
          <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms">
              <!-- Display error message in case of submission error -->
-            <xforms:setvalue ev:event="xforms-submit-error" ref="instance('status-instance')/message">Submission Error</xforms:setvalue>
-            <!-- Clear error message in case of submission success -->
-            <xforms:setvalue ev:event="xforms-submit-done" ref="instance('status-instance')/message"/>
+             <xforms:setvalue ev:event="xforms-submit-error" ref="instance('status-instance')/message">Submission Error</xforms:setvalue>
+             <!-- Clear error message in case of submission success -->
+             <xforms:setvalue ev:event="xforms-submit-done" ref="instance('status-instance')/message"/>
 
-            <xforms:instance id="main">
-                <xsl:copy-of select="doc('input:instance')"/>
-            </xforms:instance>
+             <xforms:instance id="main">
+                 <xsl:copy-of select="doc('input:instance')"/>
+             </xforms:instance>
+             <xforms:bind nodeset="instance('main')/chart/category-label-angle" type="xs:nonNegativeInteger"/>
              <xforms:instance id="status-instance">
-                <status xmlns="">
-                    <message/>
-                </status>
-            </xforms:instance>
-            <xforms:bind nodeset="instance('main')/chart/category-label-angle" type="xs:nonNegativeInteger"/>
-            <xforms:submission id="main-submission" ref="/form" method="post" action="/direct/charts" replace="all"/>
+                 <status xmlns="">
+                     <message/>
+                 </status>
+             </xforms:instance>
+             <xforms:instance id="ui">
+                 <ui xmlns="">
+                     <data-set>default</data-set>
+                     <default-trigger/>
+                     <xy-trigger/>
+                     <time-series-trigger/>
+                 </ui>
+             </xforms:instance>
+             <xforms:bind nodeset="instance('ui')">
+                 <xforms:bind nodeset="default-trigger" readonly="../data-set = 'default'"/>
+                 <xforms:bind nodeset="xy-trigger" readonly="../data-set = 'xy'"/>
+                 <xforms:bind nodeset="time-series-trigger" readonly="../data-set = 'time-series'"/>
+             </xforms:bind>
+             <xforms:submission id="main-submission" ref="/form" method="post" action="/chart/" replace="all"/>
         </xforms:model>
      </head>
      <body>
          <p style="color: red">
             <xforms:output ref="instance('status-instance')/message"/>
-        </p>
+         </p>
          <xforms:group ref="/form">
              <widget:tabs>
                 <widget:tab id="configuration">
@@ -52,6 +66,29 @@
                         <tr>
                             <th>Categories and Values</th>
                             <td>
+                                <p>
+                                    <xforms:trigger ref="instance('ui')/default-trigger">
+                                        <xforms:label>Load Default Data</xforms:label>
+                                        <xforms:action ev:event="DOMActivate">
+                                            <xforms:insert nodeset="instance('main')" origin="doc('oxf:/apps/chart/default-submission-default.xml')"/>
+                                            <xforms:setvalue ref="instance('ui')/data-set">default</xforms:setvalue>
+                                        </xforms:action>
+                                    </xforms:trigger>
+                                    <xforms:trigger ref="instance('ui')/xy-trigger">
+                                        <xforms:label>Load XY Series</xforms:label>
+                                        <xforms:action ev:event="DOMActivate">
+                                            <xforms:insert nodeset="instance('main')" origin="doc('oxf:/apps/chart/default-submission-xy.xml')"/>
+                                            <xforms:setvalue ref="instance('ui')/data-set">xy</xforms:setvalue>
+                                        </xforms:action>
+                                    </xforms:trigger>
+                                    <xforms:trigger ref="instance('ui')/time-series-trigger">
+                                        <xforms:label>Load Time Series</xforms:label>
+                                        <xforms:action ev:event="DOMActivate">
+                                            <xforms:insert nodeset="instance('main')" origin="doc('oxf:/apps/chart/default-submission-time-series.xml')"/>
+                                            <xforms:setvalue ref="instance('ui')/data-set">time-series</xforms:setvalue>
+                                        </xforms:action>
+                                    </xforms:trigger>
+                                </p>
                                 <table class="gridtable">
                                     <tr>
                                         <th style="white-space: nowrap">Label</th>
@@ -153,6 +190,10 @@
                                          <xforms:value>line</xforms:value>
                                      </xforms:item>
                                      <xforms:item>
+                                         <xforms:label>XY Lines</xforms:label>
+                                         <xforms:value>xy-line</xforms:value>
+                                     </xforms:item>                                     
+                                     <xforms:item>
                                          <xforms:label>Area</xforms:label>
                                          <xforms:value>area</xforms:value>
                                      </xforms:item>
@@ -163,6 +204,10 @@
                                      <xforms:item>
                                          <xforms:label>Pie 3D</xforms:label>
                                          <xforms:value>pie-3d</xforms:value>
+                                     </xforms:item>
+                                     <xforms:item>
+                                         <xforms:label>Time Series</xforms:label>
+                                         <xforms:value>time-series</xforms:value>
                                      </xforms:item>
                                  </xforms:select1>
                              </td>
@@ -188,19 +233,25 @@
                                      <xforms:label>Bar: </xforms:label>
                                  </xforms:input>
                              </td>
-                         </tr>
+                         </tr>                                          
                          <tr>
-                             <th>Tick Unit</th>
+                             <th>Maximum Number of Labels</th>
                              <td colspan="5">
-                                 <xforms:input ref="chart/tick-unit"/>
+                                 <xforms:input ref="chart/max-number-of-labels"/>
                              </td>
-                         </tr>
+                         </tr>                         
                          <tr>
                              <th>Category Label Angle</th>
                              <td colspan="5">
                                  <xforms:input ref="chart/category-label-angle"/>  (Positive Integer)
                              </td>
                          </tr>
+                         <tr>
+                             <th>Date Format</th>
+                             <td colspan="5">
+                                 <xforms:input ref="chart/date-format"/>
+                             </td>
+                         </tr>  
                          <tr>
                              <th>Legend</th>
                              <td colspan="5">

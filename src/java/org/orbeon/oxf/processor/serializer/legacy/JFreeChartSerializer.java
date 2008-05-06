@@ -17,13 +17,22 @@ import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.Node;
 import org.jfree.chart.*;
+
 import org.jfree.chart.axis.*;
 import org.jfree.chart.labels.StandardCategoryItemLabelGenerator;
-import org.jfree.chart.labels.StandardPieItemLabelGenerator;
+import org.jfree.chart.labels.StandardPieSectionLabelGenerator;
 import org.jfree.chart.plot.*;
-import org.jfree.chart.renderer.*;
+import org.jfree.chart.renderer.AbstractRenderer;
+import org.jfree.chart.renderer.category.*;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.chart.title.TextTitle;
-import org.jfree.data.*;
+import org.jfree.chart.title.LegendTitle;
+import org.jfree.data.Range;
+import org.jfree.data.xy.*;
+import org.jfree.data.time.*;
+import org.jfree.data.general.*;
+import org.jfree.data.category.*;
+
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorInput;
@@ -39,6 +48,11 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.text.SimpleDateFormat;
+import org.jfree.chart.block.BlockFrame;
+import org.jfree.ui.RectangleEdge;
+import org.jfree.ui.RectangleInsets;
+import org.jfree.chart.labels.StandardXYItemLabelGenerator;
 
 public class JFreeChartSerializer extends HttpBinarySerializer {
 
@@ -72,11 +86,13 @@ public class JFreeChartSerializer extends HttpBinarySerializer {
             if (chartConfig.getType() == ChartConfig.PIE_TYPE ||
                     chartConfig.getType() == ChartConfig.PIE3D_TYPE)
                 ds = createPieDataset(chartConfig, data);
+            else if(chartConfig.getType() == ChartConfig.XY_LINE_TYPE)
+                ds = createXYDataset(chartConfig, data);
+            else if(chartConfig.getType() == ChartConfig.TIME_SERIES_TYPE)
+                ds = createTimeSeriesDataset(chartConfig, data);
             else
                 ds = createDataset(chartConfig, data);
-
             JFreeChart chart = drawChart(chartConfig, ds);
-
             ChartRenderingInfo info = new ChartRenderingInfo();
             ChartUtilities.writeChartAsPNG(outputStream, chart, chartConfig.getxSize(), chartConfig.getySize(), info, true, 5);
         } catch (Exception e) {
@@ -146,6 +162,54 @@ public class JFreeChartSerializer extends HttpBinarySerializer {
         return ds;
     }
 
+    protected XYSeriesCollection createXYDataset(ChartConfig chartConfig, Document data) {
+        XYSeriesCollection ds = new XYSeriesCollection();
+        for (Iterator i = chartConfig.getValueIterator(); i.hasNext();) {
+            Value value = (Value) i.next();
+            String title = value.getTitle();
+            Iterator x = XPathUtils.selectIterator(data, value.getCategories());
+            Iterator y = XPathUtils.selectIterator(data, value.getSeries());
+
+            XYSeries xyseries = new XYSeries(title);
+            while (x.hasNext() && y.hasNext()) {
+                Node s = (Node) y.next();
+                Node c = (Node) x.next();
+                Double abcissa = new Double(c.getStringValue());
+                Double ordinate = new Double(s.getStringValue());
+                xyseries.add(abcissa, ordinate);
+            }
+            ds.addSeries(xyseries);
+        }
+        return ds;
+    }
+
+    protected TimeSeriesCollection createTimeSeriesDataset(ChartConfig chartConfig, Document data) {
+        TimeSeriesCollection ds = new TimeSeriesCollection();
+        for (Iterator i = chartConfig.getValueIterator(); i.hasNext();) {
+            Value value = (Value) i.next();
+            String title = value.getTitle();
+            Iterator x = XPathUtils.selectIterator(data, value.getCategories());
+            Iterator y = XPathUtils.selectIterator(data, value.getSeries());
+
+            TimeSeries timeSeries = new TimeSeries(title, FixedMillisecond.class );
+            while (x.hasNext() && y.hasNext()) {
+                Node s = (Node) y.next();
+                Node c = (Node) x.next();
+                SimpleDateFormat sdf = new SimpleDateFormat(chartConfig.getDateFormat());
+                FixedMillisecond fm;
+                try {
+                    fm = new FixedMillisecond(sdf.parse(c.getStringValue()).getTime());
+                }
+                catch(java.text.ParseException pe) {
+                    throw new OXFException("Date Format " + chartConfig.getDateFormat() + " does not match with the date data", pe);
+                }
+                Double ordinate = new Double(s.getStringValue());
+                timeSeries.add(fm,ordinate);
+            }
+            ds.addSeries(timeSeries);
+        }
+        return ds;
+    }
     protected ChartConfig createChartConfig(org.orbeon.oxf.pipeline.api.PipelineContext context, org.orbeon.oxf.processor.ProcessorInput input) {
         ChartConfig chart = new ChartConfig();
         Document doc = readInputAsDOM4J(context, input);
@@ -176,6 +240,10 @@ public class JFreeChartSerializer extends HttpBinarySerializer {
             chart.setType(ChartConfig.PIE_TYPE);
         else if (type.equals("pie-3d"))
             chart.setType(ChartConfig.PIE3D_TYPE);
+        else if (type.equals("xy-line"))
+            chart.setType(ChartConfig.XY_LINE_TYPE);
+        else if (type.equals("time-series"))
+            chart.setType(ChartConfig.TIME_SERIES_TYPE);
         else
             throw new OXFException("Chart type " + type + " is not supported");
 
@@ -194,46 +262,51 @@ public class JFreeChartSerializer extends HttpBinarySerializer {
 
         String bgColor = XPathUtils.selectStringValueNormalize(doc, "/chart/background-color");
         String tColor = XPathUtils.selectStringValueNormalize(doc, "/chart/title-color");
-        String tickUnit = XPathUtils.selectStringValueNormalize(doc, "/chart/tick-unit");
+        Integer maxNumOfTickUnit = XPathUtils.selectIntegerValue(doc, "/chart/max-number-of-labels");
+        String sDateFormat = XPathUtils.selectStringValueNormalize(doc, "/chart/date-format");
         String categoryLabelAngle = XPathUtils.selectStringValueNormalize(doc, "/chart/category-label-angle");
-
 
         chart.setBackgroundColor(bgColor == null ? DEFAULT_BACKGROUND_COLOR : getRGBColor(bgColor));
         chart.setTitleColor(tColor == null ? DEFAULT_TITLE_COLOR : getRGBColor(tColor));
-
-        if (tickUnit != null)
-            chart.setValueTickUnit(Double.parseDouble(tickUnit));
+        if(maxNumOfTickUnit != null)
+            chart.setMaxNumOfLabels(maxNumOfTickUnit);
+        if(sDateFormat != null)
+            chart.setDateFormat(sDateFormat);
 
         if (categoryLabelAngle != null) {
             double angle = Double.parseDouble(categoryLabelAngle);
             chart.setCategoryLabelPosition(CategoryLabelPositions.createUpRotationLabelPositions(angle * (Math.PI / 180)));
         }
 
-
         String margin = XPathUtils.selectStringValueNormalize(doc, "/chart/bar-margin");
         if (margin != null)
             chart.setBarMargin(Double.parseDouble(margin));
 
         // legend
-        CustomLegend legend = new CustomLegend();
+        CustomLegend legend = new CustomLegend(null);
         Boolean legendVis = XPathUtils.selectBooleanValue(doc, "/chart/legend/@visible = 'true'");
         legend.setVisible(legendVis.booleanValue());
+        if(legend.isVisible()) {
+            String pos = XPathUtils.selectStringValueNormalize(doc, "/chart/legend/@position");
 
-        String pos = XPathUtils.selectStringValueNormalize(doc, "/chart/legend/@position");
-        if ("north".equals(pos))
-            legend.setAnchor(Legend.NORTH);
-        else if ("east".equals(pos))
-            legend.setAnchor(Legend.EAST);
-        else if ("south".equals(pos))
-            legend.setAnchor(Legend.SOUTH);
-        else if ("west".equals(pos))
-            legend.setAnchor(Legend.WEST);
-
-        for (Iterator i = XPathUtils.selectIterator(doc, "/chart/legend/item"); i.hasNext();) {
-            Element el = (Element) i.next();
-            Color color = getRGBColor(el.attributeValue("color"));
-            String label = el.attributeValue("label");
-            legend.addItem(label, color);
+            if ("north".equals(pos)) {
+                legend.setPosition(RectangleEdge.TOP);
+            }
+            else if ("east".equals(pos)) {
+                legend.setPosition(RectangleEdge.RIGHT);
+            }
+            else if ("south".equals(pos)) {
+                legend.setPosition(RectangleEdge.BOTTOM);
+            }
+            else if ("west".equals(pos)) {
+                legend.setPosition(RectangleEdge.LEFT);
+            }
+            for (Iterator i = XPathUtils.selectIterator(doc, "/chart/legend/item"); i.hasNext();) {
+                Element el = (Element) i.next();
+                Color color = getRGBColor(el.attributeValue("color"));
+                String label = el.attributeValue("label");
+                legend.addItem(label, color);
+            }
         }
         chart.setLegendConfig(legend);
 
@@ -259,12 +332,20 @@ public class JFreeChartSerializer extends HttpBinarySerializer {
 
     protected JFreeChart drawChart(ChartConfig chartConfig, final Dataset ds) {
         JFreeChart chart = null;
-        CategoryAxis categoryAxis = new CategoryAxis(chartConfig.getCategoryTitle());
-        categoryAxis.setCategoryLabelPositions(chartConfig.getCategoryLabelPosition());
-        ValueAxis valueAxis = new NumberAxis(chartConfig.getSerieTitle());
-
-
-        CategoryItemRenderer renderer = null;
+        Axis categoryAxis = null;
+        if(ds instanceof XYSeriesCollection) {
+            categoryAxis = new RestrictedNumberAxis(chartConfig.getCategoryTitle());
+        }
+        else if(ds instanceof TimeSeriesCollection) {
+            categoryAxis = new DateAxis(chartConfig.getCategoryTitle());
+            ((DateAxis)categoryAxis).setDateFormatOverride(new SimpleDateFormat(chartConfig.getDateFormat()));
+        }
+        else {
+            categoryAxis = new CategoryAxis(chartConfig.getCategoryTitle());
+            ((CategoryAxis)categoryAxis).setCategoryLabelPositions(chartConfig.getCategoryLabelPosition());
+        }
+        Axis valueAxis = new RestrictedNumberAxis(chartConfig.getSerieTitle());
+        AbstractRenderer renderer = null;
         Plot plot = null;
 
         switch (chartConfig.getType()) {
@@ -272,7 +353,7 @@ public class JFreeChartSerializer extends HttpBinarySerializer {
             case ChartConfig.HORIZONTAL_BAR_TYPE:
                 renderer = (ds instanceof ItemPaintCategoryDataset) ? new BarRenderer() {
                     public Paint getItemPaint(int row, int column) {
-                      Paint p = ((ItemPaintCategoryDataset) ds).getItemPaint(row, column);
+                        Paint p = ((ItemPaintCategoryDataset) ds).getItemPaint(row, column);
                         if (p != null)
                             return p;
                         else
@@ -280,7 +361,7 @@ public class JFreeChartSerializer extends HttpBinarySerializer {
                     }
                 } : new BarRenderer();
 
-                plot = new CategoryPlot((CategoryDataset) ds, categoryAxis, valueAxis, renderer);
+                plot = new CategoryPlot((CategoryDataset) ds, (CategoryAxis)categoryAxis, (ValueAxis)valueAxis, (CategoryItemRenderer)renderer);
 
                 if(chartConfig.getType() == ChartConfig.VERTICAL_BAR_TYPE)
                     ((CategoryPlot) plot).setOrientation(PlotOrientation.VERTICAL);
@@ -299,16 +380,15 @@ public class JFreeChartSerializer extends HttpBinarySerializer {
                             return getSeriesPaint(row);
                     }
                 } : new StackedBarRenderer();
-                plot = new CategoryPlot((CategoryDataset) ds, categoryAxis, valueAxis, renderer);
+                plot = new CategoryPlot((CategoryDataset) ds, (CategoryAxis)categoryAxis, (ValueAxis)valueAxis,(CategoryItemRenderer)renderer);
 
                 if(chartConfig.getType() == ChartConfig.STACKED_VERTICAL_BAR_TYPE)
                     ((CategoryPlot) plot).setOrientation(PlotOrientation.VERTICAL);
                 else
                     ((CategoryPlot) plot).setOrientation(PlotOrientation.HORIZONTAL);
-
                 break;
             case ChartConfig.LINE_TYPE:
-                renderer = (ds instanceof ItemPaintCategoryDataset) ? new LineAndShapeRenderer(LineAndShapeRenderer.SHAPES_AND_LINES) {
+                renderer = (ds instanceof ItemPaintCategoryDataset) ? new LineAndShapeRenderer(true,false) {
                     public Paint getItemPaint(int row, int column) {
                         Paint p = ((ItemPaintCategoryDataset) ds).getItemPaint(row, column);
                         if (p != null)
@@ -316,8 +396,8 @@ public class JFreeChartSerializer extends HttpBinarySerializer {
                         else
                             return getSeriesPaint(row);
                     }
-                } : new LineAndShapeRenderer(LineAndShapeRenderer.SHAPES_AND_LINES);
-                plot = new CategoryPlot((CategoryDataset) ds, categoryAxis, valueAxis, renderer);
+                } : (new LineAndShapeRenderer(true,false));
+                plot = new CategoryPlot((CategoryDataset) ds, (CategoryAxis)categoryAxis, (ValueAxis)valueAxis, (CategoryItemRenderer)renderer);
                 ((CategoryPlot) plot).setOrientation(PlotOrientation.VERTICAL);
                 break;
             case ChartConfig.AREA_TYPE:
@@ -330,7 +410,7 @@ public class JFreeChartSerializer extends HttpBinarySerializer {
                             return getSeriesPaint(row);
                     }
                 } : new AreaRenderer();
-                plot = new CategoryPlot((CategoryDataset) ds, categoryAxis, valueAxis, renderer);
+                plot = new CategoryPlot((CategoryDataset) ds, (CategoryAxis)categoryAxis, (ValueAxis)valueAxis, (CategoryItemRenderer)renderer);
                 ((CategoryPlot) plot).setOrientation(PlotOrientation.VERTICAL);
                 break;
             case ChartConfig.VERTICAL_BAR3D_TYPE:
@@ -346,7 +426,7 @@ public class JFreeChartSerializer extends HttpBinarySerializer {
                             return getSeriesPaint(row);
                     }
                 } : new BarRenderer3D();
-                plot = new CategoryPlot((CategoryDataset) ds, categoryAxis, valueAxis, renderer);
+                plot = new CategoryPlot((CategoryDataset) ds, (CategoryAxis)categoryAxis, (ValueAxis)valueAxis, (CategoryItemRenderer)renderer);
 
                 if(chartConfig.getType() == ChartConfig.VERTICAL_BAR3D_TYPE)
                     ((CategoryPlot) plot).setOrientation(PlotOrientation.VERTICAL);
@@ -367,7 +447,7 @@ public class JFreeChartSerializer extends HttpBinarySerializer {
                             return getSeriesPaint(row);
                     }
                 } : new StackedBarRenderer3D();
-                plot = new CategoryPlot((CategoryDataset) ds, categoryAxis, valueAxis, renderer);
+                plot = new CategoryPlot((CategoryDataset) ds, (CategoryAxis)categoryAxis, (ValueAxis)valueAxis,(CategoryItemRenderer) renderer);
 
                 if(chartConfig.getType() == ChartConfig.STACKED_VERTICAL_BAR3D_TYPE)
                     ((CategoryPlot) plot).setOrientation(PlotOrientation.VERTICAL);
@@ -385,7 +465,7 @@ public class JFreeChartSerializer extends HttpBinarySerializer {
                 plot = chartConfig.getType() == ChartConfig.PIE_TYPE ? new PiePlot(pds) : new PiePlot3D(pds);
 
                 PiePlot pp = (PiePlot) plot;
-                pp.setLabelGenerator(new StandardPieItemLabelGenerator());
+                pp.setLabelGenerator(new StandardPieSectionLabelGenerator());
 
                 for (int i = 0; i < pds.getItemCount(); i++) {
                     Paint p = pds.getPaint(i);
@@ -399,6 +479,14 @@ public class JFreeChartSerializer extends HttpBinarySerializer {
                         pp.setSectionPaint(i, paint);
                 }
                 break;
+            case ChartConfig.XY_LINE_TYPE:
+                renderer =  new XYLineAndShapeRenderer(true,false);
+                plot = new XYPlot((XYDataset) ds, (ValueAxis)categoryAxis, (ValueAxis)valueAxis, (XYLineAndShapeRenderer) renderer);
+                break;
+            case ChartConfig.TIME_SERIES_TYPE:
+                renderer =  new XYLineAndShapeRenderer(true,false);
+                plot = new XYPlot((XYDataset) ds, (DateAxis)categoryAxis, (ValueAxis)valueAxis, (XYLineAndShapeRenderer) renderer);
+                break;
             default:
                 throw new OXFException("Chart Type not supported");
         }
@@ -407,21 +495,29 @@ public class JFreeChartSerializer extends HttpBinarySerializer {
             categoryAxis.setLabelPaint(chartConfig.getTitleColor());
             categoryAxis.setTickLabelPaint(chartConfig.getTitleColor());
             categoryAxis.setTickMarkPaint(chartConfig.getTitleColor());
-            if (chartConfig.getCategoryMargin() != 0)
-                categoryAxis.setCategoryMargin(chartConfig.getCategoryMargin());
+            if(categoryAxis instanceof RestrictedNumberAxis) {
+                ((RestrictedNumberAxis)categoryAxis).setMaxTicks(chartConfig.getMaxNumOfLabels());
+                ((RestrictedNumberAxis)categoryAxis).adjustTickUnits();
+            }
+            if (categoryAxis instanceof CategoryAxis && chartConfig.getCategoryMargin() != 0)
+                ((CategoryAxis)categoryAxis).setCategoryMargin(chartConfig.getCategoryMargin());
         }
 
         if (valueAxis != null) {
             valueAxis.setLabelPaint(chartConfig.getTitleColor());
             valueAxis.setTickLabelPaint(chartConfig.getTitleColor());
             valueAxis.setTickMarkPaint(chartConfig.getTitleColor());
-            if (valueAxis instanceof NumberAxis && chartConfig.getValueTickUnit() != 0)
-                ((NumberAxis) valueAxis).setTickUnit(new NumberTickUnit(chartConfig.getValueTickUnit()));
-
+            ((RestrictedNumberAxis)valueAxis).setMaxTicks(chartConfig.getMaxNumOfLabels());
+            ((RestrictedNumberAxis)valueAxis).adjustTickUnits();
         }
 
         if (renderer != null) {
-            renderer.setLabelGenerator(new StandardCategoryItemLabelGenerator());
+            if(renderer instanceof XYLineAndShapeRenderer) {
+                ((XYLineAndShapeRenderer) renderer).setBaseItemLabelGenerator(new StandardXYItemLabelGenerator());
+            }
+            else {
+                ((CategoryItemRenderer) renderer).setBaseItemLabelGenerator(new StandardCategoryItemLabelGenerator());
+            }
             if (renderer instanceof BarRenderer)
                 ((BarRenderer) renderer).setItemMargin(chartConfig.getBarMargin());
 
@@ -434,21 +530,17 @@ public class JFreeChartSerializer extends HttpBinarySerializer {
         }
 
         plot.setOutlinePaint(chartConfig.getTitleColor());
-
-        chart = new JFreeChart(plot);
-        chart.setBackgroundPaint(chartConfig.getBackgroundColor());
-        chart.setTitle(new TextTitle(chartConfig.getTitle(), TextTitle.DEFAULT_FONT, chartConfig.getTitleColor()));
-
         CustomLegend legend = chartConfig.getLegendConfig();
-        if (legend.isVisible())
-            if (legend.hasItems()) {
-                chart.setLegend(legend);
-            } else {
-                Legend l = Legend.createInstance(chart);
-                l.setAnchor(legend.getAnchor());
-                chart.setLegend(l);
-            }
-
+        chart = new JFreeChart(chartConfig.getTitle(), TextTitle.DEFAULT_FONT, plot, false);
+        if(legend.isVisible()) {
+            legend.setSources(new LegendItemSource[] {plot});
+            chart.addLegend(legend);
+        }
+        chart.setBackgroundPaint(chartConfig.getBackgroundColor());
+        TextTitle textTitle = new TextTitle(chartConfig.getTitle(),TextTitle.DEFAULT_FONT,chartConfig.getTitleColor(),
+                TextTitle.DEFAULT_POSITION, TextTitle.DEFAULT_HORIZONTAL_ALIGNMENT,TextTitle.DEFAULT_VERTICAL_ALIGNMENT,
+                TextTitle.DEFAULT_PADDING);
+        chart.setTitle(textTitle);
         return chart;
     }
 
@@ -471,6 +563,8 @@ public class JFreeChartSerializer extends HttpBinarySerializer {
 
         public static final int PIE_TYPE = 10;
         public static final int PIE3D_TYPE = 11;
+        public static final int XY_LINE_TYPE = 12;
+        public static final int TIME_SERIES_TYPE = 13;
 
 
         private int type;
@@ -482,7 +576,8 @@ public class JFreeChartSerializer extends HttpBinarySerializer {
         private Color titleColor;
         private Color backgroundColor;
         private double barMargin;
-        private double valueTickUnit = 0;
+        private int maxNumOfLabels = 10;
+        private String dateFormat;
         private CategoryLabelPositions categoryLabelPosition = CategoryLabelPositions.STANDARD;
         private CustomLegend legendConfig;
 
@@ -588,14 +683,6 @@ public class JFreeChartSerializer extends HttpBinarySerializer {
             this.legendConfig = legendConfig;
         }
 
-        public double getValueTickUnit() {
-            return valueTickUnit;
-        }
-
-        public void setValueTickUnit(double valueTickUnit) {
-            this.valueTickUnit = valueTickUnit;
-        }
-
         public double getCategoryMargin() {
             return categoryMargin;
         }
@@ -610,6 +697,22 @@ public class JFreeChartSerializer extends HttpBinarySerializer {
 
         public void setCategoryLabelPosition(CategoryLabelPositions categoryLabelPosition) {
             this.categoryLabelPosition = categoryLabelPosition;
+        }
+
+        public int getMaxNumOfLabels() {
+            return maxNumOfLabels;
+        }
+
+        public void setMaxNumOfLabels(int maxNumOfLabels) {
+            this.maxNumOfLabels = maxNumOfLabels;
+        }
+
+        public String getDateFormat() {
+            return dateFormat;
+        }
+
+        public void setDateFormat(String dateFormat) {
+            this.dateFormat = dateFormat;
         }
     }
 
@@ -679,20 +782,23 @@ public class JFreeChartSerializer extends HttpBinarySerializer {
         }
     }
 
-    protected static class CustomLegend extends Legend {
+    protected static class CustomLegend extends LegendTitle {
         private boolean visible = true;
-        private LegendItemCollection legendItems = new LegendItemCollection();;
+        private LegendItemCollection legendItems = new LegendItemCollection();
+        public static final Font DEFAULT_TITLE_FONT = new Font("SansSerif", 1, 11);
+        public static Paint DEFAULT_BACKGROUND_PAINT = Color.white;
+        public static Paint DEFAULT_OUTLINE_PAINT = Color.gray;
+        public static final Stroke DEFAULT_OUTLINE_STROKE = new BasicStroke();
 
-        public CustomLegend() {
-            super(null);
+        public CustomLegend(Plot plot) {
+            super(plot);
         }
 
         public void addItem(String label, Color color) {
-            legendItems.add(new LegendItem(label, label,
-                    AbstractRenderer.DEFAULT_SHAPE,
-                    color,
-                    AbstractRenderer.DEFAULT_OUTLINE_PAINT,
-                    AbstractRenderer.DEFAULT_STROKE));
+            LegendItem legendItem = new LegendItem(label,label,label,label,AbstractRenderer.DEFAULT_SHAPE,
+                    color,AbstractRenderer.DEFAULT_OUTLINE_STROKE,
+                    AbstractRenderer.DEFAULT_OUTLINE_PAINT);
+            legendItems.add(legendItem);
         }
 
         public boolean hasItems() {
@@ -712,9 +818,10 @@ public class JFreeChartSerializer extends HttpBinarySerializer {
         }
 
         public Rectangle2D draw(Graphics2D g2, Rectangle2D available, ChartRenderingInfo info) {
-            boolean horizontal = (getAnchor() & HORIZONTAL) != 0;
-            boolean inverted = (getAnchor() & INVERTED) != 0;
-            ;
+
+            boolean horizontal = RectangleEdge.isLeftOrRight(getPosition());
+            boolean inverted = RectangleEdge.isTopOrBottom(getPosition());
+            RectangleInsets insets = getFrame().getInsets();
             String title = null;
 
             if ((legendItems != null) && (legendItems.getItemCount() > 0)) {
@@ -734,9 +841,9 @@ public class JFreeChartSerializer extends HttpBinarySerializer {
                 // Compute individual rectangles in the legend, translation point as well
                 // as the bounding box for the legend.
                 if (horizontal) {
-                    double xstart = available.getX() + StandardLegend.DEFAULT_OUTER_GAP.getLeftSpace(availableWidth);
-                    double xlimit = available.getMaxX()
-                            + StandardLegend.DEFAULT_OUTER_GAP.getRightSpace(availableWidth) - 1;
+
+                    double xstart = available.getX() ;
+                    double xlimit = available.getMaxX();
                     double maxRowWidth = 0;
                     double xoffset = 0;
                     double rowHeight = 0;
@@ -745,25 +852,17 @@ public class JFreeChartSerializer extends HttpBinarySerializer {
 
 
                     if (title != null && !title.equals("")) {
+                        g2.setFont(CustomLegend.DEFAULT_TITLE_FONT);
+                        LegendItem titleItem = new LegendItem(title,title,title,title,AbstractRenderer.DEFAULT_SHAPE,
+                                Color.black,AbstractRenderer.DEFAULT_OUTLINE_STROKE,
+                                AbstractRenderer.DEFAULT_OUTLINE_PAINT);
 
-                        g2.setFont(StandardLegend.DEFAULT_TITLE_FONT);
-
-                        LegendItem titleItem = new LegendItem(title,
-                                title,
-                                null,
-                                Color.black,
-                                StandardLegend.DEFAULT_OUTLINE_PAINT,
-                                StandardLegend.DEFAULT_OUTLINE_STROKE);
-
-                        legendTitle = createDrawableLegendItem(g2, titleItem,
-                                xoffset,
-                                totalHeight);
-
+                        legendTitle = createDrawableLegendItem(g2, titleItem,xoffset,totalHeight);
                         rowHeight = Math.max(rowHeight, legendTitle.getHeight());
                         xoffset += legendTitle.getWidth();
                     }
 
-                    g2.setFont(StandardLegend.DEFAULT_ITEM_FONT);
+                    g2.setFont(LegendTitle.DEFAULT_ITEM_FONT);
                     for (int i = 0; i < legendItems.getItemCount(); i++) {
                         items[i] = createDrawableLegendItem(g2, legendItems.get(i),
                                 xoffset, totalHeight);
@@ -791,10 +890,11 @@ public class JFreeChartSerializer extends HttpBinarySerializer {
 
                     // The yloc point is the variable part of the translation point
                     // for horizontal legends. xloc is constant.
+
                     double yloc = (inverted)
                             ? available.getMaxY() - totalHeight
-                            - StandardLegend.DEFAULT_OUTER_GAP.getBottomSpace(availableHeight)
-                            : available.getY() + StandardLegend.DEFAULT_OUTER_GAP.getTopSpace(availableHeight);
+                            - insets.calculateBottomOutset(availableHeight)
+                            : available.getY() +  insets.calculateTopOutset(availableHeight);
                     double xloc = available.getX() + available.getWidth() / 2 - maxRowWidth / 2;
 
                     // Create the translation point
@@ -805,23 +905,16 @@ public class JFreeChartSerializer extends HttpBinarySerializer {
 
                     if (title != null && !title.equals("")) {
 
-                        g2.setFont(StandardLegend.DEFAULT_TITLE_FONT);
-
-                        LegendItem titleItem = new LegendItem(title,
-                                title,
-                                null,
-                                Color.black,
-                                StandardLegend.DEFAULT_OUTLINE_PAINT,
-                                StandardLegend.DEFAULT_OUTLINE_STROKE);
-
-                        legendTitle = createDrawableLegendItem(g2, titleItem, 0,
-                                totalHeight);
-
+                        g2.setFont(CustomLegend.DEFAULT_TITLE_FONT);
+                        LegendItem titleItem = new LegendItem(title,title,title,title,AbstractRenderer.DEFAULT_SHAPE,
+                                Color.black,AbstractRenderer.DEFAULT_OUTLINE_STROKE,
+                                AbstractRenderer.DEFAULT_OUTLINE_PAINT);
+                        legendTitle = createDrawableLegendItem(g2, titleItem, 0,totalHeight);
                         totalHeight += legendTitle.getHeight();
                         maxWidth = Math.max(maxWidth, legendTitle.getWidth());
                     }
 
-                    g2.setFont(StandardLegend.DEFAULT_ITEM_FONT);
+                    g2.setFont(LegendTitle.DEFAULT_ITEM_FONT);
                     for (int i = 0; i < items.length; i++) {
                         items[i] = createDrawableLegendItem(g2, legendItems.get(i),
                                 0, totalHeight);
@@ -835,8 +928,8 @@ public class JFreeChartSerializer extends HttpBinarySerializer {
                     // The xloc point is the variable part of the translation point
                     // for vertical legends. yloc is constant.
                     double xloc = (inverted)
-                            ? available.getMaxX() - maxWidth - StandardLegend.DEFAULT_OUTER_GAP.getRightSpace(availableWidth)
-                            : available.getX() + StandardLegend.DEFAULT_OUTER_GAP.getLeftSpace(availableWidth);
+                            ? available.getMaxX() - maxWidth - insets.calculateRightOutset(availableWidth)
+                            : available.getX() + insets.calculateLeftOutset(availableWidth);
                     double yloc = available.getY() + (available.getHeight() / 2) - (totalHeight / 2);
 
                     // Create the translation point
@@ -847,18 +940,18 @@ public class JFreeChartSerializer extends HttpBinarySerializer {
                 g2.translate(translation.getX(), translation.getY());
 
                 // Draw the legend's bounding box
-                g2.setPaint(StandardLegend.DEFAULT_BACKGROUND_PAINT);
+                g2.setPaint(CustomLegend.DEFAULT_BACKGROUND_PAINT);
                 g2.fill(legendArea);
-                g2.setPaint(StandardLegend.DEFAULT_OUTLINE_PAINT);
-                g2.setStroke(StandardLegend.DEFAULT_OUTLINE_STROKE);
+                g2.setPaint(CustomLegend.DEFAULT_OUTLINE_PAINT);
+                g2.setStroke(CustomLegend.DEFAULT_OUTLINE_STROKE);
                 g2.draw(legendArea);
 
                 // draw legend title
                 if (legendTitle != null) {
                     // XXX dsm - make title bold?
-                    g2.setPaint(legendTitle.getItem().getPaint());
+                    g2.setPaint(legendTitle.getItem().getFillPaint());
                     g2.setPaint(Color.black);
-                    g2.setFont(StandardLegend.DEFAULT_TITLE_FONT);
+                    g2.setFont(CustomLegend.DEFAULT_TITLE_FONT);
                     g2.drawString(legendTitle.getItem().getLabel(),
                             (float) legendTitle.getLabelPosition().getX(),
                             (float) legendTitle.getLabelPosition().getY());
@@ -866,11 +959,11 @@ public class JFreeChartSerializer extends HttpBinarySerializer {
 
                 // Draw individual series elements
                 for (int i = 0; i < items.length; i++) {
-                    g2.setPaint(items[i].getItem().getPaint());
+                    g2.setPaint(items[i].getItem().getFillPaint());
                     Shape keyBox = items[i].getMarker();
                     g2.fill(keyBox);
                     g2.setPaint(Color.black);
-                    g2.setFont(StandardLegend.DEFAULT_ITEM_FONT);
+                    g2.setFont(LegendTitle.DEFAULT_ITEM_FONT);
                     g2.drawString(items[i].getItem().getLabel(),
                             (float) items[i].getLabelPosition().getX(),
                             (float) items[i].getLabelPosition().getY());
@@ -889,13 +982,13 @@ public class JFreeChartSerializer extends HttpBinarySerializer {
                     double yy = available.getY();
                     double yloc = (inverted) ? yy
                             : yy + legendArea.getHeight()
-                            + StandardLegend.DEFAULT_OUTER_GAP.getBottomSpace(availableHeight);
+                            + insets.calculateBottomOutset(availableHeight);
 
                     // return the remaining available drawing area
                     return new Rectangle2D.Double(available.getX(), yloc, availableWidth,
                             availableHeight - legendArea.getHeight()
-                            - StandardLegend.DEFAULT_OUTER_GAP.getTopSpace(availableHeight)
-                            - StandardLegend.DEFAULT_OUTER_GAP.getBottomSpace(availableHeight));
+                                    - insets.calculateTopOutset(availableHeight)
+                                    - insets.calculateBottomOutset(availableHeight));
                 } else {
                     // The remaining drawing area bounding box will have the same
                     // y  origin, width and height independent of the anchor's
@@ -906,15 +999,15 @@ public class JFreeChartSerializer extends HttpBinarySerializer {
                     double xloc = (inverted) ? available.getX()
                             : available.getX()
                             + legendArea.getWidth()
-                            + StandardLegend.DEFAULT_OUTER_GAP.getLeftSpace(availableWidth)
-                            + StandardLegend.DEFAULT_OUTER_GAP.getRightSpace(availableWidth);
+                            + insets.calculateLeftOutset(availableWidth)
+                            + insets.calculateRightOutset(availableWidth);
 
 
                     // return the remaining available drawing area
                     return new Rectangle2D.Double(xloc, available.getY(),
                             availableWidth - legendArea.getWidth()
-                            - StandardLegend.DEFAULT_OUTER_GAP.getLeftSpace(availableWidth)
-                            - StandardLegend.DEFAULT_OUTER_GAP.getRightSpace(availableWidth),
+                                    - insets.calculateLeftOutset(availableWidth)
+                                    - insets.calculateRightOutset(availableWidth),
                             availableHeight);
                 }
             } else {
@@ -954,10 +1047,7 @@ public class JFreeChartSerializer extends HttpBinarySerializer {
             return item;
 
         }
-
-
     }
-
 
     protected static class ExtendedPieDataset extends AbstractDataset implements PieDataset {
 
@@ -1041,7 +1131,6 @@ public class JFreeChartSerializer extends HttpBinarySerializer {
 
     }
 
-
     protected static class ItemPaintCategoryDataset extends DefaultCategoryDataset {
         private List rowValues = new ArrayList();
 
@@ -1083,6 +1172,40 @@ public class JFreeChartSerializer extends HttpBinarySerializer {
             return new Color(Integer.parseInt(rgb.substring(1), 16));
         } catch (NumberFormatException e) {
             throw new OXFException("Can't parse RGB color: " + rgb, e);
+        }
+    }
+
+    protected static class RestrictedNumberAxis extends NumberAxis{
+        private int maxTicks = NumberAxis.MAXIMUM_TICK_COUNT;
+        /**
+         * Creates a Number axis with the specified label.
+         *
+         * @param label  the axis label (<code>null</code> permitted).
+         */
+        public RestrictedNumberAxis(String label) {
+            super(label);
+        }
+
+        public int getMaxTicks() {
+            return maxTicks;
+        }
+
+        public void setMaxTicks(int maxTicks) {
+            this.maxTicks = maxTicks;
+        }
+
+        protected int getVisibleTickCount() {
+            double unit = getTickUnit().getSize();
+            Range range = getRange();
+            return (int)(Math.floor(range.getUpperBound() / unit)
+                    - Math.ceil(range.getLowerBound() / unit) + 1);
+
+        }
+        protected void adjustTickUnits() {
+            int tickUnit = getVisibleTickCount()/maxTicks;
+            if(tickUnit != 0) {
+                super.setTickUnit(new NumberTickUnit(tickUnit));
+            }
         }
     }
 }

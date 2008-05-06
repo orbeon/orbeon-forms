@@ -19,7 +19,7 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.entity.ChartEntity;
 import org.jfree.chart.entity.EntityCollection;
 import org.jfree.chart.servlet.ServletUtilities;
-import org.jfree.data.Dataset;
+import org.jfree.data.general.Dataset;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -107,6 +107,10 @@ public class JFreeChartProcessor extends JFreeChartSerializer {
         if (chartConfig.getType() == JFreeChartSerializer.ChartConfig.PIE_TYPE ||
                 chartConfig.getType() == JFreeChartSerializer.ChartConfig.PIE3D_TYPE)
             ds = createPieDataset(chartConfig, data);
+        else if(chartConfig.getType() == ChartConfig.XY_LINE_TYPE)
+            ds = createXYDataset(chartConfig, data);
+        else if(chartConfig.getType() == ChartConfig.TIME_SERIES_TYPE)
+            ds = createTimeSeriesDataset(chartConfig, data);
         else
             ds = createDataset(chartConfig, data);
 

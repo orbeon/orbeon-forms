@@ -685,22 +685,36 @@ ORBEON.xforms.Document = {
 
     setOfflineEncryptionPassword: function(password) {
         ORBEON.xforms.Offline.init();
-        if (password.length < 16)
-            throw "Password must have at least 16 characters";
+
+        // Create hash of constant length based on password
+        // This algorithm comes from JavaScrypt (http://www.fourmilab.ch/javascrypt/)
+        password = encode_utf8(password);
+        if (password.length == 1)
+            password += password;
+        md5_init();
+        for (var i = 0; password < password.length; i += 2)
+            md5_update(password.charCodeAt(i));
+        md5_finish();
+        var kmd5e = byteArrayToHex(digestBits);
+        md5_init();
+        for (i = 1; i < password.length; i += 2)
+            md5_update(password.charCodeAt(i));
+        md5_finish();
+        var kmd5o = byteArrayToHex(digestBits);
+        password = kmd5e + kmd5o;
+        password = password.substring(32);
+
+        // Check or store password
         var resultSet = ORBEON.xforms.Offline.gearsDatabase.execute("select * from Current_Password");
-        var newEncryptedPassword = ORBEON.xforms.Offline._encrypt(password, stringToByteArray(password));
         if (resultSet.isValidRow()) {
             // If we have a current password, check that this is the right password
-            var encryptedPassword = resultSet.fieldByName("encrypted_password");
-            var newEncryptedPassword = ORBEON.xforms.Offline._encrypt(password, stringToByteArray(password));
-            if (encryptedPassword != newEncryptedPassword)
+            var currentPassword = resultSet.fieldByName("encrypted_password");
+            if (currentPassword != password)
                 throw "Invalid password";
         } else {
             // Store encrypted password
-            ORBEON.xforms.Offline.gearsDatabase.execute("insert into Current_Password (encrypted_password) values (?)", [ newEncryptedPassword ]);
+            ORBEON.xforms.Offline.gearsDatabase.execute("insert into Current_Password (encrypted_password) values (?)", [ password ]);
         }
-        // Encode the password so it won't be immediatly visible to one looking at cookies
-        password = byteArrayToHex(stringToByteArray(password));
         document.cookie = "orbeon.forms.encryption.password" + "=" + password + "; path=/";
         // Reset key, in case we already had another key previously
         ORBEON.xforms.Offline.encryptionKey = null;
@@ -4274,8 +4288,10 @@ ORBEON.xforms.Offline = {
         ORBEON.xforms.Offline.init();
         var localServer = google.gears.factory.create("beta.localserver");
         localServer.removeStore("orbeon.form");
-        ORBEON.xforms.Offline.gearsDatabase.execute("drop table Events").close();
-        ORBEON.xforms.Offline.gearsDatabase.execute("drop table Offline_Forms").close();
+        ORBEON.xforms.Offline.gearsDatabase.execute("drop table if exists Events").close();
+        ORBEON.xforms.Offline.gearsDatabase.execute("drop table if exists Offline_Forms").close();
+        ORBEON.xforms.Offline.gearsDatabase.execute("drop table if exists Current_Password").close();
+        window.google = null;
     },
 
     /**
@@ -5126,5 +5142,3 @@ if (!ORBEON.xforms.Globals.pageLoadedRegistered) {
     ORBEON.xforms.Globals.debugLastTime = new Date().getTime();
     ORBEON.xforms.Globals.lastEventSentTime = new Date().getTime();
 }
-
-

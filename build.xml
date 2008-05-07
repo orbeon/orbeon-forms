@@ -466,6 +466,7 @@
         <mkdir dir="${war.dir}/WEB-INF/resources/ops/javascript/yui"/>
         <mkdir dir="${war.dir}/WEB-INF/resources/ops/javascript/jscalendar/lang"/>
         <mkdir dir="${war.dir}/WEB-INF/resources/ops/javascript/ajaxxslt"/>
+        <mkdir dir="${war.dir}/WEB-INF/resources/ops/javascript/encryption"/>
         <!-- YUI -->
         <antcall target="orbeon-minify-maybe-js">
             <param name="name" value="xforms"/>
@@ -537,8 +538,15 @@
             <param name="name" value="ajaxxslt/xpath"/>
         </antcall>
 
+        <!-- Encryption -->
         <antcall target="orbeon-minify-maybe-js">
-            <param name="name" value="encryption"/>
+            <param name="name" value="encryption/encryption"/>
+        </antcall>
+        <antcall target="orbeon-minify-maybe-js">
+            <param name="name" value="encryption/md5"/>
+        </antcall>
+        <antcall target="orbeon-minify-maybe-js">
+            <param name="name" value="encryption/utf-8"/>
         </antcall>
 
     </target>

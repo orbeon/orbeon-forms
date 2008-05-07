@@ -269,7 +269,7 @@ public class JFreeChartSerializer extends HttpBinarySerializer {
         chart.setBackgroundColor(bgColor == null ? DEFAULT_BACKGROUND_COLOR : getRGBColor(bgColor));
         chart.setTitleColor(tColor == null ? DEFAULT_TITLE_COLOR : getRGBColor(tColor));
         if(maxNumOfTickUnit != null)
-            chart.setMaxNumOfLabels(maxNumOfTickUnit);
+            chart.setMaxNumOfLabels(maxNumOfTickUnit.intValue());
         if(sDateFormat != null)
             chart.setDateFormat(sDateFormat);
 

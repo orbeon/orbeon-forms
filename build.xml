@@ -21,7 +21,7 @@
     <dirname property="build.root" file="${ant.file}"/>
     <property name="lib.dir" location="lib"/>
     <property name='local-repos' value=':local:/home/cvs/objectweb-src' />
-    <property name="build.dir" value="build"/>
+    <property name="build.dir" location="build"/>
     <property name="project.name" value="orbeon"/>
     <property name="war.dir" value="${build.dir}/${project.name}-war"/>
     <property name="war.inf" value="${war.dir}/WEB-INF"/>
@@ -557,6 +557,8 @@
             <!--<arg value="-o"/>-->
             <!--<arg value="${war.dir}/WEB-INF/resources/ops/javascript/${name}-min.js"/>-->
         <!--</java>-->
+        <echo message='srcfile: ${resources-packaged.dir}/ops/javascript/${name}.js'/>
+        <echo message='targetfile: ${war.dir}/WEB-INF/resources/ops/javascript/${name}-min.js'/>
         <uptodate property="min.uptodate" srcfile="${resources-packaged.dir}/ops/javascript/${name}.js" targetfile="${war.dir}/WEB-INF/resources/ops/javascript/${name}-min.js"/>
         <echo message='Uptodate: ${min.uptodate}'/>
         <antcall target="orbeon-minify-one-js">

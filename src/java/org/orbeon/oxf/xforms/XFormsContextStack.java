@@ -68,7 +68,7 @@ public class XFormsContextStack {
         // Clear existing stack
         contextStack.clear();
 
-        if (xformsModel != null && xformsModel.getInstanceCount() > 0) {
+        if (xformsModel != null && xformsModel.getDefaultInstance() != null) {
             // Push the default context
             final NodeInfo defaultNode = xformsModel.getDefaultInstance().getInstanceRootElementInfo();
             final List defaultNodeset = Arrays.asList(new Object[]{ defaultNode });

@@ -880,11 +880,21 @@ public class XFormsControls {
 
             // Find SwitchXFormsControl
             final XFormsControl caseXFormsControl = (XFormsControl) controlsState.getIdsToXFormsControls().get(selectedCaseId);
-            if (caseXFormsControl == null)
-                throw new OXFException("No XFormsControl found for case id '" + selectedCaseId + "'.");
+            if (caseXFormsControl == null) {
+                // NOTE: we used to throw here, but really we mustn't
+                if (XFormsServer.logger.isDebugEnabled()) {
+                    XFormsServer.logger.debug("No XFormsControl found for case id '" + selectedCaseId + "'.");
+                }
+                return;
+            }
             final XFormsControl switchXFormsControl = (XFormsControl) caseXFormsControl.getParent();
-            if (switchXFormsControl == null)
-                throw new OXFException("No SwitchXFormsControl found for case id '" + selectedCaseId + "'.");
+            if (switchXFormsControl == null) {
+                // NOTE: we used to throw here, but really we mustn't
+                if (XFormsServer.logger.isDebugEnabled()) {
+                    XFormsServer.logger.debug("No XFormsControl found for case id '" + selectedCaseId + "'.");
+                }
+                return;
+            }
 
             final String currentSelectedCaseId = (String) getSwitchIdToSelectedCaseIdMap().get(switchXFormsControl.getEffectiveId());
             if (!selectedCaseId.equals(currentSelectedCaseId)) {

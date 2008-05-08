@@ -912,26 +912,32 @@
         <xi:include href="i18n/resources-model.xml" xxi:omit-xml-base="true"/>
         <!-- This model handles offline functionality through Google Gears -->
         <xi:include href="offline/offline-model.xml" xxi:omit-xml-base="true"/>
+        <!-- Handle error summary -->
+        <xi:include href="includes/error-summary-model.xml" xxi:omit-xml-base="true"/>
+        <!-- Handle document persistence -->
+        <xi:include href="includes/persistence-model.xml" xxi:omit-xml-base="true"/>
 
         <!-- This model handles print functionality -->
         <xforms:model id="fr-print-model">
             <xforms:instance id="fr-print-instance"><dummy/></xforms:instance>
             <xxforms:variable name="parameters" select="xxforms:instance('fr-parameters-instance')"/>
 
-            <xforms:submission id="fr-print-submission" resource="/fr/{{$parameters/app}}/{{$parameters/form}}/print?fr-language={{xxforms:instance('fr-language-instance')}}"
-                    method="post" ref="xxforms:instance('fr-form-instance')" replace="all" validate="false" xxforms:target="_blank" xxforms:show-progress="false"/>
+            <xforms:submission id="fr-print-submission"
+                resource="/fr/{{$parameters/app}}/{{$parameters/form}}/print?fr-language={{xxforms:instance('fr-language-instance')}}"
+                method="post" ref="xxforms:instance('fr-form-instance')" replace="all" validate="false"
+                xxforms:target="_blank" xxforms:show-progress="false"/>
 
-            <xforms:submission id="fr-pdf-submission" resource="/fr/{{$parameters/app}}/{{$parameters/form}}/pdf?fr-language={{xxforms:instance('fr-language-instance')}}"
-                    method="post" ref="xxforms:instance('fr-form-instance')" replace="all" validate="false" xxforms:target="_blank" xxforms:show-progress="false"/>
+            <xforms:submission id="fr-pdf-submission"
+                resource="/fr/{{$parameters/app}}/{{$parameters/form}}/pdf?fr-language={{xxforms:instance('fr-language-instance')}}"
+                method="post" ref="xxforms:instance('fr-form-instance')" replace="all" validate="false"
+                xxforms:target="_blank" xxforms:show-progress="false"/>
 
-            <xforms:submission id="fr-pdf-template-submission" resource="/fr/{{$parameters/app}}/{{$parameters/form}}/pdf-template?document={{xxforms:instance('fr-parameters-instance')/document}}&amp;fr-language={{xxforms:instance('fr-language-instance')}}"
-                    method="post" ref="xxforms:instance('fr-form-instance')" replace="all" validate="false" xxforms:target="_blank" xxforms:show-progress="false"/>
+            <xforms:submission id="fr-pdf-template-submission"
+                resource="/fr/{{$parameters/app}}/{{$parameters/form}}/pdf-template?document={{xxforms:instance('fr-parameters-instance')/document}}&amp;fr-language={{xxforms:instance('fr-language-instance')}}"
+                method="post" ref="xxforms:instance('fr-form-instance')" replace="all" validate="false"
+                xxforms:target="_blank" xxforms:show-progress="false"/>
         </xforms:model>
 
-        <!-- Handle error summary -->
-        <xi:include href="includes/error-summary-model.xml" xxi:omit-xml-base="true"/>
-        <!-- Handle document persistence -->
-        <xi:include href="includes/persistence-model.xml" xxi:omit-xml-base="true"/>
         <!-- Handle import/export -->
         <xi:include href="import-export/import-export-model.xml" xxi:omit-xml-base="true"/>
 

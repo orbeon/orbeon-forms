@@ -94,10 +94,11 @@
                 -->
 
                 <!-- Section about form metadata -->
+                <!--<xhtml:div id="fb-metadata-section" class="fb-metadata-section">-->
                 <fr:section id="fb-metadata-section" class="fb-metadata-section">
                     <xforms:label>About this Form</xforms:label>
 
-                    <fr:grid columns="2">
+                    <fr:grid columns="2" class="fb-metadata-names">
                         <xhtml:tr>
                             <xhtml:td>
                                 <xforms:input id="application-name-control" bind="application-name-bind" appearance="fr:in-place" class="fr-summary fr-search" incremental="true">
@@ -114,6 +115,8 @@
                                 </xforms:input>
                             </xhtml:td>
                         </xhtml:tr>
+                    </fr:grid>
+                    <fr:grid columns="2" class="fb-metadata-logo-title">
                         <xhtml:tr>
                             <xhtml:td>
                                 <!-- Image -->
@@ -142,8 +145,10 @@
                                 </xforms:input>
                             </xhtml:td>
                         </xhtml:tr>
+                    </fr:grid>
+                    <fr:grid columns="1" class="fb-metadata-description">
                         <xhtml:tr>
-                            <xhtml:td colspan="2">
+                            <xhtml:td>
                                 <xhtml:div>
                                     <xforms:textarea id="description-control" bind="description-bind"
                                                      appearance="fr:in-place" class="fr-summary fr-search" incremental="true">
@@ -155,6 +160,7 @@
                         </xhtml:tr>
                     </fr:grid>
                 </fr:section>
+                <!--</xhtml:div>-->
 
                 <!-- Form details -->
                 <xforms:group context="$body" id="fb-details-section">

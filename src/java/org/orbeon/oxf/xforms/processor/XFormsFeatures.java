@@ -243,19 +243,19 @@ public class XFormsFeatures {
                 public String getFeatureName() { return "offline"; }
             },
             // Encrytion library to encrypt data stored in the Gears store
-            new ResourceConfig("/ops/javascript/encryption/encryption.js", "/ops/javascript/encryption-min.js") {
+            new ResourceConfig("/ops/javascript/encryption/encryption.js", "/ops/javascript/encryption/encryption-min.js") {
                 public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
                     return XFormsProperties.isOfflineMode(containingDocument);
                 }
                 public String getFeatureName() { return "offline"; }
             },
-            new ResourceConfig("/ops/javascript/encryption/md5.js", "/ops/javascript/md5-min.js") {
+            new ResourceConfig("/ops/javascript/encryption/md5.js", "/ops/javascript/encryption/md5-min.js") {
                 public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
                     return XFormsProperties.isOfflineMode(containingDocument);
                 }
                 public String getFeatureName() { return "offline"; }
             },
-            new ResourceConfig("/ops/javascript/encryption/utf-8.js", "/ops/javascript/utf-8-min.js") {
+            new ResourceConfig("/ops/javascript/encryption/utf-8.js", "/ops/javascript/encryption/utf-8-min.js") {
                 public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
                     return XFormsProperties.isOfflineMode(containingDocument);
                 }

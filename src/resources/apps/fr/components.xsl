@@ -213,7 +213,7 @@
                                                                             <xforms:label>
                                                                                 <xforms:output value="@label" class="fr-error-label"/>
                                                                             </xforms:label>
-                                                                            <xforms:sefocus ev:event="DOMActivate" control="{@id}"/>
+                                                                            <xforms:setfocus ev:event="DOMActivate" control="{{@id}}"/>
                                                                         </xforms:trigger>
                                                                         <!--<xhtml:a href="#{{@id}}">-->
                                                                             <!--<xforms:output value="@label" class="fr-error-label"/>-->

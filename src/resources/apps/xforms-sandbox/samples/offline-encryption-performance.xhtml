@@ -1,0 +1,100 @@
+<!--
+    Copyright (C) 2008 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:f="http://orbeon.org/oxf/xml/formatting"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:widget="http://orbeon.org/oxf/xml/widget"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xhtml:head>
+        <xhtml:title>Offline Password</xhtml:title>
+        <xforms:model xxforms:offline="true">
+            <xforms:instance id="instance">
+                <instance>
+                    <offline>false</offline>
+                    <increment>-1</increment>
+                </instance>
+            </xforms:instance>
+            <xforms:action ev:event="xxforms-offline">
+                <xforms:setvalue ref="/instance/offline">true</xforms:setvalue>
+            </xforms:action>
+            <xforms:action ev:event="xxforms-online">
+                <xforms:setvalue ref="/instance/offline">false</xforms:setvalue>
+            </xforms:action>
+        </xforms:model>
+        <xhtml:script type="text/javascript">
+            function repeatSetValue() {
+                for (var i = 0; 100 > i; i++)
+                    ORBEON.xforms.Document.setValue("increment", i);
+            }
+        </xhtml:script>
+    </xhtml:head>
+    <xhtml:body>
+        <xhtml:p>
+            To test performance:
+            <xhtml:ul>
+                <xhtml:li>Run <code>ORBEON.xforms.Offline.reset()</code> from the console.</xhtml:li>
+                <xhtml:li>Reload this page.</xhtml:li>
+                <xhtml:li>Click <xhtml:i>Set password</xhtml:i>.</xhtml:li>
+                <xhtml:li>Click <xhtml:i>Take offline</xhtml:i>.</xhtml:li>
+                <xhtml:li>Click <xhtml:i>Set value 100 times</xhtml:i>.</xhtml:li>
+                <xhtml:li>Click <xhtml:i>Save</xhtml:i>. This is when the encryption is performed.</xhtml:li>
+            </xhtml:ul>
+        </xhtml:p>
+        <xhtml:p>
+            <xforms:trigger ref=".">
+                <xforms:label>Set password</xforms:label>
+                <xxforms:script ev:event="DOMActivate">
+                    ORBEON.xforms.Document.setOfflineEncryptionPassword("gaga");
+                </xxforms:script>
+            </xforms:trigger>
+        </xhtml:p>
+        <xhtml:p>
+            Currently
+            <xhtml:b>
+                <xforms:output value="if (offline = 'true') then 'offline' else 'online'"/>
+            </xhtml:b>
+        </xhtml:p>
+        <xhtml:p>
+            <xforms:trigger ref=".[offline = 'false']">
+                <xforms:label>Take offline</xforms:label>
+                <xxforms:offline ev:event="DOMActivate"/>
+            </xforms:trigger>
+            <xforms:trigger ref=".[offline = 'true']">
+                <xforms:label>Take online</xforms:label>
+                <xxforms:online ev:event="DOMActivate"/>
+            </xforms:trigger>
+        </xhtml:p>
+        <xhtml:p>
+            <xforms:input ref="increment" id="increment">
+                <xforms:label>Increment:</xforms:label>
+            </xforms:input>
+        </xhtml:p>
+        <xhtml:p>
+            <xhtml:button onclick="repeatSetValue()">Set value 100 times</xhtml:button>
+        </xhtml:p>
+        <xhtml:p>
+            <xforms:trigger ref=".[offline = 'true']">
+                <xforms:label>Save</xforms:label>
+                <xxforms:offline-save ev:event="DOMActivate"/>
+            </xforms:trigger>
+            <xforms:group ref=".[offline = 'true']">
+                <xhtml:button onclick="ORBEON.xforms.Document.changeOfflineEncryptionPassword('gaga', 'foo')">Change password</xhtml:button>
+            </xforms:group>
+        </xhtml:p>
+        <widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>
+    </xhtml:body>
+</xhtml:html>

@@ -56,7 +56,7 @@ var LOADING_MIN_TOP_PADDING_PROPERTY = "loading-min-top-padding";
 var REVISIT_HANDLING_PROPERTY = "revisit-handling";
 var HELP_HANDLER_PROPERTY = "help-handler";
 var HELP_TOOLTIP_PROPERTY = "help-tooltip";
-var OFFLINE_SUPPORT = "offline-support";
+var OFFLINE_SUPPORT = "offline";
 
 var APPLICATION_RESOURCES_VERSION_PROPERTY = "oxf.resources.version-number";
 
@@ -4327,6 +4327,8 @@ ORBEON.xforms.Offline = {
                 }
                 // Store controlValues in variable, so it can be updated on value change
                 ORBEON.xforms.Offline.controlValues = controlValues;
+            } else {
+                ORBEON.xforms.Offline.controlValues = {};
             }
             resultSet.close();
         }

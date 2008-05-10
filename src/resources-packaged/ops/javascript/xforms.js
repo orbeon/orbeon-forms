@@ -715,7 +715,7 @@ ORBEON.xforms.Document = {
             // Store encrypted password
             ORBEON.xforms.Offline.gearsDatabase.execute("insert into Current_Password (encrypted_password) values (?)", [ password ]);
         }
-        document.cookie = "orbeon.forms.encryption.password" + "=" + password + "; path=/";
+        document.cookie = "orbeon.forms.encryption.password=" + password + "; path=/";
         // Reset key, in case we already had another key previously
         ORBEON.xforms.Offline.encryptionKey = null;
     },
@@ -867,8 +867,7 @@ ORBEON.xforms.Controls = {
     getCurrentValue: function(control) {
         if (ORBEON.util.Dom.hasClass(control, "xforms-input") && !ORBEON.util.Dom.hasClass(control, "xforms-type-boolean")) {
             return ORBEON.util.Dom.getChildElementByIndex(control, 1).value;
-        }
-        if (ORBEON.util.Dom.hasClass(control, "xforms-select1-open")) {
+        } else if (ORBEON.util.Dom.hasClass(control, "xforms-select1-open")) {
             return ORBEON.util.Dom.getChildElementByIndex(control, 0).value;
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-select-appearance-full")
                 || ORBEON.util.Dom.hasClass(control, "xforms-select1-appearance-full")
@@ -902,6 +901,15 @@ ORBEON.xforms.Controls = {
                 && ORBEON.util.Dom.hasClass(control, "xforms-mediatype-text-html")) {
             var editorInstance = FCKeditorAPI.GetInstance(control.name);
             return editorInstance.GetXHTML();
+        } else if (ORBEON.util.Dom.hasClass(control, "xforms-output")){
+            if (ORBEON.util.Dom.hasClass(control, "xforms-mediatype-image")) {
+                var image = ORBEON.util.Dom.getChildElementByIndex(control, 0);
+                return image.src;
+            } else if (ORBEON.util.Dom.hasClass(control, "xforms-mediatype-text-html")) {
+                return control.innerHTML;
+            } else {
+                return ORBEON.util.Dom.getStringValue(control);
+            }
         } else {
             return control.value;
         }
@@ -4292,6 +4300,7 @@ ORBEON.xforms.Offline = {
         ORBEON.xforms.Offline.gearsDatabase.execute("drop table if exists Offline_Forms").close();
         ORBEON.xforms.Offline.gearsDatabase.execute("drop table if exists Current_Password").close();
         window.google = null;
+        document.cookie = "orbeon.forms.encryption.password=; path=/";
     },
 
     /**
@@ -4351,7 +4360,7 @@ ORBEON.xforms.Offline = {
                     break;
                 }
             }
-            if (cookieValue == null) {
+            if (cookieValue == null || cookieValue == "") {
                 // No password found in cookies
                 return null;
             } else {
@@ -4419,13 +4428,21 @@ ORBEON.xforms.Offline = {
             YAHOO.util.Selector.query("link"),
             YAHOO.util.Selector.query("img")
         );
-        var urlsToCapture = [];
+        // Create list of URLs to capture
+        var urlsToKeepOffline = [ window.location.href ];
         for (var elementIndex = 0; elementIndex < htmlElements.length; elementIndex++) {
             var element = htmlElements[elementIndex];
             if (YAHOO.lang.isString(element.href) && element.href != "")
-                urlsToCapture.push(element.href);
+                urlsToKeepOffline.push(element.href);
             if (YAHOO.lang.isString(element.src) && element.src != "")
-                urlsToCapture.push(element.src);
+                urlsToKeepOffline.push(element.src);
+        }
+        // Remove from the list URLs that have been captured already
+        var urlsToCapture = [];
+        for (var urlIndex = 0; urlIndex < urlsToKeepOffline.length; urlIndex++) {
+            var url = urlsToKeepOffline[urlIndex];
+            if (! ORBEON.xforms.Offline.formStore.isCaptured(url))
+                urlsToCapture.push(url);
         }
         ORBEON.xforms.Offline.formStore.capture(urlsToCapture, function (url, success, captureId) {
             // When capture is done, mark the form as offline to prevent any event from being sent to the server

@@ -57,7 +57,6 @@ a.fb-edit-help-trigger img {
     text-align: left;
     font-weight: normal;
     color: #333333;
-    /*border: 1px solid #666699;*/
     margin: 1px 1px 2px 1px;
     padding: 1px 2px 1px 2px;
     background-color: #F8F8F8;
@@ -68,10 +67,10 @@ a.fb-edit-help-trigger img {
     border-top-color: #ccc;
     border-right-color: gray;
     border-bottom-color: gray;
-    /*border-radius: 3px; -moz-border-radius: 2px; -webkit-border-radius: 3px; -ms-border-radius: 2px *//* radius appears differently w/ Safari 3.1 vs. Firefox 3.0b4 */
 }
+.fb-tools .fb-tool button
 .fb-tools .fb-tool button img { margin-left: .5em }
-.fb-tools .fb-tool button:hover { background-color: white; background-image: none }
+.fb-tools .fb-tool button.xforms-readonly { color: white }
 
 .fb-xvc { text-align: center }
 .fb-xvc .xforms-trigger { margin-right: .5em }
@@ -306,6 +305,13 @@ a.xforms-help-image .fb-control-help { vertical-align: baseline; }/*  */
 #doc-fb .fb-grid-2-columns .xforms-select-appearance-full span label { width: 28.3em; *width: 27em }
 #doc-fb .fb-grid-3-columns .xforms-select-appearance-full span label { width: 17em; *width: 16em }
 #doc-fb .fb-grid-4-columns .xforms-select-appearance-full span label { width: 11.3em; *width: 10.5em }
+
+.fb-empty-cell { display: none; font-size: 70%; color: gray; width: 100%; font-style: italic; text-align: center; margin-top: 2em  }
+.fb-empty-cell span { display: none }
+.xforms-repeat-selected-item-4 .fb-empty-cell, td:hover .fb-empty-cell { display: block }
+.xforms-repeat-selected-item-4 .fb-empty-cell .fb-use-toolbar-message { display: block }
+.xforms-repeat-selected-item-4 .fb-empty-cell .fb-click-message { display: none }
+td:hover .fb-click-message { display: block }
 
 /* This is also used for PDF generation */
 @media print {

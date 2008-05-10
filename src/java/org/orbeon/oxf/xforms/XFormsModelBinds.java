@@ -101,6 +101,10 @@ public class XFormsModelBinds {
      * @param pipelineContext   current PipelineContext
      */
     public void applyCalculateBinds(final PipelineContext pipelineContext) {
+
+        // Reset context stack just to re-evaluate the variables
+        contextStack.resetBindingContext(pipelineContext, model);
+
         // Handle calculations
         iterateBinds(pipelineContext, new BindRunner() {
             public void applyBind(PipelineContext pipelineContext, Bind bind, List nodeset, int position) {
@@ -120,6 +124,10 @@ public class XFormsModelBinds {
      * @param pipelineContext   current PipelineContext
      */
     public void applyComputedExpressionBinds(final PipelineContext pipelineContext) {
+
+        // Reset context stack just to re-evaluate the variables
+        contextStack.resetBindingContext(pipelineContext, model);
+
         // Clear state
         final List instances = model.getInstances();
         if (instances != null) {
@@ -145,6 +153,10 @@ public class XFormsModelBinds {
      * @param pipelineContext   current PipelineContext
      */
     public void applyValidationBinds(final PipelineContext pipelineContext, final Map invalidInstances) {
+
+        // Reset context stack just to re-evaluate the variables
+        contextStack.resetBindingContext(pipelineContext, model);
+
         // Handle validation
         iterateBinds(pipelineContext, new BindRunner() {
             public void applyBind(PipelineContext pipelineContext, Bind bind, List nodeset, int position) {

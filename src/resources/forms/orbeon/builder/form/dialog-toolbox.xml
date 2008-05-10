@@ -142,7 +142,6 @@
                     <xforms:label>
                         <xhtml:img src="/apps/fr/style/images/silk/table_add.png" alt="New 1-Column Grid" title="New 1-Column Grid"/>
                         <xhtml:span>New Grid</xhtml:span>
-                        <!--<xhtml:span>1-Column Grid</xhtml:span>-->
                     </xforms:label>
                     <xforms:action ev:event="DOMActivate">
                         <xforms:insert context="." nodeset="fr:section | fr:repeat | fr:grid"
@@ -151,58 +150,20 @@
                     </xforms:action>
                 </xforms:trigger>
             </xhtml:div>
-            <!--<xhtml:div class="fb-tool">-->
-                <!--<xforms:trigger appearance="full">-->
-                    <!--<xforms:label>-->
-                        <!--<xhtml:img src="/apps/fr/style/images/silk/table_add.png" alt="New 2-Column Grid" title="New 2-Column Grid"/>-->
-                        <!--<xhtml:span>2-Column Grid</xhtml:span>-->
-                    <!--</xforms:label>-->
-                    <!--<xforms:action ev:event="DOMActivate">-->
-                        <!--<xforms:insert context="." nodeset="fr:section | fr:repeat | fr:grid"-->
-                                       <!--at="index('fb-section-content-repeat')" position="after"-->
-                                       <!--origin="instance('fb-grid-2-template')"/>-->
-                    <!--</xforms:action>-->
-                <!--</xforms:trigger>-->
-            <!--</xhtml:div>-->
-            <!--<xhtml:div class="fb-tool">-->
-                <!--<xforms:trigger appearance="full">-->
-                    <!--<xforms:label>-->
-                        <!--<xhtml:img src="/apps/fr/style/images/silk/table_add.png" alt="New 3-Column Grid" title="New 3-Column Grid"/>-->
-                        <!--<xhtml:span>3-Column Grid</xhtml:span>-->
-                    <!--</xforms:label>-->
-                    <!--<xforms:action ev:event="DOMActivate">-->
-                        <!--<xforms:insert context="." nodeset="fr:section | fr:repeat | fr:grid"-->
-                                       <!--at="index('fb-section-content-repeat')" position="after"-->
-                                       <!--origin="instance('fb-grid-3-template')"/>-->
-                    <!--</xforms:action>-->
-                <!--</xforms:trigger>-->
-            <!--</xhtml:div>-->
-            <!--<xhtml:div class="fb-tool">-->
-                <!--<xforms:trigger appearance="full">-->
-                    <!--<xforms:label>-->
-                        <!--<xhtml:img src="/apps/fr/style/images/silk/table_add.png" alt="New 4-Column Grid" title="New 4-Column Grid"/>-->
-                        <!--<xhtml:span>4-Column Grid</xhtml:span>-->
-                    <!--</xforms:label>-->
-                    <!--<xforms:action ev:event="DOMActivate">-->
-                        <!--<xforms:insert context="." nodeset="fr:section | fr:repeat | fr:grid"-->
-                                       <!--at="index('fb-section-content-repeat')" position="after"-->
-                                       <!--origin="instance('fb-grid-4-template')"/>-->
-                    <!--</xforms:action>-->
-                <!--</xforms:trigger>-->
-            <!--</xhtml:div>-->
         </xforms:group>
     </xhtml:div>
     <!-- Controls toolbox -->
     <xhtml:div class="fb-toolbox fb-tools">
         <xforms:repeat nodeset="instance('fb-controls-template')/template" id="fb-controls-template-repeat">
 
+            <xxforms:variable name="template" select="."/>
             <xxforms:variable name="control-template" select="xhtml:div/xforms:*"/>
 
             <xhtml:div class="fb-tool">
-                <xforms:trigger id="fb-add-control-trigger" xmlns:f="http://orbeon.org/oxf/xml/formatting">
+                <xforms:trigger id="fb-add-control-trigger" ref="instance('fb-variables')/controls-triggers">
                     <xforms:label>
-                        <xforms:output value="concat('&lt;img width=''16'' height=''16'' src=''', if (@image) then @image else concat('/forms/orbeon/builder/images/', xhtml:div/@class, '.png'), '''/>')" mediatype="text/html" f:url-norewrite="true"/>
-                        <xforms:output ref="@label"/>
+                        <xforms:output value="concat('&lt;img width=''16'' height=''16'' src=''', if ($template/@image) then $template/@image else concat('/forms/orbeon/builder/images/', $template/xhtml:div/@class, '.png'), '''/>')" mediatype="text/html"/>
+                        <xforms:output ref="$template/@label"/>
                     </xforms:label>
                     <xforms:action ev:event="DOMActivate">
                         <!-- Insert a new control -->
@@ -273,75 +234,7 @@
             </xhtml:div>
         </xforms:repeat>
     </xhtml:div>
-    <!-- Actions toolbox -->
-    <xhtml:div class="fb-toolbox fb-tools">
-        <xhtml:div class="fb-tool">
-            <!-- Upload XML Schema -->
-            <xforms:trigger>
-                <xforms:label>
-                    <xhtml:img src="/forms/orbeon/builder/images/schema.gif" alt="Upload XML Schema" title="Upload XML Schema"/>
-                    <xhtml:span>
-                        <xforms:output value="if (exists($model/xs:schema)) then 'Change Schema' else 'Upload Schema'"/>
-                    </xhtml:span>
-                </xforms:label>
-                <xxforms:show ev:event="DOMActivate" dialog="fb-schema-upload-dialog"/>
-            </xforms:trigger>
-        </xhtml:div>
-        <xhtml:div class="fb-tool">
-            <!-- Upload CSS -->
-            <xforms:trigger>
-                <xforms:label>
-                    <xhtml:img src="/apps/fr/style/images/silk/css.png" alt="Upload CSS" title="Upload CSS"/>
-                    <xhtml:span>
-                        <xforms:output value="if (xxforms:bind('css-attachment-bind') = '') then 'Upload CSS' else 'Change CSS'"/>
-                    </xhtml:span>
-                </xforms:label>
-                <xxforms:show ev:event="DOMActivate" dialog="fb-css-upload-dialog"/>
-            </xforms:trigger>
-        </xhtml:div>
-        <xhtml:div class="fb-tool">
-            <!-- Upload PDF Template -->
-            <xforms:trigger>
-                <xforms:label>
-                    <xhtml:img src="/apps/fr/style/pdf.png" alt="Upload PDF" title="Upload PDF"/>
-                    <xhtml:span>
-                        <xforms:output value="if (xxforms:bind('pdf-attachment-bind') = '') then 'Upload PDF' else 'Change PDF'"/>
-                    </xhtml:span>
-                </xforms:label>
-                <xxforms:show ev:event="DOMActivate" dialog="fb-pdf-upload-dialog"/>
-            </xforms:trigger>
-        </xhtml:div>
-        <xhtml:div class="fb-tool">
-            <!-- Show XML -->
-            <xforms:trigger>
-                <xforms:label>
-                    <xhtml:img src="/apps/fr/style/view-xml.gif" alt="Show XML" title="Show XML"/>
-                    <xhtml:span>Show Source</xhtml:span>
-                </xforms:label>
-                <xxforms:show ev:event="DOMActivate" dialog="fb-xml-dialog"/>
-            </xforms:trigger>
-        </xhtml:div>
-        <xhtml:div class="fb-tool">
-            <!-- Edit Source -->
-            <xforms:trigger>
-                <xforms:label>
-                    <xhtml:img src="/apps/fr/style/images/silk/xhtml.png" alt="Edit Source" title="Edit Source"/>
-                    <xhtml:span>Edit Source</xhtml:span>
-                </xforms:label>
-                <xxforms:show ev:event="DOMActivate" dialog="fb-edit-source-dialog"/>
-            </xforms:trigger>
-        </xhtml:div>
-        <!-- SOAP Submission -->
-        <!--<xhtml:div class="fb-tool">-->
-            <!--<xforms:trigger>-->
-                <!--<xforms:label>-->
-                    <!--<xhtml:img src="/apps/fr/style/run.gif" alt="Edit Submission" title="Edit Submission"/>-->
-                    <!--<xhtml:span>Submission</xhtml:span>-->
-                <!--</xforms:label>-->
-                <!--<xxforms:show ev:event="DOMActivate" dialog="fb-submission-dialog"/>-->
-            <!--</xforms:trigger>-->
-        <!--</xhtml:div>-->
-    </xhtml:div>
+
     <!-- Languages toolbox -->
     <xhtml:div class="fb-toolbox">
         <xforms:group class="fb-language-choice fb-hide-alert">
@@ -400,6 +293,71 @@
         </xforms:group>
     </xhtml:div>
 
+    <!--<xforms:group>-->
+        <!--<xforms:label>Advanced</xforms:label>-->
+
+    <!-- Actions toolbox -->
+    <xhtml:div class="fb-toolbox fb-tools">
+
+        <xhtml:div class="fb-tool">
+            <!-- Upload XML Schema -->
+            <xforms:trigger>
+                <xforms:label>
+                    <xhtml:img src="/forms/orbeon/builder/images/schema.gif" alt="Upload XML Schema" title="Upload XML Schema"/>
+                    <xhtml:span>
+                        <xforms:output value="if (exists($model/xs:schema)) then 'Change Schema' else 'Upload Schema'"/>
+                    </xhtml:span>
+                </xforms:label>
+                <xxforms:show ev:event="DOMActivate" dialog="fb-schema-upload-dialog"/>
+            </xforms:trigger>
+        </xhtml:div>
+        <xhtml:div class="fb-tool">
+            <!-- Upload CSS -->
+            <xforms:trigger>
+                <xforms:label>
+                    <xhtml:img src="/apps/fr/style/images/silk/css.png" alt="Upload CSS" title="Upload CSS"/>
+                    <xhtml:span>
+                        <xforms:output value="if (xxforms:bind('css-attachment-bind') = '') then 'Upload CSS' else 'Change CSS'"/>
+                    </xhtml:span>
+                </xforms:label>
+                <xxforms:show ev:event="DOMActivate" dialog="fb-css-upload-dialog"/>
+            </xforms:trigger>
+        </xhtml:div>
+        <xhtml:div class="fb-tool">
+            <!-- Upload PDF Template -->
+            <xforms:trigger>
+                <xforms:label>
+                    <xhtml:img src="/apps/fr/style/pdf.png" alt="Upload PDF" title="Upload PDF"/>
+                    <xhtml:span>
+                        <xforms:output value="if (xxforms:bind('pdf-attachment-bind') = '') then 'Upload PDF' else 'Change PDF'"/>
+                    </xhtml:span>
+                </xforms:label>
+                <xxforms:show ev:event="DOMActivate" dialog="fb-pdf-upload-dialog"/>
+            </xforms:trigger>
+        </xhtml:div>
+        <xhtml:div class="fb-tool">
+            <!-- Show XML -->
+            <xforms:trigger>
+                <xforms:label>
+                    <xhtml:img src="/apps/fr/style/view-xml.gif" alt="Show XML" title="Show XML"/>
+                    <xhtml:span>Show Source</xhtml:span>
+                </xforms:label>
+                <xxforms:show ev:event="DOMActivate" dialog="fb-xml-dialog"/>
+            </xforms:trigger>
+        </xhtml:div>
+        <xhtml:div class="fb-tool">
+            <!-- Edit Source -->
+            <xforms:trigger>
+                <xforms:label>
+                    <xhtml:img src="/apps/fr/style/images/silk/xhtml.png" alt="Edit Source" title="Edit Source"/>
+                    <xhtml:span>Edit Source</xhtml:span>
+                </xforms:label>
+                <xxforms:show ev:event="DOMActivate" dialog="fb-edit-source-dialog"/>
+            </xforms:trigger>
+        </xhtml:div>
+
+    </xhtml:div>
+
     <!-- Submissions -->
     <xhtml:div class="fb-toolbox">
         <xforms:group class="fb-hide-alert">
@@ -454,7 +412,7 @@
     </xhtml:div>
 
     <!-- Bindings -->
-    <xhtml:div class="fb-toolbox">
+    <xhtml:div class="fb-toolbox" style="display: none">
         <xforms:group class="fb-hide-alert">
             <xforms:label>Bindings</xforms:label>
             <!-- Repeat over existing bindings -->
@@ -506,5 +464,6 @@
         </xforms:group>
     </xhtml:div>
 
+    <!--</xforms:group>-->
 
 </xhtml:div>

@@ -327,26 +327,38 @@
     </xsl:template>
 
     <xsl:template match="fr:back-button">
-        <!-- Trigger shown to go back if the data is dirty -->
-        <xforms:trigger ref="instance('fr-persistence-instance')[data-status = 'dirty']">
+        <!-- Display a "close" button as it's clearer for users -->
+        <xforms:trigger>
             <xforms:label>
-                <xhtml:img src="/apps/fr/style/images/silk/house.png" alt="Home"/>
-                <xhtml:span><xforms:output value="$fr-resources/detail/labels/discard"/></xhtml:span>
+                <xhtml:img src="/apps/fr/style/close.gif" alt=""/>
+                <xforms:output value="$fr-resources/detail/labels/close"/>
             </xforms:label>
             <xforms:action ev:event="DOMActivate">
                 <xforms:dispatch target="fr-persistence-model" name="fr-goto-summary"/>
             </xforms:action>
         </xforms:trigger>
-        <!-- Trigger shown to go back if the data is clean -->
-        <xforms:trigger ref="instance('fr-persistence-instance')[data-status = 'clean']">
-            <xforms:label>
-                <xhtml:img src="/apps/fr/style/images/silk/house.png" alt="Home"/>
-                <xhtml:span><xforms:output value="$fr-resources/detail/labels/return"/></xhtml:span>
-            </xforms:label>
-            <xforms:action ev:event="DOMActivate">
-                <xforms:dispatch target="fr-persistence-model" name="fr-goto-summary"/>
-            </xforms:action>
-        </xforms:trigger>
+        <xsl:if test="false()">
+            <!-- Trigger shown to go back if the data is dirty -->
+            <xforms:trigger ref="instance('fr-persistence-instance')[data-status = 'dirty']">
+                <xforms:label>
+                    <xhtml:img src="/apps/fr/style/images/silk/house.png" alt="Home"/>
+                    <xhtml:span><xforms:output value="$fr-resources/detail/labels/discard"/></xhtml:span>
+                </xforms:label>
+                <xforms:action ev:event="DOMActivate">
+                    <xforms:dispatch target="fr-persistence-model" name="fr-goto-summary"/>
+                </xforms:action>
+            </xforms:trigger>
+            <!-- Trigger shown to go back if the data is clean -->
+            <xforms:trigger ref="instance('fr-persistence-instance')[data-status = 'clean']">
+                <xforms:label>
+                    <xhtml:img src="/apps/fr/style/images/silk/house.png" alt="Home"/>
+                    <xhtml:span><xforms:output value="$fr-resources/detail/labels/return"/></xhtml:span>
+                </xforms:label>
+                <xforms:action ev:event="DOMActivate">
+                    <xforms:dispatch target="fr-persistence-model" name="fr-goto-summary"/>
+                </xforms:action>
+            </xforms:trigger>
+        </xsl:if>
     </xsl:template>
 
     <xsl:template match="fr:clear-button">

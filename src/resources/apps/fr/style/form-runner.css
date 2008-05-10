@@ -328,7 +328,7 @@ div.fr-collapsible {
 .fr-unsaved-data { color: #cc0000 }
 
 /* Errors */
-.fr-error-messages { float: left; margin-bottom: 0; width: 100% }
+.fr-error-messages { float: left; margin-bottom: 0 }
 .fr-error-messages td { padding: 0.2em }
 .fr-error-title {
     display: block;

@@ -109,22 +109,22 @@
             <resource xml:lang="en">
                 <application-name>
                     <label>Application Name</label>
-                    <hint>Please enter an application name</hint>
+                    <hint>click to enter an application name</hint>
                     <alert>The application name must be a non-empty identifier</alert>
                 </application-name>
                 <form-name>
                     <label>Form Name</label>
-                    <hint>Please enter a form name</hint>
+                    <hint>click to enter a form name</hint>
                     <alert>The form name must be a non-empty identifier</alert>
                 </form-name>
                 <title>
                     <label>Form Title</label>
-                    <hint>Please enter a form title</hint>
+                    <hint>click to enter a form title</hint>
                     <alert>The form title is required</alert>
                 </title>
                 <description>
                     <label>Form Description</label>
-                    <hint>Please enter an optional form description</hint>
+                    <hint>click to enter an optional form description</hint>
                 </description>
                 <logo>
                     <label>Logo</label>
@@ -244,6 +244,7 @@
             <new-source-trigger/>
 
             <publish-trigger/>
+            <controls-triggers/>
 
             <xml-view/>
         </variables>
@@ -252,7 +253,18 @@
     <xforms:bind nodeset="instance('fb-variables')">
         <!-- Publish is enabled only when the data is clean -->
         <xforms:bind nodeset="publish-trigger" readonly="xxforms:instance('fr-form-valid-instance') = 'false'"/>
+        <!-- When are toolbar controls triggers enabled -->
+        <xforms:bind nodeset="controls-triggers"
+                     readonly="$current-td/xforms:* and not($current-td/following-sibling::xhtml:td[1][not(xforms:*)]
+                                                            or not($current-td/following-sibling::xhtml:td)
+                                                                    and (not(exists($current-td/../following-sibling::xhtml:tr[1]/xhtml:td[1]/xforms:*)))
+                                                        )"/>
     </xforms:bind>
+
+    <!-- React to a focus on a repeat -->
+    <xforms:action ev:event="DOMFocusIn" ev:target="fb-section-content-grid-td-repeat">
+        <!-- TODO: anything here? -->
+    </xforms:action>
 
     <!-- Ensure there is an empty xhtml:td to place a new control (may fail) -->
     <xforms:action ev:event="fb-ensure-empty-td">
@@ -773,7 +785,7 @@
 
     <xforms:instance id="fb-controls-template" xxforms:readonly="true">
         <templates xmlns="">
-            <template label="Text Line">
+            <template label="Single-Line Text">
                 <xhtml:div class="input">
                     <xforms:input id="" ref="" incremental="true">
                         <xforms:label ref=""/>
@@ -781,6 +793,16 @@
                         <xforms:help ref=""/>
                         <xforms:alert ref="$fr-resources/detail/labels/alert"/>
                     </xforms:input>
+                </xhtml:div>
+            </template>
+            <template label="Multi-Line Text">
+                <xhtml:div id="" class="textarea">
+                    <xforms:textarea id="" ref="" incremental="true">
+                        <xforms:label ref=""/>
+                        <xforms:hint ref=""/>
+                        <xforms:help ref=""/>
+                        <xforms:alert ref="$fr-resources/detail/labels/alert"/>
+                    </xforms:textarea>
                 </xhtml:div>
             </template>
             <template label="Date Picker" image="/ops/images/xforms/calendar.png">
@@ -814,16 +836,6 @@
                     <!--</xforms:input>-->
                 <!--</xhtml:div>-->
             <!--</template>-->
-            <template label="Text Area">
-                <xhtml:div id="" class="textarea">
-                    <xforms:textarea id="" ref="" incremental="true">
-                        <xforms:label ref=""/>
-                        <xforms:hint ref=""/>
-                        <xforms:help ref=""/>
-                        <xforms:alert ref="$fr-resources/detail/labels/alert"/>
-                    </xforms:textarea>
-                </xhtml:div>
-            </template>
             <template label="Dropdown">
                 <xhtml:div class="dropdown">
                     <xforms:select1 id="" appearance="minimal" ref="">

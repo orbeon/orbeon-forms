@@ -94,9 +94,9 @@
                 -->
 
                 <!-- Section about form metadata -->
-                <!--<xhtml:div id="fb-metadata-section" class="fb-metadata-section">-->
-                <fr:section id="fb-metadata-section" class="fb-metadata-section">
-                    <xforms:label>About this Form</xforms:label>
+                <xhtml:div id="fb-metadata-section" class="fb-metadata-section">
+                <!--<fr:section id="fb-metadata-section" class="fb-metadata-section">-->
+                    <!--<xforms:label>About this Form</xforms:label>-->
 
                     <fr:grid columns="2" class="fb-metadata-names">
                         <xhtml:tr>
@@ -159,8 +159,8 @@
                             </xhtml:td>
                         </xhtml:tr>
                     </fr:grid>
-                </fr:section>
-                <!--</xhtml:div>-->
+                <!--</fr:section>-->
+                </xhtml:div>
 
                 <!-- Form details -->
                 <xforms:group context="$body" id="fb-details-section">
@@ -186,7 +186,7 @@
 
                                     <fr:section id="fb-top-level-section" editable="true">
                                         <xforms:label ref="$current-resources/*[name() = $section-name]/label"/>
-                                        <xforms:hint>Enter a section name</xforms:hint>
+                                        <xforms:hint>click to enter a section name</xforms:hint>
 
                                         <!-- Respond to fr-delete event to delete the current section -->
                                         <xforms:action ev:event="fr-delete">
@@ -555,7 +555,7 @@
                                                                                     <!-- Expand cell down -->
                                                                                     <xforms:group ref=".[exists($td/../following-sibling::xhtml:tr[xs:integer(if ($td/@rowspan) then $td/@rowspan else 1)])]">
                                                                                         <xforms:trigger appearance="minimal" id="fb-expand-cell-down-trigger">
-                                                                                            <xforms:label><xhtml:img src="/apps/fr/style/images/silk/arrow_out.png" alt="Expand" title="Expand"/></xforms:label>
+                                                                                            <xforms:label><xhtml:img src="/apps/fr/style/images/silk/arrow_down.png" alt="Expand" title="Expand"/></xforms:label>
                                                                                             <xforms:action ev:event="DOMActivate">
 
                                                                                                 <!-- Prepare span grid -->
@@ -611,7 +611,7 @@
                                                                                     <!-- Shrink -->
                                                                                     <xforms:group ref=".[$td/@rowspan and $td/@rowspan > 1]">
                                                                                         <xforms:trigger appearance="minimal" id="fb-shrink-cell-down-trigger">
-                                                                                            <xforms:label><xhtml:img src="/apps/fr/style/images/silk/arrow_in.png" alt="Shrink" title="Shrink"/></xforms:label>
+                                                                                            <xforms:label><xhtml:img src="/apps/fr/style/images/silk/arrow_up.png" alt="Shrink" title="Shrink"/></xforms:label>
                                                                                             <xforms:action ev:event="DOMActivate">
 
                                                                                                 <!-- Prepare span grid -->
@@ -729,6 +729,16 @@
 
                                                                                 <xhtml:div class="fb-grid-content">
 
+                                                                                    <xforms:group ref=".[not($control)]">
+                                                                                        <span class="fb-empty-cell">
+                                                                                            <span class="fb-click-message">
+                                                                                                click to select this cell
+                                                                                            </span>
+                                                                                            <span class="fb-use-toolbar-message">
+                                                                                                use the toolbar to insert a control
+                                                                                            </span>
+                                                                                        </span>
+                                                                                    </xforms:group>
                                                                                     <xforms:group ref=".[$control]">
 
                                                                                         <!-- Edit help for any control -->
@@ -747,13 +757,12 @@
                                                                                                           navindex="1000">
                                                                                                 <!-- TODO: navindex is just for testing -->
                                                                                                 <xforms:label class="fb-xforms-disabled"/>
-                                                                                                <xforms:hint>Enter a label</xforms:hint>
+                                                                                                <xforms:hint>click to enter a label</xforms:hint>
                                                                                             </xforms:input>
                                                                                         </xhtml:span>
 
                                                                                         <!-- Display representation of the control -->
                                                                                         <xhtml:div class="fb-control-control">
-
                                                                                             <xforms:group ref="xforms:input">
                                                                                                 <xforms:input ref="$instance-holder">
                                                                                                     <xforms:label class="fb-xforms-disabled"/>
@@ -918,7 +927,7 @@
                                                                                                           navindex="1000">
                                                                                                 <!-- TODO: navindex is just for testing -->
                                                                                                 <xforms:label class="fb-xforms-disabled"/>
-                                                                                                <xforms:hint>Enter an optional hint</xforms:hint>
+                                                                                                <xforms:hint>click to enter an optional hint</xforms:hint>
                                                                                             </xforms:input>
                                                                                         </xhtml:span>
                                                                                     </xforms:group>

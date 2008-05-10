@@ -1,0 +1,89 @@
+<!--
+    Copyright (C) 2008 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:f="http://orbeon.org/oxf/xml/formatting"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:widget="http://orbeon.org/oxf/xml/widget"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xhtml:head>
+        <xhtml:title>Offline Initial Events</xhtml:title>
+        <xforms:model xxforms:offline="true" id="main-model" xxforms:external-events="go-offline">
+            <xforms:instance id="instance">
+                <instance>
+                    <firstname>John</firstname>
+                    <lastname>Smith</lastname>
+                </instance>
+            </xforms:instance>
+            <xforms:instance id="instance-copy">
+                <dummy/>
+            </xforms:instance>
+            <xforms:instance id="ui">
+                <ui>
+                    <offline>false</offline>
+                </ui>
+            </xforms:instance>
+            <xforms:action ev:event="xforms-model-construct-done">
+                <!-- Move from "instance" to "instance-copy" -->
+                <xforms:insert nodeset="instance('instance-copy')" origin="instance('instance')"/>
+                <xforms:delete while="instance('instance')/*" nodeset="instance('instance')/*"/>
+                <xxforms:script>ORBEON.xforms.Document.dispatchEvent("main-model", "go-offline");</xxforms:script>
+            </xforms:action>
+            <xforms:action ev:event="go-offline">
+                <!--<xxforms:offline/>-->
+            </xforms:action>
+            <xforms:action ev:event="xxforms-offline">
+                <!-- Move from "instance-copy" to "instance" -->
+                <xforms:insert nodeset="instance('instance')" origin="instance('instance-copy')"/>
+                <xforms:setvalue ref="instance('ui')/offline">true</xforms:setvalue>
+            </xforms:action>
+            <xforms:action ev:event="xxforms-online">
+                <xforms:setvalue ref="instance('ui')/offline">false</xforms:setvalue>
+            </xforms:action>
+        </xforms:model>
+    </xhtml:head>
+    <xhtml:body>
+        <xhtml:p>
+            Currently
+            <xhtml:b>
+                <xforms:output value="if (instance('ui')/offline = 'true') then 'offline' else 'online'"/>
+            </xhtml:b>
+        </xhtml:p>
+        <xhtml:p>
+            <xforms:input ref="instance('instance')/firstname">
+                <xforms:label>First name: </xforms:label>
+            </xforms:input>
+            <xforms:input ref="instance('instance')/lastname">
+                <xforms:label>First name: </xforms:label>
+            </xforms:input>
+        </xhtml:p>
+        <xhtml:p>
+            <xforms:trigger ref=".[instance('ui')/offline = 'false']">
+                <xforms:label>Take offline</xforms:label>
+                <xxforms:offline ev:event="DOMActivate"/>
+            </xforms:trigger>
+            <xforms:trigger ref=".[instance('ui')/offline = 'true']">
+                <xforms:label>Take online</xforms:label>
+                <xxforms:online ev:event="DOMActivate"/>
+            </xforms:trigger>
+            <xforms:trigger ref=".[instance('ui')/offline = 'true']">
+                <xforms:label>Save to Gears</xforms:label>
+                <xxforms:offline-save ev:event="DOMActivate"/>
+            </xforms:trigger>
+        </xhtml:p>
+        <!--<widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>-->
+    </xhtml:body>
+</xhtml:html>

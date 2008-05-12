@@ -21,7 +21,7 @@
 
     <xhtml:head>
         <xhtml:title>Offline Initial Events</xhtml:title>
-        <xforms:model xxforms:offline="true" id="main-model" xxforms:external-events="go-offline">
+        <xforms:model xxforms:offline="true" id="main-model">
             <xforms:instance id="instance">
                 <instance>
                     <firstname>John</firstname>
@@ -40,10 +40,7 @@
                 <!-- Move from "instance" to "instance-copy" -->
                 <xforms:insert nodeset="instance('instance-copy')" origin="instance('instance')"/>
                 <xforms:delete while="instance('instance')/*" nodeset="instance('instance')/*"/>
-                <xxforms:script>ORBEON.xforms.Document.dispatchEvent("main-model", "go-offline");</xxforms:script>
-            </xforms:action>
-            <xforms:action ev:event="go-offline">
-                <!--<xxforms:offline/>-->
+                <xxforms:script>ORBEON.xforms.Document.dispatchEvent("$containing-document$", "xxforms-offline");</xxforms:script>
             </xforms:action>
             <xforms:action ev:event="xxforms-offline">
                 <!-- Move from "instance-copy" to "instance" -->

@@ -4193,7 +4193,8 @@ ORBEON.xforms.Offline = {
     encryptionKey: null,                            // Key that will be used when storing events in the store
     controlValues: null,                            // While offline, contains the latest value of the controls
     typeRegExps: {
-        "{http://www.w3.org/2001/XMLSchema}decimal": new RegExp("^[+-]?[0-9]+(\\.[0-9]+)?$", "g")
+        "{http://www.w3.org/2001/XMLSchema}decimal": new RegExp("^[+-]?[0-9]+(\\.[0-9]+)?$", "g"),
+        "{http://www.w3.org/2001/XMLSchema}integer": new RegExp("^[+-]?[0-9]+$", "g")
     },
 
     /**
@@ -4394,9 +4395,11 @@ ORBEON.xforms.Offline = {
         }
 
         // Controls for which there is a variable defined
-        var variables = ORBEON.util.String.eval("({" + mappings + "})").variables;
-        for (var variableName in variables) {
-            var controlID = variables[variableName];
+        var mappings = ORBEON.util.String.eval("({" + mappings + "})");
+        ORBEON.xforms.Offline.mips = mappings.mips;
+        ORBEON.xforms.Offline.variables = mappings.variables;
+        for (var variableName in mappings.variables) {
+            var controlID = mappings.variables[variableName];
             controlKeepValueIDs.push(controlID);
         }
 

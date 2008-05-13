@@ -50,6 +50,9 @@
                 <xforms:toggle case="case-done" ev:event="xforms-submit-done"/>
             </xforms:submission>
             <xforms:bind nodeset="instance('control-instance')/size" type="xs:integer"/>
+
+            <!-- Perform the submission upon initialization -->
+            <xforms:send ev:event="xforms-model-construct-done" submission="flickr-submission"/>
         </xforms:model>
         <xhtml:style type="text/css">
 
@@ -126,11 +129,11 @@
                 </tr>
             </table>
             <xforms:switch>
-                <xforms:case id="case-start"></xforms:case>
+                <xforms:case id="case-start"/>
                 <xforms:case id="case-busy">
                     <img src="/images/loading.gif" alt="Busy"/>
                 </xforms:case>
-                <xforms:case id="case-done">
+                <xforms:case id="case-done" selected="true">
                     <xforms:group ref="instance('response-instance')">
                         <xforms:repeat nodeset="photos/photo">
                             <xforms:output
@@ -164,5 +167,8 @@
                 href="http://skimstone.x-port.net/index.php?q=node/89">tutorial</a> by Mark Birbeck.
             </p>
         </xforms:group>
+
+        <!--<widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>-->
+
     </xhtml:body>
 </xhtml:html>

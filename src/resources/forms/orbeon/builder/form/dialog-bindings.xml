@@ -24,7 +24,7 @@
 
       id="fb-bindings-dialog" level="modal" close="true" draggable="true" class="fr-dialog" model="fb-bindings-model">
 
-    <xforms:label>Bindings Editor</xforms:label>
+    <xforms:label>Actions Editor</xforms:label>
 
     <xxforms:variable name="instance" select="instance('fb-bindings-editor-instance')"/>
     <xhtml:div class="fr-grid">
@@ -111,9 +111,9 @@
                                 </xforms:select1>
                             </xhtml:td>
                             <xhtml:td>
-                                <xforms:group>
+                                <xforms:group class="fb-parameters">
                                     <xforms:label>Parameters</xforms:label>
-                                    <xforms:select1 ref="@control-name[../@name = 'setvalue']">
+                                    <xforms:select1 ref="@control-name[../@name = ('setvalue', 'validate', 'itemset')]">
                                         <xforms:label>Control</xforms:label>
                                         <xforms:item>
                                             <xforms:label>[Select...]</xforms:label>

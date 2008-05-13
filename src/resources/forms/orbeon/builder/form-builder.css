@@ -70,7 +70,12 @@ a.fb-edit-help-trigger img {
 }
 .fb-tools .fb-tool button
 .fb-tools .fb-tool button img { margin-left: .5em }
+.fb-tools .fb-tool button:hover { background-color: white; background-image: none }
 .fb-tools .fb-tool button.xforms-readonly { color: white }
+.fb-tools .fb-tool button.xforms-readonly:hover {
+    background-color: #F8F8F8;
+    background-image: url(../../../apps/fr/style/logo-bg.gif)
+}
 
 .fb-xvc { text-align: center }
 .fb-xvc .xforms-trigger { margin-right: .5em }
@@ -82,6 +87,11 @@ a.fb-edit-help-trigger img {
 /*.yui-panel-container > #fb-toolbox-dialog { position: fixed; left: 0; top: 0; height: 100%; border-width: 0 1px 0 0; border-color: #666699 }*//* IE HACK: hide this definition for IE 6 */
 /*#fb-toolbox-dialog .hd { display: none }*/
 .fb-toolbox a.xforms-trigger { text-decoration: none }
+
+/* Toolbox sections */
+#fb-toolbox div.fr-collapsible { margin-left: 0 }
+#fb-toolbox .fr-section-container { border: none }
+#fb-toolbox h2 { font-size: 100%; margin-left: .5em; font-weight: bold }
 
 .fb-toolbar button { width: 12em }
 .fb-section-toolbar { margin-top: .5em }
@@ -106,6 +116,8 @@ a.fb-edit-help-trigger img {
 /* Bindings editor dialog */
 #fb-bindings-dialog { width: 45em }
 #fb-bindings-dialog .xforms-select1 { width: 10em }
+#fb-bindings-dialog .fr-repeat-table .fb-parameters .xforms-label { display: inline }
+#fb-bindings-dialog .fr-repeat-table .fb-parameters .xforms-disabled { display: none }
 
 /* Other dialogs */
 .xforms-dialog .bd { padding-left: .5em; padding-right: .5em }
@@ -149,14 +161,14 @@ a.fb-edit-help-trigger img {
 #fb-details-section .fb-grid-td:hover .fr-inplace-content .xforms-output:hover { background-color: #FFFF88 }
 
 /* In-place editing for metadata section */
-#fb-metadata-section .fr-inplace-input .xforms-input input { width: 100% }
-#fb-metadata-section .fr-inplace-textarea textarea.xforms-textarea { width: 100% }
-#fb-metadata-section .fr-inplace-buttons .xforms-control { display: inline }
-#fb-metadata-section .fr-inplace-view .fr-inplace-buttons { display: none }
+.fb-metadata-section .fr-inplace-input .xforms-input input { width: 100% }
+.fb-metadata-section .fr-inplace-textarea textarea.xforms-textarea { width: 100% }
+.fb-metadata-section .fr-inplace-buttons .xforms-control { display: inline }
+.fb-metadata-section .fr-inplace-view .fr-inplace-buttons { display: none }
 
-#fb-metadata-section .fr-grid .fr-cell-content { width: 30em }
+.fb-metadata-section .fr-grid .fr-cell-content { width: 30em }
 
-.fb-metadata-section { padding-bottom: .5em }
+.fb-metadata-section { padding-bottom: .5em; border-bottom: 1px dotted gray }
 .fb-metadata-logo-title {
     background-image: url(../../../apps/fr/style/logo-bg.gif);
     background-repeat: repeat-x;

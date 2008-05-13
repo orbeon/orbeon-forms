@@ -49,7 +49,7 @@
         </xsl:if>
         <xhtml:div id="fr-view">
             <xhtml:div id="{if (@width = '750px') then 'doc' else if (@width = '950px') then 'doc2' else if (@width = '1154px') then 'doc-fb' else 'doc4'}"
-                       class="{if (fr:leftxxx) then 'yui-t2 ' else ''}{if (doc('input:instance')/*/mode = 'print') then ' fr-print-mode' else ''}">
+                       class="{if (doc('input:instance')/*/mode = 'print') then ' fr-print-mode' else ''}">
                 <!-- Scope form resources -->
                 <xxforms:variable name="form-resources" select="xxforms:instance('fr-current-form-resources')"/>
                 <xhtml:div class="fr-header">
@@ -287,11 +287,11 @@
                             </xhtml:div>
                         </xhtml:div>
                     </xhtml:div>
-                    <xsl:if test="fr:leftxxx">
-                        <xhtml:div class="yui-b">
-                            <xsl:apply-templates select="fr:left/node()"/>
-                        </xhtml:div>
-                    </xsl:if>
+                    <!--<xsl:if test="fr:leftxxx">-->
+                        <!--<xhtml:div class="yui-b">-->
+                            <!--<xsl:apply-templates select="fr:left/node()"/>-->
+                        <!--</xhtml:div>-->
+                    <!--</xsl:if>-->
                 </xhtml:div>
                 <xhtml:div id="ft" class="fr-bottom">
                     <xsl:choose>
@@ -836,8 +836,8 @@
                     </xhtml:th>
                 </xsl:for-each>
             </xhtml:tr>
-            <!-- Lines with the data -->
             <xforms:repeat nodeset="{@nodeset}" id="{@id}">
+                <!-- First line with data -->
                 <xhtml:tr>
                     <xhtml:th class="fr-repeat-column">
                         <xforms:output value="position()"/>
@@ -859,8 +859,10 @@
                     </xsl:if>
                     <xsl:apply-templates select="xhtml:tr[1]/xhtml:td"/>
                 </xhtml:tr>
+                <!-- Following lines with data if any -->
                 <xsl:apply-templates select="xhtml:tr except xhtml:tr[1] | xhtml:td" mode="prepend-td"/>
             </xforms:repeat>
+            <!-- IE display HACK -->
             <xhtml:tr class="fr-repeat-last-line"><xhtml:td/></xhtml:tr>
         </xhtml:table>
     </xsl:template>

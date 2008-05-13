@@ -2,10 +2,17 @@
 
 html { overflow: scroll; }
 
-/* Test for iepngfix.htc */
-/*#fr-view button.xforms-trigger img, #fr-view a.xforms-trigger img,*/
-    /*#fr-view .fr-logo img,*/
-    /*#fr-view img.xforms-help-image { behavior: url(/orbeon/apps/fr/style/iepngfix.htc) }*/
+/* IE 6 HACK: bind behavior from iepngfix.htc */
+#fr-view .fr-top, #fr-view .fr-bottom,
+        #fr-view button.xforms-trigger img,
+        #fr-view a.xforms-trigger img,
+        #fr-view .fr-logo img,
+        #fr-view img.xforms-help-image,
+        #fr-view .fr-status-icons img
+{
+    behavior: url(/orbeon/apps/fr/style/iepngfix.htc) /* TODO: Fix absolute path here */
+    /*;border: 10px solid red*/
+}
 
 body {
     background-color: #FFE27F;
@@ -430,6 +437,7 @@ div.fr-collapsible {
 .fr-grid .xforms-mediatype-image { *padding-bottom: 17px; *overflow-y: hidden }/* IE HACK */
 .fr-grid .xforms-mediatype-image img { display: block }
 
+/* Cell widths */
 .fr-grid-td { width: auto; vertical-align: top; overflow: hidden }
 .fr-grid-td .fb-grid-content { width: 64em; *width: 62.4576em }
 
@@ -444,6 +452,12 @@ div.fr-collapsible {
 .fr-grid-4-columns .fr-grid-td { width: 25%; }
 #doc .fr-grid-4-columns .fr-grid-td .fr-grid-content { width: 16.5em; *width: 16.1em }
 #doc4 .fr-grid-4-columns .fr-grid-td .fr-grid-content { width: 16.5em; *width: 15.5em }
+
+/* Hand-tuned control widths for IE <= 7 */
+/* TODO: more controls */
+#doc4 .fr-grid-td .fr-grid-content .xforms-textarea { *width: 98% }
+#doc4 .fr-grid-2-columns .fr-grid-td .fr-grid-content .xforms-input-input { *width: 99.5% }
+#doc4 .fr-grid-3-columns .fr-grid-td .fr-grid-content .xforms-input-input { *width: 98.7% }
 
 /* Upload control information */
 .xforms-upload-info { display: block; width: 100%; background-color: #FFFFDD; padding: 2px }

@@ -293,177 +293,202 @@
         </xforms:group>
     </xhtml:div>
 
-    <!--<xforms:group>-->
-        <!--<xforms:label>Advanced</xforms:label>-->
+    <fr:section id="fb-toolbox-metadata-section" class="fb-metadata-section" open="false">
+        <xforms:label>Metadata</xforms:label>
 
-    <!-- Actions toolbox -->
-    <xhtml:div class="fb-toolbox fb-tools">
+        <fr:grid columns="1" class="fb-metadata-names">
+            <xhtml:tr>
+                <xhtml:td>
+                    <xforms:input id="application-name-control" bind="application-name-bind" appearance="fr:in-place" class="fr-summary fr-search" incremental="true">
+                        <xforms:label ref="$form-resources/application-name/label"/>
+                        <xforms:hint ref="$form-resources/application-name/hint"/>
+                        <xforms:alert ref="$form-resources/application-name/alert"/>
+                    </xforms:input>
+                </xhtml:td>
+            </xhtml:tr>
+            <xhtml:tr>
+                <xhtml:td>
+                    <xforms:input id="form-name-control" bind="form-name-bind" appearance="fr:in-place" class="fr-summary fr-search" incremental="true">
+                        <xforms:label ref="$form-resources/form-name/label"/>
+                        <xforms:hint ref="$form-resources/form-name/hint"/>
+                        <xforms:alert ref="$form-resources/form-name/alert"/>
+                    </xforms:input>
+                </xhtml:td>
+            </xhtml:tr>
+        </fr:grid>
+    </fr:section>
 
-        <xhtml:div class="fb-tool">
-            <!-- Upload XML Schema -->
-            <xforms:trigger>
-                <xforms:label>
-                    <xhtml:img src="/forms/orbeon/builder/images/schema.gif" alt="Upload XML Schema" title="Upload XML Schema"/>
-                    <xhtml:span>
-                        <xforms:output value="if (exists($model/xs:schema)) then 'Change Schema' else 'Upload Schema'"/>
-                    </xhtml:span>
-                </xforms:label>
-                <xxforms:show ev:event="DOMActivate" dialog="fb-schema-upload-dialog"/>
-            </xforms:trigger>
-        </xhtml:div>
-        <xhtml:div class="fb-tool">
-            <!-- Upload CSS -->
-            <xforms:trigger>
-                <xforms:label>
-                    <xhtml:img src="/apps/fr/style/images/silk/css.png" alt="Upload CSS" title="Upload CSS"/>
-                    <xhtml:span>
-                        <xforms:output value="if (xxforms:bind('css-attachment-bind') = '') then 'Upload CSS' else 'Change CSS'"/>
-                    </xhtml:span>
-                </xforms:label>
-                <xxforms:show ev:event="DOMActivate" dialog="fb-css-upload-dialog"/>
-            </xforms:trigger>
-        </xhtml:div>
-        <xhtml:div class="fb-tool">
-            <!-- Upload PDF Template -->
-            <xforms:trigger>
-                <xforms:label>
-                    <xhtml:img src="/apps/fr/style/pdf.png" alt="Upload PDF" title="Upload PDF"/>
-                    <xhtml:span>
-                        <xforms:output value="if (xxforms:bind('pdf-attachment-bind') = '') then 'Upload PDF' else 'Change PDF'"/>
-                    </xhtml:span>
-                </xforms:label>
-                <xxforms:show ev:event="DOMActivate" dialog="fb-pdf-upload-dialog"/>
-            </xforms:trigger>
-        </xhtml:div>
-        <xhtml:div class="fb-tool">
-            <!-- Show XML -->
-            <xforms:trigger>
-                <xforms:label>
-                    <xhtml:img src="/apps/fr/style/view-xml.gif" alt="Show XML" title="Show XML"/>
-                    <xhtml:span>Show Source</xhtml:span>
-                </xforms:label>
-                <xxforms:show ev:event="DOMActivate" dialog="fb-xml-dialog"/>
-            </xforms:trigger>
-        </xhtml:div>
-        <xhtml:div class="fb-tool">
-            <!-- Edit Source -->
-            <xforms:trigger>
-                <xforms:label>
-                    <xhtml:img src="/apps/fr/style/images/silk/xhtml.png" alt="Edit Source" title="Edit Source"/>
-                    <xhtml:span>Edit Source</xhtml:span>
-                </xforms:label>
-                <xxforms:show ev:event="DOMActivate" dialog="fb-edit-source-dialog"/>
-            </xforms:trigger>
-        </xhtml:div>
+    <fr:section id="fb-toolbox-advanced-section" open="false">
+        <xforms:label>Advanced</xforms:label>
 
-    </xhtml:div>
+        <!-- Actions toolbox -->
+        <xhtml:div class="fb-toolbox fb-tools">
 
-    <!-- Submissions -->
-    <xhtml:div class="fb-toolbox">
-        <xforms:group class="fb-hide-alert">
-            <xforms:label>Services</xforms:label>
-            <!-- Repeat over existing services -->
-            <xhtml:ul>
-                <xforms:repeat nodeset="$model/xforms:submission[ends-with(@id, '-submission')]">
-                    <xhtml:li>
-                        <xxforms:variable name="submission-name" select="substring-before(@id, '-submission')"/>
-                        <xforms:trigger appearance="minimal">
-                            <xforms:label>
-                                <xhtml:img src="/apps/fr/style/edit.gif" alt="Edit" title="Edit"/>
-                            </xforms:label>
-                            <xxforms:show ev:event="DOMActivate" dialog="fb-submission-dialog">
-                                <xxforms:context name="submission-id" select="$submission-name"/>
-                            </xxforms:show>
-                        </xforms:trigger>
-                        <xforms:trigger appearance="minimal" id="fb-submission-remove">
-                            <xforms:label>
-                                <xforms:label><xhtml:img src="/apps/fr/style/images/silk/bin.png" alt="Delete" title="Delete"/></xforms:label>
-                            </xforms:label>
-                            <xforms:action ev:event="DOMActivate">
-                                <!-- Ask confirmation -->
-                                <xxforms:show dialog="fb-confirmation-dialog">
-                                    <xxforms:context name="fr:message"
-                                                     select="concat('Are you sure you want to delete service ''',
-                                                                 $submission-name,
-                                                                 '''?')"/>
-                                    <xxforms:context name="fr:confirmation-target" select="'fb-submission-remove'"/>
-                                </xxforms:show>
-                            </xforms:action>
-                            <xforms:action ev:event="fb-confirmation-yes">
-                                <!-- Delete stuff -->
-                                <xforms:delete nodeset="$model/xforms:submission[@id = context()/@id]"/>
-                                <xforms:delete nodeset="$model/xforms:instance[@id = concat($submission-name, '-instance')]"/>
-                            </xforms:action>
-                        </xforms:trigger>
-                        <xforms:output value="$submission-name"/>
-                    </xhtml:li>
-                </xforms:repeat>
-            </xhtml:ul>
-            <xforms:group class="fb-language-triggers">
-                <xforms:trigger appearance="minimal">
+            <xhtml:div class="fb-tool">
+                <!-- Upload XML Schema -->
+                <xforms:trigger>
                     <xforms:label>
-                        <xhtml:img src="/apps/fr/style/images/silk/add.png" alt="Add Service" title="Add Service"/>
-                        <xhtml:span>Add</xhtml:span>
+                        <xhtml:img src="/forms/orbeon/builder/images/schema.gif" alt="Upload XML Schema" title="Upload XML Schema"/>
+                        <xhtml:span>
+                            <xforms:output value="if (exists($model/xs:schema)) then 'Change Schema' else 'Upload Schema'"/>
+                        </xhtml:span>
                     </xforms:label>
-                    <xxforms:show ev:event="DOMActivate" dialog="fb-submission-dialog"/>
+                    <xxforms:show ev:event="DOMActivate" dialog="fb-schema-upload-dialog"/>
                 </xforms:trigger>
-            </xforms:group>
-        </xforms:group>
-    </xhtml:div>
-
-    <!-- Bindings -->
-    <xhtml:div class="fb-toolbox" style="display: none">
-        <xforms:group class="fb-hide-alert">
-            <xforms:label>Bindings</xforms:label>
-            <!-- Repeat over existing bindings -->
-            <xhtml:ul>
-                <xforms:repeat nodeset="$model/xforms:submission[ends-with(@id, '-submission')]/xxxxx">
-                    <xhtml:li>
-                        <xxforms:variable name="submission-name" select="substring-before(@id, '-submission')"/>
-                        <xforms:trigger appearance="minimal">
-                            <xforms:label>
-                                <xhtml:img src="/apps/fr/style/edit.gif" alt="Edit" title="Edit"/>
-                            </xforms:label>
-                            <xxforms:show ev:event="DOMActivate" dialog="fb-bindings-dialog">
-                                <xxforms:context name="submission-id" select="$submission-name"/>
-                            </xxforms:show>
-                        </xforms:trigger>
-                        <xforms:trigger appearance="minimal" id="fb-binding-remove">
-                            <xforms:label>
-                                <xforms:label><xhtml:img src="/apps/fr/style/images/silk/bin.png" alt="Delete" title="Delete"/></xforms:label>
-                            </xforms:label>
-                            <xforms:action ev:event="DOMActivate">
-                                <!-- Ask confirmation -->
-                                <xxforms:show dialog="fb-confirmation-dialog">
-                                    <xxforms:context name="fr:message"
-                                                     select="concat('Are you sure you want to delete submission ''',
-                                                                 $submission-name,
-                                                                 '''?')"/>
-                                    <xxforms:context name="fr:confirmation-target" select="'fb-binding-remove'"/>
-                                </xxforms:show>
-                            </xforms:action>
-                            <xforms:action ev:event="fb-confirmation-yes">
-                                <!-- Delete stuff -->
-                                <xforms:delete nodeset="$model/xforms:submission[@id = context()/@id]"/>
-                                <xforms:delete nodeset="$model/xforms:instance[@id = concat($submission-name, '-instance')]"/>
-                            </xforms:action>
-                        </xforms:trigger>
-                        <xforms:output value="$submission-name"/>
-                    </xhtml:li>
-                </xforms:repeat>
-            </xhtml:ul>
-            <xforms:group class="fb-language-triggers">
-                <xforms:trigger appearance="minimal">
+            </xhtml:div>
+            <xhtml:div class="fb-tool">
+                <!-- Upload CSS -->
+                <xforms:trigger>
                     <xforms:label>
-                        <xhtml:img src="/apps/fr/style/images/silk/add.png" alt="Add Submission" title="Add Submission"/>
-                        <xhtml:span>Add</xhtml:span>
+                        <xhtml:img src="/apps/fr/style/images/silk/css.png" alt="Upload CSS" title="Upload CSS"/>
+                        <xhtml:span>
+                            <xforms:output value="if (xxforms:bind('css-attachment-bind') = '') then 'Upload CSS' else 'Change CSS'"/>
+                        </xhtml:span>
                     </xforms:label>
-                    <xxforms:show ev:event="DOMActivate" dialog="fb-bindings-dialog"/>
+                    <xxforms:show ev:event="DOMActivate" dialog="fb-css-upload-dialog"/>
                 </xforms:trigger>
-            </xforms:group>
-        </xforms:group>
-    </xhtml:div>
+            </xhtml:div>
+            <xhtml:div class="fb-tool">
+                <!-- Upload PDF Template -->
+                <xforms:trigger>
+                    <xforms:label>
+                        <xhtml:img src="/apps/fr/style/pdf.png" alt="Upload PDF" title="Upload PDF"/>
+                        <xhtml:span>
+                            <xforms:output value="if (xxforms:bind('pdf-attachment-bind') = '') then 'Upload PDF' else 'Change PDF'"/>
+                        </xhtml:span>
+                    </xforms:label>
+                    <xxforms:show ev:event="DOMActivate" dialog="fb-pdf-upload-dialog"/>
+                </xforms:trigger>
+            </xhtml:div>
+            <xhtml:div class="fb-tool">
+                <!-- Show XML -->
+                <xforms:trigger>
+                    <xforms:label>
+                        <xhtml:img src="/apps/fr/style/view-xml.gif" alt="Show XML" title="Show XML"/>
+                        <xhtml:span>Show Source</xhtml:span>
+                    </xforms:label>
+                    <xxforms:show ev:event="DOMActivate" dialog="fb-xml-dialog"/>
+                </xforms:trigger>
+            </xhtml:div>
+            <xhtml:div class="fb-tool">
+                <!-- Edit Source -->
+                <xforms:trigger>
+                    <xforms:label>
+                        <xhtml:img src="/apps/fr/style/images/silk/xhtml.png" alt="Edit Source" title="Edit Source"/>
+                        <xhtml:span>Edit Source</xhtml:span>
+                    </xforms:label>
+                    <xxforms:show ev:event="DOMActivate" dialog="fb-edit-source-dialog"/>
+                </xforms:trigger>
+            </xhtml:div>
 
-    <!--</xforms:group>-->
+        </xhtml:div>
+
+        <!-- Submissions -->
+        <xhtml:div class="fb-toolbox">
+            <xforms:group class="fb-hide-alert">
+                <xforms:label>Services</xforms:label>
+                <!-- Repeat over existing services -->
+                <xhtml:ul>
+                    <xforms:repeat nodeset="$model/xforms:submission[ends-with(@id, '-submission')]">
+                        <xhtml:li>
+                            <xxforms:variable name="submission-name" select="substring-before(@id, '-submission')"/>
+                            <xforms:trigger appearance="minimal">
+                                <xforms:label>
+                                    <xhtml:img src="/apps/fr/style/edit.gif" alt="Edit" title="Edit"/>
+                                </xforms:label>
+                                <xxforms:show ev:event="DOMActivate" dialog="fb-submission-dialog">
+                                    <xxforms:context name="submission-id" select="$submission-name"/>
+                                </xxforms:show>
+                            </xforms:trigger>
+                            <xforms:trigger appearance="minimal" id="fb-submission-remove">
+                                <xforms:label>
+                                    <xforms:label><xhtml:img src="/apps/fr/style/images/silk/bin.png" alt="Delete" title="Delete"/></xforms:label>
+                                </xforms:label>
+                                <xforms:action ev:event="DOMActivate">
+                                    <!-- Ask confirmation -->
+                                    <xxforms:show dialog="fb-confirmation-dialog">
+                                        <xxforms:context name="fr:message"
+                                                         select="concat('Are you sure you want to delete service ''',
+                                                                     $submission-name,
+                                                                     '''?')"/>
+                                        <xxforms:context name="fr:confirmation-target" select="'fb-submission-remove'"/>
+                                    </xxforms:show>
+                                </xforms:action>
+                                <xforms:action ev:event="fb-confirmation-yes">
+                                    <!-- Delete stuff -->
+                                    <xforms:delete nodeset="$model/xforms:submission[@id = context()/@id]"/>
+                                    <xforms:delete nodeset="$model/xforms:instance[@id = concat($submission-name, '-instance')]"/>
+                                </xforms:action>
+                            </xforms:trigger>
+                            <xforms:output value="$submission-name"/>
+                        </xhtml:li>
+                    </xforms:repeat>
+                </xhtml:ul>
+                <xforms:group class="fb-language-triggers">
+                    <xforms:trigger appearance="minimal">
+                        <xforms:label>
+                            <xhtml:img src="/apps/fr/style/images/silk/add.png" alt="Add Service" title="Add Service"/>
+                            <xhtml:span>Add</xhtml:span>
+                        </xforms:label>
+                        <xxforms:show ev:event="DOMActivate" dialog="fb-submission-dialog"/>
+                    </xforms:trigger>
+                </xforms:group>
+            </xforms:group>
+        </xhtml:div>
+
+        <!-- Bindings -->
+        <xhtml:div class="fb-toolbox">
+            <xforms:group class="fb-hide-alert">
+                <xforms:label>Actions</xforms:label>
+                <!-- Repeat over existing bindings -->
+                <xhtml:ul>
+                    <xforms:repeat nodeset="$model/xforms:submission[ends-with(@id, '-submission')]/xxxxx">
+                        <xhtml:li>
+                            <xxforms:variable name="submission-name" select="substring-before(@id, '-submission')"/>
+                            <xforms:trigger appearance="minimal">
+                                <xforms:label>
+                                    <xhtml:img src="/apps/fr/style/edit.gif" alt="Edit" title="Edit"/>
+                                </xforms:label>
+                                <xxforms:show ev:event="DOMActivate" dialog="fb-bindings-dialog">
+                                    <xxforms:context name="submission-id" select="$submission-name"/>
+                                </xxforms:show>
+                            </xforms:trigger>
+                            <xforms:trigger appearance="minimal" id="fb-binding-remove">
+                                <xforms:label>
+                                    <xforms:label><xhtml:img src="/apps/fr/style/images/silk/bin.png" alt="Delete" title="Delete"/></xforms:label>
+                                </xforms:label>
+                                <xforms:action ev:event="DOMActivate">
+                                    <!-- Ask confirmation -->
+                                    <xxforms:show dialog="fb-confirmation-dialog">
+                                        <xxforms:context name="fr:message"
+                                                         select="concat('Are you sure you want to delete submission ''',
+                                                                     $submission-name,
+                                                                     '''?')"/>
+                                        <xxforms:context name="fr:confirmation-target" select="'fb-binding-remove'"/>
+                                    </xxforms:show>
+                                </xforms:action>
+                                <xforms:action ev:event="fb-confirmation-yes">
+                                    <!-- Delete stuff -->
+                                    <xforms:delete nodeset="$model/xforms:submission[@id = context()/@id]"/>
+                                    <xforms:delete nodeset="$model/xforms:instance[@id = concat($submission-name, '-instance')]"/>
+                                </xforms:action>
+                            </xforms:trigger>
+                            <xforms:output value="$submission-name"/>
+                        </xhtml:li>
+                    </xforms:repeat>
+                </xhtml:ul>
+                <xforms:group class="fb-language-triggers">
+                    <xforms:trigger appearance="minimal">
+                        <xforms:label>
+                            <xhtml:img src="/apps/fr/style/images/silk/add.png" alt="Add Submission" title="Add Submission"/>
+                            <xhtml:span>Add</xhtml:span>
+                        </xforms:label>
+                        <xxforms:show ev:event="DOMActivate" dialog="fb-bindings-dialog"/>
+                    </xforms:trigger>
+                </xforms:group>
+            </xforms:group>
+        </xhtml:div>
+
+    </fr:section>
 
 </xhtml:div>

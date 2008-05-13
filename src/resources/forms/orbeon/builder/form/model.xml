@@ -109,13 +109,13 @@
             <resource xml:lang="en">
                 <application-name>
                     <label>Application Name</label>
-                    <hint>click to enter an application name</hint>
-                    <alert>The application name must be a non-empty identifier</alert>
+                    <hint>click to add</hint>
+                    <alert>Must be non-empty</alert>
                 </application-name>
                 <form-name>
                     <label>Form Name</label>
-                    <hint>click to enter a form name</hint>
-                    <alert>The form name must be a non-empty identifier</alert>
+                    <hint>click to add</hint>
+                    <alert>Must be non-empty</alert>
                 </form-name>
                 <title>
                     <label>Form Title</label>

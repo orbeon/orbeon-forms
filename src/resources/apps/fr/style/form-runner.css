@@ -314,6 +314,7 @@ body { text-align: left }
 div.fr-collapsible {
     overflow: hidden;
     margin-left: 22px;
+    border-bottom: 1px dotted #666699;
 }
 
 /* Dialogs */
@@ -362,7 +363,7 @@ div.fr-collapsible {
 /*.xforms-select1-appearance-full label { margin-left: .5em; margin-right: 1em }*/
 
 /* Sections */
-.fr-section-container { display: block; clear: both; border-bottom: 1px dotted #666699 }
+.fr-section-container { display: block; clear: both }
 .fr-section-container p { margin-top: 1em; }
 .fr-section-container img.fr-open-close { margin-right: .5em }
 

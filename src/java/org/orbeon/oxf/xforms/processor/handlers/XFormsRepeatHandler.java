@@ -101,7 +101,7 @@ public class XFormsRepeatHandler extends HandlerBase {
                     }
                     if (!isCurrentIterationRelevant)
                         addedClasses.append(" xforms-disabled");
-                    // Add classes such as Dnd classes, etc.
+                    // Add classes such as DnD classes, etc.
                     addRepeatClasses(addedClasses, attributes);
                 }
                 outputInterceptor.setAddedClasses(addedClasses);
@@ -130,7 +130,7 @@ public class XFormsRepeatHandler extends HandlerBase {
             // Determine classes to add on root elements and around root characters
             final FastStringBuffer addedClasses = new FastStringBuffer(isTopLevelRepeat ? "xforms-repeat-template" : "");
 
-            // Add classes such as Dnd classes, etc.
+            // Add classes such as DnD classes, etc.
             addRepeatClasses(addedClasses, attributes);
 
             outputInterceptor.setAddedClasses(addedClasses);
@@ -163,9 +163,10 @@ public class XFormsRepeatHandler extends HandlerBase {
     }
 
     private static void addRepeatClasses(FastStringBuffer sb, Attributes attributes) {
-        final String dndAttribute = attributes.getValue(XFormsConstants.XXFORMS_NAMESPACE_URI, "dnd");
 
-        if (dndAttribute != null) {
+        final String dndAttribute = attributes.getValue(XFormsConstants.XXFORMS_NAMESPACE_URI, "dnd");
+        if (dndAttribute != null && !dndAttribute.equals("none")) {
+
             sb.append(" xforms-dnd");
 
             if (dndAttribute.equals("vertical"))

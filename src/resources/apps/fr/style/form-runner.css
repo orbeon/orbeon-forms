@@ -10,7 +10,8 @@ html { overflow: scroll; }
         #fr-view img.xforms-help-image,
         #fr-view .fr-status-icons img
 {
-    behavior: url(/orbeon/apps/fr/style/iepngfix.htc) /* TODO: Fix absolute path here */
+    /* Absolute path is rewritten in combined resources mode */
+    behavior: url(/orbeon/ops/javascript/iepngfix.htc)
     /*;border: 10px solid red*/
 }
 

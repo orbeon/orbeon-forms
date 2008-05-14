@@ -1,0 +1,129 @@
+<public:component>
+<public:attach event="onpropertychange" onevent="iePNGFix(0)" />
+
+<script type="text/javascript">
+
+// IE5.5+ PNG Alpha Fix v1.0RC5 Preview 5
+// (c) 2004-2008 Angus Turnbull http://www.twinhelix.com
+
+// This is licensed under the GNU LGPL, version 2.1 or later.
+// For details, see: http://creativecommons.org/licenses/LGPL/2.1/
+
+
+// This must be a path to a blank image, relative to the HTML document(s).
+// In production use I suggest '/images/blank.gif' or similar. That's all!
+
+// ORBEON: find path to server in order to compute the path to the blank image
+var blankImg;
+if (typeof blankImg == 'undefined') {
+
+    var PATH_TO_JAVASCRIPT_1 = "/ops/javascript/xforms";
+    var PATH_TO_JAVASCRIPT_2 = "/xforms-server/";
+
+    var baseURL = null;
+    var scripts = window.document.getElementsByTagName("script");
+    for (var scriptIndex = 0; scriptIndex < scripts.length; scriptIndex++) {
+        var script = scripts[scriptIndex];
+        var scriptSrc = script.getAttribute("src");
+
+        if (scriptSrc != null && scriptSrc != "") {
+            var startPathToJavaScript = scriptSrc.indexOf(PATH_TO_JAVASCRIPT_1);
+            if (startPathToJavaScript == -1)
+                startPathToJavaScript = scriptSrc.indexOf(PATH_TO_JAVASCRIPT_2);
+            if (startPathToJavaScript != -1) {
+                baseURL = scriptSrc.substr(0, startPathToJavaScript);
+                break;
+            }
+        }
+    }
+    blankImg = baseURL + '/ops/images/xforms/blank.gif';
+}
+
+function filt(s, b)
+{
+    var f = 'DXImageTransform.Microsoft.AlphaImageLoader';
+    var sM = (currentStyle.backgroundRepeat == 'no-repeat') ? 'crop' : 'scale';
+    s = (s || '').replace(/\(/g, '%28').replace(/\)/g, '%29');
+
+    if (s && !(/IMG|INPUT/.test(nodeName) && !b) &&
+        currentStyle.width == 'auto' && currentStyle.height == 'auto')
+    {
+        style.width = offsetWidth + 'px';
+        style.height = clientHeight + 'px';
+        if (currentStyle.display == 'inline') style.display = 'inline-block';
+    }
+
+    if (filters[f])
+    {
+        filters[f].enabled = s ? true : false;
+        if (s) with (filters[f]) {
+            src = s
+        }
+    }
+    else if (s) style.filter = 'progid:' + f + '(src="' + s + '",sizingMethod="' + sM + '")';
+}
+
+function iePNGFix(init)
+{
+    if (!/MSIE (5\.5|6)/.test(navigator.userAgent)) return;
+    var evt = init ? { propertyName: 'src,background' } : event;
+    var isSrc = /src/.test(evt.propertyName);
+    var isBg = /background/.test(evt.propertyName);
+    var isClass = !init && (((this.className != this._png_class) && (this.className || this._png_class)));
+    // || /style.display/.test(evt.propertyName)
+
+    if (!(isSrc || isBg || isClass)) return;
+    this._png_class = this.className;
+    var blank = blankImg.match(/([^\/]+)$/)[1];
+
+    // Required for Whatever:hover support - erase any set BG if className changes.
+    if (isClass && ((style.backgroundImage.indexOf('url(') == -1) ||
+                    (style.backgroundImage.indexOf(blank) > -1)))
+    {
+        setTimeout(function() {
+            this.style.backgroundImage = ''
+        }, 0);
+        return;
+    }
+
+    if (isSrc && this.src && /IMG|INPUT/.test(nodeName))
+    {
+        if ((/\.png([^\.]+|$)/i).test(src) || (/\/xforms-server\/dynamic\/([^\.]+|$)/i).test(src))// ORBEON: support dynamic images without extension
+        {
+            filt(src, 1);
+            src = blankImg;
+        }
+        else if (src.indexOf(blank) == -1) filt();
+    }
+
+    var bgSrc = currentStyle.backgroundImage || style.backgroundImage;
+    if ((bgSrc + this.src).indexOf(blank) == -1)
+    {
+        var bgPNG = bgSrc.match(/^url[("']+(.*\.png[^\)"']*)[\)"']+[^\)]*$/i);
+
+        if (bgPNG) {
+            style.backgroundImage = 'url("' + blankImg + '")';
+            filt(bgPNG[1], 0);
+            // Unclickable elements inside PNG backgrounds.
+            var tags = ['a', 'input', 'select', 'textarea', 'iframe', 'object'],
+                    t = tags.length, tFix = [];
+            while (t--)
+            {
+                var elms = all.tags(tags[t]), e = elms.length;
+                while (e--) tFix.push(elms[e]);
+            }
+            var t = tFix.length;
+            if (t && (/relative|absolute/i).test(currentStyle.position))
+                alert('IEPNGFix: Children of positioned element are unclickable:\n\n<' +
+                      nodeName + (id && ' id=' + id) + '>');
+            while (t--) tFix[t].style.position = 'relative';
+        } else {
+            filt();
+        }
+    }
+}
+
+iePNGFix(1);
+
+</script>
+</public:component>

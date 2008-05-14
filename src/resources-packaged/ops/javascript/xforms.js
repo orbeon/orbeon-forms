@@ -2451,11 +2451,12 @@ ORBEON.xforms.Init = {
                     startPathToJavaScript = scriptSrc.indexOf(PATH_TO_JAVASCRIPT_2);
                 if (startPathToJavaScript != -1) {
                     BASE_URL = scriptSrc.substr(0, startPathToJavaScript);
-                    XFORMS_SERVER_URL = BASE_URL + "/xforms-server";
                     break;
                 }
             }
         }
+
+        XFORMS_SERVER_URL = BASE_URL + "/xforms-server";
 
         // Override image location for YUI to use local images
         var yuiBaseURL = BASE_URL + ORBEON.util.Utils.getProperty(YUI_BASE_PATH_PROPERTY);

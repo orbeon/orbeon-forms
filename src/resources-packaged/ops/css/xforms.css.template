@@ -12,9 +12,11 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 */
 
-/*
-  TODO: List of classes we actually use
- */
+/* IE 6 HACK: bind behavior from iepngfix.htc */
+img.xforms-help-image, img.xforms-showcalendar, label.xforms-alert-active  {
+    /* Absolute path is rewritten in combined resources mode only */
+    behavior: url(/ops/javascript/iepngfix.htc)
+}
 
 .xforms-output {
     display: inline;
@@ -54,6 +56,8 @@
     display: inline-block;
     margin-left: .2em;
     vertical-align: middle;
+    width: 16px;
+    height: 16px
 }
 
 .xforms-help {
@@ -98,6 +102,8 @@
     margin-left: .5em;
     margin-right: .5em;
     vertical-align: bottom;
+    width: 16px;
+    height: 16px
 }
 
 /* Hide date pickend for <xforms:input> when type not date */
@@ -117,19 +123,16 @@
 }
 
 .xforms-input input {
-    /*border: 1px solid #7f9db9;*/
-    padding-bottom: 2px;
-    padding-left: 1px;
-    padding-right: 1px;
+    -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
 }
 
 .xforms-textarea {
-    /*border: 1px solid #7f9db9;*/
+    -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
     font-family: Arial,Helvetica,Geneva,sans-serif
 }
 
 .xforms-secret {
-    /*border: 1px solid #7f9db9*/
+    -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
 }
 
 .xforms-textarea-appearance-xxforms-autosize {
@@ -138,7 +141,6 @@
 }
 
 .xforms-select1-appearance-minimal {
-    /*border: 1px solid #7f9db9;*/
     font-family: Arial,Helvetica,Geneva,sans-serif
 }
 

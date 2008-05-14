@@ -150,8 +150,10 @@
                                 <!-- Display the toolbar and errors -->
                                 <xforms:group model="fr-persistence-model" appearance="xxforms:internal">
 
+                                    <xxforms:variable name="errors-shown" select="instance('fr-persistence-instance')/message != ''
+                                                                                    or xxforms:instance('fr-errors-instance')/error"/>
                                     <xhtml:div class="fr-status-icons">
-                                        <xforms:group model="fr-error-summary-model" ref=".[instance('fr-form-valid-instance') = 'false']">
+                                        <xforms:group model="fr-error-summary-model" ref=".[$errors-shown]">
                                             <!-- Form is invalid -->
                                             <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/exclamation.png" alt="Errors on Form" title="Errors on Form"/>
                                         </xforms:group>
@@ -170,10 +172,9 @@
                                     </xhtml:div>
 
                                     <!-- Only show messages and error table if necessary -->
-                                    <xforms:group model="fr-persistence-model" ref=".[instance('fr-persistence-instance')/message != ''
-                                                                                    or xxforms:instance('fr-errors-instance')/error]">
+                                    <xforms:group model="fr-persistence-model" ref=".[$errors-shown]">
                                         <xhtml:table class="fr-error-messages">
-                                            <xforms:group ref=".[instance('fr-persistence-instance')/message != '']">
+                                            <xforms:group ref=".[$errors-shown]">
                                                 <xhtml:tr>
                                                     <xhtml:td>
                                                         <!-- Display messages -->

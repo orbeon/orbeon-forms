@@ -170,7 +170,7 @@
                     <xhtml:div>
 
                         <!-- Handle top-level blocks -->
-                        <xforms:repeat nodeset="fr:section | fr:repeat | fr:grid" id="fb-top-level-repeat" xxforms:dnd="vertical">
+                        <xforms:repeat nodeset="fr:section | fr:repeat | fr:grid" id="fb-top-level-repeat" xxforms:dnd="true">
 
                             <xxforms:variable name="top-level-position" select="position()"/>
                             <xxforms:variable name="is-top-level-current" select="$top-level-position = index('fb-top-level-repeat')"/>

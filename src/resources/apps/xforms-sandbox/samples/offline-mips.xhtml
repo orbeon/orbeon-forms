@@ -93,6 +93,12 @@
                 <xxforms:online ev:event="DOMActivate"/>
             </xforms:trigger>
         </xhtml:p>
+        <xhtml:p>
+            <xforms:trigger appearance="xxforms:link">
+                <xforms:label>Show message when online</xforms:label>
+                <xforms:message level="modal" ev:event="DOMActivate">Hello, World!</xforms:message>
+            </xforms:trigger>
+        </xhtml:p>
         <!--<widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>-->
     </xhtml:body>
 </xhtml:html>

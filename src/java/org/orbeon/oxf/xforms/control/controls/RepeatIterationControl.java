@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.control.controls;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
+import org.orbeon.oxf.xforms.control.XFormsPseudoControl;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 
 /**
@@ -25,7 +26,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
  *
  * TODO: Use inheritance to make this a single-node control that doesn't hold a value.
  */
-public class RepeatIterationControl extends XFormsSingleNodeControl {
+public class RepeatIterationControl extends XFormsSingleNodeControl implements XFormsPseudoControl {
     private int iteration;
     public RepeatIterationControl(XFormsContainingDocument containingDocument, XFormsControl parent, int iteration, String effectiveIterationId) {
         super(containingDocument, parent, null, "xxforms-repeat-iteration", effectiveIterationId);

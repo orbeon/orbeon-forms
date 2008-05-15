@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2006 Orbeon, Inc.
+ *  Copyright (C) 2008 Orbeon, Inc.
  *
  *  This program is free software; you can redistribute it and/or modify it under the terms of the
  *  GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -11,28 +11,15 @@
  *
  *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.xforms.control.controls;
+package org.orbeon.oxf.xforms.control;
 
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
-import org.orbeon.oxf.xforms.control.XFormsContainerControl;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.dom4j.Element;
 
 /**
- * Represents an xforms:group container control.
+ * Marker interface for all container controls.
  */
-public class XFormsGroupControl extends XFormsSingleNodeControl implements XFormsContainerControl {
-
-    public static final String INTERNAL_APPEARANCE = Dom4jUtils.qNameToexplodedQName(XFormsConstants.XXFORMS_INTERNAL_APPEARANCE_QNAME);
-
-    public XFormsGroupControl(XFormsContainingDocument containingDocument, XFormsControl parent, Element element, String name, String id) {
-        super(containingDocument, parent, element, name, id);
-    }
-
-    public String getType() {
-        return null;
-    }
+public interface XFormsContainerControl {
 }

@@ -22,6 +22,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.event.events.XXFormsDndEvent;
 import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.control.XFormsContainerControl;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.saxon.om.NodeInfo;
@@ -33,7 +34,7 @@ import java.util.Iterator;
 /**
  * Represents an xforms:repeat container control.
  */
-public class XFormsRepeatControl extends XFormsControl {
+public class XFormsRepeatControl extends XFormsControl implements XFormsContainerControl {
 
     private int startIndex;
 
@@ -110,6 +111,8 @@ public class XFormsRepeatControl extends XFormsControl {
                 destinationNodeset = destinationControl.getBindingContext().getNodeset();
                 requestedDestinationIndex = Integer.parseInt(dndEnd[dndEnd.length - 1]);
             }
+
+            // TODO: Detect DnD over repeat boundaries, and throw if not explicitly enabled
 
             // Delete node from source
             final List deletedNodes = XFormsDeleteAction.doDelete(pipelineContext, containingDocument, sourceNodeset, requestedSourceIndex);

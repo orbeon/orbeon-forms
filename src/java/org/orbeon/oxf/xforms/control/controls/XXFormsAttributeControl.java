@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.control.controls;
 
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
+import org.orbeon.oxf.xforms.control.XFormsPseudoControl;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.XPathCache;
@@ -25,7 +26,7 @@ import java.util.List;
 /**
  * Represents an extension xxforms:attribute control.
  */
-public class XXFormsAttributeControl extends XFormsValueControl {
+public class XXFormsAttributeControl extends XFormsValueControl implements XFormsPseudoControl {
 
     private String forAttribute;
     private String nameAttribute;

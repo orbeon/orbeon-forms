@@ -21,7 +21,8 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.action.actions.XFormsSetvalueAction;
 import org.orbeon.oxf.xforms.control.XFormsControl;
-import org.orbeon.oxf.xforms.control.XFormsValueControl;
+import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
+import org.orbeon.oxf.xforms.control.XFormsPseudoControl;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
@@ -342,9 +343,11 @@ public class XFormsModelBinds {
                 final Map.Entry currentEntry = (Map.Entry) k.next();
                 final XFormsControl currentControl = (XFormsControl) currentEntry.getValue();
 
-                // Only check value controls
+                // Only check real single-node controls (includes xforms:group, xforms:switch, xforms:trigger)
                 final NodeInfo boundNode = currentControl.getBoundNode();
-                if (currentControl instanceof XFormsValueControl && boundNode != null) {
+                if (boundNode != null
+                        && currentControl instanceof XFormsSingleNodeControl
+                        && !(currentControl instanceof XFormsPseudoControl)) {
                     if (boundNode.isSameNodeInfo(currentNodeInfo)) {
                         // There is a match
                         result.add(currentControl);

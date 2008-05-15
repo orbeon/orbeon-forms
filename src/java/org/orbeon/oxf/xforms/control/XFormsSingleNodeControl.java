@@ -23,7 +23,7 @@ import org.dom4j.Element;
  * 
  * @noinspection SimplifiableIfStatement
  */
-public class XFormsSingleNodeControl extends XFormsControl {
+public abstract class XFormsSingleNodeControl extends XFormsControl {
 
     protected boolean mipsRead;
     protected boolean readonly;

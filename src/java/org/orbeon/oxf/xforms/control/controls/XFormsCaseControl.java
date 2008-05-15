@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.control.controls;
 
 import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.control.XFormsPseudoControl;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsControls;
 import org.dom4j.Element;
@@ -23,7 +24,7 @@ import java.util.Map;
 /**
  * Represents an xforms:case pseudo-control.
  */
-public class XFormsCaseControl extends XFormsControl {
+public class XFormsCaseControl extends XFormsControl implements XFormsPseudoControl {
     public XFormsCaseControl(XFormsContainingDocument containingDocument, XFormsControl parent, Element element, String name, String id) {
         super(containingDocument, parent, element, name, id);
     }

@@ -789,21 +789,12 @@ ORBEON.xforms.Document = {
     takeOfflineFromSummary: function(url, formOfflineListener) {
         ORBEON.xforms.Offline.init();
         var formLoadingComplete = false;
-        // We first capture the form
-        ORBEON.xforms.Offline.formStore.capture(url, function (url, success, captureId) {
-            // When capture is done, set a flag.
-            // We need to resort to this trick because the code here does not run the same context and setting src
-            // attribute on the iframe would otherwise fail.
-            formLoadingComplete = true;
-        });
         // Check at a regular interval if the flag is set, when it is load the form in the frame.
         var formLoadingIntervalID = window.setInterval(function() {
             if (formLoadingComplete) {
                 window.clearInterval(formLoadingIntervalID);
                 // Load the form in the iframe
                 ORBEON.xforms.Offline.loadFormInIframe(url, function(offlineIframe) {
-                    // Send offline event to the server
-                    offlineIframe.contentWindow.ORBEON.xforms.Document.dispatchEvent("$containing-document$", "xxforms-offline");
                     // Wait for the form to be marked as offline before we call the listener
                     var takingFormOfflineIntervalID = window.setInterval(function() {
                         if (! offlineIframe.contentWindow.ORBEON.xforms.Offline.isOnline) {
@@ -813,9 +804,18 @@ ORBEON.xforms.Document = {
                                 formOfflineListener(offlineIframe.contentWindow);
                         }
                     }, 100);
+                    // Send offline event to the server
+                    offlineIframe.contentWindow.ORBEON.xforms.Document.dispatchEvent("$containing-document$", "xxforms-offline");
                 });
             }
         }, 100)
+        // We first capture the form
+        ORBEON.xforms.Offline.formStore.capture(url, function (url, success, captureId) {
+            // When capture is done, set a flag.
+            // We need to resort to this trick because the code here does not run the same context and setting src
+            // attribute on the iframe would otherwise fail.
+            formLoadingComplete = true;
+        });
     },
 
     /**
@@ -4396,11 +4396,11 @@ ORBEON.xforms.Offline = {
         }
 
         // Controls for which there is a variable defined
-        var mappings = ORBEON.util.String.eval("({" + mappings + "})");
-        ORBEON.xforms.Offline.mips = mappings.mips;
-        ORBEON.xforms.Offline.variables = mappings.variables;
-        for (var variableName in mappings.variables) {
-            var controlID = mappings.variables[variableName];
+        var mappingsObject = ORBEON.util.String.eval("({" + mappings + "})");
+        ORBEON.xforms.Offline.mips = mappingsObject.mips;
+        ORBEON.xforms.Offline.variables = mappingsObject.variables;
+        for (var variableName in mappingsObject.variables) {
+            var controlID = mappingsObject.variables[variableName];
             controlKeepValueIDs.push(controlID);
         }
 
@@ -4448,10 +4448,15 @@ ORBEON.xforms.Offline = {
             if (! ORBEON.xforms.Offline.formStore.isCaptured(url))
                 urlsToCapture.push(url);
         }
-        ORBEON.xforms.Offline.formStore.capture(urlsToCapture, function (url, success, captureId) {
-            // When capture is done, mark the form as offline to prevent any event from being sent to the server
+
+        if (urlsToCapture.length != 0) {
+            ORBEON.xforms.Offline.formStore.capture(urlsToCapture, function (url, success, captureId) {
+                // When capture is done, mark the form as offline to prevent any event from being sent to the server
+                ORBEON.xforms.Offline.isOnline = false;
+            });
+        } else {
             ORBEON.xforms.Offline.isOnline = false;
-        });
+        }
     },
 
     /**

@@ -1,0 +1,100 @@
+<!--
+    Copyright (C) 2008 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:f="http://orbeon.org/oxf/xml/formatting"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:widget="http://orbeon.org/oxf/xml/widget"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xhtml:head>
+        <xhtml:title>Offline Sections</xhtml:title>
+        <xforms:model xxforms:offline="true" id="main-model" xxforms:external-events="go-offline">
+            <xforms:instance id="ui">
+                <ui>
+                    <section>1</section>
+                    <section-1/>
+                    <section-2/>
+                    <section-3/>
+                    <offline>false</offline>
+                    <next-button/>
+                    <previous-button/>
+
+                </ui>
+            </xforms:instance>
+            <xforms:bind nodeset="instance('ui')">
+                <xforms:bind name="section" nodeset="section" xxforms:offline="true"/>
+                <xforms:bind nodeset="section-1" relevant="$section = 1" xxforms:offline="true"/>
+                <xforms:bind nodeset="section-2" relevant="$section = 2" xxforms:offline="true"/>
+                <xforms:bind nodeset="section-3" relevant="$section = 3" xxforms:offline="true"/>
+
+
+                <xforms:bind nodeset="previous-button" readonly="$section = '1'" xxforms:offline="true"/>
+                <xforms:bind nodeset="next-button" readonly="$section = '3'" xxforms:offline="true"/>
+            </xforms:bind>
+
+            <xforms:action ev:event="xxforms-offline">
+                <xforms:setvalue ref="instance('ui')/offline">true</xforms:setvalue>
+            </xforms:action>
+            <xforms:action ev:event="xxforms-online">
+                <xforms:setvalue ref="instance('ui')/offline">false</xforms:setvalue>
+            </xforms:action>
+        </xforms:model>
+        <xhtml:script type="text/javascript">
+            function nextPreviousClicked(event) {
+                var currentSection = ORBEON.xforms.Document.getValue("section");
+                ORBEON.xforms.Document.setValue("section", parseInt(currentSection)
+                        + (event.target.id == "previous" ? -1 : +1));
+            }
+            YAHOO.util.Event.onDOMReady(function (){
+                YAHOO.util.Event.addListener("next", "click", nextPreviousClicked);
+                YAHOO.util.Event.addListener("previous", "click", nextPreviousClicked);
+            });
+        </xhtml:script>
+    </xhtml:head>
+    <xhtml:body>
+        <xforms:input ref="section" id="section" style="display: none"/>
+        <xhtml:p>
+            <xforms:group ref="section-1">
+                Section 1
+            </xforms:group>
+            <xforms:group ref="section-2">
+                Section 2
+            </xforms:group>
+            <xforms:group ref="section-3">
+                Section 3
+            </xforms:group>
+        </xhtml:p>
+        <xhtml:p>
+            <!-- Take online/offline -->
+            <xforms:trigger ref=".[offline = 'false']">
+                <xforms:label>Take offline</xforms:label>
+                <xxforms:offline ev:event="DOMActivate"/>
+            </xforms:trigger>
+            <xforms:trigger ref=".[offline = 'true']">
+                <xforms:label>Take online</xforms:label>
+                <xxforms:online ev:event="DOMActivate"/>
+            </xforms:trigger>
+            <!-- Next/previous -->
+            <xforms:trigger ref="previous-button" id="previous">
+                <xforms:label>Previous</xforms:label>
+            </xforms:trigger>
+            <xforms:trigger ref="next-button" id="next">
+                <xforms:label>Next</xforms:label>
+            </xforms:trigger>
+        </xhtml:p>
+        <!--<widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>-->
+    </xhtml:body>
+</xhtml:html>

@@ -59,6 +59,9 @@
                 </xsl:for-each>
                 <!-- Orbeon Forms version -->
                 <xhtml:meta name="generator" content="Orbeon Forms {$orbeon-forms-version}"/>
+                <!-- Favicon -->
+                <xhtml:link rel="shortcut icon" href="/ops/images/orbeon-icon-16.ico"/>
+                <xhtml:link rel="icon" href="/ops/images/orbeon-icon-16.png" type="image/png"/>
             </xhtml:head>
             <xhtml:body>
                 <!-- Copy body attributes -->

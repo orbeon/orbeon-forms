@@ -841,4 +841,8 @@
         <name>text/x-component</name>
         <pattern>*.htc</pattern>
     </mime-type>
+    <mime-type>
+        <name>image/vnd.microsoft.icon</name>
+        <pattern>*.ico</pattern>
+    </mime-type>
 </mime-types>

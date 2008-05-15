@@ -664,6 +664,9 @@ ORBEON.xforms.Document = {
     setValue: function(controlId, newValue) {
         var control = ORBEON.util.Dom.getElementById(controlId);
         if (control == null) throw "ORBEON.xforms.Document.setValue: can't find control id '" + controlId + "'";
+        // If we are offline, directly change the value of the control
+        if (!ORBEON.xforms.Offline.isOnline)
+            ORBEON.xforms.Controls.setCurrentValue(control, newValue);
         xformsFireEvents(new Array(xformsCreateEventArray
                 (control, "xxforms-value-change-with-focus-change", String(newValue), null)), false);
     },

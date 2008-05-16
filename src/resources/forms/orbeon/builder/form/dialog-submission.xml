@@ -143,7 +143,7 @@
                                                 <fr:repeat nodeset="response/headers/header" id="fb-response-headers-repeat"
                                                            columns="2" appearance="xxforms:table" readonly="true">
                                                     <xhtml:tr>
-                                                        <xhtml:td>
+                                                        <xhtml:td class="fb-nowrap">
                                                             <xforms:output value="name">
                                                                 <xforms:label>Name</xforms:label>
                                                             </xforms:output>
@@ -235,10 +235,11 @@
                     <xxforms:variable name="submission" select="$model/xforms:submission[@id = $submission-id]"/>
                     <xxforms:variable name="request" select="$instance/request"/>
                     <xforms:action context="$submission">
-                        <xforms:setvalue ref="@ref" value="xxx"/>
+                        <xforms:setvalue ref="@ref" value="concat('saxon:parse(instance(''', $instance-id, ''')/request)')"/>
                         <xforms:setvalue ref="@method" value="$request/method"/>
                         <xforms:setvalue ref="@resource" value="$request/resource"/>
                         <xforms:setvalue ref="@replace" value="$request/replace"/>
+                        <xforms:setvalue ref="@target" value="concat('instance(''', $instance-id, ''')/response')"/>
                         <xforms:setvalue ref="@mediatype"
                                          value="if ($request/is-soap = 'true')
                                                 then string-join(('application/soap+xml', if (normalize-space($request/soap-action) != '') then concat('action=', normalize-space($request/soap-action)) else ()), '; ')
@@ -252,7 +253,7 @@
                     </xforms:action>
 
                     <!-- Set instance parameters -->
-                    <xforms:action context="$model/xforms:instance[@id = $instance-id]">
+                    <xforms:action context="$model/xforms:instance[@id = $instance-id]/*">
                         <xforms:setvalue ref="request" value="$request/content"/>
                     </xforms:action>
 
@@ -274,6 +275,7 @@
 
         <!-- Clear instance entirely -->
         <xforms:setvalue xxforms:iterate="$instance//*[not(*)]" ref="."/>
+
         <xforms:setvalue ref="$instance/request/is-soap">false</xforms:setvalue>
         <xforms:setvalue ref="$instance/request/method" value="instance('fb-submission-template')/@method"/>
         <xforms:setvalue ref="$instance/request/mediatype" value="instance('fb-submission-template')/@mediatype"/>
@@ -292,7 +294,7 @@
             <xforms:setvalue ref="$instance/request/method" value="$submission/@method"/>
             <xforms:setvalue ref="$instance/request/resource" value="$submission/@resource"/>
             <xforms:setvalue ref="$instance/request/replace" value="$submission/@replace"/>
-            <xforms:setvalue ref="$instance/request/content" value="$model/xforms:instance[@id = concat($submission-id, '-instance')]/request"/>
+            <xforms:setvalue ref="$instance/request/content" value="$model/xforms:instance[@id = concat($submission-id, '-instance')]/*/request"/>
         </xforms:action>
 
         <!-- Set focus to first input -->
@@ -352,13 +354,16 @@
 
         <!-- Template for inserting a submission -->
         <xforms:instance id="fb-submission-template" xxforms:readonly="true">
-            <xforms:submission id="" ref="" resource="" method="get" mediatype="application/xml" replace="instance"/>
+            <xforms:submission id="" ref="" resource="" method="get" mediatype="application/xml" replace="text" target=""/>
         </xforms:instance>
 
         <!-- Template for inserting an instance-->
         <xforms:instance id="fb-instance-template" xxforms:readonly="true">
             <xforms:instance id="">
-                <request/>
+                <submission>
+                    <request/>
+                    <response/>
+                </submission>
             </xforms:instance>
         </xforms:instance>
 

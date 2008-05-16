@@ -462,7 +462,7 @@
     <xsl:template match="fr:close-button">
         <xforms:trigger>
             <xforms:label>
-                <xhtml:img width="16" height="16" src="/apps/fr/style/close.gif" alt=""/>
+                <xhtml:img width="11" height="16" src="/apps/fr/style/close.gif" alt=""/>
                 <xforms:output value="$fr-resources/detail/labels/close"/>
             </xforms:label>
             <xforms:action ev:event="DOMActivate">

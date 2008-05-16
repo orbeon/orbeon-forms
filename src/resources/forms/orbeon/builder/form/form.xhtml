@@ -170,7 +170,7 @@
                     <xhtml:div>
 
                         <!-- Handle top-level blocks -->
-                        <xforms:repeat nodeset="fr:section | fr:repeat | fr:grid" id="fb-top-level-repeat" xxforms:dnd="true">
+                        <xforms:repeat nodeset="fr:section | fr:repeat | fr:grid" id="fb-top-level-repeat" xxforms:dnd="none">
 
                             <xxforms:variable name="top-level-position" select="position()"/>
                             <xxforms:variable name="is-top-level-current" select="$top-level-position = index('fb-top-level-repeat')"/>
@@ -386,7 +386,7 @@
                                                             </xhtml:tbody>
                                                             <xhtml:tbody>
                                                                 <!-- Repeat over table rows -->
-                                                                <xforms:repeat nodeset="xhtml:tr" id="fb-section-content-grid-tr-repeat" xxforms:dnd="true">
+                                                                <xforms:repeat nodeset="xhtml:tr" id="fb-section-content-grid-tr-repeat" xxforms:dnd="none">
                                                                     <xxforms:variable name="tr" select="."/>
                                                                     <xxforms:variable name="tr-position" select="position()"/>
                                                                     <xhtml:tr class="fb-grid-tr">
@@ -534,7 +534,7 @@
                                                                             </xhtml:div>
                                                                         </xhtml:td>
                                                                         <!-- Repeat over table columns -->
-                                                                        <xforms:repeat nodeset="xhtml:td" id="fb-section-content-grid-td-repeat" xxforms:dnd="true">
+                                                                        <xforms:repeat nodeset="xhtml:td" id="fb-section-content-grid-td-repeat" xxforms:dnd="none">
 
                                                                             <xxforms:variable name="td" select="."/>
                                                                             <xxforms:variable name="td-position" select="position()"/>

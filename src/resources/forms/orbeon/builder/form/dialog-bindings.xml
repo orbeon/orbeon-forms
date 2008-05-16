@@ -30,19 +30,12 @@
     <xhtml:div class="fr-grid">
         <xhtml:div class="fr-grid-content">
             <xforms:group ref="$instance">
-                <xforms:select1 ref="submission-id" id="fb-bindings-submission-select">
-                    <xforms:label>Submission to Call</xforms:label>
-                    <xforms:item>
-                        <xforms:label>[Select...]</xforms:label>
-                        <xforms:value/>
-                    </xforms:item>
-                    <xforms:itemset nodeset="$model/xforms:submission[ends-with(@id, '-submission')]">
-                        <xforms:label value="substring-before(@id, '-submission')"/>
-                        <xforms:value value="substring-before(@id, '-submission')"/>
-                    </xforms:itemset>
-                </xforms:select1>
-                <xforms:select1 ref="event">
-                    <xforms:label>Event to React To</xforms:label>
+                <xforms:input ref="xforms:action[1]/@id" id="fb-binding-id-input" incremental="true">
+                    <xforms:label>Action Id</xforms:label>
+                    <xforms:hint>Choose a unique id for this action</xforms:hint>
+                </xforms:input>
+                <xforms:select1 ref="xforms:action[1]/@ev:event">
+                    <xforms:label>React to</xforms:label>
                     <xforms:item>
                         <xforms:label>[Select...]</xforms:label>
                         <xforms:value/>
@@ -60,34 +53,59 @@
                         <xforms:value>xforms-ready</xforms:value>
                     </xforms:item>
                 </xforms:select1>
-                <xforms:group ref="request">
-                    <xforms:label>Submission Values</xforms:label>
-                    <fr:repeat nodeset="setvalue" id="fb-bindings-request-repeat" origin="instance('fb-bindings-editor-request-template')" columns="2" appearance="xxforms:table">
+                <!-- TODO: for xforms-ready, must have observer on the model, or no observer attr -->
+                <xforms:select1 ref="xforms:action[1]/@ev:observer">
+                    <xforms:label>Control</xforms:label>
+                    <xforms:item>
+                        <xforms:label>[Select...]</xforms:label>
+                        <xforms:value/>
+                    </xforms:item>
+                    <xforms:itemset nodeset="$body//(xforms:*[@ref or @bind or self::xforms:trigger])[ends-with(@id, '-control')]">
+                        <!-- TODO: user-friendly control label if non-emtpy -->
+                        <xforms:label value="substring-before(@id, '-control')"/>
+                        <xforms:value value="@id"/>
+                    </xforms:itemset>
+                </xforms:select1>
+                <xforms:select1 ref="xforms:action[1]/xforms:send/@submission" id="fb-bindings-submission-select">
+                    <xforms:label>Service to Call</xforms:label>
+                    <xforms:item>
+                        <xforms:label>[Select...]</xforms:label>
+                        <xforms:value/>
+                    </xforms:item>
+                    <xforms:itemset nodeset="$model/xforms:submission[ends-with(@id, '-submission')]">
+                        <xforms:label value="substring-before(@id, '-submission')"/>
+                        <xforms:value value="@id"/>
+                    </xforms:itemset>
+                </xforms:select1>
+                <xforms:group ref="xforms:action[@ev:event = 'xforms-submit']">
+                    <xforms:label>Values to Pass to Service</xforms:label>
+                    <fr:repeat nodeset="xforms:setvalue" id="fb-bindings-request-repeat" origin="instance('fb-bindings-editor-setvalue-template')" columns="2" appearance="xxforms:table">
                         <xhtml:tr>
                             <xhtml:td>
-                                <xforms:select1 ref="@control-name">
-                                    <xforms:label>Control</xforms:label>
+                                <xforms:select1 ref="@value">
+                                    <xforms:label>Source Control</xforms:label>
                                     <xforms:item>
                                         <xforms:label>[Select...]</xforms:label>
                                         <xforms:value/>
                                     </xforms:item>
                                     <xforms:itemset nodeset="$body//xforms:*[(@ref or @bind) and ends-with(@id, '-control')]">
+                                        <!-- TODO: user-friendly control label if non-emtpy -->
                                         <xforms:label value="substring-before(@id, '-control')"/>
-                                        <xforms:value value="substring-before(@id, '-control')"/>
+                                        <xforms:value value="concat('/*/*/*[name() = ''', substring-before(@id, '-control'), ''']')"/>
                                     </xforms:itemset>
                                 </xforms:select1>
                             </xhtml:td>
                             <xhtml:td>
                                 <xforms:input ref="@ref">
-                                    <xforms:label>XPath Expression</xforms:label>
+                                    <xforms:label>Destination XPath Expression</xforms:label>
                                 </xforms:input>
                             </xhtml:td>
                         </xhtml:tr>
                     </fr:repeat>
                 </xforms:group>
-                <xforms:group ref="response">
-                    <xforms:label>Actions</xforms:label>
-                    <fr:repeat nodeset="action" id="fb-bindings-response-repeat" origin="instance('fb-bindings-editor-response-template')" columns="3" appearance="xxforms:table">
+                <xforms:group ref="xforms:action[@ev:event = 'xforms-submit-done']">
+                    <xforms:label>Actions in Response to Service</xforms:label>
+                    <fr:repeat nodeset="xforms:*" id="fb-bindings-response-repeat" origin="instance('fb-bindings-editor-setvalue-template')" columns="2" appearance="xxforms:table">
                         <xhtml:tr>
                             <xhtml:td>
                                 <xforms:select1 ref="@name">
@@ -113,8 +131,24 @@
                             <xhtml:td>
                                 <xforms:group class="fb-parameters">
                                     <xforms:label>Parameters</xforms:label>
+                                    <xforms:group ref=".[self::xforms:setvalue]">
+                                        <xforms:input ref="@value">
+                                            <xforms:label>Source XPath Expression</xforms:label>
+                                        </xforms:input>
+                                        <xforms:select1 ref="@ref">
+                                            <xforms:label>Destination Control</xforms:label>
+                                            <xforms:item>
+                                                <xforms:label>[Select...]</xforms:label>
+                                                <xforms:value/>
+                                            </xforms:item>
+                                            <xforms:itemset nodeset="$body//xforms:*[(@ref or @bind) and ends-with(@id, '-control')]">
+                                                <xforms:label value="substring-before(@id, '-control')"/>
+                                                <xforms:value value="concat('/*/*/*[name() = ''', substring-before(@id, '-control'), ''']')"/>
+                                            </xforms:itemset>
+                                        </xforms:select1>
+                                    </xforms:group>
                                     <xforms:select1 ref="@control-name[../@name = ('setvalue', 'validate', 'itemset')]">
-                                        <xforms:label>Control</xforms:label>
+                                        <xforms:label>Destination Control</xforms:label>
                                         <xforms:item>
                                             <xforms:label>[Select...]</xforms:label>
                                             <xforms:value/>
@@ -146,8 +180,7 @@
     <xhtml:div class="fr-dialog-buttons">
         <xforms:group>
             <!-- Test button -->
-            <xforms:trigger ref="$instance/save-test-trigger">
-                <!-- TODO-->
+            <xforms:trigger ref="instance('fb-bindings-editor-triggers')/save-test-trigger[false()]">
                 <xforms:label>
                     <xhtml:img src="/forms/orbeon/builder/images/play.png" alt="Publish" title="Publish"/>
                     <xhtml:span>Test</xhtml:span>
@@ -155,84 +188,31 @@
 
                 <!-- Test submission -->
                 <xforms:action ev:event="DOMActivate">
-                    <!-- Clear response -->
-                    <xforms:setvalue xxforms:iterate="$instance/response/*[not(*)]" ref="."/>
-                    <xforms:delete xxforms:iterate="$instance/response/headers/header" nodeset="."/>
-
-                    <!-- Toggle back response submission -->
-                    <xforms:toggle case="fb-submission-dialog-none"/>
-
-                    <!-- Send submission -->
-                    <xforms:send submission="fb-test-submission-submission"/>
-                </xforms:action>
-
-                <!-- Common response actions -->
-                <xforms:action ev:event="xforms-submit-done xforms-submit-error" ev:observer="fb-test-submission-submission">
-                    <xforms:toggle case="fb-submission-dialog-response"/>
-                    <xforms:action context="$instance/response">
-                        <xforms:setvalue ref="resource-uri" value="event('resource-uri')"/>
-                        <xforms:setvalue ref="status-code" value="event('response-status-code')"/>
-                        <xforms:delete xxforms:iterate="headers/header" nodeset="."/>
-                        <xforms:insert context="headers" origin="event('response-headers')"/>
-                        <!-- Handle response body -->
-                        <xxforms:variable name="error-body" select="event('response-body')"/>
-                        <xforms:setvalue if="$error-body" ref="content" value="if ($error-body castable as xs:string)
-                            then $error-body else saxon:serialize($error-body, xxforms:instance('fb-xsl-output-instance'))"/>
-                    </xforms:action>
-                </xforms:action>
-                <!-- Error actions -->
-                <xforms:action ev:event="xforms-submit-error" ev:observer="fb-test-submission-submission">
-                    <xforms:action context="$instance/response">
-                        <xforms:setvalue ref="error-type" value="event('error-type')"/>
-                    </xforms:action>
+                    <!-- TODO-->
                 </xforms:action>
             </xforms:trigger>
             <!-- Save button -->
-            <xforms:trigger ref="$instance/save-test-trigger">
-                <!-- TODO-->
+            <xforms:trigger ref="instance('fb-bindings-editor-triggers')/save-test-trigger">
+
                 <xforms:label>
                     <xhtml:img src="/apps/fr/style/images/silk/disk.png" alt="Publish" title="Publish"/>
                     <xhtml:span>Save</xhtml:span>
                 </xforms:label>
                 <!-- Save changes to form -->
                 <xforms:action ev:event="DOMActivate">
-                    <!-- Actual id of the submission and instance -->
-                    <xxforms:variable name="submission-id" select="concat($instance/id, '-submission')"/>
-                    <xxforms:variable name="instance-id" select="concat($instance/id, '-instance')"/>
 
-                    <!-- Insert new submission if needed -->
-                    <xforms:action if="not(exists($model/xforms:submission[@id = $submission-id]))">
-                        <xforms:insert context="$model" nodeset="xforms:instance | xforms:submission" origin="instance('fb-submission-template')"/>
-                        <xforms:setvalue ref="$model/xforms:submission[last()]/@id" value="$submission-id"/>
+                    <!-- Delete existing binding if any -->
+                    <xxforms:variable name="binding-id" select="concat($instance/xforms:action[1]/@id, '-binding')"/>
+                    <xforms:action if="$model/xforms:action[@id = $binding-id]">
+                        <xforms:delete context="$model" xxforms:iterate="for $action in $model/xforms:action[@id = $binding-id] return ($action, subsequence($action/following-sibling::xforms:action, 1, 2))" nodeset="."/>
                     </xforms:action>
 
-                    <!-- Set submission properties -->
-                    <xxforms:variable name="submission" select="$model/xforms:submission[@id = $submission-id]"/>
-                    <xxforms:variable name="request" select="$instance/request"/>
-                    <xforms:action context="$submission">
-                        <xforms:setvalue ref="@ref" value="xxx"/>
-                        <xforms:setvalue ref="@method" value="$request/method"/>
-                        <xforms:setvalue ref="@resource" value="$request/resource"/>
-                        <xforms:setvalue ref="@replace" value="$request/replace"/>
-                        <xforms:setvalue ref="@mediatype"
-                                         value="if ($request/is-soap = 'true')
-                                                then string-join(('application/soap+xml', if (normalize-space($request/soap-action) != '') then concat('action=', normalize-space($request/soap-action)) else ()), '; ')
-                                                else 'application/xml'"/>
-                    </xforms:action>
-
-                    <!-- Insert new instance just before submission if needed -->
-                    <xforms:action if="not(exists($model/xforms:instance[@id = $instance-id]))">
-                        <xforms:insert nodeset="$submission" position="before" origin="instance('fb-instance-template')"/>
-                        <xforms:setvalue ref="$submission/preceding-sibling::xforms:instance[1]/@id" value="$instance-id"/>
-                    </xforms:action>
-
-                    <!-- Set instance parameters -->
-                    <xforms:action context="$model/xforms:instance[@id = $instance-id]">
-                        <xforms:setvalue ref="request" value="$request/content"/>
-                    </xforms:action>
+                    <!-- Insert new submission -->
+                    <xforms:setvalue ref="$instance/xforms:action[1]/@id" value="$binding-id"/>
+                    <xforms:insert context="$model" nodeset="*" origin="$instance/xforms:action"/>
 
                     <!-- Hide dialog -->
-                    <xxforms:hide dialog="fb-submission-dialog"/>
+                    <xxforms:hide dialog="fb-bindings-dialog"/>
                 </xforms:action>
             </xforms:trigger>
             <xforms:trigger>
@@ -245,13 +225,27 @@
 
     <xforms:action ev:event="xxforms-dialog-open">
         <xxforms:variable name="instance" select="instance('fb-bindings-editor-instance')"/>
+        <xxforms:variable name="binding-name" select="event('binding-name')"/>
 
-        <!-- Clear instance entirely -->
-        <xforms:setvalue xxforms:iterate="$instance//*[not(*)]" ref="."/>
-        <xforms:delete xxforms:iterate="$instance/request/setvalue | $instance/response/action" nodeset="."/>
+        <!-- Clear instance -->
+        <xforms:delete while="$instance/*" nodeset="$instance/*"/>
+
+        <!-- Empty binding if no binding id passed -->
+        <xforms:action if="not($binding-name)">
+            <xforms:insert context="$instance" origin="instance('fb-binding-template')/*"/>
+        </xforms:action>
+        <!-- Otherwise copy binding -->
+        <xforms:action if="$binding-name">
+            <xxforms:variable name="binding-id" select="concat($binding-name, '-binding')"/>
+            <!-- Insert action and the two following ones -->
+            <xforms:insert context="$instance" origin="for $action in $model/xforms:action[@id = $binding-id] return ($action, subsequence($action/following-sibling::xforms:action, 1, 2))"/>
+            <!-- Show the user a name rather than id -->
+            <xforms:setvalue ref="$instance/xforms:action[1]/@id" value="$binding-name"/>
+            <!--<xforms:message><xforms:output value="$binding-name"/></xforms:message>-->
+        </xforms:action>
 
         <!-- Set focus to first input -->
-        <xforms:setfocus control="fb-bindings-submission-select"/>
+        <xforms:setfocus control="fb-binding-id-input"/>
     </xforms:action>
 
     <!-- Model for the bindings editor -->
@@ -260,38 +254,55 @@
         <xxforms:variable name="model" select="xxforms:instance('fr-form-instance')/xhtml:head/xforms:model[@id = 'fr-form-model']"/>
 
         <xforms:instance id="fb-bindings-editor-instance">
-            <bindings>
-                <submission-id/>
-                <event/>
-                <request>
-                    <setvalue ref="" control-name=""/>
-                </request>
-                <response>
-                    <action name="" xpath="" control-name="" nodeset="" label="" value=""/>
-                    <!--<setvalue ref="" control-name=""/>-->
-                    <!--<itemset nodeset="" label="" value=""/>-->
-                    <!--<validity constraint=""/>-->
-                </response>
+            <!-- Dummy content by default -->
+            <binding/>
+        </xforms:instance>
+
+        <xforms:instance id="fb-bindings-editor-triggers">
+            <triggers>
                 <save-test-trigger/>
-            </bindings>
+            </triggers>
         </xforms:instance>
 
         <!-- Enable/disable trigger -->
-        <xforms:setvalue ev:event="xxforms-invalid" ev:observer="fb-bindings-editor-instance" ref="save-test-trigger">disabled</xforms:setvalue>
-        <xforms:setvalue ev:event="xxforms-valid" ev:observer="fb-bindings-editor-instance" ref="save-test-trigger">enabled</xforms:setvalue>
+        <xforms:setvalue ev:event="xxforms-invalid" ev:observer="fb-bindings-editor-instance" ref="instance('fb-bindings-editor-triggers')/save-test-trigger">disabled</xforms:setvalue>
+        <xforms:setvalue ev:event="xxforms-valid" ev:observer="fb-bindings-editor-instance" ref="instance('fb-bindings-editor-triggers')/save-test-trigger">enabled</xforms:setvalue>
 
         <xforms:bind nodeset="instance('fb-bindings-editor-instance')">
-            <xforms:bind nodeset="submission-id | event" required="true()"/>
+            <xforms:bind nodeset="xforms:action[1]/(@ev:event, xforms:send/@submission)" required="true()"/>
+            <xforms:bind nodeset="xforms:action[1]/@ev:observer"
+                         required="../@ev:event = ('DOMActivate', 'xforms-value-changed')"
+                        relevant="../@ev:event = ('DOMActivate', 'xforms-value-changed')"/>
+            <xforms:bind nodeset="xforms:action[position() > 1]/@ev:observer"
+                         calculate="../../xforms:action[1]/xforms:send/@submission"/>
+        </xforms:bind>
+
+        <xforms:bind nodeset="instance('fb-bindings-editor-triggers')">
             <xforms:bind nodeset="save-test-trigger" readonly=". = 'disabled'"/>
         </xforms:bind>
 
-        <xforms:instance id="fb-bindings-editor-request-template">
-            <setvalue ref="" control-name=""/>
+        <!-- Template for a given binding -->
+        <xforms:instance id="fb-binding-template" xxforms:readonly="true">
+            <binding>
+                <xforms:action id="" ev:event="" ev:observer=""><!-- react to... on control... -->
+                    <xforms:send submission=""/><!-- service to call -->
+                </xforms:action>
+                <xforms:action ev:event="xforms-submit" ev:observer=""><!-- values to set here -->
+                    <xforms:setvalue ref="" value=""/><!-- other xforms:setvalue ... -->
+                </xforms:action>
+                <xforms:action ev:event="xforms-submit-done" ev:observer=""><!-- actions here -->
+                    <xforms:setvalue ref="" value=""/><!-- other actions -->
+                </xforms:action>
+            </binding>
         </xforms:instance>
 
-        <xforms:instance id="fb-bindings-editor-response-template">
-            <action name="" xpath="" control-name="" nodeset="" label="" value=""/>
+        <xforms:instance id="fb-bindings-editor-setvalue-template">
+            <xforms:setvalue ref="" value=""/>
         </xforms:instance>
+
+        <!--<xforms:instance id="fb-bindings-editor-response-template">-->
+            <!--<action name="" xpath="" control-name="" nodeset="" label="" value=""/>-->
+        <!--</xforms:instance>-->
 
     </xforms:model>
 

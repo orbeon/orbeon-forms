@@ -9,6 +9,7 @@
     background: white url(../../../apps/fr/style/separator.gif) repeat-x scroll left center
 }
 
+.fb-nowrap { white-space: nowrap }
 .fb-xforms-disabled { display: none }
 .fb-hide-alert .xforms-alert { display: none }
 

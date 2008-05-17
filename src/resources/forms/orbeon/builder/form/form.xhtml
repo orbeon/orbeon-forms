@@ -31,6 +31,19 @@
         <xhtml:link rel="stylesheet" href="/apps/fr/style/form-runner.css" type="text/css"/>
         <xhtml:link rel="stylesheet" href="/forms/orbeon/builder/form-builder.css" type="text/css"/>
 
+        <!-- Accordion menu -->
+        <xhtml:script type="text/javascript" src="/forms/orbeon/builder/accordion-menu-v2.js"/>
+        <xhtml:script type="text/javascript">
+            var fbAccordionMenuOptions = {
+                dependent: false,
+                openedIds: ['fb-toolbox-controls-dt','fb-toolbox-i18n-dt'],
+                seconds: 0.2,
+                easeOut: false,
+                animation:true
+            }
+            new AccordionMenu.setting('fb-toolbox-dl', fbAccordionMenuOptions);
+        </xhtml:script>
+
         <!-- Include main model -->
         <xi:include href="oxf:/forms/orbeon/builder/form/model.xml" xxi:omit-xml-base="true"/>
     </xhtml:head>

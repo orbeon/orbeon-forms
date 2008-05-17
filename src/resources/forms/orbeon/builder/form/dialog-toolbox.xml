@@ -395,13 +395,13 @@
                         <xhtml:img src="/apps/fr/style/images/silk/xhtml.png" alt="Edit Source" title="Edit Source"/>
                         <xhtml:span>Edit Source</xhtml:span>
                     </xforms:label>
-                    <xxforms:show ev:event="DOMActivate" dialog="fb-edit-source-dialog"/>
+                    <xxforms:show ev:event="DOMActivate" dialog="fb-source-editor-dialog"/>
                 </xforms:trigger>
             </xhtml:div>
 
         </xhtml:div>
 
-        <!-- Submissions -->
+        <!-- Services -->
         <xhtml:div class="fb-toolbox">
             <xforms:group class="fb-hide-alert">
                 <xforms:label>Services</xforms:label>
@@ -415,7 +415,7 @@
                                     <xhtml:img src="/apps/fr/style/edit.gif" alt="Edit" title="Edit"/>
                                 </xforms:label>
                                 <xxforms:show ev:event="DOMActivate" dialog="fb-submission-dialog">
-                                    <xxforms:context name="submission-id" select="$submission-name"/>
+                                    <xxforms:context name="submission-name" select="$submission-name"/>
                                 </xxforms:show>
                             </xforms:trigger>
                             <xforms:trigger appearance="minimal" id="fb-submission-remove">
@@ -454,7 +454,7 @@
             </xforms:group>
         </xhtml:div>
 
-        <!-- Bindings -->
+        <!-- Actions -->
         <xhtml:div class="fb-toolbox">
             <xforms:group class="fb-hide-alert">
                 <xforms:label>Actions</xforms:label>
@@ -501,6 +501,60 @@
                             <xhtml:span>Add</xhtml:span>
                         </xforms:label>
                         <xxforms:show ev:event="DOMActivate" dialog="fb-bindings-dialog"/>
+                    </xforms:trigger>
+                </xforms:group>
+            </xforms:group>
+        </xhtml:div>
+
+        <!-- Database services -->
+        <xhtml:div class="fb-toolbox">
+            <xforms:group class="fb-hide-alert">
+                <xforms:label>Database Services</xforms:label>
+                <!-- Repeat over existing services -->
+                <xhtml:ul>
+                    <xforms:repeat nodeset="$model/xforms:submission[ends-with(@id, '-database')]">
+                        <xhtml:li>
+                            <xxforms:variable name="submission-name" select="substring-before(@id, '-database')"/>
+                            <xforms:trigger appearance="minimal">
+                                <xforms:label>
+                                    <xhtml:img src="/apps/fr/style/edit.gif" alt="Edit" title="Edit"/>
+                                </xforms:label>
+                                <xxforms:show ev:event="DOMActivate" dialog="fb-database-service-dialog">
+                                    <xxforms:context name="submission-name" select="$submission-name"/>
+                                </xxforms:show>
+                            </xforms:trigger>
+                            <xforms:trigger appearance="minimal" id="fb-database-submission-remove">
+                                <xforms:label>
+                                    <xforms:label><xhtml:img src="/apps/fr/style/images/silk/bin.png" alt="Delete" title="Delete"/></xforms:label>
+                                </xforms:label>
+                                <xforms:action ev:event="DOMActivate">
+                                    <!-- Ask confirmation -->
+                                    <xxforms:show dialog="fb-confirmation-dialog">
+                                        <xxforms:context name="fr:message"
+                                                         select="concat('Are you sure you want to delete service ''',
+                                                                     $submission-name,
+                                                                     '''?')"/>
+                                        <xxforms:context name="fr:confirmation-target" select="'fb-database-submission-remove'"/>
+                                    </xxforms:show>
+                                </xforms:action>
+                                <xforms:action ev:event="fb-confirmation-yes">
+                                    <!-- Delete stuff -->
+                                    <xforms:delete nodeset="$model/xforms:submission[@id = context()/@id]"/>
+                                    <!-- TODO: check -->
+                                    <!--<xforms:delete nodeset="$model/xforms:instance[@id = concat($submission-name, '-instance')]"/>-->
+                                </xforms:action>
+                            </xforms:trigger>
+                            <xforms:output value="$submission-name"/>
+                        </xhtml:li>
+                    </xforms:repeat>
+                </xhtml:ul>
+                <xforms:group class="fb-language-triggers">
+                    <xforms:trigger appearance="minimal">
+                        <xforms:label>
+                            <xhtml:img src="/apps/fr/style/images/silk/add.png" alt="Add Service" title="Add Service"/>
+                            <xhtml:span>Add</xhtml:span>
+                        </xforms:label>
+                        <xxforms:show ev:event="DOMActivate" dialog="fb-database-service-dialog"/>
                     </xforms:trigger>
                 </xforms:group>
             </xforms:group>

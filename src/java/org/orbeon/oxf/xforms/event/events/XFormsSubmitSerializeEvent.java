@@ -16,6 +16,15 @@ package org.orbeon.oxf.xforms.event.events;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
+import org.orbeon.oxf.xforms.function.xxforms.XXFormsElement;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.saxon.om.ListIterator;
+import org.orbeon.saxon.om.SequenceIterator;
+import org.orbeon.saxon.om.Item;
+import org.dom4j.Element;
+import org.dom4j.Document;
+
+import java.util.Collections;
 
 /**
  * 4.1.1 The xforms-submit-serialize Event
@@ -29,7 +38,31 @@ import org.orbeon.oxf.xforms.event.XFormsEvents;
  */
 public class XFormsSubmitSerializeEvent extends XFormsEvent {
 
+    private Element submissionBodyElement;
+
     public XFormsSubmitSerializeEvent(final XFormsEventTarget targetObject) {
         super(XFormsEvents.XFORMS_SUBMIT_SERIALIZE, targetObject, true, false);
+    }
+
+    public SequenceIterator getAttribute(String name) {
+        if ("submission-body".equals(name)) {
+
+            if (submissionBodyElement == null) {
+                // Create a document and root element
+                final Document document = Dom4jUtils.createDocument();
+                submissionBodyElement = Dom4jUtils.createElement("submission-body");
+                document.setRootElement(submissionBodyElement);
+            }
+
+            // Return document element
+            final Item item = XXFormsElement.DOCUMENT_WRAPPER.wrap(submissionBodyElement);
+            return new ListIterator(Collections.singletonList(item));
+        } else {
+            return super.getAttribute(name);
+        }
+    }
+
+    public String getSerializedData() {
+        return (submissionBodyElement == null) ? "" : submissionBodyElement.getStringValue();
     }
 }

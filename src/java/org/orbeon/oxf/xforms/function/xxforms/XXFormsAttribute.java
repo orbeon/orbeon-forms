@@ -64,6 +64,6 @@ public class XXFormsAttribute extends XFormsFunction {
             attribute = Dom4jUtils.createAttribute(new QName(qName.substring(colonIndex + 1), new Namespace(prefix, uri)), value);
         }
 
-        return XXFormsElement.documentWrapper.wrap(attribute);
+        return XXFormsElement.DOCUMENT_WRAPPER.wrap(attribute);
     }
 }

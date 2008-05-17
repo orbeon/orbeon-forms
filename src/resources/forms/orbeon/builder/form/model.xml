@@ -198,11 +198,6 @@
         </xforms:action>
     </xforms:action>
 
-    <!-- Configuration for Saxon serialization -->
-    <xforms:instance id="fb-xsl-output-instance">
-        <xsl:output xmlns:xsl="http://www.w3.org/1999/XSL/Transform" method="xml" omit-xml-declaration="yes" indent="yes" saxon:indent-spaces="4"/>
-    </xforms:instance>
-
     <!-- Store user-agent details -->
     <xforms:instance id="fb-user-agent-instance">
         <user-agent>
@@ -222,7 +217,7 @@
             <done/>
 
             <!-- Itemset editor dialog -->
-            <!-- TODO: This can be refactored to a local model for sure -->
+            <!-- TODO: This can be refactored to a local model -->
             <itemset-resource-id/>
             <itemset-lang/>
 
@@ -238,10 +233,8 @@
             <new-language/>
             <new-language-trigger/>
 
+            <!-- TODO: This can be refactored to a local model (help) -->
             <new-text/>
-
-            <new-source/>
-            <new-source-trigger/>
 
             <publish-trigger/>
             <controls-triggers/>

@@ -42,7 +42,7 @@ import java.util.Map;
 public class XXFormsElement extends XFormsFunction {
 
     // Mmh, here we use a global wrapper for creating dom4j elements. Is this the right way of doing it?
-    public static final DocumentWrapper documentWrapper
+    public static final DocumentWrapper DOCUMENT_WRAPPER
             = new DocumentWrapper(Dom4jUtils.createDocument(), null, new Configuration());
 
     public Item evaluateItem(XPathContext xpathContext) throws XPathException {
@@ -116,6 +116,6 @@ public class XXFormsElement extends XFormsFunction {
                 Dom4jUtils.normalizeTextNodes(element);
         }
 
-        return documentWrapper.wrap(element);
+        return DOCUMENT_WRAPPER.wrap(element);
     }
 }

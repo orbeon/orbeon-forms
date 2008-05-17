@@ -101,7 +101,8 @@ public class XFormsSetvalueAction extends XFormsAction {
 
             if (XFormsServer.logger.isDebugEnabled()) {
                 final XFormsInstance modifiedInstance = containingDocument.getInstanceForNode(currentNode);
-                containingDocument.logDebug("setvalue", "setting instance value", new String[] { "value", valueToSet, "instance", modifiedInstance.getEffectiveId() });
+                containingDocument.logDebug("setvalue", "setting instance value", new String[] { "value", valueToSet,
+                        "instance", (modifiedInstance != null) ? modifiedInstance.getEffectiveId() : "N/A" });
             }
 
             XFormsInstance.setValueForNodeInfo(pipelineContext, containingDocument, eventTarget, currentNode, valueToSet, type);
@@ -110,14 +111,16 @@ public class XFormsSetvalueAction extends XFormsAction {
                 // When this is called from a calculate, we don't set the flags as revalidate and refresh will have been set already
 
                 final XFormsInstance modifiedInstance = containingDocument.getInstanceForNode(currentNode);
-                final XFormsModel.DeferredActionContext deferredActionContext = modifiedInstance.getModel(containingDocument).getDeferredActionContext();
+                if (modifiedInstance != null) {// can be null if you set a value in a non-instance doc
+                    final XFormsModel.DeferredActionContext deferredActionContext = modifiedInstance.getModel(containingDocument).getDeferredActionContext();
 
-                // "XForms Actions that change only the value of an instance node results in setting the flags for
-                // recalculate, revalidate, and refresh to true and making no change to the flag for rebuild".
-                if (deferredActionContext != null) {
-                    deferredActionContext.recalculate = true;
-                    deferredActionContext.revalidate = true;
-                    deferredActionContext.refresh = true;
+                    // "XForms Actions that change only the value of an instance node results in setting the flags for
+                    // recalculate, revalidate, and refresh to true and making no change to the flag for rebuild".
+                    if (deferredActionContext != null) {
+                        deferredActionContext.recalculate = true;
+                        deferredActionContext.revalidate = true;
+                        deferredActionContext.refresh = true;
+                    }
                 }
             }
 

@@ -125,7 +125,7 @@ a.fb-edit-help-trigger img {
 
 #fb-publish-dialog { width: 35em }
 #fb-css-upload-dialog, #fb-schema-upload-dialog { width: 35em }
-#fb-edit-source-dialog, #fb-xml-dialog { width: 70em }
+#fb-source-editor-dialog, #fb-xml-dialog { width: 70em }
 #fb-edit-details-dialog, #fb-edit-help-dialog, #fb-edit-validation-dialog { width: 20em }
 
 #fb-edit-details-dialog .xforms-input input { width: 98% }
@@ -138,8 +138,8 @@ a.fb-edit-help-trigger img {
 #fb-schema-upload-dialog .fb-dialog-section { display: block; margin-left: 1em }
 
 #fb-xml-dialog .fb-xml-dialog-view { width: 100%; height: 29em; overflow: auto }
-#fb-edit-source-dialog .fb-xml-dialog-view { width: 100% }
-#fb-edit-source-dialog .fb-xml-dialog-view textarea.xforms-textarea { width: 100%; height: 29em }
+#fb-source-editor-dialog .fb-xml-dialog-view { width: 100% }
+#fb-source-editor-dialog .fb-xml-dialog-view textarea.xforms-textarea { width: 100%; height: 29em }
 
 /* In-place editing for regular fields */
 

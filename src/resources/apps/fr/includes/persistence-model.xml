@@ -21,7 +21,8 @@
               xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
               xmlns:f="http://orbeon.org/oxf/xml/formatting"
               xmlns:exist="http://exist.sourceforge.net/NS/exist"
-              xmlns:xhtml="http://www.w3.org/1999/xhtml">
+              xmlns:xhtml="http://www.w3.org/1999/xhtml"
+              xmlns:saxon="http://saxon.sf.net/">
 
     <!-- Model initialization -->
     <!-- TODO: Should not do this on summary page, for example -->
@@ -306,6 +307,11 @@
             <!-- Whether an error was received -->
             <is-error>false</is-error>
         </save>
+    </xforms:instance>
+
+    <!-- Configuration for Saxon serialization -->
+    <xforms:instance id="fr-xsl-output-instance">
+        <xsl:output xmlns:xsl="http://www.w3.org/1999/XSL/Transform" method="xml" omit-xml-declaration="yes" indent="yes" saxon:indent-spaces="4"/>
     </xforms:instance>
 
     <xforms:instance id="fr-triggers-instance">

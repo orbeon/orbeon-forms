@@ -521,6 +521,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                     documentToSubmit = initialDocumentToSubmit;
                 }
 
+                final String overriddenSerializedData;
                 if (serialize && !isDeferredSubmissionSecondPassReplaceAll) { // we don't want any changes to happen to the document upon xxforms-submit when producing a new document
                     // Fire xforms-submit-serialize
 
@@ -530,9 +531,14 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                     // consists of a serialization of the selected instance data according to the rules stated at 11.9
                     // Submission Options."
 
-                    // TODO: pass submission-body attribute
-                    containingDocument.dispatchEvent(pipelineContext, new XFormsSubmitSerializeEvent(XFormsModelSubmission.this));
-                    // TODO: look at result of submission-body attribute and see if submission body needs to be replaced
+                    final XFormsSubmitSerializeEvent serializeEvent = new XFormsSubmitSerializeEvent(XFormsModelSubmission.this);
+                    containingDocument.dispatchEvent(pipelineContext, serializeEvent);
+
+                    // TODO: rest of submission should happen upon default action of event
+
+                    overriddenSerializedData = serializeEvent.getSerializedData();
+                } else {
+                    overriddenSerializedData = null;
                 }
 
                 // Serialize
@@ -541,7 +547,18 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 final String queryString;
                 final String defaultMediatypeForSerialization;
                 {
-                    if (resolvedMethod.equals("multipart-post")) {
+                    if (overriddenSerializedData != null && !overriddenSerializedData.equals("")) {
+                        // Form author set data to serialize
+
+                        // TODO: more work to do here, or integrate below in different methods?
+                        if (serialization == null)
+                            serialization = "application/xml";
+
+                        queryString = null;
+                        messageBody = overriddenSerializedData.getBytes("UTF-8");
+                        defaultMediatypeForSerialization = "application/xml";
+
+                    } else if (resolvedMethod.equals("multipart-post")) {
 
                         // Set default serialization based on method
                         if (serialization == null)
@@ -568,7 +585,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                         // Perform "application/x-www-form-urlencoded" serialization
                         queryString = null;
-                        messageBody = serialize? createWwwFormUrlEncoded(documentToSubmit).getBytes("UTF-8") : null;// the resulting string is already ASCII
+                        messageBody = serialize ? createWwwFormUrlEncoded(documentToSubmit).getBytes("UTF-8") : null;// the resulting string is already ASCII
                         defaultMediatypeForSerialization = "application/x-www-form-urlencoded";
 
                     } else if (XFormsSubmissionUtils.isPost(resolvedMethod) || XFormsSubmissionUtils.isPut(resolvedMethod)) {

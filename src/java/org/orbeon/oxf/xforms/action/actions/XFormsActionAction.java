@@ -52,6 +52,7 @@ public class XFormsActionAction extends XFormsAction {
 
                 variablesCount++;
             } else {
+                // NOTE: We execute children actions, even if they happen to have ev:observer or ev:target attributes
 
                 // Set context on action element
                 contextStack.pushBinding(pipelineContext, currentActionElement);

@@ -24,17 +24,18 @@
       xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
       xmlns:saxon="http://saxon.sf.net/"
 
-      id="fb-edit-source-dialog" level="modeless" close="true" draggable="true" class="fr-dialog">
+      id="fb-source-editor-dialog" level="modeless" close="true" draggable="true" class="fr-dialog" model="fb-source-editor-model">
 
-    <xforms:label>Edit source</xforms:label>
+    <xforms:label>Edit Source</xforms:label>
     <xhtml:div class="fb-xml-dialog-view">
-        <xforms:textarea ref="$variables/new-source"/>
+        <xforms:textarea ref="source">
+            <xforms:alert>Please make sure the content is well-formed XML</xforms:alert>
+        </xforms:textarea>
     </xhtml:div>
     <xhtml:div class="fr-dialog-buttons">
         <xhtml:span class="fr-inplace-buttons">
-            <xforms:trigger class="fr-inplace-rename" ref="$variables/new-source-trigger">
+            <xforms:trigger class="fr-inplace-rename" ref="save-trigger">
                 <xforms:label>Accept Changes</xforms:label>
-                <!-- TODO: At the very least, should make sure the XML is well-formed. Even better would be to validate it. -->
                 <xforms:action ev:event="DOMActivate">
 
                     <!-- Parse the XML and insert it -->
@@ -44,7 +45,7 @@
                         <!--<xforms:output value="replace($variables/new-source, '&#x0d;', '&#x0d;')"/>-->
                     <!--</xforms:message>-->
 
-                    <xforms:insert nodeset="instance('fr-form-instance')" origin="saxon:parse($variables/new-source)"/>
+                    <xforms:insert nodeset="instance('fr-form-instance')" origin="saxon:parse(source)"/>
                     <!-- Saxon serialization adds an extra meta element -->
                     <xforms:delete nodeset="instance('fr-form-instance')/xhtml:head/meta[@http-equiv = 'Content-Type']"/>
 
@@ -57,8 +58,32 @@
         </xhtml:span>
     </xhtml:div>
     <!-- Hide dialog -->
-    <xxforms:hide ev:event="DOMActivate" dialog="fb-edit-source-dialog"/>
+    <xxforms:hide ev:event="DOMActivate" dialog="fb-source-editor-dialog"/>
     <!-- Serialize XML when the dialog opens -->
-    <xforms:setvalue ev:event="xxforms-dialog-open" ref="$variables/new-source"
-                     value="saxon:serialize(instance('fr-form-instance'), xxforms:instance('fb-xsl-output-instance'))"/>
+    <xforms:setvalue ev:event="xxforms-dialog-open" ref="source"
+                     value="saxon:serialize(xxforms:instance('fr-form-instance'), xxforms:instance('fr-xsl-output-instance'))"/>
+
+    <!-- Model for the source editor -->
+    <xforms:model id="fb-source-editor-model">
+
+        <xxforms:variable name="model" select="xxforms:instance('fr-form-instance')/xhtml:head/xforms:model[@id = 'fr-form-model']"/>
+
+        <xforms:instance id="fb-source-editor-instance">
+            <source-editor>
+                <source/>
+                <save-trigger/>
+            </source-editor>
+        </xforms:instance>
+
+        <xforms:bind nodeset="instance('fb-source-editor-instance')">
+            <xforms:bind nodeset="source" type="xxforms:xml"/>
+            <xforms:bind nodeset="save-trigger" readonly=". = 'disabled'"/>
+        </xforms:bind>
+
+        <!-- Enable/disable trigger -->
+        <xforms:setvalue ev:event="xxforms-invalid" ev:observer="fb-source-editor-instance" ref="instance('fb-source-editor-instance')/save-trigger">disabled</xforms:setvalue>
+        <xforms:setvalue ev:event="xxforms-valid" ev:observer="fb-source-editor-instance" ref="instance('fb-source-editor-instance')/save-trigger">enabled</xforms:setvalue>
+
+    </xforms:model>
+
 </xxforms:dialog>

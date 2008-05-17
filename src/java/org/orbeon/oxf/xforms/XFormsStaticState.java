@@ -670,9 +670,6 @@ public class XFormsStaticState {
                     modelElement = modelDocument.getRootElement();
                 }
 
-                final Map modelEventHandlers = XFormsEventHandlerImpl.extractEventHandlers(modelElement, eventNamesMap);
-                mergeEventHandlers(eventHandlersMap, modelEventHandlers);
-
                 // Iterate over model submissions
                 for (Iterator j = modelElement.elements(new QName("submission", XFormsConstants.XFORMS_NAMESPACE)).iterator(); j.hasNext();) {
                     final Element currentSubmissionElement = (Element) j.next();
@@ -680,6 +677,11 @@ public class XFormsStaticState {
                     final Map submissionEventHandlers = XFormsEventHandlerImpl.extractEventHandlers(currentSubmissionElement, eventNamesMap);
                     mergeEventHandlers(eventHandlersMap, submissionEventHandlers);
                 }
+
+                // Handle event handlers directly in model
+                final Map modelEventHandlers = XFormsEventHandlerImpl.extractEventHandlers(modelElement, eventNamesMap);
+                mergeEventHandlers(eventHandlersMap, modelEventHandlers);
+
             }
             isAnalyzed = true;
             return true;

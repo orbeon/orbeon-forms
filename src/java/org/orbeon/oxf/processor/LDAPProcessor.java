@@ -76,6 +76,9 @@ public class LDAPProcessor extends ProcessorImpl {
                             String bindDN = XPathUtils.selectStringValueNormalize(doc, "/config/bind-dn");
                             String password = XPathUtils.selectStringValueNormalize(doc, "/config/password");
                             String protocol = XPathUtils.selectStringValueNormalize(doc, "/config/protocol");
+                            String referral = XPathUtils.selectStringValueNormalize(doc, "/config/referral ");
+
+                            //logger.info("Referral="+referral);
 
                             // Override with properties if needed
                             config.setHost(host != null ? host : getPropertySet().getString(HOST_PROPERTY));
@@ -83,6 +86,11 @@ public class LDAPProcessor extends ProcessorImpl {
                             config.setBindDN(bindDN != null ? bindDN : getPropertySet().getString(BIND_PROPERTY));
                             config.setPassword(password != null ? password : getPropertySet().getString(PASSWORD_PROPERTY));
                             config.setProtocol(protocol != null ? protocol : getPropertySet().getString(PROTOCOL_PROPERTY));
+
+                            // If not set use providers default. Valid values are follow, ignore, throw
+                            if (referral != null){
+                            	config.setReferral(referral);
+                            }
 
                             // The password and bind DN are allowed to be blank
                             if (password == null)
@@ -278,6 +286,10 @@ public class LDAPProcessor extends ProcessorImpl {
             env.put(LDAP_VERSION, DEFAULT_LDAP_VERSION);
             env.put(Context.INITIAL_CONTEXT_FACTORY, DEFAULT_CTX);
             env.put(Context.PROVIDER_URL, "ldap://" + config.getHost() + ":" + config.getPort());
+            if (config.getReferral() != null){
+            	env.put(Context.REFERRAL, config.getReferral());
+            }
+
             if (config.getProtocol() != null)
                 env.put(Context.SECURITY_PROTOCOL, config.getProtocol());
             env.put("com.sun.jndi.ldap.connect.pool", "true");
@@ -319,6 +331,8 @@ public class LDAPProcessor extends ProcessorImpl {
         private String password;
         private String rootDN;
         private String protocol;
+        private String referral;
+
         private List attributes = new ArrayList();
 
         public String getBindDN() {
@@ -367,6 +381,14 @@ public class LDAPProcessor extends ProcessorImpl {
 
         public void setProtocol(String protocol) {
             this.protocol = protocol;
+        }
+
+        public String getReferral() {
+            return referral;
+        }
+
+        public void setReferral(String referral) {
+            this.referral = referral;
         }
 
         public List getAttributes() {

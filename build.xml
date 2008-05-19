@@ -87,10 +87,10 @@
         <include name="antlr-2_7_4_orbeon.jar"/>
         <include name="jakarta-slide-webdavlib-2.0rc1.jar"/>
 
-        <include name="exist-1_2.jar"/>
-        <include name="exist-modules-1_2.jar"/>
-        <include name="exist-optional-1_2.jar"/>
-        <include name="exist-ngram-module-1_2.jar"/>
+        <include name="exist-1_2_1.jar"/>
+        <include name="exist-modules-1_2_1.jar"/>
+        <include name="exist-optional-1_2_1.jar"/>
+        <include name="exist-ngram-module-1_2_1.jar"/>
 
         <include name="exist-antlr-2_7_6.jar"/>
         <include name="exist-jgroups-all-exist.jar"/>

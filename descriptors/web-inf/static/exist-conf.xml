@@ -32,9 +32,9 @@
         - http://exist-db.org/configuration.html
         - http://exist-db.org/cluster.html
         - http://exist-db.org/documentation.html
-        - http://wiki.exist-db.org/
+        - http://atomic.exist-db.org/
 
-    $Id: exist-conf.xml,v 1.1 2008/02/14 01:58:37 avernet Exp $
+    $Id: exist-conf.xml,v 1.2 2008/05/19 17:48:18 avernet Exp $
 
 -->
 <exist xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="schema/conf.xsd">
@@ -93,11 +93,6 @@
         - files:
             path to the directory where database files are stored.
 
-        - free_mem_min:
-            minimum amount of free memory in percent during indexing. The
-            database will start to flush its internal buffers whenever
-            free memory drops below the specified limit.
-
         - pageSize:
             the size of one page on the disk. This is the smallest unit
             transferred from and to the database files. Should be a multiple of
@@ -113,7 +108,7 @@
         collections, you can also increase the collectionCacheSize value
     -->
     <db-connection cacheSize="48M" collectionCache="24M" database="native"
-        files="exist-data" free_mem_min="5" pageSize="4096">
+        files="exist-data" pageSize="4096">
 
         <!--
             Specifies the default permissions for all resources and collections
@@ -149,6 +144,27 @@
             wait-before-shutdown="120000" />
 
         <!--
+		    Configure the query pool.
+		    - max-stack-size:
+		        maximum number of queries in the query-pool.
+
+		    - size:
+		        number of copies of the same query kept in the query-pool.
+		        Value "-1" effectively disables caching. Queries cannot be shared
+		        by threads, each thread needs a private copy of a query.
+
+		    - timeout:
+		        amount of time that a query will be cached in the query-pool.
+
+		    - timeout-check-interval:
+		        time between checking for timed out queries. For value "-1"
+		        the time out is switched off, resulting cached queries to remain
+		        in the cache forever.
+		-->
+        <!--query-pool max-stack-size="5" size="128" timeout="120000"
+		            timeout-check-interval="30000"/-->
+
+        <!--
             Settings for the journaling and recovery of the database. With
             recovery enabled, the database is able to recover from an unclean
             database shutdown due to, for example, power failures, OS reboots,
@@ -157,9 +173,6 @@
 
             - enabled:
                 if this attribute is set to yes, automatic recovery is enabled.
-
-            - group-commit:
-                not documented.
 
             - journal-dir:
                 this attribute sets the directory where journal files are to be
@@ -189,6 +202,16 @@
                 in which there is a complete system failure, some committed
                 transactions might not have yet been written to the journal,
                 and so will be rolled back.
+
+            - group-commit:
+                If set to "yes", eXist will not sync the journal file
+                immediately after every transaction commit. Instead,
+                it will wait until the current file buffer (32kb)
+                is really full. This can speed up eXist on some systems
+                where a file sync is an expensive operation (mainly windows
+                XP; not necessary on Linux). However, group-comit="yes"
+                will increase the risk of an already committed
+                operation being rolled back after a database crash.
         -->
         <recovery enabled="yes" group-commit="no"
             journal-dir="exist-data" size="100M" sync-on-commit="no" />
@@ -340,7 +363,6 @@
         Configures user jobs for the scheduler
     -->
     <scheduler>
-
         <!--
             Job definitions:
 
@@ -391,18 +413,47 @@
             Can be used with a period to define for how many periods a job should be
             executed. If unspecified jobs will repeat for every period indefinitely.
         -->
-
         <!-- job class="bar.foo.myjob" period="600000" delay="300000" repeat="10" /-->
+        <!--
+            Run a consistency check on the database. This will detect inconsistencies
+            or corruptions in documents or the collection store. The task can also
+            be used to create automatic backups. The backup routine is faster than
+            the one in the standard backup tool and it tries to export as much data
+            as possible, even if parts of the collection tree are destroyed.
 
+            If errors are detected during the consistency check, the job will
+            automatically start creating a backup.
+
+            Errors are reported via the JMX object with the name:
+
+            org.exist.management.tasks:type=ConsistencyCheckTask
+
+            Parameters:
+                output  The output directory used by the job. The path is interpreted
+                        relative to the data directory (WEB-INF/data).
+
+                backup  Set to "yes" to create a backup whenever the job runs, not just
+                        when it detects errors.
+        -->
+        <!--
+        <job type="system" name="check1"
+            class="org.exist.storage.ConsistencyCheckTask"
+        	cron-trigger="0 0 * * * ?">
+        	<parameter name="output" value="sanity"/>
+            <parameter name="backup" value="no"/>
+        </job>
+        -->
         <!-- Automatically creates a copy of the database .dbx files every 2 minutes
         	Parameters:
         		output-dir:
         			The directory into which the copy will be written
         -->
-        <!--job type="system" class="org.exist.storage.DataBackup" period="120000">
+
+        <!--
+        <job type="system" name="databackup"
+            class="org.exist.storage.DataBackup" period="120000">
             <parameter name="output-dir" value="backup" />
         </job-->
-
         <!-- Automatically creates a backup of the database every 6 hours.
 
             Parameters:
@@ -417,7 +468,10 @@
                     File prefix for the generated backup file or directory.
 
 		-->
-        <!--job type="system" class="org.exist.storage.BackupSystemTask" cron-trigger="0 0 */6 * * ?">
+        <!--
+        <job type="system" name="backup"
+            class="org.exist.storage.BackupSystemTask"
+            cron-trigger="0 0 */6 * * ?">
             <parameter name="dir" value="backup"/>
             <parameter name="suffix" value=".zip"/>
             <parameter name="prefix" value="backup-"/>
@@ -426,7 +480,6 @@
             <parameter name="password" value=""/>
             <parameter name="zip-files-max" value="28"/>
         </job-->
-
     </scheduler>
 
     <!--
@@ -491,7 +544,19 @@
             for Xalan (XSLT 1.0 support) - org.apache.xalan.processor.TransformerFactoryImpl
 
 
-        For further details see - http://wiki.exist-db.org/space/Howtos/Adding+XSLT+2.0+%28Saxon%29
+        For further details see - http://atomic.exist-db.org/wiki/HowTo/XSLT2/
+
+        You can also include attribute child elements, if you wish to pass in attributes
+        to your particular TransformerFactory as follows:
+
+            <transformer class="net.sf.saxon.TransformerFactoryImpl">
+                <attribute name="http://saxon.sf.net/feature/version-warning" value="false" type="boolean"/>
+            </transformer>
+
+        The example above sets Saxon to suppress warnings when executing a XSLT 1.0 stylesheet
+        with the XLST 2.0 processor. Check the documentation for your selected TransformerFactory
+        to determine which attributes can be set. Valid types include "boolean", "integer"
+        and "string".  Anything else will be treated as type "string".
 
     -->
     <transformer class="org.apache.xalan.processor.TransformerFactoryImpl" />
@@ -533,7 +598,7 @@
             -  backwardCompatible:
                 Set to "yes" to enable backward compatibility (untyped argument checks for instance)
     -->
-    <xquery enable-java-binding="no" enable-query-rewriting="no"  backwardCompatible="no">
+    <xquery enable-java-binding="no" enable-query-rewriting="yes"  backwardCompatible="no">
         <builtin-modules>
             <!-- Default Modules -->
             <module class="org.exist.xquery.functions.util.UtilModule"
@@ -596,13 +661,8 @@
     </xquery>
 
     <!--
-      During XUpdates, the database needs to do a partial reindex of the
-      document whenever the internal node-id structure has changed. Reindex
-      runs can occur quite frequently and slow down the XUpdate process.
-
-      Frequent reindex runs can be avoided by leaving some space between the
-      numeric identifiers assigned to every node. Future insertions will first
-      fill up these spare identifiers, so no reindex is required.
+      Inserting new nodes into a document can lead to fragmentation
+      in the DOM storage file.
 
         - allowed-fragmentation:
             defines the maximum number of page splits allowed within a document
@@ -615,15 +675,7 @@
             pointers in the structural index point to valid storage addresses
             containing valid nodes.
 
-        - growth-factor:
-            determines the number of spare ids to be inserted whenever the node
-            id scheme is recomputed after an XUpdate.
-            Increase the setting to have less reindex runs. However, you have
-            to be aware that leaving spare ids also limits the maximum size of
-            a document that can be indexed.
-
     -->
-    <xupdate allowed-fragmentation="5" enable-consistency-checks="no"
-        growth-factor="20" />
+    <xupdate allowed-fragmentation="5" enable-consistency-checks="no"/>
 
 </exist>

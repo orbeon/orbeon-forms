@@ -10,15 +10,16 @@
 # 3) Run this script from the eXist root directory
 
 ORBEON_HOME=../orbeon
+VERSION=1_2_1
 rm lib/endorsed/xercesImpl-2.9.1.jar
 rm lib/endorsed/xalan-2.7.0.jar
 cp $ORBEON_HOME/lib/xerces-xercesImpl-2_9_orbeon_20070711.jar lib/endorsed/
 cp $ORBEON_HOME/lib/xalan-2_5_1_orbeon.jar lib/endorsed/
-cp $ORBEON_HOME/lib/saxon-8_8_orbeon_20070817.jar lib/endorsed/
+cp $ORBEON_HOME/lib/saxon-8_8_orbeon_20080516.jar lib/endorsed/
 cp $ORBEON_HOME/build/lib/orbeon.jar lib/endorsed/
 for F in $(find src -name *.java)
 do
-    sed -i -e 's/org.apache.xerces/orbeon.apache.xerces/g' $F
+    sed -i -e 's/org.apache.xerces/orbeon.apache.xerces/g' $F 
     sed -i -e 's/org.apache.xalan/orbeon.apache.xalan/g' $F
     sed -i -e 's/net.sf.saxon/org.orbeon.saxon/g' $F
     sed -i -e 's/SAXParserFactory.newInstance()/new org.orbeon.oxf.xml.xerces.XercesSAXParserFactoryImpl()/g' $F
@@ -27,7 +28,6 @@ done
 ant clean
 ant
 rm $ORBEON_HOME/lib/*exist*
-VERSION=1_2
 cp exist.jar $ORBEON_HOME/lib/exist-$VERSION.jar
 cp exist-optional.jar $ORBEON_HOME/lib/exist-optional-$VERSION.jar
 cp lib/extensions/exist-modules.jar $ORBEON_HOME/lib/exist-modules-$VERSION.jar

@@ -26,7 +26,10 @@ body, body table, textarea.xforms-textarea {
 #fr-view .fr-hidden { display: none }
 .fr-clear { clear: both }
 
-.xforms-help-image { vertical-align: -0.2em; display: inline; margin: 0 .5em 0 0; padding: 0; }
+.xforms-help-image { vertical-align: -0.2em; display: inline; margin: 0 .5em 0 0; padding: 0;
+    float: left; /* Without the "float: left" on FF2/3 the mouseover event arrive on the label, not the help
+                    image at the left of the label. */
+}
 
 .fr-top { line-height: 10px; }
 #doc .fr-top { background-image: url(top-750.png); }

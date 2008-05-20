@@ -828,6 +828,7 @@ ORBEON.xforms.Document = {
      *                              This function receives window in which the form is loaded as parameter.
      */
     takeOnlineFromSummary: function(url, formOnlineListener) {
+        ORBEON.xforms.Offline.init();
         ORBEON.xforms.Offline.loadFormInIframe(url, function(offlineIframe) {
             offlineIframe.contentWindow.ORBEON.xforms.Document.dispatchEvent("$containing-document$", "xxforms-online");
             offlineIframe.contentWindow.ORBEON.xforms.Offline.takeOnline();

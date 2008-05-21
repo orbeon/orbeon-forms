@@ -77,6 +77,6 @@ public class XFormsSubmitSerializeEvent extends XFormsEvent {
     }
 
     public String getSerializedData() {
-        return (submissionBodyElement == null) ? "" : submissionBodyElement.getStringValue();
+        return (submissionBodyElement == null) ? null : submissionBodyElement.getStringValue();
     }
 }

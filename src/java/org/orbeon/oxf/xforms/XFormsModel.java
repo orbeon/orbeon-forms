@@ -557,7 +557,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                                                 new String[] { "URI", absoluteResolvedURLString });
 
                                     connectionResult = XFormsSubmissionUtils.doRegular(externalContext, containingDocument,
-                                            "get", absoluteResolvedURL, xxformsUsername, xxformsPassword, null, null, null, null);
+                                            "GET", absoluteResolvedURL, xxformsUsername, xxformsPassword, null, null, null, null);
 
                                     try {
                                         try {

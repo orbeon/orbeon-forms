@@ -46,100 +46,89 @@ public class XFormsSubmissionUtils {
      * Perform an optimized local connection using the Servlet API instead of using a URLConnection.
      */
     public static XFormsModelSubmission.ConnectionResult doOptimized(PipelineContext pipelineContext, ExternalContext externalContext,
-                                                                     XFormsModelSubmission xformsModelSubmission, String method, final String action, String mediatype, boolean doReplace,
+                                                                     XFormsModelSubmission xformsModelSubmission, String httpMethod, final String action, String mediatype, boolean doReplace,
                                                                      byte[] messageBody, String queryString) {
 
         final XFormsContainingDocument containingDocument = (xformsModelSubmission != null) ? xformsModelSubmission.getContainingDocument() : null;
         try {
-            if (isPost(method) || isPut(method) || isGet(method) || isDelete(method)) {
+            // Case of empty body
+            if (messageBody == null)
+                messageBody = new byte[0];
 
-                // Case of empty body
-                if (messageBody == null)
-                    messageBody = new byte[0];
+            // Create requestAdapter depending on method
+            final ForwardExternalContextRequestWrapper requestAdapter;
+            final String effectiveResourceURI;
+            {
+                if (httpMethod.equals("POST") || httpMethod.equals("PUT")) {
+                    // Simulate a POST or PUT
+                    effectiveResourceURI = action;
 
-                // Create requestAdapter depending on method
-                final ForwardExternalContextRequestWrapper requestAdapter;
-                final String effectiveResourceURI;
-                {
-                    if (isPost(method) || isPut(method)) {
-                        // Simulate a POST or PUT
-                        effectiveResourceURI = action;
+                    if (XFormsServer.logger.isDebugEnabled())
+                        XFormsContainingDocument.logDebugStatic(containingDocument, "submission", "setting request body",
+                            new String[] { "body", new String(messageBody, "UTF-8") });
 
-                        if (XFormsServer.logger.isDebugEnabled())
-                            XFormsContainingDocument.logDebugStatic(containingDocument, "submission", "setting request body",
-                                new String[] { "body", new String(messageBody, "UTF-8") });
-
-                        requestAdapter = new ForwardExternalContextRequestWrapper(externalContext.getRequest(),
-                                effectiveResourceURI, method.toUpperCase(), (mediatype != null) ? mediatype : "application/xml", messageBody);
-                    } else {
-                        // Simulate a GET
-                        {
-                            final StringBuffer updatedActionStringBuffer = new StringBuffer(action);
-                            if (queryString != null) {
-                                if (action.indexOf('?') == -1)
-                                    updatedActionStringBuffer.append('?');
-                                else
-                                    updatedActionStringBuffer.append('&');
-                                updatedActionStringBuffer.append(queryString);
-                            }
-                            effectiveResourceURI = updatedActionStringBuffer.toString();
-                        }
-                        requestAdapter = new ForwardExternalContextRequestWrapper(externalContext.getRequest(),
-                                effectiveResourceURI, method.toUpperCase());
-                    }
-                }
-
-                if (XFormsServer.logger.isDebugEnabled())
-                    XFormsContainingDocument.logDebugStatic(containingDocument, "submission", "dispatching request",
-                                new String[] { "effective resource URI (relative to servlet context)", effectiveResourceURI });
-
-                final ExternalContext.RequestDispatcher requestDispatcher = externalContext.getRequestDispatcher(action);
-                final XFormsModelSubmission.ConnectionResult connectionResult = new XFormsModelSubmission.ConnectionResult(effectiveResourceURI) {
-                    public void close() {
-                        if (getResponseInputStream() != null) {
-                            try {
-                                getResponseInputStream().close();
-                            } catch (IOException e) {
-                                throw new OXFException("Exception while closing input stream for action: " + action);
-                            }
-                        }
-                    }
-                };
-                if (doReplace) {
-                    // "the event xforms-submit-done is dispatched"
-                    if (xformsModelSubmission != null)
-                        xformsModelSubmission.getContainingDocument().dispatchEvent(pipelineContext, new XFormsSubmitDoneEvent(xformsModelSubmission, connectionResult.resourceURI, connectionResult.statusCode));
-                    // Just forward the reply
-                    requestDispatcher.forward(requestAdapter, externalContext.getResponse());
-                    connectionResult.dontHandleResponse = true;
+                    requestAdapter = new ForwardExternalContextRequestWrapper(externalContext.getRequest(),
+                            effectiveResourceURI, httpMethod, (mediatype != null) ? mediatype : "application/xml", messageBody);
                 } else {
-                    // We must intercept the reply
-                    final ResponseAdapter responseAdapter = new ResponseAdapter(externalContext.getNativeResponse());
-                    requestDispatcher.include(requestAdapter, responseAdapter);
-
-                    // Get response information that needs to be forwarded
-
-                    // NOTE: Here, the resultCode is not propagated from the included resource
-                    // when including Servlets. Similarly, it is not possible to obtain the
-                    // included resource's content type or headers. Because of this we should not
-                    // use an optimized submission from within a servlet.
-                    connectionResult.statusCode = responseAdapter.getResponseCode();
-                    connectionResult.responseMediaType = XMLUtils.XML_CONTENT_TYPE;
-                    connectionResult.setResponseInputStream(responseAdapter.getInputStream());
-                    connectionResult.responseHeaders = new HashMap();
-                    connectionResult.lastModified = 0;
+                    // Simulate a GET or DELETE
+                    {
+                        final StringBuffer updatedActionStringBuffer = new StringBuffer(action);
+                        if (queryString != null) {
+                            if (action.indexOf('?') == -1)
+                                updatedActionStringBuffer.append('?');
+                            else
+                                updatedActionStringBuffer.append('&');
+                            updatedActionStringBuffer.append(queryString);
+                        }
+                        effectiveResourceURI = updatedActionStringBuffer.toString();
+                    }
+                    requestAdapter = new ForwardExternalContextRequestWrapper(externalContext.getRequest(),
+                            effectiveResourceURI, httpMethod);
                 }
-
-                return connectionResult;
-            } else if (method.equals("multipart-post")) {
-                // TODO
-                throw new OXFException("xforms:submission: submission method not yet implemented: " + method);
-            } else if (method.equals("form-data-post")) {
-                // TODO
-                throw new OXFException("xforms:submission: submission method not yet implemented: " + method);
-            } else {
-                throw new OXFException("xforms:submission: invalid submission method requested: " + method);
             }
+
+            if (XFormsServer.logger.isDebugEnabled())
+                XFormsContainingDocument.logDebugStatic(containingDocument, "submission", "dispatching request",
+                            new String[] { "effective resource URI (relative to servlet context)", effectiveResourceURI });
+
+            final ExternalContext.RequestDispatcher requestDispatcher = externalContext.getRequestDispatcher(action);
+            final XFormsModelSubmission.ConnectionResult connectionResult = new XFormsModelSubmission.ConnectionResult(effectiveResourceURI) {
+                public void close() {
+                    if (getResponseInputStream() != null) {
+                        try {
+                            getResponseInputStream().close();
+                        } catch (IOException e) {
+                            throw new OXFException("Exception while closing input stream for action: " + action);
+                        }
+                    }
+                }
+            };
+            if (doReplace) {
+                // "the event xforms-submit-done is dispatched"
+                if (xformsModelSubmission != null)
+                    xformsModelSubmission.getContainingDocument().dispatchEvent(pipelineContext, new XFormsSubmitDoneEvent(xformsModelSubmission, connectionResult.resourceURI, connectionResult.statusCode));
+                // Just forward the reply
+                requestDispatcher.forward(requestAdapter, externalContext.getResponse());
+                connectionResult.dontHandleResponse = true;
+            } else {
+                // We must intercept the reply
+                final ResponseAdapter responseAdapter = new ResponseAdapter(externalContext.getNativeResponse());
+                requestDispatcher.include(requestAdapter, responseAdapter);
+
+                // Get response information that needs to be forwarded
+
+                // NOTE: Here, the resultCode is not propagated from the included resource
+                // when including Servlets. Similarly, it is not possible to obtain the
+                // included resource's content type or headers. Because of this we should not
+                // use an optimized submission from within a servlet.
+                connectionResult.statusCode = responseAdapter.getResponseCode();
+                connectionResult.responseMediaType = XMLUtils.XML_CONTENT_TYPE;
+                connectionResult.setResponseInputStream(responseAdapter.getInputStream());
+                connectionResult.responseHeaders = new HashMap();
+                connectionResult.lastModified = 0;
+            }
+
+            return connectionResult;
         } catch (IOException e) {
             throw new OXFException(e);
         }
@@ -151,21 +140,21 @@ public class XFormsSubmissionUtils {
      * @param action absolute URL or absolute path (which must include the context path)
      */
     public static XFormsModelSubmission.ConnectionResult doRegular(ExternalContext externalContext, XFormsContainingDocument containingDocument,
-                                                                   String method, final String action, String username, String password, String mediatype,
+                                                                   String httpMethod, final String action, String username, String password, String mediatype,
                                                                    byte[] messageBody, String queryString, List headerNames, Map headerNameValues) {
 
         // Compute absolute submission URL
         final URL submissionURL = createAbsoluteURL(action, queryString, externalContext);
-        return doRegular(externalContext, containingDocument, method, submissionURL, username, password, mediatype, messageBody, headerNames, headerNameValues);
+        return doRegular(externalContext, containingDocument, httpMethod, submissionURL, username, password, mediatype, messageBody, headerNames, headerNameValues);
     }
 
     public static XFormsModelSubmission.ConnectionResult doRegular(ExternalContext externalContext, XFormsContainingDocument containingDocument,
-                                                                   String method, final URL submissionURL, String username, String password, String mediatype,
+                                                                   String httpMethod, final URL submissionURL, String username, String password, String mediatype,
                                                                    byte[] messageBody, List headerNames, Map headerNameValues) {
 
         // Perform submission
         final String scheme = submissionURL.getProtocol();
-        if (scheme.equals("http") || scheme.equals("https") || (isGet(method) && (scheme.equals("file") || scheme.equals("oxf")))) {
+        if (scheme.equals("http") || scheme.equals("https") || (httpMethod.equals("GET") && (scheme.equals("file") || scheme.equals("oxf")))) {
             // http MUST be supported
             // https SHOULD be supported
             // file SHOULD be supported
@@ -190,184 +179,175 @@ public class XFormsSubmissionUtils {
 
                 final URLConnection urlConnection = submissionURL.openConnection();
                 final HTTPURLConnection httpURLConnection = (urlConnection instanceof HTTPURLConnection) ? (HTTPURLConnection) urlConnection : null;
-                if (isPost(method) || isPut(method) || isGet(method) || isDelete(method)) {
-                    // Whether a message body must be sent
-                    final boolean hasRequestBody = isPost(method) || isPut(method);
-                    // Case of empty body
-                    if (messageBody == null)
-                        messageBody = new byte[0];
 
-                    urlConnection.setDoInput(true);
-                    urlConnection.setDoOutput(hasRequestBody);
+                // Whether a message body must be sent
+                final boolean hasRequestBody = httpMethod.equals("POST") || httpMethod.equals("PUT");
+                // Case of empty body
+                if (messageBody == null)
+                    messageBody = new byte[0];
 
-                    if (httpURLConnection != null) {
-                        httpURLConnection.setRequestMethod(getHttpMethod(method));
-                        if (username != null) {
-                            httpURLConnection.setUsername(username);
-                            if (password != null)
-                               httpURLConnection.setPassword(password);
-                        }
+                urlConnection.setDoInput(true);
+                urlConnection.setDoOutput(hasRequestBody);
+
+                if (httpURLConnection != null) {
+                    httpURLConnection.setRequestMethod(httpMethod);
+                    if (username != null) {
+                        httpURLConnection.setUsername(username);
+                        if (password != null)
+                           httpURLConnection.setPassword(password);
                     }
-                    final String contentTypeMediaType = NetUtils.getContentTypeMediaType(mediatype);
-                    if (hasRequestBody) {
-                        if (isPost(method) && "application/soap+xml".equals(contentTypeMediaType)) {
-                            // SOAP POST
+                }
+                final String contentTypeMediaType = NetUtils.getContentTypeMediaType(mediatype);
+                if (hasRequestBody) {
+                    if (httpMethod.equals("POST") && "application/soap+xml".equals(contentTypeMediaType)) {
+                        // SOAP POST
 
-                            XFormsContainingDocument.logDebugStatic(containingDocument, "submission", "found SOAP POST");
+                        XFormsContainingDocument.logDebugStatic(containingDocument, "submission", "found SOAP POST");
 
-                            final Map parameters = NetUtils.getContentTypeParameters(mediatype);
-                            final FastStringBuffer sb = new FastStringBuffer("text/xml");
+                        final Map parameters = NetUtils.getContentTypeParameters(mediatype);
+                        final FastStringBuffer sb = new FastStringBuffer("text/xml");
 
-                            // Extract charset parameter if present
-                            // TODO: We have the body as bytes already, using the xforms:submission/@encoding attribute, so this is not right.
-                            if (parameters != null) {
-                                final String charsetParameter = (String) parameters.get("charset");
-                                if (charsetParameter != null) {
-                                    // Append charset parameter
-                                    sb.append("; ");
-                                    sb.append(charsetParameter);
-                                }
+                        // Extract charset parameter if present
+                        // TODO: We have the body as bytes already, using the xforms:submission/@encoding attribute, so this is not right.
+                        if (parameters != null) {
+                            final String charsetParameter = (String) parameters.get("charset");
+                            if (charsetParameter != null) {
+                                // Append charset parameter
+                                sb.append("; ");
+                                sb.append(charsetParameter);
                             }
+                        }
 
-                            // Set new content type
-                            urlConnection.setRequestProperty("Content-Type", sb.toString());
+                        // Set new content type
+                        urlConnection.setRequestProperty("Content-Type", sb.toString());
 
-                            // Extract action parameter if present
-                            if (parameters != null) {
-                                final String actionParameter = (String) parameters.get("action");
-                                if (actionParameter != null) {
-                                    // Set SOAPAction header
-                                    urlConnection.setRequestProperty("SOAPAction", actionParameter);
-                                    XFormsContainingDocument.logDebugStatic(containingDocument, "submission", "setting header",
-                                        new String[] { "SOAPAction", actionParameter });
-                                }
+                        // Extract action parameter if present
+                        if (parameters != null) {
+                            final String actionParameter = (String) parameters.get("action");
+                            if (actionParameter != null) {
+                                // Set SOAPAction header
+                                urlConnection.setRequestProperty("SOAPAction", actionParameter);
+                                XFormsContainingDocument.logDebugStatic(containingDocument, "submission", "setting header",
+                                    new String[] { "SOAPAction", actionParameter });
                             }
-                        } else {
-                            urlConnection.setRequestProperty("Content-Type", (mediatype != null) ? mediatype : "application/xml");
                         }
                     } else {
-                        if (isGet(method) && "application/soap+xml".equals(contentTypeMediaType)) {
-                            // SOAP GET
-                            XFormsContainingDocument.logDebugStatic(containingDocument, "submission", "found SOAP GET");
-
-                            final Map parameters = NetUtils.getContentTypeParameters(mediatype);
-                            final FastStringBuffer sb = new FastStringBuffer("application/soap+xml");
-
-                            // Extract charset parameter if present
-                            if (parameters != null) {
-                                final String charsetParameter = (String) parameters.get("charset");
-                                if (charsetParameter != null) {
-                                    // Append charset parameter
-                                    sb.append("; ");
-                                    sb.append(charsetParameter);
-                                }
-                            }
-
-                            // Set Accept header with optional charset
-                            urlConnection.setRequestProperty("Accept", sb.toString());
-                        }
+                        urlConnection.setRequestProperty("Content-Type", (mediatype != null) ? mediatype : "application/xml");
                     }
-
-                    // Set headers if provided
-                    if (headerNames != null && headerNames.size() > 0) {
-                        for (Iterator i = headerNames.iterator(); i.hasNext();) {
-                            final String headerName = (String) i.next();
-                            final String headerValue = (String) headerNameValues.get(headerName);
-                            urlConnection.setRequestProperty(headerName, headerValue);
-                        }
-                    }
-
-                    // Forward cookies for session handling
-                    if (username == null) {
-
-                        final ExternalContext.Session session = externalContext.getSession(false);
-                        if (session != null) {
-                            XFormsContainingDocument.logDebugStatic(containingDocument, "submission", "setting cookie",
-                                new String[] { "JSESSIONID", session.getId() });
-
-                            urlConnection.setRequestProperty("Cookie", "JSESSIONID=" + session.getId());
-                        }
-
-                        // TODO: ExternalContext must provide direct access to cookies
-                        final String[] cookies = (String[]) externalContext.getRequest().getHeaderValuesMap().get("cookie");
-                        if (cookies != null) {
-                            for (int i = 0; i < cookies.length; i++) {
-                                final String cookie = cookies[i];
-                                // Forward JSESSIONID (if not already done above) and JSESSIONIDSSO
-                                if ((cookie.startsWith("JSESSIONID") && session == null) || cookie.startsWith("JSESSIONIDSSO")) {
-                                    XFormsServer.logger.debug("XForms - forwarding cookie: " + cookie);
-                                    urlConnection.setRequestProperty("Cookie", cookie);
-                                }
-                            }
-                        }
-                    }
-
-                    // Forward authorization header
-                    // TODO: This should probably not be done automatically
-                    if (username == null) {
-                        final String authorizationHeader = (String) externalContext.getRequest().getHeaderMap().get("authorization");
-                        if (authorizationHeader != null) {
-                            XFormsContainingDocument.logDebugStatic(containingDocument, "submission", "forwarding header",
-                                new String[] { "Authorization ", authorizationHeader });
-                            urlConnection.setRequestProperty("Authorization", authorizationHeader);
-                        }
-                    }
-
-                    // Write request body if needed
-                    if (hasRequestBody) {
-                        if (XFormsServer.logger.isDebugEnabled()) {
-                            if (XMLUtils.isXMLMediatype(mediatype)) {
-                                containingDocument.logDebug("submission", "setting XML request body",
-                                    new String[] { "body", new String(messageBody, "UTF-8")});
-                            } else {
-                                containingDocument.logDebug("submission", "setting binary request body");
-                            }
-                        }
-
-                        httpURLConnection.setRequestBody(messageBody);
-                    }
-
-                    urlConnection.connect();
-
-                    // Create result
-                    final XFormsModelSubmission.ConnectionResult connectionResult = new XFormsModelSubmission.ConnectionResult(submissionURL.toExternalForm()) {
-                        public void close() {
-                            if (getResponseInputStream() != null) {
-                                try {
-                                    getResponseInputStream().close();
-                                } catch (IOException e) {
-                                    throw new OXFException("Exception while closing input stream for action: " + submissionURL);
-                                }
-                            }
-
-                            if (httpURLConnection != null)
-                                httpURLConnection.disconnect();
-                        }
-                    };
-
-                    // Get response information that needs to be forwarded
-                    connectionResult.statusCode = (httpURLConnection != null) ? httpURLConnection.getResponseCode() : 200;
-                    final String contentType = urlConnection.getContentType();
-                    connectionResult.responseMediaType = (contentType != null) ? NetUtils.getContentTypeMediaType(contentType) : "application/xml";
-                    connectionResult.responseHeaders = urlConnection.getHeaderFields();
-                    connectionResult.lastModified = urlConnection.getLastModified();
-                    connectionResult.setResponseInputStream(urlConnection.getInputStream());
-
-                    return connectionResult;
-
-                } else if (method.equals("multipart-post")) {
-                    // TODO
-                    throw new OXFException("xforms:submission: submission method not yet implemented: " + method);
-                } else if (method.equals("form-data-post")) {
-                    // TODO
-                    throw new OXFException("xforms:submission: submission method not yet implemented: " + method);
                 } else {
-                    throw new OXFException("xforms:submission: invalid submission method requested: " + method);
+                    if (httpMethod.equals("GET") && "application/soap+xml".equals(contentTypeMediaType)) {
+                        // SOAP GET
+                        XFormsContainingDocument.logDebugStatic(containingDocument, "submission", "found SOAP GET");
+
+                        final Map parameters = NetUtils.getContentTypeParameters(mediatype);
+                        final FastStringBuffer sb = new FastStringBuffer("application/soap+xml");
+
+                        // Extract charset parameter if present
+                        if (parameters != null) {
+                            final String charsetParameter = (String) parameters.get("charset");
+                            if (charsetParameter != null) {
+                                // Append charset parameter
+                                sb.append("; ");
+                                sb.append(charsetParameter);
+                            }
+                        }
+
+                        // Set Accept header with optional charset
+                        urlConnection.setRequestProperty("Accept", sb.toString());
+                    }
                 }
+
+                // Set headers if provided
+                if (headerNames != null && headerNames.size() > 0) {
+                    for (Iterator i = headerNames.iterator(); i.hasNext();) {
+                        final String headerName = (String) i.next();
+                        final String headerValue = (String) headerNameValues.get(headerName);
+                        urlConnection.setRequestProperty(headerName, headerValue);
+                    }
+                }
+
+                // Forward cookies for session handling
+                if (username == null) {
+
+                    final ExternalContext.Session session = externalContext.getSession(false);
+                    if (session != null) {
+                        XFormsContainingDocument.logDebugStatic(containingDocument, "submission", "setting cookie",
+                            new String[] { "JSESSIONID", session.getId() });
+
+                        urlConnection.setRequestProperty("Cookie", "JSESSIONID=" + session.getId());
+                    }
+
+                    // TODO: ExternalContext must provide direct access to cookies
+                    final String[] cookies = (String[]) externalContext.getRequest().getHeaderValuesMap().get("cookie");
+                    if (cookies != null) {
+                        for (int i = 0; i < cookies.length; i++) {
+                            final String cookie = cookies[i];
+                            // Forward JSESSIONID (if not already done above) and JSESSIONIDSSO
+                            if ((cookie.startsWith("JSESSIONID") && session == null) || cookie.startsWith("JSESSIONIDSSO")) {
+                                XFormsServer.logger.debug("XForms - forwarding cookie: " + cookie);
+                                urlConnection.setRequestProperty("Cookie", cookie);
+                            }
+                        }
+                    }
+                }
+
+                // Forward authorization header
+                // TODO: This should probably not be done automatically
+                if (username == null) {
+                    final String authorizationHeader = (String) externalContext.getRequest().getHeaderMap().get("authorization");
+                    if (authorizationHeader != null) {
+                        XFormsContainingDocument.logDebugStatic(containingDocument, "submission", "forwarding header",
+                            new String[] { "Authorization ", authorizationHeader });
+                        urlConnection.setRequestProperty("Authorization", authorizationHeader);
+                    }
+                }
+
+                // Write request body if needed
+                if (hasRequestBody) {
+                    if (XFormsServer.logger.isDebugEnabled()) {
+                        if (XMLUtils.isXMLMediatype(mediatype)) {
+                            containingDocument.logDebug("submission", "setting XML request body",
+                                new String[] { "body", new String(messageBody, "UTF-8")});
+                        } else {
+                            containingDocument.logDebug("submission", "setting binary request body");
+                        }
+                    }
+
+                    httpURLConnection.setRequestBody(messageBody);
+                }
+
+                urlConnection.connect();
+
+                // Create result
+                final XFormsModelSubmission.ConnectionResult connectionResult = new XFormsModelSubmission.ConnectionResult(submissionURL.toExternalForm()) {
+                    public void close() {
+                        if (getResponseInputStream() != null) {
+                            try {
+                                getResponseInputStream().close();
+                            } catch (IOException e) {
+                                throw new OXFException("Exception while closing input stream for action: " + submissionURL);
+                            }
+                        }
+
+                        if (httpURLConnection != null)
+                            httpURLConnection.disconnect();
+                    }
+                };
+
+                // Get response information that needs to be forwarded
+                connectionResult.statusCode = (httpURLConnection != null) ? httpURLConnection.getResponseCode() : 200;
+                final String contentType = urlConnection.getContentType();
+                connectionResult.responseMediaType = (contentType != null) ? NetUtils.getContentTypeMediaType(contentType) : "application/xml";
+                connectionResult.responseHeaders = urlConnection.getHeaderFields();
+                connectionResult.lastModified = urlConnection.getLastModified();
+                connectionResult.setResponseInputStream(urlConnection.getInputStream());
+
+                return connectionResult;
+
             } catch (IOException e) {
                 throw new ValidationException(e, new LocationData(submissionURL.toExternalForm(), -1, -1));
             }
-        } else if (!isGet(method) && (scheme.equals("file") || scheme.equals("oxf"))) {
+        } else if (!httpMethod.equals("GET") && (scheme.equals("file") || scheme.equals("oxf"))) {
             // TODO: implement writing to file: and oxf:
             // SHOULD be supported (should probably support oxf: as well)
             throw new OXFException("xforms:submission: submission URL scheme not yet implemented: " + scheme);
@@ -425,7 +405,7 @@ public class XFormsSubmissionUtils {
     }
 
     public static boolean isPost(String method) {
-        return method.equals("post") || method.equals("urlencoded-post") || method.equals(XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "post"));
+        return method.equals("post") || method.endsWith("-post") || method.equals(XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "post"));
     }
 
     public static boolean isPut(String method) {
@@ -434,10 +414,6 @@ public class XFormsSubmissionUtils {
 
     public static boolean isDelete(String method) {
         return method.equals("delete") || method.equals(XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "delete"));
-    }
-
-    public static String getHttpMethod(String method) {
-        return isGet(method) ? "GET" : isPost(method) ? "POST" : isPut(method) ? "PUT" : isDelete(method) ? "DELETE" : null;
     }
 
     /**

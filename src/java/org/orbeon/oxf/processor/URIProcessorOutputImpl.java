@@ -390,7 +390,7 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
                 // TODO: Remove dependency on XForms code
                 final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
                 final XFormsModelSubmission.ConnectionResult connectionResult
-                    = XFormsSubmissionUtils.doRegular(externalContext, null, "get", urlString, username, password, null, null, null, null, null);
+                    = XFormsSubmissionUtils.doRegular(externalContext, null, "GET", urlString, username, password, null, null, null, null, null);
 
                 // Throw if connection failed (this is caught by the caller)
                 if (connectionResult.statusCode != 200)

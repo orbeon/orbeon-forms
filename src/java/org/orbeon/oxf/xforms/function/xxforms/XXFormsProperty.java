@@ -44,8 +44,8 @@ public class XXFormsProperty extends XFormsFunction {
     }
 
     public static String property(String propertyName) {
-        // Never return the password property
-        if ("oxf.xforms.password".equals(propertyName.trim())) {
+        // Never return any property containing the string "password" as a first line of defense
+        if (propertyName.trim().indexOf("password") != -1) {
             return null;
         }
 

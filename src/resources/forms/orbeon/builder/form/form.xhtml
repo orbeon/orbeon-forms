@@ -36,7 +36,7 @@
         <xhtml:script type="text/javascript">
             var fbAccordionMenuOptions = {
                 dependent: false,
-                openedIds: ['fb-toolbox-controls-dt','fb-toolbox-i18n-dt'],
+                openedIds: ['fb-toolbox-controls-dt' ],// ,'fb-toolbox-i18n-dt'
                 seconds: 0.2,
                 easeOut: false,
                 animation:true
@@ -134,7 +134,7 @@
                             <xhtml:td>
                                 <!-- Image -->
                                 <xforms:group>
-                                    <xforms:label>Logo</xforms:label>
+                                    <xforms:label ref="$form-resources/logo/label"/>
                                     <xforms:group ref="$metadata-instance/logo[normalize-space() != '']">
                                         <xforms:output ref="." mediatype="image/*">
                                             <xforms:label class="fb-xforms-disabled"/>
@@ -147,6 +147,7 @@
                                         <xforms:mediatype ref="@mediatype"/>
                                         <xxforms:size ref="@size"/>
                                     </xforms:upload>
+                                    <xforms:hint ref="$form-resources/logo/hint"/>
                                 </xforms:group>
                             </xhtml:td>
                             <xhtml:td>
@@ -1029,10 +1030,10 @@
                 <xi:include href="oxf:/forms/orbeon/builder/form/dialog-schema.xml" xxi:omit-xml-base="true"/>
 
                 <!-- Service editor -->
-                <xi:include href="oxf:/forms/orbeon/builder/form/dialog-submission.xml" xxi:omit-xml-base="true"/>
+                <xi:include href="oxf:/forms/orbeon/builder/form/dialog-services.xml" xxi:omit-xml-base="true"/>
 
                 <!-- Actions editor -->
-                <xi:include href="oxf:/forms/orbeon/builder/form/dialog-bindings.xml" xxi:omit-xml-base="true"/>
+                <xi:include href="oxf:/forms/orbeon/builder/form/dialog-actions.xml" xxi:omit-xml-base="true"/>
 
                 <!-- Database service editor -->
                 <xi:include href="oxf:/forms/orbeon/builder/form/dialog-database-service.xml" xxi:omit-xml-base="true"/>

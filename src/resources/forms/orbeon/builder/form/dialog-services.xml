@@ -22,15 +22,15 @@
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
       xmlns:saxon="http://saxon.sf.net/"
 
-      id="fb-database-service-dialog" level="modal" close="true" draggable="true" class="fr-dialog" model="fb-database-service-model">
+      id="fb-submission-dialog" level="modal" close="true" draggable="true" class="fr-dialog" model="fb-submission-model">
 
-    <xforms:label>Database Service Editor</xforms:label>
+    <xforms:label>Service Editor</xforms:label>
 
-    <xxforms:variable name="instance" select="instance('fb-database-service-instance')"/>
+    <xxforms:variable name="instance" select="instance('fb-submission-editor-instance')"/>
     <xhtml:div class="fr-grid">
         <xhtml:div class="fr-grid-content">
             <xforms:group ref="$instance">
-                <xforms:input ref="id" id="fb-database-service-id-input" incremental="true">
+                <xforms:input ref="id" id="fb-submission-name-input" incremental="true">
                     <xforms:label>Service Name</xforms:label>
                     <xforms:hint>Choose a unique name for this submission</xforms:hint>
                 </xforms:input>
@@ -80,10 +80,10 @@
                 </xforms:group>
 
                 <xforms:switch>
-                    <xforms:case id="fb-database-service-dialog-none">
+                    <xforms:case id="fb-submission-dialog-none">
 
                     </xforms:case>
-                    <xforms:case id="fb-database-service-dialog-response">
+                    <xforms:case id="fb-submission-dialog-response">
                         <xforms:group class="fb-submission-response">
                             <xforms:label>Response</xforms:label>
 
@@ -134,6 +134,31 @@
                                 <!--<xforms:output value="response/reason-phrase">-->
                                     <!--<xforms:label>Reason Phrase</xforms:label>-->
                                 <!--</xforms:output>-->
+
+                                <xforms:group ref=".[response/headers/header]">
+                                    <xforms:label>Headers</xforms:label>
+                                    <fr:grid columns="1">
+                                        <xhtml:tr>
+                                            <xhtml:td>
+                                                <fr:repeat nodeset="response/headers/header" id="fb-response-headers-repeat"
+                                                           columns="2" appearance="xxforms:table" readonly="true">
+                                                    <xhtml:tr>
+                                                        <xhtml:td class="fb-nowrap">
+                                                            <xforms:output value="name">
+                                                                <xforms:label>Name</xforms:label>
+                                                            </xforms:output>
+                                                        </xhtml:td>
+                                                        <xhtml:td>
+                                                            <xforms:output value="string-join(value, ', ')">
+                                                                <xforms:label>Value(s)</xforms:label>
+                                                            </xforms:output>
+                                                        </xhtml:td>
+                                                    </xhtml:tr>
+                                                </fr:repeat>
+                                            </xhtml:td>
+                                        </xhtml:tr>
+                                    </fr:grid>
+                                </xforms:group>
 
                                 <xforms:textarea ref="response/content">
                                     <xforms:label>Response Body</xforms:label>
@@ -210,7 +235,6 @@
                     <xxforms:variable name="submission" select="$model/xforms:submission[@id = $submission-id]"/>
                     <xxforms:variable name="request" select="$instance/request"/>
                     <xforms:action context="$submission">
-                        <!--<xforms:setvalue ref="@ref" value="concat('saxon:parse(instance(''', $instance-id, ''')/request)')"/>-->
                         <!-- TODO: couldn't we have the editor directly edit the submission? -->
                         <xforms:setvalue ref="@ref" value="concat('instance(''', $instance-id, ''')')"/>
                         <xforms:setvalue ref="@method" value="$request/method"/>
@@ -235,20 +259,21 @@
                     </xforms:action>
 
                     <!-- Hide dialog -->
-                    <xxforms:hide dialog="fb-database-service-dialog"/>
+                    <xxforms:hide dialog="fb-submission-dialog"/>
                 </xforms:action>
             </xforms:trigger>
             <xforms:trigger>
                 <xforms:label><xhtml:img src="/apps/fr/style/close.gif" alt=""/> <xhtml:span>Cancel</xhtml:span></xforms:label>
                 <!-- Hide dialog -->
-                <xxforms:hide ev:event="DOMActivate" dialog="fb-database-service-dialog"/>
+                <xxforms:hide ev:event="DOMActivate" dialog="fb-submission-dialog"/>
             </xforms:trigger>
         </xforms:group>
     </xhtml:div>
 
+    <!-- Initialize dialog -->
     <xforms:action ev:event="xxforms-dialog-open">
         <xxforms:variable name="instance" select="instance('fb-submission-editor-instance')"/>
-        <xxforms:variable name="submission-id" select="event('submission-id')"/>
+        <xxforms:variable name="submission-name" select="event('submission-name')"/>
 
         <!-- Clear instance entirely -->
         <xforms:setvalue xxforms:iterate="$instance//*[not(*)]" ref="."/>
@@ -263,92 +288,104 @@
         <xforms:toggle case="fb-submission-dialog-none"/>
 
         <!-- Copy parameters if any -->
-        <xforms:action if="$submission-id">
-            <xforms:setvalue ref="$instance/id" value="$submission-id"/>
-            <xforms:setvalue ref="$instance/initial-id" value="$submission-id"/>
-
-            <xxforms:variable name="submission" select="$model/xforms:submission[@id = concat($submission-id, '-submission')]"/>
+        <xforms:action if="$submission-name">
+            <xforms:setvalue ref="$instance/id" value="$submission-name"/>
+            <xforms:setvalue ref="$instance/initial-id" value="$submission-name"/>
+            
+            <xxforms:variable name="submission" select="$model/xforms:submission[@id = concat($submission-name, '-submission')]"/>
             <xforms:setvalue ref="$instance/request/method" value="$submission/@method"/>
             <xforms:setvalue ref="$instance/request/resource" value="$submission/@resource"/>
             <xforms:setvalue ref="$instance/request/replace" value="$submission/@replace"/>
-            <xforms:setvalue ref="$instance/request/content" value="$model/xforms:instance[@id = concat($submission-id, '-instance')]/*/request"/>
+            <xforms:setvalue ref="$instance/request/content" value="$model/xforms:instance[@id = concat($submission-name, '-instance')]/*/request"/>
         </xforms:action>
 
         <!-- Set focus to first input -->
-        <xforms:setfocus control="fb-submission-id-input"/>
+        <xforms:setfocus control="fb-submission-name-input"/>
     </xforms:action>
 
     <!-- Model for the submission editor -->
-    <xforms:model id="fb-database-service-model">
+    <xforms:model id="fb-submission-model">
 
         <xxforms:variable name="model" select="xxforms:instance('fr-form-instance')/xhtml:head/xforms:model[@id = 'fr-form-model']"/>
 
-        <xforms:instance id="fb-database-service-instance">
+        <xforms:instance id="fb-submission-editor-instance">
             <submission>
                 <id/>
                 <initial-id/>
                 <submission-id/>
-                <datasource/>
-                <sql/>
+                <instance-id/>
+                <request>
+                    <method/>
+                    <resource/>
+                    <replace/>
+                    <is-soap>false</is-soap>
+                    <soap-action/>
+                    <content/>
+                </request>
+                <response>
+                    <error-type/>
+                    <body/>
+                    <resource-uri/>
+                    <status-code/>
+                    <reason-phrase/>
+                    <headers/>
+                    <content/>
+                </response>
                 <save-test-trigger/>
             </submission>
         </xforms:instance>
 
         <!-- Enable/disable trigger -->
-        <xforms:setvalue ev:event="xxforms-invalid" ev:observer="fb-database-service-instance" ref="save-test-trigger">disabled</xforms:setvalue>
-        <xforms:setvalue ev:event="xxforms-valid" ev:observer="fb-database-service-instance" ref="save-test-trigger">enabled</xforms:setvalue>
+        <xforms:setvalue ev:event="xxforms-invalid" ev:observer="fb-submission-editor-instance" ref="save-test-trigger">disabled</xforms:setvalue>
+        <xforms:setvalue ev:event="xxforms-valid" ev:observer="fb-submission-editor-instance" ref="save-test-trigger">enabled</xforms:setvalue>
 
-        <!--<xforms:bind nodeset="instance('fb-submission-editor-instance')">-->
-            <!--<xforms:bind nodeset="id" type="xs:NCName"-->
-                         <!--constraint="(normalize-space() != '' and normalize-space() = ../initial-id)-->
-                                        <!--or not(../submission-id = $model/xforms:submission/@id-->
-                                            <!--or ../instance-id = $model/xforms:instance/@id)"/>-->
-            <!--<xforms:bind nodeset="submission-id" calculate="concat(../id, '-submission')"/>-->
-            <!--<xforms:bind nodeset="instance-id" calculate="concat(../id, '-instance')"/>-->
-            <!--<xforms:bind nodeset="request/resource" type="xs:anyURI" required="true()"/>-->
-            <!--<xforms:bind nodeset="request/is-soap" type="xs:boolean"/>-->
-            <!--<xforms:bind nodeset="request/soap-action"/>-->
-            <!--<xforms:bind nodeset="request/content" type="xxforms:xml"/>-->
-            <!--<xforms:bind nodeset="response/error-type" readonly="true()"/>-->
-            <!--<xforms:bind nodeset="save-test-trigger" readonly=". = 'disabled'"/>-->
-        <!--</xforms:bind>-->
+        <xforms:bind nodeset="instance('fb-submission-editor-instance')">
+            <xforms:bind nodeset="id" type="xs:NCName"
+                         constraint="(normalize-space() != '' and normalize-space() = ../initial-id)
+                                        or not(../submission-id = $model/xforms:submission/@id
+                                            or ../instance-id = $model/xforms:instance/@id)"/>
+            <xforms:bind nodeset="submission-id" calculate="concat(../id, '-submission')"/>
+            <xforms:bind nodeset="instance-id" calculate="concat(../id, '-instance')"/>
+            <xforms:bind nodeset="request/resource" type="xs:anyURI" required="true()"/>
+            <xforms:bind nodeset="request/is-soap" type="xs:boolean"/>
+            <xforms:bind nodeset="request/soap-action"/>
+            <xforms:bind nodeset="request/content" type="xxforms:xml"/>
+            <xforms:bind nodeset="response/error-type" readonly="true()"/>
+            <xforms:bind nodeset="save-test-trigger" readonly=". = 'disabled'"/>
+        </xforms:bind>
 
         <!-- Template for inserting a submission -->
-        <!--<xforms:instance id="fb-submission-template" xxforms:readonly="true">-->
-            <!--<xforms:submission id="" ref="xxx" resource="" method="get" mediatype="application/xml" replace="text" target="">-->
+        <xforms:instance id="fb-submission-template" xxforms:readonly="true">
+            <xforms:submission id="" ref="" resource="" method="get" mediatype="application/xml" replace="text" target="">
                 <!--<xforms:action ev:event="xforms-submit">-->
                     <!--<xforms:delete nodeset="request-xml/*"/>-->
                     <!--<xforms:insert context="request-xml" origin="saxon:parse(../request)"/>-->
                 <!--</xforms:action>-->
                 <!--<xforms:action ev:event="xforms-submit-serialize">-->
                     <!--<xforms:setvalue ref="event('submission-body')" value="saxon:serialize(context()/request-xml/*, xxforms:instance('fr-xsl-output-instance'))"/>-->
+                    <!--<xforms:setvalue ref="event('submission-body')" value="context()/request"/>-->
                 <!--</xforms:action>-->
-                <!--<xforms:action ev:event="xforms-submit-done">-->
-                    <!--<xforms:delete nodeset="response-xml/*"/>-->
-                    <!--<xforms:insert context="response-xml" origin="saxon:parse(../response)"/>-->
-                <!--</xforms:action>-->
-            <!--</xforms:submission>-->
-        <!--</xforms:instance>-->
+            </xforms:submission>
+        </xforms:instance>
 
         <!-- Template for inserting an instance-->
-        <!--<xforms:instance id="fb-instance-template" xxforms:readonly="true">-->
-            <!--<xforms:instance id="">-->
-                <!--<submission>-->
-                    <!--<request/>-->
+        <xforms:instance id="fb-instance-template" xxforms:readonly="true">
+            <xforms:instance id="">
+                <submission>
+                    <request/>
                     <!--<request-xml/>-->
-                    <!--<response/>-->
-                    <!--<response-xml/>-->
-                <!--</submission>-->
-            <!--</xforms:instance>-->
-        <!--</xforms:instance>-->
+                    <response/>
+                </submission>
+            </xforms:instance>
+        </xforms:instance>
 
         <!-- Submission to test a submission -->
-        <!--<xforms:submission id="fb-test-submission-submission"-->
-                <!--ref="saxon:parse(instance('fb-submission-editor-instance')/request/content)/*"-->
-                <!--method="{instance('fb-submission-editor-instance')/request/method}"-->
-                <!--resource="{instance('fb-submission-editor-instance')/request/resource}"-->
-                <!--mediatype="application/xml"-->
-                <!--replace="text" target="instance('fb-submission-editor-instance')/response/content"/>-->
+        <xforms:submission id="fb-test-submission-submission"
+                ref="saxon:parse(instance('fb-submission-editor-instance')/request/content)/*"
+                method="{instance('fb-submission-editor-instance')/request/method}"
+                resource="{instance('fb-submission-editor-instance')/request/resource}"
+                mediatype="application/xml"
+                replace="text" target="instance('fb-submission-editor-instance')/response/content"/>
 
     </xforms:model>
 

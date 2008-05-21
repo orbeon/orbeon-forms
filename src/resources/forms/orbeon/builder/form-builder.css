@@ -1,4 +1,6 @@
-#fr-view { margin-left: 180px }/* because the toolbar is on the left */
+/*body { background-image: url(../../../forms/orbeon/builder/images/background.png); background-repeat: repeat; }*/
+
+#fr-view { margin-left: 195px }/* because the toolbar is on the left */
 .yui-t2 #yui-main .yui-b { margin-left: 13.8456em; *margin-left: 13.4995; border-left: 1px solid #ccc }
 
 .xforms-select table { margin-bottom: 0 }
@@ -36,8 +38,6 @@ a.fb-edit-help-trigger img {
 
 #fb-toolbox {
     padding: .5em;
-    /*background-color: #FCF6D3;*/
-    /*background-color: #FFE79F;*/
     background-color: #F8F8F8;
     border-right: 2px solid orange;
     position: fixed;
@@ -45,7 +45,13 @@ a.fb-edit-help-trigger img {
     top: 0;
     height: 100%;
     overflow: auto;
+
+}
+
+#fb-toolbox .fb-toolbox-inside {
     width: 160px;
+    margin-right: 15px;
+    /*margin-bottom: 2.5px*/
 }
 
 .fb-tools {
@@ -139,7 +145,7 @@ a.fb-edit-help-trigger img {
 
 #fb-xml-dialog .fb-xml-dialog-view { width: 100%; height: 29em; overflow: auto }
 #fb-source-editor-dialog .fb-xml-dialog-view { width: 100% }
-#fb-source-editor-dialog .fb-xml-dialog-view textarea.xforms-textarea { width: 100%; height: 29em }
+#fb-source-editor-dialog .fb-xml-dialog-view textarea.xforms-textarea { width: 100%; height: 29em; font-family: monospace }
 
 /* In-place editing for regular fields */
 

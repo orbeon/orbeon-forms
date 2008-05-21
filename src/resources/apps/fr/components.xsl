@@ -553,7 +553,7 @@
                         </xforms:input>
                         <xhtml:span class="fr-inplace-buttons">
                             <xforms:trigger class="fr-inplace-rename">
-                                <xforms:label>Change <xsl:value-of select="lower-case(xforms:label)"/></xforms:label>
+                                <xforms:label>Apply <xsl:value-of select="lower-case(xforms:label)"/></xforms:label>
                                 <xforms:toggle ev:event="DOMActivate" case="fr-inplace-{@id}-view"/>
                             </xforms:trigger>
                             or
@@ -603,7 +603,7 @@
                         </xforms:textarea>
                         <xhtml:span class="fr-inplace-buttons">
                             <xforms:trigger class="fr-inplace-rename">
-                                <xforms:label>Change <xsl:value-of select="lower-case(xforms:label)"/></xforms:label>
+                                <xforms:label>Apply <xsl:value-of select="lower-case(xforms:label)"/></xforms:label>
                                 <xforms:toggle ev:event="DOMActivate" case="fr-inplace-{@id}-view"/>
                             </xforms:trigger>
                             or

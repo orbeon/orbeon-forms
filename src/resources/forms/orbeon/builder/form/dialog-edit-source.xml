@@ -35,7 +35,7 @@
     <xhtml:div class="fr-dialog-buttons">
         <xhtml:span class="fr-inplace-buttons">
             <xforms:trigger class="fr-inplace-rename" ref="save-trigger">
-                <xforms:label>Accept Changes</xforms:label>
+                <xforms:label>Apply Changes</xforms:label>
                 <xforms:action ev:event="DOMActivate">
 
                     <!-- Parse the XML and insert it -->
@@ -45,9 +45,9 @@
                         <!--<xforms:output value="replace($variables/new-source, '&#x0d;', '&#x0d;')"/>-->
                     <!--</xforms:message>-->
 
-                    <xforms:insert nodeset="instance('fr-form-instance')" origin="saxon:parse(source)"/>
+                    <xforms:insert nodeset="xxforms:instance('fr-form-instance')" origin="saxon:parse(instance('fb-source-editor-instance')/source)"/>
                     <!-- Saxon serialization adds an extra meta element -->
-                    <xforms:delete nodeset="instance('fr-form-instance')/xhtml:head/meta[@http-equiv = 'Content-Type']"/>
+                    <xforms:delete nodeset="xxforms:instance('fr-form-instance')/xhtml:head/meta[@http-equiv = 'Content-Type']"/>
 
                 </xforms:action>
             </xforms:trigger>

@@ -128,6 +128,7 @@
                 </description>
                 <logo>
                     <label>Logo</label>
+                    <hint>The logo appears at the top of your form</hint>
                 </logo>
                 <!-- TODO: i18n whole Form Builder -->
             </resource>
@@ -153,6 +154,7 @@
                 </description>
                 <logo>
                     <label>Logo</label>
+                    <hint>Le logo apparaît au sommet de votre formulaire</hint>
                 </logo>
             </resource>
         </resources>

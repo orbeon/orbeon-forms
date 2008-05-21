@@ -17,6 +17,7 @@ import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.XPathContext;
+import org.orbeon.saxon.om.EmptyIterator;
 import org.orbeon.saxon.om.ListIterator;
 import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.trans.XPathException;
@@ -39,7 +40,7 @@ public class XXFormsProperty extends XFormsFunction {
         if (propertyValue != null)
             return new ListIterator(Collections.singletonList(new StringValue(propertyValue)));
         else
-            return new ListIterator(Collections.EMPTY_LIST);
+            return EmptyIterator.getInstance();
     }
 
     public static String property(String propertyName) {

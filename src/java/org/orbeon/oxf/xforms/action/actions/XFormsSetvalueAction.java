@@ -52,7 +52,7 @@ public class XFormsSetvalueAction extends XFormsAction {
             final List currentNodeset;
             {
                 final XFormsInstance currentInstance = contextStack.getCurrentInstance();// TODO: we should not use this
-                currentNodeset = (contextStack.getCurrentNodeset() != null && contextStack .getCurrentNodeset().size() > 0)
+                currentNodeset = (contextStack.getCurrentNodeset() != null && contextStack.getCurrentNodeset().size() > 0)
                         ? contextStack.getCurrentNodeset()
                         : Collections.singletonList(currentInstance.getDocumentInfo());
 

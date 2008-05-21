@@ -13,12 +13,13 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms;
 
+import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.StaticExternalContext;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
-import org.orbeon.oxf.common.OXFException;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.XPathContext;
+import org.orbeon.saxon.om.EmptyIterator;
 import org.orbeon.saxon.om.ListIterator;
 import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.trans.XPathException;
@@ -52,7 +53,7 @@ public class XXFormsGetRequestHeader extends XFormsFunction {
             if (headerValue != null)
                 return new ListIterator(Collections.singletonList(new StringValue(headerValue)));
             else
-                return new ListIterator(Collections.EMPTY_LIST);
+                return EmptyIterator.getInstance();
         } else {
             throw new OXFException("xxforms:get-request-header() can only be called during XForms initialization.");
         }

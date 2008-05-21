@@ -20,13 +20,13 @@ import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.XPathContext;
+import org.orbeon.saxon.om.EmptyIterator;
 import org.orbeon.saxon.om.ListIterator;
 import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.value.StringValue;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -57,11 +57,10 @@ public class XXFormsListInstances extends XFormsFunction {
 
                 return new ListIterator(instanceIds);
             } else {
-                return new ListIterator(Collections.EMPTY_LIST);
+                return EmptyIterator.getInstance();
             }
         } else {
-            return new ListIterator(Collections.EMPTY_LIST);
+            return EmptyIterator.getInstance();
         }
     }
-
 }

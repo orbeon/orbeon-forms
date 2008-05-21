@@ -24,6 +24,7 @@ import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.DocumentInfo;
+import org.orbeon.saxon.om.EmptyIterator;
 import org.orbeon.saxon.om.ListIterator;
 import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.trans.XPathException;
@@ -72,7 +73,7 @@ public class XXFormsGetRequestAttribute extends XFormsFunction {
                 return new ListIterator(Collections.singletonList(documentInfo));
             }
 
-            return new ListIterator(Collections.EMPTY_LIST);
+            return EmptyIterator.getInstance();
         } else {
             throw new OXFException("xxforms:get-request-attribute() can only be called during XForms initialization.");
         }

@@ -304,7 +304,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 final boolean isReplaceNone = replace.equals(XFormsConstants.XFORMS_SUBMIT_REPLACE_NONE);
 
                 // Get current node for xforms:submission and instance containing the node to submit
-                final NodeInfo currentNodeInfo;
+                final NodeInfo boundNodeInfo;
                 final XFormsInstance currentInstance;
                 // Create context (should we simply reuse that of the model?)
                 final XFormsContextStack contextStack = new XFormsContextStack(model);
@@ -312,15 +312,15 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 {
                     contextStack.setBinding(pipelineContext, XFormsModelSubmission.this);
 
-                    currentNodeInfo = contextStack.getCurrentSingleNode();
+                    boundNodeInfo = contextStack.getCurrentSingleNode();
                     functionContext = contextStack.getFunctionContext();
 
                     // Check that we have a current node and that it is pointing to a document or an element
-                    if (currentNodeInfo == null)
+                    if (boundNodeInfo == null)
                         throw new XFormsSubmissionException("Empty single-node binding on xforms:submission for submission id: " + id, "getting submission single-node binding",
                         		 XFormsSubmitErrorEvent.ErrorType.NO_DATA);
 
-                    if (!(currentNodeInfo instanceof DocumentInfo || currentNodeInfo.getNodeKind() == org.w3c.dom.Document.ELEMENT_NODE)) {
+                    if (!(boundNodeInfo instanceof DocumentInfo || boundNodeInfo.getNodeKind() == org.w3c.dom.Document.ELEMENT_NODE)) {
                         throw new XFormsSubmissionException("xforms:submission: single-node binding must refer to a document node or an element.", "getting submission single-node binding",
                         		XFormsSubmitErrorEvent.ErrorType.NO_DATA);
                     }
@@ -349,8 +349,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         for (Iterator i = uploadControls.iterator(); i.hasNext();) {
                             final XFormsUploadControl currentControl = (XFormsUploadControl) i.next();
                             if (currentControl.isRelevant()) {
-                                final NodeInfo boundNodeInfo = currentControl.getBoundNode();
-                                if (currentInstance == currentInstance.getModel(containingDocument).getInstanceForNode(boundNodeInfo)) {
+                                final NodeInfo controlBoundNodeInfo = currentControl.getBoundNode();
+                                if (currentInstance == currentInstance.getModel(containingDocument).getInstanceForNode(controlBoundNodeInfo)) {
                                     // Found one relevant upload control bound to the instance we are submitting
                                     hasBoundRelevantUploadControl = true;
                                     break;
@@ -362,7 +362,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                 // Evaluate early AVTs
                 {
-                    final String resolvedMethodQName = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, currentNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtMethod);
+                    final String resolvedMethodQName = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, boundNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtMethod);
                     resolvedMethod = Dom4jUtils.qNameToexplodedQName(Dom4jUtils.extractTextValueQName(prefixToURIMap, resolvedMethodQName));
                 }
 
@@ -416,7 +416,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                 final Document initialDocumentToSubmit;
                 if (serialize && !isDeferredSubmissionSecondPass) {
-                    initialDocumentToSubmit = createDocumentToSubmit(pipelineContext, currentNodeInfo, currentInstance, modelForInstance);
+                    initialDocumentToSubmit = createDocumentToSubmit(pipelineContext, boundNodeInfo, currentInstance, modelForInstance);
                 } else {
                     initialDocumentToSubmit = null;
                 }
@@ -425,7 +425,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 if (isDeferredSubmissionFirstPass) {
 
                     // Resolve the target AVT if needed
-                    resolvedXXFormsTarget = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, currentNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtXXFormsTarget);
+                    resolvedXXFormsTarget = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, boundNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtXXFormsTarget);
 
                     // When replace="all", we wait for the submission of an XXFormsSubmissionEvent from the client
                     containingDocument.setClientActiveSubmission(this);
@@ -434,16 +434,16 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                 // Evaluate late AVTs
                 {
-                    final String tempActionOrResource = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, currentNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtActionOrResource);
+                    final String tempActionOrResource = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, boundNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtActionOrResource);
                     resolvedActionOrResource = XFormsUtils.encodeHRRI(tempActionOrResource, true);
 
-                    resolvedXXFormsUsername = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, currentNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtXXFormsUsername);
-                    resolvedXXFormsPassword = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, currentNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtXXFormsPassword);
-                    resolvedXXFormsReadonly = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, currentNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtXXFormsReadonly);
-                    resolvedXXFormsShared = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, currentNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtXXFormsShared);
+                    resolvedXXFormsUsername = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, boundNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtXXFormsUsername);
+                    resolvedXXFormsPassword = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, boundNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtXXFormsPassword);
+                    resolvedXXFormsReadonly = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, boundNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtXXFormsReadonly);
+                    resolvedXXFormsShared = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, boundNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtXXFormsShared);
 
                     // Default is "false" for security reasons
-                    final String tempHandleXInclude = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, currentNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtXXFormsHandleXInclude);
+                    final String tempHandleXInclude = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, boundNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtXXFormsHandleXInclude);
                     resolvedXXFormsHandleXInclude = "true".equals(tempHandleXInclude);
                 }
 
@@ -514,7 +514,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                     }
 
                     // Create document to submit
-                    documentToSubmit = createDocumentToSubmit(pipelineContext, currentNodeInfo, currentInstance, modelForInstance);
+                    documentToSubmit = createDocumentToSubmit(pipelineContext, boundNodeInfo, currentInstance, modelForInstance);
 
                 } else {
                     // Don't recreate document
@@ -531,7 +531,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                     // consists of a serialization of the selected instance data according to the rules stated at 11.9
                     // Submission Options."
 
-                    final XFormsSubmitSerializeEvent serializeEvent = new XFormsSubmitSerializeEvent(XFormsModelSubmission.this);
+                    final XFormsSubmitSerializeEvent serializeEvent = new XFormsSubmitSerializeEvent(XFormsModelSubmission.this, boundNodeInfo);
                     containingDocument.dispatchEvent(pipelineContext, serializeEvent);
 
                     // TODO: rest of submission should happen upon default action of event
@@ -937,7 +937,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                     if (target != null) {
                                         // Evaluate destination node
                                         final Object destinationObject
-                                                = XPathCache.evaluateSingle(pipelineContext, currentNodeInfo, target, prefixToURIMap,
+                                                = XPathCache.evaluateSingle(pipelineContext, boundNodeInfo, target, prefixToURIMap,
                                                 contextStack.getCurrentVariables(), functionLibrary, functionContext, null, getLocationData());
 
                                         if (destinationObject instanceof NodeInfo) {

@@ -38,15 +38,11 @@ import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.XPathContext;
-import org.orbeon.saxon.om.Item;
-import org.orbeon.saxon.om.ListIterator;
-import org.orbeon.saxon.om.NodeInfo;
-import org.orbeon.saxon.om.SequenceIterator;
+import org.orbeon.saxon.om.*;
 import org.orbeon.saxon.trans.XPathException;
 
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -180,7 +176,7 @@ public class XXFormsCallXPL extends XFormsFunction {
                     if (newPipelineContext && !pipelineContext.isDestroyed())
                         pipelineContext.destroy(true);
 
-                    return new ListIterator(Collections.EMPTY_LIST);
+                    return EmptyIterator.getInstance();
                 } else {
                     // Create all outputs to read
                     List outputs = new ArrayList(outputNames.size());

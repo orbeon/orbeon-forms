@@ -199,6 +199,10 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
         StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
         StandardFunction.arg(e, 1, Type.ANY_ATOMIC_TYPE, StaticProperty.EXACTLY_ONE);
 
+        // xxforms:mutable
+        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI + "}mutable", XXFormsMutable.class, 0, 1, 1, Type.NODE_TYPE, StaticProperty.EXACTLY_ONE);
+        StandardFunction.arg(e, 0, Type.NODE_TYPE, StaticProperty.EXACTLY_ONE);
+
         // xxforms:sort
         // TODO: Support XSLT 2.0 enhancements and multiple sort keys
 //        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI  + "}sort", EXFormsSort.class, 0, 5, 5, Type.ITEM_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);

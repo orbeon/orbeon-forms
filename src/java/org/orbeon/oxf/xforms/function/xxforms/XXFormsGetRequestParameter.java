@@ -13,20 +13,20 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms;
 
+import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.StaticExternalContext;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
-import org.orbeon.oxf.common.OXFException;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.XPathContext;
+import org.orbeon.saxon.om.EmptyIterator;
 import org.orbeon.saxon.om.ListIterator;
 import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.value.StringValue;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * xxforms:get-parameter($a as xs:string) xs:string*
@@ -60,7 +60,7 @@ public class XXFormsGetRequestParameter extends XFormsFunction {
                 return new ListIterator(result);
             }
 
-            return new ListIterator(Collections.EMPTY_LIST);
+            return EmptyIterator.getInstance();
         } else {
             throw new OXFException("xxforms:get-request-parameter() can only be called during XForms initialization.");
         }

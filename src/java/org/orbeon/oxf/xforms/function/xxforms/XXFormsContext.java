@@ -18,6 +18,7 @@ import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.XPathContext;
+import org.orbeon.saxon.om.EmptyIterator;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.ListIterator;
 import org.orbeon.saxon.om.SequenceIterator;
@@ -45,6 +46,6 @@ public class XXFormsContext extends XFormsFunction {
         if (contextItem != null)
             return new ListIterator(new ArrayList(Collections.singleton(contextItem)));
         else
-            return new ListIterator(Collections.EMPTY_LIST);
+            return EmptyIterator.getInstance();
     }
 }

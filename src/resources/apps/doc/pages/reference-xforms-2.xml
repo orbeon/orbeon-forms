@@ -1201,7 +1201,7 @@
                                 <code>xxforms:element($element-name as xs:string) as element()</code>
                             </p>
                             <p>
-                                <code>xxforms:element($element-name as xs:string, $content as item()*) as element()</code>.
+                                <code>xxforms:element($element-name as xs:string, $content as item()*) as element()</code>
                             </p>
                             <p>
                                 The <code>xxforms:element()</code> function returns a new XML element with the qualified
@@ -1329,7 +1329,7 @@
                         <li>
                             <a name="xxforms-valid"/>
                             <p>
-                                <code>xxforms:valid($node as node(), $recurse as xs:boolean, $check-required-empty as xs:boolean) as xs:boolean</code>.
+                                <code>xxforms:valid($node as node(), $recurse as xs:boolean, $check-required-empty as xs:boolean) as xs:boolean</code>
                             </p>
                             <p>
                                 The <code>xxforms:valid()</code> function returns the validity of a instance data node
@@ -1377,9 +1377,35 @@
                             </p>
                         </li>
                         <li>
+                            <a name="xxforms-mutable-document"/>
+                            <p>
+                                <code>xxforms:mutable-document($node as node()) as document-node()</code>
+                            </p>
+                            <p>
+                                The <code>xxforms:mutable-document()</code> function takes a document as input and
+                                returns a mutable document, i.e. a document on which you can for example use
+                                <code>xforms:setvalue</code>.
+                            </p>
+                            <xml-source show-namespaces="false">
+                                <xforms:action ev:event="xforms-submit-serialize">
+                                    <comment> Get initial document to submit </comment>
+                                    <xxforms:variable name="request-document" select="xxforms:mutable-document(saxon:parse(/my/request))"/>
+                                    <comment> Set value </comment>
+                                    <xforms:setvalue ref="$request-document/my/first-name">Joe</xforms:setvalue>
+                                    <comment> Serialize request document </comment>
+                                    <xforms:setvalue ref="event('submission-body')" value="saxon:serialize($request-document, instance('my-output-instance'))"/>
+                                </xforms:action>
+                            </xml-source>
+                            <p>
+                                Note that by compatibility with the XSLT <code>document()</code> and XPath 2.0
+                                <code>doc()</code> functions, and unlike the <code>instance()</code> function,
+                                <code>xxforms:mutable-document()</code> returns a document node, not a document element
+                            </p>
+                        </li>
+                        <li>
                             <a name="xxforms-repeat-current"/>
                             <p>
-                                <code>xxforms:repeat-current($repeat-id as xs:string?) as node()</code>.
+                                <code>xxforms:repeat-current($repeat-id as xs:string?) as node()</code>
                             </p>
                             <note>
                                 <p>

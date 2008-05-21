@@ -75,7 +75,11 @@ public class XFormsDeleteAction extends XFormsAction {
                     // "If the Node Set Binding node-set empty, then this attribute is ignored"
                     deleteIndex = 0;
                 } else if (atAttribute == null) {
-                    // "If the attribute is not given, then the default is the size of the Node Set Binding node-set"
+                    // TODO
+                    // "If there is no delete location, each node in the Node Set Binding node-set is deleted, except
+                    // if the node is a readonly node or the root document element of an instance then that particular
+                    // node is not deleted."
+
                     deleteIndex = collectionToUpdate.size();
                 } else {
                     // "1. The evaluation context node is the first node in document order from the Node Set Binding

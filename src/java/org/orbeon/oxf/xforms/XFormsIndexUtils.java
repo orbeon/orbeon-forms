@@ -255,6 +255,29 @@ public class XFormsIndexUtils {
                                               final Map previousRepeatIdToIndex, final Map repeatIndexUpdates,
                                               final Map nestedRepeatIndexUpdates, final Node nodeToRemove) {
 
+        // TODO
+        // XForms 1.1: "If one or more nodes have been removed from the repeat collection by a delete action, then the
+        // repeat items corresponding to the deleted nodes must be destroyed and the repeat index must be updated based
+        // on the rules below.
+        //
+        //   1. If, prior to node deletion, the repeat index indicated a repeat that is still contained in the repeat
+        //      collection after node deletion, then the index is adjusted, if necessary, to indicate that same repeat
+        //      item.
+        //   2. Otherwise, if all repeat items in the collection have been destroyed, the repeat index is set to 0.
+        //   3. Otherwise, if the repeat index was pointing to one of the deleted repeat items, and if the new size of
+        //      the collection is smaller than the index, the index is changed to the new size of the collection.
+        //   4. Otherwise, if the repeat index was pointing to one of the deleted repeat items, and if the new size of
+        //      the collection is equal to or greater than the index, the index is not changed.
+        //
+        // Note:
+        //
+        //   The change of index on a repeat does not cause the index of any repeat nested within it to be
+        //   re-initialized.
+        //
+        //   The repeat index update on deletion behaves as if it occurs in response to the xforms-delete event
+        //   dispatched by the delete action. Specifically, the index update behaves as if it occurs when the
+        //   xforms-delete event reaches the target instance element in the capture phase."
+
         // NOTE: The code below assumes that there are no nested repeats bound to node-sets that intersect
         final XFormsStaticState staticState = xformsControls.getContainingDocument().getStaticState();
         xformsControls.getCurrentControlsState().visitControlsFollowRepeats(new XFormsControls.XFormsControlVisitorListener() {

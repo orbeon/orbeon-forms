@@ -125,6 +125,7 @@ a.fb-edit-help-trigger img {
 #fb-bindings-dialog .xforms-select1 { width: 10em }
 #fb-bindings-dialog .fr-repeat-table .fb-parameters .xforms-label { display: inline }
 #fb-bindings-dialog .fr-repeat-table .fb-parameters .xforms-disabled { display: none }
+#fb-bindings-dialog .fr-repeat-table th { white-space: nowrap }
 
 /* Other dialogs */
 .xforms-dialog .bd { padding-left: .5em; padding-right: .5em }

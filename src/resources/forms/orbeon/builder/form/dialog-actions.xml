@@ -29,9 +29,9 @@
     <xxforms:variable name="instance" select="instance('fb-bindings-editor-instance')"/>
     <xhtml:div class="fr-grid">
         <xhtml:div class="fr-grid-content">
-            <xforms:input ref="id" id="fb-binding-id-input" incremental="true">
-                <xforms:label>Action Id</xforms:label>
-                <xforms:hint>Choose a unique id for this action</xforms:hint>
+            <xforms:input ref="name" id="fb-binding-name-input" incremental="true">
+                <xforms:label>Action Name</xforms:label>
+                <xforms:hint>Choose a unique name for this action</xforms:hint>
             </xforms:input>
             <xforms:group ref="$instance/xforms:action" appearance="xxforms:internal">
                 <xforms:select1 ref="xforms:action[1]/@ev:event">
@@ -73,7 +73,7 @@
                         <xforms:value/>
                     </xforms:item>
                     <!-- Show submissions that are NOT yet used by a service. This is a current limitation. -->
-                    <xforms:itemset nodeset="$model/xforms:submission[ends-with(@id, '-submission') and not(@id = ../xforms:action[ends-with(@id, '-binding')]/xforms:action[1]/xforms:send/@submission)]">
+                    <xforms:itemset nodeset="$model/xforms:submission[ends-with(@id, '-submission') and not(@id = ../xforms:action[ends-with(@id, '-binding') and @id != concat($instance/initial-name, '-binding')]/xforms:action[1]/xforms:send/@submission)]">
                         <xforms:label value="substring-before(@id, '-submission')"/>
                         <xforms:value value="@id"/>
                     </xforms:itemset>
@@ -224,7 +224,7 @@
                     <xxforms:variable name="binding-id" select="$instance/xforms:action[1]/@id"/>
                     <xforms:delete nodeset="$model/xforms:action[@id = $binding-id]"/>
 
-                    <!-- Insert new submission -->
+                    <!-- Insert new binding -->
                     <xforms:insert context="$model" nodeset="*" origin="$instance/xforms:action[1]"/>
 
                     <!-- Hide dialog -->
@@ -253,13 +253,13 @@
         <!-- Otherwise copy binding -->
         <xforms:action if="$binding-name">
             <xxforms:variable name="binding-id" select="concat($binding-name, '-binding')"/>
-            <xforms:setvalue ref="$instance/id" value="$binding-name"/>
-            <xforms:setvalue ref="$instance/initial-id" value="$binding-name"/>
+            <xforms:setvalue ref="$instance/name" value="$binding-name"/>
+            <xforms:setvalue ref="$instance/initial-name" value="$binding-name"/>
             <xforms:insert nodeset="$instance/*" origin="$model/xforms:action[@id = $binding-id]"/>
         </xforms:action>
 
         <!-- Set focus to first input -->
-        <xforms:setfocus control="fb-binding-id-input"/>
+        <xforms:setfocus control="fb-binding-name-input"/>
     </xforms:action>
 
     <!-- Model for the bindings editor -->
@@ -269,10 +269,9 @@
 
         <xforms:instance id="fb-bindings-editor-instance">
             <bindings-editor>
-                <id/>
-                <initial-id/>
+                <name/>
+                <initial-name/>
                 <save-test-trigger/>
-                <!--<validation/>-->
                 <xforms:action/>
             </bindings-editor>
         </xforms:instance>
@@ -282,13 +281,13 @@
         <xforms:setvalue ev:event="xxforms-valid" ev:observer="fb-bindings-editor-instance" ref="save-test-trigger">enabled</xforms:setvalue>
 
         <xforms:bind nodeset="instance('fb-bindings-editor-instance')">
-            <xforms:bind nodeset="id" type="xs:NCName"
-                         constraint="(normalize-space() != '' and normalize-space() = ../initial-id)
+            <xforms:bind nodeset="name" type="xs:NCName"
+                         constraint="(normalize-space() != '' and normalize-space() = ../initial-name)
                                         or not(../xforms:action[1]/@id = $model/xforms:action/@id)"/>
             
             <xforms:bind nodeset="xforms:action">
                 <!-- Action id -->
-                <xforms:bind nodeset="@id" calculate="concat(../../id, '-binding')"/>
+                <xforms:bind nodeset="@id" calculate="concat(../../name, '-binding')"/>
                 <!-- Action that triggers the submission -->
                 <xforms:bind nodeset="xforms:action[1]">
                     <xforms:bind nodeset="(@ev:event, xforms:send/@submission)" required="true()"/>
@@ -330,7 +329,7 @@
                 <!-- Request actions -->
                 <xforms:action ev:event="xforms-submit-serialize" ev:observer="SET ME">
                     <!-- Get initial document to submit -->
-                    <xxforms:variable name="request-document" select="xxforms:mutable(saxon:parse(event('xxforms:binding')/request))"/>
+                    <xxforms:variable name="request-document" select="xxforms:mutable-document(saxon:parse(event('xxforms:binding')/request))"/>
                     <!-- Set values if needed -->
                     <xforms:action context="$request-document">
                         <!-- Setvalue actions will be here -->

@@ -11,6 +11,7 @@ html { overflow: scroll; }
         #fr-view .fr-status-icons img
 {
     /* Absolute path is rewritten in combined resources mode */
+    /* TODO: this must go through our CSS rewriter */
     behavior: url(/orbeon/ops/javascript/iepngfix.htc)
     /*;border: 10px solid red*/
 }
@@ -265,7 +266,7 @@ hr {
 
 .fr-summary-search-item { float: left; margin-right: .5em }
 
-.xforms-input input, textarea.xforms-textarea {
+.xforms-input input, textarea.xforms-textarea, input.xforms-secret {
     background-image: url(field.png);
     background-repeat: repeat-x;
     border: 1px solid #CCCCCC;
@@ -427,6 +428,7 @@ div.fr-collapsible {
 .fr-grid .xforms-input input,
     .fr-grid .xforms-upload input,
     .fr-grid .xforms-textarea,
+    .fr-grid .xforms-secret,
     .fr-grid .xforms-select1-appearance-minimal,
     .fr-grid .xforms-select1-appearance-compact,
     .fr-grid .xforms-select-appearance-compact {

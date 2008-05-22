@@ -150,10 +150,8 @@
                                 <!-- Display the toolbar and errors -->
                                 <xforms:group model="fr-persistence-model" appearance="xxforms:internal">
 
-                                    <xxforms:variable name="errors-shown" select="instance('fr-persistence-instance')/message != ''
-                                                                                    or xxforms:instance('fr-errors-instance')/error"/>
                                     <xhtml:div class="fr-status-icons">
-                                        <xforms:group model="fr-error-summary-model" ref=".[$errors-shown]">
+                                        <xforms:group model="fr-error-summary-model" ref=".[instance('fr-form-valid-instance') = 'false']">
                                             <!-- Form is invalid -->
                                             <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/exclamation.png" alt="Errors on Form" title="Errors on Form"/>
                                         </xforms:group>
@@ -171,36 +169,37 @@
                                         </xforms:group>
                                     </xhtml:div>
 
+                                    <xxforms:variable name="message-or-errors-shown" select="instance('fr-persistence-instance')/message != ''
+                                                                                    or xxforms:instance('fr-errors-instance')/error"/>
+
                                     <!-- Only show messages and error table if necessary -->
-                                    <xforms:group model="fr-persistence-model" ref=".[$errors-shown]">
+                                    <xforms:group model="fr-persistence-model" ref=".[$message-or-errors-shown]">
                                         <xhtml:table class="fr-error-messages">
-                                            <xforms:group ref=".[$errors-shown]">
-                                                <xhtml:tr>
-                                                    <xhtml:td>
-                                                        <!-- Display messages -->
-                                                        <xforms:switch>
-                                                            <xforms:case id="fr-message-none">
-                                                                <xhtml:p/>
-                                                            </xforms:case>
-                                                            <xforms:case id="fr-message-success">
-                                                                <xhtml:p class="fr-message-success">
-                                                                    <xforms:output value="instance('fr-persistence-instance')/message"/>
-                                                                </xhtml:p>
-                                                            </xforms:case>
-                                                            <xforms:case id="fr-message-validation-error">
-                                                                <xhtml:p class="fr-message-validation-error">
-                                                                    <xforms:output value="instance('fr-persistence-instance')/message"/>
-                                                                </xhtml:p>
-                                                            </xforms:case>
-                                                            <xforms:case id="fr-message-fatal-error">
-                                                                <xhtml:p class="fr-message-fatal-error">
-                                                                    <xforms:output value="instance('fr-persistence-instance')/message"/>
-                                                                </xhtml:p>
-                                                            </xforms:case>
-                                                        </xforms:switch>
-                                                    </xhtml:td>
-                                                </xhtml:tr>
-                                            </xforms:group>
+                                            <xhtml:tr>
+                                                <xhtml:td>
+                                                    <!-- Display messages -->
+                                                    <xforms:switch>
+                                                        <xforms:case id="fr-message-none">
+                                                            <xhtml:p/>
+                                                        </xforms:case>
+                                                        <xforms:case id="fr-message-success">
+                                                            <xhtml:p class="fr-message-success">
+                                                                <xforms:output value="instance('fr-persistence-instance')/message"/>
+                                                            </xhtml:p>
+                                                        </xforms:case>
+                                                        <xforms:case id="fr-message-validation-error">
+                                                            <xhtml:p class="fr-message-validation-error">
+                                                                <xforms:output value="instance('fr-persistence-instance')/message"/>
+                                                            </xhtml:p>
+                                                        </xforms:case>
+                                                        <xforms:case id="fr-message-fatal-error">
+                                                            <xhtml:p class="fr-message-fatal-error">
+                                                                <xforms:output value="instance('fr-persistence-instance')/message"/>
+                                                            </xhtml:p>
+                                                        </xforms:case>
+                                                    </xforms:switch>
+                                                </xhtml:td>
+                                            </xhtml:tr>
                                             <xhtml:tr>
                                                 <xhtml:td>
                                                     <xforms:group ref=".">

@@ -436,6 +436,14 @@ ORBEON.util.Dom = {
         return nodes.length == 0 ? null : nodes;
     },
 
+    nextSiblingElement: function(element) {
+        while (true) {
+            var candidate = element.nextSibling;
+            if (candidate == null) return null;
+            if (ORBEON.util.Dom.isElement(candidate)) return candidate;
+        }
+    },
+
     stringToDom: function(xmlString) {
         if (document.implementation.createDocument) {
             return (new DOMParser()).parseFromString(xmlString, "application/xml")
@@ -1115,7 +1123,11 @@ ORBEON.xforms.Controls = {
         function isFound(candidate) {
             return ORBEON.util.Dom.isElement(candidate)
                     && ORBEON.util.Dom.hasClass(candidate, className)
-                    && (candidate.htmlFor == null || candidate.htmlFor == control.id);
+                    // If element has a "for" attribute, make sure it is for the right control
+                    && (candidate.htmlFor == null || candidate.htmlFor == control.id)
+                    // If candidate is the help image, make sure the following sibling (the help label) is for the right control
+                    && (className != "xforms-help-image" ||
+                            ORBEON.util.Dom.nextSiblingElement(candidate).htmlFor == control.id);
         }
 
         // Search for label in the 10 node that follow the control
@@ -4388,6 +4400,9 @@ ORBEON.xforms.Offline = {
         var controlKeepValueIDs = [];
 
         // Controls for which we go a value in the eventResponse
+        /*
+            When form is taken offline, no need to store in control_values the values for the controls in
+            eventResponse, as the eventResponse is going to be played back when the form is loaded offline.
         var initialEventsXML = ORBEON.util.Dom.stringToDom(eventResponse);
         var actionElement = ORBEON.util.Dom.getChildElementByIndex(initialEventsXML.documentElement, 0)
         var controlValuesElement = ORBEON.util.Dom.getChildElementByIndex(actionElement, 0)
@@ -4398,8 +4413,12 @@ ORBEON.xforms.Offline = {
                 controlKeepValueIDs.push(controlId);
             }
         }
+        */
 
         // Controls for which there is a variable defined
+        //     We store the latest values for controls for this there is a variable defined, because those are controls
+        //     which value we want to make available to the summary page through
+        //     ORBEON.xforms.Document.getOfflineControlValues(url).
         var mappingsObject = ORBEON.util.String.eval("({" + mappings + "})");
         ORBEON.xforms.Offline.mips = mappingsObject.mips;
         ORBEON.xforms.Offline.variables = mappingsObject.variables;

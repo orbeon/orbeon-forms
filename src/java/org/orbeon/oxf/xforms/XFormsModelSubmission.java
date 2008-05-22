@@ -76,22 +76,22 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
     private String avtRelevant;
 
     private String avtSerialization;
-    private boolean serialize = true;
+    private boolean serialize = true;// computed from @serialization attribute or legacy @serialize attribute
 
-    private String target;
+    private String target;// this is an XPath expression when used with replace="instance|text" (other meaning possible post-XForms 1.1 for replace="all")
 
-    private String version;
-    private boolean indent;
-    private String mediatype;
-    private String encoding;
-    private boolean omitxmldeclaration;
-    private Boolean standalone;
+    private String avtVersion;
+    private String avtEncoding;
+    private String avtMediatype;
+    private String avtIndent;
+    private String avtOmitxmldeclaration;
+    private String avtStandalone;
     private String cdatasectionelements;
 
     private String replace = XFormsConstants.XFORMS_SUBMIT_REPLACE_ALL;
     private String replaceInstanceId;
     private String xxfReplaceInstanceId;
-    private String separator = ";";
+    private String avtSeparator = ";";
     private String includenamespaceprefixes;
 
     private String avtXXFormsUsername;
@@ -165,19 +165,13 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
             target = submissionElement.attributeValue("target");
 
-            version = submissionElement.attributeValue("version");
+            avtVersion = submissionElement.attributeValue("version");
 
-            if (submissionElement.attributeValue("indent") != null) {
-                indent = Boolean.valueOf(submissionElement.attributeValue("indent")).booleanValue();
-            }
-            mediatype = submissionElement.attributeValue("mediatype");
-            encoding = submissionElement.attributeValue("encoding");
-            if (submissionElement.attributeValue("omitxmldeclaration") != null) {
-                omitxmldeclaration = Boolean.valueOf(submissionElement.attributeValue("omit-xml-declaration")).booleanValue();
-            }
-            if (submissionElement.attributeValue("standalone") != null) {
-                standalone = new Boolean(submissionElement.attributeValue("standalone"));
-            }
+            avtIndent = submissionElement.attributeValue("indent");
+            avtMediatype = submissionElement.attributeValue("mediatype");
+            avtEncoding = submissionElement.attributeValue("encoding");
+            avtOmitxmldeclaration = submissionElement.attributeValue("omit-xml-declaration");
+            avtStandalone = submissionElement.attributeValue("standalone");
 
             cdatasectionelements = submissionElement.attributeValue("cdata-section-elements");
             if (submissionElement.attributeValue("replace") != null) {
@@ -189,7 +183,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 }
             }
             if (submissionElement.attributeValue("separator") != null) {
-                separator = submissionElement.attributeValue("separator");
+                avtSeparator = submissionElement.attributeValue("separator");
             }
             includenamespaceprefixes = submissionElement.attributeValue("includenamespaceprefixes");
 
@@ -440,6 +434,13 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                 // Evaluate late AVTs
                 final String resolvedSerialization;
+                final String resolvedMediatype;
+                final String resolvedVersion;
+                final String resolvedEncoding;
+                final String resolvedSeparator;
+                final boolean resolvedIndent;
+                final boolean resolvedOmitxmldeclaration;
+                final Boolean resolvedStandalone;
                 final String resolvedXXFormsUsername;
                 final String resolvedXXFormsPassword;
                 final String resolvedXXFormsReadonly;
@@ -450,6 +451,19 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                     resolvedActionOrResource = XFormsUtils.encodeHRRI(tempActionOrResource, true);
 
                     resolvedSerialization = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, boundNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtSerialization);
+                    resolvedMediatype = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, boundNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtMediatype);
+                    resolvedVersion = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, boundNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtVersion);
+                    resolvedEncoding = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, boundNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtEncoding);
+                    resolvedSeparator = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, boundNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtSeparator);
+
+                    final String tempIndent = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, boundNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtIndent);
+                    resolvedIndent = Boolean.valueOf(tempIndent).booleanValue();
+
+                    final String tempAvtOmitxmldeclaration = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, boundNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtOmitxmldeclaration);
+                    resolvedOmitxmldeclaration = Boolean.valueOf(tempAvtOmitxmldeclaration).booleanValue();
+
+                    final String tempStandalone = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, boundNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtStandalone);
+                    resolvedStandalone = (tempActionOrResource != null) ? Boolean.valueOf(tempStandalone) : null;
 
                     resolvedXXFormsUsername = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, boundNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtXXFormsUsername);
                     resolvedXXFormsPassword = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, boundNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtXXFormsPassword);
@@ -458,7 +472,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                     // Default is "false" for security reasons
                     final String tempHandleXInclude = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, boundNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtXXFormsHandleXInclude);
-                    resolvedXXFormsHandleXInclude = "true".equals(tempHandleXInclude);
+                    resolvedXXFormsHandleXInclude = Boolean.valueOf(tempHandleXInclude).booleanValue();
                 }
 
                 // Check read-only and shared hints
@@ -578,10 +592,10 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         // Perform "application/x-www-form-urlencoded" serialization
                         if (actualHttpMethod.equals("POST") || actualHttpMethod.equals("PUT")) {
                             queryString = null;
-                            messageBody = createWwwFormUrlEncoded(documentToSubmit).getBytes("UTF-8");// the resulting string is already ASCII in fact
+                            messageBody = createWwwFormUrlEncoded(documentToSubmit, resolvedSeparator).getBytes("UTF-8");// the resulting string is already ASCII in fact
                             defaultMediatypeForSerialization = "application/x-www-form-urlencoded";
                         } else {
-                            queryString = createWwwFormUrlEncoded(documentToSubmit);
+                            queryString = createWwwFormUrlEncoded(documentToSubmit, resolvedSeparator);
                             messageBody = null;
                             defaultMediatypeForSerialization = null;
                         }
@@ -593,7 +607,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                             try {
                                 final Transformer identity = TransformerUtils.getIdentityTransformer();
                                 TransformerUtils.applyOutputProperties(identity,
-                                        "xml", version, null, null, encoding, omitxmldeclaration, standalone, indent, 4);
+                                        "xml", resolvedVersion, null, null, resolvedEncoding, resolvedOmitxmldeclaration, resolvedStandalone, resolvedIndent, 4);
 
                                 // TODO: use cdata-section-elements
 
@@ -721,7 +735,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         // a new document so we don't dispatch xforms-submit-done and pass a null XFormsModelSubmission
                         // in that case
                         connectionResult = XFormsSubmissionUtils.doOptimized(pipelineContext, externalContext,
-                                isDeferredSubmissionSecondPassReplaceAll ? null : this, actualHttpMethod, resolvedURI.toString(), (mediatype == null) ? defaultMediatypeForSerialization : mediatype, isReplaceAll,
+                                isDeferredSubmissionSecondPassReplaceAll ? null : this, actualHttpMethod, resolvedURI.toString(), (resolvedMediatype == null) ? defaultMediatypeForSerialization : resolvedMediatype, isReplaceAll,
                                 messageBody, queryString);
 
                     } else {
@@ -770,7 +784,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         } else {
                             // Perform actual submission
                             connectionResult = XFormsSubmissionUtils.doRegular(externalContext, containingDocument,
-                                    actualHttpMethod, resolvedURL, resolvedXXFormsUsername, resolvedXXFormsPassword, (mediatype == null) ? defaultMediatypeForSerialization : mediatype,
+                                    actualHttpMethod, resolvedURL, resolvedXXFormsUsername, resolvedXXFormsPassword, (resolvedMediatype == null) ? defaultMediatypeForSerialization : resolvedMediatype,
                                     messageBody, queryString, headerNames, headerNameValues);
                         }
                     }
@@ -1171,7 +1185,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
         return documentToSubmit;
     }
 
-    private String createWwwFormUrlEncoded(final Document document) {
+    private String createWwwFormUrlEncoded(final Document document, final String separator) {
 
         final StringBuffer sb = new StringBuffer();
         document.accept(new VisitorSupport() {

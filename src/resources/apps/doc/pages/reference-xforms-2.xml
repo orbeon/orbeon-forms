@@ -1756,6 +1756,36 @@
                                     <code>action</code> and <code>resource</code>
                                 </li>
                                 <li>
+                                    <code>serialization</code>
+                                </li>
+                                <li>
+                                    <code>mediatype</code>
+                                </li>
+                                <li>
+                                    <code>version</code>
+                                </li>
+                                <li>
+                                    <code>encoding</code>
+                                </li>
+                                <li>
+                                    <code>separator</code>
+                                </li>
+                                <li>
+                                    <code>indent</code>
+                                </li>
+                                <li>
+                                    <code>omit-xml-declaration</code>
+                                </li>
+                                <li>
+                                    <code>standalone</code>
+                                </li>
+                                <li>
+                                    <code>validate</code>
+                                </li>
+                                <li>
+                                    <code>relevant</code>
+                                </li>
+                                <li>
                                     <code>xxforms:target</code>
                                 </li>
                                 <li>

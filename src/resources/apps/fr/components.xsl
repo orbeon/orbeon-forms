@@ -653,8 +653,7 @@
                                     <xsl:choose>
                                         <xsl:when test="@editable = 'true'">
                                             <xsl:variable name="input" as="element(xforms:input)">
-                                                <xforms:input id="{$section-id}-input-closed" ref="{xforms:label/@ref}"
-                                                              appearance="fr:in-place" class="fb-section-title">
+                                                <xforms:input id="{$section-id}-input-closed" ref="{xforms:label/@ref}" appearance="fr:in-place">
                                                     <xsl:apply-templates select="xforms:hint"/>
                                                     <xsl:apply-templates select="fr:buttons"/>
                                                 </xforms:input>
@@ -703,8 +702,7 @@
                                     <xsl:choose>
                                         <xsl:when test="@editable = 'true'">
                                             <xsl:variable name="input" as="element(xforms:input)">
-                                                <xforms:input id="{$section-id}-input-open" ref="{xforms:label/@ref}"
-                                                              appearance="fr:in-place" class="fb-section-title">
+                                                <xforms:input id="{$section-id}-input-open" ref="{xforms:label/@ref}" appearance="fr:in-place">
                                                     <xsl:apply-templates select="xforms:hint"/>
                                                     <xsl:apply-templates select="fr:buttons"/>
                                                 </xforms:input>

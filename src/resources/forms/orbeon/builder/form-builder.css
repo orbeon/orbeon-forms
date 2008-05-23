@@ -7,7 +7,7 @@
 
 .fb-ie-warning { display: block; margin: 1em; padding: .5em; border: 4px solid #D00000; background-color: #FFF0F0 }
 
-.fb-section-title div {
+.fr-section-title div {
     background: white url(../../../apps/fr/style/separator.gif) repeat-x scroll left center
 }
 
@@ -168,8 +168,8 @@ a.fb-edit-help-trigger img {
 .fr-inplace-content .xforms-output:hover { background-color: #FFFF88 }
 #fb-metadata-section:hover .fr-inplace-content .xforms-output { background-color: #FFFFDD }
 #fb-metadata-section:hover .fr-inplace-content .xforms-output:hover { background-color: #FFFF88 }
-#fb-details-section .fb-top-level-content:hover .fb-section-title .fr-inplace-content .xforms-output { background-color: #FFFFDD }
-#fb-details-section .fb-top-level-content:hover .fb-section-title .fr-inplace-content .xforms-output:hover { background-color: #FFFF88 }
+#fb-details-section .fb-top-level-content:hover .fr-section-title .fr-inplace-content .xforms-output { background-color: #FFFFDD }
+#fb-details-section .fb-top-level-content:hover .fr-section-title .fr-inplace-content .xforms-output:hover { background-color: #FFFF88 }
 #fb-details-section .fb-grid-td:hover .fr-inplace-content .xforms-output { background-color: #FFFFDD }
 #fb-details-section .fb-grid-td:hover .fr-inplace-content .xforms-output:hover { background-color: #FFFF88 }
 
@@ -190,20 +190,26 @@ a.fb-edit-help-trigger img {
 .fb-metadata-description { border: 4px solid orange }
 
 /* In-place editing for section titles */
-.fb-section-title .fr-inplace-content .xforms-output { text-decoration: underline; color: #666699 }
-#fb-details-section .fb-section-title { display: inline } 
-#fb-details-section .fb-section-title .fr-inplace-buttons { display:inline; margin-left: .5em; margin-right: .5em; background-color: white }
-#fb-details-section .fb-section-title .fr-inplace-buttons button { vertical-align: middle }
-#fb-details-section .fb-section-title .fr-inplace-content { vertical-align: middle; font-size: 100% }
-/*#fb-details-section .fb-section-title .fr-inplace-content .xforms-output { margin-left: 1em; padding-left: .5em; padding-right: .5em}*/
-/*#fb-details-section .fb-section-title .fr-inplace-content .xforms-input input { margin-left: 1em; padding-left: .5em; padding-right: .5em; *font-size: 100% }*/
-#fb-details-section .fb-section-title .fr-inplace-content .xforms-label { display: none }
-#fb-details-section .fb-section-title .fr-inplace-delete img { padding: 0 }
-#fb-details-section .fb-section-title .fr-inplace-delete { display: inline }
-#fb-details-section .fb-section-title .xforms-input input { width: 20em }
+.fr-section-title .fr-inplace-content .xforms-output { text-decoration: underline; color: #666699 }
+#fb-details-section .fr-section-title { display: block }
 
-/*.fb-section-title { display: inline; margin-bottom: .5em}*/
-/*.fr-section-container .fb-section-title .fr-inplace-buttons { display: inline }*/
+/* Only show buttons when in edit mode or when hovering over the title */
+#fb-details-section .fr-section-title .fr-inplace-buttons { display: none }
+#fb-details-section .fr-section-title .fr-inplace-edit .fr-inplace-buttons,
+    #fb-details-section .fr-section-title:hover .fr-inplace-buttons { display: inline }
+
+#fb-details-section .fr-section-title .fr-inplace-buttons { margin-left: .5em; margin-right: .5em; background-color: white }
+#fb-details-section .fr-section-title .fr-inplace-buttons button { vertical-align: middle }
+#fb-details-section .fr-section-title .fr-inplace-content { vertical-align: middle; font-size: 100% }
+/*#fb-details-section .fr-section-title .fr-inplace-content .xforms-output { margin-left: 1em; padding-left: .5em; padding-right: .5em}*/
+/*#fb-details-section .fr-section-title .fr-inplace-content .xforms-input input { margin-left: 1em; padding-left: .5em; padding-right: .5em; *font-size: 100% }*/
+#fb-details-section .fr-section-title .fr-inplace-content .xforms-label { display: none }
+#fb-details-section .fr-section-title .fr-inplace-delete img { padding: 0 }
+#fb-details-section .fr-section-title .fr-inplace-delete { display: inline }
+#fb-details-section .fr-section-title .xforms-input input { width: 20em }
+
+/*.fr-section-title { display: inline; margin-bottom: .5em}*/
+/*.fr-section-container .fr-section-title .fr-inplace-buttons { display: inline }*/
 
 /* Highlighting of top-level blocks (sections, ...) */
 .fb-top-level-content { padding-left: .5em; margin-bottom: .5em; border-left: 4px solid transparent }

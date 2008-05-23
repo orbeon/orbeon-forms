@@ -186,6 +186,7 @@
                         <!-- Handle top-level blocks -->
                         <xforms:repeat nodeset="fr:section | fr:repeat | fr:grid" id="fb-top-level-repeat" xxforms:dnd="none">
 
+                            <xxforms:variable name="top-level-block" select="."/>
                             <xxforms:variable name="top-level-position" select="position()"/>
                             <xxforms:variable name="is-top-level-current" select="$top-level-position = index('fb-top-level-repeat')"/>
 
@@ -202,7 +203,7 @@
                                         <xforms:label ref="$current-resources/*[name() = $section-name]/label"/>
                                         <xforms:hint>click to enter a section name</xforms:hint>
                                         <fr:buttons>
-                                            <xforms:trigger appearance="minimal" class="fr-inplace-delete">
+                                            <xforms:trigger appearance="minimal">
                                                 <xforms:label><xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/bin.png" alt="Delete" title="Delete"/></xforms:label>
                                                 <!-- Show confirmation dialog -->
                                                 <xxforms:show ev:event="DOMActivate" dialog="fb-confirmation-dialog">
@@ -213,15 +214,31 @@
 
                                                     <xxforms:context name="fr:confirmation-target" select="'fb-top-level-section'"/>
                                                 </xxforms:show>
-
                                             </xforms:trigger>
-                                            <xforms:trigger appearance="minimal" class="fr-inplace-delete">
+                                            <xforms:trigger appearance="minimal">
                                                 <xforms:label><xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/cog.png" alt="Details" title="Details"/></xforms:label>
                                                 <!-- Show section details dialog -->
                                                 <xxforms:show ev:event="DOMActivate" dialog="fb-section-details-dialog" neighbor="fb-top-level-sectionxxxtodo">
                                                     <xxforms:context name="fr:section-name" select="$section-name"/>
                                                 </xxforms:show>
-
+                                            </xforms:trigger>
+                                            <xforms:trigger appearance="minimal" ref=".[$top-level-block/preceding-sibling::fr:*]">
+                                                <xforms:label><xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/arrow_up.png" alt="Move Up" title="Move Up"/></xforms:label>
+                                                <!-- Move section up -->
+                                                <xforms:action ev:event="DOMActivate">
+                                                    <xforms:insert nodeset="$top-level-block/preceding-sibling::fr:*[1]" position="before" origin="$top-level-block"/>
+                                                    <xforms:delete nodeset="$top-level-block"/>
+                                                    <!-- TODO: would be nice to move holders and resources as well -->
+                                                </xforms:action>
+                                            </xforms:trigger>
+                                            <xforms:trigger appearance="minimal" ref=".[$top-level-block/following-sibling::fr:*]">
+                                                <xforms:label><xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/arrow_down.png" alt="Move Down" title="Move Down"/></xforms:label>
+                                                <!-- Move section down -->
+                                                <xforms:action ev:event="DOMActivate">
+                                                    <xforms:insert nodeset="$top-level-block/following-sibling::fr:*[1]" position="after" origin="$top-level-block"/>
+                                                    <xforms:delete nodeset="$top-level-block"/>
+                                                    <!-- TODO: would be nice to move holders and resources as well -->
+                                                </xforms:action>
                                             </xforms:trigger>
                                         </fr:buttons>
 

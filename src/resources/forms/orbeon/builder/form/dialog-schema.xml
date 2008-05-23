@@ -136,7 +136,7 @@
     <xhtml:div class="fr-dialog-buttons">
         <xforms:group appearance="xxforms:internal">
             <xforms:trigger class="fr-inplace-rename" id="fb-edit-schema-trigger">
-                <xforms:label>Change</xforms:label>
+                <xforms:label>Apply</xforms:label>
 
                 <xforms:action ev:event="DOMActivate">
                     <!-- Insert schema into the model -->

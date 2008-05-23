@@ -22,7 +22,7 @@
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
       xmlns:saxon="http://saxon.sf.net/"
 
-      id="fb-submission-dialog" level="modal" close="true" draggable="true" class="fr-dialog" model="fb-submission-model">
+      id="fb-service-dialog" level="modal" close="true" draggable="true" class="fr-dialog" model="fb-submission-model">
 
     <xforms:label>Service Editor</xforms:label>
 
@@ -30,7 +30,7 @@
     <xhtml:div class="fr-grid">
         <xhtml:div class="fr-grid-content">
             <xforms:group ref="$instance">
-                <xforms:input ref="id" id="fb-submission-name-input" incremental="true">
+                <xforms:input ref="id" id="fb-service-name-input" incremental="true">
                     <xforms:label>Service Name</xforms:label>
                     <xforms:hint>Choose a unique name for this submission</xforms:hint>
                 </xforms:input>
@@ -107,14 +107,14 @@
                 </xforms:group>
 
                 <xforms:switch>
-                    <xforms:case id="fb-submission-dialog-none">
+                    <xforms:case id="fb-service-dialog-none">
 
                     </xforms:case>
-                    <xforms:case id="fb-submission-dialog-response">
+                    <xforms:case id="fb-service-dialog-response">
                         <xforms:group class="fb-submission-response">
                             <xforms:label>Response</xforms:label>
 
-                            <xhtml:div class="fb-submission-dialog-{if (response/error-type = '') then 'success' else 'error'}">
+                            <xhtml:div class="fb-service-dialog-{if (response/error-type = '') then 'success' else 'error'}">
                                 <xforms:group ref=".[response/error-type != '']">
                                     <xforms:select1 ref="response/error-type" xxforms:readonly-appearance="static" >
                                         <xforms:label>Error Type</xforms:label>
@@ -213,7 +213,7 @@
                     <xforms:delete xxforms:iterate="$instance/response/headers/header" nodeset="."/>
 
                     <!-- Toggle back response submission -->
-                    <xforms:toggle case="fb-submission-dialog-none"/>
+                    <xforms:toggle case="fb-service-dialog-none"/>
 
                     <!-- Send submission -->
                     <xforms:send submission="fb-test-service-submission"/>
@@ -221,7 +221,7 @@
 
                 <!-- Common response actions -->
                 <xforms:action ev:event="xforms-submit-done xforms-submit-error" ev:observer="fb-test-service-submission">
-                    <xforms:toggle case="fb-submission-dialog-response"/>
+                    <xforms:toggle case="fb-service-dialog-response"/>
                     <xforms:action context="$instance/response">
                         <xforms:setvalue ref="resource-uri" value="event('resource-uri')"/>
                         <xforms:setvalue ref="status-code" value="event('response-status-code')"/>
@@ -249,8 +249,8 @@
                 <!-- Save changes to form -->
                 <xforms:action ev:event="DOMActivate">
                     <!-- Actual id of the submission and instance -->
-                    <xxforms:variable name="submission-id" select="concat($instance/id, '-submission')"/>
-                    <xxforms:variable name="instance-id" select="concat($instance/id, '-instance')"/>
+                    <xxforms:variable name="submission-id" select="$instance/submission-id"/>
+                    <xxforms:variable name="instance-id" select="$instance/instance-id"/>
 
                     <!-- Insert new submission if needed -->
                     <xforms:action if="not(exists($model/xforms:submission[@id = $submission-id]))">
@@ -292,13 +292,13 @@
                     </xforms:action>
 
                     <!-- Hide dialog -->
-                    <xxforms:hide dialog="fb-submission-dialog"/>
+                    <xxforms:hide dialog="fb-service-dialog"/>
                 </xforms:action>
             </xforms:trigger>
             <xforms:trigger>
                 <xforms:label><xhtml:img src="/apps/fr/style/close.gif" alt=""/> <xhtml:span>Cancel</xhtml:span></xforms:label>
                 <!-- Hide dialog -->
-                <xxforms:hide ev:event="DOMActivate" dialog="fb-submission-dialog"/>
+                <xxforms:hide ev:event="DOMActivate" dialog="fb-service-dialog"/>
             </xforms:trigger>
         </xforms:group>
     </xhtml:div>
@@ -319,7 +319,7 @@
         <xforms:delete xxforms:iterate="$instance/response/headers/header" nodeset="."/>
 
         <!-- Toggle back response submission -->
-        <xforms:toggle case="fb-submission-dialog-none"/>
+        <xforms:toggle case="fb-service-dialog-none"/>
 
         <!-- Copy parameters if any -->
         <xforms:action if="$submission-name">
@@ -339,7 +339,7 @@
         </xforms:action>
 
         <!-- Set focus to first input -->
-        <xforms:setfocus control="fb-submission-name-input"/>
+        <xforms:setfocus control="fb-service-name-input"/>
     </xforms:action>
 
     <!-- Model for the submission editor -->
@@ -405,12 +405,12 @@
 
         <!-- Template for inserting a submission -->
         <xforms:instance id="fb-submission-template" xxforms:readonly="true">
-            <xforms:submission id="" ref="" resource="" method="get" serialization="application/xml" mediatype="application/xml" replace="text" target=""/>
+            <xforms:submission id="" class="fr-service" ref="" resource="" method="get" serialization="application/xml" mediatype="application/xml" replace="text" target=""/>
         </xforms:instance>
 
         <!-- Template for inserting an instance-->
         <xforms:instance id="fb-instance-template" xxforms:readonly="true">
-            <xforms:instance id="">
+            <xforms:instance id="" class="fr-service">
                 <submission>
                     <request/>
                     <response/>

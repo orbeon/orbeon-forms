@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Copyright (C) 2008 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xxforms:dialog xmlns:xhtml="http://www.w3.org/1999/xhtml"
+      xmlns:xforms="http://www.w3.org/2002/xforms"
+      xmlns:xs="http://www.w3.org/2001/XMLSchema"
+      xmlns:ev="http://www.w3.org/2001/xml-events"
+      xmlns:xi="http://www.w3.org/2001/XInclude"
+      xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+      xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+      xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+      xmlns:saxon="http://saxon.sf.net/"
+
+      id="fb-section-details-dialog" appearance="minimal" model="fb-section-details-model">
+
+    <xforms:label>Edit Section Details</xforms:label>
+
+    <xhtml:div>
+        <xforms:input ref="section-name" incremental="true" id="fb-section-name-input">
+            <xforms:label>Section Name</xforms:label>
+            <xforms:alert>Name is already in use or incorrect</xforms:alert>
+            <!-- Close and save upon DOMActivate -->
+            <xforms:dispatch ev:event="DOMActivate" name="xxforms-dialog-close" target="fb-section-details-dialog"/>
+        </xforms:input>
+
+        <xhtml:div class="fr-dialog-buttons">
+            <xforms:trigger ref="save-trigger">
+                <xforms:label>Apply</xforms:label>
+                <!-- Close and save upon DOMActivate -->
+                <xforms:dispatch ev:event="DOMActivate" name="xxforms-dialog-close" target="fb-section-details-dialog"/>
+            </xforms:trigger>
+            or
+            <xforms:trigger appearance="minimal">
+                <xforms:label>Cancel</xforms:label>
+                <!-- Close and cancel upon DOMActivate -->
+                <xforms:dispatch ev:event="DOMActivate" name="xxforms-dialog-close" target="fb-section-details-dialog">
+                    <xxforms:context name="fb:save" select="false()"/>
+                </xforms:dispatch>
+            </xforms:trigger>
+        </xhtml:div>
+    </xhtml:div>
+
+    <!-- Save data upon close, unless explicitly prevented -->
+    <xforms:action ev:event="xxforms-dialog-close" if="not(event('fb:save') = false())">
+
+        <xxforms:variable name="instance" select="instance('fb-section-details-instance')"/>
+
+        <xxforms:variable name="old-name" select="xs:string($instance/original-section-name)"/>
+        <xxforms:variable name="new-name" select="xs:string($instance/section-name)"/>
+
+        <!-- Rename if needed -->
+        <xforms:action if="$old-name != $new-name">
+
+            <xxforms:variable name="section" select="$body//fr:section[@context = $old-name]"/>
+            <xxforms:variable name="instance-holder" select="$form-instance/*[name() = $old-name]"/>
+
+            <!-- Rename instance holder and all resources -->
+            <xforms:dispatch name="fb-rename-holders" target="fr-form-model">
+                <xxforms:context name="holders" select="($instance-holder, $resources/resource/*[name() = $old-name])"/>
+                <xxforms:context name="new-name" select="$new-name"/>
+            </xforms:dispatch>
+
+            <!-- Update section id and bindings -->
+            <xforms:dispatch name="fb-rename-section" target="fb-section-details-model">
+                <xxforms:context name="fb:old-name" select="$old-name"/>
+                <xxforms:context name="fb:new-name" select="$new-name"/>
+            </xforms:dispatch>
+
+            <!-- No binds for sections for now -->
+        </xforms:action>
+
+        <!-- No classes for sections for now -->
+
+    </xforms:action>
+
+    <!-- Show and initialize dialog -->
+    <xforms:action ev:event="xxforms-dialog-open">
+        <!-- Copy over values -->
+        <xxforms:variable name="instance" select="instance('fb-section-details-instance')"/>
+
+        <xxforms:variable name="section-name" select="event('fr:section-name')"/>
+
+        <xforms:setvalue ref="$instance/section-name" value="$section-name"/>
+        <xforms:setvalue ref="$instance/original-section-name" value="$section-name"/>
+
+        <!-- Set focus when the dialog open  -->
+        <xforms:setfocus control="fb-section-name-input"/>
+    </xforms:action>
+
+    <xforms:model id="fb-section-details-model">
+
+        <xxforms:variable name="body" select="xxforms:instance('fr-form-instance')/xhtml:body/fr:view/fr:body"/>
+
+        <xforms:instance id="fb-section-details-instance">
+            <details>
+                <original-section-name/>
+                <section-name/>
+                <save-trigger/>
+            </details>
+        </xforms:instance>
+
+        <xforms:bind nodeset="instance('fb-section-details-instance')">
+            <xforms:bind nodeset="section-name"
+                         constraint=". = ../original-section-name
+                                        or not(concat(normalize-space(), '-section') = $body//fr:section/@id)
+                                            and not(concat(normalize-space(), '-control') = $body//xforms:*/@id)" type="xs:NCName"/>
+            <xforms:bind nodeset="save-trigger" readonly=". = 'disabled'"/>
+        </xforms:bind>
+
+        <!-- Enable/disable trigger -->
+        <xforms:setvalue ev:event="xxforms-invalid" ev:observer="fb-section-details-instance" ref="save-trigger">disabled</xforms:setvalue>
+        <xforms:setvalue ev:event="xxforms-valid" ev:observer="fb-section-details-instance" ref="save-trigger">enabled</xforms:setvalue>
+
+        <!-- Rename section bindings -->
+        <xforms:action ev:event="fb-rename-section">
+            <xxforms:variable name="old-name" select="event('fb:old-name')"/>
+            <xxforms:variable name="new-name" select="event('fb:new-name')"/>
+
+            <xxforms:variable name="section" select="$body//fr:section[@context = $old-name]"/>
+            <xforms:action context="$section">
+                <!-- Set @id value -->
+                <xforms:setvalue ref="@id" value="concat($new-name, '-section')"/>
+
+                <!-- Set @contxt value if present -->
+                <xforms:setvalue ref="@context" value="$new-name"/>
+
+                <!-- Set @bind value if present -->
+                <xforms:setvalue ref="@bind" value="concat($new-name, '-bind')"/>
+
+                <!-- Set xforms:label, xforms:hint, xforms:help and xforms:alert @ref -->
+                <xforms:action xxforms:iterate="(xforms:label, xforms:hint, xforms:help, xforms:alert)[@ref = '' or starts-with(@ref, '$form-resources')]">
+                    <xxforms:variable name="local-name" select="local-name()"/>
+                    <xforms:setvalue ref="@ref" value="concat('$form-resources/', $new-name, '/', $local-name)"/>
+                </xforms:action>
+            </xforms:action>
+        </xforms:action>
+
+    </xforms:model>
+
+</xxforms:dialog>

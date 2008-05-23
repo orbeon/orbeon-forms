@@ -549,6 +549,7 @@
     </xforms:action>
 
     <!-- Details dialog -->
+    <!-- TODO: Move this to dialog and refactor following dialog-section-details.xml -->
     <xforms:instance id="fb-details-editor-instance">
         <details>
             <original-control-name/>
@@ -561,8 +562,12 @@
     </xforms:instance>
 
     <xforms:bind nodeset="instance('fb-details-editor-instance')">
-        <xforms:bind nodeset="control-name" constraint=". = ../original-control-name or not(concat(normalize-space(), '-control') = $body//xforms:*/@id)" type="xs:NCName"/>
-        <xforms:bind nodeset="change-trigger" readonly="../control-name != ../original-control-name and concat(normalize-space(../control-name), '-control') = $body//xforms:*/@id"/>
+        <xforms:bind nodeset="control-name"
+                         constraint=". = ../original-control-name
+                                        or not(concat(normalize-space(), '-section') = $body//fr:section/@id)
+                                            and not(concat(normalize-space(), '-control') = $body//xforms:*/@id)" type="xs:NCName"/>
+            <xforms:bind nodeset="change-trigger" readonly="not(xxforms:valid(../control-name))"/>
+
     </xforms:bind>
 
     <!-- Validation dialog -->

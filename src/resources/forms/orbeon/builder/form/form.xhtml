@@ -201,18 +201,29 @@
                                     <fr:section id="fb-top-level-section" editable="true">
                                         <xforms:label ref="$current-resources/*[name() = $section-name]/label"/>
                                         <xforms:hint>click to enter a section name</xforms:hint>
+                                        <fr:buttons>
+                                            <xforms:trigger appearance="minimal" class="fr-inplace-delete">
+                                                <xforms:label><xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/bin.png" alt="Delete" title="Delete"/></xforms:label>
+                                                <!-- Show confirmation dialog -->
+                                                <xxforms:show ev:event="DOMActivate" dialog="fb-confirmation-dialog">
+                                                    <xxforms:context name="fr:message"
+                                                                     select="concat('Are you sure you want to delete the current section? ',
+                                                                            count(context()/*/xhtml:tr/xhtml:td[xforms:*]),
+                                                                            ' controls will be deleted.')"/>
 
-                                        <!-- Respond to fr-delete event to delete the current section -->
-                                        <xforms:action ev:event="fr-delete">
-                                            <xxforms:show dialog="fb-confirmation-dialog">
-                                                <xxforms:context name="fr:message"
-                                                                 select="concat('Are you sure you want to delete the current section? ',
-                                                                        count(context()/*/xhtml:tr/xhtml:td[xforms:*]),
-                                                                        ' controls will be deleted.')"/>
+                                                    <xxforms:context name="fr:confirmation-target" select="'fb-top-level-section'"/>
+                                                </xxforms:show>
 
-                                                <xxforms:context name="fr:confirmation-target" select="'fb-top-level-section'"/>
-                                            </xxforms:show>
-                                        </xforms:action>
+                                            </xforms:trigger>
+                                            <xforms:trigger appearance="minimal" class="fr-inplace-delete">
+                                                <xforms:label><xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/cog.png" alt="Details" title="Details"/></xforms:label>
+                                                <!-- Show section details dialog -->
+                                                <xxforms:show ev:event="DOMActivate" dialog="fb-section-details-dialog" neighbor="fb-top-level-sectionxxxtodo">
+                                                    <xxforms:context name="fr:section-name" select="$section-name"/>
+                                                </xxforms:show>
+
+                                            </xforms:trigger>
+                                        </fr:buttons>
 
                                         <!-- Respond to section delete confirmation (make sure we only catch this event dispatched directly to the section element) -->
                                         <xforms:action ev:event="fb-confirmation-yes" ev:target="fb-top-level-section">
@@ -1020,8 +1031,11 @@
                 <!-- Dialog to edit itemsets -->
                 <xi:include href="oxf:/forms/orbeon/builder/form/dialog-itemsets.xml" xxi:omit-xml-base="true"/>
 
-                <!-- Edit details -->
+                <!-- Control details -->
                 <xi:include href="oxf:/forms/orbeon/builder/form/dialog-details.xml" xxi:omit-xml-base="true"/>
+
+                <!-- Section details -->
+                <xi:include href="oxf:/forms/orbeon/builder/form/dialog-section-details.xml" xxi:omit-xml-base="true"/>
 
                 <!-- Validation dialog -->
                 <xi:include href="oxf:/forms/orbeon/builder/form/dialog-validation.xml" xxi:omit-xml-base="true"/>

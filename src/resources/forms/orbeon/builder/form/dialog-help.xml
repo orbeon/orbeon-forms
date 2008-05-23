@@ -33,7 +33,7 @@
             </xforms:textarea>
             <xhtml:div class="fr-dialog-buttons">
                 <xforms:trigger class="fr-inplace-rename">
-                    <xforms:label>Change</xforms:label>
+                    <xforms:label>Apply</xforms:label>
                     <!-- Close and save upon DOMActivate -->
                     <xforms:dispatch ev:event="DOMActivate" name="xxforms-dialog-close" target="fb-edit-help-dialog"/>
                 </xforms:trigger>

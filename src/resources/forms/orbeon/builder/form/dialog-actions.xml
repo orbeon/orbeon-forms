@@ -22,7 +22,7 @@
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
       xmlns:saxon="http://saxon.sf.net/"
 
-      id="fb-bindings-dialog" level="modal" close="true" draggable="true" class="fr-dialog" model="fb-bindings-model">
+      id="fb-action-dialog" level="modal" close="true" draggable="true" class="fr-dialog" model="fb-bindings-model">
 
     <xforms:label>Actions Editor</xforms:label>
 
@@ -153,15 +153,17 @@
                             <xhtml:td>
                                 <xforms:group>
                                     <xforms:label>Itemset</xforms:label>
-                                    <xforms:input ref="xxforms:variable[@name = 'response-items']/@select">
-                                        <xforms:label>Items</xforms:label>
-                                    </xforms:input>
-                                    <xforms:input ref=".//xxforms:variable[@name = 'item-label']/@select">
-                                        <xforms:label>Label</xforms:label>
-                                    </xforms:input>
-                                    <xforms:input ref=".//xxforms:variable[@name = 'item-value']/@select">
-                                        <xforms:label>Value</xforms:label>
-                                    </xforms:input>
+                                    <xhtml:div class="fb-parameters">
+                                        <xforms:input ref="xxforms:variable[@name = 'response-items']/@select">
+                                            <xforms:label>Items</xforms:label>
+                                        </xforms:input>
+                                        <xforms:input ref=".//xxforms:variable[@name = 'item-label']/@select">
+                                            <xforms:label>Label</xforms:label>
+                                        </xforms:input>
+                                        <xforms:input ref=".//xxforms:variable[@name = 'item-value']/@select">
+                                            <xforms:label>Value</xforms:label>
+                                        </xforms:input>
+                                    </xhtml:div>
                                 </xforms:group>
                             </xhtml:td>
                         </xhtml:tr>
@@ -228,13 +230,13 @@
                     <xforms:insert context="$model" nodeset="*" origin="$instance/xforms:action[1]"/>
 
                     <!-- Hide dialog -->
-                    <xxforms:hide dialog="fb-bindings-dialog"/>
+                    <xxforms:hide dialog="fb-action-dialog"/>
                 </xforms:action>
             </xforms:trigger>
             <xforms:trigger>
                 <xforms:label><xhtml:img src="/apps/fr/style/close.gif" alt=""/> <xhtml:span>Cancel</xhtml:span></xforms:label>
                 <!-- Hide dialog -->
-                <xxforms:hide ev:event="DOMActivate" dialog="fb-bindings-dialog"/>
+                <xxforms:hide ev:event="DOMActivate" dialog="fb-action-dialog"/>
             </xforms:trigger>
         </xforms:group>
     </xhtml:div>
@@ -298,7 +300,7 @@
                 <!-- xforms-submit-serialize -->
                 <xforms:bind nodeset="xforms:action[@ev:event = 'xforms-submit-serialize']">
                     <xforms:bind nodeset="@ev:observer" calculate="../../xforms:action[1]/xforms:send/@submission"/>
-                    <!--<xforms:bind nodeset="@context" calculate="concat('saxon:parse(instance(''', substring-before(../@ev:observer, '-submission'), '-instance'')/response)')"/>-->
+                    <xforms:bind nodeset="xxforms:variable[@name = 'serialization']/@select" calculate="concat('''', , '''')"/>
                     <xforms:bind nodeset="xforms:setvalue/@ref | xforms:setvalue/@value" required="true()"/>
                 </xforms:bind>
                 <!-- xforms-submit-done -->
@@ -335,7 +337,11 @@
                         <!-- Setvalue actions will be here -->
                     </xforms:action>
                     <!-- Serialize request document -->
-                    <xforms:setvalue ref="event('submission-body')" value="saxon:serialize($request-document, xxforms:instance('fr-xsl-output-instance'))"/>
+                    <!-- TODO: revert to a solution where we use the submissions's serialization. Use global request and response instances. -->
+                    <xxforms:variable name="serialization" select="event('xxforms:serialization')"/>
+                    <xxforms:variable name="submission-body" select="event('submission-body')"/>
+                    <xforms:setvalue if="$serialization = 'application/xml'" ref="$submission-body" value="saxon:serialize($request-document, xxforms:instance('fr-xsl-output-instance'))"/>
+                    <xforms:setvalue if="not($serialization = 'application/xml')" ref="$submission-body" value="xxforms:form-urlencode($request-document)"/>
                 </xforms:action>
                 <!-- Response actions -->
                 <xforms:action ev:event="xforms-submit-done" ev:observer="SET ME" context="SET ME">

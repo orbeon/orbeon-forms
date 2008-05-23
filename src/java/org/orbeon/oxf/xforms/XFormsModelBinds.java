@@ -525,19 +525,18 @@ public class XFormsModelBinds {
             try {
                 // Get MIP value
                 final String xpath = "boolean(" + bind.getConstraint() + ")";
-                final Boolean valid = (Boolean) XPathCache.evaluateSingle(pipelineContext,
+                final boolean valid = ((Boolean) XPathCache.evaluateSingle(pipelineContext,
                     nodeset, position, xpath, containingDocument.getNamespaceMappings(bind.getBindElement()), getVariables(currentNodeInfo),
-                    XFormsContainingDocument.getFunctionLibrary(), contextStack.getFunctionContext(), bind.getLocationData().getSystemID(), bind.getLocationData());
+                    XFormsContainingDocument.getFunctionLibrary(), contextStack.getFunctionContext(), bind.getLocationData().getSystemID(), bind.getLocationData())).booleanValue();
 
                 // Update node with MIP value
-                InstanceData.updateConstraint(currentNodeInfo, valid.booleanValue());
+                InstanceData.updateConstraint(currentNodeInfo, valid);
             } catch (Exception e) {
                 throw ValidationException.wrapException(e, new ExtendedLocationData(bind.getLocationData(), "evaluating XForms constraint bind",
                         bind.getBindElement(), new String[] { "expression", bind.getConstraint() }));
             }
         }
 
-        boolean isMarkedInvalid = false;
         String nodeValue = null;
 
         // Handle required MIP
@@ -548,7 +547,6 @@ public class XFormsModelBinds {
             if ("".equals(nodeValue)) {
                 // ...and empty
                 InstanceData.updateValueValid(currentNodeInfo, false, bind.getId());
-                isMarkedInvalid = true;
             }
         }
 
@@ -629,7 +627,6 @@ public class XFormsModelBinds {
                         // Set error on node if necessary
                         if (result instanceof ValidationErrorValue) {
                             InstanceData.updateValueValid(currentNodeInfo, false, bind.getId());
-                            isMarkedInvalid = true;
                         }
                     } else if (isBuiltInXXFormsType) {
                         // Built-in extension types
@@ -638,7 +635,6 @@ public class XFormsModelBinds {
                             // xxforms:xml type
                             if (!XMLUtils.isWellFormedXML(nodeValue)) {
                                 InstanceData.updateValueValid(currentNodeInfo, false, bind.getId());
-                                isMarkedInvalid = true;
                             }
 
                         } else {
@@ -655,7 +651,6 @@ public class XFormsModelBinds {
                         // Set error on node if necessary
                         if (validationError != null) {
                             InstanceData.addSchemaError(currentNodeInfo, validationError, nodeValue, bind.getId());
-                            isMarkedInvalid = true;
                         }
                     } else {
                         throw new ValidationException("Invalid schema type '" + bind.getType() + "'", bind.getLocationData());
@@ -668,7 +663,7 @@ public class XFormsModelBinds {
         }
 
         // Remember invalid instances
-        if (isMarkedInvalid) {
+        if (!InstanceData.getValid(currentNodeInfo)) {
             final XFormsInstance instanceForNodeInfo = containingDocument.getInstanceForNode(currentNodeInfo);
             invalidInstances.put(instanceForNodeInfo.getId(), "");
         }

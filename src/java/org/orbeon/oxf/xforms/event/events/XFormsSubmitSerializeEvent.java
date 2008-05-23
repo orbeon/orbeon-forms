@@ -21,6 +21,7 @@ import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.saxon.om.*;
+import org.orbeon.saxon.value.StringValue;
 import org.dom4j.Element;
 import org.dom4j.Document;
 
@@ -39,17 +40,21 @@ import java.util.Collections;
 public class XFormsSubmitSerializeEvent extends XFormsEvent {
 
     private static final String XXFORMS_BINDING_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "binding");
+    private static final String XXFORMS_SERIALIZATION_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "serialization");
 
     private NodeInfo boundNode;
+    private String requestedSerialization;
+
     private Element submissionBodyElement;
 
     public XFormsSubmitSerializeEvent(final XFormsEventTarget targetObject) {
         super(XFormsEvents.XFORMS_SUBMIT_SERIALIZE, targetObject, true, false);
     }
 
-    public XFormsSubmitSerializeEvent(final XFormsEventTarget targetObject, NodeInfo boundNode) {
+    public XFormsSubmitSerializeEvent(final XFormsEventTarget targetObject, NodeInfo boundNode, String requestedSerialization) {
         super(XFormsEvents.XFORMS_SUBMIT_SERIALIZE, targetObject, true, false);
         this.boundNode = boundNode;
+        this.requestedSerialization = requestedSerialization;
     }
 
     public SequenceIterator getAttribute(String name) {
@@ -71,6 +76,9 @@ public class XFormsSubmitSerializeEvent extends XFormsEvent {
                 return new ListIterator(Collections.singletonList(boundNode));
             else
                 return EmptyIterator.getInstance();
+        } else if (XXFORMS_SERIALIZATION_ATTRIBUTE.equals(name)) {
+            // Return the requested serialization
+            return new ListIterator(Collections.singletonList(new StringValue(requestedSerialization)));
         } else {
             return super.getAttribute(name);
         }

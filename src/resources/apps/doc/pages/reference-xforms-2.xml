@@ -711,6 +711,28 @@
                         </p>
                     </li>
                 </ul>
+                <p>
+                    On <code>xforms-submit-serialize</code>, the following extension attributes are supported:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            <code>event('xxforms:binding') as node()?</code>
+                        </p>
+                        <p>
+                            Return the submission's single-node binding if any.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>event('xxforms:serialization') as xs:string</code>
+                        </p>
+                        <p>
+                            Return the submission's requested serialization, e.g. <code>application/xml</code>,
+                            <code>application/x-www-form-urlencoded</code>, etc..
+                        </p>
+                    </li>
+                </ul>
             </section>
             <a name="dispatch-context"/>
             <section>

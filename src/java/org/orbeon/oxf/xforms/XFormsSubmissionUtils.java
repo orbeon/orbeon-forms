@@ -305,11 +305,11 @@ public class XFormsSubmissionUtils {
                 // Write request body if needed
                 if (hasRequestBody) {
                     if (XFormsServer.logger.isDebugEnabled()) {
-                        if (XMLUtils.isXMLMediatype(mediatype)) {
-                            containingDocument.logDebug("submission", "setting XML request body",
-                                new String[] { "body", new String(messageBody, "UTF-8")});
+                        if (XMLUtils.isXMLMediatype(mediatype) || XMLUtils.isTextContentType(mediatype) || mediatype.equals("application/x-www-form-urlencoded")) {
+                            containingDocument.logDebug("submission", "setting request body",
+                                new String[] { "mediatype", mediatype, "body", new String(messageBody, "UTF-8")});
                         } else {
-                            containingDocument.logDebug("submission", "setting binary request body");
+                            containingDocument.logDebug("submission", "setting binary request body", new String[] { "mediatype", mediatype });
                         }
                     }
 
@@ -506,6 +506,49 @@ public class XFormsSubmissionUtils {
             }
         }
         return true;
+    }
+
+    /**
+     * Create an application/x-www-form-urlencoded string, encoded in UTF-8, based on the elements and text content
+     * present in an XML document.
+     *
+     * @param document      document to analyze
+     * @param separator     separator character
+     * @return              application/x-www-form-urlencoded string
+     */
+    public static String createWwwFormUrlEncoded(final Document document, final String separator) {
+
+        final StringBuffer sb = new StringBuffer();
+        document.accept(new VisitorSupport() {
+            public final void visit(Element element) {
+                // We only care about elements
+
+                final List children = element.elements();
+                if (children == null || children.size() == 0) {
+                    // Only consider leaves
+                    final String text = element.getText();
+                    if (text != null && text.length() > 0) {
+                        // Got one!
+                        final String localName = element.getName();
+
+                        if (sb.length() > 0)
+                            sb.append(separator);
+
+                        try {
+                            sb.append(URLEncoder.encode(localName, "UTF-8"));
+                            sb.append('=');
+                            sb.append(URLEncoder.encode(text, "UTF-8"));
+                            // TODO: check if line breaks will be correcly encoded as "%0D%0A"
+                        } catch (UnsupportedEncodingException e) {
+                            // Should not happen: UTF-8 must be supported
+                            throw new OXFException(e);
+                        }
+                    }
+                }
+            }
+        });
+
+        return sb.toString();
     }
 }
 

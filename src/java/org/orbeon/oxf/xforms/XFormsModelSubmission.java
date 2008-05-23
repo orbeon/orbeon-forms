@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms;
 import org.apache.log4j.Logger;
 import org.dom4j.*;
 import org.dom4j.io.DocumentSource;
-import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -549,6 +548,9 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                     documentToSubmit = initialDocumentToSubmit;
                 }
 
+                // Get serialization requested from @method and @serialization attributes
+                final String requestedSerialization = getRequestedSerialization(resolvedSerialization, resolvedMethod);
+
                 final String overriddenSerializedData;
                 if (serialize && !isDeferredSubmissionSecondPassReplaceAll) { // we don't want any changes to happen to the document upon xxforms-submit when producing a new document
                     // Fire xforms-submit-serialize
@@ -559,7 +561,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                     // consists of a serialization of the selected instance data according to the rules stated at 11.9
                     // Submission Options."
 
-                    final XFormsSubmitSerializeEvent serializeEvent = new XFormsSubmitSerializeEvent(XFormsModelSubmission.this, boundNodeInfo);
+                    final XFormsSubmitSerializeEvent serializeEvent = new XFormsSubmitSerializeEvent(XFormsModelSubmission.this, boundNodeInfo, requestedSerialization);
                     containingDocument.dispatchEvent(pipelineContext, serializeEvent);
 
                     // TODO: rest of submission should happen upon default action of event
@@ -574,8 +576,6 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 final String queryString;
                 final String defaultMediatypeForSerialization;
                 if (serialize) {
-                    // Get actual serialization from method attribute, unless serialization is explicitly set
-                    final String actualSerialization = getActualSerialization(resolvedSerialization, resolvedMethod);
 
                     if (overriddenSerializedData != null && !overriddenSerializedData.equals("")) {
                         // Form author set data to serialize
@@ -588,19 +588,19 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                             messageBody = null;
                             defaultMediatypeForSerialization = null;
                         }
-                    } else if (actualSerialization.equals("application/x-www-form-urlencoded")) {
+                    } else if (requestedSerialization.equals("application/x-www-form-urlencoded")) {
                         // Perform "application/x-www-form-urlencoded" serialization
                         if (actualHttpMethod.equals("POST") || actualHttpMethod.equals("PUT")) {
                             queryString = null;
-                            messageBody = createWwwFormUrlEncoded(documentToSubmit, resolvedSeparator).getBytes("UTF-8");// the resulting string is already ASCII in fact
+                            messageBody = XFormsSubmissionUtils.createWwwFormUrlEncoded(documentToSubmit, resolvedSeparator).getBytes("UTF-8");// the resulting string is already ASCII in fact
                             defaultMediatypeForSerialization = "application/x-www-form-urlencoded";
                         } else {
-                            queryString = createWwwFormUrlEncoded(documentToSubmit, resolvedSeparator);
+                            queryString = XFormsSubmissionUtils.createWwwFormUrlEncoded(documentToSubmit, resolvedSeparator);
                             messageBody = null;
                             defaultMediatypeForSerialization = null;
                         }
-                    } else if (actualSerialization.equals("application/xml")) {
-                        if (XMLUtils.isXMLMediatype(actualSerialization)) {
+                    } else if (requestedSerialization.equals("application/xml")) {
+                        if (XMLUtils.isXMLMediatype(requestedSerialization)) {
                             // XML serialization
 
                             // Serialize XML to a stream of bytes
@@ -618,7 +618,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                 throw new XFormsSubmissionException(e, "xforms:submission: exception while serializing instance to XML.", "serializing instance");
                             }
                             defaultMediatypeForSerialization = "application/xml";
-                        } else if (XMLUtils.isTextContentType(actualSerialization)) {
+                        } else if (XMLUtils.isTextContentType(requestedSerialization)) {
                             // Text serialization
                             // TODO
                             throw new XFormsSubmissionException("xforms:submission: text serialization is not yet implemented.", "serializing instance");
@@ -642,17 +642,17 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                             defaultMediatypeForSerialization = "application/octet-stream";
                         }
                         queryString = null;
-                    } else if (actualSerialization.equals("multipart/related")) {
+                    } else if (requestedSerialization.equals("multipart/related")) {
                         // TODO
-                        throw new XFormsSubmissionException("xforms:submission: submission serialization not yet implemented: " + actualSerialization, "serializing instance");
-                    } else if (actualSerialization.equals("multipart/form-data")) {
+                        throw new XFormsSubmissionException("xforms:submission: submission serialization not yet implemented: " + requestedSerialization, "serializing instance");
+                    } else if (requestedSerialization.equals("multipart/form-data")) {
                         // TODO
 
 //                        final MultipartFormDataBuilder builder = new MultipartFormDataBuilder(, , null);
 
-                        throw new XFormsSubmissionException("xforms:submission: submission serialization not yet implemented: " + actualSerialization, "serializing instance");
+                        throw new XFormsSubmissionException("xforms:submission: submission serialization not yet implemented: " + requestedSerialization, "serializing instance");
                     } else {
-                        throw new XFormsSubmissionException("xforms:submission: invalid submission serialization requested: " + actualSerialization, "serializing instance");
+                        throw new XFormsSubmissionException("xforms:submission: invalid submission serialization requested: " + requestedSerialization, "serializing instance");
                     }
                 } else {
                     queryString = null;
@@ -1055,7 +1055,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
         }
     }
 
-    private String getActualSerialization(String submissionSerializationAttribute, String submissionMethodAttribute) {
+    private String getRequestedSerialization(String submissionSerializationAttribute, String submissionMethodAttribute) {
         final String actualSerialization;
         if (submissionSerializationAttribute == null) {
             if (submissionMethodAttribute.equals("multipart-post")) {
@@ -1183,41 +1183,6 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
             }
         }
         return documentToSubmit;
-    }
-
-    private String createWwwFormUrlEncoded(final Document document, final String separator) {
-
-        final StringBuffer sb = new StringBuffer();
-        document.accept(new VisitorSupport() {
-            public final void visit(Element element) {
-                // We only care about elements
-
-                final List children = element.elements();
-                if (children == null || children.size() == 0) {
-                    // Only consider leaves
-                    final String text = element.getText();
-                    if (text != null && text.length() > 0) {
-                        // Got one!
-                        final String localName = element.getName();
-
-                        if (sb.length() > 0)
-                            sb.append(separator);
-
-                        try {
-                            sb.append(URLEncoder.encode(localName, "UTF-8"));
-                            sb.append('=');
-                            sb.append(URLEncoder.encode(text, "UTF-8"));
-                            // TODO: check if line breaks will be correcly encoded as "%0D%0A"
-                        } catch (UnsupportedEncodingException e) {
-                            // Should not happen: UTF-8 must be supported
-                            throw new OXFException(e);
-                        }
-                    }
-                }
-            }
-        });
-
-        return sb.toString();
     }
 
     private XFormsSubmitErrorEvent createErrorEvent(PipelineContext pipelineContext, ConnectionResult connectionResult, ErrorType errorType) throws IOException {

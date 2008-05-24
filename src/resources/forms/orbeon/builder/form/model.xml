@@ -29,8 +29,16 @@
     <xforms:action ev:event="xforms-model-construct-done">
         <xxforms:variable name="user-agent" select="xxforms:get-request-header('user-agent')"/>
         <xforms:setvalue ref="instance('fb-user-agent-instance')/value" value="$user-agent"/>
-        <xforms:setvalue ref="instance('fb-user-agent-instance')/is-ie"
-                         value="contains(lower-case($user-agent), 'msie') and not(contains(lower-case($user-agent), 'opera'))"/>
+        <!-- IE detection -->
+        <xxforms:variable name="is-ie" select="contains(lower-case($user-agent), 'msie') and not(contains(lower-case($user-agent), 'opera'))"/>
+        <xforms:setvalue ref="instance('fb-user-agent-instance')/is-ie" value="$is-ie"/>
+        <!-- Try to find IE version -->
+        <xforms:action if="$is-ie">
+            <xxforms:variable name="msie" select="(for $t in tokenize(lower-case($user-agent), '[;\(\)]') return normalize-space($t))[starts-with(., 'msie')][1]"/>
+            <xxforms:variable name="ie-version" select="xs:integer(substring-before(normalize-space(substring-after($msie, 'msie')), '.'))"/>
+            <xforms:setvalue ref="instance('fb-user-agent-instance')/ie-version" value="$ie-version"/>
+            <xforms:setvalue ref="instance('fb-user-agent-instance')/is-supported-ie" value="$ie-version = (7, 8)"/>
+        </xforms:action>
     </xforms:action>
 
     <xforms:action ev:event="xforms-ready">
@@ -205,6 +213,8 @@
         <user-agent>
             <value/>
             <is-ie/>
+            <ie-version/>
+            <is-supported-ie/>
         </user-agent>
     </xforms:instance>
 

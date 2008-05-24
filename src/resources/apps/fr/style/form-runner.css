@@ -1,6 +1,4 @@
-/* IE em factor: 0.9759 */
-
-html { overflow: scroll; }
+/* ************************************************** IE 6 hack for PNG ************************************************** */
 
 /* IE 6 HACK: bind behavior from iepngfix.htc */
 #fr-view .fr-top, #fr-view .fr-bottom,
@@ -16,9 +14,12 @@ html { overflow: scroll; }
     /*;border: 10px solid red*/
 }
 
-body {
-    background-color: #FFE27F;
-}
+/* ************************************************** Basic HTML settings ************************************************** */
+
+/* NOTE: IE em factor: 0.9759 */
+
+html { overflow: scroll }
+body { background-color: #FFE27F }
 
 body, body table, textarea.xforms-textarea {
     font-family: "Lucida Grande", Tahoma, Arial, Verdana, sans-serif;
@@ -26,11 +27,6 @@ body, body table, textarea.xforms-textarea {
 
 #fr-view .fr-hidden { display: none }
 .fr-clear { clear: both }
-
-.xforms-help-image { vertical-align: -0.2em; display: inline; margin: 0 .5em 0 0; padding: 0;
-    float: left; /* Without the "float: left" on FF2/3 the mouseover event arrive on the label, not the help
-                    image at the left of the label. */
-}
 
 .fr-top { line-height: 10px; }
 #doc .fr-top { background-image: url(top-750.png); }
@@ -111,6 +107,11 @@ h1 { margin-top: 0 }
 .fr-summary-language-choice { margin-right: 1em; margin-top: .2em; color: gray; font-size: 85%; text-align: right; }
 .fr-summary-language-choice a { color: gray }
 .fr-summary-language-choice .xforms-label { display: inline; margin-right: .5em }
+
+.xforms-help-image { vertical-align: -0.2em; display: inline; margin: 0 .5em 0 0; padding: 0;
+    float: left; /* Without the "float: left" on FF2/3 the mouseover event arrive on the label, not the help
+                    image at the left of the label. */
+}
 
 .xforms-label, h4  { font-weight: bold; text-align: left; }
 
@@ -266,14 +267,17 @@ hr {
 
 .fr-summary-search-item { float: left; margin-right: .5em }
 
+/* Set controls background */
 .xforms-input input, textarea.xforms-textarea, input.xforms-secret {
     background-image: url(field.png);
     background-repeat: repeat-x;
     border: 1px solid #CCCCCC;
 }
 
-/*.xforms-group { display: inline }*/
-/*.xforms-help-image { display: inline }*/
+/* But for boolean inputs, no background and border (for IE) */
+.xforms-type-boolean input {
+    background: none; border: none
+}
 
 td { border: 0 }
 h1 { font-size: 197% }
@@ -402,7 +406,7 @@ div.fr-collapsible {
 #doc4 .fr-grid-3-columns .xforms-select-appearance-full span label { width: 20.2em; *width: 19em }
 #doc4 .fr-grid-4-columns .xforms-select-appearance-full span label { width: 14.5em; *width: 13.5em }
 
-/* Grid */
+/* ************************************************** Grid ************************************************** */
 
 .fr-grid {
     width: 100%;
@@ -434,6 +438,11 @@ div.fr-collapsible {
     .fr-grid .xforms-select-appearance-compact {
     width: 100%;
     -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
+}
+
+/* But for boolean inputs, don't size (for IE) */
+.fr-grid .xforms-type-boolean input {
+    width: auto;
 }
 
 .fr-grid .xforms-upload input { width: auto; } /* The upload field responds to 100% width on IE, which gives strange result */
@@ -473,6 +482,8 @@ div.fr-collapsible {
 
 /* Test */
 /*.xforms-required::before { content: "*"; color:red }*/
+
+/* ************************************************** Other medias ************************************************** */
 
 /* This is also used for PDF generation */
 @media print {

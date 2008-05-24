@@ -74,14 +74,20 @@
                     <xforms:setvalue ref="$variables/inplace-repeat-indexes"/>
                 </xforms:action>
 
-                <xforms:group ref=".[instance('fb-user-agent-instance')/is-ie = 'true']">
+                <!--<xforms:output ref="instance('fb-user-agent-instance')/value"/>-->
+                <xforms:group ref=".[instance('fb-user-agent-instance')/is-ie = 'true' and instance('fb-user-agent-instance')/is-supported-ie != 'true']">
                     <xforms:switch>
                         <xforms:case id="fb-ie-warning-case-on">
                             <xhtml:div class="fb-ie-warning">
-                                Orbeon Form Builder still needs work to provide a satisfactory experience with Internet Explorer.
-                                Please bear with us while we fix this. In the meanwhile, we recommend you use <a
+
+                                It appears that you are using Internet Explorer 6 or earlier. We recommend you upgrade
+                                to Internet Explorer 7 or later, or use <a
                                 href="http://www.mozilla.com/firefox/">Firefox</a>, <a
-                                href="http://www.apple.com/safari/">Safari</a>, or <a href="http://www.opera.com/">Opera</a>.
+                                href="http://www.apple.com/safari/">Safari</a>, or <a
+                                href="http://www.opera.com/">Opera</a>. If we made a mistake and you are not using
+                                Internet Explorer 6 or earlier, please
+                                <a href="mailto:info@orbeon.com?subject=Form Builder Internet Explorer Version">let us know</a>.
+
                                 <xforms:trigger appearance="minimal">
                                     <xforms:label>[close]</xforms:label>
                                     <xforms:toggle ev:event="DOMActivate" case="fb-ie-warning-case-off"/>
@@ -110,25 +116,6 @@
                 <xhtml:div id="fb-metadata-section" class="fb-metadata-section fr-section-container">
                 <!--<fr:section id="fb-metadata-section" class="fb-metadata-section">-->
                     <!--<xforms:label>About this Form</xforms:label>-->
-
-                    <!--<fr:grid columns="2" class="fb-metadata-names">-->
-                        <!--<xhtml:tr>-->
-                            <!--<xhtml:td>-->
-                                <!--<xforms:input id="application-name-control" bind="application-name-bind" appearance="fr:in-place" class="fr-summary fr-search" incremental="true">-->
-                                    <!--<xforms:label ref="$form-resources/application-name/label"/>-->
-                                    <!--<xforms:hint ref="$form-resources/application-name/hint"/>-->
-                                    <!--<xforms:alert ref="$form-resources/application-name/alert"/>-->
-                                <!--</xforms:input>-->
-                            <!--</xhtml:td>-->
-                            <!--<xhtml:td>-->
-                                <!--<xforms:input id="form-name-control" bind="form-name-bind" appearance="fr:in-place" class="fr-summary fr-search" incremental="true">-->
-                                    <!--<xforms:label ref="$form-resources/form-name/label"/>-->
-                                    <!--<xforms:hint ref="$form-resources/form-name/hint"/>-->
-                                    <!--<xforms:alert ref="$form-resources/form-name/alert"/>-->
-                                <!--</xforms:input>-->
-                            <!--</xhtml:td>-->
-                        <!--</xhtml:tr>-->
-                    <!--</fr:grid>-->
                     <fr:grid columns="2" class="fb-metadata-logo-title">
                         <xhtml:tr>
                             <xhtml:td>

@@ -48,7 +48,7 @@
                     </xhtml:div>
                 </xhtml:div>
             </xforms:group>
-            <xhtml:span class="fr-inplace-buttons">
+            <xhtml:span>
                 <xforms:trigger class="fr-inplace-rename" ref="$variables/new-language-trigger">
                     <xforms:label>Add</xforms:label>
                     <xforms:action ev:event="DOMActivate">

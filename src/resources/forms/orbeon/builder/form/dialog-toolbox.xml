@@ -32,7 +32,7 @@
             <xhtml:dd class="a-m-d a-m-d-expand">
                 <xhtml:div class="bd">
                     <!-- XVC toolbox -->
-                    <xhtml:div class="fb-toolbox fb-xvc">
+                    <xhtml:div class="fb-tools fb-xvc">
                         <xforms:trigger appearance="minimal" ref="$xcv/cut-trigger">
                             <xforms:label>
                                 <xhtml:img src="/apps/fr/style/images/silk/cut.png" alt="Cut" title="Cut"/>
@@ -73,7 +73,7 @@
                         </xforms:trigger>
                     </xhtml:div>
                     <!-- Sections, grids, etc. toolbox -->
-                    <xhtml:div class="fb-toolbox fb-tools">
+                    <xhtml:div class="fb-tools">
                         <!-- Add new section -->
                         <xhtml:div class="fb-tool">
                             <xforms:trigger>
@@ -143,7 +143,7 @@
                         </xforms:group>
                     </xhtml:div>
                     <!-- Controls toolbox -->
-                    <xhtml:div class="fb-toolbox fb-tools">
+                    <xhtml:div class="fb-tools">
                         <xforms:repeat nodeset="instance('fb-controls-template')/template" id="fb-controls-template-repeat">
 
                             <xxforms:variable name="template" select="."/>
@@ -230,7 +230,7 @@
             <xhtml:dd class="a-m-d">
                 <xhtml:div class="bd">
                     <!-- Languages toolbox -->
-                    <xhtml:div class="fb-toolbox">
+                    <xhtml:div class="fb-tools">
                         <xforms:group class="fb-language-choice fb-hide-alert">
                             <xforms:select1 appearance="minimal" ref="$fb-lang" id="fb-resources-language-select">
                                 <xforms:label>Language</xforms:label>
@@ -290,34 +290,27 @@
             </xhtml:dd>
             <xhtml:dt class="a-m-t">Metadata</xhtml:dt>
             <xhtml:dd class="a-m-d">
-                <xhtml:div class="bd fb-metadata-section" id="fb-toolbox-metadata-section">
-                    <fr:grid columns="1" class="fb-metadata-names">
-                        <xhtml:tr>
-                            <xhtml:td>
-                                <xforms:input id="application-name-control" bind="application-name-bind" appearance="fr:in-place" class="fr-summary fr-search" incremental="true">
-                                    <xforms:label ref="$form-resources/application-name/label"/>
-                                    <xforms:hint ref="$form-resources/application-name/hint"/>
-                                    <xforms:alert ref="$form-resources/application-name/alert"/>
-                                </xforms:input>
-                            </xhtml:td>
-                        </xhtml:tr>
-                        <xhtml:tr>
-                            <xhtml:td>
-                                <xforms:input id="form-name-control" bind="form-name-bind" appearance="fr:in-place" class="fr-summary fr-search" incremental="true">
-                                    <xforms:label ref="$form-resources/form-name/label"/>
-                                    <xforms:hint ref="$form-resources/form-name/hint"/>
-                                    <xforms:alert ref="$form-resources/form-name/alert"/>
-                                </xforms:input>
-                            </xhtml:td>
-                        </xhtml:tr>
-                    </fr:grid>
+                <xhtml:div class="bd">
+                    <!-- NOTE: ideally we would put an fr-grid on a <div> here, but this breaks with IE 7 and the accordion menu! -->
+                    <xhtml:div class="fr-grid-content">
+                        <xforms:input id="application-name-control" bind="application-name-bind" appearance="fr:in-place" class="fr-summary fr-search" incremental="true">
+                            <xforms:label ref="$form-resources/application-name/label"/>
+                            <xforms:hint ref="$form-resources/application-name/hint"/>
+                            <xforms:alert ref="$form-resources/application-name/alert"/>
+                        </xforms:input>
+                        <xforms:input id="form-name-control" bind="form-name-bind" appearance="fr:in-place" class="fr-summary fr-search" incremental="true">
+                            <xforms:label ref="$form-resources/form-name/label"/>
+                            <xforms:hint ref="$form-resources/form-name/hint"/>
+                            <xforms:alert ref="$form-resources/form-name/alert"/>
+                        </xforms:input>
+                    </xhtml:div>
                 </xhtml:div>
             </xhtml:dd>
             <xhtml:dt class="a-m-t">Advanced</xhtml:dt>
             <xhtml:dd class="a-m-d">
                 <xhtml:div class="bd">
                     <!-- Actions toolbox -->
-                    <xhtml:div class="fb-toolbox fb-tools">
+                    <xhtml:div class="fb-tools">
 
                         <xhtml:div class="fb-tool">
                             <!-- Upload XML Schema -->
@@ -384,7 +377,7 @@
                 <xhtml:div class="bd">
 
                     <!-- Services -->
-                    <xhtml:div class="fb-toolbox">
+                    <xhtml:div class="fb-tools">
                         <xforms:group class="fb-hide-alert">
                             <xforms:label>HTTP Services</xforms:label>
                             <!-- Repeat over existing services -->
@@ -424,7 +417,7 @@
                                     </xhtml:li>
                                 </xforms:repeat>
                             </xhtml:ul>
-                            <xforms:group class="fb-language-triggers">
+                            <xforms:group>
                                 <xforms:trigger appearance="minimal">
                                     <xforms:label>
                                         <xhtml:img src="/apps/fr/style/images/silk/add.png" alt="Add Service" title="Add Service"/>
@@ -437,7 +430,7 @@
                     </xhtml:div>
 
                     <!-- Database services -->
-                    <xhtml:div class="fb-toolbox">
+                    <xhtml:div class="fb-tools">
                         <xforms:group class="fb-hide-alert">
                             <xforms:label>Database Services</xforms:label>
                             <!-- Repeat over existing services -->
@@ -477,7 +470,7 @@
                                     </xhtml:li>
                                 </xforms:repeat>
                             </xhtml:ul>
-                            <xforms:group class="fb-language-triggers">
+                            <xforms:group>
                                 <xforms:trigger appearance="minimal">
                                     <xforms:label>
                                         <xhtml:img src="/apps/fr/style/images/silk/add.png" alt="Add Service" title="Add Service"/>
@@ -490,7 +483,7 @@
                     </xhtml:div>
 
                     <!-- Actions -->
-                    <xhtml:div class="fb-toolbox">
+                    <xhtml:div class="fb-tools">
                         <xforms:group class="fb-hide-alert">
                             <xforms:label>Actions</xforms:label>
                             <!-- Repeat over existing bindings -->
@@ -529,7 +522,7 @@
                                     </xhtml:li>
                                 </xforms:repeat>
                             </xhtml:ul>
-                            <xforms:group class="fb-language-triggers">
+                            <xforms:group>
                                 <xforms:trigger appearance="minimal">
                                     <xforms:label>
                                         <xhtml:img src="/apps/fr/style/images/silk/add.png" alt="Add Action" title="Add Action"/>

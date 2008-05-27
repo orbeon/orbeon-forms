@@ -795,27 +795,26 @@
                     </xforms:input>
                 </xhtml:div>
             </template>
-            <!--<template label="Time" image="/apps/fr/style/images/silk/clock.png">-->
-                <!--<xhtml:div class="time-input">-->
-                    <!--<xforms:input id="" ref="" incremental="true">-->
-                        <!--<xforms:label ref=""/>-->
-                        <!--<xforms:hint ref=""/>-->
-                        <!--<xforms:help ref=""/>-->
-                        <!--<xforms:alert ref="$fr-resources/detail/labels/alert"/>-->
-                    <!--</xforms:input>-->
-                <!--</xhtml:div>-->
-            <!--</template>-->
-            <!-- TODO -->
-            <!--<template label="Date and Time" image="/ops/images/xforms/calendar.png">-->
-                <!--<xhtml:div class="dateTime-input">-->
-                    <!--<xforms:input id="" ref="" incremental="true">-->
-                        <!--<xforms:label ref=""/>-->
-                        <!--<xforms:hint ref=""/>-->
-                        <!--<xforms:help ref=""/>-->
+            <template label="Time" image="/apps/fr/style/images/silk/clock.png">
+                <xhtml:div class="time-input">
+                    <xforms:input id="" ref="" incremental="true">
+                        <xforms:label ref=""/>
+                        <xforms:hint ref=""/>
+                        <xforms:help ref=""/>
                         <xforms:alert ref="$fr-resources/detail/labels/alert"/>
-                    <!--</xforms:input>-->
-                <!--</xhtml:div>-->
-            <!--</template>-->
+                    </xforms:input>
+                </xhtml:div>
+            </template>
+            <template label="Date and Time" image="/apps/fr/style/images/silk/clock_link.png">
+                <xhtml:div class="dateTime-input">
+                    <xforms:input id="" ref="" incremental="true">
+                        <xforms:label ref=""/>
+                        <xforms:hint ref=""/>
+                        <xforms:help ref=""/>
+                        <xforms:alert ref="$fr-resources/detail/labels/alert"/>
+                    </xforms:input>
+                </xhtml:div>
+            </template>
             <template label="Dropdown">
                 <xhtml:div class="dropdown">
                     <xforms:select1 id="" appearance="minimal" ref="">

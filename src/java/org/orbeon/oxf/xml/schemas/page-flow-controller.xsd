@@ -39,11 +39,15 @@
                                 </complexType>
                             </element>
                             <element name="setvalue" minOccurs="0" maxOccurs="unbounded">
-                                <complexType>
-                                    <attribute name="ref" type="string" use="required"/>
-                                    <attribute name="parameter" type="string" use="optional"/>
-                                    <attribute name="matcher-group" type="positiveInteger" use="optional"/>
-                                    <attribute name="value" type="string" use="optional"/>
+                                <complexType >
+                                    <simpleContent>
+                                        <extension base="string">
+                                            <attribute name="ref" type="string" use="required"/>
+                                            <attribute name="parameter" type="string" use="optional"/>
+                                            <attribute name="matcher-group" type="positiveInteger" use="optional"/>
+                                            <attribute name="value" type="string" use="optional"/>
+                                        </extension>
+                                    </simpleContent>
                                 </complexType>
                             </element>
                             <element name="action" minOccurs="0" maxOccurs="unbounded">
@@ -157,3 +161,6 @@
     </simpleType>
 
 </schema>
+
+
+        

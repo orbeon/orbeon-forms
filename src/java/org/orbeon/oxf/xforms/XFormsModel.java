@@ -443,6 +443,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                         }
                         if (instanceResource == null) {
                             // Inline instance
+                            final String xxformsExcludeResultPrefixes = instanceContainerElement.attributeValue(XFormsConstants.XXFORMS_EXCLUDE_RESULT_PREFIXES);
                             final List children = instanceContainerElement.elements();
                             if (children == null || children.size() != 1) {
                                 final Throwable throwable = new ValidationException("xforms:instance element must contain exactly one child element",
@@ -451,8 +452,13 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                                 break;
                             }
                             if (!isReadonlyHint) {
-                                instanceDocument = Dom4jUtils.createDocumentCopyParentNamespaces((Element) children.get(0));
+                                // TODO: Implement as per XSLT 2.0. For now, we just support #all.
+                                if ("#all".equals(xxformsExcludeResultPrefixes))
+                                    instanceDocument = Dom4jUtils.createDocument((Element) children.get(0));
+                                else
+                                    instanceDocument = Dom4jUtils.createDocumentCopyParentNamespaces((Element) children.get(0));
                             } else {
+                                // TODO: Support exclude-result-prefixes
                                 instanceDocument = TransformerUtils.dom4jToTinyTree(Dom4jUtils.createDocumentCopyParentNamespaces((Element) children.get(0)));
                             }
                             instanceSourceURI = null;

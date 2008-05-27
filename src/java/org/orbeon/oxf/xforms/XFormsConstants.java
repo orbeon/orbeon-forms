@@ -148,6 +148,7 @@ public class XFormsConstants {
     public static final QName XXFORMS_SHARED_QNAME = new QName("shared", XFormsConstants.XXFORMS_NAMESPACE);
     public static final QName XXFORMS_TIME_TO_LIVE_QNAME = new QName("ttl", XFormsConstants.XXFORMS_NAMESPACE);
     public static final QName XXFORMS_VALIDATION_QNAME = new QName("validation", XFormsConstants.XXFORMS_NAMESPACE);
+    public static final QName XXFORMS_EXCLUDE_RESULT_PREFIXES = new QName("exclude-result-prefixes", XFormsConstants.XXFORMS_NAMESPACE);
 
     public static final QName XXFORMS_INSTANCE_QNAME = new QName("instance", XFormsConstants.XXFORMS_NAMESPACE);
     public static final QName XXFORMS_SHOW_PROGRESS_QNAME = new QName("show-progress", XFormsConstants.XXFORMS_NAMESPACE);

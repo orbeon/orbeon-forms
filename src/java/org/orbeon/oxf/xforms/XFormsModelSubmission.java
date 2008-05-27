@@ -462,7 +462,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                     resolvedOmitxmldeclaration = Boolean.valueOf(tempAvtOmitxmldeclaration).booleanValue();
 
                     final String tempStandalone = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, boundNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtStandalone);
-                    resolvedStandalone = (tempActionOrResource != null) ? Boolean.valueOf(tempStandalone) : null;
+                    resolvedStandalone = (tempStandalone != null) ? Boolean.valueOf(tempStandalone) : null;
 
                     resolvedXXFormsUsername = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, boundNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtXXFormsUsername);
                     resolvedXXFormsPassword = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, boundNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtXXFormsPassword);

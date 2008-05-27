@@ -198,7 +198,7 @@
                                             </xforms:dispatch>
 
                                             <!-- Insert the bind element if needed -->
-                                            <xforms:action if="$control-type = ('date-input', 'upload', 'image')">
+                                            <xforms:action if="$control-type = ('date-input', 'time-input', 'dateTime-input', 'upload', 'image')">
                                                 <xforms:dispatch name="fb-ensure-bind" target="fr-form-model">
                                                     <xxforms:context name="control-name" select="$new-control-name"/>
                                                 </xforms:dispatch>
@@ -206,6 +206,8 @@
                                                 <xxforms:variable name="bind" select="$model//xforms:bind[@nodeset = $new-control-name]"/>
 
                                                 <xforms:insert if="$control-type = 'date-input'" context="$bind" origin="xxforms:attribute('type', 'xs:date')"/>
+                                                <xforms:insert if="$control-type = 'time-input'" context="$bind" origin="xxforms:attribute('type', 'xs:time')"/>
+                                                <xforms:insert if="$control-type = 'dateTime-input'" context="$bind" origin="xxforms:attribute('type', 'xs:dateTime')"/>
                                                 <xforms:insert if="$control-type = ('upload', 'image')" context="$bind" origin="xxforms:attribute('type', 'xs:anyURI')"/>
 
                                                 <!-- Use @bind instead of @ref -->

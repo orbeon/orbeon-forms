@@ -158,7 +158,8 @@ public class SAXLoggerProcessor extends ProcessorImpl {
         private void addLocatorInfo(FastStringBuffer message) {
             if (locator != null) {
                 message.append(" [");
-                message.append(locator.getSystemId());
+                if (locator.getSystemId() != null)
+                    message.append(locator.getSystemId());
                 message.append(", ");
                 message.append(Integer.toString(locator.getLineNumber()));
                 message.append(", ");

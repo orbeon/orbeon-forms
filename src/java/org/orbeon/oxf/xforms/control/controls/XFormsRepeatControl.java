@@ -157,6 +157,6 @@ public class XFormsRepeatControl extends XFormsControl implements XFormsContaine
 
     public boolean isDnD() {
         final String dndAttribute = getControlElement().attributeValue(XFormsConstants.XXFORMS_DND_QNAME);
-        return "true".equals(dndAttribute);
+        return !"none".equals(dndAttribute);
     }
 }

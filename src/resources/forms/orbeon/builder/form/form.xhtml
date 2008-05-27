@@ -249,7 +249,7 @@
                                         </xforms:action>
 
                                         <!-- Section content -->
-                                        <xforms:repeat nodeset="fr:section | fr:repeat | fr:grid" id="fb-section-content-repeat">
+                                        <xforms:repeat nodeset="fr:section | fr:repeat | fr:grid" id="fb-section-content-repeat" xxforms:dnd="none">
                                             <xxforms:variable name="section-content-position" select="position()"/>
                                             <xxforms:variable name="is-section-content-current"
                                                               select="$is-top-level-current and $section-content-position = index('fb-section-content-repeat')"/>
@@ -563,7 +563,7 @@
                                                                             </xhtml:div>
                                                                         </xhtml:td>
                                                                         <!-- Repeat over table columns -->
-                                                                        <xforms:repeat nodeset="xhtml:td" id="fb-section-content-grid-td-repeat" xxforms:dnd="none">
+                                                                        <xforms:repeat nodeset="xhtml:td" id="fb-section-content-grid-td-repeat" xxforms:dnd="horizontal">
 
                                                                             <xxforms:variable name="td" select="."/>
                                                                             <xxforms:variable name="td-position" select="position()"/>

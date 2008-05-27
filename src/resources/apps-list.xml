@@ -15,6 +15,10 @@
     <section label="Welcome">
         <application id="welcome" label="Welcome"/>
     </section>
+    <section label="Form Builder (ALPHA)">
+        <application id="fr/orbeon/builder" label="Form Builder (ALPHA)"/>
+        <application id="fr/orbeon/bookcast" label="Bookcast Form"/>
+    </section>
     <section label="XForms">
         <application id="forms" label="Government Forms"/>
         <application id="xforms-controls" label="XForms Controls"/>

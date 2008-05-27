@@ -13,19 +13,24 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <config xmlns="http://www.orbeon.com/oxf/controller"
-        xmlns:xu="http://www.xmldb.org/xupdate"
         xmlns:oxf="http://www.orbeon.com/oxf/processors">
+
+    <!-- Home redirects to Form Builder summary page -->
+    <page path-info="/fr/?" matcher="oxf:perl5-matcher">
+        <action>
+            <result page="summary" transform="oxf:xinclude">
+                <request xmlns="">
+                    <app>orbeon</app>
+                    <form>builder</form>
+                </request>
+            </result>
+        </action>
+    </page>
 
     <!-- ==== Pages ==== -->
 
-    <!-- Summary -->
-    <page path-info="/fr/([^/]+)/" matcher="oxf:perl5-matcher"
-          default-submission="summary/submission-page-summary.xml"
-          model="summary/view.xhtml" view="html-view.xpl">
-        <setvalue ref="/*/app" matcher-group="1"/>
-    </page>
-
-    <page path-info="/fr/([^/]+)/([^/]+)" matcher="oxf:perl5-matcher"
+    <page id="summary"
+          path-info="/fr/([^/]+)/([^/]+)/?" matcher="oxf:perl5-matcher"
           default-submission="summary/submission-page-summary.xml"
           model="summary/view.xhtml" view="html-view.xpl">
         <setvalue ref="/*/app" matcher-group="1"/>

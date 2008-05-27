@@ -76,8 +76,16 @@
                 </resources>
             </xforms:instance>
 
-        </xforms:model>
+            <!-- Utility instances for services -->
+            <xforms:instance id="fr-service-request-instance" xxforms:exclude-result-prefixes="#all">
+                <request/>
+            </xforms:instance>
 
+            <xforms:instance id="fr-service-response-instance" xxforms:exclude-result-prefixes="#all">
+                <response/>
+            </xforms:instance>
+
+        </xforms:model>
     </xhtml:head>
     <xhtml:body>
         <fr:view>

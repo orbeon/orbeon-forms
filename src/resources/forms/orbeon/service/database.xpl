@@ -18,8 +18,27 @@
     <p:param type="input" name="instance"/>
     <p:param type="output" name="data"/>
 
-    <p:processor name="oxf:identity">
-        <p:input name="data" href="#instance"/>
+    <p:processor name="oxf:sql">
+        <p:input name="data"><null xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"/></p:input>
+        <p:input name="config" href="#instance" transform="oxf:xslt">
+            <sql:config xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsl:version="2.0">
+                <response>
+                    <sql:connection>
+                        <!-- "instance" input is a sql:config with sql:datasource and sql:query -->
+                        <sql:datasource><xsl:value-of select="/*/sql:datasource"/></sql:datasource>
+                        <sql:execute>
+                            <xsl:copy-of select="/*/sql:query"/>
+                            <!-- Format output in a generic way -->
+                            <sql:result-set>
+                                <sql:row-iterator>
+                                    <row><sql:get-columns format="xml"/></row>
+                                </sql:row-iterator>
+                            </sql:result-set>
+                        </sql:execute>
+                    </sql:connection>
+                </response>
+            </sql:config>
+        </p:input>
         <p:output name="data" ref="data"/>
     </p:processor>
 

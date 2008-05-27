@@ -18,6 +18,9 @@
     <!-- Test echo service -->
     <page path-info="/fr/service/custom/orbeon/echo" view="echo.xpl"/>
 
+    <!-- Database service -->
+    <page path-info="/fr/service/custom/orbeon/database" view="database.xpl"/>
+
     <epilogue url="/config/epilogue.xpl"/>
 
 </config>

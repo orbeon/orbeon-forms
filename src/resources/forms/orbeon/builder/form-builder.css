@@ -1,7 +1,7 @@
 /*body { background-image: url(../../../forms/orbeon/builder/images/background.png); background-repeat: repeat; }*/
 
-#fr-view { margin-left: 195px }/* because the toolbar is on the left */
-.yui-t2 #yui-main .yui-b { margin-left: 13.8456em; *margin-left: 13.4995; border-left: 1px solid #ccc }
+#fr-view { margin-left: 15.5em; *margin-left: 15.126 }/* because the toolbox is on the left */
+/*.yui-t2 #yui-main .yui-b { margin-left: 13.8456em; *margin-left: 13.4995; border-left: 1px solid #ccc }*/
 
 .xforms-select table { margin-bottom: 0 }
 
@@ -39,8 +39,9 @@ a.fb-edit-help-trigger img {
 }
 
 #fb-toolbox .fb-toolbox-inside {
-    width: 160px;
+    width: 13.077em; *width: 12.75em;
     margin-right: 15px;
+    padding-bottom: 1.5em /* with Firefox and Safari, scrollable content appears otherwise clipped a little (because content gets out of the box?) */
 }
 
 #fb-toolbox .fb-tools { margin: .5em }
@@ -112,7 +113,7 @@ a.fb-edit-help-trigger img {
 #fb-action-dialog .fr-repeat-table th { white-space: nowrap }
 
 #fb-database-service-dialog { width: 45em }
-#fb-database-service-dialog textarea { height: 10em }
+#fb-database-service-dialog textarea { height: 10em; font-family: monospace }
 
 /* Other dialogs */
 .xforms-dialog .bd { padding-left: .5em; padding-right: .5em }

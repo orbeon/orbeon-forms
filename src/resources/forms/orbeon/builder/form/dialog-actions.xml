@@ -79,9 +79,9 @@
                     </xforms:itemset>
                 </xforms:select1>
                 <!-- Set request values -->
-                <xforms:group ref="xforms:action[@ev:event = 'xforms-submit-serialize']/xforms:action">
+                <xforms:group ref="xforms:action[@ev:event = 'xforms-submit']/xforms:action">
                     <xforms:label>Set Service Request Values</xforms:label>
-                    <fr:repeat nodeset="xforms:action[@class = 'fr-set-service-value-action']" id="fb-bindings-request-repeat" origin="instance('fb-binding-action-template')/xforms:action[@class = 'fr-set-service-value-action']" columns="2" appearance="xxforms:table">
+                    <fr:repeat nodeset="xforms:action[@class = 'fr-set-service-value-action']" id="fb-actions-setvalue-repeat" origin="instance('fb-binding-action-template')/xforms:action[@class = 'fr-set-service-value-action']" columns="2" appearance="xxforms:table">
                         <xhtml:tr>
                             <xhtml:td>
                                 <xforms:select1 ref="xxforms:variable[@name = 'control-name']/@select">
@@ -100,6 +100,32 @@
                             <xhtml:td>
                                 <xforms:input ref="xxforms:variable[@name = 'path']/@select">
                                     <xforms:label>Destination XPath Expression</xforms:label>
+                                </xforms:input>
+                            </xhtml:td>
+                        </xhtml:tr>
+                    </fr:repeat>
+                </xforms:group>
+                <xforms:group ref="xforms:action[@ev:event = 'xforms-submit']/xforms:action">
+                    <xforms:label>Set Database Service Parameters</xforms:label>
+                    <fr:repeat nodeset="xforms:action[@class = 'fr-set-database-service-value-action']" id="fb-actions-database-setvalue-repeat" origin="instance('fb-binding-action-template')/xforms:action[@class = 'fr-set-database-service-value-action']" columns="2" appearance="xxforms:table">
+                        <xhtml:tr>
+                            <xhtml:td>
+                                <xforms:select1 ref="xxforms:variable[@name = 'control-name']/@select">
+                                    <xforms:label>Source Control</xforms:label>
+                                    <xforms:item>
+                                        <xforms:label>[Select...]</xforms:label>
+                                        <xforms:value/>
+                                    </xforms:item>
+                                    <xforms:itemset nodeset="$body//xforms:*[(@ref or @bind) and ends-with(@id, '-control')]">
+                                        <!-- TODO: user-friendly control label if non-emtpy -->
+                                        <xforms:label value="substring-before(@id, '-control')"/>
+                                        <xforms:value value="concat('''', substring-before(@id, '-control'), '''')"/>
+                                    </xforms:itemset>
+                                </xforms:select1>
+                            </xhtml:td>
+                            <xhtml:td>
+                                <xforms:input ref="xxforms:variable[@name = 'parameter']/@select">
+                                    <xforms:label>Parameter Number</xforms:label>
                                 </xforms:input>
                             </xhtml:td>
                         </xhtml:tr>
@@ -273,6 +299,7 @@
             <bindings-editor>
                 <name/>
                 <initial-name/>
+                <instance-id/>
                 <save-test-trigger/>
                 <xforms:action/>
             </bindings-editor>
@@ -286,27 +313,30 @@
             <xforms:bind nodeset="name" type="xs:NCName"
                          constraint="(normalize-space() != '' and normalize-space() = ../initial-name)
                                         or not(../xforms:action[1]/@id = $model/xforms:action/@id)"/>
+            <xforms:bind nodeset="instance-id" calculate="concat(../name, '-instance')"/>
             
             <xforms:bind nodeset="xforms:action">
                 <!-- Action id -->
                 <xforms:bind nodeset="@id" calculate="concat(../../name, '-binding')"/>
                 <!-- Action that triggers the submission -->
                 <xforms:bind nodeset="xforms:action[1]">
-                    <xforms:bind nodeset="(@ev:event, xforms:send/@submission)" required="true()"/>
+                    <xforms:bind nodeset="@ev:event" required="true()"/>
+                    <xforms:bind name="submission-bind" nodeset="xforms:send/@submission" required="true()"/>
                     <xforms:bind nodeset="@ev:observer"
                                  required="../@ev:event = ('DOMActivate', 'xforms-value-changed')"
                                  relevant="../@ev:event = ('DOMActivate', 'xforms-value-changed')"/>
                 </xforms:bind>
-                <!-- xforms-submit-serialize -->
-                <xforms:bind nodeset="xforms:action[@ev:event = 'xforms-submit-serialize']">
-                    <xforms:bind nodeset="@ev:observer" calculate="../../xforms:action[1]/xforms:send/@submission"/>
-                    <xforms:bind nodeset="xxforms:variable[@name = 'serialization']/@select" calculate="concat('''', , '''')"/>
-                    <xforms:bind nodeset="xforms:setvalue/@ref | xforms:setvalue/@value" required="true()"/>
+                <!-- xforms-submit -->
+                <xforms:bind nodeset="xforms:action[@ev:event = 'xforms-submit']">
+                    <xforms:bind nodeset="@ev:observer" calculate="$submission-bind"/>
+                    <xforms:bind nodeset="xxforms:variable[@name = 'request-instance-name']/@select"
+                                 calculate="concat('''', substring-before($submission-bind, '-submission'), '-instance''')"/>
+                    <!--<xforms:bind nodeset="xforms:setvalue/@ref | xforms:setvalue/@value" required="true()"/>-->
+                    <!-- TODO: more validation -->
                 </xforms:bind>
                 <!-- xforms-submit-done -->
                 <xforms:bind nodeset="xforms:action[@ev:event = 'xforms-submit-done']">
-                    <xforms:bind nodeset="@ev:observer" calculate="../../xforms:action[1]/xforms:send/@submission"/>
-                    <xforms:bind nodeset="@context" calculate="concat('saxon:parse(instance(''', substring-before(../@ev:observer, '-submission'), '-instance'')/response)')"/>
+                    <xforms:bind nodeset="@ev:observer" calculate="$submission-bind"/>
                     <!-- Setvalue actions -->
                     <xforms:bind nodeset="xforms:action[@class = 'fr-set-control-value-action']">
                         <xforms:bind nodeset="xxforms:variable/@select" required="true()"/>
@@ -321,7 +351,7 @@
         </xforms:bind>
 
         <!-- Template for a given binding -->
-        <xforms:instance id="fb-binding-template" xxforms:readonly="true">
+        <xforms:instance id="fb-binding-template" xxforms:readonly="true" xxforms:exclude-result-prefixes="#all">
             <xforms:action id="" ev:event="fb-dummy-event">
                 <!-- React to event... on control... -->
                 <xforms:action ev:event="" ev:observer="">
@@ -329,29 +359,25 @@
                     <xforms:send submission="SET ME"/>
                 </xforms:action>
                 <!-- Request actions -->
-                <xforms:action ev:event="xforms-submit-serialize" ev:observer="SET ME">
-                    <!-- Get initial document to submit -->
-                    <xxforms:variable name="request-document" select="xxforms:mutable-document(saxon:parse(event('xxforms:binding')/request))"/>
+                <xforms:action ev:event="xforms-submit" ev:observer="SET ME">
+                    <!-- Get reference to initial request -->
+                    <xxforms:variable name="request-instance-name" select="SET ME" as="xs:string"/>
+                    <!-- Copy over to read-write request instance -->
+                    <xforms:insert nodeset="instance('fr-service-request-instance')" origin="instance($request-instance-name)"/>
                     <!-- Set values if needed -->
-                    <xforms:action context="$request-document">
+                    <xforms:action context="instance('fr-service-request-instance')">
                         <!-- Setvalue actions will be here -->
                     </xforms:action>
-                    <!-- Serialize request document -->
-                    <!-- TODO: revert to a solution where we use the submissions's serialization. Use global request and response instances. -->
-                    <xxforms:variable name="serialization" select="event('xxforms:serialization')"/>
-                    <xxforms:variable name="submission-body" select="event('submission-body')"/>
-                    <xforms:setvalue if="$serialization = 'application/xml'" ref="$submission-body" value="saxon:serialize($request-document, xxforms:instance('fr-xsl-output-instance'))"/>
-                    <xforms:setvalue if="not($serialization = 'application/xml')" ref="$submission-body" value="xxforms:form-urlencode($request-document)"/>
                 </xforms:action>
                 <!-- Response actions -->
-                <xforms:action ev:event="xforms-submit-done" ev:observer="SET ME" context="SET ME">
+                <xforms:action ev:event="xforms-submit-done" ev:observer="SET ME" context="instance('fr-service-response-instance')">
                     <!-- Response actions will be here -->
                 </xforms:action>
             </xforms:action>
         </xforms:instance>
 
         <!-- Template for actions -->
-        <xforms:instance id="fb-binding-action-template" xxforms:readonly="true">
+        <xforms:instance id="fb-binding-action-template" xxforms:readonly="true" xxforms:exclude-result-prefixes="#all">
             <action>
                 <!-- Set service value -->
                 <xforms:action class="fr-set-service-value-action">
@@ -360,6 +386,15 @@
                     <xxforms:variable name="path" select="" as="xs:string"/>
                     <!-- Set value -->
                     <xforms:setvalue ref="$path" value="instance('fr-form-instance')/*/*[name() = $control-name]"/>
+                </xforms:action>
+                <!-- Set database service value -->
+                <xforms:action class="fr-set-database-service-value-action" xmlns:sql="http://orbeon.org/oxf/xml/sql">
+                    <!-- Parameters -->
+                    <xxforms:variable name="control-name" select="" as="xs:string"/>
+                    <xxforms:variable name="parameter" select="" as="xs:integer"/>
+                    <!-- Set value and escape single quotes -->
+                    <xforms:setvalue ref="/sql:config/sql:query/sql:param[xs:integer($parameter)]/@select"
+                                     value="concat('''', replace(instance('fr-form-instance')/*/*[name() = $control-name], '''', ''''''), '''')"/>
                 </xforms:action>
                 <!-- Set control value -->
                 <xforms:action class="fr-set-control-value-action">

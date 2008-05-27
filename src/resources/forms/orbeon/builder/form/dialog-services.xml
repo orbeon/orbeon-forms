@@ -100,9 +100,9 @@
                         </xforms:secret>
                     </xforms:group>
 
-                    <xforms:textarea ref="content" incremental="true">
-                        <xforms:label>Submission Content</xforms:label>
-                        <xforms:hint>XML data, for example a SOAP envelope</xforms:hint>
+                    <xforms:textarea ref="body" incremental="true">
+                        <xforms:label>Request Body</xforms:label>
+                        <xforms:hint>XML data (can be a SOAP envelope)</xforms:hint>
                     </xforms:textarea>
                 </xforms:group>
 
@@ -187,7 +187,7 @@
                                     </fr:grid>
                                 </xforms:group>
 
-                                <xforms:textarea ref="response/content">
+                                <xforms:textarea ref="response/body">
                                     <xforms:label>Response Body</xforms:label>
                                 </xforms:textarea>
                             </xhtml:div>
@@ -229,7 +229,7 @@
                         <xforms:insert context="headers" origin="event('response-headers')"/>
                         <!-- Handle response body -->
                         <xxforms:variable name="error-body" select="event('response-body')"/>
-                        <xforms:setvalue if="$error-body" ref="content" value="if ($error-body castable as xs:string)
+                        <xforms:setvalue if="$error-body" ref="body" value="if ($error-body castable as xs:string)
                             then $error-body else saxon:serialize($error-body, xxforms:instance('fr-xsl-output-instance'))"/>
                     </xforms:action>
                 </xforms:action>
@@ -263,12 +263,12 @@
                     <xxforms:variable name="request" select="$instance/request"/>
                     <xforms:action context="$submission">
                         <!-- TODO: couldn't we have the editor directly edit a submission? -->
-                        <xforms:setvalue ref="@ref" value="concat('instance(''', $instance-id, ''')')"/>
+                        <!--<xforms:setvalue ref="@ref" value="concat('instance(''', $instance-id, ''')')"/>-->
                         <xforms:setvalue ref="@method" value="$request/method"/>
                         <xforms:setvalue ref="@serialization" value="$request/serialization"/>
                         <xforms:setvalue ref="@resource" value="$request/resource"/>
-                        <xforms:setvalue ref="@replace" value="$request/replace"/>
-                        <xforms:setvalue ref="@target" value="concat('instance(''', $instance-id, ''')/response')"/>
+                        <!--<xforms:setvalue ref="@replace" value="$request/replace"/>-->
+                        <!--<xforms:setvalue ref="@target" value="concat('instance(''', $instance-id, ''')/response')"/>-->
                         <xforms:setvalue ref="@mediatype" value="$request/mediatype"/>
 
                         <xforms:action if="$request/is-auth = 'true'">
@@ -286,9 +286,10 @@
                         <xforms:setvalue ref="$submission/preceding-sibling::xforms:instance[1]/@id" value="$instance-id"/>
                     </xforms:action>
 
-                    <!-- Set instance parameters -->
-                    <xforms:action context="$model/xforms:instance[@id = $instance-id]/*">
-                        <xforms:setvalue ref="request" value="$request/content"/>
+                    <!-- Set instance body -->
+                    <xforms:action context="$model/xforms:instance[@id = $instance-id]">
+                        <xforms:delete context="." nodeset="*"/>
+                        <xforms:insert context="." origin="saxon:parse($request/body)"/>
                     </xforms:action>
 
                     <!-- Hide dialog -->
@@ -315,7 +316,7 @@
         <xforms:setvalue ref="$instance/request/is-auth">false</xforms:setvalue>
         <xforms:setvalue ref="$instance/request/method" value="instance('fb-submission-template')/@method"/>
         <xforms:setvalue ref="$instance/request/serialization" value="instance('fb-submission-template')/@serialization"/>
-        <xforms:setvalue ref="$instance/request/replace" value="instance('fb-submission-template')/@replace"/>
+        <!--<xforms:setvalue ref="$instance/request/replace" value="instance('fb-submission-template')/@replace"/>-->
         <xforms:delete xxforms:iterate="$instance/response/headers/header" nodeset="."/>
 
         <!-- Toggle back response submission -->
@@ -330,8 +331,8 @@
             <xforms:setvalue ref="$instance/request/method" value="$submission/@method"/>
             <xforms:setvalue ref="$instance/request/serialization" value="$submission/@serialization"/>
             <xforms:setvalue ref="$instance/request/resource" value="$submission/@resource"/>
-            <xforms:setvalue ref="$instance/request/replace" value="$submission/@replace"/>
-            <xforms:setvalue ref="$instance/request/content" value="$model/xforms:instance[@id = concat($submission-name, '-instance')]/*/request"/>
+            <!--<xforms:setvalue ref="$instance/request/replace" value="$submission/@replace"/>-->
+            <xforms:setvalue ref="$instance/request/body" value="$model/xforms:instance[@id = concat($submission-name, '-instance')]/*/request"/>
             <!-- TODO: is-soap -->
             <xforms:setvalue ref="$instance/request/is-auth" value="exists($submission/@xxforms:username | $submission/@xxforms:password)"/>
             <xforms:setvalue ref="$instance/request/username" value="$submission/@xxforms:username"/>
@@ -357,14 +358,14 @@
                     <method/>
                     <serialization/>
                     <resource/>
-                    <replace/>
+                    <!--<replace/>-->
                     <is-soap>false</is-soap>
                     <soap-action/>
                     <is-auth>false</is-auth>
                     <username/>
                     <password/>
                     <mediatype/>
-                    <content/>
+                    <body/>
                 </request>
                 <response>
                     <error-type/>
@@ -373,7 +374,7 @@
                     <status-code/>
                     <reason-phrase/>
                     <headers/>
-                    <content/>
+                    <body/>
                 </response>
                 <save-test-trigger/>
             </submission>
@@ -398,34 +399,31 @@
                          calculate="if (../is-soap = 'true')
                                     then string-join(('application/soap+xml', if (normalize-space(../soap-action) != '') then concat('action=', normalize-space(../soap-action)) else ()), '; ')
                                     else ../serialization"/>
-            <xforms:bind nodeset="request/content" type="xxforms:xml"/>
+            <xforms:bind nodeset="request/body" type="xxforms:xml"/>
             <xforms:bind nodeset="response/error-type" readonly="true()"/>
             <xforms:bind nodeset="save-test-trigger" readonly=". = 'disabled'"/>
         </xforms:bind>
 
         <!-- Template for inserting a submission -->
-        <xforms:instance id="fb-submission-template" xxforms:readonly="true">
-            <xforms:submission id="" class="fr-service" ref="" resource="" method="get" serialization="application/xml" mediatype="application/xml" replace="text" target=""/>
+        <xforms:instance id="fb-submission-template" xxforms:readonly="true" xxforms:exclude-result-prefixes="#all">
+            <xforms:submission id="" class="fr-service" ref="instance('fr-service-request-instance')"
+                               resource="" method="get" serialization="application/xml" mediatype="application/xml"
+                               replace="instance" instance="fr-service-response-instance"/>
         </xforms:instance>
 
         <!-- Template for inserting an instance-->
-        <xforms:instance id="fb-instance-template" xxforms:readonly="true">
-            <xforms:instance id="" class="fr-service">
-                <submission>
-                    <request/>
-                    <response/>
-                </submission>
-            </xforms:instance>
+        <xforms:instance id="fb-instance-template" xxforms:readonly="true" xxforms:exclude-result-prefixes="#all">
+            <xforms:instance id="" class="fr-service" xxforms:exclude-result-prefixes="#all"/>
         </xforms:instance>
 
         <!-- Submission to test a service -->
         <xforms:submission id="fb-test-service-submission"
-                ref="saxon:parse(instance('fb-submission-editor-instance')/request/content)/*"
+                ref="saxon:parse(instance('fb-submission-editor-instance')/request/body)/*"
                 method="{instance('fb-submission-editor-instance')/request/method}"
                 serialization="{instance('fb-submission-editor-instance')/request/serialization}"
                 resource="{instance('fb-submission-editor-instance')/request/resource}"
                 mediatype="{instance('fb-submission-editor-instance')/request/mediatype}"
-                replace="text" target="instance('fb-submission-editor-instance')/response/content"
+                replace="text" target="instance('fb-submission-editor-instance')/response/body"
                 xxforms:username="{instance('fb-submission-editor-instance')/request/username}"
                 xxforms:password="{instance('fb-submission-editor-instance')/request/password}"/>
 

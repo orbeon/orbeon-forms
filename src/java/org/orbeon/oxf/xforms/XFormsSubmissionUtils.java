@@ -305,7 +305,7 @@ public class XFormsSubmissionUtils {
                 // Write request body if needed
                 if (hasRequestBody) {
                     if (XFormsServer.logger.isDebugEnabled()) {
-                        if (XMLUtils.isXMLMediatype(mediatype) || XMLUtils.isTextContentType(mediatype) || mediatype.equals("application/x-www-form-urlencoded")) {
+                        if (XMLUtils.isXMLMediatype(mediatype) || XMLUtils.isTextContentType(mediatype) || (mediatype != null && mediatype.equals("application/x-www-form-urlencoded"))) {
                             containingDocument.logDebug("submission", "setting request body",
                                 new String[] { "mediatype", mediatype, "body", new String(messageBody, "UTF-8")});
                         } else {

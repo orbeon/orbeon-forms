@@ -171,7 +171,7 @@
                 <xforms:bind nodeset="search-total" calculate="(instance('fr-summary-instance')/@search-total, 0)[1]"/>
                 <xforms:bind nodeset="page-size" calculate="instance('fr-search-instance')/page-size"/>
                 <xforms:bind nodeset="page-number" calculate="instance('fr-search-instance')/page-number"/>
-                <xforms:bind nodeset="page-count" calculate="(../total + ../page-size - 1) div ../page-size"/>
+                <xforms:bind nodeset="page-count" calculate="(../total + ../page-size - 1) idiv ../page-size"/>
                 <xforms:bind nodeset="from" calculate="if (../search-total = 0) then 0 else (../page-number - 1) * ../page-size + 1"/>
                 <xforms:bind nodeset="to" calculate="min((../page-number * ../page-size, ../search-total))"/>
                 <xforms:bind nodeset="prev-trigger" readonly="../search-total = 0 or xs:integer(../page-number) le 1"/>

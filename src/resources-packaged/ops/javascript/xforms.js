@@ -29,7 +29,7 @@
  *      ORBEON.xforms.Globals.formStaticState[formID].value
  *
  * Modifcations to the state information:
- * 
+ *
  * - When the page is loaded if the client state is empty, the dynamic state is stored in the client state.
  * - When a response to an Ajax response is received the new dynamic state is stored right away.
  * - When an Ajax response also contains an updated static state, that state is stored as well.
@@ -558,10 +558,9 @@ ORBEON.util.String = {
  * Utility methods that don't in any other category
  */
 ORBEON.util.Utils = {
-    logException: function(message, exception) {
+    logMessage: function(message) {
         if (typeof console != "undefined") {
             console.log(message); // Normal use; do not remove
-            console.log(exception);  // Normal use; do not remove
         }
     },
 
@@ -1833,7 +1832,7 @@ ORBEON.xforms.Events = {
             }
 
             // If value is required, add/remove xforms-required-empty appropriately
-            // NOTE: Don't do this anymore, as this can now show an alert, which may be outdated before the next Ajax response 
+            // NOTE: Don't do this anymore, as this can now show an alert, which may be outdated before the next Ajax response
             //ORBEON.xforms.Controls.updateRequiredEmpty(target);
 
             // Resize wide text area
@@ -3000,7 +2999,8 @@ ORBEON.xforms.Server = {
      * This is to prevent the UI from becoming totally unusable after an error.
      */
     exceptionWhenTalkingToServer: function(e, formID) {
-        ORBEON.util.Utils.logException("JavaScript error", e);
+        ORBEON.util.Utils.logMessage("JavaScript error");
+        ORBEON.util.Utils.logMessage(e);
         var details = "Exception in client-side code.";
         details += "<ul>";
         if (e.message != null) details += "<li>Message: " + e.message + "</li>";
@@ -3709,6 +3709,7 @@ ORBEON.xforms.Server = {
                                         var documentElement = ORBEON.util.Dom.getElementById(controlId);
                                         if (documentElement == null) {
                                             documentElement = ORBEON.util.Dom.getElementById("group-begin-" + controlId);
+                                            if (documentElement == null) ORBEON.util.Utils.logMessage ("Can't find element or iteration with ID '" + controlId + "'");
                                         }
                                         var documentElementClasses = documentElement.className.split(" ");
                                         var isControl = ORBEON.util.Dom.hasClass(documentElement, "xforms-control");
@@ -3767,7 +3768,7 @@ ORBEON.xforms.Server = {
                                         }
 
                                         // Handle readonly
-                                        if (readonly != null && !isStaticReadonly) 
+                                        if (readonly != null && !isStaticReadonly)
                                             ORBEON.xforms.Controls.setReadonly(documentElement, readonly == "true");
 
                                         // Change classes on input control and date pick based on type
@@ -4307,6 +4308,12 @@ ORBEON.xforms.Offline = {
             // Create form store
             var localServer = google.gears.factory.create("beta.localserver");
             ORBEON.xforms.Offline.formStore = localServer.createStore("orbeon.form");
+        }
+
+        // Define the xxforms:if() XPath function
+        FunctionCallExpr.prototype.xpathfunctions["xxforms:if"] = function(ctx) {
+            var test = this.args[0].evaluate(ctx).booleanValue();
+            return new StringValue(this.args[test ? 1 : 2].evaluate(ctx).stringValue());
         }
     },
 

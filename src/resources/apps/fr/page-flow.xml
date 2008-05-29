@@ -132,6 +132,13 @@
         <setvalue ref="/*/form" matcher-group="2"/>
     </page>
 
+    <!-- List deployed forms for a given application -->
+    <page path-info="/fr/service/exist/list/([^/]+)" matcher="oxf:perl5-matcher"
+          default-submission="persistence/exist/list-submission.xml"
+          view="persistence/exist/list.xpl">
+        <setvalue ref="/*/app" matcher-group="1"/>
+    </page>
+
     <!-- ==== Built-in Resource Manager-Based Persistence Services ==== -->
 
     <!-- Create, Read, Update and Delete operations (id provided) -->

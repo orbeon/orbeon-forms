@@ -97,7 +97,6 @@
 
     <!-- Execute REST submission -->
     <p:processor name="oxf:xforms-submission">
-        <!-- query, page-size, page-number, sort-key -->
         <p:input name="submission" href="#submission"/>
         <p:input name="request" href="#query"/>
         <p:output name="response" ref="data"/>

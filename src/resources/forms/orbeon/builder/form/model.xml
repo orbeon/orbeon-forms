@@ -104,8 +104,10 @@
         <metadata>
             <application-name>orbeon</application-name>
             <form-name>builder</form-name>
-            <title>Orbeon Form Builder</title>
-            <description>Orbeon Form Builder allows you to easily build forms right from your web browser and without programming.</description>
+            <title xml:lang="en">Orbeon Form Builder</title>
+            <description xml:lang="en">Orbeon Form Builder allows you to easily build forms right from your web browser and without programming.</description>
+            <title xml:lang="fr">Orbeon Form Builder</title>
+            <description xml:lang="fr">Orbeon Form Builder vous permet d'éditer des formulaires directement depuis votre navigateur et sans programmation.</description>
             <author>Orbeon, Inc.</author>
             <logo mediatype="image/png" filename="orbeon-logo-trimmed-transparent-42.png" size="">/apps/fr/style/orbeon-logo-trimmed-transparent-42.png</logo>
         </metadata>

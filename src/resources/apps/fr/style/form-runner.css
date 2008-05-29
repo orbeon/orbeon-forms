@@ -453,6 +453,9 @@ div.fr-collapsible {
 .fr-grid .xforms-mediatype-image { *padding-bottom: 17px; *overflow-y: hidden }/* IE HACK */
 .fr-grid .xforms-mediatype-image img { display: block }
 
+/*  Buttons */
+.fr-grid .fr-grid-content button.xforms-trigger { margin-top: 1.72em } /* hand-tuned so it appears at about the same pos as input fields*/
+
 /* Cell widths */
 .fr-grid-td { width: auto; vertical-align: top; overflow: hidden }
 .fr-grid-td .fb-grid-content { width: 64em; *width: 62.4576em }

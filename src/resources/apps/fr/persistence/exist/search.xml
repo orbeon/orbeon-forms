@@ -32,7 +32,6 @@
         let $page-size := request:get-parameter('page-size', '')
         let $page-number := request:get-parameter('page-number', '')
         let $query := request:get-parameter('query', '')
-        let $decision := request:get-parameter('decision', '')
         let $path := request:get-parameter('path', '')
         let $value := request:get-parameter('value', '')
         (: Special language variable used for now by Form Builder :)

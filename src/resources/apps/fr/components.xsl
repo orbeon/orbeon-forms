@@ -93,10 +93,27 @@
                     <xhtml:div id="yui-main">
                         <xhtml:div class="yui-b">
                             <xxforms:variable name="metadata-lang" select="xxforms:instance('fr-language-instance')"/>
+                            <xxforms:variable name="source-form-metadata" select="xxforms:instance('fr-source-form-instance')/xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-metadata']/*"/>
                             <!-- title in chosen language or first one if not found -->
-                            <xxforms:variable name="title" select="((instance('fr-form-metadata')/(title[@xml:lang = $metadata-lang], title[1])[1], ({$label/@ref}), '{$label}', /xhtml:html/xhtml:head/xhtml:title)[normalize-space() != ''])[1]"/>
+                            <xxforms:variable name="title"
+                                              select="(($source-form-metadata/title[@xml:lang = $metadata-lang],
+                                                        $source-form-metadata/title[1],
+                                                        instance('fr-form-metadata')/title[@xml:lang = $metadata-lang],
+                                                        instance('fr-form-metadata')/title[1],
+                                                        ({$label/@ref}),
+                                                        '{$label}',
+                                                        /xhtml:html/xhtml:head/xhtml:title)[normalize-space() != ''])[1]"/>
                             <!-- description in chosen language or first one if not found -->
-                            <xxforms:variable name="description" select="instance('fr-form-metadata')/(description[@xml:lang = $metadata-lang], description[1])[1]"/>
+                            <xxforms:variable name="description"
+                                              select="($source-form-metadata/description[@xml:lang = $metadata-lang],
+                                                        $source-form-metadata/description[1],
+                                                        instance('fr-form-metadata')/description[@xml:lang = $metadata-lang],
+                                                        instance('fr-form-metadata')/description[1])[1]"/>
+
+
+                            <!--<xforms:output value="string-join(($source-form-metadata/description[@xml:lang = $metadata-lang], $source-form-metadata/description[1]), ' - ')"/>-->
+                            <!--xxx-->
+                            <!--<xforms:output value="string-join($source-form-metadata/(description[@xml:lang = $metadata-lang], description[1]), ' - ')"/>-->
                             <xhtml:div class="yui-g fr-logo">
                                 <xsl:choose>
                                     <!-- If custom logo section is provided, use that -->

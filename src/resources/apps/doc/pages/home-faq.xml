@@ -37,15 +37,31 @@
                     1.1 specification.
                 </p>
                 <p>
+                    Orbeon Forms is built around a user-friendly Ajax-based XForms engine, which brings W3C XForms to
+                    standard browsers, and the <a href="reference-xpl-pipelines">XPL engine</a>, a mature,
+                    high-performance XML pipeline engine for processing XML data.
+                </p>
+                <p>
+                    On top of the XForms engine, Orbeon Forms includes Form Runner (a runtime environment for forms)
+                    and Form Builder (a web-based form builder). For more information, visit:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            <a href="http://www.orbeon.com/forms/builder">Orbeon Form Builder</a> product page
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <a href="#form-builder">Orbeon Form Builder FAQ</a>
+                        </p>
+                    </li>
+                </ul>
+                <p>
                     Unlike other web application platforms based on Java objects or scripting languages, Orbeon Forms is
                     based on XML documents and XForms. This leads to an architecture perfectly suited for the tasks of
                     capturing, processing, and presenting XML data (in particular form data), and does not require
                     writing any Java, JavaScript or other scripting code at all.
-                </p>
-                <p>
-                    Orbeon Forms is built around a user-friendly Ajax-based XForms engine, which brings W3C XForms to
-                    standard browsers, and the <a href="reference-xpl-pipelines">XPL engine</a>, a mature,
-                    high-performance XML pipeline engine for processing XML data.
                 </p>
             </section>
             <a name="is-xforms"/>
@@ -403,6 +419,41 @@
                 </ul>
             </section>
         </section>
+        <a name="form-builder"/>
+        <section added="2008-05-30">
+            <title>Orbeon Form Builder FAQ</title>
+            <section added="2008-05-30">
+                <title>What is Orbeon Form Builder?</title>
+                <p>
+                    Orbeon Form Builder is a visual form designer which allows you to build and deploy forms in minutes
+                    right from your web browser. See the <a href="http://www.orbeon.com/forms/builder">Orbeon Form
+                    Builder</a> product page for more details.
+                </p>
+            </section>
+            <section added="2008-05-30">
+                <title>What is Orbeon Form Runner?</title>
+                <p>
+                    Orbeon Form Runner is the Orbeon Forms runtime environment. Form Runner manages form types and form
+                    data, handles search, validation, and takes care of the plumbing necessary to capture, save, import
+                    and export form data. See the <a href="http://www.orbeon.com/forms/builder">Orbeon Form Builder</a>
+                    product page for more details.
+                </p>
+            </section>
+            <section added="2008-05-30">
+                <title>Where is the documentation?</title>
+                <p>
+                    As of May 2008, Form Builder and Form Runner are considered alpha code and there is no
+                    documentation. The documentation will be added soon.
+                </p>
+            </section>
+            <section added="2008-05-30">
+                <title>I can't save my form, what's wrong?</title>
+                <p>
+                    Make sure you have entered: Form Title, Application Name, and Form name (in the Metadata section).
+                    We will streamline this to make it clearer.
+                </p>
+            </section>
+        </section>    
         <a name="xforms"/>
         <section>
             <title>XForms FAQ</title>

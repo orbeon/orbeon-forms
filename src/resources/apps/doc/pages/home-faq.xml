@@ -440,6 +440,15 @@
                 </p>
             </section>
             <section added="2008-05-30">
+                <title>What is the difference between Orbeon Forms and Form Runner?</title>
+                <p>
+                    Orbeon Forms is the name for the whole forms solution developped by Orbeon. Form Runner and Form
+                    Builder are part of Orbeon Forms, and are built on top of the core Orbeon Forms components,
+                    including the XForms engine and the pipeline engine. You can use Orbeon Forms without using Form
+                    Runner or Form Builder.
+                </p>
+            </section>
+            <section added="2008-05-30">
                 <title>Where is the documentation?</title>
                 <p>
                     As of May 2008, Form Builder and Form Runner are considered alpha code and there is no

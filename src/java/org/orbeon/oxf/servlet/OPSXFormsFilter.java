@@ -52,9 +52,11 @@ public class OPSXFormsFilter implements Filter {
         final HttpServletRequest httpRequest = (HttpServletRequest) servletRequest;
         final HttpServletResponse httpResponse = (HttpServletResponse) servletResponse;
 
-        if (isOPSResourceRequest(httpRequest)) {
+        final String requestPath = getRequestPathInfo(httpRequest);
+
+        if (isOPSResourceRequest(requestPath)) {
             // Directly forward all requests meant for Orbeon Forms resources
-            final String subRequestPath = getRequestPathInfo(httpRequest).substring(opsContextPath.length());
+            final String subRequestPath = requestPath.substring(opsContextPath.length());
             getOPSDispatcher(subRequestPath).forward(httpRequest, httpResponse);
         } else {
             // Forward the request to the Orbeon Forms renderer
@@ -83,8 +85,8 @@ public class OPSXFormsFilter implements Filter {
                 httpRequest.setAttribute(OPS_XFORMS_RENDERER_CONTENT_TYPE_ATTRIBUTE_NAME, responseWrapper.getMediaType());
 
             // Set base URI
-            final String absoluteBaseURI = httpRequest.getRequestURL().toString();
-            httpRequest.setAttribute(OPS_XFORMS_RENDERER_BASE_URI_ATTRIBUTE_NAME, absoluteBaseURI);
+//            final String absoluteBaseURI = httpRequest.getRequestURL().toString();
+            httpRequest.setAttribute(OPS_XFORMS_RENDERER_BASE_URI_ATTRIBUTE_NAME, requestPath);
 
             // Forward to Orbeon Forms for rendering
             getOPSDispatcher(OPS_RENDERER_PATH).forward(httpRequest, httpResponse);
@@ -105,12 +107,11 @@ public class OPSXFormsFilter implements Filter {
         return dispatcher;
     }
 
-    private boolean isOPSResourceRequest(HttpServletRequest request) {
+    private boolean isOPSResourceRequest(String requestPath) {
         if (opsContextPath == null)
             return false;
 
-        final String pathInfo = getRequestPathInfo(request);
-        return pathInfo != null && pathInfo.startsWith(opsContextPath + "/");
+        return requestPath != null && requestPath.startsWith(opsContextPath + "/");
     }
 
     // NOTE: This is borrowed from NetUtils but we don't want the dependency

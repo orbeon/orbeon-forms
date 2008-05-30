@@ -26,7 +26,7 @@
     <property as="xs:anyURI"  name="oxf.epilogue.theme"                              value="oxf:/config/theme-examples.xsl"/>
     <property as="xs:boolean" name="oxf.epilogue.use-theme"                          value="true"/>
     <property as="xs:boolean" name="oxf.epilogue.output-xhtml"                       value="false"/>
-    <property as="xs:boolean" name="oxf.epilogue.renderer-rewrite"                   value="false"/>
+    <property as="xs:boolean" name="oxf.epilogue.renderer-rewrite"                   value="true"/>
     <property as="xs:boolean" name="oxf.epilogue.process-svg"                        value="true"/>
     <property as="xs:boolean" name="oxf.epilogue.xforms.widgets"                     value="true"/>
 
@@ -67,6 +67,7 @@
     <property as="xs:integer" name="oxf.xforms.cache.shared-instances.size"          value="40"/>
 
     <!-- Other XForms options -->
+    <property as="xs:string"  name="oxf.xforms.order"                                value="label control help alert hint"/>
     <property as="xs:boolean" name="oxf.xforms.optimize-get-all"                     value="true"/>
     <property as="xs:boolean" name="oxf.xforms.optimize-local-submission"            value="true"/>
     <property as="xs:boolean" name="oxf.xforms.ajax.show-loading-icon"               value="true"/>
@@ -82,9 +83,7 @@
     <!-- Form Runner / Form Builder properties -->
     <property as="xs:anyURI"  name="oxf.fr.persistence.app.*.uri"                    value="/fr/service/exist"/>
     <property as="xs:anyURI"  name="oxf.fr.persistence.app.orbeon.builder.form.uri"  value="/fr/service/resource"/>
-    <property as="xs:anyURI"  name="oxf.fr.persistence.app.orbeon.builder.data.uri"  value="/fr/service/exist"/>
     <property as="xs:anyURI"  name="oxf.fr.persistence.app.orbeon.bookcast.form.uri" value="/fr/service/resource"/>
-    <property as="xs:anyURI"  name="oxf.fr.persistence.app.orbeon.bookcast.data.uri" value="/fr/service/exist"/>
 
     <property as="xs:anyURI"  name="oxf.fr.persistence.service.exist.uri"            value="/exist/rest/db"/>
 
@@ -110,3 +109,5 @@
     <!--<property as="xs:nonNegativeInteger"    name="processor.trace.port"    value="9999"/>-->
 
 </properties>
+
+        

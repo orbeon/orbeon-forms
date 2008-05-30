@@ -28,9 +28,8 @@
         <xhtml:style type="text/css">
             h1 { display: inline; padding-right: 10px; }
             .paragraph { margin-bottom: 1em; }
-            .feedback { background-color: #ffa; margin-left: 10px; padding: 5px; }
-            .flickr-image { width: 75px; height:75 px; }
-            .xforms-alert-inactive { display: none; }
+            .flickr-image { width: 75px; height:75 px; border: none }
+            .back { display: block; margin-top: .5em }
         </xhtml:style>
     </xhtml:head>
     <xhtml:body>
@@ -50,22 +49,11 @@
         </xhtml:div>
         <xhtml:div>
             <xforms:repeat nodeset="photo[position() le 50]">
-                <xforms:output
-                    value="concat(
-                            '&lt;a',
-                              ' href=&#34;', @page, '&#34;',
-                            '/&gt;',
-                            '&lt;img',
-                              ' src=&#34;', @url, '&#34;',
-                              ' width=&#34;75&#34;',
-                              ' height=&#34;75&#34;',
-                              ' border=&#34;0&#34;',
-                              ' style=&#34;flickr-image&#34;',
-                            '/&gt;',
-                            '&lt;/a&gt;'
-                           )"
-                        mediatype="text/html"/>
+                <xhtml:a href="{@page}">
+                    <xhtml:img class="flickr-image" src="{@url}"/>
+                </xhtml:a>
             </xforms:repeat>
         </xhtml:div>
+        <xhtml:a class="back" href="/">Back to Orbeon Forms Examples</xhtml:a>
     </xhtml:body>
 </xhtml:html>

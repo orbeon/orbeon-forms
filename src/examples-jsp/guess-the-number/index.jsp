@@ -14,7 +14,9 @@
 <%@ page import="java.util.Random"%>
 <xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
     xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:ev="http://www.w3.org/2001/xml-events">
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
     <xhtml:head>
         <xhtml:title>Guess The Number</xhtml:title>
@@ -25,12 +27,13 @@
                     <guess/>
                 </number>
             </xforms:instance>
+            <xforms:bind nodeset="guess" type="xforms:integer"/>
         </xforms:model>
         <xhtml:style type="text/css">
             .paragraph { margin-top: 1em; }
             .feedback { background-color: #ffa; margin-left: 10px; padding: 5px; }
             .guess input { width: 5em; }
-            .xforms-alert-inactive { display: none; }
+            .back { display: block; margin-top: .5em }
         </xhtml:style>
     </xhtml:head>
     <xhtml:body>
@@ -49,7 +52,8 @@
             <xforms:trigger>
                 <xforms:label>Go</xforms:label>
             </xforms:trigger>
-            <xforms:group ref="if (guess != '') then . else ()">
+            <!-- Feedback -->
+            <xforms:group ref="if (guess != '' and guess castable as xs:integer) then . else ()">
                 <xhtml:span class="feedback">
                     <xforms:group ref="if (xs:integer(answer) > xs:integer(guess)) then . else ()">
                         <xforms:output value="/number/guess"/>&#160;is a bit too low.</xforms:group>
@@ -63,7 +67,6 @@
                 </xhtml:span>
             </xforms:group>
         </xhtml:div>
-        <!-- Feedback -->
         <!-- Cheat -->
         <xhtml:div class="paragraph">
             <xforms:trigger>
@@ -79,5 +82,6 @@
                 </xforms:case>
             </xforms:switch>
         </xhtml:div>
+        <xhtml:a class="back" href="/">Back to Orbeon Forms Examples</xhtml:a>
     </xhtml:body>
 </xhtml:html>

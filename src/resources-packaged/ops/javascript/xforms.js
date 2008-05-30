@@ -742,15 +742,19 @@ ORBEON.xforms.Document = {
         var newKey = ORBEON.xforms.Offline.getEncryptionKey();
 
         // Go over events in SQL database and reencrypt them
-        var resultSet = ORBEON.xforms.Offline.gearsDatabase.execute("select id, event from Events");
+        var resultSet = ORBEON.xforms.Offline.gearsDatabase.execute("select url, event_response, offline_events from Offline_Forms");
         while (resultSet.isValidRow()) {
-            var id = resultSet.fieldByName("id");
-            var event = resultSet.fieldByName("event");
-            // Decrypt and reencrypt event
-            event = ORBEON.xforms.Offline._decrypt(event, oldKey);
-            event = ORBEON.xforms.Offline._encrypt(event, newKey);
-            // Update event for this id
-            ORBEON.xforms.Offline.gearsDatabase.execute("update Events set event = ? where id = ?", [event, id]).close();
+            var url = resultSet.fieldByName("url");
+            var eventResponse = resultSet.fieldByName("event_response");
+            var offlineEvents = resultSet.fieldByName("offline_events");
+            // Decrypt and reencrypt
+            eventResponse = ORBEON.xforms.Offline._decrypt(eventResponse, oldKey);
+            eventResponse = ORBEON.xforms.Offline._encrypt(eventResponse, newKey);
+            offlineEvents = ORBEON.xforms.Offline._decrypt(offlineEvents, oldKey);
+            offlineEvents = ORBEON.xforms.Offline._encrypt(offlineEvents, newKey);
+            // Update entries for this URL
+            ORBEON.xforms.Offline.gearsDatabase.execute("update Offline_Forms set event_response = ?, offline_events = ? where url= ?",
+                    [eventResponse, offlineEvents, url]).close();
             resultSet.next();
         }
         resultSet.close();
@@ -786,6 +790,7 @@ ORBEON.xforms.Document = {
         var resultSet = ORBEON.xforms.Offline.gearsDatabase.execute("select control_values from Offline_Forms where url = ?", [ url ]);
         if (! resultSet.isValidRow) return null;
         var controlValues = resultSet.fieldByName("control_values");
+        controlValues = ORBEON.xforms.Offline._decrypt(controlValues, ORBEON.xforms.Offline.getEncryptionKey());
         controlValues = ORBEON.xforms.Offline._deserializerControlValues(controlValues);
         return controlValues;
     },
@@ -4298,10 +4303,8 @@ ORBEON.xforms.Offline = {
             var database = google.gears.factory.create("beta.database");
             ORBEON.xforms.Offline.gearsDatabase = database;
             database.open("orbeon.xforms");
-            // Table storing events happening while offline
-            database.execute("create table if not exists Events (id integer primary key autoincrement, url text, event text)").close();
             // Table storing the list of the forms taken offline
-            database.execute("create table if not exists Offline_Forms (url text, event_response text, form_id text, static_state text, dynamic_state text, mappings text, control_values text)").close();
+            database.execute("create table if not exists Offline_Forms (url text, event_response text, form_id text, static_state text, dynamic_state text, mappings text, control_values text, offline_events text)").close();
             // Table storing the current password if any, in encrypted form
             database.execute("create table if not exists Current_Password (encrypted_password text)").close();
 
@@ -4353,6 +4356,7 @@ ORBEON.xforms.Offline = {
                 ORBEON.xforms.Globals.requestForm = ORBEON.util.Dom.getElementById(formID);
                 ORBEON.xforms.Server.handleResponseDom(initialEventsXML, formID);
                 // Set control values
+                controlValues = ORBEON.xforms.Offline._decrypt(controlValues, ORBEON.xforms.Offline.getEncryptionKey());
                 controlValues = ORBEON.xforms.Offline._deserializerControlValues(controlValues);
                 for (var controlID in controlValues) {
                     var controlValue = controlValues[controlID];
@@ -4444,14 +4448,15 @@ ORBEON.xforms.Offline = {
 
         // Remember that we took this form offline
         var resultSet = ORBEON.xforms.Offline.gearsDatabase.execute(
-            "insert into Offline_Forms (url, event_response, form_id, static_state, dynamic_state, mappings, control_values) values (?, ?, ?, ?, ?, ?, ?)", [
+            "insert into Offline_Forms (url, event_response, form_id, static_state, dynamic_state, mappings, control_values, offline_events) values (?, ?, ?, ?, ?, ?, ?, ?)", [
                 window.location.href,
                 ORBEON.xforms.Offline._encrypt(eventResponse, ORBEON.xforms.Offline.getEncryptionKey()),
                 formID,
                 ORBEON.xforms.Globals.formStaticState[formID].value,
                 ORBEON.xforms.Globals.formDynamicState[formID].value,
                 mappings,
-                controlValuesString]);
+                ORBEON.xforms.Offline._encrypt(controlValuesString, ORBEON.xforms.Offline.getEncryptionKey()),
+                ""]);
         resultSet.close();
 
         // Capture all the resources this form needs.
@@ -4497,48 +4502,45 @@ ORBEON.xforms.Offline = {
         ORBEON.xforms.Offline.init();
 
         // Update the static state and dynamic state with the one from the database
-        var resultSet = ORBEON.xforms.Offline.gearsDatabase.execute("select form_id, static_state, dynamic_state from Offline_Forms where url = ?", [window.location.href]);
+        var resultSet = ORBEON.xforms.Offline.gearsDatabase.execute("select form_id, static_state, dynamic_state, offline_events from Offline_Forms where url = ?", [window.location.href]);
         var formID = resultSet.fieldByName("form_id");
         ORBEON.xforms.Globals.formDynamicState[formID].value = resultSet.fieldByName("dynamic_state");
         ORBEON.xforms.Globals.formStaticState[formID].value = resultSet.fieldByName("static_state");
 
         // Prepare array with all the events that happened since the form was taken offline
         // Get all events from the database to create events array
-        var resultSet = ORBEON.xforms.Offline.gearsDatabase.execute("select * from Events where url = ? order by id", [window.location.href]);
-        var events = [];
-        while (resultSet.isValidRow()) {
-            var eventString = resultSet.fieldByName("event");
-            // Decrypt event if we have a password
-            eventString = ORBEON.xforms.Offline._decrypt(eventString, ORBEON.xforms.Offline.getEncryptionKey());
-            // Extract components of event into an array and unescape each one
-            var eventArray = eventString.split(" ");
-            for (var eventComponentIndex = 0; eventComponentIndex < eventArray.length; eventComponentIndex++)
-                eventArray[eventComponentIndex] = unescape(eventArray[eventComponentIndex]);
-            // Create event object
-            events.push(new ORBEON.xforms.Server.Event(
-                ORBEON.util.Dom.getElementById(eventArray[0]),
-                eventArray[1],
-                eventArray[2],
-                eventArray[3],
-                eventArray[4],
-                eventArray[5],
-                eventArray[6] == "1",
-                eventArray[7] == "1"));
-            resultSet.next();
+        var eventsString = resultSet.fieldByName("offline_events");
+        eventsString = ORBEON.xforms.Offline._decrypt(eventsString, ORBEON.xforms.Offline.getEncryptionKey());
+        ORBEON.xforms.Offline.isOnline = true;
+        if (eventsString != "") {
+            var eventsStringArray = eventsString.split(" ");
+            var events = [];
+            for (var eventIndex = 0; eventIndex < eventsStringArray.length; eventIndex++) {
+                var eventString = unescape(eventsStringArray[eventIndex]);
+                // Extract components of event into an array and unescape each one
+                var eventArray = eventString.split(" ");
+                for (var eventComponentIndex = 0; eventComponentIndex < eventArray.length; eventComponentIndex++)
+                    eventArray[eventComponentIndex] = unescape(eventArray[eventComponentIndex]);
+                // Create event object
+                events.push(new ORBEON.xforms.Server.Event(
+                    ORBEON.util.Dom.getElementById(eventArray[0]),
+                    eventArray[1],
+                    eventArray[2],
+                    eventArray[3],
+                    eventArray[4],
+                    eventArray[5],
+                    eventArray[6] == "1",
+                    eventArray[7] == "1"));
+            }
+            // Send all the events back to the server
+            ORBEON.xforms.Server.fireEvents(events, false);
         }
-        resultSet.close();
 
         // Go back online
         ORBEON.xforms.Offline.gearsDatabase.execute("delete from Offline_Forms where url = ?", [ window.location.href ]).close();
-        ORBEON.xforms.Offline.isOnline = true;
-
-        // Send all the events back to the server
-        ORBEON.xforms.Server.fireEvents(events, false);
 
         // Remove form from store
         ORBEON.xforms.Offline.formStore.remove(window.location.href);
-        // Delete events from the database the events we just sent to the server
-        ORBEON.xforms.Offline.gearsDatabase.execute("delete from Events where url = ?", [window.location.href]).close();
     },
 
     /**
@@ -4549,7 +4551,8 @@ ORBEON.xforms.Offline = {
 
         ORBEON.xforms.Offline.init();
 
-        // Store new events
+        // Compute new events
+        var newEventsString = "";
         for (var eventIndex = 0; eventIndex < events.length; eventIndex++) {
             var event = events[eventIndex];
 
@@ -4570,15 +4573,27 @@ ORBEON.xforms.Offline = {
                 if (eventComponentIndex != 0) eventString += " ";
                 eventString += escape(eventArray[eventComponentIndex]);
             }
-            // Encrypt eventString if a password was provided
-            eventString = ORBEON.xforms.Offline._encrypt(eventString, ORBEON.xforms.Offline.getEncryptionKey());
-            // Store eventString in database
-            ORBEON.xforms.Offline.gearsDatabase.execute("insert into Events (url, event) values (?, ?)", [ window.location.href, eventString ]).close();
+            // Add this event to newEventsString
+            if (newEventsString.length > 0) newEventsString += " ";
+            newEventsString += escape(eventString);
         }
 
-        // Store new values of controls
+        var resultSet = ORBEON.xforms.Offline.gearsDatabase.execute("select offline_events from Offline_Forms where url = ?", [ window.location.href ]);
+        var currentEventsString = resultSet.fieldByName("offline_events");
+        if (currentEventsString != "") {
+            currentEventsString = ORBEON.xforms.Offline._decrypt(currentEventsString, ORBEON.xforms.Offline.getEncryptionKey());
+            currentEventsString += " ";
+        }
+        currentEventsString += newEventsString;
+        currentEventsString = ORBEON.xforms.Offline._encrypt(currentEventsString, ORBEON.xforms.Offline.getEncryptionKey());
+
+        // Compute new values of controls
         var controlValuesString = ORBEON.xforms.Offline._serializeControlValues(ORBEON.xforms.Offline.controlValues);
-        ORBEON.xforms.Offline.gearsDatabase.execute("update Offline_Forms set control_values = ? where url = ?", [ controlValuesString, window.location.href ]).close();
+        controlValuesString = ORBEON.xforms.Offline._encrypt(controlValuesString, ORBEON.xforms.Offline.getEncryptionKey());
+
+        // Store new events and new value of controls
+        ORBEON.xforms.Offline.gearsDatabase.execute("update Offline_Forms set control_values = ?, offline_events = ? where url = ?",
+                [ controlValuesString, currentEventsString, window.location.href ]).close();
     },
 
     loadFormInIframe: function(url, loadListener) {
@@ -4697,6 +4712,7 @@ ORBEON.xforms.Offline = {
      */
     _encrypt: function(text, key) {
         return key == null ? text :
+               text == "" ? text :
                byteArrayToHex(rijndaelEncrypt(text, key, "ECB"));
     },
 
@@ -4705,6 +4721,7 @@ ORBEON.xforms.Offline = {
      */
     _decrypt: function(text, key) {
         return key == null ? text :
+               text == "" ? text :
                byteArrayToString(rijndaelDecrypt(hexToByteArray(text), key, "ECB"));
     }
 };

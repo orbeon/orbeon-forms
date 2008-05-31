@@ -881,7 +881,7 @@ ORBEON.xforms.Controls = {
     },
 
     getCurrentValue: function(control) {
-        if (ORBEON.util.Dom.hasClass(control, "xforms-input") && !ORBEON.util.Dom.hasClass(control, "xforms-type-boolean")) {
+        if (ORBEON.util.Dom.hasClass(control, "xforms-input") && !ORBEON.util.Dom.hasClass(control, "xforms-type-boolean") && !ORBEON.util.Dom.hasClass(control, "xforms-static")) {
             return ORBEON.util.Dom.getChildElementByIndex(control, 1).value;
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-select1-open")) {
             return ORBEON.util.Dom.getChildElementByIndex(control, 0).value;
@@ -917,7 +917,7 @@ ORBEON.xforms.Controls = {
                 && ORBEON.util.Dom.hasClass(control, "xforms-mediatype-text-html")) {
             var editorInstance = FCKeditorAPI.GetInstance(control.name);
             return editorInstance.GetXHTML();
-        } else if (ORBEON.util.Dom.hasClass(control, "xforms-output")){
+        } else if (ORBEON.util.Dom.hasClass(control, "xforms-output") || (ORBEON.util.Dom.hasClass(control, "xforms-input") && ORBEON.util.Dom.hasClass(control, "xforms-static"))) {
             if (ORBEON.util.Dom.hasClass(control, "xforms-mediatype-image")) {
                 var image = ORBEON.util.Dom.getChildElementByIndex(control, 0);
                 return image.src;

@@ -126,7 +126,7 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
             if (headerValuesMap == null) {
                 headerValuesMap = new HashMap();
                 for (Enumeration e = nativeRequest.getHeaderNames(); e.hasMoreElements();) {
-                    String name = (String) e.nextElement();
+                    final String name = (String) e.nextElement();
                     // NOTE: Normalize names to lowercase to ensure consistency between servlet containers
                     headerValuesMap.put(name.toLowerCase(), NetUtils.stringEnumerationToArray(nativeRequest.getHeaders(name)));
                 }

@@ -34,15 +34,15 @@
     }
     flickrURL += "&per_page=200&api_key=d0c3b54d6fbc1ed217ecc67feb42568b";
 
-    Document flickrResponse = xmlReader.read(new URL(flickrURL));
-    Element photosElement = flickrResponse.getRootElement().element("photos");
+    final Document flickrResponse = xmlReader.read(new URL(flickrURL));
+    final Element photosElement = flickrResponse.getRootElement().element("photos");
 %>
 <photos>
 <%  for (Iterator photoIterator = photosElement.elementIterator(); photoIterator.hasNext();) {
-        Element photo = (Element) photoIterator.next();
-        String photoURL = "http://static.flickr.com/" + photo.attributeValue("server") + "/" + photo.attributeValue("id")
+        final Element photo = (Element) photoIterator.next();
+        final String photoURL = "http://static.flickr.com/" + photo.attributeValue("server") + "/" + photo.attributeValue("id")
             + "_" + photo.attributeValue("secret") + "_s.jpg";
-        String pageURL = "http://flickr.com/photos/" + photo.attributeValue("owner") +"/" + photo.attributeValue("id") + "/";
+        final String pageURL = "http://flickr.com/photos/" + photo.attributeValue("owner") +"/" + photo.attributeValue("id") + "/";
 %>
     <photo url="<%=photoURL%>" page="<%=pageURL%>"/>
 <%  } %>

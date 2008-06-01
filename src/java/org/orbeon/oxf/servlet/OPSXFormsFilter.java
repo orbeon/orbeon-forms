@@ -193,7 +193,7 @@ public class OPSXFormsFilter implements Filter {
                 for (Enumeration e = super.getHeaderNames(); e.hasMoreElements();) {
                     final String currentName = (String) e.nextElement();
                     if (!currentName.toLowerCase().startsWith("if-"))
-                        newHeaderNames.add(newHeaderNames);
+                        newHeaderNames.add(currentName);
                 }
                 headerNames = Collections.enumeration(newHeaderNames);
 

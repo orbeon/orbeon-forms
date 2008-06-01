@@ -56,7 +56,7 @@
     <p:processor name="oxf:unsafe-xslt">
         <p:input name="data" href="#themed-data"/>
         <p:input name="instance" href="#instance"/>
-        <p:input name="config" href="oxf:/apps/fr/components.xsl"/>
+        <p:input name="config" href="components.xsl"/>
         <p:output name="data" id="after-components"/>
     </p:processor>
 

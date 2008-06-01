@@ -463,9 +463,9 @@ ul {
     min-width: 9em;
 }
 
-.ops-portlet-div { text-align: left; margin: 1em }
-.ops-portlet-content { }
-.ops-portlet-home { margin-top: 1em; font-style: italic }
+.orbeon-portlet-div { text-align: left; margin: 1em }
+.orbeon-portlet-content { }
+.orbeon-portlet-home { margin-top: 1em; font-style: italic }
 
 @media print {
     #orbeon-logo { display: none }
@@ -476,7 +476,6 @@ ul {
     .tabs { display: none }
     .tab { display: none }
     #cleaner { display: none }
-    /*#orbeon-logo { margin-left: 0; margin-bottom: 2em; }*/
     #navigation { display: none}
     #main .maincontent { margin: 0; border: none; }
 

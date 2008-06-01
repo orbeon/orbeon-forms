@@ -19,16 +19,16 @@
         <application id="fr/orbeon/builder" label="Form Builder (ALPHA)"/>
         <application id="fr/orbeon/bookcast" label="Bookcast Form"/>
     </section>
+    <section label="XForms Tutorial Apps">
+        <application id="xforms-hello" label="XForms Hello"/>
+        <application id="xforms-bookcast" label="XForms Bookcast"/>
+    </section>
     <section label="XForms">
         <application id="forms" label="Government Forms"/>
         <application id="xforms-controls" label="XForms Controls"/>
         <application id="xforms-todo" label="To-Do Lists"/>
         <application id="xforms-translate" label="Instant Translation"/>
         <application id="xforms-sandbox" label="XForms Sandbox"/>
-    </section>
-    <section label="XForms Tutorial Apps">
-        <application id="xforms-hello" label="XForms Hello"/>
-        <application id="xforms-bookcast" label="XForms Bookcast"/>
     </section>
     <section label="More XForms">
         <application id="xforms-calculator" label="Calculator"/>

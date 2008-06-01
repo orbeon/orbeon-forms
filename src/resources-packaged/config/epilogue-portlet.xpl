@@ -85,19 +85,20 @@
                     xmlns:context="java:org.orbeon.oxf.pipeline.StaticExternalContext">
                 <xsl:import href="oxf:/config/theme-plain.xsl"/>
                 <xsl:template match="/">
-                    <xhtml:div xmlns:f="http://orbeon.org/oxf/xml/formatting" class="ops-portlet-div">
+                    <xhtml:div xmlns:f="http://orbeon.org/oxf/xml/formatting" class="orbeon-portlet-div">
                         <!-- Styles and scripts -->
                         <xhtml:link rel="stylesheet" href="/config/theme/orbeon.css" type="text/css"/>
                         <xsl:apply-templates select="/xhtml:html/xhtml:head/(xhtml:style | xhtml:link | xhtml:script)"/>
-                        <!-- Try to get a title -->
+                        <!-- Try to get a title and set it on the portlet -->
                         <xsl:if test="normalize-space(/xhtml:html/xhtml:head/xhtml:title)">
                             <xsl:value-of select="context:setTitle(normalize-space(/xhtml:html/xhtml:head/xhtml:title))"/>
                         </xsl:if>
-                        <xhtml:div class="ops-portlet-content">
+                        <xhtml:div class="orbeon-portlet-content">
                             <xsl:apply-templates select="/xhtml:html/xhtml:body/node()"/>
                         </xhtml:div>
-                        <xhtml:div class="ops-portlet-home">
-                            <xhtml:a href="/" f:portlet-mode="view">Back to portlet home</xhtml:a>
+                        <!-- This is for demo purposes only -->
+                        <xhtml:div class="orbeon-portlet-home">
+                            <xhtml:a href="/" f:portlet-mode="view">Home</xhtml:a>
                         </xhtml:div>
                     </xhtml:div>
                 </xsl:template>
@@ -118,8 +119,8 @@
                     <uri>http://www.w3.org/1999/xhtml</uri>
                 </match>
                 <replace>
-                    <uri></uri>
-                    <prefix></prefix>
+                    <uri/>
+                    <prefix/>
                 </replace>
             </config>
         </p:input>
@@ -130,8 +131,9 @@
     <p:processor name="oxf:html-converter">
         <p:input name="config">
             <config>
-                <!-- Not necessary to indent at this point -->
-                <indent>false</indent>
+                <!-- Indent to level 0 -->
+                <indent>true</indent>
+                <indent-amount>0</indent-amount>
                 <!-- Do not output any doctype, this is a fragment -->
             </config>
         </p:input>

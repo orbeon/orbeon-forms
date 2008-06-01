@@ -49,16 +49,17 @@
         <p:input name="config">
             <config>
                 <include>/request/container-type</include>
+                <include>/request/parameters/parameter[starts-with(name, 'orbeon')]</include>
             </config>
         </p:input>
-        <p:output name="data" id="container-type"/>
+        <p:output name="data" id="request"/>
     </p:processor>
 
     <!-- Choose which epilogue to call depending on container type -->
     <!-- If you don't use portlets at all, you can bypass this -->
-    <p:choose  href="#container-type">
+    <p:choose  href="#request">
         <!-- If the container is a servlet, call the servlet epilogue pipeline -->
-        <p:when test="/request/container-type = 'servlet'">
+        <p:when test="/request/container-type = 'servlet' and not(/request/parameters/parameter[name = 'orbeon-portlet']/value = 'true')">
             <p:processor name="oxf:pipeline">
                 <p:input name="config" href="epilogue-servlet.xpl"/>
                 <p:input name="data" href="#data"/>

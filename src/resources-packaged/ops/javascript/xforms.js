@@ -2691,9 +2691,9 @@ ORBEON.xforms.Init = {
             xformsPageLoadedServer();
 
         // Run call-back function interested in knowing when the form is initialized
-        if (window.orbeonReady) {
-            window.orbeonReady();
-            window.orbeonReady = null;
+        if (window.parent.childWindowOrbeonReady) {
+            window.parent.childWindowOrbeonReady();
+            window.parent.childWindowOrbeonReady = null;
         }
     },
 
@@ -4612,7 +4612,7 @@ ORBEON.xforms.Offline = {
         document.body.appendChild(offlineIframe);
 
         // Load URL and call listener when done
-        offlineIframe.contentWindow.orbeonReady = function() {
+        window.childWindowOrbeonReady = function() {
             loadListener(offlineIframe);
         };
         offlineIframe.src = url;

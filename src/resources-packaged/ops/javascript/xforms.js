@@ -4468,22 +4468,35 @@ ORBEON.xforms.Offline = {
             YAHOO.util.Selector.query("img")
         );
         // Create list of URLs to capture
-        var urlsToKeepOffline = [ window.location.href ];
+        var urlsToCapture = [ window.location.href ];
         for (var elementIndex = 0; elementIndex < htmlElements.length; elementIndex++) {
             var element = htmlElements[elementIndex];
             if (YAHOO.lang.isString(element.href) && element.href != "")
-                urlsToKeepOffline.push(element.href);
+                urlsToCapture.push(element.href);
             if (YAHOO.lang.isString(element.src) && element.src != "")
-                urlsToKeepOffline.push(element.src);
+                urlsToCapture.push(element.src);
         }
+		// Remove dupplicates
+		{
+			var removeDupplicates = [];
+			urlsToCapture = urlsToCapture.sort();
+	        for (var urlIndex = 0; urlIndex < urlsToCapture.length; urlIndex++) {
+				if (urlIndex == 0 || urlsToCapture[urlIndex] != urlsToCapture[urlIndex - 1])
+					removeDupplicates.push(urlsToCapture[urlIndex]);
+			}
+			urlsToCapture = removeDupplicates;
+		}
         // Remove from the list URLs that have been captured already
-        var urlsToCapture = [];
-        for (var urlIndex = 0; urlIndex < urlsToKeepOffline.length; urlIndex++) {
-            var url = urlsToKeepOffline[urlIndex];
-            if (! ORBEON.xforms.Offline.formStore.isCaptured(url))
-                urlsToCapture.push(url);
-        }
-
+		{
+			var removeAlreadyCaptured = [];
+	        for (var urlIndex = 0; urlIndex < urlsToCapture.length; urlIndex++) {
+	            var url = urlsToCapture[urlIndex];
+	            if (! ORBEON.xforms.Offline.formStore.isCaptured(url))
+	                removeAlreadyCaptured.push(url);
+	        }
+			urlsToCapture = removeAlreadyCaptured;
+		}
+		// Call Gears to perform the capture
         if (urlsToCapture.length != 0) {
             ORBEON.xforms.Offline.formStore.capture(urlsToCapture, function (url, success, captureId) {
                 // When capture is done, mark the form as offline to prevent any event from being sent to the server

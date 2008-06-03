@@ -347,8 +347,8 @@ public class OldControlsComparator extends BaseControlsComparator {
 
                     // Try to get static itemset info
                     final XFormsStaticState.ItemsInfo itemsInfo = containingDocument.getStaticState().getItemsInfo(xformsSingleNodeControl2.getId());
-                    if (itemsInfo != null && !itemsInfo.hasNonStaticItem()) {
-                        // No update to send
+                    if (xformsSelect1Control1 != null && itemsInfo != null && !itemsInfo.hasNonStaticItem() && xformsSelect1Control1.isRelevant() == xformsSelect1Control2.isRelevant()) {
+                        // No update to send because the itemset can't change
                     } else {
                         // There is a possible change
                         if (itemsetsFull1 != null && xformsSelect1Control1 != null && xformsSelect1Control1.isRelevant()) {

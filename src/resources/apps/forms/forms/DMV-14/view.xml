@@ -249,7 +249,7 @@
                                     <xforms:alert model="resources-model" ref="instance('resources-instance')/detail/alerts/city"/>
                                     <!--<xforms:hint>Do Not Abbreviate - Use First 22 Characters in City Name</xforms:hint>-->
                                 </xforms:input>
-                                <xforms:select1 ref="dmv:state" xxforms:refresh-items="false">
+                                <xforms:select1 ref="dmv:state">
                                     <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/state"/>
                                     <xforms:alert model="resources-model" ref="instance('resources-instance')/detail/alerts/state"/>
                                     <xforms:item>

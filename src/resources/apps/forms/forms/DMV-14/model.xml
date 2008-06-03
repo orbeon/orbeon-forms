@@ -12,16 +12,18 @@
       xmlns="http://www.w3.org/1999/xhtml">
 
     <!-- This is called when the XForms engine is ready -->
-    <xforms:action ev:event="xforms-ready">
+    <xforms:action ev:event="xforms-model-construct-done">
         <!-- Build plates instance -->
         <xforms:insert context="instance('plates-instance')"
                        while="count(plate) lt count(instance('document-instance')//dmv:plate-number)"
                        nodeset="plate" origin="instance('plate-template')"/>
-        <xforms:recalculate/>
-        <xforms:refresh/>
+    </xforms:action>
+
+    <xforms:action ev:event="xforms-ready">
         <!-- Set initial focus -->
         <xforms:setfocus control="dmv-last-name-control"/>
         <!-- Make sure we look clean after initialization, as insertions can take place above -->
+        <xforms:refresh/>
         <xforms:setvalue ref="xxforms:instance('control-instance')/data-status"/>
     </xforms:action>
 

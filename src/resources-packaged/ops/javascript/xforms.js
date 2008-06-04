@@ -788,7 +788,7 @@ ORBEON.xforms.Document = {
      */
     getOfflineControlValues: function(url) {
         var resultSet = ORBEON.xforms.Offline.gearsDatabase.execute("select control_values from Offline_Forms where url = ?", [ url ]);
-        if (! resultSet.isValidRow) return null;
+        if (! resultSet.isValidRow()) return null;
         var controlValues = resultSet.fieldByName("control_values");
         controlValues = ORBEON.xforms.Offline._decrypt(controlValues, ORBEON.xforms.Offline.getEncryptionKey());
         controlValues = ORBEON.xforms.Offline._deserializerControlValues(controlValues);

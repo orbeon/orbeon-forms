@@ -4500,7 +4500,8 @@ ORBEON.xforms.Offline = {
         if (urlsToCapture.length != 0) {
             ORBEON.xforms.Offline.formStore.capture(urlsToCapture, function (url, success, captureId) {
                 // When capture is done, mark the form as offline to prevent any event from being sent to the server
-                ORBEON.xforms.Offline.isOnline = false;
+                if (url == urlsToCapture[urlsToCapture.length - 1])
+                    ORBEON.xforms.Offline.isOnline = false;
             });
         } else {
             ORBEON.xforms.Offline.isOnline = false;

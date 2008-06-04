@@ -75,7 +75,7 @@
 
                     <xforms:input ref="is-soap">
                         <xforms:label>SOAP Submission</xforms:label>
-                        <xforms:hint>Wheather this is a SOAP submission</xforms:hint>
+                        <xforms:hint>Whether this is a SOAP submission</xforms:hint>
                     </xforms:input>
 
                     <xforms:group ref=".[is-soap = 'true']">
@@ -87,7 +87,7 @@
 
                     <xforms:input ref="is-auth">
                         <xforms:label>HTTP Authentication</xforms:label>
-                        <xforms:hint>Wheather to use HTTP authentication</xforms:hint>
+                        <xforms:hint>Whether to use HTTP authentication</xforms:hint>
                     </xforms:input>
 
                     <xforms:group ref=".[is-auth = 'true']">

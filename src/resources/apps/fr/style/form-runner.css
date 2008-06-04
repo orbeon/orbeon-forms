@@ -116,7 +116,7 @@ h1 { margin-top: 0 }
 .xforms-label, h4  { font-weight: bold; text-align: left; }
 
 .fr-grid-content .xforms-control {
-    display: block;     /* So control is not displayed next to the help icon but on a new line */ 
+    display: block;     /* So control is not displayed next to the help icon but on a new line */
     margin-top: 0.3em;  /* Insert some space between the label / help and the control */
     clear: both;
 }
@@ -242,14 +242,13 @@ hr {
 
 /* Repeats: shows as table (1 line per iteration; labels used as header of table) */
 .fr-repeat-table {
-    /*margin-top: 1em;*/
     border-collapse: collapse;
 }
 .fr-repeat-table td , .fr-repeat-table th { border: 1px solid #ddd; padding: .2em .5em .2em .5em; }
 /* Styling for last dummy line added so IE displays the bottom border of the table */
 .fr-repeat-table .fr-repeat-last-line td { border: none; padding: 0; }
 .fr-repeat-table .fr-repeat-last-line { display: none }
-.fr-repeat-table th { background-color: #ddd; }
+.fr-repeat-table th { background-color: #ddd; white-space: nowrap }
 .fr-repeat-table td .xforms-label { display: none; }
 .fr-repeat-table td .xforms-help-image { display: none; }
 .fr-repeat-table td .xforms-help { display: none; }
@@ -305,7 +304,7 @@ body { text-align: left }
     background-color: #DF731B;
     color: white;
     padding: 1px;
-    border-radius: 3px; -moz-border-radius: 2px; -webkit-border-radius: 3px; -ms-border-radius: 2px /* radius appears differently w/ Safari 3.1 vs. Firefox 3.0b4*/ 
+    border-radius: 3px; -moz-border-radius: 2px; -webkit-border-radius: 3px; -ms-border-radius: 2px /* radius appears differently w/ Safari 3.1 vs. Firefox 3.0b4*/
 }
 
 /* Display hints under each control */
@@ -315,8 +314,8 @@ body { text-align: left }
     margin-top: .2em;
     margin-left: 0;/* used to have margin here but with new colors no margin seems better */
     width: 100%;
-    color: gray
-    /*color: #666699*/
+    color: gray;
+    font-style: italic
 }
 
 /* Do this for collapsible sections so that YUI animations work */
@@ -423,7 +422,7 @@ div.fr-collapsible {
 .fr-grid-content {
     padding: 0.5em;      /* Add some space arround control */
     *padding-right: 6px; /* To help IE move back controls within .fr-grid-content */
-} 
+}
 .fr-grid .fr-inplace-edit .xforms-input input { width: 100% }
 
 .fb-edit-items { text-decoration: none; display: block; clear: both }

@@ -867,7 +867,7 @@
                                     <xforms:trigger appearance="minimal" ref="if (
                                             {if ($first-mandatory) then 'position() != 1 and ' else ''}
                                             count(xxforms:repeat-nodeset('{@id}')) gt {$min-occurs}) then . else ()">
-                                        <xforms:label><xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/delete.png" alt="Remove" title="Remove"/></xforms:label>
+                                        <xforms:label><xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/bin.png" alt="Remove" title="Remove"/></xforms:label>
                                     </xforms:trigger>
                                     <xforms:delete ev:event="DOMActivate" nodeset="."/>
                                 </xforms:group>

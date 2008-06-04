@@ -410,13 +410,13 @@
                     <xxforms:variable name="control-name" select="" as="xs:string"/>
                     <xxforms:variable name="response-items" select="" as="node()*"/>
                     <!-- Set itemset -->
-                    <xxforms:variable name="control-resources" select="$form-resources/*[name() = $control-name]"/>
+                    <xxforms:variable name="control-resources" select="xxforms:instance('fr-current-form-resources')/*[name() = $control-name]"/>
                     <xforms:delete xxforms:iterate="$control-resources/item" nodeset="."/>
                     <xforms:action xxforms:iterate="$response-items">
                         <xxforms:variable name="item-label" select="" as="xs:string"/>
                         <xxforms:variable name="item-value" select="" as="xs:string"/>
                         <xforms:insert nodeset="$control-resources/*"
-                                       origin="xxforms:element('item', xxforms:element('label', $item-label), xxforms:element('value', $item-value))"/>
+                                       origin="xxforms:element('item', (xxforms:element('label', $item-label), xxforms:element('value', $item-value)))"/>
                     </xforms:action>
                 </xforms:action>
             </action>

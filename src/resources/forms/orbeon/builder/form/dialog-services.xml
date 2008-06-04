@@ -332,7 +332,8 @@
             <xforms:setvalue ref="$instance/request/serialization" value="$submission/@serialization"/>
             <xforms:setvalue ref="$instance/request/resource" value="$submission/@resource"/>
             <!--<xforms:setvalue ref="$instance/request/replace" value="$submission/@replace"/>-->
-            <xforms:setvalue ref="$instance/request/body" value="$model/xforms:instance[@id = concat($submission-name, '-instance')]/*/request"/>
+            <xforms:setvalue ref="$instance/request/body"
+                             value="saxon:serialize($model/xforms:instance[@id = concat($submission-name, '-instance')]/*, xxforms:instance('fr-xsl-output-instance'))"/>
             <!-- TODO: is-soap -->
             <xforms:setvalue ref="$instance/request/is-auth" value="exists($submission/@xxforms:username | $submission/@xxforms:password)"/>
             <xforms:setvalue ref="$instance/request/username" value="$submission/@xxforms:username"/>

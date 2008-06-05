@@ -249,7 +249,7 @@
                                         </xforms:action>
 
                                         <!-- Section content -->
-                                        <xforms:repeat nodeset="fr:section | fr:repeat | fr:grid" id="fb-section-content-repeat" xxforms:dnd="none">
+                                        <xforms:repeat nodeset="fr:section | fr:repeat | fr:grid" id="fb-section-content-repeat" xxforms:dnd="vertical">
                                             <xxforms:variable name="section-content-position" select="position()"/>
                                             <xxforms:variable name="is-section-content-current"
                                                               select="$is-top-level-current and $section-content-position = index('fb-section-content-repeat')"/>
@@ -748,6 +748,16 @@
                                                                                                     <!-- Simply update the appearance of xforms:select -->
                                                                                                     <xforms:setvalue ref="xforms:select/@appearance"
                                                                                                                      value="if (. = 'compact') then 'full' else ."/>
+                                                                                                </xforms:action>
+
+                                                                                                <xforms:action if="xforms:select1/@appearance = 'minimal'">
+                                                                                                    <!-- Make sure there is the [Select...] item -->
+                                                                                                    <xforms:insert nodeset="xforms:select1/xforms:itemset[1]" position="before"
+                                                                                                        origin="instance('fb-controls-template')//xforms:select1[@appearance = 'minimal']/xforms:item"/>
+                                                                                                </xforms:action>
+                                                                                                <xforms:action if="not(xforms:select1/@appearance = 'minimal')">
+                                                                                                    <!-- Make sure there is NO [Select...] -->
+                                                                                                    <xforms:delete nodeset="xforms:select1/xforms:item[1]"/>
                                                                                                 </xforms:action>
 
                                                                                             </xforms:action>

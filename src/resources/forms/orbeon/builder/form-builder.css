@@ -107,8 +107,9 @@ a.fb-edit-help-trigger img {
 
 /* Bindings editor dialog */
 #fb-action-dialog { width: 45em }
-#fb-action-dialog .xforms-select1 { width: 10em }
-#fb-action-dialog .fr-repeat-table .fb-parameters .xforms-label { display: inline }
+#fb-action-dialog .xforms-select1 { width: auto }
+#fb-action-dialog .fr-repeat-table .fb-parameters .xforms-label { display: block }
+#fb-action-dialog .fr-repeat-table .fb-parameters .xforms-hint { display: block }
 #fb-action-dialog .fr-repeat-table .fb-parameters .xforms-disabled { display: none }
 #fb-action-dialog .fr-repeat-table th { white-space: nowrap }
 
@@ -327,7 +328,8 @@ a.xforms-help-image .fb-control-help { vertical-align: baseline; }
 .xforms-repeat-selected-item-4 .fb-empty-cell .fb-click-message { display: none }
 td:hover .fb-click-message { display: block }
 
-/* Accordion menu */
+/* ************************************************** Accordion menu ************************************************** */
+
 dl.accordion-menu { margin: 0; padding: 0; width: 100% }
 dl.accordion-menu dt.a-m-t {
 
@@ -377,6 +379,8 @@ html.accordion-menu-js dd.a-m-d-anim {
 	overflow: hidden;
 	display: block;
 }
+
+/* ************************************************** Other media ************************************************** */
 
 /* This is also used for PDF generation */
 @media print {

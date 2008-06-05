@@ -36,6 +36,7 @@
             <xforms:group ref="$instance/xforms:action" appearance="xxforms:internal">
                 <xforms:select1 ref="xforms:action[1]/@ev:event">
                     <xforms:label>React to</xforms:label>
+                    <xforms:hint>Event (on a control or global) to react to</xforms:hint>
                     <xforms:item>
                         <xforms:label>[Select...]</xforms:label>
                         <xforms:value/>
@@ -53,7 +54,6 @@
                         <xforms:value>xforms-ready</xforms:value>
                     </xforms:item>
                 </xforms:select1>
-                <!-- TODO: for xforms-ready, must have observer on the model, or no observer attr -->
                 <xforms:select1 ref="xforms:action[1]/@ev:observer">
                     <xforms:label>Control</xforms:label>
                     <xforms:item>
@@ -61,13 +61,14 @@
                         <xforms:value/>
                     </xforms:item>
                     <xforms:itemset nodeset="$body//(xforms:*[@ref or @bind or self::xforms:trigger])[ends-with(@id, '-control')]">
-                        <!-- TODO: user-friendly control label if non-emtpy -->
-                        <xforms:label value="substring-before(@id, '-control')"/>
+                        <!-- Try to build a reasonably user-friendly label -->
+                        <xforms:label value="for $id in substring-before(@id, '-control') return concat($current-resources/*[name() = $id]/label, ' (', $id, ')')"/>
                         <xforms:value value="@id"/>
                     </xforms:itemset>
                 </xforms:select1>
                 <xforms:select1 ref="xforms:action[1]/xforms:send/@submission" id="fb-bindings-submission-select">
                     <xforms:label>Service to Call</xforms:label>
+                    <xforms:hint>Service to call when the event happens</xforms:hint>
                     <xforms:item>
                         <xforms:label>[Select...]</xforms:label>
                         <xforms:value/>
@@ -91,8 +92,8 @@
                                         <xforms:value/>
                                     </xforms:item>
                                     <xforms:itemset nodeset="$body//xforms:*[(@ref or @bind) and ends-with(@id, '-control')]">
-                                        <!-- TODO: user-friendly control label if non-emtpy -->
-                                        <xforms:label value="substring-before(@id, '-control')"/>
+                                        <!-- Try to build a reasonably user-friendly label -->
+                                        <xforms:label value="for $id in substring-before(@id, '-control') return concat($current-resources/*[name() = $id]/label, ' (', $id, ')')"/>
                                         <xforms:value value="concat('''', substring-before(@id, '-control'), '''')"/>
                                     </xforms:itemset>
                                 </xforms:select1>
@@ -117,8 +118,8 @@
                                         <xforms:value/>
                                     </xforms:item>
                                     <xforms:itemset nodeset="$body//xforms:*[(@ref or @bind) and ends-with(@id, '-control')]">
-                                        <!-- TODO: user-friendly control label if non-emtpy -->
-                                        <xforms:label value="substring-before(@id, '-control')"/>
+                                        <!-- Try to build a reasonably user-friendly label -->
+                                        <xforms:label value="for $id in substring-before(@id, '-control') return concat($current-resources/*[name() = $id]/label, ' (', $id, ')')"/>
                                         <xforms:value value="concat('''', substring-before(@id, '-control'), '''')"/>
                                     </xforms:itemset>
                                 </xforms:select1>
@@ -165,13 +166,15 @@
                             <xhtml:td>
                                 <!-- Only list selection controls -->
                                 <xforms:select1 ref="xxforms:variable[@name = 'control-name']/@select">
-                                    <xforms:label>Control</xforms:label>
+                                    <xforms:label>Destination Control</xforms:label>
+                                    <xforms:hint>Selection control</xforms:hint>
                                     <xforms:item>
                                         <xforms:label>[Select...]</xforms:label>
                                         <xforms:value/>
                                     </xforms:item>
                                     <xforms:itemset nodeset="$body//(xforms:select | xforms:select1)[(@ref or @bind) and ends-with(@id, '-control')]">
-                                        <xforms:label value="substring-before(@id, '-control')"/>
+                                        <!-- Try to build a reasonably user-friendly label -->
+                                        <xforms:label value="for $id in substring-before(@id, '-control') return concat($current-resources/*[name() = $id]/label, ' (', $id, ')')"/>
                                         <xforms:value value="concat('''', substring-before(@id, '-control'), '''')"/>
                                     </xforms:itemset>
                                 </xforms:select1>
@@ -179,15 +182,19 @@
                             <xhtml:td>
                                 <xforms:group>
                                     <xforms:label>Itemset</xforms:label>
+                                    <xforms:hint>XPath expressions to build a new itemset</xforms:hint>
                                     <xhtml:div class="fb-parameters">
                                         <xforms:input ref="xxforms:variable[@name = 'response-items']/@select">
                                             <xforms:label>Items</xforms:label>
+                                            <xforms:hint>XPath expression returning all response item nodes</xforms:hint>
                                         </xforms:input>
                                         <xforms:input ref=".//xxforms:variable[@name = 'item-label']/@select">
                                             <xforms:label>Label</xforms:label>
+                                            <xforms:hint>XPath expression relative to an item node</xforms:hint>
                                         </xforms:input>
                                         <xforms:input ref=".//xxforms:variable[@name = 'item-value']/@select">
                                             <xforms:label>Value</xforms:label>
+                                            <xforms:hint>XPath expression relative to an item node</xforms:hint>
                                         </xforms:input>
                                     </xhtml:div>
                                 </xforms:group>
@@ -293,7 +300,10 @@
     <!-- Model for the bindings editor -->
     <xforms:model id="fb-bindings-model">
 
+        <xxforms:variable name="fb-lang" select="xxforms:instance('fb-language-instance')"/>
         <xxforms:variable name="model" select="xxforms:instance('fr-form-instance')/xhtml:head/xforms:model[@id = 'fr-form-model']"/>
+        <xxforms:variable name="resources" select="$model/xforms:instance[@id = 'fr-form-resources']/*"/>
+        <xxforms:variable name="current-resources" select="$resources/resource[@xml:lang = $fb-lang]"/>
 
         <xforms:instance id="fb-bindings-editor-instance">
             <bindings-editor>
@@ -320,11 +330,15 @@
                 <xforms:bind nodeset="@id" calculate="concat(../../name, '-binding')"/>
                 <!-- Action that triggers the submission -->
                 <xforms:bind nodeset="xforms:action[1]">
+                    <!-- Event triggering the action -->
                     <xforms:bind nodeset="@ev:event" required="true()"/>
                     <xforms:bind name="submission-bind" nodeset="xforms:send/@submission" required="true()"/>
+                    <!-- The observer for the event triggering the action is either a control, or the model -->
                     <xforms:bind nodeset="@ev:observer"
                                  required="../@ev:event = ('DOMActivate', 'xforms-value-changed')"
-                                 relevant="../@ev:event = ('DOMActivate', 'xforms-value-changed')"/>
+                                 relevant="../@ev:event = ('DOMActivate', 'xforms-value-changed')"
+                                 calculate="if (../@ev:event = ('DOMActivate', 'xforms-value-changed')) then . else ('fr-form-model')"
+                                 readonly="false()"/>
                 </xforms:bind>
                 <!-- xforms-submit -->
                 <xforms:bind nodeset="xforms:action[@ev:event = 'xforms-submit']">
@@ -363,7 +377,7 @@
                     <!-- Get reference to initial request -->
                     <xxforms:variable name="request-instance-name" select="SET ME" as="xs:string"/>
                     <!-- Copy over to read-write request instance -->
-                    <xforms:insert nodeset="instance('fr-service-request-instance')" origin="instance($request-instance-name)"/>
+                    <xforms:insert nodeset="instance('fr-service-request-instance')" origin="saxon:parse(instance($request-instance-name))"/>
                     <!-- Set values if needed -->
                     <xforms:action context="instance('fr-service-request-instance')">
                         <!-- Setvalue actions will be here -->

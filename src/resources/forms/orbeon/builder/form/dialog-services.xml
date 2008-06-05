@@ -288,8 +288,7 @@
 
                     <!-- Set instance body -->
                     <xforms:action context="$model/xforms:instance[@id = $instance-id]">
-                        <xforms:delete context="." nodeset="*"/>
-                        <xforms:insert context="." origin="saxon:parse($request/body)"/>
+                        <xforms:setvalue ref="*" value="$request/body"/>
                     </xforms:action>
 
                     <!-- Hide dialog -->
@@ -333,7 +332,7 @@
             <xforms:setvalue ref="$instance/request/resource" value="$submission/@resource"/>
             <!--<xforms:setvalue ref="$instance/request/replace" value="$submission/@replace"/>-->
             <xforms:setvalue ref="$instance/request/body"
-                             value="saxon:serialize($model/xforms:instance[@id = concat($submission-name, '-instance')]/*, xxforms:instance('fr-xsl-output-instance'))"/>
+                             value="$model/xforms:instance[@id = concat($submission-name, '-instance')]/*"/>
             <!-- TODO: is-soap -->
             <xforms:setvalue ref="$instance/request/is-auth" value="exists($submission/@xxforms:username | $submission/@xxforms:password)"/>
             <xforms:setvalue ref="$instance/request/username" value="$submission/@xxforms:username"/>
@@ -414,7 +413,9 @@
 
         <!-- Template for inserting an instance-->
         <xforms:instance id="fb-instance-template" xxforms:readonly="true" xxforms:exclude-result-prefixes="#all">
-            <xforms:instance id="" class="fr-service" xxforms:exclude-result-prefixes="#all"/>
+            <xforms:instance id="" class="fr-service" xxforms:exclude-result-prefixes="#all">
+                <body/>
+            </xforms:instance>
         </xforms:instance>
 
         <!-- Submission to test a service -->

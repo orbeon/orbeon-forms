@@ -65,92 +65,20 @@
                 </li>
                 <li>
                     <p>
-                        With Tomcat 5, move <code>xercesImpl.jar</code> and
-                        <code>xmlParserAPIs.jar</code> from <code>common/endorsed</code> to
-                        <code>server/lib</code>. This way Xerces will be available to Tomcat, but it
-                        won't override the version of Xerces and standard XML APIs that comes with
-                        Orbeon Forms.
+                        With Tomcat 5, move <code>xercesImpl.jar</code> and <code>xmlParserAPIs.jar</code> from
+                        <code>common/endorsed</code> to <code>server/lib</code>. This way Xerces will be available to
+                        Tomcat, but it won't override the version of Xerces and standard XML APIs that comes with Orbeon
+                        Forms.
                     </p>
                 </li>
                 <li>
                     <p>
-                        You can now start Tomcat, and access <code>http://localhost:8080/orbeon/</code>
-                        to test your installation (replacing <code>localhost</code> and
-                        <code>8080</code> with the host name and port number of your Tomcat
-                        installation if different from the default), or perform one of the optional
-                        installation steps below.</p>
-                    </li>
-
-<!--
-                <li><p>Optionally, configure a datasource to use the SQL examples
-                using the bundled HSQLDB database:
-
-                   <ol>
-                        <li>Open <code>TOMCAT_HOME/webapps/orbeon/WEB-INF/web.xml</code> and
-                        uncomment the three sections delimited with "Uncomment this for the SQL
-                        example".</li>
-
-                        <li>Copy <code>hsqldb-1_7_2_4_orbeon.jar</code> from
-                        <code>TOMCAT_HOME/webapps/orbeon/WEB-INF/lib</code> to
-                        <code>TOMCAT_HOME/common/lib</code>.</li>
-
-                        <li>If you are using Tomcat 4.1 LE, download <link
-                        href="http://jakarta.apache.org/commons/dbcp/">Jakarta Commons DBCP</link>
-                        and <link href="http://jakarta.apache.org/commons/pool/">Jakarta Commons
-                        Pool</link> and copy the JAR files to <code>TOMCAT_HOME/common/lib</code>.
-                        </li>
-
-                        <li>With Tomcat 5.0.x or earlier, open <code>server.xml</code> and add a
-                        new context with the following properties:
-
-                            <xml-source>
-                                <Context path="/orbeon" docBase="orbeon" reloadable="true" override="true">
-                                    <Resource name="jdbc/db" auth="Container"
-                                        type="javax.sql.DataSource"/>
-
-                                    <ResourceParams name="jdbc/db">
-                                        <parameter>
-                                            <name>factory</name>
-                                            <value>org.apache.commons.dbcp.BasicDataSourceFactory</value>
-                                        </parameter>
-                                        <parameter>
-                                            <name>driverClassName</name>
-                                            <value>org.hsqldb.jdbcDriver</value>
-                                        </parameter>
-                                        <parameter>
-                                            <name>url</name>
-                                            <value>jdbc:hsqldb:http://localhost:8080/orbeon/db/orbeondb</value>
-                                        </parameter>
-                                        <parameter>
-                                            <name>username</name>
-                                            <value>sa</value>
-                                        </parameter>
-                                        <parameter>
-                                            <name>password</name>
-                                            <value></value>
-                                        </parameter>
-                                    </ResourceParams>
-                                </Context>
-                            </xml-source>
-                        </li>
-
-                        <li>
-                            With Tomcat 5.5.x, open <code>server.xml</code> and add a new context
-                            with the following properties:
-
-                            <xml-source>
-                                <Context path="/orbeon" docBase="orbeon" reloadable="true" override="true">
-                                   <Resource name="jdbc/db" auth="Container"
-                                      type="javax.sql.DataSource" driverClassName="org.hsqldb.jdbcDriver"
-                                      url="jdbc:hsqldb:http://localhost:8080/orbeon/db/orbeondb"
-                                      username="sa" password="" maxActive="20" maxIdle="10" maxWait="-1"/>
-                                </Context>
-                            </xml-source>
-                        </li>
-
-                    </ol></p>
+                        You can now start Tomcat, and access <code>http://localhost:8080/orbeon/</code> to test your
+                        installation (replacing <code>localhost</code> and <code>8080</code> with the host name and
+                        port number of your Tomcat installation if different from the default), or perform one of the
+                        optional installation steps below.
+                    </p>
                 </li>
--->
                 <li>
                     <p>
                         Optionally, to run the authentication example:
@@ -180,72 +108,16 @@
                         </li>
                     </ol>
                 </li>
-
-               <!--
-               <li>Optionally, to run the JSF example:
-                   <ol>
-                        <li>
-                            Open
-                            <code>TOMCAT_HOME/webapps/oxf/WEB-INF/web.xml</code>
-                            and, following the marker text "Uncomment this for
-                            the JSF example", uncomment all the code (in three
-                            places) related to the JSF example. This enables a
-                            filter, a servlet, a listener, and sets some
-                            parameters.
-                        </li>
-                        <li>
-                            Download the Sun Reference implementation version
-                            1.0 Early Access 4 (EA4) of JSF, part of the JWSDP, available from
-                            <a href="http://java.sun.com/webservices/downloads/webservicespack.html">
-                            http://java.sun.com/webservices/downloads/webservicespack.html</a>.
-                        </li>
-                        <li>Install the JWSDP.</li>
-                        <li>
-                            Copy the following files from the jsf/lib
-                            directory to
-                            <code>TOMCAT_HOME/webapps/oxf/WEB-INF/lib/</code>:
-                            <ul>
-                                <li><code>jsf-api.jar</code></li>
-                                <li><code>jsf-ri.jar</code></li>
-                            </ul>
-                        </li>
-                        <li>
-                            Copy the following files from the OXF jsf/lib directory
-                            to
-                            <code>TOMCAT_HOME/webapps/oxf/WEB-INF/lib/</code>:
-                            <ul>
-                                <li><code>jsf-components-ea4_orbeon.jar</code> (modified version of some of the EA 4 components)</li>
-                                <li><code>jsf-examples.jar</code> (examples)</li>
-                                <li><code>jsf-xml-renderkit.jar</code> (XML RenderKit)</li>
-                                <li><code>jstl-1_0_3.jar</code></li>
-                                <li><code>jstl-standard-1_0_3.jar</code></li>
-                            </ul>
-                            The source code for the first three JARs is
-                            available under the <code>src/jsf</code> directory.
-                        </li>
-                    </ol>
-                </li>
-                -->
-                <!--
-                <li>Optionally, to run the Portlet examples:
-                    <p>
-                        <ol>
-                            <li>
-                                    Download the Portlet API archive (JSR-168
-                                    Proposed Final Draft) from <a
-                                        href="http://jcp.org/aboutJava/communityprocess/first/jsr168/index.html">the
-                                    JCP site</a>
-                            </li>
-                            <li>
-                                    Extract the archive and copy
-                                <code>lib/portlet.jar</code> into the OXF
-                                <code>WEB-INF/lib</code> directory.
-                            </li>
-                        </ol>
-                    </p>
-                </li>
-                -->
             </ol>
+            <note>
+                <p>
+                    On Unix systems, we recommend you don't use <a
+                    href="http://en.wikipedia.org/wiki/GNU_Interpreter_for_Java">GIJ</a> / <a
+                    href="http://en.wikipedia.org/wiki/Gcj">GCG</a>, as there are reports as of June 2008 of issues
+                    with that runtime environment and Orbeon Forms. Instead, we recommend you use the Sun runtime
+                    environment.
+                </p>
+            </note>
         </section>
         <section>
             <title>Installing Orbeon Forms on BEA WebLogic 9.1</title>
@@ -283,42 +155,6 @@
                         <code>http://localhost:7001/orbeon/</code>.
                     </p>
                 </li>
-                <!--
-                <li>
-                    <p>
-                        Optionally, to run the authentication example:
-                    </p>
-                    <ol>
-                        <li>
-                            <p>
-                                Open <code>C:/WebApps/orbeon/WEB-INF/web.xml</code> and
-                                uncomment the lines between <code>&lt;!- - Uncomment this for the
-                                authentication example - -></code> and <code>&lt;!- - End
-                                authentication example - -></code>.
-                            </p>
-                        </li>
-                        <li>
-                            <p>
-                                Open <code>C:/WebApps/orbeon/WEB-INF/weblogic.xml</code> and
-                                uncomment the lines between <code>&lt;!- - Uncomment this for the
-                                authentication example - -></code> and <code>&lt;!- - End
-                                authentication example - -></code>.
-                            </p>
-                        </li>
-                        <li>
-                            <p>
-                                Open the WebLogic Console.
-                            </p>
-                        </li>
-                        <li>
-                            <p>
-                                Create a new user named <code>admin</code> with a password of your
-                                choice.
-                            </p>
-                        </li>
-                    </ol>
-                </li>
-                -->
             </ol>
         </section>
         <section>
@@ -378,57 +214,6 @@
                         </li>
                     </ol>
                 </li>
-
-<!--
-                <li><p>Optionally, configure a datasource to use the SQL examples
-                using the bundled HSQLDB database:
-
-                    <p><ol>
-                        <li>Open
-                        <code>DOMAIN/applications/orbeon/WEB-INF/web.xml</code>
-                        and uncomment the <code>jdbc/db</code> data source
-                        declaration.</li>
-
-                        <li>Edit <code>DOMAIN/startWeblogic.cmd</code>:
-
-                            <p><ul>
-                                <li>On WebLogic 7: before the call to
-                                <code>startWLS.cmd</code> add a line: <code>set
-                                PRE_CLASSPATH=applications\orbeon\WEB-INF\lib\hsqldb-1_7_2_4_orbeon.jar</code>.</li>
-
-                                <li>On WebLogic 8: at the end of the line
-                                <code>set CLASSPATH=...</code>, add:
-                                <code>;applications\orbeon\WEB-INF\lib\hsqldb-1_7_2_4_orbeon.jar</code></li>
-                            </ul></p>
-                        </li>
-
-                        <li>Go to the WebLogic Console with a browser.</li>
-
-                        <li>Create a new connection pool (in Services / JDBC /
-                        Connection Pools). Name it <code>orbeon</code>, set the
-                        URL to
-                        <code>jdbc:hsqldb:http://localhost:7001/orbeon/db</code>,
-                        the driver classname to
-                        <code>org.hsqldb.jdbcDriver</code> and the properties
-                        to <code>user=sa</code>.</li>
-
-                        <li>Go to the Connections tab of the connection pool
-                        you just created. Set the initial capacity to 0, and
-                        the maximum capacity to 5.</li>
-
-                        <li>Go to the Targets tab and deploy the pool.</li>
-
-                        <li>Create a Data Source for this connection pool.
-                        Name it <code>orbeon</code>, set the JNDI name to
-                        <code>weblogic.jdbc.jts.orbeon</code> and the pool
-                        name to <code>orbeon</code>.</li>
-
-                        <li>Go to the <code>Targets</code> tab and deploy the
-                        data source.</li>
-                    </ol></p>
-                </p></li>
--->
-
                 <li>
                     <p>
                         Optionally, to run the authentication example:
@@ -449,67 +234,6 @@
                         </li>
                     </ol>
                 </li>
-                <!--
-                <li><p>Optionally, to run the JSF example (tested with
-                WebLogic 7.0. and 8.1):
-                    <p><ol>
-                        <li>
-                            Open
-                            <code>DOMAIN/applications/oxf/WEB-INF/web.xml</code>
-                            and, following the marker text "Uncomment this for
-                            the JSF example", uncomment all the code (in three
-                            places) related to the JSF example. This enables a
-                            filter, a servlet, a listener, and sets some
-                            parameters.
-                        </li>
-                        <li>
-                            Download the Sun Reference implementation version
-                            1.0 Early Access 4 (EA4) of JSF, part of the JWSDP, available from
-                            <a href="http://java.sun.com/webservices/downloads/webservicespack.html">
-                            http://java.sun.com/webservices/downloads/webservicespack.html</a>.
-                        </li>
-                        <li>Install the JWSDP.</li>
-                        <li>
-                            Copy the following files from the jsf/lib
-                            directory to
-                            <code>DOMAIN/applications/oxf/WEB-INF/lib/</code>:
-                            <ul>
-                                <li><code>jsf-api.jar</code></li>
-                                <li><code>jsf-ri.jar</code></li>
-                            </ul>
-                        </li>
-                        <li>
-                            Copy the following files from the OXF jsf/lib directory
-                            to
-                            <code>DOMAIN/applications/oxf/WEB-INF/lib/</code>:
-                            <ul>
-                                <li><code>jsf-components-ea4_orbeon.jar</code> (modified version of some of the EA 4 components)</li>
-                                <li><code>jsf-examples.jar</code> (examples)</li>
-                                <li><code>jsf-xml-renderkit.jar</code> (XML RenderKit)</li>
-                                <li><code>jstl-1_0_3.jar</code></li>
-                                <li><code>jstl-standard-1_0_3.jar</code></li>
-                            </ul>
-                            The source code for the first three JARs is
-                            available under the <code>src/jsf</code> directory.
-                        </li>
-                        <li>
-                            Open <code>jsf-ri.jar</code>. Edit the file named
-                            <code>faces.properties</code> within that JAR file.
-                            Replace the line containing:
-                            <code>javax.faces.tree.TreeFactory=com.sun.faces.tree.SimpleTreeFactoryImpl</code>
-                            with
-                            <code>javax.faces.tree.TreeFactory=org.orbeon.faces.renderkit.TreeFactoryImpl</code>.
-                            NOTE: This is a temporary hack due to the fact that
-                            in the JSF RI EA 4, setting a RenderKit
-                            declaratively does not work. Alternatively, you can
-                            start WebLogic (modify
-                            <code>startWeblogic.cmd</code>) with the following
-                            option:
-                            <code>-Djavax.faces.tree.TreeFactory=org.orbeon.faces.renderkit.TreeFactoryImpl</code>.
-                        </li>
-                    </ol></p>
-                </p></li>
-                -->
                 <li>
                     <p>
                         Once Orbeon Forms is properly installed, you can start WebLogic as usual with the
@@ -629,191 +353,8 @@
                         </ul>
                     </p>
                 </li>
-<!--
-                <li>
-                     Optionally, configure a datasource to use the SQL examples using the bundled HSQLDB database:
-                     <ul>
-                         <li><p>
-                             Extract the
-                             <code>hsqldb-1_7_2_4_orbeon.jar</code> file from Orbeon Forms
-                             WAR file, and save it on WebSphere's directory.
-                         </p></li>
-
-                       <p>  <li>
-                             In the administrative console, go to the Resources
-                             tab, and create a new JDBC Provider. Make sure you
-                             add the HSQLDB JAR to the
-                             <code>classpath</code> option and put
-                             <code>org.hsqldb.jdbcDataSource</code> in the Implementation Class field.
-                         </p></li>
-
-                         <li><p>
-                             Create a new datasource, using the following information:
-                             <p><table>
-                                 <tr>
-                                     <th>Name</th>
-                                     <td><code>db</code></td>
-                                 </tr>
-                                 <tr>
-                                     <th>JNDI Name</th>
-                                     <td><code>jdbc/db</code></td>
-                                 </tr>
-
-                                 <tr>
-                                     <th>Database Name</th>
-                                     <td><code>http://localhost:9080/orbeon/db</code></td>
-                                 </tr>
-                                 <tr>
-                                     <th>username</th>
-                                     <td><code>sa</code></td>
-                                 </tr>
-                             </table></p>
-                         </p></li>
-
-                         <li><p>
-                             Save the configuration.
-                         </p></li>
-
-                     </ul>
-                 </li>
--->
             </ol>
         </section>
-<!--        <section>-->
-<!--            <title>Installing OXF on Sun ONE Application Server 7.0</title>-->
-<!--            <ol>-->
-<!--                <li>-->
-<!--                    Install and deploy OXF (<code>oxf.war</code>) by:-->
-<!--                    <ul>-->
-<!--                        <li>Using the administrative console and uploading the war file</li>-->
-<!--                        <li>Or by adding the following lines to the server-->
-<!--                            configuration file (the default is-->
-<!--                            <code>domains/domain1/server1/config/server.xml</code>). Don't forget-->
-<!--                            to change the war file's path.-->
-<!--                            <xml-source>-->
-<!--                                <applications dynamic-reload-enabled="true" dynamic-reload-poll-interval-in-seconds="2">-->
-<!--                                    <web-module enabled="true" location="c:/oxf/oxf.war" name="oxf" context-root="oxf" virtual-servers="server1"/>-->
-<!--                                </applications>-->
-<!--                            </xml-source>-->
-<!--                        </li>-->
-<!--                    </ul>-->
-<!--                </li>-->
-<!--                <li>-->
-<!--                    Optionally, configure a datasource to use the SQL examples using the bundled HSQLDB database:-->
-<!--                    <ul>-->
-<!--                       <p> <li>-->
-<!--                            Extract the <code>hsqldb-1_7_2_4_orbeon.jar</code> file from OXF-->
-<!--                            WAR file, and save it on your hard drive.-->
-<!--                        </p></li>-->
-<!---->
-<!--                       <li><p>-->
-<!--                            Open-->
-<!--                            <code>domains/domain1/server1/config/server.xml</code>,-->
-<!--                            locate the <code>/server/java-config</code> element and-->
-<!--                            change the <code>server-classpath</code> attribute to include the path to the HSQLDB JAR.-->
-<!--                        </p></li>-->
-<!---->
-<!--                        <li><p>-->
-<!--                            In the same file, add the following snippet to initialize the JDBC DataSource:-->
-<!--                            <xml-source>-->
-<!--                                <resources>-->
-<!--                                    <jdbc-resource enabled="true" pool-name="hsqldb" jndi-name="jdbc/db"/>-->
-<!--                                    <jdbc-connection-pool steady-pool-size="8" max-pool-size="32" max-wait-time-in-millis="60000" pool-resize-quantity="2" idle-timeout-in-seconds="300" is-isolation-level-guaranteed="false" is-connection-validation-required="false" connection-validation-method="auto-commit" fail-all-connections="false" datasource-classname="org.hsqldb.jdbcDataSource" name="hsqldb">-->
-<!--                                        <property value="sa" name="user"/>-->
-<!--                                        <property value="http://localhost/oxf/db" name="database"/>-->
-<!--                                    </jdbc-connection-pool>-->
-<!--                                </resources>-->
-<!--                            </xml-source>-->
-<!--                        </li> </p>-->
-<!--                        <li><p>Save <code>server.xml</code> and start the server.</p></li>-->
-<!--                    </ul>-->
-<!--                    <li>Optionally, to run the authentication example:-->
-<!---->
-<!--                    <p><ol>-->
-<!--                        <li>Open-->
-<!--                        <code>SUNONE_HOME/domains/domain1/server1/applications/j2ee-modules/oxf/WEB-INF/web.xml</code>-->
-<!--                        and uncomment the <code>security-constraint</code>,-->
-<!--                        <code>login-config</code> and <code>security-role</code>-->
-<!--                        declarations at the end of the file.</li>-->
-<!---->
-<!--                        <li>Log into the adminitrative console and check that a-->
-<!--                        file authentication realm exists and is active.</li>-->
-<!---->
-<!--                        <li>Add a user to the file realm, and assign him to the-->
-<!--                        <code>admmistrator</code> group.</li>-->
-<!--                    </ol></p>-->
-<!--                    </li>-->
-<!--                </li>-->
-<!--            </ol>-->
-<!--        </section>-->
-<!--        <a name="oc4j"/>-->
-<!--        <section>-->
-<!--            <title>Installing OXF on Oracle 9i AS</title>-->
-<!--            <p>-->
-<!--                This section assumes you are using OC4J version 9.0.3.0.0. You-->
-<!--                can either use the Enterprise Manager to deploy OXF, or use the-->
-<!--                instructions below to edit the configuration files.-->
-<!--            </p>-->
-<!--            <ol>-->
-<!--                <li>-->
-<!--                    <p>-->
-<!--                        Edit <code>application.xml</code> to declare-->
-<!--                        the OXF application. Add the following line near the top-->
-<!--                        of the file, replacing the filename by your actual-->
-<!--                        value.-->
-<!--                        <xml-source>-->
-<!--                            <web-module id="oxf" path="c:\oxf\oxf.war" />-->
-<!--                        </xml-source>-->
-<!--                    </p>-->
-<!--                </li>-->
-<!--                <li>-->
-<!--                    <p>-->
-<!--                        Edit <code>http-web-site.xml</code> to map the-->
-<!--                        OXF Web Application to a context path. Add the following line:-->
-<!--                        <xml-source>-->
-<!--                            <web-app application="default" name="oxf" root="/oxf" />-->
-<!--                        </xml-source>-->
-<!--                    </p>-->
-<!--                </li>-->
-<!---->
-<!--                <li>Optionally, configure a datasource to use the SQL examples-->
-<!--                using the bundled HSQLDB database. Copy the file-->
-<!--                <code>hsqldb-1_7_2_4_orbeon.jar</code> from the OXF distribution to-->
-<!--                the <code>lib</code> directory of OC4J. Edit <code>data-sources.xml</code>-->
-<!--                and add the following element:-->
-<!--                    <xml-source>-->
-<!--                        <data-source-->
-<!--                            class="com.evermind.sql.DriverManagerDataSource"-->
-<!--                            name="hsqldbDS"-->
-<!--                            location="jdbc/hsqldbDS"-->
-<!--                            connection-driver="org.hsqldb.jdbcDriver"-->
-<!--                            username="sa"-->
-<!--                            password=""-->
-<!--                            url="jdbc:hsqldb:http://localhost:8888/oxf/db"-->
-<!--                            inactivity-timeout="30"-->
-<!--                            />-->
-<!--                    </xml-source>-->
-<!--                </li>-->
-<!---->
-<!--                <li>Optionally, to run the Portlet examples:-->
-<!--                    <p>-->
-<!--                        <ol>-->
-<!--                            <li>-->
-<!--                                Download the Portlet API archive (JSR-168-->
-<!--                                Proposed Final Draft) from <a-->
-<!--                                    href="http://jcp.org/aboutJava/communityprocess/first/jsr168/index.html">the-->
-<!--                                    JCP site</a>-->
-<!--                            </li>-->
-<!--                            <li>-->
-<!--                                Extract the archive and copy-->
-<!--                                <code>lib/portlet.jar</code> into the OXF-->
-<!--                                <code>WEB-INF/lib</code> directory.-->
-<!--                            </li>-->
-<!--                        </ol>-->
-<!--                    </p>-->
-<!--                </li>-->
-<!--            </ol>-->
-<!--        </section>-->
         <a name="jboss"/>
         <section>
             <title>Installing Orbeon Forms on JBoss</title>

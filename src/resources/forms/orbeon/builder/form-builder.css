@@ -128,8 +128,11 @@ a.fb-edit-help-trigger img {
     #fb-add-language-dialog { width: 20em }
 #fb-edit-details-dialog .xforms-input input { width: 98% }
 #fb-edit-help-dialog textarea { width: 98%; height: 4em }
-#fb-edit-validation-dialog textarea { width: 98%; height: 4em }
 #fb-section-details-dialog .xforms-input input { width: 98% }
+
+#fb-edit-validation-dialog textarea { width: 98%; height: 4em }
+#fb-edit-validation-dialog .xforms-label { display: block; clear: both }
+#fb-edit-validation-dialog .xforms-hint { display: block; clear: both }
 
 #fb-schema-upload-dialog .xforms-hint { width: 100% }
 #fb-schema-upload-dialog .xforms-select1 { height: 10em; width: 100% }

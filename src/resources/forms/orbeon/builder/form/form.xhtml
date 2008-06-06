@@ -916,16 +916,11 @@
                                                                                                 <xforms:output ref="$instance-holder" id="fb-edit-output-control">
                                                                                                     <xforms:label class="fb-xforms-disabled"/>
                                                                                                 </xforms:output>
-                                                                                                <xforms:trigger appearance="minimal" class="fb-edit-items">
-                                                                                                    <xforms:label>
-                                                                                                        <xhtml:img src="/apps/fr/style/images/silk/calculator_edit.png" alt="Edit Items" title="Edit Items"/>
-                                                                                                        <xhtml:span>Calculated Value</xhtml:span>
-                                                                                                    </xforms:label>
-                                                                                                    <xforms:action ev:event="DOMActivate">
-                                                                                                        <!--<xforms:setvalue ref="$variables/itemset-resource-id" value="name($resource-holder)"/>-->
-                                                                                                        <!--<xxforms:show dialog="fb-itemset-editor-dialog" neighbor="fb-edit-select1-minimal-control"/>-->
-                                                                                                    </xforms:action>
-                                                                                                </xforms:trigger>
+                                                                                                <!-- In-place text -->
+                                                                                                <xforms:input ref="$instance-holder" appearance="fr:in-place" incremental="false">
+                                                                                                    <xforms:label class="fb-xforms-disabled"/>
+                                                                                                    <xforms:hint>click to enter text</xforms:hint>
+                                                                                                </xforms:input>
                                                                                             </xforms:group>
                                                                                             <xforms:group ref="xforms:trigger">
                                                                                                 <xforms:trigger ref="$instance-holder" id="fb-edit-trigger-control">

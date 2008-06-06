@@ -587,6 +587,7 @@
         <validation>
             <builtin-type/>
             <required>false</required>
+            <calculate/>
             <schema-type/>
             <alert/>
         </validation>

@@ -27,13 +27,15 @@
     <xforms:label>Edit Validation Properties</xforms:label>
     <xxforms:variable name="instance" select="instance('fb-validation-editor-instance')"/>
     <xhtml:div>
-        <xforms:group class="fb-hide-alert">
+        <xhtml:div class="fr-grid">
+            <xhtml:div class="fr-grid-content fb-hide-alert">
             <!--<xhtml:table>-->
                 <!--<xhtml:tr>-->
                     <!--<xhtml:td>-->
                         <!-- Built-in type selection -->
                         <xforms:select1 ref="$instance/builtin-type">
                             <xforms:label>Built-in Type</xforms:label>
+                            <xforms:hint>Built-in data type</xforms:hint>
                             <!--<xforms:item>-->
                                 <!--<xforms:label>[Select...]</xforms:label>-->
                                 <!--<xforms:value/>-->
@@ -47,7 +49,8 @@
                     <!--</xhtml:td>-->
                     <!--<xhtml:td>-->
                         <xforms:select1 ref="$instance/required" appearance="full">
-                            <xforms:label/>
+                            <xforms:label>Requiredness</xforms:label>
+                            <xforms:hint>Whether the data is required</xforms:hint>
                             <xforms:item>
                                 <xforms:label>Required</xforms:label>
                                 <xforms:value>true</xforms:value>
@@ -74,25 +77,36 @@
                     <!--</xhtml:td>-->
                 <!--</xhtml:tr>-->
             <!--</xhtml:table>-->
+                        <xforms:input ref="$instance/calculate">
+                            <xforms:label>
+                                <xhtml:img src="/apps/fr/style/images/silk/calculator_edit.png" alt="Edit Items" title="Edit Items"/>
+                                <xhtml:span>Calculated Value</xhtml:span>
+                            </xforms:label>
+                            <xforms:hint>XPath expression</xforms:hint>
+                        </xforms:input>
 
-            <!-- Schema type selection if applicable -->
-            <xforms:select1 ref="$instance/schema-type[$model/xs:schema]">
-                <xforms:label>Schema Type</xforms:label>
-                <xforms:item>
-                    <xforms:label>[Select...]</xforms:label>
-                    <xforms:value/>
-                </xforms:item>
-                <xforms:itemset nodeset="$model/xs:schema/xs:simpleType">
-                    <xforms:label ref="@name"/>
-                    <xforms:value ref="@name"/>
-                </xforms:itemset>
-                <xforms:setvalue ev:event="xforms-value-changed" if=". != ''" ref="../builtin-type"/>
-            </xforms:select1>
+                        <!-- Schema type selection if applicable -->
+                        <xforms:select1 ref="$instance/schema-type[$model/xs:schema]">
+                            <xforms:label>Schema Type</xforms:label>
+                            <xforms:hint>Imported schema type</xforms:hint>
+                            <xforms:item>
+                                <xforms:label>[Select...]</xforms:label>
+                                <xforms:value/>
+                            </xforms:item>
+                            <xforms:itemset nodeset="$model/xs:schema/xs:simpleType">
+                                <xforms:label ref="@name"/>
+                                <xforms:value ref="@name"/>
+                            </xforms:itemset>
+                            <xforms:setvalue ev:event="xforms-value-changed" if=". != ''" ref="../builtin-type"/>
+                        </xforms:select1>
 
-            <!-- Alert message -->
-            <xforms:textarea ref="$instance/alert">
-                <xforms:label>Alert Message</xforms:label>
-            </xforms:textarea>
+                        <!-- Alert message -->
+                        <xforms:textarea ref="$instance/alert">
+                            <xforms:label>Alert Message</xforms:label>
+                            <xforms:hint>Message to display when the data is incorrect</xforms:hint>
+                        </xforms:textarea>
+                </xhtml:div>
+            </xhtml:div>
 
             <xhtml:div class="fr-dialog-buttons">
                 <xforms:trigger class="fr-inplace-rename">
@@ -109,7 +123,6 @@
                     </xforms:dispatch>
                 </xforms:trigger>
             </xhtml:div>
-        </xforms:group>
     </xhtml:div>
 
     <!-- Save data upon close, unless explicitly prevented -->
@@ -125,7 +138,11 @@
         <xforms:setvalue if="normalize-space($instance/alert) != ''" ref="$current-control/xforms:alert/@ref" value="concat('$form-resources/', $current-control-name, '/alert')"/>
         <xforms:setvalue if="normalize-space($instance/alert) = ''" ref="$current-control/xforms:alert/@ref" value="'$fr-resources/detail/labels/alert'"/>
 
-        <xxforms:variable name="is-bind" select="$instance/schema-type != '' or $instance/builtin-type != 'string' or $instance/required = 'true'"/>
+        <xxforms:variable name="is-bind"
+                          select="$instance/schema-type != ''
+                                    or $instance/builtin-type != 'string'
+                                    or $instance/required = 'true'
+                                    or normalize-space($instance/calculate) != ''"/>
         <xforms:action if="$is-bind">
 
             <!-- Insert bind if needed -->
@@ -153,6 +170,10 @@
                 <!-- TODO: Handle namespace and prefix for namespace -->
                 <xforms:insert if="$instance/schema-type != ''"
                                context="." origin="xxforms:attribute('type', $instance/schema-type)"/>
+
+                <!-- Set calculated value if needed -->
+                <xforms:insert if="normalize-space($instance/calculate) != ''"
+                               context="." origin="xxforms:attribute('calculate', $instance/calculate)"/>
             </xforms:action>
 
             <!-- TODO: constraints -->
@@ -198,5 +219,8 @@
                              ref="$instance/schema-type" value="$current-bind/@type"/>
             <xforms:setvalue ref="$instance/required" value="starts-with($current-bind/@type, 'xs:')"/>
         </xforms:action>
+
+        <!-- Set calculate -->
+        <xforms:setvalue ref="$instance/calculate" value="$current-bind/@calculate"/>
     </xforms:action>
 </xxforms:dialog>

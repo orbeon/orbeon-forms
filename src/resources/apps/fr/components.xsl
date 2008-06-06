@@ -522,6 +522,9 @@
     
 
     <xsl:template match="xforms:input[@appearance = 'fr:in-place']">
+        <xsl:if test="not(@id != '')">
+            <xsl:message terminate="yes">"id" attribute is mandatory</xsl:message>
+        </xsl:if>
         <xforms:switch id="{@id}">
             <xsl:attribute name="class" select="string-join(('fr-inplace-input', @class), ' ')"/>
             <xforms:case id="fr-inplace-{@id}-view">

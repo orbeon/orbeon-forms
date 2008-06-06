@@ -52,7 +52,6 @@
                     os.setCharset(charset);
                 }
             });
-
         %>
         <p>
             This is a footer after the included form.

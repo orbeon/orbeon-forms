@@ -913,11 +913,8 @@
                                                                                                 </xforms:trigger>
                                                                                             </xforms:group>
                                                                                             <xforms:group ref="xforms:output[not(@mediatype)]">
-                                                                                                <xforms:output ref="$instance-holder" id="fb-edit-output-control">
-                                                                                                    <xforms:label class="fb-xforms-disabled"/>
-                                                                                                </xforms:output>
                                                                                                 <!-- In-place text -->
-                                                                                                <xforms:input ref="$instance-holder" appearance="fr:in-place" incremental="false">
+                                                                                                <xforms:input id="fb-xforms-output-text-input" ref="$instance-holder" appearance="fr:in-place" incremental="false">
                                                                                                     <xforms:label class="fb-xforms-disabled"/>
                                                                                                     <xforms:hint>click to enter text</xforms:hint>
                                                                                                 </xforms:input>

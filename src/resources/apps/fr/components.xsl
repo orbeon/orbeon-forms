@@ -857,6 +857,7 @@
                 </xsl:for-each>
             </xhtml:tr>
             <xforms:repeat nodeset="{@nodeset}" id="{@id}">
+                <xxforms:variable name="repeat-position" select="position()"/>
                 <!-- First line with data -->
                 <xhtml:tr>
                     <xhtml:th class="fr-repeat-column">
@@ -868,7 +869,7 @@
                                 <xforms:group>
                                     <!-- Remove trigger -->
                                     <xforms:trigger appearance="minimal" ref="if (
-                                            {if ($first-mandatory) then 'position() != 1 and ' else ''}
+                                            {if ($first-mandatory) then '$repeat-position != 1 and ' else ''}
                                             count(xxforms:repeat-nodeset('{@id}')) gt {$min-occurs}) then . else ()">
                                         <xforms:label><xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/bin.png" alt="Remove" title="Remove"/></xforms:label>
                                     </xforms:trigger>

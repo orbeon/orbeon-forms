@@ -4549,6 +4549,8 @@ ORBEON.xforms.Offline = {
             // Send all the events back to the server
             ORBEON.xforms.Server.fireEvents(events, false);
         }
+        // Tell the server we are going online
+        ORBEON.xforms.Document.dispatchEvent("$containing-document$", "xxforms-online");
 
         // Go back online
         ORBEON.xforms.Offline.gearsDatabase.execute("delete from Offline_Forms where url = ?", [ window.location.href ]).close();

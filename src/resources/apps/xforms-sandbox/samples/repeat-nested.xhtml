@@ -41,15 +41,20 @@
                 </companies>
             </xforms:instance>
         </xforms:model>
+        <xhtml:style type="text/css">
+            .table-row-odd { background-color: #ff6; }
+            .table-row-even { background-color: white; }
+        </xhtml:style>
     </xhtml:head>
     <xhtml:body>
-        <xforms:repeat nodeset="company" id="company-repeat">
+        <xhtml:h2>Div inside div</xhtml:h2>
+        <xforms:repeat nodeset="company" id="company-repeat-first">
             <xhtml:div style="padding: .5em .5em .5em 2em; border: 1px solid #eee">
                 <xforms:output ref="@name"/>
-                <xforms:repeat nodeset="department" id="department-repeat">
+                <xforms:repeat nodeset="department" id="department-repeat-first">
                     <xhtml:div style="padding: .5em .5em .5em 2em; border: 1px solid #eee">
                         <xforms:output ref="@name"/>
-                        <xforms:repeat nodeset="employee" id="employee-repeat">
+                        <xforms:repeat nodeset="employee" id="employee-repeat-first">
                             <xhtml:div style="padding: .5em .5em .5em 2em; border: 1px solid #eee">
                                 <xforms:output ref="@name"/>
                                 <i>(employee name)</i>
@@ -59,7 +64,31 @@
                 </xforms:repeat>
             </xhtml:div>
         </xforms:repeat>
-
+        <xhtml:h2>Table</xhtml:h2>
+        <xhtml:table class="zebra-table">
+            <xforms:repeat nodeset="company" id="company-repeat">
+                <xxforms:variable name="company-name" select="@name"/>
+                <xforms:repeat nodeset="department" id="department-repeat">
+                    <xxforms:variable name="department-name" select="@name"/>
+                    <xxforms:variable name="department-position" select="position()"/>
+                    <xforms:repeat nodeset="employee" id="employee-repeat">
+                        <xxforms:variable name="employee-name" select="@name"/>
+                        <xxforms:variable name="employee-position" select="position()"/>
+                        <xhtml:tr class="{if ((count(preceding::employee)  + 1) mod 2 = 1) then 'table-row-odd' else 'table-row-even'}">
+                            <xhtml:td>
+                                <xforms:output value="if ($department-position = 1 and $employee-position = 1) then $company-name else ''"/>
+                            </xhtml:td>
+                            <xhtml:td>
+                                <xforms:output value="if ($employee-position = 1) then $department-name else ''"/>
+                            </xhtml:td>
+                            <xhtml:td>
+                                <xforms:output value="$employee-name"/>
+                            </xhtml:td>
+                        </xhtml:tr>
+                    </xforms:repeat>
+                </xforms:repeat>
+            </xforms:repeat>
+        </xhtml:table>
         <xforms:trigger>
             <xforms:label>Add company</xforms:label>
             <xforms:insert ev:event="DOMActivate" nodeset="/companies/company" at="last()+1" position="after"/>

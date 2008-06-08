@@ -464,6 +464,14 @@
                     We will streamline this to make it clearer.
                 </p>
             </section>
+            <section added="2008-06-05">
+                <title>Can I import my existingt XForms documents into Form Builder?</title>
+                <p>
+                    Form Builder produces XHTML+XForms files as output, but it follows a number of convention when
+                    creating forms. It is only able to read forms that follow those conventions, which means that in
+                    general, you can't just import your existing forms into Form Builder.
+                </p>
+            </section>
         </section>    
         <a name="xforms"/>
         <section>

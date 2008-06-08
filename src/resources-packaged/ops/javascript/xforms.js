@@ -4658,39 +4658,39 @@ ORBEON.xforms.Offline = {
 
             // Calculate
             if (mips.calculate) {
-                var newValue = xpathParse(mips.calculate).evaluate(xpathContext).value;
+                var newValue = xpathParse(mips.calculate.value).evaluate(xpathContext).value;
                 ORBEON.xforms.Controls.setCurrentValue(control, newValue);
             }
 
             // Constraint
             var isValid = true;
             if (mips.constraint) {
-                var constraint = xpathParse("boolean(" + mips.constraint + ")").evaluate(xpathContext).value;
+                var constraint = xpathParse("boolean(" + mips.constraint.value + ")").evaluate(xpathContext).value;
                 isValid = isValid && constraint;
             }
 
             // Required
             var requiredButEmpty;
             if (mips.required) {
-                var required = xpathParse(mips.required).evaluate(xpathContext).value;
+                var required = xpathParse(mips.required.value).evaluate(xpathContext).value;
                 requiredButEmpty = controlValue == "" && required;
             }
 
             // Relevant
             if (mips.relevant) {
-                var isRelevant = xpathParse("boolean(" + mips.relevant + ")").evaluate(xpathContext).value;
+                var isRelevant = xpathParse("boolean(" + mips.relevant.value + ")").evaluate(xpathContext).value;
                 ORBEON.xforms.Controls.setRelevant(control, isRelevant);
             }
 
             // Readonly
             if (mips.readonly) {
-                var isReadonly = xpathParse("boolean(" + mips.readonly + ")").evaluate(xpathContext).value;
+                var isReadonly = xpathParse("boolean(" + mips.readonly.value + ")").evaluate(xpathContext).value;
                 ORBEON.xforms.Controls.setReadonly(control, isReadonly);
             }
 
             // Type
             if (mips.type) {
-                var regExp = ORBEON.xforms.Offline.typeRegExps[mips.type];
+                var regExp = ORBEON.xforms.Offline.typeRegExps[mips.type.value];
                 if (regExp != null) {
                     if (! controlValue.match(regExp))
                         isValid = false;

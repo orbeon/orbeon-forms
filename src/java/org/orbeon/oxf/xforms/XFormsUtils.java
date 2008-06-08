@@ -1021,8 +1021,25 @@ public class XFormsUtils {
         return (Node) ((NodeWrapper) nodeInfo).getUnderlyingNode();
     }
 
+    /**
+     * Get an element's children elements if any.
+     *
+     * @param nodeInfo  element NodeInfo to look at
+     * @return          elements NodeInfo or empty list
+     */
     public static List getChildrenElements(NodeInfo nodeInfo) {
         final List result = new ArrayList();
+        getChildrenElements(result, nodeInfo);
+        return result;
+    }
+
+    /**
+     * Get an element's children elements if any.
+     *
+     * @param result    List to which to add the elements found
+     * @param nodeInfo  element NodeInfo to look at
+     */
+    public static void getChildrenElements(List result, NodeInfo nodeInfo) {
         final AxisIterator i = nodeInfo.iterateAxis(Axis.CHILD);
         i.next();
         while (i.current() != null) {
@@ -1035,7 +1052,6 @@ public class XFormsUtils {
             }
             i.next();
         }
-        return result;
     }
 
     /**
@@ -1060,12 +1076,29 @@ public class XFormsUtils {
         return false;
     }
 
+    /**
+     * Get an element's attributes if any.
+     *
+     * @param nodeInfo  element NodeInfo to look at
+     * @return          attributes or empty list
+     */
     public static List getAttributes(NodeInfo nodeInfo) {
+        final List result = new ArrayList();
+        getAttributes(result, nodeInfo);
+        return result;
+    }
+
+    /**
+     * Get an element's attributes if any.
+     *
+     * @param result    List to which to add the attributes found
+     * @param nodeInfo  element NodeInfo to look at
+     */
+    public static void getAttributes(List result, NodeInfo nodeInfo) {
 
         if (nodeInfo.getNodeKind() != org.w3c.dom.Document.ELEMENT_NODE)
             throw new OXFException("Invalid node type passed to getAttributes(): " + nodeInfo.getNodeKind());
 
-        final List result = new ArrayList();
         final AxisIterator i = nodeInfo.iterateAxis(Axis.ATTRIBUTE);
         i.next();
         while (i.current() != null) {
@@ -1078,7 +1111,34 @@ public class XFormsUtils {
             }
             i.next();
         }
-        return result;
+    }
+
+    /**
+     * Find all attributes and nested nodes of the given nodeset.
+     */
+    public static void getNestedAttributesAndElements(List result, List nodeset) {
+        // Iterate through all nodes
+        if (nodeset.size() > 0) {
+            for (Iterator i = nodeset.iterator(); i.hasNext();) {
+                final NodeInfo currentNodeInfo = (NodeInfo) i.next();
+
+                if (currentNodeInfo.getNodeKind() == org.w3c.dom.Document.ELEMENT_NODE) {
+                    // Found an element
+
+                    // Add attributes
+                    getAttributes(result, currentNodeInfo);
+
+                    // Find children elements
+                    final List childrenElements = getChildrenElements(currentNodeInfo);
+
+                    // Add all children elements
+                    result.addAll(childrenElements);
+
+                    // Recurse into children elements
+                    getNestedAttributesAndElements(result, childrenElements);
+                }
+            }
+        }
     }
 
     /**

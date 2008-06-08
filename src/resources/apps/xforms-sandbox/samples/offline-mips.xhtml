@@ -26,7 +26,11 @@
             <xforms:instance id="instance">
                 <instance>
                     <a/>
-                    <b/>
+                    <b f="">
+                        <g>
+                            <h/>
+                        </g>
+                    </b>
                     <c/>
                     <d/>
                     <e/>
@@ -61,27 +65,37 @@
     </xhtml:head>
     <xhtml:body>
         <xhtml:p>
-            <xforms:input ref="a" incremental="true">
+            <xforms:input id="type-control" ref="a" incremental="true">
                 <xforms:label>Must be integer</xforms:label>
             </xforms:input>
         </xhtml:p>
         <xhtml:p>
-            <xforms:input ref="b" incremental="true">
+            <xforms:input id="relevant-control" ref="b" incremental="true">
                 <xforms:label>Relevant if previous = 42</xforms:label>
             </xforms:input>
         </xhtml:p>
         <xhtml:p>
-            <xforms:input ref="c" incremental="true">
+            <xforms:input id="relevant-inherited-element-control" ref="b/g/h" incremental="true">
+                <xforms:label>Relevant if previous = 42 (inherited on element)</xforms:label>
+            </xforms:input>
+        </xhtml:p>
+        <xhtml:p>
+            <xforms:input id="relevant-inherited-attribute-control" ref="b/@f" incremental="true">
+                <xforms:label>Relevant if previous = 42 (inherited on attribute)</xforms:label>
+            </xforms:input>
+        </xhtml:p>
+        <xhtml:p>
+            <xforms:input id="constraint-control" ref="c" incremental="true">
                 <xforms:label>Must be equal to previous</xforms:label>
             </xforms:input>
         </xhtml:p>
         <xhtml:p>
-            <xforms:input ref="d" incremental="true">
+            <xforms:input id="required-control" ref="d" incremental="true">
                 <xforms:label>Required if previous = 42</xforms:label>
             </xforms:input>
         </xhtml:p>
         <xhtml:p>
-            <xforms:input ref="e" incremental="true">
+            <xforms:input id="readonly-control" ref="e" incremental="true">
                 <xforms:label>Readonly if previous = 42</xforms:label>
             </xforms:input>
         </xhtml:p>

@@ -224,7 +224,8 @@ public class XFormsModelBinds {
      *
      * {
      *     "mips": {
-     *         "total-control": { "calculate": "$units * $price", ... other MIPs ... },
+     *         "total-control": { "calculate": { "xpath": "$units * $price" }, ... other MIPs ... },
+     *         "my-group": { "relevant": { "xpath": "$price > 10", "inherited": ["inherited-control-1", "inherited-control-2", ... ]} }
      *         ... other controls ...
      *     },
      *     "variables": {
@@ -252,7 +253,30 @@ public class XFormsModelBinds {
                     final Bind currentBind = (Bind) i.next();
                     final List currentNodeset = currentBind.getNodeset();
 
+                    // Find ids of controls inheriting the readonly and relevant MIPs if necessary
+                    final String readonly = currentBind.getReadonly();
+                    final String relevant = currentBind.getRelevant();
+                    final List controlsInheritingMIPs;
+                    if (readonly != null || relevant != null ) {
+                        // Find ids of controls that inherit the property
+
+                        // Find attributes and elements which are children of nodes in the current nodeset
+                        final List nestedNodeset = new ArrayList();
+                        XFormsUtils.getNestedAttributesAndElements(nestedNodeset, currentNodeset);
+                        if (nestedNodeset.size() > 0) {
+                            // Find all controls bound to those nested nodes: they are influenced by the mips
+                            controlsInheritingMIPs = getBoundControls(idsToXFormsControls, nestedNodeset);
+                        } else {
+                            // No controls are bound to nested nodes
+                            controlsInheritingMIPs = null;
+                        }
+                    } else {
+                        controlsInheritingMIPs = null;
+                    }
+
+                    // Find controls directly bound to nodes in the bind nodeset
                     final List boundControls = getBoundControls(idsToXFormsControls, currentNodeset);
+
                     if (boundControls.size() > 0) {
                         for (Iterator j = boundControls.iterator(); j.hasNext();) {
                             final XFormsControl currentControl = (XFormsControl) j.next();
@@ -266,19 +290,20 @@ public class XFormsModelBinds {
                             sb.append(currentControl.getEffectiveId());
                             sb.append("\": {");
 
+
                             // Output MIPs
                             boolean mipFound = false;
-                            mipFound = appendNameValue(sb, mipFound, "calculate", currentBind.getCalculate());
-                            mipFound = appendNameValue(sb, mipFound, "relevant", currentBind.getRelevant());
-                            mipFound = appendNameValue(sb, mipFound, "readonly", currentBind.getReadonly());
-                            mipFound = appendNameValue(sb, mipFound, "required", currentBind.getRequired());
-                            mipFound = appendNameValue(sb, mipFound, "constraint", currentBind.getConstraint());
+                            mipFound = appendNameValue(sb, mipFound, "calculate", currentBind.getCalculate(), null);
+                            mipFound = appendNameValue(sb, mipFound, "relevant", relevant, controlsInheritingMIPs);
+                            mipFound = appendNameValue(sb, mipFound, "readonly", readonly, controlsInheritingMIPs);
+                            mipFound = appendNameValue(sb, mipFound, "required", currentBind.getRequired(), null);
+                            mipFound = appendNameValue(sb, mipFound, "constraint", currentBind.getConstraint(), null);
 
                             // Output type MIP as an exploded QName
                             final String typeMip = currentBind.getType();
                             if (typeMip != null) {
                                 final QName typeMipQName = Dom4jUtils.extractTextValueQName(containingDocument.getStaticState().getNamespaceMappings(currentBind.getBindElement()), typeMip);
-                                mipFound = appendNameValue(sb, mipFound, "type", Dom4jUtils.qNameToexplodedQName(typeMipQName));
+                                mipFound = appendNameValue(sb, mipFound, "type", Dom4jUtils.qNameToexplodedQName(typeMipQName), null);
                             }
 
                             sb.append('}');
@@ -309,7 +334,7 @@ public class XFormsModelBinds {
                     if (boundControls.size() > 0) {
                         // NOTE: We only handle the first control found
                         final String effectiveControlId = ((XFormsControl) boundControls.get(0)).getEffectiveId();
-                        controlFound = appendNameValue(sb, controlFound, currentVariableName, effectiveControlId);
+                        controlFound = appendNameValue(sb, controlFound, currentVariableName, effectiveControlId, null);
                     }
                 }
             }
@@ -348,7 +373,7 @@ public class XFormsModelBinds {
                 if (boundNode != null
                         && currentControl instanceof XFormsSingleNodeControl
                         && !(currentControl instanceof XFormsPseudoControl)) {
-                    if (boundNode.isSameNodeInfo(currentNodeInfo)) {
+                    if (boundNode.isSameNodeInfo(currentNodeInfo)) {// make sure to compare with isSameNodeInfo()
                         // There is a match
                         result.add(currentControl);
                     }
@@ -358,16 +383,34 @@ public class XFormsModelBinds {
         return result;
     }
 
-    private static final boolean appendNameValue(FastStringBuffer sb, boolean found, String name, String value) {
+    private static final boolean appendNameValue(FastStringBuffer sb, boolean found, String name, String value, List controlsInheritingMIPs) {
         if (value != null) {
             if (found)
                 sb.append(',');
 
-            sb.append("\"");
+            sb.append('"');
             sb.append(name);
-            sb.append("\": \"");
+            sb.append("\": { \"value\":\"");
             sb.append(value);
             sb.append('"');
+            if (controlsInheritingMIPs != null) {
+                sb.append(", \"inherited\":[");
+
+                int idIndex = 0;
+                for (Iterator i = controlsInheritingMIPs.iterator(); i.hasNext(); idIndex++) {
+                    final XFormsControl currentControl = (XFormsControl) i.next();
+
+                    if (idIndex > 0)
+                        sb.append(',');
+
+                    sb.append('"');
+                    sb.append(currentControl.getEffectiveId());
+                    sb.append('"');
+                }
+
+                sb.append(']');
+            }
+            sb.append('}');
             return true;
         } else {
             return found;

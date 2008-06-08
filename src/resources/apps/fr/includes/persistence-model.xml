@@ -22,7 +22,8 @@
               xmlns:f="http://orbeon.org/oxf/xml/formatting"
               xmlns:exist="http://exist.sourceforge.net/NS/exist"
               xmlns:xhtml="http://www.w3.org/1999/xhtml"
-              xmlns:saxon="http://saxon.sf.net/">
+              xmlns:saxon="http://saxon.sf.net/"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
     <!-- Model initialization -->
     <!-- TODO: Should not do this on summary page, for example -->
@@ -79,9 +80,11 @@
             <xforms:setvalue ref="$parameters/document" value="digest(string(random(true)), 'MD5', 'hex')"/>
             <!-- If we find form data in the session, use it and reset session -->
             <xxforms:variable name="form-data-from-session" select="xxforms:get-session-attribute('fr-upload-form-data')"/>
-            <xforms:action if="exists($form-data-from-session)">
+            <xforms:action if="exists($form-data-from-session) and not($form-data-from-session/*/@xsi:nil = 'true')">
+                <!--  Get data from session -->
                 <xforms:insert nodeset="xxforms:instance('fr-form-instance')" origin="$form-data-from-session"/>
-                <!-- TODO: reset session -->
+                <!-- Reset session -->
+                <xforms:insert context="." origin="xxforms:call-xpl('oxf:/apps/fr/import-export/reset-session.xpl', (), (), ())"/>
             </xforms:action>
         </xforms:action>
 

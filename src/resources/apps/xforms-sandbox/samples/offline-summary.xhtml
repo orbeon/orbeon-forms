@@ -48,7 +48,7 @@
             </xhtml:b>
         </xhtml:p>
         <xhtml:p>
-            <xforms:trigger ref=".[is-offline = 'false']">
+            <xforms:trigger ref=".[is-offline = 'false']" id="take-offline-from-summary">
                 <xforms:label>Take offline-mips offline</xforms:label>
                 <xxforms:script ev:event="DOMActivate">
                     ORBEON.xforms.Document.takeOfflineFromSummary(FORM_URL, function() {
@@ -57,7 +57,7 @@
                     });
                 </xxforms:script>
             </xforms:trigger>
-            <xforms:trigger ref=".[is-offline = 'true']">
+            <xforms:trigger ref=".[is-offline = 'true']" id="take-online-from-summary">
                 <xforms:label>Take online-mips online</xforms:label>
                 <xxforms:script ev:event="DOMActivate">
                     ORBEON.xforms.Document.takeOnlineFromSummary(FORM_URL, function() {

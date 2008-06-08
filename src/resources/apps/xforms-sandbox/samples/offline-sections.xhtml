@@ -25,21 +25,37 @@
             <xforms:instance id="ui">
                 <ui>
                     <section>1</section>
-                    <section-1/>
-                    <section-2/>
-                    <section-3/>
+                    <section-1>
+                        <first-name/>
+                    </section-1>
+                    <section-2>
+                        <accept-privacy/>
+                    </section-2>
+                    <section-3>
+                        <last-name/>
+                    </section-3>
                     <offline>false</offline>
                     <next-button/>
                     <previous-button/>
-
                 </ui>
+            </xforms:instance>
+            <xforms:instance id="yes-no">
+                <items>
+                    <item>
+                        <value>true</value>
+                        <label>Yes</label>
+                    </item>
+                    <item>
+                        <value>false</value>
+                        <label>No</label>
+                    </item>
+                </items>
             </xforms:instance>
             <xforms:bind nodeset="instance('ui')">
                 <xforms:bind name="section" nodeset="section" xxforms:offline="true"/>
-                <xforms:bind nodeset="section-1" relevant="$section = 1" xxforms:offline="true"/>
-                <xforms:bind nodeset="section-2" relevant="$section = 2" xxforms:offline="true"/>
-                <xforms:bind nodeset="section-3" relevant="$section = 3" xxforms:offline="true"/>
-
+                <xforms:bind nodeset="section-1/descendant-or-self::*" relevant="$section = 1" xxforms:offline="true"/>
+                <xforms:bind nodeset="section-2/descendant-or-self::*" relevant="$section = 2" xxforms:offline="true"/>
+                <xforms:bind nodeset="section-3/descendant-or-self::*" relevant="$section = 3" xxforms:offline="true"/>
 
                 <xforms:bind nodeset="previous-button" readonly="$section = '1'" xxforms:offline="true"/>
                 <xforms:bind nodeset="next-button" readonly="$section = '3'" xxforms:offline="true"/>
@@ -68,13 +84,22 @@
         <xforms:input ref="section" id="section" style="display: none"/>
         <xhtml:p>
             <xforms:group ref="section-1">
-                Section 1
+                <xforms:input ref="first-name">
+                    <xforms:label>First name</xforms:label>
+                </xforms:input>
             </xforms:group>
             <xforms:group ref="section-2">
-                Section 2
+                <xforms:select1 appearance="full" ref="accept-privacy" id="accept-privacy">
+                    <xforms:itemset nodeset="instance('yes-no')/item">
+                        <xforms:label ref="label"/>
+                        <xforms:value ref="value"/>
+                    </xforms:itemset>
+                </xforms:select1>
             </xforms:group>
             <xforms:group ref="section-3">
-                Section 3
+                <xforms:input ref="last-name">
+                    <xforms:label>Last name</xforms:label>
+                </xforms:input>
             </xforms:group>
         </xhtml:p>
         <xhtml:p>

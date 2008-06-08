@@ -99,6 +99,10 @@
                 <xforms:label>Take online</xforms:label>
                 <xxforms:online ev:event="DOMActivate"/>
             </xforms:trigger>
+            <xforms:trigger ref=".[instance('ui')/offline = 'true']">
+                <xforms:label>Save to Gears</xforms:label>
+                <xxforms:offline-save ev:event="DOMActivate"/>
+            </xforms:trigger>
         </xhtml:p>
         <xhtml:p>
             <xforms:trigger appearance="xxforms:link">

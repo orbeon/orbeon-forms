@@ -794,4 +794,29 @@ public class NetUtils {
         }
         return charset;
     }
+
+    /**
+     * Test whether the user agent is IE 6 or earlier.
+     *
+     * @param request   incoming request
+     * @return          true if IE 6 or earlier is identified
+     */
+    public static boolean isIE6OrEarlier(ExternalContext.Request request) {
+        final String path = request.getRequestPath().toLowerCase();
+        final int msieIndex = path.indexOf("msie");
+        final boolean isIE = msieIndex != -1 && path.indexOf("opera") == -1;
+        if (!isIE)
+            return false;
+
+        final String versionString = path.substring(msieIndex + 4, path.indexOf(';', msieIndex + 5)).trim();
+
+        final int dotIndex = versionString.indexOf('.');
+        final int version;
+        if (dotIndex == -1) {
+            version = Integer.parseInt(versionString);
+        } else {
+            version = Integer.parseInt(versionString.substring(0, dotIndex));
+        }
+        return version <= 6;
+    }
 }

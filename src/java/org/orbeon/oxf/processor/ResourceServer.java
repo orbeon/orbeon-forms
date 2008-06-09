@@ -33,6 +33,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ * Serve resources to the response.
+ */
 public class ResourceServer extends ProcessorImpl {
 
     public static final String RESOURCE_SERVER_NAMESPACE_URI = "http://www.orbeon.com/oxf/resource-server";
@@ -45,11 +48,11 @@ public class ResourceServer extends ProcessorImpl {
         addInputInfo(new ProcessorInputOutputInfo(MIMETYPE_INPUT, MIMETYPES_NAMESPACE_URI));
     }
 
-    public void start(org.orbeon.oxf.pipeline.api.PipelineContext context) {
-        ExternalContext externalContext = (ExternalContext) context.getAttribute(org.orbeon.oxf.pipeline.api.PipelineContext.EXTERNAL_CONTEXT);
-        ExternalContext.Response response = externalContext.getResponse();
+    public void start(PipelineContext context) {
+        final ExternalContext externalContext = (ExternalContext) context.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+        final ExternalContext.Response response = externalContext.getResponse();
 
-        MimeTypeConfig mimeTypeConfig = (MimeTypeConfig) readCacheInputAsObject(context, getInputByName(MIMETYPE_INPUT), new CacheableInputReader() {
+        final MimeTypeConfig mimeTypeConfig = (MimeTypeConfig) readCacheInputAsObject(context, getInputByName(MIMETYPE_INPUT), new CacheableInputReader() {
             public Object read(PipelineContext context, ProcessorInput input) {
                 MimeTypesContentHandler ch = new MimeTypesContentHandler();
                 readInputAsSAX(context, input, ch);
@@ -59,7 +62,7 @@ public class ResourceServer extends ProcessorImpl {
 
         try {
             // Read config input into a String, cache if possible
-            Node configNode = readCacheInputAsDOM(context, INPUT_CONFIG);
+            final Node configNode = readCacheInputAsDOM(context, INPUT_CONFIG);
 
             // Get config URL first
             String urlString = XPathUtils.selectStringValueNormalize(configNode, "url");
@@ -76,20 +79,45 @@ public class ResourceServer extends ProcessorImpl {
                 urlString = "oxf:" + urlString;
             }
 
-            URLConnection urlConnection = null;
             InputStream urlConnectionInputStream = null;
             try {
                 // Open resource and set headers
                 try {
-                    URL newURL = URLFactory.createURL(urlString);
+                    final URL newURL = URLFactory.createURL(urlString);
 
-                    // Try to open the connection
-                    urlConnection = newURL.openConnection();
-                    // Get InputStream and make sure it supprorts marks
-                    urlConnectionInputStream = urlConnection.getInputStream();
+                    URLConnection urlConnection = null;
+                    {
+                        // IE 6 hack for PNG images
+                        final boolean isIE6 = NetUtils.isIE6OrEarlier(externalContext.getRequest());
+                        if (isIE6 && newURL.getProtocol().equals("oxf")) {
+                            final String urlPath = newURL.getPath();
+                            if (urlPath.endsWith(".png")) {
+                                // Case of a PNG image served to IE 6 or earlier: check if there is a .gif instead
+                                urlString = "oxf:" + urlPath.substring(0, urlPath.length() - 3) + "gif";
+                                final URL gifURL = URLFactory.createURL(urlString);
+                                try {
+                                    // Try to get InputStream
+                                    final URLConnection gifURLConnection = gifURL.openConnection();
+                                    urlConnectionInputStream = gifURLConnection.getInputStream();
+                                    // If we get to here, we were successful
+                                    urlConnection = gifURLConnection;
+                                } catch (ResourceNotFoundException e) {
+                                    // GIF doesn't exist
+                                    // NOTE: Exception throwing / catching is expensive so we hope this doesn't happen too often
+                                }
+                            }
+                        }
+                    }
+
+                    // Open the connection
+                    if (urlConnection == null) {
+                        urlConnection = newURL.openConnection();
+                        // Get InputStream
+                        urlConnectionInputStream = urlConnection.getInputStream();
+                    }
 
                     // Get date of last modification of resource
-                    long lastModified = NetUtils.getLastModified(urlConnection);
+                    final long lastModified = NetUtils.getLastModified(urlConnection);
 
                     // Set Last-Modified, required for caching and conditional get
                     response.setCaching(lastModified, false, false);
@@ -101,11 +129,11 @@ public class ResourceServer extends ProcessorImpl {
                     }
 
                     // Lookup and set the content type
-                    String contentType = mimeTypeConfig.getMimeType(urlString);
+                    final String contentType = mimeTypeConfig.getMimeType(urlString);
                     if (contentType != null)
                         response.setContentType(contentType);
 
-                    int length = urlConnection.getContentLength();
+                    final int length = urlConnection.getContentLength();
                     if (length > 0)
                         response.setContentLength(length);
 
@@ -211,7 +239,7 @@ public class ResourceServer extends ProcessorImpl {
         public String getMimeType(String path) {
             path = path.toLowerCase();
             for (Iterator i = patternToMimeTypes.iterator(); i.hasNext();) {
-                PatternToMimeType patternToMimeType = (PatternToMimeType) i.next();
+                final PatternToMimeType patternToMimeType = (PatternToMimeType) i.next();
                 if (patternToMimeType.matches(path))
                     return patternToMimeType.getMimeType();
             }

@@ -248,7 +248,7 @@ hr {
 /* Styling for last dummy line added so IE displays the bottom border of the table */
 .fr-repeat-table .fr-repeat-last-line td { border: none; padding: 0; }
 .fr-repeat-table .fr-repeat-last-line { display: none }
-.fr-repeat-table th { background-color: #ddd; white-space: nowrap }
+.fr-repeat-table th { background-color: #ddd }
 .fr-repeat-table td .xforms-label { display: none; }
 .fr-repeat-table td .xforms-help-image { display: none; }
 .fr-repeat-table td .xforms-help { display: none; }

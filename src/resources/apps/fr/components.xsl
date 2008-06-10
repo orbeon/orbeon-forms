@@ -793,7 +793,7 @@
         <xsl:variable name="min-occurs" select="if (@minOccurs) then @minOccurs else 0"/>
         <xsl:variable name="max-occurs" select="if (@maxOccurs) then @maxOccurs else 'unbounded'"/>
         <xsl:variable name="readonly" as="xs:boolean" select="if (@readonly) then @readonly = 'true' else false()"/>
-        <xsl:variable name="first-mandatory" as="xs:boolean" select="if (@first-mandatory) then @first-mandatory = 'true' else false()"/>
+        <xsl:variable name="remove-constraint" select="@remove-constraint"/>
         <xsl:variable name="is-table-appearance" as="xs:boolean" select="@appearance = 'xxforms:table'"/>
         <xhtml:table class="fr-repeat {if ($is-table-appearance) then 'fr-repeat-table' else 'fr-repeat-sections'} {if (@columns) then concat('fr-grid-', @columns, '-columns') else ()}">
             <!-- Line with the "add" triggers -->
@@ -869,7 +869,7 @@
                                 <xforms:group>
                                     <!-- Remove trigger -->
                                     <xforms:trigger appearance="minimal" ref="if (
-                                            {if ($first-mandatory) then '$repeat-position != 1 and ' else ''}
+                                            {if ($remove-constraint) then concat($remove-constraint, ' and ') else ''}
                                             count(xxforms:repeat-nodeset('{@id}')) gt {$min-occurs}) then . else ()">
                                         <xforms:label><xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/bin.png" alt="Remove" title="Remove"/></xforms:label>
                                     </xforms:trigger>

@@ -4434,7 +4434,7 @@ ORBEON.xforms.Offline = {
         ORBEON.xforms.Offline.mips = mappingsObject.mips;
         ORBEON.xforms.Offline.variables = mappingsObject.variables;
         for (var variableName in mappingsObject.variables) {
-            var controlID = mappingsObject.variables[variableName];
+            var controlID = mappingsObject.variables[variableName].value;
             controlKeepValueIDs.push(controlID);
         }
 
@@ -4641,7 +4641,7 @@ ORBEON.xforms.Offline = {
         ORBEON.util.Dom.setStringValue(ORBEON.xforms.Offline.xpathNode, controlValue);
         var context = new ExprContext(ORBEON.xforms.Offline.xpathNode);
         for (var variableName in ORBEON.xforms.Offline.variables) {
-            var controlID = ORBEON.xforms.Offline.variables[variableName];
+            var controlID = ORBEON.xforms.Offline.variables[variableName].value;
             var variableValue = ORBEON.xforms.Controls.getCurrentValue(ORBEON.util.Dom.getElementById(controlID));
             context.setVariable(variableName, variableValue);
         }
@@ -4649,6 +4649,20 @@ ORBEON.xforms.Offline = {
     },
 
     evaluateMIPs: function() {
+        
+        //  Applies a relevance or read-onlyness to inherited controls
+        function applyToInherited(control, getter, setter, inherited, value) {
+            if (getter(control) != value) {
+                setter(control, value);
+                if (inherited) {
+                    for (var inheritedControlIndex = 0; inheritedControlIndex < mips.relevant.inherited.length; inheritedControlIndex++) {
+                        var inheritedControl = ORBEON.util.Dom.getElementById(inherited[inheritedControlIndex]);
+                        setter(inheritedControl, value);
+                    };
+                }
+            }
+        }
+        
         // Go over all controls
         for (var controlID in ORBEON.xforms.Offline.mips) {
             var mips = ORBEON.xforms.Offline.mips[controlID];
@@ -4679,13 +4693,13 @@ ORBEON.xforms.Offline = {
             // Relevant
             if (mips.relevant) {
                 var isRelevant = xpathParse("boolean(" + mips.relevant.value + ")").evaluate(xpathContext).value;
-                ORBEON.xforms.Controls.setRelevant(control, isRelevant);
+                applyToInherited(control, ORBEON.xforms.Controls.isRelevant, ORBEON.xforms.Controls.setRelevant, mips.relevant.inherited, isRelevant);
             }
 
             // Readonly
             if (mips.readonly) {
                 var isReadonly = xpathParse("boolean(" + mips.readonly.value + ")").evaluate(xpathContext).value;
-                ORBEON.xforms.Controls.setReadonly(control, isReadonly);
+                applyToInherited(control, ORBEON.xforms.Controls.isReadonly, ORBEON.xforms.Controls.setReadonly, mips.readonly.inherited, isReadonly);
             }
 
             // Type

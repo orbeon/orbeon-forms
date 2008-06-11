@@ -796,38 +796,12 @@
         <xsl:variable name="remove-constraint" select="@remove-constraint"/>
         <xsl:variable name="is-table-appearance" as="xs:boolean" select="@appearance = 'xxforms:table'"/>
         <xhtml:table class="fr-repeat {if ($is-table-appearance) then 'fr-repeat-table' else 'fr-repeat-sections'} {if (@columns) then concat('fr-grid-', @columns, '-columns') else ()}">
-            <!-- Line with the "add" triggers -->
-            <xsl:if test="false() and not($readonly)">
-                <xforms:group ref=".[not(exforms:readonly(.))]">
-                    <xhtml:tr>
-                        <xhtml:td class="fr-repeat-column"/>
-                        <!-- Add trigger (image) -->
-                        <xhtml:td class="fr-repeat-column">
-                            <xforms:trigger appearance="minimal" ref=".[{if ($max-occurs = 'unbounded') then 'true()' else concat('count(', @nodeset, ') lt ', $max-occurs)}]">
-                                <xforms:label><xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/add.png" alt="Add" title="Add"/></xforms:label>
-                            </xforms:trigger>
-                        </xhtml:td>
-                        <!-- Add trigger (text) -->
-                        <xhtml:td style="width: 100%" colspan="{max(for $tr in xhtml:tr return count($tr/xhtml:td))}">
-                            <xforms:trigger appearance="minimal" ref=".[{if ($max-occurs = 'unbounded') then 'true()' else concat('count(', @nodeset, ') lt ', $max-occurs)}]">
-                                <xforms:label>Add <xsl:value-of select="lower-case(xforms:label)"/></xforms:label>
-                            </xforms:trigger>
-                        </xhtml:td>
-                    </xhtml:tr>
-                    <xforms:insert ev:event="DOMActivate"
-                                   origin="{if (@origin) then @origin else concat('instance(''templates'')/', $tokenized-path[last()])}"
-                                   context="." nodeset="{if (@after) then @after else @nodeset}"/>
-                    <!-- TODO: handle @at -->
-                    <!-- at="index('{@id}')" position="after" -->
-                </xforms:group>
-            </xsl:if>
             <!-- Line with column headers -->
             <xhtml:tr>
                 <xsl:if test="not($readonly)">
                     <xforms:group ref=".[not(exforms:readonly(.))]">
                         <!-- Try to create enough space for a 2-digit number on the left -->
-                        <!--<xhtml:td class="fr-repeat-column">&#160;&#160;&#160;&#160;</xhtml:td>-->
-                        <xhtml:td class="fr-repeat-column"><xhtml:div style="width: 1.5em"/></xhtml:td>
+                        <xhtml:th class="fr-repeat-column"><xhtml:div style="width: 1.5em"/></xhtml:th>
                     </xforms:group>
                 </xsl:if>
                 <xhtml:td class="fr-repeat-column">

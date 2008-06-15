@@ -73,9 +73,35 @@ public class XFormsSelect1Control extends XFormsValueControl {
         }
     }
 
+    public boolean isOpenSelection() {
+        return "open".equals(getControlElement().attributeValue("selection"));
+    }
+
+    protected void evaluateExternalValue(PipelineContext pipelineContext) {
+        final String internalValue = getValue(pipelineContext);
+        final String updatedValue;
+        if (internalValue == null) {
+            updatedValue = null;
+        } else {
+            if (!isOpenSelection()) {
+                // For closed selection, values sent to client must be encrypted
+                updatedValue = XFormsItemUtils.encryptValue(pipelineContext, internalValue);
+            } else {
+                // For open selection, values sent to client are the internal values
+                updatedValue = internalValue;
+            }
+        }
+        super.setExternalValue(updatedValue);
+    }
+
     public void storeExternalValue(PipelineContext pipelineContext, String value, String type) {
-        if (!(this instanceof XFormsSelectControl)) {
+
+        if (!(this instanceof XFormsSelectControl)) {// kind of a HACK due to the way our class hierarchy is setup
             // Handle xforms:select1-specific logic
+
+            // Decrypt incoming value. With open selection, values are sent to the client.
+            if (!isOpenSelection())
+                value = XFormsItemUtils.decryptValue(pipelineContext, value);
 
             // Current control value
             final String controlValue = getValue(pipelineContext);
@@ -83,6 +109,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
             // Iterate over all the items
             final List items = getItemset(pipelineContext, true);
             final List selectEvents = new ArrayList();
+            final List deselectEvents = new ArrayList();
             for (Iterator i = items.iterator(); i.hasNext();) {
                 final XFormsItemUtils.Item currentItem = (XFormsItemUtils.Item) i.next();
                 final String currentItemValue = currentItem.getValue();
@@ -98,20 +125,36 @@ public class XFormsSelect1Control extends XFormsValueControl {
 
                 // Handle xforms-select / xforms-deselect
                 // TODO: Dispatch to itemset or item once we support doing that
-                if (!itemWasSelected && itemIsSelected)
+                if (!itemWasSelected && itemIsSelected) {
                     selectEvents.add(new XFormsSelectEvent(this, currentItemValue));
-                else if (itemWasSelected && !itemIsSelected)
-                    containingDocument.dispatchEvent(pipelineContext, new XFormsDeselectEvent(this, currentItemValue));
+                } else if (itemWasSelected && !itemIsSelected) {
+                    deselectEvents.add(new XFormsDeselectEvent(this, currentItemValue));
+                }
             }
-            if (selectEvents.size() > 0) {
-                // Select events must be sent after all xforms-deselect events
+
+            // Dispatch xforms-deselect events
+            if (deselectEvents.size() > 0) {
+                for (Iterator i = deselectEvents.iterator(); i.hasNext();) {
+                    containingDocument.dispatchEvent(pipelineContext, (XFormsEvent) i.next());
+                }
+            }
+            // Select events must be sent after all xforms-deselect events
+            final boolean hasSelectedItem = selectEvents.size() > 0;
+            if (hasSelectedItem) {
                 for (Iterator i = selectEvents.iterator(); i.hasNext();) {
                     containingDocument.dispatchEvent(pipelineContext, (XFormsEvent) i.next());
                 }
             }
-        }
 
-        super.storeExternalValue(pipelineContext, value, type);
+            if (hasSelectedItem || isOpenSelection()) {
+                // Only then do we store the external value. This ensures that if the value is NOT in the itemset AND
+                // we are a closed selection then we do NOT store the value in instance.
+                super.storeExternalValue(pipelineContext, value, type);
+            }
+        } else {
+            // Forward to superclass
+            super.storeExternalValue(pipelineContext, value, type);
+        }
     }
 
     /**

@@ -130,9 +130,9 @@ public class XFormsSelect1Handler extends XFormsCoreControlHandler {
 
                     contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, reusableAttributes);
                     handleItemFull(contentHandler, attributes, xhtmlPrefix, spanQName, null, id, effectiveId, isMany, fullItemType,
-                            new XFormsItemUtils.Item(true, Collections.EMPTY_LIST,
+                            new XFormsItemUtils.Item(false, Collections.EMPTY_LIST, // make sure the value "$xforms-template-value$" is not encrypted
                                     "$xforms-template-label$", "$xforms-template-value$", 1),
-                            "$xforms-item-index$", true);
+                                    "$xforms-item-index$", true);
                     contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
                 }
             } else {
@@ -157,6 +157,7 @@ public class XFormsSelect1Handler extends XFormsCoreControlHandler {
                                 reusableAttributes.addAttribute("", "autocomplete", "autocomplete", ContentHandlerHelper.CDATA, "off");
 
                                 final String value = (xformsValueControl == null) ? null : xformsValueControl.getValue(pipelineContext);
+                                // NOTE: With open selection, we send all values to the client but not encrypt them because the client matches on values
                                 reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, (value == null) ? "" : value);
                                 handleReadOnlyAttribute(reusableAttributes, containingDocument, xformsValueControl);
                                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName, reusableAttributes);
@@ -397,7 +398,7 @@ public class XFormsSelect1Handler extends XFormsCoreControlHandler {
     private void outputJSONTreeInfo(XFormsValueControl xformsControl, List items, boolean many, ContentHandler contentHandler) throws SAXException {
         if (xformsControl != null && !handlerContext.isTemplate()) {
             // Produce a JSON fragment with hierachical information
-            final String result = XFormsItemUtils.getJSONTreeInfo(items, xformsControl.getValue(pipelineContext), many, handlerContext.getLocationData());
+            final String result = XFormsItemUtils.getJSONTreeInfo(pipelineContext, items, xformsControl.getValue(pipelineContext), many, handlerContext.getLocationData());
             contentHandler.characters(result.toCharArray(), 0, result.length());
         } else {
             // Don't produce any content when generating a template
@@ -422,7 +423,7 @@ public class XFormsSelect1Handler extends XFormsCoreControlHandler {
             reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, itemEffectiveId);
             reusableAttributes.addAttribute("", "type", "type", ContentHandlerHelper.CDATA, type);
             reusableAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, effectiveId);// TODO: may have duplicate ids for itemsets
-            reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, item.getValue() == null ? "" : item.getValue());
+            reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, item.getExternalValue(pipelineContext));
 
             if (!handlerContext.isTemplate() && xformsControl != null) {
                 final String itemValue = ((item.getValue() == null) ? "" : item.getValue()).trim();
@@ -459,7 +460,7 @@ public class XFormsSelect1Handler extends XFormsCoreControlHandler {
         final String optionValue = item.getValue();
         final AttributesImpl optionAttributes = getAttributes(new AttributesImpl(), null, null);
 
-        optionAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, optionValue == null ? "" : optionValue);
+        optionAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, item.getExternalValue(pipelineContext));
 
         // Figure out whether what items are selected
         if (!handlerContext.isTemplate() && xformsControl != null) {

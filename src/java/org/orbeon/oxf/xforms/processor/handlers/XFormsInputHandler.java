@@ -79,7 +79,7 @@ public class XFormsInputHandler extends XFormsCoreControlHandler {
             final boolean isMany = true;
 
             final List items = new ArrayList(2);
-            items.add(new XFormsItemUtils.Item(false, Collections.EMPTY_LIST, "", "true", 1));
+            items.add(new XFormsItemUtils.Item(true, Collections.EMPTY_LIST, "", "true", 1));
 
             // NOTE: In the future, we may want to use other appearances provided by xforms:select
 //            items.add(new XFormsSelect1Control.Item(false, Collections.EMPTY_LIST, "False", "false", 1));

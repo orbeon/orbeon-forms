@@ -21,6 +21,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.util.SecureUtils;
 import org.orbeon.saxon.om.FastStringBuffer;
 import org.orbeon.saxon.om.NodeInfo;
 import org.xml.sax.ContentHandler;
@@ -39,8 +40,8 @@ public class XFormsItemUtils {
      * @param items         list of XFormsSelect1Control.Item
      * @return              String representing a JSON tree
      */
-    public static String getJSONTreeInfo(List items, LocationData locationData) {
-        return getJSONTreeInfo(items, null, false, locationData);
+    public static String getJSONTreeInfo(PipelineContext pipelineContext, List items, LocationData locationData) {
+        return getJSONTreeInfo(pipelineContext, items, null, false, locationData);
     }
 
     /**
@@ -51,7 +52,7 @@ public class XFormsItemUtils {
      * @param many          whether multiple selection is allowed (to determine selected item)
      * @return              String representing a JSON tree
      */
-    public static String getJSONTreeInfo(List items, final String controlValue, final boolean many, LocationData locationData) {
+    public static String getJSONTreeInfo(final PipelineContext pipelineContext, List items, final String controlValue, final boolean many, LocationData locationData) {
         // Produce a JSON fragment with hierachical information
         if (items.size() > 0) {
             final FastStringBuffer sb = new FastStringBuffer(100);
@@ -64,7 +65,6 @@ public class XFormsItemUtils {
                 }
 
                 public void startItem(ContentHandler contentHandler, Item item, boolean first) throws SAXException {
-                    final String label = item.getLabel();
                     final String value = item.getValue();
 
                     if (!first)
@@ -72,10 +72,9 @@ public class XFormsItemUtils {
                     sb.append("[");
 
                     sb.append('"');
-                    sb.append(escapeJavaScriptQuotes(label));
+                    sb.append(item.getExternalJSLabel());
                     sb.append("\",\"");
-                    if (value != null)
-                        sb.append(escapeJavaScriptQuotes(value));
+                    sb.append(item.getExternalJSValue(pipelineContext));
                     sb.append('\"');
 
                     if (controlValue != null) {
@@ -99,8 +98,12 @@ public class XFormsItemUtils {
         }
     }
 
-    private static String escapeJavaScriptQuotes(String value) {
-        return StringUtils.replace(value, "\"", "\\\"");
+    public static String encryptValue(PipelineContext pipelineContext, String value) {
+        return SecureUtils.encrypt(pipelineContext, XFormsProperties.getXFormsPassword(), value);
+    }
+
+    public static String decryptValue(PipelineContext pipelineContext, String value) {
+        return SecureUtils.decryptAsString(pipelineContext, XFormsProperties.getXFormsPassword(), value);
     }
 
     /**
@@ -222,6 +225,8 @@ public class XFormsItemUtils {
 //        final List existingItems = containingDocument.getXFormsControls().getConstantItems(getOriginalId());
 //        final boolean[] mayReuse = new boolean[] { existingItems != null };
 
+        final boolean isOpenSelection = select1Control.isOpenSelection();
+
         Dom4jUtils.visitSubtree(select1Control.getControlElement(), new Dom4jUtils.VisitorListener() {
 
             private int hierarchyLevel = 0;
@@ -243,7 +248,7 @@ public class XFormsItemUtils {
                         throw new ValidationException("xforms:item must contain an xforms:value element.", select1Control.getLocationData());
                     final String value = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, valueElement, false, null);
 
-                    newItems.add(new Item(false, element.attributes(), label != null ? label : "", value != null ? value : "", hierarchyLevel + 1));// TODO: must filter attributes on element.attributes()
+                    newItems.add(new Item(!isOpenSelection, element.attributes(), label != null ? label : "", value != null ? value : "", hierarchyLevel + 1));// TODO: must filter attributes on element.attributes()
 
                 } else if ("itemset".equals(localname)) {
                     // xforms:itemset
@@ -309,7 +314,7 @@ public class XFormsItemUtils {
                                             // Handle xforms:value
                                             // TODO: This could be optimized for xforms:value/@ref|@value as we could get the expression from the cache only once
                                             final String value = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, element.element(XFormsConstants.XFORMS_VALUE_QNAME), false, null);
-                                            newItems.add(new Item(true, element.attributes(), label != null ? label : "", value, newLevel));// TODO: must filter attributes on element.attributes()
+                                            newItems.add(new Item(!isOpenSelection, element.attributes(), label != null ? label : "", value, newLevel));// TODO: must filter attributes on element.attributes()
                                         } else {
                                             // TODO: handle xforms:copy
                                             throw new ValidationException("xforms:copy is not yet supported.", select1Control.getLocationData());
@@ -333,7 +338,7 @@ public class XFormsItemUtils {
                     if (labelElement != null) {
                         final String label = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, element.element(XFormsConstants.XFORMS_LABEL_QNAME), false, null);
                         hierarchyLevel++;
-                        newItems.add(new Item(false, element.attributes(), label, null, hierarchyLevel));// TODO: must filter attributes on element.attributes()
+                        newItems.add(new Item(!isOpenSelection, element.attributes(), label, null, hierarchyLevel));// TODO: must filter attributes on element.attributes()
                     }
                 }
             }
@@ -397,22 +402,22 @@ public class XFormsItemUtils {
      */
     public static class Item {
 
-        private boolean isItemSet;
+        private boolean isEncryptValue; // whether this item is part of an open selection control
         private List attributesList;
         private String label;
         private String value;
         private int level;
 
-        public Item(boolean isItemSet, List attributesList, String label, String value, int level) {
-            this.isItemSet = isItemSet;
+        public Item(boolean isEncryptValue, List attributesList, String label, String value, int level) {
+            this.isEncryptValue = isEncryptValue;
             this.attributesList = attributesList;
             this.label = label;
             this.value = value;
             this.level = level;
         }
 
-        public boolean isItemSet() {
-            return isItemSet;
+        public boolean isEncryptValue() {
+            return isEncryptValue;
         }
 
         public List getAttributesList() {
@@ -425,6 +430,18 @@ public class XFormsItemUtils {
 
         public String getValue() {
             return value;
+        }
+
+        public String getExternalValue(PipelineContext pipelineContext) {
+            return value == null ? "" : isEncryptValue ? XFormsItemUtils.encryptValue(pipelineContext, value) : value;
+        }
+
+        public String getExternalJSValue(PipelineContext pipelineContext) {
+            return value == null ? "" : isEncryptValue ? XFormsItemUtils.encryptValue(pipelineContext, value) : escapeJavaScriptQuotes(value);
+        }
+
+        public String getExternalJSLabel() {
+            return label == null? "" : escapeJavaScriptQuotes(label);
         }
 
         public int getLevel() {
@@ -459,6 +476,10 @@ public class XFormsItemUtils {
             sb.append(getValue());
 
             return sb.toString();
+        }
+
+        private static String escapeJavaScriptQuotes(String value) {
+            return StringUtils.replace(value, "\"", "\\\"");
         }
     }
 }

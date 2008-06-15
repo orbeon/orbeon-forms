@@ -57,13 +57,14 @@ public class XFormsSelectControl extends XFormsSelect1Control {
             final List items = getItemset(pipelineContext, true);
 
             // Current values in the instance
-            final Map instanceValues = tokenize(controlValue);
+            final Map instanceValues = tokenize(pipelineContext, controlValue, false);
 
             // Values currently selected in the UI
-            final Map uiValues = tokenize(value);
+            final Map uiValues = tokenize(pipelineContext, value, true);
 
             // Iterate over all the items
             final List selectEvents = new ArrayList();
+            final List deselectEvents = new ArrayList();
             for (Iterator i = items.iterator(); i.hasNext();) {
                 final XFormsItemUtils.Item currentItem = (XFormsItemUtils.Item) i.next();
                 final String currentItemValue = currentItem.getValue();
@@ -81,13 +82,22 @@ public class XFormsSelectControl extends XFormsSelect1Control {
 
                 // Handle xforms-select / xforms-deselect
                 // TODO: Dispatch to itemset or item once we support doing that
-                if (!itemWasSelected && itemIsSelected)
+                if (!itemWasSelected && itemIsSelected) {
                     selectEvents.add(new XFormsSelectEvent(this, currentItemValue));
-                else if (itemWasSelected && !itemIsSelected)
-                    containingDocument.dispatchEvent(pipelineContext, new XFormsDeselectEvent(this, currentItemValue));
+                } else if (itemWasSelected && !itemIsSelected) {
+                    deselectEvents.add(new XFormsDeselectEvent(this, currentItemValue));
+                }
+
             }
-            if (selectEvents.size() > 0) {
-                // Select events must be sent after all xforms-deselect events
+            // Dispatch xforms-deselect events
+            if (deselectEvents.size() > 0) {
+                for (Iterator i = deselectEvents.iterator(); i.hasNext();) {
+                    containingDocument.dispatchEvent(pipelineContext, (XFormsEvent) i.next());
+                }
+            }
+            // Select events must be sent after all xforms-deselect events
+            final boolean hasSelectedItem = selectEvents.size() > 0;
+            if (hasSelectedItem) {
                 for (Iterator i = selectEvents.iterator(); i.hasNext();) {
                     containingDocument.dispatchEvent(pipelineContext, (XFormsEvent) i.next());
                 }
@@ -105,6 +115,9 @@ public class XFormsSelectControl extends XFormsSelect1Control {
             newValue = sb.toString();
         }
 
+        // "newValue" is created so as to ensure that if a value is NOT in the itemset AND we are a closed selection
+        // then we do NOT store the value in instance.
+        // NOTE: At the moment we don't support open selection here anyway
         super.storeExternalValue(pipelineContext, newValue, type);
     }
 
@@ -117,7 +130,7 @@ public class XFormsSelectControl extends XFormsSelect1Control {
         } else {
 
             // Current values in the instance
-            final Map instanceValues = tokenize(internalValue);
+            final Map instanceValues = tokenize(pipelineContext, internalValue, false);
 
             // Values in the itemset
             final List items = getItemset(pipelineContext, true);
@@ -131,7 +144,8 @@ public class XFormsSelectControl extends XFormsSelect1Control {
                 if (instanceValues.get(currentValue) != null) {
                     if (index > 0)
                         sb.append(' ');
-                    sb.append(currentValue);
+
+                    sb.append(currentItem.getExternalValue(pipelineContext));
                 }
             }
             updatedValue = sb.toString();
@@ -139,12 +153,13 @@ public class XFormsSelectControl extends XFormsSelect1Control {
         setExternalValue(updatedValue);
     }
 
-    private static Map tokenize(String value) {
+    private static Map tokenize(PipelineContext pipelineContext, String value, boolean decryptValues) {
         final Map result = new HashMap();
         if (value != null) {
             for (final StringTokenizer st = new StringTokenizer(value); st.hasMoreTokens();) {
                 final String token = st.nextToken();
-                result.put(token, "");
+                // Keep value and decrypt if necessary
+                result.put(decryptValues ? XFormsItemUtils.decryptValue(pipelineContext, token) : token, "");
             }
         }
         return result;

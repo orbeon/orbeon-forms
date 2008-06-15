@@ -519,7 +519,7 @@ public class XFormsServer extends ProcessorImpl {
                     // Diff itemset information
                     final Map itemsetUpdate = diffItemsets(itemsetsFull1, itemsetsFull2);
                     // TODO: handle allEvents case
-                    outputItemsets(ch, itemsetUpdate);
+                    outputItemsets(pipelineContext, ch, itemsetUpdate);
                 }
 
                 // Output automatic events
@@ -789,7 +789,7 @@ public class XFormsServer extends ProcessorImpl {
                 new String[]{"control-id", helpEffectiveControlId});
     }
 
-    private static void outputItemsets(ContentHandlerHelper ch, Map itemsetIdToItemsetInfoMap) {
+    private static void outputItemsets(PipelineContext pipelineContext, ContentHandlerHelper ch, Map itemsetIdToItemsetInfoMap) {
         if (itemsetIdToItemsetInfoMap != null && itemsetIdToItemsetInfoMap.size() > 0) {
             // There are some xforms:itemset controls
 
@@ -800,7 +800,7 @@ public class XFormsServer extends ProcessorImpl {
                 final List items = (List) currentEntry.getValue();
 
                 ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "itemset", new String[]{"id", itemsetId});
-                final String result = XFormsItemUtils.getJSONTreeInfo(items, null);// TODO: pass LocationData
+                final String result = XFormsItemUtils.getJSONTreeInfo(pipelineContext, items, null);// TODO: pass LocationData
                 if (result.length() > 0)
                     ch.text(result);
                 ch.endElement();

@@ -18,15 +18,16 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.EmptyIterator;
+import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.trans.XPathException;
 
 /**
- * xxforms:get-session-attribute($a as xs:string) document-node()?
+ * xxforms:set-session-attribute($a as xs:string) document-node()?
  *
- * Return the value of the given session attribute.
+ * Set the value of the given session attribute.
  */
-public class XXFormsGetSessionAttribute extends XXFormsGetScopeAttribute {
+public class XXFormsSetSessionAttribute extends XXFormsSetScopeAttribute {
 
     public SequenceIterator iterate(XPathContext xpathContext) throws XPathException {
 
@@ -34,20 +35,19 @@ public class XXFormsGetSessionAttribute extends XXFormsGetScopeAttribute {
         final Expression attributeNameExpression = argument[0];
         final String attributeName = attributeNameExpression.evaluateAsString(xpathContext);
 
-        // Get attribute value
+        // Get value
+        final Expression valueExpression = argument[1];
+        final Item item = valueExpression.evaluateItem(xpathContext);
 
         // This function is always called from controls so ExternalContext should be present
         final StaticExternalContext.StaticContext staticContext = StaticExternalContext.getStaticContext();
         final ExternalContext externalContext = staticContext.getExternalContext();
 
-        final ExternalContext.Session session = externalContext.getSession(false);// do not force session creation
-        if (session != null) {
-            // Found session
-            final Object attributeObject = session.getAttributesMap().get(attributeName);
-            return convertAttributeValue(attributeObject);
-        } else {
-            // No session, return empty result
-            return EmptyIterator.getInstance();
-        }
+        // Store value
+        final ExternalContext.Session session = externalContext.getSession(true);// DO force session creation
+        storeAttribute(session.getAttributesMap(), attributeName, item);
+
+        // Return empty sequence
+        return EmptyIterator.getInstance();
     }
 }

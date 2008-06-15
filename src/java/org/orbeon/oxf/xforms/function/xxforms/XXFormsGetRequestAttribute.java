@@ -13,34 +13,20 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms;
 
-import org.exolab.castor.mapping.Mapping;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.StaticExternalContext;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.processor.scope.ScopeGenerator;
-import org.orbeon.oxf.xforms.function.XFormsFunction;
-import org.orbeon.oxf.xml.SAXStore;
-import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.XPathContext;
-import org.orbeon.saxon.om.DocumentInfo;
-import org.orbeon.saxon.om.EmptyIterator;
-import org.orbeon.saxon.om.ListIterator;
 import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.trans.XPathException;
-import org.xml.sax.InputSource;
-
-import java.io.StringReader;
-import java.util.Collections;
 
 /**
  * xxforms:get-request-attribute($a as xs:string) document-node()?
  *
  * Return the value of the given request attribute.
- *
- * TODO: Later we could return other types, including strings, numeric types, booleans, etc.
  */
-public class XXFormsGetRequestAttribute extends XFormsFunction {
+public class XXFormsGetRequestAttribute extends XXFormsGetScopeAttribute {
 
     public SequenceIterator iterate(XPathContext xpathContext) throws XPathException {
 
@@ -56,24 +42,7 @@ public class XXFormsGetRequestAttribute extends XFormsFunction {
             final ExternalContext externalContext = staticContext.getExternalContext();
 
             final Object attributeObject = externalContext.getRequest().getAttributesMap().get(attributeName);
-            if (attributeObject != null) {
-                // Found request attribute
-                final SAXStore saxStore;
-                try {
-                    // We don't have any particular mappings to pass to serialize objects
-                    final Mapping mapping = new Mapping();
-                    mapping.loadMapping(new InputSource(new StringReader("<mapping/>")));
-
-                    saxStore = ScopeGenerator.getSAXStore(attributeObject, mapping);
-                } catch (Exception e) {
-                    throw new OXFException(e);
-                }
-                final DocumentInfo documentInfo = TransformerUtils.saxStoreToTinyTree(saxStore);
-
-                return new ListIterator(Collections.singletonList(documentInfo));
-            }
-
-            return EmptyIterator.getInstance();
+            return convertAttributeValue(attributeObject);
         } else {
             throw new OXFException("xxforms:get-request-attribute() can only be called during XForms initialization.");
         }

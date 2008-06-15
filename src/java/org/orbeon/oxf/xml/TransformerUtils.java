@@ -464,6 +464,20 @@ public class TransformerUtils {
             throw new OXFException(e);
         }
     }
+
+    /**
+     * Transform a TinyTree to a SAXStore.
+     */
+    public static SAXStore tinyTreeToSAXStore(NodeInfo nodeInfo) {
+        try {
+            final Transformer identity = getXMLIdentityTransformer();
+            final SAXStore result = new SAXStore();
+            identity.transform(nodeInfo, new SAXResult(result));
+            return result;
+        } catch (TransformerException e) {
+            throw new OXFException(e);
+        }
+    }
 }
 
 class TransformerWrapper extends Transformer {

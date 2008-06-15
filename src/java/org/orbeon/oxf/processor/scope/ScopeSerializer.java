@@ -28,21 +28,21 @@ public class ScopeSerializer extends ScopeProcessorBase {
         addInputInfo(new ProcessorInputOutputInfo(INPUT_DATA));
     }
 
-    public void start(org.orbeon.oxf.pipeline.api.PipelineContext context) {
-        // Read data input into a SAXStore
-        ScopeStore store = (ScopeStore) readCacheInputAsObject(context, getInputByName(INPUT_DATA), new CacheableInputReader() {
+    public void start(PipelineContext context) {
+        // Read data input into a ScopeStore
+        final ScopeStore store = (ScopeStore) readCacheInputAsObject(context, getInputByName(INPUT_DATA), new CacheableInputReader() {
             public Object read(PipelineContext context, ProcessorInput input) {
-                SAXStore saxStore = new SAXStore();
+                final SAXStore saxStore = new SAXStore();
                 readInputAsSAX(context, input, saxStore);
                 return new ScopeStore(saxStore, getInputKey(context, input), getInputValidity(context, input));
             }
         });
 
         // Read config
-        ContextConfig config = readConfig(context);
+        final ContextConfig config = readConfig(context);
 
-        // Store the SAX store in context
-        ExternalContext externalContext = (ExternalContext) context.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+        // Store into context
+        final ExternalContext externalContext = (ExternalContext) context.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
         if (config.getContextType() == ScopeProcessorBase.REQUEST_CONTEXT) {
             externalContext.getRequest().getAttributesMap().put(config.getKey(), store);
         } else if (config.getContextType() == ScopeProcessorBase.SESSION_CONTEXT) {

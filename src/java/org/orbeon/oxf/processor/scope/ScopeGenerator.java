@@ -158,7 +158,6 @@ public class ScopeGenerator extends ScopeProcessorBase {
         if (value instanceof ScopeStore) {
             final ScopeStore contextStore = (ScopeStore) value;
             result = contextStore.getSaxStore();
-
         } else {
             if (value instanceof SAXStore) {
                 result = (SAXStore) value;
@@ -167,12 +166,12 @@ public class ScopeGenerator extends ScopeProcessorBase {
                 result = new SAXStore();
                 if (value instanceof Document) {
                     // dom4j document
-                    LocationSAXWriter saxWriter = new LocationSAXWriter();
+                    final LocationSAXWriter saxWriter = new LocationSAXWriter();
                     saxWriter.setContentHandler(result);
                     saxWriter.write((Document) value);
                 } else if (value instanceof org.w3c.dom.Document) {
                     // W3C DOM document
-                    Transformer identity = TransformerUtils.getIdentityTransformer();
+                    final Transformer identity = TransformerUtils.getIdentityTransformer();
                     identity.transform(new DOMSource((org.w3c.dom.Document) value), new SAXResult(result));
                 } else if (value instanceof String) {
                     // Consider the String containing a document to parse

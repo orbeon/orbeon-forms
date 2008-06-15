@@ -802,13 +802,18 @@ public class NetUtils {
      * @return          true if IE 6 or earlier is identified
      */
     public static boolean isIE6OrEarlier(ExternalContext.Request request) {
-        final String path = request.getRequestPath().toLowerCase();
-        final int msieIndex = path.indexOf("msie");
-        final boolean isIE = msieIndex != -1 && path.indexOf("opera") == -1;
+        final Object userAgentHeader = request.getHeaderValuesMap().get("user-agent");
+        if (userAgentHeader == null)
+            return false;
+
+        final String userAgent = ((String[]) userAgentHeader)[0].toLowerCase();
+
+        final int msieIndex = userAgent.indexOf("msie");
+        final boolean isIE = msieIndex != -1 && userAgent.indexOf("opera") == -1;
         if (!isIE)
             return false;
 
-        final String versionString = path.substring(msieIndex + 4, path.indexOf(';', msieIndex + 5)).trim();
+        final String versionString = userAgent.substring(msieIndex + 4, userAgent.indexOf(';', msieIndex + 5)).trim();
 
         final int dotIndex = versionString.indexOf('.');
         final int version;

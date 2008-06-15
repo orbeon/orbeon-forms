@@ -1303,18 +1303,17 @@
                         <li>
                             <a name="xxforms-get-request-attribute"/>
                             <p>
-                                <code>xxforms:get-request-attribute($a as xs:string) document-node()?</code>
+                                <code>xxforms:get-request-attribute($name as xs:string) document-node()?</code>
                             </p>
                             <p>
                                 The <code>xxforms:get-request-attribute()</code> function returns the value of the given
                                 request attribute. The attribute may have been previously placed in the request through
-                                Java code, for example.
+                                Java code, or using <code>xxforms:set-request-attribute()</code>, for example.
                             </p>
                             <p>
-                                Currently, this function always returns an XML document or an empty sequence. The
-                                types of attribute objects supported are the same <a
+                                The types of attribute objects supported are the same <a
                                 href="processors-generators#scope-generator-types">types supported by the Scope
-                                generator</a>.
+                                generator</a>, plus types stored with <code>xxforms:set-request-attribute()</code>.
                             </p>
                             <xml-source show-namespaces="false">
                                 <comment> Get the "document" attribute and use it to replace instance "my-instance" </comment>
@@ -1331,21 +1330,48 @@
                         <li>
                             <a name="xxforms-get-session-attribute"/>
                             <p>
-                                <code>xxforms:get-session-attribute($a as xs:string) document-node()?</code>
+                                <code>xxforms:get-session-attribute($name as xs:string) document-node()?</code>
                             </p>
                             <p>
                                 The <code>xxforms:get-session-attribute()</code> function returns the value of the given
                                 session attribute.
                             </p>
                             <p>
-                                Currently, this function always returns an XML document or an empty sequence. The types
-                                of attribute objects supported are the same <a
+                                The types of attribute objects supported are the same <a
                                 href="processors-generators#scope-generator-types">types supported by the Scope
-                                generator</a>.
+                                generator</a>, plus types stored with <code>xxforms:set-session-attribute()</code>.
                             </p>
                             <xml-source show-namespaces="false">
                                 <comment> Get the "document" attribute and use it to replace instance "my-instance" </comment>
                                 <xforms:insert nodeset="instance('my-instance')" origin="xxforms:get-session-attribute('document')"/>
+                            </xml-source>
+                        </li>
+                        <li>
+                            <a name="xxforms-set-request-attribute"/>
+                            <p>
+                                <code>xxforms:set-request-attribute($name as xs:string, $value item()) ()</code>
+                            </p>
+                            <p>
+                                The <code>xxforms:set-request-attribute()</code> function stores the given value as a
+                                request attribute.
+                            </p>
+                            <xml-source show-namespaces="false">
+                                <comment> Set the "document" attribute into the request </comment>
+                                <xforms:insert context="." origin="xxforms:set-request-attribute('document', instance('my-instance'))"/>
+                            </xml-source>
+                        </li>
+                        <li>
+                            <a name="xxforms-set-session-attribute"/>
+                            <p>
+                                <code>xxforms:set-session-attribute($name as xs:string, $value item()) ()</code>
+                            </p>
+                            <p>
+                                The <code>xxforms:set-session-attribute()</code> function stores the given value as a
+                                session attribute.
+                            </p>
+                            <xml-source show-namespaces="false">
+                                <comment> Set the "document" attribute into the session </comment>
+                                <xforms:insert context="." origin="xxforms:set-session-attribute('document', instance('my-instance'))"/>
                             </xml-source>
                         </li>
                         <li>

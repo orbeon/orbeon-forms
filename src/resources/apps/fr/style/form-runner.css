@@ -1,18 +1,18 @@
 /* ************************************************** IE 6 hack for PNG ************************************************** */
 
 /* IE 6 HACK: bind behavior from iepngfix.htc */
-#fr-view .fr-top, #fr-view .fr-bottom,
-        #fr-view button.xforms-trigger img,
-        #fr-view a.xforms-trigger img,
-        #fr-view .fr-logo img,
-        #fr-view img.xforms-help-image,
-        #fr-view .fr-status-icons img
-{
+/*#fr-view .fr-top, #fr-view .fr-bottom,*/
+        /*#fr-view button.xforms-trigger img,*/
+        /*#fr-view a.xforms-trigger img,*/
+        /*#fr-view .fr-logo img,*/
+        /*#fr-view img.xforms-help-image,*/
+        /*#fr-view .fr-status-icons img*/
+/*{*/
     /* Absolute path is rewritten in combined resources mode */
     /* TODO: this must go through our CSS rewriter */
-    behavior: url(/orbeon/ops/javascript/iepngfix.htc)
+    /*behavior: url(/orbeon/ops/javascript/iepngfix.htc)*/
     /*;border: 10px solid red*/
-}
+/*}*/
 
 /* ************************************************** Basic HTML settings ************************************************** */
 

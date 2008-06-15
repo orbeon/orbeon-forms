@@ -480,7 +480,7 @@
                     <div class="fr-paging-buttons">
                         <xforms:trigger ref="instance('fr-paging-instance')/prev-trigger" appearance="minimal">
                             <xforms:label>
-                                <xhtml:img src="/apps/fr/style/images/silk/resultset_first.png" alt="First" title="First"/>
+                                <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/resultset_first.png" alt="First" title="First"/>
                                 <!--<xhtml:span><xforms:output value="$fr-resources/summary/labels/first"/></xhtml:span>-->
                             </xforms:label>
                             <xforms:action ev:event="DOMActivate">
@@ -492,7 +492,7 @@
 
                         <xforms:trigger ref="instance('fr-paging-instance')/prev-trigger" appearance="minimal">
                             <xforms:label>
-                                <xhtml:img src="/apps/fr/style/images/silk/resultset_previous.png" alt="Previous" title="Previous"/>
+                                <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/resultset_previous.png" alt="Previous" title="Previous"/>
                                 <!--<xhtml:span><xforms:output value="$fr-resources/summary/labels/previous"/></xhtml:span>-->
                             </xforms:label>
                             <xforms:action ev:event="DOMActivate">
@@ -517,7 +517,7 @@
                         <xforms:trigger ref="instance('fr-paging-instance')/next-trigger" appearance="minimal">
                             <xforms:label>
                                 <!--<xhtml:span><xforms:output value="$fr-resources/summary/labels/next"/></xhtml:span>-->
-                                <xhtml:img src="/apps/fr/style/images/silk/resultset_next.png" alt="Next" title="Next"/>
+                                <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/resultset_next.png" alt="Next" title="Next"/>
                             </xforms:label>
                             <xforms:action ev:event="DOMActivate">
                                 <xforms:setvalue ref="instance('fr-search-instance')/page-number" value=". + 1"/>
@@ -529,7 +529,7 @@
                         <xforms:trigger ref="instance('fr-paging-instance')/next-trigger" appearance="minimal">
                             <xforms:label>
                                 <!--<xhtml:span><xforms:output value="$fr-resources/summary/labels/last"/></xhtml:span>-->
-                                <xhtml:img src="/apps/fr/style/images/silk/resultset_last.png" alt="Last" title="Last"/>
+                                <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/resultset_last.png" alt="Last" title="Last"/>
                             </xforms:label>
                             <xforms:action ev:event="DOMActivate">
                                 <xforms:setvalue ref="instance('fr-search-instance')/page-number" value="instance('fr-paging-instance')/page-count"/>
@@ -577,7 +577,7 @@
                         <!-- PDF button (if not Form Builder) -->
                         <xforms:trigger ref="instance('fr-summary-triggers-instance')/edit[not($is-form-builder)]">
                             <xforms:label>
-                                <xhtml:img src="/apps/fr/style/pdf.png" alt="Print PDF"/>
+                                <xhtml:img width="16" height="16" src="/apps/fr/style/pdf.png" alt="Print PDF"/>
                                 <xhtml:span><xforms:output value="$fr-resources/detail/labels/print-pdf"/></xhtml:span>
                             </xforms:label>
                             <xforms:dispatch ev:event="DOMActivate" target="fr-form-model" name="fr-summary-pdf"/>
@@ -602,7 +602,7 @@
                         <!-- TODO -->
                         <xforms:trigger ref="instance('fr-summary-triggers-instance')/edit[$is-form-builder]">
                             <xforms:label>
-                                <xhtml:img src="/forms/orbeon/builder/images/play.png" alt="Test Form" title="Test Form"/>
+                                <xhtml:img width="16" height="16" src="/forms/orbeon/builder/images/play.png" alt="Test Form" title="Test Form"/>
                                 <xhtml:span>Test</xhtml:span>
                             </xforms:label>
                             <xforms:dispatch ev:event="DOMActivate" target="fr-form-model" name="fr-summary-test"/>

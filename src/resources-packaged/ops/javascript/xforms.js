@@ -790,7 +790,6 @@ ORBEON.xforms.Document = {
         var resultSet = ORBEON.xforms.Offline.gearsDatabase.execute("select control_values from Offline_Forms where url = ?", [ url ]);
         if (! resultSet.isValidRow()) return null;
         var controlValues = resultSet.fieldByName("control_values");
-        controlValues = ORBEON.xforms.Offline._decrypt(controlValues, ORBEON.xforms.Offline.getEncryptionKey());
         controlValues = ORBEON.xforms.Offline._deserializerControlValues(controlValues);
         return controlValues;
     },
@@ -842,7 +841,6 @@ ORBEON.xforms.Document = {
     takeOnlineFromSummary: function(url, formOnlineListener) {
         ORBEON.xforms.Offline.init();
         ORBEON.xforms.Offline.loadFormInIframe(url, function(offlineIframe) {
-            offlineIframe.contentWindow.ORBEON.xforms.Document.dispatchEvent("$containing-document$", "xxforms-online");
             offlineIframe.contentWindow.ORBEON.xforms.Offline.takeOnline();
             if (formOnlineListener)
                 formOnlineListener(offlineIframe.contentWindow);
@@ -4356,7 +4354,6 @@ ORBEON.xforms.Offline = {
                 ORBEON.xforms.Globals.requestForm = ORBEON.util.Dom.getElementById(formID);
                 ORBEON.xforms.Server.handleResponseDom(initialEventsXML, formID);
                 // Set control values
-                controlValues = ORBEON.xforms.Offline._decrypt(controlValues, ORBEON.xforms.Offline.getEncryptionKey());
                 controlValues = ORBEON.xforms.Offline._deserializerControlValues(controlValues);
                 for (var controlID in controlValues) {
                     var controlValue = controlValues[controlID];
@@ -4455,7 +4452,7 @@ ORBEON.xforms.Offline = {
                 ORBEON.xforms.Globals.formStaticState[formID].value,
                 ORBEON.xforms.Globals.formDynamicState[formID].value,
                 mappings,
-                ORBEON.xforms.Offline._encrypt(controlValuesString, ORBEON.xforms.Offline.getEncryptionKey()),
+                controlValuesString,
                 ""]);
         resultSet.close();
 
@@ -4605,7 +4602,6 @@ ORBEON.xforms.Offline = {
 
         // Compute new values of controls
         var controlValuesString = ORBEON.xforms.Offline._serializeControlValues(ORBEON.xforms.Offline.controlValues);
-        controlValuesString = ORBEON.xforms.Offline._encrypt(controlValuesString, ORBEON.xforms.Offline.getEncryptionKey());
 
         // Store new events and new value of controls
         ORBEON.xforms.Offline.gearsDatabase.execute("update Offline_Forms set control_values = ?, offline_events = ? where url = ?",

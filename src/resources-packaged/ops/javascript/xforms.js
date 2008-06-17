@@ -841,9 +841,16 @@ ORBEON.xforms.Document = {
     takeOnlineFromSummary: function(url, formOnlineListener) {
         ORBEON.xforms.Offline.init();
         ORBEON.xforms.Offline.loadFormInIframe(url, function(offlineIframe) {
+            // Calling listener to notify that the form is now completely online
+            if (formOnlineListener) {
+                var waitingForFormOnlineIntervalID = window.setInterval(function() {
+                    if (! ORBEON.xforms.Document.isFormOffline(url)) {
+                        window.clearInterval(waitingForFormOnlineIntervalID);
+                        formOnlineListener(offlineIframe.contentWindow);
+                    }
+                }, 100);
+            }
             offlineIframe.contentWindow.ORBEON.xforms.Offline.takeOnline();
-            if (formOnlineListener)
-                formOnlineListener(offlineIframe.contentWindow);
         });
     }
 };
@@ -3063,19 +3070,19 @@ ORBEON.xforms.Server = {
                 // After a delay (e.g. 500 ms), run executeNextRequest() and send queued events to server
                 // if there are no other executeNextRequest() that have been added to the queue after this
                 // request.
-                window.setTimeout(function() {
-                    ORBEON.xforms.Server.executeNextRequest(false);
-                },
-                        ORBEON.util.Utils.getProperty(DELAY_BEFORE_INCREMENTAL_REQUEST_PROPERTY));
+                window.setTimeout(
+                    function() { ORBEON.xforms.Server.executeNextRequest(false); },
+                    ORBEON.util.Utils.getProperty(DELAY_BEFORE_INCREMENTAL_REQUEST_PROPERTY)
+                );
             } else {
                 // After a very short delay (e.g. 20 ms), run executeNextRequest() and force queued events
                 // to be sent to the server, even if there are other executeNextRequest() queued.
                 // The small delay is here so we don't send multiple requests to the server when the
                 // browser gives us a sequence of events (e.g. focus out, change, focus in).
-                window.setTimeout(function() {
-                    ORBEON.xforms.Server.executeNextRequest(true);
-                },
-                        ORBEON.util.Utils.getProperty(INTERNAL_SHORT_DELAY_PROPERTY));
+                window.setTimeout(
+                    function() { ORBEON.xforms.Server.executeNextRequest(true); },
+                    ORBEON.util.Utils.getProperty(INTERNAL_SHORT_DELAY_PROPERTY)
+                );
             }
             ORBEON.xforms.Globals.lastEventSentTime = new Date().getTime(); // Update the last event sent time
         }
@@ -4473,7 +4480,7 @@ ORBEON.xforms.Offline = {
             if (YAHOO.lang.isString(element.src) && element.src != "")
                 urlsToCapture.push(element.src);
         }
-		// Remove dupplicates
+		// Remove duplicates
 		{
 			var removeDupplicates = [];
 			urlsToCapture = urlsToCapture.sort();
@@ -4522,7 +4529,7 @@ ORBEON.xforms.Offline = {
         // Get all events from the database to create events array
         var eventsString = resultSet.fieldByName("offline_events");
         eventsString = ORBEON.xforms.Offline._decrypt(eventsString, ORBEON.xforms.Offline.getEncryptionKey());
-        ORBEON.xforms.Offline.isOnline = true;
+        ORBEON.xforms.Offline.isOnline = true; // Need to set this early, otherwise even won't reach the server
         if (eventsString != "") {
             var eventsStringArray = eventsString.split(" ");
             var events = [];
@@ -4546,14 +4553,13 @@ ORBEON.xforms.Offline = {
             // Send all the events back to the server
             ORBEON.xforms.Server.fireEvents(events, false);
         }
+
+        // Remove form from store and database
+        ORBEON.xforms.Offline.gearsDatabase.execute("delete from Offline_Forms where url = ?", [ window.location.href ]).close();
+        ORBEON.xforms.Offline.formStore.remove(window.location.href);
+
         // Tell the server we are going online
         ORBEON.xforms.Document.dispatchEvent("$containing-document$", "xxforms-online");
-
-        // Go back online
-        ORBEON.xforms.Offline.gearsDatabase.execute("delete from Offline_Forms where url = ?", [ window.location.href ]).close();
-
-        // Remove form from store
-        ORBEON.xforms.Offline.formStore.remove(window.location.href);
     },
 
     /**

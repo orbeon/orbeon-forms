@@ -154,7 +154,10 @@
                             <th>
                                 <code>category-label-angle</code>
                             </th>
-                            <td>Controls the angle of the category axis labels. This value is a positive angle in degree.</td>
+                            <td>
+                                Controls the angle of the category axis labels. This value is a positive angle in degree. For 
+                                <code>time-series</code> charts, this value has to be either 0 (horizontal) or 90 (vertical).
+                            </td>
                         </tr>
                         <tr>
                             <th>

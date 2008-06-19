@@ -339,6 +339,12 @@ public class JFreeChartSerializer extends HttpBinarySerializer {
         else if(ds instanceof TimeSeriesCollection) {
             categoryAxis = new DateAxis(chartConfig.getCategoryTitle());
             ((DateAxis)categoryAxis).setDateFormatOverride(new SimpleDateFormat(chartConfig.getDateFormat()));
+            if (chartConfig.getCategoryLabelAngle() == 90) {
+                ((DateAxis)categoryAxis).setVerticalTickLabels(true);
+            } else {
+                if (chartConfig.getCategoryLabelAngle() != 0)
+                    throw new OXFException("The only supported values of category-label-angle for time-series charts are 0 or 90");
+            }
         }
         else {
             categoryAxis = new CategoryAxis(chartConfig.getCategoryTitle());
@@ -580,6 +586,7 @@ public class JFreeChartSerializer extends HttpBinarySerializer {
         private String dateFormat;
         private CategoryLabelPositions categoryLabelPosition = CategoryLabelPositions.STANDARD;
         private CustomLegend legendConfig;
+        private double categoryLabelAngle = 0;
 
         private List values = new ArrayList();
 
@@ -713,6 +720,14 @@ public class JFreeChartSerializer extends HttpBinarySerializer {
 
         public void setDateFormat(String dateFormat) {
             this.dateFormat = dateFormat;
+        }
+
+        public double getCategoryLabelAngle() {
+            return categoryLabelAngle;
+        }
+
+        public void setCategoryLabelAngle(double categoryLabelAngle) {
+            this.categoryLabelAngle = categoryLabelAngle;
         }
     }
 

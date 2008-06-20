@@ -795,16 +795,14 @@
         <xsl:variable name="readonly" as="xs:boolean" select="if (@readonly) then @readonly = 'true' else false()"/>
         <xsl:variable name="remove-constraint" select="@remove-constraint"/>
         <xsl:variable name="is-table-appearance" as="xs:boolean" select="@appearance = 'xxforms:table'"/>
-        <xhtml:table class="fr-repeat {if ($is-table-appearance) then 'fr-repeat-table' else 'fr-repeat-sections'} {if (@columns) then concat('fr-grid-', @columns, '-columns') else ()}">
-            <!-- Line with column headers -->
+        <xhtml:table class="fr-repeat {if ($is-table-appearance) then 'fr-repeat-table' else 'fr-repeat-sections'} {if (@columns) then concat('fr-grid-', @columns, '-columns') else ()}">            <!-- Line with column headers -->
             <xhtml:tr>
                 <xsl:if test="not($readonly)">
                     <xforms:group ref=".[not(exforms:readonly(.))]">
-                        <!-- Try to create enough space for a 2-digit number on the left -->
-                        <xhtml:th class="fr-repeat-column"><xhtml:div style="width: 1.5em"/></xhtml:th>
+                        <xhtml:td class="fr-repeat-column fr-repeat-column-number"/>
                     </xforms:group>
                 </xsl:if>
-                <xhtml:td class="fr-repeat-column">
+                <xhtml:td class="fr-repeat-column fr-repeat-column-trigger">
                     <xsl:if test="not($readonly)">
                         <xforms:group ref=".[not(exforms:readonly(.))]">
                             <xforms:trigger appearance="minimal" ref=".[{if ($max-occurs = 'unbounded') then 'true()' else concat('count(', @nodeset, ') lt ', $max-occurs)}]">
@@ -820,10 +818,6 @@
                 </xhtml:td>
                 <xsl:for-each select="xhtml:tr[1]/xhtml:td/xforms:*[1]">
                     <xhtml:th>
-                        <xsl:if test="count(../following-sibling::xhtml:td) = 0">
-                            <!-- Last th gets 100% with to push things to the left -->
-                            <xsl:attribute name="width" select="'100%'"/>
-                        </xsl:if>
                         <xforms:output value="''" class="fr-hidden"><!-- hide the actual output control -->
                             <xsl:copy-of select="xforms:label | xforms:help | xforms:hint"/>
                         </xforms:output>
@@ -834,12 +828,12 @@
                 <xxforms:variable name="repeat-position" select="position()"/>
                 <!-- First line with data -->
                 <xhtml:tr>
-                    <xhtml:th class="fr-repeat-column">
+                    <xhtml:th class="fr-repeat-column fr-repeat-column-number">
                         <xforms:output value="position()"/>
                     </xhtml:th>
                     <xsl:if test="not($readonly)">
                         <xforms:group ref=".[not(exforms:readonly(.))]">
-                            <xhtml:td class="fr-repeat-column">
+                            <xhtml:td class="fr-repeat-column fr-repeat-column-trigger">
                                 <xforms:group>
                                     <!-- Remove trigger -->
                                     <xforms:trigger appearance="minimal" ref="if (

@@ -243,6 +243,7 @@ hr {
 /* Repeats: shows as table (1 line per iteration; labels used as header of table) */
 .fr-repeat-table {
     border-collapse: collapse;
+    width: 100%
 }
 .fr-repeat-table td , .fr-repeat-table th { border: 1px solid #ddd; padding: .2em .5em .2em .5em; }
 /* Styling for last dummy line added so IE displays the bottom border of the table */
@@ -253,6 +254,9 @@ hr {
 .fr-repeat-table td .xforms-help-image { display: none; }
 .fr-repeat-table td .xforms-help { display: none; }
 .fr-repeat-table td .xforms-hint { display: none; }
+
+.fr-repeat-table .fr-repeat-column-number { width: 1.5em; text-align: right }
+.fr-repeat-table .fr-repeat-column-trigger { width: 1.5em; text-align: center }
 
 .fr-non-collapsible { padding-left: 1.1em; }
 

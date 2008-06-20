@@ -947,9 +947,13 @@
         <!-- Copy existing main model -->
         <xsl:copy>
             <xsl:apply-templates select="@*|node()"/>
+
+            <!-- Special bind to set the form instance read-only when necessary -->
+            <xforms:bind nodeset="instance('fr-form-instance')" readonly="xxforms:instance('fr-parameters-instance')/mode = ('view', 'print', 'pdf')"/>
+
         </xsl:copy>
 
-        <!-- Copy other models present in the UI -->
+        <!-- Copy other models present in the UI (used for dialogs until we actually have native local models) -->
         <xsl:copy-of select="/xhtml:html/xhtml:body//xforms:model"/>
 
         <!-- Handle collapsible sections -->

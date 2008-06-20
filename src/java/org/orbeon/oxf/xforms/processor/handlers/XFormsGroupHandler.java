@@ -134,12 +134,12 @@ public class XFormsGroupHandler extends HandlerBase {
 
                 final FastStringBuffer labelClasses = new FastStringBuffer("xforms-label");
 
-                // Handle relevance
+                // Handle relevance on label
                 if ((groupXFormsControl == null && !handlerContext.isTemplate()) || (groupXFormsControl != null && !groupXFormsControl.isRelevant())) {
                     labelClasses.append(" xforms-disabled");
                 }
 
-                // Copy over existing classes if any
+                // Copy over existing label classes if any
                 if (labelClassAttribute != null) {
                     labelClasses.append(' ');
                     labelClasses.append(labelClassAttribute);

@@ -214,6 +214,17 @@ public class XFormsItemUtils {
      */
     public static List evaluateItemsets(final PipelineContext pipelineContext, final XFormsContainingDocument containingDocument, final XFormsSelect1Control select1Control, boolean setBinding) {
 
+        // Optimize static itemsets
+        {
+            final boolean isStaticItemset; {
+            final XFormsStaticState.ItemsInfo itemsInfo = containingDocument.getStaticState().getItemsInfo(select1Control.getId());
+                isStaticItemset = itemsInfo != null && !itemsInfo.hasNonStaticItem();
+            }
+
+            if (isStaticItemset)
+                return evaluateStaticItemsets(containingDocument, select1Control.getId());
+        }
+
         final List newItems = new ArrayList();
         final XFormsContextStack contextStack = containingDocument.getXFormsControls().getContextStack();
 
@@ -383,6 +394,69 @@ public class XFormsItemUtils {
                 return false;
             }
 
+        });
+        return newItems;
+    }
+
+    public static List evaluateStaticItemsets(final XFormsContainingDocument containingDocument, String id) {
+
+        final List newItems = new ArrayList();
+
+        final Element controlElement = (Element) containingDocument.getStaticState().getControlElementsMap().get(id);
+        final boolean isOpenSelection = XFormsSelect1Control.isOpenSelection(controlElement);
+
+        Dom4jUtils.visitSubtree(controlElement, new Dom4jUtils.VisitorListener() {
+
+            private int hierarchyLevel = 0;
+
+            public void startElement(Element element) {
+                final String localname = element.getName();
+                if ("item".equals(localname)) {
+                    // xforms:item
+
+                    final Element labelElement = element.element(XFormsConstants.XFORMS_LABEL_QNAME);
+                    if (labelElement == null)
+                        throw new ValidationException("xforms:item must contain an xforms:label element.", (LocationData) controlElement.getData());
+                    final String label = XFormsUtils.getStaticChildElementValue(labelElement, false, null);
+
+                    final Element valueElement = element.element(XFormsConstants.XFORMS_VALUE_QNAME);
+                    if (valueElement == null)
+                        throw new ValidationException("xforms:item must contain an xforms:value element.", (LocationData) controlElement.getData());
+                    final String value = XFormsUtils.getStaticChildElementValue(valueElement, false, null);
+
+                    newItems.add(new Item(!isOpenSelection, element.attributes(), label != null ? label : "", value != null ? value : "", hierarchyLevel + 1));// TODO: must filter attributes on element.attributes()
+
+                } else if ("itemset".equals(localname)) {
+                    // xforms:itemset
+
+                    throw new ValidationException("xforms:itemset should not appear in static itemset.", (LocationData) controlElement.getData());
+
+                } else if ("choices".equals(localname)) {
+                    // xforms:choices
+
+                    final Element labelElement = element.element(XFormsConstants.XFORMS_LABEL_QNAME);
+                    if (labelElement != null) {
+                        final String label = XFormsUtils.getStaticChildElementValue(element.element(XFormsConstants.XFORMS_LABEL_QNAME), false, null);
+                        hierarchyLevel++;
+                        newItems.add(new Item(!isOpenSelection, element.attributes(), label, null, hierarchyLevel));// TODO: must filter attributes on element.attributes()
+                    }
+                }
+            }
+
+            public void endElement(Element element) {
+                final String localname = element.getName();
+                 if ("choices".equals(localname)) {
+                    // xforms:choices
+
+                    final Element labelElement = element.element(XFormsConstants.XFORMS_LABEL_QNAME);
+                    if (labelElement != null) {
+                        hierarchyLevel--;
+                    }
+                }
+            }
+
+            public void text(Text text) {
+            }
         });
         return newItems;
     }

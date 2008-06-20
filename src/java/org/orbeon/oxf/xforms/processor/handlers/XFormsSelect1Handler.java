@@ -60,7 +60,9 @@ public class XFormsSelect1Handler extends XFormsCoreControlHandler {
                 appearance = XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME;// default for xforms:select1
         }
 
-        final List items = (xformsSelect1Control != null) ? xformsSelect1Control.getItemset(pipelineContext, true) : null;
+        // Get items, dynamic or static, if possible
+        final List items = XFormsSelect1Control.getItemset(pipelineContext, containingDocument, xformsSelect1Control, id);
+
         outputContent(attributes, id, effectiveId, localname, xformsSelect1Control, items, isMany, appearance);
     }
 
@@ -123,7 +125,7 @@ public class XFormsSelect1Handler extends XFormsCoreControlHandler {
 
                 // Try to produce the template only when needed
                 final XFormsStaticState.ItemsInfo itemsInfo = containingDocument.getStaticState().getItemsInfo(id);
-                if (xformsValueControl == null || itemsInfo == null || (itemsInfo != null && itemsInfo.hasNonStaticItem())) {
+                if (itemsInfo == null || itemsInfo.hasNonStaticItem()) {
                     reusableAttributes.clear();
                     reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, "xforms-select-template-" + effectiveId);
                     reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-select-template");

@@ -51,6 +51,42 @@ public class XFormsSelect1Control extends XFormsValueControl {
                 && (TREE_APPEARANCE.equals(appearance) || MENU_APPEARANCE.equals(appearance) || AUTOCOMPLETE_APPEARANCE.equals(appearance) || "compact".equals(appearance));
     }
 
+    /**
+     * Get itemset for a selection control given either directly or by id. If by id, the control MUST have a static
+     * itemset.
+     *
+     * @param pipelineContext       current pipeline context
+     * @param containingDocument    current containing document (when )
+     * @param control               control from which to obtain itemset
+     * @param id                    id of control from which to obtain itemset (if control is null)
+     * @return                      itemset or null if it is not possible to obtain it
+     */
+    public static List getItemset(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, XFormsSelect1Control control, String id) {
+        if (control != null) {
+            // Control is there so just ask it
+            return control.getItemset(pipelineContext, true);
+        } else {
+            final boolean isStaticItemset; {
+                final XFormsStaticState.ItemsInfo itemsInfo = containingDocument.getStaticState().getItemsInfo(id);
+                isStaticItemset = itemsInfo != null && !itemsInfo.hasNonStaticItem();
+            }
+            if (isStaticItemset) {
+                // No control but the itemset is static so obtain it
+                return XFormsItemUtils.evaluateStaticItemsets(containingDocument, id);
+            } else {
+                // Not possible so return null
+                return null;
+            }
+        }
+    }
+
+    /**
+     * Get this control's itemset.
+     *
+     * @param pipelineContext   current pipeline context
+     * @param setBinding        whether to set the current binding on the control first
+     * @return                  itemset
+     */
     public List getItemset(PipelineContext pipelineContext, boolean setBinding) {
         try {
             if ("false".equals(xxformsRefresh)) {
@@ -74,7 +110,11 @@ public class XFormsSelect1Control extends XFormsValueControl {
     }
 
     public boolean isOpenSelection() {
-        return "open".equals(getControlElement().attributeValue("selection"));
+        return isOpenSelection(getControlElement());
+    }
+
+    public static boolean isOpenSelection(Element controlElement) {
+        return "open".equals(controlElement.attributeValue("selection"));
     }
 
     protected void evaluateExternalValue(PipelineContext pipelineContext) {

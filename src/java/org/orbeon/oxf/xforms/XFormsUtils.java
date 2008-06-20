@@ -293,6 +293,46 @@ public class XFormsUtils {
     }
 
     /**
+     * Get the value of a child element known to have only static content.
+     *
+     * @param childElement          element to evaluate (xforms:label, etc.)
+     * @param acceptHTML            whether the result may contain HTML
+     * @param containsHTML          whether the result actually contains HTML (null allowed)
+     * @return                      string containing the result of the evaluation, null if evaluation failed
+     */
+    public static String getStaticChildElementValue(final Element childElement, final boolean acceptHTML, final boolean[] containsHTML) {
+        // Check that there is a current child element
+        if (childElement == null)
+            return null;
+
+        // No HTML found by default
+        if (containsHTML != null)
+            containsHTML[0] = false;
+
+        // Try to get inline value
+        {
+            final FastStringBuffer sb = new FastStringBuffer(20);
+
+            // Visit the subtree and serialize
+
+            // NOTE: It is a litte funny to do our own serialization here, but the alternative is to build a DOM and
+            // serialize it, which is not trivial because of the possible interleaved xforms:output's. Furthermore, we
+            // perform a very simple serialization of elements and text to simple (X)HTML, not full-fledged HTML or XML
+            // serialization.
+
+            Dom4jUtils.visitSubtree(childElement, new ChildElementVisitorListener(acceptHTML, containsHTML, sb, childElement));
+            if (acceptHTML && containsHTML != null && !containsHTML[0]) {
+                // We went through the subtree and did not find any HTML
+                // If the caller supports the information, return a non-escaped string so we can optimize output later
+                return XMLUtils.unescapeXMLMinimal(sb.toString());
+            } else {
+                // We found some HTML, just return it
+                return sb.toString();
+            }
+        }
+    }
+
+    /**
      * Get the value of a child element by pushing the context of the child element on the binding stack first, then
      * calling getElementValue() and finally popping the binding context.
      *
@@ -410,85 +450,7 @@ public class XFormsUtils {
             // serialize it, which is not trivial because of the possible interleaved xforms:output's. Furthermore, we
             // perform a very simple serialization of elements and text to simple (X)HTML, not full-fledged HTML or XML
             // serialization.
-            Dom4jUtils.visitSubtree(childElement, new Dom4jUtils.VisitorListener() {
-
-                public void startElement(Element element) {
-                    if (element.getQName().equals(XFormsConstants.XFORMS_OUTPUT_QNAME)) {
-                        // This is an xforms:output nested among other markup
-
-                        final XFormsOutputControl outputControl = new XFormsOutputControl(containingDocument, null, element, element.getName(), null);
-                        contextStack.pushBinding(pipelineContext, element);
-                        {
-                            outputControl.setBindingContext(contextStack.getCurrentBindingContext());
-                            outputControl.evaluateIfNeeded(pipelineContext);
-                        }
-                        contextStack.popBinding();
-
-                        if (acceptHTML) {
-                            if ("text/html".equals(outputControl.getMediatype())) {
-                                if (containsHTML != null)
-                                    containsHTML[0] = true; // this indicates for sure that there is some nested HTML
-                                sb.append(outputControl.getDisplayValueOrExternalValue(pipelineContext));
-                            } else {
-                                // Mediatype is not HTML so we don't escape
-                                sb.append(XMLUtils.escapeXMLMinimal(outputControl.getDisplayValueOrExternalValue(pipelineContext)));
-                            }
-                        } else {
-                            if ("text/html".equals(outputControl.getMediatype())) {
-                                // HTML is not allowed here, better tell the user
-                                throw new OXFException("HTML not allowed within element: " + childElement.getName());
-                            } else {
-                                // Mediatype is not HTML so we don't escape
-                                sb.append(outputControl.getDisplayValueOrExternalValue(pipelineContext));
-                            }
-                        }
-                    } else {
-                        // This is a regular element, just serialize the start tag to no namespace
-
-                        // If HTML is not allowed here, better tell the user
-                        if (!acceptHTML)
-                            throw new OXFException("Nested XHTML or XForms not allowed within element: " + childElement.getName());
-
-                        if (containsHTML != null)
-                            containsHTML[0] = true;// this indicates for sure that there is some nested HTML
-
-                        sb.append('<');
-                        sb.append(element.getName());
-                        final List attributes = element.attributes();
-                        if (attributes.size() > 0) {
-                            for (Iterator i = attributes.iterator(); i.hasNext();) {
-                                final Attribute currentAttribute = (Attribute) i.next();
-
-                                final String currentName = currentAttribute.getName();
-                                final String currentValue = currentAttribute.getValue();
-
-                                // Only consider attributes in no namespace
-                                if ("".equals(currentAttribute.getNamespaceURI())) {
-                                    sb.append(' ');
-                                    sb.append(currentName);
-                                    sb.append("=\"");
-                                    sb.append(XMLUtils.escapeXMLMinimal(currentValue));
-                                    sb.append('"');
-                                }
-                            }
-                        }
-                        sb.append('>');
-                    }
-                }
-
-                public void endElement(Element element) {
-                    if (!element.getQName().equals(XFormsConstants.XFORMS_OUTPUT_QNAME)) {
-                        // This is a regular element, just serialize the end tag to no namespace
-                        sb.append("</");
-                        sb.append(element.getName());
-                        sb.append('>');
-                    }
-                }
-
-                public void text(Text text) {
-                    sb.append(acceptHTML ? XMLUtils.escapeXMLMinimal(text.getStringValue()) : text.getStringValue());
-                }
-            });
+            Dom4jUtils.visitSubtree(childElement, new ChildElementVisitorListener(pipelineContext, containingDocument, contextStack, acceptHTML, containsHTML, sb, childElement));
             if (acceptHTML && containsHTML != null && !containsHTML[0]) {
                 // We went through the subtree and did not find any HTML
                 // If the caller supports the information, return a non-escaped string so we can optimize output later
@@ -1149,5 +1111,118 @@ public class XFormsUtils {
      */
     public static String scriptIdToScriptName(String scriptId) {
         return scriptId.replace('-', '_') + "_xforms_function";
+    }
+
+    private static class ChildElementVisitorListener implements Dom4jUtils.VisitorListener {
+        private final PipelineContext pipelineContext;
+        private final XFormsContainingDocument containingDocument;
+        private final XFormsContextStack contextStack;
+        private final boolean acceptHTML;
+        private final boolean[] containsHTML;
+        private final FastStringBuffer sb;
+        private final Element childElement;
+
+        // Constructor for "static" case, i.e. when we know the child element cannot have dynamic content
+        public ChildElementVisitorListener(boolean acceptHTML, boolean[] containsHTML, FastStringBuffer sb, Element childElement) {
+            this.pipelineContext = null;
+            this.containingDocument = null;
+            this.contextStack = null;
+            this.acceptHTML = acceptHTML;
+            this.containsHTML = containsHTML;
+            this.sb = sb;
+            this.childElement = childElement;
+        }
+
+        // Constructor for "dynamic" case, i.e. when we know the child element can have dynamic content
+        public ChildElementVisitorListener(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, XFormsContextStack contextStack, boolean acceptHTML, boolean[] containsHTML, FastStringBuffer sb, Element childElement) {
+            this.pipelineContext = pipelineContext;
+            this.containingDocument = containingDocument;
+            this.contextStack = contextStack;
+            this.acceptHTML = acceptHTML;
+            this.containsHTML = containsHTML;
+            this.sb = sb;
+            this.childElement = childElement;
+        }
+
+        public void startElement(Element element) {
+            if (element.getQName().equals(XFormsConstants.XFORMS_OUTPUT_QNAME)) {
+                // This is an xforms:output nested among other markup
+
+                // This can be null in "static" mode
+                if (pipelineContext == null)
+                    throw new OXFException("xforms:output must not show-up in static itemset: " + childElement.getName());
+
+                final XFormsOutputControl outputControl = new XFormsOutputControl(containingDocument, null, element, element.getName(), null);
+                contextStack.pushBinding(pipelineContext, element);
+                {
+                    outputControl.setBindingContext(contextStack.getCurrentBindingContext());
+                    outputControl.evaluateIfNeeded(pipelineContext);
+                }
+                contextStack.popBinding();
+
+                if (acceptHTML) {
+                    if ("text/html".equals(outputControl.getMediatype())) {
+                        if (containsHTML != null)
+                            containsHTML[0] = true; // this indicates for sure that there is some nested HTML
+                        sb.append(outputControl.getDisplayValueOrExternalValue(pipelineContext));
+                    } else {
+                        // Mediatype is not HTML so we don't escape
+                        sb.append(XMLUtils.escapeXMLMinimal(outputControl.getDisplayValueOrExternalValue(pipelineContext)));
+                    }
+                } else {
+                    if ("text/html".equals(outputControl.getMediatype())) {
+                        // HTML is not allowed here, better tell the user
+                        throw new OXFException("HTML not allowed within element: " + childElement.getName());
+                    } else {
+                        // Mediatype is not HTML so we don't escape
+                        sb.append(outputControl.getDisplayValueOrExternalValue(pipelineContext));
+                    }
+                }
+            } else {
+                // This is a regular element, just serialize the start tag to no namespace
+
+                // If HTML is not allowed here, better tell the user
+                if (!acceptHTML)
+                    throw new OXFException("Nested XHTML or XForms not allowed within element: " + childElement.getName());
+
+                if (containsHTML != null)
+                    containsHTML[0] = true;// this indicates for sure that there is some nested HTML
+
+                sb.append('<');
+                sb.append(element.getName());
+                final List attributes = element.attributes();
+                if (attributes.size() > 0) {
+                    for (Iterator i = attributes.iterator(); i.hasNext();) {
+                        final Attribute currentAttribute = (Attribute) i.next();
+
+                        final String currentName = currentAttribute.getName();
+                        final String currentValue = currentAttribute.getValue();
+
+                        // Only consider attributes in no namespace
+                        if ("".equals(currentAttribute.getNamespaceURI())) {
+                            sb.append(' ');
+                            sb.append(currentName);
+                            sb.append("=\"");
+                            sb.append(XMLUtils.escapeXMLMinimal(currentValue));
+                            sb.append('"');
+                        }
+                    }
+                }
+                sb.append('>');
+            }
+        }
+
+        public void endElement(Element element) {
+            if (!element.getQName().equals(XFormsConstants.XFORMS_OUTPUT_QNAME)) {
+                // This is a regular element, just serialize the end tag to no namespace
+                sb.append("</");
+                sb.append(element.getName());
+                sb.append('>');
+            }
+        }
+
+        public void text(Text text) {
+            sb.append(acceptHTML ? XMLUtils.escapeXMLMinimal(text.getStringValue()) : text.getStringValue());
+        }
     }
 }

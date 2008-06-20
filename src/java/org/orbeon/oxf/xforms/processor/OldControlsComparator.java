@@ -347,12 +347,11 @@ public class OldControlsComparator extends BaseControlsComparator {
 
                     // Try to get static itemset info
                     final XFormsStaticState.ItemsInfo itemsInfo = containingDocument.getStaticState().getItemsInfo(xformsSingleNodeControl2.getId());
-                    if (itemsInfo != null && !itemsInfo.hasNonStaticItem()
-                            && XFormsSingleNodeControl.isRelevant(xformsSelect1Control1) == XFormsSingleNodeControl.isRelevant(xformsSelect1Control2)) {
-                        // No update to send because the itemset can't change. Conditons:
+                    if (itemsInfo != null && !itemsInfo.hasNonStaticItem()) {
+                        // There is no need to send an update:
                         //
-                        // 1. We have information telling us that the items are static
-                        // 2. Relevance hasn't changed
+                        // 1. Items are static...
+                        // 2. ...and they have been outputted statically in the HTML page, directly or in repeat template
                     } else {
                         // There is a possible change
                         if (itemsetsFull1 != null && XFormsSingleNodeControl.isRelevant(xformsSelect1Control1)) {

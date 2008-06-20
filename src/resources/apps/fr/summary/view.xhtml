@@ -245,28 +245,28 @@
                     <xforms:setvalue ref="lang" value="xxforms:instance('fr-language-instance')"/>
                 </xforms:action>
                 <!-- Handle offline mode -->
-                <xxforms:script ev:event="xforms-submit-done">
-                    if (ORBEON.xforms.Document.isOfflineAvailable()) {
-                        var noFormDataDiv = ORBEON.util.Dom.getElementById("fr-no-form-data");
-                        // If the table is empty, skip this
-                        if (ORBEON.util.Dom.hasClass(noFormDataDiv, "xforms-disabled")) {
-                            var summaryIndex = 1;
-                            while (true) {
-                                // Check if there is an item at this index; otherwise stop.
-                                var nameControlId = "fr-document-name" + XFORMS_SEPARATOR_1 + summaryIndex;
-                                if (ORBEON.util.Dom.getElementById(nameControlId) == null) break;
-                                // Get URL for edit page of this form
-                                var name = ORBEON.xforms.Document.getValue(nameControlId);
-                                var url = window.location.href + "/" + name + "/edit";
-                                // Store in instance if this form is offline or not
-                                var offlineControlId = "fr-document-offline" + XFORMS_SEPARATOR_1 + summaryIndex;
-                                var isOffline = ORBEON.xforms.Document.isFormOffline(url);
-                                ORBEON.xforms.Document.setValue(offlineControlId, isOffline ? "true" : "false");
-                                summaryIndex++;
-                            }
-                        }
-                    }
-                </xxforms:script>
+                <!--<xxforms:script ev:event="xforms-submit-done">-->
+                    <!--if (ORBEON.xforms.Document.isOfflineAvailable()) {-->
+                        <!--var noFormDataDiv = ORBEON.util.Dom.getElementById("fr-no-form-data");-->
+                        <!--// If the table is empty, skip this-->
+                        <!--if (ORBEON.util.Dom.hasClass(noFormDataDiv, "xforms-disabled")) {-->
+                            <!--var summaryIndex = 1;-->
+                            <!--while (true) {-->
+                                <!--// Check if there is an item at this index; otherwise stop.-->
+                                <!--var nameControlId = "fr-document-name" + XFORMS_SEPARATOR_1 + summaryIndex;-->
+                                <!--if (ORBEON.util.Dom.getElementById(nameControlId) == null) break;-->
+                                <!--// Get URL for edit page of this form-->
+                                <!--var name = ORBEON.xforms.Document.getValue(nameControlId);-->
+                                <!--var url = window.location.href + "/" + name + "/edit";-->
+                                <!--// Store in instance if this form is offline or not-->
+                                <!--var offlineControlId = "fr-document-offline" + XFORMS_SEPARATOR_1 + summaryIndex;-->
+                                <!--var isOffline = ORBEON.xforms.Document.isFormOffline(url);-->
+                                <!--ORBEON.xforms.Document.setValue(offlineControlId, isOffline ? "true" : "false");-->
+                                <!--summaryIndex++;-->
+                            <!--}-->
+                        <!--}-->
+                    <!--}-->
+                <!--</xxforms:script>-->
             </xforms:submission>
         </xforms:model>
         <xhtml:script type="text/javascript">

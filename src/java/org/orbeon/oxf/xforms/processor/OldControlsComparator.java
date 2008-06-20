@@ -118,7 +118,7 @@ public class OldControlsComparator extends BaseControlsComparator {
                         final boolean relevantDefault = isNewRepeatIteration;
 
                         if (isNewRepeatIteration && xformsSingleNodeControl2.isRelevant() != relevantDefault
-                                || xformsSingleNodeControl1 != null && xformsSingleNodeControl1.isRelevant() != xformsSingleNodeControl2.isRelevant()) {
+                                || XFormsSingleNodeControl.isRelevant(xformsSingleNodeControl1) != XFormsSingleNodeControl.isRelevant(xformsSingleNodeControl2)) {
                             attributesImpl.addAttribute("", XFormsConstants.XXFORMS_RELEVANT_ATTRIBUTE_NAME,
                                     XFormsConstants.XXFORMS_RELEVANT_ATTRIBUTE_NAME,
                                     ContentHandlerHelper.CDATA, Boolean.toString(xformsSingleNodeControl2.isRelevant()));
@@ -323,7 +323,7 @@ public class OldControlsComparator extends BaseControlsComparator {
                         attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, xformsSingleNodeControl2.getParent().getEffectiveId());
 
                         if (isNewRepeatIteration && !xformsSingleNodeControl2.isRelevant() // NOTE: we output if we are NOT relevant as the client must mark non-relevant elements
-                                || xformsSingleNodeControl1 != null && xformsSingleNodeControl1.isRelevant() != xformsSingleNodeControl2.isRelevant()) {
+                                || XFormsSingleNodeControl.isRelevant(xformsSingleNodeControl1) != XFormsSingleNodeControl.isRelevant(xformsSingleNodeControl2)) {
                             attributesImpl.addAttribute("", XFormsConstants.XXFORMS_RELEVANT_ATTRIBUTE_NAME,
                                     XFormsConstants.XXFORMS_RELEVANT_ATTRIBUTE_NAME,
                                     ContentHandlerHelper.CDATA, Boolean.toString(xformsSingleNodeControl2.isRelevant()));
@@ -347,17 +347,21 @@ public class OldControlsComparator extends BaseControlsComparator {
 
                     // Try to get static itemset info
                     final XFormsStaticState.ItemsInfo itemsInfo = containingDocument.getStaticState().getItemsInfo(xformsSingleNodeControl2.getId());
-                    if (xformsSelect1Control1 != null && itemsInfo != null && !itemsInfo.hasNonStaticItem() && xformsSelect1Control1.isRelevant() == xformsSelect1Control2.isRelevant()) {
-                        // No update to send because the itemset can't change
+                    if (itemsInfo != null && !itemsInfo.hasNonStaticItem()
+                            && XFormsSingleNodeControl.isRelevant(xformsSelect1Control1) == XFormsSingleNodeControl.isRelevant(xformsSelect1Control2)) {
+                        // No update to send because the itemset can't change. Conditons:
+                        //
+                        // 1. We have information telling us that the items are static
+                        // 2. Relevance hasn't changed
                     } else {
                         // There is a possible change
-                        if (itemsetsFull1 != null && xformsSelect1Control1 != null && xformsSelect1Control1.isRelevant()) {
+                        if (itemsetsFull1 != null && XFormsSingleNodeControl.isRelevant(xformsSelect1Control1)) {
                             final Object items = xformsSelect1Control1.getItemset(pipelineContext, true);
                             if (items != null)
                                 itemsetsFull1.put(xformsSelect1Control1.getEffectiveId(), items);
                         }
 
-                        if (itemsetsFull2 != null && xformsSelect1Control2.isRelevant()) {
+                        if (itemsetsFull2 != null && XFormsSingleNodeControl.isRelevant(xformsSelect1Control2)) {
                             final Object items = xformsSelect1Control2.getItemset(pipelineContext, true);
                             if (items != null)
                                 itemsetsFull2.put(xformsSelect1Control2.getEffectiveId(), items);

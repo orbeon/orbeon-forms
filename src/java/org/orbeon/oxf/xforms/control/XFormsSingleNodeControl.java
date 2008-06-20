@@ -46,6 +46,16 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
         return relevant;
     }
 
+    /**
+     * Convenience method to figure out when a control is relevant, assuming a "null" control is non-relevant.
+     *
+     * @param control   control to test or not
+     * @return          true if the control is not null and it is relevant
+     */
+    public static boolean isRelevant(XFormsSingleNodeControl control) {
+        return control != null && control.isRelevant();
+    }
+
     public boolean isRequired() {
         getMIPsIfNeeded();
         return required;

@@ -27,7 +27,7 @@
         <%-- NOTE: We can't use jsp:include, because it doesn't handle OutputStream correctly --%>
         <%
             out.flush();
-            final JspWriter myout = out;
+            <%-- NOTE: Try named dispatcher as well: getServletConfig().getServletContext().getNamedDispatcher(); --%>
             request.getRequestDispatcher("/fr/orbeon/bookcast/?orbeon-portlet=true").include(request, new HttpServletResponseWrapper(response) {
 
                 // Handle the case where the included Servlet calls getOutputStream(). Since the JSP only handles

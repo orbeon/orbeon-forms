@@ -24,7 +24,7 @@
           xmlns:ev="http://www.w3.org/2001/xml-events"
           xmlns:xi="http://www.w3.org/2001/XInclude" >
     <header>
-        <title>XForms Reference, Part 1</title>
+        <title>XForms Reference: Standard Features</title>
     </header>
     <body>
         <section>
@@ -66,13 +66,20 @@
                 </p>
             </note>
             <p>
-                This is Part 1 of a two-part document. This part focuses on how to use standard XForms features with
-                Orbeon Forms.
+                This part of the XForms reference documentation focuses on standard XForms features provided by Orbeon
+                Forms.
             </p>
             <p>
-                Please be sure to visit <a href="reference-xforms-2">Part 2</a> as well, and <a
-                href="reference-xforms-migration">Migrating from XForms Classic to XForms NG</a> if relevant.
+                Please be sure to visit:
             </p>
+            <ul>
+                <li>
+                    <a href="reference-xforms-2">XForms Reference: Extensions</a>
+                </li>
+                <li>
+                    <a href="reference-xforms-functions">XForms Reference: XPath Functions</a>
+                </li>
+            </ul>
         </section>
         <a name="introduction"/>
         <section>

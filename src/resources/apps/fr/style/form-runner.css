@@ -493,4 +493,5 @@ div.fr-collapsible {
     .fr-bottom { display: none }
     .fr-top { display: none }
     .fr-section-container img.fr-open-close { display: none }
+    .fr-status-icons { display: none }
 }

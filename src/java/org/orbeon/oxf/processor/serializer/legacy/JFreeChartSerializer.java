@@ -276,6 +276,7 @@ public class JFreeChartSerializer extends HttpBinarySerializer {
         if (categoryLabelAngle != null) {
             double angle = Double.parseDouble(categoryLabelAngle);
             chart.setCategoryLabelPosition(CategoryLabelPositions.createUpRotationLabelPositions(angle * (Math.PI / 180)));
+            chart.setCategoryLabelAngle(angle);
         }
 
         String margin = XPathUtils.selectStringValueNormalize(doc, "/chart/bar-margin");

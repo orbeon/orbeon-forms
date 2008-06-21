@@ -52,9 +52,11 @@
                 </ui>
             </xforms:instance>
             <xforms:action ev:event="xxforms-offline">
+                <xforms:message level="xxforms:log-info">Got xxforms-offline event</xforms:message>
                 <xforms:setvalue ref="instance('ui')/offline">true</xforms:setvalue>
             </xforms:action>
             <xforms:action ev:event="xxforms-online">
+                <xforms:message level="xxforms:log-info">Got xxforms-online event</xforms:message>
                 <xforms:setvalue ref="instance('ui')/offline">false</xforms:setvalue>
             </xforms:action>
 

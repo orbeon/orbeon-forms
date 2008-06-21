@@ -84,7 +84,7 @@
                 <!--  Get data from session -->
                 <xforms:insert nodeset="xxforms:instance('fr-form-instance')" origin="$form-data-from-session"/>
                 <!-- Reset session -->
-                <xforms:insert context="." origin="xxforms:call-xpl('oxf:/apps/fr/import-export/reset-session.xpl', (), (), ())"/>
+                <xforms:insert context="." origin="xxforms:set-session-attribute('fr-upload-form-data', ())"/>
             </xforms:action>
         </xforms:action>
 

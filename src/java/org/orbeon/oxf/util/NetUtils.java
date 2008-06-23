@@ -118,9 +118,11 @@ public class NetUtils {
     }
 
     /**
-     * Return a request path info that looks like what one would expect. The path starts with a "/".
+     * Return a request path info that looks like what one would expect. The path starts with a "/", relative to the
+     * servlet context. If the servlet was included or forwarded to, return the path by which the *current* servlet was
+     * invoked, NOT the path of the calling servlet.
      *
-     * Request path = servlet path + path info
+     * Request path = servlet path + path info.
      */
     public static String getRequestPathInfo(HttpServletRequest request) {
 

@@ -85,12 +85,19 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
 
         public String getContextPath() {
             if (contextPath == null) {
-                // This attribute allows overriding the context path, for example when Orbeon Forms is deployed as a separate WAR
                 final String overriddenServletContext = (String) nativeRequest.getAttribute(OPSXFormsFilter.OPS_SERVLET_CONTEXT_ATTRIBUTE_NAME);
-                if (overriddenServletContext == null)
-                    contextPath = nativeRequest.getContextPath(); // use regular context
-                else
+                if (overriddenServletContext != null) {
+                    // This attribute allows overriding the context path, for example when Orbeon Forms is deployed as a separate WAR
                     contextPath = overriddenServletContext; // use overridden context
+                } else {
+                    final String dispatcherContext = (String) nativeRequest.getAttribute("javax.servlet.include.context_path");
+                    if (dispatcherContext != null) {
+                        // This ensures we return the included / forwarded servlet's value
+                        contextPath = dispatcherContext;
+                    } else {
+                        contextPath = nativeRequest.getContextPath(); // use regular context
+                    }
+                }
             }
             return contextPath;
         }
@@ -241,7 +248,9 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
         }
 
         public String getQueryString() {
-            return nativeRequest.getQueryString();
+            // Use included / forwarded servlet's value
+            final String dispatcherQueryString = (String) nativeRequest.getAttribute("javax.servlet.include.query_string");
+            return (dispatcherQueryString != null) ? dispatcherQueryString : nativeRequest.getQueryString();
         }
 
         public String getRequestedSessionId() {
@@ -253,7 +262,9 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
         }
 
         public String getRequestURI() {
-            return nativeRequest.getRequestURI();
+            // Use included / forwarded servlet's value
+            final String dispatcherRequestURI = (String) nativeRequest.getAttribute("javax.servlet.include.request_uri");
+            return (dispatcherRequestURI != null) ? dispatcherRequestURI : nativeRequest.getRequestURI();
         }
 
         public String getRequestURL() {

@@ -27,8 +27,14 @@
         <%-- NOTE: We can't use jsp:include, because it doesn't handle OutputStream correctly --%>
         <%
             out.flush();
-            <%-- NOTE: Try named dispatcher as well: getServletConfig().getServletContext().getNamedDispatcher(); --%>
-            request.getRequestDispatcher("/fr/orbeon/bookcast/?orbeon-portlet=true").include(request, new HttpServletResponseWrapper(response) {
+            final JspWriter myout = out;
+            // Example 1: This gets the current servlet context
+            //final ServletContext servletContext = getServletConfig().getServletContext();
+            // Example 2: This gets another servlet's context (cross-context)
+            final ServletContext servletContext = getServletConfig().getServletContext().getContext("/orbeon");
+            final RequestDispatcher dispatcher = servletContext.getRequestDispatcher("/fr/orbeon/bookcast/?orbeon-portlet=true");
+
+            dispatcher.include(request, new HttpServletResponseWrapper(response) {
 
                 // Handle the case where the included Servlet calls getOutputStream(). Since the JSP only handles
                 // writers.

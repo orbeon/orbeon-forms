@@ -145,6 +145,11 @@ public class XFormsSubmitErrorEvent extends XFormsSubmitResponseEvent {
     }
 
     public void setBodyDocument(DocumentInfo bodyDocument) {
+
+        if (XFormsServer.logger.isDebugEnabled()) {
+            XFormsServer.logger.debug("XForms - submission - error body document:\n" + TransformerUtils.tinyTreeToString(bodyDocument));
+        }
+
         this.bodyDocument = bodyDocument;
     }
 
@@ -153,6 +158,11 @@ public class XFormsSubmitErrorEvent extends XFormsSubmitResponseEvent {
     }
 
     public void setBodyString(String bodyString) {
+
+        if (XFormsServer.logger.isDebugEnabled()) {
+            XFormsServer.logger.debug("XForms - submission - error body string:\n" + bodyString);
+        }
+
         this.bodyString = bodyString;
     }
 

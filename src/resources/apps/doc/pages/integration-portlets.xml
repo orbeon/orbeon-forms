@@ -226,8 +226,18 @@
                         <portlet-info>
                             <title>Orbeon Forms Portlet</title>
                         </portlet-info>
+                        <portlet-preferences>
+                            <preference>
+                                <name>web-site</name>
+                                <value>http://www.orbeon.com/</value>
+                            </preference>
+                            <preference>
+                                <name>favorite-animals</name>
+                                <value>cat, dog</value>
+                            </preference>
+                        </portlet-preferences>
                     </portlet>
-                </portlet-app>
+                </portlet-app>                
             </xml-source>
             <p>
                 It is possible to configure several Orbeon Forms Portlets within the same

@@ -75,7 +75,7 @@ public class XFormsServer extends ProcessorImpl {
      * Case where an XML response must be generated.
      */
     public ProcessorOutput createOutput(final String outputName) {
-        ProcessorOutput output = new ProcessorImpl.CacheableTransformerOutputImpl(getClass(), outputName) {
+        final ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), outputName) {
             public void readImpl(final PipelineContext pipelineContext, ContentHandler contentHandler) {
                 doIt(pipelineContext, contentHandler);
             }

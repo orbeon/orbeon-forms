@@ -67,7 +67,7 @@ public class XFormsInputHandler extends XFormsCoreControlHandler {
                 isDate = false;
                 isBoolean = false;
             }
-            handleMIPClasses(classes, inputControl);
+            handleMIPClasses(classes, id, inputControl);
             newAttributes = getAttributes(attributes, classes.toString(), effectiveId);
         }
 

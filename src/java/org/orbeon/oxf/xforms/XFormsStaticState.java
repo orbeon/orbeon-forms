@@ -87,7 +87,7 @@ public class XFormsStaticState {
     private Map controlNamesMap;            // Map<String, String> of control name to ""
     private Map eventNamesMap;              // Map<String, String> of event name to ""
     private Map eventHandlersMap;           // Map<String, List<XFormsEventHandler>> of control id to event handlers
-    private Map controlElementsMap;         // Map<String, Element> of control id to control Element
+    private Map controlInfoMap;             // Map<String, ControlInfo> of control id to control info
     private Map namespacesMap;              // Map<String, Map<String, String>> of control id to Map of namespace mappings
     private Map defaultRepeatIdToIndex;     // Map<String, Integer> of repeat id to default repeat index
     private Map repeatChildrenMap;          // Map<String, List> of repeat id to List of children
@@ -393,8 +393,8 @@ public class XFormsStaticState {
         return (List) eventHandlersMap.get(id);
     }
 
-    public Map getControlElementsMap() {
-        return controlElementsMap;
+    public Map getControlInfoMap() {
+        return controlInfoMap;
     }
 
     /**
@@ -485,7 +485,7 @@ public class XFormsStaticState {
             controlNamesMap = new HashMap();
             eventNamesMap = new HashMap();
             eventHandlersMap = new HashMap();
-            controlElementsMap = new HashMap();
+            controlInfoMap = new HashMap();
             defaultRepeatIdToIndex = new HashMap();
             repeatChildrenMap = new HashMap();
             repeatDescendantsMap = new HashMap();
@@ -508,27 +508,34 @@ public class XFormsStaticState {
                     final LocationData locationData = new ExtendedLocationData((LocationData) controlElement.getData(), "gathering static control information", controlElement);
 
                     // Check for mandatory and optional bindings
-                    if (controlElement != null && XFormsConstants.XFORMS_NAMESPACE_URI.equals(controlElement.getNamespaceURI())) {
-                        if (XFormsControls.mandatorySingleNodeControls.get(controlName) != null
-                                && !(controlElement.attribute("ref") != null || controlElement.attribute("bind") != null)) {
-                            throw new ValidationException("Missing mandatory single node binding for element: " + controlElement.getQualifiedName(), locationData);
+                    final boolean hasBinding;
+                    if (controlElement != null) {
+
+                        final boolean hasBind = controlElement.attribute("bind") != null;
+                        final boolean hasRef = controlElement.attribute("ref") != null;
+                        final boolean hasNodeset = controlElement.attribute("nodeset") != null;
+
+                        if (XFormsConstants.XFORMS_NAMESPACE_URI.equals(controlElement.getNamespaceURI())) {
+                            if (XFormsControls.mandatorySingleNodeControls.get(controlName) != null && !(hasRef || hasBind)) {
+                                throw new ValidationException("Missing mandatory single node binding for element: " + controlElement.getQualifiedName(), locationData);
+                            }
+                            if (XFormsControls.noSingleNodeControls.get(controlName) != null && (hasRef || hasBind)) {
+                                throw new ValidationException("Single node binding is prohibited for element: " + controlElement.getQualifiedName(), locationData);
+                            }
+                            if (XFormsControls.mandatoryNodesetControls.get(controlName) != null && !(hasNodeset || hasBind)) {
+                                throw new ValidationException("Missing mandatory nodeset binding for element: " + controlElement.getQualifiedName(), locationData);
+                            }
+                            if (XFormsControls.noNodesetControls.get(controlName) != null && hasNodeset) {
+                                throw new ValidationException("Node-set binding is prohibited for element: " + controlElement.getQualifiedName(), locationData);
+                            }
+                            if (XFormsControls.singleNodeOrValueControls.get(controlName) != null && !(hasRef || hasBind || controlElement.attribute("value") != null)) {
+                                throw new ValidationException("Missing mandatory single node binding or value attribute for element: " + controlElement.getQualifiedName(), locationData);
+                            }
                         }
-                        if (XFormsControls.noSingleNodeControls.get(controlName) != null
-                                && (controlElement.attribute("ref") != null || controlElement.attribute("bind") != null)) {
-                            throw new ValidationException("Single node binding is prohibited for element: " + controlElement.getQualifiedName(), locationData);
-                        }
-                        if (XFormsControls.mandatoryNodesetControls.get(controlName) != null
-                                && !(controlElement.attribute("nodeset") != null || controlElement.attribute("bind") != null)) {
-                            throw new ValidationException("Missing mandatory nodeset binding for element: " + controlElement.getQualifiedName(), locationData);
-                        }
-                        if (XFormsControls.noNodesetControls.get(controlName) != null
-                                && controlElement.attribute("nodeset") != null) {
-                            throw new ValidationException("Node-set binding is prohibited for element: " + controlElement.getQualifiedName(), locationData);
-                        }
-                        if (XFormsControls.singleNodeOrValueControls.get(controlName) != null
-                                && !(controlElement.attribute("ref") != null || controlElement.attribute("bind") != null || controlElement.attribute("value") != null)) {
-                            throw new ValidationException("Missing mandatory single node binding or value attribute for element: " + controlElement.getQualifiedName(), locationData);
-                        }
+
+                        hasBinding = hasBind || hasRef || hasNodeset;
+                    } else {
+                        hasBinding = false;
                     }
 
                     // Gather event handlers
@@ -537,7 +544,7 @@ public class XFormsStaticState {
                     mergeEventHandlers(eventHandlersMap, controlEventHandlersMap);
 
                     // Gather static control
-                    controlElementsMap.put(controlId, controlElement);
+                    controlInfoMap.put(controlId, new ControlInfo(controlElement, hasBinding));
 
                     // Gather xforms:repeat information
                     if (controlName.equals("repeat")) {
@@ -779,6 +786,24 @@ public class XFormsStaticState {
 
         public boolean hasNonStaticItem() {
             return hasNonStaticItem;
+        }
+    }
+
+    public static class ControlInfo {
+        private Element element;
+        private boolean hasBinding;
+
+        public ControlInfo(Element element, boolean hasBinding) {
+            this.element = element;
+            this.hasBinding = hasBinding;
+        }
+
+        public Element getElement() {
+            return element;
+        }
+
+        public boolean hasBinding() {
+            return hasBinding;
         }
     }
 }

@@ -89,50 +89,55 @@ public abstract class HandlerBase extends ElementHandler {
         }
     }
 
-    public void handleMIPClasses(FastStringBuffer sb, XFormsSingleNodeControl xformsControl) {
-        if (xformsControl != null) {
-            // The case of a concrete control
-            if (!xformsControl.isRelevant()) {
+    public void handleMIPClasses(FastStringBuffer sb, String controlId, XFormsSingleNodeControl xformsControl) {
+
+        // Output MIP classes only having a binding
+        final boolean hasBinding = ((XFormsStaticState.ControlInfo) containingDocument.getStaticState().getControlInfoMap().get(controlId)).hasBinding();
+        if (hasBinding) {
+            if (xformsControl != null) {
+                // The case of a concrete control
+                if (!xformsControl.isRelevant()) {
+                    if (sb.length() > 0)
+                        sb.append(' ');
+                    sb.append("xforms-disabled");
+                }
+                if (!xformsControl.isValid()) {
+                    if (sb.length() > 0)
+                        sb.append(' ');
+                    sb.append("xforms-invalid");
+                }
+                if (xformsControl.isReadonly()) {
+                    if (sb.length() > 0)
+                        sb.append(' ');
+                    sb.append("xforms-readonly");
+                }
+                if (xformsControl.isRequired()) {
+                    if (sb.length() > 0)
+                        sb.append(' ');
+                    sb.append("xforms-required");
+                    if (xformsControl instanceof XFormsValueControl) {
+                        if (isEmpty(xformsControl))
+                            sb.append(" xforms-required-empty");
+                        else
+                            sb.append(" xforms-required-filled");
+                    }
+                }
+                final String type = xformsControl.getType();
+                if (type != null && (type.startsWith(XFormsConstants.XSD_EXPLODED_TYPE_PREFIX) || type.startsWith(XFormsConstants.XFORMS_EXPLODED_TYPE_PREFIX))) {
+                    // Control is bound to built-in schema type
+                    if (sb.length() > 0)
+                        sb.append(' ');
+
+                    final String typeLocalname = type.substring(type.indexOf('}') + 1);
+                    sb.append("xforms-type-");
+                    sb.append(typeLocalname);
+                }
+            } else if (!handlerContext.isTemplate()) {
+                // Case of a non-concrete control - simply mark the control as disabled
                 if (sb.length() > 0)
                     sb.append(' ');
                 sb.append("xforms-disabled");
             }
-            if (!xformsControl.isValid()) {
-                if (sb.length() > 0)
-                    sb.append(' ');
-                sb.append("xforms-invalid");
-            }
-            if (xformsControl.isReadonly()) {
-                if (sb.length() > 0)
-                    sb.append(' ');
-                sb.append("xforms-readonly");
-            }
-            if (xformsControl.isRequired()) {
-                if (sb.length() > 0)
-                    sb.append(' ');
-                sb.append("xforms-required");
-                if (xformsControl instanceof XFormsValueControl) {
-                    if (isEmpty(xformsControl))
-                        sb.append(" xforms-required-empty");
-                    else
-                        sb.append(" xforms-required-filled");
-                }
-            }
-            final String type = xformsControl.getType();
-            if (type != null && (type.startsWith(XFormsConstants.XSD_EXPLODED_TYPE_PREFIX) || type.startsWith(XFormsConstants.XFORMS_EXPLODED_TYPE_PREFIX))) {
-                // Control is bound to built-in schema type
-                if (sb.length() > 0)
-                    sb.append(' ');
-
-                final String typeLocalname = type.substring(type.indexOf('}') + 1);
-                sb.append("xforms-type-");
-                sb.append(typeLocalname);
-            }
-        } else if (!handlerContext.isTemplate()) {
-            // Case of a non-concrete control - simply mark the control as disabled
-            if (sb.length() > 0)
-                sb.append(' ');
-            sb.append("xforms-disabled");
         }
     }
 
@@ -351,8 +356,8 @@ public abstract class HandlerBase extends ElementHandler {
         final Attributes labelHintHelpAlertAttributes;
         {
             // Statically obtain attributes information
-            final Map controlElementsMap = containingDocument.getStaticState().getControlElementsMap();
-            final Element controlElement = (Element) controlElementsMap.get(forId);
+            final Map controlInfoMap = containingDocument.getStaticState().getControlInfoMap();
+            final Element controlElement = ((XFormsStaticState.ControlInfo) controlInfoMap.get(forId)).getElement();
             final Element nestedElement;
             if (isLabel) {
                 nestedElement = controlElement.element(XFormsConstants.XFORMS_LABEL_QNAME);
@@ -417,8 +422,8 @@ public abstract class HandlerBase extends ElementHandler {
                 final AttributesImpl imgAttributes = new AttributesImpl();
                 imgAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, helpImageClasses);
                 imgAttributes.addAttribute("", "src", "src", ContentHandlerHelper.CDATA, XFormsConstants.HELP_IMAGE_URI);
-                imgAttributes.addAttribute("", "title", "title", ContentHandlerHelper.CDATA, "");
-                imgAttributes.addAttribute("", "alt", "alt", ContentHandlerHelper.CDATA, "Help");
+                imgAttributes.addAttribute("", "title", "title", ContentHandlerHelper.CDATA, "");// do we need a title for screen readers?
+                imgAttributes.addAttribute("", "alt", "alt", ContentHandlerHelper.CDATA, "");// however it seems that we don't need an alt since the help content is there
 
                 final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
                 final String imgQName = XMLUtils.buildQName(xhtmlPrefix, "img");

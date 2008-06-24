@@ -23,6 +23,7 @@ import org.orbeon.oxf.xforms.action.actions.XFormsSetvalueAction;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.XFormsPseudoControl;
+import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
@@ -237,6 +238,9 @@ public class XFormsModelBinds {
      * @return  JSON string
      */
     public static String getOfflineBindMappings(XFormsContainingDocument containingDocument) {
+
+        final long startTime = XFormsServer.logger.isDebugEnabled() ? System.currentTimeMillis() : 0;
+
         final Map idsToXFormsControls = containingDocument.getXFormsControls().getCurrentControlsState().getIdsToXFormsControls();
         final FastStringBuffer sb = new FastStringBuffer('{');
 
@@ -340,7 +344,15 @@ public class XFormsModelBinds {
             }
         }
         sb.append('}');
-        return sb.toString();
+
+        final String result = sb.toString();
+
+        if (XFormsServer.logger.isDebugEnabled()) {
+            final long elapsedTime = System.currentTimeMillis() - startTime;
+            containingDocument.logDebug("binds", "done computing offline information", new String[] { "time", Long.toString(elapsedTime) });
+        }
+
+        return result;
     }
 
     private static final List sequenceExtentToList(SequenceExtent sequenceExtent) {
@@ -368,7 +380,7 @@ public class XFormsModelBinds {
                 final Map.Entry currentEntry = (Map.Entry) k.next();
                 final XFormsControl currentControl = (XFormsControl) currentEntry.getValue();
 
-                // Only check real single-node controls (includes xforms:group, xforms:switch, xforms:trigger)
+                // Only check real single-node controls (includes xforms:group, xforms:switch, xforms:trigger) which have a new binding
                 final NodeInfo boundNode = currentControl.getBoundNode();
                 if (boundNode != null
                         && currentControl instanceof XFormsSingleNodeControl

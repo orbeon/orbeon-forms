@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms.state;
 
 import org.apache.log4j.Logger;
-import org.dom4j.Document;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -261,13 +260,27 @@ public class XFormsStateManager {
         // Create encoded static state and make sure encryption is used
         final String newEncodedStaticState;
         {
+            final long startTime = logger.isDebugEnabled() ? System.currentTimeMillis() : 0;
+
             final String encodedStaticState = xformsDecodedClientState.getXFormsState().getStaticState();
-            final Document staticStateDocument = XFormsUtils.decodeXML(pipelineContext, encodedStaticState);
-            newEncodedStaticState = XFormsUtils.encodeXML(pipelineContext, staticStateDocument, XFormsProperties.getXFormsPassword(), false);
+            newEncodedStaticState = XFormsUtils.ensureEncrypted(pipelineContext, encodedStaticState);
+
+            if (logger.isDebugEnabled()) {
+                final long elapsedTime = System.currentTimeMillis() - startTime;
+                logger.debug("Time to encode static state: " + elapsedTime);
+            }
         }
 
         // Create encoded dynamic state and make sure encryption is used
-        final String newEncodedDynamicState = containingDocument.createEncodedDynamicState(pipelineContext, true);
+        final String newEncodedDynamicState;
+        {
+            final long startTime = logger.isDebugEnabled() ? System.currentTimeMillis() : 0;
+            newEncodedDynamicState = containingDocument.createEncodedDynamicState(pipelineContext, true);
+            if (logger.isDebugEnabled()) {
+                final long elapsedTime = System.currentTimeMillis() - startTime;
+                logger.debug("Time to encode dynamic state: " + elapsedTime);
+            }
+        }
 
         return new XFormsState(newEncodedStaticState, newEncodedDynamicState);
     }

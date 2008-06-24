@@ -393,15 +393,15 @@ public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
         sb.append("</key><value>");
 
         // Store the value and make sure it is encrypted as it will be externalized
-        final String encryptedValue;
-        if (storeEntry.value.startsWith("X3") || storeEntry.value.startsWith("X4")) {
-            // Data is currently not encrypted, so encrypt it
-            final byte[] decodedValue = XFormsUtils.decodeBytes(pipelineContext, storeEntry.value, XFormsProperties.getXFormsPassword());
-            encryptedValue = XFormsUtils.encodeBytes(pipelineContext, decodedValue, XFormsProperties.getXFormsPassword());
-        } else {
-            // Data is already encrypted
-            encryptedValue = storeEntry.value;
-        }
+        final String encryptedValue = XFormsUtils.ensureEncrypted(pipelineContext, storeEntry.value);
+//        if (storeEntry.value.startsWith("X3") || storeEntry.value.startsWith("X4")) {
+//            // Data is currently not encrypted, so encrypt it
+//            final byte[] decodedValue = XFormsUtils.decodeBytes(pipelineContext, storeEntry.value, XFormsProperties.getXFormsPassword());
+//            encryptedValue = XFormsUtils.encodeBytes(pipelineContext, decodedValue, XFormsProperties.getXFormsPassword());
+//        } else {
+//            // Data is already encrypted
+//            encryptedValue = storeEntry.value;
+//        }
 
         sb.append(encryptedValue);
         sb.append("</value>");

@@ -75,7 +75,7 @@ public class XFormsTriggerHandler extends XFormsCoreControlHandler {
         final QName appearance = getAppearance(attributes);
 
         final FastStringBuffer classes = getInitialClasses(localname, attributes, triggerControl);
-        handleMIPClasses(classes, triggerControl);
+        handleMIPClasses(classes, id, triggerControl);
         containingDocument.getStaticState().appendClasses(classes, id);
 
         {
@@ -126,7 +126,6 @@ public class XFormsTriggerHandler extends XFormsCoreControlHandler {
                                 // Computed resource URL
                                 final XFormsContextStack.BindingContext currentBindingContext = triggerControl.getBindingContext();
                                 if (currentBindingContext != null && currentBindingContext.getSingleNode() != null) {
-
                                     final Map prefixToURIMap = containingDocument.getStaticState().getNamespaceMappings(id);
                                     final XFormsContextStack contextStack = containingDocument.getXFormsControls().getContextStack();
                                     hrefValue = XFormsUtils.resolveAttributeValueTemplates(pipelineContext,

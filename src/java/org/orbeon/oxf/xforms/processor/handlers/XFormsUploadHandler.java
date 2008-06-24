@@ -51,7 +51,7 @@ public class XFormsUploadHandler extends XFormsCoreControlHandler {
                 classes.append(" xforms-upload-state-empty");
             else
                 classes.append(" xforms-upload-state-file");
-            handleMIPClasses(classes, uploadControl);
+            handleMIPClasses(classes, id, uploadControl);
             newAttributes = getAttributes(attributes, classes.toString(), effectiveId);
         }
 

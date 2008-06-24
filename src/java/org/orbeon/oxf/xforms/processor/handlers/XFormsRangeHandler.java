@@ -43,7 +43,7 @@ public class XFormsRangeHandler extends XFormsCoreControlHandler {
             final FastStringBuffer classes = getInitialClasses(localname, attributes, rangeControl);
             classes.append(" xforms-range-background");
 
-            handleMIPClasses(classes, rangeControl);
+            handleMIPClasses(classes, id, rangeControl);
             newAttributes = getAttributes(attributes, classes.toString(), effectiveId);
         }
 

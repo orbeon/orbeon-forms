@@ -75,7 +75,7 @@ public class XFormsOutputHandler extends XFormsCoreControlHandler {
         final boolean isImageMediatype = mediatypeValue != null && mediatypeValue.startsWith("image/");
         final boolean isHTMLMediaType = (mediatypeValue != null && mediatypeValue.equals("text/html"));
 
-        handleMIPClasses(classes, outputControl);
+        handleMIPClasses(classes, id, outputControl);
         newAttributes = getAttributes(attributes, classes.toString(), effectiveId);
 
         // Create xhtml:span or xhtml:div

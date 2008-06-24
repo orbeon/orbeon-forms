@@ -100,7 +100,7 @@ public class XFormsSelect1Handler extends XFormsCoreControlHandler {
             if (isTree)
                 classes.append(" xforms-initially-hidden");
 
-            handleMIPClasses(classes, xformsValueControl);
+            handleMIPClasses(classes, id, xformsValueControl);
             newAttributes = getAttributes(attributes, classes.toString(), effectiveId);
         }
 

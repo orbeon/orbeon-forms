@@ -402,7 +402,7 @@ public class XFormsItemUtils {
 
         final List newItems = new ArrayList();
 
-        final Element controlElement = (Element) containingDocument.getStaticState().getControlElementsMap().get(id);
+        final Element controlElement = ((XFormsStaticState.ControlInfo) containingDocument.getStaticState().getControlInfoMap().get(id)).getElement();
         final boolean isOpenSelection = XFormsSelect1Control.isOpenSelection(controlElement);
 
         Dom4jUtils.visitSubtree(controlElement, new Dom4jUtils.VisitorListener() {

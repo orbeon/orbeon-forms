@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsStaticState;
 import org.orbeon.oxf.xforms.processor.XFormsElementFilterContentHandler;
 import org.orbeon.oxf.xforms.control.controls.XFormsGroupControl;
 import org.orbeon.oxf.xml.*;
@@ -74,7 +75,7 @@ public class XFormsGroupHandler extends HandlerBase {
         if (!handlerContext.isTemplate()) {
             groupXFormsControl = ((XFormsGroupControl) containingDocument.getObjectById(effectiveGroupId));
         }
-        handleMIPClasses(classes, groupXFormsControl);
+        handleMIPClasses(classes, groupId, groupXFormsControl);
 
         // Determine whether the closest xhtml:* parent is xhtml:table|xhtml:tbody|xhtml:thead|xhtml:tfoot|xhtml:tr
         final ElementHandlerController controller = handlerContext.getController();
@@ -106,7 +107,7 @@ public class XFormsGroupHandler extends HandlerBase {
             if (handlerContext.isTemplate() || groupXFormsControl == null) {
                 // Determine information statically
 
-                final Element groupElement = (Element) containingDocument.getStaticState().getControlElementsMap().get(handlerContext.getId(attributes));
+                final Element groupElement = ((XFormsStaticState.ControlInfo) containingDocument.getStaticState().getControlInfoMap().get(handlerContext.getId(attributes))).getElement();
                 final Element labelElement = groupElement.element(XFormsConstants.XFORMS_LABEL_QNAME);
                 hasLabel = labelElement != null;
 

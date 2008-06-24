@@ -42,7 +42,7 @@ public class XFormsSecretHandler extends XFormsCoreControlHandler {
         final AttributesImpl newAttributes;
         {
             final FastStringBuffer classes = getInitialClasses(localname, attributes, secretControl);
-            handleMIPClasses(classes, secretControl);
+            handleMIPClasses(classes, id, secretControl);
             newAttributes = getAttributes(attributes, classes.toString(), effectiveId);
             handleReadOnlyAttribute(newAttributes, containingDocument, secretControl);
         }

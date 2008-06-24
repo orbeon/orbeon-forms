@@ -46,7 +46,7 @@ public class XFormsTextareaHandler extends XFormsCoreControlHandler {
         final AttributesImpl newAttributes;
         {
             final FastStringBuffer classes = getInitialClasses(localname, attributes, textareaControl);
-            handleMIPClasses(classes, textareaControl);
+            handleMIPClasses(classes, id, textareaControl);
             newAttributes = getAttributes(attributes, classes.toString(), effectiveId);
             handleReadOnlyAttribute(newAttributes, containingDocument, textareaControl);
         }

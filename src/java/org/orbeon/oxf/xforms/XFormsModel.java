@@ -980,12 +980,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
             xformsControls.visitAllControls(new XFormsControls.XFormsControlVisitorListener() {
                 public void startVisitControl(XFormsControl control) {
 
-                    // If control is not bound (e.g. xforms:group[not(@ref) and not(@bind)]) no events are sent
-                    final boolean isControlBound = control.getBindingContext().isNewBind();
-                    if (!isControlBound)
-                        return;
-
-                    // This can happen if control is not bound to anything
+                    // This can happen if control is not bound to anything (includes xforms:group[not(@ref) and not(@bind)])
                     final NodeInfo currentNodeInfo = control.getBoundNode();
                     if (currentNodeInfo == null)
                         return;
@@ -1129,12 +1124,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                         continue;
                     }
 
-                    // If control is not bound (e.g. xforms:group[not(@ref) and not(@bind)]) no events are sent
-                    final boolean isControlBound = xformsControl.getBindingContext().isNewBind();
-                    if (!isControlBound)
-                        continue;
-
-                    // Re-obtain node to which control is bound, in case things have changed
+                    // Re-obtain node to which control is bound, in case things have changed (includes xforms:group[not(@ref) and not(@bind)])
                     final NodeInfo currentNodeInfo = xformsControl.getBoundNode();
                     if (currentNodeInfo == null) {
                         // See comment above about things that can have happened since.
@@ -1344,12 +1334,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                         if (!isValueControl)
                             return;
 
-                        // If control is not bound (e.g. xforms:group[not(@ref) and not(@bind)]) no events are sent
-                        final boolean isControlBound = control.getBindingContext().isNewBind();
-                        if (!isControlBound)
-                            return;
-
-                        // This can happen if control is not bound to anything
+                        // This can happen if control is not bound to anything (includes xforms:group[not(@ref) and not(@bind)])
                         final NodeInfo currentNodeInfo = control.getBoundNode();
                         if (currentNodeInfo == null)
                             return;

@@ -181,19 +181,19 @@ public class XFormsUtils {
             if (encryptionPassword != null) {
                 // Perform encryption
                 if (gzipByteArray == null) {
-                    // The data was not compressed
+                    // The data was not compressed above
                     return "X1" + SecureUtils.encrypt(pipelineContext, encryptionPassword, bytesToEncode).replace((char) 0xa, ' ');
                 } else {
-                    // The data was compressed
+                    // The data was compressed above
                     return "X2" + SecureUtils.encrypt(pipelineContext, encryptionPassword, gzipByteArray).replace((char) 0xa, ' ');
                 }
             } else {
                 // No encryption
                 if (gzipByteArray == null) {
-                    // The data was not compressed
+                    // The data was not compressed above
                     return "X3" + Base64.encode(bytesToEncode).replace((char) 0xa, ' ');
                 } else {
-                    // The data was compressed
+                    // The data was compressed above
                     return "X4" + Base64.encode(gzipByteArray).replace((char) 0xa, ' ');
                 }
             }
@@ -215,6 +215,32 @@ public class XFormsUtils {
                 throw new OXFException(e);
             }
         }
+    }
+
+    public static String ensureEncrypted(PipelineContext pipelineContext, String encoded) {
+        if (encoded.startsWith("X3") || encoded.startsWith("X4")) {
+            // Data is currently not encrypted, so encrypt it
+            final byte[] decodedValue = XFormsUtils.decodeBytes(pipelineContext, encoded, XFormsProperties.getXFormsPassword());
+            return XFormsUtils.encodeBytes(pipelineContext, decodedValue, XFormsProperties.getXFormsPassword());
+        } else {
+            // Data is already encrypted
+            return encoded;
+        }
+
+//        if (encoded.startsWith("X1") || encoded.startsWith("X2")) {
+//            // Case where data is already encrypted
+//            return encoded;
+//        } else if (encoded.startsWith("X3")) {
+//            // Uncompressed data to encrypt
+//            final byte[] decoded = Base64.decode(encoded.substring(2));
+//            return "X1" + SecureUtils.encrypt(pipelineContext, encryptionPassword, decoded).replace((char) 0xa, ' ');
+//        } else if (encoded.startsWith("X4")) {
+//            // Compressed data to encrypt
+//            final byte[] decoded = Base64.decode(encoded.substring(2));
+//            return "X2" + SecureUtils.encrypt(pipelineContext, encryptionPassword, decoded).replace((char) 0xa, ' ');
+//        } else {
+//            throw new OXFException("Invalid prefix for encoded data: " + encoded.substring(0, 2));
+//        }
     }
 
     private static org.w3c.dom.Document htmlStringToDocument(String value, LocationData locationData) {

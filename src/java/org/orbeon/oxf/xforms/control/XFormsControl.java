@@ -301,8 +301,13 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
      * Set this control's binding context.
      */
     public void setBindingContext(XFormsContextStack.BindingContext bindingContext) {
+
+        // Keep binding context
         this.bindingContext = bindingContext;
-        this.boundNode = bindingContext.getSingleNode();
+
+        // Set bound node, only considering actual bindings with @bind, @ref or @nodeset
+        if (bindingContext.isNewBind())
+            this.boundNode = bindingContext.getSingleNode();
     }
 
     /**

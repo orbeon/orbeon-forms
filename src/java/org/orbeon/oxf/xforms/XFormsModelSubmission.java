@@ -676,6 +676,9 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                     replaceInstance = null;
                 }
 
+                // Actual request mediatype
+                final String actualRequestMediatype = (resolvedMediatype == null) ? defaultMediatypeForSerialization : resolvedMediatype;
+
                 // Result information
                 ConnectionResult connectionResult = null;
                 final long externalSubmissionStartTime = XFormsServer.logger.isDebugEnabled() ? System.currentTimeMillis() : 0;
@@ -683,14 +686,21 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                     if ((isReplaceInstance || isReplaceNone) && resolvedActionOrResource.startsWith("test:")) {
                         // Test action
 
-                        if (messageBody == null)
+                        if (messageBody == null) {
+                            // Not sure when this can happen, but it can't be good
                             throw new XFormsSubmissionException("Action 'test:': no message body.", "processing submission response");
+                        } else {
+                            // Log message mody for debugging purposes
+                            if (XFormsServer.logger.isDebugEnabled())
+                                XFormsSubmissionUtils.logRequestBody(containingDocument, actualRequestMediatype, messageBody);
+                        }
 
+                        // Do as if we are receiving a regular XML response
                         connectionResult = new ConnectionResult(null);
                         connectionResult.statusCode = 200;
                         connectionResult.responseHeaders = new HashMap();
                         connectionResult.lastModified = 0;
-                        connectionResult.responseMediaType = "application/xml";
+                        connectionResult.responseMediaType = "application/xml";// should we use actualRequestMediatype instead?
                         connectionResult.dontHandleResponse = false;
                         connectionResult.setResponseInputStream(new ByteArrayInputStream(messageBody));
 
@@ -730,7 +740,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         // a new document so we don't dispatch xforms-submit-done and pass a null XFormsModelSubmission
                         // in that case
                         connectionResult = XFormsSubmissionUtils.doOptimized(pipelineContext, externalContext,
-                                isDeferredSubmissionSecondPassReplaceAll ? null : this, actualHttpMethod, resolvedURI.toString(), (resolvedMediatype == null) ? defaultMediatypeForSerialization : resolvedMediatype, isReplaceAll,
+                                isDeferredSubmissionSecondPassReplaceAll ? null : this, actualHttpMethod, resolvedURI.toString(), actualRequestMediatype, isReplaceAll,
                                 messageBody, queryString);
 
                     } else {
@@ -779,7 +789,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         } else {
                             // Perform actual submission
                             connectionResult = XFormsSubmissionUtils.doRegular(externalContext, containingDocument,
-                                    actualHttpMethod, resolvedURL, resolvedXXFormsUsername, resolvedXXFormsPassword, (resolvedMediatype == null) ? defaultMediatypeForSerialization : resolvedMediatype,
+                                    actualHttpMethod, resolvedURL, resolvedXXFormsUsername, resolvedXXFormsPassword, actualRequestMediatype,
                                     messageBody, queryString, headerNames, headerNameValues);
                         }
                     }

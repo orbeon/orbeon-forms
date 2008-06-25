@@ -304,15 +304,10 @@ public class XFormsSubmissionUtils {
 
                 // Write request body if needed
                 if (hasRequestBody) {
-                    if (XFormsServer.logger.isDebugEnabled()) {
-                        if (XMLUtils.isXMLMediatype(mediatype) || XMLUtils.isTextContentType(mediatype) || (mediatype != null && mediatype.equals("application/x-www-form-urlencoded"))) {
-                            containingDocument.logDebug("submission", "setting request body",
-                                new String[] { "mediatype", mediatype, "body", new String(messageBody, "UTF-8")});
-                        } else {
-                            containingDocument.logDebug("submission", "setting binary request body", new String[] { "mediatype", mediatype });
-                        }
-                    }
-
+                    // Log message mody for debugging purposes
+                    if (XFormsServer.logger.isDebugEnabled())
+                        logRequestBody(containingDocument, mediatype, messageBody);
+                    // Set request body on connection
                     httpURLConnection.setRequestBody(messageBody);
                 }
 
@@ -357,6 +352,15 @@ public class XFormsSubmissionUtils {
             throw new OXFException("xforms:submission: submission URL scheme not yet implemented: " + scheme);
         } else {
             throw new OXFException("xforms:submission: submission URL scheme not supported: " + scheme);
+        }
+    }
+
+    public static void logRequestBody(XFormsContainingDocument containingDocument, String mediatype, byte[] messageBody) throws UnsupportedEncodingException {
+        if (XMLUtils.isXMLMediatype(mediatype) || XMLUtils.isTextContentType(mediatype) || (mediatype != null && mediatype.equals("application/x-www-form-urlencoded"))) {
+            containingDocument.logDebug("submission", "setting request body",
+                new String[] { "mediatype", mediatype, "body", new String(messageBody, "UTF-8")});
+        } else {
+            containingDocument.logDebug("submission", "setting binary request body", new String[] { "mediatype", mediatype });
         }
     }
 

@@ -2952,6 +2952,33 @@ RewriteRule ^/orbeon/[^/]+/(.*\.(css|js|gif|png|jpg|html|htc))$ /home/orbeon/war
                     navigation often does not match the expectation of the user.
                 </note>
             </section>
+            <section>
+                <title>Encryption</title>
+                <p>
+                    Orbeon Forms encrypt some information sent to the client (for example when using client-side state
+                    state handling). This is done through the following property in <code>properties.xml</code>:
+                </p>
+                <xml-source>
+                    <property as="xs:string" name="oxf.xforms.password" value="REPLACE THIS WITH YOUR OWN PASSWORD"/>
+                </xml-source>
+                <warning>
+                    <p>
+                        It is strongly advised to change the default password in the property above.
+                    </p>
+                </warning>
+                <p>
+                    In addition, Orbeon Forms by default encrypts the value of selection controls before sending them to
+                    the client. This can be controlled with this property:
+                </p>
+                <xml-source>
+                    <property as="xs:boolean" name="oxf.xforms.encrypt-item-values" value="true"/>
+                </xml-source>
+                <p>
+                    In general, this should be set to <code>true</code>, but you can set it to <code>false</code> if you
+                    need to access the value of selection controls through JavaScript on the client, or through offline
+                    binds.
+                </p>
+            </section>
             <a name="xforms-debugging"/>
             <section>
                 <title>Debugging XForms Pages</title>

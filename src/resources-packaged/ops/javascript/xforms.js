@@ -4191,7 +4191,7 @@ ORBEON.xforms.Server = {
             ORBEON.xforms.Server.exceptionWhenTalkingToServer(e, formID);
         }
 
-        // Reset changes, as changes are included in this bach of events
+       // Reset changes, as changes are included in this bach of events
         ORBEON.xforms.Globals.changedIdsRequest = {};
         // Go ahead with next request, if any
         ORBEON.xforms.Globals.requestInProgress = false;
@@ -4628,6 +4628,7 @@ ORBEON.xforms.Offline = {
         // Create new iframe
         offlineIframe = document.createElement("iframe");
         offlineIframe.id = offlineIframeId;
+        offlineIframe.name = offlineIframeId;
         offlineIframe.style.display = "none";
         document.body.appendChild(offlineIframe);
 

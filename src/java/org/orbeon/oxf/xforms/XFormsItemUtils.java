@@ -237,6 +237,7 @@ public class XFormsItemUtils {
 //        final boolean[] mayReuse = new boolean[] { existingItems != null };
 
         final boolean isOpenSelection = select1Control.isOpenSelection();
+        final boolean isEncryptItemValues = !isOpenSelection && XFormsProperties.isEncryptItemValues(containingDocument);
 
         Dom4jUtils.visitSubtree(select1Control.getControlElement(), new Dom4jUtils.VisitorListener() {
 
@@ -259,7 +260,7 @@ public class XFormsItemUtils {
                         throw new ValidationException("xforms:item must contain an xforms:value element.", select1Control.getLocationData());
                     final String value = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, valueElement, false, null);
 
-                    newItems.add(new Item(!isOpenSelection, element.attributes(), label != null ? label : "", value != null ? value : "", hierarchyLevel + 1));// TODO: must filter attributes on element.attributes()
+                    newItems.add(new Item(isEncryptItemValues, element.attributes(), label != null ? label : "", value != null ? value : "", hierarchyLevel + 1));// TODO: must filter attributes on element.attributes()
 
                 } else if ("itemset".equals(localname)) {
                     // xforms:itemset
@@ -325,7 +326,7 @@ public class XFormsItemUtils {
                                             // Handle xforms:value
                                             // TODO: This could be optimized for xforms:value/@ref|@value as we could get the expression from the cache only once
                                             final String value = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, element.element(XFormsConstants.XFORMS_VALUE_QNAME), false, null);
-                                            newItems.add(new Item(!isOpenSelection, element.attributes(), label != null ? label : "", value, newLevel));// TODO: must filter attributes on element.attributes()
+                                            newItems.add(new Item(isEncryptItemValues, element.attributes(), label != null ? label : "", value, newLevel));// TODO: must filter attributes on element.attributes()
                                         } else {
                                             // TODO: handle xforms:copy
                                             throw new ValidationException("xforms:copy is not yet supported.", select1Control.getLocationData());
@@ -349,7 +350,7 @@ public class XFormsItemUtils {
                     if (labelElement != null) {
                         final String label = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, element.element(XFormsConstants.XFORMS_LABEL_QNAME), false, null);
                         hierarchyLevel++;
-                        newItems.add(new Item(!isOpenSelection, element.attributes(), label, null, hierarchyLevel));// TODO: must filter attributes on element.attributes()
+                        newItems.add(new Item(isEncryptItemValues, element.attributes(), label, null, hierarchyLevel));// TODO: must filter attributes on element.attributes()
                     }
                 }
             }
@@ -404,6 +405,7 @@ public class XFormsItemUtils {
 
         final Element controlElement = ((XFormsStaticState.ControlInfo) containingDocument.getStaticState().getControlInfoMap().get(id)).getElement();
         final boolean isOpenSelection = XFormsSelect1Control.isOpenSelection(controlElement);
+        final boolean isEncryptItemValues = !isOpenSelection && XFormsProperties.isEncryptItemValues(containingDocument);
 
         Dom4jUtils.visitSubtree(controlElement, new Dom4jUtils.VisitorListener() {
 
@@ -424,7 +426,7 @@ public class XFormsItemUtils {
                         throw new ValidationException("xforms:item must contain an xforms:value element.", (LocationData) controlElement.getData());
                     final String value = XFormsUtils.getStaticChildElementValue(valueElement, false, null);
 
-                    newItems.add(new Item(!isOpenSelection, element.attributes(), label != null ? label : "", value != null ? value : "", hierarchyLevel + 1));// TODO: must filter attributes on element.attributes()
+                    newItems.add(new Item(isEncryptItemValues, element.attributes(), label != null ? label : "", value != null ? value : "", hierarchyLevel + 1));// TODO: must filter attributes on element.attributes()
 
                 } else if ("itemset".equals(localname)) {
                     // xforms:itemset
@@ -438,7 +440,7 @@ public class XFormsItemUtils {
                     if (labelElement != null) {
                         final String label = XFormsUtils.getStaticChildElementValue(element.element(XFormsConstants.XFORMS_LABEL_QNAME), false, null);
                         hierarchyLevel++;
-                        newItems.add(new Item(!isOpenSelection, element.attributes(), label, null, hierarchyLevel));// TODO: must filter attributes on element.attributes()
+                        newItems.add(new Item(isEncryptItemValues, element.attributes(), label, null, hierarchyLevel));// TODO: must filter attributes on element.attributes()
                     }
                 }
             }

@@ -123,7 +123,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
         if (internalValue == null) {
             updatedValue = null;
         } else {
-            if (!isOpenSelection()) {
+            if (!isOpenSelection() && XFormsProperties.isEncryptItemValues(containingDocument)) {
                 // For closed selection, values sent to client must be encrypted
                 updatedValue = XFormsItemUtils.encryptValue(pipelineContext, internalValue);
             } else {
@@ -140,7 +140,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
             // Handle xforms:select1-specific logic
 
             // Decrypt incoming value. With open selection, values are sent to the client.
-            if (!isOpenSelection())
+            if (!isOpenSelection() && XFormsProperties.isEncryptItemValues(containingDocument))
                 value = XFormsItemUtils.decryptValue(pipelineContext, value);
 
             // Current control value

@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.processor.handlers;
 import org.dom4j.QName;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsItemUtils;
+import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsInputControl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
@@ -79,7 +80,8 @@ public class XFormsInputHandler extends XFormsCoreControlHandler {
             final boolean isMany = true;
 
             final List items = new ArrayList(2);
-            items.add(new XFormsItemUtils.Item(true, Collections.EMPTY_LIST, "", "true", 1));
+            final boolean isEncryptItemValues = XFormsProperties.isEncryptItemValues(containingDocument);
+            items.add(new XFormsItemUtils.Item(isEncryptItemValues, Collections.EMPTY_LIST, "", "true", 1));
 
             // NOTE: In the future, we may want to use other appearances provided by xforms:select
 //            items.add(new XFormsSelect1Control.Item(false, Collections.EMPTY_LIST, "False", "false", 1));

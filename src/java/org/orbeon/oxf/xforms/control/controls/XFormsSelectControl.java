@@ -17,6 +17,7 @@ import org.dom4j.Element;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsItemUtils;
+import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.event.events.XFormsSelectEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsDeselectEvent;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
@@ -60,7 +61,8 @@ public class XFormsSelectControl extends XFormsSelect1Control {
             final Map instanceValues = tokenize(pipelineContext, controlValue, false);
 
             // Values currently selected in the UI
-            final Map uiValues = tokenize(pipelineContext, value, true);
+            final boolean isEncryptItemValues = XFormsProperties.isEncryptItemValues(containingDocument);
+            final Map uiValues = tokenize(pipelineContext, value, isEncryptItemValues);
 
             // Iterate over all the items
             final List selectEvents = new ArrayList();

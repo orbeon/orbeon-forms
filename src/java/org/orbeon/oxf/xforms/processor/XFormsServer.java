@@ -41,9 +41,9 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.OutputKeys;
 import java.io.StringWriter;
 import java.util.*;
 

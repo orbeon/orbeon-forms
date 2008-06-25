@@ -89,6 +89,8 @@ public class XFormsProperties {
     public static final String COMPUTED_BINDS_RECALCULATE_VALUE = "recalculate";
     public static final String COMPUTED_BINDS_REVALIDATE_VALUE = "revalidate";
 
+    private static final String ENCRYPT_ITEM_VALUES_PROPERTY = "encrypt-item-values";
+
     public static class PropertyDefinition {
 
         private String name;
@@ -159,6 +161,7 @@ public class XFormsProperties {
             new PropertyDefinition(INTEGER_FORMAT_PROPERTY, "if (. castable as xs:integer) then format-number(xs:integer(.),'###,###,###,##0') else .", false),
             new PropertyDefinition(FLOAT_FORMAT_PROPERTY, "if (. castable as xs:float) then format-number(xs:float(.),'#,##0.000') else .", false),
             new PropertyDefinition(DOUBLE_FORMAT_PROPERTY, "if (. castable as xs:double) then format-number(xs:double(.),'#,##0.000') else .", false),
+            new PropertyDefinition(ENCRYPT_ITEM_VALUES_PROPERTY, true, false),
 
             // Properties to propagate to the client
             new PropertyDefinition(SESSION_HEARTBEAT_PROPERTY, true, true),
@@ -420,6 +423,10 @@ public class XFormsProperties {
 
     public static boolean isSessionHeartbeat(XFormsContainingDocument containingDocument) {
         return getBooleanProperty(containingDocument, SESSION_HEARTBEAT_PROPERTY);
+    }
+
+    public static boolean isEncryptItemValues(XFormsContainingDocument containingDocument) {
+        return getBooleanProperty(containingDocument, ENCRYPT_ITEM_VALUES_PROPERTY);
     }
 
     public static boolean isOfflineMode(XFormsContainingDocument containingDocument) {

@@ -152,7 +152,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
      * Create an XFormsContainingDocument from an XFormsEngineStaticState object.
      *
      * @param pipelineContext           current pipeline context
-     * @param xformsStaticState   XFormsEngineStaticState
+     * @param xformsStaticState         static state object
      * @param uriResolver               optional URIResolver for loading instances during initialization (and possibly more, such as schemas and "GET" submissions upon initialization)
      */
     public XFormsContainingDocument(PipelineContext pipelineContext, XFormsStaticState xformsStaticState,
@@ -181,18 +181,24 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     }
 
     /**
-     * Create an XFormsContainingDocument from an XFormsState object.
+     * Restore an XFormsContainingDocument from XFormsState and XFormsStaticState.
      *
-     * @param pipelineContext   current pipeline context
-     * @param xformsState       XFormsState containing static and dynamic state
+     * @param pipelineContext         current pipeline context
+     * @param xformsState             static and dynamic state information
+     * @param xformsStaticState       static state object, or null if not available
      */
-    public XFormsContainingDocument(PipelineContext pipelineContext, XFormsState xformsState) {
+    public XFormsContainingDocument(PipelineContext pipelineContext, XFormsState xformsState, XFormsStaticState xformsStaticState) {
 
-        logDebug("containing document", "creating new ContainingDocument (static state object not provided).");
-
-        // Create static state object
-        // TODO: Handle caching of XFormsStaticState object
-        xformsStaticState = new XFormsStaticState(pipelineContext, xformsState.getStaticState());
+        if (xformsStaticState != null) {
+            // Use passed static state object
+            logDebug("containing document", "restoring containing document (static state object provided).");
+            this.xformsStaticState = xformsStaticState;
+        } else {
+            // Create static state object
+            // TODO: Handle caching of XFormsStaticState object? Anything that can be done here?
+            logDebug("containing document", "restoring containing document (static state object not provided).");
+            this.xformsStaticState = new XFormsStaticState(pipelineContext, xformsState.getStaticState());
+        }
 
         // Restore the containing document's dynamic state
         final String encodedDynamicState = xformsState.getDynamicState();
@@ -209,6 +215,16 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         } catch (Exception e) {
             throw ValidationException.wrapException(e, new ExtendedLocationData(getLocationData(), "re-initializing XForms containing document"));
         }
+    }
+
+    /**
+     * Restore an XFormsContainingDocument from XFormsState only.
+     *
+     * @param pipelineContext   current pipeline context
+     * @param xformsState       XFormsState containing static and dynamic state
+     */
+    public XFormsContainingDocument(PipelineContext pipelineContext, XFormsState xformsState) {
+        this(pipelineContext, xformsState,  null);
     }
 
     /**

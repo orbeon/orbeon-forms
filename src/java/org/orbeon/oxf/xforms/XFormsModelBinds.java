@@ -13,27 +13,28 @@
  */
 package org.orbeon.oxf.xforms;
 
+import org.apache.commons.collections.map.CompositeMap;
 import org.dom4j.Element;
 import org.dom4j.QName;
-import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.action.actions.XFormsSetvalueAction;
 import org.orbeon.oxf.xforms.control.XFormsControl;
-import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.XFormsPseudoControl;
+import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.expr.XPathContextMajor;
-import org.orbeon.saxon.om.NodeInfo;
-import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.FastStringBuffer;
+import org.orbeon.saxon.om.Item;
+import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.style.StandardNames;
 import org.orbeon.saxon.sxpath.XPathEvaluator;
@@ -42,10 +43,9 @@ import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.type.BuiltInAtomicType;
 import org.orbeon.saxon.type.BuiltInSchemaFactory;
 import org.orbeon.saxon.value.AtomicValue;
+import org.orbeon.saxon.value.SequenceExtent;
 import org.orbeon.saxon.value.StringValue;
 import org.orbeon.saxon.value.ValidationErrorValue;
-import org.orbeon.saxon.value.SequenceExtent;
-import org.apache.commons.collections.map.CompositeMap;
 
 import java.util.*;
 
@@ -244,6 +244,8 @@ public class XFormsModelBinds {
         final Map idsToXFormsControls = containingDocument.getXFormsControls().getCurrentControlsState().getIdsToXFormsControls();
         final FastStringBuffer sb = new FastStringBuffer('{');
 
+        final Map nodesToControlsMapping = getNodesToControlsMapping(idsToXFormsControls);
+
         // Handle MIPs
         sb.append("\"mips\": {");
         {
@@ -269,7 +271,7 @@ public class XFormsModelBinds {
                         XFormsUtils.getNestedAttributesAndElements(nestedNodeset, currentNodeset);
                         if (nestedNodeset.size() > 0) {
                             // Find all controls bound to those nested nodes: they are influenced by the mips
-                            controlsInheritingMIPs = getBoundControls(idsToXFormsControls, nestedNodeset);
+                            controlsInheritingMIPs = getBoundControls(nodesToControlsMapping, nestedNodeset);
                         } else {
                             // No controls are bound to nested nodes
                             controlsInheritingMIPs = null;
@@ -279,7 +281,7 @@ public class XFormsModelBinds {
                     }
 
                     // Find controls directly bound to nodes in the bind nodeset
-                    final List boundControls = getBoundControls(idsToXFormsControls, currentNodeset);
+                    final List boundControls = getBoundControls(nodesToControlsMapping, currentNodeset);
 
                     if (boundControls.size() > 0) {
                         for (Iterator j = boundControls.iterator(); j.hasNext();) {
@@ -334,7 +336,7 @@ public class XFormsModelBinds {
 
                     // Find controls bound to the bind exposed as a variable
                     final List currentNodeset = sequenceExtentToList(currentSequenceExtent);
-                    final List boundControls = getBoundControls(idsToXFormsControls, currentNodeset);
+                    final List boundControls = getBoundControls(nodesToControlsMapping, currentNodeset);
                     if (boundControls.size() > 0) {
                         // NOTE: We only handle the first control found
                         final String effectiveControlId = ((XFormsControl) boundControls.get(0)).getEffectiveId();
@@ -369,25 +371,53 @@ public class XFormsModelBinds {
         }
     }
 
-    private static List getBoundControls(Map idsToXFormsControls, List nodeset) {
+    private static List getBoundControls(Map nodesToControlsMapping, List nodeset) {
         final List result = new ArrayList();
 
         // Iterate through nodeset
         for (Iterator j = nodeset.iterator(); j.hasNext();) {
             final NodeInfo currentNodeInfo = (NodeInfo) j.next();
-            // Iterate through controls
-            for (Iterator k = idsToXFormsControls.entrySet().iterator(); k.hasNext();) {
-                final Map.Entry currentEntry = (Map.Entry) k.next();
-                final XFormsControl currentControl = (XFormsControl) currentEntry.getValue();
+            final Object match = nodesToControlsMapping.get(currentNodeInfo);
+            if (match == null) {
+                // Nothing to see here
+            } else if (match instanceof XFormsControl) {
+                // Control
+                result.add(match);
+            } else {
+                // List
+                result.addAll((Collection) match);
+            }
+        }
+        return result;
+    }
 
+    private static Map getNodesToControlsMapping(Map idsToXFormsControls) {
+        final Map result = new HashMap();
+
+        // Iterate through controls
+        for (Iterator k = idsToXFormsControls.entrySet().iterator(); k.hasNext();) {
+            final Map.Entry currentEntry = (Map.Entry) k.next();
+            final XFormsControl currentControl = (XFormsControl) currentEntry.getValue();
+
+            if (currentControl instanceof XFormsSingleNodeControl && !(currentControl instanceof XFormsPseudoControl)) {
                 // Only check real single-node controls (includes xforms:group, xforms:switch, xforms:trigger) which have a new binding
                 final NodeInfo boundNode = currentControl.getBoundNode();
-                if (boundNode != null
-                        && currentControl instanceof XFormsSingleNodeControl
-                        && !(currentControl instanceof XFormsPseudoControl)) {
-                    if (boundNode.isSameNodeInfo(currentNodeInfo)) {// make sure to compare with isSameNodeInfo()
-                        // There is a match
-                        result.add(currentControl);
+                if (boundNode != null) {
+                    // There is a match
+                    final Object existing = result.get(boundNode);// multiple controls may be bound to a node
+                    if (existing == null) {
+                        // No control yet, put the control in (hopefully the most frequent case)
+                        result.put(boundNode, currentControl);
+                    } else if (existing instanceof XFormsControl) {
+                        // There is just one control, which we replace with a list
+                        final List newList = new ArrayList();
+                        newList.add(existing);
+                        newList.add(currentControl);
+                        result.put(boundNode, newList);
+                    } else  {
+                        // More than one control already, just add to it
+                        final List existingList = (List) existing;
+                        existingList.add(currentControl);
                     }
                 }
             }

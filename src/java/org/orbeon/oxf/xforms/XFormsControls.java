@@ -491,7 +491,7 @@ public class XFormsControls {
 
         final long startTime;
         if (XFormsServer.logger.isDebugEnabled()) {
-            containingDocument.logDebug("controls", "evaluating controls");
+            containingDocument.logDebug("controls", "start evaluating");
             startTime = System.currentTimeMillis();
         } else {
             startTime = 0;
@@ -506,7 +506,7 @@ public class XFormsControls {
         }
 
         if (XFormsServer.logger.isDebugEnabled()) {
-            containingDocument.logDebug("controls", "done evaluating controls",
+            containingDocument.logDebug("controls", "end evaluating",
                     new String[] { "time (ms)", Long.toString(System.currentTimeMillis() - startTime)});
         }
     }

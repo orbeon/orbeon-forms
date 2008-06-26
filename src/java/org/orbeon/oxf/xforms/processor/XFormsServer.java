@@ -452,7 +452,7 @@ public class XFormsServer extends ProcessorImpl {
                 if (!allEvents) {
                     initialContainingDocument = null;
                 } else {
-                    initialContainingDocument = new XFormsContainingDocument(pipelineContext, xformsDecodedInitialClientState.getXFormsState());
+                    initialContainingDocument = new XFormsContainingDocument(pipelineContext, xformsDecodedInitialClientState.getXFormsState(), containingDocument.getStaticState());
                 }
 
                 ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "action");

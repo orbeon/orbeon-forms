@@ -24,10 +24,14 @@ import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
 import org.orbeon.oxf.xforms.event.events.XFormsInsertEvent;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.om.Item;
+import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
+import org.orbeon.saxon.value.BooleanValue;
+import org.orbeon.saxon.trans.XPathException;
 
 import java.util.List;
 import java.util.Iterator;
@@ -39,6 +43,7 @@ import java.util.ArrayList;
  */
 public class XFormsInsertAction extends XFormsAction {
 
+    public static final String NO_INDEX_ADJUSTMENT = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "no-index-adjustment");
     public static final String CANNOT_INSERT_READONLY_MESSAGE = "Cannot perform insertion into read-only instance.";
 
     public void execute(XFormsActionInterpreter actionInterpreter, PipelineContext pipelineContext, String targetId,
@@ -251,21 +256,6 @@ public class XFormsInsertAction extends XFormsAction {
             clonedNodes = clonedNodesTemp;
         }
 
-
-        final XFormsControls xformsControls = containingDocument.getXFormsControls();
-
-        // Prepare switches
-        for (int i = 0; i < sourceNodes.size(); i++) {
-            final Node sourceNode = (Node) sourceNodes.get(i);
-            // 1) may be null when source is an item 2) may be null when source is from a read-only instance
-            //  && InstanceData.getLocalInstanceData(sourceNode) != null
-            // TODO: How could this come from a read-only instance since we have a Node? Remove this and the above comment when we have made sure this is fine.
-            if (sourceNode != null) {
-                final Node clonedNode = (Node) clonedNodes.get(i);
-                XFormsSwitchUtils.prepareSwitches(xformsControls, sourceNode, clonedNode);
-            }
-        }
-
         // "6. The target location of each cloned node or nodes is determined"
         // "7. The cloned node or nodes are inserted in the order they were cloned at their target location
         // depending on their node type."
@@ -371,44 +361,84 @@ public class XFormsInsertAction extends XFormsAction {
 //                }
         }
 
+        // Whether some nodes were inserted
+        final boolean didInsertNodes = insertedNodes != null && insertedNodes.size() > 0;
+
         if (XFormsServer.logger.isDebugEnabled()) {
-            if (insertedNodes.size() == 0)
-                containingDocument.logDebug("xforms:insert", "no node inserted");
-            else
+            if (didInsertNodes)
                 containingDocument.logDebug("xforms:insert", "inserted nodes",
                         new String[] { "count", Integer.toString(insertedNodes.size()), "instance", modifiedInstance.getId() });
+            else
+                containingDocument.logDebug("xforms:insert", "no node inserted");
         }
 
-        // Rebuild ControlsState
-        xformsControls.rebuildCurrentControlsState(pipelineContext);
-        final XFormsControls.ControlsState currentControlsState = xformsControls.getCurrentControlsState();
+        // Whether indexes must be adjusted (used for offline mode optimizations)
+        final boolean mustAdjustIndexesAndSwitches = didInsertNodes && isAdjustIndexes(containingDocument);
 
-        // Update repeat indexes
-        XFormsIndexUtils.adjustIndexesAfterInsert(xformsControls, currentControlsState, clonedNodes);
+        if (mustAdjustIndexesAndSwitches) {
 
-        // Update switches
-        XFormsSwitchUtils.updateSwitches(xformsControls);
+            final XFormsControls xformsControls = containingDocument.getXFormsControls();
+
+            // Prepare switches
+            // NOTE: It shouldn't matter that we already inserted nodes into the instance, as we haven't rebuilt controls yet
+            for (int i = 0; i < sourceNodes.size(); i++) {
+                final Node sourceNode = (Node) sourceNodes.get(i);
+                // 1) may be null when source is an item 2) may be null when source is from a read-only instance
+                //  && InstanceData.getLocalInstanceData(sourceNode) != null
+                // TODO: How could this come from a read-only instance since we have a Node? Remove this and the above comment when we have made sure this is fine.
+                if (sourceNode != null) {
+                    final Node clonedNode = (Node) clonedNodes.get(i);
+                    XFormsSwitchUtils.prepareSwitches(xformsControls, sourceNode, clonedNode);
+                }
+            }
+
+            // Rebuild ControlsState (we know we are dirty)
+            xformsControls.rebuildCurrentControlsState(pipelineContext);
+            final XFormsControls.ControlsState currentControlsState = xformsControls.getCurrentControlsState();
+
+            // Update repeat indexes
+            XFormsIndexUtils.adjustIndexesAfterInsert(xformsControls, currentControlsState, clonedNodes);
+
+            // Update switches
+            XFormsSwitchUtils.updateSwitches(xformsControls);
+        }
 
         // "4. If the insert is successful, the event xforms-insert is dispatched."
         {
-                final List insertedNodeInfos;
-            if (insertedNodes == null || insertedNodes.size() == 0) {
-                insertedNodeInfos = null;
-            } else {
+            final List insertedNodeInfos;
+            if (didInsertNodes) {
                 final DocumentWrapper documentWrapper = (DocumentWrapper) modifiedInstance.getDocumentInfo();
                 insertedNodeInfos = new ArrayList(insertedNodes.size());
                 for (Iterator i = insertedNodes.iterator(); i.hasNext();)
                     insertedNodeInfos.add(documentWrapper.wrap(i.next()));
+            } else {
+                insertedNodeInfos = null;
             }
-
 
             containingDocument.dispatchEvent(pipelineContext,
                     new XFormsInsertEvent(modifiedInstance, insertedNodeInfos, originObjects, insertLocationNodeInfo, positionAttribute == null ? "after" : positionAttribute));
         }
 
         // "XForms Actions that change the tree structure of instance data result in setting all four flags to true"
-        modifiedInstance.getModel(containingDocument).setAllDeferredFlags(true);
-        containingDocument.getXFormsControls().markDirtySinceLastRequest();
+        if (didInsertNodes) {
+            modifiedInstance.getModel(containingDocument).setAllDeferredFlags(true);
+            containingDocument.getXFormsControls().markDirtySinceLastRequest();
+        }
+    }
+
+    private static boolean isAdjustIndexes(XFormsContainingDocument containingDocument) {
+        final SequenceIterator si = containingDocument.getCurrentEvent().getAttribute(XFormsInsertAction.NO_INDEX_ADJUSTMENT);
+        if (si != null) {
+            try {
+                final Item item = si.next();
+                if (item instanceof BooleanValue) {
+                    return !((BooleanValue) item).getBooleanValue();
+                }
+            } catch (XPathException e) {
+                throw new OXFException(e);
+            }
+        }
+        return true;
     }
 
     private static List doInsert(Node insertionNode, List clonedNodes) {

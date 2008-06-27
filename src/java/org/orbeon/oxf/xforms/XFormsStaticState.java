@@ -96,6 +96,7 @@ public class XFormsStaticState {
     private Map itemsInfoMap;               // Map<String, ItemsInfo> of control id to ItemsInfo
     private Map controlClasses;             // Map<String, String> of control id to class
     private boolean hasOfflineSupport;      // whether the document requires offline support
+    private List offlineInsertTriggerIds;   // List<String> of trigger ids that can do inserts
 
     private static final HashMap BASIC_NAMESPACE_MAPPINGS = new HashMap();
     static {
@@ -634,6 +635,16 @@ public class XFormsStaticState {
                     "   return for $id in $handler/../descendant-or-self::xforms:trigger/@id return string($id)", BASIC_NAMESPACE_MAPPINGS,
                     null, null, null, null, locationData);
 
+                offlineInsertTriggerIds = XPathCache.evaluate(pipelineContext, controlsDocumentInfo,
+                    "for $handler in for $action in //xforms:insert return ($action/ancestor-or-self::*[@ev:event and tokenize(@ev:event, '\\s+') = 'DOMActivate'])[1]" +
+                    "   return for $id in $handler/../descendant-or-self::xforms:trigger/@id return string($id)", BASIC_NAMESPACE_MAPPINGS,
+                    null, null, null, null, locationData);
+
+                final List offlineDeleteTriggerIds = XPathCache.evaluate(pipelineContext, controlsDocumentInfo,
+                    "for $handler in for $action in //xforms:delete return ($action/ancestor-or-self::*[@ev:event and tokenize(@ev:event, '\\s+') = 'DOMActivate'])[1]" +
+                    "   return for $id in $handler/../descendant-or-self::xforms:trigger/@id return string($id)", BASIC_NAMESPACE_MAPPINGS,
+                    null, null, null, null, locationData);
+
                 for (Iterator i = onlineTriggerIds.iterator(); i.hasNext();) {
                     final String currentId = (String) i.next();
                     addClasses(currentId, "xxforms-online");
@@ -647,6 +658,16 @@ public class XFormsStaticState {
                 for (Iterator i = offlineSaveTriggerIds.iterator(); i.hasNext();) {
                     final String currentId = (String) i.next();
                     addClasses(currentId, "xxforms-offline-save");
+                }
+
+                for (Iterator i = offlineInsertTriggerIds.iterator(); i.hasNext();) {
+                    final String currentId = (String) i.next();
+                    addClasses(currentId, "xxforms-offline-insert");
+                }
+
+                for (Iterator i = offlineDeleteTriggerIds.iterator(); i.hasNext();) {
+                    final String currentId = (String) i.next();
+                    addClasses(currentId, "xxforms-offline-delete");
                 }
 
                 {
@@ -724,6 +745,10 @@ public class XFormsStaticState {
         final String classes = (String) controlClasses.get(controlId);
         if (classes != null)
             sb.append(classes);
+    }
+
+    public List getOfflineInsertTriggerIds() {
+        return offlineInsertTriggerIds;
     }
 
     private static void mergeEventHandlers(Map destination, Map source) {

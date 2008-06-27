@@ -24,20 +24,21 @@ import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
-import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl;
-import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
-import org.orbeon.oxf.xforms.control.controls.XXFormsDialogControl;
-import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
+import org.orbeon.oxf.xforms.control.controls.*;
 import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.state.XFormsState;
 import org.orbeon.oxf.xforms.processor.XFormsURIResolver;
+import org.orbeon.oxf.xforms.action.actions.XFormsInsertAction;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.om.FastStringBuffer;
+import org.orbeon.saxon.om.Item;
+import org.orbeon.saxon.value.SequenceExtent;
+import org.orbeon.saxon.value.BooleanValue;
 
 import java.io.IOException;
 import java.util.*;
@@ -1050,7 +1051,25 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     }
 
     public void goOffline(PipelineContext pipelineContext) {
-        // Dispatch to all models
+
+        // Handle inserts of controls marked as "offline insert triggers"
+        final List offlineInsertTriggerIds = getStaticState().getOfflineInsertTriggerIds();
+        if (offlineInsertTriggerIds != null) {
+            
+            for (Iterator i = offlineInsertTriggerIds.iterator(); i.hasNext();) {
+                final String currentId = (String) i.next();
+                final Object o = getObjectById(currentId);
+                if (o instanceof XFormsTriggerControl) {
+                    final XFormsTriggerControl trigger = (XFormsTriggerControl) o;
+                    final XFormsEvent event = new XFormsDOMActivateEvent(trigger);
+                    event.setAttribute(XFormsInsertAction.NO_INDEX_ADJUSTMENT, new SequenceExtent(new Item[] { BooleanValue.TRUE }));
+                    for (int j = 0; j < 8; j++)
+                        dispatchEvent(pipelineContext, event);
+                }
+            }
+        }
+
+        // Dispatch xxforms-offline to all models
         for (Iterator i = getModels().iterator(); i.hasNext();) {
             final XFormsModel currentModel = (XFormsModel) i.next();
             dispatchEvent(pipelineContext, new XXFormsOfflineEvent(currentModel));

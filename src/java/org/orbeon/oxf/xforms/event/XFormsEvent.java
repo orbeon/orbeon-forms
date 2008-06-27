@@ -97,7 +97,7 @@ public abstract class XFormsEvent {
     public void setAttribute(String name, SequenceExtent value) {
         if (customAttributes == null)
             customAttributes = new HashMap();
-        customAttributes.put(name, value.iterate(null)); // NOTE: With Saxon 8, the param is not used, and Saxon 9 has value.iterate()
+        customAttributes.put(name, value);
     }
 
     public SequenceIterator getAttribute(String name) {
@@ -126,7 +126,7 @@ public abstract class XFormsEvent {
             return new ListIterator(Collections.singletonList(BooleanValue.get(cancelable)));
         } else if (customAttributes != null && customAttributes.get(name) != null) {
             // Return custom attribute if found
-            return (SequenceIterator) customAttributes.get(name);
+            return ((SequenceExtent) customAttributes.get(name)).iterate(null); // NOTE: With Saxon 8, the param is not used, and Saxon 9 has value.iterate()
         } else {
             // "If the event context information does not contain the property indicated by the string argument, then an
             // empty node-set is returned."

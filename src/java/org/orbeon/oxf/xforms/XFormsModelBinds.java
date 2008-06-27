@@ -24,6 +24,7 @@ import org.orbeon.oxf.xforms.action.actions.XFormsSetvalueAction;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsPseudoControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
+import org.orbeon.oxf.xforms.control.controls.RepeatIterationControl;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -399,8 +400,10 @@ public class XFormsModelBinds {
             final Map.Entry currentEntry = (Map.Entry) k.next();
             final XFormsControl currentControl = (XFormsControl) currentEntry.getValue();
 
-            if (currentControl instanceof XFormsSingleNodeControl && !(currentControl instanceof XFormsPseudoControl)) {
+            if (currentControl instanceof XFormsSingleNodeControl
+                    && (currentControl instanceof RepeatIterationControl || !(currentControl instanceof XFormsPseudoControl))) {
                 // Only check real single-node controls (includes xforms:group, xforms:switch, xforms:trigger) which have a new binding
+                // But also support repeat iterations, as their MIPs
                 final NodeInfo boundNode = currentControl.getBoundNode();
                 if (boundNode != null) {
                     // There is a match

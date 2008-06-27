@@ -29,10 +29,9 @@
         <xsl:copy>
             <xsl:copy-of select="@*"/>
             <xhtml:head>
-                <!-- Standard scripts/styles -->
                 <!-- NOTE: The XForms engine may place additional scripts and stylesheets here as needed -->
-                <!-- Handle head elements -->
-                <xsl:for-each select="/xhtml:html/xhtml:head/(xhtml:meta | xhtml:link | xhtml:style | xhtml:script)">
+                <!-- Handle head elements except scripts -->
+                <xsl:for-each select="/xhtml:html/xhtml:head/(xhtml:meta | xhtml:link | xhtml:style)">
                     <xsl:element name="xhtml:{local-name()}" namespace="{namespace-uri()}">
                         <xsl:copy-of select="@*"/>
                         <xsl:apply-templates/>
@@ -54,6 +53,13 @@
                 <!-- Favicon -->
                 <xhtml:link rel="shortcut icon" href="/ops/images/orbeon-icon-16.ico"/>
                 <xhtml:link rel="icon" href="/ops/images/orbeon-icon-16.png" type="image/png"/>
+                <!-- Scripts -->
+                <xsl:for-each select="/xhtml:html/xhtml:head/xhtml:script">
+                    <xsl:element name="xhtml:{local-name()}" namespace="{namespace-uri()}">
+                        <xsl:copy-of select="@*"/>
+                        <xsl:apply-templates/>
+                    </xsl:element>
+                </xsl:for-each>
             </xhtml:head>
             <xhtml:body>
                 <!-- Copy body attributes -->

@@ -249,10 +249,10 @@
             </section>
             <a name="validate-relevant-attributes"/>
             <section>
-                <title><code>validate</code> and <code>relevant</code> Attributes on <code>xforms:submission</code></title>
+                <title><code>validate</code> and <code>relevant</code> Attributes on <code>&lt;xforms:submission></code></title>
                 <p>
                     Orbeon Forms supports the XForms 1.1 <code>validate</code> and <code>relevant</code> attributes
-                    on <code>xforms:submission</code>. These boolean attributes disable processing of validation
+                    on <code>&lt;xforms:submission></code>. These boolean attributes disable processing of validation
                     and relevance respectively for a given submission:
                 </p>
                 <xml-source>
@@ -267,10 +267,10 @@
             </section>
             <a name="serialization-attribute"/>
             <section>
-                <title><code>serialization</code> Attribute on <code>xforms:submission</code></title>
+                <title><code>serialization</code> Attribute on <code>&lt;xforms:submission></code></title>
                 <p>
                     Orbeon Forms partially supports the XForms 1.1 <code>serialization</code> on
-                    <code>xforms:submission</code>: when the value of this attribute is set to <code>none</code>, no
+                    <code>&lt;xforms:submission></code>: when the value of this attribute is set to <code>none</code>, no
                     serialization of the data takes place. This is particularly useful for the <code>get</code>
                     method:
                 </p>
@@ -1826,7 +1826,7 @@
                 <section>
                     <title>HTTP Authentication</title>
                     <p>
-                        The <code>xforms:submission</code> element supports optional <code>xxforms:username</code> and
+                        The <code>&lt;xforms:submission></code> element supports optional <code>xxforms:username</code> and
                         <code>xxforms:password</code> attributes that allow specifying HTTP authentication credentials.
                         You can specify either both attributes, or only the <code>xxforms:username</code> attribute. The
                         latter case is equivalent to setting the value of <code>xxforms:password</code> to an empty
@@ -1837,11 +1837,61 @@
                                    method="put" resource="/exist/rest/ops/my-file.xml" replace="none" xxforms:username="admin" xxforms:password=""/>
                     </xml-source>
                 </section>
+                <a name="submission-headers-forwarding"/>
+                <section>
+                    <title>HTTP Headers Forwarding</title>
+                    <p>
+                        The <code>&lt;xforms:submission></code> automatically forwards current HTTP headers specified by the
+                        <code>oxf.xforms.forward-submission-headers</code> property. This property contains a
+                        space-separated list of header names to forward:
+                    </p>
+                    <xml-source show-namespaces="false">
+                        <property as="xs:string"  name="oxf.xforms.forward-submission-headers" value="Authorization SM_USER"/>
+                    </xml-source>
+                    <p>
+                        It can also be set on a per-page basis on your first model element:
+                    </p>
+                    <xml-source show-namespaces="false">
+                        <xforms:model xxforms:forward-submission-headers="Authorization SM_USER">
+                            ...
+                        </xforms:model>
+                    </xml-source>
+                    <p>
+                        Whenever <code>&lt;xforms:submission></code> performs an HTTP request, it looks at this list of
+                        header names and it forwards the header value if the following conditions are met:
+                    </p>
+                    <ul>
+                        <li>
+                            There is an incoming header with that name, i.e. either the HTTP request causing the XForms
+                            page to load or the XForms Ajax request to run contains that header.
+                        </li>
+                        <li>
+                            There is no author-specifed header with the same name in an <code>&lt;xforms:header></code>
+                            element within <code>&lt;xforms:submission></code>.
+                        </li>
+                    </ul>
+                    <p>
+                        Forwarding the <code>Authorization</code> or other authentication-related headers can be useful
+                        to propagate authentication credentials to other services.
+                    </p>
+                    <note>
+                        <p>
+                            The <code>Authorization</code> is treated specially: if a username is specified on the
+                            submission with <code>xxforms:username</code>, then this header is never forward.
+                        </p>
+                    </note>
+                    <warning>
+                        <p>
+                            Forwarding authentication-related headers may cause a security risks when communicated with
+                            non-trusted servers. Use carefully!
+                        </p>
+                    </warning>
+                </section>
                 <a name="submission-show-progress"/>
                 <section>
                     <title>Loading Indicator</title>
                     <p>
-                        When an <code>xforms:submission</code> with <code>replace="all"</code> is executed, in general,
+                        When an <code>&lt;xforms:submission></code> with <code>replace="all"</code> is executed, in general,
                         the browser will load another page. While this happens, the loading indicator, by default shown
                         in red at the top right of the window, is displayed. However, when the browser is served not a
                         web page but say a ZIP file, the browser might ask you in you want to download it, and then stay
@@ -1867,10 +1917,10 @@
                 <section>
                     <title>Target</title>
                     <p>
-                        You can use the <code>xxforms:target</code> attribute on both <code>xforms:submission</code> and
+                        You can use the <code>xxforms:target</code> attribute on both <code>&lt;xforms:submission></code> and
                         <code>xforms:load</code>. It behaves just like the <a
                         href="http://www.w3.org/TR/html401/present/frames.html#adef-target">HTML target attribute</a>.
-                        When used on <code>xforms:submission</code>, it makes sense to use this attribute only when you
+                        When used on <code>&lt;xforms:submission></code>, it makes sense to use this attribute only when you
                         have a <code>replace="all"</code>, as the <code>replace="instance"</code> doesn't load another
                         page.
                     </p>

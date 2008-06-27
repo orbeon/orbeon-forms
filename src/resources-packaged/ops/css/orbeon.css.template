@@ -375,7 +375,6 @@ ul {
 
 .note { border: solid 1px &medium-color;; background-color: &xlight-color;; }
 .note .label { background-color: &medium-color;; color: #ffffff; }
-.note .content { padding: .5em; }
 
 .notes { border: solid 1px #7099C5; background-color: #f0f0ff; }
 .notes .label { background-color: #7099C5; color: #ffffff; }

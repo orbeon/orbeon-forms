@@ -105,10 +105,10 @@ public class XFormsTriggerHandler extends XFormsCoreControlHandler {
 
             // TODO: probably needs f:url-norewrite="true"
             if (true) {
-                newAttributes.addAttribute("", "href", "href", ContentHandlerHelper.CDATA, "");
+                newAttributes.addAttribute("", "href", "href", ContentHandlerHelper.CDATA, "#");
             } else {
                 // TODO: Complete experimenting with outputting href value
-                String hrefValue = "";
+                String hrefValue = "#";
                 {
                     // Try to compute an href value right away if we detect just a nested xforms:load
                     // TODO: Need to tell the client not to handle clicks on hyperlink

@@ -1063,7 +1063,8 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                     final XFormsTriggerControl trigger = (XFormsTriggerControl) o;
                     final XFormsEvent event = new XFormsDOMActivateEvent(trigger);
                     event.setAttribute(XFormsInsertAction.NO_INDEX_ADJUSTMENT, new SequenceExtent(new Item[] { BooleanValue.TRUE }));
-                    for (int j = 0; j < 8; j++)
+                    final int repeatCount = XFormsProperties.getOfflineRepeatCount(this);
+                    for (int j = 0; j < repeatCount; j++)
                         dispatchEvent(pipelineContext, event);
                 }
             }

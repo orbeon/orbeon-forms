@@ -386,6 +386,14 @@ public class XFormsStaticState {
             return ((Boolean) (XFormsProperties.getPropertyDefinition(propertyName)).getDefaultValue()).booleanValue();
     }
 
+    public int getIntegerProperty(String propertyName) {
+        final Integer documentProperty = (Integer) nonDefaultProperties.get(propertyName);
+        if (documentProperty != null)
+            return documentProperty.intValue();
+        else
+            return ((Integer) (XFormsProperties.getPropertyDefinition(propertyName)).getDefaultValue()).intValue();
+    }
+
     public Map getEventNamesMap() {
         return eventNamesMap;
     }

@@ -71,8 +71,10 @@ public class XHTMLBodyHandler extends HandlerBase {
 
             // Register a handler for AVTs on HTML elements
             final boolean hostLanguageAVTs = XFormsProperties.isHostLanguageAVTs(); // TODO: this should be obtained per document, but we only know about this in the extractor
-            if (hostLanguageAVTs)
+            if (hostLanguageAVTs) {
+                controller.registerHandler(XXFormsAttributeHandler.class.getName(), XFormsConstants.XXFORMS_NAMESPACE_URI, "attribute");
                 controller.registerHandler(XHTMLElementHandler.class.getName(), XMLConstants.XHTML_NAMESPACE_URI, null);
+            }
         }
 
         final XFormsState xformsState = handlerContext.getXFormsState();

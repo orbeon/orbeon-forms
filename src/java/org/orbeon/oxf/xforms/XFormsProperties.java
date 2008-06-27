@@ -85,6 +85,7 @@ public class XFormsProperties {
     private static final String HELP_TOOLTIP_PROPERTY = "help-tooltip";
     public static final String OFFLINE_SUPPORT_PROPERTY = "offline";
     public static final String OFFLINE_REPEAT_COUNT_PROPERTY = "offline-repeat-count";
+    public static final String FORWARD_SUBMISSION_HEADERS = "forward-submission-headers";
 
     private static final String COMPUTED_BINDS_PROPERTY = "computed-binds";
     public static final String COMPUTED_BINDS_RECALCULATE_VALUE = "recalculate";
@@ -164,6 +165,7 @@ public class XFormsProperties {
             new PropertyDefinition(DOUBLE_FORMAT_PROPERTY, "if (. castable as xs:double) then format-number(xs:double(.),'#,##0.000') else .", false),
             new PropertyDefinition(ENCRYPT_ITEM_VALUES_PROPERTY, true, false),
             new PropertyDefinition(OFFLINE_REPEAT_COUNT_PROPERTY, 4, false),
+            new PropertyDefinition(FORWARD_SUBMISSION_HEADERS, "Authorization", false),
 
             // Properties to propagate to the client
             new PropertyDefinition(SESSION_HEARTBEAT_PROPERTY, true, true),
@@ -439,22 +441,26 @@ public class XFormsProperties {
         return getIntegerProperty(containingDocument, OFFLINE_REPEAT_COUNT_PROPERTY);
     }
 
+    public static String getForwardSubmissionHeaders(XFormsContainingDocument containingDocument) {
+        return getStringProperty(containingDocument, FORWARD_SUBMISSION_HEADERS);
+    }
+
     private static boolean getBooleanProperty(XFormsContainingDocument containingDocument, String propertyName) {
-        if (containingDocument.getStaticState() != null)
+        if (containingDocument != null && containingDocument.getStaticState() != null)
             return containingDocument.getStaticState().getBooleanProperty(propertyName);
         else // case of legacy XForms engine which doesn't have a static state object
             return OXFProperties.instance().getPropertySet().getBoolean(propertyName, ((Boolean) (XFormsProperties.getPropertyDefinition(propertyName)).getDefaultValue()).booleanValue()).booleanValue();
     }
 
     private static String getStringProperty(XFormsContainingDocument containingDocument, String propertyName) {
-        if (containingDocument.getStaticState() != null)
+        if (containingDocument != null && containingDocument.getStaticState() != null)
             return containingDocument.getStaticState().getStringProperty(propertyName);
         else // case of legacy XForms engine which doesn't have a static state object
             return OXFProperties.instance().getPropertySet().getString(propertyName, (XFormsProperties.getPropertyDefinition(propertyName)).getDefaultValue().toString());
     }
 
     private static int getIntegerProperty(XFormsContainingDocument containingDocument, String propertyName) {
-        if (containingDocument.getStaticState() != null)
+        if (containingDocument != null && containingDocument.getStaticState() != null)
             return containingDocument.getStaticState().getIntegerProperty(propertyName);
         else // case of legacy XForms engine which doesn't have a static state object
             return OXFProperties.instance().getPropertySet().getInteger(propertyName, ((Integer) (XFormsProperties.getPropertyDefinition(propertyName)).getDefaultValue()).intValue()).intValue();

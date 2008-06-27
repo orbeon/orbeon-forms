@@ -32,10 +32,7 @@ import org.dom4j.*;
 
 import java.io.*;
 import java.net.*;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Utilities for XForms submission processing.
@@ -257,12 +254,18 @@ public class XFormsSubmissionUtils {
                     }
                 }
 
+                // Get header forwarding information
+                final Map headersToForward = getHeadersToForward(containingDocument);
+
                 // Set headers if provided
                 if (headerNames != null && headerNames.size() > 0) {
                     for (Iterator i = headerNames.iterator(); i.hasNext();) {
-                        final String headerName = (String) i.next();
-                        final String headerValue = (String) headerNameValues.get(headerName);
-                        urlConnection.setRequestProperty(headerName, headerValue);
+                        final String currentHeaderName = (String) i.next();
+                        final String currentHeaderValue = (String) headerNameValues.get(currentHeaderName);
+                        // Set header
+                        urlConnection.setRequestProperty(currentHeaderName, currentHeaderValue);
+                        // Remove from list of headers to forward below
+                        headersToForward.remove(currentHeaderName.toLowerCase());
                     }
                 }
 
@@ -291,14 +294,30 @@ public class XFormsSubmissionUtils {
                     }
                 }
 
-                // Forward authorization header
-                // TODO: This should probably not be done automatically
-                if (username == null) {
-                    final String authorizationHeader = (String) externalContext.getRequest().getHeaderMap().get("authorization");
-                    if (authorizationHeader != null) {
-                        XFormsContainingDocument.logDebugStatic(containingDocument, "submission", "forwarding header",
-                            new String[] { "Authorization ", authorizationHeader });
-                        urlConnection.setRequestProperty("Authorization", authorizationHeader);
+                // Forward headers if needed
+                {
+                    final Map headersMap = externalContext.getRequest().getHeaderMap();
+                    for (Iterator i = headersToForward.entrySet().iterator(); i.hasNext();) {
+                        final Map.Entry currentEntry = (Map.Entry) i.next();
+                        final String currentHeaderName = (String) currentEntry.getValue();
+                        final String currentHeaderNameLowercase = (String) currentEntry.getKey();
+
+                        // Get incoming header value (Map contains values in lowercase!)
+                        final String currentIncomingHeaderValue = (String) headersMap.get(currentHeaderNameLowercase);
+                        // Forward header if present
+                        if (currentIncomingHeaderValue != null) {
+                            final boolean isAuthorizationHeader = currentHeaderNameLowercase.equals("authorization");
+                            if (!isAuthorizationHeader || isAuthorizationHeader && username == null) {
+                                // Only forward Authorization header if there is no username provided
+                                XFormsContainingDocument.logDebugStatic(containingDocument, "submission", "forwarding header",
+                                    new String[] { "name", currentHeaderName, "value", currentIncomingHeaderValue});
+                                urlConnection.setRequestProperty(currentHeaderName, currentIncomingHeaderValue);
+                            } else {
+                                // Just log this information
+                                XFormsContainingDocument.logDebugStatic(containingDocument, "submission",
+                                        "not forwarding Authorization header because username is present");
+                            }
+                        }
                     }
                 }
 
@@ -353,6 +372,23 @@ public class XFormsSubmissionUtils {
         } else {
             throw new OXFException("xforms:submission: submission URL scheme not supported: " + scheme);
         }
+    }
+
+    /**
+     * Get user-specified list of headers to forward.
+     *
+     * @param containingDocument    current containing document or null (to retrieve property)
+     * @return  Map<String, String> lowercase header name to user-specified header name
+     */
+    private static Map getHeadersToForward(XFormsContainingDocument containingDocument) {
+        final Map result = new HashMap();
+        final String headersToForward = XFormsProperties.getForwardSubmissionHeaders(containingDocument);
+        for (final StringTokenizer st = new StringTokenizer(headersToForward, ", "); st.hasMoreTokens();) {
+            final String currentHeaderName = st.nextToken().trim();
+            final String currentHeaderNameLowercase = currentHeaderName.toLowerCase();
+            result.put(currentHeaderNameLowercase, currentHeaderName);
+        }
+        return result;
     }
 
     public static void logRequestBody(XFormsContainingDocument containingDocument, String mediatype, byte[] messageBody) throws UnsupportedEncodingException {

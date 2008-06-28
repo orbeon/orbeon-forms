@@ -142,8 +142,8 @@ ORBEON.xforms.Globals = ORBEON.xforms.Globals || {
     requestDocument: "",                 // The last Ajax request, so we can resend it if necessary
     requestRetries: 3,                   // How many retries we have left before we give up with this Ajax request
     executeEventFunctionQueued: 0,       // Number of ORBEON.xforms.Server.executeNextRequest waiting to be executed
-    maskFocusEvents: false,              // Avoid catching focus event when we do it because the server told us to
-    previousDOMFocusOut: null,           // We only send a focus out when we receive a focus in, or another focus out
+    maskFocusEvents: false,              // Avoid catching focus event when we do call setfocus upon server request
+    currentFocusControlId: null,         // Track which control has focus
     htmlAreaNames: [],                   // Names of the FCK editors, which we need to reenable them on Firefox
     repeatTreeChildToParent: {},         // Describes the repeat hierarchy
     repeatIndexes: {},                   // The current index for each repeat
@@ -1641,9 +1641,9 @@ ORBEON.xforms.Controls = {
         }
         // Take out the focus from the current control. This is particulary important with non-modal dialogs
         // opened with a minimal trigger, otherwise we have a dotted line around the link after it opens.
-        if (ORBEON.xforms.Globals.lastFocusControlId) {
-            var focusedElement = ORBEON.util.Dom.getElementById(ORBEON.xforms.Globals.lastFocusControlId);
-            if (focusedElement) focusedElement.blur();
+        if (ORBEON.xforms.Globals.currentFocusControlId != null) {
+            var focusedElement = ORBEON.util.Dom.getElementById(ORBEON.xforms.Globals.currentFocusControlId);
+            if (focusedElement != null) focusedElement.blur();
         }
     }
 };
@@ -1690,57 +1690,75 @@ ORBEON.xforms.Events = {
 
     focus: function(event) {
         if (!ORBEON.xforms.Globals.maskFocusEvents) {
-            var target = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
-            if (target != null) {
-                // Save id of the control that received blur last
-                ORBEON.xforms.Globals.lastFocusControlId = target.id;
+            // Control elements
+            var targetControlElement = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
+            var currentFocusControlElement = ORBEON.xforms.Globals.currentFocusControlId != null ? ORBEON.util.Dom.getElementById(ORBEON.xforms.Globals.currentFocusControlId) : null;
+
+            if (targetControlElement != null) {
                 // Store initial value of control if we don't have a server value already, and if this is is not a list
                 // Initial value for lists is set up initialization, as when we receive the focus event the new value is already set.
-                if (typeof ORBEON.xforms.Globals.serverValue[target.id] == "undefined"
-                        && ! ORBEON.util.Dom.hasClass(target, "xforms-select-appearance-compact")) {
-                    ORBEON.xforms.Globals.serverValue[target.id] = target.value;
-                }
-                // Send focus events
-                if (ORBEON.xforms.Globals.previousDOMFocusOut) {  // Test as we might never have received a focus out event before (e.g. if this is the first focus on the page)
-                    var previousDOMFocusOut = ORBEON.util.Dom.getElementById(ORBEON.xforms.Globals.previousDOMFocusOut);
-                    if (previousDOMFocusOut) {
-                        if (previousDOMFocusOut != target) {
-                            // HTML area and trees does not throw value change event, so we send the value change to the server
-                            // when we get the focus on the next control
-                            if (ORBEON.util.Dom.hasClass(previousDOMFocusOut, "xforms-textarea")
-                                    && ORBEON.util.Dom.hasClass(previousDOMFocusOut, "xforms-mediatype-text-html")) {
-                                // To-do: would be nice to use the ORBEON.xforms.Controls.getCurrentValue() so we don't dupplicate the code here
-                                var editorInstance = FCKeditorAPI.GetInstance(previousDOMFocusOut.name);
-                                previousDOMFocusOut.value = editorInstance.GetXHTML();
-                                xformsValueChanged(previousDOMFocusOut, null);
-                            } else if (ORBEON.util.Dom.hasClass(previousDOMFocusOut, "xforms-select1-appearance-xxforms-tree")
-                                    || ORBEON.util.Dom.hasClass(previousDOMFocusOut, "xforms-select-appearance-xxforms-tree")) {
-                                xformsValueChanged(previousDOMFocusOut, null);
-                            } else if (ORBEON.xforms.Globals.isMac && ORBEON.xforms.Globals.isRenderingEngineGecko
-                                    && ORBEON.util.Dom.hasClass(previousDOMFocusOut, "xforms-control")
-                                    && ! ORBEON.util.Dom.hasClass(previousDOMFocusOut, "xforms-trigger")) {
-                                // On Firefox running on Mac, when users ctrl-tabs out of Firefox, comes back, and then changes the focus
-                                // to another field, we don't receive a change event. On Windows that change event is sent then user tabs
-                                // out of Firefox. So here, we make sure that a value change has been sent to the server for the previous control
-                                // that had the focus when we get the focus event for another control.
-                                xformsFireEvents([xformsCreateEventArray(previousDOMFocusOut, "xxforms-value-change-with-focus-change",
-                                        ORBEON.xforms.Controls.getCurrentValue(previousDOMFocusOut))], false);
-                            }
-                            // Send focus out/focus in events
-                            var events = new Array();
-                            events.push(xformsCreateEventArray(previousDOMFocusOut, "DOMFocusOut", null));
-                            events.push(xformsCreateEventArray(target, "DOMFocusIn", null));
-                            xformsFireEvents(events, true);
-                        }
-                        ORBEON.xforms.Globals.previousDOMFocusOut = null;
-                    } else {
-                        if (document.xformsPreviousDOMFocusIn != target) {
-                            xformsFireEvents(new Array(xformsCreateEventArray(target, "DOMFocusIn", null)), true);
-                        }
-                    }
+                if (typeof ORBEON.xforms.Globals.serverValue[targetControlElement.id] == "undefined"
+                        && ! ORBEON.util.Dom.hasClass(targetControlElement, "xforms-select-appearance-compact")) {
+                    ORBEON.xforms.Globals.serverValue[targetControlElement.id] = targetControlElement.value;
                 }
             }
-            document.xformsPreviousDOMFocusIn = target;
+
+            // Send focus events
+            var events = new Array();
+
+            // The idea here is that we only register focus changes when focus moves between XForms controls. If focus
+            // goes out to nothing, we don't handle it at this point but wait until focus comes back to a control.
+
+            // We don't run this for dialogs, as there is not much sense doing this AND this causes issues with
+            // FCKEditor embedded within dialogs with IE. In that case, the editor gets a blur, then the dialog, which
+            // prevents detection of value changes in focus() above.
+
+            if (currentFocusControlElement != null && targetControlElement != null && currentFocusControlElement != targetControlElement
+                    && !ORBEON.util.Dom.hasClass(targetControlElement, "xforms-dialog")) {
+
+                // Handle special value changes upon losing focus
+
+                // HTML area and trees does not throw value change event, so we send the value change to the server
+                // when we get the focus on the next control
+                var changeValue = false;
+                if (ORBEON.util.Dom.hasClass(currentFocusControlElement, "xforms-textarea")
+                        && ORBEON.util.Dom.hasClass(currentFocusControlElement, "xforms-mediatype-text-html")) {
+                    // To-do: would be nice to use the ORBEON.xforms.Controls.getCurrentValue() so we don't duplicate the code here
+                    var editorInstance = FCKeditorAPI.GetInstance(currentFocusControlElement.name);
+                    currentFocusControlElement.value = editorInstance.GetXHTML();
+                    changeValue = true;
+                } else if (ORBEON.util.Dom.hasClass(currentFocusControlElement, "xforms-select1-appearance-xxforms-tree")
+                        || ORBEON.util.Dom.hasClass(currentFocusControlElement, "xforms-select-appearance-xxforms-tree")) {
+                    changeValue = true;
+                } else if (ORBEON.xforms.Globals.isMac && ORBEON.xforms.Globals.isRenderingEngineGecko
+                        && ORBEON.util.Dom.hasClass(currentFocusControlElement, "xforms-control")
+                        && !ORBEON.util.Dom.hasClass(currentFocusControlElement, "xforms-output")
+                        && ! ORBEON.util.Dom.hasClass(currentFocusControlElement, "xforms-trigger")) {
+                    // On Firefox running on Mac, when users ctrl-tabs out of Firefox, comes back, and then changes the focus
+                    // to another field, we don't receive a change event. On Windows that change event is sent then user tabs
+                    // out of Firefox. So here, we make sure that a value change has been sent to the server for the previous control
+                    // that had the focus when we get the focus event for another control.
+                    changeValue = true;
+                }
+                // Send value change if needed
+                if (changeValue)
+                    xformsValueChanged(currentFocusControlElement, null);
+
+                // Handle DOMFocusOut
+                // Should send out DOMFocusOut only if no xxforms-value-change-with-focus-change was sent to avoid extra
+                // DOMFocusOut, but it is hard to detect correctly
+                events.push(xformsCreateEventArray(currentFocusControlElement, "DOMFocusOut", null));
+
+                // Handle DOMFocusIn
+                events.push(xformsCreateEventArray(targetControlElement, "DOMFocusIn", null));
+
+                // Keep track of the id of the last known control which has focus
+                ORBEON.xforms.Globals.currentFocusControlId = targetControlElement.id;
+
+                // Fire events
+                xformsFireEvents(events, true);
+            }
+
         } else {
             ORBEON.xforms.Globals.maskFocusEvents = false;
         }
@@ -1748,10 +1766,18 @@ ORBEON.xforms.Events = {
 
     blur: function(event) {
         if (!ORBEON.xforms.Globals.maskFocusEvents) {
-            var target = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
-            if (target != null) {
-                // This is an event for an XForms control
-                ORBEON.xforms.Globals.previousDOMFocusOut = target.id;
+            var targetControlElement = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
+            if (targetControlElement != null) {
+                if (!ORBEON.util.Dom.hasClass(targetControlElement, "xforms-dialog")) {
+                    // This is an event for an XForms control
+
+                    // We don't run this for dialogs, as there is not much sense doing this AND this causes issues with
+                    // FCKEditor embedded within dialogs with IE. In that case, the editor gets a blur, then the
+                    // dialog, which prevents detection of value changes in focus() above.
+
+                    // Keep track of the id of the last known control which has focus
+                    ORBEON.xforms.Globals.currentFocusControlId = targetControlElement.id;
+                }
             }
         }
     },
@@ -1965,7 +1991,8 @@ ORBEON.xforms.Events = {
         if (target != null) {
             if (ORBEON.util.Dom.hasClass(target, "xforms-output")) {
                 // Click on output
-                xformsFireEvents([xformsCreateEventArray(target, "DOMFocusIn", null)], false);
+                // Translate this into a focus event
+                ORBEON.xforms.Events.focus(event);
             } else  if ((ORBEON.util.Dom.hasClass(target, "xforms-trigger") || ORBEON.util.Dom.hasClass(target, "xforms-submit"))) {
                 // Click on trigger
                 YAHOO.util.Event.preventDefault(event);
@@ -2218,14 +2245,14 @@ ORBEON.xforms.Events = {
      */
     treeClickFocus: function(control) {
         var isIncremental = ORBEON.util.Dom.hasClass(control, "xforms-incremental");
-        if (ORBEON.xforms.Globals.lastFocusControlId != control.id) {
+        if (ORBEON.xforms.Globals.currentFocusControlId != control.id) {// not sure we need to do this test here since focus() may do it anyway
             // We are comming from another control, simulate a focus on this control
             var focusEvent = { target: control };
             ORBEON.xforms.Events.focus(focusEvent);
         }
         // Preemptively store current control in previousDOMFocusOut, so when another control gets
         // the focus it will send the value of this control to the server
-        ORBEON.xforms.Globals.previousDOMFocusOut = control.id;
+        ORBEON.xforms.Globals.currentFocusControlId = control.id;
     },
 
     treeClickValueUpdated: function(control) {
@@ -2580,14 +2607,14 @@ ORBEON.xforms.Init = {
                         errorPanel.beforeHideEvent.subscribe(ORBEON.xforms.Events.errorPanelClosed, formID);
                         ORBEON.xforms.Globals.formErrorPanel[formID] = errorPanel;
 
-                        // Find reference to elements in the deails hidden section
+                        // Find reference to elements in the details hidden section
                         var titleDiv = ORBEON.util.Dom.getChildElementByClass(formChild, "hd");
                         var bodyDiv = ORBEON.util.Dom.getChildElementByClass(formChild, "bd");
                         var detailsHiddenDiv = ORBEON.util.Dom.getChildElementByClass(bodyDiv, "xforms-error-panel-details-hidden");
                         var showDetailsA = ORBEON.util.Dom.getChildElementByIndex(ORBEON.util.Dom.getChildElementByIndex(detailsHiddenDiv, 0), 0);
                         YAHOO.util.Dom.generateId(showDetailsA);
 
-                        // Find reference to elements in the deails shown section
+                        // Find reference to elements in the details shown section
                         var detailsShownDiv = ORBEON.util.Dom.getChildElementByClass(bodyDiv, "xforms-error-panel-details-shown");
                         var hideDetailsA = ORBEON.util.Dom.getChildElementByIndex(ORBEON.util.Dom.getChildElementByIndex(detailsShownDiv, 0), 0);
                         YAHOO.util.Dom.generateId(hideDetailsA);
@@ -3131,7 +3158,7 @@ ORBEON.xforms.Server = {
                 // Save the form for this request
                 ORBEON.xforms.Globals.requestForm = ORBEON.xforms.Globals.eventQueue[0].form;
                 var formID = ORBEON.xforms.Globals.requestForm.id;
-
+                
                 // Mark this as loading
                 ORBEON.xforms.Globals.requestInProgress = true;
                 var delayBeforeDisplayLoading = ORBEON.util.Utils.getProperty(DELAY_BEFORE_DISPLAY_LOADING_PROPERTY);
@@ -3822,27 +3849,27 @@ ORBEON.xforms.Server = {
                                             isRequiredEmpty = false;
                                         }
 
-                                                // Store new label message in control attribute
+                                        // Store new label message in control attribute
                                         var newLabel = ORBEON.util.Dom.getAttribute(controlElement, "label");
                                         if (newLabel != null)
                                             ORBEON.xforms.Controls.setLabelMessage(documentElement, newLabel);
-                                                // Store new hint message in control attribute
+                                        // Store new hint message in control attribute
                                         var newHint = ORBEON.util.Dom.getAttribute(controlElement, "hint");
                                         if (newHint != null)
                                             ORBEON.xforms.Controls.setHintMessage(documentElement, newHint);
-                                                // Store new help message in control attribute
+                                        // Store new help message in control attribute
                                         var newHelp = ORBEON.util.Dom.getAttribute(controlElement, "help");
                                         if (newHelp != null)
                                             ORBEON.xforms.Controls.setHelpMessage(documentElement, newHelp);
-                                                // Store new alert message in control attribute
+                                        // Store new alert message in control attribute
                                         var newAlert = ORBEON.util.Dom.getAttribute(controlElement, "alert");
                                         if (newAlert != null)
                                             ORBEON.xforms.Controls.setAlertMessage(documentElement, newAlert);
-                                                // Store validity, label, hint, help in element
+                                        // Store validity, label, hint, help in element
                                         var newValid = ORBEON.util.Dom.getAttribute(controlElement, "valid");
                                         ORBEON.xforms.Controls.setValid(documentElement, newValid, isRequiredEmpty);
 
-                                                // After we update classes on textarea, copy those classes on the FCKeditor iframe
+                                        // After we update classes on textarea, copy those classes on the FCKeditor iframe
                                         if (ORBEON.util.Dom.hasClass(documentElement, "xforms-textarea")
                                                 && ORBEON.util.Dom.hasClass(documentElement, "xforms-mediatype-text-html")) {
                                             ORBEON.xforms.Controls.updateHTMLAreaClasses(documentElement);
@@ -5023,15 +5050,14 @@ function xformsStoreInClientState(formID, key, value) {
  * other event handler for less usual events (e.g. slider, HTML area).
  */
 function xformsValueChanged(target, other) {
-    var valueChanged = target.value != target.previousValue;
+    var newValue = ORBEON.xforms.Controls.getCurrentValue(target);
+    var valueChanged = newValue != target.previousValue;
     // We don't send value change events for the XForms upload control
     var isUploadControl = ORBEON.util.Dom.hasClass(target, "xforms-upload");
     if (valueChanged && !isUploadControl) {
-        target.previousValue = target.value;
-        var events = new Array(xformsCreateEventArray
-                (target, "xxforms-value-change-with-focus-change", target.value, other));
-        var incremental = other == null
-                && ORBEON.util.Dom.hasClass(target, "xforms-incremental");
+        target.previousValue = newValue;
+        var events = new Array(xformsCreateEventArray(target, "xxforms-value-change-with-focus-change", newValue, other));
+        var incremental = other == null && ORBEON.util.Dom.hasClass(target, "xforms-incremental");
         xformsFireEvents(events, incremental);
     }
     return valueChanged;

@@ -2956,11 +2956,23 @@ RewriteRule ^/orbeon/(xforms-server/.*\.(css|js))$ /home/orbeon/war/WEB-INF/reso
 # Serve /config/theme resources
 # -> make sure orbeon-resources-public.jar is unzipped under "orbeon-resources-public"
 RewriteRule ^/orbeon/(config/theme/.*\.(css|png|gif))$ /home/orbeon/war/WEB-INF/orbeon-resources-public/$1 [L]
+# Special handling of PNG images for IE 6
+RewriteCond %{HTTP_USER_AGENT} .*MSIE\ 6.*
+# Make sure the corresponding GIF image exists
+RewriteCond /home/orbeon/war/WEB-INF/orbeon-resources-public/$1.gif -f
+# Match on PNG images only and rewrite to GIF
+RewriteRule ^/orbeon/(ops/.*)\.png$ /home/orbeon/war/WEB-INF/orbeon-resources-public/$1.gif [L]
 # Serve /ops resources
 # -> make sure orbeon-resources-public.jar is unzipped under "orbeon-resources-public"
-RewriteRule ^/orbeon/(ops/.*\.(css|js|gif|png|jpg|html|htc))$ /home/orbeon/war/WEB-INF/orbeon-resources-public/$1 [L]
+RewriteRule ^/orbeon/(ops/.*\.(gif|css|pdf|json|js|png|jpg|xsd|htc|ico|swf))$ /home/orbeon/war/WEB-INF/orbeon-resources-public/$1 [L]
+# Special handling of PNG images for IE 6
+RewriteCond %{HTTP_USER_AGENT} .*MSIE\ 6.*
+# Make sure the corresponding GIF image exists
+RewriteCond /home/orbeon/war/WEB-INF/resources/$1.gif -f
+# Match on PNG images only and rewrite to GIF
+RewriteRule ^/orbeon/(.*)\.png$ /home/orbeon/war/WEB-INF/resources/$1.gif [L]
 # Serve remaining resources
-RewriteRule ^/orbeon/(.*\.(css|js|gif|png|jpg|html|htc))$ /home/orbeon/war/WEB-INF/resources/$1 [L]</pre>
+RewriteRule ^/orbeon/(.*\.(gif|css|pdf|json|js|png|jpg|xsd|htc|ico|swf))$ /home/orbeon/war/WEB-INF/resources/$1 [L]</pre>
                     <p>
                         With <a href="#versioned-resources">resources versioning</a>:
                     </p>
@@ -2972,11 +2984,31 @@ RewriteRule ^/orbeon/xforms-server/[^/]+/(.*\.(css|js))$ /home/orbeon/war/WEB-IN
 # Serve /config/theme resources
 # -> make sure orbeon-resources-public.jar is unzipped under "orbeon-resources-public"
 RewriteRule ^/orbeon/[^/]+/(config/theme/.*\.(css|png|gif))$ /home/orbeon/war/WEB-INF/orbeon-resources-public/$1 [L]
+# Special handling of PNG images for IE 6
+RewriteCond %{HTTP_USER_AGENT} .*MSIE\ 6.*
+# Make sure the corresponding GIF image exists
+RewriteCond /home/orbeon/war/WEB-INF/orbeon-resources-public/$1.gif -f
+# Match on PNG images only and rewrite to GIF
+RewriteRule ^/orbeon/[^/]+/(ops/.*)\.png$ /home/orbeon/war/WEB-INF/orbeon-resources-public/$1.gif [L]
 # Serve /ops resources
 # -> make sure orbeon-resources-public.jar is unzipped under "orbeon-resources-public"
-RewriteRule ^/orbeon/[^/]+/(ops/.*\.(css|js|gif|png|jpg|html|htc))$ /home/orbeon/war/WEB-INF/orbeon-resources-public/$1 [L]
+RewriteRule ^/orbeon/[^/]+/(ops/.*\.(gif|css|pdf|json|js|png|jpg|xsd|htc|ico|swf))$ /home/orbeon/war/WEB-INF/orbeon-resources-public/$1 [L]
+# Special handling of PNG images for IE 6
+RewriteCond %{HTTP_USER_AGENT} .*MSIE\ 6.*
+# Make sure the corresponding GIF image exists
+RewriteCond /home/orbeon/war/WEB-INF/resources/$1.gif -f
+# Match on PNG images only and rewrite to GIF
+RewriteRule ^/orbeon/[^/]+/(.*)\.png$ /home/orbeon/war/WEB-INF/resources/$1.gif [L]
 # Serve remaining resources
-RewriteRule ^/orbeon/[^/]+/(.*\.(css|js|gif|png|jpg|html|htc))$ /home/orbeon/war/WEB-INF/resources/$1 [L]</pre>
+RewriteRule ^/orbeon/[^/]+/(.*\.(gif|css|pdf|json|js|png|jpg|xsd|htc|ico|swf))$ /home/orbeon/war/WEB-INF/resources/$1 [L]</pre>
+                    <note>
+                        <p>
+                            The rewriting rules above have special handling of PNG images for IE 6: when that browser
+                            is detected, any request for PNG image having a corresponding GIF image serves the GIF
+                            images instead. If you don't need that behavior, remove the corresponding lines in the rules
+                            above.
+                        </p>
+                    </note>
                 </section>
             </section>
             <a name="xforms-back-forward"/>

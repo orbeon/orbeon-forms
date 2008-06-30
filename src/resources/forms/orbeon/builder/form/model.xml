@@ -41,14 +41,6 @@
         </xforms:action>
     </xforms:action>
 
-    <xforms:action ev:event="xforms-ready">
-        <xxforms:script>
-            <!-- Position toolbox to the left upon loading (if the toolbox is positioned as fixed, this is not needed, but IE needs it) -->
-            ORBEON.xforms.Globals.dialogs["fb-toolbox-dialog"].cfg.setProperty("constraintoviewport", true);
-            ORBEON.xforms.Globals.dialogs["fb-toolbox-dialog"].cfg.setProperty("x", 0);
-        </xxforms:script>
-    </xforms:action>
-
     <!-- Variable pointing to the current language -->
     <xxforms:variable name="fb-lang" select="instance('fb-language-instance')"/>
 

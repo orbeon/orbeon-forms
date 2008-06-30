@@ -1028,12 +1028,14 @@ ORBEON.xforms.Controls = {
                 && ORBEON.util.Dom.hasClass(control, "xforms-mediatype-text-html")) {
             // HTML area
             var htmlEditor = FCKeditorAPI.GetInstance(control.name);
+            // This is typically set when handling "control-values" from the server
+            var serverValue = ORBEON.xforms.Globals.serverValue[control.id];
             var doUpdate =
                 // Update only if the new value is different than the value already have in the HTML area
                     xformsNormalizeEndlines(htmlEditor.GetXHTML()) != xformsNormalizeEndlines(newControlValue)
                         // Also update only if the value in the HTML area is the same now as it was when we sent it to the server
                         // If there is no previousServerValue, go ahead and update field
-                            && (previousServerValue == null || htmlEditor.GetXHTML() == previousServerValue);
+                            && (serverValue == null || htmlEditor.GetXHTML() == serverValue);
             if (doUpdate) {
                 // Directly modify the DOM instead of using SetHTML() provided by the FCKeditor,
                 // as we loose our listeners after using the later

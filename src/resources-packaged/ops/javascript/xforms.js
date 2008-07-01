@@ -1286,6 +1286,19 @@ ORBEON.xforms.Controls = {
         }
     },
 
+    setRepeatIterationRelevance: function(repeatID, iteration, relevant) {
+        var cursor = xformsFindRepeatDelimiter(repeatID, iteration).nextSibling;
+        while (!(cursor.nodeType == ELEMENT_TYPE &&
+                 (ORBEON.util.Dom.hasClass(cursor, "xforms-repeat-delimiter")
+                         || ORBEON.util.Dom.hasClass(cursor, "xforms-repeat-begin-end")))) {
+            if (cursor.nodeType == ELEMENT_TYPE) {
+                if (relevant) ORBEON.util.Dom.removeClass(cursor, "xforms-disabled");
+                else ORBEON.util.Dom.addClass(cursor, "xforms-disabled");
+            }
+            cursor = cursor.nextSibling;
+        }
+    },
+
     setReadonly: function(control, isReadonly) {
         function setReadonlyOnFormElement(element, isReadonly) {
             if (isReadonly) {
@@ -3917,18 +3930,8 @@ ORBEON.xforms.Server = {
                                         var iteration = ORBEON.util.Dom.getAttribute(repeatIterationElement, "iteration");
                                         var relevant = ORBEON.util.Dom.getAttribute(repeatIterationElement, "relevant");
                                         // Remove or add xforms-disabled on elements after this delimiter
-                                        var cursor = xformsFindRepeatDelimiter(repeatId, iteration).nextSibling;
-                                        while (!(cursor.nodeType == ELEMENT_TYPE &&
-                                                 (ORBEON.util.Dom.hasClass(cursor, "xforms-repeat-delimiter")
-                                                         || ORBEON.util.Dom.hasClass(cursor, "xforms-repeat-begin-end")))) {
-                                            if (cursor.nodeType == ELEMENT_TYPE) {
-                                                if (relevant) {
-                                                    if (relevant == "true") ORBEON.util.Dom.removeClass(cursor, "xforms-disabled");
-                                                    else ORBEON.util.Dom.addClass(cursor, "xforms-disabled");
-                                                }
-                                            }
-                                            cursor = cursor.nextSibling;
-                                        }
+                                        if (relevant != null)
+                                            ORBEON.xforms.Controls.setRepeatIterationRelevance(repeatId, iteration, relevant == "true" ? true : false);
                                     }
                                     break;
                                 }
@@ -4049,9 +4052,9 @@ ORBEON.xforms.Server = {
                                     }
                                     // Highlight item at new index
                                     for (var repeatId in newRepeatIndexes) {
-                                        if (typeof repeatId == "string") { // hack because repeatId may be trash when some libraries override Object
+                                        if (typeof repeatId == "string") { // Hack because repeatId may be trash when some libraries override Object
                                             var newIndex = newRepeatIndexes[repeatId];
-                                            if (typeof newIndex == "string" && newIndex != 0) { // hack because repeatId may be trash when some libraries override Object
+                                            if (typeof newIndex == "string" && newIndex != 0) { // Hack because repeatId may be trash when some libraries override Object
                                                 var newItemDelimiter = xformsFindRepeatDelimiter(repeatId, newIndex);
                                                 var cursor = newItemDelimiter.nextSibling;
                                                 while (cursor.nodeType != ELEMENT_TYPE ||
@@ -4685,13 +4688,24 @@ ORBEON.xforms.Offline = {
     evaluateMIPs: function() {
         
         //  Applies a relevance or read-onlyness to inherited controls
-        function applyToInherited(control, getter, setter, inherited, value) {
+        function applyToInherited(control, getter, setter, inherited, value, isRelevance) {
             if (getter(control) != value) {
                 setter(control, value);
                 if (inherited) {
                     for (var inheritedControlIndex = 0; inheritedControlIndex < mips.relevant.inherited.length; inheritedControlIndex++) {
-                        var inheritedControl = ORBEON.util.Dom.getElementById(inherited[inheritedControlIndex]);
+                        var controlID = inherited[inheritedControlIndex];
+                        var inheritedControl = ORBEON.util.Dom.getElementById(controlID);
+                        if (isRelevance && inheritedControl == null) {
+                            // We have a repeat iteration (this is a special case for relevance where the ID points to a repeat iteration).
+                            // This is not handled with ORBEON.xforms.Controls.setRelevant() but rather in ORBEON.xforms.Controls.setRepeatIterationRelevance().
+                            var separatorPosition = Math.max(controlID.lastIndexOf(XFORMS_SEPARATOR_1), controlID.lastIndexOf(XFORMS_SEPARATOR_2));
+                            var repeatID = controlID.substring(0, separatorPosition);
+                            var iteration = controlID.substring(separatorPosition + 1);
+                            ORBEON.xforms.Controls.setRepeatIterationRelevance(repeatID, iteration, value);
+                        } else {
+                            // We have a control
                         setter(inheritedControl, value);
+                        }
                     };
                 }
             }
@@ -4727,13 +4741,13 @@ ORBEON.xforms.Offline = {
             // Relevant
             if (mips.relevant) {
                 var isRelevant = xpathParse("boolean(" + mips.relevant.value + ")").evaluate(xpathContext).value;
-                applyToInherited(control, ORBEON.xforms.Controls.isRelevant, ORBEON.xforms.Controls.setRelevant, mips.relevant.inherited, isRelevant);
+                applyToInherited(control, ORBEON.xforms.Controls.isRelevant, ORBEON.xforms.Controls.setRelevant, mips.relevant.inherited, isRelevant, true);
             }
 
             // Readonly
             if (mips.readonly) {
                 var isReadonly = xpathParse("boolean(" + mips.readonly.value + ")").evaluate(xpathContext).value;
-                applyToInherited(control, ORBEON.xforms.Controls.isReadonly, ORBEON.xforms.Controls.setReadonly, mips.readonly.inherited, isReadonly);
+                applyToInherited(control, ORBEON.xforms.Controls.isReadonly, ORBEON.xforms.Controls.setReadonly, mips.readonly.inherited, isReadonly, false);
             }
 
             // Type

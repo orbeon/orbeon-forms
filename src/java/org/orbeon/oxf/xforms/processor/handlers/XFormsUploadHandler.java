@@ -68,6 +68,9 @@ public class XFormsUploadHandler extends XFormsCoreControlHandler {
                 reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-upload-select");
                 reusableAttributes.addAttribute("", "type", "type", ContentHandlerHelper.CDATA, "file");
                 reusableAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, effectiveId);
+                // IE causes issues when the user types in or pastes in an incorrect file name. Some sites use this to
+                // disable pasting in the file. See http://tinyurl.com/6dcd6a
+                reusableAttributes.addAttribute("", "unselectable", "unselectable", ContentHandlerHelper.CDATA, "on");
                 // NOTE: @value was meant to suggest an initial file name, but this is not supported by browsers
 
                 // Copy special attributes in xxforms namespace

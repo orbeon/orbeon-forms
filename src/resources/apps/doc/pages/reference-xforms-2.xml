@@ -3009,6 +3009,17 @@ RewriteRule ^/orbeon/[^/]+/(.*\.(gif|css|pdf|json|js|png|jpg|xsd|htc|ico|swf))$ 
                             above.
                         </p>
                     </note>
+                    <p>
+                        All in all, the rules above perform the following:
+                    </p>
+                    <ul>
+                        <li>Special handling for XForms JavaScript and CSS files (using the cached/combined/minimized resources)</li>
+                        <li>Serving of  <code>/config/theme</code> resources originally in <code>orbeon-resources-public.jar</code></li>
+                        <li>Special handling of PNG images for IE 6 for <code>/ops</code> resources originally in <code>orbeon-resources-public.jar</code></li>
+                        <li>Serving of other  <code>/ops</code> resources originally in <code>orbeon-resources-public.jar</code></li>
+                        <li>Special handling of PNG images for IE 6 for resources under  <code>RESOURCES</code></li>
+                        <li>Serving of other resources under  <code>RESOURCES</code></li>
+                    </ul>
                 </section>
             </section>
             <a name="xforms-back-forward"/>

@@ -4695,6 +4695,10 @@ ORBEON.xforms.Offline = {
                     for (var inheritedControlIndex = 0; inheritedControlIndex < mips.relevant.inherited.length; inheritedControlIndex++) {
                         var controlID = inherited[inheritedControlIndex];
                         var inheritedControl = ORBEON.util.Dom.getElementById(controlID);
+                        if (inheritedControl == null) {
+                            // If we can't find the control, maybe this is a the ID of a group
+                            inheritedControl = ORBEON.util.Dom.getElementById("group-begin-" + controlID);
+                        }
                         if (isRelevance && inheritedControl == null) {
                             // We have a repeat iteration (this is a special case for relevance where the ID points to a repeat iteration).
                             // This is not handled with ORBEON.xforms.Controls.setRelevant() but rather in ORBEON.xforms.Controls.setRepeatIterationRelevance().

@@ -947,7 +947,7 @@ ORBEON.xforms.Controls = {
      * @param uploadMediatype   Optional
      * @param uploadSize        Optional
      */
-    setCurrentValue: function(control, newControlValue, displayValue, uploadState, uploadFilename, uploadMediatype, uploadSize) {
+    setCurrentValue: function(control, newControlValue, displayValue, previousServerValue, uploadState, uploadFilename, uploadMediatype, uploadSize) {
         var isStaticReadonly = ORBEON.util.Dom.hasClass(control, "xforms-static");
         if (ORBEON.util.Dom.hasClass(control, "xforms-output") || isStaticReadonly) {
             // XForms output or "static readonly" mode
@@ -1028,19 +1028,17 @@ ORBEON.xforms.Controls = {
                 && ORBEON.util.Dom.hasClass(control, "xforms-mediatype-text-html")) {
             // HTML area
             var htmlEditor = FCKeditorAPI.GetInstance(control.name);
-            // This is typically set when handling "control-values" from the server
-            var serverValue = ORBEON.xforms.Globals.serverValue[control.id];
             var doUpdate =
-                // Update only if the new value is different than the value already have in the HTML area
+                    // Update only if the new value is different than the value already have in the HTML area
                     xformsNormalizeEndlines(htmlEditor.GetXHTML()) != xformsNormalizeEndlines(newControlValue)
                         // Also update only if the value in the HTML area is the same now as it was when we sent it to the server
                         // If there is no previousServerValue, go ahead and update field
-                            && (serverValue == null || htmlEditor.GetXHTML() == serverValue);
+                        && (previousServerValue == null || htmlEditor.GetXHTML() == previousServerValue);
             if (doUpdate) {
                 // Directly modify the DOM instead of using SetHTML() provided by the FCKeditor,
                 // as we loose our listeners after using the later
                 htmlEditor.EditorDocument.body.innerHTML = newControlValue;
-                        // Set again the server value based on the HTML as seen from the field. HTML changes slightly when it
+                // Set again the server value based on the HTML as seen from the field. HTML changes slightly when it
                 // is pasted in the FCK editor. The server value will be compared to the field value, to (a) figure out
                 // if we need to send the value again to the server and (b) to figure out if the FCK editor has been edited
                 // since the last time we sent the value to the serer. The bottom line is that we are going to compare
@@ -3152,7 +3150,7 @@ ORBEON.xforms.Server = {
                     // Don't send change value if there is already a change value for the same control
                     if (seenControlValue[event.targetId] == null) {
                         seenControlValue[event.targetId] = true;
-                            // Don't send change value if the server already knows about the value of this control
+                        // Don't send change value if the server already knows about the value of this control
                         if (ORBEON.util.Dom.hasClass(ORBEON.util.Dom.getElementById(event.targetId), "xforms-upload") ||
                             (ORBEON.xforms.Globals.serverValue[event.targetId] != "undefined"
                                     && ORBEON.xforms.Globals.serverValue[event.targetId] != event.value)) {
@@ -3848,10 +3846,10 @@ ORBEON.xforms.Server = {
                                                 var filename = ORBEON.util.Dom.getAttribute(controlElement, "filename");
                                                 var mediatype = ORBEON.util.Dom.getAttribute(controlElement, "mediatype");
                                                 var size = ORBEON.util.Dom.getAttribute(controlElement, "size");
-                                                ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue, displayValue, state, filename, mediatype, size);
+                                                ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue, displayValue, previousServerValue, state, filename, mediatype, size);
                                             } else {
                                                 // Other control just have a new value (and optional display value)
-                                                ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue, displayValue);
+                                                ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue, displayValue, previousServerValue);
                                             }
                                         }
 

@@ -4713,6 +4713,16 @@ ORBEON.xforms.Offline = {
             }
         }
         
+        // Evaluates XPath. If there is an error, logs the error and returns null.
+        function evaluateXPath(xpath, xpathContext) {
+            try {
+                return xpathParse(xpath).evaluate(xpathContext).value;
+            } catch (e) {
+                ORBEON.util.Utils.logMessage("Error evaluating XPath expression " + xpath);
+                return null;
+            }
+        }
+
         // Go over all controls
         for (var controlID in ORBEON.xforms.Offline.mips) {
             var mips = ORBEON.xforms.Offline.mips[controlID];
@@ -4722,33 +4732,38 @@ ORBEON.xforms.Offline = {
 
             // Calculate
             if (mips.calculate) {
-                var newValue = xpathParse(mips.calculate.value).evaluate(xpathContext).value;
+                var newValue = evaluateXPath(mips.calculate.value, xpathContext);
+                if (newValue != null)
                 ORBEON.xforms.Controls.setCurrentValue(control, newValue);
             }
 
             // Constraint
             var isValid = true;
             if (mips.constraint) {
-                var constraint = xpathParse("boolean(" + mips.constraint.value + ")").evaluate(xpathContext).value;
+                var constraint = evaluateXPath("boolean(" + mips.constraint.value + ")", xpathContext);
+                if (constraint != null)
                 isValid = isValid && constraint;
             }
 
             // Required
             var requiredButEmpty;
             if (mips.required) {
-                var required = xpathParse(mips.required.value).evaluate(xpathContext).value;
+                var required = evaluateXPath(mips.required.value, xpathContext);
+                if (required != null)
                 requiredButEmpty = controlValue == "" && required;
             }
 
             // Relevant
             if (mips.relevant) {
-                var isRelevant = xpathParse("boolean(" + mips.relevant.value + ")").evaluate(xpathContext).value;
+                var isRelevant = evaluateXPath("boolean(" + mips.relevant.value + ")", xpathContext);
+                if (isRelevant != null)
                 applyToInherited(control, ORBEON.xforms.Controls.isRelevant, ORBEON.xforms.Controls.setRelevant, mips.relevant.inherited, isRelevant, true);
             }
 
             // Readonly
             if (mips.readonly) {
-                var isReadonly = xpathParse("boolean(" + mips.readonly.value + ")").evaluate(xpathContext).value;
+                var isReadonly = evaluateXPath("boolean(" + mips.readonly.value + ")", xpathContext);
+                if (isReadonly != null)
                 applyToInherited(control, ORBEON.xforms.Controls.isReadonly, ORBEON.xforms.Controls.setReadonly, mips.readonly.inherited, isReadonly, false);
             }
 

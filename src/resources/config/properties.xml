@@ -82,6 +82,7 @@
     <property as="xs:boolean" name="oxf.xforms.session-heartbeat"                    value="true"/>
     <property as="xs:boolean" name="oxf.xforms.host-language-avts"                   value="true"/>
     <property as="xs:integer" name="oxf.xforms.offline-repeat-count"                 value="4"/>
+    <property as="xs:integer" name="oxf.xforms.request-retries"                      value="1"/>
 
     <!-- Form Runner / Form Builder properties -->
     <property as="xs:anyURI"  name="oxf.fr.persistence.app.*.uri"                    value="/fr/service/exist"/>

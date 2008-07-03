@@ -179,7 +179,7 @@ public class XFormsProperties {
             new PropertyDefinition(DELAY_BEFORE_AJAX_TIMEOUT_PROPERTY, -1, true),
             new PropertyDefinition(INTERNAL_SHORT_DELAY_PROPERTY, 10, true),
             new PropertyDefinition(DELAY_BEFORE_DISPLAY_LOADING_PROPERTY, 500, true),
-            new PropertyDefinition(REQUEST_RETRIES_PROPERTY, 3, true),
+            new PropertyDefinition(REQUEST_RETRIES_PROPERTY, 1, true),
             new PropertyDefinition(DEBUG_WINDOW_HEIGHT_PROPERTY, 600, true),
             new PropertyDefinition(DEBUG_WINDOW_WIDTH_PROPERTY, 300, true),
             new PropertyDefinition(LOADING_MIN_TOP_PADDING_PROPERTY, 10, true),

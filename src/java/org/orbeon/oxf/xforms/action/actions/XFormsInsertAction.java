@@ -166,7 +166,8 @@ public class XFormsInsertAction extends XFormsAction {
         doInsert(pipelineContext, containingDocument, positionAttribute, collectionToBeUpdated, insertContextNodeInfo, originObjects, insertionIndex);
     }
 
-    public static void doInsert(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, String positionAttribute, List collectionToBeUpdated, NodeInfo insertContextNodeInfo, List originObjects, int insertionIndex) {
+    public static void doInsert(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, String positionAttribute,
+                                List collectionToBeUpdated, NodeInfo insertContextNodeInfo, List originObjects, int insertionIndex) {
 
         final boolean isEmptyNodesetBinding = collectionToBeUpdated == null || collectionToBeUpdated.size() == 0;
 
@@ -260,6 +261,9 @@ public class XFormsInsertAction extends XFormsAction {
         // "7. The cloned node or nodes are inserted in the order they were cloned at their target location
         // depending on their node type."
 
+        // This attribute is a temporary HACK, used to improve performance when going offline
+        final boolean isAdjustIndexes = isAdjustIndexes(containingDocument);
+
         // Identify the instance that actually changes
         final XFormsInstance modifiedInstance;
         // Find actual insertion point and insert
@@ -291,7 +295,8 @@ public class XFormsInsertAction extends XFormsAction {
                     Dom4jUtils.normalizeTextNodes(insertLocationNode);
             }
         } else {
-            insertLocationNodeInfo = (NodeInfo) collectionToBeUpdated.get(insertionIndex - 1);
+            // HACK used to improve performance when going offline: when!isAdjustIndexes, always insert at the end of the node-set
+            insertLocationNodeInfo = (NodeInfo) collectionToBeUpdated.get(isAdjustIndexes ? insertionIndex - 1 : collectionToBeUpdated.size() - 1);
             final Node insertLocationNode = XFormsUtils.getNodeFromNodeInfo(insertLocationNodeInfo, CANNOT_INSERT_READONLY_MESSAGE);
             modifiedInstance = containingDocument.getInstanceForNode(insertLocationNodeInfo);
 
@@ -373,7 +378,7 @@ public class XFormsInsertAction extends XFormsAction {
         }
 
         // Whether indexes must be adjusted (used for offline mode optimizations)
-        final boolean mustAdjustIndexesAndSwitches = didInsertNodes && isAdjustIndexes(containingDocument);
+        final boolean mustAdjustIndexesAndSwitches = didInsertNodes && isAdjustIndexes;
 
         if (mustAdjustIndexesAndSwitches) {
 

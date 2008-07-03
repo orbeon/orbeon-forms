@@ -731,9 +731,10 @@ public class XFormsStaticState {
                         final NodeInfo controlNodeInfo = controlsDocumentInfo.wrap(controlElement);
 
                         // Try to figure out if we have dynamic items. This attempts to cover all cases, including
-                        // nested xforms:output controls.
+                        // nested xforms:output controls. Check only under xforms:choices or xforms:item so that we
+                        // don't check things like event handlers.
                         final boolean hasNonStaticItem = ((Boolean) XPathCache.evaluateSingle(pipelineContext, controlNodeInfo,
-                                "exists(.//xforms:*[@ref or @nodeset or @bind or @value])", BASIC_NAMESPACE_MAPPINGS,
+                                "exists(./(xforms:choices | xforms:item)/xforms:*[@ref or @nodeset or @bind or @value])", BASIC_NAMESPACE_MAPPINGS,
                                 null, null, null, null, locationData)).booleanValue();
 
                         // Remember information

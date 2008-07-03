@@ -1075,7 +1075,12 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                 if (o instanceof XFormsTriggerControl) {
                     final XFormsTriggerControl trigger = (XFormsTriggerControl) o;
                     final XFormsEvent event = new XFormsDOMActivateEvent(trigger);
+                    // This attribute is a temporary HACK, used to improve performance when going offline. It causes
+                    // the insert action to not rebuild controls to adjust indexes after insertion, as well as always
+                    // inserting based on the last node of the insert nodes-set. This probably wouldn't be needed if
+                    // insert performance was good from the get go.
                     event.setAttribute(XFormsInsertAction.NO_INDEX_ADJUSTMENT, new SequenceExtent(new Item[] { BooleanValue.TRUE }));
+                    // Dispatch event n times
                     final int repeatCount = XFormsProperties.getOfflineRepeatCount(this);
                     for (int j = 0; j < repeatCount; j++)
                         dispatchEvent(pipelineContext, event);

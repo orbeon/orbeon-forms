@@ -56,8 +56,8 @@ public class XFormsSelect1Control extends XFormsValueControl {
      * itemset.
      *
      * @param pipelineContext       current pipeline context
-     * @param containingDocument    current containing document (when )
-     * @param control               control from which to obtain itemset
+     * @param containingDocument    current containing document
+     * @param control               control from which to obtain itemset (may be null if control has a static itemset)
      * @param id                    id of control from which to obtain itemset (if control is null)
      * @return                      itemset or null if it is not possible to obtain it
      */

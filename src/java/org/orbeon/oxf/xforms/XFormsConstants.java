@@ -115,7 +115,7 @@ public class XFormsConstants {
     public static final QName XFORMS_FULL_APPEARANCE_QNAME = new QName("full");
     public static final QName XFORMS_COMPACT_APPEARANCE_QNAME = new QName("compact");
     public static final QName XFORMS_MINIMAL_APPEARANCE_QNAME = new QName("minimal");
-    public static final QName XFORMS_PSEUDO_MINIMAL_APPEARANCE_QNAME = new QName("minimal", XFormsConstants.XXFORMS_NAMESPACE);
+    public static final QName XXFORMS_MINIMAL_APPEARANCE_QNAME = new QName("minimal", XFormsConstants.XXFORMS_NAMESPACE);
 
     public static final QName XFORMS_MODAL_LEVEL_QNAME = new QName("modal");
     public static final QName XFORMS_MODELESS_LEVEL_QNAME = new QName("modeless");

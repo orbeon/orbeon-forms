@@ -78,7 +78,7 @@ public class XFormsTriggerHandler extends XFormsCoreControlHandler {
             final QName originalAppearance = getAppearance(attributes);
             final boolean isNoscript = XFormsProperties.isNoscript(containingDocument);
             if (isNoscript && originalAppearance != null && XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME.equals(originalAppearance))
-                appearance = XFormsConstants.XFORMS_PSEUDO_MINIMAL_APPEARANCE_QNAME;
+                appearance = XFormsConstants.XXFORMS_MINIMAL_APPEARANCE_QNAME;
             else
                 appearance = originalAppearance;
         }

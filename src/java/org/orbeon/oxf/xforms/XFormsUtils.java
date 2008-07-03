@@ -24,6 +24,7 @@ import org.orbeon.oxf.processor.DebugProcessor;
 import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.*;
+import org.orbeon.oxf.util.NumberUtils;
 import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl;
 import org.orbeon.oxf.xforms.event.events.XFormsLinkErrorEvent;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
@@ -1250,5 +1251,9 @@ public class XFormsUtils {
         public void text(Text text) {
             sb.append(acceptHTML ? XMLUtils.escapeXMLMinimal(text.getStringValue()) : text.getStringValue());
         }
+    }
+
+    public static String escapeJavaScript(String value) {
+        return org.apache.commons.lang.StringUtils.replace(org.apache.commons.lang.StringUtils.replace(value, "\\", "\\\\"), "\"", "\\\"");
     }
 }

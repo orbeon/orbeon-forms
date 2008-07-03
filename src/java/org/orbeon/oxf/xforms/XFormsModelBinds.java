@@ -434,9 +434,9 @@ public class XFormsModelBinds {
                 sb.append(',');
 
             sb.append('"');
-            sb.append(name);
+            sb.append(XFormsUtils.escapeJavaScript(name));
             sb.append("\": { \"value\":\"");
-            sb.append(value);
+            sb.append(XFormsUtils.escapeJavaScript(value));
             sb.append('"');
             if (controlsInheritingMIPs != null) {
                 sb.append(", \"inherited\":[");
@@ -449,7 +449,7 @@ public class XFormsModelBinds {
                         sb.append(',');
 
                     sb.append('"');
-                    sb.append(currentControl.getEffectiveId());
+                    sb.append(XFormsUtils.escapeJavaScript(currentControl.getEffectiveId()));
                     sb.append('"');
                 }
 

@@ -13,15 +13,14 @@
  */
 package org.orbeon.oxf.xforms;
 
-import org.apache.commons.lang.StringUtils;
 import org.dom4j.Element;
 import org.dom4j.Text;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.util.SecureUtils;
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.oxf.util.SecureUtils;
 import org.orbeon.saxon.om.FastStringBuffer;
 import org.orbeon.saxon.om.NodeInfo;
 import org.xml.sax.ContentHandler;
@@ -513,11 +512,11 @@ public class XFormsItemUtils {
         }
 
         public String getExternalJSValue(PipelineContext pipelineContext) {
-            return value == null ? "" : isEncryptValue ? XFormsItemUtils.encryptValue(pipelineContext, value) : escapeJavaScriptQuotes(value);
+            return value == null ? "" : isEncryptValue ? XFormsItemUtils.encryptValue(pipelineContext, value) : XFormsUtils.escapeJavaScript(value);
         }
 
         public String getExternalJSLabel() {
-            return label == null? "" : escapeJavaScriptQuotes(label);
+            return label == null? "" : XFormsUtils.escapeJavaScript(label);
         }
 
         public int getLevel() {
@@ -552,10 +551,6 @@ public class XFormsItemUtils {
             sb.append(getValue());
 
             return sb.toString();
-        }
-
-        private static String escapeJavaScriptQuotes(String value) {
-            return StringUtils.replace(value, "\"", "\\\"");
         }
     }
 }

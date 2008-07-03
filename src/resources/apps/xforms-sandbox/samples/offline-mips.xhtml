@@ -35,6 +35,7 @@
                     <d/>
                     <e/>
                     <f/>
+                    <g/>
                 </instance>
             </xforms:instance>
             <xforms:bind nodeset="/instance">
@@ -44,6 +45,7 @@
                 <xforms:bind nodeset="d" name="d" required="$c = '42'" xxforms:offline="true"/>
                 <xforms:bind nodeset="e" name="e" readonly="$d = '42'" xxforms:offline="true"/>
                 <xforms:bind nodeset="f" name="f" calculate="xxforms:if($e = '42', 'Good', 'Could be better')" xxforms:offline="true"/>
+                <xforms:bind nodeset="g" name="g" constraint="matches(., '^\d\d\d\d-\d\d-\d\d$')" xxforms:offline="true"/>
             </xforms:bind>
 
             <xforms:instance id="ui">
@@ -104,6 +106,11 @@
         <xhtml:p>
             <xforms:input ref="f" incremental="true">
                 <xforms:label>If previous is 42 "good" otherwise "could be better"</xforms:label>
+            </xforms:input>
+        </xhtml:p>
+        <xhtml:p>
+            <xforms:input ref="g" incremental="true">
+                <xforms:label>Valid if ISO data (2008-06-30)</xforms:label>
             </xforms:input>
         </xhtml:p>
         <xhtml:p>

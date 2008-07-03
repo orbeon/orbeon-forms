@@ -35,6 +35,7 @@
             <xsl:apply-templates select="node()"/>
             <xsl:if test="$has-xforms-instance-inspector">
                 <xsl:call-template name="widget:xforms-instance-inspector-model"/>
+<!--
                 <xhtml:script language="Javascript" type="text/javascript">
 //                    YAHOO.util.Event.addListener(window, "load", sourceInit);
 //                    YAHOO.util.Event.addListener(window, "resize", sourceResize);
@@ -67,6 +68,7 @@
 //                        return curtop;
 //                    }
                 </xhtml:script>
+-->
             </xsl:if>
             <xsl:if test="$has-widgets">
                 <xhtml:link rel="stylesheet" href="/config/theme/xforms-widgets.css" type="text/css"/>
@@ -96,7 +98,7 @@
                             <!-- Case where this tab is inactive -->
                             <xforms:case id="{$tab-id}-inactive">
                                 <xhtml:div class="widget-tab-inactive">
-                                    <xforms:trigger appearance="xxforms:link" id="{@id}-trigger">
+                                    <xforms:trigger appearance="minimal" id="{@id}-trigger">
                                         <xsl:choose>
                                             <xsl:when test="widget:label/@ref">
                                                 <xforms:label ref="{widget:label/@ref}"/>

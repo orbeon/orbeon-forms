@@ -44,7 +44,8 @@ public class XFormsStateManager {
     public static final boolean FORCE_SESSION_CREATION = true;
 
     /**
-     * Get the initial encoded XForms state as it must be sent to the client within the (X)HTML.
+     * Get the initial encoded XForms state as it must be sent to the client within the (X)HTML, and if needed (server
+     * state handling) add the state to the state store.
      *
      * @param containingDocument    containing document
      * @param externalContext       external context (for access to session and application scopes)
@@ -53,7 +54,8 @@ public class XFormsStateManager {
      * @param dynamicStateUUID      dynamic state UUID (if dynamic state was cached against output document)
      * @return                      XFormsState containing the encoded static and dynamic states
      */
-    public static XFormsState getInitialEncodedClientState(XFormsContainingDocument containingDocument, ExternalContext externalContext, XFormsState xformsState, String staticStateUUID, String dynamicStateUUID) {
+    public static XFormsState getInitialEncodedClientState(XFormsContainingDocument containingDocument, ExternalContext externalContext,
+                                                           XFormsState xformsState, String staticStateUUID, String dynamicStateUUID) {
 
         final String currentPageGenerationId;
         final String staticStateString;
@@ -83,7 +85,7 @@ public class XFormsStateManager {
                     staticStateString = PERSISTENT_STATE_PREFIX + currentPageGenerationId;
                 }
             } else {
-                // Produce encoded static state
+                // Encoded static state is just serialized form
                 staticStateString = xformsState.getStaticState();
                 currentPageGenerationId = null;
             }
@@ -129,7 +131,7 @@ public class XFormsStateManager {
                     }
                 }
             } else {
-                // Send state to the client
+                // Encoded dynamic state is just serialized form
                 dynamicStateString = xformsState.getDynamicState();
             }
         }

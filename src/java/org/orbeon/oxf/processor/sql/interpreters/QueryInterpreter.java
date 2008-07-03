@@ -425,7 +425,7 @@ public class QueryInterpreter extends SQLProcessor.InterpreterContentHandler {
                                                 // TODO: Check BLOB: should we be able to set a String as a Blob?
                                             } else if (value instanceof String || value instanceof Element) {
                                                 // Make sure we create a Document from the Element if we have one
-                                                Document xmlFragmentDocument = (value instanceof Element) ? Dom4jUtils.createDocument((Element) value) : null;
+                                                Document xmlFragmentDocument = (value instanceof Element) ? Dom4jUtils.createDocumentCopyElement((Element) value) : null;
 
                                                 // Convert document into an XML String if necessary
                                                 if (value instanceof Element && !SQL_TYPE_XMLTYPE.equals(sqlType)) {

@@ -367,7 +367,10 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         && isReplaceAll
                         && avtXXFormsUsername == null; // can't optimize if there are authentication credentials
 
-                final boolean isDeferredSubmission = (isReplaceAll && !isHandlingOptimizedGet) || (!isReplaceAll && serialize && hasBoundRelevantUploadControl);
+                final boolean isNoscript = XFormsProperties.isNoscript(containingDocument);
+                // In noscript mode, there is no deferred submission process
+                final boolean isPossibleDeferredSubmission = (isReplaceAll && !isHandlingOptimizedGet) || (!isReplaceAll && serialize && hasBoundRelevantUploadControl);
+                final boolean isDeferredSubmission = !isNoscript && isPossibleDeferredSubmission;
                 final boolean isDeferredSubmissionFirstPass = isDeferredSubmission && XFormsEvents.XFORMS_SUBMIT.equals(eventName);
                 final boolean isDeferredSubmissionSecondPass = isDeferredSubmission && !isDeferredSubmissionFirstPass; // here we get XXFORMS_SUBMIT
                 isDeferredSubmissionSecondPassReplaceAll = isDeferredSubmissionSecondPass && isReplaceAll;
@@ -411,17 +414,15 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                     modelForInstance = null;
                 }
 
-                final Document initialDocumentToSubmit;
-                if (serialize && !isDeferredSubmissionSecondPass) {
-                    initialDocumentToSubmit = createDocumentToSubmit(pipelineContext, boundNodeInfo, currentInstance, modelForInstance, resolvedValidate, resolvedRelevant);
-                } else {
-                    initialDocumentToSubmit = null;
-                }
-
                 // Deferred submission: end of the first pass
                 if (isDeferredSubmissionFirstPass) {
 
-                    // Resolve the target AVT
+                    // Create document to submit here because in case of error, an Ajax response will still be produced
+                    if (serialize) {
+                        createDocumentToSubmit(pipelineContext, boundNodeInfo, currentInstance, modelForInstance, resolvedValidate, resolvedRelevant);
+                    }
+
+                    // Resolve the target AVT because XFormsServer requires it
                     resolvedXXFormsTarget = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, boundNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtXXFormsTarget);
 
                     // When replace="all", we wait for the submission of an XXFormsSubmissionEvent from the client
@@ -493,7 +494,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 }
 
                 final Document documentToSubmit;
-                if (serialize && isDeferredSubmissionSecondPass) {
+                if (serialize) {
                     // Handle uploaded files if any
                     final Element filesElement = (event instanceof XXFormsSubmitEvent) ? ((XXFormsSubmitEvent) event).getFilesElement() : null;
                     if (filesElement != null) {
@@ -545,7 +546,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                 } else {
                     // Don't recreate document
-                    documentToSubmit = initialDocumentToSubmit;
+                    documentToSubmit = null;
                 }
 
                 // Get serialization requested from @method and @serialization attributes
@@ -1140,10 +1141,10 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
             // the remainder of the submit process. "
             if (currentNode instanceof Element) {
                 // Create subset of document
-                documentToSubmit = Dom4jUtils.createDocument((Element) currentNode);
+                documentToSubmit = Dom4jUtils.createDocumentCopyElement((Element) currentNode);
             } else {
                 // Use entire instance document
-                documentToSubmit = Dom4jUtils.createDocument(currentNode.getDocument().getRootElement());
+                documentToSubmit = Dom4jUtils.createDocumentCopyElement(currentNode.getDocument().getRootElement());
             }
 
             if (resolvedRelevant) {

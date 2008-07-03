@@ -116,6 +116,9 @@ public class XMLConstants {
 
     public static final String XHTML_PREFIX = "xhtml";
     public static final String XHTML_NAMESPACE_URI = "http://www.w3.org/1999/xhtml";
+    public static final Namespace XHTML_NAMESPACE = new Namespace(XHTML_PREFIX, XHTML_NAMESPACE_URI);
+    public static final QName XHTML_HTML_QNAME = new QName("html", XMLConstants.XHTML_NAMESPACE);
+
     public static final String XPATH_FUNCTIONS_NAMESPACE_URI = "http://www.w3.org/2005/xpath-functions";
 
     private XMLConstants() {

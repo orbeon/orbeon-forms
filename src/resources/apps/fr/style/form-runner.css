@@ -147,6 +147,14 @@ div.fr-body {
 /* Make sure text in trigger does not wrap (leads to non-native widget being used on Firefox) */
 button.xforms-trigger { white-space: nowrap; }
 button.xforms-trigger img { margin-right: 10px; }
+/* Attempt to make the button look like a link */
+button.xforms-trigger-appearance-xxforms-minimal {
+    color: #666699;
+    display: -moz-inline-box; display: inline-block;
+    text-decoration: underline;
+    font-size: inherit;
+    padding: 0
+}
 
 .fr-layout-table { padding: 0; margin: 0 }
 .fr-layout-table tr td { width: auto; vertical-align: top }

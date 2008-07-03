@@ -216,17 +216,13 @@
             <tr>
                 <td style="vertical-align: top">
                     <table>
-                        <!--<tr>-->
-                            <!--<th>Name</th>-->
-                            <!--<th>Bytes</th>-->
-                        <!--</tr>-->
                         <xforms:group>
                             <xforms:dispatch ev:event="DOMActivate" name="ops-format-source" target="main-model"/>
                             <xforms:repeat nodeset="instance('source-files-instance')//file" id="files-repeat">
                                 <tr>
                                     <td style="white-space: nowrap">
                                         <!--<xforms:output ref="@name"/>-->
-                                        <xforms:trigger ref="@path" appearance="xxforms:link">
+                                        <xforms:trigger ref="@path" appearance="minimal">
                                             <xforms:label ref="."/>
                                         </xforms:trigger>
                                     </td>

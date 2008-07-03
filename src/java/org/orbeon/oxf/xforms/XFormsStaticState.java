@@ -27,19 +27,19 @@ import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerImpl;
 import org.orbeon.oxf.xforms.processor.XFormsDocumentAnnotatorContentHandler;
+import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
+import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.saxon.Configuration;
+import org.orbeon.saxon.dom4j.DocumentWrapper;
+import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.om.FastStringBuffer;
 import org.orbeon.saxon.om.NodeInfo;
-import org.orbeon.saxon.om.DocumentInfo;
-import org.orbeon.saxon.dom4j.DocumentWrapper;
-import org.orbeon.saxon.Configuration;
 
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
 import javax.xml.transform.sax.SAXResult;
 import java.util.*;
 
@@ -48,6 +48,9 @@ import java.util.*;
  *
  * All the information contained here must be constant, and never change as the XForms engine operates on a page. This
  * information can be shared between multiple running copies of an XForms pages.
+ *
+ * The only exception to the above is during initialization, between the time initialized == false and initialized ==
+ * true, where instances can be added.
  *
  * The static state may contain constant shared XForms instances. These may be used as:
  *
@@ -65,17 +68,19 @@ public class XFormsStaticState {
     private boolean initialized;
 
     private String uuid;
-    private String encodedStaticState;
-    private Document staticStateDocument;
+    private String encodedStaticState;      // encoded state
+    private Document staticStateDocument;   // if present, stored there temporarily only until getEncodedStaticState() is called and encodedStaticState is produced
 
-    private Document controlsDocument;
-    private List modelDocuments = new ArrayList();
-    private Map xxformsScripts;
+    private Document controlsDocument;                  // controls cocument
+    private List modelDocuments = new ArrayList();      // List<Document> of model documents
+    private SAXStore xhtmlDocument;                     // entire XHTML document for noscript mode only
 
-    private Map instancesMap;
+    private Map xxformsScripts;                         // Map<String, String> of id to script content
 
-    private Map nonDefaultProperties = new HashMap();
-    private Map externalEventsMap;
+    private Map instancesMap;                           // Map<String, SharedXFormsInstance> of id to shared instance
+
+    private Map nonDefaultProperties = new HashMap();   // Map<String, Object> of property name to property value (String, Integer, Boolean)
+    private Map externalEventsMap;                      // Map<String, ""> of event names
 
     private String baseURI;
     private String containerType;
@@ -107,67 +112,55 @@ public class XFormsStaticState {
     }
 
     /**
-     * Create static state object from an encoded version.
+     * Create static state object from a Document. This constructor is used when creating an initial static state upon
+     * producing an XForms page.
+     *
+     * @param staticStateDocument   Document containing the static state. The document may be modifed by this constructor and must be discarded afterwards.
+     * @param namespacesMap         Map<String, Map<String, String>> of control id to Map of namespace mappings
+     * @param annotatedDocument     optional SAXStore containing XHTML for noscript mode
+     */
+    public XFormsStaticState(Document staticStateDocument, Map namespacesMap, SAXStore annotatedDocument) {
+        initialize(staticStateDocument, namespacesMap, annotatedDocument, null);
+    }
+
+    /**
+     * Create static state object from an encoded version. This constructor is used when restoring a static state from
+     * a serialized form.
      *
      * @param pipelineContext       current PipelineContext
      * @param encodedStaticState    encoded static state
      */
     public XFormsStaticState(PipelineContext pipelineContext, String encodedStaticState) {
 
-        // Parse document
+        // Decode encodedStaticState into staticStateDocument
         final Document staticStateDocument = XFormsUtils.decodeXML(pipelineContext, encodedStaticState);
 
-        // Recompute namespace mappings
-        final Map namespacesMap = new HashMap();
-        try {
-            final Transformer identity = TransformerUtils.getIdentityTransformer();
-            identity.transform(new DocumentSource(staticStateDocument), new SAXResult(new XFormsDocumentAnnotatorContentHandler(namespacesMap)));
-        } catch (TransformerException e) {
-            throw new OXFException(e);
-        }
-
         // Initialize
-        initialize(staticStateDocument, encodedStaticState, namespacesMap);
+        initialize(staticStateDocument, null, null, encodedStaticState);
     }
-    
 
     /**
-     * Create static state object from a Document.
+     * Initialize. Either there is:
      *
-     * @param staticStateDocument   Document containing the static state
-     * @param namespacesMap         Map<String, Map<String, String>> of control id to Map of namespace mappings
+     * o staticStateDocument, namespaceMap, and optional xhtmlDocument
+     * o staticStateDocument and encodedStaticState
+     *
+     * @param staticStateDocument
+     * @param encodedStaticState
+     * @param namespacesMap
+     * @param xhtmlDocument
      */
-    public XFormsStaticState(Document staticStateDocument, Map namespacesMap) {
-        initialize(staticStateDocument, null, namespacesMap);
-    }
-
-//    public XFormsEngineStaticState(PipelineContext pipelineContext, Document staticStateDocument, String uuid) {
-//        this.uuid = uuid;
-
-    private void initialize(Document staticStateDocument, String encodedStaticState, Map namespacesMap) {
-
-        // Namespace mappings
-        this.namespacesMap = namespacesMap;
+    private void initialize(Document staticStateDocument, Map namespacesMap, SAXStore xhtmlDocument, String encodedStaticState) {
 
         final Element rootElement = staticStateDocument.getRootElement();
 
         // Remember UUID
         this.uuid = UUIDUtils.createPseudoUUID();
 
-        // Get controls document
-        controlsDocument = Dom4jUtils.createDocumentCopyParentNamespaces(rootElement.element("controls"));
+        // TODO: if staticStateDocument contains XHTML document, get controls and models from there
 
-        // Get models from static state
-        final Element modelsElement = rootElement.element("models");
-
-        // Get all models
-        // FIXME: we don't get a System ID here. Is there a simple solution?
-        for (Iterator i = modelsElement.elements().iterator(); i.hasNext();) {
-            final Element modelElement = (Element) i.next();
-            final Document modelDocument = Dom4jUtils.createDocumentCopyParentNamespaces(modelElement);
-
-            modelDocuments.add(modelDocument);
-        }
+        // Extract controls and models documents
+        extractControlsAndModels(rootElement);
 
         // Scripts
         final Element scriptsElement = rootElement.element("scripts");
@@ -233,6 +226,51 @@ public class XFormsStaticState {
             }
         }
 
+        // Get XHTML if present and requested
+        final Element htmlElement = rootElement.element(XMLConstants.XHTML_HTML_QNAME);
+        {
+            if (xhtmlDocument == null && htmlElement != null) {
+                // Get from static state document if available there
+                final Document htmlDocument = Dom4jUtils.createDocument();
+                htmlDocument.setRootElement((Element) htmlElement.detach());
+                this.xhtmlDocument = TransformerUtils.dom4jToSAXStore(htmlDocument);
+            } else if (getBooleanProperty(XFormsProperties.NOSCRIPT_PROPERTY)) {
+                // Use provided SAXStore ONLY if noscript mode is requested
+                this.xhtmlDocument = xhtmlDocument;
+            }
+        }
+
+        if (namespacesMap == null) {
+            // Need to recompute namespace mappings
+            this.namespacesMap = new HashMap();
+            try {
+//                if (xhtmlDocument == null) {
+                    // Recompute from staticStateDocument
+                    // TODO: Can there be in this case a nested xhtml:html element, thereby causing duplicate id exceptions?
+                    final Transformer identity = TransformerUtils.getIdentityTransformer();
+
+                    // Detach xhtml element as models and controls are enough to produce namespaces map
+                    if (htmlElement != null)
+                        htmlElement.detach();
+                    // Compute namespaces map
+                    identity.transform(new DocumentSource(staticStateDocument), new SAXResult(new XFormsDocumentAnnotatorContentHandler(this.namespacesMap)));
+                    // Re-attach xhtml element
+                    if (htmlElement != null)
+                        rootElement.add(htmlElement);
+//                } else {
+//                    // Recompute from xhtmlDocument
+//                    final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
+//                    identity.setResult(new SAXResult(new XFormsDocumentAnnotatorContentHandler(namespacesMap)));
+//                    xhtmlDocument.replay(identity);
+//                }
+            } catch (Exception e) {
+                throw new OXFException(e);
+            }
+        } else {
+            // Use map that was passed
+            this.namespacesMap = namespacesMap;
+        }
+
         final String externalEvents = getStringProperty(XFormsProperties.EXTERNAL_EVENTS_PROPERTY);
         if (externalEvents != null) {
             final StringTokenizer st = new StringTokenizer(externalEvents);
@@ -279,10 +317,69 @@ public class XFormsStaticState {
         }
     }
 
+    private void extractControlsAndModels(Element rootElement) {
+        // Get controls document
+        {
+//            final Document controlsDocument = Dom4jUtils.createDocument();
+//            controlsDocument.setRootElement((Element) rootElement.element("controls").detach());
+//            this.controlsDocument = controlsDocument;
+
+            // Copy the element because we may need it in staticStateDocument for encoding
+            this.controlsDocument = Dom4jUtils.createDocumentCopyParentNamespaces(rootElement.element("controls"));
+        }
+
+        // Get models from static state
+        {
+            final Element modelsElement = rootElement.element("models");
+            modelDocuments.clear();
+
+            // Get all models
+            // FIXME: we don't get a System ID here. Is there a simple solution?
+            for (Iterator i = modelsElement.elements().iterator(); i.hasNext();) {
+                final Element modelElement = (Element) i.next();
+
+//                final Document modelDocument = Dom4jUtils.createDocument();
+//                modelDocument.setRootElement((Element) modelElement.detach());
+
+                // Copy the element because we may need it in staticStateDocument for encoding
+                final Document modelDocument = Dom4jUtils.createDocumentCopyParentNamespaces(modelElement);
+
+                modelDocuments.add(modelDocument);
+            }
+        }
+    }
+
+    public String getUUID() {
+        return uuid;
+    }
+
+    /**
+     * Whether the static state is fully initialized. It is the case when:
+     *
+     * o An encodedStaticState string was provided when restoring the static state, OR
+     * o getEncodedStaticState() was called, thereby creating an encodedStaticState string
+     *
+     * Before the static state if fully initialized, shared instances can be added and contribute to the static state.
+     * The lifecycle goes as follows:
+     *
+     * o Create initial static state from document
+     * o 0..n add instances to state
+     * o Create serialized static state string
+     *
+     * o Get existing static state from cache, OR
+     * o Restore static state from serialized form
+     *
+     * @return  true iif static state is fully initialized
+     */
     public boolean isInitialized() {
         return initialized;
     }
 
+    /**
+     * Add a shared instance to this static state. Can only be called if the static state is not entirely initialized.
+     *
+     * @param instance  shared instance
+     */
     public void addInstance(SharedXFormsInstance instance) {
         if (initialized)
             throw new IllegalStateException("Cannot add instances to static state after initialization.");
@@ -293,20 +390,27 @@ public class XFormsStaticState {
         instancesMap.put(instance.getEffectiveId(), instance);
     }
 
-    public String getUUID() {
-        return uuid;
-    }
-
+    /**
+     * Get a serialized static state. If an encodedStaticState was provided during restoration, return that. Otherwise,
+     * return a serialized static state computed from models, instances, and XHTML documents.
+     *
+     * @param pipelineContext   current PipelineContext
+     * @return                  serialized static sate
+     */
     public String getEncodedStaticState(PipelineContext pipelineContext) {
 
         if (!initialized) {
 
-            if (staticStateDocument.getRootElement().element("instances") != null)
+            final Element rootElement = staticStateDocument.getRootElement();
+
+            if (rootElement.element("instances") != null)
                 throw new IllegalStateException("Element instances already present in static state.");
+
+            // TODO: if staticStateDocument will contains XHTML document, don't store controls and models in there
 
             // Add instances to Document if needed
             if (instancesMap != null && instancesMap.size() > 0) {
-                final Element instancesElement = staticStateDocument.getRootElement().addElement("instances");
+                final Element instancesElement = rootElement.addElement("instances");
                 for (Iterator instancesIterator = instancesMap.values().iterator(); instancesIterator.hasNext();) {
                     final XFormsInstance currentInstance = (XFormsInstance) instancesIterator.next();
 
@@ -317,9 +421,17 @@ public class XFormsStaticState {
                 }
             }
 
+            // Handle XHTML document if needed (for noscript mode)
+            if (xhtmlDocument != null && rootElement.element(XMLConstants.XHTML_HTML_QNAME) == null) {
+                // Add document
+                final Document document = TransformerUtils.saxStoreToDom4jDocument(xhtmlDocument);
+                staticStateDocument.getRootElement().add(document.getRootElement().detach());
+            }
+
             // Remember encoded state and discard Document
             final boolean isStateHandlingClient = getStringProperty(XFormsProperties.STATE_HANDLING_PROPERTY).equals(XFormsProperties.STATE_HANDLING_CLIENT_VALUE);
             encodedStaticState = XFormsUtils.encodeXML(pipelineContext, staticStateDocument, isStateHandlingClient ? XFormsProperties.getXFormsPassword() : null, true);
+
             staticStateDocument = null;
             initialized = true;
         }
@@ -327,11 +439,25 @@ public class XFormsStaticState {
         return encodedStaticState;
     }
 
-    public Map getInstancesMap() {
+    /**
+     * Get a map of available static instances. Can only be called after initialization is complete.
+     *
+     * @return  Map<String, SharedXFormsInstance
+     */
+    public Map getStaticInstancesMap() {
         if (!initialized)
             throw new IllegalStateException("Cannot get instances from static before initialization.");
 
         return instancesMap;
+    }
+
+    /**
+     * Return the complete XHTML document if available. Only for noscript mode.
+     *
+     * @return  SAXStore containing XHTML document
+     */
+    public SAXStore getXHTMLDocument() {
+        return xhtmlDocument;
     }
 
     public Document getControlsDocument() {

@@ -158,7 +158,8 @@ public class XFormsToXHTML extends ProcessorImpl {
     //                        XFormsServer.logger.debug("XForms - created digest for static state: " + digest);
     //                    xformsEngineStaticState = new XFormsStaticState(pipelineContext, staticStateDocument, digest);
 
-                        xformsStaticState = new XFormsStaticState(staticStateDocument, namespaceMappings);
+                        // Create static state object
+                        xformsStaticState = new XFormsStaticState(staticStateDocument, namespaceMappings, annotatedSAXStore);
                     }
 
                     // Create document here so we can do appropriate analysis of caching dependencies
@@ -227,10 +228,18 @@ public class XFormsToXHTML extends ProcessorImpl {
             });
 
             // Output resulting document
-            if (outputName.equals("document"))
-                outputResponseDocument(pipelineContext, externalContext, inputDependencies.getAnnotatedSAXStore(), containingDocument[0], contentHandler, xformsState[0], staticStateUUID, dynamicStateUUID);
-            else
+            if (outputName.equals("document")) {
+                // Normal case where we output XHTML
+
+                // Get encoded state for the client
+                final XFormsState encodedClientState = XFormsStateManager.getInitialEncodedClientState(containingDocument[0],
+                        externalContext, xformsState[0], staticStateUUID, dynamicStateUUID);
+
+                outputResponseDocument(pipelineContext, externalContext, inputDependencies.getAnnotatedSAXStore(), containingDocument[0], contentHandler, encodedClientState);
+            } else {
+                // Test only
                 testOutputResponseState(pipelineContext, containingDocument[0], contentHandler, new XFormsStateManager.XFormsDecodedClientState(xformsState[0], staticStateUUID, dynamicStateUUID));
+            }
 
         } catch (Throwable e) {
             if (containingDocument[0] != null) {
@@ -346,10 +355,9 @@ public class XFormsToXHTML extends ProcessorImpl {
         }
     }
 
-    private void outputResponseDocument(final PipelineContext pipelineContext, final ExternalContext externalContext,
+    public static void outputResponseDocument(final PipelineContext pipelineContext, final ExternalContext externalContext,
                                 final SAXStore annotatedDocument, final XFormsContainingDocument containingDocument,
-                                final ContentHandler contentHandler, final XFormsState xformsState,
-                                final String staticStateUUID, String dynamicStateUUID) throws SAXException {
+                                final ContentHandler contentHandler, final XFormsState encodedClientState) throws SAXException {
 
         final ElementHandlerController controller = new ElementHandlerController();
 
@@ -365,7 +373,7 @@ public class XFormsToXHTML extends ProcessorImpl {
         // Set final output
         controller.setOutput(new DeferredContentHandlerImpl(contentHandler));
 
-        controller.setElementHandlerContext(new HandlerContext(controller, pipelineContext, containingDocument, xformsState, staticStateUUID, dynamicStateUUID, externalContext));
+        controller.setElementHandlerContext(new HandlerContext(controller, pipelineContext, containingDocument, encodedClientState, externalContext));
 
         // Process everything
         annotatedDocument.replay(new ElementFilterContentHandler(controller) {

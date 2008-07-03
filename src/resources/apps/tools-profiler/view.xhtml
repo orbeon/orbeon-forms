@@ -47,7 +47,7 @@
                         <xforms:output ref="instance('hprof')/url"/>
                         <xhtml:span class="change">
                             [
-                            <xforms:trigger appearance="xxforms:link">
+                            <xforms:trigger appearance="minimal">
                                 <xforms:label>Change</xforms:label>
                                 <xforms:setvalue ref="instance('ui')/url-set" ev:event="DOMActivate">false</xforms:setvalue>
                             </xforms:trigger>
@@ -65,19 +65,19 @@
                     <xforms:group ref=".[instance('ui')/url-set = 'true']">
                         <xhtml:ul>
                             <xhtml:li>
-                                <xforms:trigger appearance="xxforms:link">
+                                <xforms:trigger appearance="minimal">
                                     <xforms:label>Hotspots</xforms:label>
                                     <xforms:send submission="hotspots" ev:event="DOMActivate"/>
                                 </xforms:trigger>
                                 (
-                                <xforms:trigger appearance="xxforms:link">
+                                <xforms:trigger appearance="minimal">
                                     <xforms:label>XML</xforms:label>
                                     <xforms:send submission="hotspots-data" ev:event="DOMActivate"/>
                                 </xforms:trigger>
                                 )
                             </xhtml:li>
                             <xhtml:li>
-                                <xforms:trigger appearance="xxforms:link">
+                                <xforms:trigger appearance="minimal">
                                     <xforms:label>Split by functionality</xforms:label>
                                     <xforms:send submission="functionality" ev:event="DOMActivate"/>
                                 </xforms:trigger>

@@ -16,28 +16,16 @@ package org.orbeon.oxf.xforms.control.controls;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsConstants;
 import org.dom4j.Element;
 
 /**
  * Represents an xforms:trigger control.
  *
- * TODO: Use inheritance to make this a single-node control that doesn't hold a value.
+ * TODO: Use inheritance/interface to make this a single-node control that doesn't hold a value.
  */
 public class XFormsTriggerControl extends XFormsSingleNodeControl {
     public XFormsTriggerControl(XFormsContainingDocument containingDocument, XFormsControl parent, Element element, String name, String id) {
         super(containingDocument, parent, element, name, id);
-    }
-
-    public boolean isSupportHTMLLabels() {
-        final String appearance = getAppearance();
-        if (appearance != null && (XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME.equals(appearance) || XFormsConstants.XXFORMS_LINK_APPEARANCE_QNAME.equals(appearance))) {
-            // Minimal or link appearance
-            return true;
-        } else {
-            // Default appearance (button)
-            return true;
-        }
     }
 
     protected boolean isSupportHTMLHints() {

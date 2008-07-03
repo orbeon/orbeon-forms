@@ -63,6 +63,7 @@ public class XHTMLHeadHandler extends HandlerBase {
 
         // Gather information about appearances of controls which use Script
         // Map<String controlName, Map<String appearanceOrMediatype, List<String effectiveId>>>
+        // TODO: This would probably be done better, and more correctly, statically, in XFormsStaticState
         final Map javaScriptControlsAppearancesMap = new HashMap();
         {
             final XFormsControls xformsControls = containingDocument.getXFormsControls();
@@ -141,7 +142,8 @@ public class XHTMLHeadHandler extends HandlerBase {
         }
 
         // Scripts
-        if (!XFormsProperties.isReadonly(containingDocument)) {
+        // TODO: Have option to put this at the bottom of the page. See theme-plain.xsl and http://developer.yahoo.com/performance/rules.html#js_bottom -->
+        if (!XFormsProperties.isNoscript(containingDocument) && !XFormsProperties.isReadonly(containingDocument)) {
 
             if (isCombineResources) {
                 final String combinedResourceName = combinedResourcesPrefix + ".js";
@@ -235,7 +237,7 @@ public class XHTMLHeadHandler extends HandlerBase {
                     final Map nonDefaultProperties = containingDocument.getStaticState().getNonDefaultProperties();
                     clientPropertiesMap = new CompositeMap(new Map[] { nonDefaultProperties, dynamicProperties });
                 }
-
+                
                 FastStringBuffer sb = null;
                 if (clientPropertiesMap.size() > 0) {
 

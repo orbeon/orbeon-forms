@@ -367,7 +367,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                 // Build initial instance documents
                 final List instanceContainers = modelElement.elements(new QName("instance", XFormsConstants.XFORMS_NAMESPACE));
                 final XFormsStaticState staticState = containingDocument.getStaticState();
-                final Map staticStateInstancesMap = (staticState != null && staticState.isInitialized()) ? staticState.getInstancesMap() : null;
+                final Map staticStateInstancesMap = (staticState != null && staticState.isInitialized()) ? staticState.getStaticInstancesMap() : null;
                 if (instanceContainers.size() > 0) {
                     // Iterate through all instances
                     int instancePosition = 0;
@@ -454,7 +454,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                             if (!isReadonlyHint) {
                                 // TODO: Implement as per XSLT 2.0. For now, we just support #all.
                                 if ("#all".equals(xxformsExcludeResultPrefixes))
-                                    instanceDocument = Dom4jUtils.createDocument((Element) children.get(0));
+                                    instanceDocument = Dom4jUtils.createDocumentCopyElement((Element) children.get(0));
                                 else
                                     instanceDocument = Dom4jUtils.createDocumentCopyParentNamespaces((Element) children.get(0));
                             } else {

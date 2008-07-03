@@ -30,6 +30,8 @@ public class XFormsProperties {
     public static final String STATE_HANDLING_CLIENT_VALUE = "client";
     public static final String STATE_HANDLING_SESSION_VALUE = "session"; // deprecated
 
+    public static final String NOSCRIPT_PROPERTY = "noscript";
+
     public static final String READONLY_APPEARANCE_PROPERTY = "readonly-appearance";
     public static final String READONLY_APPEARANCE_STATIC_VALUE = "static";
     public static final String READONLY_APPEARANCE_DYNAMIC_VALUE = "dynamic";
@@ -142,6 +144,7 @@ public class XFormsProperties {
 
     private static final PropertyDefinition[] SUPPORTED_DOCUMENT_PROPERTIES_DEFAULTS = {
             new PropertyDefinition(STATE_HANDLING_PROPERTY, STATE_HANDLING_SERVER_VALUE, false),
+            new PropertyDefinition(NOSCRIPT_PROPERTY, false, false),
             new PropertyDefinition(READONLY_PROPERTY, false, false),
             new PropertyDefinition(READONLY_APPEARANCE_PROPERTY, READONLY_APPEARANCE_DYNAMIC_VALUE, false),
             new PropertyDefinition(ORDER_PROPERTY, DEFAULT_ORDER_PROPERTY, false),
@@ -340,6 +343,10 @@ public class XFormsProperties {
 
     public static boolean isLegacySessionStateHandling(XFormsContainingDocument containingDocument) {
         return getStateHandling(containingDocument).equals(STATE_HANDLING_SESSION_VALUE);
+    }
+
+    public static boolean isNoscript(XFormsContainingDocument containingDocument) {
+        return getBooleanProperty(containingDocument, NOSCRIPT_PROPERTY);
     }
 
     public static boolean isOptimizeGetAllSubmission(XFormsContainingDocument containingDocument) {

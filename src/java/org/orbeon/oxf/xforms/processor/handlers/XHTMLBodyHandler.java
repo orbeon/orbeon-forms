@@ -20,8 +20,6 @@ import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsControls;
 import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.XFormsUtils;
-import org.orbeon.oxf.xforms.state.XFormsState;
-import org.orbeon.oxf.xforms.state.XFormsStateManager;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.ElementHandlerController;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -77,8 +75,6 @@ public class XHTMLBodyHandler extends HandlerBase {
             }
         }
 
-        final XFormsState xformsState = handlerContext.getXFormsState();
-
         // Start xhtml:body
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
         contentHandler.startElement(uri, localname, qName, attributes);
@@ -86,12 +82,13 @@ public class XHTMLBodyHandler extends HandlerBase {
 
         final XFormsControls xformsControls = containingDocument.getXFormsControls();
         final String htmlPrefix = XMLUtils.prefixFromQName(qName);
+        final boolean isNoscript = XFormsProperties.isNoscript(containingDocument);
 
         // Get formatting prefix and declare it if needed
         // TODO: would be nice to do this here, but then we need to make sure this prefix is available to other handlers
 //        formattingPrefix = handlerContext.findFormattingPrefixDeclare();
 
-        // Create xhtml:form
+        // Create xhtml:form element
         final String xformsSubmissionPath = OXFProperties.instance().getPropertySet(
                 new QName("page-flow", XMLConstants.OXF_PROCESSORS_NAMESPACE)).getString(
                 PageFlowControllerProcessor.XFORMS_SUBMISSION_PATH_PROPERTY_NAME,
@@ -99,23 +96,27 @@ public class XHTMLBodyHandler extends HandlerBase {
 
         final boolean hasUpload = containingDocument.getStaticState().hasControlByName("upload");
         helper.startElement(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "form", new String[] {
-                "id", XFormsUtils.namespaceId(containingDocument, "xforms-form"), // add id so that things work in portals
-                "class", "xforms-form", "action", xformsSubmissionPath, "method", "POST", "onsubmit", "return false",
+                // Add id so that things work in portals
+                "id", XFormsUtils.namespaceId(containingDocument, "xforms-form"),
+                // Regular class
+                "class", "xforms-form",
+                // Submission parameters
+                "action", xformsSubmissionPath, "method", "POST",
+                // In noscript mode, don't add event handler
+                "onsubmit", isNoscript ? null : "return false",
                 hasUpload ? "enctype" : null, hasUpload ? "multipart/form-data" : null});
 
-        // Store private information used by the client-side JavaScript
         {
-            // Get encoded state for the client
-            final XFormsState encodedClientState = XFormsStateManager.getInitialEncodedClientState(containingDocument, externalContext, xformsState, handlerContext.getStaticStateUUID(), handlerContext.getDynamicStateUUID());
-
-            // Output encoded state
+            // Output encoded static and dynamic state
             helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[] {
-                    "type", "hidden", "name", "$static-state", "value", encodedClientState.getStaticState()
+                    "type", "hidden", "name", "$static-state", "value", handlerContext.getEncodedClientState().getStaticState()
             });
             helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[]{
-                    "type", "hidden", "name", "$dynamic-state", "value", encodedClientState.getDynamicState()
+                    "type", "hidden", "name", "$dynamic-state", "value", handlerContext.getEncodedClientState().getDynamicState()
             });
+        }
 
+        if (!isNoscript) {
             // Other fields used by JavaScript
             helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[]{
                     "type", "hidden", "name", "$server-events", "value", ""
@@ -123,59 +124,69 @@ public class XHTMLBodyHandler extends HandlerBase {
             helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[]{
                     "type", "hidden", "name", "$client-state", "value", ""
             });
-        }
 
-        // Store information about nested repeats hierarchy
-        {
-            helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[]{
-                    "type", "hidden", "name", "$repeat-tree", "value", containingDocument.getStaticState().getRepeatHierarchyString()
-            });
-        }
-
-        // Store information about the initial index of each repeat
-        {
-            final StringBuffer repeatIndexesStringBuffer = new StringBuffer();
-            final Map repeatIdToIndex = xformsControls.getCurrentControlsState().getRepeatIdToIndex();
-            if (repeatIdToIndex.size() != 0) {
-                for (Iterator i = repeatIdToIndex.entrySet().iterator(); i.hasNext();) {
-                    final Map.Entry currentEntry = (Map.Entry) i.next();
-                    final String repeatId = (String) currentEntry.getKey();
-                    final Integer index = (Integer) currentEntry.getValue();
-
-                    if (repeatIndexesStringBuffer.length() > 0)
-                        repeatIndexesStringBuffer.append(',');
-
-                    repeatIndexesStringBuffer.append(repeatId);
-                    repeatIndexesStringBuffer.append(' ');
-                    repeatIndexesStringBuffer.append(index);
-                }
+            // Store information about nested repeats hierarchy
+            {
+                helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[]{
+                        "type", "hidden", "name", "$repeat-tree", "value", containingDocument.getStaticState().getRepeatHierarchyString()
+                });
             }
 
+            // Store information about the initial index of each repeat
+            {
+                final StringBuffer repeatIndexesStringBuffer = new StringBuffer();
+                final Map repeatIdToIndex = xformsControls.getCurrentControlsState().getRepeatIdToIndex();
+                if (repeatIdToIndex.size() != 0) {
+                    for (Iterator i = repeatIdToIndex.entrySet().iterator(); i.hasNext();) {
+                        final Map.Entry currentEntry = (Map.Entry) i.next();
+                        final String repeatId = (String) currentEntry.getKey();
+                        final Integer index = (Integer) currentEntry.getValue();
+
+                        if (repeatIndexesStringBuffer.length() > 0)
+                            repeatIndexesStringBuffer.append(',');
+
+                        repeatIndexesStringBuffer.append(repeatId);
+                        repeatIndexesStringBuffer.append(' ');
+                        repeatIndexesStringBuffer.append(index);
+                    }
+                }
+
+                helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[]{
+                        "type", "hidden", "name", "$repeat-indexes", "value", repeatIndexesStringBuffer.toString()
+                });
+            }
+
+            // Ajax loading indicator
+            if (XFormsProperties.isAjaxShowLoadingIcon(containingDocument)) {
+
+                helper.startElement(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "span", new String[]{ "class", "xforms-loading-loading" });
+                helper.text("Loading..."); // text is hardcoded, but you can rewrite it in the theme if needed
+                helper.endElement();
+
+                helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "span", new String[]{ "class", "xforms-loading-none" });
+            }
+
+            // Ajax error panel
+            if (XFormsProperties.isAjaxShowErrors(containingDocument)) {
+                // XInclude dialog so users can configure it
+                // TODO: must send startPrefixMapping()/endPrefixMapping()?
+                helper.element("", XMLConstants.XINCLUDE_URI, "include", new String[] { "href", "oxf:/config/error-dialog.xml" });
+            }
+
+            // Help panel
+            // TODO: must send startPrefixMapping()/endPrefixMapping()?
+            helper.element("", XMLConstants.XINCLUDE_URI, "include", new String[] { "href", "oxf:/config/help-panel.xml" });
+
+            // Noscript panel
+            // TODO: must send startPrefixMapping()/endPrefixMapping()?
+            helper.element("", XMLConstants.XINCLUDE_URI, "include", new String[] { "href", "oxf:/config/noscript-panel.xml" });
+
+        } else {
+            // Noscript mode
             helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[]{
-                    "type", "hidden", "name", "$repeat-indexes", "value", repeatIndexesStringBuffer.toString()
+                    "type", "hidden", "name", "$noscript", "value", "true"
             });
         }
-
-        // Ajax loading indicator
-        if (XFormsProperties.isAjaxShowLoadingIcon(containingDocument)) {
-
-            helper.startElement(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "span", new String[]{ "class", "xforms-loading-loading" });
-            helper.text("Loading..."); // text is hardcoded, but you can rewrite it in the theme if needed 
-            helper.endElement();
-
-            helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "span", new String[]{ "class", "xforms-loading-none" });
-        }
-
-        // Ajax error panel
-        if (XFormsProperties.isAjaxShowErrors(containingDocument)) {
-            // XInclude dialog so users can configure it
-            // TODO: must send startPrefixMapping()/endPrefixMapping()?
-            helper.element("", XMLConstants.XINCLUDE_URI, "include", new String[] { "href", "oxf:/config/error-dialog.xml" });
-        }
-
-        // Help panel
-        // TODO: must send startPrefixMapping()/endPrefixMapping()?
-        helper.element("", XMLConstants.XINCLUDE_URI, "include", new String[] { "href", "oxf:/config/help-panel.xml" });
     }
 
     public void end(String uri, String localname, String qName) throws SAXException {

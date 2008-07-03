@@ -50,21 +50,21 @@
                     </xhtml:td>
                     <xhtml:td>
                         <xforms:output ref="@valid"/>
-                        <xforms:trigger appearance="xxforms:link">
+                        <xforms:trigger appearance="minimal">
                             <xforms:label> [toggle]</xforms:label>
                             <xforms:setvalue ref="@valid" value="(. + 1) mod 2" ev:event="DOMActivate"/>
                         </xforms:trigger>
                     </xhtml:td>
                     <xhtml:td>
                         <xforms:output ref="@readonly"/>
-                        <xforms:trigger appearance="xxforms:link">
+                        <xforms:trigger appearance="minimal">
                             <xforms:label> [toggle]</xforms:label>
                             <xforms:setvalue ref="@readonly" value="(. + 1) mod 2" ev:event="DOMActivate"/>
                         </xforms:trigger>
                     </xhtml:td>
                     <xhtml:td>
                         <xforms:output ref="@required"/>
-                        <xforms:trigger appearance="xxforms:link">
+                        <xforms:trigger appearance="minimal">
                             <xforms:label> [toggle]</xforms:label>
                             <xforms:setvalue ref="@required" value="(. + 1) mod 2" ev:event="DOMActivate"/>
                         </xforms:trigger>

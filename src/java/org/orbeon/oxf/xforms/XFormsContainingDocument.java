@@ -123,6 +123,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         allowedXFormsControlsExternalEvents.putAll(allowedXFormsOutputExternalEvents);
         allowedXFormsControlsExternalEvents.put(XFormsEvents.XFORMS_DOM_ACTIVATE, "");
         allowedXFormsControlsExternalEvents.put(XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE, "");
+        allowedXFormsControlsExternalEvents.put(XFormsEvents.XXFORMS_VALUE_OR_ACTIVATE, "");// for noscript mode
 
         // External events allowed on xforms:repeat
         allowedXFormsRepeatExternalEvents.put(XFormsEvents.XXFORMS_DND, "");
@@ -758,7 +759,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                 // Target is a regular control
 
                 // Only single-node controls accept events from the client
-                if (!(eventTarget instanceof XFormsSingleNodeControl)) {
+                if (!(eventTarget instanceof XFormsSingleNodeControl)) {// NOTE: This includes xforms:trigger/xforms:submit
                     if (XFormsServer.logger.isDebugEnabled()) {
                         logDebug("containing document", "ignoring invalid client event on non-single-node control", new String[] { "control id", controlId, "event name", eventName });
                     }
@@ -858,6 +859,18 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
             dispatchEvent(pipelineContext, new XXFormsRepeatFocusEvent(eventTarget));
             // Get a fresh reference
             eventTarget = (XFormsControl) getObjectById(eventTarget.getEffectiveId());
+        }
+
+        // Special handling of xxforms-value-or-activate for noscript mode
+        if (XFormsEvents.XXFORMS_VALUE_OR_ACTIVATE.equals(eventName)) {
+            // In this case, we translate the event depending on the control type
+            if (eventTarget instanceof XFormsTriggerControl) {
+                // Triggers get a DOM activation
+                eventName = XFormsEvents.XFORMS_DOM_ACTIVATE;
+            } else {
+                // Other controls get a value change
+                eventName = XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE;
+            }
         }
 
         // Create event
@@ -1481,7 +1494,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
             }
 
             // Then get instances from static state if necessary
-            final Map staticInstancesMap = xformsStaticState.getInstancesMap();
+            final Map staticInstancesMap = xformsStaticState.getStaticInstancesMap();
             if (staticInstancesMap != null && staticInstancesMap.size() > 0) {
                 for (Iterator instancesIterator = staticInstancesMap.values().iterator(); instancesIterator.hasNext();) {
                     final XFormsInstance currentInstance = (XFormsInstance) instancesIterator.next();

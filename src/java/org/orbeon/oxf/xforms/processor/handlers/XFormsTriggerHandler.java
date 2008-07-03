@@ -72,9 +72,18 @@ public class XFormsTriggerHandler extends XFormsCoreControlHandler {
 
         final String labelValue = handlerContext.isTemplate() ? "$xforms-template-label$" : isConcreteControl ? (triggerControl.getLabel(pipelineContext) != null ? triggerControl.getLabel(pipelineContext) : "") : "";
 
-        final QName appearance = getAppearance(attributes);
+        // Get appearance
+        final QName appearance; {
+            // Override appearance in noscript mode
+            final QName originalAppearance = getAppearance(attributes);
+            final boolean isNoscript = XFormsProperties.isNoscript(containingDocument);
+            if (isNoscript && originalAppearance != null && XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME.equals(originalAppearance))
+                appearance = XFormsConstants.XFORMS_PSEUDO_MINIMAL_APPEARANCE_QNAME;
+            else
+                appearance = originalAppearance;
+        }
 
-        final FastStringBuffer classes = getInitialClasses(localname, attributes, triggerControl);
+        final FastStringBuffer classes = getInitialClasses(localname, attributes, triggerControl, appearance, false);
         handleMIPClasses(classes, id, triggerControl);
         containingDocument.getStaticState().appendClasses(classes, id);
 
@@ -158,9 +167,18 @@ public class XFormsTriggerHandler extends XFormsCoreControlHandler {
             // No longer supported image appearance
             throw new ValidationException("\"xxforms:image\" appearance is no longer supported. Use the \"minimal\" appearance instead.", handlerContext.getLocationData());
         } else {
-            // Default appearance (button)
+            // Default full appearance (button)
+            // This can also be the "pseudo-minimal" appearance for noscript mode
 
-            newAttributes.addAttribute("", "type", "type", ContentHandlerHelper.CDATA, "button");
+            if (XFormsProperties.isNoscript(containingDocument)) {
+                // In JS-free mode, all buttons are submit buttons
+                newAttributes.addAttribute("", "type", "type", ContentHandlerHelper.CDATA, "submit");
+                // We need a name to detect activation
+                newAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, effectiveId);
+            } else {
+                // Just a button without action
+                newAttributes.addAttribute("", "type", "type", ContentHandlerHelper.CDATA, "button");
+            }
 
             // xhtml:button
             final String xhtmlPrefix = handlerContext.findXHTMLPrefix();

@@ -38,22 +38,18 @@ public class HandlerContext {
     private ElementHandlerController controller;
     private PipelineContext pipelineContext;
     private XFormsContainingDocument containingDocument;
-    private XFormsState xformsState;
-    private String staticStateUUID;
-    private String dynamicStateUUID;
+    private XFormsState encodedClientState;
     private ExternalContext externalContext;
     private final String[] documentOrder;
     private String userAgent;
     private boolean isRenderingEngineTrident;
 
     public HandlerContext(ElementHandlerController controller, PipelineContext pipelineContext,
-                          XFormsContainingDocument containingDocument, XFormsState xformsState, String staticStateUUID, String dynamicStateUUID, ExternalContext externalContext) {
+                          XFormsContainingDocument containingDocument, XFormsState encodedClientState, ExternalContext externalContext) {
         this.controller = controller;
         this.pipelineContext = pipelineContext;
         this.containingDocument = containingDocument;
-        this.xformsState = xformsState;
-        this.staticStateUUID = staticStateUUID;
-        this.dynamicStateUUID = dynamicStateUUID;
+        this.encodedClientState = encodedClientState;
         this.externalContext = externalContext;
         this.documentOrder = StringUtils.split(XFormsProperties.getOrder(containingDocument));
     }
@@ -70,16 +66,8 @@ public class HandlerContext {
         return containingDocument;
     }
 
-    public XFormsState getXFormsState() {
-        return xformsState;
-    }
-
-    public String getStaticStateUUID() {
-        return staticStateUUID;
-    }
-
-    public String getDynamicStateUUID() {
-        return dynamicStateUUID;
+    public XFormsState getEncodedClientState() {
+        return encodedClientState;
     }
 
     public ExternalContext getExternalContext() {

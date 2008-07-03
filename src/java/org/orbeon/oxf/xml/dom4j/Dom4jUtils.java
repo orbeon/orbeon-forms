@@ -28,7 +28,6 @@ import org.orbeon.saxon.om.FastStringBuffer;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
-import javax.xml.parsers.SAXParser;
 import java.io.*;
 import java.util.*;
 
@@ -520,7 +519,7 @@ public class Dom4jUtils {
     /**
      * Return a new document with a copy of newRoot as its root.
      */
-    public static Document createDocument(final Element newRoot) {
+    public static Document createDocumentCopyElement(final Element newRoot) {
         final Element copy = newRoot.createCopy();
         final NonLazyUserDataDocumentFactory factory = NonLazyUserDataDocumentFactory.getInstance14();
         return factory.createDocument(copy);
@@ -532,7 +531,7 @@ public class Dom4jUtils {
      */
     public static Document createDocumentCopyParentNamespaces(final Element newRoot) {
 
-        final Document document = Dom4jUtils.createDocument(newRoot);
+        final Document document = Dom4jUtils.createDocumentCopyElement(newRoot);
         final Element rootElement = document.getRootElement();
 
         final Element parentElement = newRoot.getParent();

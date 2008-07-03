@@ -37,6 +37,7 @@ import org.orbeon.oxf.xforms.state.XFormsStateManager;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -220,7 +221,6 @@ public class XFormsServer extends ProcessorImpl {
 //        final Object documentSyncronizationObject = (contentHandler != null) ? containingDocument : new Object();
         synchronized (containingDocument) {
             try {
-
                 // Run events if any
                 final Map valueChangeControlIds = new HashMap();
                 boolean allEvents = false;
@@ -254,11 +254,14 @@ public class XFormsServer extends ProcessorImpl {
                             allEvents = true;
 
                         } else if (sourceControlId != null && eventName != null) {
-                            // An event is passed
+                            // A normal event is passed
                             if (eventName.equals(XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE) && otherControlId == null) {
                                 // xxforms-value-change-with-focus-change event
+
+                                // The goal of the code below is to coalesce multiple sequential value changes for the
+                                // same control. Not sure if this is still needed.
                                 if (lastSourceControlId == null) {
-                                    // Rember event
+                                    // Remember event
                                     lastSourceControlId = sourceControlId;
                                     lastValueChangeEventValue = value;
                                 } else if (lastSourceControlId.equals(sourceControlId)) {
@@ -272,6 +275,7 @@ public class XFormsServer extends ProcessorImpl {
                                     lastValueChangeEventValue = value;
                                 }
                             } else {
+                                // Other normal events
 
                                 // xxforms-offline requires initial dynamic state
                                 if (eventName.equals(XFormsEvents.XXFORMS_OFFLINE) && xformsDecodedInitialClientState == null)
@@ -288,10 +292,11 @@ public class XFormsServer extends ProcessorImpl {
                             }
 
                             if (eventName.equals(XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE)) {
-                                // Remember id of control of which value changed
+                                // Remember id of controls for which value changed
                                 valueChangeControlIds.put(sourceControlId, "");
                             }
                         } else if (!(sourceControlId == null && eventName == null)) {
+                            // Error case
                             throw new OXFException("<event> element must either have source-control-id and name attributes, or no attribute.");
                         }
                     }
@@ -304,7 +309,23 @@ public class XFormsServer extends ProcessorImpl {
 
                 if (contentHandler != null) {
                     // Create resulting document if there is a ContentHandler
-                    outputResponse(containingDocument, valueChangeControlIds, pipelineContext, contentHandler, xformsDecodedClientState, xformsDecodedInitialClientState, allEvents, false, false, false);
+                    if (!XFormsProperties.isNoscript(containingDocument)) {
+                        // This is an Ajax response
+                        outputResponse(containingDocument, valueChangeControlIds, pipelineContext, contentHandler, xformsDecodedClientState, xformsDecodedInitialClientState, allEvents, false, false, false);
+                    } else {
+                        // Noscript mode: output XHTML
+                        final SAXStore xhtmlDocument = containingDocument.getStaticState().getXHTMLDocument();
+                        if (xhtmlDocument == null)
+                            throw new OXFException("Missing XHTML document in static state for noscript mode.");// shouldn't happen!
+
+                        final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+
+                        // This will also cache the containing document if needed
+                        final XFormsState encodedClientState = XFormsStateManager.getEncodedClientStateDoCache(containingDocument, pipelineContext, xformsDecodedClientState, allEvents);
+
+                        XFormsToXHTML.outputResponseDocument(pipelineContext, externalContext, xhtmlDocument, containingDocument, contentHandler,
+                                encodedClientState);
+                    }
                 } else {
                     // This is the second pass of a submission with replace="all". We make it so that the document is
                     // not modified. However, we must then return it to its pool.
@@ -518,7 +539,7 @@ public class XFormsServer extends ProcessorImpl {
                 if (allEvents || xformsControls.isDirtySinceLastRequest()) {
                     // Diff itemset information
                     final Map itemsetUpdate = diffItemsets(itemsetsFull1, itemsetsFull2);
-                    // TODO: handle allEvents case
+                    // TODO: Handle allEvents case. Something wrong here?
                     outputItemsets(pipelineContext, ch, itemsetUpdate);
                 }
 
@@ -534,7 +555,7 @@ public class XFormsServer extends ProcessorImpl {
                     outputSubmissionInfo(externalContext, ch, containingDocument.getClientActiveSubmission());
                 }
 
-                // TODO: the following should be correctly ordered in the order they were requested
+                // TODO: the following should be ordered in the order they were requested
                 // Output messages to display
                 {
                     final List messages = containingDocument.getMessagesToRun();

@@ -113,5 +113,3 @@
     <!--<property as="xs:nonNegativeInteger"    name="processor.trace.port"    value="9999"/>-->
 
 </properties>
-
-        

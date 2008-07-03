@@ -478,6 +478,20 @@ public class TransformerUtils {
             throw new OXFException(e);
         }
     }
+
+    /**
+     * Transform a dom4j document to a SAXStore.
+     */
+    public static SAXStore dom4jToSAXStore(Document document) {
+        try {
+            final Transformer identity = getXMLIdentityTransformer();
+            final SAXStore result = new SAXStore();
+            identity.transform(new LocationDocumentSource(document), new SAXResult(result));
+            return result;
+        } catch (TransformerException e) {
+            throw new OXFException(e);
+        }
+    }
 }
 
 class TransformerWrapper extends Transformer {

@@ -4354,7 +4354,13 @@ ORBEON.xforms.Offline = {
         FunctionCallExpr.prototype.xpathfunctions["xxforms:if"] = function(ctx) {
             var test = this.args[0].evaluate(ctx).booleanValue();
             return new StringValue(this.args[test ? 1 : 2].evaluate(ctx).stringValue());
-        }
+        };
+        // Define the xxforms:if() XPath function
+        FunctionCallExpr.prototype.xpathfunctions["matches"] = function(ctx) {
+            var input = this.args[0].evaluate(ctx).stringValue();
+            var pattern = this.args[1].evaluate(ctx).stringValue();
+            return new BooleanValue(new RegExp(pattern).test(input));
+        };
     },
 
     reset: function() {

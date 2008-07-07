@@ -16,7 +16,8 @@
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
         xmlns:oxf="http://www.orbeon.com/oxf/processors"
-        xmlns:xi="http://www.w3.org/2001/XInclude">
+        xmlns:xi="http://www.w3.org/2001/XInclude"
+        xmlns:PipelineFunctionLibrary="org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
 
     <!-- Parameters (app, form, document, and mode) -->
     <p:param type="input" name="instance"/>
@@ -44,8 +45,9 @@
                 <xsl:variable name="values" select="for $name in $names return pipeline:property($name)" as="xs:string*"/>
 
                 <!-- Create URI with first non-empty value -->
-                <xsl:variable name="resource" select="concat($values[normalize-space() != ''][1], '/crud/', /*/app, '/', /*/form, '/form/form.xhtml')" as="xs:string"/>
+                <xsl:variable name="resource" select="concat(PipelineFunctionLibrary:property('oxf.fr.appserver.uri'), $values[normalize-space() != ''][1], '/crud/', /*/app, '/', /*/form, '/form/form.xhtml')" as="xs:string"/>
                 <url>
+                    <xsl:message>Resource:: <xsl:copy-of select="$resource"/></xsl:message>
                     <xsl:value-of select="pipeline:rewriteResourceURI($resource, true())"/>
                 </url>
                 <mode>binary</mode>

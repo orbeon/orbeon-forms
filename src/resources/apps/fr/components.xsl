@@ -22,7 +22,8 @@
         xmlns:xhtml="http://www.w3.org/1999/xhtml"
         xmlns:xi="http://www.w3.org/2001/XInclude"
         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
-        xmlns:ev="http://www.w3.org/2001/xml-events">
+        xmlns:ev="http://www.w3.org/2001/xml-events"
+        xmlns:PipelineFunctionLibrary="org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
 
     <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
 
@@ -125,7 +126,7 @@
                                             <xhtml:table class="fr-layout-table">
                                                 <xhtml:tr>
                                                     <xhtml:td>
-                                                        <xforms:output value="((instance('fr-form-metadata')/logo, '/apps/fr/style/orbeon-logo-trimmed-transparent-42.png')[normalize-space() != ''])[1]" mediatype="image/*"/>
+                                                        <xforms:output value="((instance('fr-form-metadata')/logo, concat(PipelineFunctionLibrary:property('oxf.fr.appserver.uri'), '/apps/fr/style/orbeon-logo-trimmed-transparent-42.png'))[normalize-space() != ''])[1]" mediatype="image/*"/>
                                                     </xhtml:td>
                                                     <xhtml:td>
                                                         <xhtml:h1>

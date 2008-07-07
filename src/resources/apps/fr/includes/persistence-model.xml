@@ -115,7 +115,7 @@
 
     <xforms:submission id="fr-delete-document-submission"
             method="delete" serialization="none"
-            resource="{instance('fr-uris-instance')/data-collection}/crud/{$parameters/app}/{$parameters/form}/data/{event('document-id')}/data.xml"
+            resource="{xxforms:property('oxf.fr.appserver.uri')}{instance('fr-uris-instance')/data-collection}/crud/{$parameters/app}/{$parameters/form}/data/{event('document-id')}/data.xml"
             replace="none"/>
 
     <!-- Publish form operation -->
@@ -150,7 +150,7 @@
 
     <xforms:submission id="fr-publish-form-submission" xxforms:ensure-uploads="false"
             ref="xxforms:instance('fr-form-instance')" method="put"
-            resource="{event('collection')}/crud/{event('application')}/{event('form')}/form/form.xhtml"
+            resource="{xxforms:property('oxf.fr.appserver.uri')}{event('collection')}/crud/{event('application')}/{event('form')}/form/form.xhtml"
             replace="none">
 
         <!--<xforms:message ev:event="xforms-submit">-->
@@ -268,13 +268,13 @@
     <xforms:submission id="fr-create-update-submission"
             validate="true" method="put"
             ref="event('holder')" xxforms:ensure-uploads="false"
-            resource="{instance('fr-uris-instance')/data-collection}/crud/{$parameters/app}/{$parameters/form}/data/{$parameters/document}/{event('resource')}"
+            resource="{xxforms:property('oxf.fr.appserver.uri')}{instance('fr-uris-instance')/data-collection}/crud/{$parameters/app}/{$parameters/form}/data/{$parameters/document}/{event('resource')}"
             replace="none"/>
 
     <xforms:submission id="fr-create-update-attachment-submission"
             method="put" serialization="application/octet-stream"
             ref="event('holder')" xxforms:ensure-uploads="false"
-            resource="{event('resource')}"
+            resource="{xxforms:property('oxf.fr.appserver.uri')}{event('resource')}"
             replace="none"/>
 
     <!-- Get document -->
@@ -290,7 +290,7 @@
 
     <xforms:submission id="get-source-form-submission"
         method="get" serialization="none"
-        resource="{instance('fr-uris-instance')/form-collection}/crud/{$parameters/app}/{$parameters/form}/form/form.xhtml"
+        resource="{xxforms:property('oxf.fr.appserver.uri')}{instance('fr-uris-instance')/form-collection}/crud/{$parameters/app}/{$parameters/form}/form/form.xhtml"
         replace="instance" instance="fr-source-form-instance" xxforms:readonly="true" xxforms:xinclude="true">
     </xforms:submission>
 

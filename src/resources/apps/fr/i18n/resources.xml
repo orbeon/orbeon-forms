@@ -12,7 +12,7 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<resources>
+<resources xmlns:xhtml="http://www.w3.org/1999/xhtml">
     <resource xml:lang="en">
         <summary>
             <titles>
@@ -81,6 +81,30 @@
                 <alert>Missing or incorrect value</alert>
             </labels>
         </detail>
+        <import-export>
+            <dialog-title>Save</dialog-title>
+            <dialog-body>
+                <div>
+                    <p>
+                        To save the data you entered:
+                    </p>
+                    <ol>
+                        <li>Click on the link below.</li>
+                        <li>
+                            Then choose where you want the file to be saved on you machine. Note that the file is saved on your
+                            machine. No data is kept on the server and if you delete the file you saved your data will be lost.
+                        </li>
+                    </ol>
+                    <p>
+                        Then to reopen the data:
+                    </p>
+                    <ol>
+                        <li>Double click on the file you saved to open it.</li>
+                        <li>This will take you back to this site with the data and all the fields will be prepopulatd with the data you saved.</li>
+                    </ol>
+                </div>
+            </dialog-body>
+        </import-export>
     </resource>
     <resource xml:lang="fr">
         <summary>

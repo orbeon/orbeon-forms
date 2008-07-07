@@ -90,6 +90,7 @@
     <property as="xs:anyURI"  name="oxf.fr.persistence.app.orbeon.bookcast.form.uri" value="/fr/service/resource"/>
 
     <property as="xs:anyURI"  name="oxf.fr.persistence.service.exist.uri"            value="/exist/rest/db"/>
+    <property as="xs:anyURI"  name="oxf.fr.appserver.uri"                            value="http://localhost:8080/orbeon"/>
 
     <!-- Deprecated XForms cache configuration -->
     <property as="xs:integer" name="oxf.xforms.cache.session.size"                   value="500000"/>

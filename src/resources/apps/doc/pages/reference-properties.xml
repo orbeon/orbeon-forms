@@ -375,6 +375,45 @@
                     </table>
                 </p>
             </section>
+            <a name="appserver-uri"/>
+            <section>
+                <title>oxf.fr.appserver.uri</title>
+                <p>
+                    <table>
+                        <tr>
+                            <th>Purpose</th>
+                            <td>
+                                <p>
+                                    Specify the "base URI" for the server that should be used when making local connections,
+                                    typically to call services. In general this can be left blank, in which case Orbeon
+                                    Forms will use the host, port, and context name as seen by the browser, e.g.
+                                    <code>http://www.mycompany.com/orbeon</code>. Leaving this property empty won't work
+                                    when both of these conditions are met:
+                                </p>
+                                <ul>
+                                    <li>You have a web server (e.g. Apache httpd) which forwards requests to the application server (e.g. Tomcat).</li>
+                                    <li>The application server cannot connect to the web server.</li>
+                                </ul>
+                                <p>
+                                    In those cases, the application server will try to connect to
+                                    <code>http://www.mycompany.com/orbeon/...</code> which isn't reachable. To solve
+                                    those, you can use the <code>oxf.fr.appserver.uri</code> property to provide a URI
+                                    for the application server which can be reached by the application server, for
+                                    instance: <code>http://localhost:8080/orbeon</code>.
+                                </p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Type</th>
+                            <td><code>xs:anyURI</code></td>
+                        </tr>
+                        <tr>
+                            <th>Default Value</th>
+                            <td><i>Empty</i></td>
+                        </tr>
+                    </table>
+                </p>
+            </section>
         </section>
         <a name="epilogue"/>
         <section>

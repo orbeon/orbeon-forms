@@ -1726,7 +1726,7 @@ ORBEON.xforms.Events = {
             // FCKEditor embedded within dialogs with IE. In that case, the editor gets a blur, then the dialog, which
             // prevents detection of value changes in focus() above.
 
-            if (currentFocusControlElement != null && targetControlElement != null && currentFocusControlElement != targetControlElement
+            if (targetControlElement != null && currentFocusControlElement != targetControlElement
                     && !ORBEON.util.Dom.hasClass(targetControlElement, "xforms-dialog")) {
 
                 // Handle special value changes upon losing focus
@@ -1734,33 +1734,35 @@ ORBEON.xforms.Events = {
                 // HTML area and trees does not throw value change event, so we send the value change to the server
                 // when we get the focus on the next control
                 var changeValue = false;
-                if (ORBEON.util.Dom.hasClass(currentFocusControlElement, "xforms-textarea")
-                        && ORBEON.util.Dom.hasClass(currentFocusControlElement, "xforms-mediatype-text-html")) {
-                    // To-do: would be nice to use the ORBEON.xforms.Controls.getCurrentValue() so we don't duplicate the code here
-                    var editorInstance = FCKeditorAPI.GetInstance(currentFocusControlElement.name);
-                    currentFocusControlElement.value = editorInstance.GetXHTML();
-                    changeValue = true;
-                } else if (ORBEON.util.Dom.hasClass(currentFocusControlElement, "xforms-select1-appearance-xxforms-tree")
-                        || ORBEON.util.Dom.hasClass(currentFocusControlElement, "xforms-select-appearance-xxforms-tree")) {
-                    changeValue = true;
-                } else if (ORBEON.xforms.Globals.isMac && ORBEON.xforms.Globals.isRenderingEngineGecko
-                        && ORBEON.util.Dom.hasClass(currentFocusControlElement, "xforms-control")
-                        && !ORBEON.util.Dom.hasClass(currentFocusControlElement, "xforms-output")
-                        && ! ORBEON.util.Dom.hasClass(currentFocusControlElement, "xforms-trigger")) {
-                    // On Firefox running on Mac, when users ctrl-tabs out of Firefox, comes back, and then changes the focus
-                    // to another field, we don't receive a change event. On Windows that change event is sent then user tabs
-                    // out of Firefox. So here, we make sure that a value change has been sent to the server for the previous control
-                    // that had the focus when we get the focus event for another control.
-                    changeValue = true;
-                }
-                // Send value change if needed
-                if (changeValue)
-                    xformsValueChanged(currentFocusControlElement, null);
+                if (currentFocusControlElement != null) {// can be null on first focus
+                    if (ORBEON.util.Dom.hasClass(currentFocusControlElement, "xforms-textarea")
+                            && ORBEON.util.Dom.hasClass(currentFocusControlElement, "xforms-mediatype-text-html")) {
+                        // To-do: would be nice to use the ORBEON.xforms.Controls.getCurrentValue() so we don't duplicate the code here
+                        var editorInstance = FCKeditorAPI.GetInstance(currentFocusControlElement.name);
+                        currentFocusControlElement.value = editorInstance.GetXHTML();
+                        changeValue = true;
+                    } else if (ORBEON.util.Dom.hasClass(currentFocusControlElement, "xforms-select1-appearance-xxforms-tree")
+                            || ORBEON.util.Dom.hasClass(currentFocusControlElement, "xforms-select-appearance-xxforms-tree")) {
+                        changeValue = true;
+                    } else if (ORBEON.xforms.Globals.isMac && ORBEON.xforms.Globals.isRenderingEngineGecko
+                            && ORBEON.util.Dom.hasClass(currentFocusControlElement, "xforms-control")
+                            && !ORBEON.util.Dom.hasClass(currentFocusControlElement, "xforms-output")
+                            && ! ORBEON.util.Dom.hasClass(currentFocusControlElement, "xforms-trigger")) {
+                        // On Firefox running on Mac, when users ctrl-tabs out of Firefox, comes back, and then changes the focus
+                        // to another field, we don't receive a change event. On Windows that change event is sent then user tabs
+                        // out of Firefox. So here, we make sure that a value change has been sent to the server for the previous control
+                        // that had the focus when we get the focus event for another control.
+                        changeValue = true;
+                    }
+                    // Send value change if needed
+                    if (changeValue)
+                        xformsValueChanged(currentFocusControlElement, null);
 
-                // Handle DOMFocusOut
-                // Should send out DOMFocusOut only if no xxforms-value-change-with-focus-change was sent to avoid extra
-                // DOMFocusOut, but it is hard to detect correctly
-                events.push(xformsCreateEventArray(currentFocusControlElement, "DOMFocusOut", null));
+                    // Handle DOMFocusOut
+                    // Should send out DOMFocusOut only if no xxforms-value-change-with-focus-change was sent to avoid extra
+                    // DOMFocusOut, but it is hard to detect correctly
+                    events.push(xformsCreateEventArray(currentFocusControlElement, "DOMFocusOut", null));
+                }
 
                 // Handle DOMFocusIn
                 events.push(xformsCreateEventArray(targetControlElement, "DOMFocusIn", null));

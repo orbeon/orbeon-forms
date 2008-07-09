@@ -22,6 +22,6 @@ import org.orbeon.oxf.xforms.event.XFormsEvents;
  */
 public class XXFormsRepeatFocusEvent extends XFormsEvent {
     public XXFormsRepeatFocusEvent(XFormsEventTarget targetObject) {
-        super(XFormsEvents.XXFORMS_FOCUS, targetObject, false, false);
+        super(XFormsEvents.XXFORMS_REPEAT_FOCUS, targetObject, false, false);
     }
 }

@@ -38,6 +38,8 @@ public class ContentHandlerOutputStream extends OutputStream {
 
     private byte[] singleByte = new byte[1];
 
+    private boolean closed;
+
     public ContentHandlerOutputStream(ContentHandler contentHandler) {
         this.contentHandler = contentHandler;
     }
@@ -55,16 +57,20 @@ public class ContentHandlerOutputStream extends OutputStream {
         contentHandler.startElement("", DEFAULT_BINARY_DOCUMENT_ELEMENT, DEFAULT_BINARY_DOCUMENT_ELEMENT, attributes);
     }
 
-    public void endDocument() throws SAXException {
-        // End document
-        contentHandler.endElement("", DEFAULT_BINARY_DOCUMENT_ELEMENT, DEFAULT_BINARY_DOCUMENT_ELEMENT);
-        contentHandler.endPrefixMapping(XMLConstants.XSI_PREFIX);
-        contentHandler.endPrefixMapping(XMLConstants.XSD_PREFIX);
-        contentHandler.endDocument();
-    }
-
     public void close() throws IOException {
-        flushBuffer();
+        if (!closed) {
+            flushBuffer();
+            try {
+                // End document
+                contentHandler.endElement("", DEFAULT_BINARY_DOCUMENT_ELEMENT, DEFAULT_BINARY_DOCUMENT_ELEMENT);
+                contentHandler.endPrefixMapping(XMLConstants.XSI_PREFIX);
+                contentHandler.endPrefixMapping(XMLConstants.XSD_PREFIX);
+                contentHandler.endDocument();
+            } catch (SAXException e) {
+                throw new OXFException(e);
+            }
+            closed = true;
+        }
     }
 
     public void flush() throws IOException {

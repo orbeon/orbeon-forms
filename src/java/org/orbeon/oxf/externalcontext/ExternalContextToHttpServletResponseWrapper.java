@@ -48,6 +48,7 @@ public class ExternalContextToHttpServletResponseWrapper extends HttpServletResp
     }
 
     public void addCookie(Cookie cookie) {
+        //TODO
         if (nativeResponse != null)
             nativeResponse.addCookie(cookie);
     }

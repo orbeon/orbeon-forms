@@ -13,9 +13,6 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
-import org.dom4j.QName;
-import org.orbeon.oxf.processor.PageFlowControllerProcessor;
-import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsControls;
 import org.orbeon.oxf.xforms.XFormsProperties;
@@ -88,18 +85,16 @@ public class XHTMLBodyHandler extends HandlerBase {
         // TODO: would be nice to do this here, but then we need to make sure this prefix is available to other handlers
 //        formattingPrefix = handlerContext.findFormattingPrefixDeclare();
 
-        // Create xhtml:form element
-        final String xformsSubmissionPath = OXFProperties.instance().getPropertySet(
-                new QName("page-flow", XMLConstants.OXF_PROCESSORS_NAMESPACE)).getString(
-                PageFlowControllerProcessor.XFORMS_SUBMISSION_PATH_PROPERTY_NAME,
-                PageFlowControllerProcessor.XFORMS_SUBMISSION_PATH_DEFAULT_VALUE);
+        // Submission posts to URL of the current page and xforms-xml-submission.xpl intercepts that
+        final String xformsSubmissionPath = externalContext.getRequest().getRequestPath();
 
+        // Create xhtml:form element
         final boolean hasUpload = containingDocument.getStaticState().hasControlByName("upload");
         helper.startElement(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "form", new String[] {
                 // Add id so that things work in portals
                 "id", XFormsUtils.namespaceId(containingDocument, "xforms-form"),
-                // Regular class
-                "class", "xforms-form",
+                // Regular classes
+                "class", isNoscript ? "xforms-form xforms-noscript" : "xforms-form",
                 // Submission parameters
                 "action", xformsSubmissionPath, "method", "POST",
                 // In noscript mode, don't add event handler

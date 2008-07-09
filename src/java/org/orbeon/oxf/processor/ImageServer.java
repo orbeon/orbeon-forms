@@ -395,10 +395,8 @@ public class ImageServer extends ProcessorImpl {
                 });
 
                 try {
-                    // This is necessary so that flushing occurs
+                    // End document and close
                     contentHandlerOutputStream.close();
-                    // End the document
-                    contentHandlerOutputStream.endDocument();
                 } catch (Exception e) {
                     throw new OXFException(e);
                 }

@@ -43,7 +43,9 @@ public class XFormsSubmissionUtils {
      * Perform an optimized local connection using the Servlet API instead of using a URLConnection.
      */
     public static XFormsModelSubmission.ConnectionResult doOptimized(PipelineContext pipelineContext, ExternalContext externalContext,
-                                                                     XFormsModelSubmission xformsModelSubmission, String httpMethod, final String action, String mediatype, boolean doReplace,
+                                                                     ExternalContext.Response response,
+                                                                     XFormsModelSubmission xformsModelSubmission,
+                                                                     String httpMethod, final String action, String mediatype, boolean doReplace,
                                                                      byte[] messageBody, String queryString) {
 
         final XFormsContainingDocument containingDocument = (xformsModelSubmission != null) ? xformsModelSubmission.getContainingDocument() : null;
@@ -105,7 +107,8 @@ public class XFormsSubmissionUtils {
                 if (xformsModelSubmission != null)
                     xformsModelSubmission.getContainingDocument().dispatchEvent(pipelineContext, new XFormsSubmitDoneEvent(xformsModelSubmission, connectionResult.resourceURI, connectionResult.statusCode));
                 // Just forward the reply
-                requestDispatcher.forward(requestAdapter, externalContext.getResponse());
+                // Reason we use a Response passed is for the case of replace="all" when XFormsContainingDocument provides a Response
+                requestDispatcher.forward(requestAdapter, response != null ? response : externalContext.getResponse());
                 connectionResult.dontHandleResponse = true;
             } else {
                 // We must intercept the reply

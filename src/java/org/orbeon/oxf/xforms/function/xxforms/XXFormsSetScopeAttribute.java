@@ -52,6 +52,7 @@ public class XXFormsSetScopeAttribute extends XFormsFunction {
             }
 
             // Store value
+            // TODO: It seems that Jetty sometimes fails down the line here by calling equals() on the value.
             scope.put(attributeName, value);
         }
     }

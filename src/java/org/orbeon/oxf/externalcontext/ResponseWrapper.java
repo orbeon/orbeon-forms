@@ -20,9 +20,6 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Map;
 
-/**
- *
- */
 public class ResponseWrapper implements ExternalContext.Response {
     private ExternalContext.Response _response;
 

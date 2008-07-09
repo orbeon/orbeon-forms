@@ -14,6 +14,7 @@
 package org.orbeon.oxf.processor.pipeline.choose;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.log4j.Logger;
 import org.orbeon.oxf.cache.Cacheable;
 import org.orbeon.oxf.cache.OutputCacheKey;
 import org.orbeon.oxf.common.OXFException;
@@ -23,6 +24,7 @@ import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary;
 import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPathCache;
+import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.om.DocumentInfo;
@@ -31,6 +33,8 @@ import org.xml.sax.ContentHandler;
 import java.util.*;
 
 public class ConcreteChooseProcessor extends ProcessorImpl {
+
+    public static Logger logger = LoggerFactory.createLogger(ConcreteChooseProcessor.class);
 
     // Created when constructed
     private LocationData locationData;
@@ -163,7 +167,7 @@ public class ConcreteChooseProcessor extends ProcessorImpl {
         DocumentInfo hrefDocumentInfo = null;
         int branchIndex = 0;
         int selectedBranch = -1;
-        for (Iterator i = branchConditions.iterator(); i.hasNext();) {
+        for (Iterator i = branchConditions.iterator(); i.hasNext(); branchIndex++) {
             // Evaluate expression
             final String condition = (String) i.next();
             if (condition == null) {
@@ -186,14 +190,15 @@ public class ConcreteChooseProcessor extends ProcessorImpl {
             PooledXPathExpression expr = null;
             final Map namespaces = (Map) branchNamespaces.get(branchIndex);
             try {
-                expr = XPathCache.getXPathExpression(context, hrefDocumentInfo, "boolean(" + condition + ")", namespaces, null, PipelineFunctionLibrary.instance(), null, getLocationData());
+                expr = XPathCache.getXPathExpression(context, hrefDocumentInfo, "boolean(" + condition + ")", namespaces, null, PipelineFunctionLibrary.instance(), null, locationData);// TODO: location should be that of branch
                 if( ((Boolean)expr.evaluateSingle()).booleanValue()) {
                     selectedBranch = branchIndex;
                     break;
                 }
-                branchIndex++;
             } catch (XPathException e) {
-                throw new OXFException(e);
+                if (logger.isDebugEnabled())
+                    logger.debug("Choose: condition evaluation failed for condition: " + condition + " at " + branchProcessors.get(branchIndex));// TODO: location should be that of branch
+                throw new ValidationException("Choose: condition evaluation failed for condition: " + condition, e, locationData);// TODO: location should be that of branch
             } finally{
                 try {
                     if(expr != null) expr.returnToPool();
@@ -201,7 +206,6 @@ public class ConcreteChooseProcessor extends ProcessorImpl {
                     throw new OXFException(e);
                 }
             }
-
         }
 
         if (selectedBranch == -1) {
@@ -227,6 +231,14 @@ public class ConcreteChooseProcessor extends ProcessorImpl {
             // Connect branch outputs, or start processor
             selectedBranchProcessor.reset(context);
             if (outputsById.size() == 0 && outputsByParamRef.size() == 0) {
+                if (logger.isDebugEnabled()) {
+                    final String condition = (String) branchConditions.get(selectedBranch);
+                    // TODO: location should be that of branch
+                    if (condition != null)
+                        logger.debug("Choose: taking when branch with test: " + condition + " at " + locationData);
+                    else
+                        logger.debug("Choose: taking otherwise branch at " + locationData);
+                }
                 selectedBranchProcessor.start(context);
             }
             state.started = true;

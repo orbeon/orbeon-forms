@@ -491,7 +491,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                                     containingDocument.logDebug("model", "getting document from optimized URI",
                                                 new String[] { "URI", resolvedURI.toString() });
 
-                                connectionResult = XFormsSubmissionUtils.doOptimized(pipelineContext, externalContext, null, "get", resolvedURI.toString(), null, false, null, null);
+                                connectionResult = XFormsSubmissionUtils.doOptimized(pipelineContext, externalContext,
+                                        null, null, "get", resolvedURI.toString(), null, false, null, null);
 
                                 instanceSourceURI = resolvedURI.toString();
                                 xxformsUsername = null;

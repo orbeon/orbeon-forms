@@ -350,7 +350,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
     }
 
     public void performDefaultAction(PipelineContext pipelineContext, XFormsEvent event) {
-        if (XFormsEvents.XXFORMS_FOCUS.equals(event.getEventName()) || XFormsEvents.XFORMS_FOCUS.equals(event.getEventName())) {
+        if (XFormsEvents.XXFORMS_REPEAT_FOCUS.equals(event.getEventName()) || XFormsEvents.XFORMS_FOCUS.equals(event.getEventName())) {
 
             // Try to update xforms:repeat indices based on this
             {

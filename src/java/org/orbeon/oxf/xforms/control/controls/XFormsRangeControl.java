@@ -54,6 +54,7 @@ public class XFormsRangeControl extends XFormsValueControl {
     }
 
     public void storeExternalValue(PipelineContext pipelineContext, String value, String type) {
+        // Store after converting
         super.storeExternalValue(pipelineContext, convertFromExternalValue(value), type);
     }
 

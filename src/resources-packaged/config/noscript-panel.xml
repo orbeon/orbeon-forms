@@ -11,13 +11,15 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<noscript xmlns="http://www.w3.org/1999/xhtml" class="xforms-noscript-panel">
-    <p>
-        Your browser does not appear to support JavaScript. You may want to try one of the following:
-    </p>
-    <ul>
-        <li>Turn on JavaScript in your browser if it supports it.</li>
-        <li>Use a browser that supports JavaScript.</li>
-        <li>Try a JavaScript-free version of this page, if made available by the application author.</li>
-    </ul>
+<noscript xmlns="http://www.w3.org/1999/xhtml">
+    <div class="xforms-noscript-panel">
+        <p>
+            Your browser does not appear to support JavaScript. You may want to try one of the following:
+        </p>
+        <ul>
+            <li>Turn on JavaScript in your browser if it supports it.</li>
+            <li>Use a browser that supports JavaScript.</li>
+            <li>Try a JavaScript-free version of this page, if made available by the application author.</li>
+        </ul>
+    </div>
 </noscript>

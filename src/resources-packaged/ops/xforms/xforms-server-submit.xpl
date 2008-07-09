@@ -14,7 +14,8 @@
 <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
     xmlns:oxf="http://www.orbeon.com/oxf/processors"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
     <!-- Extract parameters -->
     <p:processor name="oxf:request">
@@ -112,12 +113,18 @@
             </p:processor>
 
             <!-- Call epilogue -->
-            <p:processor name="oxf:pipeline">
-                <p:input name="config" href="/config/epilogue-servlet.xpl"/>
-                <p:input name="data"><null xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/></p:input>
-                <p:input name="xformed-data" href="#xformed-data"/>
-                <p:input name="instance"><null xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/></p:input>
-            </p:processor>
+            <!-- NOTE: We either get an XHTML document produced by the XForms engine, a binary document in case there
+                 was a submission with replace="all", or a null document -->
+            <p:choose href="#xformed-data">
+                <p:when test="not(/null[@xsi:nil = 'true'])">
+                    <p:processor name="oxf:pipeline">
+                        <p:input name="config" href="/config/epilogue-servlet.xpl"/>
+                        <p:input name="data"><null xsi:nil="true"/></p:input>
+                        <p:input name="xformed-data" href="#xformed-data"/>
+                        <p:input name="instance"><null xsi:nil="true"/></p:input>
+                    </p:processor>
+                </p:when>
+            </p:choose>
         </p:otherwise>
     </p:choose>
 

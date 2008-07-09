@@ -79,6 +79,13 @@ public class BinaryTextContentHandler extends ContentHandlerAdapter {
         this.ignoreDocumentEncoding = ignoreDocumentEncoding;
     }
 
+//    private boolean started;
+//    public void startDocument() throws SAXException {
+//        if (started)
+//            throw new IllegalStateException("startDocument already called");
+//        started = true;
+//    }
+
     public void startPrefixMapping(String prefix, String uri) {
         if (elementLevel == 0) {
             // Record definitions only before root element arrives

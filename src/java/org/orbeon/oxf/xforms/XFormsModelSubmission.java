@@ -266,6 +266,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
             containingDocument.setGotSubmission();
 
+            // Variables declared here as they are used in a catch/finally block
             boolean isDeferredSubmissionSecondPassReplaceAll = false;
             XFormsSubmitErrorEvent submitErrorEvent = null;
             XFormsSubmitDoneEvent submitDoneEvent = null;
@@ -715,6 +716,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                     } else if (!NetUtils.urlHasProtocol(resolvedActionOrResource)
                                && !fURLNorewrite
+                               && !isNoscript // This SHOULD work with isNoscript as well, but it turns out we get exceptions related to content handlers, so disable for now
                                && headerNames == null
                                && ((request.getContainerType().equals("portlet") && !"resource".equals(urlType))
                                     || (request.getContainerType().equals("servlet")
@@ -740,9 +742,17 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         // NOTE: We don't want any changes to happen to the document upon xxforms-submit when producing
                         // a new document so we don't dispatch xforms-submit-done and pass a null XFormsModelSubmission
                         // in that case
-                        connectionResult = XFormsSubmissionUtils.doOptimized(pipelineContext, externalContext,
+
+                        if (XFormsServer.logger.isDebugEnabled())
+                                containingDocument.logDebug("submission", "starting optimized submission", new String[] { "id", getEffectiveId() });
+
+                        connectionResult = XFormsSubmissionUtils.doOptimized(pipelineContext, externalContext, containingDocument.getResponse(),
                                 isDeferredSubmissionSecondPassReplaceAll ? null : this, actualHttpMethod, resolvedURI.toString(), actualRequestMediatype, isReplaceAll,
                                 messageBody, queryString);
+
+                        // This means we got a submission with replace="all"
+                        if (connectionResult.dontHandleResponse)
+                            containingDocument.setGotSubmissionReplaceAll();
 
                     } else {
                         // This is a regular remote submission going through a protocol handler
@@ -810,13 +820,24 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                     if (!isDeferredSubmissionSecondPassReplaceAll) // we don't want any changes to happen to the document upon xxforms-submit when producing a new document
                                         containingDocument.dispatchEvent(pipelineContext, new XFormsSubmitDoneEvent(XFormsModelSubmission.this, connectionResult));
 
-                                    final ExternalContext.Response response = externalContext.getResponse();
+                                    // Remember that we got a submission producing output
+                                    containingDocument.setGotSubmissionReplaceAll();
+
+                                    // Get response from containing document
+                                    final ExternalContext.Response response = containingDocument.getResponse();
+
+                                    // Set content-type
+                                    response.setContentType(connectionResult.responseMediaType);
 
                                     // Forward headers to response
                                     connectionResult.forwardHeaders(response);
 
                                     // Forward content to response
-                                    NetUtils.copyStream(connectionResult.getResponseInputStream(), response.getOutputStream());
+                                    final OutputStream outputStream = response.getOutputStream();
+                                    NetUtils.copyStream(connectionResult.getResponseInputStream(), outputStream);
+
+                                    // End document and close
+                                    outputStream.close();
 
                                     // TODO: [#306918] RFE: Must be able to do replace="all" during initialization.
                                     // http://forge.objectweb.org/tracker/index.php?func=detail&aid=306918&group_id=168&atid=350207

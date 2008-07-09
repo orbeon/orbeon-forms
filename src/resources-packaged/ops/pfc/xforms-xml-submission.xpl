@@ -32,12 +32,31 @@
                 <include>/request/parameters</include>
             </config>
         </p:input>
+        <!--<p:output name="data" id="request-info" debug="xxxxml-submission"/>-->
         <p:output name="data" id="request-info"/>
     </p:processor>
 
     <p:choose href="#request-info">
+        <!-- Check for noscript mode form post OR script form post for replace="all" -->
+        <p:when test="lower-case(/*/method) = ('post')
+                        and /*/content-type = ('application/x-www-form-urlencoded', 'multipart/form-data')
+                        and (/*/parameters/parameter[name = '$noscript']/value = 'true' or /*/parameters/parameter[name = '$server-events'])">
+            <!-- Process submission -->
+            <p:processor name="oxf:pipeline">
+                <p:input name="config" href="/ops/xforms/xforms-server-submit.xpl"/>
+            </p:processor>
+            <!-- No submission and no default submission, return special null document to say that all processing has been handled -->
+            <p:processor name="oxf:identity">
+                <p:input name="data">
+                    <!-- The PFC knows about this one, and that's kind of a HACK -->
+                    <bypass xsi:nil="true"/>
+                </p:input>
+                <p:output name="data" ref="instance"/>
+            </p:processor>
+        </p:when>
         <!-- Check for XML post -->
-        <p:when test="lower-case(/*/method) = ('post', 'put') and (/*/content-type = ('application/xml', 'text/xml') or ends-with(/*/content-type, '+xml'))">
+        <p:when test="lower-case(/*/method) = ('post', 'put')
+                        and (/*/content-type = ('application/xml', 'text/xml') or ends-with(/*/content-type, '+xml'))">
 
             <!-- Extract request body -->
             <p:processor name="oxf:request">
@@ -78,7 +97,8 @@
             </p:choose>
 
         </p:when>
-        <p:when test="(lower-case(/*/method) = 'get' or /*/container-type = 'portlet') and /*/parameters/parameter[name = '$instance']">
+        <p:when test="(lower-case(/*/method) = 'get' or /*/container-type = 'portlet')
+                        and /*/parameters/parameter[name = '$instance']">
             <!-- Check for XML GET with $instance parameter -->
 
             <!-- Decode parameter -->
@@ -118,7 +138,6 @@
 
         </p:when>
         <p:otherwise>
-            
             <p:choose href="#default-submission">
                 <p:when test="/null/@xsi:nil = 'true'">
                     <!-- No submission and no default submission, return null document -->

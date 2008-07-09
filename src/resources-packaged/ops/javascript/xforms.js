@@ -4097,7 +4097,8 @@ ORBEON.xforms.Server = {
                                             // Display loading indicator unless the server tells us not to display it
                                             newDynamicStateTriggersReplace = true;
                                         }
-                                        requestForm.action = action;
+                                        // We now always use the action set by the client
+                                        //requestForm.action = action;
                                         if (target == null) {
                                             // Reset as this may have been changed before by asyncRequest
                                             requestForm.removeAttribute("target");

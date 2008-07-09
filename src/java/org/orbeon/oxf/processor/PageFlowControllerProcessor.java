@@ -564,7 +564,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
     }
 
     /**
-     * Handle &lt;page&gt;
+     * Handle <page>
      */
     private void handlePage(final StepProcessorContext stepProcessorContext, final String controllerContext,
                             List statementsList, final Element pageElement, final int pageNumber,
@@ -694,6 +694,29 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
         final boolean[] foundActionWithoutWhen = new boolean[] { false };
         final ASTChoose actionsChoose = new ASTChoose(new ASTHrefId(xformedInstance)) {{
 
+            // Always add a branch to test on whether the XML submission asked to bypass actions, model, view, and epilogue
+            // Use of this <bypass> document is arguably a HACK 
+            addWhen(new ASTWhen() {{
+
+                setTest("/bypass[@xsi:nil = 'true']");
+                setNamespaces(NAMESPACES_WITH_XSI_AND_XSLT);
+
+                addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
+                    addInput(new ASTInput("data", Dom4jUtils.NULL_DOCUMENT));
+                    addOutput(new ASTOutput("data", xupdatedInstance));
+                }});
+                addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
+                    final Document config = new NonLazyUserDataDocument(new NonLazyUserDataElement("is-redirect"));
+                    config.getRootElement().addText("true");
+                    addInput(new ASTInput("data", config));
+                    addOutput(new ASTOutput("data", isRedirect));
+                }});
+                addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
+                    addInput(new ASTInput("data", Dom4jUtils.NULL_DOCUMENT));
+                    addOutput(new ASTOutput("data", actionData));
+                }});
+            }});
+
             for (Iterator j = actionElements.iterator(); j.hasNext();) {
 
                 // Get info about action
@@ -818,7 +841,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                         addOutput(new ASTOutput("data", xupdatedInstance));
                     }});
                     addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
-                        Document config = new NonLazyUserDataDocument(new NonLazyUserDataElement("is-redirect"));
+                        final Document config = new NonLazyUserDataDocument(new NonLazyUserDataElement("is-redirect"));
                         config.getRootElement().addText("false");
                         addInput(new ASTInput("data", config));
                         addOutput(new ASTOutput("data", isRedirect));
@@ -831,19 +854,8 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
             }
         }};
 
-        if (actionNumber[0] != 0) {
-            // There is at least one action
-            if (actionNumber[0] == 1 && foundActionWithoutWhen[0]) {
-                // Only one default action, directly add branch statements
-                statementsList.addAll(((ASTWhen) actionsChoose.getWhen().get(0)).getStatements());
-            } else {
-                // At least one non-default action
-                statementsList.add(actionsChoose);
-            }
-        } else  {
-            // There are no actions, don't create unnecessary p:choose and just add default branch statements
-            statementsList.addAll(((ASTWhen) actionsChoose.getWhen().get(0)).getStatements());
-        }
+        // Add choose statement
+        statementsList.add(actionsChoose);
 
         // Only continue if there was no redirect
         statementsList.add(new ASTChoose(new ASTHrefId(isRedirect)) {{
@@ -1001,7 +1013,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
         final String _instancePassing = instancePassingAttribute == null ? instancePassing : instancePassingAttribute.getValue();
         final String otherXForms = (String) pageIdToXFormsModel.get(resultPageId);
 
-        // Whethe we use the legacy XUpdate transformation
+        // Whether we use the legacy XUpdate transformation
         final boolean useLegacyTransformation =
             (resultElement != null && !resultElement.elements().isEmpty() && resultElement.attribute("transform") == null);
 
@@ -1210,7 +1222,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
     }
 
     /**
-     * Handle &lt;files>
+     * Handle <files>
      */
     private void handleFile(ASTWhen when, final ASTOutput request, final String mimeType,
                             final ASTOutput epilogueData, final ASTOutput epilogueModelData,

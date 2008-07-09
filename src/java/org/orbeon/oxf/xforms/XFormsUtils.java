@@ -727,11 +727,19 @@ public class XFormsUtils {
         }
     }
 
-    public static String resolveURLDoReplace(XFormsContainingDocument containingDocument, PipelineContext pipelineContext, Element currentElement, String url) {
-        final boolean isPortletLoad = "portlet".equals(containingDocument.getContainerType());
-
+    /**
+     * Resolve a render or action URL including xml:base resolution.
+     *
+     * @param isPortletLoad         whether this is called within a portlet
+     * @param pipelineContext       current PipelineContext
+     * @param currentElement        element used for xml:base resolution
+     * @param url                   URL to resolve
+     * @param generateAbsoluteURL   whether the result must be an absolute URL (if isPortletLoad == false)
+     * @return                      resolved URL
+     */
+    public static String resolveRenderOrActionURL(boolean isPortletLoad, PipelineContext pipelineContext, Element currentElement, String url, boolean generateAbsoluteURL) {
         final URI resolvedURI = resolveXMLBase(currentElement, url);
-        final String resolvedURISTring = resolvedURI.toString();
+        final String resolvedURIString = resolvedURI.toString();
         final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
 
         final String externalURL;
@@ -739,7 +747,8 @@ public class XFormsUtils {
         // runs in a servlet when processing these events!
         if (!isPortletLoad) {
             // XForms page was loaded from a servlet
-            externalURL = externalContext.getResponse().rewriteRenderURL(resolvedURISTring);
+            externalURL = URLRewriter.rewriteURL(externalContext.getRequest(), resolvedURIString,
+                generateAbsoluteURL ? ExternalContext.Response.REWRITE_MODE_ABSOLUTE : ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
         } else {
             // XForms page was loaded from a portlet
             if (resolvedURI.getFragment() != null) {
@@ -750,20 +759,30 @@ public class XFormsUtils {
                     throw new OXFException(e);
                 }
             } else {
-                externalURL = resolvedURISTring;
+                externalURL = resolvedURIString;
             }
         }
 
         return externalURL;
     }
 
-    public static String resolveResourceURL(PipelineContext pipelineContext, Element currentElement, String url, boolean absolute) {
+    /**
+     * Resolve a resource URL includng xml:base resolution.
+     *
+     * @param pipelineContext       current PipelineContext
+     * @param currentElement        element used for xml:base resolution
+     * @param url                   URL to resolve
+     * @param generateAbsoluteURL   whether the result must be an absolute URL (if isPortletLoad == false)
+     * @return                      resolved URL
+     */
+    public static String resolveResourceURL(PipelineContext pipelineContext, Element currentElement, String url, boolean generateAbsoluteURL) {
 
         final URI resolvedURI = resolveXMLBase(currentElement, url);
-        final String resolvedURISTring = resolvedURI.toString();
+        final String resolvedURIString = resolvedURI.toString();
         final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
 
-        return externalContext.getResponse().rewriteResourceURL(resolvedURISTring, absolute);
+        return URLRewriter.rewriteURL(externalContext.getRequest(), resolvedURIString,
+                generateAbsoluteURL ? ExternalContext.Response.REWRITE_MODE_ABSOLUTE : ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
     }
 
     /**

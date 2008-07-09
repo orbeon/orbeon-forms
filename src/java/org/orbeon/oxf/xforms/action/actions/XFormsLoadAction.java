@@ -94,11 +94,17 @@ public class XFormsLoadAction extends XFormsAction {
             // Keep value unchanged if it's just a fragment or if we are explicitly disabling rewriting
             externalURL = value;
         } else {
+            // In noscript mode, produce an absolute URL because it will be passed to
+            // ExternalContext.Response.sendRedirect(), which atm prepends the context path. Possibly, the external
+            // URL could be made to not include the context path, but then there may be a need for additional info in
+            // Load to differentiate between an absolute path with context and one without context.
+
+            final boolean generateAbsoluteURL = XFormsProperties.isNoscript(containingDocument);
             if ((!isPortletLoad) ? doReplace : (doReplace && !"resource".equals(urlType))) {
-                externalURL = XFormsUtils.resolveURLDoReplace(containingDocument, pipelineContext, currentElement, value);
+                externalURL = XFormsUtils.resolveRenderOrActionURL(isPortletLoad, pipelineContext, currentElement, value, generateAbsoluteURL);
             } else {
                 // Just a resource URL
-                externalURL = XFormsUtils.resolveResourceURL(pipelineContext, currentElement, value, false);
+                externalURL = XFormsUtils.resolveResourceURL(pipelineContext, currentElement, value, generateAbsoluteURL);
             }
         }
         containingDocument.addLoadToRun(externalURL, target, urlType, doReplace, isPortletLoad, isShowProgress);

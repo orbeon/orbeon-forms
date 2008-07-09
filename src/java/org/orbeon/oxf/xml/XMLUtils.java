@@ -1063,4 +1063,15 @@ public class XMLUtils {
         newAttributes.addAttribute(uri, localname, XMLUtils.buildQName(prefix, localname), ContentHandlerHelper.CDATA, value);
         return newAttributes;
     }
+
+    public static void streamNullDocument(ContentHandler contentHandler) throws SAXException {
+        contentHandler.startDocument();
+        contentHandler.startPrefixMapping(XMLConstants.XSI_PREFIX, XMLConstants.XSI_URI);
+        final AttributesImpl attributes = new AttributesImpl();
+        attributes.addAttribute(XMLConstants.XSI_URI, "nil", "xsi:nil", "CDATA", "true");
+        contentHandler.startElement("", "null", "null", attributes);
+        contentHandler.endElement("", "null", "null");
+        contentHandler.endPrefixMapping(XMLConstants.XSI_PREFIX);
+        contentHandler.endDocument();
+    }
 }

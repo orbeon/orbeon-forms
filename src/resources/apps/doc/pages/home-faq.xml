@@ -892,6 +892,14 @@
             <a name="xforms-server-submit"/>
             <section added="2007-03-09">
                 <title>What is the matter about this <code>/xforms-server-submit</code> I am seeing?</title>
+                <note>
+                    <p>
+                        As of Orbeon Forms 3.7, this is partially addressed as the submissions are now done to the URL
+                        of the current page (<a href="http://tinyurl.com/6mva5o">see the RFE</a>). This does not solve
+                        the issue entirely, but it makes the URLs look nicer to the user. In the future, we hope to
+                        improve on this (<a href="http://tinyurl.com/692f7r">see the RFE</a>).
+                    </p>
+                </note>
                 <p>
                     Remember that the Orbeon Forms XForms engine runs for the most part on the server. This means that
                     when you perform an XForms submission that uses HTTP, that submission usually originates from the

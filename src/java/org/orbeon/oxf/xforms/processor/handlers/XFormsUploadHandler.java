@@ -92,7 +92,7 @@ public class XFormsUploadHandler extends XFormsCoreControlHandler {
                     reusableAttributes.clear();
                     reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-upload-filename");
                     contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, reusableAttributes);
-                    final String filename = (uploadControl == null) ? null : uploadControl.getFilename(pipelineContext);
+                    final String filename = (uploadControl == null) ? null : uploadControl.getFileName(pipelineContext);
                     if (filename != null)
                         contentHandler.characters(filename.toCharArray(), 0, filename.length());
                     contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
@@ -101,7 +101,7 @@ public class XFormsUploadHandler extends XFormsCoreControlHandler {
                     reusableAttributes.clear();
                     reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-upload-mediatype");
                     contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, reusableAttributes);
-                    final String mediatype = (uploadControl == null) ? null : uploadControl.getMediatype(pipelineContext);
+                    final String mediatype = (uploadControl == null) ? null : uploadControl.getFileMediatype(pipelineContext);
                     if (mediatype != null)
                         contentHandler.characters(mediatype.toCharArray(), 0, mediatype.length());
                     contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
@@ -110,7 +110,7 @@ public class XFormsUploadHandler extends XFormsCoreControlHandler {
                     reusableAttributes.clear();
                     reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-upload-size");
                     contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, reusableAttributes);
-                    final String size = (uploadControl == null) ? null : uploadControl.getSize(pipelineContext);
+                    final String size = (uploadControl == null) ? null : uploadControl.getFileSize(pipelineContext);
                     if (size != null)
                         contentHandler.characters(size.toCharArray(), 0, size.length());
                     contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);

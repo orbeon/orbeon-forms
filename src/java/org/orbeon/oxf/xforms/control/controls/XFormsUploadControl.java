@@ -64,9 +64,9 @@ public class XFormsUploadControl extends XFormsValueControl {
         super.evaluate(pipelineContext);
 
         getState(pipelineContext);
-        getMediatype(pipelineContext);
-        getFilename(pipelineContext);
-        getSize(pipelineContext);
+        getFileMediatype(pipelineContext);
+        getFileName(pipelineContext);
+        getFileSize(pipelineContext);
     }
 
     public void storeExternalValue(PipelineContext pipelineContext, String value, String type) {
@@ -168,7 +168,7 @@ public class XFormsUploadControl extends XFormsValueControl {
         return state;
     }
 
-    public String getMediatype(PipelineContext pipelineContext) {
+    public String getFileMediatype(PipelineContext pipelineContext) {
         if (!isMediatypeEvaluated) {
             mediatype = (mediatypeElement == null) ? null : getInfoValue(pipelineContext, mediatypeElement);
             isMediatypeEvaluated = true;
@@ -176,7 +176,7 @@ public class XFormsUploadControl extends XFormsValueControl {
         return mediatype;
     }
 
-    public String getFilename(PipelineContext pipelineContext) {
+    public String getFileName(PipelineContext pipelineContext) {
         if (!isFilenameEvaluated) {
             filename = (filenameElement == null) ? null : getInfoValue(pipelineContext, filenameElement);
             isFilenameEvaluated = true;
@@ -184,7 +184,7 @@ public class XFormsUploadControl extends XFormsValueControl {
         return filename;
     }
 
-    public String getSize(PipelineContext pipelineContext) {
+    public String getFileSize(PipelineContext pipelineContext) {
         if (!isSizeEvaluated) {
             size = (sizeElement == null) ? null : getInfoValue(pipelineContext, sizeElement);
             isSizeEvaluated = true;
@@ -251,11 +251,11 @@ public class XFormsUploadControl extends XFormsValueControl {
 
         if (!XFormsUtils.compareStrings(getState(pipelineContext), other.getState(pipelineContext)))
             return false;
-        if (!XFormsUtils.compareStrings(getMediatype(pipelineContext), other.getMediatype(pipelineContext)))
+        if (!XFormsUtils.compareStrings(getFileMediatype(pipelineContext), other.getFileMediatype(pipelineContext)))
             return false;
-        if (!XFormsUtils.compareStrings(getSize(pipelineContext), other.getSize(pipelineContext)))
+        if (!XFormsUtils.compareStrings(getFileSize(pipelineContext), other.getFileSize(pipelineContext)))
             return false;
-        if (!XFormsUtils.compareStrings(getFilename(pipelineContext), other.getFilename(pipelineContext)))
+        if (!XFormsUtils.compareStrings(getFileName(pipelineContext), other.getFileName(pipelineContext)))
             return false;
 
         return super.equalsExternal(pipelineContext, obj);

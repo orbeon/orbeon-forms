@@ -236,8 +236,8 @@ public class NewControlsComparator extends BaseControlsComparator {
                                     }
                                     {
                                         // Mediatype
-                                        final String mediatypeValue1 = (uploadControlInfo1 == null) ? null : uploadControlInfo1.getMediatype();
-                                        final String mediatypeValue2 = uploadControlInfo2.getMediatype();
+                                        final String mediatypeValue1 = (uploadControlInfo1 == null) ? null : uploadControlInfo1.getFileMediatype(pipelineContext);
+                                        final String mediatypeValue2 = uploadControlInfo2.getFileMediatype(pipelineContext);
 
                                         if (!((mediatypeValue1 == null && mediatypeValue2 == null) || (mediatypeValue1 != null && mediatypeValue2 != null && mediatypeValue1.equals(mediatypeValue2)))) {
                                             final String attributeValue = mediatypeValue2 != null ? mediatypeValue2 : "";
@@ -246,8 +246,8 @@ public class NewControlsComparator extends BaseControlsComparator {
                                     }
                                     {
                                         // Filename
-                                        final String filenameValue1 = (uploadControlInfo1 == null) ? null : uploadControlInfo1.getFilename(pipelineContext);
-                                        final String filenameValue2 = uploadControlInfo2.getFilename(pipelineContext);
+                                        final String filenameValue1 = (uploadControlInfo1 == null) ? null : uploadControlInfo1.getFileName(pipelineContext);
+                                        final String filenameValue2 = uploadControlInfo2.getFileName(pipelineContext);
 
                                         if (!((filenameValue1 == null && filenameValue2 == null) || (filenameValue1 != null && filenameValue2 != null && filenameValue1.equals(filenameValue2)))) {
                                             final String attributeValue = filenameValue2 != null ? filenameValue2 : "";
@@ -256,8 +256,8 @@ public class NewControlsComparator extends BaseControlsComparator {
                                     }
                                     {
                                         // Size
-                                        final String sizeValue1 = (uploadControlInfo1 == null) ? null : uploadControlInfo1.getSize(pipelineContext);
-                                        final String sizeValue2 = uploadControlInfo2.getSize(pipelineContext);
+                                        final String sizeValue1 = (uploadControlInfo1 == null) ? null : uploadControlInfo1.getFileSize(pipelineContext);
+                                        final String sizeValue2 = uploadControlInfo2.getFileSize(pipelineContext);
 
                                         if (!((sizeValue1 == null && sizeValue2 == null) || (sizeValue1 != null && sizeValue2 != null && sizeValue1.equals(sizeValue2)))) {
                                             final String attributeValue = sizeValue2 != null ? sizeValue2 : "";

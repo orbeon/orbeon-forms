@@ -55,8 +55,8 @@
 
     <!-- Execute REST submission -->
     <p:processor name="oxf:xforms-submission">
-        <p:input name="submission" href="#submission" debug="xxx"/>
-        <p:input name="request" href="#instance" debug="yyy"/>
+        <p:input name="submission" href="#submission"/>
+        <p:input name="request" href="#instance"/>
         <p:output name="response" id="response"/>
     </p:processor>
 

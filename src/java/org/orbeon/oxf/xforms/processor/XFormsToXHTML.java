@@ -493,6 +493,6 @@ public class XFormsToXHTML extends ProcessorImpl {
         xformsControls.evaluateAllControlsIfNeeded(pipelineContext);
 
         // Output XML response
-        XFormsServer.outputResponse(containingDocument, null, pipelineContext, contentHandler, xformsDecodedClientState, null, false, false, false, true);
+        XFormsServer.outputAjaxResponse(containingDocument, null, pipelineContext, contentHandler, xformsDecodedClientState, null, false, false, false, true);
     }
 }

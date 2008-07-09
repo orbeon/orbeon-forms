@@ -173,7 +173,7 @@
                     </note>
                 </section>
             </section>
-            <a name="origin-attribute"/>
+            <a name="insert-origin-attribute"/>
             <section>
                 <title><code>origin</code> Attribute on <code>xforms:insert</code> Action</title>
                 <p>

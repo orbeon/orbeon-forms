@@ -1525,6 +1525,15 @@
                         <comment> This inserts a copy of the template after the currently selected element of the collection </comment>
                         <xforms:insert nodeset="employees" at="index('employee-repeat')" position="after"/>
                     </xml-source>
+                    <note>
+                        <p>
+                            Orbeon Forms supports the new XForms 1.1 features as well, including the <a
+                            href="reference-xforms-2#insert-origin-attribute"><code>origin</code></a> and <a
+                            href="reference-xforms-2#insert-context-attribute"><code>context</code></a> attributes. The
+                            XForms 1.1 specification features a more complete <a
+                            href="http://www.w3.org/TR/xforms11/#insert-delete-patterns">list of example</a>.
+                        </p>
+                    </note>
                     <p>
                         The <code>at</code> attribute contains an XPath expression returning the
                         index of the element before or after which the insertion must be performed.

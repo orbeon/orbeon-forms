@@ -448,8 +448,8 @@
                     <li>
                         <p>
                             <b>Insert and delete actions.</b> Support for the XForms 1.1 <a
-                            href="reference-xforms-ng#context-attribute"><code>context</code></a> and <a
-                            href="reference-xforms-ng#origin-attribute"><code>origin</code></a> attributes on
+                            href="reference-xforms-2#insert-context-attribute"><code>context</code></a> and <a
+                            href="reference-xforms-2#insert-origin-attribute"><code>origin</code></a> attributes on
                             <code>xforms:insert</code> and <code>xforms:delete</code>. <!-- TODO: point to example,
                             insertion into empty elements, attributes, etc. -->
                         </p>

@@ -948,8 +948,10 @@
                 </ul>
                 <p>
                     In short we don't believe we will solve this problem perfectly in the short-term, unless we get
-                    clever suggestions as to how this can be done. However, "nice" client-side URLs are already used in
-                    the following cases:
+                    clever suggestions as to how this can be done.
+                </p>
+                <p>
+                    Note that "nice" client-side URLs are already used in the following cases:
                 </p>
                 <ul>
                     <li>

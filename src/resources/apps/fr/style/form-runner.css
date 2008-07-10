@@ -511,4 +511,5 @@ div.fr-collapsible {
     .fr-top { display: none }
     .fr-section-container img.fr-open-close { display: none }
     .fr-status-icons { display: none }
+    noscript { display: none }
 }

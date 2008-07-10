@@ -228,6 +228,7 @@ public class XFormsServer extends ProcessorImpl {
                 final Map valueChangeControlIds = new HashMap();
                 boolean allEvents = false;
                 final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+                final boolean isNoscript = XFormsProperties.isNoscript(containingDocument);
                 if (eventElements.size() > 0) {
                     // NOTE: We store here the last xxforms-value-change-with-focus-change event so
                     // we can coalesce values in case several such events are sent for the same
@@ -259,7 +260,8 @@ public class XFormsServer extends ProcessorImpl {
                             }
 
                             public void setHeader(String name, String value) {
-                                // TODO: It is not sound that we output headers here as they should be passed to the binary document in the pipeline instead
+                                // TODO: It is not sound that we output headers here as they should be passed to the
+                                // binary document in the pipeline instead.
                                 externalContext.getResponse().setHeader(name, value);
                             }
                         };
@@ -271,6 +273,32 @@ public class XFormsServer extends ProcessorImpl {
                     // Start external events
                     containingDocument.startExternalEventsSequence(pipelineContext, response);
 
+                    // Reorder events if needed for offline mode
+                    if (isNoscript) {
+                        final XFormsStaticState staticState = containingDocument.getStaticState();
+                        List activateEvents = null;
+                        for (Iterator i = eventElements.iterator(); i.hasNext();) {
+                            final Element eventElement = (Element) i.next();
+                            final String eventName = eventElement.attributeValue("name");
+                            if (XFormsEvents.XXFORMS_VALUE_OR_ACTIVATE.equals(eventName)) {
+                                // Special
+                                final String sourceControlId = eventElement.attributeValue("source-control-id");
+                                if (!staticState.isValueControl(sourceControlId)) {
+                                    // This is most likely a trigger or submit which will translate into a DOMActivate,
+                                    // so we move it to the end so that value change events are committed to the
+                                    // instance before that.
+                                    i.remove();
+                                    if (activateEvents == null)
+                                        activateEvents = new ArrayList();
+                                    activateEvents.add(eventElement);
+                                }
+                            }
+                        }
+                        if (activateEvents != null)
+                            eventElements.addAll(activateEvents);
+                    }
+                    
+                    // Iterate through all events to dispatch them
                     for (Iterator i = eventElements.iterator(); i.hasNext();) {
                         final Element eventElement = (Element) i.next();
                         final String sourceControlId = eventElement.attributeValue("source-control-id");
@@ -349,7 +377,7 @@ public class XFormsServer extends ProcessorImpl {
 
                 if (contentHandler != null) {
                     // Create resulting document if there is a ContentHandler
-                    if (!XFormsProperties.isNoscript(containingDocument)) {
+                    if (!isNoscript) {
                         // This is an Ajax response
                         containingDocument.logDebug("xforms server", "handling regular Ajax response");
                         outputAjaxResponse(containingDocument, valueChangeControlIds, pipelineContext, contentHandler, xformsDecodedClientState, xformsDecodedInitialClientState, allEvents, false, false, false);

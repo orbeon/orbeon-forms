@@ -541,6 +541,22 @@ public class XFormsStaticState {
     }
 
     /**
+     * Statically check whether a control is a value control.
+     *
+     * @param controlId id or effective id of the control
+     * @return          true iif the control is a value control
+     */
+    public boolean isValueControl(String controlId) {
+
+        final int separatorIndex = controlId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1);
+        if (separatorIndex != -1)
+            controlId = controlId.substring(0, separatorIndex);
+
+        final ControlInfo controlInfo = (ControlInfo) controlInfoMap.get(controlId);
+        return (controlInfo != null) ? controlInfo.isValueControl() : false;
+    }
+
+    /**
      * Return the namespace mappings for a given XForms element (xforms:* or xxforms:*).
      *
      * @param elementId     XForms element id
@@ -687,7 +703,7 @@ public class XFormsStaticState {
                     mergeEventHandlers(eventHandlersMap, controlEventHandlersMap);
 
                     // Gather static control
-                    controlInfoMap.put(controlId, new ControlInfo(controlElement, hasBinding));
+                    controlInfoMap.put(controlId, new ControlInfo(controlElement, hasBinding, XFormsControls.isValueControl(controlName)));
 
                     // Gather xforms:repeat information
                     if (controlName.equals("repeat")) {
@@ -960,10 +976,12 @@ public class XFormsStaticState {
     public static class ControlInfo {
         private Element element;
         private boolean hasBinding;
+        private boolean isValueControl;
 
-        public ControlInfo(Element element, boolean hasBinding) {
+        public ControlInfo(Element element, boolean hasBinding, boolean isValueControl) {
             this.element = element;
             this.hasBinding = hasBinding;
+            this.isValueControl = isValueControl;
         }
 
         public Element getElement() {
@@ -972,6 +990,10 @@ public class XFormsStaticState {
 
         public boolean hasBinding() {
             return hasBinding;
+        }
+
+        public boolean isValueControl() {
+            return isValueControl;
         }
     }
 }

@@ -111,6 +111,8 @@
                                                         instance('fr-form-metadata')/description[@xml:lang = $metadata-lang],
                                                         instance('fr-form-metadata')/description[1])[1]"/>
 
+                            <!--xxx noscript xxx-->
+                            <!--<xforms:output value="property('xxforms:noscript')"/>                            -->
 
                             <!--<xforms:output value="string-join(($source-form-metadata/description[@xml:lang = $metadata-lang], $source-form-metadata/description[1]), ' - ')"/>-->
                             <!--xxx-->
@@ -870,7 +872,7 @@
                       xxforms:order="help label control alert hint"
                       xxforms:computed-binds="recalculate"
                       xxforms:offline="true"
-                      xxforms:noscript="false">
+                      xxforms:noscript="{doc('input:request')/request/parameters/parameter[name = 'fr-noscript']/value = 'true'}">
             <xsl:copy-of select="@* except (@id, @xxforms:external-events)"/>
             <!-- Contain section being currently expanded/collapsed -->
             <!-- TODO: This probably doesn't quite work for sections within repeats -->

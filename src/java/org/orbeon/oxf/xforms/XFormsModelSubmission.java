@@ -415,6 +415,9 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                     modelForInstance = null;
                 }
 
+                // Resolve the target AVT because XFormsServer requires it for deferred submission
+                resolvedXXFormsTarget = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, boundNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtXXFormsTarget);
+
                 // Deferred submission: end of the first pass
                 if (isDeferredSubmissionFirstPass) {
 
@@ -422,9 +425,6 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                     if (serialize) {
                         createDocumentToSubmit(pipelineContext, boundNodeInfo, currentInstance, modelForInstance, resolvedValidate, resolvedRelevant);
                     }
-
-                    // Resolve the target AVT because XFormsServer requires it
-                    resolvedXXFormsTarget = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, boundNodeInfo, contextStack.getCurrentVariables(), functionLibrary, functionContext, prefixToURIMap, getLocationData(), avtXXFormsTarget);
 
                     // When replace="all", we wait for the submission of an XXFormsSubmissionEvent from the client
                     containingDocument.setClientActiveSubmission(this);
@@ -828,6 +828,12 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                                     // Set content-type
                                     response.setContentType(connectionResult.responseMediaType);
+
+                                    // Set target in noscript mode
+                                    if (isNoscript && resolvedXXFormsTarget != null) {
+                                        // NOTE: The "Window-target" header does not seem to have any effect with modern browsers
+                                        response.setHeader("Window-target", resolvedXXFormsTarget);
+                                    }
 
                                     // Forward headers to response
                                     connectionResult.forwardHeaders(response);

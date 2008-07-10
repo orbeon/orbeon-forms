@@ -557,6 +557,10 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         if (activeSubmission != null)
             throw new ValidationException("Unable to run a two-pass submission and xxforms:script within a same action sequence.", activeSubmission.getLocationData());
 
+        // Warn that scripts won't run in noscript mode (duh)
+        if (XFormsProperties.isNoscript(this))
+            logWarning("noscript", "script won't run in noscript mode", new String[] { "script id", scriptId });
+
         if (scriptsToRun == null)
             scriptsToRun = new ArrayList();
         scriptsToRun.add(new Script(XFormsUtils.scriptIdToScriptName(scriptId), eventTargetId, eventHandlerContainerId));

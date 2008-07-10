@@ -37,6 +37,7 @@ import org.orbeon.oxf.xml.dom4j.LocationDocumentSource;
 import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.functions.FunctionLibrary;
 import org.orbeon.saxon.om.*;
+import org.orbeon.saxon.value.*;
 import org.w3c.tidy.Tidy;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -498,6 +499,27 @@ public class XFormsUtils {
      */
     public static final boolean compareStrings(String value1, String value2) {
         return (value1 == null && value2 == null) || (value1 != null && value2 != null && value1.equals(value2));
+    }
+
+    public static ValueRepresentation convertJavaObjectToSaxonObject(Object object) {
+        final ValueRepresentation valueRepresentation;
+        if (object instanceof ValueRepresentation) {
+            // Native Saxon variable value
+            valueRepresentation = (ValueRepresentation) object;
+        } else if (object instanceof String) {
+            valueRepresentation = new StringValue((String) object);
+        } else if (object instanceof Boolean) {
+            valueRepresentation = BooleanValue.get(((Boolean) object).booleanValue());
+        } else if (object instanceof Integer) {
+            valueRepresentation = new IntegerValue(((Integer) object).intValue());
+        } else if (object instanceof Float) {
+            valueRepresentation = new FloatValue(((Float) object).floatValue());
+        } else if (object instanceof Double) {
+            valueRepresentation = new DoubleValue(((Double) object).doubleValue());
+        } else {
+            throw new OXFException("Invalid variable type: " + object.getClass());
+        }
+        return valueRepresentation;
     }
 
     private static class DeflaterPoolableObjetFactory implements PoolableObjectFactory {

@@ -28,7 +28,7 @@
     <xxforms:variable name="parameters" select="xxforms:instance('fr-parameters-instance')"/>
 
     <xforms:submission id="fr-print-submission"
-        resource="/fr/{$parameters/app}/{$parameters/form}/print?fr-language={xxforms:instance('fr-language-instance')}"
+        resource="/fr/{$parameters/app}/{$parameters/form}/print?fr-language={xxforms:instance('fr-language-instance')}{if (property('xxforms:noscript')) then '&amp;fr-noscript=true' else ''}"
         method="post" ref="xxforms:instance('fr-form-instance')" replace="all" validate="false"
         xxforms:target="_blank" xxforms:show-progress="false"/>
 

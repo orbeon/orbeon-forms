@@ -224,7 +224,9 @@
                     </optional>
                     <optional>
                         <element name="xxforms:submission">
-                            <attribute name="action"/>
+                            <optional>
+                                <attribute name="action"/>
+                            </optional>
                             <attribute name="method"/>
                             <attribute name="replace">
                                 <choice>

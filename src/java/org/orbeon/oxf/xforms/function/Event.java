@@ -19,12 +19,11 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.StaticContext;
 import org.orbeon.saxon.expr.XPathContext;
-import org.orbeon.saxon.om.ListIterator;
+import org.orbeon.saxon.om.EmptyIterator;
 import org.orbeon.saxon.om.NamespaceResolver;
 import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.trans.XPathException;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -48,7 +47,7 @@ public class Event extends XFormsFunction {
 
         // TODO: Currently the spec doesn't specify what happens when we call event() outside of an event handler
         if (event == null)
-            return new ListIterator(Collections.EMPTY_LIST);
+            return EmptyIterator.getInstance();
 
         // As an extension, we allow a QName
 

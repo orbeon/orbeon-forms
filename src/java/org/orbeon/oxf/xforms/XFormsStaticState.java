@@ -495,6 +495,14 @@ public class XFormsStaticState {
     public Map getNonDefaultProperties() {
         return nonDefaultProperties;
     }
+    
+    public Object getProperty(String propertyName) {
+        final Object documentProperty = (Object) nonDefaultProperties.get(propertyName);
+        if (documentProperty != null)
+            return documentProperty;
+        else
+            return XFormsProperties.getPropertyDefinition(propertyName).getDefaultValue();
+    }
 
     public String getStringProperty(String propertyName) {
         final String documentProperty = (String) nonDefaultProperties.get(propertyName);

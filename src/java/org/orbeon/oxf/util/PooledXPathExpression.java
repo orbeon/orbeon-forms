@@ -15,6 +15,7 @@ package org.orbeon.oxf.util;
 
 import org.apache.commons.pool.ObjectPool;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.XPathContext;
@@ -205,22 +206,8 @@ public class PooledXPathExpression {
 
                 final Object object = variableToValueMap.get(name);
                 if (object != null) {
-                    final ValueRepresentation valueRepresentation;
-                    if (object instanceof ValueRepresentation) {
-                        // Native Saxon variable value
-                        valueRepresentation = (ValueRepresentation) object;
-                    } else if (object instanceof String) {
-                        valueRepresentation = new StringValue((String) object);
-                    } else if (object instanceof Integer) {
-                        valueRepresentation = new IntegerValue(((Integer) object).intValue());
-                    } else if (object instanceof Float) {
-                        valueRepresentation = new FloatValue(((Float) object).floatValue());
-                    } else if (object instanceof Double) {
-                        valueRepresentation = new DoubleValue(((Double) object).doubleValue());
-                    } else {
-                        throw new OXFException("Invalid variable type: " + object.getClass());
-                    }
-
+                    // Convert Java object to Saxon object
+                    final ValueRepresentation valueRepresentation = XFormsUtils.convertJavaObjectToSaxonObject(object);
                     xpathContext.setLocalVariable(variable.getLocalSlotNumber(), valueRepresentation);
                 }
             }

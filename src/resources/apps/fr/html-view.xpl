@@ -52,10 +52,22 @@
 
     <!-- NOTE: First pass of XInclude is handled when reading the form from the persistence layer -->
 
+    <!-- Get request information -->
+    <p:processor name="oxf:request">
+        <p:input name="config">
+            <config>
+                <!-- Noscript parameter -->
+                <include>/request/parameters/parameter[starts-with(name, 'fr-noscript')]</include>
+            </config>
+        </p:input>
+        <p:output name="data" id="request"/>
+    </p:processor>
+
     <!-- Apply generic components -->
     <p:processor name="oxf:unsafe-xslt">
         <p:input name="data" href="#themed-data"/>
         <p:input name="instance" href="#instance"/>
+        <p:input name="request" href="#request"/>
         <p:input name="config" href="components.xsl"/>
         <p:output name="data" id="after-components"/>
     </p:processor>

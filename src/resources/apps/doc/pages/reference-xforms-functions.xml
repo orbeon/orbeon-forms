@@ -44,6 +44,41 @@
                 </li>
             </ul>
         </section>
+        <a name="xforms-functions"/>
+        <section>
+            <title>Standard XForms Functions</title>
+            <p>
+                Orbeon Forms supports the following standard XForms functions:
+            </p>
+            <ul>
+                <li>
+                    [TODO: most other functions are supported, provide exact list]
+                </li>
+                <li>
+                    <a name="xforms-property"/>
+                    <p>
+                        <code><a href="http://www.w3.org/TR/xforms11/#fn-property">property($property-name as xs:string) as item()?</a></code>
+                    </p>
+                    <p>
+                        This function supports extension property names in the
+                        <code>http://orbeon.org/oxf/xml/xforms</code> namespace (usually mapped to the
+                        <code>xxforms</code> prefix). Any such property name will return the value of an XForms engine
+                        property. Example:
+                    </p>
+                   <xml-source>
+                        <xforms:output value="property('xxforms:noscript')"/>
+                    </xml-source>
+                    <note>
+                        <p>
+                            The standard XForms function returns an XPath 1.0 <code>string</code>. The Orbeon Forms
+                            implementation returns the following types: empty sequence (if the property is not found),
+                            <code>xs:string</code>, <code>xs:integer</code>, and <code>xs:boolean</code> depending on
+                            the type of the XForms engine properties.
+                        </p>
+                    </note>
+                </li>
+            </ul>
+        </section>
         <a name="xpath-extensions"/>
         <section>
             <title>XPath Extension Functions</title>

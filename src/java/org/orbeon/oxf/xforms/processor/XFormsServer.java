@@ -21,14 +21,12 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.externalcontext.ResponseAdapter;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.processor.PageFlowControllerProcessor;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
-import org.orbeon.oxf.resources.OXFProperties;
+import org.orbeon.oxf.util.ContentHandlerOutputStream;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.util.ContentHandlerOutputStream;
 import org.orbeon.oxf.util.URLRewriter;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.control.XFormsControl;
@@ -37,7 +35,10 @@ import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.state.XFormsDocumentCache;
 import org.orbeon.oxf.xforms.state.XFormsState;
 import org.orbeon.oxf.xforms.state.XFormsStateManager;
-import org.orbeon.oxf.xml.*;
+import org.orbeon.oxf.xml.ContentHandlerHelper;
+import org.orbeon.oxf.xml.SAXStore;
+import org.orbeon.oxf.xml.TransformerUtils;
+import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -255,6 +256,11 @@ public class XFormsServer extends ProcessorImpl {
 
                             public Object getNativeResponse() {
                                 return externalContext.getNativeResponse();
+                            }
+
+                            public void setHeader(String name, String value) {
+                                // TODO: It is not sound that we output headers here as they should be passed to the binary document in the pipeline instead
+                                externalContext.getResponse().setHeader(name, value);
                             }
                         };
                     } else {
@@ -807,26 +813,27 @@ public class XFormsServer extends ProcessorImpl {
     }
 
     private static void outputSubmissionInfo(ExternalContext externalContext, ContentHandlerHelper ch, XFormsModelSubmission activeSubmission) {
-        final String clientSubmisssionURL;
+//        final String clientSubmisssionURL;
         final String target;
         if ("all".equals(activeSubmission.getReplace())) {
             // Replace all
 
-            // The submission path is actually defined by the oxf:page-flow processor and its configuration
-            OXFProperties.PropertySet propertySet = OXFProperties.instance().getPropertySet(XMLConstants.PAGE_FLOW_PROCESSOR_QNAME);
-            final String submissionPath = propertySet.getString(PageFlowControllerProcessor.XFORMS_SUBMISSION_PATH_PROPERTY_NAME,
-                    PageFlowControllerProcessor.XFORMS_SUBMISSION_PATH_DEFAULT_VALUE);
-
-            clientSubmisssionURL = externalContext.getResponse().rewriteResourceURL(submissionPath, false);
+            // TODO: Set action ("action", clientSubmisssionURL,) to destination page for local submissions? (http://tinyurl.com/692f7r)
+            // TODO: Should we keep the default submission path for separate deployment?
+//            // The submission path is actually defined by the oxf:page-flow processor and its configuration
+//            OXFProperties.PropertySet propertySet = OXFProperties.instance().getPropertySet(XMLConstants.PAGE_FLOW_PROCESSOR_QNAME);
+//            final String submissionPath = propertySet.getString(PageFlowControllerProcessor.XFORMS_SUBMISSION_PATH_PROPERTY_NAME,
+//                    PageFlowControllerProcessor.XFORMS_SUBMISSION_PATH_DEFAULT_VALUE);
+//
+//            clientSubmisssionURL = externalContext.getResponse().rewriteResourceURL(submissionPath, false);
             target = activeSubmission.getResolvedXXFormsTarget();
         } else {
             // Replace instance
-            clientSubmisssionURL = externalContext.getRequest().getRequestURL();
+//            clientSubmisssionURL = externalContext.getRequest().getRequestURL();
             target = null;
         }
 
         // Signal that we want a POST to the XForms Server
-        // TODO: Set action ("action", clientSubmisssionURL,) to destination page for local submissions? (http://tinyurl.com/692f7r)
         ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "submission",
                 new String[]{
                         "method", "POST",

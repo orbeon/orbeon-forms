@@ -19,6 +19,7 @@ import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.PathMap;
 import org.orbeon.saxon.expr.XPathContext;
+import org.orbeon.saxon.om.EmptyIterator;
 import org.orbeon.saxon.om.ListIterator;
 import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.trans.XPathException;
@@ -54,7 +55,7 @@ public class Instance extends XFormsFunction {
             // "an empty node-set is returned"
             getContainingDocument(xpathContext).logWarning("function", "Instance not found with instance() function",
                     new String[] { "instance id", instanceId });
-            return new ListIterator(Collections.EMPTY_LIST);
+            return EmptyIterator.getInstance();
         }
     }
 

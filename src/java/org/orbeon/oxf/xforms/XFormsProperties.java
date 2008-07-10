@@ -452,25 +452,29 @@ public class XFormsProperties {
         return getStringProperty(containingDocument, FORWARD_SUBMISSION_HEADERS);
     }
 
+    public static Object getProperty(XFormsContainingDocument containingDocument, String propertyName) {
+        return containingDocument.getStaticState().getProperty(propertyName);
+    }
+
     private static boolean getBooleanProperty(XFormsContainingDocument containingDocument, String propertyName) {
         if (containingDocument != null && containingDocument.getStaticState() != null)
             return containingDocument.getStaticState().getBooleanProperty(propertyName);
-        else // case of legacy XForms engine which doesn't have a static state object
-            return OXFProperties.instance().getPropertySet().getBoolean(propertyName, ((Boolean) (XFormsProperties.getPropertyDefinition(propertyName)).getDefaultValue()).booleanValue()).booleanValue();
+        else // case of legacy XForms engine which doesn't have a static state object TODO: SHOULD DEPRECATE/REMOVE THIS
+            return OXFProperties.instance().getPropertySet().getBoolean(XFORMS_PROPERTY_PREFIX + propertyName, ((Boolean) (XFormsProperties.getPropertyDefinition(propertyName)).getDefaultValue()).booleanValue()).booleanValue();
     }
 
     private static String getStringProperty(XFormsContainingDocument containingDocument, String propertyName) {
         if (containingDocument != null && containingDocument.getStaticState() != null)
             return containingDocument.getStaticState().getStringProperty(propertyName);
-        else // case of legacy XForms engine which doesn't have a static state object
-            return OXFProperties.instance().getPropertySet().getString(propertyName, (XFormsProperties.getPropertyDefinition(propertyName)).getDefaultValue().toString());
+        else // case of legacy XForms engine which doesn't have a static state object TODO: SHOULD DEPRECATE/REMOVE THIS
+            return OXFProperties.instance().getPropertySet().getString(XFORMS_PROPERTY_PREFIX + propertyName, (XFormsProperties.getPropertyDefinition(propertyName)).getDefaultValue().toString());
     }
 
     private static int getIntegerProperty(XFormsContainingDocument containingDocument, String propertyName) {
         if (containingDocument != null && containingDocument.getStaticState() != null)
             return containingDocument.getStaticState().getIntegerProperty(propertyName);
-        else // case of legacy XForms engine which doesn't have a static state object
-            return OXFProperties.instance().getPropertySet().getInteger(propertyName, ((Integer) (XFormsProperties.getPropertyDefinition(propertyName)).getDefaultValue()).intValue()).intValue();
+        else // case of legacy XForms engine which doesn't have a static state object TODO: SHOULD DEPRECATE/REMOVE THIS
+            return OXFProperties.instance().getPropertySet().getInteger(XFORMS_PROPERTY_PREFIX + propertyName, ((Integer) (XFormsProperties.getPropertyDefinition(propertyName)).getDefaultValue()).intValue()).intValue();
     }
 
     /**

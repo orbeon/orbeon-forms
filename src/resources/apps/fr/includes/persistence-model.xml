@@ -245,7 +245,7 @@
 
     <!-- Go back to the Form Runner summary page -->
     <xforms:action ev:event="fr-goto-summary">
-        <xforms:load resource="/fr/{$parameters/app}/{$parameters/form}"/>
+        <xforms:load resource="/fr/{$parameters/app}/{$parameters/form}{if (property('xxforms:noscript')) then '?fr-noscript=true' else ''}"/>
     </xforms:action>
 
     <!-- Parameters passed to this page -->

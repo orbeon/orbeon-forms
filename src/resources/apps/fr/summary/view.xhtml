@@ -86,17 +86,17 @@
 
             <xforms:action ev:event="fr-summary-create">
                 <xforms:recalculate/>
-                <xforms:load resource="/fr/{$parameters/app}/{$parameters/form}/new/"/>
+                <xforms:load resource="/fr/{$parameters/app}/{$parameters/form}/new/{if (property('xxforms:noscript')) then '?fr-noscript=true' else ''}"/>
             </xforms:action>
 
             <xforms:action ev:event="fr-summary-edit">
                 <xforms:recalculate/>
-                <xforms:load resource="/fr/{$parameters/app}/{$parameters/form}/{instance('fr-summary-instance')/document[index('documents-repeat')]/@name}/edit"/>
+                <xforms:load resource="/fr/{$parameters/app}/{$parameters/form}/{instance('fr-summary-instance')/document[index('documents-repeat')]/@name}/edit{if (property('xxforms:noscript')) then '?fr-noscript=true' else ''}"/>
             </xforms:action>
 
             <xforms:action ev:event="fr-summary-view">
                 <xforms:recalculate/>
-                <xforms:load resource="/fr/{$parameters/app}/{$parameters/form}/{instance('fr-summary-instance')/document[index('documents-repeat')]/@name}/view"/>
+                <xforms:load resource="/fr/{$parameters/app}/{$parameters/form}/{instance('fr-summary-instance')/document[index('documents-repeat')]/@name}/view{if (property('xxforms:noscript')) then '?fr-noscript=true' else ''}"/>
             </xforms:action>
 
             <xforms:action ev:event="fr-summary-pdf">
@@ -106,7 +106,7 @@
 
             <xforms:action ev:event="fr-summary-test">
                 <xforms:recalculate/>
-                <xforms:load resource="/fr/{$parameters/app}/{$parameters/form}/{instance('fr-summary-instance')/document[index('documents-repeat')]/@name}/test" xxforms:target="_blank" xxforms:show-progress="false"/>
+                <xforms:load resource="/fr/{$parameters/app}/{$parameters/form}/{instance('fr-summary-instance')/document[index('documents-repeat')]/@name}/test{if (property('xxforms:noscript')) then '?fr-noscript=true' else ''}" xxforms:target="_blank" xxforms:show-progress="false"/>
             </xforms:action>
 
             <xforms:action ev:event="fr-summary-xml">

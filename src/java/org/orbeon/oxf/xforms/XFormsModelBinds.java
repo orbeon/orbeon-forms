@@ -24,6 +24,7 @@ import org.orbeon.oxf.xforms.action.actions.XFormsSetvalueAction;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsPseudoControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
+import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.control.controls.RepeatIterationControl;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -333,15 +334,22 @@ public class XFormsModelBinds {
                 for (Iterator i = variables.entrySet().iterator(); i.hasNext();) {
                     final Map.Entry currentEntry = (Map.Entry) i.next();
                     final String currentVariableName = (String) currentEntry.getKey();
-                    final SequenceExtent currentSequenceExtent = (SequenceExtent) currentEntry.getValue();
+                    final SequenceExtent currentVariableValue = (SequenceExtent) currentEntry.getValue();
 
                     // Find controls bound to the bind exposed as a variable
-                    final List currentNodeset = sequenceExtentToList(currentSequenceExtent);
+                    final List currentNodeset = sequenceExtentToList(currentVariableValue);
                     final List boundControls = getBoundControls(nodesToControlsMapping, currentNodeset);
                     if (boundControls.size() > 0) {
-                        // NOTE: We only handle the first control found
-                        final String effectiveControlId = ((XFormsControl) boundControls.get(0)).getEffectiveId();
-                        controlFound = appendNameValue(sb, controlFound, currentVariableName, effectiveControlId, null);
+                        for (Iterator j = boundControls.iterator(); j.hasNext();) {
+                            final XFormsControl currentControl = (XFormsControl) j.next();
+                            // Make sure this is a value control (e.g. we can't get the value of bound groups in the UI)
+                            if (currentControl instanceof XFormsValueControl) {
+                                final String effectiveControlId = currentControl.getEffectiveId();
+                                controlFound = appendNameValue(sb, controlFound, currentVariableName, effectiveControlId, null);
+                                // We only handle the first value control found
+                                break;
+                            }
+                        }
                     }
                 }
             }

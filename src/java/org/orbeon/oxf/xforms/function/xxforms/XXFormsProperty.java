@@ -45,7 +45,7 @@ public class XXFormsProperty extends XFormsFunction {
 
     public static String property(String propertyName) {
         // Never return any property containing the string "password" as a first line of defense
-        if (propertyName.trim().indexOf("password") != -1) {
+        if (propertyName.toLowerCase().indexOf("password") != -1) {
             return null;
         }
 

@@ -52,6 +52,11 @@ public class Property extends XFormsFunction {
         final String propertyNameString = argument[0].evaluateAsString(xpathContext);
         final QName propertyNameQName = Dom4jUtils.extractTextValueQName(namespaceMappings, propertyNameString);
 
+        // Never return any property containing the string "password" as a first line of defense
+        if (propertyNameString.toLowerCase().indexOf("password") != -1) {
+            return null;
+        }
+
         if (VERSION_PROPERTY.equals(propertyNameString)) {
             // Standard "version" property
             return VERSION;

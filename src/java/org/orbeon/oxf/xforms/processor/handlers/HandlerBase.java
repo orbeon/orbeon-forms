@@ -440,12 +440,13 @@ public abstract class HandlerBase extends ElementHandler {
         }
     }
 
-    public static void outputLabelFor(HandlerContext handlerContext, AttributesImpl attributes, String forEffectiveId, String value, boolean mustOutputHTMLFragment) throws SAXException {
+    protected static void outputLabelFor(HandlerContext handlerContext, AttributesImpl attributes, String forEffectiveId, String value, boolean mustOutputHTMLFragment) throws SAXException {
         attributes.addAttribute("", "for", "for", ContentHandlerHelper.CDATA, forEffectiveId);
 
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
         final String labelQName = XMLUtils.buildQName(xhtmlPrefix, "label");
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
+
         contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "label", labelQName, attributes);
         if (value != null) {
             if (mustOutputHTMLFragment) {
@@ -455,6 +456,13 @@ public abstract class HandlerBase extends ElementHandler {
             }
         }
         contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "label", labelQName);
+    }
+
+    protected static void outputLabelText(ContentHandler contentHandler, XFormsControl xformsControl, String value, String xhtmlPrefix, boolean mustOutputHTMLFragment) throws SAXException {
+        if (mustOutputHTMLFragment)
+            XFormsUtils.streamHTMLFragment(contentHandler, value, xformsControl != null ? xformsControl.getLocationData() : null, xhtmlPrefix);
+        else
+            contentHandler.characters(value.toCharArray(), 0, value.length());
     }
 
     protected static void copyAttributes(Attributes sourceAttributes, String sourceNamespaceURI, String[] sourceAttributeLocalNames, AttributesImpl destAttributes) {

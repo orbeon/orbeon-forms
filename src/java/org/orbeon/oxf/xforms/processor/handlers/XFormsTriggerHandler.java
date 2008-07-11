@@ -110,7 +110,7 @@ public class XFormsTriggerHandler extends XFormsCoreControlHandler {
         }
 
         if (appearance != null && (XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME.equals(appearance) || XFormsConstants.XXFORMS_LINK_APPEARANCE_QNAME.equals(appearance))) {
-            // Minimal or link appearance
+            // Minimal (AKA "link") appearance
 
             // TODO: probably needs f:url-norewrite="true"
             if (true) {
@@ -160,7 +160,10 @@ public class XFormsTriggerHandler extends XFormsCoreControlHandler {
             final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
             final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "a");
             contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "a", spanQName, newAttributes);
-            XFormsUtils.streamHTMLFragment(contentHandler, labelValue, isConcreteControl ? triggerControl.getLocationData() : null, xhtmlPrefix);
+
+            final boolean mustOutputHTMLFragment = xformsControl != null && xformsControl.isHTMLLabel(pipelineContext);
+            outputLabelText(contentHandler, xformsControl, labelValue, xhtmlPrefix, mustOutputHTMLFragment);
+
             contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "a", spanQName);
 
         } else if (appearance != null && XFormsConstants.XXFORMS_IMAGE_APPEARANCE_QNAME.equals(appearance)) {
@@ -185,7 +188,10 @@ public class XFormsTriggerHandler extends XFormsCoreControlHandler {
             final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "button");
             handleReadOnlyAttribute(newAttributes, containingDocument, triggerControl);
             contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "button", spanQName, newAttributes);
-            XFormsUtils.streamHTMLFragment(contentHandler, labelValue, isConcreteControl ? triggerControl.getLocationData() : null, xhtmlPrefix);
+
+            final boolean mustOutputHTMLFragment = xformsControl != null && xformsControl.isHTMLLabel(pipelineContext);
+            outputLabelText(contentHandler, xformsControl, labelValue, xhtmlPrefix, mustOutputHTMLFragment);
+
             contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "button", spanQName);
         }
     }

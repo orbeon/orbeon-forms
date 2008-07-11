@@ -39,7 +39,7 @@
     <p:choose href="#request-info">
         <!-- Check for noscript mode form post OR script form post for replace="all" -->
         <p:when test="lower-case(/*/method) = ('post')
-                        and /*/content-type = ('application/x-www-form-urlencoded', 'multipart/form-data')
+                        and /*/content-type = 'application/x-www-form-urlencoded' or starts-with(/*/content-type, 'multipart/form-data')
                         and (/*/parameters/parameter[name = '$noscript']/value = 'true' or /*/parameters/parameter[name = '$server-events'])">
             <!-- Process submission -->
             <p:processor name="oxf:pipeline">

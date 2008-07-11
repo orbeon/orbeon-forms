@@ -18,6 +18,8 @@ import org.dom4j.QName;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsProperties;
+import org.orbeon.oxf.xforms.XFormsItemUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -43,17 +45,53 @@ public class XFormsInputControl extends XFormsValueControl {
         evaluateDisplayValueUseFormat(pipelineContext, format);
     }
 
-    public void storeExternalValue(PipelineContext pipelineContext, String value, String type) {
-        super.storeExternalValue(pipelineContext, convertFromExternalValue(value), type);
+    protected void evaluateExternalValue(PipelineContext pipelineContext) {
+        final String type = getType();
+        if (type != null && (XMLConstants.XS_BOOLEAN_EXPLODED_QNAME.equals(type) || XFormsConstants.XFORMS_BOOLEAN_EXPLODED_QNAME.equals(type))) {
+            // xs:boolean input
+
+            final String internalValue = getValue(pipelineContext);
+            final String updatedValue;
+            if (internalValue != null && !internalValue.equals("true")) {
+                // This so we don't send "false" to the client but ""
+                updatedValue = "";
+            } else {
+                if (XFormsProperties.isEncryptItemValues(containingDocument)) {
+                    // Encrypt outgoing value if needed
+                    updatedValue = XFormsItemUtils.encryptValue(pipelineContext, internalValue);
+                } else {
+                    // For open selection, values sent to client are the internal values
+                    updatedValue = internalValue;
+                }
+            }
+            super.setExternalValue(updatedValue);
+
+        } else {
+            // Other types
+            super.evaluateExternalValue(pipelineContext);
+        }
     }
 
-    private String convertFromExternalValue(String externalValue) {
+    public void storeExternalValue(PipelineContext pipelineContext, String value, String type) {
+        super.storeExternalValue(pipelineContext, convertFromExternalValue(pipelineContext, value), type);
+    }
+
+    private String convertFromExternalValue(PipelineContext pipelineContext, String externalValue) {
         final String type = getType();
-        // Store "false" when we get a blank value from the client when type is xs:boolean (case of single checkbox)
-        if (type != null && (XMLConstants.XS_BOOLEAN_EXPLODED_QNAME.equals(type) || XFormsConstants.XFORMS_BOOLEAN_EXPLODED_QNAME.equals(type)) && externalValue.trim().equals("")) {
-            return "false";
-        } else {
-            return externalValue;
+        if (type != null && (XMLConstants.XS_BOOLEAN_EXPLODED_QNAME.equals(type) || XFormsConstants.XFORMS_BOOLEAN_EXPLODED_QNAME.equals(type))) {
+            // xs:boolean input
+
+            // Decrypt incoming value if needed. With open selection, values are sent to the client.
+            if (XFormsProperties.isEncryptItemValues(containingDocument))
+                externalValue = XFormsItemUtils.decryptValue(pipelineContext, externalValue);
+
+            // Anything but "true" is "false"
+            if (!externalValue.equals("true"))
+                externalValue = "false";
+
+
         }
+
+        return externalValue;
     }
 }

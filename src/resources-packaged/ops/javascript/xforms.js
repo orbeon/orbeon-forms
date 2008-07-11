@@ -3173,7 +3173,7 @@ ORBEON.xforms.Server = {
                 // Save the form for this request
                 ORBEON.xforms.Globals.requestForm = ORBEON.xforms.Globals.eventQueue[0].form;
                 var formID = ORBEON.xforms.Globals.requestForm.id;
-                
+
                 // Mark this as loading
                 ORBEON.xforms.Globals.requestInProgress = true;
                 var delayBeforeDisplayLoading = ORBEON.util.Utils.getProperty(DELAY_BEFORE_DISPLAY_LOADING_PROPERTY);
@@ -4252,7 +4252,7 @@ ORBEON.xforms.Offline = {
     memoryOfflineEvents: [],                        // Holds events happening offline before they are commited to Gears
     mips: {},                                       // Mapping: control ID -> { required -> XPath,  ... }
     variables: {},                                  // Mapping: variable name -> control ID
-    xpathNode: document.createElement("dummy"),     // Node used as current node to evaluate XPath expression
+    controlIDToVariableName: {},                    // Mapping: control ID -> variable name
     encryptionKey: null,                            // Key that will be used when storing events in the store
     controlValues: null,                            // While offline, contains the latest value of the controls
     typeRegExps: {
@@ -4357,13 +4357,7 @@ ORBEON.xforms.Offline = {
         FunctionCallExpr.prototype.xpathfunctions["xxforms:if"] = function(ctx) {
             var test = this.args[0].evaluate(ctx).booleanValue();
             return new StringValue(this.args[test ? 1 : 2].evaluate(ctx).stringValue());
-        };
-        // Define the xxforms:if() XPath function
-        FunctionCallExpr.prototype.xpathfunctions["matches"] = function(ctx) {
-            var input = this.args[0].evaluate(ctx).stringValue();
-            var pattern = this.args[1].evaluate(ctx).stringValue();
-            return new BooleanValue(new RegExp(pattern).test(input));
-        };
+        }
     },
 
     reset: function() {
@@ -4396,7 +4390,7 @@ ORBEON.xforms.Offline = {
                 var mappingsString = resultSet.fieldByName("mappings");
                 var mappings = ORBEON.util.String.eval("({" + mappingsString + "})");
                 ORBEON.xforms.Offline.mips = mappings.mips;
-                ORBEON.xforms.Offline.variables = mappings.variables;
+                ORBEON.xforms.Offline._setVariables(mappings.variables);
                 // Replay initial events
                 var initialEventsXML = ORBEON.util.Dom.stringToDom(initialEvents);
                 ORBEON.xforms.Globals.requestForm = ORBEON.util.Dom.getElementById(formID);
@@ -4477,7 +4471,7 @@ ORBEON.xforms.Offline = {
         //     ORBEON.xforms.Document.getOfflineControlValues(url).
         var mappingsObject = ORBEON.util.String.eval("({" + mappings + "})");
         ORBEON.xforms.Offline.mips = mappingsObject.mips;
-        ORBEON.xforms.Offline.variables = mappingsObject.variables;
+        ORBEON.xforms.Offline._setVariables(mappingsObject.variables);
         for (var variableName in mappingsObject.variables) {
             var controlID = mappingsObject.variables[variableName].value;
             controlKeepValueIDs.push(controlID);
@@ -4678,22 +4672,8 @@ ORBEON.xforms.Offline = {
         offlineIframe.src = url;
     },
 
-    /**
-     * Creates an XPath evaluation context for the given control.
-     */
-    createXPathContext: function(controlValue) {
-        ORBEON.util.Dom.setStringValue(ORBEON.xforms.Offline.xpathNode, controlValue);
-        var context = new ExprContext(ORBEON.xforms.Offline.xpathNode);
-        for (var variableName in ORBEON.xforms.Offline.variables) {
-            var controlID = ORBEON.xforms.Offline.variables[variableName].value;
-            var variableValue = ORBEON.xforms.Controls.getCurrentValue(ORBEON.util.Dom.getElementById(controlID));
-            context.setVariable(variableName, variableValue);
-        }
-        return context;
-    },
-
     evaluateMIPs: function() {
-        
+
         //  Applies a relevance or read-onlyness to inherited controls
         function applyToInherited(control, getter, setter, inherited, value, isRelevance) {
             if (getter(control) != value) {
@@ -4721,7 +4701,7 @@ ORBEON.xforms.Offline = {
                 }
             }
         }
-        
+
         // Evaluates XPath. If there is an error, logs the error and returns null.
         function evaluateXPath(xpath, xpathContext) {
             try {
@@ -4732,18 +4712,36 @@ ORBEON.xforms.Offline = {
             }
         }
 
+        // Create context once; we then update it for values that are calculated
+        var xpathNode = document.createElement("dummy"); // Node used as current node to evaluate XPath expression
+        var xpathContext = new ExprContext(xpathNode);
+        for (var variableName in ORBEON.xforms.Offline.variables) {
+            var controlID = ORBEON.xforms.Offline.variables[variableName].value;
+            var variableValue = ORBEON.xforms.Controls.getCurrentValue(ORBEON.util.Dom.getElementById(controlID));
+            xpathContext.setVariable(variableName, variableValue);
+        }
+
         // Go over all controls
         for (var controlID in ORBEON.xforms.Offline.mips) {
             var mips = ORBEON.xforms.Offline.mips[controlID];
             var control = ORBEON.util.Dom.getElementById(controlID);
             var controlValue = ORBEON.xforms.Controls.getCurrentValue(control);
-            var xpathContext = ORBEON.xforms.Offline.createXPathContext(controlValue)
+
+            // Update xpathContext with the value of the current control
+            ORBEON.util.Dom.setStringValue(xpathNode, controlValue);
 
             // Calculate
             if (mips.calculate) {
                 var newValue = evaluateXPath(mips.calculate.value, xpathContext);
-                if (newValue != null)
-                ORBEON.xforms.Controls.setCurrentValue(control, newValue);
+                if (newValue != null) {
+                    // Update value
+                    ORBEON.xforms.Controls.setCurrentValue(control, newValue);
+                    // Change value of variable
+                    var variableName = ORBEON.xforms.Offline.controlIDToVariableName[controlID];
+                    if (variableName != null) {
+                        xpathContext.setVariable(variableName, newValue);
+                    }
+                }
             }
 
             // Constraint
@@ -4809,6 +4807,17 @@ ORBEON.xforms.Offline = {
             controlValues[controlID] = controlValue;
         }
         return controlValues;
+    },
+
+    _setVariables: function(variables) {
+        ORBEON.xforms.Offline.variables = variables;
+        var controlIDToVariableName = {};
+        for (var name in variables) {
+            var controlID = variables[name].value;
+            controlIDToVariableName[controlID] = name;
+        }
+        console.log(controlIDToVariableName);
+        ORBEON.xforms.Offline.controlIDToVariableName = controlIDToVariableName;
     },
 
     /**

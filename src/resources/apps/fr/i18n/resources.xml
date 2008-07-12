@@ -86,24 +86,19 @@
             <dialog-body>
                 <div>
                     <p>
-                        To save the data you entered:
+                        To save the data you entered; click on the link below and save the document on your machine.
                     </p>
-                    <ol>
-                        <li>Click on the link below.</li>
-                        <li>
-                            Then choose where you want the file to be saved on you machine. Note that the file is saved on your
-                            machine. No data is kept on the server and if you delete the file you saved your data will be lost.
-                        </li>
-                    </ol>
                     <p>
-                        Then to reopen the data:
+                        To reopen the information you entered, double click on the file you saved on your machine and
+                        the tool will automatically retrieve the information entered preciously.
                     </p>
-                    <ol>
-                        <li>Double click on the file you saved to open it.</li>
-                        <li>This will take you back to this site with the data and all the fields will be prepopulatd with the data you saved.</li>
-                    </ol>
+                    <p>
+                        <b>Note:</b> No data is kept on the server and if you delete the file you saved your data will
+                        be lost.
+                    </p>
                 </div>
             </dialog-body>
+            <link>Save</link>
         </import-export>
     </resource>
     <resource xml:lang="fr">
@@ -243,5 +238,25 @@
                 <alert>Desaparición o valor incorrecto</alert>
             </labels>
         </detail>
+        <import-export>
+            <dialog-title>Guardar</dialog-title>
+            <dialog-body>
+                <div>
+                    <p>
+                        Para guardar la información que usted ha ingresado haga clic en el siguiente enlace y guarde el
+                        documento en su máquina.
+                    </p>
+                    <p>
+                        Para recuperar la información, haga doble clic sobre documento guardado y se abrirá
+                        automáticamente la aplicación con la información ingresada anteriormente.
+                    </p>
+                    <p>
+                        <b>Nota:</b> La información no será almacenada en el sistema. Si usted elimina el archivo
+                        perderá su información.
+                    </p>
+                </div>
+            </dialog-body>
+            <link>Guardar</link>
+        </import-export>
     </resource>
 </resources>

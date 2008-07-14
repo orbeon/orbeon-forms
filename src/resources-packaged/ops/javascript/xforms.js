@@ -725,7 +725,7 @@ ORBEON.xforms.Document = {
             // Store encrypted password
             ORBEON.xforms.Offline.gearsDatabase.execute("insert into Current_Password (encrypted_password) values (?)", [ password ]);
         }
-        document.cookie = "orbeon.forms.encryption.password=" + password + "; path=/";
+        document.cookie = "orbeon.forms.encryption.password=" + password + "; path=/; secure";
         // Reset key, in case we already had another key previously
         ORBEON.xforms.Offline.encryptionKey = null;
     },
@@ -3825,15 +3825,19 @@ ORBEON.xforms.Server = {
                                         if (readonly != null && !isStaticReadonly)
                                             ORBEON.xforms.Controls.setReadonly(documentElement, readonly == "true");
 
-                                        // Change classes on input control and date pick based on type
-                                        if (ORBEON.util.Dom.hasClass(documentElement, "xforms-input")) {
-                                            if (type == "{http://www.w3.org/2001/XMLSchema}date" || type == "{http://www.w3.org/2002/xforms}date") {
+                                        // Update input control type
+                                        if (type != null && ORBEON.util.Dom.hasClass(documentElement, "xforms-input")) {
+                                            var isDateType = type == "{http://www.w3.org/2001/XMLSchema}date" || type == "{http://www.w3.org/2002/xforms}date"
+                                            //var isBooleanType = type == "{http://www.w3.org/2001/XMLSchema}boolean" || type == "{http://www.w3.org/2002/xforms}boolean"
+                                            //var isStringType = type == "" || type == "{http://www.w3.org/2001/XMLSchema}string" || type == "{http://www.w3.org/2002/xforms}string"
+                                            if (isDateType) {
                                                 ORBEON.util.Dom.addClass(documentElement, "xforms-type-date");
                                                 ORBEON.util.Dom.removeClass(documentElement, "xforms-type-string");
-                                            } else if (type != null && type != "{http://www.w3.org/2001/XMLSchema}date" && type != "{http://www.w3.org/2002/xforms}date") {
+                                            } else if (!isDateType) {
                                                 ORBEON.util.Dom.removeClass(documentElement, "xforms-type-date");
                                                 var dateDisplayElement = ORBEON.util.Dom.getChildElementByClass(documentElement, "xforms-date-display");
-                                                ORBEON.util.Dom.setStringValue(dateDisplayElement, "");
+                                                if (dateDisplayElement != null)
+                                                    ORBEON.util.Dom.setStringValue(dateDisplayElement, "");
                                             }
                                         }
 
@@ -4081,7 +4085,6 @@ ORBEON.xforms.Server = {
                                 case "submission": {
                                     var submissionElement = actionElement.childNodes[actionIndex];
                                     var showProcess = ORBEON.util.Dom.getAttribute(submissionElement, "show-progress");
-                                    var action = ORBEON.util.Dom.getAttribute(submissionElement, "action");
                                     var replace = ORBEON.util.Dom.getAttribute(submissionElement, "replace");
                                     var target = ORBEON.util.Dom.getAttribute(submissionElement, "target");
                                     if (replace == null) replace = "all";
@@ -4097,8 +4100,7 @@ ORBEON.xforms.Server = {
                                             // Display loading indicator unless the server tells us not to display it
                                             newDynamicStateTriggersReplace = true;
                                         }
-                                        // We now always use the action set by the client
-                                        //requestForm.action = action;
+                                        // We now always use the action set by the client so we don't set requestForm.action
                                         if (target == null) {
                                             // Reset as this may have been changed before by asyncRequest
                                             requestForm.removeAttribute("target");
@@ -4108,13 +4110,13 @@ ORBEON.xforms.Server = {
                                         }
                                         requestForm.submit();
                                     } else {
-                                        // Submit form in the background
+                                        // Submit form in the background (pseudo-Ajax request)
                                         YAHOO.util.Connect.setForm(requestForm, true, true);
                                         var callback = {
                                             upload: ORBEON.xforms.Server.handleUploadResponse,
                                             failure: ORBEON.xforms.Server.handleFailure
                                         }
-                                        YAHOO.util.Connect.asyncRequest("POST", action, callback);
+                                        YAHOO.util.Connect.asyncRequest("POST", XFORMS_SERVER_URL, callback);
                                     }
                                     ORBEON.xforms.Globals.formServerEvents[formID].value = "";
                                     break;
@@ -4368,7 +4370,7 @@ ORBEON.xforms.Offline = {
         ORBEON.xforms.Offline.gearsDatabase.execute("drop table if exists Offline_Forms").close();
         ORBEON.xforms.Offline.gearsDatabase.execute("drop table if exists Current_Password").close();
         window.google = null;
-        document.cookie = "orbeon.forms.encryption.password=; path=/";
+        document.cookie = "orbeon.forms.encryption.password=; path=/; secure";
     },
 
     /**

@@ -3094,8 +3094,18 @@ ORBEON.xforms.Server = {
                 }
             }
             // Evaluate MIPS if there was a value change event
-            if (foundValueChangeEvent)
+            if (foundValueChangeEvent) {
+                // Insert delay before we evaluate MIPS, just to avoid repeatedly evaluating MIPS if nothing changed
+                ORBEON.xforms.Globals.executeEventFunctionQueued++;
+                window.setTimeout(
+                    function() {
+                        ORBEON.xforms.Globals.executeEventFunctionQueued--;
+                        if (ORBEON.xforms.Globals.executeEventFunctionQueued == 0)
                 ORBEON.xforms.Offline.evaluateMIPs();
+                    },
+                    ORBEON.util.Utils.getProperty(INTERNAL_SHORT_DELAY_PROPERTY)
+                );
+            }
         } else {
             // Store the time of the first event to be sent in the queue
             var currentTime = new Date().getTime();
@@ -4677,7 +4687,7 @@ ORBEON.xforms.Offline = {
     evaluateMIPs: function() {
 
         //  Applies a relevance or read-onlyness to inherited controls
-        function applyToInherited(control, getter, setter, inherited, value, isRelevance) {
+        function applyToInherited(control, mips, getter, setter, inherited, value, isRelevance) {
             if (getter(control) != value) {
                 setter(control, value);
                 if (inherited) {
@@ -4714,79 +4724,89 @@ ORBEON.xforms.Offline = {
             }
         }
 
-        // Create context once; we then update it for values that are calculated
-        var xpathNode = document.createElement("dummy"); // Node used as current node to evaluate XPath expression
-        var xpathContext = new ExprContext(xpathNode);
-        for (var variableName in ORBEON.xforms.Offline.variables) {
-            var controlID = ORBEON.xforms.Offline.variables[variableName].value;
-            var variableValue = ORBEON.xforms.Controls.getCurrentValue(ORBEON.util.Dom.getElementById(controlID));
-            xpathContext.setVariable(variableName, variableValue);
-        }
+        // Show loading indicator
+        xformsDisplayIndicator("loading");
+        // Use timeout function to give a change to the browser to show the loading indicator before we continue with evaluation of the MIPS
+        window.setTimeout(function() {
 
-        // Go over all controls
-        for (var controlID in ORBEON.xforms.Offline.mips) {
-            var mips = ORBEON.xforms.Offline.mips[controlID];
-            var control = ORBEON.util.Dom.getElementById(controlID);
-            var controlValue = ORBEON.xforms.Controls.getCurrentValue(control);
+            // Create context once; we then update it for values that are calculated
+            var xpathNode = document.createElement("dummy"); // Node used as current node to evaluate XPath expression
+            var xpathContext = new ExprContext(xpathNode);
+            for (var variableName in ORBEON.xforms.Offline.variables) {
+                var controlID = ORBEON.xforms.Offline.variables[variableName].value;
+                var variableValue = ORBEON.xforms.Controls.getCurrentValue(ORBEON.util.Dom.getElementById(controlID));
+                xpathContext.setVariable(variableName, variableValue);
+            }
 
-            // Update xpathContext with the value of the current control
-            ORBEON.util.Dom.setStringValue(xpathNode, controlValue);
+            // Go over all controls
+            for (var controlID in ORBEON.xforms.Offline.mips) {
+                var mips = ORBEON.xforms.Offline.mips[controlID];
+                var control = ORBEON.util.Dom.getElementById(controlID);
+                var controlValue = ORBEON.xforms.Controls.getCurrentValue(control);
 
-            // Calculate
-            if (mips.calculate) {
-                var newValue = evaluateXPath(mips.calculate.value, xpathContext);
-                if (newValue != null) {
-                    // Update value
-                    ORBEON.xforms.Controls.setCurrentValue(control, newValue);
-                    // Change value of variable
-                    var variableName = ORBEON.xforms.Offline.controlIDToVariableName[controlID];
-                    if (variableName != null) {
-                        xpathContext.setVariable(variableName, newValue);
+                // Update xpathContext with the value of the current control
+                ORBEON.util.Dom.setStringValue(xpathNode, controlValue);
+
+                // Calculate
+                if (mips.calculate) {
+                    var newValue = evaluateXPath(mips.calculate.value, xpathContext);
+                    if (newValue != null) {
+                        // Update value
+                        ORBEON.xforms.Controls.setCurrentValue(control, newValue);
+                        // Change value of variable
+                        var variableName = ORBEON.xforms.Offline.controlIDToVariableName[controlID];
+                        if (variableName != null) {
+                            xpathContext.setVariable(variableName, newValue);
+                        }
                     }
                 }
-            }
 
-            // Constraint
-            var isValid = true;
-            if (mips.constraint) {
-                var constraint = evaluateXPath("boolean(" + mips.constraint.value + ")", xpathContext);
-                if (constraint != null)
-                isValid = isValid && constraint;
-            }
-
-            // Required
-            var requiredButEmpty;
-            if (mips.required) {
-                var required = evaluateXPath(mips.required.value, xpathContext);
-                if (required != null)
-                requiredButEmpty = controlValue == "" && required;
-            }
-
-            // Relevant
-            if (mips.relevant) {
-                var isRelevant = evaluateXPath("boolean(" + mips.relevant.value + ")", xpathContext);
-                if (isRelevant != null)
-                applyToInherited(control, ORBEON.xforms.Controls.isRelevant, ORBEON.xforms.Controls.setRelevant, mips.relevant.inherited, isRelevant, true);
-            }
-
-            // Readonly
-            if (mips.readonly) {
-                var isReadonly = evaluateXPath("boolean(" + mips.readonly.value + ")", xpathContext);
-                if (isReadonly != null)
-                applyToInherited(control, ORBEON.xforms.Controls.isReadonly, ORBEON.xforms.Controls.setReadonly, mips.readonly.inherited, isReadonly, false);
-            }
-
-            // Type
-            if (mips.type) {
-                var regExp = ORBEON.xforms.Offline.typeRegExps[mips.type.value];
-                if (regExp != null) {
-                    if (! controlValue.match(regExp))
-                        isValid = false;
+                // Constraint
+                var isValid = true;
+                if (mips.constraint) {
+                    var constraint = evaluateXPath("boolean(" + mips.constraint.value + ")", xpathContext);
+                    if (constraint != null)
+                    isValid = isValid && constraint;
                 }
+
+                // Required
+                var requiredButEmpty;
+                if (mips.required) {
+                    var required = evaluateXPath(mips.required.value, xpathContext);
+                    if (required != null)
+                    requiredButEmpty = controlValue == "" && required;
+                }
+
+                // Relevant
+                if (mips.relevant) {
+                    var isRelevant = evaluateXPath("boolean(" + mips.relevant.value + ")", xpathContext);
+                    if (isRelevant != null)
+                        applyToInherited(control, mips, ORBEON.xforms.Controls.isRelevant, ORBEON.xforms.Controls.setRelevant, mips.relevant.inherited, isRelevant, true);
+                }
+
+                // Readonly
+                if (mips.readonly) {
+                    var isReadonly = evaluateXPath("boolean(" + mips.readonly.value + ")", xpathContext);
+                    if (isReadonly != null)
+                        applyToInherited(control, mips, ORBEON.xforms.Controls.isReadonly, ORBEON.xforms.Controls.setReadonly, mips.readonly.inherited, isReadonly, false);
+                }
+
+                // Type
+                if (mips.type) {
+                    var regExp = ORBEON.xforms.Offline.typeRegExps[mips.type.value];
+                    if (regExp != null) {
+                        if (! controlValue.match(regExp))
+                            isValid = false;
+                    }
+                }
+
+                ORBEON.xforms.Controls.setValid(control, isValid ? "true" : "false", requiredButEmpty);
             }
 
-            ORBEON.xforms.Controls.setValid(control, isValid ? "true" : "false", requiredButEmpty);
-        }
+            // Hide loading indicator
+            xformsDisplayIndicator("none");
+
+        }, ORBEON.util.Utils.getProperty(INTERNAL_SHORT_DELAY_PROPERTY));
     },
 
     _serializeControlValues: function(controlValues) {
@@ -4818,7 +4838,6 @@ ORBEON.xforms.Offline = {
             var controlID = variables[name].value;
             controlIDToVariableName[controlID] = name;
         }
-        console.log(controlIDToVariableName);
         ORBEON.xforms.Offline.controlIDToVariableName = controlIDToVariableName;
     },
 

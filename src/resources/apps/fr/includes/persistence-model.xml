@@ -322,7 +322,8 @@
     </xforms:instance>
 
     <xforms:bind nodeset="instance('fr-triggers-instance')">
-        <xforms:bind nodeset="save" readonly="instance('fr-persistence-instance')/data-status = 'clean' or xxforms:instance('fr-form-valid-instance') = 'false'"/>
+        <xforms:bind nodeset="save" readonly="not(property('xxforms:noscript'))
+            and (instance('fr-persistence-instance')/data-status = 'clean' or xxforms:instance('fr-form-valid-instance') = 'false')"/>
     </xforms:bind>
 
     <!-- React to successful submission when saving/updating -->

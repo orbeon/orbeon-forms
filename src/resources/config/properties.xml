@@ -93,6 +93,9 @@
     <property as="xs:anyURI"  name="oxf.fr.persistence.service.exist.uri"            value="/exist/rest/db"/>
     <property as="xs:anyURI"  name="oxf.fr.appserver.uri"                            value=""/>
 
+    <property as="xs:string"  name="oxf.fr.detail.error-summary"                     value="both"/>
+    <property as="xs:boolean" name="oxf.fr.detail.button.save-locally"               value="false"/>
+
     <!-- Deprecated XForms cache configuration -->
     <property as="xs:integer" name="oxf.xforms.cache.session.size"                   value="500000"/>
     <property as="xs:integer" name="oxf.xforms.cache.application.size"               value="2000000"/>

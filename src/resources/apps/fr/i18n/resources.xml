@@ -25,6 +25,9 @@
                 <search-2>documents.</search-2>
                 <to>to</to>
                 <of>of</of>
+                <refresh>This operation will refresh the page</refresh>
+                <errors>Your Form Contains the Following Errors</errors>
+                <toc>Table of Contents</toc>
             </titles>
             <messages>
                 <intro><i>Please select a form in order to perform an operation, or select "New Form" to create a new blank form.</i></intro>
@@ -44,6 +47,10 @@
                 <any>[Any]</any>
                 <previous>Back</previous>
                 <next>Next</next>
+                <script>Full Version</script>
+                <noscript>Accessible Version</noscript>
+                <refresh>Refresh</refresh>
+                <close-box>[close]</close-box>
             </labels>
             <formats>
                 <date>[MNn] [D], [Y]</date>
@@ -113,6 +120,9 @@
                 <search-2>documents.</search-2>
                 <to>à</to>
                 <of>sur</of>
+                <refresh>Cette opération raffraîchira la page</refresh>
+                <errors>Votre formulaire contient les erreurs suivantes</errors>
+                <toc>Table des matières</toc>
             </titles>
             <messages>
                 <intro><i>Veuillez sélectionner un document avant d'effectuer une opération, ou sélectionnez "Nouveau" pour créer un nouveau formulaire.</i></intro>
@@ -132,6 +142,10 @@
                 <any>[Tous]</any>
                 <previous>Précédent</previous>
                 <next>Suivant</next>
+                <script>Version complète</script>
+                <noscript>Version accessible</noscript>
+                <refresh>Raffraîchir</refresh>
+                <close-box>[fermer]</close-box>
             </labels>
             <formats>
                 <date>Le [D] [Mn] [Y]</date>
@@ -182,6 +196,9 @@
                 <search-2>[documents.]</search-2>
                 <to>[to]</to>
                 <of>de</of>
+                <refresh>[This operation will refresh the page]</refresh>
+                <errors>[Your Form Contains the Following Errors]</errors>
+                <toc>[Table of Contents]</toc>
             </titles>
             <messages>
                 <intro><i>Por favor, seleccione una forma para llevar a cabo una operación, o seleccione "Nueva Forma" para crear un nuevo formulario en blanco.</i></intro>
@@ -201,6 +218,10 @@
                 <any>[[Any]]</any>
                 <previous>Anterior</previous>
                 <next>Siguiente</next>
+                <script>[Full Version]</script>
+                <noscript>[Accessible Version]</noscript>
+                <refresh>[Refresh]</refresh>
+                <close-box>[[fermer]]</close-box>
             </labels>
             <formats>
                 <date>[MNn] [D], [Y]</date>

@@ -42,7 +42,7 @@ body, body table, textarea.xforms-textarea {
     text-align: center;
     font-size: smaller;
     padding: 10px;
-    color: gray;
+    color: #6E6E6E;
 }
 
 .fr-container {
@@ -104,13 +104,24 @@ h1 { margin-top: 0 }
 .fr-noscript-icon { display: none }
 .xforms-noscript .fr-noscript-icon { display: inline }
 
-.fr-form-description { display: block; margin: 1em; padding: .5em; border: 4px solid orange; background-color: white }
+.fr-form-description {
+    display: block;
+    float: right;
+    padding: .5em;
+    max-width: 30em;/* not strong feelings about this one */
+    font-size: smaller;
+    font-style: italic;
+    text-align: right;
+    color: #6E6E6E;
+}
 .fr-form-description .fr-close { margin-left: .5em }
 
 .fr-header { overflow: hidden; }
-.fr-summary-language-choice { margin-right: 1em; margin-top: .2em; color: gray; font-size: 85%; text-align: right; }
-.fr-summary-language-choice a { color: gray }
-.fr-summary-language-choice .xforms-label { display: inline; margin-right: .5em }
+.fr-summary-language-choice, .fr-summary-noscript-choice { margin-right: 1em; margin-top: .2em; color: gray; font-size: 85%; text-align: right; }
+.fr-summary-language-choice a, .fr-summary-noscript-choice a { color: #6E6E6E }
+.fr-summary-language-choice .xforms-label, .fr-summary-noscript-choice .xforms-label { display: inline; margin-right: .5em }
+
+
 
 .xforms-help-image { vertical-align: -0.2em; display: inline; margin: 0 .5em 0 0; padding: 0;
     float: left; /* Without the "float: left" on FF2/3 the mouseover event arrive on the label, not the help
@@ -125,9 +136,14 @@ h1 { margin-top: 0 }
     clear: both;
 }
 
+#fr-form-group {
+    display: block;
+    margin: .5em 1em 1em;
+}
+
 div.fr-body {
-    margin: 20px 10px 0 10px;
-    padding: 0 0 20px 0;
+    /*margin: 10px 10px 0 10px;*/
+    padding: 0;
 }
 
 .fr-section-body {
@@ -331,7 +347,7 @@ body { text-align: left }
     margin-top: .2em;
     margin-left: 0;/* used to have margin here but with new colors no margin seems better */
     width: 100%;
-    color: gray;
+    color: #6E6E6E;
     font-style: italic
 }
 
@@ -360,9 +376,29 @@ div.fr-collapsible {
 .fr-message-fatal-error { color: #cc0000}
 .fr-unsaved-data { color: #cc0000 }
 
-/* Errors */
-.fr-error-messages { float: left; margin-bottom: 0 }
-.fr-error-messages td { padding: 0.2em }
+/* Table of contents */
+.fr-toc {
+    /*float: right;*/
+    color: #666699;
+    border-bottom: 0.5em solid orange;
+    /*border-left: 0.5em solid orange;*/
+    padding: 0 .5em 0 0.5em;
+    /*max-width: 30em*/
+}
+
+/* Error summary */
+.fr-error-summary {
+    clear: both;
+    width: 100%;
+    padding: 0;
+    display: block;
+}
+
+.fr-error-summary-top { border-bottom: .5em solid orange }
+.fr-error-summary-bottom { border-top: .5em solid orange }
+
+.fr-summary-body { display: block; padding: 10px }
+
 .fr-error-title {
     display: block;
     font-size: smaller;
@@ -371,7 +407,7 @@ div.fr-collapsible {
     margin-left: 0;/* used to have margin here but with new colors no margin seems better */
     background-color: #DF731B;
     color: white;
-    padding: 1px;
+    padding: .3em;
     border-radius: 3px; -moz-border-radius: 2px; -webkit-border-radius: 3px; -ms-border-radius: 2px /* radius appears differently w/ Safari 3.1 vs. Firefox 3.0b4*/
 }
 .fr-error-list li { margin-bottom: .5em; }

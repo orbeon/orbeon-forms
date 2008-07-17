@@ -322,24 +322,24 @@
                 <fr:section id="details-section" context="details">
                     <xforms:label ref="$form-resources/details/label"/>
                     <fr:grid columns="3">
-                        <tr>
-                            <td>
+                        <fr:tr>
+                            <fr:td>
                                 <xforms:input id="title-control" bind="title-bind" class="fr-summary fr-search" incremental="true">
                                     <xforms:label ref="$form-resources/title/label"/>
                                     <xforms:hint ref="$form-resources/title/hint"/>
                                     <xforms:help ref="$form-resources/title/help"/>
                                     <xforms:alert ref="$form-resources/title/alert"/>
                                 </xforms:input>
-                            </td>
-                            <td>
+                            </fr:td>
+                            <fr:td>
                                 <xforms:input id="author-control" bind="author-bind" class="fr-summary fr-search" incremental="true">
                                     <xforms:label ref="$form-resources/author/label"/>
                                     <xforms:hint ref="$form-resources/author/hint"/>
                                     <xforms:help ref="$form-resources/author/help"/>
                                     <xforms:alert ref="$form-resources/author/alert"/>
                                 </xforms:input>
-                            </td>
-                            <td rowspan="2">
+                            </fr:td>
+                            <fr:td rowspan="2">
                                 <xforms:select1 ref="rating" appearance="full">
                                     <xforms:label ref="$form-resources/rating/label"/>
                                     <xforms:hint ref="$form-resources/rating/hint"/>
@@ -350,10 +350,10 @@
                                         <xforms:value ref="value"/>
                                     </xforms:itemset>
                                 </xforms:select1>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
+                            </fr:td>
+                        </fr:tr>
+                        <fr:tr>
+                            <fr:td>
                                 <xforms:select1 id="language-control" bind="language-bind" class="fr-summary fr-search">
                                     <xforms:label ref="$form-resources/language/label"/>
                                     <xforms:hint ref="$form-resources/language/hint"/>
@@ -368,39 +368,39 @@
                                         <xforms:value ref="value"/>
                                     </xforms:itemset>
                                 </xforms:select1>
-                            </td>
-                            <td>
+                            </fr:td>
+                            <fr:td>
                                 <xforms:input ref="link" incremental="true">
                                     <xforms:label ref="$form-resources/link/label"/>
                                     <xforms:hint ref="$form-resources/link/hint"/>
                                     <xforms:help ref="$form-resources/link/help"/>
                                     <xforms:alert ref="$form-resources/link/alert"/>
                                 </xforms:input>
-                            </td>
-                        </tr>
+                            </fr:td>
+                        </fr:tr>
                     </fr:grid>
                 </fr:section>
 
                 <fr:section id="notes-section" context="notes">
                     <xforms:label ref="$form-resources/notes/label"/>
                     <fr:grid columns="1">
-                        <tr>
-                            <td>
+                        <fr:tr>
+                            <fr:td>
                                 <fr:repeat nodeset="note" id="book-repeat" origin="instance('note-template')" columns="1" appearance="xxforms:table">
                                     <xforms:label>Note</xforms:label>
-                                    <tr>
-                                        <td>
+                                    <fr:tr>
+                                        <fr:td>
                                             <xforms:textarea ref="." appearance="xxforms:autosize" incremental="true">
                                                 <xforms:label ref="$form-resources/note/label"/>
                                                 <xforms:hint ref="$form-resources/note/hint"/>
                                                 <xforms:help ref="$form-resources/note/help"/>
                                                 <xforms:alert ref="$form-resources/note/alert"/>
                                             </xforms:textarea>
-                                        </td>
-                                    </tr>
+                                        </fr:td>
+                                    </fr:tr>
                                 </fr:repeat>
-                            </td>
-                        </tr>
+                            </fr:td>
+                        </fr:tr>
                     </fr:grid>
                 </fr:section>
 
@@ -410,3 +410,4 @@
         </fr:view>
     </body>
 </html>
+

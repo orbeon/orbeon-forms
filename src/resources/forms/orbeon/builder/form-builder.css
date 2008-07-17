@@ -193,13 +193,20 @@ a.fb-edit-help-trigger img {
 
 .fb-metadata-section .fr-grid .fr-cell-content { width: 30em }
 
-.fb-metadata-section { padding-bottom: .5em; border-bottom: 1px dotted gray }
-.fb-metadata-logo-title {
+.fb-metadata-section {
     background-image: url(../../../apps/fr/style/logo-bg.gif);
     background-repeat: repeat-x;
-    /*border-bottom: .5em solid orange*/
+    background-color: #F8F8F8
 }
-.fb-metadata-description { border: 4px solid orange }
+.fb-metadata-logo { vertical-align: middle }
+
+/* TODO: trying to make this more WYSIWYG */
+/*#title-control .fr-inplace-content { text-align: right }*/
+/*#title-control .xforms-input-input { text-align: right }*/
+/*#title-control .fr-inplace-content .xforms-label { float: right }*/
+
+/*#description-control .fr-inplace-content { text-align: right }*/
+/*#description-control .fr-inplace-content .xforms-label { float: right }*/
 
 /* Highlighting of top-level blocks (sections, ...) */
 .fb-top-level-content { padding-left: .5em; margin-bottom: .5em; border-left: 4px solid transparent }

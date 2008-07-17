@@ -63,12 +63,12 @@
         <p:output name="data" id="request"/>
     </p:processor>
 
-    <!-- Apply generic components -->
+    <!-- Apply UI components -->
     <p:processor name="oxf:unsafe-xslt">
         <p:input name="data" href="#themed-data"/>
         <p:input name="instance" href="#instance"/>
         <p:input name="request" href="#request"/>
-        <p:input name="config" href="components.xsl"/>
+        <p:input name="config" href="components/components.xsl"/>
         <p:output name="data" id="after-components"/>
     </p:processor>
 

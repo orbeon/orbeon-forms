@@ -93,7 +93,8 @@
     <property as="xs:anyURI"  name="oxf.fr.persistence.service.exist.uri"            value="/exist/rest/db"/>
     <property as="xs:anyURI"  name="oxf.fr.appserver.uri"                            value=""/>
 
-    <property as="xs:string"  name="oxf.fr.detail.error-summary"                     value="both"/>
+    <property as="xs:boolean" name="oxf.fr.detail.noscript.table"                    value="true"/>
+    <property as="xs:string"  name="oxf.fr.detail.error-summary"                     value="bottom"/>
     <property as="xs:boolean" name="oxf.fr.detail.button.save-locally"               value="false"/>
 
     <!-- Deprecated XForms cache configuration -->

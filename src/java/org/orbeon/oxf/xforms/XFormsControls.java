@@ -697,7 +697,9 @@ public class XFormsControls {
      * Get the object with the id specified, null if not found.
      */
     public Object getObjectById(String controlId) {
-        return currentControlsState.getIdsToXFormsControls().get(controlId);
+        // Until xforms-ready is dispatched, ids map may be null
+        final Map idsToXFormsControls = currentControlsState.getIdsToXFormsControls();
+        return (idsToXFormsControls != null) ? idsToXFormsControls.get(controlId) : null;
     }
 
     /**

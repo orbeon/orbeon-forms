@@ -180,7 +180,8 @@
                                 </xforms:select1>
                             </xhtml:td>
                             <xhtml:td>
-                                <xforms:group>
+                                <!-- Only display this if a selection control is picked -->
+                                <xforms:group ref=".[xxforms:variable[@name = 'control-name']/@select != '']">
                                     <xforms:label>Itemset</xforms:label>
                                     <xforms:hint>XPath expressions to build a new itemset</xforms:hint>
                                     <xhtml:div class="fb-parameters">

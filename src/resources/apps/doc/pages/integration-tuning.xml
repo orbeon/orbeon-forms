@@ -161,8 +161,8 @@
                     first:
                 </p>
                 <ul>
-                    <li>maxThreads="3"</li>
-                    <li>acceptCount="50"</li>
+                    <li><code>maxThreads="3"</code></li>
+                    <li><code>acceptCount="50"</code></li>
                 </ul>
                 <p>
                     This setting sets a small maximum of 3 concurrent requests, and 50 more requests being queued. This
@@ -177,6 +177,13 @@
                     Note that it is typical for Java virtual machines to have maximum heap sizes of 256 MB to 1.5 GB in
                     production.
                 </p>
+                <warning>
+                    <p>
+                        Tomcat now appears to accept only a minimum of 10 of <code>maxThreads</code>. A <a
+                        href="http://tinyurl.com/62sjyq">new mechanism</a> to limit the number of threads will be
+                        necessary in Orbeon Forms.
+                    </p>
+                </warning>
             </section>
         </section>
         <section>

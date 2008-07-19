@@ -466,18 +466,6 @@
     </processor>
 
     <!-- XForms processors -->
-    <processor name="oxf:xforms-input">
-        <class name="org.orbeon.oxf.processor.xforms.input.XFormsInput"/>
-    </processor>
-
-    <processor name="oxf:xforms-output">
-        <class name="org.orbeon.oxf.processor.xforms.output.XFormsOutput"/>
-    </processor>
-
-    <processor name="oxf:xforms-annotate">
-        <class name="org.orbeon.oxf.processor.xforms.validation.XFormsAnnotate"/>
-    </processor>
-
     <processor name="oxf:xforms-server">
         <class name="org.orbeon.oxf.xforms.processor.XFormsServer"/>
     </processor>
@@ -490,14 +478,23 @@
         <class name="org.orbeon.oxf.xforms.processor.XFormsResourceServer"/>
     </processor>
 
-    <processor name="oxf:xforms-document-annotator">
-        <class name="org.orbeon.oxf.xforms.processor.XFormsDocumentAnnotator"/>
-    </processor>
-
     <processor name="oxf:xforms-submission">
         <instantiation name="oxf:pipeline">
             <input name="config" href="oxf:/ops/xforms/xforms-submission.xpl"/>
         </instantiation>
+    </processor>
+
+    <!-- Legacy XForms processors -->
+    <processor name="oxf:xforms-input">
+        <class name="org.orbeon.oxf.processor.xforms.input.XFormsInput"/>
+    </processor>
+
+    <processor name="oxf:xforms-output">
+        <class name="org.orbeon.oxf.processor.xforms.output.XFormsOutput"/>
+    </processor>
+
+    <processor name="oxf:xforms-annotate">
+        <class name="org.orbeon.oxf.processor.xforms.validation.XFormsAnnotate"/>
     </processor>
 
     <!-- Other processors -->

@@ -17,22 +17,18 @@
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
     xmlns:xforms="http://www.w3.org/2002/xforms"
-    xmlns:saxon="http://saxon.sf.net/">
+    xmlns:saxon="http://saxon.sf.net/"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
     <p:param name="document" type="input"/>
     <p:param name="response" type="output"/>
 
-    <!-- Annotate elements in view with ids -->
-    <p:processor name="oxf:xforms-document-annotator">
-        <p:input name="data" href="#document"/>
-        <p:input name="namespace"><request><container-namespace/></request></p:input>
-        <p:output name="data" id="annotated-view"/>
-    </p:processor>
-
     <!-- Native XForms Initialization -->
     <p:processor name="oxf:xforms-to-xhtml">
-        <p:input name="annotated-document" href="#annotated-view"/>
-        <p:input name="instance"><dummy/></p:input>
+        <p:input name="annotated-document" href="#document"/>
+        <p:input name="namespace"><request><container-namespace/></request></p:input>
+        <p:input name="data"><null xsi:nil="true"/></p:input>
+        <p:input name="instance"><null xsi:nil="true"/></p:input>
         <p:output name="response" id="encoded-response" schema-href="/ops/xforms/xforms-server-response.rng"/>
     </p:processor>
 

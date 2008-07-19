@@ -1405,13 +1405,17 @@
                         the example above, inserting or deleting table rows after the page is loaded will still
                         correctly update the <code>class</code> attribute.
                     </p>
+                    <p>
+                        It is also possible to use AVTs outside <code>&lt;xhtml:body></code>, for example:
+                    </p>
+                    <xml-source>
+                        <xhtml:html lang="{instance('language-instance')}" xml:lang="{instance('language-instance')}">
+                            ...
+                        </xhtml:html>
+                    </xml-source>
                     <note>
                         <p>
-                            At the moment, AVTs are only supported on XHTML elements within
-                            <code>&lt;xhtml:body></code>.
-                        </p>
-                        <p>
-                            It is not possible to use AVTs on the <code>id</code> attribute of XHTML elements.
+                            It is not possible to use AVTs within the <code>id</code> attribute of XHTML elements.
                         </p>
                     </note>
                 </section>

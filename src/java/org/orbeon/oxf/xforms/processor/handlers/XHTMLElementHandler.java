@@ -43,72 +43,20 @@ public class XHTMLElementHandler extends HandlerBase {
                 // This XHTML element has at least one AVT so process its attributes
 
                 final int attributesCount = attributes.getLength();
+                boolean found = false;
                 for (int i = 0; i < attributesCount; i++) {
                     final String attributeValue = attributes.getValue(i);
                     if (attributeValue.indexOf('{') != -1) {
                         // This is an AVT
-                        final String attributeName = attributes.getLocalName(i);
-                        final XXFormsAttributeControl attributeControl = controlState.getAttributeControl(effectiveId, attributeName);
+                        found = true;
 
-                        // Update the value of the id attribute
-                        attributes = XMLUtils.addOrReplaceAttribute(attributes, "", "", "id", effectiveId);
+                        final String attributeLocalName = attributes.getLocalName(i);
+                        final String attributeQName = attributes.getQName(i);// use qualified name so we match on "xml:lang"
+                        final XXFormsAttributeControl attributeControl = controlState.getAttributeControl(effectiveId, attributeQName);
 
                         // Find effective attribute value
                         final String effectiveAttributeValue;
                         if (attributeControl != null) {
-                            // Below is an attempt at automatically handle rowspans for IE, but it turns out that is a
-                            // little too hard to do as it entails not only finding the element hierarchy at this point,
-                            // but also what exactly is repeated (case of xforms:repeat around two xhtml:tr, for
-                            // example).
-
-//                            final String avtAttributeValue =  attributeControl.getExternalValue(pipelineContext);
-//                            if (handlerContext.isRenderingEngineTrident()) {
-//                                // Handle IE HACKS
-//                                if ("rowspan".equals(attributeName)) {
-//
-//                                    Element parent = attributeControl.getControlElement().getParent();// should point to <xhtml:td>
-//
-//                                    // Search for <xhtml:tr>
-//                                    boolean foundTr = false;
-//                                    while ((parent = parent.getParent()) != null) {
-//                                        if ("tr".equals(parent.getName())) {
-//                                            foundTr = true;
-//                                            break;
-//                                        }
-//                                    }
-//
-//                                    // Search for <xforms:repeat> between <xhtml:tr> and <xhtml:tbody> or <xhtml:table>
-//                                    if (foundTr) {
-//                                        boolean foundRepeat = false;
-//                                        while ((parent = parent.getParent()) != null) {
-//                                            if ("table".equals(parent.getName()) || "tbody".equals(parent.getName())) {
-//                                                break;
-//                                            } else if ("repeat".equals(parent.getName())) {
-//                                                foundRepeat = true;
-//                                                break;
-//                                            }
-//                                        }
-//                                        if (foundRepeat) {
-//                                            // This td is within a repeated tr
-//                                            // Adjust to skip separators
-//                                            effectiveAttributeValue = Integer.toString(Integer.parseInt(avtAttributeValue) * 2 - 1);
-//                                        } else {
-//                                            effectiveAttributeValue = avtAttributeValue;
-//                                        }
-//                                    } else {
-//                                        effectiveAttributeValue = avtAttributeValue;
-//                                    }
-//                                } else if ("colspan".equals(attributeName)) {
-//                                    // TO DO
-//                                    effectiveAttributeValue = avtAttributeValue;
-//                                } else {
-//                                    // Keep value as is
-//                                    effectiveAttributeValue = avtAttributeValue;
-//                                }
-//                            } else {
-//                                // Keep value as is
-//                                effectiveAttributeValue = avtAttributeValue;
-//                            }
                             effectiveAttributeValue = attributeControl.getExternalValue(pipelineContext);
                         } else {
                             // Use blank value
@@ -116,8 +64,14 @@ public class XHTMLElementHandler extends HandlerBase {
                         }
 
                         // Set the value of the attribute
-                        attributes = XMLUtils.addOrReplaceAttribute(attributes, "", "", attributeName, effectiveAttributeValue);
+                        attributes = XMLUtils.addOrReplaceAttribute(attributes, attributes.getURI(i),
+                                XMLUtils.prefixFromQName(attributeQName), attributeLocalName, effectiveAttributeValue);
                     }
+                }
+
+                if (found) {
+                    // Update the value of the id attribute
+                    attributes = XMLUtils.addOrReplaceAttribute(attributes, "", "", "id", effectiveId);
                 }
             }
         }

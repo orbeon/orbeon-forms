@@ -115,7 +115,7 @@ public class XFormsStaticState {
      * Create static state object from a Document. This constructor is used when creating an initial static state upon
      * producing an XForms page.
      *
-     * @param staticStateDocument   Document containing the static state. The document may be modifed by this constructor and must be discarded afterwards.
+     * @param staticStateDocument   Document containing the static state. The document may be modifed by this constructor and must be discarded afterwards by the caller.
      * @param namespacesMap         Map<String, Map<String, String>> of control id to Map of namespace mappings
      * @param annotatedDocument     optional SAXStore containing XHTML for noscript mode
      */
@@ -172,13 +172,32 @@ public class XFormsStaticState {
             }
         }
 
-        // Handle properties
-        for (Iterator i = rootElement.attributeIterator(); i.hasNext();) {
-            final Attribute currentAttribute = (Attribute) i.next();
-            if (XFormsConstants.XXFORMS_NAMESPACE_URI.equals(currentAttribute.getNamespaceURI())) {
-
-                final Object propertyValue = XFormsProperties.parseProperty(currentAttribute.getName(), currentAttribute.getValue());
-                nonDefaultProperties.put(currentAttribute.getName(), propertyValue);
+        // Gather xxforms:* properties
+        {
+            // Global properties (outside models and controls)
+            {
+                final Element propertiesElement = rootElement.element("properties");
+                if (propertiesElement != null) {
+                    for (Iterator i = propertiesElement.attributeIterator(); i.hasNext();) {
+                        final Attribute currentAttribute = (Attribute) i.next();
+                        final Object propertyValue = XFormsProperties.parseProperty(currentAttribute.getName(), currentAttribute.getValue());
+                        nonDefaultProperties.put(currentAttribute.getName(), propertyValue);
+                    }
+                }
+            }
+            // Properties on xforms:model elements
+            for (Iterator i = modelDocuments.iterator(); i.hasNext();) {
+                final Document currentModelDocument = (Document) i.next();
+                for (Iterator j = currentModelDocument.getRootElement().attributeIterator(); j.hasNext();) {
+                    final Attribute currentAttribute = (Attribute) j.next();
+                    if (XFormsConstants.XXFORMS_NAMESPACE_URI.equals(currentAttribute.getNamespaceURI())) {
+                        final String propertyName = currentAttribute.getName();
+                        final Object propertyValue = XFormsProperties.parseProperty(propertyName, currentAttribute.getValue());
+                        // Only take the first occurrence into account, and make sure the property is supported
+                        if (nonDefaultProperties.get(propertyName) == null && XFormsProperties.getPropertyDefinition(propertyName) != null)
+                            nonDefaultProperties.put(propertyName, propertyValue);
+                    }
+                }
             }
         }
 
@@ -318,24 +337,16 @@ public class XFormsStaticState {
     }
 
     private void extractControlsAndModels(Element rootElement) {
-        // Get controls document
-        {
-//            final Document controlsDocument = Dom4jUtils.createDocument();
-//            controlsDocument.setRootElement((Element) rootElement.element("controls").detach());
-//            this.controlsDocument = controlsDocument;
 
-            // Copy the element because we may need it in staticStateDocument for encoding
-            this.controlsDocument = Dom4jUtils.createDocumentCopyParentNamespaces(rootElement.element("controls"));
-        }
-
-        // Get models from static state
+        // Get top-level models from static state document
         {
-            final Element modelsElement = rootElement.element("models");
+            final List modelsElements = rootElement.elements(XFormsConstants.XFORMS_MODEL_QNAME);
             modelDocuments.clear();
 
             // Get all models
             // FIXME: we don't get a System ID here. Is there a simple solution?
-            for (Iterator i = modelsElement.elements().iterator(); i.hasNext();) {
+            int modelsCount = 0;
+            for (Iterator i = modelsElements.iterator(); i.hasNext(); modelsCount++) {
                 final Element modelElement = (Element) i.next();
 
 //                final Document modelDocument = Dom4jUtils.createDocument();
@@ -343,9 +354,52 @@ public class XFormsStaticState {
 
                 // Copy the element because we may need it in staticStateDocument for encoding
                 final Document modelDocument = Dom4jUtils.createDocumentCopyParentNamespaces(modelElement);
-
                 modelDocuments.add(modelDocument);
             }
+
+            XFormsContainingDocument.logDebugStatic("static state", "created model documents", new String[] { "count", Integer.toString(modelsCount) });
+        }
+
+        // Get controls document
+        {
+//            final Document controlsDocument = Dom4jUtils.createDocument();
+//            controlsDocument.setRootElement((Element) rootElement.element("controls").detach());
+//            this.controlsDocument = controlsDocument;
+
+            // Create document
+            controlsDocument = Dom4jUtils.createDocument();
+            final Element controlsElement = Dom4jUtils.createElement("controls");
+            controlsDocument.setRootElement(controlsElement);
+            
+            final Configuration xpathConfiguration = new Configuration();
+            final DocumentWrapper controlsDocumentInfo = new DocumentWrapper(controlsDocument, null, xpathConfiguration);
+
+            // Find all top-level controls
+            int topLevelControlsCount = 0;
+            for (Iterator i = rootElement.elements().iterator(); i.hasNext();) {
+                final Element currentElement = (Element) i.next();
+                final QName currentElementQName = currentElement.getQName();
+
+                if (!currentElementQName.equals(XFormsConstants.XFORMS_MODEL_QNAME)
+                        && !currentElementQName.equals(XMLConstants.XHTML_HTML_QNAME)
+                        && currentElement.getNamespaceURI() != null && !"".equals(currentElement.getNamespaceURI())) {
+                    // Any element in a namespace (xforms:*, xxforms:*, exforms:*) except xforms:model and xhtml:html
+
+                    // Copy the element because we may need it in staticStateDocument for encoding
+                    controlsElement.add(currentElement.createCopy());
+
+//                    final List onlineTriggerIds = XPathCache.evaluate(pipelineContext, controlsDocumentInfo,
+//                        "for $handler in for $action in //xxforms:online return ($action/ancestor-or-self::*[@ev:event and tokenize(@ev:event, '\\s+') = 'DOMActivate'])[1]" +
+//                        "   return for $id in $handler/../descendant-or-self::xforms:trigger/@id return string($id)", BASIC_NAMESPACE_MAPPINGS,
+//                        null, null, null, null, locationData);
+
+                    // TODO: Extract models nested within controls
+
+                    topLevelControlsCount++;
+                }
+            }
+
+            XFormsContainingDocument.logDebugStatic("static state", "created controls document", new String[] { "top-level controls count", Integer.toString(topLevelControlsCount) });
         }
     }
 
@@ -605,7 +659,7 @@ public class XFormsStaticState {
     }
 
     public ItemsInfo getItemsInfo(String controlId) {
-        return (XFormsStaticState.ItemsInfo) itemsInfoMap.get(controlId);
+        return (itemsInfoMap != null) ? (XFormsStaticState.ItemsInfo) itemsInfoMap.get(controlId) : null;
     }
 
     /**

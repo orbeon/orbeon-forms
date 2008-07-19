@@ -1050,6 +1050,7 @@ public class XMLUtils {
 
     public static Attributes addOrReplaceAttribute(Attributes attributes, String uri, String prefix, String localname, String value) {
         final AttributesImpl newAttributes = new AttributesImpl();
+        boolean replaced = false;
         for (int i = 0; i < attributes.getLength(); i++) {
             final String attributeURI = attributes.getURI(i);
             final String attributeValue = attributes.getValue(i);
@@ -1057,10 +1058,19 @@ public class XMLUtils {
             final String attributeQName = attributes.getQName(i);
             final String attributeLocalname = attributes.getLocalName(i);
 
-            if (!(uri.equals(attributeURI) && localname.equals(attributeLocalname)))
+            if (uri.equals(attributeURI) && localname.equals(attributeLocalname)) {
+                // Found existing attribute
+                replaced = true;
+                newAttributes.addAttribute(uri, localname, XMLUtils.buildQName(prefix, localname), ContentHandlerHelper.CDATA, value);
+            } else {
+                // Not a matched attribute
                 newAttributes.addAttribute(attributeURI, attributeLocalname, attributeQName, attributeType, attributeValue);
+            }
         }
-        newAttributes.addAttribute(uri, localname, XMLUtils.buildQName(prefix, localname), ContentHandlerHelper.CDATA, value);
+        if (!replaced) {
+            // Attribute did not exist already so add it
+            newAttributes.addAttribute(uri, localname, XMLUtils.buildQName(prefix, localname), ContentHandlerHelper.CDATA, value);
+        }
         return newAttributes;
     }
 

@@ -38,7 +38,7 @@
     <!-- Global variables -->
     <xsl:variable name="is-detail" select="doc('input:instance')/*/mode != ''" as="xs:boolean"/>
     <xsl:variable name="is-form-builder" select="doc('input:instance')/*/app = 'orbeon' and doc('input:instance')/*/form = 'builder'" as="xs:boolean"/>
-    <xsl:variable name="is-noscript" select="doc('input:request')/request/parameters/parameter[name = 'fr-noscript']/value = 'true'"/>
+    <xsl:variable name="is-noscript" select="not($is-form-builder) and doc('input:request')/request/parameters/parameter[name = 'fr-noscript']/value = 'true'"/>
 
     <!-- Properties -->
     <xsl:variable name="error-summary" select="PipelineFunctionLibrary:property('oxf.fr.detail.error-summary')" as="xs:string"/>
@@ -56,32 +56,28 @@
         </xsl:copy>
     </xsl:template>
 
-    <!-- Handle language -->
+    <!-- Handle document language -->
     <xsl:template match="/xhtml:html">
-        <xsl:copy>
-            <!-- Set current language if in noscript mode as we do know the language then -->
-            <xsl:if test="$is-noscript">
-                <!-- TODO: how to extract the language? -->
-                <xsl:attribute name="lang" select="xxx"/>
-                <xsl:attribute name="xml:lang" select="xxx"/>
-            </xsl:if>
+        <xhtml:html lang="{{xxforms:instance('fr-language-instance')}}"
+                    xml:lang="{{xxforms:instance('fr-language-instance')}}">
             <xsl:apply-templates select="@* | node()"/>
-        </xsl:copy>
+        </xhtml:html>
     </xsl:template>
 
     <!-- Add Form Runner models and scripts -->
     <xsl:template match="/xhtml:html/xhtml:head/xforms:model[1]">
 
         <!-- This model handles form sections -->
-        <!-- State handling is set to "client" for the offline mode until the server supports switching back and forth between client and server -->
         <xforms:model id="fr-sections-model"
                       xxforms:external-events="fr-after-collapse {@xxforms:external-events}"
                       xxforms:readonly-appearance="{if (doc('input:instance')/*/mode = ('view', 'print', 'pdf')) then 'static' else 'dynamic'}"
                       xxforms:order="help label control alert hint"
                       xxforms:computed-binds="recalculate"
-                      xxforms:offline="true"
+                      xxforms:offline="false"
                       xxforms:noscript="{$is-noscript}">
+
             <xsl:copy-of select="@* except (@id, @xxforms:external-events)"/>
+            
             <!-- Contain section being currently expanded/collapsed -->
             <!-- TODO: This probably doesn't quite work for sections within repeats -->
             <xforms:instance id="fr-current-section-instance">

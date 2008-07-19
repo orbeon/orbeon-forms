@@ -25,9 +25,7 @@ import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.util.UUIDUtils;
 import org.orbeon.oxf.xforms.*;
-import org.orbeon.oxf.xforms.processor.handlers.HandlerContext;
-import org.orbeon.oxf.xforms.processor.handlers.XHTMLBodyHandler;
-import org.orbeon.oxf.xforms.processor.handlers.XHTMLHeadHandler;
+import org.orbeon.oxf.xforms.processor.handlers.*;
 import org.orbeon.oxf.xforms.state.XFormsDocumentCache;
 import org.orbeon.oxf.xforms.state.XFormsState;
 import org.orbeon.oxf.xforms.state.XFormsStateManager;
@@ -134,12 +132,8 @@ public class XFormsToXHTML extends ProcessorImpl {
                         final LocationDocumentResult documentResult = new LocationDocumentResult();
                         identity.setResult(documentResult);
 
-                        // TODO: Digest not used at this point
-    //                    final XMLUtils.DigestContentHandler digestContentHandler = new XMLUtils.DigestContentHandler("MD5");
-
                         annotatedSAXStore = new SAXStore(new TeeContentHandler(new ContentHandler[] {
                                 new XFormsExtractorContentHandler(pipelineContext, identity)
-    //                            ,digestContentHandler
     //                            ,new SAXLoggerProcessor.DebugContentHandler()
                         }));
 
@@ -147,18 +141,9 @@ public class XFormsToXHTML extends ProcessorImpl {
                         final Map namespaceMappings = new HashMap();
                         readInputAsSAX(pipelineContext, processorInput, new XFormsDocumentAnnotatorContentHandler(annotatedSAXStore, externalContext, namespaceMappings));
 
-                        // Get the results
+                        // Get static state document and create static state object
                         final Document staticStateDocument = documentResult.getDocument();
-
 //                        XFormsContainingDocument.logDebugStatic("XForms to XHTML", "static state", new String[] { "document", Dom4jUtils.domToString(staticStateDocument) });
-
-                        // TODO: Digest not used at this point
-    //                    final String digest = Base64.encode(digestContentHandler.getResult());
-    //                    if (XFormsServer.logger.isDebugEnabled())
-    //                        XFormsServer.logger.debug("XForms - created digest for static state: " + digest);
-    //                    xformsEngineStaticState = new XFormsStaticState(pipelineContext, staticStateDocument, digest);
-
-                        // Create static state object
                         xformsStaticState = new XFormsStaticState(staticStateDocument, namespaceMappings, annotatedSAXStore);
                     }
 
@@ -367,8 +352,17 @@ public class XFormsToXHTML extends ProcessorImpl {
         xformsControls.evaluateAllControlsIfNeeded(pipelineContext);
 
         // Register handlers on controller (the other handlers are registered by the body handler)
-        controller.registerHandler(XHTMLHeadHandler.class.getName(), XMLConstants.XHTML_NAMESPACE_URI, "head");
-        controller.registerHandler(XHTMLBodyHandler.class.getName(), XMLConstants.XHTML_NAMESPACE_URI, "body");
+        {
+            controller.registerHandler(XHTMLHeadHandler.class.getName(), XMLConstants.XHTML_NAMESPACE_URI, "head");
+            controller.registerHandler(XHTMLBodyHandler.class.getName(), XMLConstants.XHTML_NAMESPACE_URI, "body");
+
+            // Register a handler for AVTs on HTML elements
+            final boolean hostLanguageAVTs = XFormsProperties.isHostLanguageAVTs(); // TODO: this should be obtained per document, but we only know about this in the extractor
+            if (hostLanguageAVTs) {
+                controller.registerHandler(XXFormsAttributeHandler.class.getName(), XFormsConstants.XXFORMS_NAMESPACE_URI, "attribute");
+                controller.registerHandler(XHTMLElementHandler.class.getName(), XMLConstants.XHTML_NAMESPACE_URI, null);
+            }
+        }
 
         // Set final output
         controller.setOutput(new DeferredContentHandlerImpl(contentHandler));

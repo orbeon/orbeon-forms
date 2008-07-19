@@ -122,12 +122,13 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
             if (attributesCount > 0) {
                 String htmlElementId = null;
                 for (int i = 0; i < attributesCount; i++) {
-                    if ("".equals(attributes.getURI(i))) {
-                        // For now we only support AVTs on attributes in no namespace
+                    final String currentAttributeURI = attributes.getURI(i);
+                    if ("".equals(currentAttributeURI) || XMLConstants.XML_URI.equals(currentAttributeURI)) {
+                        // For now we only support AVTs on attributes in no namespace or in the XML namespace (for xml:lang)
                         final String attributeValue = attributes.getValue(i);
                         if (attributeValue.indexOf('{') != -1) {
                             // This is an AVT
-                            final String attributeName = attributes.getLocalName(i);
+                            final String attributeName = attributes.getQName(i);// use qualified name for xml:lang
 
                             // Create a new id and update the attributes if needed
                             if (htmlElementId == null) {

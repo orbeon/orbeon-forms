@@ -36,7 +36,9 @@ import java.util.*;
  * This ContentHandler extracts XForms models and controls from an XHTML document and creates a static state document
  * for the request encoder. xml:base attributes are added on the models and root control elements.
  *
- * This now allows for XForms controls and AVTs not only within the body, but anywhere else outside models.
+ * This allows for XForms controls and AVTs not only within the body, but anywhere else outside models.
+ *
+ * We try to keep this ContentHandler simple. Nested models and script elements are extracted by XFormsStaticState.
  *
  * Structure:
  *
@@ -51,11 +53,6 @@ import java.util.*;
  *   <!-- Controls -->
  *   <xforms:group ...>
  *   <xforms:input ...>
- *   <!-- Scripts -->
- *   <scripts>
- *      <script id="...">...</script
- *      <script id="...">...</script
- *   </scripts>
  *   <!-- Global properties -->
  *   <properties xxforms:noscript="true" .../>
  * </static-state>
@@ -104,16 +101,10 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
     private final ExternalContext externalContext;
     private Stack xmlBaseStack = new Stack();
 
-    private boolean inControl;              // whether we are in an XForms control or extension element
-    private int controlLevel;
-    private boolean inModel;                // whether we are in a model
-    private int modelLevel;
-    private boolean inLabelHintHelpAlert;   // whether we are in a label, etc.
-
-    private boolean inScript;               // whether we are in a script
-    private String xxformsScriptId;
-    private Map xxformsScriptMap;
-    private StringBuffer xxformsScriptStringBuffer;
+    private boolean inXForms;       // whether we are in a model
+    private int xformsLevel;
+    private boolean inPreserve;     // whether we are in a label, etc. or instance
+    private int preserveLevel;
 
     public XFormsExtractorContentHandler(PipelineContext pipelineContext, ContentHandler contentHandler) {
         super(contentHandler);
@@ -168,27 +159,6 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
 
         outputFirstElementIfNeeded();
 
-        // Output scripts
-        if (xxformsScriptMap != null) {
-            super.startElement("", "scripts", "scripts", XMLUtils.EMPTY_ATTRIBUTES);
-
-            final AttributesImpl newAttributes = new AttributesImpl();
-            for (Iterator i = xxformsScriptMap.entrySet().iterator(); i.hasNext();) {
-                final Map.Entry currentEntry = (Map.Entry) i.next();
-
-                newAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, (String) currentEntry.getKey());
-
-                super.startElement("", "script", "script", newAttributes);
-                final String content = (String) currentEntry.getValue();
-                super.characters(content.toCharArray(), 0, content.length());// TODO: this copies characters around, maybe we can avoid that
-                super.endElement("", "script", "script");
-
-                newAttributes.clear();
-            }
-
-            super.endElement("", "scripts", "scripts");
-        }
-
         // Output global properties
         if (properties.size() > 0) {
             final AttributesImpl newAttributes = new AttributesImpl();
@@ -210,6 +180,8 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
 
     public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
 
+        namespaceSupport.startElement();
+
         // Handle location data
         if (locationData == null && locator != null && mustOutputFirstElement) {
             final String systemId = locator.getSystemId();
@@ -218,119 +190,80 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
             }
         }
 
-        namespaceSupport.startElement();
-
         // Check for XForms or extension namespaces
         final boolean isXForms = XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri);
         final boolean isXXForms = XFormsConstants.XXFORMS_NAMESPACE_URI.equals(uri);
         final boolean isEXForms = XFormsConstants.EXFORMS_NAMESPACE_URI.equals(uri);
         final boolean isXFormsOrExtension = isXForms || isXXForms || isEXForms;
 
-        if (!inControl && !inModel) {
-
-            // Handle xml:base
-            {
-                final String xmlBaseAttribute = attributes.getValue(XMLConstants.XML_URI, "base");
-                if (xmlBaseAttribute == null) {
-                    xmlBaseStack.push(xmlBaseStack.peek());
-                } else {
-                    try {
-                        final URI currentXMLBaseURI = (URI) xmlBaseStack.peek();
-                        xmlBaseStack.push(currentXMLBaseURI.resolve(new URI(xmlBaseAttribute)));
-                    } catch (URISyntaxException e) {
-                        throw new ValidationException("Error creating URI from: '" + xmlBaseStack.peek() + "' and '" + xmlBaseAttribute + "'.", e, new LocationData(locator));
-                    }
+        // Handle xml:base
+        if (!inXForms) {
+            final String xmlBaseAttribute = attributes.getValue(XMLConstants.XML_URI, "base");
+            if (xmlBaseAttribute == null) {
+                xmlBaseStack.push(xmlBaseStack.peek());
+            } else {
+                try {
+                    final URI currentXMLBaseURI = (URI) xmlBaseStack.peek();
+                    xmlBaseStack.push(currentXMLBaseURI.resolve(new URI(xmlBaseAttribute)));
+                } catch (URISyntaxException e) {
+                    throw new ValidationException("Error creating URI from: '" + xmlBaseStack.peek() + "' and '" + xmlBaseAttribute + "'.", e, new LocationData(locator));
                 }
             }
+        }
 
-            // Handle properties of the form @xxforms:* when outside of models or controls
-            if (!isXFormsOrExtension) {
-                final int attributesCount = attributes.getLength();
-                for (int i = 0; i < attributesCount; i++) {
-                    final String attributeURI = attributes.getURI(i);
-                    if (XFormsConstants.XXFORMS_NAMESPACE_URI.equals(attributeURI)) {
-                        // Found xxforms:* attribute
-                        final String attributeLocalName = attributes.getLocalName(i);
-                        // Only take the first occurrence into account, and make sure the property is supported
-                        if (properties.get(attributeLocalName) == null && XFormsProperties.getPropertyDefinition(attributeLocalName) != null) {
-                            properties.put(attributeLocalName, attributes.getValue(i));
-                        }
+        // Handle properties of the form @xxforms:* when outside of models or controls
+        if (!inXForms && !isXFormsOrExtension) {
+            final int attributesCount = attributes.getLength();
+            for (int i = 0; i < attributesCount; i++) {
+                final String attributeURI = attributes.getURI(i);
+                if (XFormsConstants.XXFORMS_NAMESPACE_URI.equals(attributeURI)) {
+                    // Found xxforms:* attribute
+                    final String attributeLocalName = attributes.getLocalName(i);
+                    // Only take the first occurrence into account, and make sure the property is supported
+                    if (properties.get(attributeLocalName) == null && XFormsProperties.getPropertyDefinition(attributeLocalName) != null) {
+                        properties.put(attributeLocalName, attributes.getValue(i));
                     }
                 }
             }
         }
 
-        {
-            if (isXFormsOrExtension) {
-                // This is an XForms or extension element
+        // Start extracting model or controls
+        if (!inXForms && isXFormsOrExtension) {
 
-                if (!inModel) {
-                    if (isXXForms) {
-                        // Check that we are getting a valid xxforms:* element if used in body
-                        if (ALLOWED_XXFORMS_ELEMENTS.get(localname) == null)
-                            throw new ValidationException("Invalid element in XForms document: xxforms:" + localname, new LocationData(locator));
-                    } else if (isEXForms) {
-                        // Check that we are getting a valid exforms:* element if used in body
-                        if (ALLOWED_EXFORMS_ELEMENTS.get(localname) == null)
-                            throw new ValidationException("Invalid element in XForms document: exforms:" + localname, new LocationData(locator));
-                    }
-                }
+            inXForms = true;
+            xformsLevel = level;
 
-                if (!inControl && !inModel && localname.equals("model")) {
-                    // Start extracting model
-                    inModel = true;
-                    modelLevel = level;
+            outputFirstElementIfNeeded();
 
-                    outputFirstElementIfNeeded();
+            // Add xml:base on element
+            attributes = XMLUtils.addOrReplaceAttribute(attributes, XMLConstants.XML_URI, "xml", "base", getCurrentBaseURI());
 
-                    // Add xml:base on element
-                    attributes = XMLUtils.addOrReplaceAttribute(attributes, XMLConstants.XML_URI, "xml", "base", getCurrentBaseURI());
+            sendStartPrefixMappings();
+        }
 
-                    sendStartPrefixMappings();
+        // Check for preserved content
+        if (inXForms && !inPreserve) {
 
-                } else if (!inControl && !inModel) {
-                    // Start extracting controls
-                    inControl = true;
-                    controlLevel = level;
-
-                    outputFirstElementIfNeeded();
-
-                    // Add xml:base on element
-                    attributes = XMLUtils.addOrReplaceAttribute(attributes, XMLConstants.XML_URI, "xml", "base", getCurrentBaseURI());
-
-                    sendStartPrefixMappings();
-                }
-
-                if (inControl || inModel) {
-
-                    if ("script".equals(localname) && isXXForms) {
-                        if (xxformsScriptMap == null) {
-                            xxformsScriptMap = new HashMap();
-                            xxformsScriptStringBuffer = new StringBuffer();
-                        } else {
-                            xxformsScriptStringBuffer.setLength(0);
-                        }
-                        xxformsScriptId = attributes.getValue("id");
-                        inScript = true;
-                    }
-                }
-
-                if (inControl) {
-                    if (LABEL_HINT_HELP_ALERT_ELEMENT.get(localname) != null) {
-                        inLabelHintHelpAlert = true;
-                    }
-
-                    super.startElement(uri, localname, qName, attributes);
-                }
-
-            } else if (inLabelHintHelpAlert && (XMLConstants.XHTML_NAMESPACE_URI.equals(uri) || "".equals(uri))) {
-                // Preserve content within labels, etc.
-                super.startElement(uri, localname, qName, attributes);
+            if (isXXForms) {
+                // Check that we are getting a valid xxforms:* element if used in body
+                if (ALLOWED_XXFORMS_ELEMENTS.get(localname) == null)
+                    throw new ValidationException("Invalid element in XForms document: xxforms:" + localname, new LocationData(locator));
+            } else if (isEXForms) {
+                // Check that we are getting a valid exforms:* element if used in body
+                if (ALLOWED_EXFORMS_ELEMENTS.get(localname) == null)
+                    throw new ValidationException("Invalid element in XForms document: exforms:" + localname, new LocationData(locator));
             }
 
-            if (inModel) {
-                super.startElement(uri, localname, qName, attributes);
+            // Preserve as is the content of labels, etc. and instances
+            if (LABEL_HINT_HELP_ALERT_ELEMENT.get(localname) != null || "instance".equals(localname)) {
+                inPreserve = true;
+                preserveLevel = level;
             }
+        }
+
+        // We are within preserved content or we output regular XForms content
+        if (inXForms && (inPreserve || isXFormsOrExtension)) {
+            super.startElement(uri, localname, qName, attributes);
         }
 
         level++;
@@ -365,38 +298,23 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
         final boolean isXForms = XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri);
         final boolean isXXForms = XFormsConstants.XXFORMS_NAMESPACE_URI.equals(uri);
         final boolean isEXForms = XFormsConstants.EXFORMS_NAMESPACE_URI.equals(uri);
+        final boolean isXFormsOrExtension = isXForms || isXXForms || isEXForms;
 
-        if (inModel) {
-            super.endElement(uri, localname, qName);
-        } else if (inControl && isXForms) {
-            if (LABEL_HINT_HELP_ALERT_ELEMENT.get(localname) != null) {
-                inLabelHintHelpAlert = false;
-            }
-            super.endElement(uri, localname, qName);
-        } else if (inControl && (isXXForms || isEXForms)) {
-            super.endElement(uri, localname, qName);
-        } else if (inLabelHintHelpAlert && (XMLConstants.XHTML_NAMESPACE_URI.equals(uri) || "".equals(uri))) {
-            // Preserve content
+        // We are within preserved content or we output regular XForms content
+        if (inXForms && (inPreserve || isXFormsOrExtension)) {
             super.endElement(uri, localname, qName);
         }
 
-        if (inModel && level == modelLevel) {
+        if (inPreserve && level == preserveLevel) {
+            // Leaving preserved content
+            inPreserve = false;
+        } if (inXForms && level == xformsLevel) {
             // Leaving model
-            inModel = false;
-            sendEndPrefixMappings();
-        } else if (inControl && level == controlLevel) {
-            // Leaving control
-            inControl = false;
+            inXForms = false;
             sendEndPrefixMappings();
         }
 
-        if (inScript && XFormsConstants.XXFORMS_NAMESPACE_URI.equals(uri) && "script".equals(localname)) {
-            // Leaving script: remember script content by id
-            xxformsScriptMap.put(xxformsScriptId, xxformsScriptStringBuffer.toString());
-            inScript = false;
-        }
-
-        if (!inModel && !inControl) {
+        if (!inXForms) {
             xmlBaseStack.pop();
         }
 
@@ -404,22 +322,20 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
     }
 
     public void characters(char[] chars, int start, int length) throws SAXException {
-        if (inScript) {
-            // Script content doesn't go through
-            xxformsScriptStringBuffer.append(chars, start, length);
-        } else  if (inModel || inControl) {
+        if (inPreserve)
             super.characters(chars, start, length);
-        }
+        else if (inXForms) // TODO: check this: only keep spaces within XForms elements that require it in order to reduce the size of the static state
+            super.characters(chars, start, length);
     }
 
     public void startPrefixMapping(String prefix, String uri) throws SAXException {
         namespaceSupport.startPrefixMapping(prefix, uri);
-        if (inModel || inControl)
+        if (inXForms)
             super.startPrefixMapping(prefix, uri);
     }
 
     public void endPrefixMapping(String s) throws SAXException {
-        if (inModel || inControl)
+        if (inXForms)
             super.endPrefixMapping(s);
     }
 

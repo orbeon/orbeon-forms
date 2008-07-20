@@ -146,9 +146,6 @@
 
         </xsl:copy>
 
-        <!-- Copy other models present in the UI (used for dialogs until we actually have native local models) -->
-        <xsl:copy-of select="/xhtml:html/xhtml:body//xforms:model"/>
-
         <xsl:if test="not($is-noscript)">
             <!-- Handle collapsible sections -->
             <xi:include href="../includes/collapse-script.xhtml" xxi:omit-xml-base="true"/>
@@ -157,8 +154,5 @@
         </xsl:if>
 
     </xsl:template>
-
-    <!-- Filter out models in the UI as they are copied separately -->
-    <xsl:template match="xhtml:body//xforms:model"/>
 
 </xsl:stylesheet>

@@ -144,7 +144,7 @@ public class XFormsToXHTML extends ProcessorImpl {
                         // Get static state document and create static state object
                         final Document staticStateDocument = documentResult.getDocument();
 //                        XFormsContainingDocument.logDebugStatic("XForms to XHTML", "static state", new String[] { "document", Dom4jUtils.domToString(staticStateDocument) });
-                        xformsStaticState = new XFormsStaticState(staticStateDocument, namespaceMappings, annotatedSAXStore);
+                        xformsStaticState = new XFormsStaticState(pipelineContext, staticStateDocument, namespaceMappings, annotatedSAXStore);
                     }
 
                     // Create document here so we can do appropriate analysis of caching dependencies

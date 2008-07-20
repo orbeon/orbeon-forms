@@ -35,6 +35,7 @@ import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
+import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.om.FastStringBuffer;
 import org.orbeon.saxon.om.NodeInfo;
@@ -119,8 +120,8 @@ public class XFormsStaticState {
      * @param namespacesMap         Map<String, Map<String, String>> of control id to Map of namespace mappings
      * @param annotatedDocument     optional SAXStore containing XHTML for noscript mode
      */
-    public XFormsStaticState(Document staticStateDocument, Map namespacesMap, SAXStore annotatedDocument) {
-        initialize(staticStateDocument, namespacesMap, annotatedDocument, null);
+    public XFormsStaticState(PipelineContext pipelineContext, Document staticStateDocument, Map namespacesMap, SAXStore annotatedDocument) {
+        initialize(pipelineContext, staticStateDocument, namespacesMap, annotatedDocument, null);
     }
 
     /**
@@ -136,7 +137,7 @@ public class XFormsStaticState {
         final Document staticStateDocument = XFormsUtils.decodeXML(pipelineContext, encodedStaticState);
 
         // Initialize
-        initialize(staticStateDocument, null, null, encodedStaticState);
+        initialize(pipelineContext, staticStateDocument, null, null, encodedStaticState);
     }
 
     /**
@@ -150,9 +151,9 @@ public class XFormsStaticState {
      * @param namespacesMap
      * @param xhtmlDocument
      */
-    private void initialize(Document staticStateDocument, Map namespacesMap, SAXStore xhtmlDocument, String encodedStaticState) {
+    private void initialize(PipelineContext pipelineContext, Document staticStateDocument, Map namespacesMap, SAXStore xhtmlDocument, String encodedStaticState) {
 
-        final Element rootElement = staticStateDocument.getRootElement();
+        final Element staticStateElement = staticStateDocument.getRootElement();
 
         // Remember UUID
         this.uuid = UUIDUtils.createPseudoUUID();
@@ -160,23 +161,13 @@ public class XFormsStaticState {
         // TODO: if staticStateDocument contains XHTML document, get controls and models from there
 
         // Extract controls and models documents
-        extractControlsAndModels(rootElement);
-
-        // Scripts
-        final Element scriptsElement = rootElement.element("scripts");
-        if (scriptsElement != null) {
-            xxformsScripts = new HashMap();
-            for (Iterator i = scriptsElement.elements("script").iterator(); i.hasNext();) {
-                final Element scriptElement = (Element) i.next();
-                xxformsScripts.put(scriptElement.attributeValue("id"), scriptElement.getStringValue());
-            }
-        }
+        extractControlsAndModels(pipelineContext, staticStateElement);
 
         // Gather xxforms:* properties
         {
             // Global properties (outside models and controls)
             {
-                final Element propertiesElement = rootElement.element(XFormsConstants.STATIC_STATE_PROPERTIES_QNAME);
+                final Element propertiesElement = staticStateElement.element(XFormsConstants.STATIC_STATE_PROPERTIES_QNAME);
                 if (propertiesElement != null) {
                     for (Iterator i = propertiesElement.attributeIterator(); i.hasNext();) {
                         final Attribute currentAttribute = (Attribute) i.next();
@@ -246,7 +237,7 @@ public class XFormsStaticState {
         }
 
         // Get XHTML if present and requested
-        final Element htmlElement = rootElement.element(XMLConstants.XHTML_HTML_QNAME);
+        final Element htmlElement = staticStateElement.element(XMLConstants.XHTML_HTML_QNAME);
         {
             if (xhtmlDocument == null && htmlElement != null) {
                 // Get from static state document if available there
@@ -275,7 +266,7 @@ public class XFormsStaticState {
                     identity.transform(new DocumentSource(staticStateDocument), new SAXResult(new XFormsDocumentAnnotatorContentHandler(this.namespacesMap)));
                     // Re-attach xhtml element
                     if (htmlElement != null)
-                        rootElement.add(htmlElement);
+                        staticStateElement.add(htmlElement);
 //                } else {
 //                    // Recompute from xhtmlDocument
 //                    final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
@@ -300,21 +291,21 @@ public class XFormsStaticState {
             }
         }
 
-        baseURI = rootElement.attributeValue(XMLConstants.XML_BASE_QNAME);
-        containerType = rootElement.attributeValue("container-type");
-        containerNamespace = rootElement.attributeValue("container-namespace");
+        baseURI = staticStateElement.attributeValue(XMLConstants.XML_BASE_QNAME);
+        containerType = staticStateElement.attributeValue("container-type");
+        containerNamespace = staticStateElement.attributeValue("container-namespace");
         if (containerNamespace == null)
             containerNamespace = "";
 
         {
-            final String systemId = rootElement.attributeValue("system-id");
+            final String systemId = staticStateElement.attributeValue("system-id");
             if (systemId != null) {
-                locationData = new LocationData(systemId, Integer.parseInt(rootElement.attributeValue("line")), Integer.parseInt(rootElement.attributeValue("column")));
+                locationData = new LocationData(systemId, Integer.parseInt(staticStateElement.attributeValue("line")), Integer.parseInt(staticStateElement.attributeValue("column")));
             }
         }
 
         // Extract instances if present
-        final Element instancesElement = rootElement.element("instances");
+        final Element instancesElement = staticStateElement.element("instances");
         if (instancesElement != null) {
             instancesMap = new HashMap();
 
@@ -336,11 +327,13 @@ public class XFormsStaticState {
         }
     }
 
-    private void extractControlsAndModels(Element rootElement) {
+    private void extractControlsAndModels(PipelineContext pipelineContext, Element staticStateElement) {
+
+        final Configuration xpathConfiguration = new Configuration();
 
         // Get top-level models from static state document
         {
-            final List modelsElements = rootElement.elements(XFormsConstants.XFORMS_MODEL_QNAME);
+            final List modelsElements = staticStateElement.elements(XFormsConstants.XFORMS_MODEL_QNAME);
             modelDocuments.clear();
 
             // Get all models
@@ -353,7 +346,7 @@ public class XFormsStaticState {
                 modelDocuments.add(modelDocument);
             }
 
-            XFormsContainingDocument.logDebugStatic("static state", "created model documents", new String[] { "count", Integer.toString(modelsCount) });
+            XFormsContainingDocument.logDebugStatic("static state", "created top-level model documents", new String[] { "count", Integer.toString(modelsCount) });
         }
 
         // Get controls document
@@ -362,13 +355,10 @@ public class XFormsStaticState {
             controlsDocument = Dom4jUtils.createDocument();
             final Element controlsElement = Dom4jUtils.createElement("controls");
             controlsDocument.setRootElement(controlsElement);
-            
-//            final Configuration xpathConfiguration = new Configuration();
-//            final DocumentWrapper controlsDocumentInfo = new DocumentWrapper(controlsDocument, null, xpathConfiguration);
 
             // Find all top-level controls
             int topLevelControlsCount = 0;
-            for (Iterator i = rootElement.elements().iterator(); i.hasNext();) {
+            for (Iterator i = staticStateElement.elements().iterator(); i.hasNext();) {
                 final Element currentElement = (Element) i.next();
                 final QName currentElementQName = currentElement.getQName();
 
@@ -378,21 +368,53 @@ public class XFormsStaticState {
                     // Any element in a namespace (xforms:*, xxforms:*, exforms:*) except xforms:model and xhtml:html
 
                     // Copy the element because we may need it in staticStateDocument for encoding
-
                     controlsElement.add(Dom4jUtils.copyElementCopyParentNamespaces(currentElement));
-
-//                    final List onlineTriggerIds = XPathCache.evaluate(pipelineContext, controlsDocumentInfo,
-//                        "for $handler in for $action in //xxforms:online return ($action/ancestor-or-self::*[@ev:event and tokenize(@ev:event, '\\s+') = 'DOMActivate'])[1]" +
-//                        "   return for $id in $handler/../descendant-or-self::xforms:trigger/@id return string($id)", BASIC_NAMESPACE_MAPPINGS,
-//                        null, null, null, null, locationData);
-
-                    // TODO: Extract models nested within controls
-
                     topLevelControlsCount++;
                 }
             }
 
             XFormsContainingDocument.logDebugStatic("static state", "created controls document", new String[] { "top-level controls count", Integer.toString(topLevelControlsCount) });
+
+            // Extract models nested within controls
+            final DocumentWrapper controlsDocumentInfo = new DocumentWrapper(controlsDocument, null, xpathConfiguration);
+            final List models = XPathCache.evaluate(pipelineContext, controlsDocumentInfo,
+                    "//xforms:model[not(ancestor::xforms:instance)]",
+                    BASIC_NAMESPACE_MAPPINGS, null, null, null, null, locationData);
+
+            if (models.size() > 0) {
+                for (Iterator i = models.iterator(); i.hasNext();) {
+                    final NodeInfo currentNodeInfo = (NodeInfo) i.next();
+                    final Element currentElement = (Element) ((NodeWrapper) currentNodeInfo).getUnderlyingNode();
+                    // Copy the element because we may need it in staticStateDocument for encoding
+                    modelDocuments.add(Dom4jUtils.createDocumentCopyParentNamespaces(currentElement));
+                    currentElement.detach();// the element is no longer needed within the controls
+                }
+                XFormsContainingDocument.logDebugStatic("static state", "created nested model documents", new String[] { "count", Integer.toString(models.size()) });
+            }
+        }
+
+        // Get scripts
+        {
+            // Find all xforms:script elements
+            final Document staticStateDocument = staticStateElement.getDocument();
+            final DocumentWrapper documentInfo = new DocumentWrapper(staticStateDocument, null, xpathConfiguration);
+            final List scripts = XPathCache.evaluate(pipelineContext, documentInfo,
+                        "/*/(xforms:* | xxforms:*)/descendant-or-self::xxforms:script[not(ancestor::xforms:instance)]",
+                    BASIC_NAMESPACE_MAPPINGS, null, null, null, null, locationData);
+
+            if (scripts.size() > 0) {
+                xxformsScripts = new HashMap();
+                for (Iterator i = scripts.iterator(); i.hasNext();) {
+                    final NodeInfo currentNodeInfo = (NodeInfo) i.next();
+                    final Element scriptElement = (Element) ((NodeWrapper) currentNodeInfo).getUnderlyingNode();
+
+                    // Remember script content
+                    xxformsScripts.put(scriptElement.attributeValue("id"), scriptElement.getStringValue());
+                    // Detach as the element is no longer needed within the controls
+                    scriptElement.detach();
+                }
+                XFormsContainingDocument.logDebugStatic("static state", "extracted script elements", new String[] { "count", Integer.toString(scripts.size()) });
+            }
         }
     }
 

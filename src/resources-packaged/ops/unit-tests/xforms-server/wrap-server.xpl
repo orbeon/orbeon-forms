@@ -15,8 +15,8 @@
     xmlns:oxf="http://www.orbeon.com/oxf/processors"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
     xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
     xmlns:saxon="http://saxon.sf.net/">
 
     <p:param name="action" type="input"/>
@@ -38,9 +38,10 @@
                 <static-state>
                     <xsl:variable name="static-state" as="document-node()">
                         <xsl:document>
-                            <static-state xmlns="" xxforms:state-handling="client">
-                                <xsl:copy-of select="doc('input:controls')/*"/>
-                                <xsl:copy-of select="doc('input:models')/*"/>
+                            <static-state xmlns="">
+                                <xsl:copy-of select="doc('input:controls')/*/*"/>
+                                <xsl:copy-of select="doc('input:models')/*/*"/>
+                                <properties xxforms:state-handling="client"/>
                             </static-state>
                         </xsl:document>
                     </xsl:variable>

@@ -56,33 +56,30 @@
                         <xxforms:static-state>
                             <xsl:variable name="static-state" as="document-node()">
                                 <xsl:document>
-                                    <static-state xxforms:state-handling="client">
-                                        <controls>
-                                            <xforms:trigger id="trigger">
-                                                <xforms:send submission="default-submission" ev:event="DOMActivate"/>
-                                            </xforms:trigger>
-                                        </controls>
-                                        <models>
-                                            <xforms:model id="default-model">
-                                                <xforms:instance id="default-instance">
-                                                    <xsl:copy-of select="doc('input:request')"/>
+                                    <static-state>
+                                        <xforms:trigger id="trigger">
+                                            <xforms:send submission="default-submission" ev:event="DOMActivate"/>
+                                        </xforms:trigger>
+                                        <xforms:model id="default-model">
+                                            <xforms:instance id="default-instance">
+                                                <xsl:copy-of select="doc('input:request')"/>
+                                            </xforms:instance>
+                                            <xsl:if test="$is-shared-result">
+                                                <xforms:instance id="result-instance">
+                                                    <dummy/>
                                                 </xforms:instance>
+                                            </xsl:if>
+                                            <xforms:submission id="default-submission" replace="instance">
+                                                <xsl:copy-of select="doc('input:submission')/xforms:submission/@*[local-name() != 'id' and local-name() != 'id']"/>
+                                                <xsl:copy-of select="doc('input:submission')/xforms:submission/namespace::*"/>
+                                                <xsl:copy-of select="doc('input:submission')/xforms:submission/*"/>
+                                                <!-- If the result is shared, it's not directly present in the dynamic state, so we copy it to another instance -->
                                                 <xsl:if test="$is-shared-result">
-                                                    <xforms:instance id="result-instance">
-                                                        <dummy/>
-                                                    </xforms:instance>
+                                                    <xforms:insert ev:event="xforms-submit-done" origin="instance('default-instance')" nodeset="instance('result-instance')"/>
                                                 </xsl:if>
-                                                <xforms:submission id="default-submission" replace="instance">
-                                                    <xsl:copy-of select="doc('input:submission')/xforms:submission/@*[local-name() != 'id' and local-name() != 'id']"/>
-                                                    <xsl:copy-of select="doc('input:submission')/xforms:submission/namespace::*"/>
-                                                    <xsl:copy-of select="doc('input:submission')/xforms:submission/*"/>
-                                                    <!-- If the result is shared, it's not directly present in the dynamic state, so we copy it to another instance -->
-                                                    <xsl:if test="$is-shared-result">
-                                                        <xforms:insert ev:event="xforms-submit-done" origin="instance('default-instance')" nodeset="instance('result-instance')"/>
-                                                    </xsl:if>
-                                                </xforms:submission>
-                                            </xforms:model>
-                                        </models>
+                                            </xforms:submission>
+                                        </xforms:model>
+                                        <properties xxforms:state-handling="client" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"/>
                                     </static-state>
                                 </xsl:document>
                             </xsl:variable>

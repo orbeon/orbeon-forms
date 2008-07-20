@@ -176,7 +176,7 @@ public class XFormsStaticState {
         {
             // Global properties (outside models and controls)
             {
-                final Element propertiesElement = rootElement.element("properties");
+                final Element propertiesElement = rootElement.element(XFormsConstants.STATIC_STATE_PROPERTIES_QNAME);
                 if (propertiesElement != null) {
                     for (Iterator i = propertiesElement.attributeIterator(); i.hasNext();) {
                         final Attribute currentAttribute = (Attribute) i.next();
@@ -348,10 +348,6 @@ public class XFormsStaticState {
             int modelsCount = 0;
             for (Iterator i = modelsElements.iterator(); i.hasNext(); modelsCount++) {
                 final Element modelElement = (Element) i.next();
-
-//                final Document modelDocument = Dom4jUtils.createDocument();
-//                modelDocument.setRootElement((Element) modelElement.detach());
-
                 // Copy the element because we may need it in staticStateDocument for encoding
                 final Document modelDocument = Dom4jUtils.createDocumentCopyParentNamespaces(modelElement);
                 modelDocuments.add(modelDocument);
@@ -362,17 +358,13 @@ public class XFormsStaticState {
 
         // Get controls document
         {
-//            final Document controlsDocument = Dom4jUtils.createDocument();
-//            controlsDocument.setRootElement((Element) rootElement.element("controls").detach());
-//            this.controlsDocument = controlsDocument;
-
             // Create document
             controlsDocument = Dom4jUtils.createDocument();
             final Element controlsElement = Dom4jUtils.createElement("controls");
             controlsDocument.setRootElement(controlsElement);
             
-            final Configuration xpathConfiguration = new Configuration();
-            final DocumentWrapper controlsDocumentInfo = new DocumentWrapper(controlsDocument, null, xpathConfiguration);
+//            final Configuration xpathConfiguration = new Configuration();
+//            final DocumentWrapper controlsDocumentInfo = new DocumentWrapper(controlsDocument, null, xpathConfiguration);
 
             // Find all top-level controls
             int topLevelControlsCount = 0;
@@ -386,7 +378,8 @@ public class XFormsStaticState {
                     // Any element in a namespace (xforms:*, xxforms:*, exforms:*) except xforms:model and xhtml:html
 
                     // Copy the element because we may need it in staticStateDocument for encoding
-                    controlsElement.add(currentElement.createCopy());
+
+                    controlsElement.add(Dom4jUtils.copyElementCopyParentNamespaces(currentElement));
 
 //                    final List onlineTriggerIds = XPathCache.evaluate(pipelineContext, controlsDocumentInfo,
 //                        "for $handler in for $action in //xxforms:online return ($action/ancestor-or-self::*[@ev:event and tokenize(@ev:event, '\\s+') = 'DOMActivate'])[1]" +

@@ -24,19 +24,10 @@
         </filter>
     </appender> 
 
-    <!-- Hub appender for studio to connect to. -->
-    <!-- 
-    <appender name="studio-appender" class="org.apache.log4j.net.SocketHubAppender">
-        <param name="Port" value="4445"/>
-        <param name="LocationInfo" value="true"/> 
-    </appender>
-    -->
-
     <!-- This is the root logger -->
     <root>
         <priority value="debug"/>
         <appender-ref ref="ConsoleAppender"/>
-        <!-- <appender-ref ref="studio-appender"/> -->
     </root>
 
 </log4j:configuration>

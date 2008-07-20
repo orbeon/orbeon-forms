@@ -552,9 +552,34 @@ public class Dom4jUtils {
     }
 
     public static Document createDocument() {
-        final NonLazyUserDataDocumentFactory fctry
-                = NonLazyUserDataDocumentFactory.getInstance14();
+        final NonLazyUserDataDocumentFactory fctry = NonLazyUserDataDocumentFactory.getInstance14();
         return fctry.createDocument();
+    }
+
+    /**
+     * Return a copy of the given element which includes all the namespaces in scope on the element.
+     *
+     * @param sourceElement element to copy
+     * @return              copied element
+     */
+    public static Element copyElementCopyParentNamespaces(final Element sourceElement) {
+
+        final Element newElement = sourceElement.createCopy();
+
+        final Map sourceElementNamespaceContext = Dom4jUtils.getNamespaceContext(sourceElement);
+        final Map newElementNamespaceContext = Dom4jUtils.getNamespaceContext(newElement);
+
+        for (Iterator k = sourceElementNamespaceContext.keySet().iterator(); k.hasNext();) {
+            final String prefix = (String) k.next();
+            // NOTE: Don't use rootElement.getNamespaceForPrefix() because that will return the element prefix's
+            // namespace even if there are no namespace nodes
+            if (newElementNamespaceContext.get(prefix) == null) {
+                final String uri = (String) sourceElementNamespaceContext.get(prefix);
+                newElement.addNamespace(prefix, uri);
+            }
+        }
+
+        return newElement;
     }
 
     /**

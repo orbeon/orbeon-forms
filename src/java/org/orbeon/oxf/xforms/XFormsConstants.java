@@ -181,6 +181,7 @@ public class XFormsConstants {
     public static final String XFORMS_EXPLODED_TYPE_PREFIX = "{" + XFORMS_NAMESPACE_URI + "}";
 
     public static final QName STATIC_STATE_SCRIPTS_QNAME = new QName("scripts");
+    public static final QName STATIC_STATE_PROPERTIES_QNAME = new QName("properties");
 
     private XFormsConstants() {
         // Disallow contruction

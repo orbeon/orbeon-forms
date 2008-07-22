@@ -88,7 +88,7 @@ public class ResourceServer extends ProcessorImpl {
                     URLConnection urlConnection = null;
                     {
                         // IE 6 hack for PNG images
-                        final boolean isIE6 = NetUtils.isIE6OrEarlier(externalContext.getRequest());
+                        final boolean isIE6 = NetUtils.isRenderingEngineIE6OrEarlier(externalContext.getRequest());
                         if (isIE6 && newURL.getProtocol().equals("oxf")) {
                             final String urlPath = newURL.getPath();
                             if (urlPath.endsWith(".png")) {

@@ -779,6 +779,19 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
             // In this case, we translate the event depending on the control type
             if (eventTarget instanceof XFormsTriggerControl) {
                 // Triggers get a DOM activation
+                if ("".equals(valueString)) {
+                    // Handler produces:
+                    //   <button type="submit" name="foobar" value="activate">...
+                    //   <input type="submit" name="foobar" value="Hi There">...
+                    //   <input type="image" name="foobar" value="Hi There" src="...">...
+
+                    // IE 6/7 are terminally broken: they don't send the value back, but the contents of the label. So
+                    // we must test for any empty content here instead of "!activate".equals(valueString). (Note that
+                    // this means that empty labels won't work.) Further, with IE 6, all buttons are present when
+                    // using <button>, so we use <input> instead, either with type="submit" or type="image". Bleh.
+
+                    return;
+                }
                 eventName = XFormsEvents.XFORMS_DOM_ACTIVATE;
             } else {
                 // Other controls get a value change

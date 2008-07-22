@@ -51,6 +51,11 @@
     background-position: left center;
 }
 
+/* Hide inline alerts for noscript mode */
+/*html body .xforms-noscript .xforms-alert-active {*/
+    /*display: none;*/
+/*}*/
+
 .xforms-help-image {
     display: -moz-inline-box;
     display: inline-block;
@@ -105,9 +110,10 @@
 
 .xforms-trigger-appearance-minimal img, .xforms-submit-appearance-minimal img { border: 0 }
 
-.xforms-trigger-appearance-xxforms-minimal {
+.xforms-trigger-appearance-xxforms-minimal, .xforms-submit-appearance-xxforms-minimal {
     border: none;
     background: transparent;
+    cursor: hand;
 }
 
 .xforms-showcalendar {

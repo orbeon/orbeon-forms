@@ -18,6 +18,7 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsItemUtils;
 import org.orbeon.oxf.xforms.XFormsStaticState;
+import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control;
@@ -124,18 +125,21 @@ public class XFormsSelect1Handler extends XFormsCoreControlHandler {
                 }
 
                 // Try to produce the template only when needed
-                final XFormsStaticState.ItemsInfo itemsInfo = containingDocument.getStaticState().getItemsInfo(id);
-                if (itemsInfo == null || itemsInfo.hasNonStaticItem()) {
-                    reusableAttributes.clear();
-                    reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, "xforms-select-template-" + effectiveId);
-                    reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-select-template");
+                final boolean isNoscript = XFormsProperties.isNoscript(containingDocument);
+                if (!isNoscript) {// don't generate templates in noscript mode as they won't be used
+                    final XFormsStaticState.ItemsInfo itemsInfo = containingDocument.getStaticState().getItemsInfo(id);
+                    if (itemsInfo == null || itemsInfo.hasNonStaticItem()) {// only generate if there are non-static items
+                        reusableAttributes.clear();
+                        reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, "xforms-select-template-" + effectiveId);
+                        reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-select-template");
 
-                    contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, reusableAttributes);
-                    handleItemFull(contentHandler, attributes, xhtmlPrefix, spanQName, null, id, effectiveId, isMany, fullItemType,
-                            new XFormsItemUtils.Item(false, Collections.EMPTY_LIST, // make sure the value "$xforms-template-value$" is not encrypted
-                                    "$xforms-template-label$", "$xforms-template-value$", 1),
-                                    "$xforms-item-index$", true);
-                    contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
+                        contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, reusableAttributes);
+                        handleItemFull(contentHandler, attributes, xhtmlPrefix, spanQName, null, id, effectiveId, isMany, fullItemType,
+                                new XFormsItemUtils.Item(false, Collections.EMPTY_LIST, // make sure the value "$xforms-template-value$" is not encrypted
+                                        "$xforms-template-label$", "$xforms-template-value$", 1),
+                                        "$xforms-item-index$", true);
+                        contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
+                    }
                 }
             } else {
 

@@ -118,6 +118,7 @@ h1 { margin-top: 0 }
 
 .fr-header { overflow: hidden; }
 .fr-summary-language-choice, .fr-summary-noscript-choice { margin-right: 1em; margin-top: .2em; color: gray; font-size: 85%; text-align: right; }
+.fr-summary-language-choice .xforms-trigger-appearance-xxforms-minimal, .fr-summary-noscript-choice .xforms-trigger-appearance-xxforms-minimal { *font-size: 100% }/* IE 6 HACK to fix the font size */
 .fr-summary-language-choice a, .fr-summary-noscript-choice a { color: #6E6E6E }
 .fr-summary-language-choice .xforms-label, .fr-summary-noscript-choice .xforms-label { display: inline; margin-right: .5em }
 
@@ -163,15 +164,16 @@ div.fr-body {
 #fr-view .xforms-case-deselected .xforms-label { display: none }
 
 /* Make sure text in trigger does not wrap (leads to non-native widget being used on Firefox) */
-button.xforms-trigger { white-space: nowrap; }
+button.xforms-trigger, input.xforms-trigger { white-space: nowrap; }
 button.xforms-trigger img { margin-right: 10px; }
 /* Attempt to make the button look like a link */
-button.xforms-trigger-appearance-xxforms-minimal {
+.xforms-trigger-appearance-xxforms-minimal {
     color: #666699;
     display: -moz-inline-box; display: inline-block;
     text-decoration: underline;
     font-size: inherit;
-    padding: 0
+    padding: 0;
+    vertical-align: middle;
 }
 
 .fr-layout-table { padding: 0; margin: 0 }
@@ -248,7 +250,7 @@ hr {
     float: right;
 }
 
-.fr-buttons button {
+.fr-buttons .xforms-trigger {
     width: 14em; *width: 11em
 }
 
@@ -284,6 +286,7 @@ hr {
 
 .fr-repeat-table .fr-repeat-column-number { width: 1.5em; text-align: right }
 .fr-repeat-table .fr-repeat-column-trigger { width: 1.5em; text-align: center }
+.fr-grid .fr-grid-content .fr-repeat-table .fr-repeat-column-trigger .xforms-trigger { margin-top: 0 }/* because there is a margin set for triggers in grids below */
 
 .fr-non-collapsible { padding-left: 1.1em; }
 
@@ -504,7 +507,7 @@ div.fr-collapsible {
 .fr-grid .xforms-mediatype-image img { display: block }
 
 /*  Buttons */
-.fr-grid .fr-grid-content button.xforms-trigger { margin-top: 1.72em } /* hand-tuned so it appears at about the same pos as input fields*/
+.fr-grid .fr-grid-content button.xforms-trigger, .fr-grid .fr-grid-content input.xforms-trigger { margin-top: 1.72em } /* hand-tuned so it appears at about the same pos as input fields*/
 
 /* Cell widths */
 .fr-grid-td { width: auto; vertical-align: top; overflow: hidden }

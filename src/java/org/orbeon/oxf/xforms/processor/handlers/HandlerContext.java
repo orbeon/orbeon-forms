@@ -23,6 +23,7 @@ import org.orbeon.oxf.xforms.state.XFormsState;
 import org.orbeon.oxf.xml.ElementHandlerController;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.util.NetUtils;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.Locator;
@@ -41,8 +42,10 @@ public class HandlerContext {
     private XFormsState encodedClientState;
     private ExternalContext externalContext;
     private final String[] documentOrder;
-    private String userAgent;
+
+    private boolean processedUserAgent;
     private boolean isRenderingEngineTrident;
+    private boolean isRenderingEngineIE6OrEarlier;
 
     public HandlerContext(ElementHandlerController controller, PipelineContext pipelineContext,
                           XFormsContainingDocument containingDocument, XFormsState encodedClientState, ExternalContext externalContext) {
@@ -79,15 +82,22 @@ public class HandlerContext {
     }
 
     public boolean isRenderingEngineTrident() {
-        if (userAgent == null) {
-            userAgent = (String) externalContext.getRequest().getHeaderMap().get("user-agent");
-            if (userAgent != null) {
-                // Sniff IE
-                final String lowerCaseUserAgent = userAgent.toLowerCase();
-                isRenderingEngineTrident = lowerCaseUserAgent.indexOf("msie") != -1 && lowerCaseUserAgent.indexOf("opera") == -1;
-            }
-        }
+        processedUserAgentIfNeeded();
         return isRenderingEngineTrident;
+    }
+
+    public boolean isRenderingEngineIE6OrEarlier() {
+        processedUserAgentIfNeeded();
+        return isRenderingEngineIE6OrEarlier;
+    }
+
+    private void processedUserAgentIfNeeded() {
+        if (!processedUserAgent) {
+            final ExternalContext.Request request = externalContext.getRequest();
+            isRenderingEngineIE6OrEarlier = NetUtils.isRenderingEngineIE6OrEarlier(request);
+            isRenderingEngineTrident = isRenderingEngineIE6OrEarlier ? true : NetUtils.isRenderingEngineIE6OrEarlier(request);
+            processedUserAgent = true;
+        }
     }
 
     public String findXHTMLPrefix() {

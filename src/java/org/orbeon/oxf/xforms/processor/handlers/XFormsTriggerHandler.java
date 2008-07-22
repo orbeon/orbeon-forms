@@ -17,12 +17,14 @@ import org.dom4j.Element;
 import org.dom4j.QName;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsTriggerControl;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.ContentHandlerAdapter;
 import org.orbeon.saxon.om.FastStringBuffer;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -173,26 +175,94 @@ public class XFormsTriggerHandler extends XFormsCoreControlHandler {
             // Default full appearance (button)
             // This can also be the "pseudo-minimal" appearance for noscript mode
 
+            final boolean mustOutputHTMLFragment = xformsControl != null && xformsControl.isHTMLLabel(pipelineContext);
+            final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
+
+            final String elementName;
             if (XFormsProperties.isNoscript(containingDocument)) {
-                // In JS-free mode, all buttons are submit buttons
-                newAttributes.addAttribute("", "type", "type", ContentHandlerHelper.CDATA, "submit");
                 // We need a name to detect activation
                 newAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, effectiveId);
+
+                final String inputType;
+                if (handlerContext.isRenderingEngineIE6OrEarlier()) {
+
+                    // IE 6 does not support discriminating between multiple buttons: it sends them all, so we use
+                    // "input" instead. The code below tries to output <input type="submit"> or <input type="image">
+                    // depending on the content of the label. This has limitations: we can only handle text or a single
+                    // image.
+
+                    final String inputLabelValue;
+                    if (mustOutputHTMLFragment) {
+                        // Only output character content within input
+                        XFormsServer.logger.warn("IE 6 does not support <button> elements properly. Only text within HTML content will appear garbled. Control id: " + effectiveId);
+
+                        final FastStringBuffer sb = new FastStringBuffer(labelValue.length());
+
+                        final String[] imageInfo = new String[3];// who needs classes? ;-)
+                        XFormsUtils.streamHTMLFragment(new ContentHandlerAdapter() {
+                            public void startElement(String namespaceURI, String localName, String qName, Attributes atts) throws SAXException {
+                                if (imageInfo[0] == null && "img".equals(localName)) {
+                                    // Remember information of first image found
+                                    imageInfo[0] = atts.getValue("src");
+                                    imageInfo[1] = atts.getValue("alt");
+                                    imageInfo[2] = atts.getValue("title");
+                                }
+                            }
+
+                            public void characters(char ch[], int start, int length) throws SAXException {
+                                sb.append(ch, start, length);
+                            }
+                        }, labelValue, xformsControl != null ? xformsControl.getLocationData() : null, xhtmlPrefix);
+
+                        final String sbString = sb.toString();
+                        if (imageInfo[0] != null && sbString.trim().equals("")) {
+                            // There is an image and no text, output image
+                            inputType = "image";
+                            inputLabelValue = "";
+                            newAttributes.addAttribute("", "src", "src", ContentHandlerHelper.CDATA, imageInfo[0]);
+                            if (imageInfo[1] != null)
+                                newAttributes.addAttribute("", "alt", "alt", ContentHandlerHelper.CDATA, imageInfo[1]);
+                            if (imageInfo[2] != null)
+                                newAttributes.addAttribute("", "title", "title", ContentHandlerHelper.CDATA, imageInfo[2]);
+                        } else {
+                            // Output text
+                            inputType = "submit";
+                            inputLabelValue = sbString;
+                        }
+                    } else {
+                        inputType = "submit";
+                        inputLabelValue = labelValue;
+                    }
+
+                    newAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, inputLabelValue);
+                    elementName = "input";
+                } else {
+                    // We need a value so we can detect an activated button with IE 7
+                    // NOTE: IE 6/7 sends the <button> content as value instead of the value attribute!
+                    newAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, "activate");
+                    elementName = "button";
+                    inputType = "submit";
+                }
+
+                // In JS-free mode, all buttons are submit inputs or image inputs
+                newAttributes.addAttribute("", "type", "type", ContentHandlerHelper.CDATA, inputType);
             } else {
                 // Just a button without action
                 newAttributes.addAttribute("", "type", "type", ContentHandlerHelper.CDATA, "button");
+                elementName = "button";
             }
 
-            // xhtml:button
-            final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
-            final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "button");
+            // xhtml:button or xhtml:input
+            final String spanQName = XMLUtils.buildQName(xhtmlPrefix, elementName);
             handleReadOnlyAttribute(newAttributes, containingDocument, triggerControl);
-            contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "button", spanQName, newAttributes);
+            contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, elementName, spanQName, newAttributes);
 
-            final boolean mustOutputHTMLFragment = xformsControl != null && xformsControl.isHTMLLabel(pipelineContext);
-            outputLabelText(contentHandler, xformsControl, labelValue, xhtmlPrefix, mustOutputHTMLFragment);
+            if ("button".equals(elementName)) {
+                // Output content of <button> element
+                outputLabelText(contentHandler, xformsControl, labelValue, xhtmlPrefix, mustOutputHTMLFragment);
+            }
 
-            contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "button", spanQName);
+            contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, elementName, spanQName);
         }
     }
 }

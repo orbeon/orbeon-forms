@@ -33,10 +33,19 @@ import java.net.URISyntaxException;
 import java.util.*;
 
 /**
- * This ContentHandler extracts XForms models and controls from an XHTML document and creates a static state document
- * for the request encoder. xml:base attributes are added on the models and root control elements.
+ * This ContentHandler extracts XForms models and controls from an XHTML document and creates a static state document.
  *
- * This allows for XForms controls and AVTs not only within the body, but anywhere else outside models.
+ * The static state document contains only models and controls, without interleaved XHTML elements in order to save
+ * memory and to facilitate visiting controls. The exceptions are:
+ *
+ * o The content of inline XForms instances (xforms:instance)
+ * o The content of inline XML Schemas (xs:schema)
+ * o The content of xforms:label, xforms:hint, xforms:help, xforms:alert (as they can contain XHTML)
+ *
+ * Notes:
+ *
+ * o xml:base attributes are added on the models and root control elements.
+ * o XForms controls and AVTs are also extracted outside the HTML body.
  *
  * We try to keep this ContentHandler simple. Nested models and script elements are extracted by XFormsStaticState.
  *
@@ -103,7 +112,7 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
 
     private boolean inXForms;       // whether we are in a model
     private int xformsLevel;
-    private boolean inPreserve;     // whether we are in a label, etc. or instance
+    private boolean inPreserve;     // whether we are in a label, etc., schema or instance
     private int preserveLevel;
 
     public XFormsExtractorContentHandler(PipelineContext pipelineContext, ContentHandler contentHandler) {
@@ -254,8 +263,9 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
                     throw new ValidationException("Invalid element in XForms document: exforms:" + localname, new LocationData(locator));
             }
 
-            // Preserve as is the content of labels, etc. and instances
-            if (LABEL_HINT_HELP_ALERT_ELEMENT.get(localname) != null || "instance".equals(localname)) {
+            // Preserve as is the content of labels, etc., instances, and schemas
+            if (LABEL_HINT_HELP_ALERT_ELEMENT.get(localname) != null || "instance".equals(localname)
+                    || "schema".equals(localname) && XMLConstants.XSD_URI.equals(uri)) {
                 inPreserve = true;
                 preserveLevel = level;
             }

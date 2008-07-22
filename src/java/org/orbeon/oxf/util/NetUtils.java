@@ -798,12 +798,29 @@ public class NetUtils {
     }
 
     /**
+     * Test whether the user agent is Trident.
+     *
+     * @param request   incoming request
+     * @return          true if Trident is identified
+     */
+    public boolean isRenderingEngineTrident(ExternalContext.Request request) {
+        final Object userAgentHeader = request.getHeaderValuesMap().get("user-agent");
+        if (userAgentHeader == null)
+            return false;
+
+        final String userAgent = ((String[]) userAgentHeader)[0].toLowerCase();
+
+        final String lowerCaseUserAgent = userAgent.toLowerCase();
+        return lowerCaseUserAgent.indexOf("msie") != -1 && lowerCaseUserAgent.indexOf("opera") == -1;
+    }
+
+    /**
      * Test whether the user agent is IE 6 or earlier.
      *
      * @param request   incoming request
      * @return          true if IE 6 or earlier is identified
      */
-    public static boolean isIE6OrEarlier(ExternalContext.Request request) {
+    public static boolean isRenderingEngineIE6OrEarlier(ExternalContext.Request request) {
         final Object userAgentHeader = request.getHeaderValuesMap().get("user-agent");
         if (userAgentHeader == null)
             return false;

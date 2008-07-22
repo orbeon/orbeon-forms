@@ -281,7 +281,7 @@ public class XFormsServer extends ProcessorImpl {
                             final Element eventElement = (Element) i.next();
                             final String eventName = eventElement.attributeValue("name");
                             if (XFormsEvents.XXFORMS_VALUE_OR_ACTIVATE.equals(eventName)) {
-                                // Special
+                                // Special event for noscript mode
                                 final String sourceControlId = eventElement.attributeValue("source-control-id");
                                 if (!staticState.isValueControl(sourceControlId)) {
                                     // This is most likely a trigger or submit which will translate into a DOMActivate,

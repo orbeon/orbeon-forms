@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.orbeon.oxf.xforms.XFormsControls;
 import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.control.controls.RepeatIterationControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.processor.XFormsElementFilterContentHandler;
@@ -119,7 +120,8 @@ public class XFormsRepeatHandler extends HandlerBase {
         }
 
         // Generate template
-        if (isMustGenerateTemplate) {
+        final boolean isNoscript = XFormsProperties.isNoscript(containingDocument);
+        if (isMustGenerateTemplate && !isNoscript) {// don't generate templates in noscript mode as they won't be used
 
             if (!outputInterceptor.isMustGenerateFirstDelimiters()) {
                 // Delimiter: between repeat entries

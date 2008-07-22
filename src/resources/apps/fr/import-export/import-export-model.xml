@@ -36,7 +36,10 @@
 
     <xforms:action ev:observer="save-locally-button" ev:event="DOMActivate">
         <xforms:setvalue ref="xxforms:instance('fr-persistence-instance')/save-attempted">true</xforms:setvalue>
-        <xforms:send submission="save-locally-submission"/>
+        <xforms:insert nodeset="instance('fr-uuid')" origin="xxforms:call-xpl('oxf:/apps/fr/import-export/save-generate.xpl',
+                ('form-instance', 'parameters'), (xxforms:instance('fr-form-instance'), $parameters),
+                'uuid')"/>
+        <xxforms:show dialog="fr-download-save-dialog"/>
     </xforms:action>
 
     <xforms:submission id="save-locally-submission" method="post" ref="xxforms:instance('fr-form-instance')" replace="instance" instance="fr-uuid"

@@ -13,33 +13,38 @@
         xmlns:snapshot="ccm.job.snapshot.Snapshot"
         xmlns:f="http://www.orbeon.com/oxf/function">
 
-    <p:param name="instance" type="input"/>
-    <p:param name="data" type="output"/>
+    <p:param name="form-instance" type="input"/>
+    <p:param name="parameters" type="input" debug="parameters"/>
+    <p:param name="uuid" type="output" debug="uuid"/>
 
     <p:processor name="oxf:request">
         <p:input name="config">
             <config>
                 <include>/request/request-url</include>
-                <include>/request/parameters</include>
             </config>
         </p:input>
         <p:output name="data" id="request"/>
     </p:processor>
 
     <p:processor name="oxf:unsafe-xslt">
-        <p:input name="data" href="#instance"/>
+        <p:input name="data" href="#form-instance"/>
         <p:input name="request" href="#request"/>
+        <p:input name="parameters" href="#parameters"/>
         <p:input name="config">
             <xsl:stylesheet version="2.0">
                 <xsl:output method="xml" name="xml"/>
                 <xsl:template match="/">
                     <html xsl:version="2.0">
                         <body>
+                            <!-- Get values from input documents -->
                             <xsl:variable name="request" as="element(request)" select="doc('input:request')/request"/>
                             <xsl:variable name="request-url" as="element(request-url)" select="$request/request-url"/>
-                            <xsl:variable name="app" as="element(value)" select="$request/parameters/parameter[name = 'app']/value"/>
-                            <xsl:variable name="form" as="element(value)" select="$request/parameters/parameter[name = 'form']/value"/>
-                            <form name="form1" method="post" action="{substring-before($request-url, '/fr/service')}/fr/upload" id="form1">
+                            <xsl:variable name="parameters" as="element(request)" select="doc('input:parameters')/request"/>
+                            <xsl:variable name="app" as="xs:string" select="$parameters/app"/>
+                            <xsl:variable name="form" as="xs:string" select="$parameters/form"/>
+
+                            <!-- Form we produce -->
+                            <form name="form1" method="post" action="{substring-before($request-url, '/xforms-server')}/fr/upload" id="form1">
                                 <input type="hidden" name="form-data" value="{saxon:string-to-base64Binary(saxon:serialize(/*, 'xml'), 'UTF8')}"/>
                                 <input type="hidden" name="app" value="{$app}"/>
                                 <input type="hidden" name="form" value="{$form}"/>
@@ -74,7 +79,7 @@
     <p:processor name="oxf:pipeline">
         <p:input name="config" href="serialized-to-uuid.xpl"/>
         <p:input name="data" href="#converted"/>
-        <p:output name="data" ref="data"/>
+        <p:output name="data" ref="uuid"/>
     </p:processor>
 
 </p:config>

@@ -38,6 +38,7 @@ public class ContentHandlerOutputStream extends OutputStream {
 
     private byte[] singleByte = new byte[1];
 
+    private boolean documentStarted;
     private boolean closed;
 
     public ContentHandlerOutputStream(ContentHandler contentHandler) {
@@ -55,19 +56,26 @@ public class ContentHandlerOutputStream extends OutputStream {
         contentHandler.startPrefixMapping(XMLConstants.XSI_PREFIX, XMLConstants.XSI_URI);
         contentHandler.startPrefixMapping(XMLConstants.XSD_PREFIX, XMLConstants.XSD_URI);
         contentHandler.startElement("", DEFAULT_BINARY_DOCUMENT_ELEMENT, DEFAULT_BINARY_DOCUMENT_ELEMENT, attributes);
+
+        documentStarted = true;
     }
 
     public void close() throws IOException {
         if (!closed) {
+            // Always flush
             flushBuffer();
-            try {
-                // End document
-                contentHandler.endElement("", DEFAULT_BINARY_DOCUMENT_ELEMENT, DEFAULT_BINARY_DOCUMENT_ELEMENT);
-                contentHandler.endPrefixMapping(XMLConstants.XSI_PREFIX);
-                contentHandler.endPrefixMapping(XMLConstants.XSD_PREFIX);
-                contentHandler.endDocument();
-            } catch (SAXException e) {
-                throw new OXFException(e);
+
+            // Only close element and document if startDocument was called
+            if (documentStarted) {
+                try {
+                    // End document
+                    contentHandler.endElement("", DEFAULT_BINARY_DOCUMENT_ELEMENT, DEFAULT_BINARY_DOCUMENT_ELEMENT);
+                    contentHandler.endPrefixMapping(XMLConstants.XSI_PREFIX);
+                    contentHandler.endPrefixMapping(XMLConstants.XSD_PREFIX);
+                    contentHandler.endDocument();
+                } catch (SAXException e) {
+                    throw new OXFException(e);
+                }
             }
             closed = true;
         }

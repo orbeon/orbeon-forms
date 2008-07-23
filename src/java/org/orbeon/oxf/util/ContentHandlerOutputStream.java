@@ -45,6 +45,13 @@ public class ContentHandlerOutputStream extends OutputStream {
         this.contentHandler = contentHandler;
     }
 
+    /**
+     * Start a document, add a root element and output the content type attribute specified. Calling this method is
+     * optional. If it is called, upon close() the corresponding element and document are closed as well.
+     *
+     * @param contentType   content type
+     * @throws SAXException
+     */
     public void startDocument(String contentType) throws SAXException {
         // Start document
         AttributesImpl attributes = new AttributesImpl();
@@ -60,6 +67,12 @@ public class ContentHandlerOutputStream extends OutputStream {
         documentStarted = true;
     }
 
+    /**
+     * Close this output stream. This must be called in the end if startDocument() was called, otherwise the document
+     * won't be properly produced.
+     *
+     * @throws IOException
+     */
     public void close() throws IOException {
         if (!closed) {
             // Always flush

@@ -88,6 +88,11 @@
                         Attribute Value Templates (AVTs) can be <a href="#avts-xhtml">placed on HTML elements outside
                         <code>&lt;xhtml:body></code></a>.
                     </p>
+                    <xml-source>
+                        <xhtml:body lang="{instance('language')}">
+                            ...
+                        </xhtml:body>
+                    </xml-source>
                 </li>
                 <li>
                     <p>

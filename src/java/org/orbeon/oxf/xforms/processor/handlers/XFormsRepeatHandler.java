@@ -120,7 +120,6 @@ public class XFormsRepeatHandler extends HandlerBase {
         }
 
         // Generate template
-        final boolean isNoscript = XFormsProperties.isNoscript(containingDocument);
         if (isMustGenerateTemplate && !isNoscript) {// don't generate templates in noscript mode as they won't be used
 
             if (!outputInterceptor.isMustGenerateFirstDelimiters()) {

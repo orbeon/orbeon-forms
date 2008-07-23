@@ -72,7 +72,6 @@ public class XHTMLBodyHandler extends HandlerBase {
 
         final XFormsControls xformsControls = containingDocument.getXFormsControls();
         final String htmlPrefix = XMLUtils.prefixFromQName(qName);
-        final boolean isNoscript = XFormsProperties.isNoscript(containingDocument);
 
         // Get formatting prefix and declare it if needed
         // TODO: would be nice to do this here, but then we need to make sure this prefix is available to other handlers

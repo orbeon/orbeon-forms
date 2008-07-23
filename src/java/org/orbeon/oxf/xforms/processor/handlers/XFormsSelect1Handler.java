@@ -41,30 +41,43 @@ import java.util.List;
  */
 public class XFormsSelect1Handler extends XFormsCoreControlHandler {
 
+    private boolean isMany;
+    private QName appearance;
+
     public XFormsSelect1Handler() {
         super(false);
     }
 
-    protected void handleControl(String uri, String localname, String qName, Attributes attributes, String id, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
+    protected void prepareHandler(String uri, String localname, String qName, Attributes attributes, String id, String effectiveId, XFormsSingleNodeControl xformsControl) {
+        this.isMany = localname.equals("select");
+        this.appearance = getActualAppearance(attributes, isMany);
+    }
 
-        final XFormsSelect1Control xformsSelect1Control = (XFormsSelect1Control) xformsControl;
+    private QName getActualAppearance(Attributes attributes, boolean many) {
+        final QName tempAppearance = getAppearance(attributes);
 
-        final boolean isMany = localname.equals("select");
         final QName appearance;
-        {
-            final QName tempAppearance = getAppearance(attributes);
-            if (tempAppearance != null)
-                appearance = tempAppearance;
-            else if (isMany)
-                appearance = XFormsConstants.XFORMS_COMPACT_APPEARANCE_QNAME;// default for xforms:select
-            else
-                appearance = XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME;// default for xforms:select1
-        }
+        if (tempAppearance != null)
+            appearance = tempAppearance;
+        else if (many)
+            appearance = XFormsConstants.XFORMS_COMPACT_APPEARANCE_QNAME;// default for xforms:select
+        else
+            appearance = XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME;// default for xforms:select1
 
+        return appearance;
+    }
+
+    protected void handleControl(String uri, String localname, String qName, Attributes attributes, String id, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
         // Get items, dynamic or static, if possible
+        final XFormsSelect1Control xformsSelect1Control = (XFormsSelect1Control) xformsControl;
         final List items = XFormsSelect1Control.getItemset(pipelineContext, containingDocument, xformsSelect1Control, id);
 
         outputContent(attributes, id, effectiveId, localname, xformsSelect1Control, items, isMany, appearance);
+    }
+
+    protected boolean isMustOutputStandardLabel(XFormsSingleNodeControl xformsControl) {
+        final boolean isFull = XFormsConstants.XFORMS_FULL_APPEARANCE_QNAME.equals(appearance);
+        return isStaticReadonly(xformsControl) || !isFull || !isNoscript;
     }
 
     public void outputContent(Attributes attributes, String id, String effectiveId, String localname, final XFormsValueControl xformsValueControl, List items, final boolean isMany, QName appearance) throws SAXException {
@@ -109,9 +122,32 @@ public class XFormsSelect1Handler extends XFormsCoreControlHandler {
         if (!isStaticReadonly(xformsValueControl)) {
             if (isFull) {
                 final String fullItemType = isMany ? "checkbox" : "radio";
+
+                // In noscript mode, use <fieldset>
+
+                // TODO: This really hasn't much to do with noscript; should we always use fieldset, or make this an
+                // option? Benefit of limiting to noscript is that then no JS change is needed
+                final String elementName = isNoscript ? "fieldset" : "span";
+
+                final String elementQName = XMLUtils.buildQName(xhtmlPrefix, elementName);
                 final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
                 {
-                    contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, newAttributes);
+                    contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, elementName, elementQName, newAttributes);
+
+                    if (isNoscript) {
+                        // Output <legend>
+                        final String legendName = "legend";
+                        final String legendQName = XMLUtils.buildQName(xhtmlPrefix, legendName);
+                        reusableAttributes.clear();
+                        // TODO: handle other attributes? xforms-disabled?
+                        reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-label");
+                        contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, legendName, legendQName, reusableAttributes);
+                        if (xformsValueControl != null) {
+                            final boolean mustOutputHTMLFragment = xformsValueControl.isHTMLLabel(pipelineContext);
+                            outputLabelText(contentHandler, xformsValueControl, xformsValueControl.getLabel(pipelineContext), xhtmlPrefix, mustOutputHTMLFragment);
+                        }
+                        contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, legendName, legendQName);
+                    }
 
                     if (items != null) {
                         int itemIndex = 0;
@@ -121,11 +157,10 @@ public class XFormsSelect1Handler extends XFormsCoreControlHandler {
                         }
                     }
 
-                    contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
+                    contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, elementName, elementQName);
                 }
 
                 // Try to produce the template only when needed
-                final boolean isNoscript = XFormsProperties.isNoscript(containingDocument);
                 if (!isNoscript) {// don't generate templates in noscript mode as they won't be used
                     final XFormsStaticState.ItemsInfo itemsInfo = containingDocument.getStaticState().getItemsInfo(id);
                     if (itemsInfo == null || itemsInfo.hasNonStaticItem()) {// only generate if there are non-static items
@@ -316,6 +351,7 @@ public class XFormsSelect1Handler extends XFormsCoreControlHandler {
                 } else {
                     // Create xhtml:select
                     final String selectQName = XMLUtils.buildQName(xhtmlPrefix, "select");
+                    newAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, effectiveId);// necessary for noscript mode
 
                     if (isCompact)
                         newAttributes.addAttribute("", "multiple", "multiple", ContentHandlerHelper.CDATA, "multiple");

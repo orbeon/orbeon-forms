@@ -42,17 +42,17 @@ public class XFormsTriggerHandler extends XFormsCoreControlHandler {
         super(false);
     }
 
-    protected boolean isMustOutputStandardLabel() {
+    protected boolean isMustOutputStandardLabel(XFormsSingleNodeControl xformsControl) {
         // Label is handled differently
         return false;
     }
 
-    protected boolean isMustOutputStandardHint() {
+    protected boolean isMustOutputStandardHint(XFormsSingleNodeControl xformsControl) {
         // Hint is handled differently
         return false;
     }
 
-    protected boolean isMustOutputStandardAlert(Attributes attributes) {
+    protected boolean isMustOutputStandardAlert(XFormsSingleNodeControl xformsControl, Attributes attributes) {
         // Triggers don't need an alert
         return false;
     }
@@ -78,7 +78,6 @@ public class XFormsTriggerHandler extends XFormsCoreControlHandler {
         final QName appearance; {
             // Override appearance in noscript mode
             final QName originalAppearance = getAppearance(attributes);
-            final boolean isNoscript = XFormsProperties.isNoscript(containingDocument);
             if (isNoscript && originalAppearance != null && XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME.equals(originalAppearance))
                 appearance = XFormsConstants.XXFORMS_MINIMAL_APPEARANCE_QNAME;
             else

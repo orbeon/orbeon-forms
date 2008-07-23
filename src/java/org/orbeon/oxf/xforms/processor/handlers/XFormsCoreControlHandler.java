@@ -35,7 +35,10 @@ public abstract class XFormsCoreControlHandler extends HandlerBase {
         final XFormsSingleNodeControl xformsControl = handlerContext.isTemplate()
                 ? null : (XFormsSingleNodeControl) containingDocument.getObjectById(effectiveId);
 
-        if (isMustOutputControl()) {
+        // Give the handler a chance to do some prep work
+        prepareHandler(uri, localname, qName, attributes, id, effectiveId, xformsControl);
+
+        if (isMustOutputControl(xformsControl)) {
             // Get local order for control
             final String localOrder = attributes.getValue(XFormsConstants.XXFORMS_ORDER_QNAME.getNamespaceURI(),
                     XFormsConstants.XXFORMS_ORDER_QNAME.getName());
@@ -53,17 +56,17 @@ public abstract class XFormsCoreControlHandler extends HandlerBase {
                     handleControl(uri, localname, qName, attributes, id, effectiveId, xformsControl);
                 } else if ("label".equals(current)) {
                     // xforms:label
-                    if (isMustOutputStandardLabel()) {
+                    if (isMustOutputStandardLabel(xformsControl)) {
                         handleLabelHintHelpAlert(id, effectiveId, current, xformsControl, isTemplate);
                     }
                 } else if ("alert".equals(current)) {
                     // xforms:alert
-                    if (isMustOutputStandardAlert(attributes)) {
+                    if (isMustOutputStandardAlert(xformsControl, attributes)) {
                         handleLabelHintHelpAlert(id, effectiveId, current, xformsControl, isTemplate);
                     }
                 } else if ("hint".equals(current)) {
                     // xforms:hint
-                    if (isMustOutputStandardHint()) {
+                    if (isMustOutputStandardHint(xformsControl)) {
                         handleLabelHintHelpAlert(id, effectiveId, current, xformsControl, isTemplate);
                     }
                 } else {
@@ -74,22 +77,26 @@ public abstract class XFormsCoreControlHandler extends HandlerBase {
         }
     }
 
-    protected boolean isMustOutputControl() {
+    protected void prepareHandler(String uri, String localname, String qName, Attributes attributes, String id, String effectiveId, XFormsSingleNodeControl xformsControl) {
+        // May be overridden by subclasses
+    }
+
+    protected boolean isMustOutputControl(XFormsSingleNodeControl xformsControl) {
         // May be overridden by subclasses
         return true;
     }
 
-    protected boolean isMustOutputStandardLabel() {
+    protected boolean isMustOutputStandardLabel(XFormsSingleNodeControl xformsControl) {
         // May be overridden by subclasses
         return true;
     }
 
-    protected boolean isMustOutputStandardHint() {
+    protected boolean isMustOutputStandardHint(XFormsSingleNodeControl xformsControl) {
         // May be overridden by subclasses
         return true;
     }
 
-    protected boolean isMustOutputStandardAlert(Attributes attributes) {
+    protected boolean isMustOutputStandardAlert(XFormsSingleNodeControl xformsControl, Attributes attributes) {
         // May be overridden by subclasses
         return true;
     }

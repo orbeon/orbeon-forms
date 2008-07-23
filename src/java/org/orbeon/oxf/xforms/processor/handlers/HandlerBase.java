@@ -53,6 +53,7 @@ public abstract class HandlerBase extends ElementHandler {
     protected XFormsContainingDocument containingDocument;
     protected ExternalContext externalContext;
     protected List pathMatchers;
+    protected boolean isNoscript;
 
     protected AttributesImpl reusableAttributes = new AttributesImpl();
 
@@ -70,6 +71,9 @@ public abstract class HandlerBase extends ElementHandler {
 
         // This is used for URL rewriting
         pathMatchers = (List) pipelineContext.getAttribute(PipelineContext.PATH_MATCHERS);
+
+        // Cache this property as it is used often
+        isNoscript = XFormsProperties.isNoscript(containingDocument);
 
         super.setContext(context);
     }
@@ -448,7 +452,8 @@ public abstract class HandlerBase extends ElementHandler {
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
 
         contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "label", labelQName, attributes);
-        if (value != null) {
+        // Only output content when there value is non-empty
+        if (value != null && !value.equals("")) {
             if (mustOutputHTMLFragment) {
                 XFormsUtils.streamHTMLFragment(contentHandler, value, null, xhtmlPrefix);
             } else {
@@ -459,10 +464,13 @@ public abstract class HandlerBase extends ElementHandler {
     }
 
     protected static void outputLabelText(ContentHandler contentHandler, XFormsControl xformsControl, String value, String xhtmlPrefix, boolean mustOutputHTMLFragment) throws SAXException {
-        if (mustOutputHTMLFragment)
-            XFormsUtils.streamHTMLFragment(contentHandler, value, xformsControl != null ? xformsControl.getLocationData() : null, xhtmlPrefix);
-        else
-            contentHandler.characters(value.toCharArray(), 0, value.length());
+        // Only output content when there value is non-empty
+        if (value != null && !value.equals("")) {
+            if (mustOutputHTMLFragment)
+                XFormsUtils.streamHTMLFragment(contentHandler, value, xformsControl != null ? xformsControl.getLocationData() : null, xhtmlPrefix);
+            else
+                contentHandler.characters(value.toCharArray(), 0, value.length());
+        }
     }
 
     protected static void copyAttributes(Attributes sourceAttributes, String sourceNamespaceURI, String[] sourceAttributeLocalNames, AttributesImpl destAttributes) {

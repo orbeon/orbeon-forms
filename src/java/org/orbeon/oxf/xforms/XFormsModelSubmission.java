@@ -366,7 +366,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                 final boolean isHandlingOptimizedGet = XFormsProperties.isOptimizeGetAllSubmission(containingDocument) && actualHttpMethod.equals("GET")
                         && isReplaceAll
-                        && avtXXFormsUsername == null; // can't optimize if there are authentication credentials
+                        && avtXXFormsUsername == null // can't optimize if there are authentication credentials
+                        && avtXXFormsTarget == null;  // can't optimize if there is a target
 
                 final boolean isNoscript = XFormsProperties.isNoscript(containingDocument);
                 // In noscript mode, there is no deferred submission process

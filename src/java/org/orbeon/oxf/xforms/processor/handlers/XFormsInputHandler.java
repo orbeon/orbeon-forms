@@ -179,6 +179,7 @@ public class XFormsInputHandler extends XFormsCoreControlHandler {
                     // HACK: Output XHTML image natively in order to help with the IE bug whereby IE reloads
                     // background images way too often.
                     reusableAttributes.addAttribute("", "src", "src", ContentHandlerHelper.CDATA, XFormsConstants.CALENDAR_IMAGE_URI);
+                    reusableAttributes.addAttribute("", "alt", "alt", ContentHandlerHelper.CDATA, "");// empty alt for validator
 
                     final String imgQName = XMLUtils.buildQName(xhtmlPrefix, "img");
                     contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "img", imgQName, reusableAttributes);

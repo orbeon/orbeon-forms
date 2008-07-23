@@ -89,7 +89,8 @@ public class XFormsControls {
         valueControls.put("select", "");
         valueControls.put("select1", "");
 
-        valueControls.put("attribute", "");// xxforms:attribute extension
+        valueControls.put("attribute", ""); // xxforms:attribute extension
+        valueControls.put("text", "");      // xxforms:text extension
 
         noValueControls.put("submit", "");
         noValueControls.put("trigger", "");

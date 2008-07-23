@@ -13,10 +13,7 @@
  */
 package org.orbeon.oxf.xforms.processor;
 
-import org.orbeon.oxf.xml.ForwardingContentHandler;
-import org.orbeon.oxf.xml.ContentHandlerHelper;
-import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.xml.NamespaceSupport3;
+import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xforms.XFormsProperties;
@@ -47,6 +44,8 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
     private int currentId = 1;
     private int level = 0;
     private int xformsInstanceLevel = -1;
+    private boolean inHead;
+    private boolean inTitle;
 
     private Locator documentLocator;
 
@@ -61,6 +60,8 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
     private final boolean hostLanguageAVTs = XFormsProperties.isHostLanguageAVTs(); // TODO: this should be obtained per document, but we only know about this in the extractor
     private final AttributesImpl reusableAttributes = new AttributesImpl();
     private final String[] reusableStringArray = new String[1];
+
+    private String htmlTitleElementId;
 
     /**
      * This constructor just computes the namespace mappings and AVT elements
@@ -108,59 +109,93 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
             // Create a new id and update the attributes if needed
             attributes = getAttributesGatherNamespaces(attributes, reusableStringArray);
 
-            super.startElement(uri, localname, qName, attributes);
+            if (inTitle && "output".equals(localname)) {
+                // Special case of xforms:output within title, which produces an xxforms:text control
+                attributes = XMLUtils.addOrReplaceAttribute(attributes, "", "", "for", htmlTitleElementId);
+                super.startPrefixMapping("xxforms", XFormsConstants.XXFORMS_NAMESPACE_URI);
+                super.startElement(XFormsConstants.XXFORMS_NAMESPACE_URI, "text", "xxforms:text", attributes);
+            } else {
+                // Leave element untouched (except for the id attribute)
+                super.startElement(uri, localname, qName, attributes);
+            }
 
             if ("instance".equals(localname)) { // NOTE: this catches xforms:instance AND xxforms:instance (shouldn't be a problem...)
-                // Remember we are inside an instance
+                // Entering instance
                 xformsInstanceLevel = level;
             }
 
-        } else if (XMLConstants.XHTML_NAMESPACE_URI.equals(uri) && hostLanguageAVTs) {
-            // This is an XHTML element and we allow AVTs
+        } else if (XMLConstants.XHTML_NAMESPACE_URI.equals(uri)) {
+            // XHTML element
 
-            final int attributesCount = attributes.getLength();
-            if (attributesCount > 0) {
-                String htmlElementId = null;
-                for (int i = 0; i < attributesCount; i++) {
-                    final String currentAttributeURI = attributes.getURI(i);
-                    if ("".equals(currentAttributeURI) || XMLConstants.XML_URI.equals(currentAttributeURI)) {
-                        // For now we only support AVTs on attributes in no namespace or in the XML namespace (for xml:lang)
-                        final String attributeValue = attributes.getValue(i);
-                        if (attributeValue.indexOf('{') != -1) {
-                            // This is an AVT
-                            final String attributeName = attributes.getQName(i);// use qualified name for xml:lang
+            String htmlElementId = null;
 
-                            // Create a new id and update the attributes if needed
-                            if (htmlElementId == null) {
-                                attributes = getAttributesGatherNamespaces(attributes, reusableStringArray);
-                                htmlElementId = reusableStringArray[0];
+            if (level == 2) {
+                if ("head".equals(localname)) {
+                    // Entering head
+                    inHead = true;
+                }
+            } else if (level == 3) {
+                if (inHead && "title".equals(localname)) {
+                    // Entering title
+                    inTitle = true;
+                    // Make sure there will be an id on the title element (ideally, we would do this only if there is a nested xforms:output)
+                    attributes = getAttributesGatherNamespaces(attributes, reusableStringArray);
+                    htmlElementId = reusableStringArray[0];
+                    htmlTitleElementId = htmlElementId;
+                }
+            }
 
-                                // TODO: Clear all attributes having AVTs or XPath expressions will end up in repeat templates.
+            if (hostLanguageAVTs) {
+                // This is an XHTML element and we allow AVTs
+                final int attributesCount = attributes.getLength();
+                if (attributesCount > 0) {
+                    boolean elementOutput = false;
+                    for (int i = 0; i < attributesCount; i++) {
+                        final String currentAttributeURI = attributes.getURI(i);
+                        if ("".equals(currentAttributeURI) || XMLConstants.XML_URI.equals(currentAttributeURI)) {
+                            // For now we only support AVTs on attributes in no namespace or in the XML namespace (for xml:lang)
+                            final String attributeValue = attributes.getValue(i);
+                            if (attributeValue.indexOf('{') != -1) {
+                                // This is an AVT
+                                final String attributeName = attributes.getQName(i);// use qualified name for xml:lang
 
-                                // Output the element with the new or updated id attribute
-                                super.startElement(uri, localname, qName, attributes);
+                                // Create a new id and update the attributes if needed
+                                if (htmlElementId == null) {
+                                    attributes = getAttributesGatherNamespaces(attributes, reusableStringArray);
+                                    htmlElementId = reusableStringArray[0];
+
+                                    // TODO: Clear all attributes having AVTs or XPath expressions will end up in repeat templates.
+                                }
+
+                                if (!elementOutput) {
+                                    // Output the element with the new or updated id attribute
+                                    super.startElement(uri, localname, qName, attributes);
+                                    elementOutput = true;
+                                }
+
+                                // Create a new xxforms:attribute control
+                                reusableAttributes.clear();
+
+                                final AttributesImpl newAttributes = (AttributesImpl) getAttributesGatherNamespaces(reusableAttributes, reusableStringArray);
+
+                                newAttributes.addAttribute("", "for", "for", ContentHandlerHelper.CDATA, htmlElementId);
+                                newAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, attributeName);
+                                newAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, attributeValue);
+
+                                super.startPrefixMapping("xxforms", XFormsConstants.XXFORMS_NAMESPACE_URI);
+                                super.startElement(XFormsConstants.XXFORMS_NAMESPACE_URI, "attribute", "xxforms:attribute", newAttributes);
+                                super.endElement(XFormsConstants.XXFORMS_NAMESPACE_URI, "attribute", "xxforms:attribute");
+                                super.endPrefixMapping("xxforms");
                             }
-
-                            // Create a new xxforms:attribute control
-                            reusableAttributes.clear();
-
-                            final AttributesImpl newAttributes = (AttributesImpl) getAttributesGatherNamespaces(reusableAttributes, reusableStringArray);
-
-                            newAttributes.addAttribute("", "for", "for", ContentHandlerHelper.CDATA, htmlElementId);
-                            newAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, attributeName);
-                            newAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, attributeValue);
-
-                            super.startPrefixMapping("xxforms", XFormsConstants.XXFORMS_NAMESPACE_URI);
-                            super.startElement(XFormsConstants.XXFORMS_NAMESPACE_URI, "attribute", "xxforms:attribute", newAttributes);
-                            super.endElement(XFormsConstants.XXFORMS_NAMESPACE_URI, "attribute", "xxforms:attribute");
-                            super.endPrefixMapping("xxforms");
                         }
                     }
-                }
 
-                // Output the element as is if no AVT was found
-                if (htmlElementId == null)
+                    // Output the element as is if no AVT was found
+                    if (!elementOutput)
+                        super.startElement(uri, localname, qName, attributes);
+                } else {
                     super.startElement(uri, localname, qName, attributes);
+                }
 
             } else {
                 // No attributes, just output the element
@@ -178,7 +213,27 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
             xformsInstanceLevel = -1;
         }
 
-        super.endElement(uri, localname, qName);
+        if (level == 2) {
+            if ("head".equals(localname)) {
+                // Exiting head
+                inHead = false;
+            }
+        } else if (level == 3) {
+            if ("title".equals(localname)) {
+                // Exiting title
+                inTitle = false;
+            }
+        }
+
+        if (inTitle && XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri) && "output".equals(localname)) {
+            // Closing xforms:output within xhtml:title
+            super.endElement(XFormsConstants.XXFORMS_NAMESPACE_URI, "text", "xxforms:text");
+            super.endPrefixMapping("xxforms");// for resolving appearance
+        } else {
+            // Leave element untouched
+            super.endElement(uri, localname, qName);
+        }
+
         level--;
 
         namespaceSupport.endElement();

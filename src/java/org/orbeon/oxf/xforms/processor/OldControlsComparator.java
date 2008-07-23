@@ -91,8 +91,9 @@ public class OldControlsComparator extends BaseControlsComparator {
                     // Control children values
                     final boolean isRepeatIterationControl = xformsSingleNodeControl2 instanceof RepeatIterationControl;
                     final boolean isAttributeControl = xformsSingleNodeControl2 instanceof XXFormsAttributeControl;
-                    if (!(isRepeatIterationControl || isAttributeControl)) {
-                        // Anything but a repeat iteration or an attribute
+                    final boolean isTextControl = xformsSingleNodeControl2 instanceof XXFormsTextControl;
+                    if (!(isRepeatIterationControl || isAttributeControl || isTextControl)) {
+                        // Anything but a repeat iteration, an attribute or a text
 
                         // Control id
                         attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, xformsSingleNodeControl2.getEffectiveId());
@@ -314,6 +315,35 @@ public class OldControlsComparator extends BaseControlsComparator {
                         }
                         if (doOutputElement || !isNewRepeatIteration || (isNewRepeatIteration && !value.equals(""))) {
                             ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "attribute", attributesImpl);
+                            ch.text(value);
+                            ch.endElement();
+                        }
+                    } else if (isTextControl) {
+                        // Text control
+                        final XXFormsTextControl txtControlInfo2 = (XXFormsTextControl) xformsSingleNodeControl2;
+
+                        // Control id
+                        attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, xformsSingleNodeControl2.getEffectiveId());
+
+                        // The client does not store an HTML representation of the xxforms:text control, so we
+                        // have to output these attributes.
+                        {
+                            // HTML element id
+                            final String effectiveFor2 = txtControlInfo2.getEffectiveForAttribute();
+                            doOutputElement |= addAttributeIfNeeded(attributesImpl, "for", effectiveFor2, isNewRepeatIteration, false);
+                        }
+
+                        final XFormsValueControl xformsValueControl = (XFormsValueControl) xformsSingleNodeControl2;
+
+                        // Create element with text value
+                        final String value;
+                        {
+                            // Value may become null when controls are unbound
+                            final String tempValue = xformsValueControl.getExternalValue(pipelineContext);
+                            value = (tempValue == null) ? "" : tempValue;
+                        }
+                        if (doOutputElement || !isNewRepeatIteration || (isNewRepeatIteration && !value.equals(""))) {
+                            ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "text", attributesImpl);
                             ch.text(value);
                             ch.endElement();
                         }

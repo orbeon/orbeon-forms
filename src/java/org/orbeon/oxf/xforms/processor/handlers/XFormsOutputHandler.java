@@ -21,6 +21,7 @@ import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.saxon.om.FastStringBuffer;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -78,43 +79,57 @@ public class XFormsOutputHandler extends XFormsCoreControlHandler {
         handleMIPClasses(classes, id, outputControl);
         newAttributes = getAttributes(attributes, classes.toString(), effectiveId);
 
-        // Create xhtml:span or xhtml:div
-        final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
-        // For IE we need to generate a div here for IE, which doesn't support working with innterHTML on spans.
-        final String enclosingElementLocalname = isHTMLMediaType ? "div" : "span";
-        final String enclosingElementQName = XMLUtils.buildQName(xhtmlPrefix, enclosingElementLocalname);
+        if (XFormsConstants.XXFORMS_TEXT_APPEARANCE_QNAME.equals(getAppearance(attributes))) {
+            // Just output value for "text" appearance
+            if (isImageMediatype || isHTMLMediaType) {
+                throw new ValidationException("Cannot use mediatype value for \"xxforms:text\" appearance: " + mediatypeValue, handlerContext.getLocationData());
+            }
 
-        // Handle accessibility attributes (de facto, tabindex is supported on all elements)
-        handleAccessibilityAttributes(attributes, newAttributes);
+            if (isConcreteControl) {
+                final String displayValue = outputControl.getDisplayValueOrExternalValue(pipelineContext);
+                if (displayValue != null && displayValue.length() > 0)
+                    contentHandler.characters(displayValue.toCharArray(), 0, displayValue.length());
+            }
 
-        contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, enclosingElementLocalname, enclosingElementQName, newAttributes);
-        {
-            if (isImageMediatype) {
-                // Case of image media type with URI
-                final String imgQName = XMLUtils.buildQName(xhtmlPrefix, "img");
-                final AttributesImpl imgAttributes = new AttributesImpl();
-                // @src="..."
-                // NOTE: If producing a template, or if the image URL is blank, we point to an existing dummy image
-                final String srcValue = isConcreteControl ? outputControl.getExternalValue(pipelineContext) : XFormsConstants.DUMMY_IMAGE_URI;
-                imgAttributes.addAttribute("", "src", "src", ContentHandlerHelper.CDATA, srcValue.trim().equals("") ? XFormsConstants.DUMMY_IMAGE_URI : srcValue);
+        } else {
+            // Create xhtml:span or xhtml:div
+            final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
+            // For IE we need to generate a div here for IE, which doesn't support working with innterHTML on spans.
+            final String enclosingElementLocalname = isHTMLMediaType ? "div" : "span";
+            final String enclosingElementQName = XMLUtils.buildQName(xhtmlPrefix, enclosingElementLocalname);
 
-                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "img", imgQName, imgAttributes);
-                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "img", imgQName);
-            } else if (isHTMLMediaType) {
-                // HTML case
-                if (isConcreteControl) {
-                    final String displayValue = outputControl.getDisplayValueOrExternalValue(pipelineContext);
-                    XFormsUtils.streamHTMLFragment(contentHandler, displayValue, outputControl.getLocationData(), xhtmlPrefix);
-                }
-            } else {
-                // Regular text case
-                if (isConcreteControl) {
-                    final String displayValue = outputControl.getDisplayValueOrExternalValue(pipelineContext);
-                    if (displayValue != null && displayValue.length() > 0)
-                        contentHandler.characters(displayValue.toCharArray(), 0, displayValue.length());
+            // Handle accessibility attributes (de facto, tabindex is supported on all elements)
+            handleAccessibilityAttributes(attributes, newAttributes);
+
+            contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, enclosingElementLocalname, enclosingElementQName, newAttributes);
+            {
+                if (isImageMediatype) {
+                    // Case of image media type with URI
+                    final String imgQName = XMLUtils.buildQName(xhtmlPrefix, "img");
+                    final AttributesImpl imgAttributes = new AttributesImpl();
+                    // @src="..."
+                    // NOTE: If producing a template, or if the image URL is blank, we point to an existing dummy image
+                    final String srcValue = isConcreteControl ? outputControl.getExternalValue(pipelineContext) : XFormsConstants.DUMMY_IMAGE_URI;
+                    imgAttributes.addAttribute("", "src", "src", ContentHandlerHelper.CDATA, srcValue.trim().equals("") ? XFormsConstants.DUMMY_IMAGE_URI : srcValue);
+
+                    contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "img", imgQName, imgAttributes);
+                    contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "img", imgQName);
+                } else if (isHTMLMediaType) {
+                    // HTML case
+                    if (isConcreteControl) {
+                        final String displayValue = outputControl.getDisplayValueOrExternalValue(pipelineContext);
+                        XFormsUtils.streamHTMLFragment(contentHandler, displayValue, outputControl.getLocationData(), xhtmlPrefix);
+                    }
+                } else {
+                    // Regular text case
+                    if (isConcreteControl) {
+                        final String displayValue = outputControl.getDisplayValueOrExternalValue(pipelineContext);
+                        if (displayValue != null && displayValue.length() > 0)
+                            contentHandler.characters(displayValue.toCharArray(), 0, displayValue.length());
+                    }
                 }
             }
+            contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, enclosingElementLocalname, enclosingElementQName);
         }
-        contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, enclosingElementLocalname, enclosingElementQName);
     }
 }

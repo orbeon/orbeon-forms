@@ -94,6 +94,7 @@
     <property as="xs:anyURI"  name="oxf.fr.appserver.uri"                            value=""/>
 
     <property as="xs:boolean" name="oxf.fr.detail.noscript.table"                    value="true"/>
+    <property as="xs:boolean" name="oxf.fr.detail.toc"                               value="true"/>
     <property as="xs:string"  name="oxf.fr.detail.error-summary"                     value="bottom"/>
     <property as="xs:boolean" name="oxf.fr.detail.button.save-locally"               value="false"/>
 

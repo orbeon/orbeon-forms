@@ -27,18 +27,18 @@
     <!-- - - - - - - Themed page template - - - - - - -->
     <xsl:template match="/*">
         <xsl:copy>
-            <xsl:copy-of select="@*"/>
+            <xsl:apply-templates select="@*"/>
             <xhtml:head>
                 <!-- NOTE: The XForms engine may place additional scripts and stylesheets here as needed -->
                 <!-- Handle head elements except scripts -->
                 <xsl:for-each select="/xhtml:html/xhtml:head/(xhtml:meta | xhtml:link | xhtml:style)">
                     <xsl:element name="xhtml:{local-name()}" namespace="{namespace-uri()}">
-                        <xsl:copy-of select="@*"/>
-                        <xsl:apply-templates/>
+                        <xsl:apply-templates select="@*|node()"/>
                     </xsl:element>
                 </xsl:for-each>
                 <!-- Title -->
                 <xhtml:title>
+                    <xsl:apply-templates select="/xhtml:html/xhtml:head/xhtml:title/@*"/>
                     <xsl:choose>
                         <xsl:when test="/xhtml:html/xhtml:head/xhtml:title != ''">
                             <xsl:value-of select="/xhtml:html/xhtml:head/xhtml:title"/>
@@ -53,13 +53,6 @@
                 <!-- Favicon -->
                 <xhtml:link rel="shortcut icon" href="/ops/images/orbeon-icon-16.ico"/>
                 <xhtml:link rel="icon" href="/ops/images/orbeon-icon-16.png" type="image/png"/>
-                <!-- Scripts -->
-                <xsl:for-each select="/xhtml:html/xhtml:head/xhtml:script">
-                    <xsl:element name="xhtml:{local-name()}" namespace="{namespace-uri()}">
-                        <xsl:copy-of select="@*"/>
-                        <xsl:apply-templates/>
-                    </xsl:element>
-                </xsl:for-each>
             </xhtml:head>
             <xhtml:body>
                 <!-- Copy body attributes -->
@@ -67,6 +60,13 @@
                 <!-- Copy body -->
                 <xsl:apply-templates select="/xhtml:html/xhtml:body/node()"/>
             </xhtml:body>
+            <!-- Scripts at the bottom of the page. This is not valid HTML, but it is a recommended practice for
+                 performance as of early 2008. See http://developer.yahoo.com/performance/rules.html#js_bottom -->
+            <xsl:for-each select="/xhtml:html/xhtml:head/xhtml:script">
+                <xsl:element name="xhtml:{local-name()}" namespace="{namespace-uri()}">
+                    <xsl:apply-templates select="@*|node()"/>
+                </xsl:element>
+            </xsl:for-each>
         </xsl:copy>
     </xsl:template>
 

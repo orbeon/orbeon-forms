@@ -27,11 +27,6 @@
 
     <xsl:template match="xhtml:body//fr:view">
 
-        <!-- Scope variable with Form Runner resources -->
-        <xxforms:variable name="fr-resources" select="xxforms:instance('fr-fr-current-resources')"/>
-
-        <xsl:variable name="label" select="xforms:label"/>
-
         <xsl:if test="@width and not(@width = ('750px', '950px', '974px', '1154px'))">
             <xsl:message terminate="yes">Value of fr:view/@view is not valid</xsl:message>
         </xsl:if>
@@ -41,17 +36,20 @@
                 <!-- Scope form resources -->
                 <xxforms:variable name="form-resources" select="xxforms:instance('fr-current-form-resources')"/>
                 <xhtml:div class="fr-header">
-                    <!-- Switch language -->
                     <xsl:if test="not(doc('input:instance')/*/mode = ('print', 'pdf'))">
-                        <xhtml:div class="fr-summary-noscript-choice" style="float: left">
-                            <xforms:group ref=".[not(property('xxforms:noscript'))]">
-                                <xhtml:a title="{{$fr-resources/summary/titles/refresh}}" href="?fr-noscript=true"><xforms:output value="$fr-resources/summary/labels/noscript"/></xhtml:a>
-                                <!--<xhtml:img class="fr-noscript-icon" width="16" height="16" src="/apps/fr/style/images/silk/script_delete.png" alt="Noscript Mode" title="Noscript Mode"/>-->
-                            </xforms:group>
-                            <xforms:group ref=".[property('xxforms:noscript')]">
-                                <xhtml:a title="{{$fr-resources/summary/titles/refresh}}" href="?"><xforms:output value="$fr-resources/summary/labels/script"/></xhtml:a>
-                            </xforms:group>
-                        </xhtml:div>
+                        <!-- Switch script/noscript -->
+                        <xsl:if test="not($is-form-builder)">
+                            <xhtml:div class="fr-summary-noscript-choice" style="float: left">
+                                <xforms:group ref=".[not(property('xxforms:noscript'))]">
+                                    <xhtml:a title="{{$fr-resources/summary/titles/refresh}}" href="?fr-noscript=true"><xforms:output value="$fr-resources/summary/labels/noscript"/></xhtml:a>
+                                    <!--<xhtml:img class="fr-noscript-icon" width="16" height="16" src="/apps/fr/style/images/silk/script_delete.png" alt="Noscript Mode" title="Noscript Mode"/>-->
+                                </xforms:group>
+                                <xforms:group ref=".[property('xxforms:noscript')]">
+                                    <xhtml:a title="{{$fr-resources/summary/titles/refresh}}" href="?"><xforms:output value="$fr-resources/summary/labels/script"/></xhtml:a>
+                                </xforms:group>
+                            </xhtml:div>
+                        </xsl:if>
+                        <!-- Switch language -->
                         <xhtml:div class="fr-summary-language-choice">
                             <xxforms:variable name="available-languages"
                                               select="xxforms:instance('fr-form-resources')/resource/@xml:lang"/>
@@ -89,17 +87,6 @@
                 <xhtml:div id="bd" class="fr-container">
                     <xhtml:div id="yui-main">
                         <xhtml:div class="yui-b">
-                            <xxforms:variable name="metadata-lang" select="xxforms:instance('fr-language-instance')"/>
-                            <xxforms:variable name="source-form-metadata" select="xxforms:instance('fr-source-form-instance')/xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-metadata']/*"/>
-                            <!-- title in chosen language or first one if not found -->
-                            <xxforms:variable name="title"
-                                              select="(($source-form-metadata/title[@xml:lang = $metadata-lang],
-                                                        $source-form-metadata/title[1],
-                                                        instance('fr-form-metadata')/title[@xml:lang = $metadata-lang],
-                                                        instance('fr-form-metadata')/title[1],
-                                                        ({$label/@ref}),
-                                                        '{$label}',
-                                                        /xhtml:html/xhtml:head/xhtml:title)[normalize-space() != ''])[1]"/>
                             <!-- description in chosen language or first one if not found -->
                             <xxforms:variable name="description"
                                               select="($source-form-metadata/description[@xml:lang = $metadata-lang],

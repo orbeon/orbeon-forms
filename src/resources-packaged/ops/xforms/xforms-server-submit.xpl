@@ -87,9 +87,11 @@
                         </xsl:if>
                         <xxforms:action>
                             <!-- Create list of events based on parameters -->
-                            <xsl:for-each select="/*/parameters/parameter[not(starts-with(name, '$') or filename)]">
+                            <xsl:for-each select="/*/parameters/parameter[not(starts-with(name, '$') or ends-with(name, '.y') or filename)]">
                                 <!-- Here we don't know the type of the control so can't create the proper type of event -->
-                                <xxforms:event name="xxforms-value-or-activate" source-control-id="{name}">
+                                <!-- For input[@type = 'image'], filter .y events above, and remove ending .x below -->
+                                <xxforms:event name="xxforms-value-or-activate"
+                                               source-control-id="{if (ends-with(name, '.x')) then substring(name, 1, string-length(name) - 2) else name}">
                                     <xsl:value-of select="value"/>
                                 </xxforms:event>
                             </xsl:for-each>

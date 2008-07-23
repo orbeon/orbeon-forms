@@ -111,6 +111,11 @@ public class XFormsControlFactory {
                 return new XXFormsAttributeControl(containingDocument, parent, element, name, effectiveId);
             }
         });
+        nameToClassMap.put("text", new Factory() {
+            public XFormsControl createXFormsControl(XFormsContainingDocument containingDocument, XFormsControl parent, Element element, String name, String effectiveId) {
+                return new XXFormsTextControl(containingDocument, parent, element, name, effectiveId);
+            }
+        });
     }
 
     public static XFormsControl createXFormsControl(XFormsContainingDocument containingDocument, XFormsControl parent, Element element, String name, String effectiveId) {

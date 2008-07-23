@@ -13,10 +13,7 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
-import org.orbeon.oxf.xforms.XFormsControls;
-import org.orbeon.oxf.xforms.XFormsUtils;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsProperties;
+import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.state.XFormsStateManager;
 import org.orbeon.oxf.xforms.processor.XFormsFeatures;
@@ -26,6 +23,7 @@ import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.ElementHandlerController;
 import org.orbeon.oxf.util.URLRewriter;
 import org.orbeon.oxf.common.Version;
 import org.orbeon.saxon.om.FastStringBuffer;
@@ -51,6 +49,12 @@ public class XHTMLHeadHandler extends HandlerBase {
     public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
 
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
+
+        // Register control handlers on controller
+        {
+            final ElementHandlerController controller = handlerContext.getController();
+            controller.registerHandler(XXFormsTextHandler.class.getName(), XFormsConstants.XXFORMS_NAMESPACE_URI, "text");
+        }
 
         // Declare xmlns:f
         formattingPrefix = handlerContext.findFormattingPrefixDeclare();

@@ -41,6 +41,7 @@
     <xsl:variable name="is-noscript" select="not($is-form-builder) and doc('input:request')/request/parameters/parameter[name = 'fr-noscript']/value = 'true'"/>
 
     <!-- Properties -->
+    <xsl:variable name="has-toc" select="PipelineFunctionLibrary:property('oxf.fr.detail.toc') = 'true'" as="xs:boolean"/>
     <xsl:variable name="error-summary" select="PipelineFunctionLibrary:property('oxf.fr.detail.error-summary')" as="xs:string"/>
     <xsl:variable name="has-button-save-locally" select="PipelineFunctionLibrary:property('oxf.fr.detail.button.save-locally') = 'true'" as="xs:boolean"/>
     <xsl:variable name="is-noscript-table" select="PipelineFunctionLibrary:property('oxf.fr.detail.noscript.table') = 'false'" as="xs:boolean"/>
@@ -60,8 +61,39 @@
     <xsl:template match="/xhtml:html">
         <xhtml:html lang="{{xxforms:instance('fr-language-instance')}}"
                     xml:lang="{{xxforms:instance('fr-language-instance')}}">
-            <xsl:apply-templates select="@* | node()"/>
+            <xsl:apply-templates select="@*"/>
+
+            <!-- Global XForms variables -->
+            <xxforms:variable name="metadata-lang" select="xxforms:instance('fr-language-instance')"/>
+            <xxforms:variable name="source-form-metadata" select="xxforms:instance('fr-source-form-instance')/xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-metadata']/*"/>
+            <!-- Scope variable with Form Runner resources -->
+            <xxforms:variable name="fr-resources" select="xxforms:instance('fr-fr-current-resources')"/>
+
+            <!-- Title in chosen language from metadata, view, or HTML title -->
+            <!-- Title is used later  -->
+            <xsl:variable name="view-label" select="(/xhtml:html/xhtml:body//fr:view)[1]/xforms:label" as="element(xforms:label)?"/>
+            <xxforms:variable name="title"
+                              select="(($source-form-metadata/title[@xml:lang = $metadata-lang],
+                                        $source-form-metadata/title[1],
+                                        instance('fr-form-metadata')/title[@xml:lang = $metadata-lang],
+                                        instance('fr-form-metadata')/title[1],
+                                        ({$view-label/@ref}),
+                                        '{$view-label}',
+                                        /xhtml:html/xhtml:head/xhtml:title)[normalize-space() != ''])[1]"/>
+
+            <xsl:apply-templates select="node()"/>
         </xhtml:html>
+    </xsl:template>
+
+    <!-- Set XHTML title -->
+    <xsl:template match="xhtml:head/xhtml:title">
+        <xsl:copy>
+            <xsl:apply-templates select="@*"/>
+
+            <!-- Display localized errors count and form title -->
+            <xxforms:variable name="errors" select="count(xxforms:instance('fr-errors-instance')/error)" as="xs:integer"/>
+            <xforms:output value="if ($errors > 0) then concat($errors, ' ', $fr-resources/summary/titles/(if ($errors = 1) then error-count else errors-count), ' - ', $title) else $title"/>
+        </xsl:copy>
     </xsl:template>
 
     <!-- Add Form Runner models and scripts -->

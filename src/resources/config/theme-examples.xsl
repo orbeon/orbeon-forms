@@ -52,8 +52,7 @@
                 <!-- Handle head elements except scripts -->
                 <xsl:for-each select="/xhtml:html/xhtml:head/(xhtml:meta | xhtml:link | xhtml:style)">
                     <xsl:element name="xhtml:{local-name()}" namespace="{namespace-uri()}">
-                        <xsl:copy-of select="@*"/>
-                        <xsl:apply-templates/>
+                        <xsl:apply-templates select="@*|node()"/>
                     </xsl:element>
                 </xsl:for-each>
                 <!-- Orbeon Forms version -->
@@ -61,13 +60,6 @@
                 <!-- Favicon -->
                 <xhtml:link rel="shortcut icon" href="/ops/images/orbeon-icon-16.ico"/>
                 <xhtml:link rel="icon" href="/ops/images/orbeon-icon-16.png" type="image/png"/>
-                <!-- Scripts -->
-                <xsl:for-each select="/xhtml:html/xhtml:head/xhtml:script">
-                    <xsl:element name="xhtml:{local-name()}" namespace="{namespace-uri()}">
-                        <xsl:copy-of select="@*"/>
-                        <xsl:apply-templates/>
-                    </xsl:element>
-                </xsl:for-each>
             </xhtml:head>
             <xhtml:body>
                 <!-- Copy body attributes -->
@@ -174,6 +166,13 @@
                 </xhtml:table>
                 <xhtml:p class="ops-version">Orbeon Forms <xsl:value-of select="$orbeon-forms-version"/></xhtml:p>
             </xhtml:body>
+            <!-- Scripts at the bottom of the page. This is not valid HTML, but it is a recommended practice for
+                 performance as of early 2008. See http://developer.yahoo.com/performance/rules.html#js_bottom -->
+            <xsl:for-each select="/xhtml:html/xhtml:head/xhtml:script">
+                <xsl:element name="xhtml:{local-name()}" namespace="{namespace-uri()}">
+                    <xsl:apply-templates select="@*|node()"/>
+                </xsl:element>
+            </xsl:for-each>
         </xhtml:html>
     </xsl:template>
 

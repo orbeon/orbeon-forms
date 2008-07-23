@@ -3934,6 +3934,21 @@ ORBEON.xforms.Server = {
                                         }
                                     }
 
+                                    // Handle text updates
+                                    var textElements = ORBEON.util.Dom.getElementsByName(controlValuesElement, "text", xmlNamespace);
+                                    var textElementslength = textElements.length;
+                                    for (var j = 0; j < textElementslength; j++) {
+                                        var textElement = textElements[j];
+                                        var newTextValue = ORBEON.util.Dom.getStringValue(textElement);
+                                        var forAttribute = ORBEON.util.Dom.getAttribute(textElement, "for");
+                                        var htmlElement = ORBEON.util.Dom.getElementById(forAttribute);
+
+                                        if (htmlElement.tagName.toLowerCase() == "title") {
+                                            // Set HTML title
+                                            document.title = newTextValue;
+                                        }
+                                    }
+
                                     // Model item properties on a repeat item
                                     var repeatIterationElements = ORBEON.util.Dom.getElementsByName(controlValuesElement, "repeat-iteration", xmlNamespace);
                                     var repeatIterationElementslength = repeatIterationElements.length;

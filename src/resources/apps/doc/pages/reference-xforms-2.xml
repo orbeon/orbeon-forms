@@ -45,6 +45,70 @@
                 </li>
             </ul>
         </section>
+        <a name="controls-models-placement"/>
+        <section>
+            <title>Placement of Controls and Models</title>
+            <p>
+                XForms does not specify normatively where XForms controls and models must be placed within an HTML
+                document. The <a href="http://www.w3.org/TR/xforms11/#xforms-in-xhtml-00">convention</a> is to place
+                <code>&lt;xforms:model></code> elements within <code>&lt;xhtml:head></code>, and controls within
+                <code>&lt;xhtml:body></code>. Orbeon Forms is more flexible on this:
+            </p>
+            <ul>
+                <li>
+                    <p>
+                        <code>&lt;xforms:model></code> can be placed within <code>&lt;xhtml:head></code> as is usual,
+                        but also under <code>&lt;xhtml:body></code> and even nested within other XForms elements. For
+                        example:
+                    </p>
+                    <xml-source>
+                        <xxforms:dialog id="my-dialog" model="my-dialog-model">
+                            <xforms:label>My Dialog</xforms:label>
+                            <xforms:group>
+                                ...
+                            </xforms:group>
+                            <xforms:model id="my-dialog-model">
+                                <comment> Model used by the dialog </comment>
+                                ...
+                            </xforms:model>
+                        </xxforms:dialog>
+                    </xml-source>
+                    <p>
+                        In this particular case, this allows you to write your dialog as a module in a completely
+                        separate file and to XInclude that file within your main form.
+                    </p>
+                    <p>
+                        At the moment, nested models behave exactly as if they were placed under
+                        <code>&lt;xhtml:head></code>. It is just a syntactic convenience to be able to place them within
+                        elements such as <code>&lt;xxforms:dialog></code>.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Attribute Value Templates (AVTs) can be <a href="#avts-xhtml">placed on HTML elements outside
+                        <code>&lt;xhtml:body></code></a>.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        A single <code>&lt;xforms:output></code> control may be placed within
+                        <code>&lt;xhtml:title></code>. This allows dynamically changing the HTML document title using XForms.
+                    </p>
+                    <xml-source>
+                        <xhtml:title>
+                            <xforms:output value="instance('resources')/title"/>
+                        </xhtml:title>
+                    </xml-source>
+                </li>
+           </ul>
+            <note>
+                <p>
+                    Even though AVTs and <code>&lt;xforms:output></code> elements may be placed before any XForms
+                    model, they are still considered part of the XForms "view" of the XForms document and refer to data placed in
+                    models.
+                </p>
+            </note>
+        </section>
         <a name="xforms11-extensions"/>
         <a name="xforms11"/>
         <section>

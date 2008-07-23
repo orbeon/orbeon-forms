@@ -363,7 +363,7 @@
     <!-- Table of contents UI -->
     <xsl:template name="fr-toc">
         <!-- This is statically built in XSLT instead of using XForms -->
-        <xsl:if test="$is-detail and not($is-form-builder)">
+        <xsl:if test="$has-toc and $is-detail and not($is-form-builder)">
             <xhtml:div class="fr-toc">
                 <xhtml:h2>
                     <xforms:output value="$fr-resources/summary/titles/toc"/>

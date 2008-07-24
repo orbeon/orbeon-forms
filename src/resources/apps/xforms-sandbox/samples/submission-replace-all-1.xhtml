@@ -25,7 +25,13 @@
             <xforms:instance id="instance">
                 <name/>
             </xforms:instance>
-            <xforms:submission id="say-hello" method="post" action="/xforms-sandbox/sample/submission-replace-all-2" replace="all"/>
+            <xforms:instance id="orbeon-portlet">
+                <orbeon-portlet/>
+            </xforms:instance>
+            <xforms:submission id="say-hello" method="post" action="/xforms-sandbox/sample/submission-replace-all-2{
+                if (instance('orbeon-portlet') != '') then '?orbeon-portlet=true' else ''}" replace="all"/>
+            <xforms:setvalue ref="instance('orbeon-portlet')" value="xxforms:get-request-parameter('orbeon-portlet')" ev:event="xforms-ready"/>
+
         </xforms:model>
     </xhtml:head>
     <xhtml:body>

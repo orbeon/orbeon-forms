@@ -33,8 +33,6 @@
         <xhtml:div id="fr-view">
             <xhtml:div id="{if (@width = '750px') then 'doc' else if (@width = '950px') then 'doc2' else if (@width = '1154px') then 'doc-fb' else 'doc4'}"
                        class="{if (doc('input:instance')/*/mode = 'print') then ' fr-print-mode' else ''}">
-                <!-- Scope form resources -->
-                <xxforms:variable name="form-resources" select="xxforms:instance('fr-current-form-resources')"/>
                 <xhtml:div class="fr-header">
                     <xsl:if test="not(doc('input:instance')/*/mode = ('print', 'pdf'))">
                         <!-- Switch script/noscript -->

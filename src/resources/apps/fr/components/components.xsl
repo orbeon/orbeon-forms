@@ -68,6 +68,8 @@
             <xxforms:variable name="source-form-metadata" select="xxforms:instance('fr-source-form-instance')/xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-metadata']/*"/>
             <!-- Scope variable with Form Runner resources -->
             <xxforms:variable name="fr-resources" select="xxforms:instance('fr-fr-current-resources')"/>
+            <!-- Scope form resources -->
+            <xxforms:variable name="form-resources" select="xxforms:instance('fr-current-form-resources')"/>
 
             <!-- Title in chosen language from metadata, view, or HTML title -->
             <!-- Title is used later  -->

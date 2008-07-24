@@ -35,15 +35,16 @@ import java.util.Enumeration;
  *
  * o adds ids on all the XForms elements which don't have any
  * o gathers namespace information on XForms elements (xforms:* and xxforms:*).
- * o gathers ids of XHTML elements with AVTs
+ * o gathers ids of non-XForms elements with AVTs
  *
- * TODO: Should combine this with XFormsExtractorContentHandler?
+ * NOTE: There was a thought of merging this with XFormsExtractorContentHandler but we need a separate annotated
+ * document in XFormsToXHTML to produce the output. Since the handlers use the XForms and XHTML element ids, it doesn't
+ * seem that we can separate the steps.
  */
 public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHandler {
 
     private int currentId = 1;
     private int level = 0;
-    private int xformsInstanceLevel = -1;
     private boolean inHead;
     private boolean inTitle;
 
@@ -62,6 +63,11 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
     private final String[] reusableStringArray = new String[1];
 
     private String htmlTitleElementId;
+
+    private boolean inXForms;       // whether we are in a model
+    private int xformsLevel;
+    private boolean inPreserve;     // whether we are in a label, etc., schema or instance
+    private int preserveLevel;
 
     /**
      * This constructor just computes the namespace mappings and AVT elements
@@ -98,12 +104,33 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
 
         namespaceSupport.startElement();
 
-        level++;
+        // Check for XForms or extension namespaces
+        final boolean isXForms = XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri);
+        final boolean isXXForms = XFormsConstants.XXFORMS_NAMESPACE_URI.equals(uri);
+        final boolean isEXForms = XFormsConstants.EXFORMS_NAMESPACE_URI.equals(uri);
+        final boolean isXFormsOrExtension = isXForms || isXXForms || isEXForms;
 
-        if (xformsInstanceLevel >= 0) {
-            // Don't generate ids within an XForms instance
+        // Entering model or controls
+        if (!inXForms && isXFormsOrExtension) {
+            inXForms = true;
+            xformsLevel = level;
+        }
+
+        // Check for preserved content
+        if (inXForms && !inPreserve) {
+            // Preserve as is the content of labels, etc., instances, and schemas
+            if (XFormsConstants.LABEL_HINT_HELP_ALERT_ELEMENT.get(localname) != null
+                    || "instance".equals(localname)
+                    || "schema".equals(localname) && XMLConstants.XSD_URI.equals(uri)) {
+                inPreserve = true;
+                preserveLevel = level;
+            }
+        }
+
+        if (inPreserve) {
+            // Don't do anything fancy
             super.startElement(uri, localname, qName, attributes);
-        } else if (XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri) || XFormsConstants.XXFORMS_NAMESPACE_URI.equals(uri)) {
+        } else if (isXFormsOrExtension) {
             // This is an XForms element
 
             // Create a new id and update the attributes if needed
@@ -119,22 +146,17 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
                 super.startElement(uri, localname, qName, attributes);
             }
 
-            if ("instance".equals(localname)) { // NOTE: this catches xforms:instance AND xxforms:instance (shouldn't be a problem...)
-                // Entering instance
-                xformsInstanceLevel = level;
-            }
-
-        } else if (XMLConstants.XHTML_NAMESPACE_URI.equals(uri)) {
-            // XHTML element
+        } else {
+            // Non-XForms element
 
             String htmlElementId = null;
 
-            if (level == 2) {
+            if (level == 1) {
                 if ("head".equals(localname)) {
                     // Entering head
                     inHead = true;
                 }
-            } else if (level == 3) {
+            } else if (level == 2) {
                 if (inHead && "title".equals(localname)) {
                     // Entering title
                     inTitle = true;
@@ -146,7 +168,7 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
             }
 
             if (hostLanguageAVTs) {
-                // This is an XHTML element and we allow AVTs
+                // This is a non-XForms element and we allow AVTs
                 final int attributesCount = attributes.getLength();
                 if (attributesCount > 0) {
                     boolean elementOutput = false;
@@ -201,24 +223,29 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
                 // No attributes, just output the element
                 super.startElement(uri, localname, qName, attributes);
             }
-        } else {
-            super.startElement(uri, localname, qName, attributes);
         }
+
+        level++;
     }
 
     public void endElement(String uri, String localname, String qName) throws SAXException {
 
-        if (level == xformsInstanceLevel) {
-            // Exiting xforms:instance
-            xformsInstanceLevel = -1;
+        level--;
+
+        if (inPreserve && level == preserveLevel) {
+            // Leaving preserved content
+            inPreserve = false;
+        } if (inXForms && level == xformsLevel) {
+            // Leaving model or controls
+            inXForms = false;
         }
 
-        if (level == 2) {
+        if (level == 1) {
             if ("head".equals(localname)) {
                 // Exiting head
                 inHead = false;
             }
-        } else if (level == 3) {
+        } else if (level == 2) {
             if ("title".equals(localname)) {
                 // Exiting title
                 inTitle = false;
@@ -233,8 +260,6 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
             // Leave element untouched
             super.endElement(uri, localname, qName);
         }
-
-        level--;
 
         namespaceSupport.endElement();
     }

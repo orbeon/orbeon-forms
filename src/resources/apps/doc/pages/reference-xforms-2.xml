@@ -1482,6 +1482,15 @@
                             ...
                         </xhtml:html>
                     </xml-source>
+                    <p>
+                        AVTs are also usable on HTML elements within <code>&lt;xforms:label></code>,
+                        <code>&lt;xforms:hint></code>, <code>&lt;xforms:help></code>, <code>&lt;xforms:alert></code>:
+                    </p>
+                    <xml-source>
+                        <xforms:input ref="foobar">
+                            <xforms:label><xhtml:span class="{if (. = 'green') then 'green' else 'red'}-label">Inverted label</xhtml:span></xforms:label>
+                        </xforms:input>
+                    </xml-source>
                     <note>
                         <p>
                             It is not possible to use AVTs within the <code>id</code> attribute of XHTML elements.

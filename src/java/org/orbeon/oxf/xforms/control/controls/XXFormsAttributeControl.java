@@ -31,6 +31,11 @@ public class XXFormsAttributeControl extends XFormsValueControl implements XForm
     private String forAttribute;
     private String nameAttribute;
     private String valueAttribute;
+    
+    public XXFormsAttributeControl(XFormsContainingDocument containingDocument, Element element, String valueAttribute) {
+        super(containingDocument, null, element, element.getName(), null);
+        this.valueAttribute = valueAttribute;
+    }
 
     public XXFormsAttributeControl(XFormsContainingDocument containingDocument, XFormsControl parent, Element element, String name, String effectiveId) {
         super(containingDocument, parent, element, name, effectiveId);
@@ -57,10 +62,6 @@ public class XXFormsAttributeControl extends XFormsValueControl implements XForm
         }
 
         super.setValue(rawValue);
-    }
-
-    public String getForAttribute() {
-        return forAttribute;
     }
 
     public String getNameAttribute() {

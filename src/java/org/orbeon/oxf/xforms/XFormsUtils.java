@@ -26,6 +26,7 @@ import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.util.NumberUtils;
 import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl;
+import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl;
 import org.orbeon.oxf.xforms.event.events.XFormsLinkErrorEvent;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.*;
@@ -1189,6 +1190,7 @@ public class XFormsUtils {
         private final boolean[] containsHTML;
         private final FastStringBuffer sb;
         private final Element childElement;
+        private final boolean hostLanguageAVTs;
 
         // Constructor for "static" case, i.e. when we know the child element cannot have dynamic content
         public ChildElementVisitorListener(boolean acceptHTML, boolean[] containsHTML, FastStringBuffer sb, Element childElement) {
@@ -1199,6 +1201,7 @@ public class XFormsUtils {
             this.containsHTML = containsHTML;
             this.sb = sb;
             this.childElement = childElement;
+            this.hostLanguageAVTs = false;
         }
 
         // Constructor for "dynamic" case, i.e. when we know the child element can have dynamic content
@@ -1210,6 +1213,7 @@ public class XFormsUtils {
             this.containsHTML = containsHTML;
             this.sb = sb;
             this.childElement = childElement;
+            this.hostLanguageAVTs = XFormsProperties.isHostLanguageAVTs();
         }
 
         public void startElement(Element element) {
@@ -1263,15 +1267,35 @@ public class XFormsUtils {
                     for (Iterator i = attributes.iterator(); i.hasNext();) {
                         final Attribute currentAttribute = (Attribute) i.next();
 
-                        final String currentName = currentAttribute.getName();
-                        final String currentValue = currentAttribute.getValue();
+                        final String currentAttributeName = currentAttribute.getName();
+                        final String currentAttributeValue = currentAttribute.getValue();
+
+                        final String resolvedValue;
+                        if (hostLanguageAVTs && currentAttributeValue.indexOf('{') != -1) {
+                            // This is an AVT
+                            final XXFormsAttributeControl attributeControl
+                                    = new XXFormsAttributeControl(containingDocument, element, currentAttributeValue);
+
+                            contextStack.pushBinding(pipelineContext, element);
+                            {
+                                attributeControl.setBindingContext(contextStack.getCurrentBindingContext());
+                                attributeControl.evaluateIfNeeded(pipelineContext);
+                            }
+                            contextStack.popBinding();
+
+                            resolvedValue = attributeControl.getExternalValue(pipelineContext);
+                        } else {
+                            // Simply use control value
+                            resolvedValue = currentAttributeValue;
+                        }
 
                         // Only consider attributes in no namespace
                         if ("".equals(currentAttribute.getNamespaceURI())) {
                             sb.append(' ');
-                            sb.append(currentName);
+                            sb.append(currentAttributeName);
                             sb.append("=\"");
-                            sb.append(XMLUtils.escapeXMLMinimal(currentValue));
+                            if (resolvedValue != null)
+                                sb.append(XMLUtils.escapeXMLMinimal(resolvedValue));
                             sb.append('"');
                         }
                     }

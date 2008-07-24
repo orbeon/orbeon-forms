@@ -17,11 +17,45 @@ import org.dom4j.Namespace;
 import org.dom4j.QName;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xforms.action.XFormsActions;
+
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  * Constants useful for the XForms engine. 
  */
 public class XFormsConstants {
+
+    public static final Map ALLOWED_XXFORMS_ELEMENTS = new HashMap();
+    public static final Map ALLOWED_EXFORMS_ELEMENTS = new HashMap();
+    public static final Map LABEL_HINT_HELP_ALERT_ELEMENT = new HashMap();
+        
+    static {
+        ALLOWED_XXFORMS_ELEMENTS.put(XFormsActions.XXFORMS_SCRIPT_ACTION, "");
+        ALLOWED_XXFORMS_ELEMENTS.put(XFormsActions.XXFORMS_SHOW_ACTION, "");
+        ALLOWED_XXFORMS_ELEMENTS.put(XFormsActions.XXFORMS_HIDE_ACTION, "");
+        ALLOWED_XXFORMS_ELEMENTS.put(XFormsActions.XXFORMS_ONLINE_ACTION, "");
+        ALLOWED_XXFORMS_ELEMENTS.put(XFormsActions.XXFORMS_OFFLINE_ACTION, "");
+        ALLOWED_XXFORMS_ELEMENTS.put(XFormsActions.XXFORMS_OFFLINE_SAVE_ACTION, "");
+        ALLOWED_XXFORMS_ELEMENTS.put("dialog", "");
+        ALLOWED_XXFORMS_ELEMENTS.put("variable", "");
+        ALLOWED_XXFORMS_ELEMENTS.put("attribute", "");
+        ALLOWED_XXFORMS_ELEMENTS.put("text", "");
+        ALLOWED_XXFORMS_ELEMENTS.put("context", "");
+        ALLOWED_XXFORMS_ELEMENTS.put("size", "");//xforms:upload/xxforms:size
+    }
+
+    static {
+        ALLOWED_EXFORMS_ELEMENTS.put("variable", "");
+    }
+
+    static {
+        XFormsConstants.LABEL_HINT_HELP_ALERT_ELEMENT.put("label", "");
+        XFormsConstants.LABEL_HINT_HELP_ALERT_ELEMENT.put("hint", "");
+        XFormsConstants.LABEL_HINT_HELP_ALERT_ELEMENT.put("help", "");
+        XFormsConstants.LABEL_HINT_HELP_ALERT_ELEMENT.put("alert", "");
+    }
 
     public static final String XFORMS_PREFIX = "xforms";
     public static final String XFORMS_SHORT_PREFIX = "xf";

@@ -16,12 +16,12 @@ package org.orbeon.oxf.xforms.processor;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.servlet.OPSXFormsFilter;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsProperties;
-import org.orbeon.oxf.xforms.action.XFormsActions;
 import org.orbeon.oxf.xml.*;
+import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.oxf.servlet.OPSXFormsFilter;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
@@ -67,35 +67,6 @@ import java.util.*;
  * </static-state>
  */
 public class XFormsExtractorContentHandler extends ForwardingContentHandler {
-
-    private static final Map ALLOWED_XXFORMS_ELEMENTS = new HashMap();
-    static {
-        ALLOWED_XXFORMS_ELEMENTS.put(XFormsActions.XXFORMS_SCRIPT_ACTION, "");
-        ALLOWED_XXFORMS_ELEMENTS.put(XFormsActions.XXFORMS_SHOW_ACTION, "");
-        ALLOWED_XXFORMS_ELEMENTS.put(XFormsActions.XXFORMS_HIDE_ACTION, "");
-        ALLOWED_XXFORMS_ELEMENTS.put(XFormsActions.XXFORMS_ONLINE_ACTION, "");
-        ALLOWED_XXFORMS_ELEMENTS.put(XFormsActions.XXFORMS_OFFLINE_ACTION, "");
-        ALLOWED_XXFORMS_ELEMENTS.put(XFormsActions.XXFORMS_OFFLINE_SAVE_ACTION, "");
-        ALLOWED_XXFORMS_ELEMENTS.put("dialog", "");
-        ALLOWED_XXFORMS_ELEMENTS.put("variable", "");
-        ALLOWED_XXFORMS_ELEMENTS.put("attribute", "");
-        ALLOWED_XXFORMS_ELEMENTS.put("text", "");
-        ALLOWED_XXFORMS_ELEMENTS.put("context", "");
-        ALLOWED_XXFORMS_ELEMENTS.put("size", "");//xforms:upload/xxforms:size
-    }
-
-    private static final Map ALLOWED_EXFORMS_ELEMENTS = new HashMap();
-    static {
-        ALLOWED_EXFORMS_ELEMENTS.put("variable", "");
-    }
-
-    private static final Map LABEL_HINT_HELP_ALERT_ELEMENT = new HashMap();
-    static {
-        LABEL_HINT_HELP_ALERT_ELEMENT.put("label", "");
-        LABEL_HINT_HELP_ALERT_ELEMENT.put("hint", "");
-        LABEL_HINT_HELP_ALERT_ELEMENT.put("help", "");
-        LABEL_HINT_HELP_ALERT_ELEMENT.put("alert", "");
-    }
 
     private Locator locator;
     private LocationData locationData;
@@ -256,16 +227,16 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
 
             if (isXXForms) {
                 // Check that we are getting a valid xxforms:* element if used in body
-                if (ALLOWED_XXFORMS_ELEMENTS.get(localname) == null)
+                if (XFormsConstants.ALLOWED_XXFORMS_ELEMENTS.get(localname) == null)
                     throw new ValidationException("Invalid element in XForms document: xxforms:" + localname, new LocationData(locator));
             } else if (isEXForms) {
                 // Check that we are getting a valid exforms:* element if used in body
-                if (ALLOWED_EXFORMS_ELEMENTS.get(localname) == null)
+                if (XFormsConstants.ALLOWED_EXFORMS_ELEMENTS.get(localname) == null)
                     throw new ValidationException("Invalid element in XForms document: exforms:" + localname, new LocationData(locator));
             }
 
             // Preserve as is the content of labels, etc., instances, and schemas
-            if (LABEL_HINT_HELP_ALERT_ELEMENT.get(localname) != null || "instance".equals(localname)
+            if (XFormsConstants.LABEL_HINT_HELP_ALERT_ELEMENT.get(localname) != null || "instance".equals(localname)
                     || "schema".equals(localname) && XMLConstants.XSD_URI.equals(uri)) {
                 inPreserve = true;
                 preserveLevel = level;
@@ -306,6 +277,7 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
 
         level--;
 
+        // Check for XForms or extension namespaces
         final boolean isXForms = XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri);
         final boolean isXXForms = XFormsConstants.XXFORMS_NAMESPACE_URI.equals(uri);
         final boolean isEXForms = XFormsConstants.EXFORMS_NAMESPACE_URI.equals(uri);
@@ -320,7 +292,7 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
             // Leaving preserved content
             inPreserve = false;
         } if (inXForms && level == xformsLevel) {
-            // Leaving model
+            // Leaving model or controls
             inXForms = false;
             sendEndPrefixMappings();
         }

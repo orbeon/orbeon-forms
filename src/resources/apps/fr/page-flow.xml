@@ -116,8 +116,8 @@
     </page>
 
     <!-- Custom pages provided by the project -->
-    <page path-info="/fr/page/custom/([^/]+)/.*" matcher="oxf:perl5-matcher"
-          model="/forms/${1}/page/page-flow.xml"/>
+    <page path-info="/fr/page/custom/([^/]+)/([^/]+)" matcher="oxf:perl5-matcher"
+          view="/forms/${1}/page/${2}.xhtml"/>
 
     <!-- ==== Built-in eXist-based Persistence Services ==== -->
 
@@ -154,8 +154,8 @@
     <page path-info="/fr/service/import-export/save-generate" view="import-export/save-generate.xpl"/>
 
     <!-- Custom services provided by the project -->
-    <page path-info="/fr/service/custom/([^/]+)/.*" matcher="oxf:perl5-matcher"
-          model="/forms/${1}/service/page-flow.xml"/>
+    <page path-info="/fr/service/custom/([^/]+)/([^/]+)" matcher="oxf:perl5-matcher"
+          view="/forms/${1}/service/${2}.xpl"/>
 
     <epilogue url="oxf:/config/epilogue.xpl"/>
 

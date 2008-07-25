@@ -1272,7 +1272,7 @@ public class XFormsUtils {
 
                         final String resolvedValue;
                         if (hostLanguageAVTs && currentAttributeValue.indexOf('{') != -1) {
-                            // This is an AVT
+                            // This is an AVT, use attribute control to produce the output
                             final XXFormsAttributeControl attributeControl
                                     = new XXFormsAttributeControl(containingDocument, element, currentAttributeValue);
 

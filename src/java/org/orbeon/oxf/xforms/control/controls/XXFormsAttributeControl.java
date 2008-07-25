@@ -31,11 +31,6 @@ public class XXFormsAttributeControl extends XFormsValueControl implements XForm
     private String forAttribute;
     private String nameAttribute;
     private String valueAttribute;
-    
-    public XXFormsAttributeControl(XFormsContainingDocument containingDocument, Element element, String valueAttribute) {
-        super(containingDocument, null, element, element.getName(), null);
-        this.valueAttribute = valueAttribute;
-    }
 
     public XXFormsAttributeControl(XFormsContainingDocument containingDocument, XFormsControl parent, Element element, String name, String effectiveId) {
         super(containingDocument, parent, element, name, effectiveId);
@@ -44,6 +39,18 @@ public class XXFormsAttributeControl extends XFormsValueControl implements XForm
         this.forAttribute = element.attributeValue("for");
         this.nameAttribute = element.attributeValue("name");
         this.valueAttribute = element.attributeValue("value");
+    }
+
+    /**
+     * Special constructor used for label, etc. content AVT handling.
+     *
+     * @param containingDocument    containing document
+     * @param element               control element (should not be used here)
+     * @param avtExpression         attribute template expression
+     */
+    public XXFormsAttributeControl(XFormsContainingDocument containingDocument, Element element, String avtExpression) {
+        super(containingDocument, null, element, element.getName(), null);
+        this.valueAttribute = avtExpression;
     }
 
     protected void evaluateValue(final PipelineContext pipelineContext) {

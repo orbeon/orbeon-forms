@@ -3943,7 +3943,7 @@ ORBEON.xforms.Server = {
                                         var forAttribute = ORBEON.util.Dom.getAttribute(textElement, "for");
                                         var htmlElement = ORBEON.util.Dom.getElementById(forAttribute);
 
-                                        if (htmlElement.tagName.toLowerCase() == "title") {
+                                        if (htmlElement != null && htmlElement.tagName.toLowerCase() == "title") {
                                             // Set HTML title
                                             document.title = newTextValue;
                                         }

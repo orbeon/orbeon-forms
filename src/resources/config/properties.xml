@@ -82,6 +82,7 @@
     <property as="xs:boolean" name="oxf.xforms.session-heartbeat"                    value="true"/>
     <property as="xs:boolean" name="oxf.xforms.host-language-avts"                   value="true"/>
     <property as="xs:boolean" name="oxf.xforms.noscript"                             value="false"/>
+    <!--<property as="xs:boolean" name="oxf.xforms.noscript.select-full-fieldsets"       value="false"/>-->
     <property as="xs:integer" name="oxf.xforms.offline-repeat-count"                 value="4"/>
     <property as="xs:integer" name="oxf.xforms.request-retries"                      value="1"/>
 
@@ -97,6 +98,10 @@
     <property as="xs:boolean" name="oxf.fr.detail.toc"                               value="true"/>
     <property as="xs:string"  name="oxf.fr.detail.error-summary"                     value="bottom"/>
     <property as="xs:boolean" name="oxf.fr.detail.button.save-locally"               value="false"/>
+    <property as="xs:boolean" name="oxf.fr.detail.button.close"                      value="true"/>
+    <property as="xs:boolean" name="oxf.fr.detail.button.clear"                      value="true"/>
+    <property as="xs:boolean" name="oxf.fr.detail.button.print"                      value="true"/>
+    <property as="xs:boolean" name="oxf.fr.detail.button.pdf"                        value="true"/>
 
     <!-- Deprecated XForms cache configuration -->
     <property as="xs:integer" name="oxf.xforms.cache.session.size"                   value="500000"/>

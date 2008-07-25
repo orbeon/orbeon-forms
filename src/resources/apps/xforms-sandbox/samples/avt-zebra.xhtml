@@ -37,14 +37,17 @@
         </xforms:model>
         <xhtml:style type="text/css">
             .zebra-table { border-collapse: collapse; border: 1px solid gray; width: 20em }
-            .zebra-row-even { background-color: gray }
+            .zebra-table th { background-color: lightgray; color: black }
+            .zebra-row-even { background-color: lightgray }
             .zebra-row-odd { background-color: white }
+            .xforms-label { display: block }
         </xhtml:style>
     </xhtml:head>
     <xhtml:body>
         <xhtml:table class="zebra-table">
             <xhtml:thead>
                 <xhtml:tr>
+                    <xhtml:th>Position</xhtml:th>
                     <xhtml:th>Fruit</xhtml:th>
                 </xhtml:tr>
             </xhtml:thead>
@@ -52,11 +55,14 @@
                 <xforms:repeat nodeset="*">
                     <xhtml:tr class="zebra-row-{if (position() mod 2 = 0) then 'even' else 'odd'}">
                         <xhtml:td>
-                            <xforms:output value="."/>
+                            <xforms:output value="position()"/>
                         </xhtml:td>
-                        <!--<xhtml:td>-->
-                            <!--<xforms:output value="../*[context()/position()]"/>-->
-                        <!--</xhtml:td>-->
+                        <xhtml:td>
+                            <xxforms:variable name="position" select="position()"/>
+                            <xforms:output value="."><!-- Should ../*[context()/position()] work too? -->
+                                <xforms:label><xhtml:span class="zebra-row-{if ($position mod 2 = 1) then 'even' else 'odd'}">Inverted label</xhtml:span></xforms:label>
+                            </xforms:output>
+                        </xhtml:td>
                     </xhtml:tr>
                 </xforms:repeat>
             </xhtml:tbody>

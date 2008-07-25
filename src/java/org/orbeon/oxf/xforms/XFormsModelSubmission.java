@@ -22,6 +22,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.XPathCache;
+import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.xforms.action.actions.XFormsLoadAction;
 import org.orbeon.oxf.xforms.action.actions.XFormsSetvalueAction;
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
@@ -695,15 +696,15 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         } else {
                             // Log message mody for debugging purposes
                             if (XFormsServer.logger.isDebugEnabled())
-                                XFormsSubmissionUtils.logRequestBody(containingDocument, actualRequestMediatype, messageBody);
+                                NetUtils.logRequestBody(containingDocument, actualRequestMediatype, messageBody);
                         }
 
                         // Do as if we are receiving a regular XML response
                         connectionResult = new ConnectionResult(null);
                         connectionResult.statusCode = 200;
                         connectionResult.responseHeaders = new HashMap();
-                        connectionResult.lastModified = 0;
-                        connectionResult.responseMediaType = "application/xml";// should we use actualRequestMediatype instead?
+                        connectionResult.setLastModified(null);
+                        connectionResult.setResponseContentType("application/xml");// should we use actualRequestMediatype instead?
                         connectionResult.dontHandleResponse = false;
                         connectionResult.setResponseInputStream(new ByteArrayInputStream(messageBody));
 
@@ -782,7 +783,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                 containingDocument.logDebug("submission", "using instance from application shared instance cache",
                                         new String[] { "instance", replaceInstance.getEffectiveId() });
 
-                            final URL absoluteResolvedURL = XFormsSubmissionUtils.createAbsoluteURL(resolvedURL, queryString, externalContext);
+                            final URL absoluteResolvedURL = NetUtils.createAbsoluteURL(resolvedURL, queryString, externalContext);
                             final String absoluteResolvedURLString = absoluteResolvedURL.toExternalForm();
 
                             final SharedXFormsInstance sharedInstance
@@ -800,9 +801,10 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                             submitDoneEvent = new XFormsSubmitDoneEvent(XFormsModelSubmission.this, absoluteResolvedURLString, 200);
                         } else {
                             // Perform actual submission
-                            connectionResult = XFormsSubmissionUtils.doRegular(externalContext, containingDocument,
+                            connectionResult = NetUtils.openConnection(externalContext, containingDocument,
                                     actualHttpMethod, resolvedURL, resolvedXXFormsUsername, resolvedXXFormsPassword, actualRequestMediatype,
-                                    messageBody, queryString, headerNames, headerNameValues);
+                                    messageBody, queryString,
+                                    headerNames, headerNameValues, XFormsProperties.getForwardSubmissionHeaders(containingDocument));
                         }
                     }
 
@@ -828,7 +830,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                     final ExternalContext.Response response = containingDocument.getResponse();
 
                                     // Set content-type
-                                    response.setContentType(connectionResult.responseMediaType);
+                                    response.setContentType(connectionResult.getResponseContentType());
 
                                     // Set target in noscript mode
                                     if (isNoscript && resolvedXXFormsTarget != null) {
@@ -853,7 +855,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                                 } else if (isReplaceInstance) {
 
-                                    if (XMLUtils.isXMLMediatype(connectionResult.responseMediaType)) {
+                                    if (XMLUtils.isXMLMediatype(connectionResult.getResponseMediaType())) {
                                         // Handling of XML media type
                                         // Set new instance document to replace the one submitted
 
@@ -909,7 +911,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                     } else {
                                         // Other media type
                                         submitErrorEvent = createErrorEvent(pipelineContext, connectionResult, XFormsSubmitErrorEvent.ErrorType.RESOURCE_ERROR);
-                                        throw new XFormsSubmissionException("Body received with non-XML media type for replace=\"instance\": " + connectionResult.responseMediaType, "processing instance replacement");
+                                        throw new XFormsSubmissionException("Body received with non-XML media type for replace=\"instance\": " + connectionResult.getResponseMediaType(), "processing instance replacement");
                                     }
                                 } else if (isReplaceText) {
 
@@ -921,11 +923,11 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                                     // Get response body
                                     String responseBody = "";
-                                    if (XMLUtils.isTextContentType(connectionResult.responseMediaType)) {
+                                    if (XMLUtils.isTextContentType(connectionResult.getResponseMediaType())) {
                                         // Text mediatype (including text/xml), read stream into String
                                         try {
-                                            final String charset = NetUtils.getTextCharsetFromContentType(connectionResult.responseMediaType);
-                                            final Reader reader = new InputStreamReader(connectionResult.responseInputStream, charset);
+                                            final String charset = NetUtils.getTextCharsetFromContentType(connectionResult.getResponseContentType());
+                                            final Reader reader = new InputStreamReader(connectionResult.getResponseInputStream(), charset);
                                             try {
                                                 responseBody = NetUtils.readStreamAsString(reader);
                                             } finally {
@@ -937,11 +939,11 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                         } catch (Exception e) {
                                             XFormsServer.logger.error("XForms - submission - error while reading response body ", e);
                                         }
-                                    } else if (XMLUtils.isXMLMediatype(connectionResult.responseMediaType)) {
+                                    } else if (XMLUtils.isXMLMediatype(connectionResult.getResponseMediaType())) {
                                         // XML mediatype other than text/xml
 
                                         // TODO: What should we do if the response Content-Type includes a charset parameter?
-                                        final Reader reader = XMLUtils.getReaderFromXMLInputStream(connectionResult.resourceURI, connectionResult.responseInputStream);
+                                        final Reader reader = XMLUtils.getReaderFromXMLInputStream(connectionResult.resourceURI, connectionResult.getResponseInputStream());
                                         try {
                                             responseBody = NetUtils.readStreamAsString(reader);
                                         } finally {
@@ -964,7 +966,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                         // concludes after dispatching xforms-submit-error with appropriate context
                                         // information, including an error-type of resource-error."
                                         submitErrorEvent = createErrorEvent(pipelineContext, connectionResult, XFormsSubmitErrorEvent.ErrorType.RESOURCE_ERROR);
-                                        throw new XFormsSubmissionException("Mediatype is neither text nor XML for replace=\"text\": " + connectionResult.responseMediaType, "reading response body");
+                                        throw new XFormsSubmissionException("Mediatype is neither text nor XML for replace=\"text\": " + connectionResult.getResponseMediaType(), "reading response body");
                                     }
 
                                     // Find target location
@@ -1221,104 +1223,6 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
     private XFormsSubmitErrorEvent createErrorEvent(PipelineContext pipelineContext, ConnectionResult connectionResult, ErrorType errorType) throws IOException {
         return new XFormsSubmitErrorEvent(pipelineContext, XFormsModelSubmission.this, errorType, connectionResult);
-    }
-
-    public static class ConnectionResult {
-        public boolean dontHandleResponse;
-        public int statusCode;
-        public String responseMediaType;
-        public Map responseHeaders;
-        public long lastModified;
-        public String resourceURI;
-
-        private InputStream responseInputStream;
-        private boolean hasContent;
-
-        public ConnectionResult(String resourceURI) {
-            this.resourceURI = resourceURI;
-        }
-
-        public InputStream getResponseInputStream() {
-        	return responseInputStream;
-        }
-
-        public boolean hasContent() {
-            return hasContent;
-        }
-
-        public void setResponseInputStream(final InputStream responseInputStream) throws IOException {
-        	this.responseInputStream = responseInputStream;
-        	setHasContentFlag();
-
-        }
-
-        private void setHasContentFlag() throws IOException {
-            if (responseInputStream == null) {
-                hasContent = false;
-            } else {
-                if (!responseInputStream.markSupported())
-                    this.responseInputStream = new BufferedInputStream(responseInputStream);
-
-                responseInputStream.mark(1);
-                hasContent = responseInputStream.read() != -1;
-                responseInputStream.reset();
-            }
-        }
-
-        public void forwardHeaders(ExternalContext.Response response) {
-            if (responseHeaders != null) {
-                for (Iterator i = responseHeaders.entrySet().iterator(); i.hasNext();) {
-                    final Map.Entry currentEntry = (Map.Entry) i.next();
-                    final String headerName = (String) currentEntry.getKey();
-
-                    if (headerName != null) {
-                        // NOTE: As per the doc, this should always be a List, but for some unknown reason
-                        // it appears to be a String sometimes
-                        if (currentEntry.getValue() instanceof String) {
-                            // Case of String
-                            final String headerValue = (String) currentEntry.getValue();
-                            forwardHeaderFilter(response, headerName, headerValue);
-                        } else {
-                            // Case of List
-                            final List headerValues = (List) currentEntry.getValue();
-                            if (headerValues != null) {
-                                for (Iterator j = headerValues.iterator(); j.hasNext();) {
-                                    final String headerValue = (String) j.next();
-                                    if (headerValue != null) {
-                                        forwardHeaderFilter(response, headerName, headerValue);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        private void forwardHeaderFilter(ExternalContext.Response response, String headerName, String headerValue) {
-            /**
-             * Filtering the Transfer-Encoding header
-             *
-             * We don't pass the Transfer-Encoding header, as the request body is
-             * already decoded for us. Passing along the Transfer-Encoding causes a
-             * problem if the server sends us chunked data and we send it in the
-             * response not chunked but saying in the header that it is chunked.
-             *
-             * Non-filtering of Content-Encoding header
-             *
-             * The Content-Encoding has the potential of causing the same problem as
-             * the Transfer-Encoding header. It could be an issue if we get data with
-             * Content-Encoding: gzip, but pass it along uncompressed but still
-             * include the Content-Encoding: gzip. However this does not happen, as
-             * the request we send does not contain a Accept-Encoding: gzip,deflate. So
-             * filtering the Content-Encoding header is safe here.
-             */
-            if (!"transfer-encoding".equals(headerName.toLowerCase())) {
-                response.addHeader(headerName, headerValue);
-            }
-        }
-
-        public void close() {}
     }
 
     private class XFormsSubmissionException extends ValidationException {

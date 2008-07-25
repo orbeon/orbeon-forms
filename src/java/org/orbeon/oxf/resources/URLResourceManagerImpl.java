@@ -16,6 +16,7 @@ package org.orbeon.oxf.resources;
 import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.LoggerFactory;
+import org.orbeon.oxf.util.NetUtils;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -88,14 +89,7 @@ public class URLResourceManagerImpl extends ResourceManagerBase {
     public long lastModifiedImpl(String key, boolean doNotThrowResourceNotFound) {
         URL url = getURL(key);
         try {
-            URLConnection conn = url.openConnection();
-            if (conn instanceof HttpURLConnection)
-                ((HttpURLConnection) conn).setRequestMethod("HEAD");
-            try {
-                return conn.getLastModified();
-            } finally {
-                conn.getInputStream().close();
-            }
+            return NetUtils.getLastModified(url);
         } catch (IOException e) {
             if (doNotThrowResourceNotFound) return -1;
             else throw new ResourceNotFoundException("Cannot connect to URL " + url);
@@ -109,9 +103,9 @@ public class URLResourceManagerImpl extends ResourceManagerBase {
     public int length(String key) {
         if (logger.isDebugEnabled())
             logger.debug("length(" + key + ")");
-        URL url = getURL(key);
+        final URL url = getURL(key);
         try {
-            URLConnection conn = url.openConnection();
+            final URLConnection conn = url.openConnection();
             if (conn instanceof HttpURLConnection)
                 ((HttpURLConnection) conn).setRequestMethod("HEAD");
             try {
@@ -120,7 +114,7 @@ public class URLResourceManagerImpl extends ResourceManagerBase {
                 conn.getInputStream().close();
             }
         } catch (IOException e) {
-            throw new ResourceNotFoundException("Cannot connect to URL " + getURL(key));
+            throw new ResourceNotFoundException("Cannot connect to URL " + url);
         }
     }
 

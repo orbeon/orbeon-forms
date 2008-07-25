@@ -21,6 +21,7 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
+import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.event.*;
@@ -481,7 +482,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                             final boolean optimizeForPortlets = !NetUtils.urlHasProtocol(instanceResource)
                                                         && externalContext.getRequest().getContainerType().equals("portlet");
 
-                            final XFormsModelSubmission.ConnectionResult connectionResult;
+                            final ConnectionResult connectionResult;
                             if (optimizeForPortlets) {
                                 // Use optimized local mode
 
@@ -544,7 +545,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                                         absoluteResolvedURLString = resolvedURL;
                                     } else {
                                         // URL is regular URL, make sure it is absolute
-                                        absoluteResolvedURL = XFormsSubmissionUtils.createAbsoluteURL(resolvedURL, null, externalContext);
+                                        absoluteResolvedURL = NetUtils.createAbsoluteURL(resolvedURL, null, externalContext);
                                         absoluteResolvedURLString = absoluteResolvedURL.toExternalForm();
                                     }
                                 }
@@ -563,8 +564,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                                         containingDocument.logDebug("model", "getting document from URI",
                                                 new String[] { "URI", absoluteResolvedURLString });
 
-                                    connectionResult = XFormsSubmissionUtils.doRegular(externalContext, containingDocument,
-                                            "GET", absoluteResolvedURL, xxformsUsername, xxformsPassword, null, null, null, null);
+                                    connectionResult = NetUtils.openConnection(externalContext, containingDocument,
+                                            "GET", absoluteResolvedURL, xxformsUsername, xxformsPassword, null, null, null, null, null);
 
                                     try {
                                         try {
@@ -608,7 +609,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                                         }
                                     } catch (Exception e) {
                                         final LocationData extendedLocationData = new ExtendedLocationData(locationData, "reading external instance (resolver)", instanceContainerElement);
-                                        dispatchXFormsLinkExceptionEvent(pipelineContext, new XFormsModelSubmission.ConnectionResult(absoluteResolvedURLString), instanceResource, e, instanceContainerElement, extendedLocationData);
+                                        dispatchXFormsLinkExceptionEvent(pipelineContext, new ConnectionResult(absoluteResolvedURLString), instanceResource, e, instanceContainerElement, extendedLocationData);
                                         break;
                                     }
                                 }
@@ -758,7 +759,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         }
     }
 
-    private void dispatchXFormsLinkExceptionEvent(PipelineContext pipelineContext, XFormsModelSubmission.ConnectionResult connectionResult, String srcAttribute, Exception e, Element instanceContainerElement, LocationData locationData) {
+    private void dispatchXFormsLinkExceptionEvent(PipelineContext pipelineContext, ConnectionResult connectionResult, String srcAttribute, Exception e, Element instanceContainerElement, LocationData locationData) {
         final Throwable throwable;
         if (connectionResult != null && connectionResult.resourceURI != null) {
             final ValidationException validationException

@@ -20,7 +20,8 @@
         xmlns:xi="http://www.w3.org/2001/XInclude"
         xmlns:xforms="http://www.w3.org/2002/xforms"
         xmlns:xhtml="http://www.w3.org/1999/xhtml"
-        xmlns:ev="http://www.w3.org/2001/xml-events">
+        xmlns:ev="http://www.w3.org/2001/xml-events"
+        xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
 
     <!-- Page detail (app, form, document, and mode) -->
     <p:param type="input" name="instance"/>
@@ -32,7 +33,7 @@
     <!-- Call up persistence layer to obtain XHTML+XForms -->
     <p:processor name="oxf:url-generator">
         <p:input name="config" transform="oxf:unsafe-xslt" href="#instance">
-            <config xsl:version="2.0" xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
+            <config xsl:version="2.0">
 
                 <xsl:variable name="prefix" select="'oxf.fr.persistence.app'" as="xs:string"/>
                 <xsl:variable name="app" select="/*/app" as="xs:string"/>
@@ -54,6 +55,9 @@
                 <url>
                     <xsl:value-of select="pipeline:rewriteResourceURI($resource, true())"/>
                 </url>
+                <!-- Forward the same headers that the XForms engine forwards -->
+                <forward-headers><xsl:value-of select="pipeline:property('oxf.xforms.forward-submission-headers')"/></forward-headers>
+                <!-- Produce binary so we do our own XML parsing -->
                 <mode>binary</mode>
             </config>
         </p:input>

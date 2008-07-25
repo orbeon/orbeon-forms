@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.event.events;
 
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.util.XPathCache;
-import org.orbeon.oxf.xforms.XFormsModelSubmission;
+import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xml.TransformerUtils;
@@ -37,7 +37,7 @@ public abstract class XFormsSubmitResponseEvent extends XFormsEvent {
     private Map headers;
     private int statusCode;
 
-    public XFormsSubmitResponseEvent(String eventName, XFormsEventTarget targetObject, XFormsModelSubmission.ConnectionResult connectionResult) {
+    public XFormsSubmitResponseEvent(String eventName, XFormsEventTarget targetObject, ConnectionResult connectionResult) {
         super(eventName, targetObject, true, false);
         if (connectionResult != null) {
             this.resourceURI = connectionResult.resourceURI;

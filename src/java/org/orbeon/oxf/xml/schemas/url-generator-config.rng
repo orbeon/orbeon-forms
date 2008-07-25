@@ -95,6 +95,11 @@
                         </element>
                     </zeroOrMore>
                     <optional>
+                        <element name="forward-headers">
+                            <text/>
+                        </element>
+                    </optional>
+                    <optional>
                         <element name="cache-control">
                             <optional>
                                 <element name="use-local-cache">

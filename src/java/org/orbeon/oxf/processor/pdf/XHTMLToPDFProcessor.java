@@ -20,8 +20,7 @@ import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.serializer.HttpBinarySerializer;
 import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.xforms.XFormsModelSubmission;
-import org.orbeon.oxf.xforms.XFormsSubmissionUtils;
+import org.orbeon.oxf.util.ConnectionResult;
 import org.w3c.dom.Document;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 import org.xhtmlrenderer.pdf.ITextUserAgent;
@@ -69,9 +68,9 @@ public class XHTMLToPDFProcessor extends HttpBinarySerializer {
             protected InputStream resolveAndOpenStream(String uri) {
                 try {
                     final String resolvedURI = resolveURI(uri);
-                    final XFormsModelSubmission.ConnectionResult connectionResult
-                            = XFormsSubmissionUtils.doRegular(externalContext, null, "GET", new URL(resolvedURI),
-                                null, null, null, null, null, null);
+                    final ConnectionResult connectionResult
+                            = NetUtils.openConnection(externalContext, null, "GET", new URL(resolvedURI),
+                                null, null, null, null, null, null, null);
 
                     if (connectionResult.statusCode != 200) {
                         connectionResult.close();

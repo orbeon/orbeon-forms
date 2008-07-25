@@ -17,7 +17,7 @@
         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
         xmlns:oxf="http://www.orbeon.com/oxf/processors"
         xmlns:xi="http://www.w3.org/2001/XInclude"
-        xmlns:PipelineFunctionLibrary="org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
+        xmlns:pipeline="org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
 
     <!-- Parameters (app, form, document, and mode) -->
     <p:param type="input" name="instance"/>
@@ -27,7 +27,7 @@
     <!-- Call up persistence layer to obtain XHTML+XForms -->
     <p:processor name="oxf:url-generator">
         <p:input name="config" transform="oxf:unsafe-xslt" href="#instance">
-            <config xsl:version="2.0" xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
+            <config xsl:version="2.0">
 
                 <xsl:variable name="prefix" select="'oxf.fr.persistence.app'" as="xs:string"/>
                 <xsl:variable name="app" select="/*/app" as="xs:string"/>
@@ -45,11 +45,14 @@
                 <xsl:variable name="values" select="for $name in $names return pipeline:property($name)" as="xs:string*"/>
 
                 <!-- Create URI with first non-empty value -->
-                <xsl:variable name="resource" select="concat(PipelineFunctionLibrary:property('oxf.fr.appserver.uri'), $values[normalize-space() != ''][1], '/crud/', /*/app, '/', /*/form, '/form/form.xhtml')" as="xs:string"/>
+                <xsl:variable name="resource" select="concat(pipeline:property('oxf.fr.appserver.uri'), $values[normalize-space() != ''][1], '/crud/', /*/app, '/', /*/form, '/form/form.xhtml')" as="xs:string"/>
                 <url>
-                    <xsl:message>Resource:: <xsl:copy-of select="$resource"/></xsl:message>
+                    <xsl:message>Resource: <xsl:copy-of select="$resource"/></xsl:message>
                     <xsl:value-of select="pipeline:rewriteResourceURI($resource, true())"/>
                 </url>
+                <!-- Forward the same headers that the XForms engine forwards -->
+                <forward-headers><xsl:value-of select="pipeline:property('oxf.xforms.forward-submission-headers')"/></forward-headers>
+                <!-- Produce binary so we do our own XML parsing -->
                 <mode>binary</mode>
             </config>
         </p:input>

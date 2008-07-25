@@ -412,16 +412,11 @@ public class ImageServer extends ProcessorImpl {
             }
 
             protected Object getLocalValidity(PipelineContext pipelineContext) {
-                final URL newURL = getLocalURL(pipelineContext);
-
-                URLConnection urlConnection = null;
                 try {
-                    urlConnection = newURL.openConnection();
-                    final long lastModified = NetUtils.getLastModified(urlConnection);
-                    return lastModified <= 0 ? null : new Long(lastModified);
+                    final URL newURL = getLocalURL(pipelineContext);
+                    return NetUtils.getLastModifiedAsLong(newURL);
                 } catch (IOException e) {
                     throw new OXFException(e);
-                } finally {
                 }
             }
 

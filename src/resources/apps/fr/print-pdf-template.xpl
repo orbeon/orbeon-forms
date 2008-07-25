@@ -19,7 +19,8 @@
         xmlns:oxf="http://www.orbeon.com/oxf/processors"
         xmlns:xi="http://www.w3.org/2001/XInclude"
         xmlns:xforms="http://www.w3.org/2002/xforms"
-        xmlns:ev="http://www.w3.org/2001/xml-events">
+        xmlns:ev="http://www.w3.org/2001/xml-events"
+        xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
 
     <p:param type="input" name="instance"/>
     <p:param type="output" name="data"/>
@@ -53,10 +54,13 @@
     <!-- Call up persistence layer to obtain the PDF file -->
     <p:processor name="oxf:url-generator">
         <p:input name="config" transform="oxf:unsafe-xslt" href="#form-document">
-            <config xsl:version="2.0" xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
+            <config xsl:version="2.0">
                 <url>
                     <xsl:value-of select="pipeline:rewriteResourceURI(//xforms:instance[@id = 'fr-form-attachments']/*/pdf, true())"/>
                 </url>
+                <!-- Forward the same headers that the XForms engine forwards -->
+                <forward-headers><xsl:value-of select="pipeline:property('oxf.xforms.forward-submission-headers')"/></forward-headers>
+                <!-- Produce binary so we do our own XML parsing -->
                 <mode>binary</mode>
             </config>
         </p:input>

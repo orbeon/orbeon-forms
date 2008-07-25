@@ -20,6 +20,8 @@ import org.orbeon.oxf.cache.*;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.xml.TransformerUtils;
+import org.orbeon.oxf.util.ConnectionResult;
+import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.saxon.om.DocumentInfo;
 
 import java.net.URL;
@@ -88,8 +90,8 @@ public class XFormsServerSharedInstancesCache {
                         new String[] { "id", instanceId, "URI", sourceURI });
 
             final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
-            final XFormsModelSubmission.ConnectionResult connectionResult = XFormsSubmissionUtils.doRegular(externalContext,
-                    null, "GET", sourceURL, null, null, null, null, null, null);
+            final ConnectionResult connectionResult = NetUtils.openConnection(externalContext,
+                    null, "GET", sourceURL, null, null, null, null, null, null, null);
 
             // Handle connection errors
             if (connectionResult.statusCode != 200) {

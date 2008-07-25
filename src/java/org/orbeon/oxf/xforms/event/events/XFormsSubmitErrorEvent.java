@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.event.events;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.xforms.XFormsModelSubmission;
+import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
@@ -56,7 +56,7 @@ public class XFormsSubmitErrorEvent extends XFormsSubmitResponseEvent {
         this.errorType = errorType;
     }
 
-    public XFormsSubmitErrorEvent(PipelineContext pipelineContext, XFormsEventTarget targetObject, ErrorType errorType, XFormsModelSubmission.ConnectionResult connectionResult) {
+    public XFormsSubmitErrorEvent(PipelineContext pipelineContext, XFormsEventTarget targetObject, ErrorType errorType, ConnectionResult connectionResult) {
         super(XFormsEvents.XFORMS_SUBMIT_ERROR, targetObject, connectionResult);
         this.errorType = errorType;
 
@@ -80,7 +80,7 @@ public class XFormsSubmitErrorEvent extends XFormsSubmitResponseEvent {
             }
 
             boolean isXMLParseFailed = false;
-            if (XMLUtils.isXMLMediatype(connectionResult.responseMediaType)) {
+            if (XMLUtils.isXMLMediatype(connectionResult.getResponseMediaType())) {
                 // XML content-type
                 // Read stream into Document
                 // TODO: In case of text/xml, charset is not handled. Should modify readTinyTree() and readDom4j()
@@ -101,11 +101,11 @@ public class XFormsSubmitErrorEvent extends XFormsSubmitResponseEvent {
                 }
             }
 
-            if (isXMLParseFailed || XMLUtils.isTextContentType(connectionResult.responseMediaType)) {
+            if (isXMLParseFailed || XMLUtils.isTextContentType(connectionResult.getResponseMediaType())) {
                 // XML parsing failed, or we got a text content-type
                 // Read stream into String
                 try {
-                    final String charset = NetUtils.getTextCharsetFromContentType(connectionResult.responseMediaType);
+                    final String charset = NetUtils.getTextCharsetFromContentType(connectionResult.getResponseContentType());
                     final InputStream is = new URL(tempURI).openStream();
                     final Reader reader = new InputStreamReader(is, charset);
                     try {

@@ -20,14 +20,12 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.resources.handler.OXFHandler;
+import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.xforms.XFormsModelSubmission;
-import org.orbeon.oxf.xforms.XFormsSubmissionUtils;
 import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.XMLUtils;
 
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.*;
 
 /**
@@ -206,16 +204,7 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
 
                 } else  {
                     // Other URLs
-                    final URLConnection urlConn = url.openConnection();
-                    try {
-                        long lastModified = NetUtils.getLastModified(urlConn);
-                        // Zero and negative values often have a special meaning, make sure to normalize here
-                        return lastModified <= 0 ? null : new Long(lastModified);
-                    } finally {
-                        if (urlConn != null) {
-                            urlConn.getInputStream().close();
-                        }
-                    }
+                    return NetUtils.getLastModifiedAsLong(url);
                 }
             }
         } catch (Exception e) {
@@ -384,13 +373,12 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
         if (!state.isDocumentSet(urlString, username, password)) {
             // We read the document and store it temporarily, since it will likely be read just after this anyway
             final SAXStore documentSAXStore;
-            final long lastModified;
+            final Long lastModifiedLong;
             {
                 // Perform connection
-                // TODO: Remove dependency on XForms code
                 final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
-                final XFormsModelSubmission.ConnectionResult connectionResult
-                    = XFormsSubmissionUtils.doRegular(externalContext, null, "GET", urlString, username, password, null, null, null, null, null);
+                final ConnectionResult connectionResult
+                    = NetUtils.openConnection(externalContext, null, "GET", urlString, username, password, null, null, null, null, null, null);
 
                 // Throw if connection failed (this is caught by the caller)
                 if (connectionResult.statusCode != 200)
@@ -402,11 +390,8 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
                 XMLUtils.inputStreamToSAX(connectionResult.getResponseInputStream(), connectionResult.resourceURI, documentSAXStore, false, handleXInclude);
 
                 // Obtain last modified
-                lastModified = connectionResult.lastModified;
+                lastModifiedLong = connectionResult.getLastModified();
             }
-
-            // Zero and negative values often have a special meaning, make sure to normalize here
-            final Long lastModifiedLong = lastModified <= 0 ? null : new Long(lastModified);
 
             // Cache document and last modified
             state.setDocument(urlString, username, password, documentSAXStore, lastModifiedLong);

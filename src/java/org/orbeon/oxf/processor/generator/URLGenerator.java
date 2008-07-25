@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2004 - 2005 Orbeon, Inc.
+ *  Copyright (C) 2004 - 2008 Orbeon, Inc.
  *
  *  This program is free software; you can redistribute it and/or modify it under the terms of the
  *  GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -19,11 +19,13 @@ import org.orbeon.oxf.cache.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.resources.handler.OXFHandler;
 import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -44,7 +46,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.*;
 
 /**
@@ -115,11 +116,13 @@ public class URLGenerator extends ProcessorImpl {
     }
 
     public URLGenerator(URL url, String contentType, boolean forceContentType, String encoding, boolean forceEncoding,
-                      boolean ignoreConnectionEncoding, boolean validating, boolean handleXInclude, String mode, Map headers,
+                      boolean ignoreConnectionEncoding, boolean validating, boolean handleXInclude, String mode,
+                      List headerNames, Map headerNameValues, String forwardHeaders,
                       boolean cacheUseLocalCache) {
         this.localConfigURIReferences = new ConfigURIReferences(new Config(url, contentType, forceContentType, encoding,
-                forceEncoding, ignoreConnectionEncoding, validating, handleXInclude, mode, headers, cacheUseLocalCache,
-                new TidyConfig(null)));
+                forceEncoding, ignoreConnectionEncoding, validating, handleXInclude, mode,
+                headerNames, headerNameValues, forwardHeaders,
+                cacheUseLocalCache, new TidyConfig(null)));
         addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
     }
 
@@ -131,7 +134,9 @@ public class URLGenerator extends ProcessorImpl {
         private boolean forceEncoding = DEFAULT_FORCE_ENCODING;
         private boolean ignoreConnectionEncoding = DEFAULT_IGNORE_CONNECTION_ENCODING;
         private boolean validating = DEFAULT_VALIDATING;
-        private Map headers;
+        private List headerNames;
+        private Map headerNameValues;
+        private String headersToForward;
         private boolean handleXInclude = DEFAULT_HANDLE_XINCLUDE;
 
         private String mode;
@@ -160,7 +165,8 @@ public class URLGenerator extends ProcessorImpl {
         }
 
         public Config(URL url, String contentType, boolean forceContentType, String encoding, boolean forceEncoding,
-                      boolean ignoreConnectionEncoding, boolean validating, boolean handleXInclude, String mode,Map headers,
+                      boolean ignoreConnectionEncoding, boolean validating, boolean handleXInclude, String mode,
+                      List headerNames, Map headerNameValues, String headersToForward,
                       boolean cacheUseLocalCache, TidyConfig tidyConfig) {
             this.url = url;
             this.contentType = contentType;
@@ -169,7 +175,9 @@ public class URLGenerator extends ProcessorImpl {
             this.forceEncoding = forceEncoding;
             this.ignoreConnectionEncoding = ignoreConnectionEncoding;
             this.validating = validating;
-            this.headers = headers;
+            this.headerNames = headerNames;
+            this.headerNameValues = headerNameValues;
+            this.headersToForward = headersToForward;
             this.handleXInclude = handleXInclude;
 
             this.mode = mode;
@@ -219,8 +227,16 @@ public class URLGenerator extends ProcessorImpl {
             return mode;
         }
 
-        public Map getHeaders() {
-            return headers;
+        public List getHeaderNames() {
+            return headerNames;
+        }
+
+        public Map getHeaderNameValues() {
+            return headerNameValues;
+        }
+
+        public String getHeadersToForward() {
+            return headersToForward;
         }
 
         public boolean isCacheUseLocalCache() {
@@ -260,7 +276,7 @@ public class URLGenerator extends ProcessorImpl {
                 final ConfigURIReferences configURIReferences = URLGenerator.this.localConfigURIReferences != null ? localConfigURIReferences :
                         (ConfigURIReferences) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_CONFIG), new CacheableInputReader() {
                             public Object read(PipelineContext context, ProcessorInput input) {
-                                Element configElement = readInputAsDOM4J(context, input).getRootElement();
+                                final Element configElement = readInputAsDOM4J(context, input).getRootElement();
 
                                 // Processor location data
                                 final LocationData locationData = URLGenerator.this.getLocationData();
@@ -285,43 +301,54 @@ public class URLGenerator extends ProcessorImpl {
                                 }
 
                                 // Get content-type
-                                String contentType = XPathUtils.selectStringValueNormalize(configElement, "/config/content-type");
-                                boolean forceContentType = ProcessorUtils.selectBooleanValue(configElement, "/config/force-content-type", DEFAULT_FORCE_CONTENT_TYPE);
+                                final String contentType = XPathUtils.selectStringValueNormalize(configElement, "/config/content-type");
+                                final boolean forceContentType = ProcessorUtils.selectBooleanValue(configElement, "/config/force-content-type", DEFAULT_FORCE_CONTENT_TYPE);
                                 if (forceContentType && (contentType == null || contentType.equals("")))
                                     throw new ValidationException("The force-content-type element requires a content-type element.", locationData);
 
                                 // Get encoding
-                                String encoding = XPathUtils.selectStringValueNormalize(configElement, "/config/encoding");
-                                boolean forceEncoding = ProcessorUtils.selectBooleanValue(configElement, "/config/force-encoding", DEFAULT_FORCE_ENCODING);
-                                boolean ignoreConnectionEncoding = ProcessorUtils.selectBooleanValue(configElement, "/config/ignore-connection-encoding", DEFAULT_IGNORE_CONNECTION_ENCODING);
+                                final String encoding = XPathUtils.selectStringValueNormalize(configElement, "/config/encoding");
+                                final boolean forceEncoding = ProcessorUtils.selectBooleanValue(configElement, "/config/force-encoding", DEFAULT_FORCE_ENCODING);
+                                final boolean ignoreConnectionEncoding = ProcessorUtils.selectBooleanValue(configElement, "/config/ignore-connection-encoding", DEFAULT_IGNORE_CONNECTION_ENCODING);
                                 if (forceEncoding && (encoding == null || encoding.equals("")))
                                     throw new ValidationException("The force-encoding element requires an encoding element.", locationData);
 
                                 // Get headers
-                                Map headers = new HashMap();
+                                List headerNames = null;
+                                Map headerNameValues = null;
                                 for (Iterator i = configElement.selectNodes("/config/header").iterator(); i.hasNext();) {
-                                    Element headerElement = (Element) i.next();
-                                    String name = headerElement.element("name").getStringValue();
-                                    String value = headerElement.element("value").getStringValue();
-                                    headers.put(name, value);
+                                    final Element currentHeaderElement = (Element) i.next();
+                                    final String currentHeaderName = currentHeaderElement.element("name").getStringValue();
+                                    final String currentHeaderValue = currentHeaderElement.element("value").getStringValue();
+
+                                    if (headerNames == null) {
+                                        // Lazily create collections
+                                        headerNames = new ArrayList();
+                                        headerNameValues = new HashMap();
+                                    }
+
+                                    headerNames.add(currentHeaderName);
+                                    headerNameValues.put(currentHeaderName, currentHeaderValue);
                                 }
 
+                                final String forwardHeaders = XPathUtils.selectStringValueNormalize(configElement, "/config/forward-headers");
+
                                 // Validation setting: local, then properties, then hard-coded default
-                                boolean defaultValidating = getPropertySet().getBoolean(VALIDATING_PROPERTY, DEFAULT_VALIDATING).booleanValue();
-                                boolean validating = ProcessorUtils.selectBooleanValue(configElement, "/config/validating", defaultValidating);
+                                final boolean defaultValidating = getPropertySet().getBoolean(VALIDATING_PROPERTY, DEFAULT_VALIDATING).booleanValue();
+                                final boolean validating = ProcessorUtils.selectBooleanValue(configElement, "/config/validating", defaultValidating);
 
                                 // XInclude handling
-                                boolean defaultHandleXInclude = getPropertySet().getBoolean(HANDLE_XINCLUDE_PROPERTY, DEFAULT_HANDLE_XINCLUDE).booleanValue();
-                                boolean handleXInclude = ProcessorUtils.selectBooleanValue(configElement, "/config/handle-xinclude", defaultHandleXInclude);
+                                final boolean defaultHandleXInclude = getPropertySet().getBoolean(HANDLE_XINCLUDE_PROPERTY, DEFAULT_HANDLE_XINCLUDE).booleanValue();
+                                final boolean handleXInclude = ProcessorUtils.selectBooleanValue(configElement, "/config/handle-xinclude", defaultHandleXInclude);
 
                                 // Output mode
-                                String mode = XPathUtils.selectStringValueNormalize(configElement, "/config/mode");
+                                final String mode = XPathUtils.selectStringValueNormalize(configElement, "/config/mode");
 
                                 // Cache control
-                                boolean cacheUseLocalCache = ProcessorUtils.selectBooleanValue(configElement, "/config/cache-control/use-local-cache", DEFAULT_CACHE_USE_LOCAL_CACHE);
+                                final boolean cacheUseLocalCache = ProcessorUtils.selectBooleanValue(configElement, "/config/cache-control/use-local-cache", DEFAULT_CACHE_USE_LOCAL_CACHE);
 
                                 // Get Tidy config (will only apply if content-type is text/html)
-                                TidyConfig tidyConfig = new TidyConfig(XPathUtils.selectSingleNode(configElement, "/config/tidy-options"));
+                                final TidyConfig tidyConfig = new TidyConfig(XPathUtils.selectSingleNode(configElement, "/config/tidy-options"));
 
                                 // Create configuration object
                                 try {
@@ -329,13 +356,14 @@ public class URLGenerator extends ProcessorImpl {
                                     // NOTE: We check whether there is a protocol, because we have
                                     // some Java location data which are NOT to be interpreted as
                                     // base URIs
-                                    URL fullURL = (locationData != null && locationData.getSystemID() != null && NetUtils.urlHasProtocol(locationData.getSystemID()))
+                                    final URL fullURL = (locationData != null && locationData.getSystemID() != null && NetUtils.urlHasProtocol(locationData.getSystemID()))
                                             ? URLFactory.createURL(locationData.getSystemID(), url)
                                             : URLFactory.createURL(url);
 
                                     // Create configuration
-                                    Config config = new Config(fullURL, contentType, forceContentType, encoding, forceEncoding,
-                                            ignoreConnectionEncoding, validating, handleXInclude, mode, headers,
+                                    final Config config = new Config(fullURL, contentType, forceContentType, encoding, forceEncoding,
+                                            ignoreConnectionEncoding, validating, handleXInclude, mode,
+                                            headerNames, headerNameValues, forwardHeaders,
                                             cacheUseLocalCache, tidyConfig);
                                     if (logger.isDebugEnabled())
                                         logger.debug("Read configuration: " + config.toString());
@@ -547,7 +575,7 @@ public class URLGenerator extends ProcessorImpl {
                             // This should happen only for dependencies
                             handler = OXFHandler.PROTOCOL.equals(url.getProtocol())
                                 ? (ResourceHandler) new OXFResourceHandler(new Config(url)) // Should use full config so that headers are forwarded?
-                                : (ResourceHandler) new URLResourceHandler(new Config(url));// Should use full config so that headers are forwarded?
+                                : (ResourceHandler) new URLResourceHandler(pipelineContext, new Config(url));// Should use full config so that headers are forwarded?
 
                             mustDestroyHandler = true;
                         } else {
@@ -717,11 +745,13 @@ public class URLGenerator extends ProcessorImpl {
     }
 
     private static class URLResourceHandler implements ResourceHandler {
+        private PipelineContext pipelineContext;
         private Config config;
-        private URLConnection urlConn;
+        private ConnectionResult connectionResult;
         private InputStream inputStream;
 
-        public URLResourceHandler(Config config) {
+        public URLResourceHandler(PipelineContext pipelineContext, Config config) {
+            this.pipelineContext = pipelineContext;
             this.config = config;
         }
 
@@ -731,7 +761,7 @@ public class URLGenerator extends ProcessorImpl {
                 return null;
             // Otherwise, try URLConnection
             openConnection();
-            return NetUtils.getContentTypeMediaType(urlConn.getContentType());
+            return connectionResult.getResponseContentType();
         }
 
         public String getConnectionEncoding() throws IOException {
@@ -740,14 +770,12 @@ public class URLGenerator extends ProcessorImpl {
                 return null;
             // Otherwise, try URLConnection
             openConnection();
-            return NetUtils.getContentTypeCharset(urlConn.getContentType());
+            return NetUtils.getContentTypeCharset(connectionResult.getResponseContentType());
         }
 
         public Object getValidity() throws IOException {
             openConnection();
-            long lastModified = NetUtils.getLastModified(urlConn);
-            // Zero and negative values often have a special meaning, make sure to normalize here
-            return lastModified <= 0 ? null : new Long(lastModified);
+            return connectionResult.getLastModified();
         }
 
         public void destroy() throws IOException {
@@ -758,20 +786,21 @@ public class URLGenerator extends ProcessorImpl {
             if (inputStream != null) {
                 inputStream.close();
             }
+
+            // Just in case - although URLResourceHandler should be gc'ed quickly
+            pipelineContext = null;
+            config = null;
+            connectionResult = null;
+            inputStream = null;
         }
 
         private void openConnection() throws IOException {
-            if (urlConn == null) {
-                urlConn = config.getURL().openConnection();
-                final Map headers = config.getHeaders();
-                if (headers != null) {
-                    for (Iterator i = headers.keySet().iterator(); i.hasNext();) {
-                        final String name = (String) i.next();
-                        final String value = (String) config.getHeaders().get(name);
-                        urlConn.setRequestProperty(name, value);
-                    }
-                }
-                inputStream = urlConn.getInputStream();
+            if (connectionResult == null) {
+                final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+                // TODO: pass logging callback
+                connectionResult = NetUtils.openConnection(externalContext, null, "GET", config.getURL(), null, null, null, null,
+                        config.getHeaderNames(), config.getHeaderNameValues(), config.getHeadersToForward());
+                inputStream = connectionResult.getResponseInputStream();
             }
         }
 
@@ -889,7 +918,7 @@ public class URLGenerator extends ProcessorImpl {
                 // Create and remember handler
                 mainResourceHandler = OXFHandler.PROTOCOL.equals(config.getURL().getProtocol())
                         ? (ResourceHandler) new OXFResourceHandler(config)
-                        : (ResourceHandler) new URLResourceHandler(config);
+                        : (ResourceHandler) new URLResourceHandler(pipelineContext, config);
                 // Make sure it is destroyed when the pipeline ends at the latest
                 pipelineContext.addContextListener(new PipelineContext.ContextListener() {
                     public void contextDestroyed(boolean success) {

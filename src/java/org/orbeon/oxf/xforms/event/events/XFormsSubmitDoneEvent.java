@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.event.events;
 
-import org.orbeon.oxf.xforms.XFormsModelSubmission;
+import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.saxon.om.SequenceIterator;
@@ -31,7 +31,7 @@ public class XFormsSubmitDoneEvent extends XFormsSubmitResponseEvent {
         this(targetObject, null);
     }
 
-    public XFormsSubmitDoneEvent(XFormsEventTarget targetObject, XFormsModelSubmission.ConnectionResult connectionResult) {
+    public XFormsSubmitDoneEvent(XFormsEventTarget targetObject, ConnectionResult connectionResult) {
         super(XFormsEvents.XFORMS_SUBMIT_DONE, targetObject, connectionResult);
     }
 

@@ -116,17 +116,6 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
             xformsLevel = level;
         }
 
-        // Check for preserved content
-        if (inXForms && !inPreserve) {
-            // Preserve as is the content of labels, etc., instances, and schemas
-            if (XFormsConstants.LABEL_HINT_HELP_ALERT_ELEMENT.get(localname) != null
-                    || "instance".equals(localname)
-                    || "schema".equals(localname) && XMLConstants.XSD_URI.equals(uri)) {
-                inPreserve = true;
-                preserveLevel = level;
-            }
-        }
-
         if (inPreserve) {
             // Don't do anything fancy
             super.startElement(uri, localname, qName, attributes);
@@ -222,6 +211,17 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
             } else {
                 // No attributes, just output the element
                 super.startElement(uri, localname, qName, attributes);
+            }
+        }
+
+        // Check for preserved content
+        if (inXForms && !inPreserve) {
+            // Preserve as is the content of labels, etc., instances, and schemas
+            if (XFormsConstants.LABEL_HINT_HELP_ALERT_ELEMENT.get(localname) != null
+                    || "instance".equals(localname)
+                    || "schema".equals(localname) && XMLConstants.XSD_URI.equals(uri)) {
+                inPreserve = true;
+                preserveLevel = level;
             }
         }
 

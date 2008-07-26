@@ -437,6 +437,18 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
                     <p:output name="data" id="html"/>
                 </p:processor>
             </xml-source>
+            <p>
+                In addition, you can provide a list of space-separated header names with the
+                <code>forward-headers</code> element. Any header listed is automatically forwarded if it exists in the
+                incoming request:
+            </p>
+            <xml-source>
+                <forward-headers>Authorization SM_USER</forward-headers>
+            </xml-source>
+            <p>
+                Headers specified with the <code>header</code> element have precedence over
+                <code>forward-headers</code>.
+            </p>
         </section>
         <a name="cache-control"/>
         <section>

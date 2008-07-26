@@ -492,7 +492,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                                     containingDocument.logDebug("model", "getting document from optimized URI",
                                                 new String[] { "URI", resolvedURI.toString() });
 
-                                connectionResult = XFormsSubmissionUtils.doOptimized(pipelineContext, externalContext,
+                                connectionResult = XFormsSubmissionUtils.openOptimizedConnection(pipelineContext, externalContext,
                                         null, null, "get", resolvedURI.toString(), null, false, null, null);
 
                                 instanceSourceURI = resolvedURI.toString();
@@ -564,7 +564,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                                         containingDocument.logDebug("model", "getting document from URI",
                                                 new String[] { "URI", absoluteResolvedURLString });
 
-                                    connectionResult = NetUtils.openConnection(externalContext, containingDocument,
+                                    connectionResult = NetUtils.openConnection(externalContext, containingDocument.getIndentedLogger(),
                                             "GET", absoluteResolvedURL, xxformsUsername, xxformsPassword, null, null, null, null, null);
 
                                     try {

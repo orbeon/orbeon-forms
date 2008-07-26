@@ -19,10 +19,10 @@ import org.dom4j.io.DocumentSource;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.XPathCache;
-import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.xforms.action.actions.XFormsLoadAction;
 import org.orbeon.oxf.xforms.action.actions.XFormsSetvalueAction;
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
@@ -696,7 +696,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         } else {
                             // Log message mody for debugging purposes
                             if (XFormsServer.logger.isDebugEnabled())
-                                NetUtils.logRequestBody(containingDocument, actualRequestMediatype, messageBody);
+                                NetUtils.logRequestBody(containingDocument.getIndentedLogger(), actualRequestMediatype, messageBody);
                         }
 
                         // Do as if we are receiving a regular XML response
@@ -748,7 +748,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         if (XFormsServer.logger.isDebugEnabled())
                                 containingDocument.logDebug("submission", "starting optimized submission", new String[] { "id", getEffectiveId() });
 
-                        connectionResult = XFormsSubmissionUtils.doOptimized(pipelineContext, externalContext, containingDocument.getResponse(),
+                        connectionResult = XFormsSubmissionUtils.openOptimizedConnection(pipelineContext, externalContext, containingDocument.getResponse(),
                                 isDeferredSubmissionSecondPassReplaceAll ? null : this, actualHttpMethod, resolvedURI.toString(), actualRequestMediatype, isReplaceAll,
                                 messageBody, queryString);
 
@@ -801,9 +801,13 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                             submitDoneEvent = new XFormsSubmitDoneEvent(XFormsModelSubmission.this, absoluteResolvedURLString, 200);
                         } else {
                             // Perform actual submission
-                            connectionResult = NetUtils.openConnection(externalContext, containingDocument,
-                                    actualHttpMethod, resolvedURL, resolvedXXFormsUsername, resolvedXXFormsPassword, actualRequestMediatype,
-                                    messageBody, queryString,
+
+                            // Compute absolute submission URL
+                            final URL submissionURL = NetUtils.createAbsoluteURL(resolvedURL, queryString, externalContext);
+                            // Open connection
+                            connectionResult = NetUtils.openConnection(externalContext, containingDocument.getIndentedLogger(),
+                                    actualHttpMethod, submissionURL, resolvedXXFormsUsername, resolvedXXFormsPassword,
+                                    actualRequestMediatype, messageBody,
                                     headerNames, headerNameValues, XFormsProperties.getForwardSubmissionHeaders(containingDocument));
                         }
                     }

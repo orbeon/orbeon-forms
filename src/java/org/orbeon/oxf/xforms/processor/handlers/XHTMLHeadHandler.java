@@ -111,9 +111,9 @@ public class XHTMLHeadHandler extends HandlerBase {
         final boolean isCombineResources = XFormsProperties.isCombinedResources(containingDocument);
         final boolean isCacheCombinedResources = isCombineResources && XFormsProperties.isCacheCombinedResources();
         if (isCombineResources) {
-            XFormsServer.logger.debug("XForms resources - creating xhtml:head with combined resources.");
+            containingDocument.logDebug("XForms resources", "creating xhtml:head with combined resources");
             if (isCacheCombinedResources) {
-                XFormsServer.logger.debug("XForms resources - attempting to cache combined resources.");
+                containingDocument.logDebug("XForms resources", "attempting to cache combined resources");
             }
         }
 

@@ -377,8 +377,12 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
             {
                 // Perform connection
                 final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+
+                // Compute absolute submission URL
+                final URL submissionURL = NetUtils.createAbsoluteURL(urlString, null, externalContext);
+                // Open connection
                 final ConnectionResult connectionResult
-                    = NetUtils.openConnection(externalContext, null, "GET", urlString, username, password, null, null, null, null, null, null);
+                    = NetUtils.openConnection(externalContext, ProcessorImpl.indentedLogger, "GET", submissionURL, username, password, null, null, null, null, null);
 
                 // Throw if connection failed (this is caught by the caller)
                 if (connectionResult.statusCode != 200)

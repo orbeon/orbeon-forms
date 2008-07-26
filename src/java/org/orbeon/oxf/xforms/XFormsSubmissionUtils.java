@@ -39,7 +39,7 @@ public class XFormsSubmissionUtils {
     /**
      * Perform an optimized local connection using the Servlet API instead of using a URLConnection.
      */
-    public static ConnectionResult doOptimized(PipelineContext pipelineContext, ExternalContext externalContext,
+    public static ConnectionResult openOptimizedConnection(PipelineContext pipelineContext, ExternalContext externalContext,
                                                                      ExternalContext.Response response,
                                                                      XFormsModelSubmission xformsModelSubmission,
                                                                      String httpMethod, final String action, String mediatype, boolean doReplace,

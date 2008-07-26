@@ -25,8 +25,6 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.resources.handler.HTTPURLConnection;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.ContentHandlerAdapter;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -930,22 +928,18 @@ public class NetUtils {
 //    public interface LoggerXxx
 
     /**
-     * Perform a connection using an URLConnection.
+     * Perform a connection to the given URL with the given parameters.
      *
-     * @param action absolute URL or absolute path (which must include the context path)
+     * This handles:
+     *
+     * o PUTting or POSTing a body
+     * o handling username and password
+     * o setting HTTP heades
+     * o forwarding session cookies
+     * o forwarding specified HTTP headers
+     * o managing SOAP POST and GET a la XForms 1.1 (should this be here?)
      */
-    public static ConnectionResult openConnection(ExternalContext externalContext, XFormsContainingDocument containingDocument,
-                                                                   String httpMethod, final String action, String username, String password, String contentType,
-                                                                   byte[] messageBody, String queryString,
-                                                                   List headerNames, Map headerNameValues, String headersToForward) {
-
-        // Compute absolute submission URL
-        final URL submissionURL = createAbsoluteURL(action, queryString, externalContext);
-        return openConnection(externalContext, containingDocument, httpMethod, submissionURL, username, password,
-                contentType, messageBody, headerNames, headerNameValues, headersToForward);
-    }
-
-    public static ConnectionResult openConnection(ExternalContext externalContext, XFormsContainingDocument containingDocument,
+    public static ConnectionResult openConnection(ExternalContext externalContext, IndentedLogger indentedLogger,
                                                                    String httpMethod, final URL connectionURL, String username, String password, String contentType,
                                                                    byte[] messageBody, List headerNames, Map headerNameValues, String headersToForward) {
 
@@ -956,7 +950,7 @@ public class NetUtils {
             // https SHOULD be supported
             // file SHOULD be supported
             try {
-                if (XFormsServer.logger.isDebugEnabled()) {
+                if (indentedLogger.isDebugEnabled()) {
                     final URI connectionURI;
                     try {
                         String userInfo = connectionURL.getUserInfo();
@@ -970,7 +964,7 @@ public class NetUtils {
                     } catch (URISyntaxException e) {
                         throw new OXFException(e);
                     }
-                    XFormsContainingDocument.logDebugStatic(containingDocument, "submission", "opening URL connection",
+                    indentedLogger.logDebug("submission", "opening URL connection",
                         new String[] { "URL", connectionURI.toString() });
                 }
 
@@ -999,7 +993,7 @@ public class NetUtils {
                     if (httpMethod.equals("POST") && "application/soap+xml".equals(contentTypeMediaType)) {
                         // SOAP POST
 
-                        XFormsContainingDocument.logDebugStatic(containingDocument, "submission", "found SOAP POST");
+                        indentedLogger.logDebug("submission", "found SOAP POST");
 
                         final Map parameters = getContentTypeParameters(contentType);
                         final FastStringBuffer sb = new FastStringBuffer("text/xml");
@@ -1024,7 +1018,7 @@ public class NetUtils {
                             if (actionParameter != null) {
                                 // Set SOAPAction header
                                 urlConnection.setRequestProperty("SOAPAction", actionParameter);
-                                XFormsContainingDocument.logDebugStatic(containingDocument, "submission", "setting header",
+                                indentedLogger.logDebug("submission", "setting header",
                                     new String[] { "SOAPAction", actionParameter });
                             }
                         }
@@ -1034,7 +1028,7 @@ public class NetUtils {
                 } else {
                     if (httpMethod.equals("GET") && "application/soap+xml".equals(contentTypeMediaType)) {
                         // SOAP GET
-                        XFormsContainingDocument.logDebugStatic(containingDocument, "submission", "found SOAP GET");
+                        indentedLogger.logDebug("submission", "found SOAP GET");
 
                         final Map parameters = getContentTypeParameters(contentType);
                         final FastStringBuffer sb = new FastStringBuffer("application/soap+xml");
@@ -1075,7 +1069,7 @@ public class NetUtils {
 
                     final ExternalContext.Session session = externalContext.getSession(false);
                     if (session != null) {
-                        XFormsContainingDocument.logDebugStatic(containingDocument, "submission", "setting cookie",
+                        indentedLogger.logDebug("submission", "setting cookie",
                             new String[] { "JSESSIONID", session.getId() });
 
                         urlConnection.setRequestProperty("Cookie", "JSESSIONID=" + session.getId());
@@ -1088,7 +1082,8 @@ public class NetUtils {
                             final String cookie = cookies[i];
                             // Forward JSESSIONID (if not already done above) and JSESSIONIDSSO
                             if ((cookie.startsWith("JSESSIONID") && session == null) || cookie.startsWith("JSESSIONIDSSO")) {
-                                XFormsServer.logger.debug("XForms - forwarding cookie: " + cookie);
+                                indentedLogger.logDebug("submission", "forwarding cookie",
+                                    new String[] { "cookie", cookie });
                                 urlConnection.setRequestProperty("Cookie", cookie);
                             }
                         }
@@ -1110,12 +1105,12 @@ public class NetUtils {
                             final boolean isAuthorizationHeader = currentHeaderNameLowercase.equals("authorization");
                             if (!isAuthorizationHeader || isAuthorizationHeader && username == null) {
                                 // Only forward Authorization header if there is no username provided
-                                XFormsContainingDocument.logDebugStatic(containingDocument, "submission", "forwarding header",
+                                indentedLogger.logDebug("submission", "forwarding header",
                                     new String[] { "name", currentHeaderName, "value", currentIncomingHeaderValue});
                                 urlConnection.setRequestProperty(currentHeaderName, currentIncomingHeaderValue);
                             } else {
                                 // Just log this information
-                                XFormsContainingDocument.logDebugStatic(containingDocument, "submission",
+                                indentedLogger.logDebug("submission",
                                         "not forwarding Authorization header because username is present");
                             }
                         }
@@ -1125,8 +1120,8 @@ public class NetUtils {
                 // Write request body if needed
                 if (hasRequestBody) {
                     // Log message mody for debugging purposes
-                    if (XFormsServer.logger.isDebugEnabled())
-                        logRequestBody(containingDocument, contentType, messageBody);
+                    if (indentedLogger.isDebugEnabled())
+                        logRequestBody(indentedLogger, contentType, messageBody);
                     // Set request body on connection
                     httpURLConnection.setRequestBody(messageBody);
                 }
@@ -1194,12 +1189,12 @@ public class NetUtils {
         return result;
     }
 
-    public static void logRequestBody(XFormsContainingDocument containingDocument, String mediatype, byte[] messageBody) throws UnsupportedEncodingException {
+    public static void logRequestBody(IndentedLogger indentedLogger, String mediatype, byte[] messageBody) throws UnsupportedEncodingException {
         if (XMLUtils.isXMLMediatype(mediatype) || XMLUtils.isTextContentType(mediatype) || (mediatype != null && mediatype.equals("application/x-www-form-urlencoded"))) {
-            containingDocument.logDebug("submission", "setting request body",
+            indentedLogger.logDebug("submission", "setting request body",
                 new String[] { "mediatype", mediatype, "body", new String(messageBody, "UTF-8")});
         } else {
-            containingDocument.logDebug("submission", "setting binary request body", new String[] { "mediatype", mediatype });
+            indentedLogger.logDebug("submission", "setting binary request body", new String[] { "mediatype", mediatype });
         }
     }
 }

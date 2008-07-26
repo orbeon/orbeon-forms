@@ -26,6 +26,7 @@ import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.resources.handler.OXFHandler;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.ConnectionResult;
+import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -60,6 +61,7 @@ import java.util.*;
 public class URLGenerator extends ProcessorImpl {
 
     private static Logger logger = Logger.getLogger(URLGenerator.class);
+    public static IndentedLogger indentedLogger = new IndentedLogger(logger, "oxf:url-generator");
 
     public static final boolean DEFAULT_VALIDATING = false;
     public static final boolean DEFAULT_HANDLE_XINCLUDE = false;
@@ -798,7 +800,7 @@ public class URLGenerator extends ProcessorImpl {
             if (connectionResult == null) {
                 final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
                 // TODO: pass logging callback
-                connectionResult = NetUtils.openConnection(externalContext, null, "GET", config.getURL(), null, null, null, null,
+                connectionResult = NetUtils.openConnection(externalContext, indentedLogger, "GET", config.getURL(), null, null, null, null,
                         config.getHeaderNames(), config.getHeaderNameValues(), config.getHeadersToForward());
                 inputStream = connectionResult.getResponseInputStream();
             }

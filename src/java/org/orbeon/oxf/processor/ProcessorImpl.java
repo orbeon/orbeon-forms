@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.processor;
 
-import orbeon.apache.xml.utils.DOMBuilder;
 import org.apache.log4j.Logger;
 import org.dom4j.Element;
 import org.dom4j.QName;
@@ -28,21 +27,21 @@ import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.processor.pipeline.PipelineProcessor;
 import org.orbeon.oxf.processor.validation.MSVValidationProcessor;
 import org.orbeon.oxf.resources.OXFProperties;
+import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.xml.*;
+import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
 import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.tinytree.TinyBuilder;
 import org.w3c.dom.Document;
-import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
-import org.xml.sax.SAXException;
 
-import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.dom.DOMResult;
+import javax.xml.transform.sax.TransformerHandler;
 import java.util.*;
 
 /**
@@ -51,6 +50,7 @@ import java.util.*;
 public abstract class ProcessorImpl implements Processor {
 
     public static Logger logger = LoggerFactory.createLogger(ProcessorImpl.class);
+    public static IndentedLogger indentedLogger = new IndentedLogger(logger, "XPL processor");
 
     public static final String INPUT_DATA = "data";
     public static final String INPUT_CONFIG = "config";

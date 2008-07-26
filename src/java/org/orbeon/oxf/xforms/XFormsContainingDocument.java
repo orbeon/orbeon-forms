@@ -14,12 +14,12 @@
 package org.orbeon.oxf.xforms;
 
 import org.apache.commons.pool.ObjectPool;
-import org.apache.log4j.Level;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.action.actions.XFormsInsertAction;
 import org.orbeon.oxf.xforms.control.XFormsControl;
@@ -34,7 +34,6 @@ import org.orbeon.oxf.xforms.state.XFormsState;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.saxon.om.FastStringBuffer;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.value.BooleanValue;
@@ -55,6 +54,8 @@ import java.util.*;
 public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventHandlerContainer {
 
     public static final String CONTAINING_DOCUMENT_PSEUDO_ID = "$containing-document$";
+
+    private IndentedLogger indentedLogger = new IndentedLogger(XFormsServer.logger, "XForms");
 
     // Global XForms function library
     private static XFormsFunctionLibrary functionLibrary = new XFormsFunctionLibrary();
@@ -1322,92 +1323,51 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         }
     }
 
-    private int logIndentLevel = 0;
-    private Stack eventStack = new Stack();
-
-    private void startHandleEvent(XFormsEvent event) {
-        eventStack.push(event);
-        logIndentLevel++;
-    }
-
-    private void endHandleEvent() {
-        eventStack.pop();
-        logIndentLevel--;
+    public IndentedLogger getIndentedLogger() {
+        return indentedLogger;
     }
 
     public void startHandleOperation() {
-        logIndentLevel++;
+        indentedLogger.startHandleOperation();
     }
 
     public void endHandleOperation() {
-        logIndentLevel--;
-    }
-
-    private static String getLogIndentSpaces(int level) {
-        final StringBuffer sb = new StringBuffer();
-        for (int i = 0; i < level; i++)
-            sb.append("  ");
-        return sb.toString();
+        indentedLogger.endHandleOperation();
     }
 
     public void logDebug(String type, String message) {
-        log(Level.DEBUG, logIndentLevel, type, message, null);
+        indentedLogger.logDebug(type, message);
     }
 
     public void logDebug(String type, String message, String[] parameters) {
-        log(Level.DEBUG, logIndentLevel, type, message, parameters);
-    }
-
-    public static void logDebugStatic(String type, String message) {
-        logDebugStatic(null, type, message);
+        indentedLogger.logDebug(type, message, parameters);
     }
 
     public static void logDebugStatic(String type, String message, String[] parameters) {
         logDebugStatic(null, type, message, parameters);
     }
 
-    public static void logDebugStatic(XFormsContainingDocument containingDocument, String type, String message) {
-        log(Level.DEBUG, (containingDocument != null) ? containingDocument.logIndentLevel : 0, type, message, null);
-    }
-
     public static void logDebugStatic(XFormsContainingDocument containingDocument, String type, String message, String[] parameters) {
-        log(Level.DEBUG, (containingDocument != null) ? containingDocument.logIndentLevel : 0, type, message, parameters);
+        if (containingDocument != null)
+            containingDocument.logDebug(type, message, parameters);
+        else
+            IndentedLogger.logDebugStatic(XFormsServer.logger, "XForms", type, message, parameters);
     }
 
     public void logWarning(String type, String message, String[] parameters) {
-        log(Level.WARN, logIndentLevel, type, message, parameters);
+        indentedLogger.logWarning(type, message, parameters);
     }
 
-    private static void log(Level level, int indentLevel, String type, String message, String[] parameters) {
-        final String parametersString;
-        if (parameters != null) {
-            final FastStringBuffer sb = new FastStringBuffer(" {");
-            if (parameters != null) {
-                boolean first = true;
-                for (int i = 0; i < parameters.length; i += 2) {
-                    final String paramName = parameters[i];
-                    final String paramValue = parameters[i + 1];
+    private Stack eventStack = new Stack();
 
-                    if (paramValue != null) {
-                        if (!first)
-                            sb.append(", ");
+    private void startHandleEvent(XFormsEvent event) {
+        eventStack.push(event);
+        indentedLogger.startHandleOperation();
+    }
 
-                        sb.append(paramName);
-                        sb.append(": \"");
-                        sb.append(paramValue);
-                        sb.append('\"');
-
-                        first = false;
-                    }
-                }
-            }
-            sb.append('}');
-            parametersString = sb.toString();
-        } else {
-            parametersString = "";
-        }
-
-        XFormsServer.logger.log(level, "XForms - " + getLogIndentSpaces(indentLevel) + type + " - " + message + parametersString);
+    private void endHandleEvent() {
+        eventStack.pop();
+        indentedLogger.endHandleOperation();
     }
 
     /**

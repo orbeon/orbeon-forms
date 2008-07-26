@@ -886,7 +886,8 @@ public class XFormsControls {
             if (caseXFormsControl == null) {
                 // NOTE: we used to throw here, but really we mustn't
                 if (XFormsServer.logger.isDebugEnabled()) {
-                    XFormsServer.logger.debug("No XFormsControl found for case id '" + selectedCaseId + "'.");
+                    containingDocument.logDebug("controls", "No XFormsControl found for case",
+                            new String[] { "case id", selectedCaseId });
                 }
                 return;
             }
@@ -894,7 +895,8 @@ public class XFormsControls {
             if (switchXFormsControl == null) {
                 // NOTE: we used to throw here, but really we mustn't
                 if (XFormsServer.logger.isDebugEnabled()) {
-                    XFormsServer.logger.debug("No XFormsControl found for case id '" + selectedCaseId + "'.");
+                    containingDocument.logDebug("controls", "No XFormsControl found for case",
+                            new String[] { "case id", selectedCaseId });
                 }
                 return;
             }

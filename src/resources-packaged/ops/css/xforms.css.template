@@ -167,9 +167,11 @@
 
 .xforms-select1-appearance-full input { vertical-align: middle }
 .xforms-select1-appearance-full label { vertical-align: middle; margin-right: .5em }
+fieldset.xforms-select1-appearance-full { margin: 0 } /* when fieldset is used for full selection controls */
 
 .xforms-select-appearance-full input { vertical-align: middle }
 .xforms-select-appearance-full label { vertical-align: middle; margin-right: .5em  }
+fieldset.xforms-select-appearance-full { margin: 0 } /* when fieldset is used for full selection controls */
 
 .xforms-group-appearance-xxforms-fieldset {
     padding-left: 1em;

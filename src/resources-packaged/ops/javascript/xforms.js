@@ -3914,23 +3914,25 @@ ORBEON.xforms.Server = {
                                         var forAttribute = ORBEON.util.Dom.getAttribute(attributeElement, "for");
                                         var nameAttribute = ORBEON.util.Dom.getAttribute(attributeElement, "name");
                                         var htmlElement = ORBEON.util.Dom.getElementById(forAttribute);
-                                        if (ORBEON.xforms.Globals.isRenderingEngineTrident) {
-                                            // Hack for common broken IE attributes
-                                            if (nameAttribute == "class") {
-                                                htmlElement.className = newAttributeValue;
-                                            } else if (nameAttribute == "colspan") {
-                                                htmlElement.colSpan = newAttributeValue;
-                                            } else if (nameAttribute == "rowspan") {
-                                                htmlElement.rowSpan = newAttributeValue;
-                                            } else if (nameAttribute == "accesskey") {
-                                                htmlElement.accessKey = newAttributeValue;
-                                            } else if (nameAttribute == "tabindex") {
-                                                htmlElement.tabIndex = newAttributeValue;
+                                        if (htmlElement != null) {// use case: xhtml:html/@lang but HTML fragment produced
+                                            if (ORBEON.xforms.Globals.isRenderingEngineTrident) {
+                                                // Hack for common broken IE attributes
+                                                if (nameAttribute == "class") {
+                                                    htmlElement.className = newAttributeValue;
+                                                } else if (nameAttribute == "colspan") {
+                                                    htmlElement.colSpan = newAttributeValue;
+                                                } else if (nameAttribute == "rowspan") {
+                                                    htmlElement.rowSpan = newAttributeValue;
+                                                } else if (nameAttribute == "accesskey") {
+                                                    htmlElement.accessKey = newAttributeValue;
+                                                } else if (nameAttribute == "tabindex") {
+                                                    htmlElement.tabIndex = newAttributeValue;
+                                                } else {
+                                                    htmlElement.setAttribute(nameAttribute, newAttributeValue);
+                                                }
                                             } else {
                                                 htmlElement.setAttribute(nameAttribute, newAttributeValue);
                                             }
-                                        } else {
-                                            htmlElement.setAttribute(nameAttribute, newAttributeValue);
                                         }
                                     }
 

@@ -53,7 +53,10 @@ public class LoggerFactory {
      * Init basic config until resource manager is setup.
      */
     public static void initBasicLogger() {
-        LogManager.resetConfiguration();
+        // 2008-07-25 a This has been here for a long time and it is not clear why it was put there. But this doesn't
+        //              seem to be a good idea, and is causing some problem. So: commenting. See discussion in this thread:
+        //              http://www.nabble.com/Problem-with-log-in-orbeon-with-multiple-webapp-to16932990.html#a18661451
+        // LogManager.resetConfiguration();
         Logger root = Logger.getRootLogger();
         root.setLevel(Level.INFO);
         root.addAppender(new ConsoleAppender(new PatternLayout(PatternLayout.DEFAULT_CONVERSION_PATTERN), ConsoleAppender.SYSTEM_ERR));

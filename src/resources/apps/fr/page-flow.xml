@@ -139,6 +139,26 @@
         <setvalue ref="/*/app" matcher-group="1"/>
     </page>
 
+    <!-- ==== Built-in Oracle-based Persistence Services ==== -->
+
+    <!-- Create, Read, Update and Delete operations (id provided) -->
+    <page path-info="/fr/service/oracle/crud/([^/]+/[^/]+/(form/[^/]+|data/[^/]+/[^/]+))" matcher="oxf:perl5-matcher"
+          model="persistence/oracle/crud.xpl"/>
+
+    <!-- Search -->
+    <page path-info="/fr/service/oracle/search/([^/]+)/([^/]+)" matcher="oxf:perl5-matcher"
+          view="persistence/oracle/search.xpl">
+        <setvalue ref="/*/app" matcher-group="1"/>
+        <setvalue ref="/*/form" matcher-group="2"/>
+    </page>
+
+    <!-- List deployed forms for a given application -->
+    <page path-info="/fr/service/oracle/list/([^/]+)" matcher="oxf:perl5-matcher"
+          default-submission="persistence/oracle/list-submission.xml"
+          view="persistence/oracle/list.xpl">
+        <setvalue ref="/*/app" matcher-group="1"/>
+    </page>
+
     <!-- ==== Built-in Resource Manager-Based Persistence Services ==== -->
 
     <!-- Create, Read, Update and Delete operations (id provided) -->

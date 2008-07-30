@@ -35,6 +35,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
 import java.io.OutputStream;
+import java.io.StringReader;
 import java.math.BigDecimal;
 import java.sql.*;
 import java.util.*;
@@ -465,7 +466,8 @@ public class QueryInterpreter extends SQLProcessor.InterpreterContentHandler {
                                                 } else if (SQL_TYPE_CLOB.equals(sqlType)) {
                                                     // Set String as Clob
                                                     String stringValue = (String) value;
-                                                    getInterpreterContext().getDelegate().setClob(stmt, index, stringValue);
+                                                    stmt.setCharacterStream(index, new StringReader(stringValue), stringValue.length());
+
                                                     // TODO: Check BLOB: should we be able to set a String as a Blob?
                                                 } else {
                                                     // Set String as String

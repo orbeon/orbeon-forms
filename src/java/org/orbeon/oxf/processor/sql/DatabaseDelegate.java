@@ -22,7 +22,6 @@ import java.sql.SQLException;
  * This interface is implemented by all vendor-specific database delegates.
  */
 public interface DatabaseDelegate {
-    public void setClob(PreparedStatement stmt, int index, String value) throws SQLException;
     public void setBlob(PreparedStatement stmt, int index, byte[] value) throws SQLException;
     public OutputStream getBlobOutputStream(PreparedStatement stmt, int index) throws SQLException;
     public boolean isXMLType(int columnType, String columnTypeName) throws SQLException;

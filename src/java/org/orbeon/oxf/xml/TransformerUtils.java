@@ -407,6 +407,18 @@ public class TransformerUtils {
     }
 
     /**
+     * Transforms a W3C DOM into a new W3C DOM. Useful when the initial DOM is immutable.
+     *
+     */
+    public static org.w3c.dom.Document domDocument2DomDocument(org.w3c.dom.Document document) throws TransformerException {
+        final Transformer identity = getIdentityTransformer();
+        final DOMResult domResult = new DOMResult();
+        identity.transform(new DOMSource(document), domResult);
+        final Node resultNode = domResult.getNode();
+        return (resultNode instanceof org.w3c.dom.Document) ? ((org.w3c.dom.Document) resultNode) : resultNode.getOwnerDocument();
+    }
+
+    /**
      * Transform a String to a TinyTree.
      */
     public static DocumentInfo stringToTinyTree(String string) {

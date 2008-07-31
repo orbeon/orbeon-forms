@@ -628,34 +628,42 @@ public class XFormsStaticState {
     
     public Object getProperty(String propertyName) {
         final Object documentProperty = (Object) nonDefaultProperties.get(propertyName);
-        if (documentProperty != null)
+        if (documentProperty != null) {
             return documentProperty;
-        else
-            return XFormsProperties.getPropertyDefinition(propertyName).getDefaultValue();
+        } else {
+            final XFormsProperties.PropertyDefinition propertyDefinition = XFormsProperties.getPropertyDefinition(propertyName);
+            return (propertyDefinition != null) ? propertyDefinition.getDefaultValue() : null; // may be null for example for type formats
+        }
     }
 
     public String getStringProperty(String propertyName) {
         final String documentProperty = (String) nonDefaultProperties.get(propertyName);
-        if (documentProperty != null)
+        if (documentProperty != null) {
             return documentProperty;
-        else
-            return (String) (XFormsProperties.getPropertyDefinition(propertyName)).getDefaultValue();
+        } else {
+            final XFormsProperties.PropertyDefinition propertyDefinition = XFormsProperties.getPropertyDefinition(propertyName);
+            return (propertyDefinition != null) ? (String) propertyDefinition.getDefaultValue() : null; // may be null for example for type formats
+        }
     }
 
     public boolean getBooleanProperty(String propertyName) {
         final Boolean documentProperty = (Boolean) nonDefaultProperties.get(propertyName);
-        if (documentProperty != null)
+        if (documentProperty != null) {
             return documentProperty.booleanValue();
-        else
-            return ((Boolean) (XFormsProperties.getPropertyDefinition(propertyName)).getDefaultValue()).booleanValue();
+        } else {
+            final XFormsProperties.PropertyDefinition propertyDefinition = XFormsProperties.getPropertyDefinition(propertyName);
+            return ((Boolean) propertyDefinition.getDefaultValue()).booleanValue();
+        }
     }
 
     public int getIntegerProperty(String propertyName) {
         final Integer documentProperty = (Integer) nonDefaultProperties.get(propertyName);
-        if (documentProperty != null)
+        if (documentProperty != null) {
             return documentProperty.intValue();
-        else
-            return ((Integer) (XFormsProperties.getPropertyDefinition(propertyName)).getDefaultValue()).intValue();
+        } else {
+            final XFormsProperties.PropertyDefinition propertyDefinition = XFormsProperties.getPropertyDefinition(propertyName);
+            return ((Integer) propertyDefinition.getDefaultValue()).intValue();
+        }
     }
 
     public Map getEventNamesMap() {

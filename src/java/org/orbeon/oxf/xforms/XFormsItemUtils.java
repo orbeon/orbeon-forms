@@ -148,8 +148,6 @@ public class XFormsItemUtils {
     public static void visitItemsTree(ContentHandler contentHandler, List items, LocationData locationData, TreeListener listener) {
         if (items != null && items.size() > 0) { // may be null when there is no item in the itemset
 
-//            XFormsServer.logger.info("xxx logging items:");
-
             int currentLevel = 0;
             int startItemCount = 0;
             boolean first = true;

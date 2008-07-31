@@ -126,8 +126,14 @@ public class XFormsInputControl extends XFormsValueControl {
             if (boundNode == null) {
                 result = null;
             } else {
+
+                final String xpathExpression =
+                        "if (. castable as xs:date) then format-date(xs:date(.), '"
+                                + XFormsProperties.getTypeInputFormat(containingDocument, "time".equals(typeName) ? "time" : "date")
+                                + "', 'en', (), ()) else .";
+
                 result = XPathCache.evaluateAsString(pipelineContext, boundNode,
-                        XFormsProperties.getTypeInputFormat(containingDocument, "time".equals(typeName) ? "time" : "date"),
+                        xpathExpression,
                         prefixToURIMap, getContextStack().getCurrentVariables(),
                         XFormsContainingDocument.getFunctionLibrary(),
                         getContextStack().getFunctionContext(), null, getLocationData());
@@ -162,8 +168,14 @@ public class XFormsInputControl extends XFormsValueControl {
             if (boundNode == null) {
                 result = null;
             } else {
+
+                final String xpathExpression =
+                        "if (. castable as xs:date) then format-date(xs:date(.), '"
+                                + XFormsProperties.getTypeInputFormat(containingDocument, "time")
+                                + "', 'en', (), ()) else .";
+
                 result = XPathCache.evaluateAsString(pipelineContext, boundNode,
-                        XFormsProperties.getTypeInputFormat(containingDocument, "time"),
+                        xpathExpression,
                         prefixToURIMap, getContextStack().getCurrentVariables(),
                         XFormsContainingDocument.getFunctionLibrary(),
                         getContextStack().getFunctionContext(), null, getLocationData());

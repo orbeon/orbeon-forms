@@ -56,6 +56,10 @@
     <property as="xs:string"  name="oxf.xforms.format.float"                         value="if (. castable as xs:float) then format-number(xs:float(.),'#,##0.000') else ."/>
     <property as="xs:string"  name="oxf.xforms.format.double"                        value="if (. castable as xs:double) then format-number(xs:double(.),'#,##0.000') else ."/>
 
+    <property as="xs:string"  name="oxf.xforms.format.input.date"                    value="..."/>
+    <property as="xs:string"  name="oxf.xforms.format.input.dateTime"                value="..."/>
+    <property as="xs:string"  name="oxf.xforms.format.input.time"                    value="[h]:[m]:[s] [P]"/> <!-- [h]:[m]:[s] [P]  or  [H]:[m]:[s] -->
+
     <!-- XForms cache configuration -->
     <property as="xs:string"  name="oxf.xforms.state-handling"                       value="server"/>
     <property as="xs:integer" name="oxf.xforms.store.application.size"               value="20000000"/>

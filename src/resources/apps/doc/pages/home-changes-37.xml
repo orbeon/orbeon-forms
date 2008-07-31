@@ -56,6 +56,15 @@
                 <ul>
                     <li>
                         <p>
+                            The XForms engine now supports a new mode called <i>noscript</i>, an accessible,
+                            JavaScript-free rendering mode.
+                        </p>
+                        <p>
+                            [TODO: how to enable, etc.]
+                        </p>
+                    </li>
+                    <li>
+                        <p>
                             <b>Inline XML Schema support.</b> XForms supports using XML Schemas which are embedded
                             within the <code>&lt;xforms:model></code> element. Orbeon Forms now supports this feature.
                             This is particularly useful when you create a new schema which is just used within an XForms
@@ -1197,6 +1206,17 @@ http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=2
         <a name="compatibility"/>
         <section>
             <title>Compatibility Notes</title>
+            <section>
+                <title>Legacy Classic XForms Engine</title>
+                <p>
+                    The <a href="home-faq#xforms-classic-ng">legacy Classic XForms engine</a> has been deprecated for
+                    several releases now, and is expected to be removed entirely in the next version of Orbeon Forms.
+                </p>
+                <p>
+                    This is particularly appropriate now that the XForms engine support the <i>noscript</i> mode, an
+                    accessible, JavaScript-free rendering mode.
+                </p>
+            </section>
             <section>
                 <title>Binds Evaluation</title>
                 <p>

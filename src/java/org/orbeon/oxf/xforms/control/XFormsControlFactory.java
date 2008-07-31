@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.control;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.control.controls.*;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.dom4j.Element;
 
 import java.util.Map;
@@ -28,8 +29,85 @@ public class XFormsControlFactory {
 
     private static Map nameToClassMap = new HashMap();
 
+    // TODO: fix terminology which is not consistent with class hierarchy
+    private static final Map CONTAINER_CONTROLS = new HashMap();
+    private static final Map CORE_VALUE_CONTROLS = new HashMap();
+    private static final Map CORE_CONTROLS = new HashMap();
+    private static final Map BUILTIN_CONTROLS = new HashMap();
+
+    public static final Map MANDATORY_SINGLE_NODE_CONTROLS = new HashMap();
+    public static final Map OPTIONAL_SINGLE_NODE_CONTROLS = new HashMap();
+    public static final Map NO_SINGLE_NODE_CONTROLS = new HashMap();
+    public static final Map MANDATORY_NODESET_CONTROLS = new HashMap();
+    public static final Map NO_NODESET_CONTROLS = new HashMap();
+    public static final Map SINGLE_NODE_OR_VALUE_CONTROLS = new HashMap();
+
     static {
-        // Built-in controls
+        CONTAINER_CONTROLS.put("group", "");
+        CONTAINER_CONTROLS.put("repeat", "");
+        CONTAINER_CONTROLS.put("switch", "");
+        CONTAINER_CONTROLS.put("case", "");
+        CONTAINER_CONTROLS.put("dialog", "");
+
+        CORE_VALUE_CONTROLS.put("input", "");
+        CORE_VALUE_CONTROLS.put("secret", "");
+        CORE_VALUE_CONTROLS.put("textarea", "");
+        CORE_VALUE_CONTROLS.put("output", "");
+        CORE_VALUE_CONTROLS.put("upload", "");
+        CORE_VALUE_CONTROLS.put("range", "");
+        CORE_VALUE_CONTROLS.put("select", "");
+        CORE_VALUE_CONTROLS.put("select1", "");
+
+        CORE_VALUE_CONTROLS.put("attribute", ""); // xxforms:attribute extension
+        CORE_VALUE_CONTROLS.put("text", "");      // xxforms:text extension
+
+        final Map coreNoValueControls = new HashMap();
+        coreNoValueControls.put("submit", "");
+        coreNoValueControls.put("trigger", "");
+
+        CORE_CONTROLS.putAll(CORE_VALUE_CONTROLS);
+        CORE_CONTROLS.putAll(coreNoValueControls);
+
+        BUILTIN_CONTROLS.putAll(CONTAINER_CONTROLS);
+        BUILTIN_CONTROLS.putAll(CORE_CONTROLS);
+
+        MANDATORY_SINGLE_NODE_CONTROLS.putAll(CORE_VALUE_CONTROLS);
+        MANDATORY_SINGLE_NODE_CONTROLS.remove("output");
+        MANDATORY_SINGLE_NODE_CONTROLS.put("filename", "");
+        MANDATORY_SINGLE_NODE_CONTROLS.put("mediatype", "");
+        MANDATORY_SINGLE_NODE_CONTROLS.put("setvalue", "");
+
+        SINGLE_NODE_OR_VALUE_CONTROLS.put("output", "");
+
+        OPTIONAL_SINGLE_NODE_CONTROLS.putAll(coreNoValueControls);
+        OPTIONAL_SINGLE_NODE_CONTROLS.put("output", "");  // can have @value attribute
+        OPTIONAL_SINGLE_NODE_CONTROLS.put("value", "");   // can have inline text
+        OPTIONAL_SINGLE_NODE_CONTROLS.put("label", "");   // can have linking or inline text
+        OPTIONAL_SINGLE_NODE_CONTROLS.put("help", "");    // can have linking or inline text
+        OPTIONAL_SINGLE_NODE_CONTROLS.put("hint", "");    // can have linking or inline text
+        OPTIONAL_SINGLE_NODE_CONTROLS.put("alert", "");   // can have linking or inline text
+        OPTIONAL_SINGLE_NODE_CONTROLS.put("copy", "");
+        OPTIONAL_SINGLE_NODE_CONTROLS.put("load", "");    // can have linking
+        OPTIONAL_SINGLE_NODE_CONTROLS.put("message", ""); // can have linking or inline text
+        OPTIONAL_SINGLE_NODE_CONTROLS.put("group", "");
+        OPTIONAL_SINGLE_NODE_CONTROLS.put("switch", "");
+
+        NO_SINGLE_NODE_CONTROLS.put("choices", "");
+        NO_SINGLE_NODE_CONTROLS.put("item", "");
+        NO_SINGLE_NODE_CONTROLS.put("case", "");
+        NO_SINGLE_NODE_CONTROLS.put("toggle", "");
+
+        MANDATORY_NODESET_CONTROLS.put("repeat", "");
+        MANDATORY_NODESET_CONTROLS.put("itemset", "");
+        MANDATORY_NODESET_CONTROLS.put("delete", "");
+
+        NO_NODESET_CONTROLS.putAll(MANDATORY_SINGLE_NODE_CONTROLS);
+        NO_NODESET_CONTROLS.putAll(OPTIONAL_SINGLE_NODE_CONTROLS);
+        NO_NODESET_CONTROLS.putAll(NO_SINGLE_NODE_CONTROLS);
+    }
+
+    static {
+        // Built-in standard controls
         nameToClassMap.put("case", new Factory() {
             public XFormsControl createXFormsControl(XFormsContainingDocument containingDocument, XFormsControl parent, Element element, String name, String effectiveId) {
                 return new XFormsCaseControl(containingDocument, parent, element, name, effectiveId);
@@ -100,7 +178,7 @@ public class XFormsControlFactory {
                 return new XFormsUploadControl(containingDocument, parent, element, name, effectiveId);
             }
         });
-        // Extension controls
+        // Built-in extension controls
         nameToClassMap.put("dialog", new Factory() {
             public XFormsControl createXFormsControl(XFormsContainingDocument containingDocument, XFormsControl parent, Element element, String name, String effectiveId) {
                 return new XXFormsDialogControl(containingDocument, parent, element, name, effectiveId);
@@ -118,16 +196,51 @@ public class XFormsControlFactory {
         });
     }
 
-    public static XFormsControl createXFormsControl(XFormsContainingDocument containingDocument, XFormsControl parent, Element element, String name, String effectiveId) {
+    /**
+     * Create a new XForms control. The control returned may be a built-in standard control, a built-in extension
+     * control, or a custom component.
+     *
+     * @param containingDocument    containing document
+     * @param parent                parent control, null if none
+     * @param element               element associated with the control
+     * @param effectiveId           effective id of the control
+     * @return                      control
+     */
+    public static XFormsControl createXFormsControl(XFormsContainingDocument containingDocument, XFormsControl parent, Element element, String effectiveId) {
 
-        final Factory factory = (Factory) nameToClassMap.get(name);
+        final String controlName = element.getName();
+
+        // First try built-in controls
+        Factory factory = (Factory) nameToClassMap.get(controlName);
+
+        // Then try custom components
         if (factory == null)
-            throw new OXFException("Invalid control name: " + name);
+            factory = containingDocument.getStaticState().getComponentFactory(element.getQName());
 
-        return factory.createXFormsControl(containingDocument, parent, element, name, effectiveId);
+        if (factory == null)
+            throw new OXFException("Invalid control name: " + Dom4jUtils.qNameToexplodedQName(element.getQName()));
+
+        // Create and return the control
+        return factory.createXFormsControl(containingDocument, parent, element, controlName, effectiveId);
     }
 
-    private static abstract class Factory {
+    public static boolean isValueControl(String controlName) {
+        return CORE_VALUE_CONTROLS.get(controlName) != null;
+    }
+
+    public static boolean isContainerControl(String controlName) {
+        return CONTAINER_CONTROLS.get(controlName) != null;
+    }
+
+    public static boolean isCoreControl(String controlName) {
+        return CORE_CONTROLS.get(controlName) != null;
+    }
+
+    public static boolean isBuiltinControl(String controlName) {
+        return BUILTIN_CONTROLS.get(controlName) != null;
+    }
+
+    public static abstract class Factory {
         public abstract XFormsControl createXFormsControl(XFormsContainingDocument containingDocument, XFormsControl parent, Element element, String name, String effectiveId);
     }
 

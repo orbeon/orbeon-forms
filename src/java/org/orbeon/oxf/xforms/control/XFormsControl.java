@@ -73,7 +73,8 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
 
     final boolean[] tempContainsHTML = new boolean[1];// temporary holder
 
-    // TODO: this should be handled in a subclass (e.g. ContainingControl)
+    // TODO: this should be handled in a subclass (e.g. XFormsContainerControl, but that is an interface. Can we do
+    // this with inheritance?
     private List children;
 
     public XFormsControl(XFormsContainingDocument containingDocument, XFormsControl parent, Element element, String name, String effectiveId) {

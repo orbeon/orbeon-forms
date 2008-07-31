@@ -56,8 +56,7 @@
     <property as="xs:string"  name="oxf.xforms.format.float"                         value="if (. castable as xs:float) then format-number(xs:float(.),'#,##0.000') else ."/>
     <property as="xs:string"  name="oxf.xforms.format.double"                        value="if (. castable as xs:double) then format-number(xs:double(.),'#,##0.000') else ."/>
 
-    <property as="xs:string"  name="oxf.xforms.format.input.date"                    value="..."/>
-    <property as="xs:string"  name="oxf.xforms.format.input.dateTime"                value="..."/>
+    <property as="xs:string"  name="oxf.xforms.format.input.date"                    value="[M]/[D]/[Y]"/>
     <property as="xs:string"  name="oxf.xforms.format.input.time"                    value="[h]:[m]:[s] [P]"/> <!-- [h]:[m]:[s] [P]  or  [H]:[m]:[s] -->
 
     <!-- XForms cache configuration -->
@@ -98,6 +97,7 @@
 
     <property as="xs:anyURI"  name="oxf.fr.persistence.service.exist.uri"            value="/exist/rest/db"/>
     <property as="xs:anyURI"  name="oxf.fr.appserver.uri"                            value=""/>
+    <property as="xs:anyURI"  name="oxf.fr.default-logo.uri"                         value="/apps/fr/style/orbeon-logo-trimmed-transparent-42.png"/>
 
     <property as="xs:boolean" name="oxf.fr.detail.noscript.table"                    value="true"/>
     <property as="xs:boolean" name="oxf.fr.detail.toc"                               value="true"/>
@@ -107,6 +107,12 @@
     <property as="xs:boolean" name="oxf.fr.detail.button.clear"                      value="true"/>
     <property as="xs:boolean" name="oxf.fr.detail.button.print"                      value="true"/>
     <property as="xs:boolean" name="oxf.fr.detail.button.pdf"                        value="true"/>
+
+    <property as="xs:boolean" name="oxf.fb.menu.schema"                              value="true"/>
+    <property as="xs:boolean" name="oxf.fb.menu.pdf"                                 value="true"/>
+    <property as="xs:boolean" name="oxf.fb.menu.edit-source"                         value="true"/>
+    <property as="xs:boolean" name="oxf.fb.menu.view-source"                         value="true"/>
+    <property as="xs:boolean" name="oxf.fb.menu.css"                                 value="false"/>
 
     <!-- Deprecated XForms cache configuration -->
     <property as="xs:integer" name="oxf.xforms.cache.session.size"                   value="500000"/>

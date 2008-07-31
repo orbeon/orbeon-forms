@@ -36,7 +36,7 @@
                 <xforms:switch id="switch-{$section-id}" context="{if (@context) then @context else '.'}" xxforms:readonly-appearance="dynamic">
                     <xforms:case id="case-{$section-id}-closed" selected="{if (not($open)) then 'true' else 'false'}">
                         <xhtml:div>
-                            <xsl:element name="{if ($ancestor-sections = 0) then 'h2' else 'h3'}">
+                            <xsl:element name="{if ($ancestor-sections = 0) then 'xhtml:h2' else 'xhtml:h3'}">
                                 <xsl:attribute name="class" select="'fr-section-title'"/>
 
                                 <xsl:variable name="action" as="element(xforms:action)">
@@ -86,7 +86,7 @@
                     </xforms:case>
                     <xforms:case id="case-{$section-id}-open" selected="{if ($open) then 'true' else 'false'}">
                         <xhtml:div>
-                            <xsl:element name="{if ($ancestor-sections = 0) then 'h2' else 'h3'}">
+                            <xsl:element name="{if ($ancestor-sections = 0) then 'xhtml:h2' else 'xhtml:h3'}">
                                 <xsl:attribute name="class" select="'fr-section-title'"/>
 
                                 <xsl:variable name="action" as="element(xforms:action)">

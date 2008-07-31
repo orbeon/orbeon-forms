@@ -23,6 +23,7 @@ import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
+import org.orbeon.oxf.xforms.control.XFormsControlFactory;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.ElementHandler;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -126,15 +127,14 @@ public abstract class HandlerBase extends ElementHandler {
                             sb.append(" xforms-required-filled");
                     }
                 }
-                final String type = xformsControl.getType();
-                if (type != null && (type.startsWith(XFormsConstants.XSD_EXPLODED_TYPE_PREFIX) || type.startsWith(XFormsConstants.XFORMS_EXPLODED_TYPE_PREFIX))) {
+                final String typeName = xformsControl.getBuiltinTypeName();
+                if (typeName != null) {
                     // Control is bound to built-in schema type
                     if (sb.length() > 0)
                         sb.append(' ');
 
-                    final String typeLocalname = type.substring(type.indexOf('}') + 1);
                     sb.append("xforms-type-");
-                    sb.append(typeLocalname);
+                    sb.append(typeName);
                 }
             } else if (!handlerContext.isTemplate()) {
                 // Case of a non-concrete control - simply mark the control as disabled
@@ -236,7 +236,7 @@ public abstract class HandlerBase extends ElementHandler {
         final FastStringBuffer sb;
         {
             // We only call xforms-control the actual controls as per the spec
-            if (!XFormsControls.isGroupingControl(controlName))
+            if (!XFormsControlFactory.isContainerControl(controlName))
                 sb = new FastStringBuffer("xforms-control xforms-");
             else
                 sb = new FastStringBuffer("xforms-");

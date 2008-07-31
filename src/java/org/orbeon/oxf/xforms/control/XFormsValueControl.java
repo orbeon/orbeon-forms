@@ -32,8 +32,8 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
 
     private boolean isValueEvaluated;
     private String value;
-    private boolean isDisplayValueEvaluated;
-    private String displayValue;
+//    private boolean isDisplayValueEvaluated;
+//    private String displayValue;
     private boolean isExternalValueEvaluated;
     private String externalValue;
 
@@ -48,7 +48,7 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
 
         // Evaluate control values
         getValue(pipelineContext);
-        getDisplayValue(pipelineContext);
+//        getDisplayValue(pipelineContext);
         getExternalValue(pipelineContext);
     }
 
@@ -62,10 +62,10 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
         setValue(XFormsInstance.getValueForNodeInfo(boundNode));
     }
 
-    protected void evaluateDisplayValue(PipelineContext pipelineContext) {
-        // No display value for most controls
-        setDisplayValue(null);
-    }
+//    protected void evaluateDisplayValue(PipelineContext pipelineContext) {
+//        // No display value for most controls
+//        setDisplayValue(null);
+//    }
 
     protected void evaluateExternalValue(PipelineContext pipelineContext) {
         // By default, same as value
@@ -90,47 +90,19 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
         // the controls as dirty, and they will be evaluated when necessary later.
     }
 
-    protected void evaluateDisplayValueUseFormat(PipelineContext pipelineContext, String format) {
+    protected String getValueUseFormat(PipelineContext pipelineContext, String format) {
         final String result;
         if (format == null) {
             // Try default format for known types
 
+            // Assume xs: prefix for default formats
             final Map prefixToURIMap = new HashMap();
             prefixToURIMap.put(XMLConstants.XSD_PREFIX, XMLConstants.XSD_URI);
 
             // Format according to type
-            final String type = getType();
-            if (type != null){
-                // Support both xs:* and xforms:*
-                final boolean isBuiltInSchemaType = type.startsWith(XFormsConstants.XSD_EXPLODED_TYPE_PREFIX);
-                final boolean isBuiltInXFormsType = type.startsWith(XFormsConstants.XFORMS_EXPLODED_TYPE_PREFIX);
-
-                if (isBuiltInSchemaType || isBuiltInXFormsType) {
-                    final String typeName = type.substring(type.indexOf('}') + 1);
-
-                    if ("date".equals(typeName)) {
-                        // Format a date
-                        format = XFormsProperties.getDateFormat(containingDocument);
-                    } else if ("dateTime".equals(typeName)) {
-                        // Format a dateTime
-                        format = XFormsProperties.getDateTimeFormat(containingDocument);
-                    } else if ("time".equals(typeName)) {
-                        // Format a time
-                        format = XFormsProperties.getTimeFormat(containingDocument);
-                    } else if ("decimal".equals(typeName)) {
-                        // Format a decimal
-                        format = XFormsProperties.getDecimalFormat(containingDocument);
-                    } else if ("integer".equals(typeName)) {
-                        // Format an integer
-                        format = XFormsProperties.getIntegerFormat(containingDocument);
-                    } else if ("float".equals(typeName)) {
-                        // Format a float
-                        format = XFormsProperties.getFloatFormat(containingDocument);
-                    } else if ("double".equals(typeName)) {
-                        // Format a double
-                        format = XFormsProperties.getDoubleFormat(containingDocument);
-                    }
-                }
+            final String typeName = getBuiltinTypeName();
+            if (typeName != null) {
+                format = XFormsProperties.getTypeOutputFormat(containingDocument, typeName);
             }
 
             if (format != null) {
@@ -161,7 +133,7 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
                         getContextStack().getFunctionContext(), null, getLocationData());
             }
         }
-        setDisplayValue(result);
+        return result;
     }
 
     /**
@@ -178,13 +150,13 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
     /**
      * Return a formatted display value of the control value, null if there is no such display value.
      */
-    public final String getDisplayValue(PipelineContext pipelineContext) {
-        if (!isDisplayValueEvaluated) {
-            evaluateDisplayValue(pipelineContext);
-            isDisplayValueEvaluated = true;
-        }
-        return displayValue;
-    }
+//    public final String getDisplayValue(PipelineContext pipelineContext) {
+//        if (!isDisplayValueEvaluated) {
+//            evaluateDisplayValue(pipelineContext);
+//            isDisplayValueEvaluated = true;
+//        }
+//        return displayValue;
+//    }
 
     /**
      * Return the control's external value is the value as exposed to the UI layer.
@@ -212,16 +184,17 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
      * value.
      */
     public String getDisplayValueOrExternalValue(PipelineContext pipelineContext) {
-        return displayValue != null ? displayValue : getExternalValue(pipelineContext);
+//        return displayValue != null ? displayValue : getExternalValue(pipelineContext);
+        return getExternalValue(pipelineContext);
     }
 
     protected final void setValue(String value) {
         this.value = value;
     }
 
-    protected final void setDisplayValue(String displayValue) {
-        this.displayValue = displayValue;
-    }
+//    protected final void setDisplayValue(String displayValue) {
+//        this.displayValue = displayValue;
+//    }
 
     protected final void setExternalValue(String externalValue) {
         this.externalValue = externalValue;
@@ -244,6 +217,6 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
     }
 
     public boolean isValueControl() {
-        return XFormsControls.isValueControl(getName());
+        return XFormsControlFactory.isValueControl(getName());
     }
 }

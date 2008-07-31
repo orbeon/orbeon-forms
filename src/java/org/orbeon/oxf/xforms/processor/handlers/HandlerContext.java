@@ -177,7 +177,7 @@ public class HandlerContext {
     }
 
     public String getEffectiveId(Attributes controlElementAttributes) {
-        return controlElementAttributes.getValue("id") + getIdPostfix();
+        return getIdPrefix() + controlElementAttributes.getValue("id") + getIdPostfix();
     }
 
     /**
@@ -188,6 +188,25 @@ public class HandlerContext {
     public LocationData getLocationData() {
         final Locator locator = getController().getLocator();
         return (locator == null) ? null : new LocationData(locator);
+    }
+
+    private Stack componentContextStack; // Stack<String> of static component id prefixes
+
+    public String getIdPrefix() {
+        return (componentContextStack == null || componentContextStack.size() == 0) ? "" : (String) componentContextStack.peek();
+    }
+
+    public void pushComponentContext(String staticId) {
+
+        final String newIdPrefix = getIdPrefix() + staticId + XFormsConstants.COMPONENT_SEPARATOR;
+
+        if (componentContextStack == null)
+            componentContextStack = new Stack();
+        componentContextStack.push(newIdPrefix);
+    }
+
+    public void popComponentContext() {
+        componentContextStack.pop();
     }
 
     private Stack repeatContextStack;

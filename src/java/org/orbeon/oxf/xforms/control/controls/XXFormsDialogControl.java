@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.control.controls;
 
 import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.control.XFormsContainerControl;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsControls;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
@@ -26,7 +27,7 @@ import org.dom4j.Element;
 /**
  * Represents an extension xxforms:dialog control.
  */
-public class XXFormsDialogControl extends XFormsControl {
+public class XXFormsDialogControl extends XFormsControl implements XFormsContainerControl {
 
     private String level;
     private boolean close;

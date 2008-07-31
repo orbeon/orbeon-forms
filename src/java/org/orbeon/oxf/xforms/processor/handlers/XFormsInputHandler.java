@@ -38,7 +38,6 @@ import java.util.List;
 public class XFormsInputHandler extends XFormsCoreControlHandler {
 
     private static final String[] XXFORMS_ATTRIBUTES_TO_COPY = { "size", "maxlength", "autocomplete" };
-    private static final String NBSP = "\u00a0";
 
     public XFormsInputHandler() {
         super(false);
@@ -50,22 +49,23 @@ public class XFormsInputHandler extends XFormsCoreControlHandler {
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
         final boolean isConcreteControl = inputControl != null;
 
+        final String controlTypeName = (inputControl != null) ? inputControl.getBuiltinTypeName() : null;
+
         final AttributesImpl newAttributes;
-        final boolean isDate;
+        final boolean isDateTime;
         final boolean isBoolean;
         {
             final FastStringBuffer classes = getInitialClasses(localname, attributes, inputControl);
             if (!handlerContext.isTemplate()) {
                 if (isConcreteControl) {
-                    final String controlType = inputControl.getType();
-                    isDate = XMLConstants.XS_DATE_EXPLODED_QNAME.equals(controlType) || XFormsConstants.XFORMS_DATE_EXPLODED_QNAME.equals(controlType);
-                    isBoolean = XMLConstants.XS_BOOLEAN_EXPLODED_QNAME.equals(controlType) || XFormsConstants.XFORMS_BOOLEAN_EXPLODED_QNAME.equals(controlType);
+                    isDateTime = "dateTime".equals(controlTypeName);
+                    isBoolean = "boolean".equals(controlTypeName);
                 } else {
-                    isDate = false;
+                    isDateTime = false;
                     isBoolean = false;
                 }
             } else {
-                isDate = false;
+                isDateTime = false;
                 isBoolean = false;
             }
             handleMIPClasses(classes, id, inputControl);
@@ -95,66 +95,99 @@ public class XFormsInputHandler extends XFormsCoreControlHandler {
         } else {
 
             // Create xhtml:span
-            final boolean isReadOnly = isConcreteControl && inputControl.isReadonly();
+//            final boolean isReadOnly = isConcreteControl && inputControl.isReadonly();
             final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
             final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
             final String inputQName = XMLUtils.buildQName(xhtmlPrefix, "input");
             contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, newAttributes);
             {
                 // Create xhtml:span for date display
-                if (!isStaticReadonly(inputControl)) {
-                    final StringBuffer spanClasses = new StringBuffer("xforms-date-display");
-                    if (isReadOnly)
-                        spanClasses.append(" xforms-readonly");
-                    reusableAttributes.clear();
-                    reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, spanClasses.toString());// TODO: check whether like in the XSTL version we need to copy other classes as well
-                    contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, reusableAttributes);
-                    if (isConcreteControl && isDate) {
-                        final String displayValueOrValue = inputControl.getDisplayValueOrExternalValue(pipelineContext);
-                        if (displayValueOrValue != null && !displayValueOrValue.equals("")) {
-                            contentHandler.characters(displayValueOrValue.toCharArray(), 0, displayValueOrValue.length());
-                        } else {
-                            // Add an nbsp to facilitate styling
-                            contentHandler.characters(NBSP.toCharArray(), 0, NBSP.length());
-                        }
-                    }
-                    contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
-                }
+                // NOTE: With the new date / time / dateTime handling, we don't display the formatted date separately for now
+//                if (!isStaticReadonly(inputControl)) {
+//                    final StringBuffer spanClasses = new StringBuffer("xforms-date-display");
+//                    if (isReadOnly)
+//                        spanClasses.append(" xforms-readonly");
+//                    reusableAttributes.clear();
+//                    reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, spanClasses.toString());
+//                    contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, reusableAttributes);
+//                    if (isConcreteControl && isDate) {
+//                        final String displayValueOrValue = inputControl.getDisplayValueOrExternalValue(pipelineContext);
+//                        if (displayValueOrValue != null && !displayValueOrValue.equals("")) {
+//                            contentHandler.characters(displayValueOrValue.toCharArray(), 0, displayValueOrValue.length());
+//                        } else {
+//                            // Add an nbsp to facilitate styling
+//                            contentHandler.characters(NBSP.toCharArray(), 0, NBSP.length());
+//                        }
+//                    }
+//                    contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
+//                }
 
                 // Create xhtml:input
                 {
-                    reusableAttributes.clear();
                     if (!isStaticReadonly(inputControl)) {
-                        // Regular mode
+                        // Regular read-write mode
 
                         final StringBuffer inputClasses = new StringBuffer("xforms-input-input");
 
-                        reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, "input-" + effectiveId);
-                        reusableAttributes.addAttribute("", "type", "type", ContentHandlerHelper.CDATA, "text");
-                        reusableAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, effectiveId);
+                        // Main input field
 
+                        {
+                            reusableAttributes.clear();
+                            reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, "input1-" + effectiveId);
+                            reusableAttributes.addAttribute("", "type", "type", ContentHandlerHelper.CDATA, "text");
+                            reusableAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, "input1-" + effectiveId);
 
-                        if (isConcreteControl) {
-                            // Output value only for concrete control
-                            final String value = inputControl.getExternalValue(pipelineContext);
-                            reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, (value == null) ? "" : value);
-                        } else {
-                            reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, "");
+                            if (isConcreteControl) {
+                                // Output value only for concrete control
+                                final String inputValue = inputControl.getFirstValueUseFormat(pipelineContext);
+                                reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, inputValue);
+                            } else {
+                                reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, "");
+                            }
+
+                            reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, inputClasses.toString());
+
+                            handleReadOnlyAttribute(reusableAttributes, containingDocument, inputControl);
+
+                            // Copy special attributes in xxforms namespace
+                            copyAttributes(attributes, XFormsConstants.XXFORMS_NAMESPACE_URI, XXFORMS_ATTRIBUTES_TO_COPY, reusableAttributes);
+
+                            // Handle accessibility attributes
+                            handleAccessibilityAttributes(attributes, reusableAttributes);
+
+                            contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName, reusableAttributes);
+                            contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName);
                         }
 
-                        reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA,
-                                (inputClasses.length() > 0) ? inputClasses.toString() : "");// TODO: check whether like in the XSTL version we need to copy other classes as well
+                        // Add second field for dateTime's time part
+                        if (isDateTime) {
 
-                        handleReadOnlyAttribute(reusableAttributes, containingDocument, inputControl);
+                            reusableAttributes.clear();
+                            reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, "input2-" + effectiveId);
+                            reusableAttributes.addAttribute("", "type", "type", ContentHandlerHelper.CDATA, "text");
+                            reusableAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, "input2-" + effectiveId);
 
-                        // Copy special attributes in xxforms namespace
-                        copyAttributes(attributes, XFormsConstants.XXFORMS_NAMESPACE_URI, XXFORMS_ATTRIBUTES_TO_COPY, reusableAttributes);
+                            if (isConcreteControl) {
+                                // Output value only for concrete control
+                                final String inputValue = inputControl.getSecondValueUseFormat(pipelineContext);
+                                reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, inputValue);
+                            } else {
+                                reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, "");
+                            }
 
-                        // Handle accessibility attributes
-                        handleAccessibilityAttributes(attributes, reusableAttributes);
+                            reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, inputClasses.toString());
 
-                        contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName, reusableAttributes);
-                        contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName);
+                            handleReadOnlyAttribute(reusableAttributes, containingDocument, inputControl);
+
+                            // TODO: set @size and @maxlength
+
+                            // Handle accessibility attributes
+                            handleAccessibilityAttributes(attributes, reusableAttributes);
+
+                            contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName, reusableAttributes);
+                            contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName);
+                        }
+
                     } else {
                         // Read-only mode
                         if (isConcreteControl) {
@@ -167,24 +200,26 @@ public class XFormsInputHandler extends XFormsCoreControlHandler {
                 }
 
                 // Create xhtml:span for date picker
-                if (!isStaticReadonly(inputControl)) {
-                    final StringBuffer spanClasses = new StringBuffer("xforms-showcalendar");
-                    if (isReadOnly)
-                        spanClasses.append(" xforms-showcalendar-readonly");
-
-                    reusableAttributes.clear();
-                    reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, spanClasses.toString());
-                    reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, "showcalendar-" + effectiveId);
-
-                    // HACK: Output XHTML image natively in order to help with the IE bug whereby IE reloads
-                    // background images way too often.
-                    reusableAttributes.addAttribute("", "src", "src", ContentHandlerHelper.CDATA, XFormsConstants.CALENDAR_IMAGE_URI);
-                    reusableAttributes.addAttribute("", "alt", "alt", ContentHandlerHelper.CDATA, "");// empty alt for validator
-
-                    final String imgQName = XMLUtils.buildQName(xhtmlPrefix, "img");
-                    contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "img", imgQName, reusableAttributes);
-                    contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "img", imgQName);
-                }
+                // NOTE: With the new date / time / dateTime handling, we don't display the icon
+//                if (!isStaticReadonly(inputControl)) {
+//                    // TODO: don't do this if type is not date or date-time: switch should be done in xforms.js
+//                    final StringBuffer spanClasses = new StringBuffer("xforms-showcalendar");
+//                    if (isReadOnly)
+//                        spanClasses.append(" xforms-showcalendar-readonly");
+//
+//                    reusableAttributes.clear();
+//                    reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, spanClasses.toString());
+//                    reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, "showcalendar-" + effectiveId);
+//
+//                    // HACK: Output XHTML image natively in order to help with the IE bug whereby IE reloads
+//                    // background images way too often.
+//                    reusableAttributes.addAttribute("", "src", "src", ContentHandlerHelper.CDATA, XFormsConstants.CALENDAR_IMAGE_URI);
+//                    reusableAttributes.addAttribute("", "alt", "alt", ContentHandlerHelper.CDATA, "");// empty alt for validator
+//
+//                    final String imgQName = XMLUtils.buildQName(xhtmlPrefix, "img");
+//                    contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "img", imgQName, reusableAttributes);
+//                    contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "img", imgQName);
+//                }
             }
             contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
         }

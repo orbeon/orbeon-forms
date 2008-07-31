@@ -136,7 +136,7 @@ public class XFormsTriggerHandler extends XFormsCoreControlHandler {
                                 // Computed resource URL
                                 final XFormsContextStack.BindingContext currentBindingContext = triggerControl.getBindingContext();
                                 if (currentBindingContext != null && currentBindingContext.getSingleNode() != null) {
-                                    final Map prefixToURIMap = containingDocument.getStaticState().getNamespaceMappings(id);
+                                    final Map prefixToURIMap = containingDocument.getStaticState().getNamespaceMappings(controlElement);
                                     final XFormsContextStack contextStack = containingDocument.getXFormsControls().getContextStack();
                                     hrefValue = XFormsUtils.resolveAttributeValueTemplates(pipelineContext,
                                             currentBindingContext.getNodeset(), currentBindingContext.getPosition(),

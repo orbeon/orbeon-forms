@@ -16,9 +16,7 @@ package org.orbeon.oxf.xforms.processor;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xforms.*;
-import org.orbeon.oxf.xforms.control.XFormsControl;
-import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
-import org.orbeon.oxf.xforms.control.XFormsValueControl;
+import org.orbeon.oxf.xforms.control.*;
 import org.orbeon.oxf.xforms.control.controls.*;
 import org.xml.sax.helpers.AttributesImpl;
 
@@ -261,10 +259,10 @@ public class OldControlsComparator extends BaseControlsComparator {
                             final XFormsValueControl xformsValueControl = (XFormsValueControl) xformsSingleNodeControl2;
 
                             // Check if a "display-value" attribute must be added
-                            final String displayValue = xformsValueControl.getDisplayValue(pipelineContext);
-                            if (displayValue != null) {
-                                doOutputElement |= addAttributeIfNeeded(attributesImpl, "display-value", displayValue, isNewRepeatIteration, displayValue.equals(""));
-                            }
+//                            final String displayValue = xformsValueControl.getDisplayValue(pipelineContext);
+//                            if (displayValue != null) {
+//                                doOutputElement |= addAttributeIfNeeded(attributesImpl, "display-value", displayValue, isNewRepeatIteration, displayValue.equals(""));
+//                            }
 
                             // Create element with text value
                             final String value;
@@ -402,7 +400,7 @@ public class OldControlsComparator extends BaseControlsComparator {
             }
 
             // 2: Check children if any
-            if (XFormsControls.isGroupingControl(xformsControl2.getName()) || xformsControl2 instanceof RepeatIterationControl) {
+            if (xformsControl2 instanceof XFormsContainerControl || xformsControl2 instanceof RepeatIterationControl) {
 
                 final List children1 = (xformsControl1 == null) ? null : xformsControl1.getChildren();
                 final List children2 = (xformsControl2.getChildren() == null) ? Collections.EMPTY_LIST : xformsControl2.getChildren();

@@ -17,11 +17,8 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsControls;
 import org.orbeon.oxf.xforms.XFormsProperties;
-import org.orbeon.oxf.xforms.control.XFormsControl;
-import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
-import org.orbeon.oxf.xforms.control.XFormsValueControl;
+import org.orbeon.oxf.xforms.control.*;
 import org.orbeon.oxf.xforms.control.controls.*;
 import org.xml.sax.helpers.AttributesImpl;
 
@@ -276,12 +273,12 @@ public class NewControlsComparator extends BaseControlsComparator {
                                     final XFormsValueControl xformsValueControl = (XFormsValueControl) xformsSingleNodeControl2;
 
                                     // Check if a "display-value" attribute must be added
-                                    if (!isOutputControlWithValueAttribute) {
-                                        final String displayValue = xformsValueControl.getDisplayValue(pipelineContext);
-                                        if (displayValue != null) {
-                                            doOutputElement |= addAttributeIfNeeded(attributesImpl, "display-value", displayValue, isNewRepeatIteration, displayValue.equals(""));
-                                        }
-                                    }
+//                                    if (!isOutputControlWithValueAttribute) {
+//                                        final String displayValue = xformsValueControl.getDisplayValue(pipelineContext);
+//                                        if (displayValue != null) {
+//                                            doOutputElement |= addAttributeIfNeeded(attributesImpl, "display-value", displayValue, isNewRepeatIteration, displayValue.equals(""));
+//                                        }
+//                                    }
 
                                     // Create element with text value
                                     final String value;
@@ -366,7 +363,7 @@ public class NewControlsComparator extends BaseControlsComparator {
                 }
 
                 // 2: Check children if any
-                if (XFormsControls.isGroupingControl(leadingControl.getName()) || leadingControl instanceof RepeatIterationControl) {
+                if (leadingControl instanceof XFormsContainerControl || leadingControl instanceof RepeatIterationControl) {
 
                     final boolean isRepeatControl = leadingControl instanceof XFormsRepeatControl;
 

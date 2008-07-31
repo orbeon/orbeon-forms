@@ -19,6 +19,7 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.control.XFormsControlFactory;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
@@ -609,7 +610,7 @@ public class XFormsContextStack {
             final BindingContext currentBindingContext = (BindingContext) contextStack.get(i);
 
             final Element bindingElement = currentBindingContext.getControlElement();
-            if (bindingElement != null && XFormsControls.groupingControls.get(bindingElement.getName()) != null) {
+            if (bindingElement != null && XFormsControlFactory.isContainerControl(bindingElement.getName())) {
                 // We are a grouping control
                 final String elementId = currentBindingContext.getElementId();
                 if (contextId.equals(elementId)) {

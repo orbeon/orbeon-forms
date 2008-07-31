@@ -14,9 +14,9 @@
 package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsControls;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
+import org.orbeon.oxf.xforms.control.XFormsControlFactory;
 import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -51,7 +51,7 @@ public class XFormsOutputHandler extends XFormsCoreControlHandler {
             } else {
                 parentHandlerLocalname = parentHandlerName;
             }
-            if (XFormsControls.isLeafControl(parentHandlerLocalname))
+            if (XFormsControlFactory.isCoreControl(parentHandlerLocalname))
                 return false;
         }
         return true;

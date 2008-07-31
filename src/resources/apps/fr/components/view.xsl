@@ -109,7 +109,9 @@
                                             <xhtml:table class="fr-layout-table">
                                                 <xhtml:tr>
                                                     <xhtml:td rowspan="2">
-                                                        <xforms:output value="((instance('fr-form-metadata')/logo, concat(PipelineFunctionLibrary:property('oxf.fr.appserver.uri'), '/apps/fr/style/orbeon-logo-trimmed-transparent-42.png'))[normalize-space() != ''])[1]" mediatype="image/*"/>
+                                                        <xsl:if test="normalize-space($default-logo-uri) != ''">
+                                                            <xforms:output value="((instance('fr-form-metadata')/logo, concat(PipelineFunctionLibrary:property('oxf.fr.appserver.uri'), '{$default-logo-uri}'))[normalize-space() != ''])[1]" mediatype="image/*"/>
+                                                        </xsl:if>
                                                     </xhtml:td>
                                                     <xhtml:td>
                                                         <xhtml:h1>
@@ -119,7 +121,6 @@
                                                 </xhtml:tr>
                                                 <xhtml:tr>
                                                     <xhtml:td>
-                                                        <!--<xhtml:div class="fr-form-description">-->
                                                         <xforms:output class="fr-form-description" value="$description"/>
                                                     </xhtml:td>
                                                 </xhtml:tr>
@@ -369,7 +370,7 @@
                 <xhtml:ol>
                     <xsl:for-each select="/xhtml:html/xhtml:body//fr:section">
                         <xhtml:li>
-                            <a href="#{@id}"><xforms:output value="{xforms:label/@ref}"/></a>
+                            <xhtml:a href="#{@id}"><xforms:output value="{xforms:label/@ref}"/></xhtml:a>
                             <!-- Will have to add sub-sections when necessary -->
                         </xhtml:li>
                     </xsl:for-each>

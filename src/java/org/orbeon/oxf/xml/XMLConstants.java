@@ -121,6 +121,8 @@ public class XMLConstants {
 
     public static final String XPATH_FUNCTIONS_NAMESPACE_URI = "http://www.w3.org/2005/xpath-functions";
 
+    public static final String NBSP = "\u00a0";
+
     private XMLConstants() {
         // Disallow contruction
     }

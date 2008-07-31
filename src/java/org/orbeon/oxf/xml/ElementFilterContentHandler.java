@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xml;
 
-import org.orbeon.oxf.xml.ForwardingContentHandler;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -21,10 +20,10 @@ import org.xml.sax.SAXException;
 /**
  * Allows filtering sub-trees by element.
  */
-public abstract class ElementFilterContentHandler extends ForwardingContentHandler {
+public abstract class ElementFilterContentHandler extends SimpleForwardingContentHandler {
 
     private int level = 0;
-    private int xformsLevel = -1;
+    private int filterLevel = -1;
 
     protected abstract boolean isFilterElement(String uri, String localname, String qName, Attributes attributes);
 
@@ -34,9 +33,9 @@ public abstract class ElementFilterContentHandler extends ForwardingContentHandl
 
     public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
 
-        if (xformsLevel == -1) {
+        if (filterLevel == -1) {
             if (isFilterElement(uri, localname, qName, attributes)) {
-                xformsLevel = level;
+                filterLevel = level;
             } else {
                 super.startElement(uri, localname, qName, attributes);
             }
@@ -48,40 +47,40 @@ public abstract class ElementFilterContentHandler extends ForwardingContentHandl
     public void endElement(String uri, String localname, String qName) throws SAXException {
         level--;
 
-        if (xformsLevel == level) {
-            xformsLevel = -1;
-        } else if (xformsLevel == -1) {
+        if (filterLevel == level) {
+            filterLevel = -1;
+        } else if (filterLevel == -1) {
             super.endElement(uri, localname, qName);
         }
     }
 
     public void startPrefixMapping(String s, String s1) throws SAXException {
-        if (xformsLevel == -1)
+        if (filterLevel == -1)
             super.startPrefixMapping(s, s1);
     }
 
     public void endPrefixMapping(String s) throws SAXException {
-        if (xformsLevel == -1)
+        if (filterLevel == -1)
             super.endPrefixMapping(s);
     }
 
     public void ignorableWhitespace(char[] chars, int start, int length) throws SAXException {
-        if (xformsLevel == -1)
+        if (filterLevel == -1)
             super.ignorableWhitespace(chars, start, length);
     }
 
     public void characters(char[] chars, int start, int length) throws SAXException {
-        if (xformsLevel == -1)
+        if (filterLevel == -1)
             super.characters(chars, start, length);
     }
 
     public void skippedEntity(String s) throws SAXException {
-        if (xformsLevel == -1)
+        if (filterLevel == -1)
             super.skippedEntity(s);
     }
 
     public void processingInstruction(String s, String s1) throws SAXException {
-        if (xformsLevel == -1)
+        if (filterLevel == -1)
             super.processingInstruction(s, s1);
     }
 }

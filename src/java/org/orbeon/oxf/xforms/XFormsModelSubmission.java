@@ -278,7 +278,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
             // XPath function library and namespace mappings
             final FunctionLibrary functionLibrary = XFormsContainingDocument.getFunctionLibrary();
-            final Map prefixToURIMap = containingDocument.getStaticState().getNamespaceMappings(getEffectiveId());
+            final Map prefixToURIMap = containingDocument.getStaticState().getNamespaceMappings(submissionElement);
 
             try {
                 final boolean isReplaceAll = replace.equals(XFormsConstants.XFORMS_SUBMIT_REPLACE_ALL);

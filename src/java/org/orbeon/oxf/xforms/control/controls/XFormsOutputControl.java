@@ -27,7 +27,6 @@ import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.processor.XFormsResourceServer;
-import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.saxon.om.NodeInfo;
 
 import java.util.List;
@@ -87,9 +86,9 @@ public class XFormsOutputControl extends XFormsValueControl {
         final String updatedValue;
         if (mediatypeAttribute != null && mediatypeAttribute.startsWith("image/")) {
             // Handle image mediatype
-            final String type = getType();
+            final String typeName = getBuiltinTypeName();
             if (internalValue != null && internalValue.length() > 0 && internalValue.trim().length() > 0) {
-                if (type == null || type.equals(XMLConstants.XS_ANYURI_EXPLODED_QNAME) || type.equals(XFormsConstants.XFORMS_ANYURI_EXPLODED_QNAME)) {
+                if (typeName == null || "anyURI".equals(typeName)) {// we picked xs:anyURI as default
                     // xs:anyURI type
                     if (!urlNorewrite) {
                         // We got a URI and we need to rewrite it to an absolute URI since XFormsResourceServer will have to read and stream
@@ -99,7 +98,7 @@ public class XFormsOutputControl extends XFormsValueControl {
                         // Otherwise we leave the value as is
                         updatedValue = internalValue;
                     }
-                } else if (XMLConstants.XS_BASE64BINARY_EXPLODED_QNAME.equals(type)) {
+                } else if ("base64Binary".equals(typeName)) {
                     // xs:base64Binary type
 
                     final String uri = NetUtils.base64BinaryToAnyURI(pipelineContext, internalValue, NetUtils.SESSION_SCOPE);
@@ -111,9 +110,19 @@ public class XFormsOutputControl extends XFormsValueControl {
             } else {
                 updatedValue = "";
             }
-        } else {
-            // Not an image
+        } else if (mediatypeAttribute != null && mediatypeAttribute.equals("text/html")) {
+            // Handle HTML mediatype
             updatedValue = internalValue;
+        } else {
+            // Handle other mediatypes
+            if (valueAttribute == null) {
+                // There is a single-node binding, so the format may be used
+                final String formattedValue = getValueUseFormat(pipelineContext, format);
+                updatedValue = (formattedValue != null) ? formattedValue : internalValue;
+            } else {
+                // There is a @value attribute, don't use format
+                updatedValue = internalValue;
+            }
         }
 
         setExternalValue(updatedValue);
@@ -145,14 +154,6 @@ public class XFormsOutputControl extends XFormsValueControl {
         // Rewrite new URI to absolute path without the context
         return externalContext.getResponse().rewriteResourceURL(XFormsResourceServer.DYNAMIC_RESOURCES_PATH + digest,
                 ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT);
-    }
-
-    public void evaluateDisplayValue(PipelineContext pipelineContext) {
-        if (valueAttribute == null) {
-            evaluateDisplayValueUseFormat(pipelineContext, format);
-        } else {
-            setDisplayValue(null);
-        }
     }
 
     public String getEscapedExternalValue(PipelineContext pipelineContext) {

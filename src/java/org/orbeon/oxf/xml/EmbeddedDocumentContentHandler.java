@@ -6,7 +6,7 @@ import org.xml.sax.SAXException;
 /**
  * Forwards all the SAX events to a content handler, except for startDocument and endDocument.
  */
-public class EmbeddedDocumentContentHandler extends ForwardingContentHandler {
+public class EmbeddedDocumentContentHandler extends SimpleForwardingContentHandler {
     public EmbeddedDocumentContentHandler(ContentHandler contentHandler) {
         super(contentHandler);
     }

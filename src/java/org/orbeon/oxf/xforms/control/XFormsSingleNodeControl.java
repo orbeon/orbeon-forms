@@ -25,12 +25,12 @@ import org.dom4j.Element;
  */
 public abstract class XFormsSingleNodeControl extends XFormsControl {
 
-    protected boolean mipsRead;
-    protected boolean readonly;
-    protected boolean required;
-    protected boolean relevant;
-    protected boolean valid;
-    protected String type;
+    private boolean mipsRead;
+    private boolean readonly;
+    private boolean required;
+    private boolean relevant;
+    private boolean valid;
+    private String type;
 
     public XFormsSingleNodeControl(XFormsContainingDocument containingDocument, XFormsControl parent, Element element, String name, String effectiveId) {
         super(containingDocument, parent, element, name, effectiveId);
@@ -64,6 +64,28 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
     public String getType() {
         getMIPsIfNeeded();
         return type;
+    }
+
+    /**
+     * Convenience method to return the local name of a built-in XML Schema or XForms type.
+     *
+     * @return the local name of the built-in type, or null if not found
+     */
+    public String getBuiltinTypeName() {
+        final String type = getType();
+
+        if (type != null) {
+            final boolean isBuiltInSchemaType = type.startsWith(XFormsConstants.XSD_EXPLODED_TYPE_PREFIX);
+            final boolean isBuiltInXFormsType = type.startsWith(XFormsConstants.XFORMS_EXPLODED_TYPE_PREFIX);
+
+            if (isBuiltInSchemaType || isBuiltInXFormsType) {
+                return type.substring(type.indexOf('}') + 1);
+            } else {
+                return null;
+            }
+        } else {
+            return null;
+        }
     }
 
     public boolean isValid() {

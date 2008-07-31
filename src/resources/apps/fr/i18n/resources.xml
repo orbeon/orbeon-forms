@@ -125,8 +125,8 @@
                 <refresh>Cette opération raffraîchira la page</refresh>
                 <errors>Votre formulaire contient les erreurs suivantes</errors>
                 <toc>Table des matières</toc>
-                <error-count>erreur dans votre formulaire</error-count>
-                <errors-count>erreurs dans votre formulaire</errors-count>
+                <error-count>erreur de saisie dans votre formulaire</error-count>
+                <errors-count>erreurs de saisie dans votre formulaire</errors-count>
             </titles>
             <messages>
                 <intro><i>Veuillez sélectionner un document avant d'effectuer une opération, ou sélectionnez "Nouveau" pour créer un nouveau formulaire.</i></intro>

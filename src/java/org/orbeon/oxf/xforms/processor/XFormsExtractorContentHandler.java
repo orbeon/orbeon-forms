@@ -33,7 +33,7 @@ import java.net.URISyntaxException;
 import java.util.*;
 
 /**
- * This ContentHandler extracts XForms models and controls from an XHTML document and creates a static state document.
+ * This ContentHandler extracts XForms information from an XHTML document and creates a static state document.
  *
  * The static state document contains only models and controls, without interleaved XHTML elements in order to save
  * memory and to facilitate visiting controls. The exceptions are:
@@ -56,6 +56,9 @@ import java.util.*;
  *   <xxforms:attribute .../>
  *   <!-- E.g. xforms:output within xhtml:title -->
  *   <xforms:output .../>
+ *   <!-- E.g. XBL component definitions -->
+ *   <xbl:xbl .../>
+ *   <xbl:xbl .../>
  *   <!-- Models -->
  *   <xforms:model ...>
  *   <xforms:model ...>
@@ -175,7 +178,10 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
         final boolean isXForms = XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri);
         final boolean isXXForms = XFormsConstants.XXFORMS_NAMESPACE_URI.equals(uri);
         final boolean isEXForms = XFormsConstants.EXFORMS_NAMESPACE_URI.equals(uri);
-        final boolean isXFormsOrExtension = isXForms || isXXForms || isEXForms;
+        final boolean isXBL = XFormsConstants.XBL_NAMESPACE_URI.equals(uri);
+        final boolean isXHTML = XMLConstants.XHTML_NAMESPACE_URI.equals(uri);
+//        final boolean isXFormsOrExtension = isXForms || isXXForms || isEXForms || isXBL;
+        final boolean isXFormsOrExtension = !isXHTML && !"".equals(uri);// TODO: how else can we handle components?
 
         // Handle xml:base
         if (!inXForms) {
@@ -226,18 +232,24 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
         if (inXForms && !inPreserve) {
 
             if (isXXForms) {
-                // Check that we are getting a valid xxforms:* element if used in body
+                // Check that we are getting a valid xxforms:* element
                 if (XFormsConstants.ALLOWED_XXFORMS_ELEMENTS.get(localname) == null)
-                    throw new ValidationException("Invalid element in XForms document: xxforms:" + localname, new LocationData(locator));
+                    throw new ValidationException("Invalid extension element in XForms document: " + qName, new LocationData(locator));
             } else if (isEXForms) {
-                // Check that we are getting a valid exforms:* element if used in body
+                // Check that we are getting a valid exforms:* element
                 if (XFormsConstants.ALLOWED_EXFORMS_ELEMENTS.get(localname) == null)
-                    throw new ValidationException("Invalid element in XForms document: exforms:" + localname, new LocationData(locator));
+                    throw new ValidationException("Invalid eXForms element in XForms document: " + qName, new LocationData(locator));
+            } else if (isXBL) {
+                // Check that we are getting a valid xbl:* element
+                if (XFormsConstants.ALLOWED_XBL_ELEMENTS.get(localname) == null)
+                    throw new ValidationException("Invalid XBL element in XForms document: " + qName, new LocationData(locator));
             }
 
             // Preserve as is the content of labels, etc., instances, and schemas
-            if (XFormsConstants.LABEL_HINT_HELP_ALERT_ELEMENT.get(localname) != null || "instance".equals(localname)
-                    || "schema".equals(localname) && XMLConstants.XSD_URI.equals(uri)) {
+            if ((XFormsConstants.LABEL_HINT_HELP_ALERT_ELEMENT.get(localname) != null // labels, etc. may contain XHTML
+                    || "instance".equals(localname)) && isXForms // XForms instances
+                    || "schema".equals(localname) && XMLConstants.XSD_URI.equals(uri) // XML schemas
+                    || "xbl".equals(localname) && isXBL) {// preserve everything under xbl:xbl so that templates may be processed by static state
                 inPreserve = true;
                 preserveLevel = level;
             }
@@ -278,10 +290,13 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
         level--;
 
         // Check for XForms or extension namespaces
-        final boolean isXForms = XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri);
-        final boolean isXXForms = XFormsConstants.XXFORMS_NAMESPACE_URI.equals(uri);
-        final boolean isEXForms = XFormsConstants.EXFORMS_NAMESPACE_URI.equals(uri);
-        final boolean isXFormsOrExtension = isXForms || isXXForms || isEXForms;
+//        final boolean isXForms = XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri);
+//        final boolean isXXForms = XFormsConstants.XXFORMS_NAMESPACE_URI.equals(uri);
+//        final boolean isEXForms = XFormsConstants.EXFORMS_NAMESPACE_URI.equals(uri);
+//        final boolean isXBL = XFormsConstants.XBL_NAMESPACE_URI.equals(uri);
+        final boolean isXHTML = XMLConstants.XHTML_NAMESPACE_URI.equals(uri);
+//        final boolean isXFormsOrExtension = isXForms || isXXForms || isEXForms || isXBL;
+        final boolean isXFormsOrExtension = !isXHTML && !"".equals(uri);// TODO: how else can we handle components?
 
         // We are within preserved content or we output regular XForms content
         if (inXForms && (inPreserve || isXFormsOrExtension)) {
@@ -305,10 +320,15 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
     }
 
     public void characters(char[] chars, int start, int length) throws SAXException {
-        if (inPreserve)
+        if (inPreserve) {
             super.characters(chars, start, length);
-        else if (inXForms) // TODO: check this: only keep spaces within XForms elements that require it in order to reduce the size of the static state
-            super.characters(chars, start, length);
+        } else {
+
+            // TODO: we must not output characters here if we are not directly within an XForms element; 
+
+            if (inXForms) // TODO: check this: only keep spaces within XForms elements that require it in order to reduce the size of the static state
+                super.characters(chars, start, length);
+        }
     }
 
     public void startPrefixMapping(String prefix, String uri) throws SAXException {

@@ -1,4 +1,4 @@
-    /**
+/**
  *  Copyright (C) 2004 Orbeon, Inc.
  *
  *  This program is free software; you can redistribute it and/or modify it under the terms of the
@@ -29,6 +29,7 @@ public class XFormsConstants {
 
     public static final Map ALLOWED_XXFORMS_ELEMENTS = new HashMap();
     public static final Map ALLOWED_EXFORMS_ELEMENTS = new HashMap();
+    public static final Map ALLOWED_XBL_ELEMENTS = new HashMap();
     public static final Map LABEL_HINT_HELP_ALERT_ELEMENT = new HashMap();
         
     static {
@@ -44,13 +45,15 @@ public class XFormsConstants {
         ALLOWED_XXFORMS_ELEMENTS.put("text", "");
         ALLOWED_XXFORMS_ELEMENTS.put("context", "");
         ALLOWED_XXFORMS_ELEMENTS.put("size", "");//xforms:upload/xxforms:size
-    }
 
-    static {
         ALLOWED_EXFORMS_ELEMENTS.put("variable", "");
-    }
 
-    static {
+        ALLOWED_XBL_ELEMENTS.put("xbl", "");
+        ALLOWED_XBL_ELEMENTS.put("binding", "");
+//        ALLOWED_XBL_ELEMENTS.put("handlers", "");
+//        ALLOWED_XBL_ELEMENTS.put("implementation", "");
+        ALLOWED_XBL_ELEMENTS.put("template", "");
+
         XFormsConstants.LABEL_HINT_HELP_ALERT_ELEMENT.put("label", "");
         XFormsConstants.LABEL_HINT_HELP_ALERT_ELEMENT.put("hint", "");
         XFormsConstants.LABEL_HINT_HELP_ALERT_ELEMENT.put("help", "");
@@ -74,6 +77,14 @@ public class XFormsConstants {
     public static final QName EXFORMS_IF_ATTRIBUTE_QNAME = new QName("if", EXFORMS_NAMESPACE);
     public static final QName EXFORMS_WHILE_ATTRIBUTE_QNAME = new QName("while", EXFORMS_NAMESPACE);
     public static final QName EXFORMS_ITERATE_ATTRIBUTE_QNAME = new QName("iterate", EXFORMS_NAMESPACE);
+
+    // XBL
+    public static final String XBL_PREFIX = "xbl";
+    public static final String XBL_NAMESPACE_URI = "http://www.w3.org/ns/xbl";
+    public static final Namespace XBL_NAMESPACE = new Namespace(XBL_PREFIX, XBL_NAMESPACE_URI);
+    public static final QName XBL_XBL_QNAME = new QName("xbl", XBL_NAMESPACE);
+    public static final QName XBL_BINDING_QNAME = new QName("binding", XBL_NAMESPACE);
+    public static final QName XBL_TEMPLATE_QNAME = new QName("template", XBL_NAMESPACE);
 
     public static final QName XXFORMS_ITERATE_ATTRIBUTE_QNAME = new QName("iterate", XXFORMS_NAMESPACE);
 
@@ -205,6 +216,9 @@ public class XFormsConstants {
 
     public static final char REPEAT_HIERARCHY_SEPARATOR_1 = 0xB7;
     public static final char REPEAT_HIERARCHY_SEPARATOR_2 = '-';
+
+    public static final char COMPONENT_SEPARATOR = '$';
+
     public static final String DEFAULT_UPLOAD_TYPE_EXPLODED_QNAME = XMLConstants.XS_ANYURI_EXPLODED_QNAME;
     public static final QName DEFAULT_UPLOAD_TYPE_QNAME = XMLConstants.XS_ANYURI_QNAME;
 

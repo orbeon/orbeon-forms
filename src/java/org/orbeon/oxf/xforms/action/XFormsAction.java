@@ -146,7 +146,7 @@ public abstract class XFormsAction {
             if (bindingContext.getSingleNode() == null)
                 return null;
 
-            final Map prefixToURIMap = containingDocument.getStaticState().getNamespaceMappings(actionElement.attributeValue("id"));
+            final Map prefixToURIMap = containingDocument.getStaticState().getNamespaceMappings(actionElement);
             final LocationData locationData = (LocationData) actionElement.getData();
 
             resolvedAVTValue = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, bindingContext.getNodeset(),

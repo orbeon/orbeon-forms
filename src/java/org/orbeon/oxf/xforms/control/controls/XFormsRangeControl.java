@@ -59,9 +59,8 @@ public class XFormsRangeControl extends XFormsValueControl {
     }
 
     private String convertFromExternalValue(String externalValue) {
-        if (getStart() != null && getEnd() != null
-                && (XMLConstants.XS_INTEGER_EXPLODED_QNAME.equals(getType()) || XFormsConstants.XFORMS_INTEGER_EXPLODED_QNAME.equals(getType()))) {
-
+        final String typeName = getBuiltinTypeName();
+        if (getStart() != null && getEnd() != null && "integer".equals(typeName)) {
             final int start = Integer.parseInt(getStart());
             final int end = Integer.parseInt(getEnd());
 

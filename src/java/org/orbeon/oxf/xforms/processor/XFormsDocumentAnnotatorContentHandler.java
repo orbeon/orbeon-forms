@@ -33,9 +33,12 @@ import java.util.Enumeration;
 /**
  * ContentHandler that:
  *
- * o adds ids on all the XForms elements which don't have any
- * o gathers namespace information on XForms elements (xforms:* and xxforms:*).
- * o gathers ids of non-XForms elements with AVTs
+ * o adds ids on all the XForms elements which don't have one
+ * o gathers namespace information on XForms elements (xforms:*, xxforms:*, exforms:*, xbl:*).
+ * o finds AVTs on non-XForms elements
+ *   o adds ids to those elements
+ *   o produces xxforms:attribute elements
+ * o finds title information and produces xxforms:text elements
  *
  * NOTE: There was a thought of merging this with XFormsExtractorContentHandler but we need a separate annotated
  * document in XFormsToXHTML to produce the output. Since the handlers use the XForms and XHTML element ids, it doesn't
@@ -108,7 +111,8 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
         final boolean isXForms = XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri);
         final boolean isXXForms = XFormsConstants.XXFORMS_NAMESPACE_URI.equals(uri);
         final boolean isEXForms = XFormsConstants.EXFORMS_NAMESPACE_URI.equals(uri);
-        final boolean isXFormsOrExtension = isXForms || isXXForms || isEXForms;
+        final boolean isXBL = XFormsConstants.XBL_NAMESPACE_URI.equals(uri);
+        final boolean isXFormsOrExtension = isXForms || isXXForms || isEXForms || isXBL;
 
         // Entering model or controls
         if (!inXForms && isXFormsOrExtension) {
@@ -121,6 +125,9 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
             super.startElement(uri, localname, qName, attributes);
         } else if (isXFormsOrExtension) {
             // This is an XForms element
+
+            // TODO: do we actually need to add ids / gather namespaces to xbl:*?
+            // TODO: can we restrain gathering ids / namespaces to only certain elements (all controls + elements with XPath expressions)?
 
             // Create a new id and update the attributes if needed
             attributes = getAttributesGatherNamespaces(attributes, reusableStringArray);
@@ -217,9 +224,9 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
         // Check for preserved content
         if (inXForms && !inPreserve) {
             // Preserve as is the content of labels, etc., instances, and schemas
-            if (XFormsConstants.LABEL_HINT_HELP_ALERT_ELEMENT.get(localname) != null
-                    || "instance".equals(localname)
-                    || "schema".equals(localname) && XMLConstants.XSD_URI.equals(uri)) {
+            if ((XFormsConstants.LABEL_HINT_HELP_ALERT_ELEMENT.get(localname) != null       // labels, etc. may contain XHTML
+                    || "instance".equals(localname)) && isXForms                            // XForms instances
+                    || "schema".equals(localname) && XMLConstants.XSD_URI.equals(uri)) {    // XML schemas
                 inPreserve = true;
                 preserveLevel = level;
             }

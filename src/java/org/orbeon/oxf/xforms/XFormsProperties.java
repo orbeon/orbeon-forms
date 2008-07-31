@@ -55,6 +55,8 @@ public class XFormsProperties {
 
     private static final String SKIP_SCHEMA_VALIDATION_PROPERTY = "skip-schema-validation";
 
+    private static final String TYPE_OUTPUT_FORMAT_PROPERTY_PREFIX = "format.";
+    private static final String TYPE_INPUT_FORMAT_PROPERTY_PREFIX = "format.input.";
     private static final String DATE_FORMAT_PROPERTY = "format.date";
     private static final String DATETIME_FORMAT_PROPERTY = "format.dateTime";
     private static final String TIME_FORMAT_PROPERTY = "format.time";
@@ -62,6 +64,11 @@ public class XFormsProperties {
     private static final String INTEGER_FORMAT_PROPERTY = "format.integer";
     private static final String FLOAT_FORMAT_PROPERTY = "format.float";
     private static final String DOUBLE_FORMAT_PROPERTY = "format.double";
+
+    private static final String DATE_FORMAT_INPUT_PROPERTY = "format.input.date";
+    private static final String TIME_FORMAT_INPUT_PROPERTY = "format.input.time";
+
+    private static final String DATEPICKER_PROPERTY = "datepicker";
 
     private static final String SESSION_HEARTBEAT_PROPERTY = "session-heartbeat";
     public static final String SESSION_HEARTBEAT_DELAY_PROPERTY = "session-heartbeat-delay";
@@ -189,7 +196,10 @@ public class XFormsProperties {
             new PropertyDefinition(REVISIT_HANDLING_PROPERTY, REVISIT_HANDLING_RESTORE_VALUE, true),
             new PropertyDefinition(HELP_HANDLER_PROPERTY, false, true),// dynamic
             new PropertyDefinition(HELP_TOOLTIP_PROPERTY, false, true),
-            new PropertyDefinition(OFFLINE_SUPPORT_PROPERTY, false, true)// dynamic
+            new PropertyDefinition(OFFLINE_SUPPORT_PROPERTY, false, true),// dynamic
+            new PropertyDefinition(DATE_FORMAT_INPUT_PROPERTY, "[M]/[D]/[Y]", true),
+            new PropertyDefinition(TIME_FORMAT_INPUT_PROPERTY, "[h]:[m]:[s] [P]", true),
+            new PropertyDefinition(DATEPICKER_PROPERTY, "jscalendar", true)
     };
 
     private static final Map SUPPORTED_DOCUMENT_PROPERTIES;
@@ -405,31 +415,12 @@ public class XFormsProperties {
         return getReadonlyAppearance(containingDocument).equals(XFormsProperties.READONLY_APPEARANCE_STATIC_VALUE);
     }
 
-    public static String getDateFormat(XFormsContainingDocument containingDocument) {
-        return getStringProperty(containingDocument, DATE_FORMAT_PROPERTY);
+    public static String getTypeOutputFormat(XFormsContainingDocument containingDocument, String typeName) {
+        return getStringProperty(containingDocument, TYPE_OUTPUT_FORMAT_PROPERTY_PREFIX + typeName);
     }
 
-    public static String getDateTimeFormat(XFormsContainingDocument containingDocument) {
-        return getStringProperty(containingDocument, DATETIME_FORMAT_PROPERTY);
-    }
-
-    public static String getTimeFormat(XFormsContainingDocument containingDocument) {
-        return getStringProperty(containingDocument, TIME_FORMAT_PROPERTY);
-    }
-
-    public static String getDecimalFormat(XFormsContainingDocument containingDocument) {
-        return getStringProperty(containingDocument, DECIMAL_FORMAT_PROPERTY);
-    }
-
-    public static String getIntegerFormat(XFormsContainingDocument containingDocument) {
-        return getStringProperty(containingDocument, INTEGER_FORMAT_PROPERTY);
-    }
-    public static String getFloatFormat(XFormsContainingDocument containingDocument) {
-        return getStringProperty(containingDocument, FLOAT_FORMAT_PROPERTY);
-    }
-
-    public static String getDoubleFormat(XFormsContainingDocument containingDocument) {
-        return getStringProperty(containingDocument, DOUBLE_FORMAT_PROPERTY);
+    public static String getTypeInputFormat(XFormsContainingDocument containingDocument, String typeName) {
+        return getStringProperty(containingDocument, TYPE_INPUT_FORMAT_PROPERTY_PREFIX + typeName);
     }
 
     public static boolean isSessionHeartbeat(XFormsContainingDocument containingDocument) {

@@ -55,7 +55,6 @@ public class ElementHandlerController extends ForwardingContentHandler implement
      * Register a handler. The handler can match on a URI + localname, or on URI only. URI
      * matching has lower priority than URI + localname matching.
      *
-     *
      * @param handlerClassName  class name for the handler
      * @param uri               URI of the element that triggers the handler
      * @param localname         local name of the element that triggers the handler

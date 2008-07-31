@@ -13,10 +13,7 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
-import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsControls;
-import org.orbeon.oxf.xforms.XFormsProperties;
-import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.ElementHandlerController;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -24,6 +21,7 @@ import org.orbeon.oxf.xml.XMLUtils;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
+import org.dom4j.QName;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -42,6 +40,8 @@ public class XHTMLBodyHandler extends HandlerBase {
     }
 
     public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
+
+        final XFormsStaticState staticState = containingDocument.getStaticState();
 
         // Register control handlers on controller
         {
@@ -63,6 +63,15 @@ public class XHTMLBodyHandler extends HandlerBase {
             controller.registerHandler(XFormsRepeatHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "repeat");
 
             controller.registerHandler(XXFormsDialogHandler.class.getName(), XFormsConstants.XXFORMS_NAMESPACE_URI, "dialog");
+
+            // Add handlers for custom components
+            final Map componentBindings = staticState.getComponentBindings();
+            if (componentBindings != null) {
+                for (Iterator i = componentBindings.keySet().iterator(); i.hasNext();) {
+                    final QName currentQName = (QName) i.next();
+                    controller.registerHandler(XXFormsComponentHandler.class.getName(), currentQName.getNamespaceURI(), currentQName.getName());
+                }
+            }
         }
 
         // Start xhtml:body
@@ -81,7 +90,7 @@ public class XHTMLBodyHandler extends HandlerBase {
         final String xformsSubmissionPath = externalContext.getRequest().getRequestPath();
 
         // Create xhtml:form element
-        final boolean hasUpload = containingDocument.getStaticState().hasControlByName("upload");
+        final boolean hasUpload = staticState.hasControlByName("upload");
         helper.startElement(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "form", new String[] {
                 // Add id so that things work in portals
                 "id", XFormsUtils.namespaceId(containingDocument, "xforms-form"),
@@ -115,7 +124,7 @@ public class XHTMLBodyHandler extends HandlerBase {
             // Store information about nested repeats hierarchy
             {
                 helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[]{
-                        "type", "hidden", "name", "$repeat-tree", "value", containingDocument.getStaticState().getRepeatHierarchyString()
+                        "type", "hidden", "name", "$repeat-tree", "value", staticState.getRepeatHierarchyString()
                 });
             }
 

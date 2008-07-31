@@ -25,6 +25,7 @@ import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.util.UUIDUtils;
 import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.control.XFormsControlFactory;
 import org.orbeon.oxf.xforms.processor.handlers.*;
 import org.orbeon.oxf.xforms.state.XFormsDocumentCache;
 import org.orbeon.oxf.xforms.state.XFormsState;
@@ -372,9 +373,11 @@ public class XFormsToXHTML extends ProcessorImpl {
         // Process everything
         annotatedDocument.replay(new ElementFilterContentHandler(controller) {
             protected boolean isFilterElement(String uri, String localname, String qName, Attributes attributes) {
-                // We filter everything that is not a control element
-                return !XFormsControls.isActualControl(localname)
-                        && (XFormsConstants.XXFORMS_NAMESPACE_URI.equals(uri) || XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri));
+                // We filter out XForms elements that are not controls
+                return !XFormsControlFactory.isBuiltinControl(localname)
+                        && (XFormsConstants.XXFORMS_NAMESPACE_URI.equals(uri)
+                            || XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri)
+                            || XFormsConstants.XBL_NAMESPACE_URI.equals(uri));
             }
 
             // Below we wrap all the exceptions to try to add location information

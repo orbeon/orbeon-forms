@@ -44,6 +44,7 @@
     <xsl:variable name="has-toc" select="PipelineFunctionLibrary:property('oxf.fr.detail.toc') = 'true'" as="xs:boolean"/>
     <xsl:variable name="error-summary" select="PipelineFunctionLibrary:property('oxf.fr.detail.error-summary')" as="xs:string"/>
     <xsl:variable name="is-noscript-table" select="PipelineFunctionLibrary:property('oxf.fr.detail.noscript.table') = 'false'" as="xs:boolean"/>
+    <xsl:variable name="default-logo-uri" select="PipelineFunctionLibrary:property('oxf.fr.default-logo.uri')" as="xs:string?"/>
     <xsl:variable name="has-button-save-locally" select="PipelineFunctionLibrary:property('oxf.fr.detail.button.save-locally') = 'true'" as="xs:boolean"/>
     <xsl:variable name="has-button-close" select="PipelineFunctionLibrary:property('oxf.fr.detail.button.close') = 'true'" as="xs:boolean"/>
     <xsl:variable name="has-button-clear" select="PipelineFunctionLibrary:property('oxf.fr.detail.button.clear') = 'true'" as="xs:boolean"/>
@@ -194,3 +195,4 @@
     </xsl:template>
 
 </xsl:stylesheet>
+

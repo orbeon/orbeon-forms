@@ -25,8 +25,6 @@ import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.events.XFormsDeselectEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsSelectEvent;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
-import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
-import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.NodeInfo;
 import org.xml.sax.Locator;
 
@@ -54,87 +52,8 @@ public class XFormsControls {
     private XFormsContainingDocument containingDocument;
 
     private XFormsContextStack contextStack;
-
-    //private Map eventsMap;// TODO: this must go into XFormsStaticState
     
     private Map constantItems;
-//    private Map
-
-    public static final Map groupingControls = new HashMap();
-    private static final Map valueControls = new HashMap();
-    private static final Map noValueControls = new HashMap();
-    private static final Map leafControls = new HashMap();
-    private static final Map actualControls = new HashMap();
-    public static final Map mandatorySingleNodeControls = new HashMap();
-    private static final Map optionalSingleNodeControls = new HashMap();
-    public static final Map noSingleNodeControls = new HashMap();
-
-    public static final Map mandatoryNodesetControls = new HashMap();
-    public static final Map noNodesetControls = new HashMap();
-    public static final Map singleNodeOrValueControls = new HashMap();
-
-    static {
-        groupingControls.put("group", "");
-        groupingControls.put("repeat", "");
-        groupingControls.put("switch", "");
-        groupingControls.put("case", "");
-        groupingControls.put("dialog", "");
-
-        valueControls.put("input", "");
-        valueControls.put("secret", "");
-        valueControls.put("textarea", "");
-        valueControls.put("output", "");
-        valueControls.put("upload", "");
-        valueControls.put("range", "");
-        valueControls.put("select", "");
-        valueControls.put("select1", "");
-
-        valueControls.put("attribute", ""); // xxforms:attribute extension
-        valueControls.put("text", "");      // xxforms:text extension
-
-        noValueControls.put("submit", "");
-        noValueControls.put("trigger", "");
-
-        leafControls.putAll(valueControls);
-        leafControls.putAll(noValueControls);
-
-        actualControls.putAll(groupingControls);
-        actualControls.putAll(leafControls);
-
-        mandatorySingleNodeControls.putAll(valueControls);
-        mandatorySingleNodeControls.remove("output");
-        mandatorySingleNodeControls.put("filename", "");
-        mandatorySingleNodeControls.put("mediatype", "");
-        mandatorySingleNodeControls.put("setvalue", "");
-
-        singleNodeOrValueControls.put("output", "");
-
-        optionalSingleNodeControls.putAll(noValueControls);
-        optionalSingleNodeControls.put("output", "");  // can have @value attribute
-        optionalSingleNodeControls.put("value", "");   // can have inline text
-        optionalSingleNodeControls.put("label", "");   // can have linking or inline text
-        optionalSingleNodeControls.put("help", "");    // can have linking or inline text
-        optionalSingleNodeControls.put("hint", "");    // can have linking or inline text
-        optionalSingleNodeControls.put("alert", "");   // can have linking or inline text
-        optionalSingleNodeControls.put("copy", "");
-        optionalSingleNodeControls.put("load", "");    // can have linking
-        optionalSingleNodeControls.put("message", ""); // can have linking or inline text
-        optionalSingleNodeControls.put("group", "");
-        optionalSingleNodeControls.put("switch", "");
-
-        noSingleNodeControls.put("choices", "");
-        noSingleNodeControls.put("item", "");
-        noSingleNodeControls.put("case", "");
-        noSingleNodeControls.put("toggle", "");
-
-        mandatoryNodesetControls.put("repeat", "");
-        mandatoryNodesetControls.put("itemset", "");
-        mandatoryNodesetControls.put("delete", "");
-
-        noNodesetControls.putAll(mandatorySingleNodeControls);
-        noNodesetControls.putAll(optionalSingleNodeControls);
-        noNodesetControls.putAll(noSingleNodeControls);
-    }
 
     public XFormsControls(XFormsContainingDocument containingDocument, XFormsStaticState xformsStaticState, Element repeatIndexesElement) {
 
@@ -293,22 +212,6 @@ public class XFormsControls {
         return contextStack;
     }
 
-    public static boolean isValueControl(String controlName) {
-        return valueControls.get(controlName) != null;
-    }
-
-    public static boolean isGroupingControl(String controlName) {
-        return groupingControls.get(controlName) != null;
-    }
-
-    public static boolean isLeafControl(String controlName) {
-        return leafControls.get(controlName) != null;
-    }
-
-    public static boolean isActualControl(String controlName) {
-        return actualControls.get(controlName) != null;
-    }
-
     /**
      * For the given control id and the current binding, try to find an effective control id.
      *
@@ -343,18 +246,13 @@ public class XFormsControls {
 
             private XFormsControl currentControlsContainer = rootXFormsControl;
 
-            public boolean startVisitControl(Element controlElement, String effectiveControlId) {
-
-                if (effectiveControlId == null)
-                    throw new ValidationException("Control element doesn't have an id", new ExtendedLocationData((LocationData) controlElement.getData(),
-                            "analyzing control element", controlElement));
-
-                final String controlName = controlElement.getName();
+            public void startVisitControl(Element controlElement, String effectiveControlId) {
 
                 // Create XFormsControl with basic information
-                final XFormsControl xformsControl = XFormsControlFactory.createXFormsControl(containingDocument, currentControlsContainer, controlElement, controlName, effectiveControlId);
+                final XFormsControl xformsControl = XFormsControlFactory.createXFormsControl(containingDocument, currentControlsContainer, controlElement, effectiveControlId);
                 idsToXFormsControls.put(effectiveControlId, xformsControl);
 
+                final String controlName = xformsControl.getName();
                 // Control type-specific handling
                 {
                     if (controlName.equals("case")) {
@@ -397,18 +295,16 @@ public class XFormsControls {
                 currentControlsContainer.addChild(xformsControl);
 
                 // Current grouping control becomes the current controls container
-                if (isGroupingControl(controlName)) {
+                if (XFormsControlFactory.isContainerControl(controlName)) {
                     currentControlsContainer = xformsControl;
                 }
-
-                return true;
             }
             
-            public boolean endVisitControl(Element controlElement, String effectiveControlId) {
+            public void endVisitControl(Element controlElement, String effectiveControlId) {
 
                 final String controlName = controlElement.getName();
 
-                if (isGroupingControl(controlName)) {
+                if (XFormsControlFactory.isContainerControl(controlName)) {
                     // Handle grouping controls
 
                     if (controlName.equals("switch")) {
@@ -437,8 +333,6 @@ public class XFormsControls {
                     // Go back up to parent
                     currentControlsContainer = currentControlsContainer.getParent();
                 }
-
-                return true;
             }
 
             public void startRepeatIteration(int iteration, String effectiveIterationId) {
@@ -709,12 +603,12 @@ public class XFormsControls {
     public void visitAllControlsHandleRepeat(PipelineContext pipelineContext, ControlElementVisitorListener controlElementVisitorListener) {
         contextStack.resetBindingContext(pipelineContext);
         final boolean isOptimizeRelevance = XFormsProperties.isOptimizeRelevance(containingDocument);
-        handleControls(pipelineContext, controlElementVisitorListener, isOptimizeRelevance, containingDocument.getStaticState().getControlsDocument().getRootElement(), "");
+        handleControls(pipelineContext, controlElementVisitorListener, isOptimizeRelevance, containingDocument.getStaticState(),
+                containingDocument.getStaticState().getControlsDocument().getRootElement(), "", "");
     }
 
-    private boolean handleControls(PipelineContext pipelineContext, ControlElementVisitorListener controlElementVisitorListener,
-                                   boolean isOptimizeRelevance, Element containerElement, String idPostfix) {
-        boolean doContinue = true;
+    private void handleControls(PipelineContext pipelineContext, ControlElementVisitorListener controlElementVisitorListener,
+                                   boolean isOptimizeRelevance, XFormsStaticState staticState, Element containerElement, String idPrefix, String idPostfix) {
 
         int variablesCount = 0;
         for (Iterator i = containerElement.elements().iterator(); i.hasNext();) {
@@ -722,14 +616,15 @@ public class XFormsControls {
             final String currentControlName = currentControlElement.getName();
 
             final String controlId = currentControlElement.attributeValue("id");
-            final String effectiveControlId = controlId + (idPostfix.equals("") ? "" : XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1 + idPostfix);
+            final String effectiveControlId
+                    = idPrefix + controlId + (idPostfix.equals("") ? "" : XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1 + idPostfix);
 
             if (currentControlName.equals("repeat")) {
                 // Handle xforms:repeat
                 contextStack.pushBinding(pipelineContext, currentControlElement);
 
                 // Visit xforms:repeat element
-                doContinue = controlElementVisitorListener.startVisitControl(currentControlElement, effectiveControlId);
+                controlElementVisitorListener.startVisitControl(currentControlElement, effectiveControlId);
 
                 // Iterate over current xforms:repeat nodeset
                 final List currentNodeSet = contextStack.getCurrentNodeset();
@@ -739,36 +634,33 @@ public class XFormsControls {
                         contextStack.pushIteration(currentPosition);
                         {
                             // Handle children of xforms:repeat
-                            if (doContinue) {
-                                // TODO: handle isOptimizeRelevance()
+                            // TODO: handle isOptimizeRelevance()
 
-                                // Compute repeat iteration id
-                                final String iterationEffectiveId = effectiveControlId
-                                        + (idPostfix.equals("") ? XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1 : XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_2)
-                                        + currentPosition;
+                            // Compute repeat iteration id
+                            final String iterationEffectiveId = effectiveControlId
+                                    + (idPostfix.equals("") ? XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1 : XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_2)
+                                    + currentPosition;
 
-                                controlElementVisitorListener.startRepeatIteration(currentPosition, iterationEffectiveId);
-                                final String newIdPostfix = idPostfix.equals("") ? Integer.toString(currentPosition) : (idPostfix + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_2 + currentPosition);
-                                doContinue = handleControls(pipelineContext, controlElementVisitorListener, isOptimizeRelevance, currentControlElement, newIdPostfix);
-                                controlElementVisitorListener.endRepeatIteration(currentPosition);
-                            }
+                            controlElementVisitorListener.startRepeatIteration(currentPosition, iterationEffectiveId);
+                            final String newIdPostfix = idPostfix.equals("") ? Integer.toString(currentPosition) : (idPostfix + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_2 + currentPosition);
+                            handleControls(pipelineContext, controlElementVisitorListener, isOptimizeRelevance,
+                                    staticState, currentControlElement, idPrefix, newIdPostfix);
+                            controlElementVisitorListener.endRepeatIteration(currentPosition);
                         }
                         contextStack.popBinding();
-                        if (!doContinue)
-                            break;
                     }
                 }
 
-                doContinue = doContinue && controlElementVisitorListener.endVisitControl(currentControlElement, effectiveControlId);
+                controlElementVisitorListener.endVisitControl(currentControlElement, effectiveControlId);
                 contextStack.popBinding();
-            } else if (isGroupingControl(currentControlName)) {
+            } else if (XFormsControlFactory.isContainerControl(currentControlName)) {
                 // Handle XForms grouping controls
                 contextStack.pushBinding(pipelineContext, currentControlElement);
-                doContinue = controlElementVisitorListener.startVisitControl(currentControlElement, effectiveControlId);
+                controlElementVisitorListener.startVisitControl(currentControlElement, effectiveControlId);
                 final XFormsContextStack.BindingContext currentBindingContext = contextStack.getCurrentBindingContext();
-                if (doContinue) {
-                    // Recurse into grouping control if we don't optimize relevance, OR if we do optimize and we are
-                    // not bound to a node OR we are bound to a relevant node
+                {
+                    // Recurse into grouping control and components if we don't optimize relevance, OR if we do
+                    // optimize and we are not bound to a node OR we are bound to a relevant node
 
                     // NOTE: Simply excluding non-selected cases with the expression below doesn't work. So for
                     // now, we don't consider hidden cases as non-relevant. In the future, we might want to improve
@@ -779,16 +671,17 @@ public class XFormsControls {
                             || (!currentBindingContext.isNewBind()
                                  || (currentBindingContext.getSingleNode() != null && InstanceData.getInheritedRelevant(currentBindingContext.getSingleNode())))) {
 
-                        doContinue = handleControls(pipelineContext, controlElementVisitorListener, isOptimizeRelevance, currentControlElement, idPostfix);
+                        handleControls(pipelineContext, controlElementVisitorListener, isOptimizeRelevance,
+                                staticState, currentControlElement, idPrefix, idPostfix);
                     }
                 }
-                doContinue = doContinue && controlElementVisitorListener.endVisitControl(currentControlElement, effectiveControlId);
+                controlElementVisitorListener.endVisitControl(currentControlElement, effectiveControlId);
                 contextStack.popBinding();
-            } else if (isLeafControl(currentControlName)) {
+            } else if (XFormsControlFactory.isCoreControl(currentControlName)) {
                 // Handle leaf control
                 contextStack.pushBinding(pipelineContext, currentControlElement);
-                doContinue = controlElementVisitorListener.startVisitControl(currentControlElement, effectiveControlId);
-                doContinue = doContinue && controlElementVisitorListener.endVisitControl(currentControlElement, effectiveControlId);
+                controlElementVisitorListener.startVisitControl(currentControlElement, effectiveControlId);
+                controlElementVisitorListener.endVisitControl(currentControlElement, effectiveControlId);
                 contextStack.popBinding();
             } else if (currentControlName.equals("variable")) {
                 // Handle xxforms:variable specifically
@@ -801,17 +694,27 @@ public class XFormsControls {
                 contextStack.pushVariable(currentControlElement, variable.getVariableName(), variable.getVariableValue(pipelineContext, true));
 
                 variablesCount++;
-            }
+            } else if (staticState.isComponent(currentControlElement.getQName())) {
+                // Handle components
 
-            if (!doContinue)
-                break;
+                contextStack.pushBinding(pipelineContext, currentControlElement);
+                controlElementVisitorListener.startVisitControl(currentControlElement, effectiveControlId);
+                {
+                    // Recurse into component
+                    handleControls(pipelineContext, controlElementVisitorListener, isOptimizeRelevance,
+                            staticState, staticState.getShadowTreeControls(controlId), idPrefix + controlId + XFormsConstants.COMPONENT_SEPARATOR, idPostfix);
+                }
+                controlElementVisitorListener.endVisitControl(currentControlElement, effectiveControlId);
+                contextStack.popBinding();
+
+            } else {
+                // Ignore, this is not a control
+            }
         }
 
         // Unscope all variables
         for (int i = 0; i < variablesCount; i++)
             contextStack.popBinding();
-
-        return doContinue;
     }
 
     /**
@@ -840,8 +743,8 @@ public class XFormsControls {
     }
 
     private static interface ControlElementVisitorListener {
-        public boolean startVisitControl(Element controlElement, String effectiveControlId);
-        public boolean endVisitControl(Element controlElement, String effectiveControlId);
+        public void startVisitControl(Element controlElement, String effectiveControlId);
+        public void endVisitControl(Element controlElement, String effectiveControlId);
         public void startRepeatIteration(int iteration, String effectiveIterationId);
         public void endRepeatIteration(int iteration);
     }
@@ -1322,7 +1225,7 @@ public class XFormsControls {
             }
 
             // 2: Check children if any
-            if (XFormsControls.isGroupingControl(leadingControl.getName()) || leadingControl instanceof RepeatIterationControl) {
+            if (XFormsControlFactory.isContainerControl(leadingControl.getName()) || leadingControl instanceof RepeatIterationControl) {
 
                 final List children1 = (xformsControl1 == null) ? null : xformsControl1.getChildren();
                 final List children2 = (xformsControl2 == null) ? null : xformsControl2.getChildren();

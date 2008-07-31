@@ -25,6 +25,7 @@ import org.orbeon.oxf.xforms.action.actions.XFormsInsertAction;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
+import org.orbeon.oxf.xforms.control.XFormsComponentControl;
 import org.orbeon.oxf.xforms.control.controls.*;
 import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.*;
@@ -1225,6 +1226,10 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                 while (container != null) {
                     containers.add(container);
                     container = container.getParentContainer(this);
+
+                    // Stop propagation on component boundary
+                    if (container instanceof XFormsComponentControl)
+                        break;
                 }
             }
 

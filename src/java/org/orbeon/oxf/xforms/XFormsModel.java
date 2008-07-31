@@ -24,6 +24,7 @@ import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.control.XFormsControlFactory;
 import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
@@ -992,7 +993,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                         return;
 
                     // Check if value has changed
-                    final boolean isValueControl = XFormsControls.isValueControl(control.getName());
+                    final boolean isValueControl = XFormsControlFactory.isValueControl(control.getName());
                     final boolean valueChanged = isValueControl && InstanceData.isValueChanged(currentNodeInfo);
 
                     final String effectiveId = control.getEffectiveId();
@@ -1138,7 +1139,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                         continue;
 
                     // Is this a value control?
-                    final boolean isValueControl = XFormsControls.isValueControl(xformsControl.getName());
+                    final boolean isValueControl = XFormsControlFactory.isValueControl(xformsControl.getName());
 
                     // "The XForms processor is not considered to be executing an outermost action handler at the time that it
                     // performs deferred update behavior for XForms models. Therefore, event handlers for events dispatched to
@@ -1195,7 +1196,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                             continue;
 
                         // Is this a value control?
-                        final boolean isValueControl = XFormsControls.isValueControl(xformsControl.getName());
+                        final boolean isValueControl = XFormsControlFactory.isValueControl(xformsControl.getName());
 
                         // Re-obtain node to which control is bound, in case things have changed
                         final NodeInfo currentNodeInfo = xformsControl.getBoundNode();
@@ -1249,7 +1250,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                         // The control no longer exists
                         if (eventSchedule.getXFormsControl() != null) {
                             // Is this a value control?
-                            final boolean isValueControl = XFormsControls.isValueControl(eventSchedule.getXFormsControl().getName());
+                            final boolean isValueControl = XFormsControlFactory.isValueControl(eventSchedule.getXFormsControl().getName());
                             sendDefaultEventsForDisabledControl(pipelineContext, eventSchedule.getXFormsControl(), isValueControl,
                                     isMustSendRequiredEvents, isMustSendRelevantEvents, isMustSendReadonlyEvents, isMustSendValidEvents);
                         }
@@ -1332,7 +1333,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                     public void startVisitControl(XFormsControl control) {
 
                         // Don't do anything if it's not a value control
-                        final boolean isValueControl = XFormsControls.isValueControl(control.getName());
+                        final boolean isValueControl = XFormsControlFactory.isValueControl(control.getName());
                         if (!isValueControl)
                             return;
 

@@ -887,7 +887,8 @@ ORBEON.xforms.Controls = {
 
     getCurrentValue: function(control) {
         if (ORBEON.util.Dom.hasClass(control, "xforms-input") && !ORBEON.util.Dom.hasClass(control, "xforms-type-boolean") && !ORBEON.util.Dom.hasClass(control, "xforms-static")) {
-            return ORBEON.util.Dom.getChildElementByIndex(control, 1).value;
+            // TODO: ALEX: fix for dateTime
+            return ORBEON.util.Dom.getChildElementByIndex(control, 0).value;
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-select1-open")) {
             return ORBEON.util.Dom.getChildElementByIndex(control, 0).value;
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-select-appearance-full")
@@ -1009,14 +1010,15 @@ ORBEON.xforms.Controls = {
             }
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-input") && !ORBEON.util.Dom.hasClass(control, "xforms-type-boolean")) {
             // XForms input
-            var displayField = ORBEON.util.Dom.getChildElementByIndex(control, 0);
-            var inputField = ORBEON.util.Dom.getChildElementByIndex(control, 1);
-            var datePicker = ORBEON.util.Dom.getChildElementByIndex(control, 2);
+//            var displayField = ORBEON.util.Dom.getChildElementByIndex(control, 0);
+            // TODO: ALEX: fix for dateTime
+            var inputField = ORBEON.util.Dom.getChildElementByIndex(control, 0);
+//            var datePicker = ORBEON.util.Dom.getChildElementByIndex(control, 1);
 
             // Populate values
-            if (ORBEON.util.Dom.hasClass(control, "xforms-type-date")) {
-                ORBEON.util.Dom.setStringValue(displayField, (displayValue == null || displayValue == "") ? "\u00a0" : displayValue);
-            }
+//            if (ORBEON.util.Dom.hasClass(control, "xforms-type-date")) {
+//                ORBEON.util.Dom.setStringValue(displayField, (displayValue == null || displayValue == "") ? "\u00a0" : displayValue);
+//            }
             if (control.value != newControlValue) {
                 control.previousValue = newControlValue;
                 control.valueSetByXForms++;
@@ -1425,7 +1427,7 @@ ORBEON.xforms.Controls = {
         // To-do: getting elements by position is not very robust
         ORBEON.xforms.Globals.maskFocusEvents = true;
         if (ORBEON.util.Dom.hasClass(control, "xforms-input") && !ORBEON.util.Dom.hasClass(control, "xforms-type-boolean")) {
-            ORBEON.util.Dom.getChildElementByIndex(control, 1).focus();
+            ORBEON.util.Dom.getChildElementByIndex(control, 0).focus();
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-select-appearance-full") || ORBEON.util.Dom.hasClass(control, "xforms-select1-appearance-full")) {
             // Find for radio button or check box that is is checked
             var itemIndex = 0;
@@ -2039,6 +2041,7 @@ ORBEON.xforms.Events = {
                 // Click on calendar inside input field
 
                 // Initialize calendar when needed
+                // TODO: ALEX: fix for dateTime
                 var displayField = ORBEON.util.Dom.getChildElementByIndex(target, 0);
                 var inputField = ORBEON.util.Dom.getChildElementByIndex(target, 1);
                 var showCalendar = ORBEON.util.Dom.getChildElementByIndex(target, 2);
@@ -5373,3 +5376,4 @@ if (!ORBEON.xforms.Globals.pageLoadedRegistered) {
     ORBEON.xforms.Globals.debugLastTime = new Date().getTime();
     ORBEON.xforms.Globals.lastEventSentTime = new Date().getTime();
 }
+

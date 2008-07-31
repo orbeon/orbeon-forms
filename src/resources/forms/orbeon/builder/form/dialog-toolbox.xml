@@ -314,7 +314,7 @@
                     <!-- Actions toolbox -->
                     <xhtml:div class="fb-tools">
 
-                        <xhtml:div class="fb-tool">
+                        <xforms:group ref=".[xxforms:property('oxf.fb.menu.schema') = 'true']" class="fb-tool">
                             <!-- Upload XML Schema -->
                             <xforms:trigger>
                                 <xforms:label>
@@ -325,20 +325,22 @@
                                 </xforms:label>
                                 <xxforms:show ev:event="DOMActivate" dialog="fb-schema-upload-dialog"/>
                             </xforms:trigger>
-                        </xhtml:div>
-                        <xhtml:div class="fb-tool">
-                            <!-- Upload CSS -->
-                            <xforms:trigger>
-                                <xforms:label>
-                                    <xhtml:img src="/apps/fr/style/images/silk/css.png" alt="Upload CSS" title="Upload CSS"/>
-                                    <xhtml:span>
-                                        <xforms:output value="if (xxforms:bind('css-attachment-bind') = '') then 'Upload CSS' else 'Change CSS'"/>
-                                    </xhtml:span>
-                                </xforms:label>
-                                <xxforms:show ev:event="DOMActivate" dialog="fb-css-upload-dialog"/>
-                            </xforms:trigger>
-                        </xhtml:div>
-                        <xhtml:div class="fb-tool">
+                        </xforms:group>
+                        <xforms:group ref=".[xxforms:property('oxf.fb.menu.css') = 'true']" class="fb-tool">
+                            <!--<xhtml:div class="fb-tool">-->
+                                <!-- Upload CSS -->
+                                <xforms:trigger>
+                                    <xforms:label>
+                                        <xhtml:img src="/apps/fr/style/images/silk/css.png" alt="Upload CSS" title="Upload CSS"/>
+                                        <xhtml:span>
+                                            <xforms:output value="if (xxforms:bind('css-attachment-bind') = '') then 'Upload CSS' else 'Change CSS'"/>
+                                        </xhtml:span>
+                                    </xforms:label>
+                                    <xxforms:show ev:event="DOMActivate" dialog="fb-css-upload-dialog"/>
+                                </xforms:trigger>
+                            <!--</xhtml:div>-->
+                        </xforms:group>
+                        <xforms:group ref=".[xxforms:property('oxf.fb.menu.pdf') = 'true']" class="fb-tool">
                             <!-- Upload PDF Template -->
                             <xforms:trigger>
                                 <xforms:label>
@@ -349,8 +351,8 @@
                                 </xforms:label>
                                 <xxforms:show ev:event="DOMActivate" dialog="fb-pdf-upload-dialog"/>
                             </xforms:trigger>
-                        </xhtml:div>
-                        <xhtml:div class="fb-tool">
+                        </xforms:group>
+                        <xforms:group ref=".[xxforms:property('oxf.fb.menu.view-source') = 'true']" class="fb-tool">
                             <!-- Show XML -->
                             <xforms:trigger>
                                 <xforms:label>
@@ -359,8 +361,8 @@
                                 </xforms:label>
                                 <xxforms:show ev:event="DOMActivate" dialog="fb-xml-dialog"/>
                             </xforms:trigger>
-                        </xhtml:div>
-                        <xhtml:div class="fb-tool">
+                        </xforms:group>
+                        <xforms:group ref=".[xxforms:property('oxf.fb.menu.edit-source') = 'true']" class="fb-tool">
                             <!-- Edit Source -->
                             <xforms:trigger>
                                 <xforms:label>
@@ -369,8 +371,7 @@
                                 </xforms:label>
                                 <xxforms:show ev:event="DOMActivate" dialog="fb-source-editor-dialog"/>
                             </xforms:trigger>
-                        </xhtml:div>
-
+                        </xforms:group>
                     </xhtml:div>
                 </xhtml:div>
             </xhtml:dd>

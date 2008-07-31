@@ -89,6 +89,7 @@
     <!--<property as="xs:boolean" name="oxf.xforms.noscript.select-full-fieldsets"       value="false"/>-->
     <property as="xs:integer" name="oxf.xforms.offline-repeat-count"                 value="4"/>
     <property as="xs:integer" name="oxf.xforms.request-retries"                      value="1"/>
+    <property as="xs:string"  name="oxf.xforms.datepicker"                           value="jscalendar"/>  <!-- jcalendar or yui -->
 
     <!-- Form Runner / Form Builder properties -->
     <property as="xs:anyURI"  name="oxf.fr.persistence.app.*.uri"                    value="/fr/service/exist"/>

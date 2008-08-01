@@ -674,7 +674,7 @@
                        method="post" replace="none" resource="test:"/>
 
     <!-- Instance for the itemset editor -->
-    <xforms:instance id="fb-itemset-instance">
+    <xforms:instance id="fb-itemset-instance" xxforms:exclude-result-prefixes="#all">
         <itemset>
             <!-- Content will be like this -->
             <!--<item>-->

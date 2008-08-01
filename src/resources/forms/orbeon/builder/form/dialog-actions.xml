@@ -431,7 +431,7 @@
                         <xxforms:variable name="item-label" select="" as="xs:string"/>
                         <xxforms:variable name="item-value" select="" as="xs:string"/>
                         <xforms:insert nodeset="$control-resources/*"
-                                       origin="xxforms:element('item', (xxforms:element('label', $item-label), xxforms:element('value', $item-value)))"/>
+                                       origin="xxforms:element('item', (xxforms:element('label', xs:string($item-label)), xxforms:element('value', xs:string($item-value))))"/>
                     </xforms:action>
                 </xforms:action>
             </action>

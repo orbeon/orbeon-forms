@@ -148,6 +148,7 @@ a.fb-edit-help-trigger img {
 /* In-place editing for regular fields */
 
 .fr-inplace-buttons { display: block; margin-top: .5em; margin-bottom: .5em }
+.fr-grid .fr-grid-content .fr-inplace-buttons button.xforms-trigger { margin-top: 0 }/* because another rule puts a margin to position buttons further down in the grid */
 .fr-inplace-input input {
     border: 1px inset rgb(233, 233, 174); padding: 0; background-color: #FFFF88; background-image: none; width: 100%
 }

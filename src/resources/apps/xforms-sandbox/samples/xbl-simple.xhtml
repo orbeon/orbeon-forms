@@ -1,0 +1,74 @@
+<!--
+    Copyright (C) 2008 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+        xmlns:f="http://orbeon.org/oxf/xml/formatting"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+        xmlns:foo="http://orbeon.org/oxf/xml/foo"
+        xmlns:ev="http://www.w3.org/2001/xml-events"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:xbl="http://www.w3.org/ns/xbl">
+
+    <xhtml:head>
+        <xforms:model>
+            <xforms:instance id="main-instance">
+                <instance xmlns="">
+                    <value0>42</value0>
+                    <value1>
+                        <date>d1</date>
+                        <time>t1</time>
+                    </value1>
+                    <value2>
+                        <date>d2</date>
+                        <time>t2</time>
+                    </value2>
+                </instance>
+            </xforms:instance>
+        </xforms:model>
+        <xbl:xbl script-type="application/xhtml+xml">
+            <xbl:binding id="test-component" element="foo|test">
+                <xbl:template>
+                    <xhtml:div class="test-class">
+                        <xforms:group xbl:attr="ref=myref">
+                            <!--<xbl:content includes="xforms|label,xforms|help,xforms|hint"/>-->
+                            <xforms:input ref="date">
+                                <xforms:label>Value 2</xforms:label>
+                            </xforms:input>
+                            <xhtml:br/>
+                            <xforms:input ref="time">
+                                <xforms:label>Value 3</xforms:label>
+                            </xforms:input>
+                        </xforms:group>
+                    </xhtml:div>
+                </xbl:template>
+            </xbl:binding>
+        </xbl:xbl>
+    </xhtml:head>
+    <xhtml:body>
+
+        <xforms:input ref="value0">
+            <xforms:label>Value 0: </xforms:label>
+        </xforms:input>
+
+        <!-- Instanciate component -->
+        <foo:test id="my-test-1" myref="value1"/>
+
+        <foo:test id="my-test-2" myref="value2"/>
+
+        <foo:test id="my-test-3" myref="value0"/>
+
+    </xhtml:body>
+</xhtml:html>
+
+        

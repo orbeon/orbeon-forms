@@ -38,7 +38,7 @@ public class XXFormsComponentHandler extends HandlerBase {
 
         final String staticId = handlerContext.getId(attributes);
         final String effectiveId = handlerContext.getEffectiveId(attributes);
-        final String elementName = "span";
+        final String elementName = "div";
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
         final String elementQName = XMLUtils.buildQName(xhtmlPrefix, elementName);
 
@@ -52,7 +52,7 @@ public class XXFormsComponentHandler extends HandlerBase {
         handlerContext.pushComponentContext(staticId);
 
         // Process shadow content if present
-        final Element shadowTree = containingDocument.getStaticState().getShadowTree(staticId);
+        final Element shadowTree = containingDocument.getStaticState().getFullShadowTree(staticId);
         if (shadowTree != null) {
             // TODO: handle inclusion and namespaces using XIncludeProcessor facilities
             TransformerUtils.writeDom4j(shadowTree, new ElementFilterContentHandler(controller) {
@@ -99,7 +99,7 @@ public class XXFormsComponentHandler extends HandlerBase {
         final ElementHandlerController controller = handlerContext.getController();
         final ContentHandler contentHandler = controller.getOutput();
 
-        final String elementName = "span";
+        final String elementName = "div";
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
         final String elementQName = XMLUtils.buildQName(xhtmlPrefix, elementName);
 

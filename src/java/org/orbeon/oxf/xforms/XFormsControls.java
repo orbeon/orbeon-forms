@@ -697,15 +697,15 @@ public class XFormsControls {
             } else if (staticState.isComponent(currentControlElement.getQName())) {
                 // Handle components
 
-                contextStack.pushBinding(pipelineContext, currentControlElement);
+                // NOTE: don't push the binding here, this is handled if necessary by the component implementation
                 controlElementVisitorListener.startVisitControl(currentControlElement, effectiveControlId);
                 {
                     // Recurse into component
+                    final Element shadowTreeDocument = staticState.getShadowTreeControls(controlId);
                     handleControls(pipelineContext, controlElementVisitorListener, isOptimizeRelevance,
-                            staticState, staticState.getShadowTreeControls(controlId), idPrefix + controlId + XFormsConstants.COMPONENT_SEPARATOR, idPostfix);
+                            staticState, shadowTreeDocument, idPrefix + controlId + XFormsConstants.COMPONENT_SEPARATOR, idPostfix);
                 }
                 controlElementVisitorListener.endVisitControl(currentControlElement, effectiveControlId);
-                contextStack.popBinding();
 
             } else {
                 // Ignore, this is not a control

@@ -13,10 +13,7 @@
  */
 package org.orbeon.oxf.xforms;
 
-import org.dom4j.Attribute;
-import org.dom4j.Document;
-import org.dom4j.Element;
-import org.dom4j.QName;
+import org.dom4j.*;
 import org.dom4j.io.DocumentSource;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
@@ -30,21 +27,24 @@ import org.orbeon.oxf.xforms.control.XFormsControlFactory;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerImpl;
 import org.orbeon.oxf.xforms.processor.XFormsDocumentAnnotatorContentHandler;
-import org.orbeon.oxf.xml.SAXStore;
-import org.orbeon.oxf.xml.TransformerUtils;
-import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
 import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.om.FastStringBuffer;
 import org.orbeon.saxon.om.NodeInfo;
+import org.xml.sax.Attributes;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.SAXException;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.sax.SAXResult;
+import javax.xml.transform.sax.TransformerHandler;
 import java.util.*;
 
 /**
@@ -110,7 +110,8 @@ public class XFormsStaticState {
     // Components
     private Map componentsFactories;        // Map<QName, Factory> of QNames to component factory
     private Map componentBindings;          // Map<QName, Element> of QNames to bindings
-    private Map shadowTrees;                // Map<String, Document> of ids to shadow trees
+    private Map fullShadowTrees;            // Map<String, Document> of ids to shadow trees (with full content, e.g. XHTML)
+    private Map controlsShadowTrees;        // Map<String, Document> of ids to shadow trees (without full content, only the XForms controls)
 
     private static final HashMap BASIC_NAMESPACE_MAPPINGS = new HashMap();
     static {
@@ -444,7 +445,9 @@ public class XFormsStaticState {
             if (xblElements.size() > 0) {
                 componentsFactories = new HashMap();
                 componentBindings = new HashMap();
-                shadowTrees = new HashMap();
+                fullShadowTrees = new HashMap();
+                controlsShadowTrees = new HashMap();
+
                 int xblCount = 0;
                 int xblBindingCount = 0;
                 for (Iterator i = xblElements.iterator(); i.hasNext(); xblCount++) {
@@ -809,8 +812,8 @@ public class XFormsStaticState {
      * @param controlId static control id
      * @return          expanded shadow tree, or null
      */
-    public Element getShadowTree(String controlId) {
-        return (shadowTrees == null) ? null : ((Document) shadowTrees.get(controlId)).getRootElement();
+    public Element getFullShadowTree(String controlId) {
+        return (fullShadowTrees == null) ? null : ((Document) fullShadowTrees.get(controlId)).getRootElement();
     }
 
     /**
@@ -820,8 +823,7 @@ public class XFormsStaticState {
      * @return          expanded shadow tree, or null
      */
     public Element getShadowTreeControls(String controlId) {
-        // TODO: get just controls
-        return getShadowTree(controlId);
+        return (controlsShadowTrees == null) ? null : ((Document) controlsShadowTrees.get(controlId)).getRootElement();
     }
 
     /**
@@ -894,8 +896,8 @@ public class XFormsStaticState {
 
                 // Check for mandatory id
                 // NOTE: Currently, XFDA does not automatically produce id attributes on elements to which components are bound
-                final String id = controlElement.attributeValue("id");
-                if (id == null)
+                final String staticId = controlElement.attributeValue("id");
+                if (staticId == null)
                     throw new ValidationException("Missing mandatory id for element: " + controlElement.getQualifiedName(), locationData);
 
                 // If element is not built-in, check XBL and generate shadow content if needed
@@ -907,9 +909,16 @@ public class XFormsStaticState {
                         // TODO: add namespaces to namespacesMap if not present yet, as namespaces on components are not gathered by XFDA
 
                         // If the document has a template, recurse into it
-                        final Element templateElement = generateXBLShadowContent(id, bindingElement);
-                        if (templateElement != null) {
-                            analyzeComponentTree(pipelineContext, xpathConfiguration, templateElement, repeatHierarchyStringBuffer);
+                        final Document shadowTreeDocument = generateXBLShadowContent(controlElement, bindingElement);
+                        if (shadowTreeDocument != null) {
+
+                            // Remember shadow tree for this static id
+                            fullShadowTrees.put(staticId, shadowTreeDocument);
+                            final Document filteredShadowTree = filterShadowTree(shadowTreeDocument);
+                            controlsShadowTrees.put(staticId, filteredShadowTree);
+
+                            // TODO: the nested ids must be passed a prefixed, right?
+                            analyzeComponentTree(pipelineContext, xpathConfiguration, filteredShadowTree.getRootElement(), repeatHierarchyStringBuffer);
                         }
                     }
                 }
@@ -1219,20 +1228,253 @@ public class XFormsStaticState {
     /**
      * Generate shadow content for the given control id and XBL binding.
      *
-     * @param id                control id
-     * @param binding           corresponding binding element <xbl:binding>
+     * @param boundElement      element to which the binding applies
+     * @param binding           corresponding <xbl:binding>
+     * @return                  shadow tree document
      */
-    private Element generateXBLShadowContent(String id, Element binding) {
+    private static Document generateXBLShadowContent(final Element boundElement, Element binding) {
         final Element templateElement = binding.element(XFormsConstants.XBL_TEMPLATE_QNAME);
         if (templateElement != null) {
-            // TODO: handle attribute + content forwarding
             // TODO: in script mode, XHTML elements in template should only be kept during page generation
 
             // Here we create a completely separate document
             // Copy as the template element may be used many times
-            final Document templateDocument = Dom4jUtils.createDocumentCopyElement(templateElement);
-            shadowTrees.put(id, templateDocument);
+            final Document shadowTreeDocument = Dom4jUtils.createDocumentCopyElement(templateElement);
+
+            Dom4jUtils.visitSubtree(shadowTreeDocument.getRootElement(), new Dom4jUtils.VisitorListener() {
+                public void startElement(Element element) {
+
+                    // Handle attribute forwarding
+                    final Attribute xblAttr = element.attribute(XFormsConstants.XBL_ATTR_QNAME);
+                    if (xblAttr != null) {
+                        // Detach attribute (not strictly necessary?)
+                        xblAttr.detach();
+                        // Get attribute value
+                        final String xblAttrString = xblAttr.getValue();
+                        final StringTokenizer st = new StringTokenizer(xblAttrString);
+                        while (st.hasMoreTokens()) {
+                            final String currentValue = st.nextToken();
+
+                            final int equalIndex = currentValue.indexOf('=');
+                            if (equalIndex == -1) {
+                                // No a=b pair, just a single QName
+                                final QName valueQName = Dom4jUtils.extractTextValueQName(element, currentValue);
+                                if (!valueQName.getNamespaceURI().equals(XFormsConstants.XBL_NAMESPACE_URI)) {
+                                     // This is not xbl:text, copy the attribute
+                                    element.addAttribute(valueQName, boundElement.attributeValue(valueQName));
+                                } else {
+                                    // This is xbl:text
+                                    // "The xbl:text value cannot occur by itself in the list"
+                                }
+
+                            } else {
+                                // a=b pair
+                                final String leftSide = currentValue.substring(0, equalIndex);
+                                final String rightSide = currentValue.substring(equalIndex + 1);
+
+                                final QName leftSideQName = Dom4jUtils.extractTextValueQName(element, leftSide);
+                                final QName rightSideQName = Dom4jUtils.extractTextValueQName(element, rightSide);
+
+                                final boolean isLeftSideXBLText = leftSideQName.getNamespaceURI().equals(XFormsConstants.XBL_NAMESPACE_URI);
+                                final boolean isRightSideXBLText = rightSideQName.getNamespaceURI().equals(XFormsConstants.XBL_NAMESPACE_URI);
+
+                                final String rightSideValue;
+                                if (!isRightSideXBLText) {
+                                     // Get attribute value
+                                    rightSideValue = boundElement.attributeValue(rightSideQName);
+                                } else {
+                                    // Get text value
+
+                                    // "any text nodes (including CDATA nodes and whitespace text nodes) that are
+                                    // explicit children of the bound element must have their data concatenated"
+                                    rightSideValue = boundElement.getText();// must use getText() and not stringValue()
+                                }
+
+                                if (!isLeftSideXBLText) {
+                                     // Set attribute value
+                                    element.addAttribute(leftSideQName, rightSideValue);
+                                } else {
+                                    // Set text value
+
+                                    // "value of the attribute on the right-hand side are to be represented as text
+                                    // nodes underneath the shadow element"
+                                    
+                                    // TODO: "If the element has any child nodes in the DOM (any nodes, including
+                                    // comment nodes, whitespace text nodes, or even empty CDATA nodes) then the pair
+                                    // is in error and UAs must ignore it, meaning the attribute value is not forwarded"
+
+                                    element.setText(rightSide);
+                                }
+                            }
+                            // TODO: handle xbl:lang?
+                            // TODO: handle type specifiers?
+                        }
+                    }
+
+                    // Handle xbl:content
+                    if (element.getQName().equals(XFormsConstants.XBL_CONTENT_QNAME)) {
+                        // TODO
+                    }
+                }
+
+                public void endElement(Element element) {}
+
+                public void text(Text text) {}
+            });
+            return shadowTreeDocument;
+        } else {
+            return null;
         }
-        return templateElement;
+    }
+
+    /**
+     * Filter a shadow tree document to keep only XForms controls. This does not modify the input document.
+     *
+     * @param shadowTreeDocument    full shadow tree document
+     * @return                      filtered shadow tree document
+     */
+    private static Document filterShadowTree(Document shadowTreeDocument) {
+
+        final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
+
+        final LocationDocumentResult result= new LocationDocumentResult();
+        identity.setResult(result);
+
+        TransformerUtils.writeDom4j(shadowTreeDocument, new XFormsFilterContentHandler(identity));
+
+        return result.getDocument();
+    }
+}
+
+class XFormsFilterContentHandler extends SimpleForwardingContentHandler {
+
+    private int level;
+
+    private NamespaceSupport3 namespaceSupport = new NamespaceSupport3();
+
+    private boolean inXForms;       // whether we are in a model
+    private int xformsLevel;
+    private boolean inPreserve;     // whether we are in a label, etc., schema or instance
+    private int preserveLevel;
+
+    public XFormsFilterContentHandler(ContentHandler contentHandler) {
+        super(contentHandler);
+    }
+
+    public void startDocument() throws SAXException {
+        super.startDocument();
+    }
+
+    public void endDocument() throws SAXException {
+        super.endDocument();
+    }
+
+    public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
+
+        namespaceSupport.startElement();
+
+        // Check for XForms or extension namespaces
+        final boolean isXForms = XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri);
+        final boolean isXHTML = XMLConstants.XHTML_NAMESPACE_URI.equals(uri);
+//        final boolean isXFormsOrExtension = isXForms || isXXForms || isEXForms || isXBL;
+        final boolean isXFormsOrExtension = !isXHTML && !"".equals(uri);// TODO: how else can we handle components?
+
+        // Start extracting model or controls
+        if (!inXForms && isXFormsOrExtension) {
+
+            inXForms = true;
+            xformsLevel = level;
+
+            sendStartPrefixMappings();
+        }
+
+        // Check for preserved content
+        if (inXForms && !inPreserve) {
+
+            // Preserve as is the content of labels, etc., instances, and schemas
+            if ((XFormsConstants.LABEL_HINT_HELP_ALERT_ELEMENT.get(localname) != null // labels, etc. may contain XHTML
+                    || "instance".equals(localname)) && isXForms // XForms instances
+                    || "schema".equals(localname) && XMLConstants.XSD_URI.equals(uri)) { // XML schemas
+                inPreserve = true;
+                preserveLevel = level;
+            }
+        }
+
+        // We are within preserved content or we output regular XForms content
+        if (inXForms && (inPreserve || isXFormsOrExtension)) {
+            super.startElement(uri, localname, qName, attributes);
+        }
+
+        level++;
+    }
+
+    private void sendStartPrefixMappings() throws SAXException {
+        for (Enumeration e = namespaceSupport.getPrefixes(); e.hasMoreElements();) {
+            final String namespacePrefix = (String) e.nextElement();
+            final String namespaceURI = namespaceSupport.getURI(namespacePrefix);
+            if (!namespacePrefix.startsWith("xml"))
+                super.startPrefixMapping(namespacePrefix, namespaceURI);
+        }
+    }
+
+    private void sendEndPrefixMappings() throws SAXException {
+        for (Enumeration e = namespaceSupport.getPrefixes(); e.hasMoreElements();) {
+            final String namespacePrefix = (String) e.nextElement();
+            if (!namespacePrefix.startsWith("xml"))
+                super.endPrefixMapping(namespacePrefix);
+        }
+    }
+
+    public void endElement(String uri, String localname, String qName) throws SAXException {
+
+        level--;
+
+        // Check for XForms or extension namespaces
+//        final boolean isXForms = XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri);
+//        final boolean isXXForms = XFormsConstants.XXFORMS_NAMESPACE_URI.equals(uri);
+//        final boolean isEXForms = XFormsConstants.EXFORMS_NAMESPACE_URI.equals(uri);
+//        final boolean isXBL = XFormsConstants.XBL_NAMESPACE_URI.equals(uri);
+        final boolean isXHTML = XMLConstants.XHTML_NAMESPACE_URI.equals(uri);
+//        final boolean isXFormsOrExtension = isXForms || isXXForms || isEXForms || isXBL;
+        final boolean isXFormsOrExtension = !isXHTML && !"".equals(uri);// TODO: how else can we handle components?
+
+        // We are within preserved content or we output regular XForms content
+        if (inXForms && (inPreserve || isXFormsOrExtension)) {
+            super.endElement(uri, localname, qName);
+        }
+
+        if (inPreserve && level == preserveLevel) {
+            // Leaving preserved content
+            inPreserve = false;
+        } if (inXForms && level == xformsLevel) {
+            // Leaving model or controls
+            inXForms = false;
+            sendEndPrefixMappings();
+        }
+
+        namespaceSupport.endElement();
+    }
+
+    public void characters(char[] chars, int start, int length) throws SAXException {
+        if (inPreserve) {
+            super.characters(chars, start, length);
+        } else {
+
+            // TODO: we must not output characters here if we are not directly within an XForms element;
+
+            if (inXForms) // TODO: check this: only keep spaces within XForms elements that require it in order to reduce the size of the static state
+                super.characters(chars, start, length);
+        }
+    }
+
+    public void startPrefixMapping(String prefix, String uri) throws SAXException {
+        namespaceSupport.startPrefixMapping(prefix, uri);
+        if (inXForms)
+            super.startPrefixMapping(prefix, uri);
+    }
+
+    public void endPrefixMapping(String s) throws SAXException {
+        if (inXForms)
+            super.endPrefixMapping(s);
     }
 }

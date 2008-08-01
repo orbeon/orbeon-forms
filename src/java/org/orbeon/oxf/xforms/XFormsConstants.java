@@ -85,6 +85,8 @@ public class XFormsConstants {
     public static final QName XBL_XBL_QNAME = new QName("xbl", XBL_NAMESPACE);
     public static final QName XBL_BINDING_QNAME = new QName("binding", XBL_NAMESPACE);
     public static final QName XBL_TEMPLATE_QNAME = new QName("template", XBL_NAMESPACE);
+    public static final QName XBL_ATTR_QNAME = new QName("attr", XBL_NAMESPACE);
+    public static final QName XBL_CONTENT_QNAME = new QName("content", XBL_NAMESPACE);
 
     public static final QName XXFORMS_ITERATE_ATTRIBUTE_QNAME = new QName("iterate", XXFORMS_NAMESPACE);
 

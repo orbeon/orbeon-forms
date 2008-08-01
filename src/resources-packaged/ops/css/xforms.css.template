@@ -285,11 +285,6 @@ a.xforms-trigger img { vertical-align: middle; cursor: pointer }
 a.xforms-readonly img { cursor: default }
 a.xforms-trigger span { vertical-align: middle }
 
-/* Hide input field for <xforms:input> when type is date */
-.xforms-type-date input {
-    display: none;
-}
-
 a.xforms-readonly { color: gray; cursor: default }
 
 .xforms-message {

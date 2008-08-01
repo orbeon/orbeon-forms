@@ -77,11 +77,12 @@
                                 <xforms:label>Apply <xsl:value-of select="lower-case(xforms:label)"/></xforms:label>
                                 <xforms:toggle ev:event="DOMActivate" case="fr-inplace-{@id}-view"/>
                             </xforms:trigger>
-                            or
-                            <xforms:trigger appearance="minimal" class="fr-inplace-cancel">
-                                <xforms:label>Cancel</xforms:label>
-                                <xforms:toggle ev:event="DOMActivate" case="fr-inplace-{@id}-view"/>
-                            </xforms:trigger>
+                            <!-- Cancel not supported for now -->
+                            <!--or-->
+                            <!--<xforms:trigger appearance="minimal" class="fr-inplace-cancel">-->
+                                <!--<xforms:label>Cancel</xforms:label>-->
+                                <!--<xforms:toggle ev:event="DOMActivate" case="fr-inplace-{@id}-view"/>-->
+                            <!--</xforms:trigger>-->
                         </xhtml:span>
                     </xhtml:span>
                 </xhtml:span>
@@ -127,11 +128,12 @@
                                 <xforms:label>Apply <xsl:value-of select="lower-case(xforms:label)"/></xforms:label>
                                 <xforms:toggle ev:event="DOMActivate" case="fr-inplace-{@id}-view"/>
                             </xforms:trigger>
-                            or
-                            <xforms:trigger appearance="minimal" class="fr-inplace-cancel">
-                                <xforms:label>Cancel</xforms:label>
-                                <xforms:toggle ev:event="DOMActivate" case="fr-inplace-{@id}-view"/>
-                            </xforms:trigger>
+                            <!-- Cancel not supported for now -->
+                            <!--or-->
+                            <!--<xforms:trigger appearance="minimal" class="fr-inplace-cancel">-->
+                                <!--<xforms:label>Cancel</xforms:label>-->
+                                <!--<xforms:toggle ev:event="DOMActivate" case="fr-inplace-{@id}-view"/>-->
+                            <!--</xforms:trigger>-->
                         </xhtml:span>
                     </xhtml:span>
                 </xhtml:div>

@@ -32,6 +32,8 @@
                 <xsl:variable name="prefix" select="'oxf.fr.persistence.app'" as="xs:string"/>
                 <xsl:variable name="app" select="/*/app" as="xs:string"/>
                 <xsl:variable name="form" select="/*/form" as="xs:string"/>
+                <!-- /*/document is available e.g. when editing or viewing a document -->
+                <xsl:variable name="document" select="/*/document" as="xs:string"/>
                 <xsl:variable name="suffix" select="'uri'" as="xs:string"/>
 
                 <!-- List of properties from specific to generic -->
@@ -45,7 +47,10 @@
                 <xsl:variable name="values" select="for $name in $names return pipeline:property($name)" as="xs:string*"/>
 
                 <!-- Create URI with first non-empty value -->
-                <xsl:variable name="resource" select="concat(pipeline:property('oxf.fr.appserver.uri'), $values[normalize-space() != ''][1], '/crud/', /*/app, '/', /*/form, '/form/form.xhtml')" as="xs:string"/>
+                <xsl:variable name="resource"
+                              select="concat(pipeline:property('oxf.fr.appserver.uri'),
+                                        $values[normalize-space() != ''][1], '/crud/', /*/app, '/', /*/form, '/form/form.xhtml',
+                                        if ($document != '') then concat('?document=', $document) else '')" as="xs:string"/>
                 <url>
                     <xsl:message>Resource: <xsl:copy-of select="$resource"/></xsl:message>
                     <xsl:value-of select="pipeline:rewriteResourceURI($resource, true())"/>

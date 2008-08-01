@@ -686,23 +686,6 @@
                     href="/xforms-upload/">XForms upload example</a>
                 </p>
             </section>
-            <!--<a name="xforms-upload-trouble"/>-->
-            <!--<section added="2005-05-21">-->
-                <!--<title>My XForms upload doesn't work. What can I do?</title>-->
-                <!--<p>-->
-                    <!--With Orbeon Forms 2.8 or earlier, or if you are using XForms Classic with Orbeon Forms 3.0 or-->
-                    <!--later, make sure that you have the correct submission method and encoding in your XForms model:-->
-                <!--</p>-->
-                <!--<p>-->
-                    <!--<xml-source show-namespaces="false" xmlns:xforms="http://www.w3.org/2002/xforms">-->
-                        <!--<xforms:submission method="post" encoding="multipart/form-data"/>-->
-                    <!--</xml-source>-->
-                <!--</p>-->
-                <!--<p>-->
-                    <!--With Orbeon Forms 3.0 or later and XForms NG, uploaded files can only be retrieved with a-->
-                    <!--submission with <code>replace="all"</code>.-->
-                <!--</p>-->
-            <!--</section>-->
             <a name="xforms-xpath20"/>
             <section added="2007-03-29">
                 <title>I get errors when I use the XPath <code>if()</code> function in Orbeon Forms. What's wrong?</title>

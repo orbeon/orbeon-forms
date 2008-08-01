@@ -56,7 +56,9 @@ var LOADING_MIN_TOP_PADDING_PROPERTY = "loading-min-top-padding";
 var REVISIT_HANDLING_PROPERTY = "revisit-handling";
 var HELP_HANDLER_PROPERTY = "help-handler";
 var HELP_TOOLTIP_PROPERTY = "help-tooltip";
-var OFFLINE_SUPPORT = "offline";
+var OFFLINE_SUPPORT_PROPERTY = "offline";
+var FORMAT_INPUT_TIME_PROPERTY = "format.input.time";
+var DATE_PICKER_PROPERTY = "yui";
 
 var APPLICATION_RESOURCES_VERSION_PROPERTY = "oxf.resources.version-number";
 
@@ -594,7 +596,7 @@ ORBEON.util.Utils = {
             case LOADING_MIN_TOP_PADDING_PROPERTY: { return XFORMS_LOADING_MIN_TOP_PADDING; }
             case HELP_HANDLER_PROPERTY: { return XFORMS_HELP_HANDLER; }
             case HELP_TOOLTIP_PROPERTY: { return XFORMS_HELP_TOOLTIP; }
-            case OFFLINE_SUPPORT: { return XFORMS_OFFLINE_SUPPORT; }
+            case OFFLINE_SUPPORT_PROPERTY: { return XFORMS_OFFLINE_SUPPORT; }
             }
     	// Neither the property's value was supplied, nor a default value exists for the property
         return null;
@@ -2428,7 +2430,9 @@ ORBEON.xforms.Events = {
             }
             xformsFireEvents([xformsCreateEventArray(heartBeatDiv, "xxforms-session-heartbeat")], false);
         }
-    }
+    },
+
+    ajaxResponseProcessedEvent: new YAHOO.util.CustomEvent("ajaxResponseProcessed")
 };
 
 ORBEON.xforms.Init = {
@@ -2485,7 +2489,7 @@ ORBEON.xforms.Init = {
 
     document: function() {
         // Notify the offline module that the page was loaded
-        if (ORBEON.util.Utils.getProperty(OFFLINE_SUPPORT))
+        if (ORBEON.util.Utils.getProperty(OFFLINE_SUPPORT_PROPERTY))
             ORBEON.xforms.Offline.pageLoad();
 
         // Register events in the capture phase for W3C-compliant browsers.
@@ -3382,6 +3386,7 @@ ORBEON.xforms.Server = {
         }
         var formID = ORBEON.xforms.Globals.requestForm.id;
         ORBEON.xforms.Server.handleResponseDom(responseXML, formID);
+        ORBEON.xforms.Events.ajaxResponseProcessedEvent.fire();
     },
 
     /**

@@ -108,21 +108,21 @@ public class XFormsFeatures {
             // Calendar stylesheets
             // TODO: move to YUI if possible
             new ResourceConfig("/ops/javascript/jscalendar/calendar-blue.css", null),
-            new ResourceConfig("/ops/css/yui/container.css", null),
+            new ResourceConfig("/ops/yui/container/assets/container.css", null),
             // Yahoo! UI Library
-            new ResourceConfig("/ops/css/yui/tree.css", null) {
+            new ResourceConfig("/ops/yui/treeview/assets/treeview.css", null) {
                 public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
                     return isTreeInUse(appearancesMap);
                 }
                 public String getFeatureName() { return "tree"; }
             },
-            new ResourceConfig("/ops/css/yui/tree-check.css", null) {
+            new ResourceConfig("/ops/yui/examples/treeview/assets/css/check/tree.css", null) {
                 public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
                     return isTreeInUse(appearancesMap);
                 }
                 public String getFeatureName() { return "tree"; }
             },
-            new ResourceConfig("/ops/css/yui/menu.css", null) {
+            new ResourceConfig("/ops/yui/menu/assets/menu.css", null) {
                 public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
                     return isMenuInUse(appearancesMap);
                 }
@@ -147,44 +147,44 @@ public class XFormsFeatures {
             new ResourceConfig("/ops/javascript/jscalendar/lang/calendar-en.js", "/ops/javascript/jscalendar/lang/calendar-en-min.js"),
             new ResourceConfig("/ops/javascript/jscalendar/calendar-setup.js", "/ops/javascript/jscalendar/calendar-setup-min.js"),
             // Yahoo UI Library
-            new ResourceConfig("/ops/javascript/yui/yahoo.js", "/ops/javascript/yui/yahoo-min.js"),
-            new ResourceConfig("/ops/javascript/yui/selector-beta.js", "/ops/javascript/yui/selector-beta-min.js") {
+            new ResourceConfig("/ops/yui/yahoo/yahoo.js", "/ops/yui/yahoo/yahoo-min.js"),
+            new ResourceConfig("/ops/yui/selector/selector-beta.js", "/ops/yui/selector/selector-beta-min.js") {
                 public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
                     return XFormsProperties.isOfflineMode(containingDocument);
                 }
                 public String getFeatureName() { return "offline"; }
             },
-            new ResourceConfig("/ops/javascript/yui/event.js", "/ops/javascript/yui/event-min.js"),
-            new ResourceConfig("/ops/javascript/yui/dom.js", "/ops/javascript/yui/dom-min.js"),
-            new ResourceConfig("/ops/javascript/yui/connection.js", "/ops/javascript/yui/connection-min.js"),
-            new ResourceConfig("/ops/javascript/yui/animation.js", "/ops/javascript/yui/animation-min.js"),
-            new ResourceConfig("/ops/javascript/yui/dragdrop.js", "/ops/javascript/yui/dragdrop-min.js"),
-            new ResourceConfig("/ops/javascript/yui/container.js", "/ops/javascript/yui/container-min.js"),
-            new ResourceConfig("/ops/javascript/yui/slider.js", "/ops/javascript/yui/slider-min.js") {
+            new ResourceConfig("/ops/yui/event/event.js", "/ops/yui/event/event-min.js"),
+            new ResourceConfig("/ops/yui/dom/dom.js", "/ops/yui/dom/dom-min.js"),
+            new ResourceConfig("/ops/yui/connection/connection.js", "/ops/yui/connection/connection-min.js"),
+            new ResourceConfig("/ops/yui/animation/animation.js", "/ops/yui/animation/animation-min.js"),
+            new ResourceConfig("/ops/yui/dragdrop/dragdrop.js", "/ops/yui/dragdrop/dragdrop-min.js"),
+            new ResourceConfig("/ops/yui/container/container.js", "/ops/yui/container/container-min.js"),
+            new ResourceConfig("/ops/yui/slider/slider.js", "/ops/yui/slider/slider-min.js") {
                 public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
                     return isRangeInUse(appearancesMap);
                 }
                 public String getFeatureName() { return "range"; }
             },
-            new ResourceConfig("/ops/javascript/yui/treeview.js", "/ops/javascript/yui/treeview-min.js") {
+            new ResourceConfig("/ops/yui/treeview/treeview.js", "/ops/yui/treeview/treeview-min.js") {
                 public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
                     return isTreeInUse(appearancesMap);
                 }
                 public String getFeatureName() { return "tree"; }
             },
-            new ResourceConfig("/ops/javascript/yui/treeview-tasknode.js", "/ops/javascript/yui/treeview-tasknode-min.js") {
+            new ResourceConfig("/ops/yui/examples/treeview/assets/js/TaskNode.js", "/ops/yui/examples/treeview/assets/js/TaskNode-min.js") {
                 public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
                     return isTreeInUse(appearancesMap);
                 }
                 public String getFeatureName() { return "tree"; }
             },
-            new ResourceConfig("/ops/javascript/yui/treeview-checkonclicknode.js", "/ops/javascript/yui/treeview-checkonclicknode-min.js") {
+            new ResourceConfig("/ops/yui/examples/treeview/assets/js/CheckOnClickNode.js", "/ops/yui/examples/treeview/assets/js/CheckOnClickNode-min.js") {
                 public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
                     return isTreeInUse(appearancesMap);
                 }
                 public String getFeatureName() { return "tree"; }
             },
-            new ResourceConfig("/ops/javascript/yui/menu.js", "/ops/javascript/yui/menu-min.js") {
+            new ResourceConfig("/ops/yui/menu/menu.js", "/ops/yui/menu/menu-min.js") {
                 public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
                     return isMenuInUse(appearancesMap);
                 }
@@ -211,7 +211,7 @@ public class XFormsFeatures {
                 public String getFeatureName() { return "autocomplete"; }
             },
             // Selector is so far only used offline
-            new ResourceConfig("/ops/javascript/yui/selector-beta.js", "/ops/javascript/yui/selector-beta-min.js") {
+            new ResourceConfig("/ops/yui/selector/selector-beta.js", "/ops/yui/selector/selector-beta-min.js") {
                 public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
                     return XFormsProperties.isOfflineMode(containingDocument);
                 }

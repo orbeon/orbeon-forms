@@ -463,103 +463,90 @@
     </target>
 
     <target name="orbeon-minify-js" depends="init">
-        <mkdir dir="${war.dir}/WEB-INF/resources/ops/javascript/yui"/>
+        <mkdir dir="${war.dir}/WEB-INF/resources/ops/javascript"/>
+        <mkdir dir="${war.dir}/WEB-INF/resources/ops/yui/container"/>
+        <mkdir dir="${war.dir}/WEB-INF/resources/ops/yui/treeview"/>
+        <mkdir dir="${war.dir}/WEB-INF/resources/ops/yui/slider"/>
+        <mkdir dir="${war.dir}/WEB-INF/resources/ops/yui/examples/treeview/assets/js"/>
+        <mkdir dir="${war.dir}/WEB-INF/resources/ops/yui/examples/treeview/assets/js"/>
         <mkdir dir="${war.dir}/WEB-INF/resources/ops/javascript/jscalendar/lang"/>
         <mkdir dir="${war.dir}/WEB-INF/resources/ops/javascript/ajaxxslt"/>
         <mkdir dir="${war.dir}/WEB-INF/resources/ops/javascript/encryption"/>
-        <!-- YUI -->
+
+        <!-- Orbeon xforms.js -->
         <antcall target="orbeon-minify-maybe-js">
-            <param name="name" value="xforms"/>
-        </antcall>
-        <antcall target="orbeon-minify-maybe-js">
-            <param name="name" value="yui/event"/>
-        </antcall>
-        <antcall target="orbeon-minify-maybe-js">
-            <param name="name" value="yui/container"/>
-        </antcall>
-        <antcall target="orbeon-minify-maybe-js">
-            <param name="name" value="yui/treeview"/>
+            <param name="name" value="javascript/xforms"/>
         </antcall>
 
+        <!-- YUI -->
         <antcall target="orbeon-minify-maybe-js">
-            <param name="name" value="yui/slider"/>
+            <param name="name" value="yui/container/container"/>
         </antcall>
         <antcall target="orbeon-minify-maybe-js">
-            <param name="name" value="yui/editor-beta"/>
-        </antcall>
-        
-        <antcall target="orbeon-minify-maybe-js">
-            <param name="name" value="yui/calendar"/>
+            <param name="name" value="yui/treeview/treeview"/>
         </antcall>
         <antcall target="orbeon-minify-maybe-js">
-            <param name="name" value="yui/colorpicker-beta"/>
+            <param name="name" value="yui/slider/slider"/>
         </antcall>
+
         <!-- From YUI examples -->
         <antcall target="orbeon-minify-maybe-js">
-            <param name="name" value="yui/resizepanel"/>
+            <param name="name" value="yui/examples/treeview/assets/js/TaskNode"/>
         </antcall>
         <antcall target="orbeon-minify-maybe-js">
-            <param name="name" value="yui/treeview-tasknode"/>
-        </antcall>
-        <antcall target="orbeon-minify-maybe-js">
-            <param name="name" value="yui/treeview-checkonclicknode"/>
+            <param name="name" value="yui/examples/treeview/assets/js/CheckOnClickNode"/>
         </antcall>
 
         <!-- JSCalendar -->
         <antcall target="orbeon-minify-maybe-js">
-            <param name="name" value="jscalendar/calendar"/>
+            <param name="name" value="javascript/jscalendar/calendar"/>
         </antcall>
         <antcall target="orbeon-minify-maybe-js">
-            <param name="name" value="jscalendar/lang/calendar-en"/>
+            <param name="name" value="javascript/jscalendar/lang/calendar-en"/>
         </antcall>
         <antcall target="orbeon-minify-maybe-js">
-            <param name="name" value="jscalendar/calendar-setup"/>
+            <param name="name" value="javascript/jscalendar/calendar-setup"/>
         </antcall>
 
         <!-- Autocomplete -->
         <antcall target="orbeon-minify-maybe-js">
-            <param name="name" value="suggest-common"/>
+            <param name="name" value="javascript/suggest-common"/>
         </antcall>
         <antcall target="orbeon-minify-maybe-js">
-            <param name="name" value="suggest-actb"/>
+            <param name="name" value="javascript/suggest-actb"/>
         </antcall>
 
         <!-- AJAXXSLT -->
         <antcall target="orbeon-minify-maybe-js">
-            <param name="name" value="ajaxxslt/util"/>
+            <param name="name" value="javascript/ajaxxslt/util"/>
         </antcall>
         <antcall target="orbeon-minify-maybe-js">
-            <param name="name" value="ajaxxslt/xmltoken"/>
+            <param name="name" value="javascript/ajaxxslt/xmltoken"/>
         </antcall>
         <antcall target="orbeon-minify-maybe-js">
-            <param name="name" value="ajaxxslt/dom"/>
+            <param name="name" value="javascript/ajaxxslt/dom"/>
         </antcall>
         <antcall target="orbeon-minify-maybe-js">
-            <param name="name" value="ajaxxslt/xpath"/>
+            <param name="name" value="javascript/ajaxxslt/xpath"/>
         </antcall>
 
         <!-- Encryption -->
         <antcall target="orbeon-minify-maybe-js">
-            <param name="name" value="encryption/encryption"/>
+            <param name="name" value="javascript/encryption/encryption"/>
         </antcall>
         <antcall target="orbeon-minify-maybe-js">
-            <param name="name" value="encryption/md5"/>
+            <param name="name" value="javascript/encryption/md5"/>
         </antcall>
         <antcall target="orbeon-minify-maybe-js">
-            <param name="name" value="encryption/utf-8"/>
+            <param name="name" value="javascript/encryption/utf-8"/>
         </antcall>
 
     </target>
     
     <target name="orbeon-minify-maybe-js">
-        <!--<java jar="${lib.dir}/yuicompressor-2.3.5.jar" fork="true" failonerror="true">-->
-            <!--<arg value="${resources-packaged.dir}/ops/javascript/${name}.js"/>-->
-            <!--<arg value="-o"/>-->
-            <!--<arg value="${war.dir}/WEB-INF/resources/ops/javascript/${name}-min.js"/>-->
-        <!--</java>-->
-        <echo message='srcfile: ${resources-packaged.dir}/ops/javascript/${name}.js'/>
-        <echo message='targetfile: ${war.dir}/WEB-INF/resources/ops/javascript/${name}-min.js'/>
-        <uptodate property="min.uptodate" srcfile="${resources-packaged.dir}/ops/javascript/${name}.js" targetfile="${war.dir}/WEB-INF/resources/ops/javascript/${name}-min.js"/>
+        <echo message='srcfile: ${resources-packaged.dir}/ops/${name}.js'/>
+        <echo message='targetfile: ${war.dir}/WEB-INF/resources/ops/${name}-min.js'/>
+        <uptodate property="min.uptodate" srcfile="${resources-packaged.dir}/ops/${name}.js" targetfile="${war.dir}/WEB-INF/resources/ops/${name}-min.js"/>
         <echo message='Uptodate: ${min.uptodate}'/>
         <antcall target="orbeon-minify-one-js">
             <param name="name" value="${name}"/>
@@ -568,9 +555,9 @@
 
     <target name="orbeon-minify-one-js" unless="min.uptodate">
         <java classname="com.yahoo.platform.yui.compressor.YUICompressor" classpath="${lib.dir}/yuicompressor-2.3.5.jar" fork="true" failonerror="true">
-            <arg value="${resources-packaged.dir}/ops/javascript/${name}.js"/>
+            <arg value="${resources-packaged.dir}/ops/${name}.js"/>
             <arg value="-o"/>
-            <arg value="${war.dir}/WEB-INF/resources/ops/javascript/${name}-min.js"/>
+            <arg value="${war.dir}/WEB-INF/resources/ops/${name}-min.js"/>
         </java>
     </target>
 

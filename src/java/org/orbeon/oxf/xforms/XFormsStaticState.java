@@ -111,7 +111,7 @@ public class XFormsStaticState {
     private Map componentsFactories;        // Map<QName, Factory> of QNames to component factory
     private Map componentBindings;          // Map<QName, Element> of QNames to bindings
     private Map fullShadowTrees;            // Map<String, Document> of ids to shadow trees (with full content, e.g. XHTML)
-    private Map controlsShadowTrees;        // Map<String, Document> of ids to shadow trees (without full content, only the XForms controls)
+    private Map compactShadowTrees;         // Map<String, Document> of ids to shadow trees (without full content, only the XForms controls)
 
     private static final HashMap BASIC_NAMESPACE_MAPPINGS = new HashMap();
     static {
@@ -446,7 +446,7 @@ public class XFormsStaticState {
                 componentsFactories = new HashMap();
                 componentBindings = new HashMap();
                 fullShadowTrees = new HashMap();
-                controlsShadowTrees = new HashMap();
+                compactShadowTrees = new HashMap();
 
                 int xblCount = 0;
                 int xblBindingCount = 0;
@@ -822,8 +822,8 @@ public class XFormsStaticState {
      * @param controlId static control id
      * @return          expanded shadow tree, or null
      */
-    public Element getShadowTreeControls(String controlId) {
-        return (controlsShadowTrees == null) ? null : ((Document) controlsShadowTrees.get(controlId)).getRootElement();
+    public Element getCompactShadowTree(String controlId) {
+        return (compactShadowTrees == null) ? null : ((Document) compactShadowTrees.get(controlId)).getRootElement();
     }
 
     /**
@@ -915,9 +915,9 @@ public class XFormsStaticState {
                             // Remember shadow tree for this static id
                             fullShadowTrees.put(staticId, shadowTreeDocument);
                             final Document filteredShadowTree = filterShadowTree(shadowTreeDocument);
-                            controlsShadowTrees.put(staticId, filteredShadowTree);
+                            compactShadowTrees.put(staticId, filteredShadowTree);
 
-                            // TODO: the nested ids must be passed a prefixed, right?
+                            // TODO: the nested ids must be passed with prefix, right?
                             analyzeComponentTree(pipelineContext, xpathConfiguration, filteredShadowTree.getRootElement(), repeatHierarchyStringBuffer);
                         }
                     }
@@ -1376,7 +1376,6 @@ class XFormsFilterContentHandler extends SimpleForwardingContentHandler {
         // Check for XForms or extension namespaces
         final boolean isXForms = XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri);
         final boolean isXHTML = XMLConstants.XHTML_NAMESPACE_URI.equals(uri);
-//        final boolean isXFormsOrExtension = isXForms || isXXForms || isEXForms || isXBL;
         final boolean isXFormsOrExtension = !isXHTML && !"".equals(uri);// TODO: how else can we handle components?
 
         // Start extracting model or controls
@@ -1430,12 +1429,7 @@ class XFormsFilterContentHandler extends SimpleForwardingContentHandler {
         level--;
 
         // Check for XForms or extension namespaces
-//        final boolean isXForms = XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri);
-//        final boolean isXXForms = XFormsConstants.XXFORMS_NAMESPACE_URI.equals(uri);
-//        final boolean isEXForms = XFormsConstants.EXFORMS_NAMESPACE_URI.equals(uri);
-//        final boolean isXBL = XFormsConstants.XBL_NAMESPACE_URI.equals(uri);
         final boolean isXHTML = XMLConstants.XHTML_NAMESPACE_URI.equals(uri);
-//        final boolean isXFormsOrExtension = isXForms || isXXForms || isEXForms || isXBL;
         final boolean isXFormsOrExtension = !isXHTML && !"".equals(uri);// TODO: how else can we handle components?
 
         // We are within preserved content or we output regular XForms content

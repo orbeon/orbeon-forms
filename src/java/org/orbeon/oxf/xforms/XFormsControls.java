@@ -701,7 +701,7 @@ public class XFormsControls {
                 controlElementVisitorListener.startVisitControl(currentControlElement, effectiveControlId);
                 {
                     // Recurse into component
-                    final Element shadowTreeDocument = staticState.getShadowTreeControls(controlId);
+                    final Element shadowTreeDocument = staticState.getCompactShadowTree(controlId);
                     handleControls(pipelineContext, controlElementVisitorListener, isOptimizeRelevance,
                             staticState, shadowTreeDocument, idPrefix + controlId + XFormsConstants.COMPONENT_SEPARATOR, idPostfix);
                 }

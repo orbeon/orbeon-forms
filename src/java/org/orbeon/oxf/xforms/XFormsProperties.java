@@ -73,7 +73,6 @@ public class XFormsProperties {
     private static final String SESSION_HEARTBEAT_PROPERTY = "session-heartbeat";
     public static final String SESSION_HEARTBEAT_DELAY_PROPERTY = "session-heartbeat-delay";
     public static final String FCK_EDITOR_BASE_PATH_PROPERTY = "fck-editor-base-path";
-    public static final String YUI_BASE_PATH_PROPERTY = "yui-base-path";
     private static final String DELAY_BEFORE_INCREMENTAL_REQUEST_PROPERTY = "delay-before-incremental-request";
     private static final String DELAY_BEFORE_FORCE_INCREMENTAL_REQUEST_PROPERTY = "delay-before-force-incremental-request";
     private static final String DELAY_BEFORE_GECKO_COMMUNICATION_ERROR_PROPERTY = "delay-before-gecko-communication-error";
@@ -181,7 +180,6 @@ public class XFormsProperties {
             new PropertyDefinition(SESSION_HEARTBEAT_PROPERTY, true, true),
             new PropertyDefinition(SESSION_HEARTBEAT_DELAY_PROPERTY, 12 * 60 * 60 * 800, true), // dynamic; 80 % of 12 hours in ms
             new PropertyDefinition(FCK_EDITOR_BASE_PATH_PROPERTY, "/ops/fckeditor/", true),// dynamic
-            new PropertyDefinition(YUI_BASE_PATH_PROPERTY, "/ops/images/yui/", true),// dynamic
             new PropertyDefinition(DELAY_BEFORE_INCREMENTAL_REQUEST_PROPERTY, 500, true),
             new PropertyDefinition(DELAY_BEFORE_FORCE_INCREMENTAL_REQUEST_PROPERTY, 2000, true),
             new PropertyDefinition(DELAY_BEFORE_GECKO_COMMUNICATION_ERROR_PROPERTY, 5000, true),

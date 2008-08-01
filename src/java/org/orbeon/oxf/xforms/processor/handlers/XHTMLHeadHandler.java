@@ -13,27 +13,34 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
-import org.orbeon.oxf.xforms.*;
+import org.apache.commons.collections.map.CompositeMap;
+import org.orbeon.oxf.common.Version;
+import org.orbeon.oxf.util.URLRewriter;
+import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsControls;
+import org.orbeon.oxf.xforms.XFormsProperties;
+import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
-import org.orbeon.oxf.xforms.state.XFormsStateManager;
 import org.orbeon.oxf.xforms.processor.XFormsFeatures;
 import org.orbeon.oxf.xforms.processor.XFormsResourceServer;
-import org.orbeon.oxf.xforms.processor.XFormsServer;
-import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.state.XFormsStateManager;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
+import org.orbeon.oxf.xml.ElementHandlerController;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.oxf.xml.ElementHandlerController;
-import org.orbeon.oxf.util.URLRewriter;
-import org.orbeon.oxf.common.Version;
 import org.orbeon.saxon.om.FastStringBuffer;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
-import org.apache.commons.collections.map.CompositeMap;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Handle xhtml:head.
@@ -202,14 +209,6 @@ public class XHTMLHeadHandler extends HandlerBase {
                                 final String fckEditorPath = isVersionResources ? "/" + Version.getVersion() + propertyDefinition.getDefaultValue() : (String) propertyDefinition.getDefaultValue();
                                 if (!fckEditorPath.equals(propertyDefinition.getDefaultValue()))
                                     dynamicProperties.put(XFormsProperties.FCK_EDITOR_BASE_PATH_PROPERTY, fckEditorPath);
-                            }
-
-                            // YUI base path
-                            {
-                                final XFormsProperties.PropertyDefinition propertyDefinition = XFormsProperties.getPropertyDefinition(XFormsProperties.YUI_BASE_PATH_PROPERTY);
-                                final String yuiBasePath = isVersionResources ? "/" + Version.getVersion() + propertyDefinition.getDefaultValue() : (String) propertyDefinition.getDefaultValue();
-                                if (!yuiBasePath.equals(propertyDefinition.getDefaultValue()))
-                                    dynamicProperties.put(XFormsProperties.YUI_BASE_PATH_PROPERTY, yuiBasePath);
                             }
                         }
 

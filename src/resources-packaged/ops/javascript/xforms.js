@@ -41,7 +41,6 @@
 var SESSION_HEARTBEAT_PROPERTY = "session-heartbeat";
 var SESSION_HEARTBEAT_DELAY_PROPERTY = "session-heartbeat-delay";
 var FCK_EDITOR_BASE_PATH_PROPERTY = "fck-editor-base-path";
-var YUI_BASE_PATH_PROPERTY = "yui-base-path";
 var DELAY_BEFORE_INCREMENTAL_REQUEST_PROPERTY = "delay-before-incremental-request";
 var DELAY_BEFORE_FORCE_INCREMENTAL_REQUEST_PROPERTY = "delay-before-force-incremental-request";
 var DELAY_BEFORE_GECKO_COMMUNICATION_ERROR_PROPERTY = "delay-before-gecko-communication-error";
@@ -67,7 +66,6 @@ var APPLICATION_RESOURCES_VERSION_PROPERTY = "oxf.resources.version-number";
 var XFORMS_SESSION_HEARTBEAT = true;
 var XFORMS_SESSION_HEARTBEAT_DELAY = 12 * 60 * 60 * 800; // 80 % of 12 hours in ms
 var FCK_EDITOR_BASE_PATH = "/ops/fckeditor/";
-var YUI_BASE_PATH = "/ops/images/yui/";
 var XFORMS_DELAY_BEFORE_INCREMENTAL_REQUEST_IN_MS = 500;
 var XFORMS_DELAY_BEFORE_FORCE_INCREMENTAL_REQUEST_IN_MS = 2000;
 var XFORMS_DELAY_BEFORE_GECKO_COMMUNICATION_ERROR_IN_MS = 5000;
@@ -582,7 +580,6 @@ ORBEON.util.Utils = {
             case SESSION_HEARTBEAT_DELAY_PROPERTY: { return XFORMS_SESSION_HEARTBEAT_DELAY;  }
             case REVISIT_HANDLING_PROPERTY: { return XFORMS_REVISIT_HANDLING; }
             case FCK_EDITOR_BASE_PATH_PROPERTY: { return FCK_EDITOR_BASE_PATH; }
-            case YUI_BASE_PATH_PROPERTY: { return YUI_BASE_PATH; }
             case DELAY_BEFORE_INCREMENTAL_REQUEST_PROPERTY: { return XFORMS_DELAY_BEFORE_INCREMENTAL_REQUEST_IN_MS; }
             case DELAY_BEFORE_FORCE_INCREMENTAL_REQUEST_PROPERTY: { return XFORMS_DELAY_BEFORE_FORCE_INCREMENTAL_REQUEST_IN_MS; }
             case DELAY_BEFORE_GECKO_COMMUNICATION_ERROR_PROPERTY: { return XFORMS_DELAY_BEFORE_GECKO_COMMUNICATION_ERROR_IN_MS; }
@@ -2533,24 +2530,6 @@ ORBEON.xforms.Init = {
         }
 
         XFORMS_SERVER_URL = BASE_URL + "/xforms-server";
-
-        // Override image location for YUI to use local images
-        var yuiBaseURL = BASE_URL + ORBEON.util.Utils.getProperty(YUI_BASE_PATH_PROPERTY);
-
-        if (YAHOO && YAHOO.widget) {
-            if (YAHOO.widget.Module) {
-                YAHOO.widget.Module.IMG_ROOT = yuiBaseURL;
-                YAHOO.widget.Module.IMG_ROOT_SSL = yuiBaseURL;
-            }
-            if (YAHOO.widget.Calendar_Core) {
-                YAHOO.widget.Calendar_Core.IMG_ROOT = yuiBaseURL;
-                YAHOO.widget.Calendar_Core.IMG_ROOT_SSL = yuiBaseURL;
-            }
-            if (YAHOO.widget.MenuModuleItem) {
-                YAHOO.widget.MenuModuleItem.prototype.IMG_ROOT = yuiBaseURL;
-                YAHOO.widget.MenuModuleItem.prototype.IMG_ROOT_SSL = yuiBaseURL;
-            }
-        }
 
         // A heartbeat event - An AJAX request for letting server know that "I'm still alive"
         if (ORBEON.util.Utils.getProperty(SESSION_HEARTBEAT_PROPERTY)) {

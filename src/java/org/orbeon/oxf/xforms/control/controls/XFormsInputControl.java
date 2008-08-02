@@ -117,28 +117,7 @@ public class XFormsInputControl extends XFormsValueControl {
         final String typeName = getBuiltinTypeName();
         if ("date".equals(typeName) || "time".equals(typeName) || "dateTime".equals(typeName)) {
             // Format value specially
-
-            // Assume xs: prefix for default formats
-            final Map prefixToURIMap = new HashMap();
-            prefixToURIMap.put(XMLConstants.XSD_PREFIX, XMLConstants.XSD_URI);
-
-            final NodeInfo boundNode = getBoundNode();
-            if (boundNode == null) {
-                result = null;
-            } else {
-
-                final String xpathExpression =
-                        "if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), '"
-                                + XFormsProperties.getTypeInputFormat(containingDocument, getFirstValueType())
-                                + "', 'en', (), ()) else .";
-
-                result = XPathCache.evaluateAsString(pipelineContext, boundNode,
-                        xpathExpression,
-                        prefixToURIMap, getContextStack().getCurrentVariables(),
-                        XFormsContainingDocument.getFunctionLibrary(),
-                        getContextStack().getFunctionContext(), null, getLocationData());
-            }
-
+            result = format(pipelineContext, typeName, getFirstValueType());
         } else {
             // Regular case, use external value
             result = getExternalValue(pipelineContext);
@@ -159,34 +138,37 @@ public class XFormsInputControl extends XFormsValueControl {
         final String typeName = getBuiltinTypeName();
         if ("dateTime".equals(typeName)) {
             // Format value specially
-
-            // Assume xs: prefix for default formats
-            final Map prefixToURIMap = new HashMap();
-            prefixToURIMap.put(XMLConstants.XSD_PREFIX, XMLConstants.XSD_URI);
-
-            final NodeInfo boundNode = getBoundNode();
-            if (boundNode == null) {
-                result = null;
-            } else {
-
-                final String xpathExpression =
-                        "if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), '"
-                                + XFormsProperties.getTypeInputFormat(containingDocument, getSecondValueType())
-                                + "', 'en', (), ()) else .";
-
-                result = XPathCache.evaluateAsString(pipelineContext, boundNode,
-                        xpathExpression,
-                        prefixToURIMap, getContextStack().getCurrentVariables(),
-                        XFormsContainingDocument.getFunctionLibrary(),
-                        getContextStack().getFunctionContext(), null, getLocationData());
-            }
-
+            result = format(pipelineContext, typeName, getSecondValueType());
         } else {
             // N/A
             result = null;
         }
 
         return (result != null) ? result : "";
+    }
+
+    private String format(PipelineContext pipelineContext, String typeName, String formatName) {
+        // Assume xs: prefix for default formats
+        final Map prefixToURIMap = new HashMap();
+        prefixToURIMap.put(XMLConstants.XSD_PREFIX, XMLConstants.XSD_URI);
+
+        final NodeInfo boundNode = getBoundNode();
+        if (boundNode == null) {
+            // Can't format
+            return null;
+        } else {
+            // Format
+            final String xpathExpression =
+                    "if (. castable as xs:" + typeName + ") then format-" + typeName + "(xs:" + typeName + "(.), '"
+                            + XFormsProperties.getTypeInputFormat(containingDocument, formatName)
+                            + "', 'en', (), ()) else .";
+
+            return XPathCache.evaluateAsString(pipelineContext, boundNode,
+                    xpathExpression,
+                    prefixToURIMap, getContextStack().getCurrentVariables(),
+                    XFormsContainingDocument.getFunctionLibrary(),
+                    getContextStack().getFunctionContext(), null, getLocationData());
+        }
     }
 
     public String getFirstValueType() {

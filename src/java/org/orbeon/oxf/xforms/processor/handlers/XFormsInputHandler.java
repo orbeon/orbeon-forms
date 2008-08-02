@@ -127,7 +127,7 @@ public class XFormsInputHandler extends XFormsCoreControlHandler {
                     if (!isStaticReadonly(inputControl)) {
                         // Regular read-write mode
 
-                        final StringBuffer inputClasses = new StringBuffer("xforms-input-input");
+                        final FastStringBuffer inputClasses = new FastStringBuffer("xforms-input-input");
 
                         // Main input field
 
@@ -141,6 +141,12 @@ public class XFormsInputHandler extends XFormsCoreControlHandler {
                                 // Output value only for concrete control
                                 final String inputValue = inputControl.getFirstValueUseFormat(pipelineContext);
                                 reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, inputValue);
+
+                                final String firstType = inputControl.getFirstValueType();
+                                if (firstType != null) {
+                                    inputClasses.append(" xforms-type-");
+                                    inputClasses.append(firstType);
+                                }
                             } else {
                                 reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, "");
                             }
@@ -171,6 +177,12 @@ public class XFormsInputHandler extends XFormsCoreControlHandler {
                                 // Output value only for concrete control
                                 final String inputValue = inputControl.getSecondValueUseFormat(pipelineContext);
                                 reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, inputValue);
+
+                                final String secondType = inputControl.getSecondValueType();
+                                if (secondType != null) {
+                                    inputClasses.append(" xforms-type-");
+                                    inputClasses.append(secondType);
+                                }
                             } else {
                                 reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, "");
                             }

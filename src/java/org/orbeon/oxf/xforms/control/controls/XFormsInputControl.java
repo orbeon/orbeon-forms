@@ -128,8 +128,8 @@ public class XFormsInputControl extends XFormsValueControl {
             } else {
 
                 final String xpathExpression =
-                        "if (. castable as xs:date) then format-date(xs:date(.), '"
-                                + XFormsProperties.getTypeInputFormat(containingDocument, "time".equals(typeName) ? "time" : "date")
+                        "if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), '"
+                                + XFormsProperties.getTypeInputFormat(containingDocument, getFirstValueType())
                                 + "', 'en', (), ()) else .";
 
                 result = XPathCache.evaluateAsString(pipelineContext, boundNode,
@@ -170,8 +170,8 @@ public class XFormsInputControl extends XFormsValueControl {
             } else {
 
                 final String xpathExpression =
-                        "if (. castable as xs:date) then format-date(xs:date(.), '"
-                                + XFormsProperties.getTypeInputFormat(containingDocument, "time")
+                        "if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), '"
+                                + XFormsProperties.getTypeInputFormat(containingDocument, getSecondValueType())
                                 + "', 'en', (), ()) else .";
 
                 result = XPathCache.evaluateAsString(pipelineContext, boundNode,
@@ -187,5 +187,23 @@ public class XFormsInputControl extends XFormsValueControl {
         }
 
         return (result != null) ? result : "";
+    }
+
+    public String getFirstValueType() {
+        final String typeName = getBuiltinTypeName();
+        if ("dateTime".equals(typeName)) {
+            return "date";
+        } else {
+            return typeName;
+        }
+    }
+
+    public String getSecondValueType() {
+        final String typeName = getBuiltinTypeName();
+        if ("dateTime".equals(typeName)) {
+            return "time";
+        } else {
+            return null;
+        }
     }
 }

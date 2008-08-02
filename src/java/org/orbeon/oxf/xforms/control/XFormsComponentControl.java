@@ -17,14 +17,11 @@ import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.dom4j.Element;
 
 /**
- * Base class for custom components.
+ * Control that represents a custom components.
  */
 public class XFormsComponentControl extends XFormsSingleNodeControl {
 
-    private Element bindingElement;
-
-    public XFormsComponentControl(XFormsContainingDocument containingDocument, XFormsControl parent, Element element, String name, String effectiveId, Element bindingElement) {
+    public XFormsComponentControl(XFormsContainingDocument containingDocument, XFormsControl parent, Element element, String name, String effectiveId) {
         super(containingDocument, parent, element, name, effectiveId);
-        this.bindingElement = bindingElement;
     }
 }

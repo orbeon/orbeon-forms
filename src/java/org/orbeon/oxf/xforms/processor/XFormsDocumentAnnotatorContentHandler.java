@@ -127,7 +127,7 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
             // This is an XForms element
 
             // TODO: do we actually need to add ids / gather namespaces to xbl:*?
-            // TODO: can we restrain gathering ids / namespaces to only certain elements (all controls + elements with XPath expressions)?
+            // TODO: can we restrain gathering ids / namespaces to only certain elements (all controls + elements with XPath expressions + models + instances)?
 
             // Create a new id and update the attributes if needed
             attributes = getAttributesGatherNamespaces(attributes, reusableStringArray);

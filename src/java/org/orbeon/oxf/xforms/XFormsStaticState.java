@@ -468,7 +468,7 @@ public class XFormsStaticState {
                         componentsFactories.put(currentQNameMatch,
                             new XFormsControlFactory.Factory() {
                                 public XFormsControl createXFormsControl(XFormsContainingDocument containingDocument, XFormsControl parent, Element element, String name, String effectiveId) {
-                                    return new XFormsComponentControl(containingDocument, parent, element, name, effectiveId, currentBindingElement);
+                                    return new XFormsComponentControl(containingDocument, parent, element, name, effectiveId);
                                 }
                             });
 

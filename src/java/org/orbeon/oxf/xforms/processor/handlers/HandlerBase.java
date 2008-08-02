@@ -38,7 +38,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Base class for all XHTML and XForms handlers.
+ * Base class for all XHTML and XForms element handlers.
  */
 public abstract class HandlerBase extends ElementHandler {
 

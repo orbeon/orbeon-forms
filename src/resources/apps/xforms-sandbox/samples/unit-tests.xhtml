@@ -24,47 +24,58 @@
         <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms">
             <xforms:instance id="instance">
                 <instance>
-                    <yahoo>http://www.yahoo.com</yahoo>
+                    <input>
+                        <type/>
+                        <field/>
+                        <copy/>
+                        <time>20:12:21</time>
+                        <date>2008-09-01</date>
+                        <date-time>2008-09-01T20:12:21</date-time>
+                    </input>
                 </instance>
             </xforms:instance>
+            <xforms:bind nodeset="/instance">
+                <xforms:bind nodeset="input">
+                    <xforms:bind nodeset="copy" calculate="context()/field"/>
+                    <xforms:bind nodeset="time" type="xs:time"/>
+                    <xforms:bind nodeset="date" type="xs:date"/>
+                    <xforms:bind nodeset="date-time" type="xs:dateTime"/>
+                </xforms:bind>
+            </xforms:bind>
         </xforms:model>
+        <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
+        <xhtml:style type="text/css">
+            .xforms-label { display: block }
+        </xhtml:style>
+        <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
+        <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
+        <xhtml:script type="text/javascript" src="/ops/javascript/xforms-unit-tests.js"/>
+        <xhtml:script type="text/javascript">
+            ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
+                ORBEON.testing.run();
+            });
+        </xhtml:script>
     </xhtml:head>
     <xhtml:body>
-        <xhtml:button onclick="test()">Run test</xhtml:button>
-        <xhtml:p id="output"/>
-        <xhtml:script type="text/javascript">
-            var sections = new Array();
-            var output = document.getElementById("output");
-
-            // Compare expected result with actual result
-            function assert(description, expected, actual) {
-                var success = expected == actual;
-                var html = "&lt;div style='color: " + (success ? "green" : "red") + "'>";
-                html += sections.join(" - ");
-                if (sections.length != 0) html +=  " - ";
-                html += description;
-                if (!success) html += " (expected: " + expected + ", actual: " + actual + ")";
-                html += "&lt;/div>";
-                output.innerHTML += html;
-            }
-
-            function startSection(description) {
-                sections.push(description);
-            }
-
-            function endSection() {
-                sections.pop();
-            }
-
-            function test() {
-                startSection("Client store");
-                xformsStoreInClientState("one", "abc");
-                xformsStoreInClientState("two", "d&amp;f");
-                assert("Simple test" , "abc", xformsGetFromClientState("one"));
-                assert("Escape character" , "d&amp;f", xformsGetFromClientState("two"));
-                assert("Empty result" , null, xformsGetFromClientState("three"));
-                endSection();
-            }
-        </xhtml:script>
+        <xforms:group ref="/instance">
+            <xforms:group ref="input">
+                <xhtml:h1>xforms:input</xhtml:h1>
+                <xforms:input ref="type" id="input-type">
+                    <xforms:label>type</xforms:label>
+                </xforms:input>
+                <xforms:input ref="field" id="input-field">
+                    <xforms:label>field</xforms:label>
+                </xforms:input>
+                <xforms:input ref="time" id="input-time">
+                    <xforms:label>time</xforms:label>
+                </xforms:input>
+                <xforms:input ref="date" id="input-date">
+                    <xforms:label>date</xforms:label>
+                </xforms:input>
+                <xforms:input ref="date-time" id="input-date-time">
+                    <xforms:label>date-time</xforms:label>
+                </xforms:input>
+            </xforms:group>
+        </xforms:group>
     </xhtml:body>
 </xhtml:html>

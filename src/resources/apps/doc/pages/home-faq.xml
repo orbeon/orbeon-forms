@@ -381,15 +381,29 @@
                 </p>
             </section>
             <a name="wiki"/>
-            <section added="2008-01-30">
+            <section added="2008-01-30" updated="2008-08-03">
                 <title>Is there a wiki?</title>
                 <p>
-                    Yes. You find it <a href="https://wiki.objectweb.org/ops/Wiki.jsp?page=Main">here on the OW2 site</a>.
+                    Yes! In fact we have two:
                 </p>
+                <ul>
+                    <li>
+                        <p>
+                            A legacy wiki <a href="https://wiki.objectweb.org/ops/Wiki.jsp?page=Main">on the OW2 site</a>.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            New documents <a href="http://wiki.orbeon.com/forms/">on Google Sites</a>. We are migrating
+                            documents from the OW2 site to Google Sites, as we prefer the WYSIWYG approach of Google
+                            Sites.
+                        </p>
+                    </li>
+                </ul>
                 <p>
                     Feel free to add or make changes to the contents there. You can do so after creating a user
-                    (anonymous changes are not allowed). But please be considerate. You may want to discuss changes
-                    there on the mailing-list first.
+                    (anonymous changes are not allowed). But please be considerate. You may want to discuss changes on
+                    the mailing-list first.
                 </p>
             </section>
             <a name="development"/>
@@ -453,7 +467,7 @@
             <section added="2008-05-30">
                 <title>Where is the documentation?</title>
                 <p>
-                    As of May 2008, Form Builder and Form Runner are considered alpha code and there is no
+                    As of August 2008, Form Builder and Form Runner are considered alpha code and there is no
                     documentation. The documentation will be added soon.
                 </p>
             </section>
@@ -800,8 +814,9 @@
             <section added="2006-12-06">
                 <title>How do I design forms in Orbeon Forms?</title>
                 <p>
-                    Orbeon Forms does not come with a visual forms designer. You create forms by writing XHTML pages
-                    that contain embedded XForms markup.
+                    Orbeon <a href="#form-builder">Form Builder</a> (in alpha as of August 2008) is Orbeon Forms's
+                    visual form designer. You can also create forms by writing XHTML pages that contain embedded XForms
+                    markup.
                 </p>
                 <p>
                     Orbeon Forms 3.6 comes with a <a href="intro-tutorial">tutorial</a> which explains step by step how
@@ -812,25 +827,12 @@
                     Also note that Orbeon provides services around Orbeon Forms, including training. Please visit our
                     <a href="http://www.orbeon.com/support">support page</a> for more information.
                 </p>
-                <p>
-                    In the future, we hope to be able to provide a web-based tool to help build forms.
-                </p>
             </section>
             <a name="graphical-designer"/>
             <section>
                 <title>What visual tool / graphical designer do you recommend for XForms?</title>
                 <p>
-                    At Orbeon we develop all our applications and forms using an XML editor. This is the only way you
-                    can leverage all the features of XForms today, especially the more complex ones like events and
-                    actions. This means that we do not have a visual tool to recommend officially. You may however try
-                    the Intalio designer. Trial versions are available <a href="http://www.intalio.com/">from their web
-                    site</a> once you register.
-                </p>
-                <p>
-                    This said, one of our top priorities at the moment is to make it much easier to build forms with
-                    Orbeon Forms. We realize that there is a need for a visual form builder, and we would like to offer
-                    one in the short-term future. It will be web-based and itself implemented with XForms. In fact, we
-                    already have a prototype, so the only thing we can say is: stay tuned!
+                    Orbeon <a href="#form-builder">Form Builder</a>.
                 </p>
             </section>
             <a name="javascript-dom"/>
@@ -1003,26 +1005,32 @@
                 </p>
             </section>
             <a name="xforms-accessibility"/>
-            <section added="2007-10-05">
+            <section added="2007-10-05" updated="2008-08-03">
                 <title>Does Orbeon Forms support the Disability Discrimination Act (DDA) and/or W3C WCAG?</title>
                 <p>
                     We do not guarantee that Orbeon Forms supports DDA, but it seems that the first step of DDA is to
                     comply with <a href="http://www.w3.org/TR/WAI-WEBCONTENT/">WCAG 1.0</a> priority 1 and 2 (or
-                    AA).
+                    AA). As of August 2008, we are working on such compliance within Form Runner.
                 </p>
                 <p>
                     With Orbeon Forms, many points in WCAG 1.0 relate to HTML written by the page author. For those,
                     Orbeon Forms is of course in theory compliant since this depends on how the page authors creates the
-                    HTML. Regarding the markup that Orbeon Forms generate automatically, we are doing everything we can
-                    to produce clean HTML, which helps a lot with making pages accessible. For example we generate
-                    HTML labels for all form controls.
+                    HTML. Regarding the markup that Orbeon Forms generate automatically (for with Form Runner), we are
+                    doing everything we can to produce clean HTML, which helps a lot with making pages accessible. For
+                    example we generate HTML labels for all form controls.
                 </p>
                 <p>
                     It seems that the most problematic point is point 6.3 of WCAG 1.0, which states that pages should
-                    be functional even if script is disabled. At the moment Orbeon Forms requires JavaScript and Ajax
-                    for its XForms pages to be functional. However:
+                    be functional even if script is disabled. Please note the following:
                 </p>
                 <ul>
+                    <li>
+                        <p>
+                            As of Orbeon Forms 3.7, the <a
+                            href="http://wiki.orbeon.com/forms/developer-documentation/noscript-mode">Noscript Mode</a>
+                            provides support in Orbeon Forms for JavaScript-free operation.
+                        </p>
+                    </li>
                     <li>
                         <p>
                             Based on feedback from people in the accessibility field, it seems that the requirement is
@@ -1039,13 +1047,6 @@
                             supported."
                         </blockquote>
                     </li>
-                    <li>
-                        <p>
-                            We think that it is possible to improve the XForms engine to support a JavaScript-less
-                            option, which would be less functional but which could use the same XForms source. Please
-                            let us know if you are interested in sponsoring this feature.
-                        </p>
-                    </li>
                 </ul>
                 <p>
                     Orbeon is interested in getting your input on accessibility issues. Please contact us or post to the
@@ -1053,28 +1054,21 @@
                 </p>
             </section>
             <a name="xforms-widgets"/>
-            <section added="2007-10-11">
+            <section added="2007-10-11" updated="2008-08-03">
                 <title>How do I add my own rich controls to Orbeon Forms?</title>
                 <p>
-                    We hope to add a good configurable component system to Orbeon Forms in the future, but at the
-                    moment Orbeon Forms unfortunately does not feature an easy way of adding custom controls.
-                </p>
-                <p>
-                    At this point, adding your own control involves either:
+                    As of Orbeon Forms 3.7, a component system for Orbeon Forms, based on XBL 2, is almost in place.
+                    For more information, see the developer documentation:
                 </p>
                 <ul>
                     <li>
                         <p>
-                            Digging into the Orbeon Forms code, in particular the
-                            <code>org.orbeon.oxf.xforms.processor.handlers</code> package, <code>xforms.js</code>, and
-                            classes derived from <code>XFormsControl</code>.
+                            <a href="http://wiki.orbeon.com/forms/projects/xforms-component-system">XForms Component System</a>
                         </p>
                     </li>
                     <li>
                         <p>
-                            Implementing everything with CSS and JavaScript. In some cases, if your control is simple
-                            enough and a variation on an existing control, you may be able to implement the added
-                            behavior with JavaScript and CSS.
+                            <a href="http://wiki.orbeon.com/forms/projects/form-builder-components">Form Builder - Components</a>
                         </p>
                     </li>
                 </ul>
@@ -1086,26 +1080,87 @@
                 </p>
             </section>
             <a name="xforms-javascript"/>
-            <section added="2007-10-30">
+            <section added="2007-10-30" updated="2008-08-03">
                 <title>I am not allowed to run JavaScript in the browser. Is Orbeon Forms a solution for me?</title>
                 <p>
-                    Currently, the Orbeon Forms XForms engine uses JavaScript on the client. In particular, it uses <a
-                    href="http://developer.yahoo.com/yui/">The Yahoo! User Interface Library (YUI)</a> as a foundation
-                    to Orbeon-specific JavaScript code. This is at the moment a required component of Orbeon Forms when
-                    you use the XForms functionality.
+                    The short answer: yes. As of Orbeon Forms 3.7, the Orbeon Forms XForms engine has two modes:
                 </p>
+                <ul>
+                    <li>
+                        <p>
+                            In <i>full</i> mode, the Orbeon Forms XForms engine uses JavaScript on the client. Namely,
+                            it uses <a href="http://developer.yahoo.com/yui/">The Yahoo! User Interface Library
+                            (YUI)</a> as a foundation to Orbeon-specific JavaScript code. This mode allows you to
+                            leverage the Orbeon Forms XForms engine to the maximum.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            In <i>noscript</i> mode, the Orbeon Forms XForms engine works without any JavaScript. This
+                            allows running simple forms, in particular most forms created with Form Builder.
+                        </p>
+                        <p>
+                            This mode has some limitations: dynamic behavior in the user interface is reduced, and the
+                            user has to press a "refresh" buttons to perform udates, like with older-style web
+                            applications. Also, advanced widgets like dialogs, trees, and menus, are not yet
+                            implemented.
+                        </p>
+                    </li>
+                </ul>
                 <p>
-                    So at the moment, Orbeon Forms does not support JavaScript-less operation with XForms. However, it
-                    would be possible to support much of the XForms functionality without JavaScript, and even to
-                    automatically fallback to this mode if the client does not support JavaScript.
+                    For more technical information, visit the <a
+                    href="http://wiki.orbeon.com/forms/developer-documentation/noscript-mode">Noscript Mode</a>
+                    developer documentation.
                 </p>
+            </section>
+            <a name="xforms-native"/>
+            <section added="2008-08-03">
+                <title>Can I easily migrate from Orbeon Forms to a native XForms implementation?</title>
                 <p>
-                    This would have some limitations, of course. Dynamic behavior in the user interface would be
-                    reduced, and the user might have to press buttons to perform udates, like with older-style web
-                    applications. Also, advanced widgets like dialogs, trees, and menus, might not be implemented.
+                    We don't believe it is realistic in the short term to migrate entire applications from Orbeon Forms
+                    to client-side implementations. There are multiple reasons for this:
                 </p>
+                <ul>
+                    <li>
+                        <p>
+                            In our opinion, there is only little chance that all mainstream browsers will implement
+                            XForms natively in the short term. Certainly, we doubt that Microsoft will implement
+                            XForms. Other browsers require extensions (Firefox) or plugins (Internet Explorer).
+                        </p>
+                        <p>
+                            In our opinion, a more promising approach for pure client-side solutions are
+                            JavaScript-based implementations, like Ubiquity (which is not quite yet beta as of August
+                            2008, and for now concentrates on IE and Firefox with no Safari or Opera support).
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Once JavaScript implementations become mature enough, it remains to be seen how many
+                            interoperability issues will arise, in particular related to the level of XForms support
+                            (XML Schema validation, for example, is hard to do in JavaScript), extensions available (for
+                            example: dialogs, variables, etc.), and styling (CSS).
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            There are big benefits to running XForms on the server. In Orbeon Forms, and in particular
+                            in Form Runner, we use XForms as a server-side technology. Applications written with XForms
+                            are able to manipulate data on the server that the client must never see, much like you
+                            would do in Java, Ruby, or any server-side language. Also, running XForms on the server
+                            allows you to produce applications that work with or without script (for accessibility
+                            purposes, or for supporting legacy browsers) based on a single definition written in XForms
+                            (more information about the <a href="#xforms-javascript"><i>noscript</i> mode</a>).
+                        </p>
+                        <p>
+                            XForms is only one of the technologie that enable Form Runner and Form Builder. Form Runner
+                            provides a full environment to manage forms, including persistence, PDF generation, etc.
+                        </p>
+                    </li>
+                </ul>
                 <p>
-                    If you are interested in this feature, please consider sponsoring it.
+                    This said, for simple XForms-based applications, you can certainly write interoperable XForms that
+                    will work both on Orbeon Forms and native or client-side JavaScript implementations. We are very
+                    interested in getting your feedback on your experience in this area.
                 </p>
             </section>
         </section>
@@ -1210,7 +1265,7 @@
                     implementation found in Orbeon Forms.
                 </p>
                 <p>
-                    As of November 2007, the XML Processing Model Working Group has released several working drafts of
+                    As of August 2008, the XML Processing Model Working Group has released several working drafts of
                     the <a href="http://www.w3.org/TR/xproc/">XProc XML Pipeline Language</a>. A Last Call should be
                     coming very soon.
                 </p>

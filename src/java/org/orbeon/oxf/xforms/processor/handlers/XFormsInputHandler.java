@@ -132,10 +132,13 @@ public class XFormsInputHandler extends XFormsCoreControlHandler {
                         // Main input field
 
                         {
+                            final String inputId = effectiveId + "$xforms-input-1";// do as if this was in a component, noscript has to handle that
+
                             reusableAttributes.clear();
-                            reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, "input1-" + effectiveId);
+                            reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, inputId);
                             reusableAttributes.addAttribute("", "type", "type", ContentHandlerHelper.CDATA, "text");
-                            reusableAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, "input1-" + effectiveId);
+                            // Use effective id for name of first field
+                            reusableAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, inputId);
 
                             if (isConcreteControl) {
                                 // Output value only for concrete control
@@ -166,12 +169,16 @@ public class XFormsInputHandler extends XFormsCoreControlHandler {
                         }
 
                         // Add second field for dateTime's time part
+                        // NOTE: In the future, we probably want to do this as an XBL component
                         if (isDateTime) {
 
+                            final String inputId = effectiveId + "$xforms-input-2";// do as if this was in a component, noscript has to handle that
+
                             reusableAttributes.clear();
-                            reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, "input2-" + effectiveId);
+                            reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, inputId);
                             reusableAttributes.addAttribute("", "type", "type", ContentHandlerHelper.CDATA, "text");
-                            reusableAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, "input2-" + effectiveId);
+                            // TODO: Is this an appropriate name? Noscript must be able to find this
+                            reusableAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, inputId);
 
                             if (isConcreteControl) {
                                 // Output value only for concrete control

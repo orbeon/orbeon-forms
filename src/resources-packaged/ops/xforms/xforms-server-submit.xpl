@@ -91,8 +91,29 @@
                                 <!-- Here we don't know the type of the control so can't create the proper type of event -->
                                 <!-- For input[@type = 'image'], filter .y events above, and remove ending .x below -->
                                 <xxforms:event name="xxforms-value-or-activate"
-                                               source-control-id="{if (ends-with(name, '.x')) then substring(name, 1, string-length(name) - 2) else name}">
-                                    <xsl:value-of select="value"/>
+                                                       source-control-id="{if (ends-with(name, '.x')) then substring(name, 1, string-length(name) - 2) else name}">
+                                    <xsl:choose>
+                                        <xsl:when test="contains(name, '$xforms-input-1')">
+                                            <!-- Case of xforms:input, which may have two HTML input controls -->
+                                            <xsl:attribute name="source-control-id" select="replace(name, '\$xforms-input-1', '')"/>
+                                            <!-- TODO: handle formatting of $xforms-input-1 for date, time and dateTime => in Java code? how do we know the type? -->
+                                            <!-- TODO: handle $xforms-input-2 for dateTime -->
+                                            <xsl:value-of select="value"/>
+                                        </xsl:when>
+                                        <xsl:when test="contains(name, '$xforms-input-2')">
+                                            <!-- NOP, handled with $xforms-input-1 -->
+                                        </xsl:when>
+                                        <xsl:when test="ends-with(name, '.x')">
+                                            <!-- input[@type = 'image'] -->
+                                            <xsl:attribute name="source-control-id" select="substring(name, 1, string-length(name) - 2)"/>
+                                            <xsl:value-of select="value"/>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <!-- Regular case -->
+                                            <xsl:attribute name="source-control-id" select="name"/>
+                                            <xsl:value-of select="value"/>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
                                 </xxforms:event>
                             </xsl:for-each>
                         </xxforms:action>

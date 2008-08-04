@@ -21,6 +21,7 @@
       xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
       xmlns:saxon="http://saxon.sf.net/"
+      xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
       xmlns:xbl="http://www.w3.org/ns/xbl"
 
       id="fb-toolbox">
@@ -235,9 +236,9 @@
                             <xhtml:div class="fb-tool">
                                 <xforms:trigger id="fb-add-component-trigger" ref="instance('fb-variables')/controls-triggers">
                                     <xforms:label>
-                                        <xhtml:img src="{if ($binding/xhtml:link[@rel = 'icon']/@href) then $binding/xhtml:link[@rel = 'icon']/@href else '/apps/fr/style/images/silk/plugin.png'}" alt="" width="16" height="16"/>
+                                        <xhtml:img src="{if ($binding/fb:metadata/fb:icon/fb:small-icon) then $binding/fb:metadata/fb:icon/fb:small-icon else '/apps/fr/style/images/silk/plugin.png'}" alt="" width="16" height="16"/>
                                         <!-- TODO: resolve title using current language instead of taking first one -->
-                                        <xforms:output value="$binding/xhtml:title"/>
+                                        <xforms:output value="$binding/fb:metadata/fb:display-name"/>
                                     </xforms:label>
                                     <xforms:action ev:event="DOMActivate">
                                         <!-- Insert a new control -->
@@ -257,19 +258,28 @@
                                         <xforms:action context="$new-td" if="not(exists(*))">
                                             <!-- Context is now on td and there is room for insertion -->
 
-                                            <!-- Try to find the binding QName (for now takes the first CSS rule and assume the form foo|bar) -->
-                                            <xxforms:variable name="element-qname" select="replace(normalize-space(tokenize($binding/@element, ',')[1]), '\|', ':')" as="xs:string"/>
-
                                             <!-- Insert control into td -->
-                                            <xforms:insert context="." origin="xxforms:element(resolve-QName($element-qname, $binding))"/>
+                                            <xforms:action if="$binding/fb:metadata/fb:template/*">
+                                                <xforms:insert context="." origin="$binding/fb:metadata/fb:template/*[1]"/>
+                                            </xforms:action>
+                                            <xforms:action if="not($binding/fb:metadata/fb:template/*)">
+                                                <!-- Try to find the binding QName (for now takes the first CSS rule and assume the form foo|bar) -->
+                                                <xxforms:variable name="element-qname" select="replace(normalize-space(tokenize($binding/@element, ',')[1]), '\|', ':')" as="xs:string"/>
+                                                <xforms:insert context="." origin="xxforms:element(resolve-QName($element-qname, $binding))"/>
+                                                <!-- Insert control content (label, hint, help, alert) -->
+                                                <xxforms:variable name="control" select="*[1]"/>
+                                                <xforms:insert context="$control" origin="instance('fb-lhha-template')/*"/>
+                                            </xforms:action>
+
                                             <xxforms:variable name="control" select="*[1]"/>
 
-                                            <!-- Insert control content (label, hint, help, alert) -->
-                                            <xforms:insert context="$control" origin="instance('fb-lhha-template')/*"/>
+                                            <!-- Set default pointer to resources if there is an xforms:alert -->
+                                            <xforms:setvalue ref="$control/xforms:alert/@ref" value="'$fr-resources/detail/labels/alert'"/>
 
                                             <!-- Get control type -->
                                             <!-- TODO: for now assume a literal 'xs:' prefix (should resolve namespace) -->
-                                            <xxforms:variable name="control-type" select="$binding/xhtml:meta[resolve-QName(@property, .) = xs:QName('xforms:type')]/@content"/>
+                                            <!--<xxforms:variable name="control-type" select="$binding/xhtml:meta[resolve-QName(@property, .) = xs:QName('xforms:type')]/@content"/>-->
+                                            <xxforms:variable name="control-type" select="$binding/fb:metadata/fb:datatype"/>
 
                                             <!-- Adjust bindings on newly inserted control -->
                                             <xforms:dispatch name="fb-rename-control" target="fr-form-model">
@@ -296,7 +306,7 @@
                                             </xforms:dispatch>
                                             <xxforms:variable name="bind" select="$model//xforms:bind[@nodeset = $new-control-name]"/>
 
-                                            <!-- Use @bind instead of @ref -->
+                                            <!-- Make sure there is a @bind instead of a @ref -->
                                             <xforms:delete nodeset="$control/@ref"/>
                                             <xforms:insert context="$control" origin="xxforms:attribute('bind', $bind/@id)"/>
 

@@ -128,7 +128,7 @@
     <!-- Save data upon close, unless explicitly prevented -->
     <xforms:action ev:event="xxforms-dialog-close" if="not(event('fb:save') = false())">
         <xxforms:variable name="instance" select="instance('fb-validation-editor-instance')"/>
-        <xxforms:variable name="current-control" select="if ($current-control-name != '') then $body//xforms:*[@id = concat($current-control-name, '-control')] else ()"/>
+        <xxforms:variable name="current-control" select="if ($current-control-name != '') then $body//*[@id = concat($current-control-name, '-control')] else ()"/>
         <xxforms:variable name="current-control-resource" select="$current-resources/*[name() = $current-control-name]"/>
         <xxforms:variable name="current-bind-id" select="concat($current-control-name, '-bind')"/>
 

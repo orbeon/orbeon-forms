@@ -60,7 +60,7 @@
                         <xforms:label>[Select...]</xforms:label>
                         <xforms:value/>
                     </xforms:item>
-                    <xforms:itemset nodeset="$body//(xforms:*[@ref or @bind or self::xforms:trigger])[ends-with(@id, '-control')]">
+                    <xforms:itemset nodeset="$body//(*[@ref or @bind or self::xforms:trigger])[ends-with(@id, '-control')]">
                         <!-- Try to build a reasonably user-friendly label -->
                         <xforms:label value="for $id in substring-before(@id, '-control') return concat($current-resources/*[name() = $id]/label, ' (', $id, ')')"/>
                         <xforms:value value="@id"/>
@@ -91,7 +91,7 @@
                                         <xforms:label>[Select...]</xforms:label>
                                         <xforms:value/>
                                     </xforms:item>
-                                    <xforms:itemset nodeset="$body//xforms:*[(@ref or @bind) and ends-with(@id, '-control')]">
+                                    <xforms:itemset nodeset="$body//*[(@ref or @bind) and ends-with(@id, '-control')]">
                                         <!-- Try to build a reasonably user-friendly label -->
                                         <xforms:label value="for $id in substring-before(@id, '-control') return concat($current-resources/*[name() = $id]/label, ' (', $id, ')')"/>
                                         <xforms:value value="concat('''', substring-before(@id, '-control'), '''')"/>
@@ -117,7 +117,7 @@
                                         <xforms:label>[Select...]</xforms:label>
                                         <xforms:value/>
                                     </xforms:item>
-                                    <xforms:itemset nodeset="$body//xforms:*[(@ref or @bind) and ends-with(@id, '-control')]">
+                                    <xforms:itemset nodeset="$body//*[(@ref or @bind) and ends-with(@id, '-control')]">
                                         <!-- Try to build a reasonably user-friendly label -->
                                         <xforms:label value="for $id in substring-before(@id, '-control') return concat($current-resources/*[name() = $id]/label, ' (', $id, ')')"/>
                                         <xforms:value value="concat('''', substring-before(@id, '-control'), '''')"/>
@@ -144,7 +144,7 @@
                                         <xforms:label>[Select...]</xforms:label>
                                         <xforms:value/>
                                     </xforms:item>
-                                    <xforms:itemset nodeset="$body//xforms:*[(@ref or @bind) and ends-with(@id, '-control')]">
+                                    <xforms:itemset nodeset="$body//*[(@ref or @bind) and ends-with(@id, '-control')]">
                                         <xforms:label value="substring-before(@id, '-control')"/>
                                         <xforms:value value="concat('''', substring-before(@id, '-control'), '''')"/>
                                     </xforms:itemset>
@@ -215,7 +215,7 @@
                                     <!--<xforms:label>[Select...]</xforms:label>-->
                                     <!--<xforms:value/>-->
                                 <!--</xforms:item>-->
-                                <!--<xforms:itemset nodeset="$body//xforms:*[(@ref or @bind) and ends-with(@id, '-control')]">-->
+                                <!--<xforms:itemset nodeset="$body//*[(@ref or @bind) and ends-with(@id, '-control')]">-->
                                     <!--<xforms:label value="substring-before(@id, '-control')"/>-->
                                     <!--<xforms:value value="concat('instance(''fr-form-instance'')/*/*[name() = ''', substring-before(@id, '-control'), ''']')"/>-->
                                 <!--</xforms:itemset>-->

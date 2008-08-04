@@ -23,10 +23,14 @@
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
       xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
       xmlns:saxon="http://saxon.sf.net/"
+      xmlns:xbl="http://www.w3.org/ns/xbl"
 
       id="fr-form-model">
 
     <xforms:action ev:event="xforms-model-construct-done">
+
+        <!-- Handle user agent -->
+
         <xxforms:variable name="user-agent" select="xxforms:get-request-header('user-agent')"/>
         <xforms:setvalue ref="instance('fb-user-agent-instance')/value" value="$user-agent"/>
         <!-- IE detection -->
@@ -39,6 +43,9 @@
             <xforms:setvalue ref="instance('fb-user-agent-instance')/ie-version" value="$ie-version"/>
             <xforms:setvalue ref="instance('fb-user-agent-instance')/is-supported-ie" value="$ie-version = (7, 8)"/>
         </xforms:action>
+
+        <!-- Load components -->
+        <xforms:send submission="fb-load-components"/>
     </xforms:action>
 
     <!-- Variable pointing to the current language -->
@@ -254,9 +261,9 @@
         <xforms:bind nodeset="publish-trigger" readonly="xxforms:instance('fr-form-valid-instance') = 'false'"/>
         <!-- When are toolbar controls triggers enabled -->
         <xforms:bind nodeset="controls-triggers"
-                     readonly="$current-td/xforms:* and not($current-td/following-sibling::xhtml:td[1][not(xforms:*)]
+                     readonly="$current-td/* and not($current-td/following-sibling::xhtml:td[1][not(*)]
                                                             or not($current-td/following-sibling::xhtml:td)
-                                                                    and (not(exists($current-td/../following-sibling::xhtml:tr[1]/xhtml:td[1]/xforms:*)))
+                                                                    and (not(exists($current-td/../following-sibling::xhtml:tr[1]/xhtml:td[1]/*)))
                                                         )"/>
     </xforms:bind>
 
@@ -269,12 +276,12 @@
     <xforms:action ev:event="fb-ensure-empty-td">
 
         <xforms:action context="$current-td">
-            <xforms:action if="not(exists(xforms:*))">
-                <!-- There is no xforms:* element in the current td, don't change anything -->
+            <xforms:action if="not(exists(*))">
+                <!-- There is no  element in the current td, don't change anything -->
             </xforms:action>
-            <xforms:action if="exists(xforms:*)">
-                <!-- There is an xforms:* element in the current td, figure out what to do -->
-                <xxforms:variable name="is-next-td-available" select="following-sibling::xhtml:td[1][not(xforms:*)]"/>
+            <xforms:action if="exists(*)">
+                <!-- There is an element in the current td, figure out what to do -->
+                <xxforms:variable name="is-next-td-available" select="following-sibling::xhtml:td[1][not(*)]"/>
                 <xforms:action if="$is-next-td-available">
                     <!-- Next cell is empty, move to that one -->
                     <xforms:setindex repeat="fb-section-content-grid-td-repeat" index="index('fb-section-content-grid-td-repeat') + 1"/>
@@ -284,7 +291,7 @@
                 </xforms:action>
                 <xforms:action if="not($is-next-td-available) and not(following-sibling::xhtml:td)">
                     <xxforms:variable name="is-insert-new-row"
-                                      select="exists(../following-sibling::xhtml:tr[1]/xhtml:td[1]/xforms:*) or not(exists(../following-sibling::xhtml:tr[1]))"/>
+                                      select="exists(../following-sibling::xhtml:tr[1]/xhtml:td[1]/*) or not(exists(../following-sibling::xhtml:tr[1]))"/>
                     <!-- We are the last cell of the row -->
                     <xforms:action if="$is-insert-new-row">
                         <!-- The first cell of the next row is occupied, or there is no next row: insert new row -->
@@ -331,7 +338,7 @@
         <xxforms:variable name="tds" select="($current-td/../preceding-sibling::xhtml:tr/xhtml:td, $current-td/preceding-sibling::xhtml:td)"/>
 
         <!-- Name of the preceding control id -->
-        <xxforms:variable name="preceding-control-id" select="substring-before(($tds/xforms:*)[last()]/@id, '-control')"/>
+        <xxforms:variable name="preceding-control-id" select="substring-before(($tds/*)[last()]/@id, '-control')"/>
 
         <!--<xforms:message>-->
             <!--Preceding: <xforms:output value="$preceding-control-id"/>-->
@@ -367,14 +374,14 @@
     <xxforms:variable name="xcv" select="instance('fb-xcv-instance')"/>
 
     <xforms:bind nodeset="$xcv">
-        <xforms:bind nodeset="cut-trigger" readonly="not(exists($current-td/xforms:*))"/>
-        <xforms:bind nodeset="copy-trigger" readonly="not(exists($current-td/xforms:*))"/>
+        <xforms:bind nodeset="cut-trigger" readonly="not(exists($current-td/*))"/>
+        <xforms:bind nodeset="copy-trigger" readonly="not(exists($current-td/*))"/>
         <xforms:bind nodeset="paste-trigger" readonly="not(exists(../control/*))"/>
     </xforms:bind>
 
     <!-- Copy current control to xcv instance -->
     <xforms:action ev:event="fb-copy-control">
-        <xxforms:variable name="current-control" select="event('current-td')/xforms:*"/>
+        <xxforms:variable name="current-control" select="event('current-td')/*"/>
 
         <xforms:action if="exists($current-control)">
             <xxforms:variable name="current-control-name" select="substring-before($current-control/@id, '-control')"/>
@@ -407,8 +414,8 @@
         <xxforms:variable name="new-control-name" select="event('new-name')"/>
 
         <xforms:action context="$control">
-            <!-- Set @id value -->
-            <xforms:setvalue ref="@id" value="concat($new-control-name, '-control')"/>
+            <!-- Set @id in any case -->
+            <xforms:insert context="." origin="xxforms:attribute('id', concat($new-control-name, '-control'))"/>
 
             <!-- Set @ref value if present -->
             <xforms:setvalue ref="@ref" value="$new-control-name"/>
@@ -416,13 +423,13 @@
             <!-- Set @bind value if present -->
             <xforms:setvalue ref="@bind" value="concat($new-control-name, '-bind')"/>
 
-            <!-- Set xforms:label, xforms:hint, xforms:help and xforms:alert @ref -->
+            <!-- Set xforms:label, xforms:hint, xforms:help and xforms:alert @ref if present -->
             <xforms:action xxforms:iterate="(xforms:label, xforms:hint, xforms:help, xforms:alert)[@ref = '' or starts-with(@ref, '$form-resources')]">
                 <xxforms:variable name="local-name" select="local-name()"/>
                 <xforms:setvalue ref="@ref" value="concat('$form-resources/', $new-control-name, '/', $local-name)"/>
             </xforms:action>
 
-            <!-- Set xforms:itemset/@nodeset value -->
+            <!-- Set xforms:itemset/@nodeset value if present -->
             <xforms:setvalue ref="xforms:itemset/@nodeset" value="concat('$form-resources/', $new-control-name, '/item')"/>
         </xforms:action>
     </xforms:action>
@@ -445,8 +452,18 @@
         </xforms:action>
     </xforms:action>
 
+    <!-- Rename bind -->
+    <xforms:action ev:event="fb-rename-bind">
+        <xxforms:variable name="old-bind-id" select="concat(event('old-name'), '-bind')"/>
+        <xxforms:variable name="bind" select="$model//xforms:bind[@id = $old-bind-id]"/>
+        <xforms:action context="$bind" if="exists(.)">
+            <xforms:setvalue ref="@id" value="concat(event('new-name'), '-bind')"/>
+            <xforms:setvalue ref="@nodeset" value="event('new-name')"/>
+        </xforms:action>
+    </xforms:action>
+
     <!-- Paste control if there is one in the clipboard -->
-    <xforms:action ev:event="fb-paste-control" if="$xcv/control/xforms:*">
+    <xforms:action ev:event="fb-paste-control" if="$xcv/control/*">
 
         <!-- Try to find empty td -->
         <xforms:dispatch name="fb-ensure-empty-td" target="fr-form-model"/>
@@ -455,20 +472,20 @@
         <xxforms:variable name="new-td" select="$current-section-content-block/
             xhtml:tr[index('fb-section-content-grid-tr-repeat')]/
             xhtml:td[index('fb-section-content-grid-td-repeat')]"/>
-        <xforms:action context="$new-td" if="not(exists(xforms:*))">
+        <xforms:action context="$new-td" if="not(exists(*))">
             <!-- We now have an empty cell for pasting -->
 
-            <xxforms:variable name="xcv-control-id" select="$xcv/control/xforms:*/@id"/>
+            <xxforms:variable name="xcv-control-id" select="$xcv/control/*/@id"/>
 
             <!-- Check if clipboard control id is in use -->
-            <xforms:action if="$body//xforms:*[@id = $xcv-control-id]">
+            <xforms:action if="$body//*[@id = $xcv-control-id]">
                 <!-- If so, get new id and replace references -->
                 <xforms:dispatch name="fb-compute-control-id" target="fr-form-model"/>
                 <xxforms:variable name="new-control-name" select="concat('control-', $next-control-id)"/>
 
                 <!-- Adjust bindings on xcv control -->
                 <xforms:dispatch name="fb-rename-control" target="fr-form-model">
-                    <xxforms:context name="control" select="$xcv/control/xforms:*"/>
+                    <xxforms:context name="control" select="$xcv/control/*"/>
                     <xxforms:context name="new-name" select="$new-control-name"/>
                 </xforms:dispatch>
 
@@ -485,7 +502,7 @@
             </xforms:action>
 
             <!-- Insert control -->
-            <xforms:insert context="$new-td" origin="$xcv/control/xforms:*"/>
+            <xforms:insert context="$new-td" origin="$xcv/control/*"/>
 
             <!-- Insert instance and resource holders -->
             <!-- TODO: match against existing languages, as that may have changed between copy and paste -->
@@ -499,7 +516,7 @@
 
             <!-- Insert bind if any -->
             <xforms:action if="exists($xcv/bind/xforms:bind)">
-                <xxforms:variable name="control-name" select="substring-before($xcv/control/xforms:*/@id, '-control')"/>
+                <xxforms:variable name="control-name" select="substring-before($xcv/control/*/@id, '-control')"/>
                 <xforms:dispatch name="fb-ensure-bind" target="fr-form-model">
                     <xxforms:context name="control-name" select="$control-name"/>
                 </xforms:dispatch>
@@ -531,7 +548,7 @@
                        origin="instance('fb-bind-template')"/>
 
         <!-- Insert bind for section if needed -->
-        <xxforms:variable name="current-control" select="$body//xforms:*[@id = concat($control-name, '-control')]"/>
+        <xxforms:variable name="current-control" select="$body//*[@id = concat($control-name, '-control')]"/>
         <xxforms:variable name="current-section-name" select="$current-control/ancestor::fr:section[1]/@context"/>
         <xforms:action context="$model/xforms:bind[@id = 'fr-form-binds']">
             <xforms:action if="not(xforms:bind[@nodeset = $current-section-name])">
@@ -551,33 +568,6 @@
             </xforms:action>
         </xforms:action>
     </xforms:action>
-
-    <!-- Details dialog -->
-    <!-- TODO: Move this to dialog and refactor following dialog-section-details.xml -->
-    <xforms:instance id="fb-details-editor-instance">
-        <details>
-            <original-control-name/>
-            <control-name/>
-            <control/>
-            <classes/>
-            <instance-holder/>
-            <change-trigger/>
-        </details>
-    </xforms:instance>
-
-    <xforms:bind nodeset="instance('fb-details-editor-instance')">
-        <xforms:bind nodeset="control-name"
-                         constraint=". = ../original-control-name
-                                        or not(concat(normalize-space(), '-section') = $body//fr:section/@id)
-                                            and not(concat(normalize-space(), '-control') = $body//xforms:*/@id)" type="xs:NCName"/>
-        <!-- Annoying that we need to repeat the expression here, but we can't use xxforms:valid(). Should use variables once available in binds. -->
-        <xforms:bind nodeset="change-trigger"
-                        readonly="for $control-name in ../control-name return
-                                    not($control-name = ../original-control-name
-                                        or not(concat(normalize-space($control-name), '-section') = $body//fr:section/@id)
-                                            and not(concat(normalize-space($control-name), '-control') = $body//xforms:*/@id))"/>
-
-    </xforms:bind>
 
     <!-- Validation dialog -->
     <xforms:instance id="fb-validation-editor-instance">
@@ -678,6 +668,16 @@
     <xforms:submission id="fb-schema-upload-submission" ref="instance('fb-schema-upload-instance')"
                        method="post" replace="none" resource="test:"/>
 
+    <!-- Submission to load initial components-->
+    <xforms:submission id="fb-load-components" serialization="none"
+                       method="get" resource="{xxforms:property('oxf.fb.components.uri.*.*')}"
+                       replace="instance" instance="fb-components-instance"/>
+
+    <xforms:instance id="fb-components-instance">
+        <!-- This will contain the default component available for the currently edited form -->
+        <xbl:xbl/>
+    </xforms:instance>
+
     <!-- Instance for the itemset editor -->
     <xforms:instance id="fb-itemset-instance" xxforms:exclude-result-prefixes="#all">
         <itemset>
@@ -727,9 +727,9 @@
     <!-- Compute the next control id -->
     <xforms:action ev:event="fb-compute-control-id">
         <!-- Initialize based on count of existing controls (we could as well start from 1) -->
-        <xforms:setvalue if="$next-control-id = ''" ref="$next-control-id" value="count($body//xforms:*[ends-with(@id, '-control')]) + 1"/>
+        <xforms:setvalue if="$next-control-id = ''" ref="$next-control-id" value="count($body//*[ends-with(@id, '-control')]) + 1"/>
         <!-- Increment number until the id doesn't clash with the control id OR the element name -->
-        <xforms:action while="$body//xforms:*[@id = concat('control-', $next-control-id, '-control')]
+        <xforms:action while="$body//*[@id = concat('control-', $next-control-id, '-control')]
                                 or $form-instance/*/*[name() = concat('control-', $next-control-id)]">
             <xforms:setvalue ref="$next-control-id" value=". + 1"/>
         </xforms:action>
@@ -763,6 +763,16 @@
         </fr:grid>
     </xforms:instance>
 
+    <xforms:instance id="fb-lhha-template" xxforms:readonly="true" xxforms:exclude-result-prefixes="#all">
+        <xforms:input>
+            <xforms:label ref=""/>
+            <xforms:hint ref=""/>
+            <xforms:help ref=""/>
+            <xforms:alert ref="$fr-resources/detail/labels/alert"/>
+        </xforms:input>
+    </xforms:instance>
+
+    <!-- Built-in controls -->
     <xforms:instance id="fb-controls-template" xxforms:readonly="true" xxforms:exclude-result-prefixes="#all">
         <templates xmlns="">
             <template label="Single-Line Text">

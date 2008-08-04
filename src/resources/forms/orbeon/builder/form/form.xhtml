@@ -191,7 +191,7 @@
                                                 <xxforms:show ev:event="DOMActivate" dialog="fb-confirmation-dialog">
                                                     <xxforms:context name="fr:message"
                                                                      select="concat('Are you sure you want to delete the current section? ',
-                                                                            count(context()/*/xhtml:tr/xhtml:td[xforms:*]),
+                                                                            count(context()/*/xhtml:tr/xhtml:td[*]),
                                                                             ' controls will be deleted.')"/>
 
                                                     <xxforms:context name="fr:confirmation-target" select="'fb-top-level-section'"/>
@@ -233,9 +233,9 @@
 
                                             <xforms:action xxforms:iterate="*/xhtml:tr/xhtml:td">
                                                 <!-- Delete holder element and resources for control -->
-                                                <xforms:action if="exists(xforms:*)">
-                                                    <xforms:delete nodeset="$form-instance/*[index('fb-top-level-repeat')]/*[name() = context()/xforms:*/@ref]"/>
-                                                    <xforms:delete xxforms:iterate="$resources/resource/*[name() = context()/xforms:*/@ref]" nodeset="."/>
+                                                <xforms:action if="exists(*)">
+                                                    <xforms:delete nodeset="$form-instance/*[index('fb-top-level-repeat')]/*[name() = context()/*/@ref]"/>
+                                                    <xforms:delete xxforms:iterate="$resources/resource/*[name() = context()/*/@ref]" nodeset="."/>
                                                 </xforms:action>
                                             </xforms:action>
 
@@ -268,7 +268,7 @@
                                                                             </xforms:label>
                                                                             <xforms:action ev:event="DOMActivate">
 
-                                                                                <xxforms:variable name="count" select="count($grid/xhtml:tr/xhtml:td[xforms:*])"/>
+                                                                                <xxforms:variable name="count" select="count($grid/xhtml:tr/xhtml:td[*])"/>
 
                                                                                 <xforms:action if="$count > 0">
                                                                                     <!-- Ask confirmation -->
@@ -290,8 +290,8 @@
 
                                                                                 <xforms:action xxforms:iterate="$grid/xhtml:tr/xhtml:td">
                                                                                     <!-- Delete control -->
-                                                                                    <xforms:dispatch if="exists(xforms:*)" name="fb-delete-control" target="fr-form-model">
-                                                                                        <xxforms:context name="control" select="xforms:*"/>
+                                                                                    <xforms:dispatch if="exists(*)" name="fb-delete-control" target="fr-form-model">
+                                                                                        <xxforms:context name="control" select="*[1]"/>
                                                                                     </xforms:dispatch>
                                                                                 </xforms:action>
 
@@ -369,7 +369,7 @@
                                                                                                                           return $r/c[$column-number][. != 'x']
                                                                                                                 return $grid/xhtml:tr[count($c/../preceding-sibling::r) + 1]/xhtml:td[count($c/preceding-sibling::c[. != 'x']) + 1]"/>
 
-                                                                                    <xxforms:variable name="count" select="count($delete-tds[xforms:*])"/>
+                                                                                    <xxforms:variable name="count" select="count($delete-tds[*])"/>
 
                                                                                     <xforms:action if="$count > 0">
                                                                                         <!-- Ask confirmation -->
@@ -397,8 +397,8 @@
                                                                                     <!-- Iterate over rows and in each delete the appropriate column -->
                                                                                     <xforms:action xxforms:iterate="$delete-tds">
                                                                                         <!-- Delete control -->
-                                                                                        <xforms:dispatch if="exists(xforms:*)" name="fb-delete-control" target="fr-form-model">
-                                                                                            <xxforms:context name="control" select="xforms:*"/>
+                                                                                        <xforms:dispatch if="exists(*)" name="fb-delete-control" target="fr-form-model">
+                                                                                            <xxforms:context name="control" select="*[1]"/>
                                                                                         </xforms:dispatch>
                                                                                         <xforms:delete nodeset="."/>
                                                                                     </xforms:action>
@@ -460,7 +460,7 @@
                                                                                     <xforms:label><xhtml:img src="/apps/fr/style/images/silk/bin.png" alt="Delete Row" title="Delete Row"/></xforms:label>
                                                                                     <xforms:action ev:event="DOMActivate">
 
-                                                                                        <xxforms:variable name="count" select="count($tr/xhtml:td[xforms:*])"/>
+                                                                                        <xxforms:variable name="count" select="count($tr/xhtml:td[*])"/>
 
                                                                                         <xforms:action if="$count > 0">
                                                                                             <!-- Ask confirmation -->
@@ -503,8 +503,8 @@
                                                                                         <!-- Delete holder elements and resources -->
                                                                                         <xforms:action xxforms:iterate="$tr/xhtml:td">
                                                                                             <!-- Delete control -->
-                                                                                            <xforms:dispatch if="exists(xforms:*)" name="fb-delete-control" target="fr-form-model">
-                                                                                                <xxforms:context name="control" select="xforms:*"/>
+                                                                                            <xforms:dispatch if="exists(*)" name="fb-delete-control" target="fr-form-model">
+                                                                                                <xxforms:context name="control" select="*[1]"/>
                                                                                             </xforms:dispatch>
                                                                                         </xforms:action>
 
@@ -563,7 +563,7 @@
                                                                             <xxforms:variable name="td" select="."/>
                                                                             <xxforms:variable name="td-position" select="position()"/>
 
-                                                                            <xxforms:variable name="control" select="xforms:*[1]"/>
+                                                                            <xxforms:variable name="control" select="*[1]"/>
                                                                             <xxforms:variable name="control-name" select="substring-before($control/@id, '-control')"/>
                                                                             <xxforms:variable name="instance-holder" select="$section-holder/*[name() = $control-name]"/>
                                                                             <xxforms:variable name="resource-holder" select="$current-resources/*[name() = $control-name]"/>
@@ -596,7 +596,7 @@
                                                                                                 <!-- td to delete -->
                                                                                                 <xxforms:variable name="delete-td" select="$td/../following-sibling::xhtml:tr[$current-rowspan]/xhtml:td[$delete-td-position]"/>
 
-                                                                                                <xforms:action if="exists($delete-td/xforms:*)">
+                                                                                                <xforms:action if="exists($delete-td/*)">
                                                                                                     <!-- Ask confirmation -->
                                                                                                     <xxforms:show dialog="fb-confirmation-dialog">
                                                                                                         <xxforms:context name="fr:message"
@@ -605,7 +605,7 @@
                                                                                                         <xxforms:context name="fr:confirmation-target" select="'fb-expand-cell-down-trigger'"/>
                                                                                                     </xxforms:show>
                                                                                                 </xforms:action>
-                                                                                                <xforms:action if="not(exists($delete-td/xforms:*))">
+                                                                                                <xforms:action if="not(exists($delete-td/*))">
                                                                                                     <!-- We are automatically confirmed as there is no control to delete -->
                                                                                                     <xforms:dispatch name="fb-confirmation-yes" target="fb-expand-cell-down-trigger"/>
                                                                                                 </xforms:action>
@@ -624,8 +624,8 @@
                                                                                                 <!-- Increase rowspan on current xhtml:td -->
                                                                                                 <xforms:insert context="$td" origin="xxforms:attribute('rowspan', xs:string($current-rowspan + $rowspan-delta))"/>
                                                                                                 <!-- Delete holder element, resources, and control in td to delete -->
-                                                                                                <xforms:dispatch if="exists($delete-td/xforms:*)" name="fb-delete-control" target="fr-form-model">
-                                                                                                    <xxforms:context name="control" select="$delete-td/xforms:*"/>
+                                                                                                <xforms:dispatch if="exists($delete-td/*)" name="fb-delete-control" target="fr-form-model">
+                                                                                                    <xxforms:context name="control" select="$delete-td/*[1]"/>
                                                                                                 </xforms:dispatch>
                                                                                                 <!-- Delete xhtml:td -->
                                                                                                 <xforms:delete nodeset="$delete-td"/>
@@ -674,9 +674,8 @@
                                                                                     <!-- Edit details for any control -->
                                                                                     <xforms:trigger appearance="minimal" id="fb-edit-details-trigger">
                                                                                         <xforms:label><xhtml:img alt="Details" title="" src="/apps/fr/style/images/silk/cog.png"/></xforms:label>
-                                                                                        <xforms:action ev:event="DOMActivate" context="instance('fb-details-editor-instance')">
+                                                                                        <xforms:action ev:event="DOMActivate">
                                                                                             <xxforms:show dialog="fb-edit-details-dialog" neighbor="fb-edit-details-trigger">
-                                                                                                <xxforms:context name="control" select="$control"/>
                                                                                                 <xxforms:context name="control-name" select="$control-name"/>
                                                                                                 <xxforms:context name="instance-holder" select="$instance-holder"/>
                                                                                             </xxforms:show>
@@ -943,6 +942,9 @@
                                                                                                     <xforms:mediatype ref="@mediatype"/>
                                                                                                     <xxforms:size ref="@size"/>
                                                                                                 </xforms:upload>
+                                                                                            </xforms:group>
+                                                                                            <xforms:group ref="*[not(namespace-uri-from-QName(resolve-QName(name(), .)) = 'http://www.w3.org/2002/xforms' )]">
+                                                                                                <xhtml:img src="/apps/fr/style/images/silk/plugin.png" alt="" width="16" height="16"/>
                                                                                             </xforms:group>
                                                                                         </xhtml:div>
 

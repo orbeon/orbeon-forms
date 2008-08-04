@@ -39,6 +39,13 @@
                 </form>
             </xforms:instance>
 
+            <!-- Bindings -->
+            <xforms:bind id="fr-form-binds" nodeset="instance('fr-form-instance')">
+                <xforms:bind id="section-1-bind" nodeset="section-1">
+                    <xforms:bind id="control-1-bind" nodeset="control-1"/>
+                </xforms:bind>
+            </xforms:bind>
+
             <!-- Metadata -->
             <xforms:instance id="fr-form-metadata" xxforms:readonly="true">
                 <metadata>
@@ -97,7 +104,7 @@
                     <fr:grid columns="2">
                         <xhtml:tr>
                             <xhtml:td>
-                                <xforms:input id="control-1-control" ref="control-1" incremental="true">
+                                <xforms:input id="control-1-control" bind="control-1-bind" incremental="true">
                                     <xforms:label ref="$form-resources/control-1/label"/>
                                     <xforms:hint ref="$form-resources/control-1/hint"/>
                                     <xforms:help ref="$form-resources/control-1/help"/>

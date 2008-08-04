@@ -21,9 +21,11 @@
       xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
       xmlns:saxon="http://saxon.sf.net/"
-
+      xmlns:xbl="http://www.w3.org/ns/xbl"
 
       id="fb-toolbox">
+
+    <!-- TODO: i18n -->
 
     <xhtml:div class="fb-toolbox-inside">
 
@@ -45,7 +47,7 @@
                                 </xforms:dispatch>
                                 <!-- Then delete the source -->
                                 <xforms:dispatch name="fb-delete-control" target="fr-form-model">
-                                    <xxforms:context name="control" select="$current-td/xforms:*"/>
+                                    <xxforms:context name="control" select="$current-td/*[1]"/>
                                 </xforms:dispatch>
                             </xforms:action>
                         </xforms:trigger>
@@ -152,7 +154,7 @@
                             <xhtml:div class="fb-tool">
                                 <xforms:trigger id="fb-add-control-trigger" ref="instance('fb-variables')/controls-triggers">
                                     <xforms:label>
-                                        <xforms:output value="concat('&lt;img width=''16'' height=''16'' src=''', if ($template/@image) then $template/@image else concat('/forms/orbeon/builder/images/', $template/xhtml:div/@class, '.png'), '''/>')" mediatype="text/html"/>
+                                        <xhtml:img src="{if ($template/@image) then $template/@image else concat('/forms/orbeon/builder/images/', $template/xhtml:div/@class, '.png')}" alt="" width="16" height="16"/>
                                         <xforms:output ref="$template/@label"/>
                                     </xforms:label>
                                     <xforms:action ev:event="DOMActivate">
@@ -170,12 +172,12 @@
                                         <xxforms:variable name="new-td" select="$current-section-content-block/
                                             xhtml:tr[index('fb-section-content-grid-tr-repeat')]/
                                             xhtml:td[index('fb-section-content-grid-td-repeat')]"/>
-                                        <xforms:action context="$new-td" if="not(exists(xforms:*))">
+                                        <xforms:action context="$new-td" if="not(exists(*))">
                                             <!-- Context is now on td and there is room for insertion -->
 
                                             <!-- Insert control into td -->
                                             <xforms:insert context="." origin="$control-template"/>
-                                            <xxforms:variable name="control" select="xforms:*"/>
+                                            <xxforms:variable name="control" select="*[1]"/>
                                             <xxforms:variable name="control-type" select="$control-template/../@class"/>
 
                                             <!-- Adjust bindings on newly inserted control -->
@@ -197,23 +199,109 @@
                                                 <xxforms:context name="resource-holders" select="for $r in $resources/resource return xxforms:element($new-control-name)"/>
                                             </xforms:dispatch>
 
-                                            <!-- Insert the bind element if needed -->
-                                            <xforms:action if="$control-type = ('date-input', 'time-input', 'dateTime-input', 'upload', 'image')">
-                                                <xforms:dispatch name="fb-ensure-bind" target="fr-form-model">
-                                                    <xxforms:context name="control-name" select="$new-control-name"/>
-                                                </xforms:dispatch>
+                                            <!-- Insert bind element -->
+                                            <xforms:dispatch name="fb-ensure-bind" target="fr-form-model">
+                                                <xxforms:context name="control-name" select="$new-control-name"/>
+                                            </xforms:dispatch>
+                                            <xxforms:variable name="bind" select="$model//xforms:bind[@nodeset = $new-control-name]"/>
 
-                                                <xxforms:variable name="bind" select="$model//xforms:bind[@nodeset = $new-control-name]"/>
+                                            <!-- Use @bind instead of @ref -->
+                                            <xforms:delete nodeset="$control/@ref"/>
+                                            <xforms:insert context="$control" origin="xxforms:attribute('bind', $bind/@id)"/>
 
-                                                <xforms:insert if="$control-type = 'date-input'" context="$bind" origin="xxforms:attribute('type', 'xs:date')"/>
-                                                <xforms:insert if="$control-type = 'time-input'" context="$bind" origin="xxforms:attribute('type', 'xs:time')"/>
-                                                <xforms:insert if="$control-type = 'dateTime-input'" context="$bind" origin="xxforms:attribute('type', 'xs:dateTime')"/>
-                                                <xforms:insert if="$control-type = ('upload', 'image')" context="$bind" origin="xxforms:attribute('type', 'xs:anyURI')"/>
+                                            <!-- Set bind type if needed -->
+                                            <xforms:insert if="$control-type = 'date-input'" context="$bind" origin="xxforms:attribute('type', 'xs:date')"/>
+                                            <xforms:insert if="$control-type = 'time-input'" context="$bind" origin="xxforms:attribute('type', 'xs:time')"/>
+                                            <xforms:insert if="$control-type = 'dateTime-input'" context="$bind" origin="xxforms:attribute('type', 'xs:dateTime')"/>
+                                            <xforms:insert if="$control-type = ('upload', 'image')" context="$bind" origin="xxforms:attribute('type', 'xs:anyURI')"/>
 
-                                                <!-- Use @bind instead of @ref -->
-                                                <xforms:delete nodeset="$control/@ref"/>
-                                                <xforms:insert context="$control" origin="xxforms:attribute('bind', $bind/@id)"/>
-                                            </xforms:action>
+                                            <!-- Open label editor for newly inserted control -->
+                                            <xforms:toggle case="fr-inplace-fb-control-label-control-edit"/>
+                                            <xforms:setfocus control="fr-inplace-fb-control-label-control-input"/>
+
+                                        </xforms:action>
+
+                                    </xforms:action>
+                                </xforms:trigger>
+                            </xhtml:div>
+                        </xforms:repeat>
+                    </xhtml:div>
+                    <!-- Custom components -->
+                    <xhtml:div class="fb-tools">
+                        <xforms:repeat nodeset="instance('fb-components-instance')//xbl:binding" id="fb-components-template-repeat">
+
+                            <xxforms:variable name="binding" select="." as="element(xbl:binding)"/>
+
+                            <xhtml:div class="fb-tool">
+                                <xforms:trigger id="fb-add-component-trigger" ref="instance('fb-variables')/controls-triggers">
+                                    <xforms:label>
+                                        <xhtml:img src="{if ($binding/xhtml:link[@rel = 'icon']/@href) then $binding/xhtml:link[@rel = 'icon']/@href else '/apps/fr/style/images/silk/plugin.png'}" alt="" width="16" height="16"/>
+                                        <!-- TODO: resolve title using current language instead of taking first one -->
+                                        <xforms:output value="$binding/xhtml:title"/>
+                                    </xforms:label>
+                                    <xforms:action ev:event="DOMActivate">
+                                        <!-- Insert a new control -->
+
+                                        <!-- Compute next control id -->
+                                        <xforms:dispatch target="fr-form-model" name="fb-compute-control-id"/>
+                                        <xxforms:variable name="new-control-name" select="concat('control-', $next-control-id)"/>
+                                        <xxforms:variable name="section-name" select="$current-td/ancestor::fr:section[1]/@context"/>
+
+                                        <!-- Try to find empty td -->
+                                        <xforms:dispatch name="fb-ensure-empty-td" target="fr-form-model"/>
+
+                                        <!-- This ensures the context is recomputed -->
+                                        <xxforms:variable name="new-td" select="$current-section-content-block/
+                                            xhtml:tr[index('fb-section-content-grid-tr-repeat')]/
+                                            xhtml:td[index('fb-section-content-grid-td-repeat')]"/>
+                                        <xforms:action context="$new-td" if="not(exists(*))">
+                                            <!-- Context is now on td and there is room for insertion -->
+
+                                            <!-- Try to find the binding QName (for now takes the first CSS rule and assume the form foo|bar) -->
+                                            <xxforms:variable name="element-qname" select="replace(normalize-space(tokenize($binding/@element, ',')[1]), '\|', ':')" as="xs:string"/>
+
+                                            <!-- Insert control into td -->
+                                            <xforms:insert context="." origin="xxforms:element(resolve-QName($element-qname, $binding))"/>
+                                            <xxforms:variable name="control" select="*[1]"/>
+
+                                            <!-- Insert control content (label, hint, help, alert) -->
+                                            <xforms:insert context="$control" origin="instance('fb-lhha-template')/*"/>
+
+                                            <!-- Get control type -->
+                                            <!-- TODO: for now assume a literal 'xs:' prefix (should resolve namespace) -->
+                                            <xxforms:variable name="control-type" select="$binding/xhtml:meta[resolve-QName(@property, .) = xs:QName('xforms:type')]/@content"/>
+
+                                            <!-- Adjust bindings on newly inserted control -->
+                                            <xforms:dispatch name="fb-rename-control" target="fr-form-model">
+                                                <xxforms:context name="control" select="$control"/>
+                                                <xxforms:context name="new-name" select="$new-control-name"/>
+                                            </xforms:dispatch>
+
+                                            <!-- Insert instance and resource holders -->
+                                            <xforms:dispatch name="fb-insert-holders" target="fr-form-model">
+                                                <xxforms:context name="current-td" select="$new-td"/>
+                                                <xxforms:context name="section-name" select="$section-name"/>
+                                                <!-- Instance holder, with extra attributes if needed -->
+                                                <xxforms:context name="instance-holder"
+                                                                 select="xxforms:element($new-control-name,
+                                                                            if ($control-type = 'xs:anyURI')
+                                                                            then (xxforms:attribute('filename'), xxforms:attribute('mediatype'), xxforms:attribute('size'))
+                                                                            else ())"/>
+                                                <xxforms:context name="resource-holders" select="for $r in $resources/resource return xxforms:element($new-control-name)"/>
+                                            </xforms:dispatch>
+
+                                            <!-- Insert the bind element -->
+                                            <xforms:dispatch name="fb-ensure-bind" target="fr-form-model">
+                                                <xxforms:context name="control-name" select="$new-control-name"/>
+                                            </xforms:dispatch>
+                                            <xxforms:variable name="bind" select="$model//xforms:bind[@nodeset = $new-control-name]"/>
+
+                                            <!-- Use @bind instead of @ref -->
+                                            <xforms:delete nodeset="$control/@ref"/>
+                                            <xforms:insert context="$control" origin="xxforms:attribute('bind', $bind/@id)"/>
+
+                                            <!-- Set bind type if needed -->
+                                            <xforms:insert if="$control-type and not($control-type = 'xs:string')" context="$bind" origin="xxforms:attribute('type', $control-type)"/>
 
                                             <!-- Open label editor for newly inserted control -->
                                             <xforms:toggle case="fr-inplace-fb-control-label-control-edit"/>

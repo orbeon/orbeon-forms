@@ -23,47 +23,44 @@
       xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
       xmlns:saxon="http://saxon.sf.net/"
 
-      id="fb-edit-details-dialog" appearance="minimal">
+      id="fb-edit-details-dialog" appearance="minimal" model="fb-details-editor-model">
 
     <xforms:label>Edit Control Details</xforms:label>
 
     <xhtml:div>
-        <xxforms:variable name="instance" select="instance('fb-details-editor-instance')"/>
-        <xforms:group context="$instance">
-            <xforms:input ref="control-name" incremental="true" id="fb-edit-details-control-name-input">
-                <xforms:label>Control Name</xforms:label>
-                <xforms:alert>Name is already in use or incorrect</xforms:alert>
+        <xforms:input ref="control-name" incremental="true" id="fb-edit-details-control-name-input">
+            <xforms:label>Control Name</xforms:label>
+            <xforms:alert>Name is already in use or incorrect</xforms:alert>
+            <!-- Close and save upon DOMActivate -->
+            <xforms:dispatch ev:event="DOMActivate" name="xxforms-dialog-close" target="fb-edit-details-dialog"/>
+        </xforms:input>
+        <xforms:select ref="classes" appearance="full">
+            <xforms:label>Summary Page</xforms:label>
+            <xforms:item>
+                <xforms:label>Show in Summary</xforms:label>
+                <xforms:value>fr-summary</xforms:value>
+            </xforms:item>
+            <xforms:item>
+                <xforms:label>Show in Search</xforms:label>
+                <xforms:value>fr-search</xforms:value>
+            </xforms:item>
+        </xforms:select>
+
+        <xhtml:div class="fr-dialog-buttons">
+            <xforms:trigger class="fr-inplace-rename" ref="change-trigger">
+                <xforms:label>Apply</xforms:label>
                 <!-- Close and save upon DOMActivate -->
                 <xforms:dispatch ev:event="DOMActivate" name="xxforms-dialog-close" target="fb-edit-details-dialog"/>
-            </xforms:input>
-            <xforms:select ref="classes" appearance="full">
-                <xforms:label>Summary Page</xforms:label>
-                <xforms:item>
-                    <xforms:label>Show in Summary</xforms:label>
-                    <xforms:value>fr-summary</xforms:value>
-                </xforms:item>
-                <xforms:item>
-                    <xforms:label>Show in Search</xforms:label>
-                    <xforms:value>fr-search</xforms:value>
-                </xforms:item>
-            </xforms:select>
-
-            <xhtml:div class="fr-dialog-buttons">
-                <xforms:trigger class="fr-inplace-rename" ref="change-trigger">
-                    <xforms:label>Apply</xforms:label>
-                    <!-- Close and save upon DOMActivate -->
-                    <xforms:dispatch ev:event="DOMActivate" name="xxforms-dialog-close" target="fb-edit-details-dialog"/>
-                </xforms:trigger>
-                or
-                <xforms:trigger appearance="minimal" class="fr-inplace-cancel">
-                    <xforms:label>Cancel</xforms:label>
-                    <!-- Close and cancel upon DOMActivate -->
-                    <xforms:dispatch ev:event="DOMActivate" name="xxforms-dialog-close" target="fb-edit-details-dialog">
-                        <xxforms:context name="fb:save" select="false()"/>
-                    </xforms:dispatch>
-                </xforms:trigger>
-            </xhtml:div>
-        </xforms:group>
+            </xforms:trigger>
+            or
+            <xforms:trigger appearance="minimal" class="fr-inplace-cancel">
+                <xforms:label>Cancel</xforms:label>
+                <!-- Close and cancel upon DOMActivate -->
+                <xforms:dispatch ev:event="DOMActivate" name="xxforms-dialog-close" target="fb-edit-details-dialog">
+                    <xxforms:context name="fb:save" select="false()"/>
+                </xforms:dispatch>
+            </xforms:trigger>
+        </xhtml:div>
     </xhtml:div>
 
     <!-- Save data upon close, unless explicitly prevented -->
@@ -71,11 +68,13 @@
 
         <xxforms:variable name="instance" select="instance('fb-details-editor-instance')"/>
 
-        <xxforms:variable name="control" select="$form-instance/root()/saxon:evaluate($instance/control)"/>
         <xxforms:variable name="instance-holder" select="$form-instance/root()/saxon:evaluate($instance/instance-holder)"/>
 
         <xxforms:variable name="old-name" select="name($instance-holder)"/>
         <xxforms:variable name="new-name" select="$instance/control-name"/>
+
+        <!-- Find reference to control -->
+        <xxforms:variable name="control" select="$body//*[@id = concat($old-name, '-control')]"/>
 
         <!-- Rename if needed -->
         <xforms:action if="$old-name != $new-name">
@@ -92,13 +91,11 @@
                 <xxforms:context name="new-name" select="$new-name"/>
             </xforms:dispatch>
 
-            <!-- Update bind if existing -->
-            <xxforms:variable name="old-bind-id" select="concat($old-name, '-bind')"/>
-            <xxforms:variable name="bind" select="$model//xforms:bind[@id = $old-bind-id]"/>
-            <xforms:action context="$bind" if="exists(.)">
-                <xforms:setvalue ref="@id" value="concat($new-name, '-bind')"/>
-                <xforms:setvalue ref="@nodeset" value="$new-name"/>
-            </xforms:action>
+            <!-- Rename bind if existing -->
+            <xforms:dispatch name="fb-rename-bind" target="fr-form-model">
+                <xxforms:context name="old-name" select="$old-name"/>
+                <xxforms:context name="new-name" select="$new-name"/>
+            </xforms:dispatch>
         </xforms:action>
 
         <!-- Set proper classes -->
@@ -110,20 +107,50 @@
 
     <!-- Show dialog -->
     <xforms:action ev:event="xxforms-dialog-open">
-        <!-- Copy over values -->
-        <xxforms:variable name="instance" select="instance('fb-details-editor-instance')"/>
+        <!-- Remember values -->
 
         <xxforms:variable name="control" select="event('control')"/>
 
-        <xforms:setvalue ref="$instance/control-name" value="event('control-name')"/>
-        <xforms:setvalue ref="$instance/original-control-name" value="event('control-name')"/>
-        <xforms:setvalue ref="$instance/control" value="$control/saxon:path()"/>
-        <xforms:setvalue ref="$instance/instance-holder" value="event('instance-holder')/saxon:path()"/>
+        <xforms:setvalue ref="control-name" value="event('control-name')"/>
+        <xforms:setvalue ref="original-control-name" value="event('control-name')"/>
+        <xforms:setvalue ref="instance-holder" value="event('instance-holder')/saxon:path()"/>
 
-        <xforms:setvalue ref="$instance/classes" value="$control/@class"/>
+        <xxforms:variable name="control" select="$body//*[@id = concat(event('control-name'), '-control')]"/>
+        <xforms:setvalue ref="classes" value="$control/@class"/>
 
         <!-- Set focus when the dialog open  -->
         <xforms:setfocus control="fb-edit-details-control-name-input"/>
     </xforms:action>
+
+    <!-- Local model -->
+    <xforms:model id="fb-details-editor-model">
+
+        <xxforms:variable name="body" select="xxforms:instance('fr-form-instance')/xhtml:body/fr:view/fr:body"/>
+        
+        <xforms:instance id="fb-details-editor-instance">
+            <details>
+                <original-control-name/>
+                <control-name/>
+                <classes/>
+                <instance-holder/>
+                <change-trigger/>
+            </details>
+        </xforms:instance>
+
+        <xforms:bind nodeset="instance('fb-details-editor-instance')">
+            <xforms:bind nodeset="control-name"
+                             constraint=". = ../original-control-name
+                                            or not(concat(normalize-space(), '-section') = $body//fr:section/@id)
+                                                and not(concat(normalize-space(), '-control') = $body//*/@id)" type="xs:NCName"/>
+            <!-- Annoying that we need to repeat the expression here, but we can't use xxforms:valid().
+                 Should use variables once available in binds. -->
+            <xforms:bind nodeset="change-trigger"
+                            readonly="for $control-name in ../control-name return
+                                        not($control-name = ../original-control-name
+                                            or not(concat(normalize-space($control-name), '-section') = $body//fr:section/@id)
+                                                and not(concat(normalize-space($control-name), '-control') = $body//*/@id))"/>
+
+        </xforms:bind>
+    </xforms:model>
 
 </xxforms:dialog>

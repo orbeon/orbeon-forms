@@ -50,6 +50,7 @@
     <xsl:variable name="has-button-clear" select="PipelineFunctionLibrary:property('oxf.fr.detail.button.clear') = 'true'" as="xs:boolean"/>
     <xsl:variable name="has-button-print" select="PipelineFunctionLibrary:property('oxf.fr.detail.button.print') = 'true'" as="xs:boolean"/>
     <xsl:variable name="has-button-pdf" select="PipelineFunctionLibrary:property('oxf.fr.detail.button.pdf') = 'true'" as="xs:boolean"/>
+    <xsl:variable name="components-uri" select="PipelineFunctionLibrary:property('oxf.fb.components.uri.*.*')" as="xs:string?"/>
 
     <xsl:template match="/xhtml:html/xhtml:body">
         <xsl:copy>
@@ -105,6 +106,11 @@
 
     <!-- Add Form Runner models and scripts -->
     <xsl:template match="/xhtml:html/xhtml:head/xforms:model[1]">
+
+        <!-- Load components if not Form Builder -->
+        <xsl:if test="not($is-form-builder) and normalize-space($components-uri) != '' ">
+            <xi:include href="{$components-uri}" xxi:omit-xml-base="true"/>
+        </xsl:if>
 
         <!-- This model handles form sections -->
         <xforms:model id="fr-sections-model"

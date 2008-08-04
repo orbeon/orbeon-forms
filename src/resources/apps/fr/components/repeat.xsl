@@ -56,7 +56,7 @@
                         </xforms:group>
                     </xsl:if>
                 </xhtml:td>
-                <xsl:for-each select="(xhtml:tr[1] | fr:tr[1])/(xhtml:td | fr:td)/xforms:*[1]">
+                <xsl:for-each select="(xhtml:tr[1] | fr:tr[1])/(xhtml:td | fr:td)/*[1]">
                     <xhtml:th>
                         <xforms:output value="''" class="fr-hidden"><!-- hide the actual output control -->
                             <xsl:copy-of select="xforms:label | xforms:help | xforms:hint"/>

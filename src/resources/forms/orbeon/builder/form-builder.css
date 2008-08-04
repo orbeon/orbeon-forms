@@ -284,7 +284,7 @@ a.xforms-help-image .fb-control-help { vertical-align: baseline; }
 
 /* Grid content */
 .fb-grid-td .fb-grid-content { *overflow: hidden }/* IE HACK so that scrollable images work in the table - but beware it causes clipping of inside content */
-.fb-grid-td .fb-grid-content { float: left; width: 65em; *width: 63.5em }
+.fb-grid-td .fb-grid-content { float: left; width: 64.8em; *width: 63.5em }
 
 .fb-control-control { *padding-right: 6px }/* To help IE move back controls within .fb-grid-content */
 .fb-control-control { margin-top: .3em }

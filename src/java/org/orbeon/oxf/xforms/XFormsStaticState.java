@@ -1346,6 +1346,9 @@ public class XFormsStaticState {
     }
 }
 
+/**
+ * This filters non-XForms elements. Simplification of XFormsDocumentAnnotatorContentHandler. Can this be simplified?
+ */
 class XFormsFilterContentHandler extends SimpleForwardingContentHandler {
 
     private int level;

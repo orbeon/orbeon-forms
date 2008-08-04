@@ -30,6 +30,7 @@ import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.value.AtomicValue;
+import org.orbeon.saxon.value.QNameValue;
 
 import java.util.Map;
 
@@ -47,30 +48,58 @@ public class XXFormsElement extends XFormsFunction {
 
     public Item evaluateItem(XPathContext xpathContext) throws XPathException {
 
+        // Element QName
         final Expression qNameExpression = (argument == null || argument.length < 1) ? null : argument[0];
-        final String qName = (qNameExpression == null) ? null : qNameExpression.evaluateAsString(xpathContext);
+        final String qNameString;
+        final String qNameURI;
+        {
+            final Object qNameObject = (qNameExpression == null) ? null : qNameExpression.evaluateItem(xpathContext);
+            if (qNameObject instanceof QNameValue) {
+                // Directly got a QName
+                final QNameValue qName = (QNameValue) qNameObject;
+                qNameString = qName.getStringValue();
+                qNameURI = qName.getNamespaceURI();
+            } else if (qNameObject != null) {
+                // Another atomic value
+                final AtomicValue qName = (AtomicValue) qNameObject;
+                qNameString = qName.getStringValue();
 
+                final int colonIndex = qNameString.indexOf(':');
+                if (colonIndex == -1) {
+                    // NCName
+                    qNameURI = null;
+                } else {
+                    // QName-but-not-NCName
+                    final String prefix = qNameString.substring(0, colonIndex);
+
+                    final XFormsContextStack contextStack = getContextStack(xpathContext);
+                    final Map namespaceMappings = getContainingDocument(xpathContext).getNamespaceMappings(contextStack.getCurrentBindingContext().getControlElement());
+
+                    // Get QName URI
+                    qNameURI = (String) namespaceMappings.get(prefix);
+                    if (qNameURI == null)
+                        throw new OXFException("Namespace prefix not in space for QName: " + qNameString);
+                }
+            } else {
+                // Just don't return anything if no QName was passed
+                return null;
+            }
+        }
+
+//        final String qNameString;
+//        final String qNameURI;
+//        {
+//            final SequenceIterator qNameIterator = (qNameExpression == null) ? null : qNameExpression.evaluateItem(xpathContext);
+//            qNameString = qNameIterator.next().getStringValue();
+//            final Item secondItem = qNameIterator.next();
+//            qNameURI = (secondItem != null) ? secondItem.getStringValue() : null;
+//        }
+
+        // Content sequence
         final Expression contextExpression = (argument == null || argument.length < 2) ? null : argument[1];
         final SequenceIterator content = (contextExpression == null) ? null : contextExpression.iterate(xpathContext);
 
-        final int colonIndex = qName.indexOf(':');
-        final Element element;
-        if (colonIndex == -1) {
-            // NCName
-            element = Dom4jUtils.createElement(qName);
-        } else {
-            // QName-but-not-NCName
-            final String prefix = qName.substring(0, colonIndex);
-
-            final XFormsContextStack contextStack = getContextStack(xpathContext);
-            final Map namespaceMappings = getContainingDocument(xpathContext).getNamespaceMappings(contextStack.getCurrentBindingContext().getControlElement());
-
-            final String uri = (String) namespaceMappings.get(prefix);
-            if (uri == null)
-                throw new OXFException("Namespace prefix not in space for QName: " + qName);
-
-            element = Dom4jUtils.createElement(qName, uri);
-        }
+        final Element element = Dom4jUtils.createElement(qNameString, (qNameURI != null) ? qNameURI : "");// createElement() doesn't like a null namespace
 
         // Iterate over content if passed
         if (content != null) {

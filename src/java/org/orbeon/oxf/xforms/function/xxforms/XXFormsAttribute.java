@@ -24,6 +24,8 @@ import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.trans.XPathException;
+import org.orbeon.saxon.value.QNameValue;
+import org.orbeon.saxon.value.AtomicValue;
 
 import java.util.Map;
 
@@ -38,30 +40,59 @@ public class XXFormsAttribute extends XFormsFunction {
 
     public Item evaluateItem(XPathContext xpathContext) throws XPathException {
 
+        // Attribute QName
         final Expression qNameExpression = (argument == null || argument.length < 1) ? null : argument[0];
-        final String qName = (qNameExpression == null) ? null : qNameExpression.evaluateAsString(xpathContext);
+        final String qNameString;
+        final String qNameURI;
+        {
+            final Object qNameObject = (qNameExpression == null) ? null : qNameExpression.evaluateItem(xpathContext);
+            if (qNameObject instanceof QNameValue) {
+                // Directly got a QName
+                final QNameValue qName = (QNameValue) qNameObject;
+                qNameString = qName.getStringValue();
+                qNameURI = qName.getNamespaceURI();
+            } else if (qNameObject != null) {
+                // Another atomic value
+                final AtomicValue qName = (AtomicValue) qNameObject;
+                qNameString = qName.getStringValue();
 
+                final int colonIndex = qNameString.indexOf(':');
+                if (colonIndex == -1) {
+                    // NCName
+                    qNameURI = null;
+                } else {
+                    // QName-but-not-NCName
+                    final String prefix = qNameString.substring(0, colonIndex);
+
+                    final XFormsContextStack contextStack = getContextStack(xpathContext);
+                    final Map namespaceMappings = getContainingDocument(xpathContext).getNamespaceMappings(contextStack.getCurrentBindingContext().getControlElement());
+
+                    // Get QName URI
+                    qNameURI = (String) namespaceMappings.get(prefix);
+                    if (qNameURI == null)
+                        throw new OXFException("Namespace prefix not in space for QName: " + qNameString);
+                }
+            } else {
+                // Just don't return anything if no QName was passed
+                return null;
+            }
+        }
+
+        // Attribute value
         final Expression valueExpression = (argument == null || argument.length < 2) ? null : argument[1];
         final Item item = (valueExpression == null) ? null : valueExpression.evaluateItem(xpathContext);
         final String value = (item != null) ? item.getStringValue() : "";
 
-        final int colonIndex = qName.indexOf(':');
+        final int colonIndex = qNameString.indexOf(':');
         final Attribute attribute;
         if (colonIndex == -1) {
             // NCName
-            attribute = Dom4jUtils.createAttribute(new QName(qName), value);
+            // NOTE: This assumes that if there is no prefix, the QName is in no namespace
+            attribute = Dom4jUtils.createAttribute(new QName(qNameString), value);
         } else {
             // QName-but-not-NCName
-            final String prefix = qName.substring(0, colonIndex);
-
-            final XFormsContextStack contextStack = getContextStack(xpathContext);
-            final Map namespaceMappings = getContainingDocument(xpathContext).getNamespaceMappings(contextStack.getCurrentBindingContext().getControlElement());
-
-            final String uri = (String) namespaceMappings.get(prefix);
-            if (uri == null)
-                throw new OXFException("Namespace prefix not in space for QName: " + qName);
-
-            attribute = Dom4jUtils.createAttribute(new QName(qName.substring(colonIndex + 1), new Namespace(prefix, uri)), value);
+            final String prefix = qNameString.substring(0, colonIndex);
+            attribute = Dom4jUtils.createAttribute(new QName(qNameString.substring(colonIndex + 1), new Namespace(prefix, qNameURI)), value);
         }
 
         return XXFormsElement.DOCUMENT_WRAPPER.wrap(attribute);

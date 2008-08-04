@@ -345,14 +345,15 @@
                     <li>
                         <a name="xxforms-element"/>
                         <p>
-                            <code>xxforms:element($element-name as xs:string) as element()</code>
+                            <code>xxforms:element($element-name as xs:anyAtomicType?) as element()</code>
                         </p>
                         <p>
-                            <code>xxforms:element($element-name as xs:string, $content as item()*) as element()</code>
+                            <code>xxforms:element($element-name as xs:anyAtomicType?, $content as item()*) as element()</code>
                         </p>
                         <p>
                             The <code>xxforms:element()</code> function returns a new XML element with the qualified
-                            name provided. If the name has a prefix, it is resolved using in-scope namespaces.
+                            name provided. If the qualified name is not of type <code>xs:QName</code> and if it has a
+                            prefix, it is resolved using in-scope namespaces.
                         </p>
                         <xml-source show-namespaces="false">
                             <comment> Insert an element called "value" as a child of element "section" </comment>
@@ -366,21 +367,35 @@
                             <comment> Insert an element called "value" as a child of element "section", with an attribute and text content </comment>
                             <xforms:insert context="section" origin="xxforms:element('value', (xxforms:attribute('id', 'my-value'), 'John'))"/>
                         </xml-source>
+                        <p>
+                            The first argument can be of type <code>xs:QName</code>:
+                        </p>
+                        <xml-source show-namespaces="false">
+                            <comment> Insert an element called "foo:bar" as a child of element "section" and resolve the namespaces on element $element </comment>
+                            <xforms:insert context="section" origin="xxforms:element(resolve-QName('foo:bar', $element))"/>
+                        </xml-source>
                     </li>
                     <li>
                         <a name="xxforms-attribute"/>
                         <p>
-                            <code>xxforms:attribute($qname as xs:string, $value as xs:anyAtomicType?) as attribute()</code>
+                            <code>xxforms:attribute($qname as xs:anyAtomicType?, $value as xs:anyAtomicType?) as attribute()</code>
                         </p>
                         <p>
-                            The <code>xxforms:attribute()</code> function returns a new XML attribute with the
-                            qualified name provided as first argument. If the name has a prefix, it is resolved
-                            using in-scope namespaces. The second argument is an optional value for the attribute.
-                            It default to the empty string.
+                            The <code>xxforms:attribute()</code> function returns a new XML attribute with the qualified
+                            name provided as first argument. If the qualified name is not of type <code>xs:QName</code>
+                            and if it has a prefix, it is resolved using in-scope namespaces. The second argument is an
+                            optional value for the attribute. It default to the empty string.
                         </p>
                         <xml-source show-namespaces="false">
                             <comment> Add an attribute called "id" with a value of "first-name" to element "section" </comment>
                             <xforms:insert context="section" origin="xxforms:attribute('id', 'first-name')"/>
+                        </xml-source>
+                        <p>
+                            The first argument can be of type <code>xs:QName</code>:
+                        </p>
+                        <xml-source show-namespaces="false">
+                            <comment> Add an attribute called "id" with a value of "foo:bar" to element "section" and resolve the namespaces on element $element </comment>
+                            <xforms:insert context="section" origin="xxforms:attribute(resolve-QName('foo:bar', $element), 'first-name')"/>
                         </xml-source>
                     </li>
                     <li>

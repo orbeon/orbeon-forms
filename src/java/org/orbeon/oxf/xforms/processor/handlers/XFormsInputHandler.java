@@ -127,8 +127,6 @@ public class XFormsInputHandler extends XFormsCoreControlHandler {
                     if (!isStaticReadonly(inputControl)) {
                         // Regular read-write mode
 
-                        final FastStringBuffer inputClasses = new FastStringBuffer("xforms-input-input");
-
                         // Main input field
 
                         {
@@ -140,6 +138,7 @@ public class XFormsInputHandler extends XFormsCoreControlHandler {
                             // Use effective id for name of first field
                             reusableAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, inputId);
 
+                            final FastStringBuffer inputClasses = new FastStringBuffer("xforms-input-input");
                             if (isConcreteControl) {
                                 // Output value only for concrete control
                                 final String inputValue = inputControl.getFirstValueUseFormat(pipelineContext);
@@ -180,6 +179,7 @@ public class XFormsInputHandler extends XFormsCoreControlHandler {
                             // TODO: Is this an appropriate name? Noscript must be able to find this
                             reusableAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, inputId);
 
+                            final FastStringBuffer inputClasses = new FastStringBuffer("xforms-input-input");
                             if (isConcreteControl) {
                                 // Output value only for concrete control
                                 final String inputValue = inputControl.getSecondValueUseFormat(pipelineContext);

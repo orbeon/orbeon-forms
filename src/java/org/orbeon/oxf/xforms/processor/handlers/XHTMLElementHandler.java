@@ -35,7 +35,7 @@ public class XHTMLElementHandler extends HandlerBase {
 
         final String id = attributes.getValue("id");
         if (id != null) {
-            final String effectiveId = id + handlerContext.getIdPostfix();
+            final String effectiveId = handlerContext.getEffectiveId(attributes);
 
             final XFormsControls.ControlsState controlState = containingDocument.getXFormsControls().getCurrentControlsState();
             final boolean hasAVT = controlState.hasAttributeControl(effectiveId);

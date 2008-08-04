@@ -27,7 +27,7 @@
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:foo="http://orbeon.org/oxf/xml/foo">
 
-    <xbl:binding id="test-component" element="foo|test">
+    <xbl:binding id="test-component" element="foo|bar">
 
         <!-- Orbeon Form Builder Component Metadata -->
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
@@ -42,10 +42,10 @@
             <datatype>xs:string</datatype>
             <template>
                  <foo:bar>
-                    <xforms:label ref=""/>
-                    <xforms:hint ref=""/>
-                    <xforms:help ref=""/>
-                    <xforms:alert ref=""/>
+                     <xforms:label ref=""/>
+                     <xforms:hint ref=""/>
+                     <xforms:help ref=""/>
+                     <xforms:alert ref=""/>
                 </foo:bar>
             </template>
         </metadata>
@@ -58,6 +58,86 @@
                     <xforms:label>Value 2</xforms:label>
                 </xforms:input>
             </xhtml:div>
+        </xbl:template>
+    </xbl:binding>
+
+    <xbl:binding id="foo-select1-binding" element="foo|select1"><!-- [appearance='xxforms|full'] -->
+
+        <!-- Orbeon Form Builder Component Metadata -->
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Link Select</display-name>
+            <display-name lang="fr">Selection lien</display-name>
+            <description lang="en">Single selection control which uses a series of links</description>
+            <description lang="fr">Contrôle de sélection unique utilisant une série de liens</description>
+            <icon xml:lang="en">
+                <small-icon>/apps/fr/style/images/silk/plugin.png</small-icon>
+                <large-icon>/apps/fr/style/images/silk/plugin.png</large-icon>
+            </icon>
+            <datatype>xs:string</datatype>
+            <template>
+                 <foo:select1>
+                     <xforms:label ref=""/>
+                     <xforms:hint ref=""/>
+                     <xforms:help ref=""/>
+                     <xforms:alert ref=""/>
+                     <xforms:itemset nodeset="">
+                         <xforms:label ref="label"/>
+                         <xforms:value ref="value"/>
+                     </xforms:itemset>
+                </foo:select1>
+            </template>
+        </metadata>
+
+        <xbl:template>
+            <xforms:group xbl:attr="ref bind">
+                <xxforms:variable name="ref" select="."/>
+                <!-- NOTE: the code below doesn't work because xbl:attr is unable to copy attributes from other elements -->
+                <xforms:repeat model="fr-resources-model" xbl:attr="xforms|itemset[nodeset]">
+                    <xxforms:variable name="position" select="position()"/>
+                    <xxforms:variable name="label" xbl:attr="select=xforms|itemset xforms|label[ref]"/>
+                    <xxforms:variable name="value" xbl:attr="select=xforms|itemset xforms|value[ref]"/>
+                    <xforms:group ref=".[$position > 1]"> | </xforms:group>
+                    <xforms:trigger ref=".[$value != $ref]" appearance="minimal">
+                        <xforms:label value="$label"/>
+                        <xforms:action ev:event="DOMActivate">
+                            <xforms:setvalue ref="$ref" value="$value"/>
+                        </xforms:action>
+                    </xforms:trigger>
+                    <xforms:output ref=".[$value = $ref]" value="$label"/>
+                </xforms:repeat>
+            </xforms:group>
+        </xbl:template>
+    </xbl:binding>
+
+    <xbl:binding id="foo-color-binding" element="foo|rgb">
+
+        <!-- Orbeon Form Builder Component Metadata -->
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">RGB Color</display-name>
+            <display-name lang="fr">Couleur RGB</display-name>
+            <icon xml:lang="en">
+                <small-icon>/apps/fr/style/images/silk/plugin.png</small-icon>
+                <large-icon>/apps/fr/style/images/silk/plugin.png</large-icon>
+            </icon>
+            <datatype>xs:string</datatype>
+            <template>
+                 <foo:rgb>
+                     <xforms:label ref=""/>
+                     <xforms:hint ref=""/>
+                     <xforms:help ref=""/>
+                     <xforms:alert ref=""/>
+                </foo:rgb>
+            </template>
+        </metadata>
+
+        <xbl:template>
+            <xforms:group xbl:attr="ref bind">
+                <xforms:input ref="." incremental="true">
+                    <xforms:label>RGB Color</xforms:label>
+                    <!--<xbl:content includes="xforms|label,xforms|help,xforms|hint"/>-->
+                </xforms:input>
+                <xhtml:div style="margin-top: .5em; border: 1px solid orange; width: 100%; height: 2em; background-color: {.}"/>
+            </xforms:group>
         </xbl:template>
     </xbl:binding>
 </xbl:xbl>

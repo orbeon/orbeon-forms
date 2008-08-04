@@ -679,7 +679,7 @@
     </xforms:instance>
 
     <!-- Instance for the itemset editor -->
-    <xforms:instance id="fb-itemset-instance" xxforms:exclude-result-prefixes="#all">
+    <xforms:instance id="fb-itemset-instance" xxforms:exclude-result-prefixes="xhtml xforms xs xsi ev xi xxi xxforms fr fb saxon xbl exforms">
         <itemset>
             <!-- Content will be like this -->
             <!--<item>-->
@@ -691,7 +691,7 @@
     </xforms:instance>
 
     <!-- Item template for the itemset editor -->
-    <xforms:instance id="fb-item-template" xxforms:exclude-result-prefixes="#all">
+    <xforms:instance id="fb-item-template" xxforms:exclude-result-prefixes="xhtml xforms xs xsi ev xi xxi xxforms fr fb saxon xbl exforms">
         <item>
             <!-- Content will be like this -->
             <!--<label xml:lang="en"/>-->
@@ -701,7 +701,7 @@
     </xforms:instance>
 
     <!-- Template for outer bind -->
-    <xforms:instance id="fb-bind-template" xxforms:readonly="true" xxforms:exclude-result-prefixes="#all">
+    <xforms:instance id="fb-bind-template" xxforms:readonly="true" xxforms:exclude-result-prefixes="xhtml xs xsi ev xi xxi xxforms fr fb saxon xbl exforms">
         <xforms:bind id="fr-form-binds" nodeset="."/>
     </xforms:instance>
 
@@ -735,7 +735,7 @@
         </xforms:action>
     </xforms:action>
 
-    <xforms:instance id="fb-section-template" xxforms:readonly="true" xxforms:exclude-result-prefixes="#all">
+    <xforms:instance id="fb-section-template" xxforms:readonly="true" xxforms:exclude-result-prefixes="xs xsi ev xi xxi xxforms fb saxon xbl exforms">
         <fr:section id="" context="">
             <xforms:label ref=""/>
             <fr:grid columns="1">
@@ -746,7 +746,7 @@
         </fr:section>
     </xforms:instance>
 
-    <xforms:instance id="fb-resource-template" xxforms:readonly="true" xxforms:exclude-result-prefixes="#all">
+    <xforms:instance id="fb-resource-template" xxforms:readonly="true" xxforms:exclude-result-prefixes="xhtml xforms xs xsi ev xi xxi xxforms fr fb saxon xbl exforms">
         <template>
             <label/>
             <hint/>
@@ -755,7 +755,7 @@
         </template>
     </xforms:instance>
 
-    <xforms:instance id="fb-grid-1-template" xxforms:readonly="true" xxforms:exclude-result-prefixes="#all">
+    <xforms:instance id="fb-grid-1-template" xxforms:readonly="true" xxforms:exclude-result-prefixes="xforms xs xsi ev xi xxi xxforms fb saxon xbl exforms">
         <fr:grid columns="1">
             <xhtml:tr>
                 <xhtml:td/>
@@ -763,7 +763,7 @@
         </fr:grid>
     </xforms:instance>
 
-    <xforms:instance id="fb-lhha-template" xxforms:readonly="true" xxforms:exclude-result-prefixes="#all">
+    <xforms:instance id="fb-lhha-template" xxforms:readonly="true" xxforms:exclude-result-prefixes="xhtml xs xsi ev xi xxi xxforms fr fb saxon xbl exforms">
         <xforms:input>
             <xforms:label ref=""/>
             <xforms:hint ref=""/>
@@ -773,7 +773,7 @@
     </xforms:instance>
 
     <!-- Built-in controls -->
-    <xforms:instance id="fb-controls-template" xxforms:readonly="true" xxforms:exclude-result-prefixes="#all">
+    <xforms:instance id="fb-controls-template" xxforms:readonly="true" xxforms:exclude-result-prefixes="xs xsi ev xi xxi fr fb saxon xbl exforms">
         <templates xmlns="">
             <template label="Single-Line Text">
                 <xhtml:div class="input">

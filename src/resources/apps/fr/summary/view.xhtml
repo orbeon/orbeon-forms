@@ -397,7 +397,7 @@
                         <table class="fr-summary-table">
                             <thead>
                                 <tr>
-                                    <th><xforms:output value="$fr-resources/summary/titles/row-number"/></th>
+                                    <th class="fr-summary-repeat-column-number"><xforms:output value="$fr-resources/summary/titles/row-number"/></th>
                                     <th><xforms:output value="$fr-resources/summary/titles/created"/></th>
                                     <th><xforms:output value="$fr-resources/summary/titles/last-modified"/></th>
                                     <!-- Iterate through specially marked controls and derive resource id then resource -->
@@ -417,12 +417,18 @@
                             <tbody>
                                 <xforms:repeat nodeset="document" id="documents-repeat">
                                     <tr>
-                                        <td>
+                                        <td class="fr-summary-repeat-column-number">
                                             <!-- Expose to JavaScript attribute that will be by JavaScript, telling us if the form if offline or online -->
                                             <xforms:input ref="@offline" id="fr-document-offline" class="fr-expose-to-javascript"/>
                                             <!-- Expose to JavaScript name of this form -->
                                             <xforms:input ref="@name" id="fr-document-name" class="fr-expose-to-javascript"/>
-                                            <xforms:output value="instance('fr-paging-instance')/from + count(preceding-sibling::document)"/>
+
+                                            <!-- Just output the number -->
+                                            <xforms:output ref=".[not(property('xxforms:noscript'))]" value="instance('fr-paging-instance')/from + count(preceding-sibling::document)"/>
+                                            <!-- Trigger to select the row in noscript mode -->
+                                            <xforms:trigger ref=".[property('xxforms:noscript')]">
+                                                <xforms:label value="instance('fr-paging-instance')/from + count(preceding-sibling::document)"/>
+                                            </xforms:trigger>
                                         </td>
                                         <td>
                                             <xforms:group ref="@created">

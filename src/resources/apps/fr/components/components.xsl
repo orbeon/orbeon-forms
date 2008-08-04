@@ -106,9 +106,8 @@
 
     <!-- Add Form Runner models and scripts -->
     <xsl:template match="/xhtml:html/xhtml:head/xforms:model[1]">
-
-        <!-- Load components if not Form Builder -->
-        <xsl:if test="not($is-form-builder) and normalize-space($components-uri) != '' ">
+        <!-- Load components -->
+        <xsl:if test="normalize-space($components-uri) != '' ">
             <xi:include href="{$components-uri}" xxi:omit-xml-base="true"/>
         </xsl:if>
 

@@ -375,6 +375,8 @@
                     </table>
                 </p>
             </section>
+            <!--
+                NOTE: For now this is done on the wiki: http://wiki.orbeon.com/forms/developer-documentation/form-runner-configuration
             <a name="appserver-uri"/>
             <section>
                 <title>oxf.fr.appserver.uri</title>
@@ -414,6 +416,7 @@
                     </table>
                 </p>
             </section>
+            -->
         </section>
         <a name="epilogue"/>
         <section>

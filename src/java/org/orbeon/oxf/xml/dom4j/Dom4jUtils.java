@@ -551,6 +551,33 @@ public class Dom4jUtils {
         return document;
     }
 
+    /**
+     * Return a new document with a copy of newRoot as its root and all parent namespaces copied to the new root
+     * element, except those with the prefixes appearing in the Map, assuming they are not already declared on the new
+     * root element.
+     */
+    public static Document createDocumentCopyParentNamespaces(final Element newRoot, Map prefixesToFilter) {
+
+        final Document document = Dom4jUtils.createDocumentCopyElement(newRoot);
+        final Element rootElement = document.getRootElement();
+
+        final Element parentElement = newRoot.getParent();
+        final Map parentNamespaceContext = Dom4jUtils.getNamespaceContext(parentElement);
+        final Map rootElementNamespaceContext = Dom4jUtils.getNamespaceContext(rootElement);
+
+        for (Iterator k = parentNamespaceContext.keySet().iterator(); k.hasNext();) {
+            final String prefix = (String) k.next();
+            // NOTE: Don't use rootElement.getNamespaceForPrefix() because that will return the element prefix's
+            // namespace even if there are no namespace nodes
+            if (rootElementNamespaceContext.get(prefix) == null && prefixesToFilter.get(prefix) == null) {
+                final String uri = (String) parentNamespaceContext.get(prefix);
+                rootElement.addNamespace(prefix, uri);
+            }
+        }
+
+        return document;
+    }
+
     public static Document createDocument() {
         final NonLazyUserDataDocumentFactory fctry = NonLazyUserDataDocumentFactory.getInstance14();
         return fctry.createDocument();

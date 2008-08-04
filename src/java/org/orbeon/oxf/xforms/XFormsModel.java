@@ -456,10 +456,19 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                             {
                                 final Document tempDocument;
                                 // TODO: Implement as per XSLT 2.0. For now, we just support #all.
-                                if ("#all".equals(xxformsExcludeResultPrefixes))
+                                // TODO: Must implement namespace fixup, the code below can break serialization
+                                if ("#all".equals(xxformsExcludeResultPrefixes)) {
                                     tempDocument = Dom4jUtils.createDocumentCopyElement((Element) children.get(0));
-                                else
+                                } else if (xxformsExcludeResultPrefixes != null) {
+                                    final StringTokenizer st = new StringTokenizer(xxformsExcludeResultPrefixes);
+                                    final Map prefixesToExclude = new HashMap();
+                                    while (st.hasMoreTokens()) {
+                                        prefixesToExclude.put(st.nextToken(), "");
+                                    }
+                                    tempDocument = Dom4jUtils.createDocumentCopyParentNamespaces((Element) children.get(0), prefixesToExclude);
+                                } else {
                                     tempDocument = Dom4jUtils.createDocumentCopyParentNamespaces((Element) children.get(0));
+                                }
 
                                 if (!isReadonlyHint) {
                                     instanceDocument = tempDocument;

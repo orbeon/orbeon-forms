@@ -121,6 +121,7 @@ h1 { margin-top: 0 }
 .fr-summary-language-choice .xforms-trigger-appearance-xxforms-minimal, .fr-summary-noscript-choice .xforms-trigger-appearance-xxforms-minimal { *font-size: 100% }/* IE 6 HACK to fix the font size */
 .fr-summary-language-choice a, .fr-summary-noscript-choice a { color: #6E6E6E }
 .fr-summary-language-choice .xforms-label, .fr-summary-noscript-choice .xforms-label { display: inline; margin-right: .5em }
+.fr-summary-repeat-column-number { text-align: right; width: 3em }
 
 .xforms-help-image { vertical-align: -0.2em; display: inline; margin: 0 .5em 0 0; padding: 0;
     float: left; /* Without the "float: left" on FF2/3 the mouseover event arrive on the label, not the help
@@ -251,7 +252,7 @@ hr {
 }
 
 .fr-buttons .xforms-trigger {
-    width: 14em; *width: 11em
+    width: 13em; *width: 11em
 }
 
 /* Repeats: all */

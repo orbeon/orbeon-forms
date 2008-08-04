@@ -201,14 +201,14 @@
         </xforms:bind>
 
         <!-- Template for the submission -->
-        <xforms:instance id="fb-database-submission-template" xxforms:readonly="true" xxforms:exclude-result-prefixes="#all">
+        <xforms:instance id="fb-database-submission-template" xxforms:readonly="true" xxforms:exclude-result-prefixes="xhtml xs xsi xi xxi fr fb saxon xbl exforms">
             <xforms:submission id="" class="fr-database-service" ref="instance('fr-service-request-instance')"
                    resource="/fr/service/custom/orbeon/database" method="post"
                    serialization="application/xml" replace="instance" instance="fr-service-response-instance"/>
         </xforms:instance>
 
         <!-- Template for the instance containing the submission paramters -->
-        <xforms:instance id="fb-database-instance-template" xxforms:readonly="true" xxforms:exclude-result-prefixes="#all">
+        <xforms:instance id="fb-database-instance-template" xxforms:readonly="true" xxforms:exclude-result-prefixes="xhtml xs xsi xi xxi fr fb saxon xbl exforms">
             <xforms:instance id="" class="fr-database-service" xxforms:exclude-result-prefixes="#all">
                 <sql:config xmlns:sql="http://orbeon.org/oxf/xml/sql">
                     <sql:datasource>jdbc/</sql:datasource>

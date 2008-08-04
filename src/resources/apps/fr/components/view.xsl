@@ -49,21 +49,34 @@
                         </xsl:if>
                         <!-- Switch language -->
                         <xhtml:div class="fr-summary-language-choice">
+                            <xxforms:variable name="default-language"
+                                              select="xxforms:property('oxf.fr.default-language')" as="xs:string"/>
+                            <!-- Put default language first, then other languages -->
                             <xxforms:variable name="available-languages"
-                                              select="xxforms:instance('fr-form-resources')/resource/@xml:lang"/>
-                            <!-- This implements a sort of xforms:select1[@appearance = 'xxforms:full']. Should be componentized. -->
+                                              select="(xxforms:instance('fr-form-resources')/resource[@xml:lang = $default-language]/@xml:lang,
+                                                        xxforms:instance('fr-form-resources')/resource[not(@xml:lang = $default-language)]/@xml:lang)"/>
+
+                            <!-- Group below implements a sort of xforms:select1[@appearance = 'xxforms:full']. Should be componentized, e.g.: -->
+                            <!--<fb:select1 appearance="xxforms:full" ref="instance('fr-language-instance')">-->
+                                <!--<xforms:itemset nodeset="$available-languages">-->
+                                    <!--<xforms:label ref="(instance('fr-languages-instance')/language[@code = context()]/@native-name, context())[1]"/>-->
+                                    <!--<xforms:value ref="."/>-->
+                                <!--</xforms:itemset>-->
+                            <!--</fb:select1>-->
+
                             <xforms:group id="fr-language-selector">
                                 <xforms:repeat model="fr-resources-model" nodeset="$available-languages">
                                     <xxforms:variable name="position" select="position()"/>
                                     <xxforms:variable name="label" select="(instance('fr-languages-instance')/language[@code = context()]/@native-name, context())[1]"/>
+                                    <xxforms:variable name="value" select="context()"/>
                                     <xforms:group ref=".[$position > 1]"> | </xforms:group>
-                                    <xforms:trigger ref=".[context() != instance('fr-language-instance')]" appearance="minimal">
+                                    <xforms:trigger ref=".[$value != instance('fr-language-instance')]" appearance="minimal">
                                         <xforms:label value="$label"/>
                                         <xforms:action ev:event="DOMActivate">
-                                            <xforms:setvalue ref="instance('fr-language-instance')" value="context()"/>
+                                            <xforms:setvalue ref="instance('fr-language-instance')" value="$value"/>
                                         </xforms:action>
                                     </xforms:trigger>
-                                    <xforms:output ref=".[context() = instance('fr-language-instance')]" value="$label"/>
+                                    <xforms:output ref=".[$value = instance('fr-language-instance')]" value="$label"/>
                                 </xforms:repeat>
                             </xforms:group>
                         </xhtml:div>
@@ -232,7 +245,9 @@
                                             <xsl:when test="doc('input:instance')/*/mode = ('print', 'test')">
                                                 <xsl:variable name="default-buttons" as="element(fr:buttons)">
                                                     <fr:buttons>
-                                                        <fr:close-button/>
+                                                        <xsl:if test="$has-button-close">
+                                                            <fr:close-button/>
+                                                        </xsl:if>
                                                     </fr:buttons>
                                                 </xsl:variable>
                                                 <xsl:apply-templates select="$default-buttons/*"/>
@@ -241,8 +256,12 @@
                                             <xsl:when test="doc('input:instance')/*/mode = ('view')">
                                                 <xsl:variable name="default-buttons" as="element(fr:buttons)">
                                                     <fr:buttons>
-                                                        <fr:back-button/>
-                                                        <fr:pdf-button/>
+                                                        <xsl:if test="$has-button-close">
+                                                            <fr:back-button/>
+                                                        </xsl:if>
+                                                        <xsl:if test="$has-button-pdf">
+                                                            <fr:pdf-button/>
+                                                        </xsl:if>
                                                     </fr:buttons>
                                                 </xsl:variable>
                                                 <xsl:apply-templates select="$default-buttons/*"/>
@@ -258,10 +277,18 @@
                                                 <xsl:variable name="default-buttons" as="element(fr:buttons)">
                                                     <fr:buttons>
                                                         <fr:refresh-button/>
-                                                        <fr:back-button/>
-                                                        <fr:clear-button/>
-                                                        <fr:print-button/>
-                                                        <fr:pdf-button/>
+                                                        <xsl:if test="$has-button-close">
+                                                            <fr:back-button/>
+                                                        </xsl:if>
+                                                        <xsl:if test="$has-button-clear">
+                                                            <fr:clear-button/>
+                                                        </xsl:if>
+                                                        <xsl:if test="$has-button-print">
+                                                            <fr:print-button/>
+                                                        </xsl:if>
+                                                        <xsl:if test="$has-button-pdf">
+                                                            <fr:pdf-button/>
+                                                        </xsl:if>
                                                         <!-- These buttons are disabled until we can save initial changes to the DOM in store and
                                                               replay them when the form is first loaded offline -->
                                                         <!--<fr:take-offline/>-->

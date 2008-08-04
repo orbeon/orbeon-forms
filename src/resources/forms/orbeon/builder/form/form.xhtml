@@ -808,7 +808,7 @@
                                                                                                 </xforms:textarea>
                                                                                             </xforms:group>
                                                                                             <xforms:group ref="xforms:select1[@appearance = 'minimal']">
-                                                                                                <xforms:select1 appearance="minimal" ref="$instance-holder" id="fb-edit-select1-minimal-control">
+                                                                                                <xforms:select1 appearance="minimal" ref="$instance-holder">
                                                                                                     <xforms:label class="fb-xforms-disabled"/>
                                                                                                     <xforms:item>
                                                                                                         <xforms:label>[Choose...]</xforms:label>
@@ -819,92 +819,42 @@
                                                                                                         <xforms:value ref="value"/>
                                                                                                     </xforms:itemset>
                                                                                                 </xforms:select1>
-                                                                                                <xforms:trigger appearance="minimal" class="fb-edit-items">
-                                                                                                    <xforms:label>
-                                                                                                        <xhtml:img src="/apps/fr/style/images/silk/text_list_bullets.png" alt="Edit Items" title="Edit Items"/>
-                                                                                                        <xhtml:span>Edit Items</xhtml:span>
-                                                                                                    </xforms:label>
-                                                                                                    <xforms:action ev:event="DOMActivate">
-                                                                                                        <xforms:setvalue ref="$variables/itemset-resource-id" value="name($resource-holder)"/>
-                                                                                                        <xxforms:show dialog="fb-itemset-editor-dialog" neighbor="fb-edit-select1-minimal-control"/>
-                                                                                                    </xforms:action>
-                                                                                                </xforms:trigger>
                                                                                             </xforms:group>
                                                                                             <xforms:group ref="xforms:select1[@appearance = 'full']">
-                                                                                                <xforms:select1 appearance="full" ref="$instance-holder" id="fb-edit-select1-full-control">
+                                                                                                <xforms:select1 appearance="full" ref="$instance-holder">
                                                                                                     <xforms:label class="fb-xforms-disabled"/>
                                                                                                     <xforms:itemset nodeset="$resource-holder/item">
                                                                                                         <xforms:label ref="label"/>
                                                                                                         <xforms:value ref="value"/>
                                                                                                     </xforms:itemset>
                                                                                                 </xforms:select1>
-                                                                                                <xforms:trigger appearance="minimal" class="fb-edit-items">
-                                                                                                    <xforms:label>
-                                                                                                        <xhtml:img src="/apps/fr/style/images/silk/text_list_bullets.png" alt="Edit Items" title="Edit Items"/>
-                                                                                                        <xhtml:span>Edit Items</xhtml:span>
-                                                                                                    </xforms:label>
-                                                                                                    <xforms:action ev:event="DOMActivate">
-                                                                                                        <xforms:setvalue ref="$variables/itemset-resource-id" value="name($resource-holder)"/>
-                                                                                                        <xxforms:show dialog="fb-itemset-editor-dialog" neighbor="fb-edit-select1-full-control"/>
-                                                                                                    </xforms:action>
-                                                                                                </xforms:trigger>
                                                                                             </xforms:group>
                                                                                             <xforms:group ref="xforms:select1[@appearance = 'compact']">
-                                                                                                <xforms:select1 appearance="compact" ref="$instance-holder" id="fb-edit-select1-compact-control">
+                                                                                                <xforms:select1 appearance="compact" ref="$instance-holder">
                                                                                                     <xforms:label class="fb-xforms-disabled"/>
                                                                                                     <xforms:itemset nodeset="$resource-holder/item">
                                                                                                         <xforms:label ref="label"/>
                                                                                                         <xforms:value ref="value"/>
                                                                                                     </xforms:itemset>
                                                                                                 </xforms:select1>
-                                                                                                <xforms:trigger appearance="minimal" class="fb-edit-items">
-                                                                                                    <xforms:label>
-                                                                                                        <xhtml:img src="/apps/fr/style/images/silk/text_list_bullets.png" alt="Edit Items" title="Edit Items"/>
-                                                                                                        <xhtml:span>Edit Items</xhtml:span>
-                                                                                                    </xforms:label>
-                                                                                                    <xforms:action ev:event="DOMActivate">
-                                                                                                        <xforms:setvalue ref="$variables/itemset-resource-id" value="name($resource-holder)"/>
-                                                                                                        <xxforms:show dialog="fb-itemset-editor-dialog" neighbor="fb-edit-select1-compact-control"/>
-                                                                                                    </xforms:action>
-                                                                                                </xforms:trigger>
                                                                                             </xforms:group>
                                                                                             <xforms:group ref="xforms:select[@appearance = 'full']">
-                                                                                                <xforms:select appearance="full" ref="$instance-holder" id="fb-edit-select-full-control">
+                                                                                                <xforms:select appearance="full" ref="$instance-holder">
                                                                                                     <xforms:label class="fb-xforms-disabled"/>
                                                                                                     <xforms:itemset nodeset="$resource-holder/item">
                                                                                                         <xforms:label ref="label"/>
                                                                                                         <xforms:value ref="value"/>
                                                                                                     </xforms:itemset>
                                                                                                 </xforms:select>
-                                                                                                <xforms:trigger appearance="minimal" class="fb-edit-items">
-                                                                                                    <xforms:label>
-                                                                                                        <xhtml:img src="/apps/fr/style/images/silk/text_list_bullets.png" alt="Edit Items" title="Edit Items"/>
-                                                                                                        <xhtml:span>Edit Items</xhtml:span>
-                                                                                                    </xforms:label>
-                                                                                                    <xforms:action ev:event="DOMActivate">
-                                                                                                        <xforms:setvalue ref="$variables/itemset-resource-id" value="name($resource-holder)"/>
-                                                                                                        <xxforms:show dialog="fb-itemset-editor-dialog" neighbor="fb-edit-select-full-control"/>
-                                                                                                    </xforms:action>
-                                                                                                </xforms:trigger>
                                                                                             </xforms:group>
                                                                                             <xforms:group ref="xforms:select[@appearance = 'compact']">
-                                                                                                <xforms:select appearance="compact" ref="$instance-holder" id="fb-edit-select-compact-control">
+                                                                                                <xforms:select appearance="compact" ref="$instance-holder">
                                                                                                     <xforms:label class="fb-xforms-disabled"/>
                                                                                                     <xforms:itemset nodeset="$resource-holder/item">
                                                                                                         <xforms:label ref="label"/>
                                                                                                         <xforms:value ref="value"/>
                                                                                                     </xforms:itemset>
                                                                                                 </xforms:select>
-                                                                                                <xforms:trigger appearance="minimal" class="fb-edit-items">
-                                                                                                    <xforms:label>
-                                                                                                        <xhtml:img src="/apps/fr/style/images/silk/text_list_bullets.png" alt="Edit Items" title="Edit Items"/>
-                                                                                                        <xhtml:span>Edit Items</xhtml:span>
-                                                                                                    </xforms:label>
-                                                                                                    <xforms:action ev:event="DOMActivate">
-                                                                                                        <xforms:setvalue ref="$variables/itemset-resource-id" value="name($resource-holder)"/>
-                                                                                                        <xxforms:show dialog="fb-itemset-editor-dialog" neighbor="fb-edit-select-compact-control"/>
-                                                                                                    </xforms:action>
-                                                                                                </xforms:trigger>
                                                                                             </xforms:group>
                                                                                             <xforms:group ref="xforms:output[not(@mediatype)]">
                                                                                                 <!-- In-place text -->
@@ -946,6 +896,17 @@
                                                                                             <xforms:group ref="*[not(namespace-uri-from-QName(resolve-QName(name(), .)) = 'http://www.w3.org/2002/xforms' )]">
                                                                                                 <xhtml:img src="/apps/fr/style/images/silk/plugin.png" alt="" width="16" height="16"/>
                                                                                             </xforms:group>
+                                                                                            <!-- Button to show items editor if needed -->
+                                                                                            <xforms:trigger ref="*[xforms:itemset]" appearance="minimal" class="fb-edit-items" id="fb-edit-items-trigger">
+                                                                                                <xforms:label>
+                                                                                                    <xhtml:img src="/apps/fr/style/images/silk/text_list_bullets.png" alt="Edit Items" title="Edit Items"/>
+                                                                                                    <xhtml:span>Edit Items</xhtml:span>
+                                                                                                </xforms:label>
+                                                                                                <xforms:action ev:event="DOMActivate">
+                                                                                                    <xforms:setvalue ref="$variables/itemset-resource-id" value="name($resource-holder)"/>
+                                                                                                    <xxforms:show dialog="fb-itemset-editor-dialog" neighbor="fb-edit-items-trigger"/>
+                                                                                                </xforms:action>
+                                                                                            </xforms:trigger>
                                                                                         </xhtml:div>
 
                                                                                         <!-- Edit hint for any control -->

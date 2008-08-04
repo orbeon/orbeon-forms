@@ -40,95 +40,88 @@
 
     <xsl:template match="fr:back-button">
         <!-- NOTE: There is a "back" button and a "close" button. "Back" takes to the summary page, "close" just closes the window. -->
-        <xsl:if test="$has-button-close">
-            <!-- Display a "close" button as it's clearer for users -->
-            <xforms:trigger>
+
+        <!-- Display a "close" button as it's clearer for users -->
+        <xforms:trigger>
+            <xforms:label>
+                <xhtml:img width="11" height="16" src="/apps/fr/style/close.gif" alt=""/>
+                <xforms:output value="$fr-resources/detail/labels/close"/>
+            </xforms:label>
+            <xforms:action ev:event="DOMActivate">
+                <xforms:dispatch target="fr-persistence-model" name="fr-goto-summary"/>
+            </xforms:action>
+        </xforms:trigger>
+        <xsl:if test="false()">
+            <!-- Trigger shown to go back if the data is dirty -->
+            <xforms:trigger ref="instance('fr-persistence-instance')[data-status = 'dirty']">
                 <xforms:label>
-                    <xhtml:img width="11" height="16" src="/apps/fr/style/close.gif" alt=""/>
-                    <xforms:output value="$fr-resources/detail/labels/close"/>
+                    <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/house.png" alt=""/>
+                    <xhtml:span><xforms:output value="$fr-resources/detail/labels/discard"/></xhtml:span>
                 </xforms:label>
                 <xforms:action ev:event="DOMActivate">
                     <xforms:dispatch target="fr-persistence-model" name="fr-goto-summary"/>
                 </xforms:action>
             </xforms:trigger>
-            <xsl:if test="false()">
-                <!-- Trigger shown to go back if the data is dirty -->
-                <xforms:trigger ref="instance('fr-persistence-instance')[data-status = 'dirty']">
-                    <xforms:label>
-                        <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/house.png" alt=""/>
-                        <xhtml:span><xforms:output value="$fr-resources/detail/labels/discard"/></xhtml:span>
-                    </xforms:label>
-                    <xforms:action ev:event="DOMActivate">
-                        <xforms:dispatch target="fr-persistence-model" name="fr-goto-summary"/>
-                    </xforms:action>
-                </xforms:trigger>
-                <!-- Trigger shown to go back if the data is clean -->
-                <xforms:trigger ref="instance('fr-persistence-instance')[data-status = 'clean']">
-                    <xforms:label>
-                        <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/house.png" alt=""/>
-                        <xhtml:span><xforms:output value="$fr-resources/detail/labels/return"/></xhtml:span>
-                    </xforms:label>
-                    <xforms:action ev:event="DOMActivate">
-                        <xforms:dispatch target="fr-persistence-model" name="fr-goto-summary"/>
-                    </xforms:action>
-                </xforms:trigger>
-            </xsl:if>
+            <!-- Trigger shown to go back if the data is clean -->
+            <xforms:trigger ref="instance('fr-persistence-instance')[data-status = 'clean']">
+                <xforms:label>
+                    <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/house.png" alt=""/>
+                    <xhtml:span><xforms:output value="$fr-resources/detail/labels/return"/></xhtml:span>
+                </xforms:label>
+                <xforms:action ev:event="DOMActivate">
+                    <xforms:dispatch target="fr-persistence-model" name="fr-goto-summary"/>
+                </xforms:action>
+            </xforms:trigger>
         </xsl:if>
     </xsl:template>
 
     <xsl:template match="fr:clear-button">
-        <xsl:if test="$has-button-clear">
-            <xforms:trigger>
-                <xforms:label><xhtml:img width="16" height="16" src="/apps/fr/style/clear.gif" alt=""/>
-                    <xhtml:span><xforms:output value="$fr-resources/detail/labels/clear"/></xhtml:span>
-                </xforms:label>
-                <xforms:action ev:event="DOMActivate">
-                    <xforms:setvalue ref="xxforms:instance('errors-state')/submitted">true</xforms:setvalue>
-                    <xxforms:show dialog="fr-clear-confirm-dialog"/>
-                </xforms:action>
-            </xforms:trigger>
-        </xsl:if>
+        <xforms:trigger>
+            <xforms:label><xhtml:img width="16" height="16" src="/apps/fr/style/clear.gif" alt=""/>
+                <xhtml:span><xforms:output value="$fr-resources/detail/labels/clear"/></xhtml:span>
+            </xforms:label>
+            <xforms:action ev:event="DOMActivate">
+                <xforms:setvalue ref="xxforms:instance('errors-state')/submitted">true</xforms:setvalue>
+                <xxforms:show dialog="fr-clear-confirm-dialog"/>
+            </xforms:action>
+        </xforms:trigger>
     </xsl:template>
 
     <xsl:template match="fr:print-button">
-        <xsl:if test="$has-button-print">
-            <xforms:trigger>
-                <xforms:label>
-                    <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/printer.png" alt=""/>
-                    <xhtml:span><xforms:output value="$fr-resources/detail/labels/print"/></xhtml:span>
-                </xforms:label>
-                <xforms:action ev:event="DOMActivate">
-                    <xforms:send submission="fr-print-submission"/>
-                </xforms:action>
-            </xforms:trigger>
-        </xsl:if>
+        <xforms:trigger>
+            <xforms:label>
+                <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/printer.png" alt=""/>
+                <xhtml:span><xforms:output value="$fr-resources/detail/labels/print"/></xhtml:span>
+            </xforms:label>
+            <xforms:action ev:event="DOMActivate">
+                <xforms:send submission="fr-print-submission"/>
+            </xforms:action>
+        </xforms:trigger>
     </xsl:template>
 
     <xsl:template match="fr:pdf-button">
-        <xsl:if test="$has-button-pdf">
-            <!-- Show button only if there is no PDF template -->
-            <xforms:trigger model="fr-persistence-model"
-                            ref=".[instance('fr-source-form-instance')/xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-attachments']/*/pdf = '']">
-                <xforms:label>
-                    <xhtml:img width="16" height="16" src="/apps/fr/style/pdf.png" alt=""/>
-                    <xhtml:span><xforms:output value="$fr-resources/detail/labels/print-pdf"/></xhtml:span>
-                </xforms:label>
-                <xforms:action ev:event="DOMActivate">
-                    <xforms:send submission="fr-pdf-submission"/>
-                </xforms:action>
-            </xforms:trigger>
-            <!-- Show button only if there is a PDF template -->
-            <xforms:trigger model="fr-persistence-model"
-                            ref=".[instance('fr-source-form-instance')/xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-attachments']/*/pdf != '']">
-                <xforms:label>
-                    <xhtml:img width="16" height="16" src="/apps/fr/style/pdf.png" alt=""/>
-                    <xhtml:span><xforms:output value="$fr-resources/detail/labels/print-pdf"/></xhtml:span>
-                </xforms:label>
-                <xforms:action ev:event="DOMActivate">
-                    <xforms:send submission="fr-pdf-template-submission"/>
-                </xforms:action>
-            </xforms:trigger>
-        </xsl:if>
+        <!-- Show button only if there is no PDF template -->
+        <xforms:trigger model="fr-persistence-model"
+                        ref=".[instance('fr-source-form-instance')/xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-attachments']/*/pdf = '']">
+            <xforms:label>
+                <xhtml:img width="16" height="16" src="/apps/fr/style/pdf.png" alt=""/>
+                <xhtml:span><xforms:output value="$fr-resources/detail/labels/print-pdf"/></xhtml:span>
+            </xforms:label>
+            <xforms:action ev:event="DOMActivate">
+                <xforms:send submission="fr-pdf-submission"/>
+            </xforms:action>
+        </xforms:trigger>
+        <!-- Show button only if there is a PDF template -->
+        <xforms:trigger model="fr-persistence-model"
+                        ref=".[instance('fr-source-form-instance')/xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-attachments']/*/pdf != '']">
+            <xforms:label>
+                <xhtml:img width="16" height="16" src="/apps/fr/style/pdf.png" alt=""/>
+                <xhtml:span><xforms:output value="$fr-resources/detail/labels/print-pdf"/></xhtml:span>
+            </xforms:label>
+            <xforms:action ev:event="DOMActivate">
+                <xforms:send submission="fr-pdf-template-submission"/>
+            </xforms:action>
+        </xforms:trigger>
     </xsl:template>
 
     <xsl:template match="fr:take-offline">
@@ -184,18 +177,16 @@
         <!-- NOTE: There is a "back" button and a "close" button. "Back" takes to the summary page, "close" just
              closes the window. "Close" is used for the print view. -->
 
-        <xsl:if test="$has-button-close">
-            <!-- Don't show this button in noscript mode -->
-            <xforms:trigger ref=".[not(property('xxforms:noscript'))]">
-                <xforms:label>
-                    <xhtml:img width="11" height="16" src="/apps/fr/style/close.gif" alt=""/>
-                    <xforms:output value="$fr-resources/detail/labels/close"/>
-                </xforms:label>
-                <xforms:action ev:event="DOMActivate">
-                    <xxforms:script>window.close();</xxforms:script>
-                </xforms:action>
-            </xforms:trigger>
-        </xsl:if>
+        <!-- Don't show this button in noscript mode -->
+        <xforms:trigger ref=".[not(property('xxforms:noscript'))]">
+            <xforms:label>
+                <xhtml:img width="11" height="16" src="/apps/fr/style/close.gif" alt=""/>
+                <xforms:output value="$fr-resources/detail/labels/close"/>
+            </xforms:label>
+            <xforms:action ev:event="DOMActivate">
+                <xxforms:script>window.close();</xxforms:script>
+            </xforms:action>
+        </xforms:trigger>
     </xsl:template>
 
 </xsl:stylesheet>

@@ -67,7 +67,7 @@
                 <clear-confirm-message>Are you sure you want to clear all the fields on this page? Your data will be lost if you haven't saved it.</clear-confirm-message>
             </messages>
             <labels>
-                <save-document>Save Document</save-document>
+                <save-document>Save</save-document>
                 <save-locally>Save Locally</save-locally>
                 <save-offline>Save Offline</save-offline>
                 <return>Back to Forms</return>
@@ -79,8 +79,8 @@
                 <language-choice>Language</language-choice>
                 <close>Close</close>
                 <print>Print</print>
-                <print-pdf>Print PDF</print-pdf>
-                <print-pdf-template>Print PDF (Template)</print-pdf-template>
+                <print-pdf>PDF</print-pdf>
+                <print-pdf-template>PDF (Template)</print-pdf-template>
                 <clear>Clear</clear>
                 <confirm>Confirm</confirm>
                 <cancel>Cancel</cancel>
@@ -176,8 +176,8 @@
                 <language-choice>Langue</language-choice>
                 <close>Fermer</close>
                 <print>Imprimer</print>
-                <print-pdf>Imprimer PDF</print-pdf>
-                <print-pdf-template>Imprimer PDF (Template)</print-pdf-template>
+                <print-pdf>PDF</print-pdf>
+                <print-pdf-template>PDF (Template)</print-pdf-template>
                 <clear>Effacer</clear>
                 <confirm>Confirmer</confirm>
                 <cancel>Annuler</cancel>
@@ -254,8 +254,8 @@
                 <language-choice>Idioma</language-choice>
                 <close>Cerrar</close>
                 <print>Imprimir</print>
-                <print-pdf>Imprimir PDF</print-pdf>
-                <print-pdf-template>[Print PDF (Template)]</print-pdf-template>
+                <print-pdf>PDF</print-pdf>
+                <print-pdf-template>[PDF (Template)]</print-pdf-template>
                 <clear>Borrar</clear>
                 <confirm>Confirme</confirm>
                 <cancel>Cancelar</cancel>

@@ -453,15 +453,19 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                                 containingDocument.dispatchEvent(pipelineContext, new XFormsLinkExceptionEvent(XFormsModel.this, null, instanceContainerElement, throwable));
                                 break;
                             }
-                            if (!isReadonlyHint) {
+                            {
+                                final Document tempDocument;
                                 // TODO: Implement as per XSLT 2.0. For now, we just support #all.
                                 if ("#all".equals(xxformsExcludeResultPrefixes))
-                                    instanceDocument = Dom4jUtils.createDocumentCopyElement((Element) children.get(0));
+                                    tempDocument = Dom4jUtils.createDocumentCopyElement((Element) children.get(0));
                                 else
-                                    instanceDocument = Dom4jUtils.createDocumentCopyParentNamespaces((Element) children.get(0));
-                            } else {
-                                // TODO: Support exclude-result-prefixes
-                                instanceDocument = TransformerUtils.dom4jToTinyTree(Dom4jUtils.createDocumentCopyParentNamespaces((Element) children.get(0)));
+                                    tempDocument = Dom4jUtils.createDocumentCopyParentNamespaces((Element) children.get(0));
+
+                                if (!isReadonlyHint) {
+                                    instanceDocument = tempDocument;
+                                } else {
+                                    instanceDocument = TransformerUtils.dom4jToTinyTree(tempDocument);
+                                }
                             }
                             instanceSourceURI = null;
                             xxformsUsername = null;

@@ -26,7 +26,7 @@ import org.orbeon.oxf.processor.serializer.store.ResultStoreOutputStream;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xml.XPathUtils;
-import org.orbeon.oxf.resources.OXFProperties;
+import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.xml.XMLUtils;
 
 import java.io.File;
@@ -345,7 +345,7 @@ public class FileSerializer extends ProcessorImpl {
         });
     }
 
-    public static File getFile(String configDirectory, String configFile, boolean makeDirectories, OXFProperties.PropertySet propertySet) {
+    public static File getFile(String configDirectory, String configFile, boolean makeDirectories, PropertySet propertySet) {
         final File file;
         final String directoryProperty = (propertySet != null) ? propertySet.getString(DIRECTORY_PROPERTY) : null;
         if (directoryProperty == null && configDirectory == null) {

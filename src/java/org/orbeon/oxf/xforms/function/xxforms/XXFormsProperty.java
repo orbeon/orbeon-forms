@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms;
 
-import org.orbeon.oxf.resources.OXFProperties;
+import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.XPathContext;
@@ -43,6 +43,7 @@ public class XXFormsProperty extends XFormsFunction {
             return EmptyIterator.getInstance();
     }
 
+    // TODO: Return typed values like with org.orbeon.oxf.xforms.function.Property
     public static String property(String propertyName) {
         // Never return any property containing the string "password" as a first line of defense
         if (propertyName.toLowerCase().indexOf("password") != -1) {
@@ -50,7 +51,7 @@ public class XXFormsProperty extends XFormsFunction {
         }
 
         // Get property value
-        final Object propertyValue = OXFProperties.instance().getPropertySet().getObject(propertyName);
+        final Object propertyValue = Properties.instance().getPropertySet().getObject(propertyName);
         return (propertyValue == null) ? null : propertyValue.toString();
     }
 }

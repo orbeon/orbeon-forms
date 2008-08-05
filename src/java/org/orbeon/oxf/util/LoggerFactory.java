@@ -19,7 +19,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.DOMSerializer;
 import org.orbeon.oxf.processor.Processor;
 import org.orbeon.oxf.processor.ProcessorImpl;
-import org.orbeon.oxf.resources.OXFProperties;
+import org.orbeon.oxf.properties.Properties;
 
 public class LoggerFactory {
 
@@ -68,9 +68,9 @@ public class LoggerFactory {
     public static void initLogger() {
         try {
             // Accept both xs:string and xs:anyURI types
-            String log4jConfigURL = OXFProperties.instance().getPropertySet().getStringOrURIAsString(LOG4J_DOM_CONFIG_PROPERTY);
+            String log4jConfigURL = Properties.instance().getPropertySet().getStringOrURIAsString(LOG4J_DOM_CONFIG_PROPERTY);
             if (log4jConfigURL == null)
-                log4jConfigURL = OXFProperties.instance().getPropertySet().getStringOrURIAsString(LOG4J_DOM_CONFIG_PROPERTY_OLD);
+                log4jConfigURL = Properties.instance().getPropertySet().getStringOrURIAsString(LOG4J_DOM_CONFIG_PROPERTY_OLD);
 
             if (log4jConfigURL != null) {
                 Processor url = PipelineUtils.createURLGenerator(log4jConfigURL, true);

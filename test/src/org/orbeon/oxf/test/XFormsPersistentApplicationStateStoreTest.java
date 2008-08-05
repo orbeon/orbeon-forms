@@ -20,7 +20,6 @@ import org.orbeon.oxf.pipeline.StaticExternalContext;
 import org.orbeon.oxf.pipeline.api.ExternalContext.Session;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.test.TestExternalContext;
-import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.util.Base64;
 import org.orbeon.oxf.xforms.XFormsProperties;
@@ -42,14 +41,14 @@ public class XFormsPersistentApplicationStateStoreTest extends TestCase {
 	static {
 		// Setup resource manager
 		final Map props = new HashMap();
-		final Properties properties = System.getProperties();
+		final java.util.Properties properties = System.getProperties();
 		for (Enumeration e = properties.propertyNames(); e.hasMoreElements();) {
 			final String name = (String) e.nextElement();
 			if (name.startsWith("oxf.resources."))
 				props.put(name, properties.getProperty(name));
 		}
 		ResourceManagerWrapper.init(props);
-		OXFProperties.init("oxf:/ops/unit-tests/properties.xml");
+		org.orbeon.oxf.properties.Properties.init("oxf:/ops/unit-tests/properties.xml");
 	}
 
 	protected void setUp() {

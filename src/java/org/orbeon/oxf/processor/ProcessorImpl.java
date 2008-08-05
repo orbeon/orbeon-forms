@@ -26,7 +26,8 @@ import org.orbeon.oxf.pipeline.api.PipelineContext.TraceInfo;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.processor.pipeline.PipelineProcessor;
 import org.orbeon.oxf.processor.validation.MSVValidationProcessor;
-import org.orbeon.oxf.resources.OXFProperties;
+import org.orbeon.oxf.properties.Properties;
+import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.PipelineUtils;
@@ -76,8 +77,8 @@ public abstract class ProcessorImpl implements Processor {
     /**
      * Return a property set for this processor.
      */
-    protected OXFProperties.PropertySet getPropertySet() {
-        return OXFProperties.instance().getPropertySet(getName());
+    protected PropertySet getPropertySet() {
+        return org.orbeon.oxf.properties.Properties.instance().getPropertySet(getName());
     }
 
     public LocationData getLocationData() {
@@ -119,13 +120,13 @@ public abstract class ProcessorImpl implements Processor {
     }
 
     public ProcessorInput createInput(final String name) {
-        ProcessorInputOutputInfo inputInfo = getInputInfo(name);
+        final ProcessorInputOutputInfo inputInfo = getInputInfo(name);
 
         // The PropertySet can be null during properties initialization. This should be one of the
         // rare places where this should be tested on. By default, enable validation so the
         // properties can be validated!
-        OXFProperties.PropertySet propertySet = OXFProperties.instance().getPropertySet();
-        Boolean valEnabled = (propertySet == null) ? new Boolean(true) : propertySet.getBoolean(PROCESSOR_VALIDATION_FLAG, true);
+        final PropertySet propertySet = Properties.instance().getPropertySet();
+        final Boolean valEnabled = (propertySet == null) ? new Boolean(true) : propertySet.getBoolean(PROCESSOR_VALIDATION_FLAG, true);
         if (valEnabled.booleanValue() && inputInfo != null && inputInfo.getSchemaURI() != null) {
 
             if (logger.isDebugEnabled())
@@ -136,7 +137,7 @@ public abstract class ProcessorImpl implements Processor {
             final Processor inputValidator = new MSVValidationProcessor(inputInfo.getSchemaURI());
 
             // Connect schema to validator
-            Processor schema = SchemaRepository.instance().getURLGenerator(inputInfo.getSchemaURI());
+            final Processor schema = PipelineUtils.createURLGenerator(SchemaRepository.instance().getSchemaLocation(inputInfo.getSchemaURI()));
             PipelineUtils.connect(schema, OUTPUT_DATA, inputValidator, MSVValidationProcessor.INPUT_SCHEMA);
             PipelineUtils.connect(MSVValidationProcessor.NO_DECORATION_CONFIG, OUTPUT_DATA, inputValidator, INPUT_CONFIG);
 
@@ -193,7 +194,7 @@ public abstract class ProcessorImpl implements Processor {
             addInput(name, fakeInput);
             return fakeInput;
         } else {
-            ProcessorInput input = new ProcessorInputImpl(ProcessorImpl.this.getClass(), name);
+            final ProcessorInput input = new ProcessorInputImpl(ProcessorImpl.this.getClass(), name);
             addInput(name, input);
             return input;
         }
@@ -1047,7 +1048,7 @@ public abstract class ProcessorImpl implements Processor {
 
             // The PropertySet can be null during properties initialization. This should be one of the
             // rare places where this should be tested on.
-            OXFProperties.PropertySet propertySet = OXFProperties.instance().getPropertySet();
+            PropertySet propertySet = Properties.instance().getPropertySet();
 
             // Create and hook-up output validation processor if needed
             Boolean isOutputValidation = (propertySet == null) ? null : propertySet.getBoolean(USER_VALIDATION_FLAG, true);

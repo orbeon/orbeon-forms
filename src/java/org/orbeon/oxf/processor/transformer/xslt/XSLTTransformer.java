@@ -26,8 +26,8 @@ import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.processor.transformer.TransformerURIResolver;
 import org.orbeon.oxf.processor.transformer.URIResolverListener;
-import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.oxf.resources.URLFactory;
+import org.orbeon.oxf.properties.*;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.ConstantLocator;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
@@ -116,9 +116,9 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                             // Read input as an attribute Map and cache it
                             attributes = (Map) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_ATTRIBUTES), new CacheableInputReader() {
                                 public Object read(PipelineContext context, ProcessorInput input) {
-                                    Document preferencesDocument = readInputAsDOM4J(context, input);
-                                    OXFPropertiesSerializer.PropertyStore propertyStore = OXFPropertiesSerializer.createPropertyStore(preferencesDocument);
-                                    OXFProperties.PropertySet propertySet = propertyStore.getGlobalPropertySet();
+                                    final Document preferencesDocument = readInputAsDOM4J(context, input);
+                                    final PropertyStore propertyStore = new PropertyStore(preferencesDocument);
+                                    final PropertySet propertySet = propertyStore.getGlobalPropertySet();
                                     return propertySet.getObjectMap();
                                 }
                             });

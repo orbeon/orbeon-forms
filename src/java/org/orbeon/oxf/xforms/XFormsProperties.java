@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms;
 
-import org.orbeon.oxf.resources.OXFProperties;
+import org.orbeon.oxf.properties.Properties;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -276,68 +276,68 @@ public class XFormsProperties {
 
     public static String getXFormsPassword() {
         if (isHiddenEncryptionEnabled())
-            return OXFProperties.instance().getPropertySet().getString(PASSWORD_PROPERTY);
+            return Properties.instance().getPropertySet().getString(PASSWORD_PROPERTY);
         else
             return null;// TODO: is this needed?
     }
 
     public static boolean isCacheDocument() {
-        return OXFProperties.instance().getPropertySet().getBoolean
+        return Properties.instance().getPropertySet().getBoolean
                 (CACHE_DOCUMENT_PROPERTY, CACHE_DOCUMENT_DEFAULT).booleanValue();
     }
 
     public static int getSessionStoreSize() {
-        return OXFProperties.instance().getPropertySet().getInteger
+        return Properties.instance().getPropertySet().getInteger
                 (CACHE_SESSION_SIZE_PROPERTY, CACHE_SESSION_SIZE_DEFAULT).intValue();
     }
 
     public static int getApplicationStateStoreSize() {
-        return OXFProperties.instance().getPropertySet().getInteger
+        return Properties.instance().getPropertySet().getInteger
                 (STORE_APPLICATION_SIZE_PROPERTY, STORE_APPLICATION_SIZE_DEFAULT).intValue();
     }
 
     public static int getApplicationCacheSize() {
-        return OXFProperties.instance().getPropertySet().getInteger
+        return Properties.instance().getPropertySet().getInteger
                 (CACHE_APPLICATION_SIZE_PROPERTY, CACHE_APPLICATION_SIZE_DEFAULT).intValue();
     }
 
     public static boolean isGZIPState() {
-        return OXFProperties.instance().getPropertySet().getBoolean
+        return Properties.instance().getPropertySet().getBoolean
                 (GZIP_STATE_PROPERTY, GZIP_STATE_DEFAULT).booleanValue();
     }
 
     public static boolean isAjaxTest() {
-        return OXFProperties.instance().getPropertySet().getBoolean
+        return Properties.instance().getPropertySet().getBoolean
                 (TEST_AJAX_PROPERTY, TEST_AJAX_DEFAULT).booleanValue();
     }
 
     public static String getStoreUsername() {
-        return OXFProperties.instance().getPropertySet().getString
+        return Properties.instance().getPropertySet().getString
                 (STORE_APPLICATION_USERNAME_PROPERTY, STORE_APPLICATION_USERNAME_DEFAULT);
     }
 
     public static String getStorePassword() {
-        return OXFProperties.instance().getPropertySet().getString
+        return Properties.instance().getPropertySet().getString
                 (STORE_APPLICATION_PASSWORD_PROPERTY, STORE_APPLICATION_PASSWORD_DEFAULT);
     }
 
     public static String getStoreURI() {
-        return OXFProperties.instance().getPropertySet().getStringOrURIAsString
+        return Properties.instance().getPropertySet().getStringOrURIAsString
                 (STORE_APPLICATION_URI_PROPERTY, STORE_APPLICATION_URI_DEFAULT);
     }
 
     public static String getStoreCollection() {
-        return OXFProperties.instance().getPropertySet().getString
+        return Properties.instance().getPropertySet().getString
                 (STORE_APPLICATION_COLLECTION_PROPERTY, STORE_APPLICATION_COLLECTION_DEFAULT);
     }
 
     public static boolean isHostLanguageAVTs() {
-        return OXFProperties.instance().getPropertySet().getBoolean
+        return Properties.instance().getPropertySet().getBoolean
                 (HOST_LANGUAGE_AVTS_PROPERTY, HOST_LANGUAGE_AVTS_DEFAULT).booleanValue();
     }
 
     public static boolean isCacheCombinedResources() {
-        return OXFProperties.instance().getPropertySet().getBoolean
+        return Properties.instance().getPropertySet().getBoolean
                 (CACHE_COMBINED_RESOURCES_PROPERTY, CACHE_COMBINED_RESOURCES_DEFAULT).booleanValue();
     }
 
@@ -449,28 +449,28 @@ public class XFormsProperties {
         if (containingDocument != null && containingDocument.getStaticState() != null)
             return containingDocument.getStaticState().getBooleanProperty(propertyName);
         else // case of legacy XForms engine which doesn't have a static state object TODO: SHOULD DEPRECATE/REMOVE THIS
-            return OXFProperties.instance().getPropertySet().getBoolean(XFORMS_PROPERTY_PREFIX + propertyName, ((Boolean) (XFormsProperties.getPropertyDefinition(propertyName)).getDefaultValue()).booleanValue()).booleanValue();
+            return Properties.instance().getPropertySet().getBoolean(XFORMS_PROPERTY_PREFIX + propertyName, ((Boolean) (XFormsProperties.getPropertyDefinition(propertyName)).getDefaultValue()).booleanValue()).booleanValue();
     }
 
     private static String getStringProperty(XFormsContainingDocument containingDocument, String propertyName) {
         if (containingDocument != null && containingDocument.getStaticState() != null)
             return containingDocument.getStaticState().getStringProperty(propertyName);
         else // case of legacy XForms engine which doesn't have a static state object TODO: SHOULD DEPRECATE/REMOVE THIS
-            return OXFProperties.instance().getPropertySet().getString(XFORMS_PROPERTY_PREFIX + propertyName, (XFormsProperties.getPropertyDefinition(propertyName)).getDefaultValue().toString());
+            return Properties.instance().getPropertySet().getString(XFORMS_PROPERTY_PREFIX + propertyName, (XFormsProperties.getPropertyDefinition(propertyName)).getDefaultValue().toString());
     }
 
     private static int getIntegerProperty(XFormsContainingDocument containingDocument, String propertyName) {
         if (containingDocument != null && containingDocument.getStaticState() != null)
             return containingDocument.getStaticState().getIntegerProperty(propertyName);
         else // case of legacy XForms engine which doesn't have a static state object TODO: SHOULD DEPRECATE/REMOVE THIS
-            return OXFProperties.instance().getPropertySet().getInteger(XFORMS_PROPERTY_PREFIX + propertyName, ((Integer) (XFormsProperties.getPropertyDefinition(propertyName)).getDefaultValue()).intValue()).intValue();
+            return Properties.instance().getPropertySet().getInteger(XFORMS_PROPERTY_PREFIX + propertyName, ((Integer) (XFormsProperties.getPropertyDefinition(propertyName)).getDefaultValue()).intValue()).intValue();
     }
 
     /**
      * @return  whether name encryption is enabled (legacy XForms engine only).
      */
     public static boolean isNameEncryptionEnabled() {
-        return OXFProperties.instance().getPropertySet().getBoolean
+        return Properties.instance().getPropertySet().getBoolean
                 (ENCRYPT_NAMES_PROPERTY, false).booleanValue();
     }
 
@@ -478,7 +478,7 @@ public class XFormsProperties {
      * @return  whether hidden fields encryption is enabled (legacy XForms engine only).
      */
     public static boolean isHiddenEncryptionEnabled() {
-        return OXFProperties.instance().getPropertySet().getBoolean
+        return Properties.instance().getPropertySet().getBoolean
                 (ENCRYPT_HIDDEN_PROPERTY, false).booleanValue();
     }
 }

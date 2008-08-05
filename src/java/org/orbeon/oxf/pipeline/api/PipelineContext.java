@@ -16,8 +16,8 @@ package org.orbeon.oxf.pipeline.api;
 import java.util.*;
 
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.resources.OXFProperties;
-import org.orbeon.oxf.resources.OXFProperties.PropertySet;
+import org.orbeon.oxf.properties.Properties;
+import org.orbeon.oxf.properties.PropertySet;
 
 /**
  * PipelineContext represents a context object passed to all the processors running in a given
@@ -109,7 +109,7 @@ public class PipelineContext {
     private final Trace trace;
 
     public PipelineContext() {
-        final OXFProperties properties = OXFProperties.instance();
+        final Properties properties = org.orbeon.oxf.properties.Properties.instance();
         final PropertySet propertySet = properties.getPropertySet();
         final String traceClass = propertySet.getNCName("processor.trace");
         if (traceClass == null) {

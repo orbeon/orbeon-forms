@@ -20,7 +20,7 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.sql.interpreters.*;
-import org.orbeon.oxf.resources.OXFProperties;
+import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.*;
@@ -277,7 +277,7 @@ public class SQLProcessor extends ProcessorImpl {
         private SQLProcessorInterpreterContext interpreterContext;
         private NamespaceSupport namespaceSupport = new NamespaceSupport();
 
-        public RootInterpreter(PipelineContext context, OXFProperties.PropertySet propertySet, Node input, Datasource datasource, XPathContentHandler xpathContentHandler, ContentHandler output) {
+        public RootInterpreter(PipelineContext context, PropertySet propertySet, Node input, Datasource datasource, XPathContentHandler xpathContentHandler, ContentHandler output) {
             super(null, false);
             interpreterContext = new SQLProcessorInterpreterContext(propertySet);
             interpreterContext.setPipelineContext(context);

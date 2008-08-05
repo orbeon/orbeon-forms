@@ -23,7 +23,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.DatabaseContext;
 import org.orbeon.oxf.processor.Datasource;
 import org.orbeon.oxf.processor.sql.delegates.SQLProcessorGenericDelegate;
-import org.orbeon.oxf.resources.OXFProperties;
+import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.xml.DeferredContentHandler;
 import org.orbeon.oxf.xml.XPathContentHandler;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -41,7 +41,7 @@ import java.util.*;
  */
 public class SQLProcessorInterpreterContext extends DatabaseContext {
 
-    private OXFProperties.PropertySet propertySet;
+    private PropertySet propertySet;
 
     // Locator for datasource declaration, if any
     private Locator documentLocator;
@@ -60,11 +60,11 @@ public class SQLProcessorInterpreterContext extends DatabaseContext {
     private List currentNodes;
     private List currentFunctions = new ArrayList();
 
-    public SQLProcessorInterpreterContext(OXFProperties.PropertySet propertySet) {
+    public SQLProcessorInterpreterContext(PropertySet propertySet) {
         this.propertySet = propertySet;
     }
 
-    public OXFProperties.PropertySet getPropertySet() {
+    public PropertySet getPropertySet() {
         return propertySet;
     }
 

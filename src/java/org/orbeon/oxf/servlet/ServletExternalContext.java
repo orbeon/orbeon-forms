@@ -28,7 +28,7 @@ import org.orbeon.oxf.pipeline.InitUtils;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.generator.RequestGenerator;
-import org.orbeon.oxf.resources.OXFProperties;
+import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.SystemUtils;
@@ -59,7 +59,7 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
     public static final String SESSION_LISTENERS = "oxf.servlet.session-listeners";
     public static final String APPLICATION_LISTENERS = "oxf.servlet.application-listeners";
 
-    private static final String DEFAULT_FORM_CHARSET = OXFProperties.instance().getPropertySet().getString(DEFAULT_FORM_CHARSET_PROPERTY, DEFAULT_FORM_CHARSET_DEFAULT);
+    private static final String DEFAULT_FORM_CHARSET = Properties.instance().getPropertySet().getString(DEFAULT_FORM_CHARSET_PROPERTY, DEFAULT_FORM_CHARSET_DEFAULT);
 
     private class Request implements ExternalContext.Request {
 
@@ -361,7 +361,7 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
                 protected FileItem createItem(Map headers, boolean isFormField) throws FileUploadException {
                     if (isFormField) {
                         // Handle externalized values
-                        final String externalizeFormValuesPrefix = OXFProperties.instance().getPropertySet().getString(EXTERNALIZE_FORM_VALUES_PREFIX_PROPERTY);
+                        final String externalizeFormValuesPrefix = org.orbeon.oxf.properties.Properties.instance().getPropertySet().getString(EXTERNALIZE_FORM_VALUES_PREFIX_PROPERTY);
                         final String fieldName = getFieldName(headers);
                         if (externalizeFormValuesPrefix != null && fieldName.startsWith(externalizeFormValuesPrefix)) {
                             // In this case, we do as if the value content is an uploaded file so that it can be externalized
@@ -544,13 +544,13 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
 
             // Check a special mode to make all pages appear static, unless the user is logged in (HACK)
             if (allowOverride) {
-                Date forceLastModified = OXFProperties.instance().getPropertySet().getDateTime(ProcessorService.HTTP_FORCE_LAST_MODIFIED_PROPERTY);
+                Date forceLastModified = Properties.instance().getPropertySet().getDateTime(ProcessorService.HTTP_FORCE_LAST_MODIFIED_PROPERTY);
                 if (forceLastModified != null) {
                     // The properties tell that we should override
                     if (request.getRemoteUser() == null) {
                         // If the user is not logged in, just used the specified properties
                         lastModified = forceLastModified.getTime();
-                        revalidate = OXFProperties.instance().getPropertySet().getBoolean(ProcessorService.HTTP_FORCE_MUST_REVALIDATE_PROPERTY, false).booleanValue();
+                        revalidate = Properties.instance().getPropertySet().getBoolean(ProcessorService.HTTP_FORCE_MUST_REVALIDATE_PROPERTY, false).booleanValue();
                     } else {
                         // If the user is logged in, make sure the correct lastModified is used
                         lastModified = 0;
@@ -596,7 +596,7 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
         public boolean checkIfModifiedSince(long lastModified, boolean allowOverride) {
             // Check a special mode to make all pages appear static, unless the user is logged in (HACK)
             if (allowOverride) {
-                Date forceLastModified = OXFProperties.instance().getPropertySet().getDateTime(ProcessorService.HTTP_FORCE_LAST_MODIFIED_PROPERTY);
+                Date forceLastModified = Properties.instance().getPropertySet().getDateTime(ProcessorService.HTTP_FORCE_LAST_MODIFIED_PROPERTY);
                 if (forceLastModified != null) {
                     if (request.getRemoteUser() == null)
                         lastModified = forceLastModified.getTime();

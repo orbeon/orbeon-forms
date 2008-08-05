@@ -23,7 +23,7 @@ import org.orbeon.oxf.pipeline.CommandLineExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.PipelineEngineFactory;
 import org.orbeon.oxf.pipeline.api.ProcessorDefinition;
-import org.orbeon.oxf.resources.OXFProperties;
+import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
@@ -89,7 +89,7 @@ public class OPS {
         ResourceManagerWrapper.init(props);
 
         // 3. Initialize properties with default properties file.
-        OXFProperties.init(OXFProperties.DEFAULT_PROPERTIES_URI);
+        Properties.init(Properties.DEFAULT_PROPERTIES_URI);
 
         // 4. Initialize log4j (using the properies this time)
         LoggerFactory.initLogger();

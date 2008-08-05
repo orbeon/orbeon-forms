@@ -24,7 +24,6 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.processor.generator.URLGenerator;
-import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.oxf.resources.ResourceManager;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.servlet.ServletExternalContext;
@@ -70,7 +69,7 @@ public class ProcessorTest extends TestCase {
 
             // Setup resource manager
             Map props = new HashMap();
-            Properties properties = System.getProperties();
+            java.util.Properties properties = System.getProperties();
             for (Enumeration e = properties.propertyNames(); e.hasMoreElements();) {
                 String name = (String) e.nextElement();
                 if (name.startsWith("oxf.resources."))
@@ -79,7 +78,7 @@ public class ProcessorTest extends TestCase {
             ResourceManagerWrapper.init(props);
             ResourceManager resourceManager = ResourceManagerWrapper.instance();
 
-            OXFProperties.init("oxf:/ops/unit-tests/properties.xml");
+            org.orbeon.oxf.properties.Properties.init("oxf:/ops/unit-tests/properties.xml");
             pipelineContext = new PipelineContext();
             pipelineContext.setAttribute(PipelineContext.JNDI_CONTEXT, jndiContext);
 

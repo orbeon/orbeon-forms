@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.cache;
 
-import org.orbeon.oxf.resources.OXFProperties;
+import org.orbeon.oxf.properties.Properties;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -57,7 +57,7 @@ public class ObjectCache {
         Cache cache = (Cache) namedObjectCaches.get(cacheName);
         if (cache == null) {
             final String propertyName = CACHE_PROPERTY_NAME_PREFIX + cacheName + CACHE_PROPERTY_NAME_SIZE_SUFFIX;
-            final Integer size = OXFProperties.instance().getPropertySet().getInteger(propertyName, defaultSize);
+            final Integer size = Properties.instance().getPropertySet().getInteger(propertyName, defaultSize);
             cache = new MemoryCacheImpl(cacheName, size.intValue());
             namedObjectCaches.put(cacheName, cache);
         }

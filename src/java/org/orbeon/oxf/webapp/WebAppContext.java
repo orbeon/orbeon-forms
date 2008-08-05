@@ -17,7 +17,6 @@ import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.Version;
 import org.orbeon.oxf.pipeline.InitUtils;
-import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.WebAppResourceManagerImpl;
 import org.orbeon.oxf.util.LoggerFactory;
@@ -100,7 +99,7 @@ public class WebAppContext {
             // 2. Initialize properties
             String propertiesFile = (String) getServletInitParametersMap().get(PROPERTIES_PROPERTY);
             if (propertiesFile != null)
-                OXFProperties.init(propertiesFile);
+                org.orbeon.oxf.properties.Properties.init(propertiesFile);
 
             // 3. Initialize log4j with a DOMConfiguration
             if (initializeLogging) {

@@ -27,7 +27,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.ProcessorDefinition;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
-import org.orbeon.oxf.resources.OXFProperties;
+import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.util.AttributesToMap;
 import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.webapp.ServletContextExternalContext;
@@ -86,7 +86,7 @@ public class InitUtils {
 
         try {
             // Set cache size
-            Integer cacheMaxSize = OXFProperties.instance().getPropertySet().getInteger(CACHE_SIZE_PROPERTY);
+            Integer cacheMaxSize = Properties.instance().getPropertySet().getInteger(CACHE_SIZE_PROPERTY);
             if (cacheMaxSize != null)
                 ObjectCache.instance().setMaxSize(pipelineContext, cacheMaxSize.intValue());
 
@@ -122,7 +122,7 @@ public class InitUtils {
                 sb.append(Long.toString(timing));
 
                 // Add cache statistics
-                final String cacheDisplayStatistics = OXFProperties.instance().getPropertySet().getString(CACHE_DISPLAY_STATISTICS_PROPERTY, DEFAULT_CACHE_DISPLAY_STATISTICS);
+                final String cacheDisplayStatistics = Properties.instance().getPropertySet().getString(CACHE_DISPLAY_STATISTICS_PROPERTY, DEFAULT_CACHE_DISPLAY_STATISTICS);
                 if (cacheDisplayStatistics.indexOf(' ') == -1) {
                     // Single token
                     if (cacheDisplayStatistics.length() > 0)
@@ -288,7 +288,7 @@ public class InitUtils {
                     registry.start(pipelineContext);
 
                     // If user defines a PROLOGUE_PROPERTY, overrides the defaults
-                    String prologueSrc = OXFProperties.instance().getPropertySet().getString(PROLOGUE_PROPERTY);
+                    String prologueSrc = Properties.instance().getPropertySet().getString(PROLOGUE_PROPERTY);
                     if (prologueSrc != null) {
                         processorDefinitions = PipelineUtils.createURLGenerator(prologueSrc, true);
                         registry = new XMLProcessorRegistry();
@@ -356,11 +356,11 @@ public class InitUtils {
         public OXFPropertiesMap() {
             super(new Attributeable() {
                 public Object getAttribute(String s) {
-                    return OXFProperties.instance().getPropertySet().getObject(s);
+                    return Properties.instance().getPropertySet().getObject(s);
                 }
 
                 public java.util.Enumeration getAttributeNames() {
-                    return java.util.Collections.enumeration(OXFProperties.instance().getPropertySet().keySet());
+                    return java.util.Collections.enumeration(Properties.instance().getPropertySet().keySet());
                 }
 
                 public void removeAttribute(String s) {

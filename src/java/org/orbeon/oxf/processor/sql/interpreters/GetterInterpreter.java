@@ -17,7 +17,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.processor.sql.SQLProcessor;
 import org.orbeon.oxf.processor.sql.SQLProcessorInterpreterContext;
-import org.orbeon.oxf.resources.OXFProperties;
+import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.util.ISODateUtils;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -491,7 +491,7 @@ public class GetterInterpreter extends SQLProcessor.InterpreterContentHandler {
         return (String) getterToXMLType.get(getterName);
     }
 
-    public static String getXMLTypeFromAttributeStringHandleDefault(Locator locator, OXFProperties.PropertySet propertySet, String typeAttribute, Map prefixesMap, int columnType) {
+    public static String getXMLTypeFromAttributeStringHandleDefault(Locator locator, PropertySet propertySet, String typeAttribute, Map prefixesMap, int columnType) {
         String xmlType;
         if (typeAttribute != null) {
             // User specified an XML type
@@ -507,7 +507,7 @@ public class GetterInterpreter extends SQLProcessor.InterpreterContentHandler {
         return (String) sqlTypesToDefaultXMLTypes.get(new Integer(type));
     }
 
-    public static String getXMLTypeFromAttributeString(Locator locator, OXFProperties.PropertySet propertySet, String typeAttribute, Map prefixesMap) {
+    public static String getXMLTypeFromAttributeString(Locator locator, PropertySet propertySet, String typeAttribute, Map prefixesMap) {
 
         final int colonIndex = typeAttribute.indexOf(':');
         if (colonIndex < 1)

@@ -18,7 +18,8 @@ import org.dom4j.io.DocumentSource;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.resources.OXFProperties;
+import org.orbeon.oxf.properties.Properties;
+import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.util.UUIDUtils;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.control.XFormsComponentControl;
@@ -190,6 +191,8 @@ public class XFormsStaticState {
         if (namespacesMap == null) {
             this.namespacesMap = new HashMap();
             try {
+//                System.out.println(Dom4jUtils.domToString(staticStateDocument));
+
 //                if (xhtmlDocument == null) {
                     // Recompute from staticStateDocument
                     // TODO: Can there be in this case a nested xhtml:html element, thereby causing duplicate id exceptions?
@@ -290,7 +293,7 @@ public class XFormsStaticState {
         }
 
         // Handle default for properties
-        final OXFProperties.PropertySet propertySet = OXFProperties.instance().getPropertySet();
+        final PropertySet propertySet = Properties.instance().getPropertySet();
         for (Iterator i = XFormsProperties.getPropertyDefinitionEntryIterator(); i.hasNext();) {
             final Map.Entry currentEntry = (Map.Entry) i.next();
             final String propertyName = (String) currentEntry.getKey();

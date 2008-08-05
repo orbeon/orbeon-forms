@@ -22,7 +22,8 @@ import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.processor.transformer.xslt.StringErrorListener;
 import org.orbeon.oxf.processor.transformer.xslt.XSLTTransformer;
-import org.orbeon.oxf.resources.OXFProperties;
+import org.orbeon.oxf.properties.PropertyStore;
+import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.Configuration;
@@ -35,7 +36,6 @@ import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.URIResolver;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Properties;
 
 /**
  * XQuery processor based on the Saxon engine.
@@ -88,9 +88,9 @@ public class SaxonXQueryProcessor extends ProcessorImpl {
                                 // Read input as an attribute Map and cache it
                                 attributes = (Map) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_ATTRIBUTES), new CacheableInputReader() {
                                     public Object read(PipelineContext context, ProcessorInput input) {
-                                        Document preferencesDocument = readInputAsDOM4J(context, input);
-                                        OXFPropertiesSerializer.PropertyStore propertyStore = OXFPropertiesSerializer.createPropertyStore(preferencesDocument);
-                                        OXFProperties.PropertySet propertySet = propertyStore.getGlobalPropertySet();
+                                        final Document preferencesDocument = readInputAsDOM4J(context, input);
+                                        final PropertyStore propertyStore = new PropertyStore(preferencesDocument);
+                                        final PropertySet propertySet = propertyStore.getGlobalPropertySet();
                                         return propertySet.getObjectMap();
                                     }
                                 });
@@ -156,7 +156,7 @@ public class SaxonXQueryProcessor extends ProcessorImpl {
                     dynamicContext.setContextItem(staticContext.buildDocument(new DocumentSource(dataDocument)));
                     dynamicContext.setURIResolver(uriResolver);
                     // TODO: use xqueryExpression.getStaticContext() when Saxon is upgraded
-                    xqueryExpression.run(dynamicContext, new SAXResult(contentHandler), new Properties());
+                    xqueryExpression.run(dynamicContext, new SAXResult(contentHandler), new java.util.Properties());
 
                 } catch (Exception e) {
                     throw new OXFException(e);

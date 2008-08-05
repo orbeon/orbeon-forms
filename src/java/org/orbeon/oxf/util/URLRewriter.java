@@ -17,7 +17,7 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.Version;
 import org.orbeon.oxf.processor.*;
-import org.orbeon.oxf.resources.OXFProperties;
+import org.orbeon.oxf.properties.Properties;
 import org.dom4j.QName;
 
 import java.net.URI;
@@ -198,11 +198,11 @@ public class URLRewriter {
     }
 
     public static boolean isResourcesVersioned() {
-        return OXFProperties.instance().getPropertySet().getBoolean(RESOURCES_VERSIONED_PROPERTY, RESOURCES_VERSIONED_DEFAULT).booleanValue();
+        return Properties.instance().getPropertySet().getBoolean(RESOURCES_VERSIONED_PROPERTY, RESOURCES_VERSIONED_DEFAULT).booleanValue();
     }
 
     public static String getApplicationResourceVersion() {
-        return OXFProperties.instance().getPropertySet().getString(RESOURCES_VERSION_NUMBER_PROPERTY);
+        return Properties.instance().getPropertySet().getString(RESOURCES_VERSION_NUMBER_PROPERTY);
     }
 
     public static class PathMatcher {

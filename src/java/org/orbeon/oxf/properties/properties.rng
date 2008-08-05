@@ -1,0 +1,142 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<element name="properties"
+    datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes"
+    xmlns="http://relaxng.org/ns/structure/1.0">
+
+    <zeroOrMore>
+        <element name="property">
+            <attribute name="name"/>
+            <optional>
+                <attribute name="processor-name">
+                    <data type="QName"/>
+                </attribute>
+            </optional>
+            <choice>
+                <group>
+                    <choice>
+                        <attribute name="type">
+                            <value>string</value>
+                        </attribute>
+                        <attribute name="as">
+                            <data type="QName">
+                                <param name="pattern">.+:string</param>
+                            </data>
+                        </attribute>
+                    </choice>
+                    <attribute name="value">
+                        <data type="string"/>
+                    </attribute>
+                </group>
+
+                <group>
+                    <choice>
+                        <attribute name="type">
+                            <value>boolean</value>
+                        </attribute>
+                        <attribute name="as">
+                            <data type="QName">
+                                <param name="pattern">.+:boolean</param>
+                            </data>
+                        </attribute>
+                    </choice>
+                    <attribute name="value">
+                        <data type="boolean"/>
+                    </attribute>
+                </group>
+
+                <group>
+                    <choice>
+                        <attribute name="type">
+                            <value>integer</value>
+                        </attribute>
+                        <attribute name="as">
+                            <data type="QName">
+                                <param name="pattern">.+:integer</param>
+                            </data>
+                        </attribute>
+                    </choice>
+                    <attribute name="value">
+                        <data type="integer"/>
+                    </attribute>
+                </group>
+
+                <group>
+                    <choice>
+                        <attribute name="type">
+                            <value>date</value>
+                        </attribute>
+                        <attribute name="as">
+                            <data type="QName">
+                                <param name="pattern">.+:date</param>
+                            </data>
+                        </attribute>
+                    </choice>
+                    <attribute name="value">
+                        <data type="date"/>
+                    </attribute>
+                </group>
+
+                <group>
+                    <choice>
+                        <attribute name="type">
+                            <value>dateTime</value>
+                        </attribute>
+                        <attribute name="as">
+                            <data type="QName">
+                                <param name="pattern">.+:dateTime</param>
+                            </data>
+                        </attribute>
+                    </choice>
+                    <attribute name="value">
+                        <data type="dateTime"/>
+                    </attribute>
+                </group>
+
+                <group>
+                    <choice>
+                        <attribute name="type">
+                            <value>QName</value>
+                        </attribute>
+                        <attribute name="as">
+                            <data type="QName">
+                                <param name="pattern">.+:QName</param>
+                            </data>
+                        </attribute>
+                    </choice>
+                    <attribute name="value">
+                        <data type="QName"/>
+                    </attribute>
+                </group>
+
+                <group>
+                    <choice>
+                        <attribute name="type">
+                            <value>anyURI</value>
+                        </attribute>
+                        <attribute name="as">
+                            <data type="QName">
+                                <param name="pattern">.+:anyURI</param>
+                            </data>
+                        </attribute>
+                    </choice>
+                    <attribute name="value">
+                        <data type="anyURI"/>
+                    </attribute>
+                </group>
+
+            </choice>
+        </element>
+    </zeroOrMore>
+</element>

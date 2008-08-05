@@ -26,7 +26,8 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
-import org.orbeon.oxf.resources.OXFProperties;
+import org.orbeon.oxf.properties.Properties;
+import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.SystemUtils;
@@ -541,13 +542,13 @@ public class RequestGenerator extends ProcessorImpl {
     }
 
     public static int getMaxSizeProperty() {
-        OXFProperties.PropertySet propertySet = OXFProperties.instance().getPropertySet(XMLConstants.REQUEST_PROCESSOR_QNAME);
+        PropertySet propertySet = Properties.instance().getPropertySet(XMLConstants.REQUEST_PROCESSOR_QNAME);
         Integer maxSizeProperty = propertySet.getInteger(RequestGenerator.MAX_UPLOAD_SIZE_PROPERTY);
         return (maxSizeProperty != null) ? maxSizeProperty.intValue() : RequestGenerator.DEFAULT_MAX_UPLOAD_SIZE;
     }
 
     public static int getMaxMemorySizeProperty() {
-        OXFProperties.PropertySet propertySet = OXFProperties.instance().getPropertySet(XMLConstants.REQUEST_PROCESSOR_QNAME);
+        PropertySet propertySet = org.orbeon.oxf.properties.Properties.instance().getPropertySet(XMLConstants.REQUEST_PROCESSOR_QNAME);
         Integer maxMemorySizeProperty = propertySet.getInteger(RequestGenerator.MAX_UPLOAD_MEMORY_SIZE_PROPERTY);
         return (maxMemorySizeProperty != null) ? maxMemorySizeProperty.intValue() : RequestGenerator.DEFAULT_MAX_UPLOAD_MEMORY_SIZE;
     }

@@ -484,7 +484,7 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
                                           String schemaUri, String schemaHref, String debug) {
         // Set schema if any
         if (schemaUri != null) {
-            processorInputOutput.setSchema(SchemaRepository.instance().getSchema(schemaUri));
+            processorInputOutput.setSchema(SchemaRepository.instance().getSchemaLocation(schemaUri));
         } else if (schemaHref != null) {
             String url;
             if (locationData != null) {

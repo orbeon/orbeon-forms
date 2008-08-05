@@ -20,7 +20,6 @@ import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
-import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.oxf.xml.NamespaceCleanupContentHandler;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -623,7 +622,7 @@ public class Dom4jUtils {
 
     public static LocationData getLocationData(final int depth, boolean isDebug) {
         // Enable this with a property for debugging only, as it is time consuming
-        if (!isDebug && !OXFProperties.instance().getPropertySet()
+        if (!isDebug && !org.orbeon.oxf.properties.Properties.instance().getPropertySet()
                 .getBoolean("oxf.debug.enable-java-location-data", false).booleanValue())
             return null;
 

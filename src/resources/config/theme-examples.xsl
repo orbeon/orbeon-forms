@@ -45,6 +45,7 @@
     <!-- - - - - - - Themed page template - - - - - - -->
     <xsl:template match="/">
         <xhtml:html>
+            <xsl:apply-templates select="/xhtml:html/@*"/>
             <xhtml:head>
                 <xhtml:title>Orbeon Forms Example Applications - <xsl:value-of select="$title"/></xhtml:title>
                 <!-- NOTE: The XForms engine may place additional scripts and stylesheets here as needed -->

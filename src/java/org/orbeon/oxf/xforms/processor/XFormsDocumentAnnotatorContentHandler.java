@@ -57,6 +57,7 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
     private final boolean portlet;
 
     private final Map namespaceMappings;
+    private final boolean isGenerateIds;
 
     private NamespaceSupport3 namespaceSupport = new NamespaceSupport3();
 
@@ -84,6 +85,7 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
         this.portlet = false;
 
         this.namespaceMappings = namespaceMappings;
+        this.isGenerateIds = false;
     }
 
     /**
@@ -101,6 +103,7 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
         this.portlet = "portlet".equals(externalContext.getRequest().getContainerType());
 
         this.namespaceMappings = namespaceMappings;
+        this.isGenerateIds = true;
     }
 
     public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
@@ -287,36 +290,44 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
 
     private Attributes getAttributesGatherNamespaces(Attributes attributes, String[] newIdAttribute) {
         final int idIndex = attributes.getIndex("id");
-        final String newIdAttributeUnprefixed;
-        if (idIndex == -1) {
-            // Create a new "id" attribute, prefixing if needed
-            final AttributesImpl newAttributes = new AttributesImpl(attributes);
-            newIdAttributeUnprefixed = "xforms-element-" + currentId;
-            newIdAttribute[0] = containerNamespace + newIdAttributeUnprefixed;
-            newAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, newIdAttribute[0]);
-            attributes = newAttributes;
-        } else if (portlet) {
-            // Then we must prefix the existing id
-            final AttributesImpl newAttributes = new AttributesImpl(attributes);
-            newIdAttributeUnprefixed = newAttributes.getValue(idIndex);
-            newIdAttribute[0] = containerNamespace + newIdAttributeUnprefixed;
-            newAttributes.setValue(idIndex, newIdAttribute[0]);
-            attributes = newAttributes;
+        if (isGenerateIds) {
+            // Process ids
+            final String newIdAttributeUnprefixed;
+            if (idIndex == -1) {
+                // Create a new "id" attribute, prefixing if needed
+                final AttributesImpl newAttributes = new AttributesImpl(attributes);
+                newIdAttributeUnprefixed = "xforms-element-" + currentId;
+                newIdAttribute[0] = containerNamespace + newIdAttributeUnprefixed;
+                newAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, newIdAttribute[0]);
+                attributes = newAttributes;
+            } else if (portlet) {
+                // Then we must prefix the existing id
+                final AttributesImpl newAttributes = new AttributesImpl(attributes);
+                newIdAttributeUnprefixed = newAttributes.getValue(idIndex);
+                newIdAttribute[0] = containerNamespace + newIdAttributeUnprefixed;
+                newAttributes.setValue(idIndex, newIdAttribute[0]);
+                attributes = newAttributes;
+            } else {
+                // Keep existing id
+                newIdAttributeUnprefixed = newIdAttribute[0] = attributes.getValue(idIndex);
+            }
+
+            // Check for duplicate ids
+            if (ids.get(newIdAttribute[0]) != null) // TODO: create Element to provide more location info?
+                throw new ValidationException("Duplicate id for XForms element: " + newIdAttributeUnprefixed,
+                        new ExtendedLocationData(new LocationData(getDocumentLocator()), "analyzing control element", new String[] { "id", newIdAttributeUnprefixed }, false));
+
+            // Remember that this id was used
+            ids.put(newIdAttribute[0], "");
+
+            currentId++;
         } else {
-            // Keep existing id
-            newIdAttributeUnprefixed = newIdAttribute[0] = attributes.getValue(idIndex);
+            // Don't process ids
+            newIdAttribute[0] = attributes.getValue(idIndex);
         }
 
-        // Check for duplicate ids
-        if (ids.get(newIdAttribute[0]) != null) // TODO: create Element to provide more location info?
-            throw new ValidationException("Duplicate id for XForms element: " + newIdAttributeUnprefixed,
-                    new ExtendedLocationData(new LocationData(getDocumentLocator()), "analyzing control element", new String[] { "id", newIdAttributeUnprefixed }, false));
-
-        // Remember that this id was used
-        ids.put(newIdAttribute[0], "");
-
-        // Gather namespace information
-        if (namespaceMappings != null) {
+        // Gather namespace information if there is an id
+        if (namespaceMappings != null && idIndex != -1) {
             final Map namespaces = new HashMap();
             for (Enumeration e = namespaceSupport.getPrefixes(); e.hasMoreElements();) {
                 final String namespacePrefix = (String) e.nextElement();
@@ -327,8 +338,6 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
             namespaces.put(XMLConstants.XML_PREFIX, XMLConstants.XML_URI);
             namespaceMappings.put(newIdAttribute[0], namespaces);
         }
-
-        currentId++;
 
         return attributes;
     }

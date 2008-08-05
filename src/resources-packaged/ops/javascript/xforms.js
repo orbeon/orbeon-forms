@@ -567,20 +567,23 @@ ORBEON.util.String = {
 ORBEON.util.DateTime = {
 
     magicTimeToJSDate: function(magicTime) {
-        var timeParsePatterns = ORBEON.util.DateTime._timeParsePatterns;
-        for (var i = 0; i < timeParsePatterns.length; i++) {
-            var re = timeParsePatterns[i].re;
-            var handler = timeParsePatterns[i].handler;
-            var bits = re.exec(magicTime);
+        return ORBEON.util.DateTime._magicToJSDate(magicTime, ORBEON.util.DateTime._timeParsePatterns);
+    },
+
+    magicDateToJSDate: function(magicDate) {
+        return ORBEON.util.DateTime._magicToJSDate(magicDate, ORBEON.util.DateTime._dateParsePatterns);
+    },
+
+    _magicToJSDate: function(magicTimeDate, parsePatterns) {
+        for (var i = 0; i < parsePatterns.length; i++) {
+            var re = parsePatterns[i].re;
+            var handler = parsePatterns[i].handler;
+            var bits = re.exec(magicTimeDate);
             if (bits) {
                 return handler(bits);
             }
         }
         return null;
-    },
-
-    magicDateToJSDate: function(magicDate) {
-
     },
 
     jsDateToISOTime: function(jsDate) {
@@ -592,11 +595,13 @@ ORBEON.util.DateTime = {
     },
 
     jsDateToISODate: function(jsDate) {
-
+        return jsDate.getFullYear()
+               + '-' + ORBEON.util.DateTime._padAZero(jsDate.getMonth() + 1)
+               + '-' + ORBEON.util.DateTime._padAZero(jsDate.getDate());
     },
 
     jsDateToISODateTime: function(jsDateDate, jsDateTime) {
-
+        return ORBEON.util.DateTime.jsDateToISODate(jsDateDate) + "T" + ORBEON.util.DateTime.jsDateToISOTime(jsDateTime);
     },
 
     jsDateToformatDisplayTime: function(jsDate) {
@@ -607,7 +612,7 @@ ORBEON.util.DateTime = {
                     + ORBEON.util.DateTime._padAZero(jsDate.getSeconds())
                     + (jsDate.getHours() < 12 ? " a.m." : " p.m.");
         } else {
-            // International time
+            // EU time
             return jsDate.getHours() + ":"
                     + ORBEON.util.DateTime._padAZero(jsDate.getMinutes()) + ":"
                     + ORBEON.util.DateTime._padAZero(jsDate.getSeconds());
@@ -615,7 +620,11 @@ ORBEON.util.DateTime = {
     },
 
     jsDateToformatDisplayDate: function(jsDate) {
-
+        // US date
+        // [M]/[D]/[Y]
+        return (jsDate.getMonth() + 1)
+               + '/' + jsDate.getDate()
+               + '/' + jsDate.getFullYear();
     },
 
     /**
@@ -623,22 +632,17 @@ ORBEON.util.DateTime = {
      * <ul><li>'re' - a regular expression</li>
      * <li>'handler' - a function for creating a date from something
      *     that matches the regular expression</li>
-     * <li>'example' - an array of examples that show matching examples</li>
      * Handlers may throw errors if string is unparseable.
-     * Examples are used for automated testing, so they should be updated
-     *   once a regexp is added/modified.
      */
     _timeParsePatterns: [
         // Now
         {   re: /^now/i,
-            example: new Array('now'),
             handler: function() {
                 return new Date();
             }
         },
         // p.m.
         {   re: /(\d{1,2}):(\d{1,2}):(\d{1,2})(?:p| p)/,
-            example: new Array('9:55:00 pm','12:55:00 p.m.','9:55:00 p','11:5:10pm','9:5:1p'),
             handler: function(bits) {
                 var d = new Date();
                 var h = parseInt(bits[1], 10);
@@ -651,7 +655,6 @@ ORBEON.util.DateTime = {
         },
         // p.m., no seconds
         {   re: /(\d{1,2}):(\d{1,2})(?:p| p)/,
-            example: new Array('9:55 pm','12:55 p.m.','9:55 p','11:5pm','9:5p'),
             handler: function(bits) {
                 var d = new Date();
                 var h = parseInt(bits[1], 10);
@@ -664,7 +667,6 @@ ORBEON.util.DateTime = {
         },
         // p.m., hour only
         {   re: /(\d{1,2})(?:p| p)/,
-            example: new Array('9 pm','12 p.m.','9 p','11pm','9p'),
             handler: function(bits) {
                 var d = new Date();
                 var h = parseInt(bits[1], 10);
@@ -677,7 +679,6 @@ ORBEON.util.DateTime = {
         },
         // hh:mm:ss
         {   re: /(\d{1,2}):(\d{1,2}):(\d{1,2})/,
-            example: new Array('9:55:00','19:55:00','19:5:10','9:5:1','9:55:00 a.m.','11:55:00a'),
             handler: function(bits) {
                 var d = new Date();
                 d.setHours(parseInt(bits[1], 10));
@@ -688,7 +689,6 @@ ORBEON.util.DateTime = {
         },
         // hh:mm
         {   re: /(\d{1,2}):(\d{1,2})/,
-            example: new Array('9:55','19:55','19:5','9:55 a.m.','11:55a'),
             handler: function(bits) {
                 var d = new Date();
                 d.setHours(parseInt(bits[1], 10));
@@ -699,7 +699,6 @@ ORBEON.util.DateTime = {
         },
         // hhmmss
         {   re: /(\d{1,6})/,
-            example: new Array('9','9a','9am','19','1950','195510','0955'),
             handler: function(bits) {
                 var d = new Date();
                 var h = bits[1].substring(0,2);
@@ -712,7 +711,118 @@ ORBEON.util.DateTime = {
                 d.setSeconds(parseInt(s, 10));
                 return d;
             }
+        }
+    ],
+
+    _dateParsePatterns: [
+        // Today
+        {   re: /^tod/i,
+            handler: function() {
+                return new Date();
+            }
         },
+        // Tomorrow
+        {   re: /^tom/i,
+            handler: function() {
+                var d = new Date();
+                d.setDate(d.getDate() + 1);
+                return d;
+            }
+        },
+        // Yesterday
+        {   re: /^yes/i,
+            handler: function() {
+                var d = new Date();
+                d.setDate(d.getDate() - 1);
+                return d;
+            }
+        },
+        // 4th
+        {   re: /^(\d{1,2})(st|nd|rd|th)?$/i,
+            handler: function(bits) {
+                var d = new Date();
+                d.setDate(parseInt(bits[1], 10));
+                return d;
+            }
+        },
+        // 4th Jan
+        {   re: /^(\d{1,2})(?:st|nd|rd|th)? (\w+)$/i,
+            handler: function(bits) {
+                var d = new Date();
+                d.setDate(parseInt(bits[1], 10));
+                d.setMonth(parseMonth(bits[2]));
+                return d;
+            }
+        },
+        // 4th Jan 2003
+        {   re: /^(\d{1,2})(?:st|nd|rd|th)? (\w+),? (\d{4})$/i,
+            handler: function(bits) {
+                var d = new Date();
+                d.setDate(parseInt(bits[1], 10));
+                d.setMonth(parseMonth(bits[2]));
+                d.setYear(bits[3]);
+                return d;
+            }
+        },
+        // Jan 4th
+        {   re: /^(\w+) (\d{1,2})(?:st|nd|rd|th)?$/i,
+            handler: function(bits) {
+                var d = new Date();
+                d.setDate(parseInt(bits[2], 10));
+                d.setMonth(parseMonth(bits[1]));
+                return d;
+            }
+        },
+        // Jan 4th 2003
+        {   re: /^(\w+) (\d{1,2})(?:st|nd|rd|th)?,? (\d{4})$/i,
+            handler: function(bits) {
+                var d = new Date();
+                d.setDate(parseInt(bits[2], 10));
+                d.setMonth(parseMonth(bits[1]));
+                d.setYear(bits[3]);
+                return d;
+            }
+        },
+        // next Tuesday - this is suspect due to weird meaning of "next"
+        {   re: /^next (\w+)$/i,
+            handler: function(bits) {
+                var d = new Date();
+                var day = d.getDay();
+                var newDay = parseWeekday(bits[1]);
+                var addDays = newDay - day;
+                if (newDay <= day) {
+                    addDays += 7;
+                }
+                d.setDate(d.getDate() + addDays);
+                return d;
+            }
+        },
+        // last Tuesday
+        {   re: /^last (\w+)$/i,
+            handler: function(bits) {
+                throw new Error("Not yet implemented");
+            }
+        },
+        // mm/dd/yyyy (American style)
+        {   re: /(\d{1,2})\/(\d{1,2})\/(\d{4})/,
+            handler: function(bits) {
+                var d = new Date();
+                d.setYear(bits[3]);
+                d.setDate(parseInt(bits[2], 10));
+                d.setMonth(parseInt(bits[1], 10) - 1); // Because months indexed from 0
+                return d;
+            }
+        },
+        // yyyy-mm-dd (ISO style)
+        {   re: /(\d{4})-(\d{1,2})-(\d{1,2})/,
+            handler: function(bits) {
+                var d = new Date();
+                d.setYear(parseInt(bits[1]));
+                d.setDate(parseInt(bits[3], 10));
+                d.setMonth(parseInt(bits[2], 10) - 1);
+                return d;
+            }
+        }
     ],
 
     /**
@@ -1071,7 +1181,17 @@ ORBEON.xforms.Controls = {
         if (ORBEON.util.Dom.hasClass(control, "xforms-type-time")) {
             var inputValue = ORBEON.util.Dom.getChildElementByIndex(control, 0).value;
             var jsDate = ORBEON.util.DateTime.magicTimeToJSDate(inputValue);
-            return ORBEON.util.DateTime.jsDateToISOTime(jsDate);
+            return jsDate == null ? inputValue : ORBEON.util.DateTime.jsDateToISOTime(jsDate);
+        } else if (ORBEON.util.Dom.hasClass(control, "xforms-type-date")) {
+            var inputValue = ORBEON.util.Dom.getChildElementByIndex(control, 0).value;
+            var jsDate = ORBEON.util.DateTime.magicDateToJSDate(inputValue);
+            return jsDate == null ? inputValue : ORBEON.util.DateTime.jsDateToISODate(jsDate);
+        } else if (ORBEON.util.Dom.hasClass(control, "xforms-type-dateTime")) {
+            var dateValue = ORBEON.util.Dom.getChildElementByIndex(control, 0).value;
+            var jsDateDate = ORBEON.util.DateTime.magicDateToJSDate(dateValue);
+            var timeValue = ORBEON.util.Dom.getChildElementByIndex(control, 1).value;
+            var jsDateTime = ORBEON.util.DateTime.magicTimeToJSDate(timeValue);
+            return jsDateDate == null || jsDateTime == null ? dateValue + "T" + timeValue : ORBEON.util.DateTime.jsDateToISODateTime(jsDateDate, jsDateTime);
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-input") && !ORBEON.util.Dom.hasClass(control, "xforms-type-boolean") && !ORBEON.util.Dom.hasClass(control, "xforms-static")) {
             return ORBEON.util.Dom.getChildElementByIndex(control, 0).value;
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-select1-open")) {
@@ -1196,17 +1316,26 @@ ORBEON.xforms.Controls = {
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-type-time")) {
             var inputField = ORBEON.util.Dom.getChildElementByIndex(control, 0);
             var jsDate = ORBEON.util.DateTime.magicTimeToJSDate(newControlValue);
-            inputField.value = ORBEON.util.DateTime.jsDateToformatDisplayTime(jsDate);
+            inputField.value = jsDate == null ? newControlValue : ORBEON.util.DateTime.jsDateToformatDisplayTime(jsDate);
+        } else if (ORBEON.util.Dom.hasClass(control, "xforms-type-date")) {
+            var inputField = ORBEON.util.Dom.getChildElementByIndex(control, 0);
+            var jsDate = ORBEON.util.DateTime.magicDateToJSDate(newControlValue);
+            inputField.value = jsDate == null ? newControlValue : ORBEON.util.DateTime.jsDateToformatDisplayDate(jsDate);
+        } else if (ORBEON.util.Dom.hasClass(control, "xforms-type-dateTime")) {
+            var separatorIndex = newControlValue.indexOf("T");
+            // Populate date field
+            var datePartString = newControlValue.substring(0, separatorIndex);
+            var datePartJSDate = ORBEON.util.DateTime.magicDateToJSDate(datePartString);
+            var inputFieldDate = ORBEON.util.Dom.getChildElementByIndex(control, 0);
+            inputFieldDate.value = datePartJSDate == null ? datePartString : ORBEON.util.DateTime.jsDateToformatDisplayDate(datePartJSDate);
+            // Populate time field
+            var timePartString = newControlValue.substring(separatorIndex + 1);
+            var timePartJSDate = ORBEON.util.DateTime.magicTimeToJSDate(timePartString);
+            var inputFieldTime = ORBEON.util.Dom.getChildElementByIndex(control, 1);
+            inputFieldTime.value = timePartJSDate == null ? timePartString : ORBEON.util.DateTime.jsDateToformatDisplayTime(timePartJSDate);
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-input") && !ORBEON.util.Dom.hasClass(control, "xforms-type-boolean")) {
             // XForms input
-//            var displayField = ORBEON.util.Dom.getChildElementByIndex(control, 0);
             var inputField = ORBEON.util.Dom.getChildElementByIndex(control, 0);
-//            var datePicker = ORBEON.util.Dom.getChildElementByIndex(control, 1);
-
-            // Populate values
-//            if (ORBEON.util.Dom.hasClass(control, "xforms-type-date")) {
-//                ORBEON.util.Dom.setStringValue(displayField, (displayValue == null || displayValue == "") ? "\u00a0" : displayValue);
-//            }
             if (control.value != newControlValue) {
                 control.previousValue = newControlValue;
                 control.valueSetByXForms++;
@@ -1999,8 +2128,8 @@ ORBEON.xforms.Events = {
                 if (ORBEON.xforms.Globals.changedIdsRequest[target.id] != null)
                     ORBEON.xforms.Globals.changedIdsRequest[target.id] = 0;
 
-                // For select1 list, make sure we have exactly one value selected
                 if (ORBEON.util.Dom.hasClass(target, "xforms-select1-appearance-compact")) {
+                    // For select1 list, make sure we have exactly one value selected
                     if (target.value == "") {
                         // Stop end-user from deselecting last selected value
                         target.options[0].selected = true;
@@ -2016,17 +2145,23 @@ ORBEON.xforms.Events = {
                             }
                         }
                     }
-                }
+                } else if (ORBEON.util.Dom.hasClass(target, "xforms-type-time") || ORBEON.util.Dom.hasClass(target, "xforms-type-date") || ORBEON.util.Dom.hasClass(target, "xforms-type-dateTime")) {
 
-                // For time field, magic-parse time, and if recognized replace by display value
-                if (ORBEON.util.Dom.hasClass(target, "xforms-type-time")) {
-                    var timeInput = ORBEON.util.Dom.getChildElementByIndex(target, 0);
-                    var userEnteredTime = timeInput.value;
-                    var jsDate = ORBEON.util.DateTime.magicTimeToJSDate(userEnteredTime);
-                    if (jsDate != null) {
-                        var displayTime = ORBEON.util.DateTime.jsDateToformatDisplayTime(jsDate);
-                        timeInput.value = displayTime; 
+                    // For time, date, and dateTime fields, magic-parse field, and if recognized replace by display value
+
+                    function toDisplayValue(input, magicToJSDate, jsDateToDisplay) {
+                        var jsDate = magicToJSDate(input.value);
+                        if (jsDate != null)
+                            input.value = jsDateToDisplay(jsDate);
                     }
+
+                    // Handle first text field (time or date)
+                    toDisplayValue(ORBEON.util.Dom.getChildElementByIndex(target, 0),
+                            ORBEON.util.Dom.hasClass(target, "xforms-type-time") ? ORBEON.util.DateTime.magicTimeToJSDate : ORBEON.util.DateTime.magicDateToJSDate,
+                            ORBEON.util.Dom.hasClass(target, "xforms-type-time") ? ORBEON.util.DateTime.jsDateToformatDisplayTime : ORBEON.util.DateTime.jsDateToformatDisplayDate);
+                    // Handle second text field for dateTime
+                    if (ORBEON.util.Dom.hasClass(target, "xforms-type-dateTime"))
+                        toDisplayValue(ORBEON.util.Dom.getChildElementByIndex(target, 1), ORBEON.util.DateTime.magicTimeToJSDate, ORBEON.util.DateTime.jsDateToformatDisplayTime);
                 }
 
                 // Fire change event
@@ -2236,38 +2371,35 @@ ORBEON.xforms.Events = {
                 xformsFireEvents(new Array(xformsCreateEventArray
                         (target, "xxforms-value-change-with-focus-change",
                                 ORBEON.xforms.Controls.getCurrentValue(target), null)), false);
-            } else if (ORBEON.util.Dom.hasClass(target, "xforms-type-date") || ORBEON.util.Dom.hasClass(target, "xforms-type-dateTime")) {
+            } else if (ORBEON.util.Dom.hasClass(originalTarget, "xforms-type-date") ) {
                 // Click on calendar inside input field
 
                 // Initialize calendar when needed
-                // TODO: ALEX: fix for dateTime
                 var inputField = ORBEON.util.Dom.getChildElementByIndex(target, 0);
-                if (ORBEON.util.Dom.hasClass(target, "xforms-type-date")) {
 
-                    // Setup calendar library if not done already
-                    if (!ORBEON.xforms.Globals.inputCalendarCreated[target.id]) {
-                        Calendar.setup({
-                            inputField     :    inputField.id,
-                            ifFormat       :    "%Y-%m-%d",
-                            showsTime      :    false,
-                            button         :    target.id,
-                            singleClick    :    true,
-                            step           :    1,
-                            onUpdate       :    ORBEON.xforms.Events.calendarUpdate,
-                            onClose        :    ORBEON.xforms.Events.calendarClose,
-                            electric       :    true
-                        });
-                        // JSCalendar sets his listener in the onclick attribute: save it so we can call it later
-                        ORBEON.xforms.Globals.inputCalendarOnclick[target.id] = target.onclick;
-                        target.onclick = null;
-                        ORBEON.xforms.Globals.inputCalendarCreated[target.id] = true;
-                        // Save initial value
-                        ORBEON.xforms.Globals.inputCalendarCommitedValue[target.id] = ORBEON.xforms.Controls.getCurrentValue(target);
-                    }
-
-                    // Event can be received on calendar picker span, or on the containing span
-                    ORBEON.xforms.Globals.inputCalendarOnclick[target.id]();
+                // Setup calendar library if not done already
+                if (!ORBEON.xforms.Globals.inputCalendarCreated[target.id]) {
+                    Calendar.setup({
+                        inputField     :    inputField.id,
+                        ifFormat       :    "%m/%d/%Y",
+                        showsTime      :    false,
+                        button         :    target.id,
+                        singleClick    :    true,
+                        step           :    1,
+                        onUpdate       :    ORBEON.xforms.Events.calendarUpdate,
+                        onClose        :    ORBEON.xforms.Events.calendarClose,
+                        electric       :    true
+                    });
+                    // JSCalendar sets his listener in the onclick attribute: save it so we can call it later
+                    ORBEON.xforms.Globals.inputCalendarOnclick[target.id] = target.onclick;
+                    target.onclick = null;
+                    ORBEON.xforms.Globals.inputCalendarCreated[target.id] = true;
+                    // Save initial value
+                    ORBEON.xforms.Globals.inputCalendarCommitedValue[target.id] = inputField.value;
                 }
+
+                // Event can be received on calendar picker span, or on the containing span
+                ORBEON.xforms.Globals.inputCalendarOnclick[target.id]();
             } else if (ORBEON.util.Dom.hasClass(target, "xforms-upload") && ORBEON.util.Dom.hasClass(originalTarget, "xforms-upload-remove")) {
                 // Click on remove icon in upload control
                 xformsFireEvents(new Array(xformsCreateEventArray(target, "xxforms-value-change-with-focus-change", "")), false);
@@ -2390,15 +2522,14 @@ ORBEON.xforms.Events = {
      */
     calendarUpdate: function(calendar) {
         if (ORBEON.util.Dom.hasClass(calendar.activeDiv, "day")) {
-            var inputField = calendar.params.inputField;
             // Change value in field from ISO to display value
-            var date = ORBEON.util.DateTime.isoDateToJSDate(inputField.value);
-            inputField.value = ORBEON.util.DateTime.isoDateToJSDate(date);
-
+            var inputField = calendar.params.inputField;
+            var jsDate = ORBEON.util.DateTime.magicDateToJSDate(inputField.value);
+            inputField.value = ORBEON.util.DateTime.jsDateToformatDisplayDate(jsDate);
             var element = inputField.parentNode;
-            var newValue = ORBEON.xforms.Controls.getCurrentValue(element);
-            ORBEON.xforms.Globals.inputCalendarCommitedValue[element.id] = newValue;
-            xformsFireEvents([xformsCreateEventArray(element, "xxforms-value-change-with-focus-change", newValue)], false);
+            ORBEON.xforms.Globals.inputCalendarCommitedValue[element.id] = inputField.value;
+            xformsFireEvents([xformsCreateEventArray(element, "xxforms-value-change-with-focus-change",
+                    ORBEON.xforms.Controls.getCurrentValue(element))], false);
         }
     },
 
@@ -4029,16 +4160,38 @@ ORBEON.xforms.Server = {
                                         // Update input control type
                                         if (type != null && ORBEON.util.Dom.hasClass(documentElement, "xforms-input")) {
                                             var isDateType = type == "{http://www.w3.org/2001/XMLSchema}date" || type == "{http://www.w3.org/2002/xforms}date"
+                                            var isTimeType = type == "{http://www.w3.org/2001/XMLSchema}time" || type == "{http://www.w3.org/2002/xforms}time"
+                                            var isDateTimeType = type == "{http://www.w3.org/2001/XMLSchema}dateTime" || type == "{http://www.w3.org/2002/xforms}dateTime"
                                             //var isBooleanType = type == "{http://www.w3.org/2001/XMLSchema}boolean" || type == "{http://www.w3.org/2002/xforms}boolean"
                                             //var isStringType = type == "" || type == "{http://www.w3.org/2001/XMLSchema}string" || type == "{http://www.w3.org/2002/xforms}string"
+
+                                            function removeAllTypeCSS(element) {
+                                                ORBEON.util.Dom.removeClass(element, "xforms-type-date");
+                                                ORBEON.util.Dom.removeClass(element, "xforms-type-time");
+                                                ORBEON.util.Dom.removeClass(element, "xforms-type-dateTime");
+                                            }
+
+                                            // Do clean-up: remove type classes, and second input, if any
+                                            removeAllTypeCSS(documentElement);
+                                            var firstInput = ORBEON.util.Dom.getChildElementByIndex(documentElement, 0);
+                                            removeAllTypeCSS(firstInput);
+                                            var secondInput = ORBEON.util.Dom.getChildElementByIndex(documentElement, 1);
+                                            if (secondInput != null)
+                                                documentElement.removeChild(secondInput);
+
                                             if (isDateType) {
                                                 ORBEON.util.Dom.addClass(documentElement, "xforms-type-date");
-                                                ORBEON.util.Dom.removeClass(documentElement, "xforms-type-string");
-                                            } else if (!isDateType) {
-                                                ORBEON.util.Dom.removeClass(documentElement, "xforms-type-date");
-                                                var dateDisplayElement = ORBEON.util.Dom.getChildElementByClass(documentElement, "xforms-date-display");
-                                                if (dateDisplayElement != null)
-                                                    ORBEON.util.Dom.setStringValue(dateDisplayElement, "");
+                                                ORBEON.util.Dom.addClass(firstInput, "xforms-type-date");
+                                            } else if (isTimeType) {
+                                                ORBEON.util.Dom.addClass(documentElement, "xforms-type-time");
+                                                ORBEON.util.Dom.addClass(firstInput, "xforms-type-time");
+                                            } else if (isDateTimeType) {
+                                                ORBEON.util.Dom.addClass(documentElement, "xforms-type-dateTime");
+                                                ORBEON.util.Dom.addClass(firstInput, "xforms-type-date");
+                                                secondInput = document.createElement("input");
+                                                secondInput.setAttribute("type", "text");
+                                                secondInput.setAttribute("class", "xforms-input-input xforms-type-time");
+                                                documentElement.appendChild(secondInput);
                                             }
                                         }
 

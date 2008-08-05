@@ -116,29 +116,9 @@
     cursor: hand;
 }
 
-.xforms-showcalendar {
-    margin-left: .5em;
-    margin-right: .5em;
-    vertical-align: bottom;
-    width: 16px;
-    height: 16px
-}
-
-/* Hide date pickend for <xforms:input> when type not date */
-.xforms-showcalendar {
-    display: none;
-}
-
-/* Show it when input field of date type */
-.xforms-type-date .xforms-showcalendar {
-    display: -moz-inline-box;
-    display: inline-block;
-}
-
-/* But don't show calendar picker if the value is readonly */
-.xforms-input .xforms-showcalendar-readonly {
-    display: none;
-}
+input.xforms-type-date { width: 6em }
+input.xforms-type-time { width: 6em }
+.xforms-type-dateTime .xforms-type-date { margin-right: .5em }
 
 .xforms-input input {
     -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;

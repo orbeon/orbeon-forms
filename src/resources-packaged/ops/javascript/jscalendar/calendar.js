@@ -12,7 +12,7 @@
  * Read the entire license text here: http://www.gnu.org/licenses/lgpl.html
  */
 
-// $Id: calendar.js,v 1.1 2006/11/10 00:39:20 ebruchez Exp $
+// $Id: calendar.js,v 1.2 2008/08/05 03:08:01 avernet Exp $
 
 /** The Calendar object constructor. */
 Calendar = function (firstDayOfWeek, dateStr, onSelected, onClose) {
@@ -115,7 +115,8 @@ Calendar.getAbsolutePos = function(el) {
 };
 
 Calendar.isRelated = function (el, evt) {
-	var related = evt.relatedTarget;
+    console.log(el);
+    var related = evt.relatedTarget;
 	if (!related) {
 		var type = evt.type;
 		if (type == "mouseover") {
@@ -128,7 +129,11 @@ Calendar.isRelated = function (el, evt) {
 		if (related == el) {
 			return true;
 		}
-		related = related.parentNode;
+        // Orbeon change
+        // When we arrive to the div created by the calendar, trying to get the parent gives a "Permission denied to
+        // get property HTMLDivElement.parentNode". We are detecting this case, and stopping the loop there.
+        if (ORBEON.util.Dom.hasClass(related, "calendar")) return false;
+        related = related.parentNode;
 	}
 	return false;
 };

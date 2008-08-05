@@ -154,7 +154,7 @@ public class XHTMLHeadHandler extends HandlerBase {
 
         // Scripts
         // TODO: Have option to put this at the bottom of the page. See theme-plain.xsl and http://developer.yahoo.com/performance/rules.html#js_bottom -->
-        if (!XFormsProperties.isNoscript(containingDocument) && !XFormsProperties.isReadonly(containingDocument)) {
+        if (!isNoscript && !XFormsProperties.isReadonly(containingDocument)) {
 
             if (isCombineResources) {
                 final String combinedResourceName = combinedResourcesPrefix + ".js";

@@ -178,7 +178,7 @@ public class XFormsTriggerHandler extends XFormsCoreControlHandler {
             final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
 
             final String elementName;
-            if (XFormsProperties.isNoscript(containingDocument)) {
+            if (isNoscript) {
                 // We need a name to detect activation
                 newAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, effectiveId);
 

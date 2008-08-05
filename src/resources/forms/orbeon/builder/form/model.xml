@@ -86,8 +86,10 @@
         <!-- Form instance -->
         <xforms:bind nodeset="xhtml:head/xforms:model[@id = 'fr-form-model']/xforms:instance[@id = 'fr-form-instance']/*">
 
-            <!-- Handle "date" type. Note we make it optional with xforms:date so we can save the form -->
+            <!-- Handle date / time types. Note we make them optional with xforms:* so we can save the form -->
             <xforms:bind nodeset="*/*[name() = $model/xforms:bind/xforms:bind/xforms:bind[substring-after(@type, ':') = 'date']/@nodeset]" type="xforms:date"/>
+            <xforms:bind nodeset="*/*[name() = $model/xforms:bind/xforms:bind/xforms:bind[substring-after(@type, ':') = 'time']/@nodeset]" type="xforms:time"/>
+            <xforms:bind nodeset="*/*[name() = $model/xforms:bind/xforms:bind/xforms:bind[substring-after(@type, ':') = 'dateTime']/@nodeset]" type="xforms:dateTime"/>
             <!-- Handle "boolean" type -->
             <!--<xforms:bind nodeset="*/*[name() = $model/xforms:bind/xforms:bind/xforms:bind[substring-after(@type, ':') = 'boolean']/@nodeset]" type="xs:boolean"/>-->
 

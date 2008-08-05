@@ -12,7 +12,7 @@
  * Read the entire license text here: http://www.gnu.org/licenses/lgpl.html
  */
 
-// $Id: calendar.js,v 1.2 2008/08/05 03:08:01 avernet Exp $
+// $Id: calendar.js,v 1.3 2008/08/05 03:09:04 avernet Exp $
 
 /** The Calendar object constructor. */
 Calendar = function (firstDayOfWeek, dateStr, onSelected, onClose) {
@@ -115,7 +115,6 @@ Calendar.getAbsolutePos = function(el) {
 };
 
 Calendar.isRelated = function (el, evt) {
-    console.log(el);
     var related = evt.relatedTarget;
 	if (!related) {
 		var type = evt.type;

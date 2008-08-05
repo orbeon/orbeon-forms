@@ -21,12 +21,19 @@
 
     <xhtml:head>
         <xhtml:title>Unit Tests</xhtml:title>
-        <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms">
+        <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms" id="main-model" xxforms:external-events="restore-instance">
+
+            <!-- Instance used at run-time -->
             <xforms:instance id="instance">
+                <instance/>
+            </xforms:instance>
+
+            <!-- Copy of the original instance, so we can restore it as tests are running -->
+            <xforms:instance id="initial-instance">
                 <instance>
                     <input>
-                        <type/>
-                        <field/>
+                        <type>string</type>
+                        <field>gaga</field>
                         <copy/>
                         <time>20:12:21</time>
                         <date>2008-09-01</date>
@@ -34,14 +41,29 @@
                     </input>
                 </instance>
             </xforms:instance>
+
             <xforms:bind nodeset="/instance">
                 <xforms:bind nodeset="input">
+                    <xforms:bind nodeset="field[../type = 'date']" type="xs:date"/>
+                    <xforms:bind nodeset="field[../type = 'time']" type="xs:time"/>
+                    <xforms:bind nodeset="field[../type = 'date-time']" type="xs:dateTime"/>
                     <xforms:bind nodeset="copy" calculate="context()/field"/>
                     <xforms:bind nodeset="time" type="xs:time"/>
                     <xforms:bind nodeset="date" type="xs:date"/>
                     <xforms:bind nodeset="date-time" type="xs:dateTime"/>
                 </xforms:bind>
             </xforms:bind>
+
+            <!-- Restore initial instance, used between tests -->
+            <xforms:action ev:event="restore-instance">
+                <xforms:insert nodeset="instance('instance')" origin="instance('initial-instance')"/>
+            </xforms:action>
+
+            <xforms:action ev:event="xforms-model-construct-done">
+                <xforms:dispatch name="restore-instance" target="main-model"/>
+            </xforms:action>
+
+
         </xforms:model>
         <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
         <xhtml:style type="text/css">
@@ -62,6 +84,12 @@
                 <xhtml:h1>xforms:input</xhtml:h1>
                 <xforms:input ref="type" id="input-type">
                     <xforms:label>type</xforms:label>
+                    <xforms:action ev:event="xforms-value-changed">
+                        <xforms:rebuild/>
+                        <xforms:recalculate/>
+                        <xforms:revalidate/>
+                        <xforms:refresh/>
+                    </xforms:action>
                 </xforms:input>
                 <xforms:input ref="field" id="input-field">
                     <xforms:label>field</xforms:label>
@@ -77,5 +105,6 @@
                 </xforms:input>
             </xforms:group>
         </xforms:group>
+        <!--<widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>-->
     </xhtml:body>
 </xhtml:html>

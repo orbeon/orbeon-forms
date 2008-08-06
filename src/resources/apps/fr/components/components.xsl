@@ -36,8 +36,11 @@
     <xsl:import href="section.xsl"/>
 
     <!-- Global variables -->
+    <xsl:variable name="app" select="doc('input:instance')/*/app" as="xs:string"/>
+    <xsl:variable name="form" select="doc('input:instance')/*/form" as="xs:string"/>
+    <xsl:variable name="mode" select="doc('input:instance')/*/mode" as="xs:string?"/>
     <xsl:variable name="is-detail" select="doc('input:instance')/*/mode != ''" as="xs:boolean"/>
-    <xsl:variable name="is-form-builder" select="doc('input:instance')/*/app = 'orbeon' and doc('input:instance')/*/form = 'builder'" as="xs:boolean"/>
+    <xsl:variable name="is-form-builder" select="$app = 'orbeon' and $form = 'builder'" as="xs:boolean"/>
     <xsl:variable name="is-noscript" select="not($is-form-builder) and doc('input:request')/request/parameters/parameter[name = 'fr-noscript']/value = 'true'"/>
 
     <!-- Properties -->
@@ -50,7 +53,7 @@
     <xsl:variable name="has-button-clear" select="pipeline:property('oxf.fr.detail.button.clear') = 'true'" as="xs:boolean"/>
     <xsl:variable name="has-button-print" select="pipeline:property('oxf.fr.detail.button.print') = 'true'" as="xs:boolean"/>
     <xsl:variable name="has-button-pdf" select="pipeline:property('oxf.fr.detail.button.pdf') = 'true'" as="xs:boolean"/>
-    <xsl:variable name="components-uri" select="pipeline:property('oxf.fb.components.uri.*.*')" as="xs:string?"/>
+    <xsl:variable name="components-uri" select="pipeline:property(string-join(('oxf.fb.components.uri', $app, $form), '.'))" as="xs:string?"/>
 
     <xsl:template match="/xhtml:html/xhtml:body">
         <xsl:copy>
@@ -114,7 +117,7 @@
         <!-- This model handles form sections -->
         <xforms:model id="fr-sections-model"
                       xxforms:external-events="fr-after-collapse {@xxforms:external-events}"
-                      xxforms:readonly-appearance="{if (doc('input:instance')/*/mode = ('view', 'print', 'pdf')) then 'static' else 'dynamic'}"
+                      xxforms:readonly-appearance="{if ($mode = ('view', 'print', 'pdf')) then 'static' else 'dynamic'}"
                       xxforms:order="help label control alert hint"
                       xxforms:computed-binds="recalculate"
                       xxforms:offline="false"

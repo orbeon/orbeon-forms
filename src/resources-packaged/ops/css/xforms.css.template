@@ -116,9 +116,22 @@
     cursor: hand;
 }
 
-input.xforms-type-date { width: 6em }
-input.xforms-type-time { width: 6em }
-.xforms-type-dateTime .xforms-type-date { margin-right: .5em }
+.xforms-input input.xforms-type-date {
+    width: 8em;
+    padding-right: 16px;
+    background-image: url(../../ops/images/xforms/calendar.png);
+    background-position: right center;
+    background-repeat: no-repeat;
+}
+.xforms-input input.xforms-type-time {
+    width: 8em;
+    padding-right: 16px;
+    background-image: url(../../ops/images/xforms/clock.png);
+    background-position: right center;
+    background-repeat: no-repeat;
+}
+.xforms-type-dateTime input.xforms-type-date { margin-right: 1em }
+
 
 .xforms-input input {
     -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
@@ -224,7 +237,7 @@ html body .xforms-form .xforms-repeat-template {
     position: absolute;
     -moz-opacity: 0.5;
     opacity: 0.5;
-    filter:alpha(opacity=50);
+    *filter: alpha(opacity=50);
     border: 1px solid red;
     font-size: 11px;
 }

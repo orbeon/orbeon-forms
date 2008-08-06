@@ -29,30 +29,16 @@
         <p:input name="config" transform="oxf:unsafe-xslt" href="#instance">
             <config xsl:version="2.0">
 
-                <xsl:variable name="prefix" select="'oxf.fr.persistence.app'" as="xs:string"/>
-                <xsl:variable name="app" select="/*/app" as="xs:string"/>
-                <xsl:variable name="form" select="/*/form" as="xs:string"/>
                 <!-- /*/document is available e.g. when editing or viewing a document -->
                 <xsl:variable name="document" select="/*/document" as="xs:string"/>
-                <xsl:variable name="suffix" select="'uri'" as="xs:string"/>
 
-                <!-- List of properties from specific to generic -->
-                <xsl:variable name="names"
-                                  select="(string-join(($prefix, $app, $form, 'form', $suffix), '.'),
-                                           string-join(($prefix, $app, $form, $suffix), '.'),
-                                           string-join(($prefix, $app, $suffix), '.'),
-                                           string-join(($prefix, '*', $suffix), '.'))" as="xs:string+"/>
-
-                <!-- Find all values -->
-                <xsl:variable name="values" select="for $name in $names return pipeline:property($name)" as="xs:string*"/>
-
-                <!-- Create URI with first non-empty value -->
+                <!-- Create URI based on properties -->
                 <xsl:variable name="resource"
                               select="concat(pipeline:property('oxf.fr.appserver.uri'),
-                                        $values[normalize-space() != ''][1], '/crud/', /*/app, '/', /*/form, '/form/form.xhtml',
+                                        pipeline:property(string-join(('oxf.fr.persistence.app.uri', /*/app, /*/form, 'form'), '.')),
+                                        '/crud/', /*/app, '/', /*/form, '/form/form.xhtml',
                                         if ($document != '') then concat('?document=', $document) else '')" as="xs:string"/>
                 <url>
-                    <xsl:message>Resource: <xsl:copy-of select="$resource"/></xsl:message>
                     <xsl:value-of select="pipeline:rewriteResourceURI($resource, true())"/>
                 </url>
                 <!-- Forward the same headers that the XForms engine forwards -->

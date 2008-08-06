@@ -23,6 +23,9 @@ import java.net.URI;
 
 /**
  * Represent a set of properties.
+ *
+ * A property name can be exact, e.g. foo.bar.gaga, or it can contain wildcards, like ".*.bar.gaga", "foo.*.gaga", or
+ * "foo.bar.*", or "*.bar.*", etc.
  */
 public class PropertySet {
 
@@ -30,13 +33,19 @@ public class PropertySet {
         public final QName type;
         public Object value;
 
-        public TypeValue(final QName typ, final Object val) {
+        public TypeValue(final QName typ, final Object value) {
             type = typ;
-            value = val;
+            this.value = value;
         }
     }
 
-    private Map properties = new HashMap();
+    private static class PropertyNode {
+        public TypeValue typeValue;
+        public Map children;// Map<String, PropertyNode> of token to property node
+    }
+
+    private Map exactProperties = new HashMap();// Map<String, TypeValue> of property name to typed value
+    private PropertyNode wildcardProperties = new PropertyNode();
 
     /**
      * Return the set of property names.
@@ -44,7 +53,7 @@ public class PropertySet {
      * @return set of property names
      */
     public Set keySet() {
-        return properties.keySet();
+        return exactProperties.keySet();
     }
 
     /**
@@ -53,7 +62,7 @@ public class PropertySet {
      * @return number of properties
      */
     public int size() {
-        return properties.size();
+        return exactProperties.size();
     }
 
     /**
@@ -83,8 +92,34 @@ public class PropertySet {
      * @param stringValue     property string value
      */
     public void setProperty(final Element element, String name, final QName type, String stringValue) {
-        final Object object = PropertyStore.getObject(stringValue, type, element);
-        properties.put(name, new TypeValue(type, object));
+
+        final Object value = PropertyStore.getObjectFromStringValue(stringValue, type, element);
+        final TypeValue typeValue = new TypeValue(type, value);
+
+        // Store exact property name anyway
+        exactProperties.put(name, typeValue);
+
+        if (name.indexOf(".*.") != -1 || name.startsWith("*.") || name.endsWith(".*")) {
+            // Contains wildcards so store tree
+
+            final StringTokenizer st = new StringTokenizer(name, ".");
+            PropertyNode currentNode = wildcardProperties;
+            while (st.hasMoreTokens()) {
+                final String currentToken = st.nextToken();
+                if (currentNode.children == null) {
+                    currentNode.children = new HashMap();
+                }
+                PropertyNode newNode = (PropertyNode) currentNode.children.get(currentToken);
+                if (newNode == null) {
+                    newNode = new PropertyNode();
+                    currentNode.children.put(currentToken, newNode);
+                }
+                currentNode = newNode;
+            }
+
+            // Store value
+            currentNode.typeValue = typeValue;
+        }
     }
 
     /**
@@ -95,12 +130,49 @@ public class PropertySet {
      * @return          property object if found
      */
     private Object getProperty(String name, final QName type) {
-        TypeValue typeValue = (TypeValue) properties.get(name);
-        if (typeValue == null)
-            return null;
+
+        // Try first from exact properties
+        TypeValue typeValue = (TypeValue) exactProperties.get(name);
+        if (typeValue == null) {
+            // If not found try wildcards
+
+            final StringTokenizer st = new StringTokenizer(name, ".");
+            PropertyNode currentNode = wildcardProperties;
+            while (st.hasMoreTokens()) {
+                final String currentToken = st.nextToken();
+                if (currentNode.children == null) {
+                    // Not found
+                    return null;
+                }
+                PropertyNode newNode = (PropertyNode) currentNode.children.get(currentToken);
+                if (newNode == null) {
+                    // Exact value not found, try wildcard
+                    newNode = (PropertyNode) currentNode.children.get("*");
+
+                    if (newNode == null) {
+                        // Not found
+                        return null;
+                    }
+                }
+
+                // Keep going
+                currentNode = newNode;
+            }
+
+            typeValue = currentNode.typeValue;
+
+            if (typeValue == null) {
+                // Not found
+                return null;
+            }
+        }
+
+        // Found a value, check type
         if (type != null && !type.equals(typeValue.type))
             throw new OXFException("Invalid attribute type requested for property '" + name + "': expected "
                     + type.getQualifiedName() + ", found " + typeValue.type.getQualifiedName());
+
+        // Return value
         return typeValue.value;
     }
 

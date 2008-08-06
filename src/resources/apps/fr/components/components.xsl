@@ -23,7 +23,7 @@
         xmlns:xi="http://www.w3.org/2001/XInclude"
         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
         xmlns:ev="http://www.w3.org/2001/xml-events"
-        xmlns:PipelineFunctionLibrary="org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
+        xmlns:pipeline="org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
 
     <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
 
@@ -41,16 +41,16 @@
     <xsl:variable name="is-noscript" select="not($is-form-builder) and doc('input:request')/request/parameters/parameter[name = 'fr-noscript']/value = 'true'"/>
 
     <!-- Properties -->
-    <xsl:variable name="has-toc" select="PipelineFunctionLibrary:property('oxf.fr.detail.toc') = 'true'" as="xs:boolean"/>
-    <xsl:variable name="error-summary" select="PipelineFunctionLibrary:property('oxf.fr.detail.error-summary')" as="xs:string"/>
-    <xsl:variable name="is-noscript-table" select="PipelineFunctionLibrary:property('oxf.fr.detail.noscript.table') = 'false'" as="xs:boolean"/>
-    <xsl:variable name="default-logo-uri" select="PipelineFunctionLibrary:property('oxf.fr.default-logo.uri')" as="xs:string?"/>
-    <xsl:variable name="has-button-save-locally" select="PipelineFunctionLibrary:property('oxf.fr.detail.button.save-locally') = 'true'" as="xs:boolean"/>
-    <xsl:variable name="has-button-close" select="PipelineFunctionLibrary:property('oxf.fr.detail.button.close') = 'true'" as="xs:boolean"/>
-    <xsl:variable name="has-button-clear" select="PipelineFunctionLibrary:property('oxf.fr.detail.button.clear') = 'true'" as="xs:boolean"/>
-    <xsl:variable name="has-button-print" select="PipelineFunctionLibrary:property('oxf.fr.detail.button.print') = 'true'" as="xs:boolean"/>
-    <xsl:variable name="has-button-pdf" select="PipelineFunctionLibrary:property('oxf.fr.detail.button.pdf') = 'true'" as="xs:boolean"/>
-    <xsl:variable name="components-uri" select="PipelineFunctionLibrary:property('oxf.fb.components.uri.*.*')" as="xs:string?"/>
+    <xsl:variable name="has-toc" select="pipeline:property('oxf.fr.detail.toc') = 'true'" as="xs:boolean"/>
+    <xsl:variable name="error-summary" select="pipeline:property('oxf.fr.detail.error-summary')" as="xs:string"/>
+    <xsl:variable name="is-noscript-table" select="pipeline:property('oxf.fr.detail.noscript.table') = 'false'" as="xs:boolean"/>
+    <xsl:variable name="default-logo-uri" select="pipeline:property('oxf.fr.default-logo.uri')" as="xs:string?"/>
+    <xsl:variable name="has-button-save-locally" select="pipeline:property('oxf.fr.detail.button.save-locally') = 'true'" as="xs:boolean"/>
+    <xsl:variable name="has-button-close" select="pipeline:property('oxf.fr.detail.button.close') = 'true'" as="xs:boolean"/>
+    <xsl:variable name="has-button-clear" select="pipeline:property('oxf.fr.detail.button.clear') = 'true'" as="xs:boolean"/>
+    <xsl:variable name="has-button-print" select="pipeline:property('oxf.fr.detail.button.print') = 'true'" as="xs:boolean"/>
+    <xsl:variable name="has-button-pdf" select="pipeline:property('oxf.fr.detail.button.pdf') = 'true'" as="xs:boolean"/>
+    <xsl:variable name="components-uri" select="pipeline:property('oxf.fb.components.uri.*.*')" as="xs:string?"/>
 
     <xsl:template match="/xhtml:html/xhtml:body">
         <xsl:copy>

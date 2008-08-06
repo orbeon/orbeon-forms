@@ -28,32 +28,15 @@
     <!-- Model initialization -->
     <!-- TODO: Should not do this on summary page, for example -->
     <xforms:action ev:event="xforms-model-construct-done">
-        <!-- Initialize URIs based on hierarchy of properties -->
 
-        <!-- TODO: This code must be moved to a function -->
-        <xxforms:variable name="prefix" select="'oxf.fr.persistence.app'"/>
-        <xxforms:variable name="suffix" select="'uri'"/>
-        
-        <xxforms:variable name="properties"
-                          select="(string-join(($prefix, $app, $form, $suffix), '.'),
-                                   string-join(($prefix, $app, $suffix), '.'),
-                                   string-join(($prefix, '*', $suffix), '.'))"/>
+        <!-- Initialize form and data URIs from properties properties -->
+        <xforms:setvalue ref="instance('fr-uris-instance')/form-collection"
+                         value="concat(xxforms:property('oxf.fr.appserver.uri'),
+                                    xxforms:property(string-join(('oxf.fr.persistence.app.uri', $app, $form, 'form'), '.')))"/>
 
-        <xxforms:variable name="form-properties" select="(string-join(($prefix, $app, $form, 'form', $suffix), '.'), $properties)"/>
-
-        <xforms:action xxforms:iterate="$form-properties">
-            <xforms:action if="not(empty(xxforms:property(context()))) and instance('fr-uris-instance')/form-collection = ''">
-                <xforms:setvalue ref="instance('fr-uris-instance')/form-collection" value="xxforms:property(context())"/>
-            </xforms:action>
-        </xforms:action>
-
-        <xxforms:variable name="data-properties" select="(string-join(($prefix, $app, $form, 'data', $suffix), '.'), $properties)"/>
-
-        <xforms:action xxforms:iterate="$data-properties">
-            <xforms:action if="not(empty(xxforms:property(context()))) and instance('fr-uris-instance')/data-collection = ''">
-                <xforms:setvalue ref="instance('fr-uris-instance')/data-collection" value="xxforms:property(context())"/>
-            </xforms:action>
-        </xforms:action>
+        <xforms:setvalue ref="instance('fr-uris-instance')/data-collection"
+                         value="concat(xxforms:property('oxf.fr.appserver.uri'),
+                                    xxforms:property(string-join(('oxf.fr.persistence.app.uri', $app, $form, 'data'), '.')))"/>
 
         <!-- Load current form configuration -->
         <xxforms:variable name="source-form" select="xxforms:get-request-attribute('oxf.fr.form')"/>
@@ -115,34 +98,21 @@
 
     <xforms:submission id="fr-delete-document-submission"
             method="delete" serialization="none"
-            resource="{xxforms:property('oxf.fr.appserver.uri')}{instance('fr-uris-instance')/data-collection}/crud/{$parameters/app}/{$parameters/form}/data/{event('document-id')}/data.xml"
+            resource="{instance('fr-uris-instance')/data-collection}/crud/{$parameters/app}/{$parameters/form}/data/{event('document-id')}/data.xml"
             replace="none"/>
 
     <!-- Publish form operation -->
     <xforms:action ev:event="fr-publish-form">
 
-        <!-- TODO: This code must be moved to a function -->
-        <xxforms:variable name="prefix" select="'oxf.fr.persistence.app'"/>
+        <!-- Determine the URI of the collection to deploy to -->
         <xxforms:variable name="app" select="event('application')"/>
         <xxforms:variable name="form" select="event('form')"/>
-        <xxforms:variable name="suffix" select="'uri'"/>
-
-        <!-- List of properties from specific to generic -->
-        <xxforms:variable name="form-properties"
-                          select="(string-join(($prefix, $app, $form, 'form', $suffix), '.'),
-                                   string-join(($prefix, $app, $form, $suffix), '.'),
-                                   string-join(($prefix, $app, $suffix), '.'),
-                                   string-join(($prefix, '*', $suffix), '.'))"/>
-
-        <!-- Iterate to find property -->
-        <xforms:action xxforms:iterate="$form-properties">
-            <xforms:action if="not(empty(xxforms:property(context()))) and instance('fr-uris-instance')/temp-collection = ''">
-                <xforms:setvalue ref="instance('fr-uris-instance')/temp-collection" value="xxforms:property(context())"/>
-            </xforms:action>
-        </xforms:action>
+        <xxforms:variable name="collection"
+                          select="concat(xxforms:property('oxf.fr.appserver.uri'),
+                                    xxforms:property(string-join(('oxf.fr.persistence.app.uri', $app, $form, 'form'), '.')))"/>
 
         <xforms:send submission="fr-publish-form-submission">
-            <xxforms:context name="collection" select="instance('fr-uris-instance')/temp-collection"/>
+            <xxforms:context name="collection" select="$collection"/>
             <xxforms:context name="application" select="$app"/>
             <xxforms:context name="form" select="$form"/>
         </xforms:send>
@@ -150,7 +120,7 @@
 
     <xforms:submission id="fr-publish-form-submission" xxforms:ensure-uploads="false"
             ref="xxforms:instance('fr-form-instance')" method="put"
-            resource="{xxforms:property('oxf.fr.appserver.uri')}{event('collection')}/crud/{event('application')}/{event('form')}/form/form.xhtml"
+            resource="{event('collection')}/crud/{event('application')}/{event('form')}/form/form.xhtml"
             replace="none">
 
         <!--<xforms:message ev:event="xforms-submit">-->
@@ -261,20 +231,19 @@
         <uris xmlns="">
             <form-collection/>
             <data-collection/>
-            <temp-collection/>
         </uris>
     </xforms:instance>
 
     <xforms:submission id="fr-create-update-submission"
             validate="true" method="put"
             ref="event('holder')" xxforms:ensure-uploads="false"
-            resource="{xxforms:property('oxf.fr.appserver.uri')}{instance('fr-uris-instance')/data-collection}/crud/{$parameters/app}/{$parameters/form}/data/{$parameters/document}/{event('resource')}"
+            resource="{instance('fr-uris-instance')/data-collection}/crud/{$parameters/app}/{$parameters/form}/data/{$parameters/document}/{event('resource')}"
             replace="none"/>
 
     <xforms:submission id="fr-create-update-attachment-submission"
             method="put" serialization="application/octet-stream"
             ref="event('holder')" xxforms:ensure-uploads="false"
-            resource="{xxforms:property('oxf.fr.appserver.uri')}{event('resource')}"
+            resource="{event('resource')}"
             replace="none"/>
 
     <!-- Get document -->
@@ -290,7 +259,7 @@
 
     <xforms:submission id="get-source-form-submission"
         method="get" serialization="none"
-        resource="{xxforms:property('oxf.fr.appserver.uri')}{instance('fr-uris-instance')/form-collection}/crud/{$parameters/app}/{$parameters/form}/form/form.xhtml"
+        resource="{instance('fr-uris-instance')/form-collection}/crud/{$parameters/app}/{$parameters/form}/form/form.xhtml"
         replace="instance" instance="fr-source-form-instance" xxforms:readonly="true" xxforms:xinclude="true">
     </xforms:submission>
 

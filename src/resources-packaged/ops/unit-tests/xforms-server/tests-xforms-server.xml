@@ -601,25 +601,25 @@
                                     <xforms:action ev:event="DOMActivate">
                                         <xforms:insert nodeset="../department" at="2" position="after"/>
                                     </xforms:action>
-                                    <tr>
-                                        <td>
-                                            <table>
+                                    <xhtml:tr>
+                                        <xhtml:td>
+                                            <xhtml:table>
                                                 <xforms:repeat nodeset="employee" id="id124" startindex="2">
                                                     <xforms:action ev:event="DOMActivate">
                                                         <xforms:insert nodeset="../../department[index('id123')]/employee" at="2" position="after"/>
                                                     </xforms:action>
-                                                    <tr>
-                                                        <td>
+                                                    <xhtml:tr>
+                                                        <xhtml:td>
                                                             <xforms:output ref="@first" id="id125"/>
-                                                        </td>
-                                                        <td>
+                                                        </xhtml:td>
+                                                        <xhtml:td>
                                                             <xforms:output ref="@last" id="id126"/>
-                                                        </td>
-                                                    </tr>
+                                                        </xhtml:td>
+                                                    </xhtml:tr>
                                                 </xforms:repeat>
-                                            </table>
-                                        </td>
-                                    </tr>
+                                            </xhtml:table>
+                                        </xhtml:td>
+                                    </xhtml:tr>
                                 </xforms:repeat>
                             </xhtml:body>
                         </xhtml:html>

@@ -91,10 +91,10 @@
     <property as="xs:string"  name="oxf.xforms.datepicker"                           value="jscalendar"/>  <!-- jcalendar or yui -->
 
     <!-- Form Runner / Form Builder properties -->
-    <property as="xs:anyURI"  name="oxf.fr.persistence.app.*.uri"                    value="/fr/service/exist"/>
-    <property as="xs:anyURI"  name="oxf.fr.persistence.app.orbeon.builder.form.uri"  value="/fr/service/resource"/>
-    <property as="xs:anyURI"  name="oxf.fr.persistence.app.orbeon.bookcast.form.uri" value="/fr/service/resource"/>
-
+    <property as="xs:anyURI"  name="oxf.fr.persistence.app.uri.*.*.*"                value="/fr/service/exist"/>
+    <property as="xs:anyURI"  name="oxf.fr.persistence.app.uri.orbeon.builder.form"  value="/fr/service/resource"/>
+    <property as="xs:anyURI"  name="oxf.fr.persistence.app.uri.orbeon.bookcast.form" value="/fr/service/resource"/>
+    
     <property as="xs:anyURI"  name="oxf.fr.persistence.service.exist.uri"            value="/exist/rest/db"/>
     <property as="xs:anyURI"  name="oxf.fr.appserver.uri"                            value=""/>
     <property as="xs:string"  name="oxf.fr.default-language"                         value="en"/>

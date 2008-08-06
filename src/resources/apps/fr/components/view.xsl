@@ -23,7 +23,7 @@
         xmlns:xi="http://www.w3.org/2001/XInclude"
         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
         xmlns:ev="http://www.w3.org/2001/xml-events"
-        xmlns:PipelineFunctionLibrary="org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
+        xmlns:pipeline="org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
 
     <xsl:template match="xhtml:body//fr:view">
 
@@ -123,7 +123,7 @@
                                                 <xhtml:tr>
                                                     <xhtml:td rowspan="2">
                                                         <xsl:if test="normalize-space($default-logo-uri) != ''">
-                                                            <xforms:output value="((instance('fr-form-metadata')/logo, concat(PipelineFunctionLibrary:property('oxf.fr.appserver.uri'), '{$default-logo-uri}'))[normalize-space() != ''])[1]" mediatype="image/*"/>
+                                                            <xforms:output value="((instance('fr-form-metadata')/logo, concat(pipeline:property('oxf.fr.appserver.uri'), '{$default-logo-uri}'))[normalize-space() != ''])[1]" mediatype="image/*"/>
                                                         </xsl:if>
                                                     </xhtml:td>
                                                     <xhtml:td>

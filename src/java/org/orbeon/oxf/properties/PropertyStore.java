@@ -53,9 +53,17 @@ public class PropertyStore {
         SUPPORTED_TYPES.put(XMLConstants.XS_NONNEGATIVEINTEGER_QNAME, new NonNegativeIntegerConverter());
     }
 
-    public static Object getObject(final String value, final QName type, final Element element) {
+    /**
+     * Convert a property's string value to an object.
+     *
+     * @param stringValue   string value
+     * @param type          type
+     * @param element       Element on which the property is defined. Used for QName resolution if needed.
+     * @return              object, or null
+     */
+    public static Object getObjectFromStringValue(final String stringValue, final QName type, final Element element) {
         final Converter converter = (Converter) SUPPORTED_TYPES.get(type);
-        return (converter == null) ? null : converter.convert(value, element);
+        return (converter == null) ? null : converter.convert(stringValue, element);
     }
 
     /**

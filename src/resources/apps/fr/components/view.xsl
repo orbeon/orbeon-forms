@@ -111,7 +111,7 @@
                             <!--<xforms:output value="string-join(($source-form-metadata/description[@xml:lang = $metadata-lang], $source-form-metadata/description[1]), ' - ')"/>-->
                             <!--xxx-->
                             <!--<xforms:output value="string-join($source-form-metadata/(description[@xml:lang = $metadata-lang], description[1]), ' - ')"/>-->
-                            <xhtml:div class="yui-g fr-logo">
+                            <xhtml:div class="yui-g fr-metadata">
                                 <xsl:choose>
                                     <!-- If custom logo section is provided, use that -->
                                     <xsl:when test="fr:logo">
@@ -123,11 +123,11 @@
                                                 <xhtml:tr>
                                                     <xhtml:td rowspan="2">
                                                         <xsl:if test="normalize-space($default-logo-uri) != ''">
-                                                            <xforms:output value="((instance('fr-form-metadata')/logo, concat(pipeline:property('oxf.fr.appserver.uri'), '{$default-logo-uri}'))[normalize-space() != ''])[1]" mediatype="image/*"/>
+                                                            <xforms:output class="fr-logo" value="((instance('fr-form-metadata')/logo, concat(pipeline:property('oxf.fr.appserver.uri'), '{$default-logo-uri}'))[normalize-space() != ''])[1]" mediatype="image/*"/>
                                                         </xsl:if>
                                                     </xhtml:td>
                                                     <xhtml:td>
-                                                        <xhtml:h1>
+                                                        <xhtml:h1 class="fr-form-title">
                                                             <xforms:output value="$title"/>
                                                         </xhtml:h1>
                                                     </xhtml:td>

@@ -12,12 +12,6 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 */
 
-/* IE 6 HACK: bind behavior from iepngfix.htc */
-/*img.xforms-help-image, img.xforms-showcalendar, label.xforms-alert-active  {*/
-    /* Absolute path is rewritten in combined resources mode only */
-    /*behavior: url(/ops/javascript/iepngfix.htc)*/
-/*}*/
-
 .xforms-output {
     display: inline;
 }

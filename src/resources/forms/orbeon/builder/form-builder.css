@@ -1,4 +1,16 @@
-/*body { background-image: url(../../../forms/orbeon/builder/images/background.png); background-repeat: repeat; }*/
+/*
+    Copyright (C) 2008 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+*/
 
 #fr-view { margin-left: 15.5em; *margin-left: 15.126 }/* because the toolbox is on the left */
 /*.yui-t2 #yui-main .yui-b { margin-left: 13.8456em; *margin-left: 13.4995; border-left: 1px solid #ccc }*/
@@ -284,7 +296,7 @@ a.xforms-help-image .fb-control-help { vertical-align: baseline; }
 
 /* Grid content */
 .fb-grid-td .fb-grid-content { *overflow: hidden }/* IE HACK so that scrollable images work in the table - but beware it causes clipping of inside content */
-.fb-grid-td .fb-grid-content { float: left; width: 64.8em; *width: 63.5em }
+.fb-grid-td .fb-grid-content { float: left; width: 64.6em; *width: 63.5em }
 
 .fb-control-control { *padding-right: 6px }/* To help IE move back controls within .fb-grid-content */
 .fb-control-control { margin-top: .3em }
@@ -315,7 +327,7 @@ a.xforms-help-image .fb-control-help { vertical-align: baseline; }
 .fb-grid-2-columns .fb-grid-td .fb-grid-content { width: 30.5em; *width: 29.8em }
 
 .fb-grid-3-columns .fb-grid-td { width: 33.3%; }
-.fb-grid-3-columns .fb-grid-td .fb-grid-content { width: 19.5em; *width: 19em }
+.fb-grid-3-columns .fb-grid-td .fb-grid-content { width: 19.4em; *width: 19em }
 
 .fb-grid-4-columns .fb-grid-td { width: 25%; }
 .fb-grid-4-columns .fb-grid-td .fb-grid-content { width: 13.8em; *width: 13.4em }

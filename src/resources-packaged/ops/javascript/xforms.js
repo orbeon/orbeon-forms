@@ -750,16 +750,16 @@ ORBEON.util.DateTime = {
             handler: function(bits) {
                 var d = new Date();
                 d.setDate(parseInt(bits[1], 10));
-                d.setMonth(parseMonth(bits[2]));
+                d.setMonth(ORBEON.util.DateTime._parseMonth(bits[2]));
                 return d;
             }
         },
         // 4th Jan 2003
-        {   re: /^(\d{1,2})(?:st|nd|rd|th)? (\w+),? (\d{4})$/i,
+        {   re: /^(\d{1,2})(?:st|nd|rd|th)? (\w+),? (\d{2,4})$/i,
             handler: function(bits) {
                 var d = new Date();
                 d.setDate(parseInt(bits[1], 10));
-                d.setMonth(parseMonth(bits[2]));
+                d.setMonth(ORBEON.util.DateTime._parseMonth(bits[2]));
                 d.setYear(bits[3]);
                 return d;
             }
@@ -769,16 +769,16 @@ ORBEON.util.DateTime = {
             handler: function(bits) {
                 var d = new Date();
                 d.setDate(parseInt(bits[2], 10));
-                d.setMonth(parseMonth(bits[1]));
+                d.setMonth(ORBEON.util.DateTime._parseMonth(bits[1]));
                 return d;
             }
         },
         // Jan 4th 2003
-        {   re: /^(\w+) (\d{1,2})(?:st|nd|rd|th)?,? (\d{4})$/i,
+        {   re: /^(\w+) (\d{1,2})(?:st|nd|rd|th)?,? (\d{2,4})$/i,
             handler: function(bits) {
                 var d = new Date();
                 d.setDate(parseInt(bits[2], 10));
-                d.setMonth(parseMonth(bits[1]));
+                d.setMonth(ORBEON.util.DateTime._parseMonth(bits[1]));
                 d.setYear(bits[3]);
                 return d;
             }
@@ -788,7 +788,7 @@ ORBEON.util.DateTime = {
             handler: function(bits) {
                 var d = new Date();
                 var day = d.getDay();
-                var newDay = parseWeekday(bits[1]);
+                var newDay = ORBEON.util.DateTime._parseWeekday(bits[1]);
                 var addDays = newDay - day;
                 if (newDay <= day) {
                     addDays += 7;
@@ -804,7 +804,7 @@ ORBEON.util.DateTime = {
             }
         },
         // mm/dd/yyyy (American style)
-        {   re: /(\d{1,2})\/(\d{1,2})\/(\d{4})/,
+        {   re: /^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/,
             handler: function(bits) {
                 var d = new Date();
                 d.setYear(bits[3]);
@@ -823,7 +823,7 @@ ORBEON.util.DateTime = {
             }
         },
         // yyyy-mm-dd (ISO style)
-        {   re: /(\d{4})-(\d{1,2})-(\d{1,2})/,
+        {   re: /(\d{2,4})-(\d{1,2})-(\d{1,2})/,
             handler: function(bits) {
                 var d = new Date();
                 d.setYear(parseInt(bits[1]));
@@ -851,6 +851,40 @@ ORBEON.util.DateTime = {
         } else {
             return s;
         }
+    },
+
+    _monthNames: "January February March April May June July August September October November December".split(" "),
+    _weekdayNames: "Sunday Monday Tuesday Wednesday Thursday Friday Saturday".split(" "),
+
+    /**
+     *  Takes a string, returns the index of the month matching that string, throws
+     *  an error if 0 or more than 1 matches
+     */
+    _parseMonth: function(month) {
+        var matches = ORBEON.util.DateTime._monthNames.filter(function(item) {
+            return new RegExp("^" + month, "i").test(item);
+        });
+        if (matches.length == 0) {
+            throw new Error("Invalid month string");
+        }
+        if (matches.length > 1) {
+            throw new Error("Ambiguous month");
+        }
+        return ORBEON.util.DateTime._monthNames.indexOf(matches[0]);
+    },
+
+    /* Same as parseMonth but for days of the week */
+    _parseWeekday: function(weekday) {
+        var matches = ORBEON.util.DateTime._weekdayNames.filter(function(item) {
+            return new RegExp("^" + weekday, "i").test(item);
+        });
+        if (matches.length == 0) {
+            throw new Error("Invalid day string");
+        }
+        if (matches.length > 1) {
+            throw new Error("Ambiguous weekday");
+        }
+        return ORBEON.util.DateTime._weekdayNames.indexOf(matches[0]);
     }
 }
 

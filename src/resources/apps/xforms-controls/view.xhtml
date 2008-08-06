@@ -82,6 +82,8 @@
                                       else false()"
                                       readonly="false()"
                                       calculate="if (. = '') then adjust-date-to-timezone(current-date(), ()) else ."/>
+                <xforms:bind nodeset="time" type="xs:time" calculate="if (. = '') then current-time() else ." readonly="false()"/>
+                <xforms:bind nodeset="date-time" type="xs:dateTime" calculate="if (. = '') then current-dateTime() else ." readonly="false()"/>
                 <!--<xforms:bind nodeset="time" type="xs:time"/>-->
                 <xforms:bind nodeset="range/value" type="xs:integer"/>
                 <xforms:bind nodeset="range/letter" calculate="
@@ -140,17 +142,17 @@
                 <xhtml:p>
                     <xforms:input ref="date" navindex="4" class="datafield">
                         <xforms:label class="fixed-width">Date:</xforms:label>
-                    <xforms:help>
-                        <div>
-                            <p>
-                                This field must contain:
-                            </p>
-                            <ul>
-                                <li>a valid date</li>
-                                <li>which is at most one day in the future</li>
-                            </ul>
-                        </div>
-                    </xforms:help>
+                        <xforms:help>
+                            <div>
+                                <p>
+                                    This field must contain:
+                                </p>
+                                <ul>
+                                    <li>a valid date</li>
+                                    <li>which is at most one day in the future</li>
+                                </ul>
+                            </div>
+                        </xforms:help>
                     </xforms:input>
                 </xhtml:p>
                 <xhtml:p>
@@ -164,6 +166,16 @@
                         <xforms:label class="fixed-width">Date (in French):</xforms:label>
                     <xforms:help><xforms:output mediatype="text/html" value="xxforms:serialize(instance('resources-instance')/help/date/output/french/*, 'html')"/></xforms:help>
                     </xforms:output>
+                </xhtml:p>
+                <xhtml:p>
+                    <xforms:input ref="time" tabindex="5">
+                        <xforms:label class="fixed-width">Time:</xforms:label>
+                    </xforms:input>
+                </xhtml:p>
+                <xhtml:p>
+                    <xforms:input ref="date-time" tabindex="6">
+                        <xforms:label class="fixed-width">Date-time:</xforms:label>
+                    </xforms:input>
                 </xhtml:p>
             </widget:tab>
             <widget:tab id="selection-controls">

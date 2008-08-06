@@ -162,7 +162,7 @@
                     </xforms:output>
                 </xhtml:p>
                 <xhtml:p>
-                    <xforms:output ref="date" xxforms:format="format-date(xs:date(.), '[FNn], le [D] [MNn] [Y]', 'fr', (), ())">
+                    <xforms:output ref="date" xxforms:format="if (. castable as xs:date) then format-date(xs:date(.), '[FNn], le [D] [MNn] [Y]', 'fr', (), ()) else ()">
                         <xforms:label class="fixed-width">Date (in French):</xforms:label>
                     <xforms:help><xforms:output mediatype="text/html" value="xxforms:serialize(instance('resources-instance')/help/date/output/french/*, 'html')"/></xforms:help>
                     </xforms:output>

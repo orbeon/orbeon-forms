@@ -23,54 +23,103 @@
         <section>
             <title>Overview</title>
             <ul>
-                <li><p>
-                    <b>Rationale</b> – The Orbeon Forms properties are used by some processors to configure
-                    or customize their behavior. This section describes how the system is
-                    configured, and lists all the customizable properties.
-                </p></li>
-                <li><p>
-                    <b>Properties File Location</b> – The properties sub-system is initialized after
-                    the <link href="reference-resource-managers">Resource Manager</link> (the
-                    properties being read like any other Orbeon Forms resources). By default
-                    it tries to load a file from the URL <code>oxf:/properties.xml</code>. This
-                    value can be overridden in the Web application descriptor <code>web.xmxl</code>
-                    with the <code>oxf.properties</code> initialization parameter:
+                <li>
+                    <p>
+                        <b>Rationale</b> – The Orbeon Forms properties are used by some processors to configure or
+                        customize their behavior. This section describes how the system is configured, and lists all the
+                        customizable properties.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>Properties File Location</b> – The properties sub-system is initialized after the <link
+                        href="reference-resource-managers">Resource Manager</link> (the properties being read like any
+                        other Orbeon Forms resources). By default it tries to load a file from the
+                        URL<code>oxf:/properties.xml</code>. This value can be overridden in the Web application
+                        descriptor <code>web.xmxl</code> with the <code>oxf.properties</code> initialization parameter:
 
+                        <xml-source>
+                            <context-param>
+                                <param-name>oxf.properties</param-name>
+                                <param-value>oxf:/config/properties.xml</param-value>
+                            </context-param>
+                        </xml-source>
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>Automatic Reloading</b> – The property file is reloaded every time it is changed (after a
+                        short delay), however some properties are taken into account only when the server is first
+                        started.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>Property types</b> – Properties have a type, which must be one of the following XML Schema
+                        simple types:<code>xs:anyURI</code>, <code>xs:integer</code>, <code>xs:boolean</code>,
+                        <code>xs:QName</code>, <code>xs:string</code>, <code>xs:date</code>, <code>xs:dateTime</code>.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>Global and Processor Properties</b> – There are two types of properties: global properties
+                        that apply to the system as a whole, and processor-specific properties. For instance, you set
+                        the cache size with a global property:
+
+                        <xml-source>
+                            <property as="xs:integer" name="oxf.cache.size" value="200"/>
+                        </xml-source>
+
+                        On the other hand setting the maximum amount of bytes that can be uploaded to the server is set
+                        with a processor specific property. Note the additional <code>processor-name</code> attribute:
+
+                        <xml-source>
+                            <property as="xs:integer" processor-name="oxf:request" name="max-upload-size" value="100000000"/>
+                        </xml-source>
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>Wildcards</b> – Property names may be defined using wildcards. A property name is assumed to
+                        be built as a series of path elements separated by <code>.</code> characters. A path element
+                        may contain a <code>*</code> character instead of an actual path element value.
+                    </p>
                     <xml-source>
-                        <context-param>
-                            <param-name>oxf.properties</param-name>
-                            <param-value>oxf:/config/properties.xml</param-value>
-                        </context-param>
+                        <property as="xs:anyURI"  name="oxf.fr.persistence.app.uri.*.*.*"                value="/fr/service/exist"/>
+                        <property as="xs:anyURI"  name="oxf.fr.persistence.app.uri.*.*.data"             value="/fr/service/oracle"/>
+                        <property as="xs:anyURI"  name="oxf.fr.persistence.app.uri.orbeon.builder.form"  value="/fr/service/resource"/>
                     </xml-source>
-                </p></li>
-                <li><p>
-                    <b>Automatic Reloading</b> – The property file is reloaded every time it is
-                    changed, however some properties are taken into account only when the server is
-                    first started.
-                </p></li>
-                <li><p>
-                    <b>Property types</b> – Properties have a type, which must be one of the
-                    following XML Schema simple types: <code>xs:anyURI</code>,
-                    <code>xs:integer</code>, <code>xs:boolean</code>, <code>xs:QName</code>,
-                    <code>xs:string</code>, <code>xs:date</code>, <code>xs:dateTime</code>.
-                </p></li>
-                <li><p>
-                    <b>Global and Processor Properties</b> – There are two types of properties:
-                    global properties that apply to the system as a whole, and processor-specific
-                    properties. For instance, you set the cache size with a global property:
-
-                    <xml-source>
-                        <property as="xs:integer" name="oxf.cache.size" value="200"/>
-                    </xml-source>
-
-                    On the other hand setting the maximum amount of bytes that can be uploaded to
-                    the server is set with a processor specific property. Note the additional
-                    <code>processor-name</code> attribute:
-
-                    <xml-source>
-                        <property as="xs:integer" processor-name="oxf:request" name="max-upload-size"  value="100000000"/>
-                    </xml-source>
-                </p></li>
+                    <p>
+                        In this example:
+                    </p>
+                    <ul>
+                        <li>
+                            <p>
+                                If the property name <code>oxf.fr.persistence.app.uri.orbeon.builder.form</code> is
+                                requested, the value <code>/fr/service/resource</code> is returned (exact match).
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                If the property name <code>oxf.fr.persistence.app.uri.orbeon.foobar.data</code> is
+                                requested, the value <code>/fr/service/oracle</code> is returned, because the path
+                                elements <code>orbeon</code>, <code>foobar</code> match wildcards, and <code>data</code>
+                                matches the last path element.
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                If the property name <code>oxf.fr.persistence.app.uri.orbeon.foobar.form</code> is
+                                requested, the value <code>/fr/service/exist</code> is returned, because the path
+                                elements <code>orbeon</code>, <code>foobar</code> and <code>form</code> all match
+                                wildcards.
+                            </p>
+                        </li>
+                    </ul>
+                    <p>
+                        This allows creating hierarchical properties with generic defaults and more specific values.
+                    </p>
+                </li>
             </ul>
         </section>
         <section>

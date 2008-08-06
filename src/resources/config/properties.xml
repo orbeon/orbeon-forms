@@ -94,8 +94,11 @@
     <property as="xs:anyURI"  name="oxf.fr.persistence.app.uri.*.*.*"                value="/fr/service/exist"/>
     <property as="xs:anyURI"  name="oxf.fr.persistence.app.uri.orbeon.builder.form"  value="/fr/service/resource"/>
     <property as="xs:anyURI"  name="oxf.fr.persistence.app.uri.orbeon.bookcast.form" value="/fr/service/resource"/>
+    <!--<property as="xs:anyURI"  name="oxf.fr.persistence.app.orbeon.bookcast.data.uri" value="/fr/service/oracle"/>-->
     
     <property as="xs:anyURI"  name="oxf.fr.persistence.service.exist.uri"            value="/exist/rest/db"/>
+    <property as="xs:anyURI " name="oxf.fr.persistence.service.oracle.datasource"    value="oracle"/>
+
     <property as="xs:anyURI"  name="oxf.fr.appserver.uri"                            value=""/>
     <property as="xs:string"  name="oxf.fr.default-language"                         value="en"/>
     <property as="xs:anyURI"  name="oxf.fr.default-logo.uri"                         value="/apps/fr/style/orbeon-logo-trimmed-transparent-42.png"/>

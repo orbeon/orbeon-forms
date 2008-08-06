@@ -1,0 +1,61 @@
+/*
+    Copyright (C) 2008 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+*/
+
+/* ************************************************** Summary Page ************************************************** */
+
+.fr-summary-repeat-column-number { text-align: right; width: 3em }
+
+.fr-summary-search .xforms-label {
+    display: block;     /* So control is not displayed next to the help icon but on a new line */
+    /*margin-top: 0.3em;  *//* Insert some space between the label / help and the control */
+    /*clear: both;*/
+}
+
+.fr-summary-table tbody .xforms-repeat-selected-item-1 { background-image: url(logo-bg.gif) }
+.fr-summary-table tbody .xforms-repeat-selected-item-2 { background-image: url(logo-bg.gif) }/* HACK for IE 7 only */
+.fr-summary-table tbody tr:hover { background-image: url(logo-bg.gif) }
+
+.fr-summary-table .xforms-label { display: none }
+.fr-summary-table, .fr-summary-table td, .fr-summary-table th { border: 1px solid #600 }
+.fr-summary-table th { background-color: #f8f8f8 }
+.fr-summary-table td, .fr-summary-table th { padding: 4px }
+
+.fr-summary-table {
+    margin: 1px 0 0 1px;
+    border-collapse: collapse;
+    width: 100%
+}
+
+.fr-summary-welcome-message { display: block; margin-top: .5em; margin-bottom: .5em; clear: both }
+.fr-summary-search-count {  display: block; margin-top: 1em; margin-bottom: 1em }
+
+.fr-summary-search { display: block; margin-bottom: .5em }
+.fr-summary-search-item { float: left; margin-right: .5em }
+
+.fr-summary-body { display: block; padding: 10px }
+
+.fr-paging-buttons { padding-top: .5em }
+.fr-paging-buttons button { vertical-align: middle }
+.fr-paging-buttons button img { margin: 0 } /* as other buttons set an img margin */
+.fr-paging-numbers { vertical-align: middle; margin-left: .5em; margin-right: .5em }
+
+.fr-search-input input {
+    background-image: url(search.gif);
+    background-position: right center;
+    background-repeat: no-repeat;
+    padding-right: 16px;
+}
+
+/* Controls added just to expose instance nodes to JavaScript */
+.fr-expose-to-javascript { display: none }

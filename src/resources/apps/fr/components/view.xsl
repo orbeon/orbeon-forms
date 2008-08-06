@@ -37,7 +37,7 @@
                     <xsl:if test="not(doc('input:instance')/*/mode = ('print', 'pdf'))">
                         <!-- Switch script/noscript -->
                         <xsl:if test="not($is-form-builder)">
-                            <xhtml:div class="fr-summary-noscript-choice" style="float: left">
+                            <xhtml:div class="fr-noscript-choice" style="float: left">
                                 <xforms:group ref=".[not(property('xxforms:noscript'))]">
                                     <xhtml:a title="{{$fr-resources/summary/titles/refresh}}" href="?fr-noscript=true"><xforms:output value="$fr-resources/summary/labels/noscript"/></xhtml:a>
                                     <!--<xhtml:img class="fr-noscript-icon" width="16" height="16" src="/apps/fr/style/images/silk/script_delete.png" alt="Noscript Mode" title="Noscript Mode"/>-->
@@ -48,7 +48,7 @@
                             </xhtml:div>
                         </xsl:if>
                         <!-- Switch language -->
-                        <xhtml:div class="fr-summary-language-choice">
+                        <xhtml:div class="fr-language-choice">
                             <xxforms:variable name="default-language"
                                               select="xxforms:property('oxf.fr.default-language')" as="xs:string"/>
                             <!-- Put default language first, then other languages -->
@@ -416,3 +416,5 @@
     </xsl:template>
 
 </xsl:stylesheet>
+
+        

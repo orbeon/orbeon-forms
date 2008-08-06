@@ -96,6 +96,29 @@
         </xhtml:html>
     </xsl:template>
 
+    <!-- Insert stylesheets -->
+    <xsl:template match="xhtml:head">
+        <xsl:copy>
+            <xsl:apply-templates select="@*"/>
+
+            <!-- Form Runner CSS stylesheets -->
+            <xhtml:link rel="stylesheet" href="/ops/css/yui/reset-fonts-grids.css" type="text/css"/>
+            <xhtml:link rel="stylesheet" href="/ops/css/yui/base-min.css" type="text/css"/>
+            <xhtml:link rel="stylesheet" href="/apps/fr/style/form-runner-base.css" type="text/css"/>
+            <xhtml:link rel="stylesheet" href="/apps/fr/style/form-runner.css" type="text/css"/>
+
+            <!-- Handle existing stylesheets -->
+            <xsl:for-each select="xhtml:link | xhtml:style">
+                <xsl:element name="xhtml:{local-name()}" namespace="{namespace-uri()}">
+                    <xsl:apply-templates select="@*|node()"/>
+                </xsl:element>
+            </xsl:for-each>
+
+            <!-- Process the rest -->
+            <xsl:apply-templates select="node() except (xhtml:link | xhtml:style)"/>
+        </xsl:copy>
+    </xsl:template>
+
     <!-- Set XHTML title -->
     <xsl:template match="xhtml:head/xhtml:title">
         <xsl:copy>

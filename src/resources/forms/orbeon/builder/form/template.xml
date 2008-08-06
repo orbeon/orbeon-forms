@@ -84,11 +84,11 @@
             </xforms:instance>
 
             <!-- Utility instances for services -->
-            <xforms:instance id="fr-service-request-instance" xxforms:exclude-result-prefixes="#all">
+            <xforms:instance id="fr-service-request-instance" xxforms:exclude-result-prefixes="pipeline #all">
                 <request/>
             </xforms:instance>
 
-            <xforms:instance id="fr-service-response-instance" xxforms:exclude-result-prefixes="#all">
+            <xforms:instance id="fr-service-response-instance" xxforms:exclude-result-prefixes="pipeline #all">
                 <response/>
             </xforms:instance>
 

@@ -366,7 +366,7 @@
         </xforms:bind>
 
         <!-- Template for a given binding -->
-        <xforms:instance id="fb-binding-template" xxforms:readonly="true" xxforms:exclude-result-prefixes="xhtml xsi xi xxi fr fb saxon xbl exforms">
+        <xforms:instance id="fb-binding-template" xxforms:readonly="true" xxforms:exclude-result-prefixes="pipeline xhtml xsi xi xxi fr fb saxon xbl exforms">
             <xforms:action id="" ev:event="fb-dummy-event">
                 <!-- React to event... on control... -->
                 <xforms:action ev:event="" ev:observer="">
@@ -392,7 +392,7 @@
         </xforms:instance>
 
         <!-- Template for actions -->
-        <xforms:instance id="fb-binding-action-template" xxforms:readonly="true" xxforms:exclude-result-prefixes="xhtml xsi xi xxi fr fb saxon xbl exforms">
+        <xforms:instance id="fb-binding-action-template" xxforms:readonly="true" xxforms:exclude-result-prefixes="pipeline xhtml xsi xi xxi fr fb saxon xbl exforms">
             <action>
                 <!-- Set service value -->
                 <xforms:action class="fr-set-service-value-action">

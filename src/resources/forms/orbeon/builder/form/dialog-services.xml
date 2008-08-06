@@ -405,14 +405,14 @@
         </xforms:bind>
 
         <!-- Template for inserting a submission -->
-        <xforms:instance id="fb-submission-template" xxforms:readonly="true" xxforms:exclude-result-prefixes="xhtml xs xsi xi xxi fr fb saxon xbl exforms">
+        <xforms:instance id="fb-submission-template" xxforms:readonly="true" xxforms:exclude-result-prefixes="pipeline xhtml xs xsi xi xxi fr fb saxon xbl exforms">
             <xforms:submission id="" class="fr-service" ref="instance('fr-service-request-instance')"
                                resource="" method="get" serialization="application/xml" mediatype="application/xml"
                                replace="instance" instance="fr-service-response-instance"/>
         </xforms:instance>
 
         <!-- Template for inserting an instance-->
-        <xforms:instance id="fb-instance-template" xxforms:readonly="true" xxforms:exclude-result-prefixes="xhtml xs xsi xi xxi fr fb saxon xbl exforms">
+        <xforms:instance id="fb-instance-template" xxforms:readonly="true" xxforms:exclude-result-prefixes="pipeline xhtml xs xsi xi xxi fr fb saxon xbl exforms">
             <xforms:instance id="" class="fr-service" xxforms:exclude-result-prefixes="#all">
                 <body/>
             </xforms:instance>

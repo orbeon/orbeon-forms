@@ -2116,9 +2116,9 @@ ORBEON.xforms.Events = {
         if (!ORBEON.xforms.Globals.maskFocusEvents) {
             var targetControlElement = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
             if (targetControlElement != null) {
-                if (! YAHOO.lang.isNull(window.calendar)) {
+                // Hide calendar (if one is shown) when going from one field to another 
+                if (! YAHOO.lang.isNull(window.calendar) && ! YAHOO.lang.isUndefined(window.calendar))
                     window.calendar.hide();
-                }
                 if (!ORBEON.util.Dom.hasClass(targetControlElement, "xforms-dialog")) {
                     // This is an event for an XForms control
 

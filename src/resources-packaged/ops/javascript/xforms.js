@@ -813,6 +813,15 @@ ORBEON.util.DateTime = {
                 return d;
             }
         },
+        // mm/dd (American style without year)
+        {   re: /^(\d{1,2})\/(\d{1,2})$/,
+            handler: function(bits) {
+                var d = new Date();
+                d.setDate(parseInt(bits[2], 10));
+                d.setMonth(parseInt(bits[1], 10) - 1); // Because months indexed from 0
+                return d;
+            }
+        },
         // yyyy-mm-dd (ISO style)
         {   re: /(\d{4})-(\d{1,2})-(\d{1,2})/,
             handler: function(bits) {
@@ -1322,17 +1331,22 @@ ORBEON.xforms.Controls = {
             var jsDate = ORBEON.util.DateTime.magicDateToJSDate(newControlValue);
             inputField.value = jsDate == null ? newControlValue : ORBEON.util.DateTime.jsDateToformatDisplayDate(jsDate);
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-type-dateTime")) {
-            var separatorIndex = newControlValue.indexOf("T");
-            // Populate date field
-            var datePartString = newControlValue.substring(0, separatorIndex);
-            var datePartJSDate = ORBEON.util.DateTime.magicDateToJSDate(datePartString);
-            var inputFieldDate = ORBEON.util.Dom.getChildElementByIndex(control, 0);
-            inputFieldDate.value = datePartJSDate == null ? datePartString : ORBEON.util.DateTime.jsDateToformatDisplayDate(datePartJSDate);
-            // Populate time field
-            var timePartString = newControlValue.substring(separatorIndex + 1);
-            var timePartJSDate = ORBEON.util.DateTime.magicTimeToJSDate(timePartString);
-            var inputFieldTime = ORBEON.util.Dom.getChildElementByIndex(control, 1);
-            inputFieldTime.value = timePartJSDate == null ? timePartString : ORBEON.util.DateTime.jsDateToformatDisplayTime(timePartJSDate);
+            // Only update value if different from the one we have. This handle the case where the fields contain invalid 
+            // values with the T letter in them. E.g. aTb/cTd, aTbTcTd sent to server, which we don't know anymore how
+            // to separate into 2 values.
+            if (ORBEON.xforms.Controls.getCurrentValue(control) != newControlValue) {
+                var separatorIndex = newControlValue.indexOf("T");
+                // Populate date field
+                var datePartString = newControlValue.substring(0, separatorIndex);
+                var datePartJSDate = ORBEON.util.DateTime.magicDateToJSDate(datePartString);
+                var inputFieldDate = ORBEON.util.Dom.getChildElementByIndex(control, 0);
+                inputFieldDate.value = datePartJSDate == null ? datePartString : ORBEON.util.DateTime.jsDateToformatDisplayDate(datePartJSDate);
+                // Populate time field
+                var timePartString = newControlValue.substring(separatorIndex + 1);
+                var timePartJSDate = ORBEON.util.DateTime.magicTimeToJSDate(timePartString);
+                var inputFieldTime = ORBEON.util.Dom.getChildElementByIndex(control, 1);
+                inputFieldTime.value = timePartJSDate == null ? timePartString : ORBEON.util.DateTime.jsDateToformatDisplayTime(timePartJSDate);
+            }
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-input") && !ORBEON.util.Dom.hasClass(control, "xforms-type-boolean")) {
             // XForms input
             var inputField = ORBEON.util.Dom.getChildElementByIndex(control, 0);
@@ -4193,7 +4207,7 @@ ORBEON.xforms.Server = {
                                                 ORBEON.util.Dom.addClass(firstInput, "xforms-type-date");
                                                 secondInput = document.createElement("input");
                                                 secondInput.setAttribute("type", "text");
-                                                secondInput.setAttribute("class", "xforms-input-input xforms-type-time");
+                                                secondInput.className = "xforms-input-input xforms-type-time"
                                                 documentElement.appendChild(secondInput);
                                             }
                                         }

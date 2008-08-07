@@ -1,5 +1,5 @@
 <!--
-    Copyright (C) 2005 Orbeon, Inc.
+    Copyright (C) 2007 Orbeon, Inc.
 
     This program is free software; you can redistribute it and/or modify it under the terms of the
     GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -20,23 +20,17 @@
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
     <xhtml:head>
-        <xhtml:title>XForms Submssion Serialize</xhtml:title>
+        <xhtml:title>Submission using POST</xhtml:title>
         <xforms:model>
             <xforms:instance id="instance">
-                <instance/>
+                <dummy/>
             </xforms:instance>
-            <xforms:submission id="get" method="get" serialization="none" action="http://www.google.com/"/>
-            <xforms:submission id="post" method="post" serialization="none" action="http://localhost/" replace="instance"/>
+            <xforms:submission id="default-submission" method="post" action="" replace="all"/>
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
-        <xforms:trigger>
-            <xforms:label>Go to Google</xforms:label>
-            <xforms:send submission="get" ev:event="DOMActivate"/>
-        </xforms:trigger>
-        <xforms:trigger>
-            <xforms:label>Post to localhost</xforms:label>
-            <xforms:send submission="post" ev:event="DOMActivate"/>
-        </xforms:trigger>
+        <xforms:submit submission="default-submission">
+            <xforms:label>Run doomed submission</xforms:label>
+        </xforms:submit>
     </xhtml:body>
 </xhtml:html>

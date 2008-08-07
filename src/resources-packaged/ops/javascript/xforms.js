@@ -153,8 +153,6 @@ ORBEON.xforms.Globals = ORBEON.xforms.Globals || {
     repeatTreeChildToParent: {},         // Describes the repeat hierarchy
     repeatIndexes: {},                   // The current index for each repeat
     repeatTreeParentToAllChildren: {},   // Map from parent to array with children, used when highlight changes
-    inputCalendarCreated: {},            // Maps input id to true when the calendar has been created for that input
-    inputCalendarOnclick: {},            // Maps input id to the JSCalendar function that displays the calendar
     inputCalendarCommitedValue: {},      // Maps input id to the value of JSCalendar actually selected by the user
     yuiCalendar: null,                   // Reusable calendar widget
     tooltipLibraryInitialized: false,
@@ -961,6 +959,16 @@ ORBEON.util.Utils = {
             ORBEON.xforms.Globals.modalProgressPanel.render(document.body);
         }
         ORBEON.xforms.Globals.modalProgressPanel.show();
+    },
+
+    countOccurences: function(str, character) {
+        var count = 0;
+        var pos = str.indexOf(character);
+        while ( pos != -1 ) {
+            count++;
+            pos = str.indexOf(character,pos+1);
+        }
+            return count;
     }
 }
 
@@ -2154,9 +2162,6 @@ ORBEON.xforms.Events = {
         if (!ORBEON.xforms.Globals.maskFocusEvents) {
             var targetControlElement = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
             if (targetControlElement != null) {
-                // Hide calendar (if one is shown) when going from one field to another 
-                if (! YAHOO.lang.isNull(window.calendar) && ! YAHOO.lang.isUndefined(window.calendar))
-                    window.calendar.hide();
                 if (!ORBEON.util.Dom.hasClass(targetControlElement, "xforms-dialog")) {
                     // This is an event for an XForms control
 
@@ -2239,6 +2244,9 @@ ORBEON.xforms.Events = {
                 ORBEON.xforms.Globals.changedIdsRequest[target.id] =
                 ORBEON.xforms.Globals.changedIdsRequest[target.id] == null ? 1
                         : ORBEON.xforms.Globals.changedIdsRequest[target.id] + 1;
+            if (ORBEON.widgets.JSCalendar.appliesToControl(target)) {
+                ORBEON.widgets.JSCalendar.keydown(event, target);
+            }
         }
     },
 
@@ -2432,40 +2440,8 @@ ORBEON.xforms.Events = {
                                 ORBEON.xforms.Controls.getCurrentValue(target), null)), false);
             } else if (ORBEON.util.Dom.hasClass(originalTarget, "xforms-type-date") ) {
                 // Click on calendar inside input field
-
                 if (ORBEON.util.Utils.getProperty(DATE_PICKER_PROPERTY) == "jscalendar") {
-                    // Use the jscalendar widgets
-
-                    // Initialize calendar when needed
-                    var inputField = ORBEON.util.Dom.getChildElementByIndex(target, 0);
-
-                    // Setup calendar library if not done already
-                    if (!ORBEON.xforms.Globals.inputCalendarCreated[target.id]) {
-                        Calendar.setup({
-                            inputField     :    inputField.id,
-                            ifFormat       :    "%m/%d/%Y",
-                            showsTime      :    false,
-                            button         :    target.id,
-                            singleClick    :    true,
-                            step           :    1,
-                            onUpdate       :    ORBEON.xforms.Events.calendarUpdate,
-                            onClose        :    ORBEON.xforms.Events.calendarClose,
-                            electric       :    true
-                        });
-                        // JSCalendar sets his listener in the onclick attribute: save it so we can call it later
-                        ORBEON.xforms.Globals.inputCalendarOnclick[target.id] = target.onclick;
-                        target.onclick = null;
-                        ORBEON.xforms.Globals.inputCalendarCreated[target.id] = true;
-                        // Save initial value
-                        ORBEON.xforms.Globals.inputCalendarCommitedValue[target.id] = inputField.value;
-                    } else {
-                        // Use the YUI widget
-
-                        
-                    }
-
-                    // Call jscalendar code that opens the calendar
-                    ORBEON.xforms.Globals.inputCalendarOnclick[target.id]();
+                    ORBEON.widgets.JSCalendar.click(event, target);
                 } else {
                     ORBEON.widgets.YUICalendar.click(event, target);
                 }
@@ -2584,33 +2560,6 @@ ORBEON.xforms.Events = {
                 yuiDialog.cfg.setProperty("xy", yuiDialog.cfg.getProperty("xy"));
             }
         }
-    },
-
-    /**
-     * Send notification to XForms engine end-user clicked on day.
-     */
-    calendarUpdate: function(calendar) {
-        if (ORBEON.util.Dom.hasClass(calendar.activeDiv, "day")) {
-            // Change value in field from ISO to display value
-            var inputField = calendar.params.inputField;
-            var jsDate = ORBEON.util.DateTime.magicDateToJSDate(inputField.value);
-            inputField.value = ORBEON.util.DateTime.jsDateToformatDisplayDate(jsDate);
-            var element = inputField.parentNode;
-            ORBEON.xforms.Globals.inputCalendarCommitedValue[element.id] = inputField.value;
-            xformsFireEvents([xformsCreateEventArray(element, "xxforms-value-change-with-focus-change",
-                    ORBEON.xforms.Controls.getCurrentValue(element))], false);
-        }
-    },
-
-    /**
-     * Restore last value actualy selected by user in the input field, which at this point could
-     * contain a value the user just browsed to, without selecting it.
-     */
-    calendarClose: function(calendar) {
-        var inputField = calendar.params.inputField;
-        var element = inputField.parentNode;
-        inputField.value = ORBEON.xforms.Globals.inputCalendarCommitedValue[element.id];
-        calendar.hide();
     },
 
     sliderValueChange: function(offset) {
@@ -2834,32 +2783,94 @@ ORBEON.xforms.Events = {
     ajaxResponseProcessedEvent: new YAHOO.util.CustomEvent("ajaxResponseProcessed")
 };
 
-ORBEON.widgets.Base = {
+ORBEON.widgets.Base = function() {
+    return {
+        /**
+         * Other widget this widget extends.
+         */
+        extending: null,
+
+        /**
+         * Function that returns true if and only if the this class applies to the control provided. This provides a
+         * way to implement conditions in addition to the one set on the classes the element must have.
+         */
+        appliesToControl: function(control) {},
+
+        /**
+         * Respond to the click event.
+         */
+        click: function(event, target) {},
+        blur: function(event, target) {},
+        keydown: function(event, target) {}
+    }
+}();
+
+ORBEON.widgets.JSCalendar = function() {
 
     /**
-     * Other widget this widget extends.
+     * Send notification to XForms engine end-user clicked on day.
      */
-    extends: null,
+    function update(calendar) {
+        if (ORBEON.util.Dom.hasClass(calendar.activeDiv, "day")) {
+            // Change value in field from ISO to display value
+            var inputField = calendar.params.inputField;
+            var jsDate = ORBEON.util.DateTime.magicDateToJSDate(inputField.value);
+            inputField.value = ORBEON.util.DateTime.jsDateToformatDisplayDate(jsDate);
+            var element = inputField.parentNode;
+            xformsFireEvents([xformsCreateEventArray(element, "xxforms-value-change-with-focus-change",
+                    ORBEON.xforms.Controls.getCurrentValue(element))], false);
+        }
+    }
 
     /**
-     * List (array) of classes the HTML element must for it to be handled by this widget.
-     * If the list is empty, then this widget is considered to be an abstract widget, defined only for the purpose
-     * of inheritence.
+     * Restore last value actualy selected by user in the input field, which at this point could
+     * contain a value the user just browsed to, without selecting it.
      */
-    classes: [],
+    function close(calendar) {
+        var inputField = calendar.params.inputField;
+        var element = inputField.parentNode;
+        calendar.hide();
+    }
 
-    /**
-     * Function that returns true if and only if the this class applies to the control provided. This provides a
-     * way to implement conditions in addition to the one set on the classes the element must have.
-     */
-    appliesToControl: function(control) {},
+    return {
 
-    /**
-     * Respond to the click event.
-     */
-    click: function(event, target) {}
+        extending: ORBEON.widgets.Base,
 
-};
+        appliesToControl: function(control) {
+            return (ORBEON.util.Dom.hasClass(control, "xforms-type-date") || ORBEON.util.Dom.hasClass(control, "xforms-type-dateTime"))
+                    && ORBEON.util.Utils.getProperty(DATE_PICKER_PROPERTY) == "jscalendar";
+        },
+
+        click: function(event, target) {
+            // Initialize calendar when needed
+            var inputField = ORBEON.util.Dom.getChildElementByIndex(target, 0);
+
+            // Setup calendar library
+            Calendar.setup({
+                inputField     :    inputField.id,
+                ifFormat       :    "%m/%d/%Y",
+                showsTime      :    false,
+                button         :    target.id,
+                singleClick    :    true,
+                step           :    1,
+                onUpdate       :    update,
+                onClose        :    close,
+                electric       :    false
+            });
+            // JSCalendar sets his listener in the onclick attribute: save it so we can call it later
+            var jsCalendarOnclick = target.onclick;
+            target.onclick = null;
+            // Call jscalendar code that opens the calendar
+            jsCalendarOnclick();
+        },
+
+        blur: function(event, target) {},
+
+        keydown: function(event, target) {
+            calendar.hide();
+        }
+    }
+}();
 
 ORBEON.widgets.YUICalendar = function() {
 
@@ -2912,8 +2923,7 @@ ORBEON.widgets.YUICalendar = function() {
     }
 
     return {
-        extends: ORBEON.widgets.Base,
-        classes: [ "xforms-type-date" ],
+        extending: ORBEON.widgets.Base,
 
         appliesToControl: function(control) {
             return (ORBEON.util.Dom.hasClass(control, "xforms-type-date") || ORBEON.util.Dom.hasClass(control, "xforms-type-dateTime"))
@@ -3027,6 +3037,36 @@ ORBEON.xforms.Init = {
         YAHOO.util.Event.addListener(element, "change", ORBEON.xforms.Events.change);
     },
 
+    registerDraggableListenersOnRepeatElements: function() {
+	var repeatDelimiter = YAHOO.util.Dom.getElementsByClassName("xforms-repeat-delimiter");
+
+        for (var i = 0; i < repeatDelimiter.length; i++) {
+            var previousSiblingId = YAHOO.util.Dom.getPreviousSibling(repeatDelimiter[i]).id;
+            var repeatElement = YAHOO.util.Dom.getNextSibling(repeatDelimiter[i]);
+            if (ORBEON.util.Dom.hasClass(repeatElement, "xforms-dnd")) {
+            	//Right now, we support Drag n Drop of following elements
+            	if(repeatElement.tagName.toLowerCase() == "div" || repeatElement.tagName.toLowerCase() == "tr" || repeatElement.tagName.toLowerCase() == "td") {
+                    ORBEON.xforms.Init.registerDraggableListenersOnRepeatElement(repeatElement, previousSiblingId);
+                }
+            }
+        }
+    },
+
+    registerDraggableListenersOnRepeatElement: function(repeatElement, previousSiblingId) {
+         var draggableItem = new ORBEON.xforms.DnD.DraggableItem(repeatElement);
+
+        if(previousSiblingId.indexOf(XFORMS_SEPARATOR_1) == -1)
+            repeatElement.position = XFORMS_SEPARATOR_1 + "1";
+        else
+           repeatElement.position = XFORMS_SEPARATOR_1 + previousSiblingId.substring(previousSiblingId.indexOf(XFORMS_SEPARATOR_1)+1) + XFORMS_SEPARATOR_2 + "1";
+
+
+        if(ORBEON.util.Dom.hasClass(repeatElement, "xforms-dnd-vertical"))
+           draggableItem.setXConstraint(0, 0);
+        else if(ORBEON.util.Dom.hasClass(repeatElement, "xforms-dnd-horizontal"))
+	   draggableItem.setYConstraint(0, 0);
+    },
+
     document: function() {
         // Notify the offline module that the page was loaded
         if (ORBEON.util.Utils.getProperty(OFFLINE_SUPPORT_PROPERTY))
@@ -3044,6 +3084,7 @@ ORBEON.xforms.Init = {
             document.addEventListener("change", ORBEON.xforms.Events.change, true);
         }
 
+        ORBEON.xforms.Init.registerDraggableListenersOnRepeatElements();
         // Register events that bubble on document for all browsers
         YAHOO.util.Event.addListener(document, "keypress", ORBEON.xforms.Events.keypress);
         YAHOO.util.Event.addListener(document, "keydown", ORBEON.xforms.Events.keydown);
@@ -3568,7 +3609,7 @@ ORBEON.xforms.Init = {
 
 ORBEON.xforms.Server = {
 
-    Event: function(form, targetId, otherId, value, eventName, bubbles, cancelable, ignoreErrors) {
+    Event: function(form, targetId, otherId, value, eventName, bubbles, cancelable, ignoreErrors, additionalAttribs) {
         this.form = form;
         this.targetId = targetId;
         this.otherId = otherId;
@@ -3577,6 +3618,7 @@ ORBEON.xforms.Server = {
         this.bubbles = bubbles;
         this.cancelable = cancelable;
         this.ignoreErrors = ignoreErrors;
+        this.additionalAttribs = additionalAttribs;
     },
 
     /**
@@ -3800,6 +3842,10 @@ ORBEON.xforms.Server = {
                             requestDocumentString += ' source-control-id="' + event.targetId + '"';
                         if (event.otherId != null)
                             requestDocumentString += ' other-control-id="' + event.otherId + '"';
+                        if (event.additionalAttribs != null) {
+                            for(var attribIndex = 0; attribIndex < event.additionalAttribs.length - 1; attribIndex+=2)
+                                requestDocumentString += ' '+ event.additionalAttribs[attribIndex] +'="' + event.additionalAttribs[attribIndex+1] + '"';
+                        }
                         requestDocumentString += '>';
                         if (event.value != null) {
                             // When the range is used we get an int here when the page is first loaded
@@ -4055,8 +4101,10 @@ ORBEON.xforms.Server = {
                                         }
                                         // Initialize newly added form elements. We don't need to do this for IE, because with
                                         // IE when an element is cloned, the clone has the same event listeners as the original.
-                                        if (ORBEON.xforms.Globals.isRenderingEngineWebCore13)
+                                        if (ORBEON.xforms.Globals.isRenderingEngineWebCore13) {
                                             ORBEON.xforms.Init.registerListenersOnFormElements();
+                                            ORBEON.xforms.Init.registerDraggableListenersOnRepeatElements();
+                                        }
                                     }
 
                                     var deleteRepeatTemplateElements = ORBEON.util.Dom.getElementsByName(controlValuesElement, "delete-repeat-elements", xmlNamespace);
@@ -4825,6 +4873,118 @@ ORBEON.xforms.Server = {
         theFunction.call(observer, event);
     }
 };
+
+//SAN start
+YAHOO.util.DDM.mode = YAHOO.util.DDM.INTERSECT;
+YAHOO.util.DragDropMgr.preventDefault = false;
+
+ORBEON.xforms.DnD = {
+
+    DraggableItem: function(element, sGroup, config) {
+    	ORBEON.xforms.DnD.DraggableItem.superclass.constructor.call(this, element, element.tagName, config);
+    	YAHOO.util.Dom.setStyle(element, "cursor", "move");
+    },
+
+    getClosestMatch: function(id) {
+	var bestMatchId = YAHOO.util.DDM.getBestMatch(id);
+	var bestMatchCount = ORBEON.util.Utils.countOccurences(bestMatchId.id.substring(bestMatchId.id.indexOf(XFORMS_SEPARATOR_1)+1),XFORMS_SEPARATOR_2);
+	for(var i = 0 ; i < id.length; i++) {
+	    var count = ORBEON.util.Utils.countOccurences(id[i].id.substring(id[i].id.indexOf(XFORMS_SEPARATOR_1)+1) ,XFORMS_SEPARATOR_2);
+	    if(count > bestMatchCount) { //We get a more specific match
+	        bestMatchId = id[i];
+	        bestMatchCount = count;
+	    }
+	    else if(count == bestMatchCount) { //Both are specific to the same level, let's check the level of overlap
+	       if(bestMatchId.getEl().overlap && (bestMatchId.getEl().overlap.getArea() < id[i].overlap.getArea())) {
+	           bestMatchId = id[i];
+	           bestMatchCount = count;
+	       }
+	    }
+	}
+	return bestMatchId.getEl();
+    }
+};
+
+YAHOO.extend(ORBEON.xforms.DnD.DraggableItem, YAHOO.util.DDProxy, {
+
+    startDrag: function(x, y) {
+
+    	var dragElement = this.getDragEl();
+        var srcElement = this.getEl();
+        var sourceControlElement = ORBEON.util.Dom.getChildElementByClass(srcElement.parentNode, "xforms-repeat-begin-end");
+        this.sourceControlID = sourceControlElement.id.substr(13);//we are interested in part after repeat-begin- in id
+
+	var index = srcElement.id.indexOf(XFORMS_SEPARATOR_1); //middot's index
+	this.startPosition = (index != -1) ? srcElement.id.substr(index+1) : srcElement.position.substr(srcElement.position.indexOf(XFORMS_SEPARATOR_1)+1);
+	YAHOO.util.Dom.setStyle(dragElement, "opacity", 0.67);
+        dragElement.innerHTML = srcElement.innerHTML;
+        dragElement.className = srcElement.className;
+        YAHOO.util.Dom.setStyle(srcElement, "visibility", "hidden");
+    },
+
+    onDragDrop: function(e, id) {
+        var overElement;
+
+	if ("string" == typeof id) {
+            overElement = YAHOO.util.DDM.getElement(id);
+        }
+        else {
+            overElement = ORBEON.xforms.DnD.getClosestMatch(id);
+        }
+	var srcElement = this.getEl();
+	var index = overElement.id.indexOf(XFORMS_SEPARATOR_1); //middot's index
+	this.endPosition = (index != -1) ? overElement.id.substr(index+1) : overElement.position.substr(overElement.position.indexOf(XFORMS_SEPARATOR_1)+1);
+    },
+
+    endDrag: function(e) {
+
+        var srcElement = this.getEl();
+        var proxy = this.getDragEl();
+
+        YAHOO.util.Dom.setStyle(proxy, "visibility", "");
+         var motion = new YAHOO.util.Motion(
+             proxy, {
+                 points: {
+                     to: YAHOO.util.Dom.getXY(srcElement)
+                 }
+             },
+             0.2,
+             YAHOO.util.Easing.easeOut
+         )
+         var proxyid = proxy.id;
+         var thisid = this.id;
+
+         // Hide the proxy and show the source element when finished with the animation
+         motion.onComplete.subscribe(function() {
+         	YAHOO.util.Dom.setStyle(proxyid, "visibility", "hidden");
+         	YAHOO.util.Dom.setStyle(thisid, "visibility", "");
+         });
+         motion.animate();
+
+       if(this.startPosition == null || this.endPosition == null)
+            return;
+  	 var draggableRepeatDiv = YAHOO.util.Dom.getElementsByClassName("xforms-draggableRepeat")[0];
+       if (draggableRepeatDiv == null) {
+            var form;
+            for (var formIndex = 0; formIndex < document.forms.length; formIndex++) {
+            	var candidateForm = document.forms[formIndex];
+                if (ORBEON.util.Dom.hasClass(candidateForm, "xforms-form")) {
+                    form = candidateForm;
+                    break;
+                }
+            }
+            var draggableRepeatDiv = document.createElement("div");
+            draggableRepeatDiv.className = "xforms-draggableRepeat";
+            draggableRepeatDiv.id = this.sourceControlID;
+            form.appendChild(draggableRepeatDiv);
+        }
+        else {
+	    draggableRepeatDiv.id = this.sourceControlID;
+        }
+        xformsFireEvents([xformsCreateEventArray(draggableRepeatDiv, "xxforms-dnd", null, null,
+                          new Array("dnd-start", this.startPosition, "dnd-end", this.endPosition))], false);
+     }
+});
 
 ORBEON.xforms.Offline = {
 
@@ -5743,17 +5903,19 @@ function xformsFireEvents(events, incremental) {
         var eventName = event[1];
         var value = event[2];
         var other = event[3];
+        var additionalAttribs = event[4];
         newEvents.push(new ORBEON.xforms.Server.Event(
                 target == undefined ? null : ORBEON.xforms.Controls.getForm(target),
                 target == undefined ? null : target.id,
                 other == undefined ? null : other.id,
-                value, eventName, null, null));
+                value, eventName, null, null,
+                additionalAttribs ==  undefined ? null : additionalAttribs));
     }
     ORBEON.xforms.Server.fireEvents(newEvents, incremental);
 }
 
-function xformsCreateEventArray(target, eventName, value, other) {
-    return new Array(target, eventName, value, other);
+function xformsCreateEventArray(target, eventName, value, other, additionalAttribs) {
+    return new Array(target, eventName, value, other, additionalAttribs);
 }
 
 function getEventTarget(event) {

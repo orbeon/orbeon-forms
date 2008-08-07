@@ -58,7 +58,7 @@ var HELP_TOOLTIP_PROPERTY = "help-tooltip";
 var OFFLINE_SUPPORT_PROPERTY = "offline";
 var FORMAT_INPUT_TIME_PROPERTY = "format.input.time";
 var FORMAT_INPUT_DATE_PROPERTY = "format.input.date";
-var DATE_PICKER_PROPERTY = "yui";
+var DATE_PICKER_PROPERTY = "datepicker";
 
 var APPLICATION_RESOURCES_VERSION_PROPERTY = "oxf.resources.version-number";
 
@@ -84,6 +84,7 @@ var XFORMS_HELP_TOOLTIP = false;
 var XFORMS_OFFLINE_SUPPORT = false;
 var XFORMS_FORMAT_INPUT_TIME = "[h]:[m]:[s] [P]";
 var XFORMS_FORMAT_INPUT_DATE = "[M]/[D]/[Y]";
+var XFORMS_DATEPICKER = "yui";
 
 var APPLICATION_RESOURCES_VERSION = "1.0";
 
@@ -117,6 +118,7 @@ var XFORMS_WIDE_TEXTAREA_MIN_ROWS = 5;
 var ORBEON = ORBEON || {};
 ORBEON.util = ORBEON.util || {};
 ORBEON.xforms = ORBEON.xforms || {};
+ORBEON.widgets = ORBEON.widgets || {};
 
 /**
  * Global constants and variable
@@ -154,6 +156,7 @@ ORBEON.xforms.Globals = ORBEON.xforms.Globals || {
     inputCalendarCreated: {},            // Maps input id to true when the calendar has been created for that input
     inputCalendarOnclick: {},            // Maps input id to the JSCalendar function that displays the calendar
     inputCalendarCommitedValue: {},      // Maps input id to the value of JSCalendar actually selected by the user
+    yuiCalendar: null,                   // Reusable calendar widget
     tooltipLibraryInitialized: false,
     changedIdsRequest: {},               // Id of controls that have been touched by user since the last response was received
     serverValue: {},                     // Values on controls known to the server
@@ -930,6 +933,7 @@ ORBEON.util.Utils = {
             case OFFLINE_SUPPORT_PROPERTY: { return XFORMS_OFFLINE_SUPPORT; }
             case FORMAT_INPUT_TIME_PROPERTY: { return XFORMS_FORMAT_INPUT_TIME; }
             case FORMAT_INPUT_DATE_PROPERTY: { return XFORMS_FORMAT_INPUT_DATE; }
+            case DATE_PICKER_PROPERTY: { return XFORMS_DATEPICKER; }
             }
     	// Neither the property's value was supplied, nor a default value exists for the property
         return null;
@@ -2163,6 +2167,10 @@ ORBEON.xforms.Events = {
                     // Keep track of the id of the last known control which has focus
                     ORBEON.xforms.Globals.currentFocusControlId = targetControlElement.id;
                 }
+
+                if (ORBEON.widgets.YUICalendar.appliesToControl(targetControlElement)) {
+                    ORBEON.widgets.YUICalendar.blur(event, targetControlElement);
+                }
             }
         }
     },
@@ -2425,32 +2433,42 @@ ORBEON.xforms.Events = {
             } else if (ORBEON.util.Dom.hasClass(originalTarget, "xforms-type-date") ) {
                 // Click on calendar inside input field
 
-                // Initialize calendar when needed
-                var inputField = ORBEON.util.Dom.getChildElementByIndex(target, 0);
+                if (ORBEON.util.Utils.getProperty(DATE_PICKER_PROPERTY) == "jscalendar") {
+                    // Use the jscalendar widgets
 
-                // Setup calendar library if not done already
-                if (!ORBEON.xforms.Globals.inputCalendarCreated[target.id]) {
-                    Calendar.setup({
-                        inputField     :    inputField.id,
-                        ifFormat       :    "%m/%d/%Y",
-                        showsTime      :    false,
-                        button         :    target.id,
-                        singleClick    :    true,
-                        step           :    1,
-                        onUpdate       :    ORBEON.xforms.Events.calendarUpdate,
-                        onClose        :    ORBEON.xforms.Events.calendarClose,
-                        electric       :    true
-                    });
-                    // JSCalendar sets his listener in the onclick attribute: save it so we can call it later
-                    ORBEON.xforms.Globals.inputCalendarOnclick[target.id] = target.onclick;
-                    target.onclick = null;
-                    ORBEON.xforms.Globals.inputCalendarCreated[target.id] = true;
-                    // Save initial value
-                    ORBEON.xforms.Globals.inputCalendarCommitedValue[target.id] = inputField.value;
+                    // Initialize calendar when needed
+                    var inputField = ORBEON.util.Dom.getChildElementByIndex(target, 0);
+
+                    // Setup calendar library if not done already
+                    if (!ORBEON.xforms.Globals.inputCalendarCreated[target.id]) {
+                        Calendar.setup({
+                            inputField     :    inputField.id,
+                            ifFormat       :    "%m/%d/%Y",
+                            showsTime      :    false,
+                            button         :    target.id,
+                            singleClick    :    true,
+                            step           :    1,
+                            onUpdate       :    ORBEON.xforms.Events.calendarUpdate,
+                            onClose        :    ORBEON.xforms.Events.calendarClose,
+                            electric       :    true
+                        });
+                        // JSCalendar sets his listener in the onclick attribute: save it so we can call it later
+                        ORBEON.xforms.Globals.inputCalendarOnclick[target.id] = target.onclick;
+                        target.onclick = null;
+                        ORBEON.xforms.Globals.inputCalendarCreated[target.id] = true;
+                        // Save initial value
+                        ORBEON.xforms.Globals.inputCalendarCommitedValue[target.id] = inputField.value;
+                    } else {
+                        // Use the YUI widget
+
+                        
+                    }
+
+                    // Call jscalendar code that opens the calendar
+                    ORBEON.xforms.Globals.inputCalendarOnclick[target.id]();
+                } else {
+                    ORBEON.widgets.YUICalendar.click(event, target);
                 }
-
-                // Event can be received on calendar picker span, or on the containing span
-                ORBEON.xforms.Globals.inputCalendarOnclick[target.id]();
             } else if (ORBEON.util.Dom.hasClass(target, "xforms-upload") && ORBEON.util.Dom.hasClass(originalTarget, "xforms-upload-remove")) {
                 // Click on remove icon in upload control
                 xformsFireEvents(new Array(xformsCreateEventArray(target, "xxforms-value-change-with-focus-change", "")), false);
@@ -2815,6 +2833,147 @@ ORBEON.xforms.Events = {
     orbeonLoadedEvent: new YAHOO.util.CustomEvent("orbeonLoaded"),
     ajaxResponseProcessedEvent: new YAHOO.util.CustomEvent("ajaxResponseProcessed")
 };
+
+ORBEON.widgets.Base = {
+
+    /**
+     * Other widget this widget extends.
+     */
+    extends: null,
+
+    /**
+     * List (array) of classes the HTML element must for it to be handled by this widget.
+     * If the list is empty, then this widget is considered to be an abstract widget, defined only for the purpose
+     * of inheritence.
+     */
+    classes: [],
+
+    /**
+     * Function that returns true if and only if the this class applies to the control provided. This provides a
+     * way to implement conditions in addition to the one set on the classes the element must have.
+     */
+    appliesToControl: function(control) {},
+
+    /**
+     * Respond to the click event.
+     */
+    click: function(event, target) {}
+
+};
+
+ORBEON.widgets.YUICalendar = function() {
+
+    // Set when the calendar is ceated the first time
+    var yuiCalendar = null;
+    var calendarDiv = null;
+
+    // Set when the calendar is opened for a given control
+    var control = null;
+    var inputField = null;
+
+    // When calendar is in use, is the mouse in the calendar area
+    var mouseOverCalendar = false;
+
+    function hideCal() {
+        if (!over_cal) {
+            YAHOO.util.Dom.setStyle('cal1Container', 'display', 'none');
+        }
+    }
+
+    function mouseover() {
+        mouseOverCalendar = true;
+    }
+
+    function mouseout() {
+        mouseOverCalendar = false;
+    }
+
+    // After the calendar is rendered, setup listeners on mouseover/mouseout
+    function setupListeners() {
+        YAHOO.util.Event.addListener(calendarDiv, "mouseover", mouseover);
+        YAHOO.util.Event.addListener(calendarDiv, "mouseout", mouseout);
+    }
+
+    // User selected a date in the picker
+    function dateSelected() {
+        var jsDate = yuiCalendar.getSelectedDates()[0];
+        inputField.value = ORBEON.util.DateTime.jsDateToformatDisplayDate(jsDate);
+        xformsFireEvents([xformsCreateEventArray(control, "xxforms-value-change-with-focus-change",
+                ORBEON.xforms.Controls.getCurrentValue(control))], false);
+        closeCalendar();
+    }
+
+    // Hide calendar div and do some cleanup of private variables
+    function closeCalendar() {
+        control = null;
+        inputField = null;
+        mouseOverCalendar = false;
+        YAHOO.util.Dom.setStyle(calendarDiv, "display", "none");
+    }
+
+    return {
+        extends: ORBEON.widgets.Base,
+        classes: [ "xforms-type-date" ],
+
+        appliesToControl: function(control) {
+            return (ORBEON.util.Dom.hasClass(control, "xforms-type-date") || ORBEON.util.Dom.hasClass(control, "xforms-type-dateTime"))
+                    && ORBEON.util.Utils.getProperty(DATE_PICKER_PROPERTY) == "yui";
+        },
+
+        click: function(event, target) {
+
+            // Create YUI calendar the first time this is used
+            if (calendarDiv == null) {
+                // Create div for the YUI calendar widget
+                calendarDiv = document.createElement("div");
+                calendarDiv.id = "orbeon-calendar-div";
+                document.body.appendChild(calendarDiv);
+
+                // Create YUI calendar
+                yuiCalendar = new YAHOO.widget.Calendar(calendarDiv.id);
+
+                // Listeners on calendar events
+                yuiCalendar.renderEvent.subscribe(setupListeners, yuiCalendar, true);
+                yuiCalendar.selectEvent.subscribe(dateSelected, yuiCalendar, true);
+            }
+
+            // Set date
+            control = target;
+            var date = ORBEON.util.DateTime.magicDateToJSDate(ORBEON.xforms.Controls.getCurrentValue(control));
+            if (date == null) {
+                yuiCalendar.cfg.setProperty("selected", "", false);
+                yuiCalendar.cfg.setProperty("pagedate", new Date(), false);
+            } else {
+                // Date must be the internal format expected by YUI
+                var dateStringForYUI = (date.getMonth() + 1)
+                   + "/" + date.getDate()
+                   + "/" + date.getFullYear();
+                yuiCalendar.cfg.setProperty("selected", dateStringForYUI, false);
+                yuiCalendar.cfg.setProperty("pagedate", date, false);
+            }
+            yuiCalendar.cfg.applyConfig();
+
+            // Show calendar
+            yuiCalendar.render();
+            YAHOO.util.Dom.setStyle(calendarDiv, "display", "block");
+
+            // Position calendar below field
+            inputField = ORBEON.util.Dom.getChildElementByIndex(control, 0);
+            var xy = YAHOO.util.Dom.getXY(inputField);
+            xy[1] = xy[1] + 20;
+            YAHOO.util.Dom.setXY(calendarDiv, xy);
+        },
+
+        blur: function(event, target) {
+            if (mouseOverCalendar) {
+                window.setTimeout(function() { inputField.focus(); }, XFORMS_INTERNAL_SHORT_DELAY_IN_MS);
+            } else {
+                closeCalendar();
+            }
+        }
+    }
+}();
+
 
 ORBEON.xforms.Init = {
 

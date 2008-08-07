@@ -1,6 +1,8 @@
-<%@ page import="org.orbeon.oxf.util.NetUtils" %>
 <%@ page import="org.orbeon.oxf.util.WriterOutputStream" %>
 <%@ page import="java.io.IOException" %>
+<%@ page import="java.util.Map" %>
+<%@ page import="java.util.StringTokenizer" %>
+<%@ page import="java.util.HashMap" %>
 <%--
     Copyright (C) 2008 Orbeon, Inc.
 
@@ -54,8 +56,49 @@
 
                 public void setContentType(String contentType) {
                     // TODO: Handle non-text XML types at some point (which may not have a charset parameter)
-                    final String charset = NetUtils.getContentTypeCharset(contentType);
+                    final String charset = getContentTypeCharset(contentType);
                     os.setCharset(charset);
+                }
+
+                // This is copied from NetUtils
+                public String getContentTypeCharset(String contentType) {
+                    final Map parameters = getContentTypeParameters(contentType);
+                    return (String) ((parameters == null) ? null : parameters.get("charset"));
+                }
+
+                public Map getContentTypeParameters(String contentType) {
+                    if (contentType == null)
+                        return null;
+
+                    // Check whether there may be parameters
+                    final int semicolumnIndex = contentType.indexOf(";");
+                    if (semicolumnIndex == -1)
+                        return null;
+
+                    // Tokenize
+                    final StringTokenizer st = new StringTokenizer(contentType, ";");
+
+                    if (!st.hasMoreTokens())
+                        return null; // should not happen as there should be at least the content type
+
+                    st.nextToken();
+
+                    // No parameters
+                    if (!st.hasMoreTokens())
+                        return null;
+
+                    // Parse parameters
+                    final Map parameters = new HashMap();
+                    while (st.hasMoreTokens()) {
+                        final String parameter = st.nextToken().trim();
+                        final int equalIndex = parameter.indexOf('=');
+                        if (equalIndex == -1)
+                            continue;
+                        final String name = parameter.substring(0, equalIndex).trim();
+                        final String value = parameter.substring(equalIndex + 1).trim();
+                        parameters.put(name, value);
+                    }
+                    return parameters;
                 }
             });
         %>

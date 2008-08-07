@@ -78,7 +78,7 @@
     <property as="xs:boolean" name="oxf.xforms.ajax.show-loading-icon"               value="true"/>
     <property as="xs:boolean" name="oxf.xforms.ajax.show-errors"                     value="true"/>
     <property as="xs:boolean" name="oxf.xforms.gzip-state"                           value="true"/>
-    <property as="xs:boolean" name="oxf.xforms.minimal-resources"                    value="true"/>
+    <property as="xs:boolean" name="oxf.xforms.minimal-resources"                    value="false"/>
     <property as="xs:boolean" name="oxf.xforms.combine-resources"                    value="true"/>
     <property as="xs:boolean" name="oxf.xforms.cache-combined-resources"             value="false"/>
     <property as="xs:boolean" name="oxf.xforms.optimize-relevance"                   value="false"/>
@@ -90,7 +90,7 @@
     <property as="xs:integer" name="oxf.xforms.request-retries"                      value="1"/>
     <property as="xs:string"  name="oxf.xforms.datepicker"                           value="yui"/>  <!-- jcalendar or yui -->
 
-    <!-- Form Runner / Form Builder properties -->
+    <!-- Form Runner properties -->
     <property as="xs:anyURI"  name="oxf.fr.persistence.app.uri.*.*.*"                value="/fr/service/exist"/>
     <property as="xs:anyURI"  name="oxf.fr.persistence.app.uri.orbeon.builder.form"  value="/fr/service/resource"/>
     <property as="xs:anyURI"  name="oxf.fr.persistence.app.uri.orbeon.bookcast.form" value="/fr/service/resource"/>
@@ -101,18 +101,20 @@
 
     <property as="xs:anyURI"  name="oxf.fr.appserver.uri"                            value=""/>
     <property as="xs:string"  name="oxf.fr.default-language"                         value="en"/>
-    <property as="xs:anyURI"  name="oxf.fr.default-logo.uri"                         value="/apps/fr/style/orbeon-logo-trimmed-transparent-42.png"/>
+    <property as="xs:anyURI"  name="oxf.fr.default-logo.uri.*.*"                     value="/apps/fr/style/orbeon-logo-trimmed-transparent-42.png"/>
 
-    <property as="xs:boolean" name="oxf.fr.detail.noscript.table"                    value="true"/>
-    <property as="xs:boolean" name="oxf.fr.detail.toc"                               value="true"/>
-    <property as="xs:string"  name="oxf.fr.detail.error-summary"                     value="bottom"/>
+    <property as="xs:boolean" name="oxf.fr.noscript-link.*.*"                        value="true"/>
+    <property as="xs:boolean" name="oxf.fr.detail.noscript.table.*.*"                value="true"/>
+    <property as="xs:boolean" name="oxf.fr.detail.toc.*.*"                           value="true"/>
+    <property as="xs:string"  name="oxf.fr.detail.error-summary.*.*"                 value="bottom"/>
 
-    <property as="xs:boolean" name="oxf.fr.detail.button.save-locally"               value="false"/>
-    <property as="xs:boolean" name="oxf.fr.detail.button.close"                      value="true"/>
-    <property as="xs:boolean" name="oxf.fr.detail.button.clear"                      value="true"/>
-    <property as="xs:boolean" name="oxf.fr.detail.button.print"                      value="true"/>
-    <property as="xs:boolean" name="oxf.fr.detail.button.pdf"                        value="true"/>
+    <property as="xs:boolean" name="oxf.fr.detail.button.save-locally.*.*"           value="false"/>
+    <property as="xs:boolean" name="oxf.fr.detail.button.close.*.*"                  value="true"/>
+    <property as="xs:boolean" name="oxf.fr.detail.button.clear.*.*"                  value="true"/>
+    <property as="xs:boolean" name="oxf.fr.detail.button.print.*.*"                  value="true"/>
+    <property as="xs:boolean" name="oxf.fr.detail.button.pdf.*.*"                    value="true"/>
 
+    <!-- Form Builder properties -->
     <!--<property as="xs:anyURI"  name="oxf.fb.schemas.uri.*.*"                          value="oxf:/forms/orbeon/builder/standard.xsd"/>-->
     <property as="xs:anyURI"  name="oxf.fb.components.uri.*.*"                       value="oxf:/forms/orbeon/builder/standard.xbl"/>
 
@@ -121,13 +123,6 @@
     <property as="xs:boolean" name="oxf.fb.menu.edit-source"                         value="true"/>
     <property as="xs:boolean" name="oxf.fb.menu.view-source"                         value="true"/>
     <property as="xs:boolean" name="oxf.fb.menu.css"                                 value="false"/>
-
-    <!-- Deprecated XForms cache configuration -->
-    <property as="xs:integer" name="oxf.xforms.cache.session.size"                   value="500000"/>
-    <property as="xs:integer" name="oxf.xforms.cache.application.size"               value="2000000"/>
-
-    <!-- Rarely used global properties -->
-    <property as="xs:string"  name="oxf.servlet.externalize-form-values-prefix"      value="$extnode^"/>
 
     <!-- Test properties -->
     <!--<property as="xs:string"  name="oxf.cache.display-statistics"                    value="cache.main cache.xpath xforms.cache.documents xforms.cache.shared-instances"/>-->

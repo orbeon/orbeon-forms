@@ -78,7 +78,7 @@
 
             <!-- Apply theme if needed -->
             <p:choose href="#request"><!-- dummy test input -->
-                <p:when test="not(not(p:property('oxf.epilogue.use-theme')))">
+                <p:when test="not(p:property('oxf.epilogue.use-theme') = false())">
                     <!-- Theme -->
                     <p:processor name="oxf:url-generator">
                         <p:input name="config" href="#theme-config"/>

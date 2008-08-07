@@ -144,8 +144,17 @@
                 </search>
             </xforms:instance>
 
+            <xforms:bind nodeset="instance('fr-search-instance')">
+                <!-- Don't send this to the server -->
+                <xforms:bind nodeset="query/@search-field" relevant=". = 'true'"/>
+                <!-- Set types so the search fields display the proper controls -->
+                <xforms:bind nodeset="query[ends-with(@type, ':date')]" type="xforms:date"/>
+                <xforms:bind nodeset="query[ends-with(@type, ':time')]" type="xforms:time"/>
+                <xforms:bind nodeset="query[ends-with(@type, ':dateTime')]" type="xforms:dateTime"/>
+            </xforms:bind>
+
             <xforms:instance id="fr-search-template" xxforms:readonly="true">
-                <query xmlns="" name="" path="" type="" control=""/>
+                <query xmlns="" name="" path="" type="" control="" search-field=""/>
             </xforms:instance>
 
             <!-- Paging information -->
@@ -187,15 +196,13 @@
             <!-- Extract summary configuration information from the XHTML document -->
             <!-- TODO: Move back to persistence model? -->
             <xforms:action ev:event="xforms-submit-done" ev:observer="get-source-form-submission">
-                <!--<xforms:insert context="instance('fr-search-instance')" nodeset="query"-->
-                    <!--origin="instance('fr-source-form-instance')/search"/>-->
 
                 <!-- Extract fields which must appear in the summary -->
                 <xforms:insert context="instance('fr-configuration-instance')" nodeset="*"
                     origin="xxforms:instance('fr-source-form-instance')/xhtml:body//xforms:*[@class and tokenize(@class, ' ') = ('fr-summary', 'fr-search')]"/>
 
                 <!-- Create elements holding structured search data -->
-                <xforms:action xxforms:iterate="xxforms:instance('fr-source-form-instance')/xhtml:body//xforms:*[@class and tokenize(@class, ' ') = ('fr-search')]">
+                <xforms:action xxforms:iterate="xxforms:instance('fr-source-form-instance')/xhtml:body//xforms:*[@class and tokenize(@class, ' ') = ('fr-summary', 'fr-search')]">
                     <xxforms:variable name="control" select="."/>
 
                     <!-- Insert empty template -->
@@ -204,6 +211,10 @@
 
                     <!-- Add control information to template -->
                     <xforms:setvalue ref="$query/@control" value="$control/local-name()"/>
+
+                    <!-- Add whether we must show the search field -->
+                    <xforms:setvalue ref="$query/@search-field" value="tokenize($control/@class, ' ') = ('fr-search')"/>
+
                     <!-- Add meta-information to template -->
                     <xforms:action if="$control/@bind">
                         <xxforms:variable name="bind" select="xxforms:instance('fr-source-form-instance')/xhtml:head/xforms:model//xforms:bind[@id = $control/@bind]"/>
@@ -234,9 +245,10 @@
                 </documents>
             </xforms:instance>
 
+            <!-- This submission doesn't validate as we allow sending incomplete date, time and dateTime -->
             <xforms:submission id="search-submission"
-                    ref="instance('fr-search-instance')" method="post"
-                    resource="{xxforms:instance('fr-uris-instance')/data-collection}/search/{$parameters/app}/{$parameters/form}"
+                    ref="instance('fr-search-instance')" validate="false"
+                    method="post" resource="{xxforms:instance('fr-uris-instance')/data-collection}/search/{$parameters/app}/{$parameters/form}"
                     replace="instance" instance="fr-summary-instance">
                 <!-- Set language upon submitting -->
                 <xforms:action ev:event="xforms-submit">
@@ -332,8 +344,8 @@
                         <xforms:label ref="$fr-resources/summary/labels/free-search"/>
                     </xforms:input>
 
-                    <!-- Structured search -->
-                    <xforms:repeat nodeset="instance('fr-search-instance')/query[@path]" id="search-repeat">
+                    <!-- Structured search over query terms that have search-field set to 'true' -->
+                    <xforms:repeat nodeset="instance('fr-search-instance')/query[@path and @search-field = 'true']" id="search-repeat">
                         <xxforms:variable name="control-name" select="context()/@name"/>
                         <div class="fr-summary-search-item">
                             <xxforms:variable name="label" select="$form-resources/*[local-name() = $control-name]/label"/>
@@ -443,18 +455,31 @@
                                                 <!-- control to make data accessible to JavaScript -->
                                                 <xforms:input ref="." id="fr-document-document-detail-value" class="fr-expose-to-javascript"/>
 
+                                                <xxforms:variable name="query" select="instance('fr-search-instance')/query[count(context()/preceding-sibling::detail) + 2]"/>
+
                                                 <!-- input -->
-                                                <xforms:group ref=".[instance('fr-search-instance')/query[count(context()/preceding-sibling::detail) + 2]/@control = 'input']">
-                                                    <xforms:output value="if (. castable as xs:date) then format-date(xs:date(.), $fr-resources/summary/formats/date, xxforms:instance('fr-language-instance'), (), ()) else ."/>
+                                                <xforms:group ref=".[$query/@control = 'input']">
+                                                    <xforms:group ref=".[ends-with($query/@type, ':date')]">
+                                                        <xforms:output value="if (. castable as xs:date) then format-date(xs:date(.), $fr-resources/summary/formats/date, xxforms:instance('fr-language-instance'), (), ()) else ."/>
+                                                    </xforms:group>
+                                                    <xforms:group ref=".[ends-with($query/@type, ':time')]">
+                                                        <xforms:output value="if (. castable as xs:time) then format-time(xs:time(.), $fr-resources/summary/formats/time, xxforms:instance('fr-language-instance'), (), ()) else ."/>
+                                                    </xforms:group>
+                                                    <xforms:group ref=".[ends-with($query/@type, ':dateTime')]">
+                                                        <xforms:output value="if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), $fr-resources/summary/formats/dateTime, xxforms:instance('fr-language-instance'), (), ()) else ."/>
+                                                    </xforms:group>
+                                                    <xforms:group ref=".[ends-with($query/@type, ':string')]">
+                                                        <xforms:output value="."/>
+                                                    </xforms:group>
                                                 </xforms:group>
 
                                                 <!-- textarea -->
-                                                <xforms:group ref=".[instance('fr-search-instance')/query[count(context()/preceding-sibling::detail) + 2]/@control = 'textarea']">
+                                                <xforms:group ref=".[$query/@control = 'textarea']">
                                                     <xforms:output value="if (string-length(context()) > 20) then concat(substring(context(), 1, 20), '...') else context()"/>
                                                 </xforms:group>
 
                                                 <!-- select1 -->
-                                                <xforms:group ref=".[instance('fr-search-instance')/query[count(context()/preceding-sibling::detail) + 2]/@control = 'select1']">
+                                                <xforms:group ref=".[$query/@control = 'select1']">
                                                     <xforms:output value="."/>
                                                     <!-- TODO: Obtain value from itemset -->
                                                     <!--instance('fr-source-form-instance')/xhtml:head/xforms:model/xforms:instance[@id = concat(xxforms:context('documents-repeat')/@name, 's-itemset')]/*/*-->
@@ -638,6 +663,5 @@
                 </xhtml:div>
             </fr:buttons>
         </fr:view>
-        <!--<widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>-->
     </body>
 </html>

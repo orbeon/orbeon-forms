@@ -56,6 +56,8 @@
             </labels>
             <formats>
                 <date>[MNn] [D], [Y]</date>
+                <time>[H01]:[m01]:[s01]</time>
+                <dateTime>[MNn] [D], [Y] [H01]:[m01]:[s01]</dateTime>
                 <save-datetime>[MNn] [D], [Y] [H01]:[m01]:[s01]</save-datetime>
             </formats>
         </summary>
@@ -153,6 +155,8 @@
             </labels>
             <formats>
                 <date>Le [D] [Mn] [Y]</date>
+                <time>[H01]:[m01]:[s01]</time>
+                <datetime>[D] [Mn] [Y] à [H01]:[m01]:[s01]</datetime>
                 <save-datetime>[D] [Mn] [Y] à [H01]:[m01]:[s01]</save-datetime>
             </formats>
         </summary>
@@ -231,6 +235,8 @@
             </labels>
             <formats>
                 <date>[MNn] [D], [Y]</date>
+                <time>[H01]:[m01]:[s01]</time>
+                <dateTime>[MNn] [D], [Y] [H01]:[m01]:[s01]</dateTime>
                 <save-datetime>[MNn] [D], [Y] [H01]:[m01]:[s01]</save-datetime>
             </formats>
         </summary>

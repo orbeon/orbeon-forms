@@ -137,48 +137,14 @@
             <xi:include href="{$components-uri}" xxi:omit-xml-base="true"/>
         </xsl:if>
 
-        <!-- This model handles form sections -->
-        <xforms:model id="fr-sections-model"
+        <!-- This model handles help -->
+        <xforms:model id="fr-help-model"
                       xxforms:external-events="fr-after-collapse {@xxforms:external-events}"
                       xxforms:readonly-appearance="{if ($mode = ('view', 'print', 'pdf')) then 'static' else 'dynamic'}"
                       xxforms:order="help label control alert hint"
                       xxforms:computed-binds="recalculate"
                       xxforms:offline="false"
                       xxforms:noscript="{$is-noscript}">
-
-            <xsl:copy-of select="@* except (@id, @xxforms:external-events)"/>
-            
-            <!-- Contain section being currently expanded/collapsed -->
-            <!-- TODO: This probably doesn't quite work for sections within repeats -->
-            <xforms:instance id="fr-current-section-instance">
-                <section xmlns="">
-                    <id/>
-                    <repeat-indexes/>
-                </section>
-            </xforms:instance>
-
-            <!-- Handle section collapse -->
-            <xforms:action ev:event="fr-after-collapse">
-                <xforms:toggle case="case-{{instance('fr-current-section-instance')/id}}-closed"/>
-            </xforms:action>
-
-            <!-- Close section -->
-            <xforms:action ev:event="fr-collapse">
-                <!-- Different behavior depending on whether we support script or not -->
-                <xxforms:script if="not(property('xxforms:noscript'))">frCollapse();</xxforms:script>
-                <xforms:dispatch if="property('xxforms:noscript')" target="fr-sections-model" name="fr-after-collapse"/>
-            </xforms:action>
-
-            <!-- Open section -->
-            <xforms:action ev:event="fr-expand">
-                <xforms:toggle case="case-{{instance('fr-current-section-instance')/id}}-open"/>
-                <!-- Only if we support script -->
-                <xxforms:script if="not(property('xxforms:noscript'))">frExpand();</xxforms:script>
-            </xforms:action>
-        </xforms:model>
-
-        <!-- This model handles help -->
-        <xforms:model id="fr-help-model">
             <xforms:instance id="fr-help-instance">
                 <help xmlns="">
                     <label/>
@@ -194,6 +160,8 @@
 
         </xforms:model>
 
+        <!-- This model handles form sections -->
+        <xi:include href="../includes/sections-model.xml" xxi:omit-xml-base="true"/>
         <!-- This model handles i18n resources -->
         <xi:include href="../i18n/resources-model.xml" xxi:omit-xml-base="true"/>
         <!-- This model handles offline functionality through Google Gears -->
@@ -227,4 +195,4 @@
 
 </xsl:stylesheet>
 
-
+        

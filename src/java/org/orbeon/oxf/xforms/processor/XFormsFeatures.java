@@ -115,15 +115,10 @@ public class XFormsFeatures {
     }
 
     private static final ResourceConfig[] stylesheets = {
-            // Calendar stylesheets
+            // Standard CSS
+            new ResourceConfig("/ops/yui/container/assets/container.css", null),
+            // Calendar CSS
             new ResourceConfig("/ops/javascript/jscalendar/calendar-blue.css", null) {
-                public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
-                    return "jscalendar".equals(XFormsProperties.getDatePicker(containingDocument));
-                }
-
-                protected String getFeatureName() { return "jscalendar"; }
-            },
-            new ResourceConfig("/ops/yui/container/assets/container.css", null) {
                 public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
                     return "jscalendar".equals(XFormsProperties.getDatePicker(containingDocument));
                 }

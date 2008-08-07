@@ -46,7 +46,7 @@
     <!-- Properties -->
     <xsl:variable name="has-toc" select="pipeline:property('oxf.fr.detail.toc')" as="xs:boolean?"/>
     <xsl:variable name="error-summary" select="pipeline:property('oxf.fr.detail.error-summary')" as="xs:string?"/>
-    <xsl:variable name="is-noscript-table" select="pipeline:property('oxf.fr.detail.noscript.table') = 'false'" as="xs:boolean?"/>
+    <xsl:variable name="is-noscript-table" select="not(pipeline:property('oxf.fr.detail.noscript.table'))" as="xs:boolean?"/>
     <xsl:variable name="default-logo-uri" select="pipeline:property('oxf.fr.default-logo.uri')" as="xs:string?"/>
     <xsl:variable name="has-button-save-locally" select="pipeline:property('oxf.fr.detail.button.save-locally')" as="xs:boolean?"/>
     <xsl:variable name="has-button-close" select="pipeline:property('oxf.fr.detail.button.close')" as="xs:boolean?"/>

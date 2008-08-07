@@ -14,7 +14,8 @@
 <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
     xmlns:saxon="http://saxon.sf.net/"
     xmlns:oxf="http://www.orbeon.com/oxf/processors"
-    xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
     <p:param name="instance" type="input"/>
     <p:param name="data" type="output"/>

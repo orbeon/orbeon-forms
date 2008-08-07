@@ -34,6 +34,16 @@ public class XFormsFeatures {
                 public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
                     return XFormsProperties.isOfflineMode(containingDocument);
                 }
+            },
+            new FeatureConfig("jscalendar") {
+                public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
+                    return "jscalendar".equals(XFormsProperties.getDatePicker(containingDocument));
+                }
+            },
+            new FeatureConfig("yuicalendar") {
+                public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
+                    return !"jscalendar".equals(XFormsProperties.getDatePicker(containingDocument));
+                }
             }
     };
     
@@ -107,8 +117,27 @@ public class XFormsFeatures {
     private static final ResourceConfig[] stylesheets = {
             // Calendar stylesheets
             // TODO: move to YUI if possible
-            new ResourceConfig("/ops/javascript/jscalendar/calendar-blue.css", null),
-            new ResourceConfig("/ops/yui/container/assets/container.css", null),
+            new ResourceConfig("/ops/javascript/jscalendar/calendar-blue.css", null) {
+                public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
+                    return "jscalendar".equals(XFormsProperties.getDatePicker(containingDocument));
+                }
+
+                protected String getFeatureName() { return "jscalendar"; }
+            },
+            new ResourceConfig("/ops/yui/container/assets/container.css", null) {
+                public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
+                    return "jscalendar".equals(XFormsProperties.getDatePicker(containingDocument));
+                }
+
+                protected String getFeatureName() { return "jscalendar"; }
+            },
+            new ResourceConfig("/ops/yui/calendar/assets/calendar.css", "/ops/yui/calendar/assets/calendar-min.css") {
+                public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
+                    return !"jscalendar".equals(XFormsProperties.getDatePicker(containingDocument));
+                }
+
+                protected String getFeatureName() { return "yuicalendar"; }
+            },
             // Yahoo! UI Library
             new ResourceConfig("/ops/yui/treeview/assets/treeview.css", null) {
                 public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
@@ -142,10 +171,24 @@ public class XFormsFeatures {
 
     private static final ResourceConfig[] scripts = {
             // Calendar scripts
-            // TODO: move to YUI in the future if possible
-            new ResourceConfig("/ops/javascript/jscalendar/calendar.js", "/ops/javascript/jscalendar/calendar-min.js"),
-            new ResourceConfig("/ops/javascript/jscalendar/lang/calendar-en.js", "/ops/javascript/jscalendar/lang/calendar-en-min.js"),
-            new ResourceConfig("/ops/javascript/jscalendar/calendar-setup.js", "/ops/javascript/jscalendar/calendar-setup-min.js"),
+            new ResourceConfig("/ops/javascript/jscalendar/calendar.js", "/ops/javascript/jscalendar/calendar-min.js") {
+                public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
+                    return "jscalendar".equals(XFormsProperties.getDatePicker(containingDocument));
+                }
+                protected String getFeatureName() { return "jscalendar"; }
+            },
+            new ResourceConfig("/ops/javascript/jscalendar/lang/calendar-en.js", "/ops/javascript/jscalendar/lang/calendar-en-min.js") {
+                public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
+                    return "jscalendar".equals(XFormsProperties.getDatePicker(containingDocument));
+                }
+                protected String getFeatureName() { return "jscalendar"; }
+            },
+            new ResourceConfig("/ops/javascript/jscalendar/calendar-setup.js", "/ops/javascript/jscalendar/calendar-setup-min.js") {
+                public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
+                    return "jscalendar".equals(XFormsProperties.getDatePicker(containingDocument));
+                }
+                protected String getFeatureName() { return "jscalendar"; }
+            },
             // Yahoo UI Library
             new ResourceConfig("/ops/yui/yahoo/yahoo.js", "/ops/yui/yahoo/yahoo-min.js"),
             new ResourceConfig("/ops/yui/selector/selector-beta.js", "/ops/yui/selector/selector-beta-min.js") {
@@ -160,6 +203,13 @@ public class XFormsFeatures {
             new ResourceConfig("/ops/yui/animation/animation.js", "/ops/yui/animation/animation-min.js"),
             new ResourceConfig("/ops/yui/dragdrop/dragdrop.js", "/ops/yui/dragdrop/dragdrop-min.js"),
             new ResourceConfig("/ops/yui/container/container.js", "/ops/yui/container/container-min.js"),
+
+            new ResourceConfig("/ops/yui/calendar/calendar.js", "/ops/yui/calendar/calendar-min.js") {
+                public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
+                    return !"jscalendar".equals(XFormsProperties.getDatePicker(containingDocument));
+                }
+                protected String getFeatureName() { return "yuicalendar"; }
+            },
             new ResourceConfig("/ops/yui/slider/slider.js", "/ops/yui/slider/slider-min.js") {
                 public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
                     return isRangeInUse(appearancesMap);

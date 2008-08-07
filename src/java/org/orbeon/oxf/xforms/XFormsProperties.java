@@ -197,7 +197,7 @@ public class XFormsProperties {
             new PropertyDefinition(OFFLINE_SUPPORT_PROPERTY, false, true),// dynamic
             new PropertyDefinition(DATE_FORMAT_INPUT_PROPERTY, "[M]/[D]/[Y]", true),
             new PropertyDefinition(TIME_FORMAT_INPUT_PROPERTY, "[h]:[m]:[s] [P]", true),
-            new PropertyDefinition(DATEPICKER_PROPERTY, "jscalendar", true)
+            new PropertyDefinition(DATEPICKER_PROPERTY, "yui", true)
     };
 
     private static final Map SUPPORTED_DOCUMENT_PROPERTIES;
@@ -439,6 +439,10 @@ public class XFormsProperties {
 
     public static String getForwardSubmissionHeaders(XFormsContainingDocument containingDocument) {
         return getStringProperty(containingDocument, FORWARD_SUBMISSION_HEADERS);
+    }
+
+    public static String getDatePicker(XFormsContainingDocument containingDocument) {
+        return getStringProperty(containingDocument, DATEPICKER_PROPERTY);
     }
 
     public static Object getProperty(XFormsContainingDocument containingDocument, String propertyName) {

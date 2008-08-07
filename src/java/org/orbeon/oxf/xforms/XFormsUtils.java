@@ -517,6 +517,8 @@ public class XFormsUtils {
             valueRepresentation = new FloatValue(((Float) object).floatValue());
         } else if (object instanceof Double) {
             valueRepresentation = new DoubleValue(((Double) object).doubleValue());
+        } else if (object instanceof URI) {
+            valueRepresentation = new AnyURIValue(((URI) object).toString());
         } else {
             throw new OXFException("Invalid variable type: " + object.getClass());
         }

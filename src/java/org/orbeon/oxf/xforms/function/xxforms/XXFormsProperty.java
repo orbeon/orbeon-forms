@@ -14,37 +14,32 @@
 package org.orbeon.oxf.xforms.function.xxforms;
 
 import org.orbeon.oxf.properties.Properties;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.XPathContext;
-import org.orbeon.saxon.om.EmptyIterator;
-import org.orbeon.saxon.om.ListIterator;
-import org.orbeon.saxon.om.SequenceIterator;
+import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.trans.XPathException;
-import org.orbeon.saxon.value.StringValue;
+import org.orbeon.saxon.value.AtomicValue;
 
-import java.util.Collections;
-
+/**
+ * xxforms:property() function.
+ *
+ * Return the value of a property from properties.xml.
+ */
 public class XXFormsProperty extends XFormsFunction {
 
-    public SequenceIterator iterate(XPathContext xpathContext) throws XPathException {
+    public Item evaluateItem(XPathContext xpathContext) throws XPathException {
 
         // Get property name
         final Expression propertyNameExpression = argument[0];
         final String propertyName = propertyNameExpression.evaluateAsString(xpathContext);
 
         // Get property value
-        final String propertyValue = property(propertyName);
-
-        // Return iterator
-        if (propertyValue != null)
-            return new ListIterator(Collections.singletonList(new StringValue(propertyValue)));
-        else
-            return EmptyIterator.getInstance();
+        return property(propertyName);
     }
 
-    // TODO: Return typed values like with org.orbeon.oxf.xforms.function.Property
-    public static String property(String propertyName) {
+    public static AtomicValue property(String propertyName) {
         // Never return any property containing the string "password" as a first line of defense
         if (propertyName.toLowerCase().indexOf("password") != -1) {
             return null;
@@ -52,6 +47,6 @@ public class XXFormsProperty extends XFormsFunction {
 
         // Get property value
         final Object propertyValue = Properties.instance().getPropertySet().getObject(propertyName);
-        return (propertyValue == null) ? null : propertyValue.toString();
+        return (propertyValue == null) ? null : (AtomicValue) XFormsUtils.convertJavaObjectToSaxonObject(propertyValue);
     }
 }

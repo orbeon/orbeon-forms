@@ -85,7 +85,7 @@
 
                     <!-- Apply XForms widgets if needed -->
                     <p:choose href="#request-info"><!-- dummy test input -->
-                        <p:when test="not(p:property('oxf.epilogue.xforms.widgets') = 'false')">
+                        <p:when test="not(p:property('oxf.epilogue.xforms.widgets'))">
                             <p:processor name="oxf:xslt">
                                 <!--<p:input name="data" href="#data2"/>-->
                                 <p:input name="data" href="#data"/>

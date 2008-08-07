@@ -57,7 +57,7 @@
                 <li>
                     <a name="xforms-property"/>
                     <p>
-                        <code><a href="http://www.w3.org/TR/xforms11/#fn-property">property($property-name as xs:string) as item()?</a></code>
+                        <code><a href="http://www.w3.org/TR/xforms11/#fn-property">property($property-name as xs:string) as xs:anyAtomicType?</a></code>
                     </p>
                     <p>
                         This function supports extension property names in the
@@ -72,8 +72,8 @@
                         <p>
                             The standard XForms function returns an XPath 1.0 <code>string</code>. The Orbeon Forms
                             implementation returns the following types: empty sequence (if the property is not found),
-                            <code>xs:string</code>, <code>xs:integer</code>, and <code>xs:boolean</code> depending on
-                            the type of the XForms engine properties.
+                            <code>xs:string</code>, <code>xs:integer</code>, <code>xs:boolean</code>or
+                            <code>xs:anyURI</code> depending on the type of the XForms engine properties.
                         </p>
                     </note>
                 </li>
@@ -324,12 +324,16 @@
                     <li>
                         <a name="xxforms-property"/>
                         <p>
-                            <code>xxforms:property($property-name as xs:string) as xs:string?</code>
+                            <code>xxforms:property($property-name as xs:string) as xs:anyAtomicType?</code>
                         </p>
                         <p>
                             The <code>xxforms:property()</code> function retrieves the value of a property defined
-                            in <code>properties.xml</code>. If no property exists with the given name, returns an
-                            empty sequence.
+                            in <code>properties.xml</code>.
+                        </p>
+                        <p>
+                            This function returns the following types: empty sequence (if the property is not found),
+                            <code>xs:string</code>, <code>xs:integer</code>, <code>xs:boolean</code> or
+                            <code>xs:anyURI</code> depending on the actual type of the property.
                         </p>
                         <xml-source show-namespaces="false">
                             <xforms:repeat nodeset="employee" id="employee-repeat">

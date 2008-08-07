@@ -412,7 +412,7 @@
                     <!-- Actions toolbox -->
                     <xhtml:div class="fb-tools">
 
-                        <xforms:group ref=".[xxforms:property('oxf.fb.menu.schema') = 'true']" class="fb-tool">
+                        <xforms:group ref=".[xxforms:property('oxf.fb.menu.schema')]" class="fb-tool">
                             <!-- Upload XML Schema -->
                             <xforms:trigger>
                                 <xforms:label>
@@ -424,7 +424,7 @@
                                 <xxforms:show ev:event="DOMActivate" dialog="fb-schema-upload-dialog"/>
                             </xforms:trigger>
                         </xforms:group>
-                        <xforms:group ref=".[xxforms:property('oxf.fb.menu.css') = 'true']" class="fb-tool">
+                        <xforms:group ref=".[xxforms:property('oxf.fb.menu.css')]" class="fb-tool">
                             <!--<xhtml:div class="fb-tool">-->
                                 <!-- Upload CSS -->
                                 <xforms:trigger>
@@ -438,7 +438,7 @@
                                 </xforms:trigger>
                             <!--</xhtml:div>-->
                         </xforms:group>
-                        <xforms:group ref=".[xxforms:property('oxf.fb.menu.pdf') = 'true']" class="fb-tool">
+                        <xforms:group ref=".[xxforms:property('oxf.fb.menu.pdf')]" class="fb-tool">
                             <!-- Upload PDF Template -->
                             <xforms:trigger>
                                 <xforms:label>
@@ -450,7 +450,7 @@
                                 <xxforms:show ev:event="DOMActivate" dialog="fb-pdf-upload-dialog"/>
                             </xforms:trigger>
                         </xforms:group>
-                        <xforms:group ref=".[xxforms:property('oxf.fb.menu.view-source') = 'true']" class="fb-tool">
+                        <xforms:group ref=".[xxforms:property('oxf.fb.menu.view-source')]" class="fb-tool">
                             <!-- Show XML -->
                             <xforms:trigger>
                                 <xforms:label>
@@ -460,7 +460,7 @@
                                 <xxforms:show ev:event="DOMActivate" dialog="fb-xml-dialog"/>
                             </xforms:trigger>
                         </xforms:group>
-                        <xforms:group ref=".[xxforms:property('oxf.fb.menu.edit-source') = 'true']" class="fb-tool">
+                        <xforms:group ref=".[xxforms:property('oxf.fb.menu.edit-source')]" class="fb-tool">
                             <!-- Edit Source -->
                             <xforms:trigger>
                                 <xforms:label>

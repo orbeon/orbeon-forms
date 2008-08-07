@@ -43,8 +43,6 @@
 .fr-summary-search { display: block; margin-bottom: .5em }
 .fr-summary-search-item { float: left; margin-right: .5em }
 
-.fr-summary-body { display: block; padding: 10px }
-
 .fr-paging-buttons { padding-top: .5em }
 .fr-paging-buttons button { vertical-align: middle }
 .fr-paging-buttons button img { margin: 0 } /* as other buttons set an img margin */

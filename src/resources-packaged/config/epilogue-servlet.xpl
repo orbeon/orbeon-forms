@@ -78,7 +78,7 @@
 
             <!-- Apply theme if needed -->
             <p:choose href="#request"><!-- dummy test input -->
-                <p:when test="not(p:property('oxf.epilogue.use-theme') = 'false')">
+                <p:when test="not(not(p:property('oxf.epilogue.use-theme')))">
                     <!-- Theme -->
                     <p:processor name="oxf:url-generator">
                         <p:input name="config" href="#theme-config"/>
@@ -102,7 +102,7 @@
 
             <!-- Perform URL rewriting if needed -->
             <p:choose href="#request">
-                <p:when test="not(starts-with(/request/request-path, '/xforms-renderer') and p:property('oxf.epilogue.renderer-rewrite') != 'true')">
+                <p:when test="not(starts-with(/request/request-path, '/xforms-renderer') and not(p:property('oxf.epilogue.renderer-rewrite')))">
                     <!-- Rewriting -->
                     <p:processor name="oxf:xhtml-rewrite">
                         <p:input name="rewrite-in" href="#themed-data"/>
@@ -120,7 +120,7 @@
 
             <!-- Choose between XHTML output and HTML output -->
             <p:choose href="#request">
-                <p:when test="p:property('oxf.epilogue.output-xhtml') = 'true'">
+                <p:when test="p:property('oxf.epilogue.output-xhtml')">
                     <!-- Produce XHTML output -->
                     <p:choose href="#request">
                         <p:when test="contains(/request/headers/header[name = 'accept'], 'application/xhtml+xml')">
@@ -284,7 +284,7 @@
             </p:processor>
         </p:when>
         <!-- SVG detection -->
-        <p:when test="p:property('oxf.epilogue.process-svg') = 'true' and /svg:svg">
+        <p:when test="p:property('oxf.epilogue.process-svg') and /svg:svg">
             <p:processor name="oxf:svg-converter">
                 <p:input name="config"><config/></p:input>
                 <p:input name="data" href="#xformed-data"/>

@@ -14,8 +14,8 @@
 package org.orbeon.oxf.processor.pipeline;
 
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.xforms.function.xxforms.XXFormsProperty;
 import org.orbeon.oxf.processor.pipeline.functions.RewriteResourceURI;
+import org.orbeon.oxf.xforms.function.xxforms.XXFormsProperty;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.StaticProperty;
 import org.orbeon.saxon.functions.*;
@@ -23,6 +23,7 @@ import org.orbeon.saxon.om.NamespaceConstant;
 import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.type.ItemType;
 import org.orbeon.saxon.type.Type;
+import org.orbeon.saxon.value.AtomicValue;
 import org.orbeon.saxon.value.SequenceType;
 
 import java.util.HashMap;
@@ -61,7 +62,7 @@ public class PipelineFunctionLibrary implements FunctionLibrary {
 
     // Functions are exposed statically below for access through XSLT
 
-    public static String property(String name) {
+    public static AtomicValue property(String name) {
         return XXFormsProperty.property(name);
     }
 
@@ -73,7 +74,7 @@ public class PipelineFunctionLibrary implements FunctionLibrary {
         StandardFunction.Entry e;
 
         // property() function
-        e = register("{" + PipelineProcessor.PIPELINE_NAMESPACE_URI + "}property", XXFormsProperty.class, 0, 1, 1, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
+        e = register("{" + PipelineProcessor.PIPELINE_NAMESPACE_URI + "}property", XXFormsProperty.class, 0, 1, 1, Type.ANY_ATOMIC_TYPE, StaticProperty.ALLOWS_ZERO_OR_ONE);
         StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
 
         // rewrite-resource-uri() function

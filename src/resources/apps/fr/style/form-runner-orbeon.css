@@ -1,0 +1,130 @@
+/*
+    Copyright (C) 2008 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+*/
+
+/* *********************************************** Colors, fonts, etc. ********************************************** */
+
+/* NOTE: repeats and dialogs still have colors and fonts settings above */
+
+body { background-color: #FFE27F }
+
+body, body table, textarea.xforms-textarea {
+    font-family: "Lucida Grande", Tahoma, Arial, Verdana, sans-serif;
+}
+
+a { color: #666699 }
+hr { border: 1px solid #eee }
+
+.fr-top, .fr-bottom { background-repeat: no-repeat }
+.fr-top { line-height: 10px; }/* help background image display */
+/* IE 6 HACK in all the lines below: don't show the PNG background image as it doesn't show properly */
+#doc .fr-top { background-image: url(top-750.png); _background-image: none }
+#doc4 .fr-top { background-image: url(top-974.png); _background-image: none }
+#doc-fb .fr-top { background-image: url(top-974.png); _background-image: none }
+
+#doc .fr-bottom { background-image: url(bottom-750.png); _background-image: none }
+#doc4 .fr-bottom { background-image: url(bottom-974.png); _background-image: none }
+#doc-fb .fr-bottom { background-image: url(bottom-974.png); _background-image: none }
+
+.fr-bottom .fr-orbeon-version {
+    text-align: center;
+    font-size: smaller;
+    padding: 10px;
+    color: #6E6E6E;
+}
+
+.fr-container {
+    background-color: white;
+    border: 1px solid #cccccc;
+}
+
+.fr-separator {
+    background-color: orange;
+    line-height: .5em;
+}
+
+.fr-metadata, .fr-buttons-block {
+    background-color: #F8F8F8;
+    background-image: url(logo-bg.gif);
+    background-position: top;
+    padding: 1em;
+}
+
+.xforms-alert-active {
+    font-weight: bold;
+    font-size: smaller;
+    background-image: none;
+    background-color: #DF731B;
+    color: white;
+    border-radius: 3px; -moz-border-radius: 2px; -webkit-border-radius: 3px; -ms-border-radius: 2px /* radius appears differently w/ Safari 3.1 vs. Firefox 3.0b4*/
+}
+
+.xforms-hint {
+    display: block;
+    font-size: smaller;
+    margin-top: .2em;
+    margin-left: 0;/* used to have margin here but with new colors no margin seems better */
+    width: 100%;
+    color: #6E6E6E;
+    font-style: italic
+}
+
+.xforms-label { font-weight: bold }
+
+/* Language and mode selectors */
+.fr-language-choice, .fr-noscript-choice { color: gray; font-size: 85% }
+.fr-language-choice a, .fr-noscript-choice a { color: #6E6E6E }
+
+/* Make button appear the same color as a link */
+.xforms-trigger-appearance-xxforms-minimal {
+    color: #666699;
+}
+
+/* Set controls background */
+.xforms-input input, textarea.xforms-textarea, input.xforms-secret {
+    background-image: url(field.png);
+    background-repeat: repeat-x;
+    border: 1px solid #ccc;
+}
+
+/* Upload control information */
+.xforms-upload-info { background-color: #FFFFDD }
+
+/* Metadata */
+.fr-metadata .fr-form-title {
+    color: #666699;
+}
+
+.fr-metadata .fr-form-description {
+    font-size: smaller;
+    font-style: italic;
+    color: #6E6E6E;
+}
+
+/* Table of contents */
+.fr-toc { color: #666699 }
+
+/* Error summary */
+.fr-error-title {
+    font-size: smaller;
+    font-weight: bold;
+    background-color: #DF731B;
+    color: white;
+    border-radius: 3px; -moz-border-radius: 2px; -webkit-border-radius: 3px; -ms-border-radius: 2px /* radius appears differently w/ Safari 3.1 vs. Firefox 3.0b4*/
+}
+.fr-error-label, .fr-error-row { font-weight: bold }
+
+/* Sections */
+.fr-section-container div.fr-collapsible {
+    border-bottom: 1px dotted #666699;
+}

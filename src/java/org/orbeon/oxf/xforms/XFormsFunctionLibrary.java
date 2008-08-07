@@ -242,7 +242,7 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
         StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
 
         // xxforms:property
-        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI + "}property", XXFormsProperty.class, 0, 1, 1, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
+        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI + "}property", XXFormsProperty.class, 0, 1, 1, Type.ANY_ATOMIC_TYPE, StaticProperty.ALLOWS_ZERO_OR_ONE);
         StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
 
         // Useful XSLT function

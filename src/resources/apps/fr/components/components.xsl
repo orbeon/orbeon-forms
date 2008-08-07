@@ -44,15 +44,15 @@
     <xsl:variable name="is-noscript" select="not($is-form-builder) and doc('input:request')/request/parameters/parameter[name = 'fr-noscript']/value = 'true'"/>
 
     <!-- Properties -->
-    <xsl:variable name="has-toc" select="pipeline:property('oxf.fr.detail.toc') = 'true'" as="xs:boolean"/>
-    <xsl:variable name="error-summary" select="pipeline:property('oxf.fr.detail.error-summary')" as="xs:string"/>
-    <xsl:variable name="is-noscript-table" select="pipeline:property('oxf.fr.detail.noscript.table') = 'false'" as="xs:boolean"/>
+    <xsl:variable name="has-toc" select="pipeline:property('oxf.fr.detail.toc')" as="xs:boolean?"/>
+    <xsl:variable name="error-summary" select="pipeline:property('oxf.fr.detail.error-summary')" as="xs:string?"/>
+    <xsl:variable name="is-noscript-table" select="pipeline:property('oxf.fr.detail.noscript.table') = 'false'" as="xs:boolean?"/>
     <xsl:variable name="default-logo-uri" select="pipeline:property('oxf.fr.default-logo.uri')" as="xs:string?"/>
-    <xsl:variable name="has-button-save-locally" select="pipeline:property('oxf.fr.detail.button.save-locally') = 'true'" as="xs:boolean"/>
-    <xsl:variable name="has-button-close" select="pipeline:property('oxf.fr.detail.button.close') = 'true'" as="xs:boolean"/>
-    <xsl:variable name="has-button-clear" select="pipeline:property('oxf.fr.detail.button.clear') = 'true'" as="xs:boolean"/>
-    <xsl:variable name="has-button-print" select="pipeline:property('oxf.fr.detail.button.print') = 'true'" as="xs:boolean"/>
-    <xsl:variable name="has-button-pdf" select="pipeline:property('oxf.fr.detail.button.pdf') = 'true'" as="xs:boolean"/>
+    <xsl:variable name="has-button-save-locally" select="pipeline:property('oxf.fr.detail.button.save-locally')" as="xs:boolean?"/>
+    <xsl:variable name="has-button-close" select="pipeline:property('oxf.fr.detail.button.close')" as="xs:boolean?"/>
+    <xsl:variable name="has-button-clear" select="pipeline:property('oxf.fr.detail.button.clear')" as="xs:boolean?"/>
+    <xsl:variable name="has-button-print" select="pipeline:property('oxf.fr.detail.button.print')" as="xs:boolean?"/>
+    <xsl:variable name="has-button-pdf" select="pipeline:property('oxf.fr.detail.button.pdf')" as="xs:boolean?"/>
     <xsl:variable name="components-uri" select="pipeline:property(string-join(('oxf.fb.components.uri', $app, $form), '.'))" as="xs:string?"/>
 
     <xsl:template match="/xhtml:html/xhtml:body">
@@ -105,7 +105,7 @@
             <xhtml:link rel="stylesheet" href="/ops/css/yui/reset-fonts-grids.css" type="text/css"/>
             <xhtml:link rel="stylesheet" href="/ops/css/yui/base-min.css" type="text/css"/>
             <xhtml:link rel="stylesheet" href="/apps/fr/style/form-runner-base.css" type="text/css"/>
-            <xhtml:link rel="stylesheet" href="/apps/fr/style/form-runner.css" type="text/css"/>
+            <xhtml:link rel="stylesheet" href="/apps/fr/style/form-runner-orbeon.css" type="text/css"/>
 
             <!-- Handle existing stylesheets -->
             <xsl:for-each select="xhtml:link | xhtml:style">
@@ -133,7 +133,7 @@
     <!-- Add Form Runner models and scripts -->
     <xsl:template match="/xhtml:html/xhtml:head/xforms:model[1]">
         <!-- Load components -->
-        <xsl:if test="normalize-space($components-uri) != '' ">
+        <xsl:if test="$components-uri">
             <xi:include href="{$components-uri}" xxi:omit-xml-base="true"/>
         </xsl:if>
 
@@ -226,4 +226,5 @@
     </xsl:template>
 
 </xsl:stylesheet>
+
 

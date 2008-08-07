@@ -122,7 +122,7 @@
                                             <xhtml:table class="fr-layout-table">
                                                 <xhtml:tr>
                                                     <xhtml:td rowspan="2">
-                                                        <xsl:if test="normalize-space($default-logo-uri) != ''">
+                                                        <xsl:if test="$default-logo-uri">
                                                             <xforms:output class="fr-logo" value="((instance('fr-form-metadata')/logo, concat(pipeline:property('oxf.fr.appserver.uri'), '{$default-logo-uri}'))[normalize-space() != ''])[1]" mediatype="image/*"/>
                                                         </xsl:if>
                                                     </xhtml:td>
@@ -354,7 +354,7 @@
             <xsl:if test="$position = 'bottom'">
                 <xhtml:div class="fr-separator">&#160;</xhtml:div>
             </xsl:if>
-            <xforms:group class="fr-summary-body" model="fr-error-summary-model" ref="instance('fr-errors-instance')[error[@id = instance('fr-visited-instance')/control/@id]]">
+            <xforms:group class="fr-error-summary-body" model="fr-error-summary-model" ref="instance('fr-errors-instance')[error[@id = instance('fr-visited-instance')/control/@id]]">
                 <xforms:output class="fr-error-title" value="$fr-resources/summary/titles/errors"/>
                 <xhtml:ol class="fr-error-list">
                     <xforms:repeat nodeset="error">

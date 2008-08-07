@@ -130,7 +130,7 @@ public class XFormsFeatures {
 
                 protected String getFeatureName() { return "jscalendar"; }
             },
-            new ResourceConfig("/ops/yui/calendar/assets/calendar.css", "/ops/yui/calendar/assets/calendar-min.css") {
+            new ResourceConfig("/ops/yui/calendar/assets/calendar.css", null) {
                 public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
                     return !"jscalendar".equals(XFormsProperties.getDatePicker(containingDocument));
                 }

@@ -116,7 +116,6 @@ public class XFormsFeatures {
 
     private static final ResourceConfig[] stylesheets = {
             // Calendar stylesheets
-            // TODO: move to YUI if possible
             new ResourceConfig("/ops/javascript/jscalendar/calendar-blue.css", null) {
                 public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
                     return "jscalendar".equals(XFormsProperties.getDatePicker(containingDocument));

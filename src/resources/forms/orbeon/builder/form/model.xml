@@ -121,12 +121,12 @@
                 <application-name>
                     <label>Application Name</label>
                     <hint>click to add</hint>
-                    <alert>Must be non-empty</alert>
+                    <alert>Must be non-empty and contain no blanks</alert>
                 </application-name>
                 <form-name>
                     <label>Form Name</label>
                     <hint>click to add</hint>
-                    <alert>Must be non-empty</alert>
+                    <alert>Must be non-empty and contain no blanks</alert>
                 </form-name>
                 <title>
                     <label>Form Title</label>

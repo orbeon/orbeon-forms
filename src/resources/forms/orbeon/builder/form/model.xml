@@ -235,6 +235,8 @@
             <!-- TODO: This can be refactored to a local model -->
             <itemset-resource-id/>
             <itemset-lang/>
+            <!-- TODO: This can be refactored to a local model (help) -->
+            <new-text/>
 
             <!-- Currently open in-place editor -->
             <inplace-id/>
@@ -247,9 +249,6 @@
 
             <new-language/>
             <new-language-trigger/>
-
-            <!-- TODO: This can be refactored to a local model (help) -->
-            <new-text/>
 
             <publish-trigger/>
             <controls-triggers/>
@@ -539,9 +538,12 @@
     </xforms:instance>
     <xxforms:variable name="current-control-name" select="instance('fb-current-control-instance')/id"/>
 
-    <!-- Create the bind element for the current control if it does not exist yet -->
+    <!-- Create the bind element for the current control or section if it does not exist yet -->
     <xforms:action ev:event="fb-ensure-bind">
+        <!-- Control name -->
         <xxforms:variable name="control-name" select="event('control-name')"/>
+        <!-- Use this if you don't pass a control name and just want to create the bind for the section -->
+        <xxforms:variable name="section-name" select="event('section-name')"/>
 
         <!-- Insert bind container if needed -->
         <xforms:insert context="$model"
@@ -550,8 +552,8 @@
                        origin="instance('fb-bind-template')"/>
 
         <!-- Insert bind for section if needed -->
-        <xxforms:variable name="current-control" select="$body//*[@id = concat($control-name, '-control')]"/>
-        <xxforms:variable name="current-section-name" select="$current-control/ancestor::fr:section[1]/@context"/>
+        <xxforms:variable name="current-control" select="if ($control-name) then $body//*[@id = concat($control-name, '-control')] else ()"/>
+        <xxforms:variable name="current-section-name" select="if ($control-name) then $current-control/ancestor::fr:section[1]/@context else $section-name"/>
         <xforms:action context="$model/xforms:bind[@id = 'fr-form-binds']">
             <xforms:action if="not(xforms:bind[@nodeset = $current-section-name])">
                 <xforms:insert context="." nodeset="xforms:bind" origin="instance('fb-bind-template')"/>
@@ -560,93 +562,18 @@
             </xforms:action>
         </xforms:action>
 
-        <!-- Insert bind for control if needed -->
-        <xxforms:variable name="current-bind-id" select="concat($control-name, '-bind')"/>
-        <xforms:action context="$model/xforms:bind[@id = 'fr-form-binds']/xforms:bind[@nodeset = $current-section-name]">
-            <xforms:action if="not(xforms:bind[@id = $current-bind-id])">
-                <xforms:insert context="." nodeset="xforms:bind" origin="instance('fb-bind-template')"/>
-                <xforms:setvalue ref="xforms:bind[last()]/@id" value="$current-bind-id"/>
-                <xforms:setvalue ref="xforms:bind[last()]/@nodeset" value="$control-name"/>
+        <xforms:action if="$control-name">
+            <!-- Insert bind for control if needed -->
+            <xxforms:variable name="current-bind-id" select="concat($control-name, '-bind')"/>
+            <xforms:action context="$model/xforms:bind[@id = 'fr-form-binds']/xforms:bind[@nodeset = $current-section-name]">
+                <xforms:action if="not(xforms:bind[@id = $current-bind-id])">
+                    <xforms:insert context="." nodeset="xforms:bind" origin="instance('fb-bind-template')"/>
+                    <xforms:setvalue ref="xforms:bind[last()]/@id" value="$current-bind-id"/>
+                    <xforms:setvalue ref="xforms:bind[last()]/@nodeset" value="$control-name"/>
+                </xforms:action>
             </xforms:action>
         </xforms:action>
     </xforms:action>
-
-    <!-- Validation dialog -->
-    <xforms:instance id="fb-validation-editor-instance">
-        <validation>
-            <builtin-type/>
-            <required>false</required>
-            <calculate/>
-            <schema-type/>
-            <alert/>
-        </validation>
-    </xforms:instance>
-
-    <xforms:bind nodeset="instance('fb-validation-editor-instance')">
-        <xforms:bind nodeset="required" readonly="../schema-type != ''"/>
-    </xforms:bind>
-
-    <xforms:instance id="fb-validation-types-instance" xxforms:readonly="true">
-        <choices>
-            <choices>
-                <label>String Types</label>
-                <type allow-empty="true">string</type>
-                <type allow-empty="true">normalizedString</type>
-                <type>token</type>
-                <type>language</type>
-                <type>Name</type>
-                <type>NCName</type>
-                <type>ID</type>
-                <type>IDREF</type>
-                <type>IDREFS</type>
-                <type>ENTITY</type>
-                <type>ENTITIES</type>
-                <type>NMTOKEN</type>
-                <type>NMTOKENS</type>
-            </choices>
-            <choices>
-                <label>Number Types</label>
-                <type>float</type>
-                <type>double</type>
-                <type>decimal</type>
-                <type>integer</type>
-                <type>long</type>
-                <type>int</type>
-                <type>short</type>
-                <type>byte</type>
-                <type>positiveInteger</type>
-                <type>nonPositiveInteger</type>
-                <type>negativeInteger</type>
-                <type>nonNegativeInteger</type>
-                <type>unsignedLong</type>
-                <type>unsignedInt</type>
-                <type>unsignedShort</type>
-                <type>unsignedByte</type>
-            </choices>
-            <choices>
-                <label>Time Types</label>
-                <type>duration</type>
-                <type>dateTime</type>
-                <type>time</type>
-                <type>date</type>
-                <type>gYearMonth</type>
-                <type>gYear</type>
-                <type>gMonthDay</type>
-                <type>gDay</type>
-                <type>gMonth</type>
-            </choices>
-            <choices>
-                <label>Other Types</label>
-                <type>boolean</type>
-                <!-- Not 100% sure if these two types allow empty content -->
-                <type allow-empty="true">hexBinary</type>
-                <type allow-empty="true">base64Binary</type>
-                <type>anyURI</type>
-                <type>QName</type>
-                <type>NOTATION</type>
-            </choices>
-        </choices>
-    </xforms:instance>
 
     <!-- Schema upload dialog -->
     <xforms:instance id="fb-schema-upload-instance">
@@ -776,6 +703,7 @@
     </xforms:instance>
 
     <!-- Built-in controls -->
+    <!-- TODO: create XBL-like control metadata for those -->
     <xforms:instance id="fb-controls-template" xxforms:readonly="true" xxforms:exclude-result-prefixes="pipeline xs xsi ev xi xxi fr fb saxon xbl exforms">
         <templates xmlns="">
             <template label="Single-Line Text">

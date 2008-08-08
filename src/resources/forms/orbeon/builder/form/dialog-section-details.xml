@@ -35,6 +35,16 @@
             <xforms:dispatch ev:event="DOMActivate" name="xxforms-dialog-close" target="fb-section-details-dialog"/>
         </xforms:input>
 
+        <xforms:input ref="relevant">
+            <xforms:label>Visible</xforms:label>
+            <xforms:alert>Incorrect XPath expression</xforms:alert>
+        </xforms:input>
+
+        <xforms:input ref="readonly">
+            <xforms:label>Read-Only</xforms:label>
+            <xforms:alert>Incorrect XPath expression</xforms:alert>
+        </xforms:input>
+
         <xhtml:div class="fr-dialog-buttons">
             <xforms:trigger ref="save-trigger">
                 <xforms:label>Apply</xforms:label>
@@ -78,7 +88,33 @@
                 <xxforms:context name="fb:new-name" select="$new-name"/>
             </xforms:dispatch>
 
-            <!-- No binds for sections for now -->
+        </xforms:action>
+
+        <!-- Handle binds -->
+        <xxforms:variable name="is-bind"
+                      select="normalize-space($instance/relevant) != ''
+                                or normalize-space($instance/readonly) != 'string'"/>
+        <xforms:action if="$is-bind">
+            <xxforms:variable name="current-bind-id" select="concat($new-name, '-bind')"/>
+
+            <!-- Make sure the bind is created -->
+            <xforms:dispatch name="fb-ensure-bind" target="fr-form-model">
+                <xxforms:context name="section-name" select="$new-name"/>
+            </xforms:dispatch>
+            <xxforms:variable name="bind" select="$model//xforms:bind[@nodeset = $new-name]"/>
+
+            <!-- Set relevance -->
+            <xforms:insert if="normalize-space($instance/relevant) != ''" context="$bind"
+                           origin="xxforms:attribute('relevant', normalize-space($instance/relevant))"/>
+            <xforms:delete if="normalize-space($instance/relevant) = ''" context="$bind"
+                           nodeset="@relevant"/>
+
+            <!-- Set readonly -->
+            <xforms:insert if="normalize-space($instance/readonly) != ''" context="$bind"
+                           origin="xxforms:attribute('readonly', normalize-space($instance/readonly))"/>
+            <xforms:delete if="normalize-space($instance/readonly) = ''" context="$bind"
+                           nodeset="@readonly"/>
+
         </xforms:action>
 
         <!-- No classes for sections for now -->
@@ -95,6 +131,10 @@
         <xforms:setvalue ref="$instance/section-name" value="$section-name"/>
         <xforms:setvalue ref="$instance/original-section-name" value="$section-name"/>
 
+        <xxforms:variable name="bind" select="$model//xforms:bind[@nodeset = $section-name]"/>
+        <xforms:setvalue ref="$instance/relevant" value="$bind/@relevant"/>
+        <xforms:setvalue ref="$instance/readonly" value="$bind/@readonly"/>
+
         <!-- Set focus when the dialog open  -->
         <xforms:setfocus control="fb-section-name-input"/>
     </xforms:action>
@@ -107,6 +147,8 @@
             <details>
                 <original-section-name/>
                 <section-name/>
+                <relevant/>
+                <readonly/>
                 <save-trigger/>
             </details>
         </xforms:instance>

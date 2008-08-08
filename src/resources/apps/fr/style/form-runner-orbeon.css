@@ -57,6 +57,7 @@ hr { border: 1px solid #eee }
     background-color: #F8F8F8;
     background-image: url(logo-bg.gif);
     background-position: top;
+    background-repeat: repeat-x;
     padding: 1em;
 }
 

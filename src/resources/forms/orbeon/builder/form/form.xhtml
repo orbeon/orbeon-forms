@@ -22,7 +22,8 @@
       xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
       xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-      xmlns:saxon="http://saxon.sf.net/">
+      xmlns:saxon="http://saxon.sf.net/"
+      xmlns:xbl="http://www.w3.org/ns/xbl">
     <xhtml:head>
         <xhtml:title>Orbeon Form Builder</xhtml:title>
         <!-- CSS -->
@@ -197,7 +198,8 @@
                                             <xforms:trigger appearance="minimal">
                                                 <xforms:label><xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/cog.png" alt="Details" title="Details"/></xforms:label>
                                                 <!-- Show section details dialog -->
-                                                <xxforms:show ev:event="DOMActivate" dialog="fb-section-details-dialog" neighbor="fb-top-level-sectionxxxtodo">
+                                                <!-- TODO: position better; isseu with id of buttons in fr:buttons as adding id causes duplicate id error -->
+                                                <xxforms:show ev:event="DOMActivate" dialog="fb-section-details-dialog" neighbor="fb-top-level-section">
                                                     <xxforms:context name="fr:section-name" select="$section-name"/>
                                                 </xxforms:show>
                                             </xforms:trigger>
@@ -223,18 +225,24 @@
 
                                         <!-- Respond to section delete confirmation (make sure we only catch this event dispatched directly to the section element) -->
                                         <xforms:action ev:event="fb-confirmation-yes" ev:target="fb-top-level-section">
-                                            <!-- Delete holder element for section -->
-                                            <xforms:delete nodeset="$form-instance/*[name() = context()/@context]"/>
-                                            <!-- Delete resources for section -->
-                                            <xforms:delete xxforms:iterate="$resources/resource/*[name() = context()/@context]" nodeset="."/>
 
+                                           <xxforms:variable name="section-name" select="context()/@context"/>
+
+                                            <!-- Delete holder element for section -->
+                                            <xforms:delete nodeset="$form-instance/*[name() = $section-name]"/>
+                                            <!-- Delete resources for section -->
+                                            <xforms:delete xxforms:iterate="$resources/resource/*[name() = $section-name]" nodeset="."/>
+
+                                            <!-- Delete holder element and resources for control -->
                                             <xforms:action xxforms:iterate="*/xhtml:tr/xhtml:td">
-                                                <!-- Delete holder element and resources for control -->
                                                 <xforms:action if="exists(*)">
                                                     <xforms:delete nodeset="$form-instance/*[index('fb-top-level-repeat')]/*[name() = context()/*/@ref]"/>
                                                     <xforms:delete xxforms:iterate="$resources/resource/*[name() = context()/*/@ref]" nodeset="."/>
                                                 </xforms:action>
                                             </xforms:action>
+
+                                            <!-- Delete bind -->
+                                            <xforms:delete nodeset="$model//xforms:bind[@nodeset = $section-name]"/>
 
                                             <!-- Delete section including all controls -->
                                             <xforms:delete nodeset="."/>

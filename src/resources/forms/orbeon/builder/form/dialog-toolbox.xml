@@ -22,7 +22,6 @@
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
       xmlns:saxon="http://saxon.sf.net/"
       xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-      xmlns:xbl="http://www.w3.org/ns/xbl"
 
       id="fb-toolbox">
 
@@ -94,36 +93,42 @@
 
                                     <!-- Compute next section id -->
                                     <xforms:dispatch target="fr-form-model" name="fb-compute-section-id"/>
+                                    <xxforms:variable name="new-section-name" select="concat('section-', $next-section-id)"/>
 
                                     <!-- Set xforms:label @ref value -->
                                     <xforms:setvalue ref="*[index('fb-top-level-repeat')]/xforms:label/@ref" value="concat('$form-resources/section-', $next-section-id, '/label')"/>
 
                                     <!-- Set @id value -->
-                                    <xforms:setvalue ref="*[index('fb-top-level-repeat')]/@id" value="concat('section-', $next-section-id, '-section')"/>
+                                    <xforms:setvalue ref="*[index('fb-top-level-repeat')]/@id" value="concat($new-section-name, '-section')"/>
 
                                     <!-- Set @context value -->
-                                    <xforms:setvalue ref="*[index('fb-top-level-repeat')]/@context" value="concat('section-', $next-section-id)"/>
+                                    <xforms:setvalue ref="*[index('fb-top-level-repeat')]/@context" value="$new-section-name"/>
 
                                     <!-- Insert container in the instance -->
                                     <xforms:action context="$form-instance">
                                         <!-- TODO: for now assume a top-level section containing a grid -->
                                         <xforms:insert context="." nodeset="*"
                                                        at="index('fb-top-level-repeat')" position="after"
-                                                       origin="xxforms:element(concat('section-', $next-section-id))"/>
+                                                       origin="xxforms:element($new-section-name)"/>
 
                                     </xforms:action>
 
                                     <!-- Insert resources placeholders for all languages -->
                                     <xforms:action xxforms:iterate="$resources/resource">
                                         <xforms:insert context="." nodeset="*"
-                                                       origin="xxforms:element(concat('section-', $next-section-id))"/>
+                                                       origin="xxforms:element($new-section-name)"/>
 
                                         <xforms:insert context="*[last()]" origin="instance('fb-resource-template')/*"/>
                                     </xforms:action>
 
+                                    <!-- Make sure the bind is created -->
+                                    <xforms:dispatch name="fb-ensure-bind" target="fr-form-model">
+                                        <xxforms:context name="section-name" select="$new-section-name"/>
+                                    </xforms:dispatch>
+
                                     <!-- Open label editor for newly inserted section -->
-                                    <xforms:toggle case="fr-inplace-fb-section-title-input-edit"/>
-                                    <xforms:setfocus control="fr-inplace-fb-section-title-input-input"/>
+                                    <xforms:toggle case="fr-inplace-fb-top-level-section-input-open-edit"/>
+                                    <xforms:setfocus control="fr-inplace-fb-top-level-section-input-open-input"/>
 
                                 </xforms:action>
                             </xforms:trigger>

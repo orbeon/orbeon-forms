@@ -22,7 +22,7 @@
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
       xmlns:saxon="http://saxon.sf.net/"
 
-      id="fb-edit-validation-dialog" appearance="minimal">
+      id="fb-edit-validation-dialog" appearance="minimal" model="fb-validation-model">
 
     <xforms:label>Edit Validation Properties</xforms:label>
     <xxforms:variable name="instance" select="instance('fb-validation-editor-instance')"/>
@@ -41,8 +41,8 @@
                                 <!--<xforms:value/>-->
                             <!--</xforms:item>-->
                             <xforms:itemset nodeset="instance('fb-validation-types-instance')/root()//(choices | type)">
-                                <xforms:label ref="if (self::choices) then label else ."/>
-                                <xforms:value ref="if (self::choices) then () else ."/>
+                                <xforms:label ref="if (self::choices) then label else if (label) then label else ."/>
+                                <xforms:value ref="if (self::choices) then () else if (value) then value else ."/>
                             </xforms:itemset>
                             <xforms:setvalue ev:event="xforms-value-changed" if=". != ''" ref="../schema-type"/>
                         </xforms:select1>
@@ -223,4 +223,98 @@
         <!-- Set calculate -->
         <xforms:setvalue ref="$instance/calculate" value="$current-bind/@calculate"/>
     </xforms:action>
+
+    <xforms:model id="fb-validation-model">
+        <xforms:instance id="fb-validation-editor-instance">
+            <validation>
+                <builtin-type/>
+                <required>false</required>
+                <calculate/>
+                <schema-type/>
+                <alert/>
+            </validation>
+        </xforms:instance>
+
+        <xforms:bind nodeset="instance('fb-validation-editor-instance')">
+            <xforms:bind nodeset="required" readonly="../schema-type != ''"/>
+        </xforms:bind>
+
+        <!-- TODO: i18n -->
+        <!-- TODO: more user-friendly labels for common types -->
+        <xforms:instance id="fb-validation-types-instance" xxforms:readonly="true">
+            <choices>
+                <choices>
+                    <label>Common Types</label>
+                    <type allow-empty="true">string</type>
+                    <type>float</type>
+                    <type>double</type>
+                    <type>decimal</type>
+                    <type>integer</type>
+                    <type>dateTime</type>
+                    <type>time</type>
+                    <type>date</type>
+                    <type>boolean</type>
+                    <type>anyURI</type>
+                </choices>
+                <choices>
+                    <label>String Types</label>
+                    <type allow-empty="true">string</type>
+                    <type allow-empty="true">normalizedString</type>
+                    <type>token</type>
+                    <type>language</type>
+                    <type>Name</type>
+                    <type>NCName</type>
+                    <type>ID</type>
+                    <type>IDREF</type>
+                    <type>IDREFS</type>
+                    <type>ENTITY</type>
+                    <type>ENTITIES</type>
+                    <type>NMTOKEN</type>
+                    <type>NMTOKENS</type>
+                </choices>
+                <choices>
+                    <label>Number Types</label>
+                    <type>float</type>
+                    <type>double</type>
+                    <type>decimal</type>
+                    <type>integer</type>
+                    <type>long</type>
+                    <type>int</type>
+                    <type>short</type>
+                    <type>byte</type>
+                    <type>positiveInteger</type>
+                    <type>nonPositiveInteger</type>
+                    <type>negativeInteger</type>
+                    <type>nonNegativeInteger</type>
+                    <type>unsignedLong</type>
+                    <type>unsignedInt</type>
+                    <type>unsignedShort</type>
+                    <type>unsignedByte</type>
+                </choices>
+                <choices>
+                    <label>Time Types</label>
+                    <type>duration</type>
+                    <type>dateTime</type>
+                    <type>time</type>
+                    <type>date</type>
+                    <type>gYearMonth</type>
+                    <type>gYear</type>
+                    <type>gMonthDay</type>
+                    <type>gDay</type>
+                    <type>gMonth</type>
+                </choices>
+                <choices>
+                    <label>Other Types</label>
+                    <type>boolean</type>
+                    <!-- Not 100% sure if these two types allow empty content -->
+                    <type allow-empty="true">hexBinary</type>
+                    <type allow-empty="true">base64Binary</type>
+                    <type>anyURI</type>
+                    <type>QName</type>
+                    <type>NOTATION</type>
+                </choices>
+            </choices>
+        </xforms:instance>
+    </xforms:model>
+
 </xxforms:dialog>

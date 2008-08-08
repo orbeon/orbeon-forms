@@ -49,8 +49,7 @@
                         </xsl:if>
                         <!-- Switch language -->
                         <xhtml:div class="fr-language-choice">
-                            <xxforms:variable name="default-language"
-                                              select="xxforms:property('oxf.fr.default-language')" as="xs:string"/>
+                            <xxforms:variable name="default-language" select="xxforms:instance('fr-default-language-instance')"/>
                             <!-- Put default language first, then other languages -->
                             <xxforms:variable name="available-languages"
                                               select="(xxforms:instance('fr-form-resources')/resource[@xml:lang = $default-language]/@xml:lang,

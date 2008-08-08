@@ -29,20 +29,32 @@
 
     <xhtml:div>
         <xforms:input ref="section-name" incremental="true" id="fb-section-name-input">
-            <xforms:label>Section Name</xforms:label>
+            <xforms:label>
+                <xhtml:img src="/apps/fr/style/images/silk/tag_blue.png" alt="" title=""/>
+                <xhtml:span>Section Name</xhtml:span>
+            </xforms:label>
             <xforms:alert>Name is already in use or incorrect</xforms:alert>
+            <xforms:hint>E.g.: address</xforms:hint>
             <!-- Close and save upon DOMActivate -->
             <xforms:dispatch ev:event="DOMActivate" name="xxforms-dialog-close" target="fb-section-details-dialog"/>
         </xforms:input>
 
         <xforms:input ref="relevant">
-            <xforms:label>Visible</xforms:label>
+            <xforms:label>
+                <xhtml:img src="/apps/fr/style/images/silk/eye.png" alt="" title=""/>
+                <xhtml:span>Visibility</xhtml:span>
+            </xforms:label>
             <xforms:alert>Incorrect XPath expression</xforms:alert>
+            <xforms:hint>Boolean XPath expression</xforms:hint>
         </xforms:input>
 
         <xforms:input ref="readonly">
-            <xforms:label>Read-Only</xforms:label>
+            <xforms:label>
+                <xhtml:img src="/apps/fr/style/images/silk/key.png" alt="" title=""/>
+                <xhtml:span>Read-Only</xhtml:span>
+            </xforms:label>
             <xforms:alert>Incorrect XPath expression</xforms:alert>
+            <xforms:hint>Boolean XPath expression</xforms:hint>
         </xforms:input>
 
         <xhtml:div class="fr-dialog-buttons">
@@ -70,7 +82,7 @@
         <xxforms:variable name="old-name" select="xs:string($instance/original-section-name)" as="xs:string"/>
         <xxforms:variable name="new-name" select="xs:string($instance/section-name)" as="xs:string"/>
 
-        <xxforms:variable name="section" select="($body//fr:section[@section = $old-name or @bind = concat($old-name, '-bind')])[1]" as="element(fr:section)"/>
+        <xxforms:variable name="section" select="($body//fr:section[@context = $old-name or @bind = concat($old-name, '-bind')])[1]" as="element(fr:section)"/>
 
         <!-- Make sure the bind is created (as it may not have one if it is an older form with @context only) -->
         <xforms:dispatch name="fb-ensure-bind" target="fr-form-model">

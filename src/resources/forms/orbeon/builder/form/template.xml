@@ -93,7 +93,6 @@
     <xhtml:body>
         <fr:view>
             <xforms:label ref="instance('fr-form-metadata')/title"/>
-            <xhtml:img src="/apps/fr/style/orbeon-logo-trimmed-transparent-42.png"/>
             <fr:body>
                 <fr:section id="section-1-section" context="section-1">
                     <xforms:label ref="$form-resources/section-1/label"/>

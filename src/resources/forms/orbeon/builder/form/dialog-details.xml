@@ -29,8 +29,12 @@
 
     <xhtml:div>
         <xforms:input ref="control-name" incremental="true" id="fb-edit-details-control-name-input">
-            <xforms:label>Control Name</xforms:label>
+            <xforms:label>
+                <xhtml:img src="/apps/fr/style/images/silk/tag_blue.png" alt="" title=""/>
+                <xhtml:span>Control Name</xhtml:span>
+            </xforms:label>
             <xforms:alert>Name is already in use or incorrect</xforms:alert>
+            <xforms:hint>E.g.: first-name</xforms:hint>
             <!-- Close and save upon DOMActivate -->
             <xforms:dispatch ev:event="DOMActivate" name="xxforms-dialog-close" target="fb-edit-details-dialog"/>
         </xforms:input>

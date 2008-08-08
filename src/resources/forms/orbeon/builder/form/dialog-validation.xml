@@ -79,7 +79,7 @@
             <!--</xhtml:table>-->
                         <xforms:input ref="$instance/calculate">
                             <xforms:label>
-                                <xhtml:img src="/apps/fr/style/images/silk/calculator_edit.png" alt="Edit Items" title="Edit Items"/>
+                                <xhtml:img src="/apps/fr/style/images/silk/calculator_edit.png" alt="" title=""/>
                                 <xhtml:span>Calculated Value</xhtml:span>
                             </xforms:label>
                             <xforms:hint>XPath expression</xforms:hint>

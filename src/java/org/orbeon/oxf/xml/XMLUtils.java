@@ -1048,6 +1048,12 @@ public class XMLUtils {
         return ret;
     }
 
+    public static Attributes appendToClassAttribute(Attributes attributes, String newClasses) {
+        final String oldAttribute = attributes.getValue("class");
+        final String newAttribute = oldAttribute == null ? newClasses : oldAttribute + ' ' + newClasses;
+        return addOrReplaceAttribute(attributes, "", "", "class", newAttribute);
+    }
+
     public static Attributes addOrReplaceAttribute(Attributes attributes, String uri, String prefix, String localname, String value) {
         final AttributesImpl newAttributes = new AttributesImpl();
         boolean replaced = false;

@@ -116,7 +116,7 @@ public class XFormsFeatures {
 
     private static final ResourceConfig[] stylesheets = {
             // Standard CSS
-            new ResourceConfig("/ops/yui/container/assets/container.css", null),
+            new ResourceConfig("/ops/yui/container/assets/skins/sam/container.css", null),
             // Calendar CSS
             new ResourceConfig("/ops/javascript/jscalendar/calendar-blue.css", null) {
                 public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
@@ -125,7 +125,7 @@ public class XFormsFeatures {
 
                 protected String getFeatureName() { return "jscalendar"; }
             },
-            new ResourceConfig("/ops/yui/calendar/assets/calendar.css", null) {
+            new ResourceConfig("/ops/yui/calendar/assets/skins/sam/calendar.css", null) {
                 public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
                     return !"jscalendar".equals(XFormsProperties.getDatePicker(containingDocument));
                 }
@@ -133,7 +133,7 @@ public class XFormsFeatures {
                 protected String getFeatureName() { return "yuicalendar"; }
             },
             // Yahoo! UI Library
-            new ResourceConfig("/ops/yui/treeview/assets/treeview.css", null) {
+            new ResourceConfig("/ops/yui/treeview/assets/skins/sam/treeview.css", null) {
                 public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
                     return isTreeInUse(appearancesMap);
                 }
@@ -145,7 +145,7 @@ public class XFormsFeatures {
                 }
                 public String getFeatureName() { return "tree"; }
             },
-            new ResourceConfig("/ops/yui/menu/assets/menu.css", null) {
+            new ResourceConfig("/ops/yui/menu/assets/skins/sam/menu.css", null) {
                 public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
                     return isMenuInUse(appearancesMap);
                 }

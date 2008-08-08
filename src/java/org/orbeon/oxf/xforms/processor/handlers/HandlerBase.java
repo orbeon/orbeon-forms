@@ -236,6 +236,7 @@ public abstract class HandlerBase extends ElementHandler {
         final FastStringBuffer sb;
         {
             // We only call xforms-control the actual controls as per the spec
+            // TODO: no longer, XForms 1.1 has core and container controls
             if (!XFormsControlFactory.isContainerControl(controlName))
                 sb = new FastStringBuffer("xforms-control xforms-");
             else

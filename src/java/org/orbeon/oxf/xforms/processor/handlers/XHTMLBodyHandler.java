@@ -74,6 +74,10 @@ public class XHTMLBodyHandler extends HandlerBase {
             }
         }
 
+        // Add class for YUI skin
+        // TODO: should be configurable somehow
+        attributes = XMLUtils.appendToClassAttribute(attributes, "yui-skin-sam");
+
         // Start xhtml:body
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
         contentHandler.startElement(uri, localname, qName, attributes);

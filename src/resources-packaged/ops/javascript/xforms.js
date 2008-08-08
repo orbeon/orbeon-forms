@@ -351,7 +351,7 @@ ORBEON.util.Dom = {
      *    See: http://www.csb7.com/test/ie_getelementbyid_bug/index.php
      *
      * 2) This performs caching of element ids, so when the same element is requested many times in a row we'll be
-     *    able to respond just by looking at the cache, instead of calling document.getElementById. This has a=
+     *    able to respond just by looking at the cache, instead of calling document.getElementById. This has a
      *    significant impact in particular when copying many repeat items on Firefox.
      */
     getElementById: function(controlId) {
@@ -3042,14 +3042,14 @@ ORBEON.xforms.Init = {
     },
 
     registerDraggableListenersOnRepeatElements: function() {
-	var repeatDelimiter = YAHOO.util.Dom.getElementsByClassName("xforms-repeat-delimiter");
+        var repeatDelimiter = YAHOO.util.Dom.getElementsByClassName("xforms-repeat-delimiter");
 
         for (var i = 0; i < repeatDelimiter.length; i++) {
             var previousSiblingId = YAHOO.util.Dom.getPreviousSibling(repeatDelimiter[i]).id;
             var repeatElement = YAHOO.util.Dom.getNextSibling(repeatDelimiter[i]);
             if (ORBEON.util.Dom.hasClass(repeatElement, "xforms-dnd")) {
-            	//Right now, we support Drag n Drop of following elements
-            	if(repeatElement.tagName.toLowerCase() == "div" || repeatElement.tagName.toLowerCase() == "tr" || repeatElement.tagName.toLowerCase() == "td") {
+                //Right now, we support Drag n Drop of following elements
+                if(repeatElement.tagName.toLowerCase() == "div" || repeatElement.tagName.toLowerCase() == "tr" || repeatElement.tagName.toLowerCase() == "td") {
                     ORBEON.xforms.Init.registerDraggableListenersOnRepeatElement(repeatElement, previousSiblingId);
                 }
             }
@@ -3057,18 +3057,19 @@ ORBEON.xforms.Init = {
     },
 
     registerDraggableListenersOnRepeatElement: function(repeatElement, previousSiblingId) {
-         var draggableItem = new ORBEON.xforms.DnD.DraggableItem(repeatElement);
+        //console.log("Draggable element", repeatElement);
+        var draggableItem = new ORBEON.xforms.DnD.DraggableItem(repeatElement);
 
         if(previousSiblingId.indexOf(XFORMS_SEPARATOR_1) == -1)
             repeatElement.position = XFORMS_SEPARATOR_1 + "1";
         else
-           repeatElement.position = XFORMS_SEPARATOR_1 + previousSiblingId.substring(previousSiblingId.indexOf(XFORMS_SEPARATOR_1)+1) + XFORMS_SEPARATOR_2 + "1";
+            repeatElement.position = XFORMS_SEPARATOR_1 + previousSiblingId.substring(previousSiblingId.indexOf(XFORMS_SEPARATOR_1)+1) + XFORMS_SEPARATOR_2 + "1";
 
 
         if(ORBEON.util.Dom.hasClass(repeatElement, "xforms-dnd-vertical"))
-           draggableItem.setXConstraint(0, 0);
+            draggableItem.setXConstraint(0, 0);
         else if(ORBEON.util.Dom.hasClass(repeatElement, "xforms-dnd-horizontal"))
-	   draggableItem.setYConstraint(0, 0);
+            draggableItem.setYConstraint(0, 0);
     },
 
     document: function() {
@@ -3729,30 +3730,30 @@ ORBEON.xforms.Server = {
                 && (bypassRequestQueue || ORBEON.xforms.Globals.executeEventFunctionQueued == 0)) {
 
             // Collapse value change for the same control
-        {
-            var seenControlValue = {};
-            var newEvents = [];
-            for (var eventIndex = ORBEON.xforms.Globals.eventQueue.length - 1; eventIndex >= 0; eventIndex--) {
-                // Extract information from event array
-                var event = ORBEON.xforms.Globals.eventQueue[eventIndex];
-                if (event.eventName == "xxforms-value-change-with-focus-change") {
-                    // Don't send change value if there is already a change value for the same control
-                    if (seenControlValue[event.targetId] == null) {
-                        seenControlValue[event.targetId] = true;
-                        // Don't send change value if the server already knows about the value of this control
-                        if (ORBEON.util.Dom.hasClass(ORBEON.util.Dom.getElementById(event.targetId), "xforms-upload") ||
-                            (ORBEON.xforms.Globals.serverValue[event.targetId] != "undefined"
-                                    && ORBEON.xforms.Globals.serverValue[event.targetId] != event.value)) {
-                            ORBEON.xforms.Globals.serverValue[event.targetId] = event.value;
-                            newEvents.unshift(event);
+            {
+                var seenControlValue = {};
+                var newEvents = [];
+                for (var eventIndex = ORBEON.xforms.Globals.eventQueue.length - 1; eventIndex >= 0; eventIndex--) {
+                    // Extract information from event array
+                    var event = ORBEON.xforms.Globals.eventQueue[eventIndex];
+                    if (event.eventName == "xxforms-value-change-with-focus-change") {
+                        // Don't send change value if there is already a change value for the same control
+                        if (seenControlValue[event.targetId] == null) {
+                            seenControlValue[event.targetId] = true;
+                            // Don't send change value if the server already knows about the value of this control
+                            if (ORBEON.util.Dom.hasClass(ORBEON.util.Dom.getElementById(event.targetId), "xforms-upload") ||
+                                (ORBEON.xforms.Globals.serverValue[event.targetId] != "undefined"
+                                        && ORBEON.xforms.Globals.serverValue[event.targetId] != event.value)) {
+                                ORBEON.xforms.Globals.serverValue[event.targetId] = event.value;
+                                newEvents.unshift(event);
+                            }
                         }
+                    } else {
+                        newEvents.unshift(event);
                     }
-                } else {
-                    newEvents.unshift(event);
                 }
+                ORBEON.xforms.Globals.eventQueue = newEvents;
             }
-            ORBEON.xforms.Globals.eventQueue = newEvents;
-        }
 
             // Check again that we have events to send after collapsing
             if (ORBEON.xforms.Globals.eventQueue.length > 0) {
@@ -4878,34 +4879,33 @@ ORBEON.xforms.Server = {
     }
 };
 
-//SAN start
 YAHOO.util.DDM.mode = YAHOO.util.DDM.INTERSECT;
 YAHOO.util.DragDropMgr.preventDefault = false;
 
 ORBEON.xforms.DnD = {
 
     DraggableItem: function(element, sGroup, config) {
-    	ORBEON.xforms.DnD.DraggableItem.superclass.constructor.call(this, element, element.tagName, config);
-    	YAHOO.util.Dom.setStyle(element, "cursor", "move");
+        ORBEON.xforms.DnD.DraggableItem.superclass.constructor.call(this, element, element.tagName, config);
+        YAHOO.util.Dom.setStyle(element, "cursor", "move");
     },
 
     getClosestMatch: function(id) {
-	var bestMatchId = YAHOO.util.DDM.getBestMatch(id);
-	var bestMatchCount = ORBEON.util.Utils.countOccurences(bestMatchId.id.substring(bestMatchId.id.indexOf(XFORMS_SEPARATOR_1)+1),XFORMS_SEPARATOR_2);
-	for(var i = 0 ; i < id.length; i++) {
-	    var count = ORBEON.util.Utils.countOccurences(id[i].id.substring(id[i].id.indexOf(XFORMS_SEPARATOR_1)+1) ,XFORMS_SEPARATOR_2);
-	    if(count > bestMatchCount) { //We get a more specific match
-	        bestMatchId = id[i];
-	        bestMatchCount = count;
-	    }
-	    else if(count == bestMatchCount) { //Both are specific to the same level, let's check the level of overlap
-	       if(bestMatchId.getEl().overlap && (bestMatchId.getEl().overlap.getArea() < id[i].overlap.getArea())) {
-	           bestMatchId = id[i];
-	           bestMatchCount = count;
-	       }
-	    }
-	}
-	return bestMatchId.getEl();
+        var bestMatchId = YAHOO.util.DDM.getBestMatch(id);
+        var bestMatchCount = ORBEON.util.Utils.countOccurences(bestMatchId.id.substring(bestMatchId.id.indexOf(XFORMS_SEPARATOR_1)+1),XFORMS_SEPARATOR_2);
+        for(var i = 0 ; i < id.length; i++) {
+            var count = ORBEON.util.Utils.countOccurences(id[i].id.substring(id[i].id.indexOf(XFORMS_SEPARATOR_1)+1) ,XFORMS_SEPARATOR_2);
+            if(count > bestMatchCount) { //We get a more specific match
+                bestMatchId = id[i];
+                bestMatchCount = count;
+            }
+            else if(count == bestMatchCount) { //Both are specific to the same level, let's check the level of overlap
+                if(bestMatchId.getEl().overlap && (bestMatchId.getEl().overlap.getArea() < id[i].overlap.getArea())) {
+                    bestMatchId = id[i];
+                    bestMatchCount = count;
+                }
+            }
+        }
+        return bestMatchId.getEl();
     }
 };
 
@@ -4913,14 +4913,14 @@ YAHOO.extend(ORBEON.xforms.DnD.DraggableItem, YAHOO.util.DDProxy, {
 
     startDrag: function(x, y) {
 
-    	var dragElement = this.getDragEl();
+        var dragElement = this.getDragEl();
         var srcElement = this.getEl();
         var sourceControlElement = ORBEON.util.Dom.getChildElementByClass(srcElement.parentNode, "xforms-repeat-begin-end");
         this.sourceControlID = sourceControlElement.id.substr(13);//we are interested in part after repeat-begin- in id
 
-	var index = srcElement.id.indexOf(XFORMS_SEPARATOR_1); //middot's index
-	this.startPosition = (index != -1) ? srcElement.id.substr(index+1) : srcElement.position.substr(srcElement.position.indexOf(XFORMS_SEPARATOR_1)+1);
-	YAHOO.util.Dom.setStyle(dragElement, "opacity", 0.67);
+        var index = srcElement.id.indexOf(XFORMS_SEPARATOR_1); //middot's index
+        this.startPosition = (index != -1) ? srcElement.id.substr(index+1) : srcElement.position.substr(srcElement.position.indexOf(XFORMS_SEPARATOR_1)+1);
+        YAHOO.util.Dom.setStyle(dragElement, "opacity", 0.67);
         dragElement.innerHTML = srcElement.innerHTML;
         dragElement.className = srcElement.className;
         YAHOO.util.Dom.setStyle(srcElement, "visibility", "hidden");
@@ -4929,15 +4929,15 @@ YAHOO.extend(ORBEON.xforms.DnD.DraggableItem, YAHOO.util.DDProxy, {
     onDragDrop: function(e, id) {
         var overElement;
 
-	if ("string" == typeof id) {
+        if ("string" == typeof id) {
             overElement = YAHOO.util.DDM.getElement(id);
         }
         else {
             overElement = ORBEON.xforms.DnD.getClosestMatch(id);
         }
-	var srcElement = this.getEl();
-	var index = overElement.id.indexOf(XFORMS_SEPARATOR_1); //middot's index
-	this.endPosition = (index != -1) ? overElement.id.substr(index+1) : overElement.position.substr(overElement.position.indexOf(XFORMS_SEPARATOR_1)+1);
+        var srcElement = this.getEl();
+        var index = overElement.id.indexOf(XFORMS_SEPARATOR_1); //middot's index
+        this.endPosition = (index != -1) ? overElement.id.substr(index+1) : overElement.position.substr(overElement.position.indexOf(XFORMS_SEPARATOR_1)+1);
     },
 
     endDrag: function(e) {
@@ -4946,32 +4946,32 @@ YAHOO.extend(ORBEON.xforms.DnD.DraggableItem, YAHOO.util.DDProxy, {
         var proxy = this.getDragEl();
 
         YAHOO.util.Dom.setStyle(proxy, "visibility", "");
-         var motion = new YAHOO.util.Motion(
-             proxy, {
-                 points: {
-                     to: YAHOO.util.Dom.getXY(srcElement)
-                 }
-             },
-             0.2,
-             YAHOO.util.Easing.easeOut
-         )
-         var proxyid = proxy.id;
-         var thisid = this.id;
+        var motion = new YAHOO.util.Motion(
+                proxy, {
+            points: {
+                to: YAHOO.util.Dom.getXY(srcElement)
+            }
+        },
+                0.2,
+                YAHOO.util.Easing.easeOut
+                )
+        var proxyid = proxy.id;
+        var thisid = this.id;
 
-         // Hide the proxy and show the source element when finished with the animation
-         motion.onComplete.subscribe(function() {
-         	YAHOO.util.Dom.setStyle(proxyid, "visibility", "hidden");
-         	YAHOO.util.Dom.setStyle(thisid, "visibility", "");
-         });
-         motion.animate();
+        // Hide the proxy and show the source element when finished with the animation
+        motion.onComplete.subscribe(function() {
+            YAHOO.util.Dom.setStyle(proxyid, "visibility", "hidden");
+            YAHOO.util.Dom.setStyle(thisid, "visibility", "");
+        });
+        motion.animate();
 
-       if(this.startPosition == null || this.endPosition == null)
+        if(this.startPosition == null || this.endPosition == null)
             return;
-  	 var draggableRepeatDiv = YAHOO.util.Dom.getElementsByClassName("xforms-draggableRepeat")[0];
-       if (draggableRepeatDiv == null) {
+        var draggableRepeatDiv = YAHOO.util.Dom.getElementsByClassName("xforms-draggableRepeat")[0];
+        if (draggableRepeatDiv == null) {
             var form;
             for (var formIndex = 0; formIndex < document.forms.length; formIndex++) {
-            	var candidateForm = document.forms[formIndex];
+                var candidateForm = document.forms[formIndex];
                 if (ORBEON.util.Dom.hasClass(candidateForm, "xforms-form")) {
                     form = candidateForm;
                     break;
@@ -4983,11 +4983,11 @@ YAHOO.extend(ORBEON.xforms.DnD.DraggableItem, YAHOO.util.DDProxy, {
             form.appendChild(draggableRepeatDiv);
         }
         else {
-	    draggableRepeatDiv.id = this.sourceControlID;
+            draggableRepeatDiv.id = this.sourceControlID;
         }
         xformsFireEvents([xformsCreateEventArray(draggableRepeatDiv, "xxforms-dnd", null, null,
-                          new Array("dnd-start", this.startPosition, "dnd-end", this.endPosition))], false);
-     }
+                new Array("dnd-start", this.startPosition, "dnd-end", this.endPosition))], false);
+    }
 });
 
 ORBEON.xforms.Offline = {
@@ -5908,12 +5908,19 @@ function xformsFireEvents(events, incremental) {
         var value = event[2];
         var other = event[3];
         var additionalAttribs = event[4];
-        newEvents.push(new ORBEON.xforms.Server.Event(
-                target == undefined ? null : ORBEON.xforms.Controls.getForm(target),
-                target == undefined ? null : target.id,
-                other == undefined ? null : other.id,
-                value, eventName, null, null,
-                additionalAttribs ==  undefined ? null : additionalAttribs));
+        var form = target == undefined ? null : ORBEON.xforms.Controls.getForm(target);
+
+        // If a target was specified but we can't find the form for that target, then it means that the target is not
+        // in the page anymore. It must have been removed and we don't want to send information about this
+        // target to the server.
+        if (target == undefined || form != null) {
+            newEvents.push(new ORBEON.xforms.Server.Event(
+                    target == undefined ? null : ORBEON.xforms.Controls.getForm(target),
+                    target == undefined ? null : target.id,
+                    other == undefined ? null : other.id,
+                    value, eventName, null, null,
+                    additionalAttribs ==  undefined ? null : additionalAttribs));
+        }
     }
     ORBEON.xforms.Server.fireEvents(newEvents, incremental);
 }

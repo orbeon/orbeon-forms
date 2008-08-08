@@ -1,0 +1,38 @@
+<!--
+    Copyright (C) 2008 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+            xmlns:xhtml="http://www.w3.org/1999/xhtml"
+            xmlns:xi="http://www.w3.org/2001/XInclude">
+
+    <xhtml:head>
+        <xforms:model>
+            <xforms:instance>
+                <foo:value xmlns:foo="http://orbeon.org/oxf/xml/foo"/>
+            </xforms:instance>
+        </xforms:model>
+    </xhtml:head>
+    <xhtml:body>
+
+        <!--<xforms:input xmlns:xforms="http://www.w3.org/2002/xforms"-->
+                      <!--xmlns:xhtml="http://www.w3.org/1999/xhtml"-->
+                      <!--xmlns:foo="http://orbeon.org/oxf/xml/foo"-->
+
+                      <!--ref="/foo:value">-->
+            <!--<xforms:label>Value:</xforms:label>-->
+        <!--</xforms:input>-->
+
+        <xi:include href="oxf:/apps/xforms-sandbox/samples/include.xml"/>
+        <xi:include href="oxf:/apps/xforms-sandbox/samples/include.xml"/>
+    </xhtml:body>
+</xhtml:html>

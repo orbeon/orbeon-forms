@@ -1246,7 +1246,11 @@ ORBEON.xforms.Controls = {
             var jsDateDate = ORBEON.util.DateTime.magicDateToJSDate(dateValue);
             var timeValue = ORBEON.util.Dom.getChildElementByIndex(control, 1).value;
             var jsDateTime = ORBEON.util.DateTime.magicTimeToJSDate(timeValue);
-            return jsDateDate == null || jsDateTime == null ? dateValue + "T" + timeValue : ORBEON.util.DateTime.jsDateToISODateTime(jsDateDate, jsDateTime);
+            if (jsDateDate == null || jsDateTime == null) {
+                return dateValue == "" && timeValue == "" ? "" : dateValue + "T" + timeValue;
+            } else {
+                return ORBEON.util.DateTime.jsDateToISODateTime(jsDateDate, jsDateTime);
+            }
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-input") && !ORBEON.util.Dom.hasClass(control, "xforms-type-boolean") && !ORBEON.util.Dom.hasClass(control, "xforms-static")) {
             return ORBEON.util.Dom.getChildElementByIndex(control, 0).value;
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-select1-open")) {

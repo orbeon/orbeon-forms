@@ -315,7 +315,7 @@
         <xxforms:variable name="control" select="event('control')"/>
 
         <xxforms:variable name="control-name" select="substring-before($control/@id, '-control')"/>
-        <xxforms:variable name="section-name" select="$control/ancestor::fr:section[1]/@context"/>
+        <xxforms:variable name="section-name" select="$control/ancestor::fr:section[1]/(if (@context) then @context else substring-before(@bind, '-bind'))"/>
         <xxforms:variable name="bind" select="$model/xforms:bind[@id = 'fr-form-binds']/xforms:bind[@nodeset = $section-name]/xforms:bind[@nodeset = $control-name]"/>
 
         <!-- Delete control -->
@@ -507,7 +507,7 @@
 
             <!-- Insert instance and resource holders -->
             <!-- TODO: match against existing languages, as that may have changed between copy and paste -->
-            <xxforms:variable name="section-name" select="$current-td/ancestor::fr:section[1]/@context"/>
+            <xxforms:variable name="section-name" select="$current-td/ancestor::fr:section[1]/(if (@context) then @context else substring-before(@bind, '-bind'))"/>
             <xforms:dispatch name="fb-insert-holders" target="fr-form-model">
                 <xxforms:context name="current-td" select="$new-td"/>
                 <xxforms:context name="section-name" select="$section-name"/>
@@ -552,8 +552,10 @@
                        origin="instance('fb-bind-template')"/>
 
         <!-- Insert bind for section if needed -->
-        <xxforms:variable name="current-control" select="if ($control-name) then $body//*[@id = concat($control-name, '-control')] else ()"/>
-        <xxforms:variable name="current-section-name" select="if ($control-name) then $current-control/ancestor::fr:section[1]/@context else $section-name"/>
+        <xxforms:variable name="current-control"
+                          select="if ($control-name) then $body//*[@id = concat($control-name, '-control')] else ()"/>
+        <xxforms:variable name="current-section-name"
+                          select="if ($control-name) then $current-control/ancestor::fr:section[1]/(if (@context) then @context else substring-before(@bind, '-bind')) else $section-name"/>
         <xforms:action context="$model/xforms:bind[@id = 'fr-form-binds']">
             <xforms:action if="not(xforms:bind[@nodeset = $current-section-name])">
                 <xforms:insert context="." nodeset="xforms:bind" origin="instance('fb-bind-template')"/>
@@ -574,6 +576,12 @@
             </xforms:action>
         </xforms:action>
     </xforms:action>
+
+    <!-- TODO: Use this once OF supports custom XPath functions -->
+    <!--<xforms:function name="fb:get-section-name" as="xs:string">-->
+        <!--<xforms:param name="section" as="element(fr:section)"/>-->
+        <!--<xforms:return select="if ($section/@context) then $section/@context else substring-before($section/@bind, '-bind')"/>-->
+    <!--</xforms:function>-->
 
     <!-- Schema upload dialog -->
     <xforms:instance id="fb-schema-upload-instance">
@@ -666,7 +674,7 @@
     </xforms:action>
 
     <xforms:instance id="fb-section-template" xxforms:readonly="true" xxforms:exclude-result-prefixes="pipeline xs xsi ev xi xxi xxforms fb saxon xbl exforms">
-        <fr:section id="" context="">
+        <fr:section id="" bind="">
             <xforms:label ref=""/>
             <fr:grid columns="1">
                 <xhtml:tr>

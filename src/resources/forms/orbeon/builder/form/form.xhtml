@@ -175,7 +175,7 @@
                                 <xforms:group ref=".[local-name() = 'section']">
 
                                     <!-- Section name -->
-                                    <xxforms:variable name="section-name" select="@context"/>
+                                    <xxforms:variable name="section-name" select="if (@context) then @context else substring-before(@bind, '-bind')"/>
                                     <!-- Holder element for the section -->
                                     <xxforms:variable name="section-holder" select="$form-instance/*[name() = $section-name]"/>
 
@@ -226,7 +226,7 @@
                                         <!-- Respond to section delete confirmation (make sure we only catch this event dispatched directly to the section element) -->
                                         <xforms:action ev:event="fb-confirmation-yes" ev:target="fb-top-level-section">
 
-                                           <xxforms:variable name="section-name" select="context()/@context"/>
+                                            <xxforms:variable name="section-name" select="if (context()/@context) then context()/@context else substring-before(context()/@bind, '-bind')"/>
 
                                             <!-- Delete holder element for section -->
                                             <xforms:delete nodeset="$form-instance/*[name() = $section-name]"/>

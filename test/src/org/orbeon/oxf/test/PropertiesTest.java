@@ -42,6 +42,7 @@ public class PropertiesTest extends TestCase {
     public void testWildcardMatches() {
         final PropertySet propertySet = propertyStore.getGlobalPropertySet();
 
+        // Try to find one match per property
         assertEquals(propertySet.getString("test.orbeon.builder.form"), "value0");
         assertEquals(propertySet.getString("test.foo.builder.form"), "value1");
         assertEquals(propertySet.getString("test.orbeon.foo.form"), "value2");
@@ -50,5 +51,20 @@ public class PropertiesTest extends TestCase {
         assertEquals(propertySet.getString("test.foo.builder.bar"), "value5");
         assertEquals(propertySet.getString("test.orbeon.foo.bar"), "value6");
         assertEquals(propertySet.getString("test.foo.bar.bat"), "value7");
+    }
+
+    public void testExactMatches() {
+        final PropertySet propertySet = propertyStore.getGlobalPropertySet();
+
+        // Ensure that exact matches are handled first (you would expect that wildcards would work here too, but for
+        // now they don't work by design ;)
+        assertEquals(propertySet.getString("test.orbeon.builder.form"), "value0");
+        assertEquals(propertySet.getString("test.*.builder.form"), "value1");
+        assertEquals(propertySet.getString("test.orbeon.*.form"), "value2");
+        assertEquals(propertySet.getString("test.*.*.form"), "value3");
+        assertEquals(propertySet.getString("test.orbeon.builder.*"), "value4");
+        assertEquals(propertySet.getString("test.*.builder.*"), "value5");
+        assertEquals(propertySet.getString("test.orbeon.*.*"), "value6");
+        assertEquals(propertySet.getString("test.*.*.*"), "value7");
     }
 }

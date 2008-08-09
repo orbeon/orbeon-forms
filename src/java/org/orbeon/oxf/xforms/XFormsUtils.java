@@ -1175,6 +1175,27 @@ public class XFormsUtils {
     }
 
     /**
+     * Return whether the given string contains a well-formed XPath 2.0 expression.
+     *
+     * @param xpathString   string to check
+     * @return              true iif the given string contains well-formed XPath 2.0
+     */
+    public static boolean isXPath2Expression(String xpathString) {
+        // Empty string is never well-formed XPath
+        if (xpathString.trim().length() == 0)
+            return false;
+
+        try {
+            XPathCache.getXPathExpression(null, null, xpathString, null);
+        } catch (Exception e) {
+            // Ideally we would like the parser to not throw as this is time-consuming, but not sure how to achieve that
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * Create a JavaScript function name based on a script id.
      *
      * @param scriptId  id of the script

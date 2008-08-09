@@ -636,7 +636,8 @@ public class XFormsModelBinds {
         String nodeValue = null;
 
         // Handle required MIP
-        if (InstanceData.getRequired(currentNodeInfo)) {// this assumes that the required MIP has been already computed (during recalculate)
+        final boolean isRequired = InstanceData.getRequired(currentNodeInfo);
+        if (isRequired) {// this assumes that the required MIP has been already computed (during recalculate)
             // Current node is required...
             nodeValue = XFormsInstance.getValueForNodeInfo(currentNodeInfo);
 
@@ -727,9 +728,17 @@ public class XFormsModelBinds {
                     } else if (isBuiltInXXFormsType) {
                         // Built-in extension types
 
+                        // NOTE: For the two types below, we use the required MIP to influence validity. This is not
+                        // the common XForms practice but it is convenient here.
+                        final boolean isOptionalAndEmpty = !isRequired && "".equals(nodeValue);
                         if (typeLocalname.equals("xml")) {
                             // xxforms:xml type
-                            if (!XMLUtils.isWellFormedXML(nodeValue)) {
+                            if (!isOptionalAndEmpty && !XMLUtils.isWellFormedXML(nodeValue)) {
+                                InstanceData.updateValueValid(currentNodeInfo, false, bind.getId());
+                            }
+                        } else if (typeLocalname.equals("xpath2")) {
+                            // xxforms:xpath2 type
+                            if (!isOptionalAndEmpty && !XFormsUtils.isXPath2Expression(nodeValue)) {
                                 InstanceData.updateValueValid(currentNodeInfo, false, bind.getId());
                             }
 

@@ -359,9 +359,14 @@ public class XMLUtils {
      * Return whether the given string contains well-formed XML.
      *
      * @param xmlString     string to check
-     * @return              true iif the given string contains well-formed XML.
+     * @return              true iif the given string contains well-formed XML
      */
     public static boolean isWellFormedXML(String xmlString) {
+
+        // Empty string is never well-formed XML
+        if (xmlString.trim().length() == 0)
+            return false;
+
         try {
             final XMLReader xmlReader = newSAXParser(false, false).getXMLReader();
             xmlReader.setContentHandler(NULL_CONTENT_HANDLER);

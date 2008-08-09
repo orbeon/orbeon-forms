@@ -991,6 +991,20 @@
                         Note that this checks the <b>string value</b> of the node, which means that the node must
                         contain escaped XML.
                     </p>
+                    <p>
+                        Orbeon Forms supports the built-in <code>xxforms:xpath2</code> extension type. This types checks
+                        that the value is well-formed XPath 2.0:
+                    </p>
+                    <xml-source>
+                        <xforms:bind nodeset="my-xpath" type="xxforms:xpath2"/>
+                    </xml-source>
+                    <note>
+                        <p>
+                            In both these cases, Orbeon Forms checks for the <code>required</code> MIP: if it evaluates
+                            to <code>false()</code> and the value is the empty string, then the instance data node is
+                            considered valid. This is contrary to XForms 1.1 as of August 2008.
+                        </p>
+                    </note>
                 </section>
                 <a name="validation-extensions-schema"/>
                 <section>

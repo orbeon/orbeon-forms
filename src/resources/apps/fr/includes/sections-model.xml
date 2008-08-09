@@ -34,7 +34,7 @@
 
     <!-- Handle section collapse -->
     <xforms:action ev:event="fr-after-collapse">
-        <xforms:toggle case="case-{{instance('fr-current-section-instance')/id}}-closed"/>
+        <xforms:toggle case="case-{instance('fr-current-section-instance')/id}-closed"/>
     </xforms:action>
 
     <!-- Close section -->
@@ -46,7 +46,7 @@
 
     <!-- Open section -->
     <xforms:action ev:event="fr-expand">
-        <xforms:toggle case="case-{{instance('fr-current-section-instance')/id}}-open"/>
+        <xforms:toggle case="case-{instance('fr-current-section-instance')/id}-open"/>
         <!-- Only if we support script -->
         <xxforms:script if="not(property('xxforms:noscript'))">frExpand();</xxforms:script>
     </xforms:action>

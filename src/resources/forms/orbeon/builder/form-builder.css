@@ -130,6 +130,7 @@ a.fb-edit-help-trigger img {
 
 /* Other dialogs */
 .xforms-dialog .bd { padding-left: .5em; padding-right: .5em }
+.xforms-dialog .xforms-label img { vertical-align: middle } 
 
 #fb-publish-dialog { width: 35em }
 #fb-css-upload-dialog, #fb-schema-upload-dialog { width: 35em }

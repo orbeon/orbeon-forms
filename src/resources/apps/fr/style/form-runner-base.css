@@ -263,7 +263,7 @@ button.xforms-trigger img { margin-right: 10px }
 .fr-dialog .bd { margin: 0 .5em .5em .5em }
 .fr-dialog-icon { float: left; margin-right: 2em; margin-left: 1em; padding-bottom: 1em }
 .fr-dialog-message { margin-top: .5em; padding-top: 0.5em }
-.fr-dialog-buttons { text-align: right; padding-right: .5em; padding-top: .5em; padding-bottom: .5em; margin-top: .5em; border-top: 2px solid #DDDDEE }
+.fr-dialog-buttons { text-align: right; padding-right: .5em; padding-top: .5em; padding-bottom: .5em; margin-top: .5em; border-top: 2px solid #DDDDEE; clear: both }
 
 /* **************************************************** Sections **************************************************** */
 

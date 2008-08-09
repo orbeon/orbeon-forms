@@ -28,105 +28,119 @@
     <xxforms:variable name="instance" select="instance('fb-validation-editor-instance')"/>
     <xhtml:div>
         <xhtml:div class="fr-grid">
-            <xhtml:div class="fr-grid-content fb-hide-alert">
-            <!--<xhtml:table>-->
-                <!--<xhtml:tr>-->
-                    <!--<xhtml:td>-->
-                        <!-- Built-in type selection -->
-                        <xforms:select1 ref="$instance/builtin-type">
-                            <xforms:label>Built-in Type</xforms:label>
-                            <xforms:hint>Built-in data type</xforms:hint>
-                            <!--<xforms:item>-->
-                                <!--<xforms:label>[Select...]</xforms:label>-->
-                                <!--<xforms:value/>-->
-                            <!--</xforms:item>-->
-                            <xforms:itemset nodeset="instance('fb-validation-types-instance')/root()//(choices | type)">
-                                <xforms:label ref="if (self::choices) then label else if (label) then label else ."/>
-                                <xforms:value ref="if (self::choices) then () else if (value) then value else ."/>
-                            </xforms:itemset>
-                            <xforms:setvalue ev:event="xforms-value-changed" if=". != ''" ref="../schema-type"/>
-                        </xforms:select1>
-                    <!--</xhtml:td>-->
-                    <!--<xhtml:td>-->
-                        <xforms:select1 ref="$instance/required" appearance="full">
-                            <xforms:label>Requiredness</xforms:label>
-                            <xforms:hint>Whether the data is required</xforms:hint>
-                            <xforms:item>
-                                <xforms:label>Required</xforms:label>
-                                <xforms:value>true</xforms:value>
-                            </xforms:item>
-                            <xforms:item>
-                                <xforms:label>Optional</xforms:label>
-                                <xforms:value>false</xforms:value>
-                            </xforms:item>
-                        </xforms:select1>
-                        <!--<xforms:select ref="$instance/mark-required" appearance="full">-->
-                            <!--<xforms:label/>-->
-                            <!--<xforms:item>-->
-                                <!--<xforms:label>Mark as required</xforms:label>-->
-                                <!--<xforms:value>true</xforms:value>-->
-                            <!--</xforms:item>-->
-                        <!--</xforms:select>-->
-                        <!--<xforms:select ref="$instance/allow-blanks" appearance="full">-->
-                            <!--<xforms:label/>-->
-                            <!--<xforms:item>-->
-                                <!--<xforms:label>Allow blanks</xforms:label>-->
-                                <!--<xforms:value>true</xforms:value>-->
-                            <!--</xforms:item>-->
-                        <!--</xforms:select>-->
-                    <!--</xhtml:td>-->
-                <!--</xhtml:tr>-->
-            <!--</xhtml:table>-->
-                        <xforms:input ref="$instance/calculate">
-                            <xforms:label>
-                                <xhtml:img src="/apps/fr/style/images/silk/calculator_edit.png" alt="" title=""/>
-                                <xhtml:span>Calculated Value</xhtml:span>
-                            </xforms:label>
-                            <xforms:hint>XPath expression</xforms:hint>
-                        </xforms:input>
+            <xhtml:div class="fr-grid-content">
 
-                        <!-- Schema type selection if applicable -->
-                        <xforms:select1 ref="$instance/schema-type[$model/xs:schema]">
-                            <xforms:label>Schema Type</xforms:label>
-                            <xforms:hint>Imported schema type</xforms:hint>
-                            <xforms:item>
-                                <xforms:label>[Select...]</xforms:label>
-                                <xforms:value/>
-                            </xforms:item>
-                            <xforms:itemset nodeset="$model/xs:schema/xs:simpleType">
-                                <xforms:label ref="@name"/>
-                                <xforms:value ref="@name"/>
-                            </xforms:itemset>
-                            <xforms:setvalue ev:event="xforms-value-changed" if=". != ''" ref="../builtin-type"/>
-                        </xforms:select1>
+                <xforms:select1 ref="builtin-type">
+                    <xforms:label>Built-in Type</xforms:label>
+                    <xforms:hint>Built-in data type</xforms:hint>
+                    <xforms:itemset nodeset="instance('fb-validation-types-instance')/root()//(choices | type)">
+                        <xforms:label ref="if (self::choices) then label else if (label) then label else ."/>
+                        <xforms:value ref="if (self::choices) then () else if (value) then value else ."/>
+                    </xforms:itemset>
+                    <xforms:setvalue ev:event="xforms-value-changed" if=". != ''" ref="../schema-type"/>
+                </xforms:select1>
 
-                        <!-- Alert message -->
-                        <xforms:textarea ref="$instance/alert">
-                            <xforms:label>Alert Message</xforms:label>
-                            <xforms:hint>Message to display when the data is incorrect</xforms:hint>
-                        </xforms:textarea>
-                </xhtml:div>
+                <xforms:select1 ref="required" appearance="full">
+                    <xforms:label>Requiredness</xforms:label>
+                    <xforms:hint>Whether the data is required</xforms:hint>
+                    <xforms:item>
+                        <xforms:label>Required</xforms:label>
+                        <xforms:value>true</xforms:value>
+                    </xforms:item>
+                    <xforms:item>
+                        <xforms:label>Optional</xforms:label>
+                        <xforms:value>false</xforms:value>
+                    </xforms:item>
+                </xforms:select1>
+
+                <!-- TODO: expression for @constraint + figure out how to deal w/ max length etc. -->
+
+                <!-- TODO: expression for @required -->
+
+                <xforms:input ref="constraint" incremental="true">
+                    <xforms:label>
+                        <xhtml:img src="/apps/fr/style/images/silk/link.png" alt="" title=""/>
+                        <xhtml:span>Constraint</xhtml:span>
+                    </xforms:label>
+                    <xforms:alert>Incorrect XPath expression</xforms:alert>
+                    <xforms:hint>Boolean XPath expression</xforms:hint>
+                </xforms:input>
+
+                <xforms:input ref="relevant" incremental="true">
+                    <xforms:label>
+                        <xhtml:img src="/apps/fr/style/images/silk/eye.png" alt="" title=""/>
+                        <xhtml:span>Visibility</xhtml:span>
+                    </xforms:label>
+                    <xforms:alert>Incorrect XPath expression</xforms:alert>
+                    <xforms:hint>Boolean XPath expression</xforms:hint>
+                </xforms:input>
+
+                <xforms:input ref="readonly" incremental="true">
+                    <xforms:label>
+                        <xhtml:img src="/apps/fr/style/images/silk/key.png" alt="" title=""/>
+                        <xhtml:span>Read-Only</xhtml:span>
+                    </xforms:label>
+                    <xforms:alert>Incorrect XPath expression</xforms:alert>
+                    <xforms:hint>Boolean XPath expression</xforms:hint>
+                </xforms:input>
+
+                <xforms:input ref="calculate" incremental="true">
+                    <xforms:label>
+                        <xhtml:img src="/apps/fr/style/images/silk/calculator_edit.png" alt="" title=""/>
+                        <xhtml:span>Calculated Value</xhtml:span>
+                    </xforms:label>
+                    <xforms:hint>XPath expression</xforms:hint>
+                </xforms:input>
+
+                <!-- Schema type selection if applicable -->
+                <xforms:select1 ref="schema-type[$model/xs:schema]">
+                    <xforms:label>
+                        <xhtml:img src="/forms/orbeon/builder/images/schema.gif" alt="" title=""/>
+                        <xhtml:span>Schema Type</xhtml:span>
+                    </xforms:label>
+                    <xforms:hint>Imported schema type</xforms:hint>
+                    <xforms:item>
+                        <xforms:label>[Select...]</xforms:label>
+                        <xforms:value/>
+                    </xforms:item>
+                    <xforms:itemset nodeset="$model/xs:schema/xs:simpleType">
+                        <xforms:label ref="@name"/>
+                        <xforms:value ref="@name"/>
+                    </xforms:itemset>
+                    <xforms:setvalue ev:event="xforms-value-changed" if=". != ''" ref="../builtin-type"/>
+                </xforms:select1>
+
+                <!-- Alert message -->
+                <xforms:textarea ref="alert" incremental="true">
+                    <xforms:label>
+                        <xhtml:img src="/apps/fr/style/images/silk/exclamation.png" alt="" title=""/>
+                        <xhtml:span>Alert Message</xhtml:span>
+                    </xforms:label>
+                    <xforms:label>Alert Message</xforms:label>
+                    <xforms:hint>Message to display when the data is incorrect</xforms:hint>
+                </xforms:textarea>
             </xhtml:div>
+        </xhtml:div>
 
-            <xhtml:div class="fr-dialog-buttons">
-                <xforms:trigger class="fr-inplace-rename">
-                    <xforms:label>Apply</xforms:label>
-                    <!-- Close and save upon DOMActivate -->
-                    <xforms:dispatch ev:event="DOMActivate" name="xxforms-dialog-close" target="fb-edit-validation-dialog"/>
-                </xforms:trigger>
-                or
-                <xforms:trigger appearance="minimal" class="fr-inplace-cancel">
-                    <xforms:label>Cancel</xforms:label>
-                    <!-- Close and cancel upon DOMActivate -->
-                    <xforms:dispatch ev:event="DOMActivate" name="xxforms-dialog-close" target="fb-edit-validation-dialog">
-                        <xxforms:context name="fb:save" select="false()"/>
-                    </xforms:dispatch>
-                </xforms:trigger>
-            </xhtml:div>
+        <xhtml:div class="fr-dialog-buttons">
+                <xforms:trigger ref="save-trigger" class="fr-inplace-rename">
+                <xforms:label>Apply</xforms:label>
+                <!-- Close and save upon DOMActivate -->
+                <xforms:dispatch ev:event="DOMActivate" name="xxforms-dialog-close" target="fb-edit-validation-dialog"/>
+            </xforms:trigger>
+            or
+            <xforms:trigger appearance="minimal" class="fr-inplace-cancel">
+                <xforms:label>Cancel</xforms:label>
+                <!-- Close and cancel upon DOMActivate -->
+                <xforms:dispatch ev:event="DOMActivate" name="xxforms-dialog-close" target="fb-edit-validation-dialog">
+                    <xxforms:context name="fb:save" select="false()"/>
+                </xforms:dispatch>
+            </xforms:trigger>
+        </xhtml:div>
     </xhtml:div>
 
-    <!-- Save data upon close, unless explicitly prevented -->
-    <xforms:action ev:event="xxforms-dialog-close" if="not(event('fb:save') = false())">
+    <!-- Save data upon close, unless explicitly prevented or unless the sub-form is not valid -->
+    <xforms:action ev:event="xxforms-dialog-close" if="not(event('fb:save') = false()) and instance('fb-validation-editor-instance')/save-trigger = 'enabled'">
         <xxforms:variable name="instance" select="instance('fb-validation-editor-instance')"/>
         <xxforms:variable name="current-control" select="if ($current-control-name != '') then $body//*[@id = concat($current-control-name, '-control')] else ()"/>
         <xxforms:variable name="current-control-resource" select="$current-resources/*[name() = $current-control-name]"/>
@@ -159,21 +173,43 @@
             <xxforms:variable name="new-bind" select="$model//xforms:bind[@id = $current-bind-id]"/>
             <xforms:action context="$new-bind">
                 <!-- Set built-in type if needed -->
-                <xforms:insert if="$instance/builtin-type != ''"
-                               context="." origin="xxforms:attribute('type', concat(if ($instance/required = 'true') then 'xs:' else 'xforms:', $instance/builtin-type))"/>
-                <xforms:insert if="$instance/required = 'true'"
-                               context="." origin="xxforms:attribute('required', 'true()')"/>
-                <xforms:delete if="$instance/required = 'false'"
-                               context="." nodeset="@required"/>
+                <xforms:insert if="$instance/builtin-type != ''" context="$new-bind"
+                               origin="xxforms:attribute('type', concat(if ($instance/required = 'true') then 'xs:' else 'xforms:', $instance/builtin-type))"/>
 
                 <!-- Set schema type if needed -->
                 <!-- TODO: Handle namespace and prefix for namespace -->
-                <xforms:insert if="$instance/schema-type != ''"
-                               context="." origin="xxforms:attribute('type', $instance/schema-type)"/>
+                <xforms:insert if="$instance/schema-type != ''" context="$new-bind"
+                               origin="xxforms:attribute('type', $instance/schema-type)"/>
+
+                <!-- Set required -->
+                <xforms:insert if="$instance/required = 'true'" context="$new-bind"
+                               origin="xxforms:attribute('required', 'true()')"/>
+                <xforms:delete if="$instance/required = 'false'" context="$new-bind"
+                               nodeset="@required"/>
+
+                <!-- Set constraint -->
+                <xforms:insert if="normalize-space($instance/constraint) != ''" context="$new-bind"
+                               origin="xxforms:attribute('constraint', normalize-space($instance/constraint))"/>
+                <xforms:delete if="normalize-space($instance/constraint) = ''" context="$new-bind"
+                               nodeset="@constraint"/>
+
+                <!-- Set relevance -->
+                <xforms:insert if="normalize-space($instance/relevant) != ''" context="$new-bind"
+                               origin="xxforms:attribute('relevant', normalize-space($instance/relevant))"/>
+                <xforms:delete if="normalize-space($instance/relevant) = ''" context="$new-bind"
+                               nodeset="@relevant"/>
+
+                <!-- Set readonly -->
+                <xforms:insert if="normalize-space($instance/readonly) != ''" context="$new-bind"
+                               origin="xxforms:attribute('readonly', normalize-space($instance/readonly))"/>
+                <xforms:delete if="normalize-space($instance/readonly) = ''" context="$new-bind"
+                               nodeset="@readonly"/>
 
                 <!-- Set calculated value if needed -->
-                <xforms:insert if="normalize-space($instance/calculate) != ''"
-                               context="." origin="xxforms:attribute('calculate', $instance/calculate)"/>
+                <xforms:insert if="normalize-space($instance/calculate) != ''" context="$new-bind"
+                               origin="xxforms:attribute('calculate', normalize-space($instance/calculate))"/>
+                <xforms:delete if="normalize-space($instance/readonly) = ''" context="$new-bind"
+                               nodeset="@readonly"/>
             </xforms:action>
 
             <!-- TODO: constraints -->
@@ -209,6 +245,9 @@
         <xforms:setvalue if="not($current-bind/@type)" ref="$instance/builtin-type">string</xforms:setvalue>
         <xforms:setvalue ref="$instance/schema-type"/>
         <xforms:setvalue ref="$instance/required">false</xforms:setvalue>
+        <xforms:setvalue ref="$instance/constraint" value="$current-bind/@constraint"/>
+        <xforms:setvalue ref="$instance/relevant" value="$current-bind/@relevant"/>
+        <xforms:setvalue ref="$instance/readonly" value="$current-bind/@readonly"/>
 
         <!-- Set type information if there is a type specified -->
         <xforms:action if="$current-bind/@type">
@@ -228,15 +267,28 @@
         <xforms:instance id="fb-validation-editor-instance">
             <validation>
                 <builtin-type/>
-                <required>false</required>
+                <required>false</required><!-- TODO XPath expression as well? -->
+
+                <constraint/>
+                <relevant/>
+                <readonly/>
+
                 <calculate/>
                 <schema-type/>
                 <alert/>
+
+                <save-trigger/>
             </validation>
         </xforms:instance>
 
+        <!-- Enable/disable trigger -->
+        <xforms:setvalue ev:event="xxforms-invalid" ev:observer="fb-validation-editor-instance" ref="save-trigger">disabled</xforms:setvalue>
+        <xforms:setvalue ev:event="xxforms-valid" ev:observer="fb-validation-editor-instance" ref="save-trigger">enabled</xforms:setvalue>
+
         <xforms:bind nodeset="instance('fb-validation-editor-instance')">
             <xforms:bind nodeset="required" readonly="../schema-type != ''"/>
+            <xforms:bind nodeset="relevant | readonly | constraint | calculate" type="xxforms:xpath2" required="false()"/>
+            <xforms:bind nodeset="save-trigger" readonly=". = 'disabled'"/>
         </xforms:bind>
 
         <!-- TODO: i18n -->

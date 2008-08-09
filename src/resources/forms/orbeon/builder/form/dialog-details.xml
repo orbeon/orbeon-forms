@@ -28,30 +28,34 @@
     <xforms:label>Edit Control Details</xforms:label>
 
     <xhtml:div>
-        <xforms:input ref="control-name" incremental="true" id="fb-edit-details-control-name-input">
-            <xforms:label>
-                <xhtml:img src="/apps/fr/style/images/silk/tag_blue.png" alt="" title=""/>
-                <xhtml:span>Control Name</xhtml:span>
-            </xforms:label>
-            <xforms:alert>Name is already in use or incorrect</xforms:alert>
-            <xforms:hint>E.g.: first-name</xforms:hint>
-            <!-- Close and save upon DOMActivate -->
-            <xforms:dispatch ev:event="DOMActivate" name="xxforms-dialog-close" target="fb-edit-details-dialog"/>
-        </xforms:input>
-        <xforms:select ref="classes" appearance="full">
-            <xforms:label>Summary Page</xforms:label>
-            <xforms:item>
-                <xforms:label>Show in Summary</xforms:label>
-                <xforms:value>fr-summary</xforms:value>
-            </xforms:item>
-            <xforms:item>
-                <xforms:label>Show in Search</xforms:label>
-                <xforms:value>fr-search</xforms:value>
-            </xforms:item>
-        </xforms:select>
+        <xhtml:div class="fr-grid">
+            <xhtml:div class="fr-grid-content">
+                <xforms:input ref="control-name" incremental="true" id="fb-edit-details-control-name-input">
+                    <xforms:label>
+                        <xhtml:img src="/apps/fr/style/images/silk/tag_blue.png" alt="" title=""/>
+                        <xhtml:span>Control Name</xhtml:span>
+                    </xforms:label>
+                    <xforms:alert>Name is already in use or incorrect</xforms:alert>
+                    <xforms:hint>E.g.: first-name</xforms:hint>
+                    <!-- Close and save upon DOMActivate -->
+                    <xforms:dispatch ev:event="DOMActivate" name="xxforms-dialog-close" target="fb-edit-details-dialog"/>
+                </xforms:input>
+                <xforms:select ref="classes" appearance="full">
+                    <xforms:label>Summary Page</xforms:label>
+                    <xforms:item>
+                        <xforms:label>Show in Summary</xforms:label>
+                        <xforms:value>fr-summary</xforms:value>
+                    </xforms:item>
+                    <xforms:item>
+                        <xforms:label>Show in Search</xforms:label>
+                        <xforms:value>fr-search</xforms:value>
+                    </xforms:item>
+                </xforms:select>
+            </xhtml:div>
+        </xhtml:div>
 
         <xhtml:div class="fr-dialog-buttons">
-            <xforms:trigger class="fr-inplace-rename" ref="change-trigger">
+            <xforms:trigger class="fr-inplace-rename" ref="save-trigger">
                 <xforms:label>Apply</xforms:label>
                 <!-- Close and save upon DOMActivate -->
                 <xforms:dispatch ev:event="DOMActivate" name="xxforms-dialog-close" target="fb-edit-details-dialog"/>
@@ -68,7 +72,7 @@
     </xhtml:div>
 
     <!-- Save data upon close, unless explicitly prevented -->
-    <xforms:action ev:event="xxforms-dialog-close" if="not(event('fb:save') = false())">
+    <xforms:action ev:event="xxforms-dialog-close" if="not(event('fb:save') = false()) and instance('fb-details-editor-instance')/save-trigger = 'enabled'">
 
         <xxforms:variable name="instance" select="instance('fb-details-editor-instance')"/>
 
@@ -137,7 +141,7 @@
                 <control-name/>
                 <classes/>
                 <instance-holder/>
-                <change-trigger/>
+                <save-trigger/>
             </details>
         </xforms:instance>
 
@@ -146,15 +150,13 @@
                              constraint=". = ../original-control-name
                                             or not(concat(normalize-space(), '-section') = $body//fr:section/@id)
                                                 and not(concat(normalize-space(), '-control') = $body//*/@id)" type="xs:NCName"/>
-            <!-- Annoying that we need to repeat the expression here, but we can't use xxforms:valid().
-                 Should use variables once available in binds. -->
-            <xforms:bind nodeset="change-trigger"
-                            readonly="for $control-name in ../control-name return
-                                        not($control-name = ../original-control-name
-                                            or not(concat(normalize-space($control-name), '-section') = $body//fr:section/@id)
-                                                and not(concat(normalize-space($control-name), '-control') = $body//*/@id))"/>
-
+            <xforms:bind nodeset="save-trigger" readonly=". = 'disabled'"/>
         </xforms:bind>
+
+        <!-- Enable/disable trigger -->
+        <xforms:setvalue ev:event="xxforms-invalid" ev:observer="fb-details-editor-instance" ref="save-trigger">disabled</xforms:setvalue>
+        <xforms:setvalue ev:event="xxforms-valid" ev:observer="fb-details-editor-instance" ref="save-trigger">enabled</xforms:setvalue>
+
     </xforms:model>
 
 </xxforms:dialog>

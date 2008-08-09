@@ -28,34 +28,38 @@
     <xforms:label>Edit Section Details</xforms:label>
 
     <xhtml:div>
-        <xforms:input ref="section-name" incremental="true" id="fb-section-name-input">
-            <xforms:label>
-                <xhtml:img src="/apps/fr/style/images/silk/tag_blue.png" alt="" title=""/>
-                <xhtml:span>Section Name</xhtml:span>
-            </xforms:label>
-            <xforms:alert>Name is already in use or incorrect</xforms:alert>
-            <xforms:hint>E.g.: address</xforms:hint>
-            <!-- Close and save upon DOMActivate -->
-            <xforms:dispatch ev:event="DOMActivate" name="xxforms-dialog-close" target="fb-section-details-dialog"/>
-        </xforms:input>
+        <xhtml:div class="fr-grid">
+            <xhtml:div class="fr-grid-content">
+                <xforms:input ref="section-name" incremental="true" id="fb-section-name-input">
+                    <xforms:label>
+                        <xhtml:img src="/apps/fr/style/images/silk/tag_blue.png" alt="" title=""/>
+                        <xhtml:span>Section Name</xhtml:span>
+                    </xforms:label>
+                    <xforms:alert>Name is already in use or incorrect</xforms:alert>
+                    <xforms:hint>E.g.: "address"</xforms:hint>
+                    <!-- Close and save upon DOMActivate -->
+                    <xforms:dispatch ev:event="DOMActivate" name="xxforms-dialog-close" target="fb-section-details-dialog"/>
+                </xforms:input>
 
-        <xforms:input ref="relevant">
-            <xforms:label>
-                <xhtml:img src="/apps/fr/style/images/silk/eye.png" alt="" title=""/>
-                <xhtml:span>Visibility</xhtml:span>
-            </xforms:label>
-            <xforms:alert>Incorrect XPath expression</xforms:alert>
-            <xforms:hint>Boolean XPath expression</xforms:hint>
-        </xforms:input>
+                <xforms:input ref="relevant" incremental="true">
+                    <xforms:label>
+                        <xhtml:img src="/apps/fr/style/images/silk/eye.png" alt="" title=""/>
+                        <xhtml:span>Visibility</xhtml:span>
+                    </xforms:label>
+                    <xforms:alert>Incorrect XPath expression</xforms:alert>
+                    <xforms:hint>Boolean XPath expression</xforms:hint>
+                </xforms:input>
 
-        <xforms:input ref="readonly">
-            <xforms:label>
-                <xhtml:img src="/apps/fr/style/images/silk/key.png" alt="" title=""/>
-                <xhtml:span>Read-Only</xhtml:span>
-            </xforms:label>
-            <xforms:alert>Incorrect XPath expression</xforms:alert>
-            <xforms:hint>Boolean XPath expression</xforms:hint>
-        </xforms:input>
+                <xforms:input ref="readonly" incremental="true">
+                    <xforms:label>
+                        <xhtml:img src="/apps/fr/style/images/silk/key.png" alt="" title=""/>
+                        <xhtml:span>Read-Only</xhtml:span>
+                    </xforms:label>
+                    <xforms:alert>Incorrect XPath expression</xforms:alert>
+                    <xforms:hint>Boolean XPath expression</xforms:hint>
+                </xforms:input>
+            </xhtml:div>
+        </xhtml:div>
 
         <xhtml:div class="fr-dialog-buttons">
             <xforms:trigger ref="save-trigger">
@@ -75,7 +79,7 @@
     </xhtml:div>
 
     <!-- Save data upon close, unless explicitly prevented -->
-    <xforms:action ev:event="xxforms-dialog-close" if="not(event('fb:save') = false())">
+    <xforms:action ev:event="xxforms-dialog-close" if="not(event('fb:save') = false()) and instance('fb-section-details-instance')/save-trigger = 'enabled'">
 
         <xxforms:variable name="instance" select="instance('fb-section-details-instance')" as="element()"/>
 
@@ -168,6 +172,7 @@
                          constraint=". = ../original-section-name
                                         or not(concat(normalize-space(), '-section') = $body//fr:section/@id)
                                             and not(concat(normalize-space(), '-control') = $body//*/@id)" type="xs:NCName"/>
+            <xforms:bind nodeset="relevant | readonly" type="xxforms:xpath2" required="false()"/>
             <xforms:bind nodeset="save-trigger" readonly=". = 'disabled'"/>
         </xforms:bind>
 

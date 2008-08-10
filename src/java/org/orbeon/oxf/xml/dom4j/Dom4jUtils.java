@@ -342,12 +342,11 @@ public class Dom4jUtils {
      * and SAX level, so this should be used only in rare occasions, when
      * serializing certain documents to XML 1.0.
      */
-    public static Document adjustNamespaces
-            (Document document, boolean xml11) {
+    public static Document adjustNamespaces(Document document, boolean xml11) {
         if (xml11)
             return document;
-        LocationSAXWriter writer = new LocationSAXWriter();
-        LocationSAXContentHandler ch = new LocationSAXContentHandler();
+        final LocationSAXWriter writer = new LocationSAXWriter();
+        final LocationSAXContentHandler ch = new LocationSAXContentHandler();
         writer.setContentHandler(new NamespaceCleanupContentHandler(ch, xml11));
         try {
             writer.write(document);
@@ -370,6 +369,11 @@ public class Dom4jUtils {
                     namespaces.put(namespace.getPrefix(), namespace.getURI());
             }
         }
+        // It seems that by default this may not be declared. However, it should be: "The prefix xml is by definition
+        // bound to the namespace name http://www.w3.org/XML/1998/namespace. It MAY, but need not, be declared, and MUST
+        // NOT be bound to any other namespace name. Other prefixes MUST NOT be bound to this namespace name, and it
+        // MUST NOT be declared as the default namespace."
+        namespaces.put(XMLConstants.XML_PREFIX, XMLConstants.XML_URI);
         return namespaces;
     }
 

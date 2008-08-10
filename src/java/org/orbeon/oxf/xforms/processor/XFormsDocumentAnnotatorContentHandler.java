@@ -327,7 +327,7 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
         }
 
         // Gather namespace information if there is an id
-        if (namespaceMappings != null && idIndex != -1) {
+        if (namespaceMappings != null && (isGenerateIds || idIndex != -1)) {
             final Map namespaces = new HashMap();
             for (Enumeration e = namespaceSupport.getPrefixes(); e.hasMoreElements();) {
                 final String namespacePrefix = (String) e.nextElement();

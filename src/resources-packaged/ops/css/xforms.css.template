@@ -72,7 +72,7 @@
     right: 2em;
 }
 
-.xforms-error-panel .bd { overflow: auto; }
+.xforms-error-panel .bd { overflow: auto; background-color: white }
 /*.xforms-error-panel .bd p { margin-bottom: 0 }*/
 .xforms-error-panel .hd { background-color: #FF6600; }
 .xforms-error-panel-details-hidden, .xforms-error-panel-details-shown { vertical-align: middle; }

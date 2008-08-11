@@ -152,7 +152,7 @@ a.fb-edit-help-trigger img {
 #fb-schema-upload-dialog .fb-dialog-h2 { font-size: larger }
 #fb-schema-upload-dialog .fb-dialog-section { display: block; margin-left: 1em }
 
-#fb-xml-dialog .fb-xml-dialog-view { width: 100%; height: 29em; overflow: auto }
+#fb-xml-dialog .fb-xml-dialog-view { width: 100%; height: 29em; overflow: auto; background-color: white }
 #fb-source-editor-dialog .fb-xml-dialog-view { width: 100% }
 #fb-source-editor-dialog .fb-xml-dialog-view textarea.xforms-textarea { width: 100%; height: 29em; font-family: monospace }
 

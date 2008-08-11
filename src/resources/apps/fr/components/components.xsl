@@ -49,6 +49,7 @@
     <xsl:variable name="error-summary" select="pipeline:property(string-join(('oxf.fr.detail.error-summary', $app, $form), '.'))" as="xs:string?"/>
     <xsl:variable name="is-noscript-table" select="not(string-join(('oxf.fr.detail.noscript.table', $app, $form), '.'))" as="xs:boolean?"/>
     <xsl:variable name="default-logo-uri" select="pipeline:property(string-join(('oxf.fr.default-logo.uri', $app, $form), '.'))" as="xs:string?"/>
+    <xsl:variable name="css-uri" select="pipeline:property(string-join(('oxf.fr.css.uri', $app, $form), '.'))" as="xs:string?"/>
 
     <xsl:variable name="has-button-save-locally" select="pipeline:property(string-join(('oxf.fr.detail.button.save-locally', $app, $form), '.'))" as="xs:boolean?"/>
     <xsl:variable name="has-button-close" select="pipeline:property(string-join(('oxf.fr.detail.button.close', $app, $form), '.'))" as="xs:boolean?"/>
@@ -108,7 +109,9 @@
             <xhtml:link rel="stylesheet" href="/ops/css/yui/reset-fonts-grids.css" type="text/css"/>
             <xhtml:link rel="stylesheet" href="/ops/css/yui/base-min.css" type="text/css"/>
             <xhtml:link rel="stylesheet" href="/apps/fr/style/form-runner-base.css" type="text/css"/>
-            <xhtml:link rel="stylesheet" href="/apps/fr/style/form-runner-orbeon.css" type="text/css"/>
+            <xsl:if test="normalize-space($css-uri) != ''">
+                <xhtml:link rel="stylesheet" href="{$css-uri}" type="text/css"/>
+            </xsl:if>
 
             <!-- Handle existing stylesheets -->
             <xsl:for-each select="xhtml:link | xhtml:style">
@@ -197,3 +200,4 @@
     </xsl:template>
 
 </xsl:stylesheet>
+

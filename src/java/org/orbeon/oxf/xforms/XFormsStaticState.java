@@ -716,12 +716,12 @@ public class XFormsStaticState {
             if (cachedMap != null) {
                 return cachedMap;
             } else {
-//                XFormsContainingDocument.logDebugStatic("static state", "namespace mappings not cached", new String[] { "element", Dom4jUtils.elementToString(element) });
+                XFormsContainingDocument.logDebugStatic("static state", "namespace mappings not cached", new String[] { "element", Dom4jUtils.elementToString(element) });
                 return Dom4jUtils.getNamespaceContextNoDefault(element);
             }
         } else {
             // No id attribute
-//            XFormsContainingDocument.logDebugStatic("static state", "namespace mappings not cached", new String[] { "element", Dom4jUtils.elementToString(element) });
+            XFormsContainingDocument.logDebugStatic("static state", "namespace mappings not cached", new String[] { "element", Dom4jUtils.elementToString(element) });
             return Dom4jUtils.getNamespaceContextNoDefault(element);
         }
     }

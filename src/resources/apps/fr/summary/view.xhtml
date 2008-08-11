@@ -33,14 +33,13 @@
 
             <!-- Model initialization -->
             <xforms:action ev:event="xforms-model-construct-done">
-
-                <!-- Query list of documents -->
-                <xforms:send submission="search-submission"/>
                 <!-- Store resources from configuration instance -->
                 <xforms:insert nodeset="instance('fr-form-resources')"
                                origin="xxforms:instance('fr-source-form-instance')/xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-resources']/*"/>
                 <!-- Update to current language -->
                 <xforms:dispatch name="fr-update-language" target="fr-resources-model"/>
+                <!-- Query list of documents -->
+                <xforms:send submission="search-submission"/>
             </xforms:action>
 
             <!-- Standard Form Runner data instance -->
@@ -459,16 +458,17 @@
 
                                                 <!-- input -->
                                                 <xforms:group ref=".[$query/@control = 'input']">
-                                                    <xforms:group ref=".[ends-with($query/@type, ':date')]">
+                                                    <xxforms:variable name="type" select="substring-after($query/@type, ':')" as="xs:string"/>
+                                                    <xforms:group ref=".[$type = 'date']">
                                                         <xforms:output value="if (. castable as xs:date) then format-date(xs:date(.), $fr-resources/summary/formats/date, xxforms:instance('fr-language-instance'), (), ()) else ."/>
                                                     </xforms:group>
-                                                    <xforms:group ref=".[ends-with($query/@type, ':time')]">
+                                                    <xforms:group ref=".[$type = 'time']">
                                                         <xforms:output value="if (. castable as xs:time) then format-time(xs:time(.), $fr-resources/summary/formats/time, xxforms:instance('fr-language-instance'), (), ()) else ."/>
                                                     </xforms:group>
-                                                    <xforms:group ref=".[ends-with($query/@type, ':dateTime')]">
+                                                    <xforms:group ref=".[$type = 'dateTime']">
                                                         <xforms:output value="if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), $fr-resources/summary/formats/dateTime, xxforms:instance('fr-language-instance'), (), ()) else ."/>
                                                     </xforms:group>
-                                                    <xforms:group ref=".[ends-with($query/@type, ':string')]">
+                                                    <xforms:group ref=".[not($type = ('date', 'time', 'dateTime'))]">
                                                         <xforms:output value="."/>
                                                     </xforms:group>
                                                 </xforms:group>

@@ -84,8 +84,10 @@ h3, h4 {
     margin-left: 0;/* used to have margin here but with new colors no margin seems better */
     height: auto;
     width: auto;/*width: 100%;*/
-    text-indent: 0;
     padding: 1px;
+    font-size: inherit;/* override xforms.css */
+    text-indent: 0;/* override xforms.css */
+    background-image: none;/* override xforms.css */
 }
 
 /* Display hints under each control */

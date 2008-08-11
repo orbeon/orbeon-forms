@@ -494,6 +494,38 @@
                 </table>
             </section>
             <section>
+                <title>oxf.epilogue.theme.portlet</title>
+                <table>
+                    <tr>
+                        <th>Name</th>
+                        <td><code>oxf.epilogue.theme.portlet</code></td>
+                    </tr>
+                    <tr>
+                        <th>Purpose</th>
+                        <td>Specifies the theme stylesheet to use when within a portlet</td>
+                    </tr>
+                    <tr>
+                        <th>Type</th>
+                        <td>
+                            <code>xs:anyURI</code>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Default Value</th>
+                        <td>
+                            <ul>
+                                <li>
+                                    For Form Runner pages: <code>oxf:/config/theme-portlet-fr.xsl</code>
+                                </li>
+                                <li>
+                                    For all other pages: <code>oxf:/config/theme-portlet-examples.xsl</code>
+                                </li>
+                            </ul>
+                        </td>
+                    </tr>
+                </table>
+            </section>
+            <section>
                 <title>oxf.epilogue.use-theme</title>
                 <table>
                     <tr>

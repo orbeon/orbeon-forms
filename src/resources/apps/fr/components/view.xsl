@@ -318,10 +318,10 @@
                         <xsl:when test="fr:footer">
                             <xsl:apply-templates select="fr:footer/node()"/>
                         </xsl:when>
-                        <xsl:otherwise>
+                        <xsl:when test="not($has-version = false())">
                             <xsl:variable xmlns:version="java:org.orbeon.oxf.common.Version" name="orbeon-forms-version" select="version:getVersion()" as="xs:string"/>
                             <xhtml:div class="fr-orbeon-version">Orbeon Forms <xsl:value-of select="$orbeon-forms-version"/></xhtml:div>
-                        </xsl:otherwise>
+                        </xsl:when>
                     </xsl:choose>
                 </xhtml:div>
             </xhtml:div>

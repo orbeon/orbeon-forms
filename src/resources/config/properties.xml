@@ -25,6 +25,7 @@
     <!-- Epilogue configuration -->
     <property as="xs:anyURI"  name="oxf.epilogue.theme"                              value="oxf:/config/theme-examples.xsl"/>
     <property as="xs:boolean" name="oxf.epilogue.use-theme"                          value="true"/>
+    <property as="xs:anyURI"  name="oxf.epilogue.theme.portlet"                      value="oxf:/config/theme-portlet-examples.xsl"/>
     <property as="xs:boolean" name="oxf.epilogue.output-xhtml"                       value="false"/>
     <property as="xs:boolean" name="oxf.epilogue.renderer-rewrite"                   value="true"/>
     <property as="xs:boolean" name="oxf.epilogue.process-svg"                        value="true"/>
@@ -104,6 +105,7 @@
     <property as="xs:anyURI"  name="oxf.fr.default-logo.uri.*.*"                     value="/apps/fr/style/orbeon-logo-trimmed-transparent-42.png"/>
     <property as="xs:anyURI"  name="oxf.fr.css.uri.*.*"                              value="/apps/fr/style/form-runner-orbeon.css"/>
 
+    <property as="xs:boolean" name="oxf.fr.version.*.*"                              value="true"/>
     <property as="xs:boolean" name="oxf.fr.noscript-link.*.*"                        value="true"/>
     <property as="xs:boolean" name="oxf.fr.detail.noscript.table.*.*"                value="true"/>
     <property as="xs:boolean" name="oxf.fr.detail.toc.*.*"                           value="true"/>

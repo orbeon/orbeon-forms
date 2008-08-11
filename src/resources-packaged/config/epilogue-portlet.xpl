@@ -75,35 +75,35 @@
             </p:processor>
         </p:otherwise>
     </p:choose>
+
+    <!-- Pick theme -->
+    <p:choose href="#request">
+        <p:when test="starts-with(/request/request-path, '/fr/')">
+            <!-- Plain theme -->
+            <p:processor name="oxf:identity">
+                <p:input name="data">
+                    <config>oxf:/config/theme-portlet-fr.xsl</config>
+                </p:input>
+                <p:output name="data" id="theme-config"/>
+            </p:processor>
+        </p:when>
+        <p:otherwise>
+            <!-- Get theme from property -->
+            <p:processor name="oxf:identity">
+                <p:input name="data" href="aggregate('config', #request#xpointer(p:property('oxf.epilogue.theme.portlet')))"/>
+                <p:output name="data" id="theme-config"/>
+            </p:processor>
+        </p:otherwise>
+    </p:choose>
     <!-- Extract a fragment and apply theme -->
+    <p:processor name="oxf:url-generator">
+        <p:input name="config" href="#theme-config"/>
+        <p:output name="data" id="theme"/>
+    </p:processor>
     <p:processor name="oxf:unsafe-xslt">
         <p:input name="data" href="#xformed-data-2"/>
         <p:input name="request" href="#request"/>
-        <p:input name="config">
-            <xsl:stylesheet version="2.0"
-                    xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xhtml="http://www.w3.org/1999/xhtml"
-                    xmlns:context="java:org.orbeon.oxf.pipeline.StaticExternalContext">
-                <xsl:import href="oxf:/config/theme-plain.xsl"/>
-                <xsl:template match="/">
-                    <xhtml:div xmlns:f="http://orbeon.org/oxf/xml/formatting" class="orbeon-portlet-div">
-                        <!-- Styles and scripts -->
-                        <xhtml:link rel="stylesheet" href="/config/theme/orbeon.css" type="text/css"/>
-                        <xsl:apply-templates select="/xhtml:html/xhtml:head/(xhtml:style | xhtml:link | xhtml:script)"/>
-                        <!-- Try to get a title and set it on the portlet -->
-                        <xsl:if test="normalize-space(/xhtml:html/xhtml:head/xhtml:title)">
-                            <xsl:value-of select="context:setTitle(normalize-space(/xhtml:html/xhtml:head/xhtml:title))"/>
-                        </xsl:if>
-                        <xhtml:div class="orbeon-portlet-content">
-                            <xsl:apply-templates select="/xhtml:html/xhtml:body/node()"/>
-                        </xhtml:div>
-                        <!-- This is for demo purposes only -->
-                        <xhtml:div class="orbeon-portlet-home">
-                            <xhtml:a href="/" f:portlet-mode="view">Home</xhtml:a>
-                        </xhtml:div>
-                    </xhtml:div>
-                </xsl:template>
-            </xsl:stylesheet>
-        </p:input>
+        <p:input name="config" href="#theme"/>
         <p:output name="data" id="themed-data"/>
     </p:processor>
     <!-- Rewrite all URLs in XHTML documents -->

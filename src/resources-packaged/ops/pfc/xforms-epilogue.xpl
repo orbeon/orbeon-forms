@@ -36,111 +36,74 @@
     </p:processor>
 
     <!-- Annotate XForms elements and generate XHTML if necessary -->
-    <p:choose href="#xforms-model">
-        <!-- ========== Test for Classic XForms engine ========== -->
-        <p:when test="/xforms:model">
-            <p:processor name="oxf:xforms-output">
-                <p:input name="model" href="#xforms-model"/>
-                <p:input name="instance" href="#instance"/>
-                <p:input name="data" href="#data"/>
-                <p:output name="data" id="annotated-data"/>
-            </p:processor>
-            <!-- Transform annotated XForms to XHTML -->
-            <p:processor name="oxf:unsafe-xslt">
-                <p:input name="config" href="/config/deprecated/xforms-to-xhtml.xsl"/>
-                <p:input name="model" href="#xforms-model"/>
-                <p:input name="instance" href="#instance"/>
-                <p:input name="data" href="#annotated-data"/>
-                <p:output name="data" id="xhtml-data"/>
-            </p:processor>
-            <p:choose href="#request-info">
-                <p:when test="/request/container-type = 'servlet'">
-                    <!-- Handle portlet forms (you can skip this step if you are not including portlets in your page) -->
-                    <p:processor name="oxf:unsafe-xslt">
-                        <p:input name="config" href="xforms-portlet-forms.xsl"/>
-                        <p:input name="data" href="#xhtml-data"/>
-                        <p:output name="data" ref="xformed-data"/>
+    <!-- TODO: put here processor detecting XForms model -->
+    <p:choose href="#data">
+        <!-- ========== Test for NG XForms engine ========== -->
+        <!-- NOTE: in the future, we may want to support "XForms within XML" so this test will have to be modified -->
+        <p:when test="/xhtml:html/xhtml:head/xforms:model"><!-- TODO: test on result of processor above -->
+            <!-- Handle widgets -->
+
+            <!--<p:processor name="oxf:sax-logger">-->
+                <!--<p:input name="data" href="#data"/>-->
+                <!--<p:output name="data" id="data2"/>-->
+            <!--</p:processor>-->
+
+            <!-- Apply XForms widgets if needed -->
+            <p:choose href="#request-info"><!-- dummy test input -->
+                <p:when test="p:property('oxf.epilogue.xforms.widgets')">
+                    <p:processor name="oxf:xslt">
+                        <!--<p:input name="data" href="#data2"/>-->
+                        <p:input name="data" href="#data"/>
+                        <p:input name="config" href="/config/xforms-widgets.xsl"/>
+                        <p:output name="data" id="widgeted-view"/>
                     </p:processor>
                 </p:when>
                 <p:otherwise>
-                    <!-- Don't go through this step if we are implementing a portlet -->
-                    <p:processor name="oxf:identity">
-                        <p:input name="data" href="#xhtml-data"/>
-                        <p:output name="data" ref="xformed-data"/>
-                    </p:processor>
-                </p:otherwise>
-            </p:choose>
-        </p:when>
-        <p:otherwise>
-            <!-- TODO: put here processor detecting XForms model -->
-            <p:choose href="#data">
-                <!-- ========== Test for NG XForms engine ========== -->
-                <p:when test="/xhtml:html/xhtml:head/xforms:model"><!-- TODO: test on result of processor above -->
-                    <!-- Handle widgets -->
-
-                    <!--<p:processor name="oxf:sax-logger">-->
-                        <!--<p:input name="data" href="#data"/>-->
-                        <!--<p:output name="data" id="data2"/>-->
-                    <!--</p:processor>-->
-
-                    <!-- Apply XForms widgets if needed -->
-                    <p:choose href="#request-info"><!-- dummy test input -->
-                        <p:when test="p:property('oxf.epilogue.xforms.widgets')">
-                            <p:processor name="oxf:xslt">
-                                <!--<p:input name="data" href="#data2"/>-->
-                                <p:input name="data" href="#data"/>
-                                <p:input name="config" href="/config/xforms-widgets.xsl"/>
-                                <p:output name="data" id="widgeted-view"/>
-                            </p:processor>
-                        </p:when>
-                        <p:otherwise>
-                            <!-- No theme -->
-                            <p:processor name="oxf:identity">
-                                <p:input name="data" href="#data"/>
-                                <p:output name="data" id="widgeted-view"/>
-                            </p:processor>
-                        </p:otherwise>
-                    </p:choose>
-
-                    <!--<p:processor name="oxf:sax-logger">-->
-                        <!--<p:input name="data" href="#widgeted-view"/>-->
-                        <!--<p:output name="data" id="widgeted-view2"/>-->
-                    <!--</p:processor>-->
-
-                    <!-- Get current namespace to enable caching per portlet -->
-                    <p:processor name="oxf:request">
-                        <p:input name="config">
-                            <config>
-                                <include>/request/container-namespace</include>
-                            </config>
-                        </p:input>
-                        <p:output name="data" id="namespace"/>
-                    </p:processor>
-
-                    <!-- Native XForms Initialization -->
-                    <p:processor name="oxf:xforms-to-xhtml">
-                        <p:input name="annotated-document" href="#widgeted-view"/>
-                        <p:input name="data" href="#model-data"/>
-                        <!-- This input adds a dependency on the container namespace. Keep it for portlets. -->
-                        <p:input name="namespace" href="#namespace"/>
-                        <p:input name="instance" href="#instance"/>
-                        <p:output name="document" id="xhtml-data"/>
-                    </p:processor>
-
-                    <!-- XInclude processing to add error dialog configuration and more -->
-                    <p:processor name="oxf:xinclude">
-                        <p:input name="config" href="#xhtml-data"/>
-                        <p:output name="data" ref="xformed-data"/>
-                    </p:processor>
-                </p:when>
-                <p:otherwise>
-                    <!-- ========== No XForms ========== -->
+                    <!-- No theme -->
                     <p:processor name="oxf:identity">
                         <p:input name="data" href="#data"/>
-                        <p:output name="data" ref="xformed-data"/>
+                        <p:output name="data" id="widgeted-view"/>
                     </p:processor>
                 </p:otherwise>
             </p:choose>
+
+            <!--<p:processor name="oxf:sax-logger">-->
+                <!--<p:input name="data" href="#widgeted-view"/>-->
+                <!--<p:output name="data" id="widgeted-view2"/>-->
+            <!--</p:processor>-->
+
+            <!-- Get current namespace to enable caching per portlet -->
+            <p:processor name="oxf:request">
+                <p:input name="config">
+                    <config>
+                        <include>/request/container-namespace</include>
+                    </config>
+                </p:input>
+                <p:output name="data" id="namespace"/>
+            </p:processor>
+
+            <!-- Native XForms Initialization -->
+            <p:processor name="oxf:xforms-to-xhtml">
+                <p:input name="annotated-document" href="#widgeted-view"/>
+                <p:input name="data" href="#model-data"/>
+                <!-- This input adds a dependency on the container namespace. Keep it for portlets. -->
+                <p:input name="namespace" href="#namespace"/>
+                <p:input name="instance" href="#instance"/>
+                <p:output name="document" id="xhtml-data"/>
+            </p:processor>
+
+            <!-- XInclude processing to add error dialog configuration and more -->
+            <p:processor name="oxf:xinclude">
+                <p:input name="config" href="#xhtml-data"/>
+                <p:output name="data" ref="xformed-data"/>
+            </p:processor>
+        </p:when>
+        <p:otherwise>
+            <!-- ========== No XForms ========== -->
+            <p:processor name="oxf:identity">
+                <p:input name="data" href="#data"/>
+                <p:output name="data" ref="xformed-data"/>
+            </p:processor>
         </p:otherwise>
     </p:choose>
 

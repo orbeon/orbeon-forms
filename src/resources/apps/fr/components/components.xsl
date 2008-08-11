@@ -44,6 +44,7 @@
     <xsl:variable name="is-noscript" select="not($is-form-builder) and doc('input:request')/request/parameters/parameter[name = 'fr-noscript']/value = 'true'"/>
 
     <!-- Properties -->
+    <xsl:variable name="has-version" select="pipeline:property(string-join(('oxf.fr.version', $app, $form), '.'))" as="xs:boolean?"/>
     <xsl:variable name="has-noscript-link" select="pipeline:property(string-join(('oxf.fr.noscript-link', $app, $form), '.'))" as="xs:boolean?"/>
     <xsl:variable name="has-toc" select="pipeline:property(string-join(('oxf.fr.detail.toc', $app, $form), '.'))" as="xs:boolean?"/>
     <xsl:variable name="error-summary" select="pipeline:property(string-join(('oxf.fr.detail.error-summary', $app, $form), '.'))" as="xs:string?"/>
@@ -200,4 +201,3 @@
     </xsl:template>
 
 </xsl:stylesheet>
-

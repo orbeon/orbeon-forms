@@ -1180,15 +1180,15 @@ public class XFormsUtils {
      * @param xpathString   string to check
      * @return              true iif the given string contains well-formed XPath 2.0
      */
-    public static boolean isXPath2Expression(String xpathString) {
+    public static boolean isXPath2Expression(String xpathString, Map namespaceMap) {
         // Empty string is never well-formed XPath
         if (xpathString.trim().length() == 0)
             return false;
 
         try {
-            XPathCache.getXPathExpression(null, null, xpathString, null);
+            XPathCache.checkXPathExpression(xpathString, namespaceMap, XFormsContainingDocument.getFunctionLibrary());
         } catch (Exception e) {
-            // Ideally we would like the parser to not throw as this is time-consuming, but not sure how to achieve that
+            // Ideally we would like the parser to not throw as this is time-consuming, but not sure ho.w to achieve that
             return false;
         }
 

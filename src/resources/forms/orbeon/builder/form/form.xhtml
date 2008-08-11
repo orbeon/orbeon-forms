@@ -249,7 +249,7 @@
                                         </xforms:action>
 
                                         <!-- Section content -->
-                                        <xforms:repeat nodeset="fr:section | fr:repeat | fr:grid" id="fb-section-content-repeat" xxforms:dnd="vertical">
+                                        <xforms:repeat nodeset="fr:section | fr:repeat | fr:grid" id="fb-section-content-repeat" xxforms:dnd="none">
                                             <xxforms:variable name="section-content-position" select="position()"/>
                                             <xxforms:variable name="is-section-content-current"
                                                               select="$is-top-level-current and $section-content-position = index('fb-section-content-repeat')"/>
@@ -563,7 +563,7 @@
                                                                             </xhtml:div>
                                                                         </xhtml:td>
                                                                         <!-- Repeat over table columns -->
-                                                                        <xforms:repeat nodeset="xhtml:td" id="fb-section-content-grid-td-repeat" xxforms:dnd="horizontal">
+                                                                        <xforms:repeat nodeset="xhtml:td" id="fb-section-content-grid-td-repeat" xxforms:dnd="none">
 
                                                                             <xxforms:variable name="td" select="."/>
                                                                             <xxforms:variable name="td-position" select="position()"/>
@@ -899,6 +899,7 @@
                                                                                                 </xforms:upload>
                                                                                             </xforms:group>
                                                                                             <xforms:group ref="*[not(namespace-uri-from-QName(resolve-QName(name(), .)) = 'http://www.w3.org/2002/xforms' )]">
+                                                                                                <!-- TODO: use actual image for the component -->
                                                                                                 <xhtml:img src="/apps/fr/style/images/silk/plugin.png" alt="" width="16" height="16"/>
                                                                                             </xforms:group>
                                                                                             <!-- Button to show items editor if needed -->
@@ -919,7 +920,7 @@
                                                                                             <xforms:input id="fb-control-hint-control" ref="$resource-holder/hint"
                                                                                                           appearance="fr:in-place" class="fb-control-hint"
                                                                                                           navindex="1000">
-                                                                                                <!-- TODO: navindex is just for testing -->
+                                                                                                <!-- TODO: navindex above is just for testing -->
                                                                                                 <xforms:label class="fb-xforms-disabled"/>
                                                                                                 <xforms:hint>click to enter an optional hint</xforms:hint>
                                                                                             </xforms:input>
@@ -1049,8 +1050,7 @@
                     </xforms:action>
                 </xforms:trigger>
 
-                <!--<fr:print-button/>-->
-                <!--<fr:save-locally-button/>-->
+                <!-- Save form -->
                 <fr:save-button/>
             </fr:buttons>
         </fr:view>

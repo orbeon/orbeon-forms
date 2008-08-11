@@ -459,6 +459,7 @@
         <xxforms:variable name="bind" select="$model//xforms:bind[@id = $old-bind-id]"/>
         <xforms:action context="$bind" if="exists(.)">
             <xforms:setvalue ref="@id" value="concat(event('new-name'), '-bind')"/>
+            <xforms:insert context="." origin="xxforms:attribute('name', event('new-name'))"/>
             <xforms:setvalue ref="@nodeset" value="event('new-name')"/>
         </xforms:action>
     </xforms:action>
@@ -559,8 +560,9 @@
         <xforms:action context="$model/xforms:bind[@id = 'fr-form-binds']">
             <xforms:action if="not(xforms:bind[@nodeset = $current-section-name])">
                 <xforms:insert context="." nodeset="xforms:bind" origin="instance('fb-bind-template')"/>
-                <xforms:setvalue ref="xforms:bind[last()]/@id" value="concat($current-section-name, '-bind')"/>
-                <xforms:setvalue ref="xforms:bind[last()]/@nodeset" value="$current-section-name"/>
+                <xxforms:variable name="bind" select="xforms:bind[last()]" as="element(xforms:bind)"/>
+                <xforms:setvalue ref="$bind/@id" value="concat($current-section-name, '-bind')"/>
+                <xforms:setvalue ref="$bind/@nodeset" value="$current-section-name"/>
             </xforms:action>
         </xforms:action>
 
@@ -570,8 +572,10 @@
             <xforms:action context="$model/xforms:bind[@id = 'fr-form-binds']/xforms:bind[@nodeset = $current-section-name]">
                 <xforms:action if="not(xforms:bind[@id = $current-bind-id])">
                     <xforms:insert context="." nodeset="xforms:bind" origin="instance('fb-bind-template')"/>
-                    <xforms:setvalue ref="xforms:bind[last()]/@id" value="$current-bind-id"/>
-                    <xforms:setvalue ref="xforms:bind[last()]/@nodeset" value="$control-name"/>
+                    <xxforms:variable name="bind" select="xforms:bind[last()]" as="element(xforms:bind)"/>
+                    <xforms:setvalue ref="$bind/@id" value="$current-bind-id"/>
+                    <xforms:insert context="$bind" origin="xxforms:attribute('name', $control-name)"/>
+                    <xforms:setvalue ref="$bind/@nodeset" value="$control-name"/>
                 </xforms:action>
             </xforms:action>
         </xforms:action>

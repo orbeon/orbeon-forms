@@ -614,6 +614,7 @@ public class XFormsModelBinds {
     private void handleValidationBind(PipelineContext pipelineContext, Bind bind, List nodeset, int position, Map invalidInstances) {
 
         final NodeInfo currentNodeInfo = (NodeInfo) nodeset.get(position - 1);
+        final Map namespaceMap = containingDocument.getNamespaceMappings(bind.getBindElement());
 
         // Handle XPath constraint MIP
         if (bind.getConstraint() != null) {
@@ -622,7 +623,7 @@ public class XFormsModelBinds {
                 // Get MIP value
                 final String xpath = "boolean(" + bind.getConstraint() + ")";
                 final boolean valid = ((Boolean) XPathCache.evaluateSingle(pipelineContext,
-                    nodeset, position, xpath, containingDocument.getNamespaceMappings(bind.getBindElement()), getVariables(currentNodeInfo),
+                    nodeset, position, xpath, namespaceMap, getVariables(currentNodeInfo),
                     XFormsContainingDocument.getFunctionLibrary(), contextStack.getFunctionContext(), bind.getLocationData().getSystemID(), bind.getLocationData())).booleanValue();
 
                 // Update node with MIP value
@@ -659,7 +660,6 @@ public class XFormsModelBinds {
                     xpathEvaluator = new XPathEvaluator();
                     // NOTE: Not sure declaring namespaces here is necessary just to perform the cast
                     final IndependentContext context = xpathEvaluator.getStaticContext();
-                    final Map namespaceMap = containingDocument.getNamespaceMappings(bind.getBindElement());
                     for (Iterator j = namespaceMap.keySet().iterator(); j.hasNext();) {
                         final String prefix = (String) j.next();
                         context.declareNamespace(prefix, (String) namespaceMap.get(prefix));
@@ -677,7 +677,7 @@ public class XFormsModelBinds {
                         final int prefixPosition = typeQName.indexOf(':');
                         if (prefixPosition > 0) {
                             final String prefix = typeQName.substring(0, prefixPosition);
-                            typeNamespaceURI = (String) containingDocument.getNamespaceMappings(bind.getBindElement()).get(prefix);
+                            typeNamespaceURI = (String) namespaceMap.get(prefix);
                             if (typeNamespaceURI == null)
                                 throw new ValidationException("Namespace not declared for prefix '" + prefix + "'",
                                         bind.getLocationData());
@@ -738,7 +738,7 @@ public class XFormsModelBinds {
                             }
                         } else if (typeLocalname.equals("xpath2")) {
                             // xxforms:xpath2 type
-                            if (!isOptionalAndEmpty && !XFormsUtils.isXPath2Expression(nodeValue)) {
+                            if (!isOptionalAndEmpty && !XFormsUtils.isXPath2Expression(nodeValue, namespaceMap)) {
                                 InstanceData.updateValueValid(currentNodeInfo, false, bind.getId());
                             }
 

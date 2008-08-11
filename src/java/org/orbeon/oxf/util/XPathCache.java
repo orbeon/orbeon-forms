@@ -22,7 +22,7 @@ import org.orbeon.oxf.cache.ObjectCache;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xml.XPathCacheStandaloneContext;
+import org.orbeon.oxf.xml.XPathCacheStaticContext;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
@@ -218,7 +218,20 @@ public class XPathCache {
                                                            LocationData locationData) {
         final List contextItems = Collections.singletonList(contextNode);
         return getXPathExpression(pipelineContext, contextItems, 1, xpathString, prefixToURIMap, variableToValueMap, functionLibrary, baseURI, false, false, locationData);
-     }
+    }
+
+    /**
+     * Just attempt to compile an XPath expression. An exception is thrown if the expression is not statically correct.
+     * Any variable used by the expression is assumed to be in scope. The expression is not added to the cache.
+     *
+     * @param xpathString       XPath string
+     * @param prefixToURIMap    namespaces in scope
+     * @param functionLibrary   function library
+     * @throws Exception        if the expression is not correct
+     */
+    public static void checkXPathExpression(String xpathString, Map prefixToURIMap, FunctionLibrary functionLibrary) throws Exception {
+        new XFormsCachePoolableObjetFactory(null, xpathString, prefixToURIMap, null, functionLibrary, null, false, true).makeObject();
+    }
 
     private static PooledXPathExpression getXPathExpression(PipelineContext pipelineContext,
                                                            List contextItems, int contextPosition,
@@ -279,7 +292,7 @@ public class XPathCache {
             final PooledXPathExpression expr;
             if (testNoCache) {
                 // For testing only: don't get expression from cache
-                final Object o = new XFormsCachePoolableObjetFactory(null, xpathString, prefixToURIMap, variableNames, functionLibrary, baseURI, isAvt).makeObject();
+                final Object o = new XFormsCachePoolableObjetFactory(null, xpathString, prefixToURIMap, variableNames, functionLibrary, baseURI, isAvt, false).makeObject();
                 expr = (PooledXPathExpression) o;
             } else {
                 // Get or create pool
@@ -329,7 +342,7 @@ public class XPathCache {
             // TODO: pool should have at least one hard reference
             final SoftReferenceObjectPool pool = new SoftReferenceObjectPool();
             pool.setFactory(new XFormsCachePoolableObjetFactory(pool, xpathString,
-                    prefixToURIMap, variableNames, functionLibrary, baseURI, isAvt));
+                    prefixToURIMap, variableNames, functionLibrary, baseURI, isAvt, false));
 
             return pool;
         } catch (Exception e) {
@@ -346,6 +359,7 @@ public class XPathCache {
         private final ObjectPool pool;
         private final String baseURI;
         private final boolean isAvt;
+        private final boolean allowAllVariables;
 
         public XFormsCachePoolableObjetFactory(ObjectPool pool,
                                           String xpathString,
@@ -353,7 +367,8 @@ public class XPathCache {
                                           Set variableNames,
                                           FunctionLibrary functionLibrary,
                                           String baseURI,
-                                          boolean isAvt) {
+                                          boolean isAvt,
+                                          boolean allowAllVariables) {
             this.pool = pool;
             this.xpathString = xpathString;
             this.prefixToURIMap = prefixToURIMap;
@@ -361,6 +376,7 @@ public class XPathCache {
             this.functionLibrary = functionLibrary;
             this.baseURI = baseURI;
             this.isAvt = isAvt;
+            this.allowAllVariables = allowAllVariables;
         }
 
         public void activateObject(Object o) throws Exception {
@@ -382,7 +398,7 @@ public class XPathCache {
                 logger.debug("makeObject(" + xpathString + ")");
 
             // Create context
-            final IndependentContext independentContext = new XPathCacheStandaloneContext();
+            final IndependentContext independentContext = new XPathCacheStaticContext(allowAllVariables);
 
             // Set the base URI if specified
             if (baseURI != null)

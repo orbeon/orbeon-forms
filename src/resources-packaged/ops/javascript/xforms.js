@@ -98,7 +98,6 @@ var BASE_URL = null;
 var XFORMS_SERVER_URL = null;
 var PATH_TO_JAVASCRIPT_1 = "/ops/javascript/xforms";
 var PATH_TO_JAVASCRIPT_2 = "/xforms-server/";
-var XFORMS_IS_GECKO = navigator.userAgent.toLowerCase().indexOf("gecko") != -1;
 var ELEMENT_TYPE = document.createElement("dummy").nodeType;
 var ATTRIBUTE_TYPE = document.createAttribute("dummy").nodeType;
 var TEXT_TYPE = document.createTextNode("").nodeType;
@@ -127,7 +126,7 @@ ORBEON.xforms.Globals = ORBEON.xforms.Globals || {
     // Booleans used for browser detection
     isMac : navigator.userAgent.toLowerCase().indexOf("macintosh") != -1,                 // Running on Mac
     isRenderingEngineGecko: navigator.userAgent.toLowerCase().indexOf("gecko") != -1,     // Firefox
-    isFF3: navigator.userAgent.toLowerCase().indexOf("firefox/3") != -1,                  // Firefox 3.0
+    isFF3: navigator.userAgent.toLowerCase().indexOf("firefox/3") != -1,                  // Firefox 3.0 (NOTE: will have to fix this for Firefox 4 and later)
     isRenderingEnginePresto: navigator.userAgent.toLowerCase().indexOf("opera") != -1,    // Opera
     isRenderingEngineWebCore: navigator.userAgent.toLowerCase().indexOf("safari") != -1,  // Safari
     isRenderingEngineWebCore13: navigator.userAgent.indexOf("AppleWebKit/312") != -1,     // Safari 1.3
@@ -4585,6 +4584,7 @@ ORBEON.xforms.Server = {
                                             var neighbor = ORBEON.util.Dom.getAttribute(divElement, "neighbor");
 
                                             var yuiDialog = ORBEON.xforms.Globals.dialogs[controlId];
+                                            var children = new Array();// elements that are being shown
                                             if (yuiDialog == null) {
                                                 // This is a case
                                                 var caseBeginId = "xforms-case-begin-" + controlId;
@@ -4601,12 +4601,15 @@ ORBEON.xforms.Server = {
                                                         if (cursor.id == "xforms-case-end-" + controlId) break;
                                                         ORBEON.util.Dom.addClass(cursor, visible ? "xforms-case-selected" : "xforms-case-deselected");
                                                         ORBEON.util.Dom.removeClass(cursor, visible ? "xforms-case-deselected" : "xforms-case-selected");
+
+                                                        children[children.length] = cursor;
                                                     }
                                                 }
                                             } else {
                                                 // This is a dialog
                                                 if (visible) {
                                                     ORBEON.xforms.Controls.showDialog(controlId, neighbor);
+                                                    children[0] = ORBEON.util.Dom.getElementById(controlId);
                                                 } else {
                                                     yuiDialog.hide();
                                                     // Fixes cursor Firefox issue; more on this in dialog init code
@@ -4616,23 +4619,38 @@ ORBEON.xforms.Server = {
                                                         ORBEON.xforms.Globals.dialogMinimalVisible[yuiDialog.element.id] = false;
                                                 }
                                             }
+
+                                            // After we display divs, we must re-enable the HTML editors.
+                                            // This is a workaround for a Gecko (pre-Firefox 3) bug documented at:
+                                            // http://wiki.fckeditor.net/Troubleshooting#gecko_hidden_div
+                                            if (children.length > 0 && ORBEON.xforms.Globals.isRenderingEngineGecko && !ORBEON.xforms.Globals.isFF3
+                                                    && ORBEON.xforms.Globals.htmlAreaNames.length > 0) {
+
+                                                for (var childIndex = 0; childIndex < children.length; childIndex++) {
+                                                    var child = children[childIndex];
+                                                    var textHTMLElements = YAHOO.util.Dom.getElementsByClassName("xforms-mediatype-text-html", null, child);
+
+                                                    // Below we try to find elements with both xforms-mediatype-text-html and xforms-textarea
+                                                    if (textHTMLElements != null && textHTMLElements.length > 0) {
+                                                        for (var htmlElementIndex = 0; htmlElementIndex < textHTMLElements.length; htmlElementIndex++) {
+                                                            var htmlElement = textHTMLElements[htmlElementIndex];
+                                                            // The code below tries to make sure we are getting an HTML form element
+                                                            if (htmlElement.name != null && htmlElement.name != "" && ORBEON.util.Dom.hasClass(htmlElement, "xforms-textarea")) {
+                                                                var editor = FCKeditorAPI.GetInstance(htmlElement.name);
+                                                                if (editor != null) {
+                                                                    try {
+                                                                        editor.EditorDocument.designMode = "on";
+                                                                    } catch (e) {
+                                                                        // Nop
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
                                         }
                                     }
-
-                                    // After we display divs, we must reenable the HTML editors.
-                                    // This is a workaround for a Gecko bug documented at:
-                                    // http://wiki.fckeditor.net/Troubleshooting#gecko_hidden_div
-//                                    if (XFORMS_IS_GECKO && ORBEON.xforms.Globals.htmlAreaNames.length > 0) {
-//                                        for (var htmlAreaIndex = 0; htmlAreaIndex < ORBEON.xforms.Globals.htmlAreaNames.length; htmlAreaIndex++) {
-//                                            var name = ORBEON.xforms.Globals.htmlAreaNames[htmlAreaIndex];
-//                                            var editor = FCKeditorAPI.GetInstance(name);
-//                                            try {
-//                                                editor.EditorDocument.designMode = "on";
-//                                            } catch (e) {
-//                                                // Nop
-//                                            }
-//                                        }
-//                                    }
 
                                     break;
                                 }

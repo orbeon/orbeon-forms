@@ -992,8 +992,9 @@
                         contain escaped XML.
                     </p>
                     <p>
-                        Orbeon Forms supports the built-in <code>xxforms:xpath2</code> extension type. This types checks
-                        that the value is well-formed XPath 2.0:
+                        Orbeon Forms supports the built-in <code>xxforms:xpath2</code> extension type. This types
+                        checks that the value is well-formed XPath 2.0. Any variable used by the expression is assumed
+                        to be in scope:
                     </p>
                     <xml-source>
                         <xforms:bind nodeset="my-xpath" type="xxforms:xpath2"/>

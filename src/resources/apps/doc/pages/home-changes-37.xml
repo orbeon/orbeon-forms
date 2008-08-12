@@ -32,7 +32,7 @@
                 Welcome to Orbeon Forms 3.7!
             </p>
             <p>
-                Orbeon Forms 3.7 features over <a href="#changes-37-full">115 improvements</a> since <a
+                Orbeon Forms 3.7 features over <a href="#changes-37-full">180 improvements</a> since <a
                 href="home-changes-36">Orbeon Forms 3.6</a>, including, in the areas of schema validation, session
                 handling, caching, core XForms engine enhancements, and application server support.
             </p>
@@ -40,7 +40,7 @@
                 This document describes changes made between Orbeon Forms 3.6 and Orbeon Forms 3.7.
             </p>
             <p>
-                <b style="color: red">NOTE: Orbeon Forms 3.7 is still UNDER DEVELOPMENT as of March 2008. The
+                <b style="color: red">NOTE: Orbeon Forms 3.7 is still UNDER DEVELOPMENT as of August 2008. The
                 latest stable release of Orbeon Forms is 3.6.</b>
             </p>
         </section>
@@ -292,7 +292,7 @@
             <section>
                 <title>Complete List of Issues Addressed in this Release</title>
                 <p>
-                    <b style="color: red">NOTE: Orbeon Forms 3.7 is still UNDER DEVELOPMENT as of March 2008. The
+                    <b style="color: red">NOTE: Orbeon Forms 3.7 is still UNDER DEVELOPMENT as of August 2008. The
                     latest stable release of Orbeon Forms is 3.6.</b>
                 </p>
                 <p>
@@ -317,6 +317,156 @@ http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=2
 </ul>
 -->
                 <ul>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=304973&amp;group_id=168&amp;atid=350207">
+                            #304973: Hints are ignored with triggers
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=305672&amp;group_id=168&amp;atid=350207">
+                            #305672: RFE: Investigate using YUI to implement tooltips
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306172&amp;group_id=168&amp;atid=350207">
+                            #306172: RFE: Improve date selector
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306385&amp;group_id=168&amp;atid=350207">
+                            #306385: Calendar widget should allow the date to be removed
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=304558&amp;group_id=168&amp;atid=350207">
+                            #304558: Empty date field with mapped xs:date type only displays calendar icon
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306952&amp;group_id=168&amp;atid=350207">
+                            #306952: RFE: Need widgets for xs:time and xs:dateTime
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310569&amp;group_id=168&amp;atid=350207">
+                            #310569: RFE: xforms:input should not generate span and img for date for non-date fields
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310826&amp;group_id=168&amp;atid=350207">
+                            #310826: Regression: oxf:url-generator may not recognize modes based on content-type anymore
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310825&amp;group_id=168&amp;atid=350207">
+                            #310825: RFE: Make portlet theme configurable through properties
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310778&amp;group_id=168&amp;atid=350207">
+                            #310778: Namespace prefix not in space for QName: xml:lang
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310779&amp;group_id=168&amp;atid=350207">
+                            #310779: Prefix xbl has not been declared
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310797&amp;group_id=168&amp;atid=350207">
+                            #310797: RFE: Provide XForms extension type to validate XPath 2.0 expressions
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310795&amp;group_id=168&amp;atid=350207">
+                            #310795: ORBEON.xforms.Globals.requestForm has no properties
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310764&amp;group_id=168&amp;atid=350207">
+                            #310764: RFE: Add ability to natively handle hierarchical properties in properties.xml
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308408&amp;group_id=168&amp;atid=350207">
+                            #308408: Upgrade to YUI 2.5.2 or later
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310675&amp;group_id=168&amp;atid=350207">
+                            #310675: Log4j configurations still being clobbered...
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310674&amp;group_id=168&amp;atid=350207">
+                            #310674: RFE: oxf:url-generator should support forward-headers property like
+                            xforms:submission
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=308758&amp;group_id=168&amp;atid=350207">
+                            #308758: RFE: Support for AVT in HTML in xforms:label (i18n issue)
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310640&amp;group_id=168&amp;atid=350207">
+                            #310640: RFE: Support for xforms:output within xhtml:title
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310616&amp;group_id=168&amp;atid=350207">
+                            #310616: RFE: Support xforms:model outside xhtml:head, especially within xxforms:dialog
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310611&amp;group_id=168&amp;atid=350207">
+                            #310611: RFE: Ability to use AVTs on XHTML elements outside HTML body
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310550&amp;group_id=168&amp;atid=350207">
+                            #310550: Regression: xforms:input bound to xs:boolean stores encrypted value instead of
+                            decrypted value
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310557&amp;group_id=168&amp;atid=350207">
+                            #310557: Reserved HTML characters like opening bracket and quotes don't work in trigger
+                            label
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310544&amp;group_id=168&amp;atid=350207">
+                            #310544: RFE: property() function should support XForms engine properties
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310542&amp;group_id=168&amp;atid=350207">
+                            #310542: RFE: xforms-server-submit URLs are ugly
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310541&amp;group_id=168&amp;atid=350207">
+                            #310541: xforms:upload control does not display mediatype after a file is uploaded
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310457&amp;group_id=168&amp;atid=350207">
+                            #310457: Regression: Form Builder: Clicking on a label just after page load no longer works
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310496&amp;group_id=168&amp;atid=350207">
+                            #310496: RFE: Present noscript content in JavaScript-enabled mode then the client has
+                            JavaScript disabled
+                        </a>
+                    </li>
                     <li>
                         <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=310456&amp;group_id=168&amp;atid=350207">
                             #310456: Selecting a non-existing file for upload causes a JS exception with IE

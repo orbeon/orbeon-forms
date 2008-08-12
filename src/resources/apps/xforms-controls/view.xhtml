@@ -247,6 +247,7 @@
                         <xhtml:span class="fixed-width"/>
                         <xforms:trigger navindex="12">
                             <xforms:label>Add carrier</xforms:label>
+                            <xforms:hint>Add a carrier to the list of carriers</xforms:hint>
                             <xforms:action  ev:event="DOMActivate">
                                 <xforms:insert nodeset="instance('carriers-instance')/carrier"
                                     at="last()" position="after"/>
@@ -258,7 +259,8 @@
                         </xforms:trigger>
                         <xforms:trigger navindex="13">
                             <xforms:label>Add flavor</xforms:label>
-                            <xforms:action  ev:event="DOMActivate">
+                            <xforms:hint>Add a flavor to the list of flavors</xforms:hint>
+                            <xforms:action ev:event="DOMActivate">
                                 <xforms:insert nodeset="instance('flavors-instance')/flavor"
                                     at="last()" position="after"/>
                                 <xforms:setvalue ref="instance('flavors-instance')/flavor[last()]/@value"

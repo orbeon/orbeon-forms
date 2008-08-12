@@ -416,7 +416,7 @@ public class URLGenerator extends ProcessorImpl {
                             if (configURIReferences.config.isForceContentType()) {
                                 contentType = configURIReferences.config.getContentType();
                             } else {
-                                contentType = handler.getResourceContentType();
+                                contentType = handler.getResourceMediaType();
                                 if (contentType == null)
                                     contentType = configURIReferences.config.getContentType();
                                 if (contentType == null)
@@ -630,7 +630,7 @@ public class URLGenerator extends ProcessorImpl {
     private interface ResourceHandler {
         public Object getValidity() throws IOException;
 
-        public String getResourceContentType() throws IOException;
+        public String getResourceMediaType() throws IOException;
 
         public String getConnectionEncoding() throws IOException;
 
@@ -654,7 +654,7 @@ public class URLGenerator extends ProcessorImpl {
             this.config = config;
         }
 
-        public String getResourceContentType() throws IOException {
+        public String getResourceMediaType() throws IOException {
             // We generally don't know the "connection" content-type
             return null;
         }
@@ -757,13 +757,13 @@ public class URLGenerator extends ProcessorImpl {
             this.config = config;
         }
 
-        public String getResourceContentType() throws IOException {
+        public String getResourceMediaType() throws IOException {
             // Return null for file protocol, as it returns incorrect content types
             if ("file".equals(config.getURL().getProtocol()))
                 return null;
             // Otherwise, try URLConnection
             openConnection();
-            return connectionResult.getResponseContentType();
+            return connectionResult.getResponseMediaType();
         }
 
         public String getConnectionEncoding() throws IOException {

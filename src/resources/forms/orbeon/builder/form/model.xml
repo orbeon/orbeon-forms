@@ -235,14 +235,10 @@
             <!-- TODO: This can be refactored to a local model -->
             <itemset-resource-id/>
             <itemset-lang/>
-            <!-- TODO: This can be refactored to a local model (help) -->
-            <new-text/>
 
             <!-- Currently open in-place editor -->
             <inplace-id/>
             <inplace-repeat-indexes/>
-
-            <result-node/>
 
             <next-section-id/>
             <next-control-id/>

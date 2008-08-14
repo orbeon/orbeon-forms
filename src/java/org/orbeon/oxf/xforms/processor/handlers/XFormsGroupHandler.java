@@ -13,33 +13,37 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
+import org.dom4j.Element;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsStaticState;
+import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
+import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.processor.XFormsElementFilterContentHandler;
-import org.orbeon.oxf.xforms.control.controls.XFormsGroupControl;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.saxon.om.FastStringBuffer;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
-import org.dom4j.Element;
 
-import java.util.Stack;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Stack;
 
 /**
  * Handle xforms:group.
  */
-public class XFormsGroupHandler extends HandlerBase {
+public class XFormsGroupHandler extends XFormsControlLifecyleHandler {
 
-    protected String groupId;
-    protected String effectiveGroupId;
-    private XFormsGroupControl groupXFormsControl;
+    // Appearances
     private boolean isFieldsetAppearance;
     private boolean isInternalAppearance;
 
     private boolean isGroupInTable;
+
+    // Label information gathered during prepareHandler()
+    private String labelValue;
+    private FastStringBuffer labelClasses;
+
     private DeferredContentHandler savedOutput;
     private OutputInterceptor outputInterceptor;
 
@@ -59,27 +63,16 @@ public class XFormsGroupHandler extends HandlerBase {
         super(false, true);
     }
 
-    public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
-
+    protected void prepareHandler(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsSingleNodeControl xformsControl) {
         // Special appearance that does not output any HTML. This is temporary until xforms:group is correctly supported within xforms:repeat.
         isInternalAppearance = XFormsConstants.XXFORMS_INTERNAL_APPEARANCE_QNAME.equals(getAppearance(attributes));
         if (isInternalAppearance)
             return;
 
-        groupId = handlerContext.getId(attributes);
-        effectiveGroupId = handlerContext.getEffectiveId(attributes);
         isFieldsetAppearance = XFormsConstants.XXFORMS_FIELDSET_APPEARANCE_QNAME.equals(getAppearance(attributes));
-
-        // Find classes to add
-        final FastStringBuffer classes = getInitialClasses(localname, attributes, null);
-        if (!handlerContext.isTemplate()) {
-            groupXFormsControl = ((XFormsGroupControl) containingDocument.getObjectById(effectiveGroupId));
-        }
-        handleMIPClasses(classes, groupId, groupXFormsControl);
 
         // Determine whether the closest xhtml:* parent is xhtml:table|xhtml:tbody|xhtml:thead|xhtml:tfoot|xhtml:tr
         final ElementHandlerController controller = handlerContext.getController();
-
         {
             final Stack elementNames = controller.getElementNames();
             for (int i = elementNames.size() - 1; i >= 0; i--) {
@@ -92,24 +85,16 @@ public class XFormsGroupHandler extends HandlerBase {
             }
         }
 
-        // Start xhtml:span or xhtml:fieldset
-        final String groupElementName = isFieldsetAppearance ? "fieldset" : "span";
-        final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
-        final String groupElementQName = XMLUtils.buildQName(xhtmlPrefix, groupElementName);
-
         if (!isGroupInTable) {
+            // Gather information about the label and alert
 
-            final ContentHandler contentHandler = controller.getOutput();
-
-            final boolean hasLabel;
-            final String labelValue;
+            final boolean hasLabel = XFormsControl.hasLabel(containingDocument, xformsControl, staticId);
             final String labelClassAttribute;
-            if (handlerContext.isTemplate() || groupXFormsControl == null) {
+            if (handlerContext.isTemplate() || xformsControl == null) {
                 // Determine information statically
 
                 final Element groupElement = ((XFormsStaticState.ControlInfo) containingDocument.getStaticState().getControlInfoMap().get(handlerContext.getId(attributes))).getElement();
                 final Element labelElement = groupElement.element(XFormsConstants.XFORMS_LABEL_QNAME);
-                hasLabel = labelElement != null;
 
                 labelValue = null;
                 labelClassAttribute = hasLabel ? labelElement.attributeValue("class") : null;
@@ -117,11 +102,10 @@ public class XFormsGroupHandler extends HandlerBase {
             } else {
                 // Determine information dynamically
 
-                labelValue = groupXFormsControl.getLabel(pipelineContext);
-                hasLabel = groupXFormsControl.hasLabel();
+                labelValue = xformsControl.getLabel(pipelineContext);
 
                 if (hasLabel) {
-                    final Element groupElement = groupXFormsControl.getControlElement();
+                    final Element groupElement = xformsControl.getControlElement();
                     final Element labelElement = groupElement.element(XFormsConstants.XFORMS_LABEL_QNAME);
 
                     labelClassAttribute = labelElement.attributeValue("class");
@@ -131,12 +115,10 @@ public class XFormsGroupHandler extends HandlerBase {
             }
 
             if (hasLabel) {
-                reusableAttributes.clear();
-
-                final FastStringBuffer labelClasses = new FastStringBuffer("xforms-label");
+                labelClasses = new FastStringBuffer("xforms-label");
 
                 // Handle relevance on label
-                if ((groupXFormsControl == null && !handlerContext.isTemplate()) || (groupXFormsControl != null && !groupXFormsControl.isRelevant())) {
+                if ((xformsControl == null && !handlerContext.isTemplate()) || (xformsControl != null && !xformsControl.isRelevant())) {
                     labelClasses.append(" xforms-disabled");
                 }
 
@@ -145,19 +127,47 @@ public class XFormsGroupHandler extends HandlerBase {
                     labelClasses.append(' ');
                     labelClasses.append(labelClassAttribute);
                 }
-
-                reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, labelClasses.toString());
             }
+        }
+    }
+
+    public void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, final String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
+
+        // No additional markup for internal appearance
+        if (isInternalAppearance)
+            return;
+
+        // Find classes to add
+        final FastStringBuffer classes = getInitialClasses(localname, attributes, null);
+        handleMIPClasses(classes, staticId, xformsControl);
+
+        // Start xhtml:span or xhtml:fieldset
+        final String groupElementName = isFieldsetAppearance ? "fieldset" : "span";
+        final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
+        final String groupElementQName = XMLUtils.buildQName(xhtmlPrefix, groupElementName);
+
+        final ElementHandlerController controller = handlerContext.getController();
+
+        if (!isGroupInTable) {
+
+            final ContentHandler contentHandler = controller.getOutput();
 
             if (isFieldsetAppearance) {
                 // Fieldset appearance
 
                 // Start xhtml:fieldset element
-                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, groupElementName, groupElementQName, getAttributes(attributes, classes.toString(), effectiveGroupId));
+                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, groupElementName, groupElementQName, getAttributes(attributes, classes.toString(), effectiveId));
 
                 // Output an xhtml:legend element if and only if there is an xforms:label element. This help with
                 // styling in particular.
+                final boolean hasLabel = XFormsControl.hasLabel(containingDocument, xformsControl, staticId);
                 if (hasLabel) {
+
+                    // Handle label classes
+                    reusableAttributes.clear();
+                    reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, labelClasses.toString());
+
+                    // Output xhtml:legend with label content
                     final String legendQName = XMLUtils.buildQName(xhtmlPrefix, "legend");
                     contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "legend", legendQName, reusableAttributes);
                     if (labelValue != null && !labelValue.equals(""))
@@ -167,18 +177,11 @@ public class XFormsGroupHandler extends HandlerBase {
             } else {
                 // Default appearance
 
-                // Output an xhtml:label element if and only if there is an xforms:label element. This help with
-                // styling in particular.
-                if (hasLabel) {
-                    outputLabelFor(handlerContext, reusableAttributes, effectiveGroupId, labelValue, groupXFormsControl != null && groupXFormsControl.isHTMLLabel(pipelineContext));
-                }
+                // Label is handled by handleLabel()
 
                 // Start xhtml:span element
-                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, groupElementName, groupElementQName, getAttributes(attributes, classes.toString(), effectiveGroupId));
+                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, groupElementName, groupElementQName, getAttributes(attributes, classes.toString(), effectiveId));
             }
-
-            // NOTE: This doesn't work because attributes for the label are only gathered after start()
-//            handleLabelHintHelpAlert(effectiveGroupId, "label", groupXFormsControl);
         } else {
 
             // Place interceptor on output
@@ -191,7 +194,7 @@ public class XFormsGroupHandler extends HandlerBase {
                 public void generateFirstDelimiter(OutputInterceptor outputInterceptor) throws SAXException {
                     // Delimiter: begin group
                     outputInterceptor.outputDelimiter(savedOutput, outputInterceptor.getDelimiterNamespaceURI(),
-                            outputInterceptor.getDelimiterPrefix(), outputInterceptor.getDelimiterLocalName(), "xforms-group-begin-end", "group-begin-" + effectiveGroupId);
+                            outputInterceptor.getDelimiterPrefix(), outputInterceptor.getDelimiterLocalName(), "xforms-group-begin-end", "group-begin-" + effectiveId);
                 }
             });
             controller.setOutput(new DeferredContentHandlerImpl(new XFormsElementFilterContentHandler(outputInterceptor)));
@@ -204,8 +207,9 @@ public class XFormsGroupHandler extends HandlerBase {
         }
     }
 
-    public void end(String uri, String localname, String qName) throws SAXException {
+    public void handleControlEnd(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
 
+        // No additional markup for internal appearance
         if (isInternalAppearance)
             return;
 
@@ -216,16 +220,6 @@ public class XFormsGroupHandler extends HandlerBase {
             final String groupElementName = isFieldsetAppearance ? "fieldset" : "span";
             final String groupElementQName = XMLUtils.buildQName(xhtmlPrefix, groupElementName);
             controller.getOutput().endElement(XMLConstants.XHTML_NAMESPACE_URI, groupElementName, groupElementQName);
-            final boolean isTemplate = handlerContext.isTemplate();
-
-            // xforms:help
-            handleLabelHintHelpAlert(groupId, effectiveGroupId, "help", groupXFormsControl, isTemplate, false);
-
-            // xforms:alert
-            handleLabelHintHelpAlert(groupId, effectiveGroupId, "alert", groupXFormsControl, isTemplate, false);
-
-            // xforms:hint
-            handleLabelHintHelpAlert(groupId, effectiveGroupId, "hint", groupXFormsControl, isTemplate, false);
         } else {
 
             // Restore output
@@ -235,9 +229,34 @@ public class XFormsGroupHandler extends HandlerBase {
             // Delimiter: end repeat
             outputInterceptor.flushCharacters(true, true);
             outputInterceptor.outputDelimiter(savedOutput, outputInterceptor.getDelimiterNamespaceURI(),
-                    outputInterceptor.getDelimiterPrefix(), outputInterceptor.getDelimiterLocalName(), "xforms-group-begin-end", "group-end-" + effectiveGroupId);
+                    outputInterceptor.getDelimiterPrefix(), outputInterceptor.getDelimiterLocalName(), "xforms-group-begin-end", "group-end-" + effectiveId);
 
             // Don't support help, alert, or hint!
         }
+    }
+
+    protected void handleLabel(String staticId, String effectiveId, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
+        if (!isInternalAppearance && !isGroupInTable && !isFieldsetAppearance) {// regular group
+            // Output an xhtml:label element if and only if there is an xforms:label element. This help with
+            // styling in particular.
+            reusableAttributes.clear();
+            reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, labelClasses.toString());
+            outputLabelFor(handlerContext, reusableAttributes, effectiveId, labelValue, xformsControl != null && xformsControl.isHTMLLabel(pipelineContext));
+        }
+    }
+
+    protected void handleHint(String staticId, String effectiveId, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
+        if (!isInternalAppearance && !isGroupInTable)
+            super.handleHint(staticId, effectiveId, xformsControl, isTemplate);
+    }
+
+    protected void handleAlert(String staticId, String effectiveId, Attributes attributes, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
+        if (!isInternalAppearance && !isGroupInTable)
+            super.handleAlert(staticId, effectiveId, attributes, xformsControl, isTemplate);
+    }
+
+    protected void handleHelp(String staticId, String effectiveId, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
+        if (!isInternalAppearance && !isGroupInTable)
+            super.handleHelp(staticId, effectiveId, xformsControl, isTemplate);
     }
 }

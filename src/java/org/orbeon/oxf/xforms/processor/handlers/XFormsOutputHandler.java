@@ -33,7 +33,7 @@ import org.xml.sax.helpers.AttributesImpl;
  * 
  * @noinspection SimplifiableIfStatement
  */
-public class XFormsOutputHandler extends XFormsCoreControlHandler {
+public class XFormsOutputHandler extends XFormsControlLifecyleHandler {
 
     public XFormsOutputHandler() {
         super(false);
@@ -57,12 +57,13 @@ public class XFormsOutputHandler extends XFormsCoreControlHandler {
         return true;
     }
 
-    protected boolean isMustOutputStandardAlert(XFormsSingleNodeControl xformsControl, Attributes attributes) {
+    protected void handleAlert(String staticId, String effectiveId, Attributes attributes, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
         // Handle alert only if there is no value attribute
-        return attributes.getValue("value") == null;
+        if (attributes.getValue("value") == null)
+            super.handleAlert(staticId, effectiveId, attributes, xformsControl, isTemplate);
     }
 
-    protected void handleControl(String uri, String localname, String qName, Attributes attributes, String id, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
+    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String id, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
 
         final XFormsOutputControl outputControl = (XFormsOutputControl) xformsControl;
 

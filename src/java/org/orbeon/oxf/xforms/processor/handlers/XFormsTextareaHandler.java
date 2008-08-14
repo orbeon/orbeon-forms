@@ -29,7 +29,7 @@ import org.xml.sax.helpers.AttributesImpl;
 /**
  * Handle xforms:textarea.
  */
-public class XFormsTextareaHandler extends XFormsCoreControlHandler {
+public class XFormsTextareaHandler extends XFormsControlLifecyleHandler {
 
     private static final String[] XXFORMS_ATTRIBUTES_TO_COPY = { "rows", "cols" };
 
@@ -37,7 +37,7 @@ public class XFormsTextareaHandler extends XFormsCoreControlHandler {
         super(false);
     }
 
-    protected void handleControl(String uri, String localname, String qName, Attributes attributes, String id, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
+    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String id, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
 
         final XFormsTextareaControl textareaControl = (XFormsTextareaControl) xformsControl;
         final ContentHandler contentHandler = handlerContext.getController().getOutput();

@@ -34,8 +34,8 @@
         <xforms:group id="{$section-id}">
             <!-- Support single-node bindings and contex -->
             <xsl:copy-of select="@ref | @bind | @context"/>
-
             <xsl:attribute name="class" select="string-join(('fr-section-container', @class), ' ')"/>
+
             <xforms:switch id="switch-{$section-id}" xxforms:readonly-appearance="dynamic">
                 <xforms:case id="case-{$section-id}-closed" selected="{if (not($open)) then 'true' else 'false'}">
                     <xhtml:div>
@@ -76,7 +76,7 @@
                                     </xsl:when>
                                     <xsl:otherwise>
                                         <xforms:trigger appearance="minimal">
-                                            <xsl:apply-templates select="xforms:label"/>
+                                            <xsl:apply-templates select="xforms:label | xforms:help"/>
                                         </xforms:trigger>
                                     </xsl:otherwise>
                                 </xsl:choose>
@@ -126,7 +126,7 @@
                                     </xsl:when>
                                     <xsl:otherwise>
                                         <xforms:trigger appearance="minimal">
-                                            <xsl:apply-templates select="xforms:label"/>
+                                            <xsl:apply-templates select="xforms:label | xforms:help"/>
                                         </xforms:trigger>
                                     </xsl:otherwise>
                                 </xsl:choose>

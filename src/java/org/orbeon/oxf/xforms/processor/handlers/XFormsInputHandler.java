@@ -35,7 +35,7 @@ import java.util.List;
 /**
  * Handle xforms:input.
  */
-public class XFormsInputHandler extends XFormsCoreControlHandler {
+public class XFormsInputHandler extends XFormsControlLifecyleHandler {
 
     private static final String[] XXFORMS_ATTRIBUTES_TO_COPY = { "size", "maxlength", "autocomplete" };
 
@@ -43,7 +43,7 @@ public class XFormsInputHandler extends XFormsCoreControlHandler {
         super(false);
     }
 
-    protected void handleControl(String uri, String localname, String qName, Attributes attributes, String id, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
+    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String id, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
 
         final XFormsInputControl inputControl = (XFormsInputControl) xformsControl;
         final ContentHandler contentHandler = handlerContext.getController().getOutput();

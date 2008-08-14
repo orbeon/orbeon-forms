@@ -123,7 +123,7 @@
                                         <xforms:insert context="." nodeset="*"
                                                        origin="xxforms:element($new-section-name)"/>
 
-                                        <xforms:insert context="*[last()]" origin="instance('fb-resource-template')/*"/>
+                                        <xforms:insert context="*[last()]" origin="instance('fb-resource-template')/(label | help)"/>
                                     </xforms:action>
 
                                     <!-- Make sure the bind is created -->

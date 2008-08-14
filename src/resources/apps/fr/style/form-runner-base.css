@@ -249,6 +249,11 @@ button.xforms-trigger img { margin-right: 10px }
     margin-left: 22px;
 }
 
+.fr-section-title .xforms-help-image {
+    float: none;
+    vertical-align: middle
+}
+
 /* ****************************************************** Grids ***************************************************** */
 
 .fr-grid {

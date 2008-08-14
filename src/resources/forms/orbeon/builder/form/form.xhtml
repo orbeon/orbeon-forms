@@ -175,12 +175,14 @@
                                 <xforms:group ref=".[local-name() = 'section']">
 
                                     <!-- Section name -->
-                                    <xxforms:variable name="section-name" select="if (@context) then @context else substring-before(@bind, '-bind')"/>
+                                    <xxforms:variable name="section-name" select="if (@context) then @context else substring-before(@bind, '-bind')" as="xs:string"/>
                                     <!-- Holder element for the section -->
-                                    <xxforms:variable name="section-holder" select="$form-instance/*[name() = $section-name]"/>
+                                    <xxforms:variable name="section-holder" select="$form-instance/*[name() = $section-name]" as="element()"/>
+                                    <!-- Resources for the section -->
+                                    <xxforms:variable name="section-resource" select="$current-resources/*[name() = $section-name]" as="element()"/>
 
                                     <fr:section id="fb-top-level-section" editable="true">
-                                        <xforms:label ref="$current-resources/*[name() = $section-name]/label"/>
+                                        <xforms:label ref="$section-resource/label"/>
                                         <xforms:hint>click to enter a section name</xforms:hint>
                                         <fr:buttons>
                                             <xforms:trigger appearance="minimal">
@@ -219,6 +221,16 @@
                                                     <xforms:insert nodeset="$top-level-block/following-sibling::fr:*[1]" position="after" origin="$top-level-block"/>
                                                     <xforms:delete nodeset="$top-level-block"/>
                                                     <!-- TODO: would be nice to move holders and resources as well -->
+                                                </xforms:action>
+                                            </xforms:trigger>
+                                            <!-- Edit help for section -->
+                                            <!-- TODO: id="fb-edit-section-help-trigger"  -->
+                                            <xforms:trigger appearance="minimal" class="fb-edit-section-help-trigger">
+                                                <xforms:label><xhtml:img alt="Help" title="" src="/ops/images/xforms/help.png"/></xforms:label>
+                                                <xforms:action ev:event="DOMActivate">
+                                                    <xxforms:show dialog="fb-edit-help-dialog" neighbor="fb-edit-section-help-trigger">
+                                                        <xxforms:context name="fb:node" select="$section-resource/help"/>
+                                                    </xxforms:show>
                                                 </xforms:action>
                                             </xforms:trigger>
                                         </fr:buttons>
@@ -687,15 +699,6 @@
                                                                                         </xforms:action>
                                                                                     </xforms:trigger>
 
-                                                                                    <!-- Edit help for any control -->
-                                                                                    <!--<xforms:trigger appearance="minimal" id="fb-edit-help-trigger">-->
-                                                                                        <!--<xforms:label><xhtml:img class="fb-control-help" alt="Help" title="" src="/ops/images/xforms/help.png"/></xforms:label>-->
-                                                                                        <!--<xforms:action ev:event="DOMActivate">-->
-                                                                                            <!--<xforms:setvalue ref="$variables/result-node" value="$resource-holder/help/saxon:path()"/>-->
-                                                                                            <!--<xxforms:show dialog="fb-edit-help-dialog" neighbor="fb-edit-help-trigger"/>-->
-                                                                                        <!--</xforms:action>-->
-                                                                                    <!--</xforms:trigger>-->
-
                                                                                     <!-- Edit validation for any control -->
                                                                                     <xforms:trigger appearance="minimal" id="fb-edit-alert-trigger">
                                                                                         <xforms:label><xhtml:img class="fb-control-alert" alt="Alert" title="" src="/apps/fr/style/images/silk/exclamation.png"/></xforms:label>
@@ -780,11 +783,12 @@
                                                                                     <xforms:group ref=".[$control]">
 
                                                                                         <!-- Edit help for any control -->
-                                                                                        <xforms:trigger appearance="minimal" id="fb-edit-help-trigger" class="fb-edit-help-trigger">
+                                                                                        <xforms:trigger appearance="minimal" id="fb-edit-control-help-trigger" class="fb-edit-help-trigger">
                                                                                             <xforms:label><xhtml:img alt="Help" title="" src="/ops/images/xforms/help.png"/></xforms:label>
                                                                                             <xforms:action ev:event="DOMActivate">
-                                                                                                <xforms:setvalue ref="$variables/result-node" value="$resource-holder/help/saxon:path()"/>
-                                                                                                <xxforms:show dialog="fb-edit-help-dialog" neighbor="fb-edit-help-trigger"/>
+                                                                                                <xxforms:show dialog="fb-edit-help-dialog" neighbor="fb-edit-control-help-trigger">
+                                                                                                    <xxforms:context name="fb:node" select="$resource-holder/help"/>
+                                                                                                </xxforms:show>
                                                                                             </xforms:action>
                                                                                         </xforms:trigger>
 

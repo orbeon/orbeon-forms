@@ -23,12 +23,12 @@
       xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
       xmlns:saxon="http://saxon.sf.net/"
 
-      id="fb-edit-help-dialog" appearance="minimal">
+      id="fb-edit-help-dialog" appearance="minimal" model="fb-edit-help-model">
 
     <xforms:label>Edit Help</xforms:label>
     <xhtml:div>
         <xforms:group class="fb-hide-alert">
-            <xforms:textarea ref="$variables/new-text">
+            <xforms:textarea ref="help-text" id="fb-edit-help-dialog-text">
                 <xforms:label>Help Message</xforms:label>
             </xforms:textarea>
             <xhtml:div class="fr-dialog-buttons">
@@ -51,9 +51,24 @@
 
     <!-- Save data upon close, unless explicitly prevented -->
     <xforms:action ev:event="xxforms-dialog-close" if="not(event('fb:save') = false())">
-        <xforms:setvalue ref="$form-instance/root()/saxon:evaluate($variables/result-node)" value="$variables/new-text"/>
+        <xxforms:variable name="instance" select="instance('fb-edit-help-instance')" as="element()"/>
+        <xforms:setvalue ref="$form-instance/root()/saxon:evaluate($instance/result-path)" value="$instance/help-text"/>
     </xforms:action>
 
     <!-- Copy help value when the dialog opens -->
-    <xforms:setvalue ev:event="xxforms-dialog-open" ref="$variables/new-text" value="$form-instance/root()/saxon:evaluate($variables/result-node)"/>
+    <xforms:action ev:event="xxforms-dialog-open">
+        <xxforms:variable name="instance" select="instance('fb-edit-help-instance')" as="element()"/>
+        <xforms:setvalue ref="$instance/result-path" value="event('fb:node')/saxon:path()"/>
+        <xforms:setvalue ref="$instance/help-text" value="event('fb:node')"/>
+        <xforms:setfocus control="fb-edit-help-dialog-text"/>
+    </xforms:action>
+
+    <xforms:model id="fb-edit-help-model">
+        <xforms:instance id="fb-edit-help-instance">
+            <instance>
+                <help-text/>
+                <result-path/>
+            </instance>
+        </xforms:instance>
+    </xforms:model>
 </xxforms:dialog>

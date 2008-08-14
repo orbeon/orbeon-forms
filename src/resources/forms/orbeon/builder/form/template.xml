@@ -68,6 +68,7 @@
                     <resource xml:lang="en">
                         <section-1>
                             <label/>
+                            <help/>
                         </section-1>
                         <control-1>
                             <label/>

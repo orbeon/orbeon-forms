@@ -19,6 +19,7 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
+import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsTriggerControl;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
@@ -36,28 +37,25 @@ import java.util.Map;
 /**
  * Handle xforms:trigger.
  */
-public class XFormsTriggerHandler extends XFormsCoreControlHandler {
+public class XFormsTriggerHandler extends XFormsControlLifecyleHandler {
 
     public XFormsTriggerHandler() {
         super(false);
     }
 
-    protected boolean isMustOutputStandardLabel(XFormsSingleNodeControl xformsControl) {
+    protected void handleLabel(String staticId, String effectiveId, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
         // Label is handled differently
-        return false;
     }
 
-    protected boolean isMustOutputStandardHint(XFormsSingleNodeControl xformsControl) {
+    protected void handleHint(String staticId, String effectiveId, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
         // Hint is handled differently
-        return false;
     }
 
-    protected boolean isMustOutputStandardAlert(XFormsSingleNodeControl xformsControl, Attributes attributes) {
+    protected void handleAlert(String staticId, String effectiveId, Attributes attributes, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
         // Triggers don't need an alert
-        return false;
     }
 
-    protected void handleControl(String uri, String localname, String qName, Attributes attributes, String id, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
+    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
 
         final XFormsTriggerControl triggerControl = (XFormsTriggerControl) xformsControl;
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
@@ -69,7 +67,8 @@ public class XFormsTriggerHandler extends XFormsCoreControlHandler {
 
         final boolean isConcreteControl = triggerControl != null;
 
-        if (isConcreteControl && !triggerControl.hasLabel())
+        final boolean hasLabel = XFormsControl.hasLabel(containingDocument, xformsControl, staticId);
+        if (isConcreteControl && !hasLabel)
             throw new ValidationException("Missing label on xforms:trigger element.", triggerControl.getLocationData());
 
         final String labelValue = handlerContext.isTemplate() ? "$xforms-template-label$" : isConcreteControl ? (triggerControl.getLabel(pipelineContext) != null ? triggerControl.getLabel(pipelineContext) : "") : "";
@@ -85,8 +84,8 @@ public class XFormsTriggerHandler extends XFormsCoreControlHandler {
         }
 
         final FastStringBuffer classes = getInitialClasses(localname, attributes, triggerControl, appearance, false);
-        handleMIPClasses(classes, id, triggerControl);
-        containingDocument.getStaticState().appendClasses(classes, id);
+        handleMIPClasses(classes, staticId, triggerControl);
+        containingDocument.getStaticState().appendClasses(classes, staticId);
 
         {
             // Set modal class

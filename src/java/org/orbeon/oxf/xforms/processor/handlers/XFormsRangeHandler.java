@@ -27,13 +27,13 @@ import org.xml.sax.helpers.AttributesImpl;
 /**
  * Handle xforms:range.
  */
-public class XFormsRangeHandler extends XFormsCoreControlHandler {
+public class XFormsRangeHandler extends XFormsControlLifecyleHandler {
 
     public XFormsRangeHandler() {
         super(false);
     }
 
-    protected void handleControl(String uri, String localname, String qName, Attributes attributes, String id, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
+    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String id, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
 
         final XFormsRangeControl rangeControl = (XFormsRangeControl) xformsControl;
         final ContentHandler contentHandler = handlerContext.getController().getOutput();

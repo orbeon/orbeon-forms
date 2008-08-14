@@ -18,7 +18,6 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsItemUtils;
 import org.orbeon.oxf.xforms.XFormsStaticState;
-import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control;
@@ -39,7 +38,7 @@ import java.util.List;
 /**
  * Handle xforms:select and xforms:select1.
  */
-public class XFormsSelect1Handler extends XFormsCoreControlHandler {
+public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
 
     private boolean isMany;
     private QName appearance;
@@ -48,7 +47,7 @@ public class XFormsSelect1Handler extends XFormsCoreControlHandler {
         super(false);
     }
 
-    protected void prepareHandler(String uri, String localname, String qName, Attributes attributes, String id, String effectiveId, XFormsSingleNodeControl xformsControl) {
+    protected void prepareHandler(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsSingleNodeControl xformsControl) {
         this.isMany = localname.equals("select");
         this.appearance = getActualAppearance(attributes, isMany);
     }
@@ -67,7 +66,7 @@ public class XFormsSelect1Handler extends XFormsCoreControlHandler {
         return appearance;
     }
 
-    protected void handleControl(String uri, String localname, String qName, Attributes attributes, String id, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
+    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String id, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
         // Get items, dynamic or static, if possible
         final XFormsSelect1Control xformsSelect1Control = (XFormsSelect1Control) xformsControl;
         final List items = XFormsSelect1Control.getItemset(pipelineContext, containingDocument, xformsSelect1Control, id);
@@ -75,9 +74,10 @@ public class XFormsSelect1Handler extends XFormsCoreControlHandler {
         outputContent(attributes, id, effectiveId, localname, xformsSelect1Control, items, isMany, appearance);
     }
 
-    protected boolean isMustOutputStandardLabel(XFormsSingleNodeControl xformsControl) {
+    protected void handleLabel(String staticId, String effectiveId, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
         final boolean isFull = XFormsConstants.XFORMS_FULL_APPEARANCE_QNAME.equals(appearance);
-        return isStaticReadonly(xformsControl) || !isFull || !isNoscript;
+        if (isStaticReadonly(xformsControl) || !isFull || !isNoscript)
+            super.handleLabel(staticId, effectiveId, xformsControl, isTemplate);
     }
 
     public void outputContent(Attributes attributes, String id, String effectiveId, String localname, final XFormsValueControl xformsValueControl, List items, final boolean isMany, QName appearance) throws SAXException {

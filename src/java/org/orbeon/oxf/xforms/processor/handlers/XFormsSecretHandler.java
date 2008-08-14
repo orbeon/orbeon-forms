@@ -27,7 +27,7 @@ import org.xml.sax.helpers.AttributesImpl;
 /**
  * Handle xforms:secret.
  */
-public class XFormsSecretHandler extends XFormsCoreControlHandler {
+public class XFormsSecretHandler extends XFormsControlLifecyleHandler {
 
     private static final String HIDDEN_PASSWORD = "********";
 
@@ -35,7 +35,7 @@ public class XFormsSecretHandler extends XFormsCoreControlHandler {
         super(false);
     }
 
-    protected void handleControl(String uri, String localname, String qName, Attributes attributes, String id, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
+    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String id, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
 
         final XFormsSecretControl secretControl = (XFormsSecretControl) xformsControl;
         final ContentHandler contentHandler = handlerContext.getController().getOutput();

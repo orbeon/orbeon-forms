@@ -14,9 +14,45 @@
 
 /* *********************************************** Colors, fonts, etc. ********************************************** */
 
-/* NOTE: repeats and dialogs still have colors and fonts settings above */
+/* TODO: repeats and dialogs still have colors and fonts settings in form-runner-base.css */
 
-body { background-color: #FFE27F }
+/* *********************************************** Basic HTML settings ********************************************** */
+
+html { overflow: scroll }/* TODO: add comment about why this is useful (if is actually is) */
+
+body {
+    background-color: #FFE27F;
+    text-align: left /* Not sure why the YUI resets this to center */
+}
+
+td { border: 0 }
+i { font-style: italic }
+b { font-weight: bold }
+th, td {border: 0; padding: 0 }
+
+h1, h2, h3 {
+	margin:1em 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    text-align: left;
+    font-weight: normal;
+    clear: left;
+    padding: 0;
+}
+
+h1 { font-size: 197% }
+
+h2 {
+    font-size: 160%;
+    margin: .25em 0 .5em 0;/* try smaller margins */
+}
+
+h3, h4 {
+    font-size: 110%;
+    line-height: 135%;
+    margin: 1em 0 1em 0;
+}
 
 body, body table, textarea.xforms-textarea {
     font-family: "Lucida Grande", Tahoma, Arial, Verdana, sans-serif;
@@ -25,9 +61,24 @@ body, body table, textarea.xforms-textarea {
 a { color: #666699 }
 hr { border: 1px solid #eee }
 
+/* Some definitions from YUI base-min.css */
+strong { font-weight: bold }
+abbr, acronym { border-bottom: 1px dotted #000; cursor: help }
+em { font-style: italic }
+blockquote, ul, ol, dl { margin: 1em }
+ol, ul, dl { margin-left: 2em }
+ol li { list-style: decimal outside }
+ul li { list-style: disc outside }
+dl dd { margin-left: 1em }
+th { font-weight:bold; text-align:center }
+caption { margin-bottom:.5em; text-align:center }
+p, fieldset, table { margin-bottom: 1em }
+
+/* ****************************************************** Other ***************************************************** */
+
 .fr-top, .fr-bottom { background-repeat: no-repeat }
 .fr-top { line-height: 10px; }/* help background image display */
-/* IE 6 HACK in all the lines below: don't show the PNG background image as it doesn't show properly */
+/* IE 6 HACK in all the lines below: don't use the PNG background image as it doesn't show properly */
 #doc .fr-top { background-image: url(top-750.png); _background-image: none }
 #doc4 .fr-top { background-image: url(top-974.png); _background-image: none }
 #doc-fb .fr-top { background-image: url(top-974.png); _background-image: none }
@@ -35,6 +86,9 @@ hr { border: 1px solid #eee }
 #doc .fr-bottom { background-image: url(bottom-750.png); _background-image: none }
 #doc4 .fr-bottom { background-image: url(bottom-974.png); _background-image: none }
 #doc-fb .fr-bottom { background-image: url(bottom-974.png); _background-image: none }
+
+/* Put margins here as they are not needed */
+#fr-form-group { margin: .5em 1em 1em }
 
 .fr-bottom .fr-orbeon-version {
     text-align: center;
@@ -130,4 +184,11 @@ hr { border: 1px solid #eee }
 /* Sections */
 .fr-section-container div.fr-collapsible {
     border-bottom: 1px dotted #666699;
+}
+
+/* ************************************************** Print and PDF ************************************************* */
+
+/* This is also used for PDF generation */
+@media print {
+    body { background-color: white }
 }

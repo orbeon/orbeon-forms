@@ -107,11 +107,10 @@
             <xsl:apply-templates select="@*"/>
 
             <!-- Form Runner CSS stylesheets -->
-            <xhtml:link rel="stylesheet" href="/ops/css/yui/reset-fonts-grids.css" type="text/css"/>
-            <xhtml:link rel="stylesheet" href="/ops/css/yui/base-min.css" type="text/css"/>
-            <xhtml:link rel="stylesheet" href="/apps/fr/style/form-runner-base.css" type="text/css"/>
             <xsl:if test="normalize-space($css-uri) != ''">
-                <xhtml:link rel="stylesheet" href="{$css-uri}" type="text/css"/>
+                <xsl:for-each select="tokenize($css-uri, '\s')[normalize-space() != '']">
+                    <xhtml:link rel="stylesheet" href="{.}" type="text/css"/>
+                </xsl:for-each>
             </xsl:if>
 
             <!-- Handle existing stylesheets -->

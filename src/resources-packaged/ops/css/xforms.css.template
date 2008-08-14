@@ -81,8 +81,6 @@
 .xforms-error-panel-reload { cursor: pointer; }
 
 .xforms-help-panel { width: 300px; }
-.xforms-help-panel-message { margin-bottom: 1em; margin-top: 1em; }
-.xforms-help-panel-message { margin-bottom: 1em; margin-top: 1em; }
 .xforms-help-panel-close { text-align: right; }
 
 .xforms-noscript-panel {
@@ -295,7 +293,7 @@ a.xforms-readonly { color: gray; cursor: default }
 /* In the tree, because we don't have an href, we use this CSS so the cursor is a pointer when over the link */
 a.ygtvlabel { cursor: pointer; }
 
-/* Styles used by xforms-to-xhtml.xsl */
+/* Legacy styles used by xforms-to-xhtml.xsl */
 .xforms-legacy-error-table { border: 0; margin: 0; padding: 0; }
 .xforms-legacy-error-table td { border: 0; margin: 0; padding: 0; }
 .xforms-legacy-help-table { margin: 0 }

@@ -12,37 +12,7 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 */
 
-/* *********************************************** Basic HTML settings ********************************************** */
-
 /* NOTE: IE em factor: 0.9759 */
-
-html { overflow: scroll }/* TODO: add comment about why this is useful (if is actually is) */
-
-body { text-align: left }/* Not sure why the YUI resets this to center */
-td { border: 0 }
-i { font-style: italic }
-b { font-weight: bold }
-th, td {border: 0; padding: 0 }
-
-h1, h2, h3, h4 {
-    text-align: left;
-    font-weight: normal;
-    clear: left;
-    padding: 0;
-}
-
-h1 { font-size: 197% }
-
-h2 {
-    font-size: 160%;
-    margin: .25em 0 .5em 0;/* try smaller margins */
-}
-
-h3, h4 {
-    font-size: 110%;
-    line-height: 135%;
-    margin: 1em 0 1em 0;
-}
 
 /* *************************************************** Utilities **************************************************** */
 
@@ -392,7 +362,6 @@ button.xforms-trigger img { margin-right: 10px }
 
 /* This is also used for PDF generation */
 @media print {
-    body { background-color: white }
     .fr-bottom { display: none }
     .fr-top { display: none }
     .fr-section-container img.fr-open-close { display: none }

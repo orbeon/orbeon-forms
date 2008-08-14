@@ -57,7 +57,7 @@
                                 <xforms:trigger appearance="minimal">
                                     <xforms:label>
                                         <!-- TODO: i18n of title -->
-                                        <xhtml:img width="12" height="12" src="/apps/fr/style/plus.png" alt="Open section" title="Open section" class="fr-open-close"/>
+                                        <xhtml:img width="12" height="12" src="/apps/fr/style/plus.png" alt="" title="Open section" class="fr-open-close"/>
                                     </xforms:label>
                                     <xsl:if test="@editable = 'true'">
                                         <xsl:apply-templates select="$action"/>
@@ -107,7 +107,7 @@
                                 <xforms:trigger appearance="minimal">
                                     <xforms:label>
                                         <!-- TODO: i18n of title -->
-                                        <xhtml:img width="12" height="12" src="/apps/fr/style/minus.png" alt="Close section" title="Close section" class="fr-open-close"/>
+                                        <xhtml:img width="12" height="12" src="/apps/fr/style/minus.png" alt="" title="Close section" class="fr-open-close"/>
                                     </xforms:label>
                                     <xsl:if test="@editable = 'true'">
                                         <xsl:apply-templates select="$action"/>

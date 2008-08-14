@@ -324,8 +324,8 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
             super.characters(chars, start, length);
         } else {
 
-            // TODO: we must not output characters here if we are not directly within an XForms element; 
-
+            // TODO: we must not output characters here if we are not directly within an XForms element
+            // See: http://forge.objectweb.org/tracker/index.php?func=detail&aid=310835&group_id=168&atid=350207
             if (inXForms) // TODO: check this: only keep spaces within XForms elements that require it in order to reduce the size of the static state
                 super.characters(chars, start, length);
         }

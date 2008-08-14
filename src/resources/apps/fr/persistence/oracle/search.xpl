@@ -23,7 +23,8 @@
         xmlns:xforms="http://www.w3.org/2002/xforms"
         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
         xmlns:ev="http://www.w3.org/2001/xml-events"
-        xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
+        xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
+        xmlns:f="http//www.orbeon.com/function">
 
     <!--
         Search instance, e.g.:
@@ -41,7 +42,7 @@
             <lang>en</lang>
         </search>
     -->
-    <p:param name="instance" type="input" debug="search instance"/>
+    <p:param name="instance" type="input"/>
 
     <!--
         Search result, e.g.:
@@ -63,80 +64,110 @@
             </document>
         </documents>
     -->
-    <p:param name="data" type="output" debug="search result"/>
+    <p:param name="data" type="output"/>
 
     <!-- Run query -->
+    <p:processor name="oxf:unsafe-xslt">
+        <p:input name="data" href="#instance"/>
+        <p:input name="config">
+            <xsl:stylesheet version="2.0">
+                <xsl:template match="/">
+                    <sql:config>
+                        <documents>
+                            <sql:connection>
+                                <sql:datasource>
+                                    <xsl:value-of select="pipeline:property('oxf.fr.persistence.service.oracle.datasource')"/>
+                                </sql:datasource>
+
+                                <!-- Query that returns all the search results, which we will reuse in multiple palces -->
+                                <xsl:variable name="query">
+                                    select created, last_modified, document_id
+                                        <!-- Go over detail columns and extract data from XML -->
+                                        <xsl:for-each select="/search/query[@path]">
+                                            , extractValue(xml, '/*/<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>',
+                                                '<xsl:value-of select="f:namespaces(.)"/>') detail_<xsl:value-of select="position()"/>
+                                        </xsl:for-each>
+                                    from orbeon_form_data
+                                    where app = <sql:param type="xs:string" select="/search/app"/>
+                                        and form = <sql:param type="xs:string" select="/search/form"/>
+                                        <xsl:for-each select="/search/query[@path and . != '']">
+                                            and lower(extractValue(xml, '/*/<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>', '<xsl:value-of select="f:namespaces(.)"/>'))
+                                                like '%<xsl:value-of select="lower-case(f:escape-sql(.))"/>%'
+                                        </xsl:for-each>
+                                    order by created
+                                </xsl:variable>
+
+                                <!-- Get total number of document in collection for this app/form -->
+                                <sql:execute>
+                                    <sql:query>
+                                        select
+                                            (select count(*) from orbeon_form_data
+                                                where app = <sql:param type="xs:string" select="/search/app"/>
+                                                and form = <sql:param type="xs:string" select="/search/form"/>) total,
+                                            (select count(*) from (<xsl:copy-of select="$query"/>)) search_total
+                                        from dual
+                                    </sql:query>
+                                    <sql:result-set>
+                                        <sql:row-iterator>
+                                            <sql:get-columns format="xml"/>
+                                        </sql:row-iterator>
+                                    </sql:result-set>
+                                </sql:execute>
+
+                                <!-- Get details -->
+                                <sql:execute>
+                                    <sql:query>
+                                        select *
+                                          from ( select
+                                          a.*, ROWNUM rnum
+                                              from ( <xsl:copy-of select="$query"/> ) a
+                                              where ROWNUM &lt;= <xsl:value-of select="/search/page-number * /search/page-size"/> )
+                                        where rnum  > <xsl:value-of select="(/search/page-number - 1) * /search/page-size"/>
+                                    </sql:query>
+                                    <sql:result-set>
+                                        <sql:row-iterator>
+                                            <document>
+                                                <created><sql:get-column-value column="created"/></created>
+                                                <last-modified><sql:get-column-value column="last_modified"/></last-modified>
+                                                <document-id><sql:get-column-value column="document_id"/></document-id>
+                                                <xsl:for-each select="/search/query[@path]">
+                                                    <detail><sql:get-column-value column="detail_{position()}"/></detail>
+                                                </xsl:for-each>
+                                            </document>
+                                        </sql:row-iterator>
+                                    </sql:result-set>
+                                </sql:execute>
+                            </sql:connection>
+                        </documents>
+                    </sql:config>
+                </xsl:template>
+                <xsl:function name="f:escape-lang">
+                    <xsl:param name="text" as="xs:string"/>
+                    <xsl:param name="lang" as="xs:string"/>
+                    <xsl:value-of select="replace($text, '\[@xml:lang = \$fb-lang\]', concat('[@xml:lang = ''', f:escape-sql($lang), ''']'))"/>
+                </xsl:function>
+                <xsl:function name="f:escape-sql">
+                    <xsl:param name="text" as="xs:string"/>
+                    <xsl:value-of select="replace($text, '''', '''''')"/>
+                </xsl:function>
+                <xsl:function name="f:namespaces">
+                    <xsl:param name="query" as="element(query)"/>
+                    <xsl:for-each select="in-scope-prefixes($query)">
+                        <xsl:text>xmlns:</xsl:text>
+                        <xsl:value-of select="."/>
+                        <xsl:text>="</xsl:text>
+                        <xsl:value-of select="namespace-uri-for-prefix(., $query)"/>
+                        <xsl:text>" </xsl:text>
+                    </xsl:for-each>
+                </xsl:function>
+            </xsl:stylesheet>
+        </p:input>
+        <p:output name="data" id="sql-config"/>
+    </p:processor>
     <p:processor name="oxf:sql">
         <p:input name="data" href="#instance"/>
-        <p:input name="config" transform="oxf:unsafe-xslt" href="#instance">
-            <sql:config xsl:version="2.0">
-                <documents>
-                    <sql:connection>
-                        <sql:datasource>
-                            <xsl:value-of select="pipeline:property('oxf.fr.persistence.service.oracle.datasource')"/>
-                        </sql:datasource>
-
-                        <!-- Query that returns all the search results, which we will reuse in multiple palces -->
-                        <xsl:variable name="query">
-                            select created, last_modified, document_id
-                                <!-- Go over detail columns and extract data from XML -->
-                                <xsl:for-each select="/search/query[@path]">
-                                    , extractValue(xml, '/*/<xsl:value-of select="@path"/>') detail_<xsl:value-of select="position()"/>
-                                </xsl:for-each>
-                            from orbeon_form_data
-                            where app = <sql:param type="xs:string" select="/search/app"/>
-                                and form = <sql:param type="xs:string" select="/search/form"/>
-                                <xsl:for-each select="/search/query[@path and . != '']">
-                                    and lower(extractValue(xml, '/*/<xsl:value-of select="@path"/>')) like '%<xsl:value-of select="lower-case(replace(., '''', ''''''))"/>%'
-                                </xsl:for-each>
-                            order by created
-                        </xsl:variable>
-
-                        <!-- Get total number of document in collection for this app/form -->
-                        <sql:execute>
-                            <sql:query>
-                                select
-                                    (select count(*) from orbeon_form_data
-                                        where app = <sql:param type="xs:string" select="/search/app"/>
-                                        and form = <sql:param type="xs:string" select="/search/form"/>) total,
-                                    (select count(*) from (<xsl:copy-of select="$query"/>)) search_total
-                                from dual
-                            </sql:query>
-                            <sql:result-set>
-                                <sql:row-iterator>
-                                    <sql:get-columns format="xml"/>
-                                </sql:row-iterator>
-                            </sql:result-set>
-                        </sql:execute>
-
-                        <!-- Get details -->
-                        <sql:execute>
-                            <sql:query>
-                                select *
-                                  from ( select
-                                  a.*, ROWNUM rnum
-                                      from ( <xsl:copy-of select="$query"/> ) a
-                                      where ROWNUM &lt;= <xsl:value-of select="/search/page-number * /search/page-size"/> )
-                                where rnum  > <xsl:value-of select="(/search/page-number - 1) * /search/page-size"/>
-                            </sql:query>
-                            <sql:result-set>
-                                <sql:row-iterator>
-                                    <document>
-                                        <created><sql:get-column-value column="created"/></created>
-                                        <last-modified><sql:get-column-value column="last_modified"/></last-modified>
-                                        <document-id><sql:get-column-value column="document_id"/></document-id>
-                                        <xsl:for-each select="/search/query[@path]">
-                                            <detail><sql:get-column-value column="detail_{position()}"/></detail>
-                                        </xsl:for-each>
-                                    </document>
-                                </sql:row-iterator>
-                            </sql:result-set>
-                        </sql:execute>
-                    </sql:connection>
-                </documents>
-            </sql:config>
-        </p:input>
-        <p:output name="data" id="sql-output" debug="sql-output"/>
+        <p:input name="config" href="#sql-config"/>
+        <p:output name="data" id="sql-output"/>
     </p:processor>
 
     <!-- Transform output from SQL processor into the XML form the caller expects -->

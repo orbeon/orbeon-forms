@@ -170,6 +170,53 @@ ORBEON.testcases = {
                     });
                 });
             });
+        },
+
+        // Set date, send to server and check result
+        testSetDateChangedByServer: function() {
+            ORBEON.testing.executeWithInitialInstance(this, function() {
+                ORBEON.testing.executeCausingAjaxRequest(this, function() {
+                    // Set time
+                    ORBEON.xforms.Document.setValue("input-type", "time");
+                    ORBEON.xforms.Document.setValue("input-field", "9:05 pm");
+                }, function() {
+                    // Check date coming back is formated
+                    var control = ORBEON.util.Dom.getElementById("input-field");
+                    var firstInput = ORBEON.util.Dom.getChildElementByIndex(control, 0);
+                    YAHOO.util.Assert.areEqual("9:05:00 p.m.", firstInput.value);
+                    YAHOO.util.Assert.areEqual("21:05:00", ORBEON.xforms.Document.getValue("input-field"));
+                });
+            });
+        },
+
+        
+        // When we send an invalid date-time to the server, we don't want to try to parse the result if it is the same
+        // as what we just sent
+        testInvalidDateTimeSentToServer: function() {
+            ORBEON.testing.executeWithInitialInstance(this, function() {
+                ORBEON.testing.executeCausingAjaxRequest(this, function() {
+                    // Switch to date-time input
+                    ORBEON.xforms.Document.setValue("input-type", "date-time");
+                }, function() {
+                    // Get reference to control and input fields
+                    var control = ORBEON.util.Dom.getElementById("input-field");
+                    var firstInput = ORBEON.util.Dom.getChildElementByIndex(control, 0);
+                    var secondInput = ORBEON.util.Dom.getChildElementByIndex(control, 1);
+                    ORBEON.testing.executeCausingAjaxRequest(this, function() {
+                        // Set invalid values in date and time fields
+                        firstInput.value = "aTb";
+                        secondInput.value = "cTd"
+                        // Send change event to the server
+                        var event = new ORBEON.xforms.Server.Event(ORBEON.xforms.Controls.getForm(control), control.id, null,
+                                ORBEON.xforms.Controls.getCurrentValue(control), "xxforms-value-change-with-focus-change", false, false, false);
+                        ORBEON.xforms.Server.fireEvents([event], false);
+                    }, function() {
+                        // Check that the values are the one we set
+                        YAHOO.util.Assert.areEqual("aTb", firstInput.value);
+                        YAHOO.util.Assert.areEqual("cTd", secondInput.value);
+                    });
+                });
+            });
         }
     })
 

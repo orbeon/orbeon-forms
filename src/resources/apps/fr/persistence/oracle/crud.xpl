@@ -15,6 +15,7 @@
 <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
         xmlns:sql="http://orbeon.org/oxf/xml/sql"
         xmlns:odt="http://orbeon.org/oxf/xml/datatypes"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
         xmlns:oxf="http://www.orbeon.com/oxf/processors"
@@ -48,6 +49,7 @@
     <p:processor name="oxf:xslt">
         <p:input name="matcher-groups" href="#matcher-groups"/>
         <p:input name="instance" href="#instance"/>
+        <p:input name="request" href="#request"/>
         <p:input name="data"><dummy/></p:input>
         <p:input name="config">
             <request xsl:version="2.0">
@@ -65,6 +67,7 @@
                     <document-id><xsl:value-of select="$matcher-groups[7]"/></document-id>
                 </xsl:if>
                 <filename><xsl:value-of select="if ($type = 'data') then $matcher-groups[8] else $matcher-groups[5]"/></filename>
+                <xsl:copy-of select="doc('input:request')/request/body"/>
             </request>
         </p:input>
         <p:output name="data" id="request-description"/>
@@ -79,50 +82,105 @@
         <!-- Handle binary and XML GET -->
         <p:when test="/*/method = 'GET'">
 
-            <p:processor name="oxf:sql">
-                <p:input name="data" href="#request-description"/>
-                <p:input name="config" transform="oxf:unsafe-xslt" href="#request-description">
-                    <sql:config xsl:version="2.0">
-                        <sql:connection>
-                            <sql:datasource>
-                                <xsl:value-of select="pipeline:property('oxf.fr.persistence.service.oracle.datasource')"/>
-                            </sql:datasource>
+            <p:choose href="#request-description">
 
-                            <sql:execute>
-                                <sql:query>
-                                    <xsl:variable name="is-data" as="xs:boolean" select="/request/type = 'data'"/>
-                                    <xsl:variable name="table-name" as="xs:string" select="if ($is-data) then 'orbeon_form_data' else 'orbeon_form_definition'"/>
+                <!-- Get XML -->
+                <p:when test="ends-with(/request/filename, '.xml') or ends-with(/request/filename, '.xhtml')">
+                    <p:processor name="oxf:sql">
+                        <p:input name="data" href="#request-description"/>
+                        <p:input name="config" transform="oxf:unsafe-xslt" href="#request-description">
+                            <sql:config xsl:version="2.0">
+                                <sql:connection>
+                                    <sql:datasource>
+                                        <xsl:value-of select="pipeline:property('oxf.fr.persistence.service.oracle.datasource')"/>
+                                    </sql:datasource>
 
-                                    select t.xml.getClobVal() xml from <xsl:value-of select="$table-name"/> t
-                                        where app = <sql:param type="xs:string" select="/request/app"/>
-                                        and form = <sql:param type="xs:string" select="/request/form"/>
-                                        <xsl:if test="$is-data">
-                                            and document_id = <sql:param type="xs:string" select="/request/document-id"/>
-                                        </xsl:if>
-                                </sql:query>
-                                <sql:result-set>
-                                    <sql:row-iterator>
-                                        <sql:get-column-value column="xml" type="odt:xmlFragment"/>
-                                    </sql:row-iterator>
-                                </sql:result-set>
-                            </sql:execute>
-                        </sql:connection>
-                    </sql:config>
-                </p:input>
-                <p:output name="data" id="document"/>
-            </p:processor>
+                                    <sql:execute>
+                                        <sql:query>
+                                            <xsl:variable name="is-data" as="xs:boolean" select="/request/type = 'data'"/>
+                                            <xsl:variable name="table-name" as="xs:string" select="if ($is-data) then 'orbeon_form_data' else 'orbeon_form_definition'"/>
 
-            <!-- Convert and serialize to XML -->
-            <p:processor name="oxf:xml-converter">
-                <p:input name="config">
-                    <config>
-                        <indent>false</indent>
-                        <encoding>utf-8</encoding>
-                    </config>
-                </p:input>
-                <p:input name="data" href="#document"/>
-                <p:output name="data" id="converted"/>
-            </p:processor>
+                                            select t.xml.getClobVal() xml from <xsl:value-of select="$table-name"/> t
+                                                where app = <sql:param type="xs:string" select="/request/app"/>
+                                                and form = <sql:param type="xs:string" select="/request/form"/>
+                                                <xsl:if test="$is-data">
+                                                    and document_id = <sql:param type="xs:string" select="/request/document-id"/>
+                                                </xsl:if>
+                                        </sql:query>
+                                        <sql:result-set>
+                                            <sql:row-iterator>
+                                                <sql:get-column-value column="xml" type="odt:xmlFragment"/>
+                                            </sql:row-iterator>
+                                        </sql:result-set>
+                                    </sql:execute>
+                                </sql:connection>
+                            </sql:config>
+                        </p:input>
+                        <p:output name="data" id="document"/>
+                    </p:processor>
+
+                    <!-- Convert and serialize to XML -->
+                    <p:processor name="oxf:xml-converter">
+                        <p:input name="config">
+                            <config>
+                                <indent>false</indent>
+                                <encoding>utf-8</encoding>
+                            </config>
+                        </p:input>
+                        <p:input name="data" href="#document"/>
+                        <p:output name="data" id="converted"/>
+                    </p:processor>
+                </p:when>
+
+                <!-- Get binary file -->
+                <p:otherwise>
+                    <p:processor name="oxf:sql">
+                        <p:input name="data" href="#request-description"/>
+                        <p:input name="config" transform="oxf:unsafe-xslt" href="#request-description">
+                            <sql:config xsl:version="2.0">
+                                <document>
+                                    <sql:connection>
+                                        <sql:datasource>
+                                            <xsl:value-of select="pipeline:property('oxf.fr.persistence.service.oracle.datasource')"/>
+                                        </sql:datasource>
+
+                                        <sql:execute>
+                                            <sql:query>
+                                                <xsl:variable name="is-data" as="xs:boolean" select="/request/type = 'data'"/>
+                                                <xsl:variable name="table-name" as="xs:string" select="if ($is-data) then 'orbeon_form_data_attach' else 'orbeon_form_definition_attach'"/>
+
+                                                select file_content from <xsl:value-of select="$table-name"/> t
+                                                    where app = <sql:param type="xs:string" select="/request/app"/>
+                                                    and form = <sql:param type="xs:string" select="/request/form"/>
+                                                    <xsl:if test="$is-data">
+                                                        and document_id = <sql:param type="xs:string" select="/request/document-id"/>
+                                                    </xsl:if>
+                                                    and file_name = <sql:param type="xs:string" select="/request/filename"/>
+                                            </sql:query>
+                                            <sql:result-set>
+                                                <sql:row-iterator>
+                                                    <sql:get-column-value column="file_content" type="xs:base64Binary"/>
+                                                </sql:row-iterator>
+                                            </sql:result-set>
+                                        </sql:execute>
+                                    </sql:connection>
+                                </document>
+                            </sql:config>
+                        </p:input>
+                        <p:output name="data" id="binary-file"/>
+                    </p:processor>
+                    <!-- Add the xsi:type in a separate step, as the SQL Processor doesn't pass namespace declaration for xs even if the namespace is declared on the element -->
+                    <p:processor name="oxf:xslt">
+                        <p:input name="data" href="#binary-file"/>
+                        <p:input name="config">
+                            <document xsi:type="xs:base64Binary" xsl:version="2.0">
+                                <xsl:value-of select="/*"/>
+                            </document>
+                        </p:input>
+                        <p:output name="data" id="converted"/>
+                    </p:processor>
+                </p:otherwise>
+            </p:choose>
 
             <!-- Serialize out as is -->
             <p:processor name="oxf:http-serializer">
@@ -144,23 +202,68 @@
                 <!-- Binary PUT -->
                 <p:when test="/*/method = 'PUT' and not(/*/content-type = ('application/xml', 'text/xml') or ends-with(/*/content-type, '+xml'))">
 
-                    <!--<p:processor name="oxf:xforms-submission">-->
-                        <!--<p:input name="submission">-->
-                            <!-- NOTE: The <body> element contains the xs:anyURI type -->
-                            <!--<xforms:submission ref="/*/body" method="put" replace="none"-->
-                                    <!--serialization="application/octet-stream"-->
-                                    <!--resource="{xxforms:property('oxf.fr.persistence.service.exist.uri')}/{/*/group[1]}">-->
-                                <!--<xforms:action ev:event="xforms-submit-error">-->
-                                    <!-- TODO: Propagate error to caller -->
-                                    <!--<xforms:delete while="/*/*" nodeset="/*/*"/>-->
-                                    <!--<xforms:setvalue ref="/*" value="event('response-body')"/>-->
-                                    <!--<xforms:message level="xxforms:log-error"><xforms:output value="event('response-body')"/></xforms:message>-->
-                                <!--</xforms:action>-->
-                            <!--</xforms:submission>-->
-                        <!--</p:input>-->
-                        <!--<p:input name="request" href="aggregate('root', #request#xpointer(/*/body), #matcher-groups#xpointer(/*/group))"/>-->
-                        <!--<p:output name="response" id="response"/>-->
-                    <!--</p:processor>-->
+                    <p:processor name="oxf:sql">
+                        <p:input name="data" href="#request-description"/>
+                        <p:input name="config" transform="oxf:unsafe-xslt" href="#request-description">
+                            <sql:config xsl:version="2.0">
+                                <result>
+                                    <sql:connection>
+                                        <sql:datasource>
+                                            <xsl:value-of select="pipeline:property('oxf.fr.persistence.service.oracle.datasource')"/>
+                                        </sql:datasource>
+                                        <sql:execute>
+                                            <sql:update>
+                                                <xsl:variable name="is-data" as="xs:boolean" select="/request/type = 'data'"/>
+                                                <xsl:variable name="table-name" as="xs:string" select="if ($is-data) then 'orbeon_form_data_attach' else 'orbeon_form_definition_attach'"/>
+                                                declare
+                                                    row_exists number;
+                                                begin
+                                                    <!-- Check if we already have a row for this document -->
+                                                    select count(*) into row_exists
+                                                    from <xsl:value-of select="$table-name"/>
+                                                    where
+                                                        app = <sql:param type="xs:string" select="/request/app"/>
+                                                        and form = <sql:param type="xs:string" select="/request/form"/>
+                                                        <xsl:if test="$is-data">
+                                                            and document_id = <sql:param type="xs:string" select="/request/document-id"/>
+                                                        </xsl:if>
+                                                        and file_name = <sql:param type="xs:string" select="/request/filename"/>;
+                                                    if row_exists = 0 then
+                                                        <!-- If we don't, insert one -->
+                                                        insert
+                                                            into <xsl:value-of select="$table-name"/>
+                                                            (created, last_modified, app, form, <xsl:if test="$is-data">document_id,</xsl:if> file_name, file_content)
+                                                            values (
+                                                                <sql:param type="xs:dateTime" select="/request/timestamp"/>,
+                                                                <sql:param type="xs:dateTime" select="request/timestamp"/>,
+                                                                <sql:param type="xs:string" select="/request/app"/>,
+                                                                <sql:param type="xs:string" select="/request/form"/>,
+                                                                <xsl:if test="$is-data">
+                                                                    <sql:param type="xs:string" select="/request/document-id"/>,
+                                                                </xsl:if>
+                                                                <sql:param type="xs:string" select="/request/filename"/>,
+                                                                <sql:param type="xs:anyURI" select="/request/body"/>
+                                                            );
+                                                    else
+                                                        <!-- If we do, update it -->
+                                                        update <xsl:value-of select="$table-name"/>
+                                                        set last_modified = <sql:param type="xs:dateTime" select="/request/timestamp"/>,
+                                                            file_content = <sql:param type="xs:anyURI" select="/request/body"/>
+                                                        where app = <sql:param type="xs:string" select="/request/app"/>
+                                                            and form = <sql:param type="xs:string" select="/request/form"/>
+                                                            <xsl:if test="$is-data">
+                                                                and document_id = <sql:param type="xs:string" select="/request/document-id"/>
+                                                            </xsl:if>
+                                                            and file_name = <sql:param type="xs:string" select="/request/filename"/>;
+                                                    end if;
+                                                end;
+                                            </sql:update>
+                                        </sql:execute>
+                                    </sql:connection>
+                                </result>
+                            </sql:config>
+                        </p:input>
+                    </p:processor>
 
                 </p:when>
                 <!-- DELETE -->
@@ -201,65 +304,60 @@
                     <p:processor name="oxf:sql">
                         <p:input name="data" href="#request-description"/>
                         <p:input name="config" transform="oxf:unsafe-xslt" href="#request-description">
-                            <xsl:stylesheet version="2.0" xmlns:saxon="http://saxon.sf.net/">
-                                <xsl:output method="xml" omit-xml-declaration="yes" name="xml-output"/>
-                                <xsl:template match="/">
-                                    <sql:config>
-                                        <result>
-                                            <sql:connection>
-                                                <sql:datasource>
-                                                    <xsl:value-of select="pipeline:property('oxf.fr.persistence.service.oracle.datasource')"/>
-                                                </sql:datasource>
-                                                <sql:execute>
-                                                    <sql:update>
-                                                        <xsl:variable name="is-data" as="xs:boolean" select="/request/type = 'data'"/>
-                                                        <xsl:variable name="table-name" as="xs:string" select="if ($is-data) then 'orbeon_form_data' else 'orbeon_form_definition'"/>
-                                                        declare
-                                                            row_exists number;
-                                                        begin
-                                                            <!-- Check if we already have a row for this document -->
-                                                            select count(*) into row_exists
-                                                            from <xsl:value-of select="$table-name"/>
-                                                            where
-                                                                app = <sql:param type="xs:string" select="/request/app"/>
-                                                                and form = <sql:param type="xs:string" select="/request/form"/>
+                            <sql:config xsl:version="2.0">
+                                <result>
+                                    <sql:connection>
+                                        <sql:datasource>
+                                            <xsl:value-of select="pipeline:property('oxf.fr.persistence.service.oracle.datasource')"/>
+                                        </sql:datasource>
+                                        <sql:execute>
+                                            <sql:update>
+                                                <xsl:variable name="is-data" as="xs:boolean" select="/request/type = 'data'"/>
+                                                <xsl:variable name="table-name" as="xs:string" select="if ($is-data) then 'orbeon_form_data' else 'orbeon_form_definition'"/>
+                                                declare
+                                                    row_exists number;
+                                                begin
+                                                    <!-- Check if we already have a row for this document -->
+                                                    select count(*) into row_exists
+                                                    from <xsl:value-of select="$table-name"/>
+                                                    where
+                                                        app = <sql:param type="xs:string" select="/request/app"/>
+                                                        and form = <sql:param type="xs:string" select="/request/form"/>
+                                                        <xsl:if test="$is-data">
+                                                            and document_id = <sql:param type="xs:string" select="/request/document-id"/>
+                                                        </xsl:if>;
+                                                    if row_exists = 0 then
+                                                        <!-- If we don't, insert one -->
+                                                        insert
+                                                            into <xsl:value-of select="$table-name"/>
+                                                            (created, last_modified, app, form, <xsl:if test="$is-data">document_id,</xsl:if> xml)
+                                                            values (
+                                                                <sql:param type="xs:dateTime" select="/request/timestamp"/>,
+                                                                <sql:param type="xs:dateTime" select="request/timestamp"/>,
+                                                                <sql:param type="xs:string" select="/request/app"/>,
+                                                                <sql:param type="xs:string" select="/request/form"/>,
                                                                 <xsl:if test="$is-data">
-                                                                    and document_id = <sql:param type="xs:string" select="/request/document-id"/>
-                                                                </xsl:if>;
-                                                            if row_exists = 0 then
-                                                                <!-- If we don't, insert one -->
-                                                                insert
-                                                                    into <xsl:value-of select="$table-name"/>
-                                                                    (created, last_modified, app, form, <xsl:if test="$is-data">document_id,</xsl:if> xml)
-                                                                    values (
-                                                                        <sql:param type="xs:dateTime" select="/request/timestamp"/>,
-                                                                        <sql:param type="xs:dateTime" select="request/timestamp"/>,
-                                                                        <sql:param type="xs:string" select="/request/app"/>,
-                                                                        <sql:param type="xs:string" select="/request/form"/>,
-                                                                        <xsl:if test="$is-data">
-                                                                            <sql:param type="xs:string" select="/request/document-id"/>,
-                                                                        </xsl:if>
-                                                                        XMLType(<sql:param type="odt:xmlFragment" sql-type="clob" select="/request/document/*"/>)
-                                                                    );
-                                                            else
-                                                                <!-- If we do, update it -->
-                                                                update <xsl:value-of select="$table-name"/>
-                                                                set xml = XMLType(<sql:param type="odt:xmlFragment" sql-type="clob" select="/request/document/*"/>),
-                                                                    last_modified = <sql:param type="xs:dateTime" select="/request/timestamp"/>
-                                                                where app = <sql:param type="xs:string" select="/request/app"/>
-                                                                    and form = <sql:param type="xs:string" select="/request/form"/>
-                                                                    <xsl:if test="$is-data">
-                                                                        and document_id = <sql:param type="xs:string" select="/request/document-id"/>
-                                                                    </xsl:if>;
-                                                            end if;
-                                                        end;
-                                                    </sql:update>
-                                                </sql:execute>
-                                            </sql:connection>
-                                        </result>
-                                    </sql:config>
-                                </xsl:template>
-                            </xsl:stylesheet>
+                                                                    <sql:param type="xs:string" select="/request/document-id"/>,
+                                                                </xsl:if>
+                                                                XMLType(<sql:param type="odt:xmlFragment" sql-type="clob" select="/request/document/*"/>)
+                                                            );
+                                                    else
+                                                        <!-- If we do, update it -->
+                                                        update <xsl:value-of select="$table-name"/>
+                                                        set xml = XMLType(<sql:param type="odt:xmlFragment" sql-type="clob" select="/request/document/*"/>),
+                                                            last_modified = <sql:param type="xs:dateTime" select="/request/timestamp"/>
+                                                        where app = <sql:param type="xs:string" select="/request/app"/>
+                                                            and form = <sql:param type="xs:string" select="/request/form"/>
+                                                            <xsl:if test="$is-data">
+                                                                and document_id = <sql:param type="xs:string" select="/request/document-id"/>
+                                                            </xsl:if>;
+                                                    end if;
+                                                end;
+                                            </sql:update>
+                                        </sql:execute>
+                                    </sql:connection>
+                                </result>
+                            </sql:config>
                         </p:input>
                     </p:processor>
 

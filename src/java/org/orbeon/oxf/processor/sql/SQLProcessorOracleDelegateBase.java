@@ -17,6 +17,7 @@ import oracle.jdbc.OraclePreparedStatement;
 import oracle.jdbc.OracleResultSet;
 import oracle.jdbc.OracleTypes;
 import oracle.sql.BLOB;
+import oracle.sql.CLOB;
 import oracle.sql.OPAQUE;
 import oracle.xdb.XMLType;
 import org.orbeon.oxf.common.OXFException;
@@ -29,6 +30,8 @@ import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.StringReader;
+import java.io.Writer;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -42,7 +45,7 @@ import java.sql.SQLException;
  */
 public abstract class SQLProcessorOracleDelegateBase implements DatabaseDelegate {
 
-//    public SQLProcessorOracleTomcatDelegate() {
+//    public SQLProcessorOracleTomcat4Delegate() {
 //      // Load the Oracle JDBC driver
 //        try {
 //            DriverManager.registerDriver
@@ -59,6 +62,28 @@ public abstract class SQLProcessorOracleDelegateBase implements DatabaseDelegate
 //            e.printStackTrace();
 //        }
 //    }
+
+
+    public void setClob(PreparedStatement stmt, int index, String value) throws SQLException {
+
+        // Get an OraclePreparedStatement
+        final OraclePreparedStatement oracleStmt = getOraclePreparedStatement(stmt);
+
+        // Create a temporary CLOB
+        final CLOB clob = CLOB.createTemporary(oracleStmt.getConnection(), true, CLOB.DURATION_SESSION);
+
+        // Write to the CLOB
+        final Writer writer = clob.getCharacterOutputStream();
+        try {
+            NetUtils.copyStream(new StringReader(value), writer);
+            writer.flush();
+        } catch (IOException e) {
+            throw new OXFException(e);
+        }
+
+        // Set the CLOB on the statement
+        oracleStmt.setClob(index, clob);
+    }
 
     public void setBlob(PreparedStatement stmt, int index, byte[] value) throws SQLException {
         final OutputStream os = getBlobOutputStream(stmt, index);

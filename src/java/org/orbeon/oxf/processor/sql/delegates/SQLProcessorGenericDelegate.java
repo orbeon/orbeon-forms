@@ -18,11 +18,16 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 import java.io.OutputStream;
+import java.io.StringReader;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class SQLProcessorGenericDelegate implements DatabaseDelegate {
+    public void setClob(PreparedStatement stmt, int index, String value) throws SQLException {
+        stmt.setCharacterStream(index, new StringReader(value), value.length());
+    }
+
     public void setBlob(PreparedStatement stmt, int index, byte[] value) throws SQLException {
         throw new UnsupportedOperationException();
     }

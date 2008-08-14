@@ -137,13 +137,26 @@ public class SQLProcessorInterpreterContext extends DatabaseContext {
                 DatabaseMetaData databaseMetaData = getConnection().getMetaData();
                 String productName = databaseMetaData.getDatabaseProductName();
                 Class clazz = null;
+
                 if ("oracle".equalsIgnoreCase(productName)) {
-                    // First try Tomcat (4.1 or greater)
+                    // First try Tomcat 5
                     try {
-                        clazz = getClass().getClassLoader().loadClass("org.orbeon.oxf.processor.sql.delegates.SQLProcessorOracleTomcatDelegate");
-                        SQLProcessor.logger.info("Using Oracle Tomcat delegate.");
+                        // Try load a class used by Tomcat 5, and that we use in our code
+                        getClass().getClassLoader().loadClass("org.apache.tomcat.dbcp.dbcp.DelegatingPreparedStatement");
+                        // We went this far, so the class must exist
+                        clazz = getClass().getClassLoader().loadClass("org.orbeon.oxf.processor.sql.delegates.SQLProcessorOracleTomcat5Delegate");
+                        SQLProcessor.logger.info("Using Oracle Tomcat 5 delegate.");
                     } catch (Throwable t) {
                         // Ignore
+                    }
+                    // First try Tomcat 4
+                    if (clazz == null) {
+                        try {
+                            clazz = getClass().getClassLoader().loadClass("org.orbeon.oxf.processor.sql.delegates.SQLProcessorOracleTomcat4Delegate");
+                            SQLProcessor.logger.info("Using Oracle Tomcat 4 delegate.");
+                        } catch (Throwable t) {
+                            // Ignore
+                        }
                     }
                     // Then try WebLogic (8.1 or greater)
                     if (clazz == null) {

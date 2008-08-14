@@ -32,7 +32,7 @@
         <search>
             <app>orbeon</app>
             <form>bookcast</form>
-            <query>free</query>
+            <query>free text search</query>
             <query name="title" path="details/title" type="xs:string" control="input">title</query>
             <query name="author" path="details/author" type="xs:string" control="input">author</query>
             <query name="language" path="details/language" type="xs:string" control="select1">en</query>
@@ -90,10 +90,15 @@
                                     from orbeon_form_data
                                     where app = <sql:param type="xs:string" select="/search/app"/>
                                         and form = <sql:param type="xs:string" select="/search/form"/>
+                                        <!-- Conditions on searcheable columns -->
                                         <xsl:for-each select="/search/query[@path and . != '']">
                                             and lower(extractValue(xml, '/*/<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>', '<xsl:value-of select="f:namespaces(.)"/>'))
                                                 like '%<xsl:value-of select="lower-case(f:escape-sql(.))"/>%'
                                         </xsl:for-each>
+                                        <!-- Condition for free text search -->
+                                        <xsl:if test="/search/query[empty(@path) and . != '']">
+                                             and contains(xml, <sql:param type="xs:string" select="concat('%', /search/query[not(@path)], '%')"/>) > 0
+                                        </xsl:if>
                                     order by created
                                 </xsl:variable>
 

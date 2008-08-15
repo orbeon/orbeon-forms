@@ -215,10 +215,14 @@ button.xforms-trigger img { margin-right: 10px }
 .fr-repeat-table .fr-repeat-last-line td { border: none; padding: 0 }
 .fr-repeat-table .fr-repeat-last-line { display: none }
 .fr-repeat-table th { background-color: #ddd }
+/* Don't show label, help, hint for controls inside a repeat-table (they are shown in the column header) */
 .fr-repeat-table td .xforms-label { display: none }
 .fr-repeat-table td .xforms-help-image { display: none }
 .fr-repeat-table td .xforms-help { display: none }
 .fr-repeat-table td .xforms-hint { display: none }
+/* But if there is a nested table, show those in the label in the column header of that table */
+.fr-repeat-table tr th .xforms-label { display: block; }
+
 
 .fr-repeat-table .fr-repeat-column-number { width: 1.5em; text-align: right }
 .fr-repeat-table .fr-repeat-column-trigger { width: 1.5em; text-align: center }

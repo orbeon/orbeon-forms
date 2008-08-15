@@ -384,16 +384,18 @@
                             <fr:td>
                                 <fr:repeat nodeset="note" id="book-repeat" origin="instance('note-template')" columns="1" appearance="xxforms:table">
                                     <xforms:label>Note</xforms:label>
-                                    <fr:tr>
-                                        <fr:td>
-                                            <xforms:textarea ref="." appearance="xxforms:autosize" incremental="true">
-                                                <xforms:label ref="$form-resources/note/label"/>
-                                                <xforms:hint ref="$form-resources/note/hint"/>
-                                                <xforms:help ref="$form-resources/note/help"/>
-                                                <xforms:alert ref="$form-resources/note/alert"/>
-                                            </xforms:textarea>
-                                        </fr:td>
-                                    </fr:tr>
+                                    <fr:body>
+                                        <fr:tr>
+                                            <fr:td>
+                                                <xforms:textarea ref="." appearance="xxforms:autosize" incremental="true">
+                                                    <xforms:label ref="$form-resources/note/label"/>
+                                                    <xforms:hint ref="$form-resources/note/hint"/>
+                                                    <xforms:help ref="$form-resources/note/help"/>
+                                                    <xforms:alert ref="$form-resources/note/alert"/>
+                                                </xforms:textarea>
+                                            </fr:td>
+                                        </fr:tr>
+                                    </fr:body>
                                 </fr:repeat>
                             </fr:td>
                         </fr:tr>

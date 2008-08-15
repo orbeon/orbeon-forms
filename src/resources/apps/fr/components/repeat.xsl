@@ -27,6 +27,7 @@
 
     <!-- Helper for repeats -->
     <xsl:template match="xhtml:body//fr:repeat">
+        <xsl:variable name="fr-repeat" select="."/>
         <xsl:variable name="tokenized-path" select="tokenize(@nodeset, '/')"/>
         <xsl:variable name="min-occurs" select="if (@minOccurs) then @minOccurs else 0"/>
         <xsl:variable name="max-occurs" select="if (@maxOccurs) then @maxOccurs else 'unbounded'"/>
@@ -64,7 +65,14 @@
                     </xhtml:th>
                 </xsl:for-each>
             </xhtml:tr>
-            <xforms:repeat nodeset="{@nodeset}" id="{@id}">
+            <!-- Optional row(s) showns before the repeated rows -->
+            <xsl:for-each select="fr:header">
+                <xsl:apply-templates select="xhtml:tr except xhtml:tr[1] | xhtml:td" mode="prepend-td"/>
+                <xsl:apply-templates select="fr:tr except fr:tr[1] | fr:td" mode="prepend-td"/>
+            </xsl:for-each>
+            <!-- Repeated rows -->
+            <xsl:for-each select="fr:body">
+                <xforms:repeat nodeset="{$fr-repeat/@nodeset}" id="{$fr-repeat/@id}">
                 <xxforms:variable name="repeat-position" select="position()"/>
                 <!-- First line with data -->
                 <xhtml:tr>
@@ -78,7 +86,7 @@
                                     <!-- Remove trigger -->
                                     <xforms:trigger appearance="minimal" ref="if (
                                             {if ($remove-constraint) then concat($remove-constraint, ' and ') else ''}
-                                            count(xxforms:repeat-nodeset('{@id}')) gt {$min-occurs}) then . else ()">
+                                                count(xxforms:repeat-nodeset('{$fr-repeat/@id}')) gt {$min-occurs}) then . else ()">
                                         <!-- TODO: i18n of title -->
                                         <xforms:label><xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/bin.png" alt="Remove" title="Remove"/></xforms:label>
                                     </xforms:trigger>
@@ -90,11 +98,18 @@
                     <xsl:apply-templates select="(xhtml:tr[1] | fr:tr[1])/(xhtml:td | fr:td)"/>
                 </xhtml:tr>
                 <!-- Following lines with data if any -->
+
                 <xsl:apply-templates select="xhtml:tr except xhtml:tr[1] | xhtml:td" mode="prepend-td"/>
                 <xsl:apply-templates select="fr:tr except fr:tr[1] | fr:td" mode="prepend-td"/>
             </xforms:repeat>
             <!-- IE display HACK -->
             <xhtml:tr class="fr-repeat-last-line"><xhtml:td/></xhtml:tr>
+            </xsl:for-each>
+            <!-- Optional row(s) showns after the repeated rows -->
+            <xsl:for-each select="fr:footer">
+                <xsl:apply-templates select="xhtml:tr except xhtml:tr[1] | xhtml:td" mode="prepend-td"/>
+                <xsl:apply-templates select="fr:tr except fr:tr[1] | fr:td" mode="prepend-td"/>
+            </xsl:for-each>
         </xhtml:table>
     </xsl:template>
 

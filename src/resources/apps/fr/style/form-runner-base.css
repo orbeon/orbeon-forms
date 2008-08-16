@@ -49,7 +49,7 @@
 
 /* Display alerts under each control */
 .xforms-alert-active {
-    display: block;
+    display: none;
     margin-top: .2em;
     margin-left: 0;/* used to have margin here but with new colors no margin seems better */
     height: auto;
@@ -58,6 +58,9 @@
     font-size: inherit;/* override xforms.css */
     text-indent: 0;/* override xforms.css */
     background-image: none;/* override xforms.css */
+}
+.xforms-alert-active-visited {
+    display: block;
 }
 
 /* Display hints under each control */

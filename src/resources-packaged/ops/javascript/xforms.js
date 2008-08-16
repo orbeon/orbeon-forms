@@ -1602,10 +1602,16 @@ ORBEON.xforms.Controls = {
     setValid: function(control, newValid, isRequiredEmpty) {
         // Update class xforms-invalid on the control
         var isValid;
+        var isVisited = ORBEON.util.Dom.hasClass(control, "xforms-visited");
         if (newValid != null) {
             isValid = newValid != "false";
-            if (isValid) ORBEON.util.Dom.removeClass(control, "xforms-invalid");
-            else ORBEON.util.Dom.addClass(control, "xforms-invalid");
+            if (isValid) {
+                ORBEON.util.Dom.removeClass(control, "xforms-invalid");
+                if (isVisited) ORBEON.util.Dom.removeClass(control, "xforms-invalid-visited");
+            } else {
+                ORBEON.util.Dom.addClass(control, "xforms-invalid");
+                if (isVisited) ORBEON.util.Dom.addClass(control, "xforms-invalid-visited");
+            }
         } else {
             isValid = ORBEON.xforms.Controls.isValid(control);
         }
@@ -1615,10 +1621,12 @@ ORBEON.xforms.Controls = {
         if (alertElement != null) { // Some controls don't have validity indicator
             if (isValid && !isRequiredEmpty) {
                 ORBEON.util.Dom.removeClass(alertElement, "xforms-alert-active");
+                if (isVisited) ORBEON.util.Dom.removeClass(alertElement, "xforms-alert-active-visited");
                 ORBEON.util.Dom.addClass(alertElement, "xforms-alert-inactive");
             } else {
                 ORBEON.util.Dom.removeClass(alertElement, "xforms-alert-inactive");
                 ORBEON.util.Dom.addClass(alertElement, "xforms-alert-active");
+                if (isVisited) ORBEON.util.Dom.addClass(alertElement, "xforms-alert-active-visited");
             }
         }
     },
@@ -2165,6 +2173,16 @@ ORBEON.xforms.Events = {
         if (!ORBEON.xforms.Globals.maskFocusEvents) {
             var targetControlElement = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
             if (targetControlElement != null) {
+
+                // Keep track of visited controls
+                ORBEON.util.Dom.addClass(targetControlElement, "xforms-visited");
+                if (ORBEON.util.Dom.hasClass(targetControlElement, "xforms-invalid"))
+                    ORBEON.util.Dom.addClass(targetControlElement, "xforms-invalid-visited");
+                var alertLabel = ORBEON.xforms.Controls._getControlLabel(targetControlElement, "xforms-alert");
+                console.log(alertLabel);
+                if (alertLabel != null && ORBEON.util.Dom.hasClass(alertLabel, "xforms-alert-active"))
+                    ORBEON.util.Dom.addClass(alertLabel, "xforms-alert-active-visited");
+
                 if (!ORBEON.util.Dom.hasClass(targetControlElement, "xforms-dialog")) {
                     // This is an event for an XForms control
 

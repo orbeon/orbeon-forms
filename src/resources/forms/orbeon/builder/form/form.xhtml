@@ -198,7 +198,7 @@
                                                 </xxforms:show>
                                             </xforms:trigger>
                                             <xforms:trigger appearance="minimal">
-                                                <xforms:label><xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/cog.png" alt="Details" title="Details"/></xforms:label>
+                                                <xforms:label><xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/cog.png" alt="Section Details" title="Section Details"/></xforms:label>
                                                 <!-- Show section details dialog -->
                                                 <!-- TODO: position better; isseu with id of buttons in fr:buttons as adding id causes duplicate id error -->
                                                 <xxforms:show ev:event="DOMActivate" dialog="fb-section-details-dialog" neighbor="fb-top-level-section">
@@ -226,7 +226,7 @@
                                             <!-- Edit help for section -->
                                             <!-- TODO: id="fb-edit-section-help-trigger"  -->
                                             <xforms:trigger appearance="minimal" class="fb-edit-section-help-trigger">
-                                                <xforms:label><xhtml:img alt="Help" title="" src="/ops/images/xforms/help.png"/></xforms:label>
+                                                <xforms:label><xhtml:img alt="Help" title="Help" src="/ops/images/xforms/help.png"/></xforms:label>
                                                 <xforms:action ev:event="DOMActivate">
                                                     <xxforms:show dialog="fb-edit-help-dialog" neighbor="fb-edit-section-help-trigger">
                                                         <xxforms:context name="fb:node" select="$section-resource/help"/>
@@ -690,7 +690,7 @@
                                                                                 <xforms:group ref=".[$control]" class="fb-grid-control-icons">
                                                                                     <!-- Edit details for any control -->
                                                                                     <xforms:trigger appearance="minimal" id="fb-edit-details-trigger">
-                                                                                        <xforms:label><xhtml:img alt="Details" title="" src="/apps/fr/style/images/silk/cog.png"/></xforms:label>
+                                                                                        <xforms:label><xhtml:img alt="Control Details" title="Control Details" src="/apps/fr/style/images/silk/cog.png"/></xforms:label>
                                                                                         <xforms:action ev:event="DOMActivate">
                                                                                             <xxforms:show dialog="fb-edit-details-dialog" neighbor="fb-edit-details-trigger">
                                                                                                 <xxforms:context name="control-name" select="$control-name"/>
@@ -701,7 +701,7 @@
 
                                                                                     <!-- Edit validation for any control -->
                                                                                     <xforms:trigger appearance="minimal" id="fb-edit-alert-trigger">
-                                                                                        <xforms:label><xhtml:img class="fb-control-alert" alt="Alert" title="" src="/apps/fr/style/images/silk/exclamation.png"/></xforms:label>
+                                                                                        <xforms:label><xhtml:img class="fb-control-alert" alt="Validation Settings" title="Validation Settings" src="/apps/fr/style/images/silk/exclamation.png"/></xforms:label>
                                                                                         <xforms:action ev:event="DOMActivate">
                                                                                             <xforms:setvalue ref="$current-control-name" value="$control-name"/>
                                                                                             <xxforms:show dialog="fb-edit-validation-dialog" neighbor="fb-edit-alert-trigger"/>
@@ -784,7 +784,7 @@
 
                                                                                         <!-- Edit help for any control -->
                                                                                         <xforms:trigger appearance="minimal" id="fb-edit-control-help-trigger" class="fb-edit-help-trigger">
-                                                                                            <xforms:label><xhtml:img alt="Help" title="" src="/ops/images/xforms/help.png"/></xforms:label>
+                                                                                            <xforms:label><xhtml:img alt="Help" title="Help" src="/ops/images/xforms/help.png"/></xforms:label>
                                                                                             <xforms:action ev:event="DOMActivate">
                                                                                                 <xxforms:show dialog="fb-edit-help-dialog" neighbor="fb-edit-control-help-trigger">
                                                                                                     <xxforms:context name="fb:node" select="$resource-holder/help"/>
@@ -904,7 +904,7 @@
                                                                                             </xforms:group>
                                                                                             <xforms:group ref="*[not(namespace-uri-from-QName(resolve-QName(name(), .)) = 'http://www.w3.org/2002/xforms' )]">
                                                                                                 <!-- TODO: use actual image for the component -->
-                                                                                                <xhtml:img src="/apps/fr/style/images/silk/plugin.png" alt="" width="16" height="16"/>
+                                                                                                <xhtml:img src="/apps/fr/style/images/silk/plugin.png" alt="Component" title="Component" width="16" height="16"/>
                                                                                             </xforms:group>
                                                                                             <!-- Button to show items editor if needed -->
                                                                                             <xforms:trigger ref="*[xforms:itemset]" appearance="minimal" class="fb-edit-items" id="fb-edit-items-trigger">

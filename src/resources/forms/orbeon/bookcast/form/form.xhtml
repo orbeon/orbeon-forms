@@ -144,9 +144,11 @@
                     <resource xml:lang="en">
                         <details>
                             <label>Book Details</label>
+                            <help>This section contains details about the book.</help>
                         </details>
                         <notes>
                             <label>Notes</label>
+                            <help>This section contains notes about the book.</help>
                         </notes>
                         <title>
                             <label>Title</label>
@@ -224,9 +226,11 @@
                     <resource xml:lang="fr">
                         <details>
                             <label>Détails du livre</label>
+                            <help>Cette section contient les détails du livre.</help>
                         </details>
                         <notes>
                             <label>Notes</label>
+                            <help>Cette section contient des notes à propos du livre.</help>
                         </notes>
                         <title>
                             <label>Titre</label>
@@ -317,6 +321,7 @@
             <fr:body>
                 <fr:section id="details-section" context="details">
                     <xforms:label ref="$form-resources/details/label"/>
+                    <xforms:help ref="$form-resources/details/help"/>
                     <fr:grid columns="3">
                         <fr:tr>
                             <fr:td>
@@ -379,6 +384,7 @@
 
                 <fr:section id="notes-section" context="notes">
                     <xforms:label ref="$form-resources/notes/label"/>
+                    <xforms:help ref="$form-resources/notes/help"/>
                     <fr:grid columns="1">
                         <fr:tr>
                             <fr:td>

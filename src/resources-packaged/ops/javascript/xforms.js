@@ -2175,13 +2175,10 @@ ORBEON.xforms.Events = {
             if (targetControlElement != null) {
 
                 // Keep track of visited controls
-                ORBEON.util.Dom.addClass(targetControlElement, "xforms-visited");
-                if (ORBEON.util.Dom.hasClass(targetControlElement, "xforms-invalid"))
-                    ORBEON.util.Dom.addClass(targetControlElement, "xforms-invalid-visited");
-                var alertLabel = ORBEON.xforms.Controls._getControlLabel(targetControlElement, "xforms-alert");
-                console.log(alertLabel);
-                if (alertLabel != null && ORBEON.util.Dom.hasClass(alertLabel, "xforms-alert-active"))
-                    ORBEON.util.Dom.addClass(alertLabel, "xforms-alert-active-visited");
+                if (! ORBEON.util.Dom.hasClass(targetControlElement, "xforms-visited")) {
+                    ORBEON.util.Dom.addClass(targetControlElement, "xforms-visited");
+                    ORBEON.xforms.Events.ajaxResponseProcessedEvent.subscribe(ORBEON.xforms.Events._blurSetInvalidVisited, targetControlElement, true);
+                }
 
                 if (!ORBEON.util.Dom.hasClass(targetControlElement, "xforms-dialog")) {
                     // This is an event for an XForms control
@@ -2199,6 +2196,20 @@ ORBEON.xforms.Events = {
                 }
             }
         }
+    },
+
+    /**
+     * Called for a given control (this) that has receieved a blur after the following Ajax response
+     * has been received.
+     */
+    _blurSetInvalidVisited: function() {
+        var control = this;
+        if (ORBEON.util.Dom.hasClass(control, "xforms-invalid"))
+            ORBEON.util.Dom.addClass(control, "xforms-invalid-visited");
+        var alertLabel = ORBEON.xforms.Controls._getControlLabel(control, "xforms-alert");
+        if (alertLabel != null && ORBEON.util.Dom.hasClass(alertLabel, "xforms-alert-active"))
+            ORBEON.util.Dom.addClass(alertLabel, "xforms-alert-active-visited");
+        ORBEON.xforms.Events.ajaxResponseProcessedEvent.unsubscribe(ORBEON.xforms.Events._blurSetInvalidVisited);
     },
 
     change: function(event) {

@@ -136,7 +136,7 @@ p, fieldset, table { margin-bottom: 1em }
 .xforms-label { font-weight: bold }
 
 /* Colored border for invalid fields */
-.xforms-invalid .xforms-input-input, textarea.xforms-invalid { border-color: orange }
+.xforms-invalid-visited .xforms-input-input, textarea.xforms-invalid-visited { border-color: orange }
 
 /* Language and mode selectors */
 .fr-language-choice, .fr-noscript-choice { color: gray; font-size: 85% }

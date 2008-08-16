@@ -964,7 +964,7 @@ public class NetUtils {
                     } catch (URISyntaxException e) {
                         throw new OXFException(e);
                     }
-                    indentedLogger.logDebug("submission", "opening URL connection",
+                    indentedLogger.logDebug("connection", "opening URL connection",
                         new String[] { "URL", connectionURI.toString() });
                 }
 
@@ -993,7 +993,7 @@ public class NetUtils {
                     if (httpMethod.equals("POST") && "application/soap+xml".equals(contentTypeMediaType)) {
                         // SOAP POST
 
-                        indentedLogger.logDebug("submission", "found SOAP POST");
+                        indentedLogger.logDebug("connection", "found SOAP POST");
 
                         final Map parameters = getContentTypeParameters(contentType);
                         final FastStringBuffer sb = new FastStringBuffer("text/xml");
@@ -1018,7 +1018,7 @@ public class NetUtils {
                             if (actionParameter != null) {
                                 // Set SOAPAction header
                                 urlConnection.setRequestProperty("SOAPAction", actionParameter);
-                                indentedLogger.logDebug("submission", "setting header",
+                                indentedLogger.logDebug("connection", "setting header",
                                     new String[] { "SOAPAction", actionParameter });
                             }
                         }
@@ -1028,7 +1028,7 @@ public class NetUtils {
                 } else {
                     if (httpMethod.equals("GET") && "application/soap+xml".equals(contentTypeMediaType)) {
                         // SOAP GET
-                        indentedLogger.logDebug("submission", "found SOAP GET");
+                        indentedLogger.logDebug("connection", "found SOAP GET");
 
                         final Map parameters = getContentTypeParameters(contentType);
                         final FastStringBuffer sb = new FastStringBuffer("application/soap+xml");
@@ -1069,7 +1069,7 @@ public class NetUtils {
 
                     final ExternalContext.Session session = externalContext.getSession(false);
                     if (session != null) {
-                        indentedLogger.logDebug("submission", "setting cookie",
+                        indentedLogger.logDebug("connection", "setting cookie",
                             new String[] { "JSESSIONID", session.getId() });
 
                         urlConnection.setRequestProperty("Cookie", "JSESSIONID=" + session.getId());
@@ -1082,7 +1082,7 @@ public class NetUtils {
                             final String cookie = cookies[i];
                             // Forward JSESSIONID (if not already done above) and JSESSIONIDSSO
                             if ((cookie.startsWith("JSESSIONID") && session == null) || cookie.startsWith("JSESSIONIDSSO")) {
-                                indentedLogger.logDebug("submission", "forwarding cookie",
+                                indentedLogger.logDebug("connection", "forwarding cookie",
                                     new String[] { "cookie", cookie });
                                 urlConnection.setRequestProperty("Cookie", cookie);
                             }
@@ -1105,12 +1105,12 @@ public class NetUtils {
                             final boolean isAuthorizationHeader = currentHeaderNameLowercase.equals("authorization");
                             if (!isAuthorizationHeader || isAuthorizationHeader && username == null) {
                                 // Only forward Authorization header if there is no username provided
-                                indentedLogger.logDebug("submission", "forwarding header",
+                                indentedLogger.logDebug("connection", "forwarding header",
                                     new String[] { "name", currentHeaderName, "value", currentIncomingHeaderValue});
                                 urlConnection.setRequestProperty(currentHeaderName, currentIncomingHeaderValue);
                             } else {
                                 // Just log this information
-                                indentedLogger.logDebug("submission",
+                                indentedLogger.logDebug("connection",
                                         "not forwarding Authorization header because username is present");
                             }
                         }

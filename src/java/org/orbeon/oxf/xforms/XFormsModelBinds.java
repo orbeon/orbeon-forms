@@ -243,10 +243,10 @@ public class XFormsModelBinds {
 
         final long startTime = XFormsServer.logger.isDebugEnabled() ? System.currentTimeMillis() : 0;
 
-        final Map idsToXFormsControls = containingDocument.getXFormsControls().getCurrentControlsState().getIdsToXFormsControls();
+        final Map effectiveIdsToControls = containingDocument.getXFormsControls().getCurrentControlsState().getEffectiveIdsToControls();
         final FastStringBuffer sb = new FastStringBuffer('{');
 
-        final Map nodesToControlsMapping = getNodesToControlsMapping(idsToXFormsControls);
+        final Map nodesToControlsMapping = getNodesToControlsMapping(effectiveIdsToControls);
 
         // Handle MIPs
         sb.append("\"mips\": {");
@@ -770,7 +770,7 @@ public class XFormsModelBinds {
         // Remember invalid instances
         if (!InstanceData.getValid(currentNodeInfo)) {
             final XFormsInstance instanceForNodeInfo = containingDocument.getInstanceForNode(currentNodeInfo);
-            invalidInstances.put(instanceForNodeInfo.getId(), "");
+            invalidInstances.put(instanceForNodeInfo.getEffectiveId(), "");
         }
     }
 

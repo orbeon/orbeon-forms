@@ -53,7 +53,7 @@ public abstract class XFormsControlLifecyleHandler extends HandlerBase {
         staticId = handlerContext.getId(attributes);
         effectiveId = handlerContext.getEffectiveId(attributes);
         xformsControl = handlerContext.isTemplate()
-                ? null : (XFormsSingleNodeControl) containingDocument.getObjectById(effectiveId);
+                ? null : (XFormsSingleNodeControl) containingDocument.getObjectByEffectiveId(effectiveId);
 
         // Give the handler a chance to do some prep work
         prepareHandler(uri, localname, qName, attributes, staticId, effectiveId, xformsControl);

@@ -54,6 +54,7 @@ import java.util.*;
  */
 public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventHandlerContainer {
 
+    // Special id name for the top-level containing document
     public static final String CONTAINING_DOCUMENT_PSEUDO_ID = "$containing-document$";
 
     private IndentedLogger indentedLogger = new IndentedLogger(XFormsServer.logger, "XForms");
@@ -273,8 +274,8 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
      * Return model with the specified id, null if not found. If the id is the empty string, return
      * the default model, i.e. the first model.
      */
-    public XFormsModel getModel(String modelId) {
-        return (XFormsModel) ("".equals(modelId) ? getDefaultModel() : modelsMap.get(modelId));
+    public XFormsModel getModelByEffectiveId(String modelEffectiveId) {
+        return (XFormsModel) ("".equals(modelEffectiveId) ? getDefaultModel() : modelsMap.get(modelEffectiveId));
     }
 
     public XFormsModel getDefaultModel() {
@@ -375,27 +376,62 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     }
 
     /**
-     * Get object with the id specified.
+     * Get object with the effective id specified.
+     *
+     * @param effectiveId   effective id of the target
+     * @return              object, or null if not found
      */
-    public Object getObjectById(String id) {
+    public Object getObjectByEffectiveId(String effectiveId) {
 
         // Search in models
         for (Iterator i = models.iterator(); i.hasNext();) {
             XFormsModel model = (XFormsModel) i.next();
-            final Object resultObject = model.getObjectByid(id);
+            final Object resultObject = model.getObjectByEffectiveId(effectiveId);
             if (resultObject != null)
                 return resultObject;
         }
 
         // Search in controls
         {
-            final Object resultObject = xformsControls.getObjectById(id);
+            final Object resultObject = xformsControls.getObjectByEffectiveId(effectiveId);
             if (resultObject != null)
                 return resultObject;
         }
 
         // Check containing document
-        if (id.equals(getEffectiveId()))
+        if (effectiveId.equals(getEffectiveId()))
+            return this;
+
+        return null;
+    }
+
+    /**
+     * Resolve an object. This optionally depends on a source, and involves resolving whether the source is within a
+     * repeat or a component.
+     *
+     * @param effectiveSourceId  effective id of the source, or null
+     * @param targetId           id of the target
+     * @return                   object, or null if not found
+     */
+    public Object resolveObjectById(String effectiveSourceId, String targetId) {
+
+        // Search in models
+        for (Iterator i = models.iterator(); i.hasNext();) {
+            XFormsModel model = (XFormsModel) i.next();
+            final Object resultObject = model.resolveObjectById(effectiveSourceId, targetId);
+            if (resultObject != null)
+                return resultObject;
+        }
+
+        // Search in controls
+        {
+            final Object resultObject = xformsControls.resolveObjectById(effectiveSourceId, targetId);
+            if (resultObject != null)
+                return resultObject;
+        }
+
+        // Check containing document
+        if (targetId.equals(getEffectiveId()))
             return this;
 
         return null;
@@ -681,7 +717,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         if (focusEffectiveControlId == null)
             return null;
 
-        final XFormsControl xformsControl = (XFormsControl) getObjectById(focusEffectiveControlId);
+        final XFormsControl xformsControl = (XFormsControl) getObjectByEffectiveId(focusEffectiveControlId);
         // It doesn't make sense to tell the client to set the focus to an element that is non-relevant or readonly
         if (xformsControl != null && xformsControl instanceof XFormsSingleNodeControl) {
             final XFormsSingleNodeControl xformsSingleNodeControl = (XFormsSingleNodeControl) xformsControl;
@@ -717,7 +753,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         if (helpEffectiveControlId == null)
             return null;
 
-        final XFormsControl xformsControl = (XFormsControl) getObjectById(helpEffectiveControlId);
+        final XFormsControl xformsControl = (XFormsControl) getObjectByEffectiveId(helpEffectiveControlId);
         // It doesn't make sense to tell the client to show help for an element that is non-relevant, but we allow readonly
         if (xformsControl != null && xformsControl instanceof XFormsSingleNodeControl) {
             final XFormsSingleNodeControl xformsSingleNodeControl = (XFormsSingleNodeControl) xformsControl;
@@ -733,18 +769,18 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     /**
      * Execute an external event on element with id targetElementId and event eventName.
      */
-    public void executeExternalEvent(PipelineContext pipelineContext, String eventName, String controlId, String otherControlId, String valueString, Element filesElement, String dndStart, String dndEnd) {
+    public void executeExternalEvent(PipelineContext pipelineContext, String eventName, String effectiveControlId, String effectiveOtherControlId, String valueString, Element filesElement, String dndStart, String dndEnd) {
 
         // Get event target object
         XFormsEventTarget eventTarget;
         {
-            final Object eventTargetObject = getObjectById(controlId);
+            final Object eventTargetObject = getObjectByEffectiveId(effectiveControlId);
             if (!(eventTargetObject instanceof XFormsEventTarget)) {
                 if (XFormsProperties.isExceptionOnInvalidClientControlId(this)) {
-                    throw new ValidationException("Event target id '" + controlId + "' is not an XFormsEventTarget.", getLocationData());
+                    throw new ValidationException("Event target id '" + effectiveControlId + "' is not an XFormsEventTarget.", getLocationData());
                 } else {
                     if (XFormsServer.logger.isDebugEnabled()) {
-                        logDebug("containing document", "ignoring client event with invalid control id", new String[] { "control id", controlId, "event name", eventName });
+                        logDebug("containing document", "ignoring client event with invalid control id", new String[] { "control id", effectiveControlId, "event name", eventName });
                     }
                     return;
                 }
@@ -759,15 +795,15 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         // Get other event target
         final XFormsEventTarget otherEventTarget;
         {
-            final Object otherEventTargetObject = (otherControlId == null) ? null : getObjectById(otherControlId);
+            final Object otherEventTargetObject = (effectiveOtherControlId == null) ? null : getObjectByEffectiveId(effectiveOtherControlId);
             if (otherEventTargetObject == null) {
                 otherEventTarget = null;
             } else if (!(otherEventTargetObject instanceof XFormsEventTarget)) {
                 if (XFormsProperties.isExceptionOnInvalidClientControlId(this)) {
-                    throw new ValidationException("Other event target id '" + otherControlId + "' is not an XFormsEventTarget.", getLocationData());
+                    throw new ValidationException("Other event target id '" + effectiveOtherControlId + "' is not an XFormsEventTarget.", getLocationData());
                 } else {
                     if (XFormsServer.logger.isDebugEnabled()) {
-                        logDebug("containing document", "ignoring invalid client event with invalid second control id", new String[] { "control id", controlId, "event name", eventName, "second control id", otherControlId });
+                        logDebug("containing document", "ignoring invalid client event with invalid second control id", new String[] { "control id", effectiveControlId, "event name", eventName, "second control id", effectiveOtherControlId });
                     }
                     return;
                 }
@@ -823,7 +859,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                 true, true, true, valueString, filesElement, new String[] { dndStart, dndEnd} );
 
         // Handle repeat focus. Don't dispatch event on DOMFocusOut however.
-        if (controlId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1) != -1
+        if (effectiveControlId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1) != -1
                 && !XFormsEvents.XFORMS_DOM_FOCUS_OUT.equals(eventName)) {
 
             // Check if the value to set will be different from the current value
@@ -854,7 +890,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                 // The event target is in a repeated structure, so make sure it gets repeat focus
                 dispatchEvent(pipelineContext, new XXFormsRepeatFocusEvent(eventTarget));
                 // Get a fresh reference
-                eventTarget = (XFormsControl) getObjectById(eventTarget.getEffectiveId());
+                eventTarget = (XFormsControl) getObjectByEffectiveId(eventTarget.getEffectiveId());
             }
         }
 
@@ -868,7 +904,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                 dispatchEvent(pipelineContext, xformsEvent);
 
                 // Then, dispatch DOMActivate unless the control is read-only
-                final XFormsOutputControl xformsOutputControl = (XFormsOutputControl) getObjectById(eventTarget.getEffectiveId());
+                final XFormsOutputControl xformsOutputControl = (XFormsOutputControl) getObjectByEffectiveId(eventTarget.getEffectiveId());
                 if (!xformsOutputControl.isReadonly()) {
                     dispatchEvent(pipelineContext, new XFormsDOMActivateEvent(xformsOutputControl));
                 }
@@ -911,13 +947,13 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                     // Dispatch DOMFocusOut
                     // NOTE: setExternalValue() above may cause e.g. xforms-select / xforms-deselect events to be
                     // dispatched, so we get the control again to have a fresh reference
-                    final XFormsControl sourceXFormsControl = (XFormsControl) getObjectById(eventTarget.getEffectiveId());
+                    final XFormsControl sourceXFormsControl = (XFormsControl) getObjectByEffectiveId(eventTarget.getEffectiveId());
                     if (sourceXFormsControl != null)
                         dispatchEvent(pipelineContext, new XFormsDOMFocusOutEvent(sourceXFormsControl));
 
                     // Dispatch DOMFocusIn
                     final XFormsControl otherTargetXFormsControl
-                        = (XFormsControl) getObjectById(((XFormsControl) valueChangeWithFocusChangeEvent.getOtherTargetObject()).getEffectiveId());
+                        = (XFormsControl) getObjectByEffectiveId(((XFormsControl) valueChangeWithFocusChangeEvent.getOtherTargetObject()).getEffectiveId());
                     if (otherTargetXFormsControl != null)
                         dispatchEvent(pipelineContext, new XFormsDOMFocusInEvent(otherTargetXFormsControl));
                 }
@@ -1170,7 +1206,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
             
             for (Iterator i = offlineInsertTriggerIds.iterator(); i.hasNext();) {
                 final String currentId = (String) i.next();
-                final Object o = getObjectById(currentId);
+                final Object o = getObjectByEffectiveId(currentId);
                 if (o instanceof XFormsTriggerControl) {
                     final XFormsTriggerControl trigger = (XFormsTriggerControl) o;
                     final XFormsEvent event = new XFormsDOMActivateEvent(trigger);
@@ -1471,7 +1507,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                     }
 
                     // Output deselected ids
-                    final XFormsControl switchXFormsControl = (XFormsControl) xformsControls.getObjectById(switchId);
+                    final XFormsControl switchXFormsControl = (XFormsControl) xformsControls.getObjectByEffectiveId(switchId);
                     final List children = switchXFormsControl.getChildren();
                     if (children != null && children.size() > 0) {
                         for (Iterator j = children.iterator(); j.hasNext();) {
@@ -1526,7 +1562,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         final Element repeatIndexesElement = dynamicStateDocument.getRootElement().element("repeat-indexes");
 
         // Create XForms controls and models
-        createControlAndModel(pipelineContext, repeatIndexesElement);
+        createControlsAndModels(pipelineContext, repeatIndexesElement);
 
         // Extract and restore instances
         {
@@ -1547,12 +1583,12 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                             throw new ValidationException("Non-initialized instance has to be application shared for id: " + newInstance.getEffectiveId(), getLocationData());
 
                         final SharedXFormsInstance sharedInstance
-                                = XFormsServerSharedInstancesCache.instance().find(pipelineContext, this, newInstance.getEffectiveId(), newInstance.getModelId(), newInstance.getSourceURI(), newInstance.getTimeToLive(), newInstance.getValidation());
-                        getModel(sharedInstance.getModelId()).setInstance(sharedInstance, false);
+                                = XFormsServerSharedInstancesCache.instance().find(pipelineContext, this, newInstance.getEffectiveId(), newInstance.getEffectiveModelId(), newInstance.getSourceURI(), newInstance.getTimeToLive(), newInstance.getValidation());
+                        getModelByEffectiveId(sharedInstance.getEffectiveModelId()).setInstance(sharedInstance, false);
 
                     } else {
                         // Instance is initialized, just use it
-                        getModel(newInstance.getModelId()).setInstance(newInstance, newInstance.isReplaced());
+                        getModelByEffectiveId(newInstance.getEffectiveModelId()).setInstance(newInstance, newInstance.isReplaced());
                     }
 
                     // Log instance if needed
@@ -1561,7 +1597,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
             }
 
             // Then get instances from static state if necessary
-            final Map staticInstancesMap = xformsStaticState.getStaticInstancesMap();
+            final Map staticInstancesMap = xformsStaticState.getSharedInstancesMap();
             if (staticInstancesMap != null && staticInstancesMap.size() > 0) {
                 for (Iterator instancesIterator = staticInstancesMap.values().iterator(); instancesIterator.hasNext();) {
                     final XFormsInstance currentInstance = (XFormsInstance) instancesIterator.next();
@@ -1577,12 +1613,12 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                                 throw new ValidationException("Non-initialized instance has to be application shared for id: " + currentInstance.getEffectiveId(), getLocationData());
 
                             final SharedXFormsInstance sharedInstance
-                                    = XFormsServerSharedInstancesCache.instance().find(pipelineContext, this, currentInstance.getEffectiveId(), currentInstance.getModelId(), currentInstance.getSourceURI(), currentInstance.getTimeToLive(), currentInstance.getValidation());
-                            getModel(sharedInstance.getModelId()).setInstance(sharedInstance, false);
+                                    = XFormsServerSharedInstancesCache.instance().find(pipelineContext, this, currentInstance.getEffectiveId(), currentInstance.getEffectiveModelId(), currentInstance.getSourceURI(), currentInstance.getTimeToLive(), currentInstance.getValidation());
+                            getModelByEffectiveId(sharedInstance.getEffectiveModelId()).setInstance(sharedInstance, false);
 
                         } else {
                             // Instance is initialized, just use it
-                            getModel(currentInstance.getModelId()).setInstance(currentInstance, false);
+                            getModelByEffectiveId(currentInstance.getEffectiveModelId()).setInstance(currentInstance, false);
                         }
                     }
                 }
@@ -1617,7 +1653,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         // This is called upon the first creation of the XForms engine only
 
         // Create XForms controls and models
-        createControlAndModel(pipelineContext, null);
+        createControlsAndModels(pipelineContext, null);
 
         // 4.2 Initialization Events
 
@@ -1666,7 +1702,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         this.mustPerformInitializationFirstRefresh = false;
     }
 
-    private void createControlAndModel(PipelineContext pipelineContext, Element repeatIndexesElement) {
+    private void createControlsAndModels(PipelineContext pipelineContext, Element repeatIndexesElement) {
 
         if (xformsStaticState != null) {
 
@@ -1684,10 +1720,13 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
             xformsControls = new XFormsControls(this, xformsStaticState, repeatIndexesElement);
 
             // Create and index models
-            for (Iterator i = xformsStaticState.getModelDocuments().iterator(); i.hasNext();) {
-                final Document modelDocument = (Document) i.next();
-                final XFormsModel model = new XFormsModel(modelDocument);
-                model.setContainingDocument(this); // NOTE: This requires the XFormsControls to be set on XFormsContainingDocument
+            for (Iterator i = xformsStaticState.getModelDocuments().entrySet().iterator(); i.hasNext();) {
+                final Map.Entry currentEntry = (Map.Entry) i.next();
+                final String prefixedId = (String) currentEntry.getKey();
+                final Document modelDocument = (Document) currentEntry.getValue();
+
+                final XFormsModel model = new XFormsModel(prefixedId, modelDocument);
+                model.setContainingDocument(this); // NOTE: This requires the XFormsControls to be set on XFormsContainingDocument (really? should explain why)
 
                 this.models.add(model);
                 if (model.getEffectiveId() != null)

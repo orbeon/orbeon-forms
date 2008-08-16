@@ -1344,4 +1344,16 @@ public class XFormsUtils {
     public static String escapeJavaScript(String value) {
         return org.apache.commons.lang.StringUtils.replace(org.apache.commons.lang.StringUtils.replace(value, "\\", "\\\\"), "\"", "\\\"");
     }
+
+    public static String getEffectiveIdPrefix(String effectiveId) {
+        if (effectiveId == null)
+            return null;
+
+        final int prefixIndex = effectiveId.lastIndexOf(XFormsConstants.COMPONENT_SEPARATOR);
+        if (prefixIndex != -1) {
+            return effectiveId.substring(0, prefixIndex + 1);
+        } else {
+            return "";
+        }
+    }
 }

@@ -42,6 +42,8 @@ import org.orbeon.saxon.om.NodeInfo;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
+import org.apache.commons.collections.OrderedMap;
+import org.apache.commons.collections.map.LinkedMap;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.sax.SAXResult;
@@ -77,7 +79,7 @@ public class XFormsStaticState {
     private Document staticStateDocument;   // if present, stored there temporarily only until getEncodedStaticState() is called and encodedStaticState is produced
 
     private Document controlsDocument;                  // controls cocument
-    private List modelDocuments = new ArrayList();      // List<Document> of model documents
+    private OrderedMap modelDocuments = new LinkedMap();// Map<String, Document> of model prefixed ids) to model documents
     private SAXStore xhtmlDocument;                     // entire XHTML document for noscript mode only
 
     private Map xxformsScripts;                         // Map<String, String> of id to script content
@@ -220,8 +222,8 @@ public class XFormsStaticState {
             this.namespacesMap = namespacesMap;
         }
 
-        // Extract controls and models documents
-        extractControlsAndModels(pipelineContext, staticStateElement);
+        // Extract controls, models and components documents
+        extractControlsModelsComponents(pipelineContext, staticStateElement);
 
         // Extract properties information
         extractProperties(staticStateElement);
@@ -277,8 +279,9 @@ public class XFormsStaticState {
                 }
             }
             // Properties on xforms:model elements
-            for (Iterator i = modelDocuments.iterator(); i.hasNext();) {
-                final Document currentModelDocument = (Document) i.next();
+            for (Iterator i = modelDocuments.entrySet().iterator(); i.hasNext();) {
+                final Map.Entry currenEntry = (Map.Entry) i.next();
+                final Document currentModelDocument = (Document) currenEntry.getValue();
                 for (Iterator j = currentModelDocument.getRootElement().attributeIterator(); j.hasNext();) {
                     final Attribute currentAttribute = (Attribute) j.next();
                     if (XFormsConstants.XXFORMS_NAMESPACE_URI.equals(currentAttribute.getNamespaceURI())) {
@@ -348,7 +351,7 @@ public class XFormsStaticState {
         }
     }
 
-    private void extractControlsAndModels(PipelineContext pipelineContext, Element staticStateElement) {
+    private void extractControlsModelsComponents(PipelineContext pipelineContext, Element staticStateElement) {
 
         final Configuration xpathConfiguration = new Configuration();
 
@@ -364,7 +367,7 @@ public class XFormsStaticState {
                 final Element modelElement = (Element) i.next();
                 // Copy the element because we may need it in staticStateDocument for encoding
                 final Document modelDocument = Dom4jUtils.createDocumentCopyParentNamespaces(modelElement);
-                modelDocuments.add(modelDocument);
+                modelDocuments.put(modelElement.attributeValue("id"), modelDocument);
             }
 
             XFormsContainingDocument.logDebugStatic("static state", "created top-level model documents", new String[] { "count", Integer.toString(modelsCount) });
@@ -400,23 +403,13 @@ public class XFormsStaticState {
         // Extract models nested within controls
         {
             final DocumentWrapper controlsDocumentInfo = new DocumentWrapper(controlsDocument, null, xpathConfiguration);
-            final List models = XPathCache.evaluate(pipelineContext, controlsDocumentInfo,
-                    "//xforms:model[not(ancestor::xforms:instance)]",
-                    BASIC_NAMESPACE_MAPPINGS, null, null, null, null, locationData);
-
-            if (models.size() > 0) {
-                for (Iterator i = models.iterator(); i.hasNext();) {
-                    final NodeInfo currentNodeInfo = (NodeInfo) i.next();
-                    final Element currentElement = (Element) ((NodeWrapper) currentNodeInfo).getUnderlyingNode();
-                    // Copy the element because we may need it in staticStateDocument for encoding
-                    modelDocuments.add(Dom4jUtils.createDocumentCopyParentNamespaces(currentElement));
-                    currentElement.detach();// the element is no longer needed within the controls
-                }
-                XFormsContainingDocument.logDebugStatic("static state", "created nested model documents", new String[] { "count", Integer.toString(models.size()) });
+            final List extractedModels = extractNestedModels(pipelineContext, controlsDocumentInfo, locationData);
+            XFormsContainingDocument.logDebugStatic("static state", "created nested model documents", new String[] { "count", Integer.toString(extractedModels.size()) });
+            for (Iterator i = extractedModels.iterator(); i.hasNext();) {
+                final Document currentModelDocument = (Document) i.next();
+                modelDocuments.put(currentModelDocument.getRootElement().attributeValue("id"), currentModelDocument);
             }
         }
-
-        // TODO: Extract models within XBL
 
         // Extract scripts
         {
@@ -516,7 +509,7 @@ public class XFormsStaticState {
      *
      * @param instance  shared instance
      */
-    public void addInstance(SharedXFormsInstance instance) {
+    public void addSharedInstance(SharedXFormsInstance instance) {
         if (initialized)
             throw new IllegalStateException("Cannot add instances to static state after initialization.");
 
@@ -552,8 +545,8 @@ public class XFormsStaticState {
 
                     // Add information for all shared instances, but don't add content for globally shared instances
                     // NOTE: This strategy could be changed in the future or be configurable
-                    final boolean addContent = !currentInstance.isApplicationShared();
-                    instancesElement.add(currentInstance.createContainerElement(addContent));
+                    final boolean serializeInstance = !currentInstance.isApplicationShared();
+                    instancesElement.add(currentInstance.createContainerElement(serializeInstance));
                 }
             }
 
@@ -576,11 +569,11 @@ public class XFormsStaticState {
     }
 
     /**
-     * Get a map of available static instances. Can only be called after initialization is complete.
+     * Get a map of available shared instances. Can only be called after initialization is complete.
      *
      * @return  Map<String, SharedXFormsInstance
      */
-    public Map getStaticInstancesMap() {
+    public Map getSharedInstancesMap() {
         if (!initialized)
             throw new IllegalStateException("Cannot get instances from static before initialization.");
 
@@ -600,7 +593,7 @@ public class XFormsStaticState {
         return controlsDocument;
     }
 
-    public List getModelDocuments() {
+    public Map getModelDocuments() {
         return modelDocuments;
     }
 
@@ -854,10 +847,12 @@ public class XFormsStaticState {
             repeatHierarchyString = repeatHierarchyStringBuffer.toString();
 
             // Iterate over models
-            for (Iterator i = getModelDocuments().iterator(); i.hasNext();) {
+            for (Iterator i = modelDocuments.entrySet().iterator(); i.hasNext();) {
+                final Map.Entry currentEntry = (Map.Entry) i.next();
+                final String prefixedId = (String) currentEntry.getKey();
 
                 final Element modelElement; {
-                    final Document modelDocument = (Document) i.next();
+                final Document modelDocument = (Document) currentEntry.getValue();
                     modelElement = modelDocument.getRootElement();
                 }
 
@@ -917,11 +912,25 @@ public class XFormsStaticState {
 
                             // Remember shadow tree for this static id
                             fullShadowTrees.put(staticId, shadowTreeDocument);
-                            final Document filteredShadowTree = filterShadowTree(shadowTreeDocument);
-                            compactShadowTrees.put(staticId, filteredShadowTree);
+                            final Document compactShadowTreeDocument = filterShadowTree(shadowTreeDocument);
+                            compactShadowTrees.put(staticId, compactShadowTreeDocument);
+
+                            // Extract models from components instances
+                            final DocumentWrapper compactShadowTreeWrapper = new DocumentWrapper(compactShadowTreeDocument, null, xpathConfiguration);
+                            final List extractedModels = extractNestedModels(pipelineContext, compactShadowTreeWrapper, locationData);
+
+                            for (Iterator i = extractedModels.iterator(); i.hasNext();) {
+                                final Document currentModelDocument = (Document) i.next();
+                                // Store models by "prefixed id"
+                                modelDocuments.put(staticId + XFormsConstants.COMPONENT_SEPARATOR + currentModelDocument.getRootElement().attributeValue("id"), currentModelDocument);
+                            }
+
+                            XFormsContainingDocument.logDebugStatic("static state", "created nested model documents", new String[] { "count", Integer.toString(extractedModels.size()) });
 
                             // TODO: the nested ids must be passed with prefix, right?
-                            analyzeComponentTree(pipelineContext, xpathConfiguration, filteredShadowTree.getRootElement(), repeatHierarchyStringBuffer);
+                            analyzeComponentTree(pipelineContext, xpathConfiguration, compactShadowTreeDocument.getRootElement(), repeatHierarchyStringBuffer);
+
+                            // TODO: Extract models within XBL
                         }
                     }
                 }
@@ -1091,8 +1100,10 @@ public class XFormsStaticState {
             {
                 // Create list of all the documents to search
                 final List documentInfos = new ArrayList(modelDocuments.size() + 1);
-                for (Iterator i = modelDocuments.iterator(); i.hasNext();) {
-                    documentInfos.add(new DocumentWrapper((Document) i.next(), null, xpathConfiguration));
+                for (Iterator i = modelDocuments.entrySet().iterator(); i.hasNext();) {
+                    final Map.Entry currenEntry = (Map.Entry) i.next();
+                    final Document currentModelDocument = (Document) currenEntry.getValue();
+                    documentInfos.add(new DocumentWrapper(currentModelDocument, null, xpathConfiguration));
                 }
                 documentInfos.add(controlsDocumentInfo);
 
@@ -1105,6 +1116,29 @@ public class XFormsStaticState {
                 }
             }
         }
+    }
+
+    private static List extractNestedModels(PipelineContext pipelineContext, DocumentWrapper compactShadowTreeWrapper, LocationData locationData) {
+
+        final List result = new ArrayList();
+
+        final List modelElements = XPathCache.evaluate(pipelineContext, compactShadowTreeWrapper,
+                "//xforms:model[not(ancestor::xforms:instance)]",
+                BASIC_NAMESPACE_MAPPINGS, null, null, null, null, locationData);
+
+        if (modelElements.size() > 0) {
+            for (Iterator i = modelElements.iterator(); i.hasNext();) {
+                final NodeInfo currentNodeInfo = (NodeInfo) i.next();
+                final Element currentModelElement = (Element) ((NodeWrapper) currentNodeInfo).getUnderlyingNode();
+                // Copy the element because we may need it in staticStateDocument for encoding
+                final Document modelDocument = Dom4jUtils.createDocumentCopyParentNamespaces(currentModelElement);
+
+                result.add(modelDocument);
+                currentModelElement.detach();// the element is no longer needed within the controls
+            }
+        }
+
+        return result;
     }
 
     public boolean isHasOfflineSupport() {

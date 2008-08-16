@@ -49,6 +49,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
     // Model attributes
     private String modelId;
+    private String modelEffectiveId;
 
     // Instances
     private List instanceIds;
@@ -70,7 +71,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
     // For legacy XForms engine
     private InstanceConstructListener instanceConstructListener;
 
-    public XFormsModel(Document modelDocument) {
+
+    public XFormsModel(String prefixedId, Document modelDocument) {
         this.modelDocument = modelDocument;
 
         // Basic check trying to make sure this is an XForms model
@@ -82,8 +84,9 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                     + XFormsConstants.XFORMS_NAMESPACE_URI + "'. Found instead: '" + rootNamespaceURI + "'",
                     (LocationData) modelElement.getData());
 
-        // Get model id (may be null)
+        // Get model id (may be null) (really? how? legacy mode?)
         modelId = modelElement.attributeValue("id");
+        modelEffectiveId = prefixedId;
 
         // Extract list of instances ids
         {
@@ -97,6 +100,10 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                 }
             }
         }
+    }
+
+    public XFormsModel(Document modelDocument) {
+        this(modelDocument.getRootElement().attributeValue("id"), modelDocument);
     }
 
     public void setContainingDocument(XFormsContainingDocument containingDocument) {
@@ -134,27 +141,52 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
     /**
      * Get object with the id specified.
      */
-    public Object getObjectByid(String id) {
+    public Object getObjectByEffectiveId(String effectiveId) {
 
         // Check model itself
-        if (id.equals(modelId))
+        if (effectiveId.equals(modelEffectiveId))
             return this;
 
         // Search instances
         if (instancesMap != null) {
-            final XFormsInstance instance = (XFormsInstance) instancesMap.get(id);
+            final XFormsInstance instance = (XFormsInstance) instancesMap.get(effectiveId);
             if (instance != null)
                 return instance;
         }
 
         // Search submissions
         if (submissions != null) {
-            final XFormsModelSubmission resultSubmission = (XFormsModelSubmission) submissions.get(id);
+            final XFormsModelSubmission resultSubmission = (XFormsModelSubmission) submissions.get(effectiveId);
             if (resultSubmission != null)
                 return resultSubmission;
         }
 
         return null;
+    }
+
+    /**
+     * Resolve an object. This optionally depends on a source, and involves resolving whether the source is within a
+     * repeat or a component.
+     *
+     * @param effectiveSourceId  effective id of the source, or null
+     * @param targetId           id of the target
+     * @return                   object, or null if not found
+     */
+    public Object resolveObjectById(String effectiveSourceId, String targetId) {
+
+        if (targetId.indexOf(XFormsConstants.COMPONENT_SEPARATOR) != -1 || targetId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1) != -1)
+            throw new OXFException("Target id must be static id: " + targetId);
+
+        if (effectiveSourceId != null) {
+            final String prefix = XFormsUtils.getEffectiveIdPrefix(effectiveSourceId);
+            if (!prefix.equals("")) {
+                // Source is in a component so we can only reach items within this same component instance
+                final String effectiveTargetId = prefix + targetId;
+                return getObjectByEffectiveId(effectiveTargetId);
+            }
+        }
+
+        return getObjectByEffectiveId(targetId);
     }
 
     /**
@@ -277,7 +309,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
     }
 
     public String getEffectiveId() {
-        return getId();
+        return modelEffectiveId;
     }
 
     public LocationData getLocationData() {
@@ -313,7 +345,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                     if (!currentInstance.isReadOnly()) {
                         if (!schemaValidator.validateInstance(currentInstance)) {
                             // Remember that instance is invalid
-                            invalidInstances.put(currentInstance.getId(), "");
+                            invalidInstances.put(currentInstance.getEffectiveId(), "");
                         }
                     }
                 }
@@ -369,7 +401,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                 // Build initial instance documents
                 final List instanceContainers = modelElement.elements(new QName("instance", XFormsConstants.XFORMS_NAMESPACE));
                 final XFormsStaticState staticState = containingDocument.getStaticState();
-                final Map staticStateInstancesMap = (staticState != null && staticState.isInitialized()) ? staticState.getStaticInstancesMap() : null;
+                final Map staticStateInstancesMap = (staticState != null && staticState.isInitialized()) ? staticState.getSharedInstancesMap() : null;
                 if (instanceContainers.size() > 0) {
                     // Iterate through all instances
                     int instancePosition = 0;
@@ -407,7 +439,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                                                 new String[] { "id", staticStateInstance.getEffectiveId() });
 
                                     final SharedXFormsInstance sharedInstance
-                                            = XFormsServerSharedInstancesCache.instance().find(pipelineContext, containingDocument, staticStateInstance.getEffectiveId(), staticStateInstance.getModelId(), staticStateInstance.getSourceURI(), staticStateInstance.getTimeToLive(), staticStateInstance.getValidation());
+                                            = XFormsServerSharedInstancesCache.instance().find(pipelineContext, containingDocument, staticStateInstance.getEffectiveId(), staticStateInstance.getEffectiveModelId(), staticStateInstance.getSourceURI(), staticStateInstance.getTimeToLive(), staticStateInstance.getValidation());
                                     setInstance(sharedInstance, false);
 
                                 } else {
@@ -685,9 +717,6 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
             if (staticState != null && !staticState.isInitialized()) {
                 // The static state is open to adding instances
-
-                final boolean modelHasReset = false;// TODO: containingDocument[0].hasReset(modelId) or xformsEngineStaticState.hasReset(modelId);
-
                 if (getInstances() != null) {
                     for (Iterator instanceIterator = getInstances().iterator(); instanceIterator.hasNext();) {
                         final XFormsInstance currentInstance = (XFormsInstance) instanceIterator.next();
@@ -699,13 +728,17 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                             if (XFormsServer.logger.isDebugEnabled())
                                 containingDocument.logDebug("model", "adding read-only instance to static state",
                                     new String[] { "instance", currentInstance.getEffectiveId() });
-                            staticState.addInstance((SharedXFormsInstance) currentInstance);
-                        } else if (modelHasReset) {
-                            if (XFormsServer.logger.isDebugEnabled())
-                                containingDocument.logDebug("model", "adding reset instance to static state",
-                                    new String[] { "instance", currentInstance.getEffectiveId() });
-                            staticState.addInstance(currentInstance.createSharedInstance());
+                            staticState.addSharedInstance((SharedXFormsInstance) currentInstance);
                         }
+                        // TODO: something like staticState.hasReset(modelId);
+                        // TODO: maybe we won't do this here, but by restoring the initial dynamic state instead
+//                        final boolean modelHasReset = false;
+//                        else if (modelHasReset) {
+//                            if (XFormsServer.logger.isDebugEnabled())
+//                                containingDocument.logDebug("model", "adding reset instance to static state",
+//                                    new String[] { "instance", currentInstance.getEffectiveId() });
+//                            staticState.addSharedInstance(currentInstance.createSharedInstance());
+//                        }
                     }
                 }
             }
@@ -923,7 +956,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
             // algorithm below.
             for (Iterator i = instances.iterator(); i.hasNext();) {
                 final XFormsInstance instance = (XFormsInstance) i.next();
-                if (invalidInstances.get(instance.getId()) == null) {
+                if (invalidInstances.get(instance.getEffectiveId()) == null) {
                     containingDocument.dispatchEvent(pipelineContext, new XXFormsValidEvent(instance));
                 } else {
                     containingDocument.dispatchEvent(pipelineContext, new XXFormsInvalidEvent(instance));
@@ -1128,7 +1161,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                 final int type = eventSchedule.getType();
                 final boolean isRelevantBindingEvent = (type & EventSchedule.RELEVANT_BINDING) != 0;
 
-                final XFormsControl xformsControl = (XFormsControl) xformsControls.getObjectById(controlInfoId);
+                final XFormsControl xformsControl = (XFormsControl) xformsControls.getObjectByEffectiveId(controlInfoId);
 
                 if (!isRelevantBindingEvent) {
                     // Regular type of event

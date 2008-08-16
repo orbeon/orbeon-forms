@@ -18,10 +18,7 @@ import org.dom4j.QName;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
-import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsContextStack;
-import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -161,25 +158,28 @@ public abstract class XFormsAction {
     }
 
     /**
-     * Find an effective control id based on either the xxforms:repeat-indexes attribute, or on the current repeat
-     * indexes.
+     * Find an effective object based on either the xxforms:repeat-indexes attribute, or on the current repeat indexes.
      *
      * @param actionInterpreter current XFormsActionInterpreter
      * @param pipelineContext   current PipelineContext
-     * @param id                control id to resolve
+     * @param sourceEffectiveId effective id of the source action
+     * @param targetId          target to resolve
      * @param actionElement     current action element
      * @return                  effective control id if possible
      */
-    protected String findEffectiveControlId(XFormsActionInterpreter actionInterpreter, PipelineContext pipelineContext, String id, Element actionElement) {
+    protected Object resolveEffectiveControl(XFormsActionInterpreter actionInterpreter, PipelineContext pipelineContext, String sourceEffectiveId, String targetId, Element actionElement) {
+
+        final XFormsControls controls = actionInterpreter.getXFormsControls();
 
         // Get indexes as space-separated list
         final String repeatindexes = resolveAVT(actionInterpreter, pipelineContext, actionElement, XFormsConstants.XXFORMS_REPEAT_INDEXES_QNAME, false);
         if (repeatindexes != null && !"".equals(repeatindexes.trim())) {
             // Effective id is provided, modify appropriately
-            return id + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1 + StringUtils.join(StringUtils.split(repeatindexes), XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_2);
+            // TODO: provided really, but what about prefix for components?
+            return controls.getObjectByEffectiveId(targetId + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1 + StringUtils.join(StringUtils.split(repeatindexes), XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_2));
         } else {
             // Figure out effective id
-            return actionInterpreter.getXFormsControls().findEffectiveControlId(id);
+            return controls.resolveObjectById(sourceEffectiveId, targetId);
         }
     }
 }

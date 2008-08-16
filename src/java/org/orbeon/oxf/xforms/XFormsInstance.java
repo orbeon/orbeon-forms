@@ -55,7 +55,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventHandlerCont
     private DocumentInfo documentInfo;
 
     private String instanceId;
-    private String modelId;
+    private String effectiveModelId;
 
     private String sourceURI;
 
@@ -88,7 +88,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventHandlerCont
     public XFormsInstance(Element containerElement) {
 
         this.instanceId = containerElement.attributeValue("id");
-        this.modelId = containerElement.attributeValue("model-id");
+        this.effectiveModelId = containerElement.attributeValue("model-id");
 
         this.sourceURI = containerElement.attributeValue("source-uri");
 
@@ -138,18 +138,18 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventHandlerCont
         this.documentInfo = documentInfo;
     }
 
-    public XFormsInstance(String modelId, String instanceId, Document instanceDocument, String instanceSourceURI, String username, String password, boolean applicationShared, long timeToLive, String validation) {
+    public XFormsInstance(String effectiveModelId, String instanceId, Document instanceDocument, String instanceSourceURI, String username, String password, boolean applicationShared, long timeToLive, String validation) {
         // We normalize the Document before setting it, so that text nodes follow the XPath constraints
-        this(modelId, instanceId, new DocumentWrapper((Document) Dom4jUtils.normalizeTextNodes(instanceDocument), null, new Configuration()), instanceSourceURI, username, password, applicationShared, timeToLive, validation);
+        this(effectiveModelId, instanceId, new DocumentWrapper((Document) Dom4jUtils.normalizeTextNodes(instanceDocument), null, new Configuration()), instanceSourceURI, username, password, applicationShared, timeToLive, validation);
     }
 
-    protected XFormsInstance(String modelId, String instanceId, DocumentInfo instanceDocumentInfo, String instanceSourceURI, String username, String password, boolean applicationShared, long timeToLive, String validation) {
+    protected XFormsInstance(String effectiveModelId, String instanceId, DocumentInfo instanceDocumentInfo, String instanceSourceURI, String username, String password, boolean applicationShared, long timeToLive, String validation) {
 
         if (applicationShared && instanceSourceURI == null)
             throw new OXFException("Only XForms instances externally loaded through the src attribute may have xxforms:shared=\"application\".");
 
         this.instanceId = instanceId;
-        this.modelId = modelId;
+        this.effectiveModelId = effectiveModelId;
 
         this.readonly = !(instanceDocumentInfo instanceof DocumentWrapper);
         this.applicationShared = applicationShared;
@@ -167,10 +167,10 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventHandlerCont
     /**
      * Serialize the instance into a containing Element with meta-information.
      *
-     * @param serialize     whether the instance document must be serialized
-     * @return              containing Element
+     * @param serializeInstance     whether the instance document must be serialized
+     * @return                      containing Element
      */
-    public Element createContainerElement(boolean serialize) {
+    public Element createContainerElement(boolean serializeInstance) {
 
         // DocumentInfo may wrap an actual TinyTree or a dom4j document
         final Element instanceElement = Dom4jUtils.createElement("instance");
@@ -183,7 +183,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventHandlerCont
             instanceElement.addAttribute("ttl", Long.toString(timeToLive));
 
         instanceElement.addAttribute("id", instanceId);
-        instanceElement.addAttribute("model-id", modelId);
+        instanceElement.addAttribute("model-id", effectiveModelId);
         if (sourceURI != null)
             instanceElement.addAttribute("source-uri", sourceURI);
         if (username != null)
@@ -196,7 +196,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventHandlerCont
         if (replaced)
             instanceElement.addAttribute("replaced", "true");
 
-        if (serialize) {
+        if (serializeInstance) {
             final String instanceString;
             if (getDocument() != null) {
                 // This is probably more optimal than going through NodeInfo. Furthermore, there may be an issue with
@@ -218,7 +218,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventHandlerCont
      * @return XFormsModel          XFormsModel containing this instance
      */
     public XFormsModel getModel(XFormsContainingDocument containingDocument) {
-        return containingDocument.getModel(modelId);
+        return containingDocument.getModelByEffectiveId(effectiveModelId);
     }
 
     /**
@@ -238,11 +238,13 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventHandlerCont
     }
 
     public String getEffectiveId() {
-        return getId();
+        // Instance effective id has the same prefix as effective id of the model
+        final String prefix = XFormsUtils.getEffectiveIdPrefix(effectiveModelId);
+        return prefix + getId();
     }
 
-    public String getModelId() {
-        return modelId;
+    public String getEffectiveModelId() {
+        return effectiveModelId;
     }
 
     public boolean isReadOnly() {
@@ -541,7 +543,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventHandlerCont
      * @return  mutable XFormsInstance
      */
     public SharedXFormsInstance createSharedInstance() {
-        return new SharedXFormsInstance(modelId, instanceId, documentInfo, sourceURI, username, password, false, timeToLive, validation);
+        return new SharedXFormsInstance(effectiveModelId, instanceId, documentInfo, sourceURI, username, password, false, timeToLive, validation);
     }
 
     public static String getInstanceId(Element xformsInstanceElement) {
@@ -594,7 +596,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventHandlerCont
 
     public void logIfNeeded(XFormsContainingDocument containingDocument, String message) {
         if (logger.isDebugEnabled()) {
-            containingDocument.logDebug("instance", message, new String[] { "model id", getModelId(), "isntance id", getEffectiveId(),
+            containingDocument.logDebug("instance", message, new String[] { "effective model id", getEffectiveModelId(), "effective instance id", getEffectiveId(),
                     "instance", TransformerUtils.tinyTreeToString(getInstanceRootElementInfo()) } );
         }
     }

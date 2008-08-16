@@ -372,7 +372,7 @@ public class XFormsInsertAction extends XFormsAction {
         if (XFormsServer.logger.isDebugEnabled()) {
             if (didInsertNodes)
                 containingDocument.logDebug("xforms:insert", "inserted nodes",
-                        new String[] { "count", Integer.toString(insertedNodes.size()), "instance", modifiedInstance.getId() });
+                        new String[] { "count", Integer.toString(insertedNodes.size()), "instance", modifiedInstance.getEffectiveId() });
             else
                 containingDocument.logDebug("xforms:insert", "no node inserted");
         }

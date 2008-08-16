@@ -50,8 +50,7 @@ public class XFormsSetfocusAction extends XFormsAction {
                 return;
         }
 
-        final String effectiveControlId = findEffectiveControlId(actionInterpreter, pipelineContext, resolvedControlId, actionElement);
-        final Object controlObject = (effectiveControlId != null) ? containingDocument.getObjectById(effectiveControlId) : null;
+        final Object controlObject = resolveEffectiveControl(actionInterpreter, pipelineContext, eventHandlerContainer.getEffectiveId(), resolvedControlId, actionElement);
 
         if (controlObject instanceof XFormsControl) {
             // Dispatch event to control object

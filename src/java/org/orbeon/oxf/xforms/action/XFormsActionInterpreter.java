@@ -65,7 +65,7 @@ public class XFormsActionInterpreter {
                                          Element actionElement, String effectiveEventContainerId) {
 
         // Get "fresh" container
-        final XFormsEventHandlerContainer eventHandlerContainer = (XFormsEventHandlerContainer) containingDocument.getObjectById(effectiveEventContainerId);
+        final XFormsEventHandlerContainer eventHandlerContainer = (XFormsEventHandlerContainer) containingDocument.getObjectByEffectiveId(effectiveEventContainerId);
 
         // Set context on container element
         contextStack.setBinding(pipelineContext, eventHandlerContainer);

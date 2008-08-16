@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.orbeon.oxf.xforms.XFormsControls;
 import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.control.controls.RepeatIterationControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.processor.XFormsElementFilterContentHandler;
@@ -54,7 +53,7 @@ public class XFormsRepeatHandler extends HandlerBase {
         final Map effectiveRepeatIdToIterations = currentControlState.getEffectiveRepeatIdToIterations();
         final Map repeatIdToIndex = currentControlState.getRepeatIdToIndex();
 
-        final XFormsRepeatControl repeatControl = handlerContext.isTemplate() ? null : (XFormsRepeatControl) containingDocument.getObjectById(effectiveId);
+        final XFormsRepeatControl repeatControl = handlerContext.isTemplate() ? null : (XFormsRepeatControl) containingDocument.getObjectByEffectiveId(effectiveId);
         final boolean isConcreteControl = repeatControl != null;
 
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();

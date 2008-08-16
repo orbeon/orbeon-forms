@@ -21,6 +21,7 @@ import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.xforms.XFormsControls;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
+import org.orbeon.oxf.xforms.control.controls.XFormsCaseControl;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.saxon.om.Item;
@@ -50,11 +51,10 @@ public class XFormsToggleAction extends XFormsAction {
             caseId = caseAttribute;
         }
 
-        final String effectiveCaseId = findEffectiveControlId(actionInterpreter, pipelineContext, caseId, actionElement);
-
-        if (effectiveCaseId != null) { // can be null if the switch is not relevant
+        final XFormsCaseControl effectiveCase = (XFormsCaseControl) resolveEffectiveControl(actionInterpreter, pipelineContext, eventHandlerContainer.getEffectiveId(), caseId, actionElement);
+        if (effectiveCase != null) { // can be null if the switch is not relevant
             // Update xforms:switch info and dispatch events
-            xformsControls.activateCase(pipelineContext, effectiveCaseId);
+            xformsControls.activateCase(pipelineContext, effectiveCase.getEffectiveId());
         } else {
             // "If there is a null search result for the target object and the source object is an XForms action such as
             // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."

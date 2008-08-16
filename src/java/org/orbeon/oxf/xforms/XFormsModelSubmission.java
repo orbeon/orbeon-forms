@@ -243,7 +243,9 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
     }
 
     public String getEffectiveId() {
-        return id;
+        // Submission effective id has the same prefix as effective id of the model
+        final String prefix = XFormsUtils.getEffectiveIdPrefix(model.getEffectiveId());
+        return prefix + getId();
     }
 
     public LocationData getLocationData() {
@@ -506,7 +508,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                             final String name = parameterElement.element("name").getTextTrim();
 
                             final XFormsUploadControl uploadControl
-                                        = (XFormsUploadControl) containingDocument.getObjectById(name);
+                                        = (XFormsUploadControl) containingDocument.getObjectByEffectiveId(name);
 
                             // In case of xforms:repeat, the name of the template will not match an existing control
                             if (uploadControl == null)
@@ -787,7 +789,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                             final String absoluteResolvedURLString = absoluteResolvedURL.toExternalForm();
 
                             final SharedXFormsInstance sharedInstance
-                                    = XFormsServerSharedInstancesCache.instance().find(pipelineContext, containingDocument, replaceInstance.getEffectiveId(), replaceInstance.getModelId(), absoluteResolvedURLString, timeToLive, replaceInstance.getValidation());
+                                    = XFormsServerSharedInstancesCache.instance().find(pipelineContext, containingDocument, replaceInstance.getEffectiveId(), replaceInstance.getEffectiveModelId(), absoluteResolvedURLString, timeToLive, replaceInstance.getValidation());
 
                             if (XFormsServer.logger.isDebugEnabled())
                                 containingDocument.logDebug("submission", "replacing instance with read-only instance",
@@ -885,7 +887,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                                     // TODO: What about configuring validation? And what default to choose?
                                                     final Document resultingInstanceDocument
                                                             = TransformerUtils.readDom4j(connectionResult.getResponseInputStream(), connectionResult.resourceURI, resolvedXXFormsHandleXInclude);
-                                                    newInstance = new XFormsInstance(replaceInstance.getModelId(), replaceInstance.getEffectiveId(), resultingInstanceDocument,
+                                                    newInstance = new XFormsInstance(replaceInstance.getEffectiveModelId(), replaceInstance.getEffectiveId(), resultingInstanceDocument,
                                                             connectionResult.resourceURI, resolvedXXFormsUsername, resolvedXXFormsPassword, false, -1, replaceInstance.getValidation());
                                                 } else {
                                                     // Resulting instance is read-only
@@ -897,7 +899,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                                     // TODO: What about configuring validation? And what default to choose?
                                                     // NOTE: isApplicationSharedHint is always false when get get here. isApplicationSharedHint="true" is handled above.
                                                     final DocumentInfo resultingInstanceDocument = TransformerUtils.readTinyTree(connectionResult.getResponseInputStream(), connectionResult.resourceURI, resolvedXXFormsHandleXInclude);
-                                                    newInstance = new SharedXFormsInstance(replaceInstance.getModelId(), replaceInstance.getEffectiveId(), resultingInstanceDocument,
+                                                    newInstance = new SharedXFormsInstance(replaceInstance.getEffectiveModelId(), replaceInstance.getEffectiveId(), resultingInstanceDocument,
                                                             connectionResult.resourceURI, resolvedXXFormsUsername, resolvedXXFormsPassword, false, -1, replaceInstance.getValidation());
                                                 }    
                                             } catch (Exception e) {

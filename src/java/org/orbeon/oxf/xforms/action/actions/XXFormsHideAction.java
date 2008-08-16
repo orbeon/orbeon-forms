@@ -47,7 +47,7 @@ public class XXFormsHideAction extends XFormsAction {
 
         if (dialogId != null) {
             // Dispatch xxforms-dialog-close event to dialog
-            final Object controlObject = (dialogId != null) ? xformsControls.getObjectById(dialogId) : null;
+            final Object controlObject = (dialogId != null) ? xformsControls.getObjectByEffectiveId(dialogId) : null;// xxx fix not effective
             if (controlObject instanceof XXFormsDialogControl) {
                 final XFormsEvent newEvent = new XXFormsDialogCloseEvent((XFormsEventTarget) controlObject);
                 addContextAttributes(actionInterpreter, pipelineContext, actionElement, newEvent);

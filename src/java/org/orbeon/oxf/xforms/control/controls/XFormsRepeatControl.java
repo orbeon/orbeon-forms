@@ -107,7 +107,7 @@ public class XFormsRepeatControl extends XFormsControl implements XFormsContaine
                 }
 
 
-                final XFormsRepeatControl destinationControl = (XFormsRepeatControl) containingDocument.getObjectById(containingRepeatEffectiveId);
+                final XFormsRepeatControl destinationControl = (XFormsRepeatControl) containingDocument.getObjectByEffectiveId(containingRepeatEffectiveId);
                 destinationNodeset = destinationControl.getBindingContext().getNodeset();
                 requestedDestinationIndex = Integer.parseInt(dndEnd[dndEnd.length - 1]);
             }

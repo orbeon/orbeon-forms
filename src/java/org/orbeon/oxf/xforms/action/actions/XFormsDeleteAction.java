@@ -184,7 +184,7 @@ public class XFormsDeleteAction extends XFormsAction {
         final int removedNodesCount = 1;
         if (XFormsServer.logger.isDebugEnabled())
             containingDocument.logDebug("xforms:delete", "removed nodes",
-                    new String[] { "count", Integer.toString(removedNodesCount), "instance", modifiedInstance.getId() });
+                    new String[] { "count", Integer.toString(removedNodesCount), "instance", modifiedInstance.getEffectiveId() });
 
         // Rebuild ControlsState
         xformsControls.rebuildCurrentControlsState(pipelineContext);

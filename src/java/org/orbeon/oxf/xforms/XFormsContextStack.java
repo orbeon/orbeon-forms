@@ -205,7 +205,7 @@ public class XFormsContextStack {
      * @param bindingElement    current element containing node binding attributes
      * @param model             if specified, overrides a potential @model attribute on the element
      */
-    public void pushBinding(PipelineContext pipelineContext, Element bindingElement, String model) {
+    private void pushBinding(PipelineContext pipelineContext, Element bindingElement, String model) {
         final String ref = bindingElement.attributeValue("ref");
         final String context = bindingElement.attributeValue("context");
         final String nodeset = bindingElement.attributeValue("nodeset");
@@ -232,7 +232,7 @@ public class XFormsContextStack {
         final XFormsModel newModel;
         final boolean isNewModel;
         if (modelId != null) {
-            newModel = containingDocument.getModel(modelId);
+            newModel = (XFormsModel) containingDocument.resolveObjectById(null, modelId);// xxx use this? 
             if (newModel == null)
                 throw new ValidationException("Invalid model id: " + modelId, locationData);
             isNewModel = newModel != currentBindingContext.getModel();// don't say it's a new model unless it has really changed
@@ -426,13 +426,13 @@ public class XFormsContextStack {
     /**
      * Get the current node-set binding for the given model id.
      */
-    public BindingContext getCurrentBindingContextForModel(String modelId) {
+    public BindingContext getCurrentBindingContextForModel(String effectiveModelId) {
 
         for (int i = contextStack.size() - 1; i >= 0; i--) {
             final BindingContext currentBindingContext = (BindingContext) contextStack.get(i);
 
             final String currentModelId = currentBindingContext.getModel().getEffectiveId();
-            if ((currentModelId == null && modelId == null) || (modelId != null && modelId.equals(currentModelId)))
+            if ((currentModelId == null && effectiveModelId == null) || (effectiveModelId != null && effectiveModelId.equals(currentModelId)))
                 return currentBindingContext;
         }
 
@@ -440,18 +440,18 @@ public class XFormsContextStack {
     }
 
     /**
-     * Get the current node-set binding for the given model id.
+     * Get the current node-set binding for the given effective model id.
      */
-    public List getCurrentNodeset(String modelId) {
+    public List getCurrentNodeset(String effectiveModelId) {
 
-        final BindingContext bindingContext = getCurrentBindingContextForModel(modelId);
+        final BindingContext bindingContext = getCurrentBindingContextForModel(effectiveModelId);
 
         // If a context exists, return its node-set
         if (bindingContext != null)
             return bindingContext.getNodeset();
 
         // If there is no default instance, return an empty node-set
-        final XFormsInstance defaultInstance = containingDocument.getModel(modelId).getDefaultInstance();
+        final XFormsInstance defaultInstance = containingDocument.getModelByEffectiveId(effectiveModelId).getDefaultInstance();
         if (defaultInstance == null)
             return Collections.EMPTY_LIST;
 
@@ -465,24 +465,24 @@ public class XFormsContextStack {
     }
 
     /**
-     * Get the current single node binding for the given model id.
+     * Get the current single node binding for the given effective model id.
      */
-    public NodeInfo getCurrentSingleNode(String modelId) {
-
-        final BindingContext bindingContext = getCurrentBindingContextForModel(modelId);
-
-        // If a context exists, use it
-        if (bindingContext != null)
-            return bindingContext.getSingleNode();
-
-        // If there is no default instance, return null
-        final XFormsInstance defaultInstance = containingDocument.getModel(modelId).getDefaultInstance();
-        if (defaultInstance == null)
-            return null;
-
-        // Otherwise return the document element of the model's default instance
-        return defaultInstance.getInstanceRootElementInfo();
-    }
+//    public NodeInfo getCurrentSingleNode(String effectiveModelId) {
+//
+//        final BindingContext bindingContext = getCurrentBindingContextForModel(effectiveModelId);
+//
+//        // If a context exists, use it
+//        if (bindingContext != null)
+//            return bindingContext.getSingleNode();
+//
+//        // If there is no default instance, return null
+//        final XFormsInstance defaultInstance = containingDocument.getModelByEffectiveId(effectiveModelId).getDefaultInstance();
+//        if (defaultInstance == null)
+//            return null;
+//
+//        // Otherwise return the document element of the model's default instance
+//        return defaultInstance.getInstanceRootElementInfo();
+//    }
 
     /**
      * Get the current single node binding, if any.

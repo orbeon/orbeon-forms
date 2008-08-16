@@ -42,7 +42,7 @@ public class XFormsSubmitControl extends XFormsTriggerControl {
                 throw new ValidationException("xforms:submit requires a submission attribute.", getLocationData());
 
             // Find submission object and dispatch submit event to it
-            final Object object = containingDocument.getObjectById(submissionId);
+            final Object object = containingDocument.getObjectByEffectiveId(submissionId);// xxx fix not effective
             if (object instanceof XFormsModelSubmission) {
                 final XFormsModelSubmission submission = (XFormsModelSubmission) object;
                 containingDocument.dispatchEvent(pipelineContext, new XFormsSubmitEvent(submission));

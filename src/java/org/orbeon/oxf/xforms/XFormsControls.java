@@ -212,16 +212,6 @@ public class XFormsControls {
         return contextStack;
     }
 
-    /**
-     * For the given control id and the current binding, try to find an effective control id.
-     *
-     * @param caseId    a control id
-     * @return          an effective control id if possible
-     */
-    public String findEffectiveControlId(String caseId) {
-        return getCurrentControlsState().findEffectiveControlId(caseId);
-    }
-
     private ControlsState buildControlsState(final PipelineContext pipelineContext, final boolean evaluateItemsets) {
 
         final long startTime;
@@ -236,21 +226,21 @@ public class XFormsControls {
 
         final ControlsState result = new ControlsState();
 
-        final XFormsControl rootXFormsControl = new RootControl(containingDocument);// this is temporary and won't be stored
-        final Map idsToXFormsControls = new HashMap();
+        final XFormsControl rootControl = new RootControl(containingDocument);// this is temporary and won't be stored
+        final Map effectiveIdsToControls = new HashMap();
 
         final Map switchIdToSelectedCaseIdMap = new HashMap();
         final Map dialogIdToVisibleMap = new HashMap();
 
         visitAllControlsHandleRepeat(pipelineContext, new XFormsControls.ControlElementVisitorListener() {
 
-            private XFormsControl currentControlsContainer = rootXFormsControl;
+            private XFormsControl currentControlsContainer = rootControl;
 
             public void startVisitControl(Element controlElement, String effectiveControlId) {
 
                 // Create XFormsControl with basic information
                 final XFormsControl xformsControl = XFormsControlFactory.createXFormsControl(containingDocument, currentControlsContainer, controlElement, effectiveControlId);
-                idsToXFormsControls.put(effectiveControlId, xformsControl);
+                effectiveIdsToControls.put(effectiveControlId, xformsControl);
 
                 final String controlName = xformsControl.getName();
                 // Control type-specific handling
@@ -338,7 +328,7 @@ public class XFormsControls {
             public void startRepeatIteration(int iteration, String effectiveIterationId) {
 
                 final XFormsControl repeatIterationControl = new RepeatIterationControl(containingDocument, currentControlsContainer, iteration, effectiveIterationId);
-                idsToXFormsControls.put(effectiveIterationId, repeatIterationControl);
+                effectiveIdsToControls.put(effectiveIterationId, repeatIterationControl);
 
                 currentControlsContainer.addChild(repeatIterationControl);
                 currentControlsContainer = repeatIterationControl;
@@ -354,7 +344,7 @@ public class XFormsControls {
         });
 
         // Make it so that all the root XFormsControl don't have a parent
-        final List rootChildren = rootXFormsControl.getChildren();
+        final List rootChildren = rootControl.getChildren();
         if (rootChildren != null) {
             for (Iterator i = rootChildren.iterator(); i.hasNext();) {
                 final XFormsControl currentXFormsControl = (XFormsControl) i.next();
@@ -363,7 +353,7 @@ public class XFormsControls {
         }
 
         result.setChildren(rootChildren);
-        result.setIdsToXFormsControls(idsToXFormsControls);
+        result.setEffectiveIdsToControls(effectiveIdsToControls);
         result.setSwitchIdToSelectedCaseIdMap(switchIdToSelectedCaseIdMap);
         result.setDialogIdToVisibleMap(dialogIdToVisibleMap);
 
@@ -392,9 +382,9 @@ public class XFormsControls {
             startTime = 0;
         }
 
-        final Map idsToXFormsControls = getCurrentControlsState().getIdsToXFormsControls();
+        final Map effectiveIdsToControls = getCurrentControlsState().getEffectiveIdsToControls();
         // Evaluate all controls
-        for (Iterator i = idsToXFormsControls.entrySet().iterator(); i.hasNext();) {
+        for (Iterator i = effectiveIdsToControls.entrySet().iterator(); i.hasNext();) {
             final Map.Entry currentEntry = (Map.Entry) i.next();
             final XFormsControl currentControl = (XFormsControl) currentEntry.getValue();
             currentControl.evaluateIfNeeded(pipelineContext);
@@ -464,7 +454,7 @@ public class XFormsControls {
     public void showHideDialog(String dialogId, boolean show, String neighbor, boolean constrainToViewport) {
 
         // Make sure the id refers to an existing xxforms:dialog
-        final Object object = getObjectById(dialogId);
+        final Object object = getObjectByEffectiveId(dialogId);
         if (object == null || !(object instanceof XXFormsDialogControl))
             return;
 
@@ -589,12 +579,28 @@ public class XFormsControls {
     }
 
     /**
-     * Get the object with the id specified, null if not found.
+     * Get object with the effective id specified.
+     *
+     * @param effectiveId   effective id of the target
+     * @return              object, or null if not found
      */
-    public Object getObjectById(String controlId) {
+    public Object getObjectByEffectiveId(String effectiveId) {
         // Until xforms-ready is dispatched, ids map may be null
-        final Map idsToXFormsControls = currentControlsState.getIdsToXFormsControls();
-        return (idsToXFormsControls != null) ? idsToXFormsControls.get(controlId) : null;
+        final Map effectiveIdsToControls = currentControlsState.getEffectiveIdsToControls();
+        return (effectiveIdsToControls != null) ? effectiveIdsToControls.get(effectiveId) : null;
+    }
+
+    /**
+     * Resolve an object. This optionally depends on a source, and involves resolving whether the source is within a
+     * repeat or a component.
+     *
+     * @param effectiveSourceId  effective id of the source, or null
+     * @param targetId           id of the target
+     * @return                   object, or null if not found
+     */
+    public Object resolveObjectById(String effectiveSourceId, String targetId) {
+        final String effectiveControlId = getCurrentControlsState().findEffectiveControlId(effectiveSourceId, targetId);
+        return (effectiveControlId != null) ? getObjectByEffectiveId(effectiveControlId) : null;
     }
 
     /**
@@ -701,9 +707,9 @@ public class XFormsControls {
                 controlElementVisitorListener.startVisitControl(currentControlElement, effectiveControlId);
                 {
                     // Recurse into component
-                    final Element shadowTreeDocument = staticState.getCompactShadowTree(controlId);
+                    final Element shadowTreeDocumentElement = staticState.getCompactShadowTree(controlId);
                     handleControls(pipelineContext, controlElementVisitorListener, isOptimizeRelevance,
-                            staticState, shadowTreeDocument, idPrefix + controlId + XFormsConstants.COMPONENT_SEPARATOR, idPostfix);
+                            staticState, shadowTreeDocumentElement, idPrefix + controlId + XFormsConstants.COMPONENT_SEPARATOR, idPostfix);
                 }
                 controlElementVisitorListener.endVisitControl(currentControlElement, effectiveControlId);
 
@@ -785,7 +791,7 @@ public class XFormsControls {
         public void updateSwitchInfo(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, ControlsState controlsState, String selectedCaseId) {
 
             // Find SwitchXFormsControl
-            final XFormsControl caseXFormsControl = (XFormsControl) controlsState.getIdsToXFormsControls().get(selectedCaseId);
+            final XFormsControl caseXFormsControl = (XFormsControl) controlsState.getEffectiveIdsToControls().get(selectedCaseId);
             if (caseXFormsControl == null) {
                 // NOTE: we used to throw here, but really we mustn't
                 if (XFormsServer.logger.isDebugEnabled()) {
@@ -813,10 +819,10 @@ public class XFormsControls {
                 getSwitchIdToSelectedCaseIdMap().put(switchXFormsControl.getEffectiveId(), selectedCaseId);
 
                 // "1. Dispatching an xforms-deselect event to the currently selected case."
-                containingDocument.dispatchEvent(pipelineContext, new XFormsDeselectEvent((XFormsEventTarget) controlsState.getIdsToXFormsControls().get(currentSelectedCaseId)));
+                containingDocument.dispatchEvent(pipelineContext, new XFormsDeselectEvent((XFormsEventTarget) controlsState.getEffectiveIdsToControls().get(currentSelectedCaseId)));
 
                 // "2. Dispatching an xform-select event to the case to be selected."
-                containingDocument.dispatchEvent(pipelineContext, new XFormsSelectEvent((XFormsEventTarget) controlsState.getIdsToXFormsControls().get(selectedCaseId)));
+                containingDocument.dispatchEvent(pipelineContext, new XFormsSelectEvent((XFormsEventTarget) controlsState.getEffectiveIdsToControls().get(selectedCaseId)));
             }
         }
 
@@ -879,7 +885,7 @@ public class XFormsControls {
      */
     public static class ControlsState {
         private List children;
-        private Map idsToXFormsControls;
+        private Map effectiveIdsToControls;
         private Map defaultRepeatIdToIndex;
         private Map repeatIdToIndex;
         private Map effectiveRepeatIdToIterations;
@@ -916,8 +922,8 @@ public class XFormsControls {
             this.children = children;
         }
 
-        public void setIdsToXFormsControls(Map idsToXFormsControls) {
-            this.idsToXFormsControls = idsToXFormsControls;
+        public void setEffectiveIdsToControls(Map idsToXFormsControls) {
+            this.effectiveIdsToControls = idsToXFormsControls;
         }
 
         public Map getDefaultRepeatIdToIndex() {
@@ -950,8 +956,8 @@ public class XFormsControls {
             return children;
         }
 
-        public Map getIdsToXFormsControls() {
-            return idsToXFormsControls;
+        public Map getEffectiveIdsToControls() {
+            return effectiveIdsToControls;
         }
 
         public Map getRepeatIdToIndex() {
@@ -1100,20 +1106,21 @@ public class XFormsControls {
          * Find an effective control id based on a control id, following the branches of the
          * current indexes of the repeat elements.
          */
-        public String findEffectiveControlId(String controlId) {
+        public String findEffectiveControlId(String sourceId, String targetId) {
             // Don't iterate if we don't have controls
             if (this.children == null)
                 return null;
 
-            return findEffectiveControlId(controlId, this.children);
+            return findEffectiveControlId(sourceId, targetId, this.children);
         }
 
-        private String findEffectiveControlId(String controlId, List children) {
+        private String findEffectiveControlId(String sourceId, String targetId, List children) {
+            // TODO: use sourceId properly as defined in XForms 1.1 under 4.7.1 References to Elements within a repeat Element
             for (Iterator i = children.iterator(); i.hasNext();) {
                 final XFormsControl currentXFormsControl = (XFormsControl) i.next();
                 final String originalControlId = currentXFormsControl.getId();
 
-                if (controlId.equals(originalControlId)) {
+                if (targetId.equals(originalControlId)) {
                     return currentXFormsControl.getEffectiveId();
                 } else if (currentXFormsControl instanceof XFormsRepeatControl) {
                     final XFormsRepeatControl currentRepeatXFormsControl = (XFormsRepeatControl) currentXFormsControl;
@@ -1123,7 +1130,7 @@ public class XFormsControls {
                     if (index > 0) {
                         final List newChildren = currentXFormsControl.getChildren();
                         if (newChildren != null && newChildren.size() > 0) {
-                            final String result = findEffectiveControlId(controlId, Collections.singletonList(newChildren.get(index - 1)));
+                            final String result = findEffectiveControlId(sourceId, targetId, Collections.singletonList(newChildren.get(index - 1)));
                             if (result != null)
                                 return result;
                         }
@@ -1132,7 +1139,7 @@ public class XFormsControls {
                 } else {
                     final List newChildren = currentXFormsControl.getChildren();
                     if (newChildren != null) {
-                        final String result = findEffectiveControlId(controlId, newChildren);
+                        final String result = findEffectiveControlId(sourceId, targetId, newChildren);
                         if (result != null)
                             return result;
                     }

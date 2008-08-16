@@ -47,7 +47,7 @@ public class XFormsSwitchUtils {
 
     //                System.out.println("xxx 1: has separator");
 
-                    final XFormsControl switchXFormsControl = (XFormsControl) xformsControls.getObjectById(switchId);
+                    final XFormsControl switchXFormsControl = (XFormsControl) xformsControls.getObjectByEffectiveId(switchId);
                     XFormsControl parent = switchXFormsControl;
                     while ((parent = parent.getParent()) != null) {
                         if (parent instanceof RepeatIterationControl) {
@@ -142,7 +142,7 @@ public class XFormsSwitchUtils {
 
     //                System.out.println("xxx 2: has separator");
 
-                    final XFormsControl switchXFormsControl = (XFormsControl) xformsControls.getObjectById(switchId);
+                    final XFormsControl switchXFormsControl = (XFormsControl) xformsControls.getObjectByEffectiveId(switchId);
                     XFormsControl parent = switchXFormsControl;
                     while ((parent = parent.getParent()) != null) {
                         if (parent instanceof RepeatIterationControl) {

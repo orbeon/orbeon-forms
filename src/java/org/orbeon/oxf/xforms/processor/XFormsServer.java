@@ -972,7 +972,7 @@ public class XFormsServer extends ProcessorImpl {
                             );
                         } else {
                             // This is a new switch (can happen with repeat), send all deselected to be sure
-                            final XFormsControl switchXFormsControl = (XFormsControl) xformsControls.getObjectById(switchId);
+                            final XFormsControl switchXFormsControl = (XFormsControl) xformsControls.getObjectByEffectiveId(switchId);
                             final List children = switchXFormsControl.getChildren();
                             if (children != null && children.size() > 0) {
                                 for (Iterator j = children.iterator(); j.hasNext();) {
@@ -1021,7 +1021,7 @@ public class XFormsServer extends ProcessorImpl {
                         }
 
                         // Find neighbor if any, first on xxforms:show, then on xxforms:dialog
-                        final XXFormsDialogControl dialogControl = newDialogInfo.isShow() ? (XXFormsDialogControl) xformsControls.getObjectById(dialogId) : null;
+                        final XXFormsDialogControl dialogControl = newDialogInfo.isShow() ? (XXFormsDialogControl) xformsControls.getObjectByEffectiveId(dialogId) : null;
                         final String neighbor = !newDialogInfo.isShow()
                                 ? null : (newDialogInfo.getNeighbor() != null)
                                 ? newDialogInfo.getNeighbor() : (dialogControl != null) ? dialogControl.getNeighborControlId() : null;

@@ -78,18 +78,13 @@ public class XFormsDispatchAction extends XFormsAction {
         // Find actual target
         final Object xformsEventTarget;
         {
-            final Object tempXFormsEventTarget = (XFormsEventTarget) containingDocument.getObjectById(resolvedNewEventTargetId);
+            final Object tempXFormsEventTarget = (XFormsEventTarget) containingDocument.getObjectByEffectiveId(resolvedNewEventTargetId);
             if (tempXFormsEventTarget != null) {
                 // Object with this id exists
                 xformsEventTarget = tempXFormsEventTarget;
             } else {
                 // Otherwise, try effective id
-                final String newEventTargetEffectiveId = findEffectiveControlId(actionInterpreter, pipelineContext, resolvedNewEventTargetId, actionElement);
-                if (newEventTargetEffectiveId != null) {
-                    xformsEventTarget = (XFormsEventTarget) containingDocument.getObjectById(newEventTargetEffectiveId);
-                } else {
-                    xformsEventTarget = null;
-                }
+                xformsEventTarget = resolveEffectiveControl(actionInterpreter, pipelineContext, eventHandlerContainer.getEffectiveId(), resolvedNewEventTargetId, actionElement);
             }
         }
 

@@ -19,6 +19,7 @@ import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsControls;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.control.controls.XXFormsDialogControl;
+import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
@@ -44,7 +45,8 @@ public class XXFormsShowAction extends XFormsAction {
         final String effectiveNeighborId;
         {
             final String neighborId = resolveAVT(actionInterpreter, pipelineContext, actionElement, "neighbor", true);
-            effectiveNeighborId = (neighborId != null) ? findEffectiveControlId(actionInterpreter, pipelineContext, neighborId, actionElement) : null;
+            final XFormsControl effectiveNeighbor = (XFormsControl) ((neighborId != null) ? resolveEffectiveControl(actionInterpreter, pipelineContext, eventHandlerContainer.getEffectiveId(), neighborId, actionElement) : null);
+            effectiveNeighborId = (effectiveNeighbor != null) ? effectiveNeighbor.getEffectiveId() : null;
         }
         final boolean constrainToViewport;
         {
@@ -54,7 +56,7 @@ public class XXFormsShowAction extends XFormsAction {
 
         if (dialogId != null) {
             // Dispatch xxforms-dialog-open event to dialog
-            final Object controlObject = (dialogId != null) ? xformsControls.getObjectById(dialogId) : null;
+            final Object controlObject = (dialogId != null) ? xformsControls.getObjectByEffectiveId(dialogId) : null;// xxx fix not effective
             if (controlObject instanceof XXFormsDialogControl) {
 
                 final XFormsEvent newEvent = new XXFormsDialogOpenEvent((XFormsEventTarget) controlObject, effectiveNeighborId, constrainToViewport);

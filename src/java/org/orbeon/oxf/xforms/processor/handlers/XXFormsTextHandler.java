@@ -27,7 +27,7 @@ public class XXFormsTextHandler extends HandlerBase {
     public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
 
         final String effectiveId = handlerContext.getEffectiveId(attributes);
-        final XXFormsTextControl textControl = (XXFormsTextControl) containingDocument.getObjectById(effectiveId);
+        final XXFormsTextControl textControl = (XXFormsTextControl) containingDocument.getObjectByEffectiveId(effectiveId);
 
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
         final boolean isConcreteControl = textControl != null;

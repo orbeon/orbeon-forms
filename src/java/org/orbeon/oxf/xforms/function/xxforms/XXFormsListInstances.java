@@ -40,7 +40,7 @@ public class XXFormsListInstances extends XFormsFunction {
         final Expression modelIdExpression = argument[0];
         final String modelId = XFormsUtils.namespaceId(containingDocument, modelIdExpression.evaluateAsString(xpathContext));
 
-        final XFormsModel model = containingDocument.getModel(modelId);
+        final XFormsModel model = containingDocument.getModelByEffectiveId(modelId);// xxx fix not effective
 
         if (model != null) {
             final List instances = model.getInstances();
